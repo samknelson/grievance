@@ -1,0 +1,220 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.menu.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.forward.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.letter.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.log.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.permission.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.admin.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.gform.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.arbitrationform.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.report_bytype.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.block.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.notify.inc";
+
+function grievance_node_update($node) {
+  if ($node->type == 'grievance') {
+    grievance_log_update($node, 'update');
+    grievance_notify($node);
+  }
+}
+
+function grievance_node_insert($node) {
+  if ($node->type == 'grievance') {
+    grievance_log_update($node, 'insert');
+    grievance_notify($node);
+  }
+}
+
+
+function grievance_mail($key, &$message, $params) {
+  dpm($key);
+  dpm($message);
+  dpm($params);
+	global $user;
+  switch($key) {
+    case 'grievance':
+    case 'notify':
+      $message['subject'] = $params['subject'];
+      $message['body'][] = $params['body'];
+      if (isset($params['attachments'])) {
+				$message['params']['attachments'] = $params['attachments'];
+			}
+			$message['headers']['Reply-To'] = $user->mail;
+      break;
+  }
+}
+
+function grievance_form_alter(&$form, &$form_state, $form_id) {
+  // Set default values for entity fields with autocomplete widgets
+  $defaultable_fields = array('grievance');
+  foreach ($defaultable_fields as $field) {
+    if (isset($_GET[$field]) && isset($form['field_' . $field])) {
+      $nid = $_GET[$field];
+      $entity_node = node_load($nid);
+      if ($entity_node) {
+        $form['field_' . $field]["und"][0]['target_id']['#default_value'] = "$entity_node->title ($nid)";
+      }
+    }
+  }
+
+  $defaultable_fields = array();
+  foreach ($defaultable_fields as $field) {
+    if (isset($_GET[$field]) && isset($form['field_' . $field])) {
+      $form['field_' . $field]["und"]['#default_value'][0] = $_GET[$field];
+    }
+  }
+
+  if ($form_id == 'grievance_node_form') { 
+    if (!user_access('grievance admin')) {
+      $fields = array(
+        'field_grievance_arbitration_a',
+        'field_grievance_arbitration_b',
+        'field_grievance_arbitration_c',
+        'field_grievance_arbitration_d',
+      );
+      foreach ($fields as $field) {
+        $form[$field]['#access'] = FALSE;
+      }
+    }
+  }
+}
+
+function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
+  // 
+  // Set default values for manager, organizer, etc.
+  //
+
+  // Find the current user
+  global $user;
+  if (!$user) { return; }
+  $user_full = user_load($user->uid);
+  if (!$user_full) { return; }
+
+  // Filed by
+  $form['field_grievance_rep_filed']['und'][0]['target_id']['#default_value'] = "$user_full->name ($user_full->uid)";
+
+  // Leads
+  $leads = array();
+  if (isset($user_full->field_grievance_rep_lead['und'])) {
+    foreach ($user_full->field_grievance_rep_lead['und'] as $tmp) {
+      $lead_uid = $tmp['target_id'];
+      $leads[] = user_load($lead_uid);
+    }
+  }
+
+  // Organizers (and leads from organizers)
+  $organizers = array();
+  if (isset($user_full->field_grievance_rep_organizer['und'])) {
+    foreach ($user_full->field_grievance_rep_organizer['und'] as $tmp) {
+      $organizer_uid = $tmp['target_id'];
+      $organizer = user_load($organizer_uid);
+      $organizers[] = $organizer;
+      if (isset($organizer->field_grievance_rep_lead['und'])) {
+        foreach ($organizer->field_grievance_rep_lead['und'] as $tmp) {
+          $lead_uid = $tmp['target_id'];
+          $leads[] = user_load($lead_uid);
+        }
+      }
+    }
+  }
+
+  $delta = 0;
+  foreach ($organizers as $organizer) {
+    $form['field_grievance_rep_organizer']['und'][$delta]['target_id']['#default_value'] = "$organizer->name ($organizer->uid)";
+    ++$delta;
+  }
+
+  $delta = 0;
+  foreach ($leads as $lead) {
+    $form['field_grievance_rep_lead']['und'][$delta]['target_id']['#default_value'] = "$lead->name ($lead->uid)";
+    ++$delta;
+  }
+
+  // Manager
+  $manager = variable_get('grievance_rep_manager', '');
+  if ($manager) {
+    $form['field_grievance_rep_manager']['und'][0]['target_id']['#default_value'] = "$manager[entity_label] ($manager[entity_id])";
+  }
+
+  // Obeserver
+  $watching = variable_get('grievance_rep_watching', '');
+  if ($watching) {
+    $form['field_grievance_rep_watching']['und'][0]['target_id']['#default_value'] = "$watching[entity_label] ($watching[entity_id])";
+  }
+
+  // Base node
+  $grievance_node = $form_state['node'];
+
+  // Shop
+  $shop_nid = NULL;
+  if (isset($user_full->field_grievance_shops['und'][0]['target_id'])) {
+    $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
+    $shop_node = node_load($shop_nid);
+    $form['field_grievance_shop']['und'][0]['target_id']['#default_value'] = "$shop_node->title ($shop_node->nid)";
+  }
+
+  // Link to contract
+  if ($grievance_node->field_grievance_shop['und'][0]['target_id']) {
+    $shop_nid = $grievance_node->field_grievance_shop['und'][0]['target_id'];
+  }
+  if ($shop_nid) {
+    $shop_node = node_load($shop_nid);
+    $contract_uri = $shop_node->field_grievance_contract['und'][0]['uri'];
+    if ($contract_uri) {
+      $contract_url = file_create_url($contract_uri);
+      $form['#groups']['group_grievance_form']->format_settings['instance_settings']['description'] = 
+        '<strong>' .
+        t('(The contract for ') .
+        $shop_node->title . 
+        t(' can be downloaded ') .
+        l(t('here'), $contract_url, array('attributes' => array('target'=>'_blank'))) .
+        '.)' .
+        '</strong>';
+    }
+
+    $fields = array(
+      'field_grievance_co_name',
+      'field_grievance_co_phone',
+      'field_grievance_co_address',
+      'field_grievance_co_address_2',
+      'field_grievance_co_city',
+      'field_grievance_co_state',
+      'field_grievance_co_zip'
+    );
+
+    foreach ($fields as $field) {
+      if (!isset($form[$field]['und'][0]['value']['#default_value'])) {
+        $form[$field]['und'][0]['value']['#default_value'] = $shop_node->{$field}['und'][0]['value'];
+      }
+    }
+    if (!isset($form['field_grievance_co_email']['und'][0]['email']['#default_value'])) {
+      $form['field_grievance_co_email']['und'][0]['email']['#default_value'] = $shop_node->field_grievance_co_email['und'][0]['email'];
+    }
+  }
+}
+
+function grievance_classes_array($new_classes = null) {
+  static $classes = array();
+  if ($new_classes) {
+    if (is_array($new_classes)) {
+      foreach ($new_classses as $new_class) {
+        $classes[] = $new_class;
+      }
+    } else {
+      $classes[] = $new_classes;
+    }
+  }
+
+  return $classes;
+}
+
+function grievance_preprocess_html(&$variables) {
+  $classes= grievance_classes_array();
+  foreach ($classes as $class) {
+    $variables['classes_array'][] = $class;
+  }
+}

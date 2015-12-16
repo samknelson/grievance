@@ -1,0 +1,339 @@
+<?php
+
+/**
+ * @file
+ * Custom Help Text module testing class.
+ */
+
+class CustomHelpTextTest extends DrupalWebTestCase {
+
+  public $full_user;
+    
+  /**
+   * Set up.
+   */
+  public function setUp() {
+    parent::setUp('block', 'help', 'custom_help_text');
+
+
+    $permissions = array(
+        'administer custom_help_text',
+        'view custom_help_text',
+        'administer blocks',
+        'administer nodes',
+        'administer site configuration',
+        'bypass node access',
+        'administer users',
+        'create page content'
+    );
+ 
+    $this->full_user = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($this->full_user);
+  }
+
+  /**
+   * Create an array of options for the simpletest module.
+   *
+   * @return array
+   *   The array of options
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Custom Help Text Tests'),
+      'description' => t('Tests for the custom help text module.'),
+      'group' => t('Custom Help Text'),
+    );
+  }
+
+  /**
+   * Test normal path help text.
+   */
+  public function testNormalPath() {
+    $random_string = trim(DrupalTestCase::randomName());
+
+    $help_item = array(
+      'path' => 'admin/structure/custom_help_text',
+      'help' => $random_string,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on help page');
+
+    $this->drupalGet('<front>');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the front page.');
+  }
+
+  /**
+   * Test two help messages on same path.
+   */
+  public function testTwoHelpMessages() {
+    $random_string1 = trim(DrupalTestCase::randomName());
+
+    $help_item1 = array(
+      'path' => 'admin/structure/custom_help_text',
+      'help' => $random_string1,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item1, 'Create new help message');
+
+    $random_string2 = trim(DrupalTestCase::randomName());
+
+    $help_item2 = array(
+      'path' => 'admin/structure/custom_help_text',
+      'help' => $random_string2,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item2, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string1 . '/', '(' . $help_item1['path'] . ') Help text 1 is present on help page');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string2 . '/', '(' . $help_item2['path'] . ') Help text 2 is present on help page');
+
+    $this->drupalGet('<front>');
+
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string1 . '/', '(' . $help_item1['path'] . ') Help text is not present on the front page.');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string2 . '/', '(' . $help_item2['path'] . ') Help text is not present on the front page.');
+  }
+
+  /**
+   * Test that help messages appear on all pages underneath 'admin/structure/*'.
+   */
+  public function testAdminBuildStar() {
+    $random_string = trim(DrupalTestCase::randomName());
+
+    $help_item = array(
+      'path' => 'admin/structure/*',
+      'help' => $random_string,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on help page');
+
+    $this->drupalGet('admin/structure/block');
+    $this->assertText($random_string, 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on block admin page');
+
+    $this->drupalGet('<front>');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the front page.');
+  }
+
+  /**
+   * Test that help messages appear on all pages underneath 'admin/*'.
+   */
+  public function testAdminStar() {
+    $random_string = trim(DrupalTestCase::randomName());
+
+    $help_item = array(
+      'path' => 'admin/*',
+      'help' => $random_string,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on help page');
+
+    $this->drupalGet('admin/structure/block');
+    $this->assertText($random_string, 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on block admin page');
+
+    $this->drupalGet('admin/people');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on main build page');
+
+    $this->drupalGet('<front>');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the front page.');
+  }
+
+  /**
+   * Test that help messages appear on a page called custom_help_text and two
+   * directory levels deep.
+   */
+  public function testStarStarAdmin() {
+    $random_string = trim(DrupalTestCase::randomName());
+
+    $help_item = array(
+      'path' => '*/*/custom_help_text',
+      'help' => $random_string,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on help page');
+
+    $this->drupalGet('admin/structure/block');
+    $this->assertNoText($random_string, 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on block admin page');
+
+    $this->drupalGet('<front>');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the front page.');
+  }
+
+  /**
+   * Test that help text appears on all pages.
+   */
+  public function testHelpOnAllPages() {
+    $random_string = trim(DrupalTestCase::randomName());
+
+    $help_item = array(
+      'path' => '*',
+      'help' => $random_string,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on help page');
+
+    $this->drupalGet('admin/structure/block');
+    $this->assertText($random_string, 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on block admin page');
+
+    $this->drupalGet('admin/people');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on main build page');
+
+    $this->drupalGet('<front>');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on the front page.');
+  }
+
+  /**
+   * Check that help text doesn't appear on a page that doesn't 
+   * show on a 404 page.
+   */
+  public function testHelpOn404Page() {
+    $random_string = trim(DrupalTestCase::randomName());
+
+    $help_item = array(
+      'path' => 'a/path/that/doesnt/exist',
+      'help' => $random_string,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on help page');
+
+    $this->drupalGet($help_item['path']);
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the 404 page');
+
+    $this->drupalGet('<front>');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the front page.');
+  }
+
+  /**
+   * Test that help text appears on new node page.
+   */
+  public function testHelpOnNewPage() {
+    // Create new node.
+    $node = array(
+      'title' => 'a random title',
+      'body[und][0][value]' => 'some body text',
+      'status' => 1,
+    );
+    $this->drupalPost('node/add/page', $node, 'Save');
+
+    $random_string = trim(DrupalTestCase::randomName());
+
+    // Create help item.
+    $help_item = array(
+      'path' => 'node/1',
+      'help' => $random_string,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on help page');
+
+    $this->drupalGet('node/1');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on the new node page');
+
+    $this->drupalGet('<front>');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the front page.');
+  }
+
+  /**
+   * Test that help text is available to default user role.
+   */
+  public function testNormalPathWithDefaultAccessibleRole() {
+    $random_string = trim(DrupalTestCase::randomName());
+
+    $help_item = array(
+      'path' => 'admin/structure/custom_help_text',
+      'help' => $random_string,
+      'roles[' . max(array_keys($this->full_user->roles)) . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on help page');
+
+    $this->drupalGet('<front>');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the front page.');
+  }
+
+  /**
+   * Check that help text is viewable for correct user role.
+   */
+  public function testNormalPathWithCustomAccessibleRole() {
+    $permissions = array('administer custom_help_text', 'view custom_help_text');
+
+    $this->drupalLogout();
+
+    $user = $this->drupalCreateUser($permissions);
+
+    $this->drupalLogin($user);
+
+    $random_string = trim(DrupalTestCase::randomName());
+
+    $rid = max(array_keys($user->roles));
+
+    $this->assertPattern('//', '<pre>' . print_r($user->roles, TRUE) . '</pre>');
+
+    $help_item = array(
+      'path' => 'admin/structure/custom_help_text',
+      'help' => $random_string,
+      'roles[' . $rid . ']' => TRUE,
+    );
+    
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is present on help page');
+
+    $this->drupalGet('<front>');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the front page.');
+  }
+
+  /**
+   * Test that help text isn't available for user with no access.
+   */
+  public function testNormalPathWithNonAccessibleRole() {
+    $random_string = trim(DrupalTestCase::randomName());
+    $permissions = array(
+        'administer custom_help_text',
+        'view custom_help_text',
+        'administer blocks',
+        'administer nodes',
+        'administer site configuration',
+        'bypass node access',
+        'administer users',
+        'create page content'
+    );
+    $rid = $this->drupalCreateRole($permissions, 'Random Role');
+
+    $help_item = array(
+      'path' => 'admin/structure/custom_help_text',
+      'help' => $random_string,
+      'roles[' . $rid . ']' => TRUE,
+    );
+    $this->drupalPost('admin/structure/custom_help_text/add', $help_item, 'Create new help message');
+
+    $this->drupalGet('admin/structure/custom_help_text');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on help page');
+
+    $this->drupalGet('<front>');
+    $this->assertNoPattern('/(?<!\<td\>)' . $random_string . '/', 'Help text "' . $random_string . '" for path "' . $help_item['path'] . '" is not present on the front page.');
+  }
+
+}

@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * Custom Help Text install file.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function custom_help_text_schema() {
+  $schema['custom_help_text'] = array(
+    'description' => 'Stores help text with paths',
+    'fields' => array(
+      'hid' => array(
+        'description' => 'The ID of the help record',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'path' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The Drupal path',
+      ),
+      'help' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'big',
+        'description' => 'Help text',
+      ),
+      'weight' => array(
+        'description' => 'The weight',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('hid'),
+    'indexes' => array(
+      'path' => array('path'),
+    ),
+  );
+
+  $schema['custom_help_text_roles'] = array(
+    'description' => 'Stores help records with user roles',
+    'fields' => array(
+      'hid' => array(
+        'description' => 'The ID of the help record',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'rid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'The Drupal user role id',
+      ),
+    ),
+    'primary key' => array('hid', 'rid'),
+    'indexes' => array(
+      'hid' => array('hid'),
+      'rid' => array('rid'),
+    ),
+  );
+
+  return $schema;
+}

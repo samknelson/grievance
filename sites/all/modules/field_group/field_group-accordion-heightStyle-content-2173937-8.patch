@@ -1,0 +1,13 @@
+diff --git a/field_group.js b/field_group.js
+index eef6aaa..1109cb7 100644
+--- a/field_group.js
++++ b/field_group.js
+@@ -42,7 +42,7 @@ Drupal.FieldGroup.Effects.processAccordion = {
+       var wrapper = $(this);
+ 
+       wrapper.accordion({
+-        autoHeight: false,
++        heightStyle: "content",
+         active: '.field-group-accordion-active',
+         collapsible: true,
+         changestart: function(event, ui) {

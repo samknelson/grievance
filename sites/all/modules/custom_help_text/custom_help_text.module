@@ -1,0 +1,606 @@
+<?php
+
+// SKN I hacked this module so don't update
+function custom_help_text_update_projects_alter(&$projects){
+	unset($projects['custom_help_text']);
+}
+
+/**
+ * @file
+ * Custom Help Text module file.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function custom_help_text_help($path, $arg) {
+  if ($path == 'admin/help#custom_help_text') {
+    /* Function is called twice
+     * return false here on second call to prevent multi printing.
+     */
+    return FALSE;
+  }
+
+  if (!user_access('view custom_help_text')) {
+    // User does not have access to view this so just return false.
+    return FALSE;
+  }
+
+  // Get the current user ojbject.
+  global $user;
+
+  // Remove empty items from the arg array.
+  $arg = array_filter($arg);
+  $fixed_path = implode('/', $arg);
+
+  // Get all relevant paths from the help table and attempt to match them.
+  $user_roles = array_keys($user->roles);
+  $path_results = db_query("SELECT hh.hid, hh.path FROM {custom_help_text} hh INNER JOIN {custom_help_text_roles} hhr ON hh.hid = hhr.hid WHERE hhr.rid IN (:user_roles)", array(':user_roles' => $user_roles));
+  
+  // Array to store the matched help ids.
+  $hids = array();
+  
+  while ($path_row = $path_results->fetchAssoc()) {
+    if ($path_row['path']) {
+      $regexp = '/^(' . preg_replace(array('/(\r\n?|\n)/', '/\\\\\*/', '/(^|\|)\\\\<front\\\\>($|\|)/'), array('|', '.*', '\1' . preg_quote(variable_get('site_frontpage', 'node'), '/') . '\2'), preg_quote($path_row['path'], '/')) . ')$/';
+    }
+    else {
+      $regexp = '/^(' . preg_replace(array('/(\r\n?|\n)/', '/\\\\\*/'), array('|', '.*'), preg_quote($path_row['path'], '/')) . ')$/';
+    }
+
+		// SKN Patched to match on alias as well.
+		$fixed_path_alias = drupal_get_path_alias($fixed_path);
+    if (preg_match($regexp, $fixed_path) ||
+				preg_match($regexp, $fixed_path_alias)) {
+      $hids[] = $path_row['hid'];
+    }
+  }
+
+  if (count($hids) == 0) {
+    return FALSE;
+  }
+
+  // Get the found help messages.
+  $help_results = db_query("SELECT help, hid FROM {custom_help_text} WHERE hid IN(:hids) ORDER BY weight ASC", array(':hids' => $hids));
+
+  // Include all of the messages into an array.
+  $found_help = array();
+
+  while ($help_data = $help_results->fetchAssoc()) {
+		// SKN Since I'm already screwing with this module, I'm hardcoding the text format as "full_html".  Really should be a configuration variable.
+		// Also adding a "edit this" link
+		$help_data['help'] .= '<div class="edit-link">';
+		if (user_access('administer custom_help_text')) {
+			$help_data['help'] .= l(
+				t('[Edit help text]'), 
+				'admin/structure/custom_help_text/edit/' . $help_data['hid'],
+				array('query' => 
+					array(
+						'destination' => current_path()
+					)
+				)
+			);
+			$help_data['help'] .= '</div>';
+		}
+    $found_help[] = check_markup($help_data['help'], 'full_html');
+  }
+
+  if (count($found_help) == 1) {
+    // 1 element found, just print it.
+    return $found_help[0];
+  }
+  elseif (count($found_help) > 1) {
+    // Multiple help texts found, print them as a list.
+    return theme('item_list', array('items' => $found_help));
+  }
+  else {
+    // Nothing found, return FALSE to stop anything appearing on screen.
+    return FALSE;
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function custom_help_text_permission() {
+  return array(
+    'administer custom_help_text' => array(
+      'title' => t('administer custom_help_text'),
+      'description' => t('TODO Add a description for \'administer custom_help_text\''),
+    ),
+    'view custom_help_text' => array(
+      'title' => t('view custom_help_text'),
+      'description' => t('TODO Add a description for \'view custom_help_text\''),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function custom_help_text_menu() {
+  $items['admin/structure/custom_help_text'] = array(
+    'title' => "Custom Help Text",
+    'description' => "Builds help messages for contextual paths",
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_help_text_settings'),
+    'access arguments' => array('administer custom_help_text'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/structure/custom_help_text/admin'] = array(
+    'title' => "List",
+    'description' => "Builds help messages for contextual paths",
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -40,
+  );
+
+  $items['admin/structure/custom_help_text/add'] = array(
+    'title' => 'Add',
+    'description' => "Add a new help item",
+    'page callback' => 'custom_help_text_admin_edit',
+    'access arguments' => array('administer custom_help_text'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['admin/structure/custom_help_text/edit'] = array(
+    'title' => 'Edit',
+    'description' => "Edit an existing help item",
+    'page callback' => 'custom_help_text_admin_edit',
+    'access arguments' => array('administer custom_help_text'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/structure/custom_help_text/delete'] = array(
+    'title' => 'Delete',
+    'description' => "Delete a help item",
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_help_text_admin_delete_confirm'),
+    'access arguments' => array('administer custom_help_text'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function custom_help_text_theme() {
+  return array(
+    'custom_help_text_settings' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+/**
+ * The custom help text main admin page form.
+ *
+ * @param array $form_state
+ *   The current form state.
+ *
+ * @return array
+ *   The form.
+ */
+function custom_help_text_settings($form, &$form_state) {
+  $form = array();
+  $form['#method'] = 'post';
+  $form['#submit'][] = 'custom_help_text_settings_submit';
+
+  $destination = drupal_get_destination();
+  
+  // Fetch the help data from the DB.
+	// SKN we're not interested in weight...
+  // $result = db_query("SELECT hid, path, help, weight FROM {custom_help_text} ORDER BY weight ASC");
+	$result = db_query("SELECT hid, path, help, weight FROM {custom_help_text} ORDER BY path ASC");
+
+  while ($row = $result->fetchAssoc()) {
+    $form['rows'][$row['hid']]['path_' . $row['hid']] = array(
+      '#type' => 'textfield',
+      '#default_value' => $row['path'],
+    );
+
+    $form['rows'][$row['hid']]['help_' . $row['hid']] = array(
+      '#markup' => filter_xss(drupal_strlen($row['help']) > 40 ? drupal_substr($row['help'], 0, 40) . '...' : $row['help']),
+    );
+
+    // Now create the weight form element.
+		/*
+    $form['rows'][$row['hid']]['weight_' . $row['hid']] = array(
+      '#type' => 'weight',
+      '#size' => 5,
+      '#delta' => 50,
+      '#default_value' => $row['weight'],
+      // Add a specific class in here - we need this later.
+      '#attributes' => array(
+        'class' => array(
+          'weight'
+        ),
+      ),
+    );
+		*/
+
+    $form['rows'][$row['hid']]['action_' . $row['hid']] = array(
+      '#markup' => l(t('edit'), 'admin/structure/custom_help_text/edit/' . $row['hid'], array('query' => $destination)) . ' ' .
+      l(t('delete'), 'admin/structure/custom_help_text/delete/' . $row['hid'], array('query' => $destination)),
+    );
+  }
+
+  // Don't forget the submit button.
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save changes'),
+  );
+
+  return $form;
+}
+
+/**
+ * The theme for the custom help text administration form.
+ *
+ * This will take the form data and wrap it in a tabledrag element.
+ *
+ * @param array $form
+ *   The form
+ *
+ * @return array
+ *   The rendered form.
+ */
+function theme_custom_help_text_settings($variables) {
+  $form = $variables['form'];
+  $table_rows = array();
+
+  if (isset($form['rows']) && is_array($form['rows'])) {
+    // Loop through each "row" in the table array.
+    foreach ($form['rows'] as $id => $row) {
+      // We are only interested in numeric keys.
+      if (intval($id)) {
+        $this_row = array();
+
+        // Add data.
+        $this_row[] = drupal_render($form['rows'][$id]['path_' . $id]);
+        $this_row[] = drupal_render($form['rows'][$id]['help_' . $id]);
+
+        // Add the weight field to the row.
+        // $this_row[] = drupal_render($form['rows'][$id]['weight_' . $id]);
+
+        // Add actions.
+        $this_row[] = drupal_render($form['rows'][$id]['action_' . $id]);
+
+        // Add the row to the array of rows.
+        $table_rows[] = array(
+          'data' => $this_row,
+          'class' => array(     
+            'draggable'
+          ),
+        );
+      }
+    }
+  }
+
+  // Make sure the header count matches the column count.
+  $header = array(
+    "Path",
+    "Help",
+    // "Weight",
+    "Actions",
+  );
+
+  $output = theme('table', array('header' => $header, 'rows' => $table_rows, 'attributes' => array('id' => 'custom_help_text')));
+  $output .= drupal_render_children($form);
+
+ //  drupal_add_tabledrag('custom_help_text', 'order', 'sibling', 'weight');
+
+  return $output;
+}
+
+/**
+ * Implements hook_submit().
+ *
+ * For the custom_help_text_admin_form() form.
+ *
+ * @param array $form
+ *   The form.
+ *
+ * @param array $form_state
+ *   The current state of the form.
+ */
+function custom_help_text_settings_submit($form, &$form_state) {
+  $helpitems = array();
+
+  foreach ($form_state['values'] as $key => $value) {
+    if (strpos($key, 'path_') !== FALSE || strpos($key, 'weight_') !== FALSE) {
+      $replace_elements = array('path_', 'hid_', 'weight_');
+      $helpitems[str_replace($replace_elements, '', $key)][drupal_substr($key, 0, strpos($key, '_'))] = $value;
+    }
+  }
+
+  foreach ($helpitems as $id => $item) {
+    if ($id != 0 && $item['path'] != '') {
+      custom_help_text_admin_update($id, $item['path'], NULL, $item['weight']);
+    }
+  }
+  drupal_set_message(t('Help item updated'));
+}
+
+/**
+ * Form for adding and editing custom help text items.
+ *
+ * @param array $form_state
+ *   The form state (if any).
+ *
+ * @param array $args
+ *   Any additional arguments passed to the form
+ *
+ * @return array
+ *   The form.
+ */
+function custom_help_text_addedit_form($form, &$form_state, $args = NULL) {
+  $form['path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Path'),
+    '#default_value' => isset($args['path']) ? $args['path'] : '',
+    '#maxlength' => 128,
+    '#size' => 45,
+    '#description' => t('The path that will be used to display the help text on.'),
+    '#required' => TRUE,
+  );
+
+  $form['help'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Help message'),
+    '#default_value' => isset($args['help']) ? $args['help'] : '',
+    '#description' => t('Specify a help message for this path.'),
+    '#required' => TRUE,
+  );
+
+  // Add roles.
+  $roles = user_roles(FALSE, 'view custom_help_text');
+
+  $form['roles'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $roles,
+    '#title' => t('User roles'),
+    '#description' => t('This is a list of user roles that currently have access
+    to the \'view custom_help_text\' permission. If you leave this blank then
+    no user will be able to view the message.'),
+  );
+
+  if (isset($args['hid'])) {
+    $hid_results = db_query("SELECT rid FROM {custom_help_text_roles} WHERE hid = :hid", array(':hid' => $args['hid']));
+    $hids = array();
+    
+    while ($hid_row = $hid_results->fetchAssoc()) {
+      $hids[] = $hid_row['rid'];
+    }
+    $form['roles']['#default_value'] = $hids;
+  }
+  else {
+    $form['roles']['#default_value'] = array(2);
+  }
+
+  if (isset($args['hid'])) {
+    $form['hid'] = array(
+      '#type' => 'hidden',
+      '#value' => isset($args['hid']) ? $args['hid'] : '',
+    );
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Update help message'),
+    );
+  }
+  else {
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Create new help message'),
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_submit().
+ *
+ * For the custom_help_text_addedit_form() form.
+ *
+ * @param array $form
+ *   The form.
+ *
+ * @param array $form_state
+ *   The current state of the form.
+ */
+function custom_help_text_addedit_form_submit($form, &$form_state) {
+
+  // Save or update custom help text item.
+  if (isset($form_state['values']['hid'])) {
+    $hid = $form_state['values']['hid'];
+    custom_help_text_admin_update($hid, $form_state['values']['path'], $form_state['values']['help']);
+  }
+  else {
+    $hid = custom_help_text_admin_insert($form_state['values']['path'], $form_state['values']['help']);
+  }
+
+  // Update user roles by deleting them all first and re inserting them.
+  db_delete('custom_help_text_roles')
+  ->condition('hid', $hid)
+  ->execute();
+
+  $tmp_class = new stdClass();
+  $tmp_class->hid = $hid;
+
+  $roles = array_filter($form_state['values']['roles']);
+  if (count($roles) > 0) {
+    foreach ($roles as $rid) {
+      $tmp_class->rid = $rid;
+      drupal_write_record('custom_help_text_roles', $tmp_class);
+    }
+  }
+
+  drupal_set_message(t('The help message has been saved.'));
+  $form_state['redirect'] = 'admin/structure/custom_help_text/admin';
+}
+
+/**
+ * Helper function for editing custom help text items.
+ *
+ * This function loads the correct help item and populates the
+ * custom_help_text_addedit_form form. If no help ID is present then the
+ * form will be loaded with no data present.
+ *
+ * @param int $hid
+ *   The help id to edit.
+ *
+ * @return array
+ *   The custom_help_text_addedit_form form.
+ */
+function custom_help_text_admin_edit($hid = 0) {
+  if ($hid != 0) {
+    $custom_help_text = custom_help_text_admin_load($hid);
+    $custom_help_text['hid'] = $hid;
+    drupal_set_title(t('Edit help message for path "@path"', array('@path' => $custom_help_text['path'])), PASS_THROUGH);
+    $output = drupal_get_form('custom_help_text_addedit_form', $custom_help_text);
+  }
+  else {
+    $output = drupal_get_form('custom_help_text_addedit_form');
+  }
+
+  return $output;
+}
+
+/**
+ * Helper function to load a single help item.
+ *
+ * @param int $hid
+ *   The help ID to load.
+ *
+ * @return array
+ *   An array containing the help item data.
+ */
+function custom_help_text_admin_load($hid) {
+  $result = db_query('SELECT * FROM {custom_help_text} WHERE hid = :hid', array(':hid' => $hid));
+  return $result->fetchAssoc();
+}
+
+/**
+ * Helper function to update a single help item.
+ *
+ * @param int $hid
+ *   The help ID to update.
+ * @param string $path
+ *   The path data element.
+ * @param string $help
+ *   The contents of the help item.
+ * @param int $weight
+ *   The weight of the help item.
+ */
+function custom_help_text_admin_update($hid, $path = NULL, $help = NULL, $weight = NULL) {
+  if ($path[0] == '/') {
+    $path = drupal_substr($path, 1);
+  }
+
+  $tmp_class = new stdClass();
+  $tmp_class->hid = $hid;
+
+  if (!is_null($path)) {
+    $tmp_class->path = $path;
+  }
+
+  if (!is_null($help)) {
+    $tmp_class->help = $help;
+  }
+
+  if (!is_null($weight)) {
+    $tmp_class->weight = $weight;
+  }
+
+  drupal_write_record('custom_help_text', $tmp_class, 'hid');
+}
+
+/**
+ * Helper function to insert a single help item.
+ *
+ * @param string $path
+ *   The path data element.
+ * @param string $help
+ *   The contents of the help item.
+ *
+ * @return int
+ *   The new hid of the inserted record.
+ */
+function custom_help_text_admin_insert($path, $help) {
+  if ($path[0] == '/') {
+    $path = drupal_substr($path, 1);
+  }
+
+  $tmp_class = new stdClass();
+  $tmp_class->path = $path;
+  $tmp_class->help = $help;
+
+  if (drupal_write_record('custom_help_text', $tmp_class)) {
+    return $tmp_class->hid;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Helper function to delete an item with a given HID.
+ *
+ * @param int $hid
+ *   The help item ID.
+ */
+function custom_help_text_admin_delete($hid = 0) {
+  db_delete('custom_help_text')
+  ->condition('hid', $hid)
+  ->execute();
+
+  db_delete('custom_help_text_roles')
+  ->condition('hid', $hid)
+  ->execute();
+}
+
+/**
+ * Confirmation form for the deletion of an item.
+ *
+ * @param array $form_state
+ *   The form state (if any).
+ * @param int $hid
+ *   The help item ID to delete.
+ *
+ * @return array
+ *   The form.
+ */
+function custom_help_text_admin_delete_confirm($form, $form_state, $hid) {
+  $custom_help_text = custom_help_text_admin_load($hid);
+  if (user_access('administer custom_help_text')) {
+    $form['hid'] = array(
+      '#type' => 'hidden',
+      '#value' => $hid,
+    );
+    $output = confirm_form($form, t('Are you sure you want to delete the help message for path %path?', array('%path' => $custom_help_text['path'])), isset($_GET['destination']) ? $_GET['destination'] : 'admin/structure/custom_help_text');
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_submit().
+ *
+ * This is for the custom_help_text_admin_delete_confirm form.
+ *
+ * @param array $form
+ *   The form.
+ *
+ * @param array $form_state
+ *   The current state of the form.
+ */
+function custom_help_text_admin_delete_confirm_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    custom_help_text_admin_delete($form_state['values']['hid']);
+    drupal_set_message(t('Help item deleted.'));
+    $form_state['redirect'] = 'admin/structure/custom_help_text/admin';
+  }
+}

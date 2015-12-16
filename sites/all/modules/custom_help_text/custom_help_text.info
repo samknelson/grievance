@@ -1,0 +1,11 @@
+name = Custom Help Text
+description = Allows administrators to set the help messages on a URL and role basis.
+dependencies[] = help
+core = 7.x
+files[] = custom_help_text.test
+; Information added by drupal.org packaging script on 2012-11-07
+version = "7.x-1.0"
+core = "7.x"
+project = "custom_help_text"
+datestamp = "1352327161"
+
