@@ -1,6 +1,6 @@
 name = Grievance
 description = 
-package = UNITE
+package = grievance
 core = 7.x
 ; configure = admin/config/unite
 ; stylesheets[all][] = css/unite.css

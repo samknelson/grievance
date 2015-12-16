@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Grievance Views feature.
+ */
+
+include_once 'grievance_views.features.inc';
