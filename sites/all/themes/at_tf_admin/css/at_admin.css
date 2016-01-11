@@ -3152,3 +3152,29 @@ fieldset legend {
 .alert-box-warning-4 { border: 1px solid #D8000C; color: #D8000C; background-color: #FFBABA; }
 .alert-box-warning-5 { border: 1px solid #D8000C; color: #D8000C; background-color: #FFBABA; }
 .alert-box-overdue   { border: 1px solid #D8000C; color: #D8000C; background-color: #FFBABA; }
+
+
+
+
+
+.banner .banner-title a {
+  font-weight: normal;
+  font-variant: normal;
+  font-style: normal;
+  font-size: 42px;
+  float: left;
+  padding-top: 8px;
+  text-transform: none;
+  color: #ffffff;
+}
+
+.banner .banner-subtitle a {
+  font-weight: normal;
+  font-variant: normal;
+  font-style: normal;
+  padding-top: 22px;
+  font-size: 24px;
+  float: right;
+  text-transform: none;
+  color: #ffffff;
+}
