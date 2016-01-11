@@ -15,12 +15,23 @@ function grievance_notify($node) {
 	if ($node->original) {
 		$orig_status_tid = $node->original->field_grievance_status['und'][0]['tid'];
 	}
-	// if ($status_tid == $orig_status_tid) { return; }
+	if ($status_tid == $orig_status_tid) { return; }
+
+	$email = $node->field_grievance_co_email['und'][0]['email'];
+	if (!$email) { 
+		drupal_set_message(t('Warning: No notification has been sent, because no company representative email has been entered.  The company has NOT been notified!'), 'warning');
+		return;
+	}
+
+	$cc = join(',', grievance_alert_list_recipients($node));
 
 	// We're good.  Send a notification.
 	$params = array();
-	$params['body'] = 'Hello, notification!';
-	$params['subject'] = 'Hello, notification subject.';
+	$params['body'] = $status_term->field_grievance_notify_body['und'][0]['value'];
+	$params['subject'] = $status_term->field_grievance_notify_subject['und'][0]['value'];
+	if ($cc) {
+		$params['headers']['Cc'] = $cc;
+	}
 	$params['attachments'] = array();
 
 	// Attach the grievance as a PDF
@@ -30,7 +41,6 @@ function grievance_notify($node) {
 		'filemime' => 'grievance/pdf',
 	);
 
-	$email = 'samknelson@gmail.com';
 
 	drupal_mail(
 		'grievance', 
@@ -40,6 +50,8 @@ function grievance_notify($node) {
 		$params
 	);
 
-	drupal_set_message("Notifying.");
+	grievance_log_notify($node, $email);
+
+	drupal_set_message(t('Notification sent to: ') . $email);
 }
 

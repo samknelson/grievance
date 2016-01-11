@@ -3,12 +3,25 @@
 function grievance_admin() {
   $form = array();
 
-  $form['grievance_log_update_type'] = array(
+  $form['grievance_log'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Log Types'),
+  );
+
+  $form['grievance_log']['grievance_log_update_type'] = array(
     '#type' => 'select',
     '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
     '#title' => t('Grievance Log Update Type'),
     '#default_value' => variable_get('grievance_log_update_type', ''),
     '#description' => t("Grievance log type to be used for updates."),
+  );
+
+  $form['grievance_log']['grievance_log_notify_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Grievance Log Notify Type'),
+    '#default_value' => variable_get('grievance_log_notify_type', ''),
+    '#description' => t("Grievance log type to be used for notification to the company."),
   );
 
   $form['grievance_alerts'] = array(

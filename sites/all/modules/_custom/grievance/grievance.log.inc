@@ -32,3 +32,27 @@ function grievance_log_update($grievance_node, $title) {
   $log_node = node_submit($log_node); // Prepare node for saving
   node_save($log_node);
 }
+
+
+function grievance_log_notify($grievance_node, $email) {
+  global $user;
+
+  $log_node = new stdClass();
+  $log_node->title = t('Notification sent to ') . $email;
+  $log_node->type = 'grievance_log';
+  node_object_prepare($log_node);
+  $log_node->language = LANGUAGE_NONE;
+  $log_node->uid = $user->uid; 
+  $log_node->status = 1;
+  $log_node->promote = 0;
+  $log_node->comment = 0;
+
+  $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+  $log_node->field_grievance_status = $grievance_node->field_grievance_status;
+  $log_node->field_grievance_alert = $grievance_node->field_grievance_alert;
+  $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
+  $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_notify_type', '');
+
+  $log_node = node_submit($log_node); // Prepare node for saving
+  node_save($log_node);
+}
