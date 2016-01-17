@@ -1,7 +1,0 @@
-<?php
-/**
- * @file
- * Code for the Grievance Help Text feature.
- */
-
-include_once 'grievance_help_text.features.inc';
