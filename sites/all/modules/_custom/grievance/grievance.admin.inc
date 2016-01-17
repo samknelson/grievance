@@ -83,5 +83,18 @@ function grievance_admin() {
     '#era_entity_type' => 'user',
   );
 
+  $form['grievance_messaging'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Messaging'),
+    '#description' => t('Set text messaging for the footer, the welcome page, etc.'),
+  );
+
+  $form['grievance_messaging']['grievance_messaging_footer'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Footer'),
+    '#default_value' => variable_get('grievance_messaging_footer', ''),
+    '#description' => t('Enter the footer copy for the site.  May contain HTML.'),
+  );
+
   return system_settings_form($form);
 }

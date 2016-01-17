@@ -10,6 +10,11 @@ function grievance_block_info() {
     'cache' => DRUPAL_CACHE_PER_ROLE,
   );
 
+  $blocks['grievance_messaging_footer'] = array(
+    'info' => t('Grievance Messaging - Footer'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
   return $blocks;
 }
 
@@ -17,6 +22,11 @@ function grievance_block_view($delta = '') {
   if ($delta == 'grievance_timeleft') { 
     $block['subject'] = t('');
     $block['content'] = grievance_block_timeleft();
+  }
+
+  if ($delta == 'grievance_messaging_footer') { 
+    $block['subject'] = t('');
+    $block['content'] = variable_get('grievance_messaging_footer', '');
   }
 
   return $block;

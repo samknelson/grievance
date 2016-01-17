@@ -23,7 +23,8 @@ function grievance_notify($node) {
 		return;
 	}
 
-	$cc = join(',', grievance_alert_list_recipients($node));
+	$cc_arr = grievance_alert_list_recipients($node);
+	$cc = join(',', $cc_arr);
 
 	// We're good.  Send a notification.
 	$params = array();
@@ -50,7 +51,14 @@ function grievance_notify($node) {
 		$params
 	);
 
-	grievance_log_notify($node, $email);
+	grievance_log_notify(
+		$node,
+		$email,
+		$cc_arr,
+		$params['subject'],
+		$params['body'],
+		$params['attachments']
+	);
 
 	drupal_set_message(t('Notification sent to: ') . $email);
 }
