@@ -1,0 +1,7 @@
+name = Display Suite ID Argument
+description = Passes the entity ID to Views blocks in Display Suite Block Fields
+package = ADG
+core = 7.x
+dependencies[] = ds
+dependencies[] = views 
+files[] = ds_id_arg.module

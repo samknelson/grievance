@@ -1,0 +1,113 @@
+<?php
+
+/*
+ * Implements hook_form_alter()
+ */
+function ds_id_arg_form_alter(&$form, &$form_state, $form_id) {
+  // if we're on the ds block field form
+  if ($form_id == 'ds_edit_block_field_form') {
+
+    $enabled = FALSE;
+
+    // if we're editting an existing field, get the field name and default value
+    if (isset($form['field']['#default_value']) && !empty($form['field']['#default_value'])) {
+      $this_field = $form['field']['#default_value'];
+      $enabled_fields = variable_get('ds_id_arg_pass_id_fields', array());
+      if (isset($enabled_fields[$this_field])) $enabled = TRUE;
+    }
+
+    // add the pass id checkbox
+    $form['ds_id_arg_pass_id'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Pass Entity ID as argument'),
+      '#description' => t('When a Views block is selected, pass the entity ID as the argument for the View'),
+      '#default_value' => $enabled,
+    );
+
+    // add our submit handler
+    array_unshift($form['#submit'], 'ds_id_arg_form_submit');
+
+  } // if ds block field form
+} // ds_id_arg_form_alter()
+
+/*
+ * Form submit handler
+ */
+function ds_id_arg_form_submit($form, &$form_state) {
+  if (isset($form_state['values']['ds_id_arg_pass_id'])) {
+
+    // get the current settings
+    $enabled_fields = variable_get('ds_id_arg_pass_id_fields', array());
+
+    if ($form_state['values']['ds_id_arg_pass_id']) {
+      // add the field
+      $enabled_fields[$form_state['field']->field] = $form_state['field']->field;
+    } else {
+      // remove the field
+      unset($enabled_fields[$form_state['field']->field]);
+    }
+      
+    // save
+    variable_set('ds_id_arg_pass_id_fields', array_unique($enabled_fields));
+
+  } // if enabled
+} // ds_id_arg_form_submit()
+
+/*
+ * Implements hook_ds_fields_info_alter()
+ */
+function ds_id_arg_ds_fields_info_alter(&$fields, $entity_type) {
+  $ds_id_arg_fields = variable_get('ds_id_arg_pass_id_fields', array());
+
+  foreach ($ds_id_arg_fields as $field) {
+
+    // if the field is a view block field
+    if (isset($fields[$field]['properties']['block']) && strpos($fields[$field]['properties']['block'], 'views|') === 0) {
+
+      // reset the type to a function
+      $fields[$field]['field_type'] = DS_FIELD_TYPE_FUNCTION;
+      $fields[$field]['function'] = 'ds_id_arg_render_view_block_arguments';
+
+    } // if
+  } // foreach
+} // ds_id_arg_ds_fields_info_alter()
+
+/*
+ * Display Suite function callback
+ */
+function ds_id_arg_render_view_block_arguments($field) {
+  // get the view info
+  list($module, $delta) = explode('|', $field['properties']['block']);
+  list($view_name, $display_id) = explode('-', $delta);
+
+  $view = views_get_view($view_name);
+  if (is_object($view) && $view->access($display_id)) {
+
+    // determine the id field name
+    if ($field['entity_type'] == 'node') {
+      $id = 'nid';
+    }
+    else if ($field['entity_type'] == 'taxonomy_term') {
+      $id = 'tid';
+    }
+    else if ($field['entity_type'] == 'user') {
+      $id = 'uid';
+    }
+
+    // set the argument
+    $view->set_arguments(array($field['entity']->{$id}));
+
+    // run the view
+    $return = $view->execute_display($display_id);
+    if (empty($return['content'])) return;
+
+    // determine whether to show or hide the block title
+    if ($field['properties']['block_render'] == 3) {
+      return $return['content'];
+    }
+    else {
+      return $return['subject'] . $return['content'];
+    }
+
+  } // if view is accessible
+} // ds_id_arg_render_view_block_arguments()
