@@ -94,12 +94,10 @@ function grievance_content_types_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_grievance_violation' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'This violates the contract, including but not limited to Article(s)',
-        ),
-      ),
+    'grievance_timeline' => array(
+      'weight' => '1',
+      'label' => 'inline',
+      'format' => 'default',
     ),
     'field_grievance_remedy_other' => array(
       'formatter_settings' => array(
@@ -112,6 +110,13 @@ function grievance_content_types_ds_field_settings_info() {
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Remedy is to make grievant(s) whole in every way, including but not limited to',
+        ),
+      ),
+    ),
+    'field_grievance_violation' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'This violates the contract, including but not limited to Article(s)',
         ),
       ),
     ),
@@ -510,7 +515,7 @@ function grievance_content_types_ds_layout_settings_info() {
     'regions' => array(
       'header' => array(
         0 => 'field_grievance_date_1',
-        1 => 'field_grievance_date_2',
+        1 => 'grievance_timeline',
       ),
       'left' => array(
         2 => 'field_grievance_shop',
@@ -540,9 +545,9 @@ function grievance_content_types_ds_layout_settings_info() {
         24 => 'field_grievance_supervisor_unit',
       ),
       'footer' => array(
-        25 => 'field_grievance_type',
-        26 => 'field_grievance_type_other',
-        27 => 'field_grievance_violation',
+        25 => 'field_grievance_violation',
+        26 => 'field_grievance_type',
+        27 => 'field_grievance_type_other',
         28 => 'field_grievance_remedy',
         29 => 'field_grievance_remedy_other',
         30 => 'grievance_form_signature',
@@ -550,7 +555,7 @@ function grievance_content_types_ds_layout_settings_info() {
     ),
     'fields' => array(
       'field_grievance_date_1' => 'header',
-      'field_grievance_date_2' => 'header',
+      'grievance_timeline' => 'header',
       'field_grievance_shop' => 'left',
       'field_grievance_co_name' => 'left',
       'field_grievance_co_address' => 'left',
@@ -574,9 +579,9 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_grievance_supervisor_name' => 'right',
       'field_grievance_supervisor_title' => 'right',
       'field_grievance_supervisor_unit' => 'right',
+      'field_grievance_violation' => 'footer',
       'field_grievance_type' => 'footer',
       'field_grievance_type_other' => 'footer',
-      'field_grievance_violation' => 'footer',
       'field_grievance_remedy' => 'footer',
       'field_grievance_remedy_other' => 'footer',
       'grievance_form_signature' => 'footer',
