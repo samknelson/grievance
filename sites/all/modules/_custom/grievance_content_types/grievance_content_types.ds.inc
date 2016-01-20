@@ -158,6 +158,21 @@ function grievance_content_types_ds_custom_fields_info() {
   );
   $export['grievance_form_signature'] = $ds_field;
 
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'grievance_timeline';
+  $ds_field->label = 'Timeline';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'block' => 'views|grievance_timeline-block_1',
+    'block_render' => '2',
+  );
+  $export['grievance_timeline'] = $ds_field;
+
   return $export;
 }
 
