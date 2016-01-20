@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Grievance Content Types feature.
+ */
+
+include_once 'grievance_content_types.features.inc';
