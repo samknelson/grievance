@@ -511,10 +511,11 @@ function grievance_content_types_field_group_info() {
     'weight' => '6',
     'children' => array(
       0 => 'field_grievance_type',
-      1 => 'field_grievance_remedy_other',
-      2 => 'field_grievance_remedy',
-      3 => 'field_grievance_type_other',
-      4 => 'field_grievance_violation',
+      1 => 'field_grievance_date_1',
+      2 => 'field_grievance_remedy_other',
+      3 => 'field_grievance_remedy',
+      4 => 'field_grievance_type_other',
+      5 => 'field_grievance_violation',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -810,34 +811,6 @@ function grievance_content_types_field_group_info() {
     ),
   );
   $field_groups['group_grievance_timeline|node|grievance|default'] = $field_group;
-
-  $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
-  $field_group->api_version = 1;
-  $field_group->identifier = 'group_grievance_timeline|node|grievance|form';
-  $field_group->group_name = 'group_grievance_timeline';
-  $field_group->entity_type = 'node';
-  $field_group->bundle = 'grievance';
-  $field_group->mode = 'form';
-  $field_group->parent_name = 'group_grievance';
-  $field_group->data = array(
-    'label' => 'Timeline',
-    'weight' => '9',
-    'children' => array(
-      0 => 'field_grievance_date_1',
-      1 => 'field_grievance_date_2',
-    ),
-    'format_type' => 'accordion-item',
-    'format_settings' => array(
-      'formatter' => 'closed',
-      'instance_settings' => array(
-        'description' => '',
-        'classes' => '',
-        'required_fields' => 1,
-      ),
-    ),
-  );
-  $field_groups['group_grievance_timeline|node|grievance|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */

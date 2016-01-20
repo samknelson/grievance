@@ -17,7 +17,7 @@ function grievance_node_tabs() {
 	);
 
 	$node_tabs['grievance']['statuslog'] = array(
-		'title' => 'Log',
+		'title' => 'Timeline',
 		'description' => '',
 		'callback' => 'grievance_node_tab_log',
 		'permissions' => array('grievance admin'),
