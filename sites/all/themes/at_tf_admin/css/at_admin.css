@@ -3187,3 +3187,24 @@ fieldset legend {
   padding-bottom: 20px;
   border-bottom: 1px solid #666666;
 }
+
+
+.field-item .view-grievance-timeline th {
+  display: none;
+}
+
+.field-item .view-grievance-timeline th, 
+.field-item .view-grievance-timeline table, 
+.field-item .view-grievance-timeline tr, 
+.field-item .view-grievance-timeline thead, 
+.field-item .view-grievance-timeline tbody, 
+.field-item .view-grievance-timeline td {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.field-item .view-grievance-timeline td.views-field-field-grievance-status {
+  font-weight: bold;
+  padding-right: 20px;
+}
