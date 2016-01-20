@@ -16,7 +16,6 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.notify.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.alert.inc";
 
-/*
 function grievance_node_update($node) {
   if ($node->type == 'grievance') {
     grievance_log_update($node, 'update');
@@ -24,6 +23,7 @@ function grievance_node_update($node) {
   }
 }
 
+/*
 function grievance_node_insert($node) {
   if ($node->type == 'grievance') {
     grievance_log_update($node, 'insert');
@@ -34,7 +34,7 @@ function grievance_node_insert($node) {
 
 function grievance_node_postsave($node, $op) {
   if ($node->type == 'grievance') {
-    if ($op == 'update' || $op == 'insert') {
+    if ($op == 'insert') {
       grievance_log_update($node, $op);
       grievance_notify($node);
     }
