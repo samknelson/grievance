@@ -65,6 +65,14 @@ function grievance_block_timeleft() {
     $interval . 
     ')</strong>';
 
+  $status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
+  $status_term = taxonomy_term_load($status_tid);
+  if ($status_term && $status_term->description) {
+    $msg .= '<hr><em>';
+    $msg .= $status_term->description;
+    $msg .= '</em>';
+  }
+
   $class = "alert-box ";
 
   if (time() >= $alert_date) { $class .= "alert-box-overdue "; }

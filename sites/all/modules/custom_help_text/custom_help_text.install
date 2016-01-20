@@ -42,20 +42,6 @@ function custom_help_text_schema() {
       'path' => array('path'),
     ),
 
-    // This is all the CTools Exportables block
-    'export' => array(
-      'key' => 'hid',
-      'key name' => 'Help ID',
-      'identifier' => 'custom_help_text',
-      'default hook' => 'default_custom_help_text',
-      'api' => array(
-        'owner' => 'custom_help_text',
-        'api' => 'default_custom_help_text',
-        'minimum_version' => 1,
-        'current_version' => 1,
-      ),
-    ),
-
   );
 
   $schema['custom_help_text_roles'] = array(

@@ -3178,3 +3178,12 @@ fieldset legend {
   text-transform: none;
   color: #ffffff;
 }
+
+
+
+
+.view-grievance-log div.node {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #666666;
+}

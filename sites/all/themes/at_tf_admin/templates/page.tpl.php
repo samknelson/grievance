@@ -22,7 +22,7 @@
               $contract_uri = $shop_node->field_grievance_contract['und'][0]['uri'];
               if ($contract_uri) {
                 $contract_url = file_create_url($contract_uri);
-                print l('contract (pdf)', $contract_url, array('attributes' => array('target'=>'_blank')));
+                print l(t('contract (pdf)'), $contract_url, array('attributes' => array('target'=>'_blank')));
                 print ' / ';
               }
             }

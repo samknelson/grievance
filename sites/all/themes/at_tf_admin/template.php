@@ -25,7 +25,7 @@ function at_tf_admin_preprocess_page(&$vars) {
   $vars['content_header_attributes_array']['role'][] = 'banner';
 
 
-	drupal_add_js('/sites/all/themes/at_tf_admin/js/main.js');
+	drupal_add_js('sites/all/themes/at_tf_admin/js/main.js');
 }
 
 function at_tf_admin_preprocess_html(&$vars) {

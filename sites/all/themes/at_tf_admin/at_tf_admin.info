@@ -9,7 +9,7 @@
 
 
 ;----------// Stylesheets
-  stylesheets[screen][] = css/at_admin.css
+  stylesheets[all][] = css/at_admin.css
   stylesheets[print][] = css/at_admin.print.css
 
 
