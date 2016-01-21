@@ -41,46 +41,58 @@ function grievance_block_timeleft() {
   $alert_date = $grievance_node->field_grievance_alert_date['und'][0]['value'];
   $alert_date = strtotime($alert_date);
 
-  if (!$alert) { return ''; }
-  if (!$alert_date) { return ''; }
-  if ($alert_date < date('-3000 days')) { return ''; }
+  $need_alert = TRUE;
+  if (!$alert) { $need_alert = FALSE; }
+  if (!$alert_date) { $need_alert = FALSE; }
+  if ($alert_date < date('-3000 days')) { $need_alert = FALSE; }
 
-  if (time() <= $alert_date) {
-    $interval = format_interval($alert_date - time(), 2) . t(' remaining');
-  } else {
-    $interval = format_interval(time() - $alert_date, 2) . t(' overdue');
+  if ($need_alert) {
+    if (time() <= $alert_date) {
+      $interval = format_interval($alert_date - time(), 2) . t(' remaining');
+    } else {
+      $interval = format_interval(time() - $alert_date, 2) . t(' overdue');
+    }
+
+    $datestr = date('l, F j, Y', $alert_date);
+
+    $alert_msg = '<strong>' . 
+      t('The Union must') . 
+      '</strong> <u>' . 
+      $alert . 
+      '</u> <strong>' . 
+      t('not later than') . 
+      '</strong> <u>' .
+      $datestr . 
+      '</u> <strong>(' .
+      $interval . 
+      ')</strong>';
   }
 
-  $datestr = date('l, F j, Y', $alert_date);
-
-  $msg = '<strong>' . 
-    t('The Union must') . 
-    '</strong> <u>' . 
-    $alert . 
-    '</u> <strong>' . 
-    t('not later than') . 
-    '</strong> <u>' .
-    $datestr . 
-    '</u> <strong>(' .
-    $interval . 
-    ')</strong>';
 
   $status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
   $status_term = taxonomy_term_load($status_tid);
   if ($status_term && $status_term->description) {
-    $msg .= '<hr><em>';
-    $msg .= $status_term->description;
-    $msg .= '</em>';
+    $status_msg = $status_term->description;
+  }
+
+  if ($alert_msg && $status_msg) { 
+    $msg = $alert_msg . '<hr>' . $status_msg;
+  } elseif ($alert_msg) {
+    $msg = $alert_msg;
+  } elseif ($status_msg) {
+    $msg = $status_msg;
   }
 
   $class = "alert-box ";
 
-  if (time() >= $alert_date) { $class .= "alert-box-overdue "; }
-  for ($i=1; $i<=5; ++$i) {
-    $days = variable_get('grievance_alert_days_warning' . $i, 0);
-    if ($days) {
-      if (time() >= $alert_date - $days*24*60*60) {
-        $class .= "alert-box-warning-$i "; 
+  if ($need_alert) {
+    if (time() >= $alert_date) { $class .= "alert-box-overdue "; }
+    for ($i=1; $i<=5; ++$i) {
+      $days = variable_get('grievance_alert_days_warning' . $i, 0);
+      if ($days) {
+        if (time() >= $alert_date - $days*24*60*60) {
+          $class .= "alert-box-warning-$i "; 
+        }
       }
     }
   }

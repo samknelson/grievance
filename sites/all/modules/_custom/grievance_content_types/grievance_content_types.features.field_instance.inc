@@ -251,7 +251,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 21,
+        'weight' => 1,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -305,7 +305,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 23,
+        'weight' => 2,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -359,7 +359,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 24,
+        'weight' => 3,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -413,7 +413,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 25,
+        'weight' => 4,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -1303,9 +1303,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
+        'type' => 'hidden',
         'weight' => 31,
       ),
       'grievance_arbitrationform' => array(
@@ -3662,6 +3661,39 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'taxonomy_term-grievance_status-field_grievance_timeline_show'.
+  $field_instances['taxonomy_term-grievance_status-field_grievance_timeline_show'] = array(
+    'bundle' => 'grievance_status',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'When the grievance enters this status, should it be displayed on the timeline presented to the company?',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 6,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_timeline_show',
+    'label' => 'Show on Timeline?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 4,
+    ),
+  );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Address');
@@ -3718,6 +3750,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Select the roles with permission to edit grievances at this step.');
   t('Send Notifcation?');
   t('Shop');
+  t('Show on Timeline?');
   t('State');
   t('Statement of Grievance');
   t('Statement of Grievance (Other)');
@@ -3732,6 +3765,7 @@ function grievance_content_types_field_default_field_instances() {
   t('When a grievance is moved to this status, should a notification be sent to the company?');
   t('When a notification for this status is sent to the company, what subject should be used?');
   t('When a notification is sent to the company, what should the body of the email be? ');
+  t('When the grievance enters this status, should it be displayed on the timeline presented to the company?');
   t('Witness Statements');
   t('Zip');
 
