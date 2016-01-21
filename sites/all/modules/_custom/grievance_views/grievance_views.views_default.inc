@@ -588,6 +588,10 @@ function grievance_views_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  /* Relationship: Content: Status (field_grievance_status) */
+  $handler->display->display_options['relationships']['field_grievance_status_tid']['id'] = 'field_grievance_status_tid';
+  $handler->display->display_options['relationships']['field_grievance_status_tid']['table'] = 'field_data_field_grievance_status';
+  $handler->display->display_options['relationships']['field_grievance_status_tid']['field'] = 'field_grievance_status_tid';
   /* Field: Content: Status */
   $handler->display->display_options['fields']['field_grievance_status']['id'] = 'field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['table'] = 'field_data_field_grievance_status';
@@ -636,6 +640,14 @@ function grievance_views_views_default_views() {
   );
   $handler->display->display_options['filters']['field_grievance_log_type_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_grievance_log_type_tid']['vocabulary'] = 'grievance_log_types';
+  /* Filter criterion: Taxonomy term: Show on Timeline? (field_grievance_timeline_show) */
+  $handler->display->display_options['filters']['field_grievance_timeline_show_value']['id'] = 'field_grievance_timeline_show_value';
+  $handler->display->display_options['filters']['field_grievance_timeline_show_value']['table'] = 'field_data_field_grievance_timeline_show';
+  $handler->display->display_options['filters']['field_grievance_timeline_show_value']['field'] = 'field_grievance_timeline_show_value';
+  $handler->display->display_options['filters']['field_grievance_timeline_show_value']['relationship'] = 'field_grievance_status_tid';
+  $handler->display->display_options['filters']['field_grievance_timeline_show_value']['value'] = array(
+    'Yes' => 'Yes',
+  );
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block_1');
@@ -654,6 +666,7 @@ function grievance_views_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
+    t('term from field_grievance_status'),
     t('Status'),
     t('Post date'),
     t('All'),
