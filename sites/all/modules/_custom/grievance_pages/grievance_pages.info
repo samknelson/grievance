@@ -1,6 +1,6 @@
 name = Grievance Pages
 core = 7.x
-package = grievances
+package = grievance
 dependencies[] = features
 dependencies[] = text
 dependencies[] = uuid_features

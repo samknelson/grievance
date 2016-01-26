@@ -96,5 +96,12 @@ function grievance_admin() {
     '#description' => t('Enter the footer copy for the site.  May contain HTML.'),
   );
 
+  $form['grievance_hidefields'] = array(
+    '#default_value' => variable_get('grievance_hidefields', ''),
+    '#title' => t('Hide Fields'),
+    '#description' => t('The grievance system comes with many fields, not all of which will be appropriate for a given deployment.  Enter the machine names (one per line) of fields which should be hidden.'),
+    '#type' => 'textarea',
+  );
+
   return system_settings_form($form);
 }

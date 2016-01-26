@@ -87,7 +87,10 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
   }
 
   if ($form_id == 'grievance_node_form') { 
+    // Alert data is a system-only field
     $form['field_grievance_data_alert']['#access'] = FALSE;
+
+    // Arbitration fields are restricted by admin
     if (!user_access('grievance admin')) {
       $fields = array(
         'field_grievance_arbitration_a',
@@ -97,6 +100,14 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
       );
       foreach ($fields as $field) {
         $form[$field]['#access'] = FALSE;
+      }
+    }
+
+    // Certain fields are hidden altogether
+    $hidefields = preg_split('/\s+/', variable_get('grievance_hidefields', ''));
+    foreach ($hidefields as $hidefield) {
+      if (preg_match('/^field_/', $hidefield) && $form[$hidefield]) {
+        $form[$hidefield]['#access'] = FALSE;
       }
     }
   }

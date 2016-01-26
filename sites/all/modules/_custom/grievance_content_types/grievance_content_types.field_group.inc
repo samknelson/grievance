@@ -379,6 +379,7 @@ function grievance_content_types_field_group_info() {
       9 => 'field_grievance_zip',
       10 => 'field_grievance_email',
       11 => 'field_grievance_classification',
+      12 => 'field_grievance_ein',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -417,6 +418,7 @@ function grievance_content_types_field_group_info() {
       9 => 'field_grievance_zip',
       10 => 'field_grievance_email',
       11 => 'field_grievance_classification',
+      12 => 'field_grievance_ein',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -893,10 +895,9 @@ function grievance_content_types_field_group_info() {
       2 => 'group_grievance_supervisor',
       3 => 'group_grievance_form',
       4 => 'group_grievance_union_rep',
-      5 => 'group_grievance_timeline',
-      6 => 'group_grievance_company',
-      7 => 'group_grievance_arbitration',
-      8 => 'group_grievance_status',
+      5 => 'group_grievance_company',
+      6 => 'group_grievance_arbitration',
+      7 => 'group_grievance_status',
     ),
     'format_type' => 'accordion',
     'format_settings' => array(
