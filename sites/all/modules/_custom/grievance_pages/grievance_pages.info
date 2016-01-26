@@ -1,0 +1,14 @@
+name = Grievance Pages
+core = 7.x
+package = grievances
+dependencies[] = features
+dependencies[] = text
+dependencies[] = uuid_features
+__drupal_alter_by_ref[][node][grievance_basic_page] = grievance_basic_page
+features[features_api][] = api:2
+features[field_base][] = body
+features[field_instance][] = node-grievance_basic_page-body
+features[node][] = grievance_basic_page
+features[uuid_node][] = 7faf33be-7d65-4038-a808-c433ffb3d1ee
+features[uuid_node][] = e99f55b0-b460-47c4-a420-28e8a766900d
+project path = sites/all/modules/_custom
