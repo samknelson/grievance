@@ -16,6 +16,14 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.notify.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.alert.inc";
 
+/**
+ * Implement hook_cron() 
+ */
+
+function grievance_cron() {
+  grievance_alert_all();
+}
+
 /*
 function grievance_node_update($node) {
   if ($node->type == 'grievance') {
