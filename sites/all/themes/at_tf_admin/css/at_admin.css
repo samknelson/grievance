@@ -2131,12 +2131,16 @@ h2.field-label {
 }
 
 
-.ds-2col-stacked > .group-left {
+.ds-2col-stacked > .group-left, 
+.ds-2col-stacked > .group-leftright > .group-left {
 	width: 49%;
+  float: left;
 }
 
-.ds-2col-stacked > .group-right {
+.ds-2col-stacked > .group-right,
+.ds-2col-stacked > .group-leftright > .group-right {
 	width: 49%;
+  float: right;
 }
 
 .field-type-taxonomy-term-reference li {
@@ -3207,4 +3211,18 @@ fieldset legend {
 .field-item .view-grievance-timeline td.views-field-field-grievance-status {
   font-weight: bold;
   padding-right: 20px;
+}
+
+
+
+.grievance_form_body_grievance_gform_a .group-leftright {
+  padding: 20px;
+  border: 2px solid #000000;
+  clear: both;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.grievance_form_body_grievance_gform_a .group-footer section.field-label-above {
+  padding-bottom: 15px;
 }
