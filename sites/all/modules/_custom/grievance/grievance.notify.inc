@@ -43,6 +43,7 @@ function grievance_notify($node) {
 	);
 
 
+	/*
 	drupal_mail(
 		'grievance', 
 		'notify', 
@@ -50,6 +51,8 @@ function grievance_notify($node) {
 		LANGUAGE_NONE, 
 		$params
 	);
+	*/
+
 
 	grievance_log_notify(
 		$node,
