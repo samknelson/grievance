@@ -119,6 +119,9 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Set default values for manager, organizer, etc.
   //
 
+  // This should be on insert only, not edit.  We never set defaults on edit.
+  if ($form['nid']['#value']) { return; }
+
   // Find the current user
   global $user;
   if (!$user) { return; }
@@ -155,20 +158,26 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
   $delta = 0;
   foreach ($organizers as $organizer) {
-    $form['field_grievance_rep_organizer']['und'][$delta]['target_id']['#default_value'] = "$organizer->name ($organizer->uid)";
-    ++$delta;
+    if ($organizer) {
+      $form['field_grievance_rep_organizer']['und'][$delta]['target_id']['#default_value'] = "$organizer->name ($organizer->uid)";
+      ++$delta;
+    }
   }
 
   $delta = 0;
   foreach ($leads as $lead) {
-    $form['field_grievance_rep_lead']['und'][$delta]['target_id']['#default_value'] = "$lead->name ($lead->uid)";
-    ++$delta;
+    if ($lead) {
+      $form['field_grievance_rep_lead']['und'][$delta]['target_id']['#default_value'] = "$lead->name ($lead->uid)";
+      ++$delta;
+    }
   }
 
   // Manager
   $manager = variable_get('grievance_rep_manager', '');
   if ($manager) {
-    $form['field_grievance_rep_manager']['und'][0]['target_id']['#default_value'] = "$manager[entity_label] ($manager[entity_id])";
+    if ($manager) {
+      $form['field_grievance_rep_manager']['und'][0]['target_id']['#default_value'] = "$manager[entity_label] ($manager[entity_id])";
+    }
   }
 
   // Obeserver
