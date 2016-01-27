@@ -187,22 +187,20 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
-    'label' => 'Comments and Attachments',
+    'label' => 'Comments',
     'weight' => '7',
     'children' => array(
       0 => 'field_grievance_comments',
-      1 => 'field_grievance_attachments',
-      2 => 'field_grievance_attachments_a',
-      3 => 'field_grievance_attachments_b',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Comments',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => '',
         'required_fields' => 1,
+        'classes' => '',
+        'description' => '',
       ),
+      'formatter' => 'closed',
     ),
   );
   $field_groups['group_grievance_comments|node|grievance|form'] = $field_group;
@@ -959,6 +957,7 @@ function grievance_content_types_field_group_info() {
   t('Arbitration');
   t('Arbitration Comments');
   t('Attachments');
+  t('Comments');
   t('Comments and Attachments');
   t('Company Represenatives');
   t('Company Representatives');

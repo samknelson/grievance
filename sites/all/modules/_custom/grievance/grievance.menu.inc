@@ -23,6 +23,13 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance admin'),
 	);
 
+	$node_tabs['grievance']['attachments'] = array(
+		'title' => 'Attachments',
+		'description' => '',
+		'callback' => 'grievance_node_tab_attachments',
+		'permissions' => array('grievance user'),
+	);
+
 	$node_tabs['grievance']['gform'] = array(
 		'title' => 'Grievance Form',
 		'description' => '',
@@ -34,7 +41,7 @@ function grievance_node_tabs() {
 		'title' => 'Arbitration Prep Form',
 		'description' => '',
 		'callback' => 'grievance_node_tab_arbitrationform',
-		'permissions' => array('grievance user'),
+		'permissions' => array('grievance admin'),
 	);
 	
 	return $node_tabs;

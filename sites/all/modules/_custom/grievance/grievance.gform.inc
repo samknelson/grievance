@@ -25,15 +25,30 @@ function grievance_node_tab_gform($node, $is_loopback = FALSE) {
 	if (!$is_loopback) {
 		$result .= $pdf_link;
 	}
-	$result .= variable_get('grievance_gform_header', '');
 	$display_mode = variable_get('grievance_gform_display_mode', 'grievance_gform');
+
+	$result .= "<div class=\"grievance_form_wrapper grievance_form_wrapper_$display_mode\">";
+
+	$result .= "<div class=\"grievance_form_header grievance_form_header_$display_mode\">";
+	$result .= variable_get('grievance_gform_header', '');
+	$result .= "</div>";
+
+	$result .= "<div class=\"grievance_form_body grievance_form_body_$display_mode\">";
 	$tmp = node_view($node, $display_mode);
 	$result .= drupal_render($tmp);
-	$result .= variable_get('grievance_gform_footer', '');
+	$result .= "</div>";
 
+	$result .= "<div class=\"grievance_form_footer grievance_form_footer_$display_mode\">";
+	$result .= variable_get('grievance_gform_footer', '');
+	$result .= "</div>";
+
+	$result .= "</div>";
+
+	/*
 	if (!$is_loopback) {
 		$result .= $pdf_link;
 	}
+	*/
 
 	return $result;
 }

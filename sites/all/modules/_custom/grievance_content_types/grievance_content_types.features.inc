@@ -29,6 +29,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'grievance_attachment' => array(
+      'name' => t('Grievance Attachment'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'grievance_basic_page' => array(
       'name' => t('Grievance Basic Page'),
       'base' => 'node_content',
