@@ -17,6 +17,10 @@ function grievance_notify($node) {
 	}
 	if ($status_tid == $orig_status_tid) { return; }
 
+	// Only notify if we haven't already, for this status
+	if (grievance_log_notify_check($node)) { return; }
+
+	// Get the company representative
 	$email = $node->field_grievance_co_email['und'][0]['email'];
 	if (!$email) { 
 		drupal_set_message(t('Warning: No notification has been sent, because no company representative email has been entered.  The company has NOT been notified!'), 'warning');
@@ -42,8 +46,6 @@ function grievance_notify($node) {
 		'filemime' => 'grievance/pdf',
 	);
 
-
-	/*
 	drupal_mail(
 		'grievance', 
 		'notify', 
@@ -51,8 +53,6 @@ function grievance_notify($node) {
 		LANGUAGE_NONE, 
 		$params
 	);
-	*/
-
 
 	grievance_log_notify(
 		$node,

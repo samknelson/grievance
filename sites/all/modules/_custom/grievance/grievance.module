@@ -28,11 +28,12 @@ function grievance_cron() {
 /*
 function grievance_node_update($node) {
   if ($node->type == 'grievance') {
-    grievance_log_update($node, 'update');
-    grievance_notify($node);
+    grievance_log_notify_check($node);
   }
 }
+*/
 
+/*
 function grievance_node_insert($node) {
   if ($node->type == 'grievance') {
     grievance_log_update($node, 'insert');

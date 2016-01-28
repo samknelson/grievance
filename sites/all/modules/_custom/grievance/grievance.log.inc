@@ -33,6 +33,28 @@ function grievance_log_update($grievance_node, $title) {
   node_save($log_node);
 }
 
+function grievance_log_notify_check($grievance_node) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_notify_type', ''));
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
+  $stmt = $query->execute();
+
+  if (!$stmt['node']) { return FALSE; }
+
+  $log_nids = array_keys($stmt['node']);
+  $log_nodes = node_load_multiple($log_nids);
+
+  foreach ($log_nodes as $log_node) {
+    if ($log_node->field_grievance_status['und'][0]['tid'] == $grievance_node->field_grievance_status['und'][0]['tid']) {
+      return TRUE; 
+    }
+  }
+
+  return FALSE;
+}
+
 function grievance_log_notify($grievance_node, $email, $cc_arr, $subject, $body, $attachments) {
   global $user;
 
