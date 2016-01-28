@@ -3215,6 +3215,7 @@ fieldset legend {
 
 
 
+.grievance_form_body_grievance_gform_a .group-leftright,
 .grievance_form_body_grievance_gform_a .group-leftright {
   padding: 20px;
   border: 2px solid #000000;
@@ -3223,6 +3224,18 @@ fieldset legend {
   margin-bottom: 20px;
 }
 
+.grievance_form_body_grievance_gform .group-leftright,
+.grievance_form_body_grievance_gform .group-leftright {
+  padding: 20px;
+  border-top: 2px solid #000000;
+  border-bottom: 2px solid #000000;
+  clear: both;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+
+.grievance_form_body_grievance_gform .group-footer section.field-label-above,
 .grievance_form_body_grievance_gform_a .group-footer section.field-label-above {
   padding-bottom: 15px;
 }
