@@ -150,6 +150,11 @@ function grievance_content_types_ds_field_settings_info() {
       'label' => 'inline',
       'format' => 'default',
     ),
+    'grievant_name' => array(
+      'weight' => '0',
+      'label' => 'inline',
+      'format' => 'default',
+    ),
     'field_grievance_type' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -161,20 +166,6 @@ function grievance_content_types_ds_field_settings_info() {
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Employer',
-        ),
-      ),
-    ),
-    'field_grievance_first_name' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'Grievant First Name',
-        ),
-      ),
-    ),
-    'field_grievance_last_name' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'Grievant Last Name',
         ),
       ),
     ),
@@ -777,39 +768,37 @@ function grievance_content_types_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
-        0 => 'field_grievance_shop',
-        1 => 'field_grievance_first_name',
-        2 => 'field_grievance_last_name',
-        3 => 'field_grievance_address',
-        4 => 'field_grievance_address_2',
-        5 => 'field_grievance_city',
-        6 => 'field_grievance_state',
-        7 => 'field_grievance_zip',
-        8 => 'field_grievance_classification',
+        0 => 'grievant_name',
+        1 => 'field_grievance_shop',
+        2 => 'field_grievance_address',
+        3 => 'field_grievance_address_2',
+        4 => 'field_grievance_city',
+        5 => 'field_grievance_state',
+        6 => 'field_grievance_zip',
+        7 => 'field_grievance_classification',
       ),
       'right' => array(
-        9 => 'field_grievance_date_1',
-        10 => 'grievance_timeline',
-        11 => 'field_grievance_ein',
-        12 => 'field_grievance_hire_date',
-        13 => 'field_grievance_phone',
+        8 => 'field_grievance_date_1',
+        9 => 'grievance_timeline',
+        10 => 'field_grievance_ein',
+        11 => 'field_grievance_hire_date',
+        12 => 'field_grievance_phone',
       ),
       'footer' => array(
-        14 => 'field_grievance_type',
-        15 => 'field_grievance_type_other',
-        16 => 'field_grievance_violation',
-        17 => 'field_grievance_remedy',
-        18 => 'field_grievance_remedy_other',
-        19 => 'field_grievance_supervisor_name',
-        20 => 'field_grievance_co_name',
-        21 => 'field_grievance_rep_organizer',
-        22 => 'field_grievance_rep_lead',
+        13 => 'field_grievance_type',
+        14 => 'field_grievance_type_other',
+        15 => 'field_grievance_violation',
+        16 => 'field_grievance_remedy',
+        17 => 'field_grievance_remedy_other',
+        18 => 'field_grievance_supervisor_name',
+        19 => 'field_grievance_co_name',
+        20 => 'field_grievance_rep_organizer',
+        21 => 'field_grievance_rep_lead',
       ),
     ),
     'fields' => array(
+      'grievant_name' => 'left',
       'field_grievance_shop' => 'left',
-      'field_grievance_first_name' => 'left',
-      'field_grievance_last_name' => 'left',
       'field_grievance_address' => 'left',
       'field_grievance_address_2' => 'left',
       'field_grievance_city' => 'left',

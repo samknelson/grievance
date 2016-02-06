@@ -1565,9 +1565,8 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
+        'type' => 'hidden',
         'weight' => 1,
       ),
       'teaser' => array(
@@ -1715,9 +1714,8 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
+        'type' => 'hidden',
         'weight' => 2,
       ),
       'teaser' => array(
