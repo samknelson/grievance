@@ -155,13 +155,6 @@ function grievance_content_types_ds_field_settings_info() {
       'label' => 'inline',
       'format' => 'default',
     ),
-    'field_grievance_type' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'FACTS OF THE CASE',
-        ),
-      ),
-    ),
     'field_grievance_shop' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -804,15 +797,14 @@ function grievance_content_types_ds_layout_settings_info() {
         12 => 'field_grievance_phone',
       ),
       'footer' => array(
-        13 => 'field_grievance_type',
-        14 => 'field_grievance_type_other',
-        15 => 'field_grievance_violation',
-        16 => 'field_grievance_remedy',
-        17 => 'field_grievance_remedy_other',
-        18 => 'field_grievance_supervisor_name',
-        19 => 'field_grievance_co_name',
-        20 => 'field_grievance_rep_organizer',
-        21 => 'field_grievance_rep_lead',
+        13 => 'field_grievance_type_other',
+        14 => 'field_grievance_violation',
+        15 => 'field_grievance_remedy',
+        16 => 'field_grievance_remedy_other',
+        17 => 'field_grievance_supervisor_name',
+        18 => 'field_grievance_co_name',
+        19 => 'field_grievance_rep_organizer',
+        20 => 'field_grievance_rep_lead',
       ),
     ),
     'fields' => array(
@@ -829,7 +821,6 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_grievance_ein' => 'right',
       'field_grievance_hire_date' => 'right',
       'field_grievance_phone' => 'right',
-      'field_grievance_type' => 'footer',
       'field_grievance_type_other' => 'footer',
       'field_grievance_violation' => 'footer',
       'field_grievance_remedy' => 'footer',

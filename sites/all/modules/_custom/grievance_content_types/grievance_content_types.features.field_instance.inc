@@ -2676,9 +2676,8 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
-        'module' => 'taxonomy',
         'settings' => array(),
-        'type' => 'taxonomy_term_reference_plain',
+        'type' => 'hidden',
         'weight' => 14,
       ),
       'teaser' => array(
