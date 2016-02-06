@@ -7,6 +7,7 @@ features[ctools][] = views:views_default:3.0
 features[features_api][] = api:2
 features[views_view][] = grievance_attachments
 features[views_view][] = grievance_basic_pages
+features[views_view][] = grievance_field_overrides
 features[views_view][] = grievance_log
 features[views_view][] = grievance_shops
 features[views_view][] = grievance_timeline

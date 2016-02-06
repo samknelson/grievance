@@ -103,11 +103,10 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_document_type']['field'] = 'field_grievance_document_type';
   $handler->display->display_options['fields']['field_grievance_document_type']['label'] = 'Type';
   $handler->display->display_options['fields']['field_grievance_document_type']['type'] = 'taxonomy_term_reference_plain';
-  /* Field: Content: Attachments */
+  /* Field: Content: Attachment */
   $handler->display->display_options['fields']['field_grievance_attachments']['id'] = 'field_grievance_attachments';
   $handler->display->display_options['fields']['field_grievance_attachments']['table'] = 'field_data_field_grievance_attachments';
   $handler->display->display_options['fields']['field_grievance_attachments']['field'] = 'field_grievance_attachments';
-  $handler->display->display_options['fields']['field_grievance_attachments']['label'] = 'Attachment';
   $handler->display->display_options['fields']['field_grievance_attachments']['click_sort_column'] = 'fid';
   $handler->display->display_options['fields']['field_grievance_attachments']['delta_offset'] = '0';
   /* Field: Content: Post date */
@@ -290,6 +289,130 @@ function grievance_views_views_default_views() {
   $export['grievance_basic_pages'] = $view;
 
   $view = new view();
+  $view->name = 'grievance_field_overrides';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'Grievance Field Overrides';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Grievance Field Overrides';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'grievance admin';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'some';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '5';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'title' => 'title',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'title' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
+  /* Header: Global: Text area */
+  $handler->display->display_options['header']['area']['id'] = 'area';
+  $handler->display->display_options['header']['area']['table'] = 'views';
+  $handler->display->display_options['header']['area']['field'] = 'area';
+  $handler->display->display_options['header']['area']['empty'] = TRUE;
+  $handler->display->display_options['header']['area']['content'] = 'The list below shows "field overrides".  Sometimes the grievance system uses a field label which is not appropriate to your installation.  For example, the grievance software refers to the union staff person assigned to a grievance as the "Organizer", whereas a particular installation might refer to them as a "Steward".  The list below can be used to override field labels or descriptions.';
+  $handler->display->display_options['header']['area']['format'] = 'full_html';
+  /* Footer: Global: Text area */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
+  $handler->display->display_options['footer']['area']['empty'] = TRUE;
+  $handler->display->display_options['footer']['area']['content'] = '[<a href="/node/add/grievance-field-overrides">Add an override</a>]
+[<a href="/admin/config/grievances/fieldoverrides/apply">Apply Overrides</a>]';
+  $handler->display->display_options['footer']['area']['format'] = 'full_html';
+  /* Field: Content: Entity Type */
+  $handler->display->display_options['fields']['field_grievance_entity_type']['id'] = 'field_grievance_entity_type';
+  $handler->display->display_options['fields']['field_grievance_entity_type']['table'] = 'field_data_field_grievance_entity_type';
+  $handler->display->display_options['fields']['field_grievance_entity_type']['field'] = 'field_grievance_entity_type';
+  /* Field: Content: Bundle */
+  $handler->display->display_options['fields']['field_grievance_bundle']['id'] = 'field_grievance_bundle';
+  $handler->display->display_options['fields']['field_grievance_bundle']['table'] = 'field_data_field_grievance_bundle';
+  $handler->display->display_options['fields']['field_grievance_bundle']['field'] = 'field_grievance_bundle';
+  /* Field: Content: Field Name */
+  $handler->display->display_options['fields']['field_grievance_field_name']['id'] = 'field_grievance_field_name';
+  $handler->display->display_options['fields']['field_grievance_field_name']['table'] = 'field_data_field_grievance_field_name';
+  $handler->display->display_options['fields']['field_grievance_field_name']['field'] = 'field_grievance_field_name';
+  /* Field: Content: Label */
+  $handler->display->display_options['fields']['field_grievance_label']['id'] = 'field_grievance_label';
+  $handler->display->display_options['fields']['field_grievance_label']['table'] = 'field_data_field_grievance_label';
+  $handler->display->display_options['fields']['field_grievance_label']['field'] = 'field_grievance_label';
+  /* Field: Content: Description */
+  $handler->display->display_options['fields']['field_grievance_description']['id'] = 'field_grievance_description';
+  $handler->display->display_options['fields']['field_grievance_description']['table'] = 'field_data_field_grievance_description';
+  $handler->display->display_options['fields']['field_grievance_description']['field'] = 'field_grievance_description';
+  /* Field: Content: Edit link */
+  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['label'] = 'Edit';
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
+  $handler->display->display_options['sorts']['title']['order'] = 'DESC';
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'grievance_field_overrides' => 'grievance_field_overrides',
+  );
+
+  /* Display: Block */
+  $handler = $view->new_display('block', 'Block', 'block');
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page_1');
+  $handler->display->display_options['path'] = 'admin/config/grievances/fieldoverrides';
+  $translatables['grievance_field_overrides'] = array(
+    t('Master'),
+    t('Grievance Field Overrides'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('The list below shows "field overrides".  Sometimes the grievance system uses a field label which is not appropriate to your installation.  For example, the grievance software refers to the union staff person assigned to a grievance as the "Organizer", whereas a particular installation might refer to them as a "Steward".  The list below can be used to override field labels or descriptions.'),
+    t('[<a href="/node/add/grievance-field-overrides">Add an override</a>]
+[<a href="/admin/config/grievances/fieldoverrides/apply">Apply Overrides</a>]'),
+    t('Entity Type'),
+    t('Bundle'),
+    t('Field Name'),
+    t('Label'),
+    t('Description'),
+    t('Edit'),
+    t('Block'),
+    t('Page'),
+  );
+  $export['grievance_field_overrides'] = $view;
+
+  $view = new view();
   $view->name = 'grievance_log';
   $view->description = '';
   $view->tag = 'default';
@@ -348,15 +471,14 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_status']['table'] = 'field_data_field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['field'] = 'field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['type'] = 'taxonomy_term_reference_plain';
-  /* Field: Content: Next Step */
+  /* Field: Content: Next Step in the Grievance Procedure for the Union */
   $handler->display->display_options['fields']['field_grievance_alert']['id'] = 'field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['table'] = 'field_data_field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['field'] = 'field_grievance_alert';
-  /* Field: Content: Next Deadline */
+  /* Field: Content: Next Deadline Date */
   $handler->display->display_options['fields']['field_grievance_alert_date']['id'] = 'field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['field'] = 'field_grievance_alert_date';
-  $handler->display->display_options['fields']['field_grievance_alert_date']['label'] = 'Next Deadline Date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -418,7 +540,7 @@ function grievance_views_views_default_views() {
     t('Title'),
     t('Author'),
     t('Status'),
-    t('Next Step'),
+    t('Next Step in the Grievance Procedure for the Union'),
     t('Next Deadline Date'),
     t('All'),
     t('Block'),
@@ -1077,15 +1199,14 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_status']['table'] = 'field_data_field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['field'] = 'field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['type'] = 'taxonomy_term_reference_plain';
-  /* Field: Content: Next Step */
+  /* Field: Content: Next Step in the Grievance Procedure for the Union */
   $handler->display->display_options['fields']['field_grievance_alert']['id'] = 'field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['table'] = 'field_data_field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['field'] = 'field_grievance_alert';
-  /* Field: Content: Next Deadline */
+  /* Field: Content: Next Deadline Date */
   $handler->display->display_options['fields']['field_grievance_alert_date']['id'] = 'field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['field'] = 'field_grievance_alert_date';
-  $handler->display->display_options['fields']['field_grievance_alert_date']['label'] = 'Next Deadline Date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['settings'] = array(
     'format_type' => 'short',
     'fromto' => 'both',
@@ -1243,11 +1364,10 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['nid']['table'] = 'node';
   $handler->display->display_options['fields']['nid']['field'] = 'nid';
   $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
-  /* Field: Content: Next Deadline */
+  /* Field: Content: Next Deadline Date */
   $handler->display->display_options['fields']['field_grievance_alert_date']['id'] = 'field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['field'] = 'field_grievance_alert_date';
-  $handler->display->display_options['fields']['field_grievance_alert_date']['label'] = 'Next Deadline Date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['settings'] = array(
     'format_type' => 'short',
     'fromto' => 'both',
@@ -1256,7 +1376,7 @@ function grievance_views_views_default_views() {
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Next Deadline */
+  /* Field: Content: Next Deadline Date */
   $handler->display->display_options['fields']['field_grievance_alert_date_1']['id'] = 'field_grievance_alert_date_1';
   $handler->display->display_options['fields']['field_grievance_alert_date_1']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date_1']['field'] = 'field_grievance_alert_date';
@@ -1266,7 +1386,7 @@ function grievance_views_views_default_views() {
     'interval' => '2',
     'interval_display' => 'inverse time span',
   );
-  /* Field: Content: Next Step */
+  /* Field: Content: Next Step in the Grievance Procedure for the Union */
   $handler->display->display_options['fields']['field_grievance_alert']['id'] = 'field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['table'] = 'field_data_field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['field'] = 'field_grievance_alert';
@@ -1311,7 +1431,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['label'] = 'Edit';
   $handler->display->display_options['defaults']['sorts'] = FALSE;
-  /* Sort criterion: Content: Next Deadline (field_grievance_alert_date) */
+  /* Sort criterion: Content: Next Deadline Date (field_grievance_alert_date) */
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['id'] = 'field_grievance_alert_date_value';
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['field'] = 'field_grievance_alert_date_value';
@@ -1459,7 +1579,7 @@ function grievance_views_views_default_views() {
     t('Last Name'),
     t('Filed By'),
     t('Statement of Grievance'),
-    t('Next Step'),
+    t('Next Step in the Grievance Procedure for the Union'),
     t('Next Deadline Date'),
     t('View'),
     t('Edit'),

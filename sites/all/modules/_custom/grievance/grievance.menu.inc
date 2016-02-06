@@ -140,6 +140,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['admin/config/grievances/fieldoverrides/apply'] = array(
+		'title' => 'Apply Field Overrides',
+		'description' => '',
+		'page callback' => 'grievance_field_overrides_apply',
+		'page arguments' => array(),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
   return $items;
 }
 

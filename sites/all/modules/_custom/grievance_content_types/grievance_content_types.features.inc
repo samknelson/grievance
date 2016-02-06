@@ -45,6 +45,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'grievance_field_overrides' => array(
+      'name' => t('Grievance Field Overrides'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'grievance_log' => array(
       'name' => t('Grievance Log'),
       'base' => 'node_content',

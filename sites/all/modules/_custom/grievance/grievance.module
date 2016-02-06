@@ -16,6 +16,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.block.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.notify.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.alert.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.field_overrides.inc";
 
 /**
  * Implement hook_cron() 
