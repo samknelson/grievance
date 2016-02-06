@@ -70,7 +70,7 @@ function grievance_field_overrides_apply() {
 	  }
 
 	  if ($default) {
-	  	$instance_info['default_value'] = $default;
+	  	$instance_info['default_value'] = array('value' => $default);
 
   		drupal_set_message(
   			t('Set default for @entity_type / @bundle / @field_name to @default', 
