@@ -70,6 +70,7 @@ function grievance_field_overrides_apply() {
 	  }
 
 	  if ($default) {
+	  	dpm($instance_info);
 	  	$instance_info['default_value'] = array('value' => $default);
 
   		drupal_set_message(
