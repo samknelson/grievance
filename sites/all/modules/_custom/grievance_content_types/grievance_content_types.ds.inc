@@ -153,7 +153,7 @@ function grievance_content_types_ds_field_settings_info() {
     'field_grievance_type' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'lb' => 'FACTS OF THE CASE:',
+          'lb' => 'FACTS OF THE CASE',
         ),
       ),
     ),
@@ -181,56 +181,56 @@ function grievance_content_types_ds_field_settings_info() {
     'field_grievance_supervisor_name' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'lb' => 'SUPERVISOR OR FOREMAN INVOLVED:',
-        ),
-      ),
-    ),
-    'field_grievance_rep_filed' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'STEWARD INVOLVED:',
+          'lb' => 'SUPERVISOR OR FOREMAN INVOLVED',
         ),
       ),
     ),
     'field_grievance_rep_organizer' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'lb' => 'BUSINESS AGENT ASSIGNED TO THIS GRIEVANCE:',
+          'lb' => 'STEWARD INVOLVED',
+        ),
+      ),
+    ),
+    'field_grievance_rep_lead' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'BUSINESS AGENT INVOLVED',
         ),
       ),
     ),
     'field_grievance_co_name' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'lb' => 'REPORTED TO:',
+          'lb' => 'REPORTED TO',
         ),
       ),
     ),
     'field_grievance_remedy_other' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'lb' => 'REMEDY SOUGHT:',
+          'lb' => 'REMEDY SOUGHT',
         ),
       ),
     ),
     'field_grievance_remedy' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'lb' => 'REMEDY SOUGHT:',
+          'lb' => 'REMEDY SOUGHT',
         ),
       ),
     ),
     'field_grievance_type_other' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'lb' => 'FACTS OF THE CASE:',
+          'lb' => 'FACTS OF THE CASE',
         ),
       ),
     ),
     'field_grievance_violation' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'lb' => 'ARTICLES OF THE CONTRACT VIOLATED:',
+          'lb' => 'ARTICLES OF THE CONTRACT VIOLATED',
         ),
       ),
     ),
@@ -802,8 +802,8 @@ function grievance_content_types_ds_layout_settings_info() {
         18 => 'field_grievance_remedy_other',
         19 => 'field_grievance_supervisor_name',
         20 => 'field_grievance_co_name',
-        21 => 'field_grievance_rep_filed',
-        22 => 'field_grievance_rep_organizer',
+        21 => 'field_grievance_rep_organizer',
+        22 => 'field_grievance_rep_lead',
       ),
     ),
     'fields' => array(
@@ -828,8 +828,8 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_grievance_remedy_other' => 'footer',
       'field_grievance_supervisor_name' => 'footer',
       'field_grievance_co_name' => 'footer',
-      'field_grievance_rep_filed' => 'footer',
       'field_grievance_rep_organizer' => 'footer',
+      'field_grievance_rep_lead' => 'footer',
     ),
     'classes' => array(),
     'wrappers' => array(
