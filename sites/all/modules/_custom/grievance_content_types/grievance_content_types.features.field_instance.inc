@@ -3122,6 +3122,48 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_field_overrides-field_grievance_default'.
+  $field_instances['node-grievance_field_overrides-field_grievance_default'] = array(
+    'bundle' => 'grievance_field_overrides',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_default',
+    'label' => 'Default Value',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_field_overrides-field_grievance_description'.
   $field_instances['node-grievance_field_overrides-field_grievance_description'] = array(
     'bundle' => 'grievance_field_overrides',
@@ -4225,6 +4267,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Contract');
   t('Date of Grievance');
   t('Date of Hire');
+  t('Default Value');
   t('Department');
   t('Description');
   t('Email');

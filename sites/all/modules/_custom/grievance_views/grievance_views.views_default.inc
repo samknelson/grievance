@@ -363,6 +363,10 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['label'] = 'Edit';
+  /* Field: Content: Default Value */
+  $handler->display->display_options['fields']['field_grievance_default']['id'] = 'field_grievance_default';
+  $handler->display->display_options['fields']['field_grievance_default']['table'] = 'field_data_field_grievance_default';
+  $handler->display->display_options['fields']['field_grievance_default']['field'] = 'field_grievance_default';
   /* Sort criterion: Content: Title */
   $handler->display->display_options['sorts']['title']['id'] = 'title';
   $handler->display->display_options['sorts']['title']['table'] = 'node';
@@ -407,6 +411,7 @@ function grievance_views_views_default_views() {
     t('Label'),
     t('Description'),
     t('Edit'),
+    t('Default Value'),
     t('Block'),
     t('Page'),
   );
