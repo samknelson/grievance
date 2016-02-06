@@ -22,6 +22,7 @@ function grievance_field_overrides_apply() {
 		$field_name = $node->field_grievance_field_name['und'][0]['value'];
 		$label = $node->field_grievance_label['und'][0]['value'];
 		$description = $node->field_grievance_description['und'][0]['value'];
+		$default = $node->field_grievance_default['und'][0]['value'];
 
 	  $instance_info = field_info_instance($entity_type, $field_name, $bundle);
 	  if (!$instance_info) {
@@ -63,6 +64,21 @@ function grievance_field_overrides_apply() {
 	  				'@bundle' => $bundle,
 	  				'@field_name' => $field_name,
 	  				'@description' => $description
+	  			)
+		  	)
+		  );
+	  }
+
+	  if ($default) {
+	  	$instance_info['default_value'] = $default;
+
+  		drupal_set_message(
+  			t('Set default for @entity_type / @bundle / @field_name to @default', 
+	  			array(
+	  				'@entity_type' => $entity_type,
+	  				'@bundle' => $bundle,
+	  				'@field_name' => $field_name,
+	  				'@default' => $default
 	  			)
 		  	)
 		  );
