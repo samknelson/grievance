@@ -76,7 +76,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -137,7 +137,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -195,7 +195,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 47,
+        'weight' => 49,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -260,7 +260,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 48,
+        'weight' => 50,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -329,7 +329,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 49,
+        'weight' => 51,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -354,7 +354,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 12,
+      'weight' => 35,
     ),
   );
 
@@ -370,7 +370,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -389,7 +389,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 46,
+        'weight' => 48,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -414,7 +414,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 14,
+      'weight' => 36,
     ),
   );
 
@@ -430,7 +430,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -449,7 +449,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 45,
+        'weight' => 47,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -474,7 +474,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 15,
+      'weight' => 37,
     ),
   );
 
@@ -490,7 +490,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -509,7 +509,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 44,
+        'weight' => 46,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -534,7 +534,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 16,
+      'weight' => 38,
     ),
   );
 
@@ -571,7 +571,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -632,7 +632,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 8,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -692,7 +692,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -752,7 +752,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -812,7 +812,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -872,7 +872,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 40,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -932,7 +932,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 20,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -992,7 +992,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 39,
+        'weight' => 41,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1052,7 +1052,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 38,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1112,7 +1112,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 39,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1170,7 +1170,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 50,
+        'weight' => 52,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1230,7 +1230,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 43,
+        'weight' => 45,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1319,7 +1319,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 9,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1388,7 +1388,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 41,
+        'weight' => 43,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1447,7 +1447,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 11,
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1508,7 +1508,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 40,
+        'weight' => 42,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1567,7 +1567,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 1,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1647,7 +1647,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 12,
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1684,6 +1684,66 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-grievance-field_grievance_inforeq'.
+  $field_instances['node-grievance-field_grievance_inforeq'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 31,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 21,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_inforeq',
+    'label' => 'Information Request',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 16,
+    ),
+  );
+
   // Exported field_instance: 'node-grievance-field_grievance_last_name'.
   $field_instances['node-grievance-field_grievance_last_name'] = array(
     'bundle' => 'grievance',
@@ -1716,7 +1776,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1777,7 +1837,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 13,
+        'weight' => 12,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1813,7 +1873,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
@@ -1838,7 +1898,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 17,
+        'weight' => 15,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1872,7 +1932,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => 'If the remedy does not fit one of the options above, enter an alternative remedy here.',
     'display' => array(
       'default' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
@@ -1897,7 +1957,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 18,
+        'weight' => 16,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1961,7 +2021,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2034,7 +2094,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 22,
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2103,7 +2163,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 51,
+        'weight' => 53,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2175,7 +2235,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 21,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2245,7 +2305,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 52,
+        'weight' => 54,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2320,7 +2380,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2382,7 +2442,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2440,7 +2500,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 53,
+        'weight' => 55,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2498,7 +2558,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 19,
+        'weight' => 17,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2558,7 +2618,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2618,7 +2678,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 42,
+        'weight' => 44,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2654,7 +2714,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
@@ -2678,7 +2738,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 14,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2737,7 +2797,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 15,
+        'weight' => 13,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2799,7 +2859,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 16,
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2861,7 +2921,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4286,6 +4346,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Grievance Log Type');
   t('If the grievance does not fit one of the options above, enter an alternative grievance statement here.');
   t('If the remedy does not fit one of the options above, enter an alternative remedy here.');
+  t('Information Request');
   t('Is this status considered "Un-Resolved"?  Only unresolved grievances are displayed on the "my grievances" list.');
   t('Label');
   t('Labor charges or other relevant shop issues');

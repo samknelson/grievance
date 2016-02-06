@@ -161,9 +161,6 @@ function grievance_content_types_field_group_info() {
     'weight' => '9',
     'children' => array(
       0 => 'field_grievance_comments',
-      1 => 'field_grievance_attachments',
-      2 => 'field_grievance_attachments_a',
-      3 => 'field_grievance_attachments_b',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -484,6 +481,7 @@ function grievance_content_types_field_group_info() {
       2 => 'field_grievance_remedy',
       3 => 'field_grievance_type_other',
       4 => 'field_grievance_violation',
+      5 => 'field_grievance_inforeq',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -516,6 +514,7 @@ function grievance_content_types_field_group_info() {
       3 => 'field_grievance_remedy',
       4 => 'field_grievance_type_other',
       5 => 'field_grievance_violation',
+      6 => 'field_grievance_inforeq',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
