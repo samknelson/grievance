@@ -289,8 +289,9 @@ function grievance_content_types_ds_custom_fields_info() {
   $ds_field->ui_limit = '';
   $ds_field->properties = array(
     'code' => array(
-      'value' => '[node:field_grievance_first_name] [node:field_grievance_last_name]',
-      'format' => 'plain_text',
+      'value' => '[node:field_grievance_first_name] [node:field_grievance_last_name]
+',
+      'format' => 'full_html',
     ),
     'use_token' => 1,
   );
