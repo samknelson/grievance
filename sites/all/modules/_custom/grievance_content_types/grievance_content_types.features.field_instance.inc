@@ -2030,7 +2030,7 @@ function grievance_content_types_field_default_field_instances() {
         'weight' => 52,
       ),
       'grievance_gform_a' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
           'link' => 0,
