@@ -489,6 +489,10 @@ function grievance_notify_form_submit($form, &$form_state) {
 		}
 	}
 
+	if ($is_changed) {
+		node_save($grievance_node);
+	}
+
 	// Next, send the notification.
 	$to = $company_recipients['primary'][0]['name'] . ' <' . $company_recipients['primary'][0]['email'] . '>';
 	$from = $union_recipients['primary'][0]['name'] . ' <' . $union_recipients['primary'][0]['email'] . '>';
@@ -565,6 +569,9 @@ function grievance_notify_form_submit($form, &$form_state) {
 	if ($bcc) {
 		drupal_set_message(t('Notification BCC: ') . htmlspecialchars($bcc));
 	}
+
+	$form_state['rebuild'] = FALSE;
+	$form_state['redirect'] = 'node/' . $grievance_node->nid . '/gform';
 }
 
 function grievance_notify_form_add_one_company($form, &$form_state) {
