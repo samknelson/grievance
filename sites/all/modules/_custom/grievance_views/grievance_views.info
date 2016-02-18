@@ -9,6 +9,7 @@ features[views_view][] = grievance_attachments
 features[views_view][] = grievance_basic_pages
 features[views_view][] = grievance_field_overrides
 features[views_view][] = grievance_log
+features[views_view][] = grievance_shop_contacts
 features[views_view][] = grievance_shops
 features[views_view][] = grievance_timeline
 features[views_view][] = grievances

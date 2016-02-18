@@ -43,6 +43,20 @@ function grievance_node_tabs() {
 		'callback' => 'grievance_node_tab_arbitrationform',
 		'permissions' => array('grievance admin'),
 	);
+
+	$node_tabs['grievance']['notification'] = array(
+		'title' => 'Notification',
+		'description' => '',
+		'callback' => 'grievance_node_tab_notification',
+		'permissions' => array('grievance user'),
+	);
+
+	$node_tabs['grievance_shop']['contacts'] = array(
+		'title' => 'Contacts',
+		'description' => '',
+		'callback' => 'grievance_shop_node_tab_contacts',
+		'permissions' => array('grievance admin'),
+	);
 	
 	return $node_tabs;
 }

@@ -150,6 +150,243 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_co_address|node|grievance_shop_contact|default';
+  $field_group->group_name = 'group_grievance_co_address';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop_contact';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Address',
+    'weight' => '2',
+    'children' => array(
+      0 => 'field_grievance_co_address',
+      1 => 'field_grievance_co_address_2',
+      2 => 'field_grievance_co_city',
+      3 => 'field_grievance_co_state',
+      4 => 'field_grievance_co_zip',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Address',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-grievance-co-address field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_grievance_co_address|node|grievance_shop_contact|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_co_address|node|grievance_shop_contact|form';
+  $field_group->group_name = 'group_grievance_co_address';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop_contact';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_grievance_co';
+  $field_group->data = array(
+    'label' => 'Address',
+    'weight' => '8',
+    'children' => array(
+      0 => 'field_grievance_co_address',
+      1 => 'field_grievance_co_address_2',
+      2 => 'field_grievance_co_city',
+      3 => 'field_grievance_co_state',
+      4 => 'field_grievance_co_zip',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-grievance-co-address field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_grievance_co_address|node|grievance_shop_contact|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_co_email|node|grievance_shop_contact|default';
+  $field_group->group_name = 'group_grievance_co_email';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop_contact';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Email and Phone',
+    'weight' => '1',
+    'children' => array(
+      0 => 'field_grievance_co_phone',
+      1 => 'field_grievance_co_email',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Email and Phone',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-grievance-co-email field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_grievance_co_email|node|grievance_shop_contact|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_co_email|node|grievance_shop_contact|form';
+  $field_group->group_name = 'group_grievance_co_email';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop_contact';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_grievance_co';
+  $field_group->data = array(
+    'label' => 'Phone and Email',
+    'weight' => '9',
+    'children' => array(
+      0 => 'field_grievance_co_phone',
+      1 => 'field_grievance_co_email',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'label' => 'Phone and Email',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-grievance-co-email field-group-accordion-item',
+        'description' => 'The email field will be used to send notifications to this representative.',
+      ),
+      'formatter' => 'closed',
+    ),
+  );
+  $field_groups['group_grievance_co_email|node|grievance_shop_contact|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_co_nameandrole|node|grievance_shop_contact|default';
+  $field_group->group_name = 'group_grievance_co_nameandrole';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop_contact';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Name and Role',
+    'weight' => '0',
+    'children' => array(
+      0 => 'field_grievance_co_name',
+      1 => 'field_grievance_co_role',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Name and Role',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-grievance-co-nameandrole field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_grievance_co_nameandrole|node|grievance_shop_contact|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_co_nameandrole|node|grievance_shop_contact|form';
+  $field_group->group_name = 'group_grievance_co_nameandrole';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop_contact';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_grievance_co';
+  $field_group->data = array(
+    'label' => 'Name and Role',
+    'weight' => '7',
+    'children' => array(
+      0 => 'field_grievance_co_name',
+      1 => 'field_grievance_co_role',
+      2 => 'title',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-grievance-co-nameandrole field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_grievance_co_nameandrole|node|grievance_shop_contact|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_co_shops|node|grievance_shop_contact|default';
+  $field_group->group_name = 'group_grievance_co_shops';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop_contact';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Shops and Statuses',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_grievance_shops',
+      1 => 'field_grievance_statuses',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Shops and Statuses',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-grievance-co-shops field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_grievance_co_shops|node|grievance_shop_contact|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_co_shops|node|grievance_shop_contact|form';
+  $field_group->group_name = 'group_grievance_co_shops';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop_contact';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_grievance_co';
+  $field_group->data = array(
+    'label' => 'Shops and Statuses',
+    'weight' => '10',
+    'children' => array(
+      0 => 'field_grievance_shops',
+      1 => 'field_grievance_statuses',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'label' => 'Shops and Statuses',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-grievance-co-shops field-group-accordion-item',
+        'description' => 'This contact will appear as an option for any of the shops selected.  If you select statuses, then the contact will also appear as an option for <strong>every</strong> grievance with that status.',
+      ),
+      'formatter' => 'closed',
+    ),
+  );
+  $field_groups['group_grievance_co_shops|node|grievance_shop_contact|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_comments|node|grievance|default';
   $field_group->group_name = 'group_grievance_comments';
   $field_group->entity_type = 'node';
@@ -271,6 +508,36 @@ function grievance_content_types_field_group_info() {
     ),
   );
   $field_groups['group_grievance_company|node|grievance|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_co|node|grievance_shop_contact|form';
+  $field_group->group_name = 'group_grievance_co';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop_contact';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Company Representative',
+    'weight' => '0',
+    'children' => array(
+      0 => 'group_grievance_co_nameandrole',
+      1 => 'group_grievance_co_email',
+      2 => 'group_grievance_co_address',
+      3 => 'group_grievance_co_shops',
+    ),
+    'format_type' => 'accordion',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'effect' => 'none',
+        'classes' => '',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_grievance_co|node|grievance_shop_contact|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -988,17 +1255,23 @@ function grievance_content_types_field_group_info() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Address');
   t('Arbitration');
   t('Arbitration Comments');
   t('Attachments');
   t('Comments');
   t('Comments and Attachments');
   t('Company Represenatives');
+  t('Company Representative');
   t('Company Representatives');
+  t('Email and Phone');
   t('Employee');
   t('Grievance');
   t('Grievance Form');
+  t('Name and Role');
   t('Notifications');
+  t('Phone and Email');
+  t('Shops and Statuses');
   t('Status');
   t('Supervisor');
   t('Timeline');

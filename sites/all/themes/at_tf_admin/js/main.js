@@ -19,6 +19,19 @@
 		
 		$(".showhide_b").hide();
 
+
+
+		$('.grievance-recipient .form-type-radios input').change(function () {
+
+			$(this).closest('.grievance-recipient').removeClass('grievance-recipient-none');
+			$(this).closest('.grievance-recipient').removeClass('grievance-recipient-primary');
+			$(this).closest('.grievance-recipient').removeClass('grievance-recipient-secondary');
+			$(this).closest('.grievance-recipient').removeClass('grievance-recipient-secret');
+
+
+			$(this).closest('.grievance-recipient').addClass('grievance-recipient-' + this.value);
+    });
+
 	}); // END: DRF
 }(jQuery));
 

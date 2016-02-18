@@ -69,6 +69,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Shop Name'),
       'help' => '',
     ),
+    'grievance_shop_contact' => array(
+      'name' => t('Grievance Shop Contact'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
   );
   drupal_alter('node_info', $items);
   return $items;

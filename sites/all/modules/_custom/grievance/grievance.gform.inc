@@ -54,6 +54,10 @@ function grievance_node_tab_gform($node, $is_loopback = FALSE) {
 }
 
 function grievance_node_tab_gform_pdf($node) {
+	// Spool the PDF
+	header('Content-Type: application/pdf');
+	header("Content-Disposition: attachment; filename=grievance_" . $node->nid . ".pdf");
+
 	print grievance_gform_pdf_contents($node);
 	drupal_exit();
 }
@@ -75,10 +79,6 @@ function grievance_gform_pdf_contents($node) {
 	$cmd .= ' ';
 	$cmd .= $pdf_path;
 	exec($cmd);
-
-	// Spool the PDF
-	header('Content-Type: text/csv');
-	header("Content-Disposition: attachment; filename=grievance_" . $node->nid . ".pdf");
 
 	return file_get_contents($pdf_path);
 }

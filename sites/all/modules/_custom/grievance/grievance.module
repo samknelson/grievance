@@ -17,6 +17,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.notify.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.alert.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.field_overrides.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.contacts.inc";
 
 /**
  * Implement hook_cron() 
@@ -47,7 +48,7 @@ function grievance_node_postsave($node, $op) {
   if ($node->type == 'grievance') {
     if ($op == 'insert' || $op == 'update') {
       grievance_log_update($node, $op);
-      grievance_notify($node);
+      // grievance_notify($node);
     }
   }
 }
@@ -57,7 +58,6 @@ function grievance_mail($key, &$message, $params) {
 	global $user;
   switch($key) {
     case 'grievance':
-    case 'notify':
     case 'alert':
       $message['subject'] = $params['subject'];
       $message['body'][] = $params['body'];
@@ -66,12 +66,34 @@ function grievance_mail($key, &$message, $params) {
 			}
 			$message['headers']['Reply-To'] = $user->mail;
       break;
+
+    case 'notify':
+      $message['subject'] = $params['subject'];
+      $message['body'][] = $params['body'];
+      if (isset($params['attachments'])) {
+        $message['params']['attachments'] = $params['attachments'];
+      }
+      $from = $message['params']['from'];
+      if (!$from) {
+        $from = $user->mail;
+      }
+      $message['headers']['Reply-To'] = $from;
+      $message['headers']['From'] = $from;
+      $message['headers']['Return-Path'] = $from;
+      if ($message['params']['Cc']) {
+        $message['headers']['Cc'] = $message['params']['Cc'];
+      } 
+      if ($message['params']['Bcc']) {
+        $message['headers']['Bcc'] = $message['params']['Bcc'];
+      } 
+
+      break;
   }
 }
 
 function grievance_form_alter(&$form, &$form_state, $form_id) {
   // Set default values for entity fields with autocomplete widgets
-  $defaultable_fields = array('grievance');
+  $defaultable_fields = array('grievance', 'grievance_shops');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $nid = $_GET[$field];

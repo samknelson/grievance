@@ -55,11 +55,19 @@ function grievance_log_notify_check($grievance_node) {
   return FALSE;
 }
 
-function grievance_log_notify($grievance_node, $email, $cc_arr, $subject, $body, $attachments) {
+function grievance_log_notify(
+  $grievance_node, 
+  $from, 
+  $to, 
+  $cc,
+  $subject, 
+  $body, 
+  $attachments
+) {
   global $user;
 
   $log_node = new stdClass();
-  $log_node->title = t('Notification sent to ') . $params[''];
+  $log_node->title = t('Notification sent to ') . htmlspecialchars($to);
   $log_node->type = 'grievance_log';
   node_object_prepare($log_node);
   $log_node->language = LANGUAGE_NONE;
@@ -75,9 +83,9 @@ function grievance_log_notify($grievance_node, $email, $cc_arr, $subject, $body,
   $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_notify_type', '');
 
   $comments = t("COMPANY NOTIFICATION SENT\n");
-  $comments .= t('To: ') . $email . "\n";
-  foreach ($cc_arr as $cc) {
-    $comments .= t('Cc: ') . $email . "\n";
+  $comments .= t('To: ') . htmlspecialchars($to) . "\n";
+  if ($cc) {
+    $comments .= t('Cc: ') . htmlspecialchars($cc) . "\n";
   }
   $comments .= t('Subject: ') . $subject . "\n\n";
   $comments .= $body;

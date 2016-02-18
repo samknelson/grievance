@@ -3239,3 +3239,68 @@ fieldset legend {
 .grievance_form_body_grievance_gform_a .group-footer section.field-label-above {
   padding-bottom: 15px;
 }
+
+
+.grievance_recipients {
+  clear: both;
+}
+
+.grievance-recipient {
+  width: 190px;
+  padding: 10px;
+  float: left;
+  margin-right: 20px;
+  margin-top: 20px;
+  height: 190px;
+  border: 1px solid #000000;
+  background-color: #dcdcdc;
+  border-radius: 10px;
+}
+
+.grievance-recipient:hover {
+  background-color: #FFC384;
+  border-color: #ff8500;
+}
+
+.grievance-recipient-secondary,
+.grievance-recipient-secret {
+  background-color: #ffffff;
+}
+
+.grievance-recipient-primary {
+  background-color: #CBC5EB;
+  border-color: #6154a4;
+}
+
+
+.grievance-recipient-name { 
+  font-weight: bold;
+}
+
+.grievance-recipient-type {
+  color: #666666;
+}
+
+.grievance-union-recipients-intro,
+.grievance-company-recipients-intro {
+  clear: both;
+}
+
+
+.grievance-recipient .form-type-textfield label {
+  display:inline;
+  float: left;
+  width: 60px;
+}
+
+.grievance-recipient .form-type-textfield input {
+  width: 110px;
+  float: left;
+}
+
+.grievance-recipient .form-item {
+  clear: left;
+}
+
+
+
