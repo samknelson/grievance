@@ -3253,7 +3253,7 @@ fieldset legend {
   margin-top: 20px;
   height: 190px;
   border: 1px solid #000000;
-  background-color: #dcdcdc;
+  background-color: #ffffff;
   border-radius: 10px;
 }
 
@@ -3262,6 +3262,7 @@ fieldset legend {
   border-color: #ff8500;
 }
 
+/*
 .grievance-recipient-secondary,
 .grievance-recipient-secret {
   background-color: #ffffff;
@@ -3271,7 +3272,7 @@ fieldset legend {
   background-color: #CBC5EB;
   border-color: #6154a4;
 }
-
+*/
 
 .grievance-recipient-name { 
   font-weight: bold;
