@@ -215,11 +215,15 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 				if ($nodupes[$user->mail]) { continue; }
 				$nodupes[$user->mail] = TRUE;
 
+
 				$recipient = array();
 				$recipient['type'] = $label;
 				$recipient['uid'] = $uid;
 				$recipient['name'] = $user->name;
 				$recipient['email'] = $user->mail;
+				if ($field == 'field_grievance_rep_watching') {
+					$recipient['secret'] = TRUE;
+				}
 
 				$union_recipients[] = $recipient;
 			}
@@ -269,6 +273,8 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 
 		if ($recipient['email'] == $user->mail) {
 			$default_value = 'primary';
+		} else if ($recipient['secret']) {
+			$default_value = 'secret';
 		} else if ($recipient['email']) {
 			$default_value = 'secondary';
 		} else {
@@ -518,11 +524,6 @@ function grievance_notify_form_submit($form, &$form_state) {
 			$bcc .= $recipient['name'] . ' <' . $recipient['email'] . '>';
 		}
 	}
-
-	drupal_set_message(htmlspecialchars("From: $from"));
-	drupal_set_message(htmlspecialchars("To: $to"));
-	drupal_set_message(htmlspecialchars("CC: $cc"));
-	drupal_set_message(htmlspecialchars("BCC: $bcc"));
 
 	$params = array();
 	$params['body'] = $form_state['values']['body'];

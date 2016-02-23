@@ -83,9 +83,10 @@ function grievance_log_notify(
   $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_notify_type', '');
 
   $comments = t("COMPANY NOTIFICATION SENT\n");
-  $comments .= t('To: ') . htmlspecialchars($to) . "\n";
+  $comments .= t('From: ') . $from . "\n";
+  $comments .= t('To: ') . $to . "\n";
   if ($cc) {
-    $comments .= t('Cc: ') . htmlspecialchars($cc) . "\n";
+    $comments .= t('Cc: ') . $cc . "\n";
   }
   $comments .= t('Subject: ') . $subject . "\n\n";
   $comments .= $body;
