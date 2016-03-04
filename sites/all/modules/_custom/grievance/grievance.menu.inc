@@ -57,6 +57,13 @@ function grievance_node_tabs() {
 		'callback' => 'grievance_shop_node_tab_contacts',
 		'permissions' => array('grievance admin'),
 	);
+
+	$node_tabs['grievance_company']['contacts'] = array(
+		'title' => 'Contacts',
+		'description' => '',
+		'callback' => 'grievance_company_node_tab_contacts',
+		'permissions' => array('grievance admin'),
+	);
 	
 	return $node_tabs;
 }

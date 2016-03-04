@@ -3711,6 +3711,50 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-grievance_shop-field_grievance_company'.
+  $field_instances['node-grievance_shop-field_grievance_company'] = array(
+    'bundle' => 'grievance_shop',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Enter the company that this shop is associated with.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_company',
+    'label' => 'Company',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 2,
+    ),
+  );
+
   // Exported field_instance: 'node-grievance_shop-field_grievance_contract'.
   $field_instances['node-grievance_shop-field_grievance_contract'] = array(
     'bundle' => 'grievance_shop',
@@ -4154,6 +4198,51 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_shop_contact-field_grievance_company'.
+  $field_instances['node-grievance_shop_contact-field_grievance_company'] = array(
+    'bundle' => 'grievance_shop_contact',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'If selected, this contact will appear for all shops associated with this company.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 9,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_company',
+    'label' => 'Company',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 14,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_shop_contact-field_grievance_shops'.
   $field_instances['node-grievance_shop_contact-field_grievance_shops'] = array(
     'bundle' => 'grievance_shop_contact',
@@ -4168,7 +4257,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 4,
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4194,7 +4283,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 11,
+      'weight' => 15,
     ),
   );
 
@@ -4211,7 +4300,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 5,
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4233,7 +4322,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 12,
+      'weight' => 16,
     ),
   );
 
@@ -4457,6 +4546,7 @@ function grievance_content_types_field_default_field_instances() {
   t('City');
   t('Classification');
   t('Comments');
+  t('Company');
   t('Company Rep Address');
   t('Company Rep Address 2');
   t('Company Rep City');
@@ -4474,6 +4564,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Email');
   t('Employee ID #');
   t('Enter the article of the contract that was violated, for example: Article ....');
+  t('Enter the company that this shop is associated with.');
   t('Enter the next deadline that the Union must meet -- i.e. "File Step 2" or "File for Arbitration".');
   t('Enter the organizer assigned to this grievance.');
   t('Enter the role of this representative, e.g. "Attorney" or "Manager".');
@@ -4486,6 +4577,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Grievance');
   t('Grievance Document Type');
   t('Grievance Log Type');
+  t('If selected, this contact will appear for all shops associated with this company.');
   t('If the grievance does not fit one of the options above, enter an alternative grievance statement here.');
   t('If the remedy does not fit one of the options above, enter an alternative remedy here.');
   t('Information Request');

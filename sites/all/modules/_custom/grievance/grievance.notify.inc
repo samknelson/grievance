@@ -53,6 +53,36 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 		}
 	}
 
+	// Find contacts associated with the company
+	$company_nid = $shop_node->field_grievance_company['und'][0]['target_id'];
+	$company_node = node_load($company_nid);
+
+	if ($company_nid) {
+		$query = new EntityFieldQuery();
+		$query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'grievance_shop_contact');
+	  $query->fieldCondition('field_grievance_company', 'target_id', $company_nid);
+		$stmt = $query->execute();
+		if ($stmt['node']) {
+			$contact_nids = array_keys($stmt['node']);
+			$contact_nodes = node_load_multiple($contact_nids);
+			foreach ($contact_nodes as $contact_nid => $contact_node) {
+				$recipient = array();
+				$role = $contact_node->field_grievance_co_role['und'][0]['value'];
+				if ($role) {
+					$recipient['type'] = $role . t(' for ') . $company_node->title;
+				} else {
+					$recipient['type'] = t('Copmany contact for: ') . $company_node->title;
+				}
+
+				$recipient['nid'] = $contact_node->nid;
+				$recipient['name'] = $contact_node->field_grievance_co_name['und'][0]['value'];
+				$recipient['email'] = $contact_node->field_grievance_co_email['und'][0]['email'];
+				$recipients[] = $recipient;
+			}
+		}
+	}
+
 	// Find shop contacts associated with the status
 	$status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
 	$status_term = taxonomy_term_load($status_tid);

@@ -1,19 +1,88 @@
 <?php
 
 function grievance_report_bytype() {
+	return drupal_get_form('grievance_report_bytype_form');
+}
 
-	$consolidate_status = !$_REQUEST['expand_status'];
-	$consolidate_type = !$_REQUEST['expand_type'];
+function grievance_report_bytype_form($form, &$form_state) {
 
-	$html = '';
-	$html .= l(t('default'), current_path());
-	$html .= ' // '; 
-	$html .= l(t('expand type'), current_path(), array('query' => array('expand_type' => 1)));
-	$html .= ' // '; 
-	$html .= l(t('expand status'), current_path(), array('query' => array('expand_status' => 1)));
-	$html .= ' // '; 
-	$html .= l(t('expand both'), current_path(), array('query' => array('expand_type' => 1, 'expand_status' => 1)));
+  $form['company'] = array(
+    '#type' => 'entityreference',
+    '#title' => t('Company'),
+    '#era_entity_type' => 'node',
+    '#era_bundles' => array('grievance_company'),
+    '#era_query_settings' => array(),
+  );
 
+  $form['shop'] = array(
+    '#type' => 'entityreference',
+    '#title' => t('Shop'),
+    '#era_entity_type' => 'node',
+    '#era_bundles' => array('grievance_shop'),
+    '#era_query_settings' => array(),
+  );
+
+  $form['start_date'] = array(
+    '#title' => t('Start Date'),
+    '#date_format' => 'm/d/Y',
+    '#type' => 'date_popup',
+    '#default_value' => NULL,
+	);
+
+  $form['end_date'] = array(
+    '#title' => t('End Date'),
+    '#date_format' => 'm/d/Y',
+    '#type' => 'date_popup',
+    '#default_value' => NULL,
+	);
+
+  $form['expand_type'] = array(
+    '#title' => t('Expand Type?'),
+    '#type' => 'select',
+    '#options' => array(
+    	'0' => t('No, show only general grievance types'),
+    	'1' => t('Yes, show detailed breakdown of grievance types')
+    )
+	);
+
+  $form['expand_status'] = array(
+    '#title' => t('Expand Status?'),
+    '#type' => 'select',
+    '#options' => array(
+    	'0' => t('No, show only top-level statuses'),
+    	'1' => t('Yes, show detailed breakdown of grievance status')
+    )
+	);
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Generate Report',
+  );
+
+  if ($form_state['results']) {
+  	$form['results'] = array(
+  		'#type' => 'markup',
+  		'#markup' => $form_state['results'],
+  	);
+  }
+
+  return $form;
+}
+
+function grievance_report_bytype_form_submit($form, &$form_state) {
+	$form_state['rebuild'] = TRUE;
+
+	$shop_nid = $form_state['values']['shop']['entity_id'];
+	$company_nid = $form_state['values']['company']['entity_id'];
+
+	$consolidate_status = !$form_state['values']['expand_status'];
+	$consolidate_type = !$form_state['values']['expand_type'];
+
+	$start_date = $form_state['values']['start_date'];
+	if ($start_date) { $start_ts = strtotime($start_date); }
+
+	$end_date = $form_state['values']['end_date'];
+	if ($end_date) { $end_ts = strtotime($end_date); }
 
 	$grievance_type_vid = taxonomy_vocabulary_machine_name_load('grievance_types')->vid;
 	$grievance_type_terms = taxonomy_get_tree($grievance_type_vid);
@@ -29,18 +98,48 @@ function grievance_report_bytype() {
 		$grievance_status_map[$term->tid] = $term; 
 	}
 
+	$args = array();
 	$sql = "select field_grievance_status_tid, field_grievance_type_tid, count(*) as c ";
-	$sql .= "from field_data_field_grievance_status, field_data_field_grievance_type ";
-	$sql .= "where field_data_field_grievance_status.entity_id = field_data_field_grievance_type.entity_id ";
-	$sql .= "and field_data_field_grievance_status.entity_type = 'node' ";
-	$sql .= "and field_data_field_grievance_status.bundle = 'grievance' ";
-	$sql .= "and field_data_field_grievance_status.deleted = 0 ";
-	$sql .= "and field_data_field_grievance_type.entity_type = 'node' ";
-	$sql .= "and field_data_field_grievance_type.bundle = 'grievance' ";
-	$sql .= "and field_data_field_grievance_type.deleted = 0 ";
+	$sql .= "from node grievance_node ";
+	$sql .= "left join field_data_field_grievance_status on (";
+	$sql .= "    field_data_field_grievance_status.entity_id = grievance_node.nid ";
+	$sql .= "    and field_data_field_grievance_status.entity_type = 'node' ";
+	$sql .= "    and field_data_field_grievance_status.deleted = 0 ";
+	$sql .= ") ";
+	$sql .= "left join field_data_field_grievance_type on (";
+	$sql .= "    field_data_field_grievance_type.entity_id = grievance_node.nid ";
+	$sql .= "    and field_data_field_grievance_type.entity_type = 'node' ";
+	$sql .= "    and field_data_field_grievance_type.deleted = 0 ";
+	$sql .= ") ";
+	$sql .= "left join field_data_field_grievance_shop on (";
+	$sql .= "    field_data_field_grievance_shop.entity_id = grievance_node.nid ";
+	$sql .= "    and field_data_field_grievance_shop.entity_type = 'node' ";
+	$sql .= "    and field_data_field_grievance_shop.deleted = 0 ";
+	$sql .= ") ";
+	$sql .= "left join field_data_field_grievance_company on (";
+	$sql .= "    field_data_field_grievance_company.entity_id = field_data_field_grievance_shop.field_grievance_shop_target_id ";
+	$sql .= "    and field_data_field_grievance_company.entity_type = 'node' ";
+	$sql .= "    and field_data_field_grievance_company.deleted = 0 ";
+	$sql .= ") ";
+	$sql .= "where grievance_node.type = 'grievance' ";
+	if ($company_nid) {
+		$sql .= "and field_data_field_grievance_company.field_grievance_company_target_id = :company_nid ";
+		$args[':company_nid'] = $company_nid;
+	}
+	if ($shop_nid) {
+		$sql .= "and field_data_field_grievance_shop.field_grievance_shop_target_id = :shop_nid ";
+		$args[':shop_nid'] = $shop_nid;
+	}
+	if ($start_ts) {
+		$sql .= "and grievance_node.created >= :start_ts ";
+		$args[':start_ts'] = $start_ts;
+	}
+	if ($end_ts) {
+		$sql .= "and grievance_node.created <= :end_ts ";
+		$args[':end_ts'] = $end_ts;
+	}
 	$sql .= "group by field_grievance_status_tid, field_grievance_type_tid ";
-	$stmt = db_query($sql);
-	$stmt->execute();
+	$stmt = db_query($sql, $args);
 	$counts = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		$status_tid = $hr['field_grievance_status_tid'];
@@ -103,7 +202,11 @@ function grievance_report_bytype() {
 	$row[] = '<strong>' . number_format($counts[0][0]) . '</strong>';
 	$rows[] = $row;
 
+	$html = '<hr>';
+
 	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+
+	$form_state['results'] = $html;
 
 	return $html;
 }

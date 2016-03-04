@@ -341,6 +341,7 @@ function grievance_content_types_field_group_info() {
     'children' => array(
       0 => 'field_grievance_shops',
       1 => 'field_grievance_statuses',
+      2 => 'field_grievance_company',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -370,6 +371,7 @@ function grievance_content_types_field_group_info() {
     'children' => array(
       0 => 'field_grievance_shops',
       1 => 'field_grievance_statuses',
+      2 => 'field_grievance_company',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -909,16 +911,7 @@ function grievance_content_types_field_group_info() {
   $field_group->data = array(
     'label' => 'Notifications',
     'weight' => '2',
-    'children' => array(
-      0 => 'field_grievance_co_name',
-      1 => 'field_grievance_co_phone',
-      2 => 'field_grievance_co_email',
-      3 => 'field_grievance_co_address',
-      4 => 'field_grievance_co_address_2',
-      5 => 'field_grievance_co_city',
-      6 => 'field_grievance_co_state',
-      7 => 'field_grievance_co_zip',
-    ),
+    'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(
       'formatter' => 'collapsible',

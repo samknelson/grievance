@@ -93,7 +93,7 @@ function grievance_mail($key, &$message, $params) {
 
 function grievance_form_alter(&$form, &$form_state, $form_id) {
   // Set default values for entity fields with autocomplete widgets
-  $defaultable_fields = array('grievance', 'grievance_shops');
+  $defaultable_fields = array('grievance', 'grievance_shops', 'grievance_company');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $nid = $_GET[$field];

@@ -3303,5 +3303,6 @@ fieldset legend {
   clear: left;
 }
 
-
-
+.page-grievance-report-bytype .form-type-date-popup .form-item label {
+  display: none;
+}
