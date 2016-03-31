@@ -79,6 +79,7 @@ function grievance_quicksearch_autocomplete($string) {
 		return;
 	}
 	$matches = grievance_quicksearch_results($string);
+	if (!$matches) { $matches = array(); }
   drupal_json_output($matches);
 }
 
