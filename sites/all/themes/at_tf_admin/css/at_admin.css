@@ -2466,13 +2466,13 @@ table.trustfund-payperiod tr.error {
 	background-color: #f4fbfe;
 }
 
-#block-trustfund-trustfund-quicksearch,
-#block-trustfund-trustfund-quicksearch-sub {
+#block-grievance-grievance-quicksearch,
+#block-grievance-grievance-quicksearch-sub {
 	position: relative;
 }
 
-#trustfund-quicksearch-form,
-#trustfund-quicksearch-sub-form {
+#grievance-quicksearch-form,
+#grievance-quicksearch-sub-form {
 	width: auto;
 	float: right;
 	position: absolute;
@@ -2485,17 +2485,17 @@ table.trustfund-payperiod tr.error {
 }
 
 
-#trustfund-quicksearch-form label,
-#trustfund-quicksearch-sub-form label {
+#grievance-quicksearch-form label,
+#grievance-quicksearch-sub-form label {
 	display: none;
 }
 
-#trustfund-quicksearch-form .form-submit,
-#trustfund-quicksearch-sub-form .form-submit {
+#grievance-quicksearch-form .form-submit,
+#grievance-quicksearch-sub-form .form-submit {
 	margin-right: 0;
 }
-#trustfund-quicksearch-form div.form-item,
-#trustfund-quicksearch-sub-form div.form-item {
+#grievance-quicksearch-form div.form-item,
+#grievance-quicksearch-sub-form div.form-item {
 	display: inline-block;
 	margin: 0;
 	padding: 0;
