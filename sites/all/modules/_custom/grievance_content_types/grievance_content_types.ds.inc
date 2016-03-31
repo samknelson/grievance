@@ -104,11 +104,6 @@ function grievance_content_types_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'grievance';
   $ds_fieldsetting->view_mode = 'grievance_gform';
   $ds_fieldsetting->settings = array(
-    'grievance_form_signature' => array(
-      'weight' => '30',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'grievance_timeline' => array(
       'weight' => '1',
       'label' => 'inline',
@@ -145,8 +140,13 @@ function grievance_content_types_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'grievance';
   $ds_fieldsetting->view_mode = 'grievance_gform_a';
   $ds_fieldsetting->settings = array(
+    'grievance_address_combined' => array(
+      'weight' => '2',
+      'label' => 'inline',
+      'format' => 'default',
+    ),
     'grievance_timeline' => array(
-      'weight' => '9',
+      'weight' => '10',
       'label' => 'inline',
       'format' => 'default',
     ),
@@ -236,6 +236,25 @@ function grievance_content_types_ds_field_settings_info() {
  */
 function grievance_content_types_ds_custom_fields_info() {
   $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'grievance_address_combined';
+  $ds_field->label = 'Grievant\'s Address';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '[node:field_grievance_address]<br />
+[node:field_grievance_city], [node:field_grievance_state] [node:field_grievance_zip]',
+      'format' => 'full_html',
+    ),
+    'use_token' => 1,
+  );
+  $export['grievance_address_combined'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -719,7 +738,6 @@ function grievance_content_types_ds_layout_settings_info() {
         27 => 'field_grievance_type_other',
         28 => 'field_grievance_remedy',
         29 => 'field_grievance_remedy_other',
-        30 => 'grievance_form_signature',
       ),
     ),
     'fields' => array(
@@ -753,7 +771,6 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_grievance_type_other' => 'footer',
       'field_grievance_remedy' => 'footer',
       'field_grievance_remedy_other' => 'footer',
-      'grievance_form_signature' => 'footer',
     ),
     'classes' => array(),
     'wrappers' => array(
@@ -785,40 +802,32 @@ function grievance_content_types_ds_layout_settings_info() {
       'left' => array(
         0 => 'grievant_name',
         1 => 'field_grievance_shop',
-        2 => 'field_grievance_address',
-        3 => 'field_grievance_address_2',
-        4 => 'field_grievance_city',
-        5 => 'field_grievance_state',
-        6 => 'field_grievance_zip',
-        7 => 'field_grievance_classification',
+        2 => 'grievance_address_combined',
+        3 => 'field_grievance_classification',
       ),
       'right' => array(
-        8 => 'field_grievance_date_1',
-        9 => 'grievance_timeline',
-        10 => 'field_grievance_ein',
-        11 => 'field_grievance_hire_date',
-        12 => 'field_grievance_phone',
+        4 => 'field_grievance_date_1',
+        5 => 'grievance_timeline',
+        6 => 'field_grievance_ein',
+        7 => 'field_grievance_hire_date',
+        8 => 'field_grievance_phone',
       ),
       'footer' => array(
-        13 => 'field_grievance_type_other',
-        14 => 'field_grievance_violation',
-        15 => 'field_grievance_remedy',
-        16 => 'field_grievance_remedy_other',
-        17 => 'field_grievance_supervisor_name',
-        18 => 'field_grievance_co_name',
-        19 => 'field_grievance_rep_organizer',
-        20 => 'field_grievance_rep_lead',
-        21 => 'field_grievance_inforeq',
+        9 => 'field_grievance_type_other',
+        10 => 'field_grievance_violation',
+        11 => 'field_grievance_remedy',
+        12 => 'field_grievance_remedy_other',
+        13 => 'field_grievance_supervisor_name',
+        14 => 'field_grievance_co_name',
+        15 => 'field_grievance_rep_organizer',
+        16 => 'field_grievance_rep_lead',
+        17 => 'field_grievance_inforeq',
       ),
     ),
     'fields' => array(
       'grievant_name' => 'left',
       'field_grievance_shop' => 'left',
-      'field_grievance_address' => 'left',
-      'field_grievance_address_2' => 'left',
-      'field_grievance_city' => 'left',
-      'field_grievance_state' => 'left',
-      'field_grievance_zip' => 'left',
+      'grievance_address_combined' => 'left',
       'field_grievance_classification' => 'left',
       'field_grievance_date_1' => 'right',
       'grievance_timeline' => 'right',

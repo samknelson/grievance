@@ -23,6 +23,7 @@ features[ds_field_settings][] = node|grievance_log|default
 features[ds_field_settings][] = node|grievance|default
 features[ds_field_settings][] = node|grievance|grievance_gform
 features[ds_field_settings][] = node|grievance|grievance_gform_a
+features[ds_fields][] = grievance_address_combined
 features[ds_fields][] = grievance_form_signature
 features[ds_fields][] = grievance_timeline
 features[ds_fields][] = grievant_name

@@ -15,6 +15,11 @@ function grievance_block_info() {
     'cache' => DRUPAL_CACHE_PER_ROLE,
   );
 
+  $blocks['grievance_quicksearch'] = array(
+    'info' => t('Grievance QuickSearch'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
   return $blocks;
 }
 
@@ -27,6 +32,11 @@ function grievance_block_view($delta = '') {
   if ($delta == 'grievance_messaging_footer') { 
     $block['subject'] = t('');
     $block['content'] = variable_get('grievance_messaging_footer', '');
+  }
+
+  if ($delta == 'grievance_quicksearch') { 
+    $block['subject'] = t('QuickSearch');
+    $block['content'] = drupal_get_form('grievance_quicksearch_form');
   }
 
   return $block;

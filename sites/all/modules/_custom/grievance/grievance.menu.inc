@@ -170,6 +170,22 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	// QuickSearch
+	
+	$items['grievance/ajax/quicksearch'] = array(
+		'page callback' => 'grievance_quicksearch_autocomplete',
+		'page arguments' => array(),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_CALLBACK,
+	);
+
+	$items['grievance/admin/quicksearch/%'] = array(
+		'page callback' => 'grievance_quicksearch_page',
+		'page arguments' => array(3),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_CALLBACK,
+	);
+
   return $items;
 }
 
