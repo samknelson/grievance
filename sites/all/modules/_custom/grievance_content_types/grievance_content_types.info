@@ -237,6 +237,7 @@ features[node][] = grievance_field_overrides
 features[node][] = grievance_log
 features[node][] = grievance_shop
 features[node][] = grievance_shop_contact
+features[taxonomy][] = grievance_alert_types
 features[taxonomy][] = grievance_document_types
 features[taxonomy][] = grievance_log_types
 features[taxonomy][] = grievance_remedies
