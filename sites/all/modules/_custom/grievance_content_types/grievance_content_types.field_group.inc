@@ -21,7 +21,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Arbitration',
-    'weight' => '10',
+    'weight' => '11',
     'children' => array(
       0 => 'field_grievance_arbitration_a',
       1 => 'field_grievance_arbitration_b',
@@ -397,7 +397,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Comments and Attachments',
-    'weight' => '9',
+    'weight' => '10',
     'children' => array(
       0 => 'field_grievance_comments',
     ),
@@ -452,7 +452,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Company Represenatives',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(
       0 => 'field_grievance_co_name',
       1 => 'field_grievance_co_email',
@@ -629,7 +629,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Employee',
-    'weight' => '5',
+    'weight' => '6',
     'children' => array(
       0 => 'field_grievance_department',
       1 => 'field_grievance_phone',
@@ -743,7 +743,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Grievance Form',
-    'weight' => '8',
+    'weight' => '9',
     'children' => array(
       0 => 'field_grievance_type',
       1 => 'field_grievance_remedy_other',
@@ -969,7 +969,8 @@ function grievance_content_types_field_group_info() {
       0 => 'field_grievance_status',
       1 => 'field_grievance_alert_date',
       2 => 'field_grievance_alert',
-      3 => 'title',
+      3 => 'field_grievance_alert_waived',
+      4 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -995,7 +996,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Supervisor',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
       0 => 'field_grievance_supervisor_name',
       1 => 'field_grievance_supervisor_title',
@@ -1054,7 +1055,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Timeline',
-    'weight' => '11',
+    'weight' => '12',
     'children' => array(
       0 => 'field_grievance_date_1',
       1 => 'grievance_timeline',
@@ -1082,7 +1083,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Union Representatives',
-    'weight' => '4',
+    'weight' => '5',
     'children' => array(
       0 => 'field_grievance_rep_filed',
       1 => 'field_grievance_rep_organizer',
@@ -1145,7 +1146,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Union Representatives',
-    'weight' => '39',
+    'weight' => '43',
     'children' => array(
       0 => 'field_grievance_rep_filed',
       1 => 'field_grievance_rep_organizer',

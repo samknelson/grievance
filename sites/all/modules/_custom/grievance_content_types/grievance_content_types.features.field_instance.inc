@@ -69,7 +69,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 16,
+        'weight' => 17,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -129,7 +129,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 17,
+        'weight' => 18,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -187,7 +187,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 47,
+        'weight' => 51,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -252,7 +252,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 48,
+        'weight' => 52,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -296,6 +296,88 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-grievance-field_grievance_alert_waived'.
+  $field_instances['node-grievance-field_grievance_alert_waived'] = array(
+    'bundle' => 'grievance',
+    'deleted' => 0,
+    'description' => 'Deadlines have been waived as of this date.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => 0,
+        ),
+        'type' => 'date_default',
+        'weight' => 4,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'inline',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => 0,
+        ),
+        'type' => 'date_default',
+        'weight' => 2,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_alert_waived',
+    'label' => 'Deadlines Waived',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'now',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'no_fieldset' => 0,
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_popup',
+      'weight' => 33,
+    ),
+  );
+
   // Exported field_instance: 'node-grievance-field_grievance_arbitration_a'.
   $field_instances['node-grievance-field_grievance_arbitration_a'] = array(
     'bundle' => 'grievance',
@@ -321,7 +403,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 49,
+        'weight' => 53,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -381,7 +463,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 46,
+        'weight' => 50,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -441,7 +523,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 45,
+        'weight' => 49,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -501,7 +583,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 44,
+        'weight' => 48,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -562,7 +644,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 18,
+        'weight' => 19,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -622,7 +704,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -683,7 +765,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -743,7 +825,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 9,
+        'weight' => 10,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -803,7 +885,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 10,
+        'weight' => 11,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -863,7 +945,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'email',
         'settings' => array(),
         'type' => 'email_plain',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -922,7 +1004,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -983,7 +1065,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1043,7 +1125,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1103,7 +1185,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1161,7 +1243,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 50,
+        'weight' => 54,
       ),
       'grievance_gform_a' => array(
         'label' => 'hidden',
@@ -1209,7 +1291,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 23,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -1221,7 +1303,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 43,
+        'weight' => 47,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -1379,7 +1461,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 24,
+        'weight' => 25,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1437,7 +1519,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 42,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1499,7 +1581,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'email',
         'settings' => array(),
         'type' => 'email_plain',
-        'weight' => 22,
+        'weight' => 23,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1558,7 +1640,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 14,
+        'weight' => 15,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1630,7 +1712,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 51,
+        'weight' => 55,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1705,7 +1787,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 40,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -1767,7 +1849,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 15,
+        'weight' => 16,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1827,7 +1909,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 21,
+        'weight' => 22,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -1888,7 +1970,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 28,
+        'weight' => 29,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -1947,7 +2029,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 29,
+        'weight' => 30,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -2296,7 +2378,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 52,
+        'weight' => 56,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -2368,7 +2450,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -2432,7 +2514,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 19,
+        'weight' => 20,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -2490,7 +2572,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 53,
+        'weight' => 57,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -2547,7 +2629,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 11,
+        'weight' => 12,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -2608,7 +2690,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 12,
+        'weight' => 13,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -2668,7 +2750,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 13,
+        'weight' => 14,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -2728,7 +2810,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -2786,7 +2868,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 27,
+        'weight' => 28,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -2848,7 +2930,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'grievance_gform_a' => array(
         'label' => 'above',
@@ -2910,7 +2992,7 @@ function grievance_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'grievance_gform_a' => array(
         'label' => 'inline',
@@ -4553,6 +4635,8 @@ function grievance_content_types_field_default_field_instances() {
   t('Contract');
   t('Date of Grievance');
   t('Date of Hire');
+  t('Deadlines Waived');
+  t('Deadlines have been waived as of this date.');
   t('Default Value');
   t('Department');
   t('Description');
