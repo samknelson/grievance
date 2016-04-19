@@ -30,6 +30,13 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance user'),
 	);
 
+	$node_tabs['grievance']['settlements'] = array(
+		'title' => 'Settlements',
+		'description' => '',
+		'callback' => 'grievance_node_tab_settlements',
+		'permissions' => array('grievance admin'),
+	);
+
 	$node_tabs['grievance']['gform'] = array(
 		'title' => 'Grievance Form',
 		'description' => '',

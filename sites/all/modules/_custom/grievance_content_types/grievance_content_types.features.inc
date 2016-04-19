@@ -69,6 +69,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'grievance_settlement' => array(
+      'name' => t('Grievance Settlement'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'grievance_shop' => array(
       'name' => t('Grievance Shop'),
       'base' => 'node_content',

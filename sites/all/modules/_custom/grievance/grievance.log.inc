@@ -26,6 +26,7 @@ function grievance_log_update($grievance_node, $title) {
   $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
   $log_node->field_grievance_status = $grievance_node->field_grievance_status;
   $log_node->field_grievance_alert = $grievance_node->field_grievance_alert;
+  $log_node->field_grievance_alert_tid = $grievance_node->field_grievance_alert_tid;
   $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
   $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_update_type', '');
 
