@@ -1700,8 +1700,7 @@ function grievance_views_views_default_views() {
     'field_grievance_status' => 'field_grievance_status',
     'field_grievance_alert' => 'field_grievance_alert',
     'field_grievance_alert_date' => 'field_grievance_alert_date',
-    'title' => 'title',
-    'edit_node' => 'edit_node',
+    'nothing_1' => 'nothing_1',
   );
   $handler->display->display_options['style_options']['default'] = '-1';
   $handler->display->display_options['style_options']['info'] = array(
@@ -1734,6 +1733,8 @@ function grievance_views_views_default_views() {
       'empty_column' => 0,
     ),
     'field_grievance_rep_filed' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
@@ -1766,14 +1767,7 @@ function grievance_views_views_default_views() {
       'separator' => '',
       'empty_column' => 0,
     ),
-    'title' => array(
-      'sortable' => 1,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-    'edit_node' => array(
+    'nothing_1' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
@@ -1868,6 +1862,8 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_rep_filed']['settings'] = array(
     'link' => 0,
   );
+  $handler->display->display_options['fields']['field_grievance_rep_filed']['group_rows'] = FALSE;
+  $handler->display->display_options['fields']['field_grievance_rep_filed']['delta_limit'] = '1';
   $handler->display->display_options['fields']['field_grievance_rep_filed']['delta_offset'] = '0';
   /* Field: Content: Statement of Grievance */
   $handler->display->display_options['fields']['field_grievance_type']['id'] = 'field_grievance_type';
