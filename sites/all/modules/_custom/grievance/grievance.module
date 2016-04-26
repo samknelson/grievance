@@ -125,6 +125,7 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
         'field_grievance_arbitration_c',
         'field_grievance_arbitration_d',
         'field_grievance_alert_waived',
+        'field_grievance_alert_tid',
       );
       foreach ($fields as $field) {
         $form[$field]['#access'] = FALSE;
