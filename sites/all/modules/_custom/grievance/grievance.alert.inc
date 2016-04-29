@@ -35,13 +35,9 @@ function grievance_alert($node) {
 
 	$deadline = $node->field_grievance_alert_date['und'][0]['value'];
 	$alert = '';
-	if (isset($node->field_grievance_alert['und'][0]['value'])) {
-		$alert = $node->field_grievance_alert['und'][0]['value'];
-	} else {
-		$alert_tid = $node->field_grievance_alert['und'][0]['tid'];
-		$alert_term = taxonomy_term_load($alert_tid);
-		$alert = $alert_term->name;
-	}
+	$alert_tid = $node->field_grievance_alert['und'][0]['tid'];
+	$alert_term = taxonomy_term_load($alert_tid);
+	$alert = $alert_term->name;
 
 	$need_save = FALSE;
 

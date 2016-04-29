@@ -1733,7 +1733,7 @@ function grievance_views_views_default_views() {
       'empty_column' => 0,
     ),
     'field_grievance_rep_filed' => array(
-      'sortable' => 1,
+      'sortable' => 0,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
@@ -1880,6 +1880,12 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_alert']['id'] = 'field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['table'] = 'field_data_field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['field'] = 'field_grievance_alert';
+  $handler->display->display_options['fields']['field_grievance_alert']['label'] = 'Next Step in the Grievance Procedure for the Union (orig)';
+  /* Field: Content: Next Step in the Grievance Procedure for the Union */
+  $handler->display->display_options['fields']['field_grievance_alert_tid']['id'] = 'field_grievance_alert_tid';
+  $handler->display->display_options['fields']['field_grievance_alert_tid']['table'] = 'field_data_field_grievance_alert_tid';
+  $handler->display->display_options['fields']['field_grievance_alert_tid']['field'] = 'field_grievance_alert_tid';
+  $handler->display->display_options['fields']['field_grievance_alert_tid']['type'] = 'taxonomy_term_reference_plain';
   /* Field: Content: Next Deadline Date */
   $handler->display->display_options['fields']['field_grievance_alert_date']['id'] = 'field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['table'] = 'field_data_field_grievance_alert_date';
@@ -2115,8 +2121,14 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_alert']['id'] = 'field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['table'] = 'field_data_field_grievance_alert';
   $handler->display->display_options['fields']['field_grievance_alert']['field'] = 'field_grievance_alert';
-  $handler->display->display_options['fields']['field_grievance_alert']['label'] = 'Next Step';
+  $handler->display->display_options['fields']['field_grievance_alert']['label'] = 'Next Step (orig)';
   $handler->display->display_options['fields']['field_grievance_alert']['exclude'] = TRUE;
+  /* Field: Content: Next Step in the Grievance Procedure for the Union */
+  $handler->display->display_options['fields']['field_grievance_alert_tid']['id'] = 'field_grievance_alert_tid';
+  $handler->display->display_options['fields']['field_grievance_alert_tid']['table'] = 'field_data_field_grievance_alert_tid';
+  $handler->display->display_options['fields']['field_grievance_alert_tid']['field'] = 'field_grievance_alert_tid';
+  $handler->display->display_options['fields']['field_grievance_alert_tid']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_grievance_alert_tid']['type'] = 'taxonomy_term_reference_plain';
   /* Field: Content: Status */
   $handler->display->display_options['fields']['field_grievance_status']['id'] = 'field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['table'] = 'field_data_field_grievance_status';
@@ -2129,7 +2141,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['nothing_1']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing_1']['label'] = 'Status';
   $handler->display->display_options['fields']['nothing_1']['alter']['text'] = '[field_grievance_status]<br>
-Union must: [field_grievance_alert]';
+Union must: [field_grievance_alert_tid]';
   /* Field: Content: Shop */
   $handler->display->display_options['fields']['field_grievance_shop']['id'] = 'field_grievance_shop';
   $handler->display->display_options['fields']['field_grievance_shop']['table'] = 'field_data_field_grievance_shop';
@@ -2320,6 +2332,7 @@ Union must: [field_grievance_alert]';
     t('Last Name'),
     t('Filed By'),
     t('Statement of Grievance'),
+    t('Next Step in the Grievance Procedure for the Union (orig)'),
     t('Next Step in the Grievance Procedure for the Union'),
     t('Next Deadline Date'),
     t('Actions'),
@@ -2333,9 +2346,9 @@ Union must: [field_grievance_alert]';
     t('Time Remaining'),
     t('Next Deadline'),
     t('[field_grievance_alert_date]<br>([field_grievance_alert_date_1])'),
-    t('Next Step'),
+    t('Next Step (orig)'),
     t('[field_grievance_status]<br>
-Union must: [field_grievance_alert]'),
+Union must: [field_grievance_alert_tid]'),
     t('Grievant'),
     t('[field_grievance_first_name] [field_grievance_last_name]'),
     t('[field_grievance_first_name] [field_grievance_last_name]<br>

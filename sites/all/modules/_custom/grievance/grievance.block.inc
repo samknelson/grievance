@@ -47,7 +47,11 @@ function grievance_block_timeleft() {
   if (!$grievance_node) { return ''; }
   if ($grievance_node->type != 'grievance') { return ''; }
 
-  $alert = $grievance_node->field_grievance_alert['und'][0]['value'];
+  $alert_tid = $grievance_node->field_grievance_alert_tid['und'][0]['tid'];
+  $alert_term = taxonomy_term_load($alert_tid);
+  if ($alert_term) {
+    $alert = $alert_term->name;
+  }
   $alert_date = $grievance_node->field_grievance_alert_date['und'][0]['value'];
   $alert_date = strtotime($alert_date);
 
