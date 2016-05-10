@@ -18,7 +18,15 @@ function grievance_permission() {
 }
 
 function grievance_node_access($node, $op, $account) {
+	// If the node is a grievance, check if we have access to it.
 	if ($node->type == 'grievance') { return grievance_node_access_grievance($node, $op, $account); }
+
+	// If the node references a grievance, check that we have access to that grievance.
+	if (isset($node->field_grievance) && isset($node->field_grievance['und'][0]['target_id'])) {
+		$grievance_node = node_load($node->field_grievance['und'][0]['target_id']);
+		return grievance_node_access_grievance($grievance_node, $op, $account);
+	}
+	
 	return NODE_ACCESS_IGNORE;
 }
 
