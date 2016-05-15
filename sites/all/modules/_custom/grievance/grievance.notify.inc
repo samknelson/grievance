@@ -6,25 +6,9 @@ function grievance_node_tab_notification($grievance_node) {
 	return drupal_get_form('grievance_notify_form', $grievance_node);
 }
 
-function grievance_notify_form($form, &$form_state, $grievance_node) {
-	$form_state['grievance_node'] = $grievance_node;
-
-	//
-	// Company Recipients
-	//
-
-	$form['grievance_company_recipients_intro'] = array(
-		'#title' => '',
-		'#type' => 'markup',
-		'#markup' => '<h2>' . t('Company Recipients') . '</h2>' . t('Select <strong>one</strong> company contact as the primary recipient of the notification.  This contact will be entered into the grievance form.  Arbitrarily many company contacts may also be selected as secondary recipients.  These contacts will be CC\'d on the notification, but will not be recorded in the grievance form.'),
-		'#prefix' => '<div class="grievance-company-recipients-intro">',
-		'#suffix' => '</div>'
-	);
-
+function grievance_notify_conmpany_contacts($shop_nid) {
 	// Find shop contacts associated with the shop
 	$recipients = array();
-
-	$shop_nid = $grievance_node->field_grievance_shop['und'][0]['target_id'];
 	$shop_node = node_load($shop_nid);
 
 	if ($shop_nid) {
@@ -83,6 +67,7 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 		}
 	}
 
+	/*
 	// Find shop contacts associated with the status
 	$status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
 	$status_term = taxonomy_term_load($status_tid);
@@ -111,6 +96,28 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 			}
 		}
 	}
+	*/
+
+	return $recipients;
+}
+
+function grievance_notify_form($form, &$form_state, $grievance_node) {
+	$form_state['grievance_node'] = $grievance_node;
+
+	//
+	// Company Recipients
+	//
+
+	$form['grievance_company_recipients_intro'] = array(
+		'#title' => '',
+		'#type' => 'markup',
+		'#markup' => '<h2>' . t('Company Recipients') . '</h2>' . t('Select <strong>one</strong> company contact as the primary recipient of the notification.  This contact will be entered into the grievance form.  Arbitrarily many company contacts may also be selected as secondary recipients.  These contacts will be CC\'d on the notification, but will not be recorded in the grievance form.'),
+		'#prefix' => '<div class="grievance-company-recipients-intro">',
+		'#suffix' => '</div>'
+	);
+
+	$shop_nid = $grievance_node->field_grievance_shop['und'][0]['target_id'];
+	$recipients = grievance_notify_conmpany_contacts($shop_nid);
 
 	// Additional contacts
   if (!$form_state['num_addl_company_recipients']) {

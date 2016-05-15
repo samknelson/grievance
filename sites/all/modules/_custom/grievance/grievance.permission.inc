@@ -14,6 +14,10 @@ function grievance_permission() {
       'title' => t('Grievance Admin'), 
       'description' => t('Grievance administrator, with permission to modify system settings.'),
     ),
+    'grievance view' => array(
+    	'title' => t('Grievance View'),
+    	'description' => t('Permission to view any grievance on the system.  Does not grant any editing permissions.')
+    )
  );
 }
 
@@ -30,9 +34,12 @@ function grievance_node_access($node, $op, $account) {
 	return NODE_ACCESS_IGNORE;
 }
 
-function  grievance_node_access_grievance($node, $op, $account) {
+function grievance_node_access_grievance($node, $op, $account) {
 	// Admins can do anything
-	if (user_access('grievance admin', $account->uid)) { return NODE_ACCESS_IGNORE; }
+	if (user_access('grievance admin', $account)) { return NODE_ACCESS_IGNORE; }
+
+	// Viewers can view
+	if ($op == 'view' && user_access('grievance view', $account)) { return NODE_ACCESS_IGNORE; }
 
 	// Must be on one of the user rep fields for the grievance
 	$fields = array(

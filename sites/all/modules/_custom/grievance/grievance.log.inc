@@ -4,8 +4,11 @@ function grievance_node_tab_log($node) {
   drupal_set_title($node->title . ': ' . t('Log'));
   $entity_nid = $node->nid;
 
-  $result = views_embed_view('grievance_log', 'block', $entity_nid);
-  $result .= grievance_node_tab_get_addlink("grievance-log", array("grievance" => $entity_nid));
+  $result = '';
+  $result .= grievance_node_tab_get_addlink("grievance-log", array("grievance" => $entity_nid), 'Add a new log entry');
+  $result .= '<br>';
+  $result .= views_embed_view('grievance_log', 'block', $entity_nid);
+  $result .= grievance_node_tab_get_addlink("grievance-log", array("grievance" => $entity_nid), 'Add a new log entry');
 
   return $result;
 }

@@ -60,22 +60,13 @@ function grievance_content_types_ds_field_settings_info() {
     ),
     'field_grievance_status' => array(
       'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'Grievance Status',
-        ),
-      ),
-    ),
-    'field_grievance_alert' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'Next Step (orig)',
-        ),
+        'ft' => array(),
       ),
     ),
     'field_grievance_alert_date' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'lb' => 'Grievance Next Deadline',
+          'lb' => 'Next Deadline',
         ),
       ),
     ),
@@ -351,11 +342,13 @@ function grievance_content_types_ds_layout_settings_info() {
       'ds_content' => array(
         0 => 'field_grievance_document_type',
         1 => 'field_grievance_attachments',
+        2 => 'field_s3_file',
       ),
     ),
     'fields' => array(
       'field_grievance_document_type' => 'ds_content',
       'field_grievance_attachments' => 'ds_content',
+      'field_s3_file' => 'ds_content',
     ),
     'classes' => array(),
     'wrappers' => array(
@@ -386,10 +379,9 @@ function grievance_content_types_ds_layout_settings_info() {
         2 => 'field_grievance_log_type',
         3 => 'field_grievance_status',
         4 => 'field_grievance_alert_tid',
-        5 => 'field_grievance_alert',
-        6 => 'field_grievance_alert_date',
-        7 => 'body',
-        8 => 'field_grievance_attachments',
+        5 => 'field_grievance_alert_date',
+        6 => 'body',
+        7 => 'field_grievance_attachments',
       ),
     ),
     'fields' => array(
@@ -398,7 +390,6 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_grievance_log_type' => 'ds_content',
       'field_grievance_status' => 'ds_content',
       'field_grievance_alert_tid' => 'ds_content',
-      'field_grievance_alert' => 'ds_content',
       'field_grievance_alert_date' => 'ds_content',
       'body' => 'ds_content',
       'field_grievance_attachments' => 'ds_content',
@@ -757,6 +748,7 @@ function grievance_content_types_ds_layout_settings_info() {
         28 => 'field_grievance_type_other',
         29 => 'field_grievance_remedy',
         30 => 'field_grievance_remedy_other',
+        31 => 'field_grievance_inforeq',
       ),
     ),
     'fields' => array(
@@ -791,6 +783,7 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_grievance_type_other' => 'footer',
       'field_grievance_remedy' => 'footer',
       'field_grievance_remedy_other' => 'footer',
+      'field_grievance_inforeq' => 'footer',
     ),
     'classes' => array(),
     'wrappers' => array(

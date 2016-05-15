@@ -3255,6 +3255,7 @@ fieldset legend {
   border: 1px solid #000000;
   background-color: #ffffff;
   border-radius: 10px;
+  overflow: hidden;
 }
 
 .grievance-recipient:hover {
@@ -3303,6 +3304,11 @@ fieldset legend {
   clear: left;
 }
 
+.field-name-field-grievance-contact-selector-form .grievance-recipient {
+  height: 140px;
+}
+
 .page-grievance-report-bytype .form-type-date-popup .form-item label {
   display: none;
 }
+

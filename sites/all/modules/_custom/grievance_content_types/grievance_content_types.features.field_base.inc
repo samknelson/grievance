@@ -673,6 +673,27 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
+  // Exported field_base: 'field_grievance_contact_selector'.
+  $field_bases['field_grievance_contact_selector'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_contact_selector',
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'markup',
+    'settings' => array(
+      'markup' => array(
+        'format' => 'full_html',
+        'value' => '<p>[replace me]</p>
+',
+      ),
+    ),
+    'translatable' => 0,
+    'type' => 'markup',
+  );
+
   // Exported field_base: 'field_grievance_contract'.
   $field_bases['field_grievance_contract'] = array(
     'active' => 1,
@@ -959,6 +980,30 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'datetime',
   );
 
+  // Exported field_base: 'field_grievance_id'.
+  $field_bases['field_grievance_id'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_id',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
   // Exported field_base: 'field_grievance_inforeq'.
   $field_bases['field_grievance_inforeq'] = array(
     'active' => 1,
@@ -1044,6 +1089,27 @@ function grievance_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
+  );
+
+  // Exported field_base: 'field_grievance_min'.
+  $field_bases['field_grievance_min'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_min',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
   );
 
   // Exported field_base: 'field_grievance_notify'.
@@ -1242,6 +1308,9 @@ function grievance_content_types_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_lead',
+    'field_permissions' => array(
+      'type' => 2,
+    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -1308,6 +1377,9 @@ function grievance_content_types_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_organizer',
+    'field_permissions' => array(
+      'type' => 2,
+    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -1432,6 +1504,9 @@ function grievance_content_types_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_shops',
+    'field_permissions' => array(
+      'type' => 2,
+    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',

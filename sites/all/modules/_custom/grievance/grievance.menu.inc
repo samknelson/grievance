@@ -215,6 +215,15 @@ function grievance_node_tab_content($node, $in_tab_name) {
 }
 
 function grievance_node_tab_access($node, $in_tab_name) {
+	// Specific logic re. edit
+	global $user;
+	if ($in_tab_name == 'notification' && $node->type == 'grievance') {
+		if (grievance_node_access_grievance($node, 'update', $user) == NODE_ACCESS_DENY) {
+			return false;
+		}
+	}
+
+	// Check generic permissions
 	$node_tabs = grievance_node_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		if ($node->type == $node_type) {
@@ -233,17 +242,28 @@ function grievance_node_tab_access($node, $in_tab_name) {
 	return false;
 }
 
-function grievance_node_tab_get_addlink($content_type, $query) {
+function grievance_node_tab_get_addlink($content_type, $query, $prompt = NULL) {
+	if (!$prompt) { $prompt = t('Add a new entry'); }
+
 	$query['destination'] = current_path();
+
+	global $user;
+	$grievance_nid = $query['grievance'];
+	if ($grievance_nid) {
+		$grievance_node = node_load($grievance_nid);
+		if (grievance_node_access_grievance($grievance_node, 'update', $user) == NODE_ACCESS_DENY) {
+			return '';
+		}
+	}
 	
 	$path = 'node/add/' . $content_type;
 	$item = menu_get_item($path);
-	if (!$item['access']) { return; }
+	if (!$item['access']) { return ''; }
 	
 	$result = "<div class=\"unite-addlink\">";
 	$result .= '[';
 	$result .= l(
-		t("Add a new entry"), 
+		$prompt, 
 		$path,
 		array('query' => $query)
 	);

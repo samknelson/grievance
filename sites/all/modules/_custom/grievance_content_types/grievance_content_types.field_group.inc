@@ -497,6 +497,7 @@ function grievance_content_types_field_group_info() {
       6 => 'field_grievance_co_city',
       7 => 'field_grievance_co_state',
       8 => 'field_grievance_co_zip',
+      9 => 'field_grievance_contact_selector',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -504,7 +505,7 @@ function grievance_content_types_field_group_info() {
       'instance_settings' => array(
         'required_fields' => 1,
         'classes' => '',
-        'description' => 'Enter information about the company representative.  This representative will receive notification when the grievance enters specific statuses, such as Step 1, Step 2, or Arbitration.',
+        'description' => 'Enter information about the company representative who should be listed on the grievance form as the main recipient of the grievance.',
       ),
       'formatter' => 'closed',
     ),
@@ -683,6 +684,7 @@ function grievance_content_types_field_group_info() {
       10 => 'field_grievance_email',
       11 => 'field_grievance_classification',
       12 => 'field_grievance_ein',
+      13 => 'field_grievance_min',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -971,7 +973,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_grievance_alert',
       3 => 'field_grievance_alert_waived',
       4 => 'field_grievance_alert_tid',
-      5 => 'title',
+      5 => 'field_grievance_id',
+      6 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(

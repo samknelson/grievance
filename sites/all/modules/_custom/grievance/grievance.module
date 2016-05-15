@@ -4,6 +4,7 @@
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.menu.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.form.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.forward.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.letter.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.log.inc";
@@ -20,6 +21,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.field_overrides.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.contacts.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.quicksearch.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.id.inc";
 
 /**
  * Implement hook_cron() 
@@ -49,8 +51,8 @@ function grievance_node_insert($node) {
 function grievance_node_postsave($node, $op) {
   if ($node->type == 'grievance') {
     if ($op == 'insert' || $op == 'update') {
+      grievance_id_set($node, $op);
       grievance_log_update($node, $op);
-      // grievance_notify($node);
     }
   }
 }
@@ -117,6 +119,9 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     // Alert data is a system-only field
     $form['field_grievance_data_alert']['#access'] = FALSE;
 
+    // ID is a system-only field
+    $form['field_grievance_id']['#access'] = FALSE;
+
     // Arbitration fields are restricted by admin
     if (!user_access('grievance admin')) {
       $fields = array(
@@ -137,142 +142,6 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
       if (preg_match('/^field_/', $hidefield) && $form[$hidefield]) {
         $form[$hidefield]['#access'] = FALSE;
       }
-    }
-  }
-}
-
-function grievance_form_shop_callback_replace($form, $form_state) {
-  return array(
-    '#type' => 'ajax',
-    '#commands' => array(
-      ajax_command_replace("#replace-me-1", render($form['replace_me_1'])),
-      ajax_command_replace("#replace-me-2", render($form['replace_me_2']))
-    )
-  );
-}
-
-
-function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
-  /*
-  // Add a callback when shop changes
-  for ($i=0; $i<3; ++$i) {
-    $form['field_grievance_shop']['und'][$i]['target_id']['#ajax'] = array(
-      'callback' => 'grievance_form_shop_callback_replace',
-      'wrapper' => 'grievance-form-shop-callback-replace-wrapper',
-      'method' => 'replace',
-    );
-  }
-
-  $form['replace_me_1'] = array(
-    '#type' => 'markup',
-    '#markup' => '<div id="replace-me-1"><h2>Rand: ' . rand(0, 1000) . '</h2></div>'
-  );
-
-  $form['replace_me_2'] = array(
-    '#type' => 'markup',
-    '#markup' => '<div id="replace-me-2"><h2>Rand: ' . rand(0, 1000) . '</h2></div>'
-  );
-  */
-
-  // 
-  // Set default values for manager, organizer, etc.
-  //
-
-  // This should be on insert only, not edit.  We never set defaults on edit.
-  if ($form['nid']['#value']) { return; }
-
-  // Find the current user
-  global $user;
-  if (!$user) { return; }
-  $user_full = user_load($user->uid);
-  if (!$user_full) { return; }
-
-  // Filed by
-  $form['field_grievance_rep_filed']['und'][0]['target_id']['#default_value'] = "$user_full->name ($user_full->uid)";
-
-  // leads
-  $leads = array();
-  if (isset($user_full->field_grievance_rep_lead['und'])) {
-    foreach ($user_full->field_grievance_rep_lead['und'] as $tmp) {
-      $lead_uid = $tmp['target_id'];
-      $leads[] = user_load($lead_uid);
-    }
-  }
-
-  // Organizers (and leads from organizers)
-  $organizers = array();
-  if (isset($user_full->field_grievance_rep_organizer['und'])) {
-    foreach ($user_full->field_grievance_rep_organizer['und'] as $tmp) {
-      $organizer_uid = $tmp['target_id'];
-      $organizer = user_load($organizer_uid);
-      $organizers[] = $organizer;
-      if (isset($organizer->field_grievance_rep_lead['und'])) {
-        foreach ($organizer->field_grievance_rep_lead['und'] as $tmp) {
-          $lead_uid = $tmp['target_id'];
-          $leads[] = user_load($lead_uid);
-        }
-      }
-    }
-  }
-
-  $delta = 0;
-  foreach ($organizers as $organizer) {
-    if ($organizer) {
-      $form['field_grievance_rep_organizer']['und'][$delta]['target_id']['#default_value'] = "$organizer->name ($organizer->uid)";
-      ++$delta;
-    }
-  }
-
-  $delta = 0;
-  foreach ($leads as $lead) {
-    if ($lead) {
-      $form['field_grievance_rep_lead']['und'][$delta]['target_id']['#default_value'] = "$lead->name ($lead->uid)";
-      ++$delta;
-    }
-  }
-
-  // Manager
-  $manager = variable_get('grievance_rep_manager', '');
-  if ($manager) {
-    if ($manager) {
-      $form['field_grievance_rep_manager']['und'][0]['target_id']['#default_value'] = "$manager[entity_label] ($manager[entity_id])";
-    }
-  }
-
-  // Obeserver
-  $watching = variable_get('grievance_rep_watching', '');
-  if ($watching) {
-    $form['field_grievance_rep_watching']['und'][0]['target_id']['#default_value'] = "$watching[entity_label] ($watching[entity_id])";
-  }
-
-  // Base node
-  $grievance_node = $form_state['node'];
-
-  // Shop
-  $shop_nid = NULL;
-  if (isset($user_full->field_grievance_shops['und'][0]['target_id'])) {
-    $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
-    $shop_node = node_load($shop_nid);
-    $form['field_grievance_shop']['und'][0]['target_id']['#default_value'] = "$shop_node->title ($shop_node->nid)";
-  }
-
-  // Link to contract
-  if ($grievance_node->field_grievance_shop['und'][0]['target_id']) {
-    $shop_nid = $grievance_node->field_grievance_shop['und'][0]['target_id'];
-  }
-  if ($shop_nid) {
-    $shop_node = node_load($shop_nid);
-    $contract_uri = $shop_node->field_grievance_contract['und'][0]['uri'];
-    if ($contract_uri) {
-      $contract_url = file_create_url($contract_uri);
-      $form['#groups']['group_grievance_form']->format_settings['instance_settings']['description'] = 
-        '<strong>' .
-        t('(The contract for ') .
-        $shop_node->title . 
-        t(' can be downloaded ') .
-        l(t('here'), $contract_url, array('attributes' => array('target'=>'_blank'))) .
-        '.)' .
-        '</strong>';
     }
   }
 }
