@@ -31,6 +31,7 @@ features[ds_fields][] = grievance_timeline
 features[ds_fields][] = grievant_name
 features[ds_layout_settings][] = node|grievance_attachment|default
 features[ds_layout_settings][] = node|grievance_log|default
+features[ds_layout_settings][] = node|grievance_shop_contact|teaser
 features[ds_layout_settings][] = node|grievance|default
 features[ds_layout_settings][] = node|grievance|grievance_arbitrationform
 features[ds_layout_settings][] = node|grievance|grievance_gform

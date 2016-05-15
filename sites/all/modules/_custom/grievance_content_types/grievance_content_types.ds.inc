@@ -410,6 +410,52 @@ function grievance_content_types_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|grievance_shop_contact|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'grievance_shop_contact';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_grievance_co_name',
+        1 => 'field_grievance_co_role',
+        2 => 'field_grievance_co_email',
+        3 => 'field_grievance_co_phone',
+        4 => 'field_grievance_co_address',
+        5 => 'field_grievance_co_address_2',
+        6 => 'field_grievance_co_city',
+        7 => 'field_grievance_co_state',
+        8 => 'field_grievance_co_zip',
+      ),
+    ),
+    'fields' => array(
+      'field_grievance_co_name' => 'ds_content',
+      'field_grievance_co_role' => 'ds_content',
+      'field_grievance_co_email' => 'ds_content',
+      'field_grievance_co_phone' => 'ds_content',
+      'field_grievance_co_address' => 'ds_content',
+      'field_grievance_co_address_2' => 'ds_content',
+      'field_grievance_co_city' => 'ds_content',
+      'field_grievance_co_state' => 'ds_content',
+      'field_grievance_co_zip' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|grievance_shop_contact|teaser'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|grievance|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'grievance';
