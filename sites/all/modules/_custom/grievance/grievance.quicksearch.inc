@@ -126,6 +126,26 @@ function grievance_quicksearch_results($string, $limit = 20) {
 			}
 		}	
 	}
+
+	if (preg_match('/\d/', $string)) {
+		$query = new EntityFieldQuery();
+		$query->entityCondition('entity_type', 'node');
+		$query->entityCondition('bundle', array('grievance'), 'in');
+		$query->propertyCondition('status', 1);
+		$query->fieldCondition('field_grievance_id', 'value', '%' . $string . '%', 'like');
+		$query->range(0, $limit);
+		$result = $query->execute();
+		if (isset($result['node'])) {
+			$grievance_nids = array_keys($result['node']);
+			$grievance_nodes = entity_load('node', $grievance_nids);
+			foreach ($grievance_nodes as $grievance_node) {
+				$idx = $grievance_node->title . ' (' . $grievance_node->nid . ')';
+				$matches[$idx] = check_plain($idx);
+			}
+		}	
+	}
 	
 	return $matches;
 }
+
+

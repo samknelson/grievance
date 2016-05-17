@@ -104,6 +104,13 @@ function grievance_notify_conmpany_contacts($shop_nid) {
 function grievance_notify_form($form, &$form_state, $grievance_node) {
 	$form_state['grievance_node'] = $grievance_node;
 
+	// 
+	// Status term
+	//
+
+	$status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
+	$status_term = taxonomy_term_load($status_tid);
+
 	//
 	// Company Recipients
 	//
