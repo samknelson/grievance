@@ -2,6 +2,7 @@
 
 function grievance_id_set($node, $op) {
 	// Assign an ID if one hasn't been set already.
+	/*
 	if ($node->type != 'grievance') { return; }
 	if ($op != 'update' && $op != 'insert') { return; }
 	if ($node->field_grievance_id['und'][0]['value']) { return; }
@@ -22,6 +23,6 @@ function grievance_id_set($node, $op) {
 
 	$node->field_grievance_id['und'][0]['value'] = $next_id;
 	node_save($node);
-
 	watchdog('grievance', "Setting ID for " . $node->nid . " to $next_id.");
+	*/
 }
