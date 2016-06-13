@@ -645,6 +645,7 @@ function grievance_content_types_field_group_info() {
       10 => 'field_grievance_email',
       11 => 'field_grievance_classification',
       12 => 'field_grievance_ein',
+      13 => 'field_grievance_min',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -974,7 +975,8 @@ function grievance_content_types_field_group_info() {
       3 => 'field_grievance_alert_waived',
       4 => 'field_grievance_alert_tid',
       5 => 'field_grievance_id',
-      6 => 'title',
+      6 => 'field_grievance_meeting_date',
+      7 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1150,7 +1152,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Union Representatives',
-    'weight' => '43',
+    'weight' => '48',
     'children' => array(
       0 => 'field_grievance_rep_filed',
       1 => 'field_grievance_rep_organizer',
