@@ -58,6 +58,7 @@ function grievance_node_access_grievance($node, $op, $account) {
 		}
 	}
 
+	/*
 	if (!$found) {
 		// Can also see grievances at the same shop
 		$user_full = user_load($account->uid);
@@ -65,6 +66,7 @@ function grievance_node_access_grievance($node, $op, $account) {
 			$found = TRUE;
 		}
 	}
+	*/
 	if (!$found) { return NODE_ACCESS_DENY; }
 
 	// The user must have a role that's granted permission on this status
@@ -96,11 +98,14 @@ function grievance_views_query_alter(&$view, &$query) {
 		foreach ($where['conditions'] as &$condition) {
 			if (is_string($condition['field'])) {
 				if ($condition['field'] == 'field_data_field_grievance_shop.field_grievance_shop_target_id') {
+					/*
 					if ($user_full->field_grievance_shops['und'][0]['target_id']) {
 						$condition['value'] = $user_full->field_grievance_shops['und'][0]['target_id'];
 					} else {
 						unset($where['conditions'][$count]);
 					}
+					*/
+					unset($where['conditions'][$count]);
 				}
 			}
 			++$count;
