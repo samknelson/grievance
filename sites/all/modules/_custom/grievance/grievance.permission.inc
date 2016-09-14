@@ -17,7 +17,47 @@ function grievance_permission() {
     'grievance view' => array(
     	'title' => t('Grievance View'),
     	'description' => t('Permission to view any grievance on the system.  Does not grant any editing permissions.')
-    )
+    ),
+    'grievance attachment' => array(
+    	'title' => t('Grievance Attachments'),
+    	'description' => t('Permission to upload attachments to grievances.')
+    ),
+    'grievance forward' => array(
+    	'title' => t('Grievance Forward'),
+    	'description' => t('Permission use the "forward a grievance" form.')
+    ),
+    'grievance statuslog' => array(
+    	'title' => t('Grievance Status Log'),
+    	'description' => t('Permission to view or edit the status log for a grievance.')
+    ),
+    'grievance arbitrationform' => array(
+    	'title' => t('Grievance Arbitration Form'),
+    	'description' => t('Permission to view or edit the arbitration form for a grievance.')
+    ),
+    'grievance notification' => array(
+    	'title' => t('Grievance Notification'),
+    	'description' => t('Permission to send notifications for a grievance.')
+    ),
+    'grievance settlement' => array(
+    	'title' => t('Grievance Settlements'),
+    	'description' => t('Permission to view and edit settlements for a grievance.')
+    ),
+    'grievance contact' => array(
+    	'title' => t('Grievance Contacts'),
+    	'description' => t('Permission to edit contacts for a shop of company.')
+    ),
+    'grievance report' => array(
+    	'title' => t('Grievance Report'),
+    	'description' => t('Permission to view grievance reports.')
+    ),
+    'grievance quicksearch' => array(
+    	'title' => t('Grievance Quicksearch'),
+    	'description' => t('Permission to use the "quicksearch" grievance search.')
+    ),
+    'grievance contract' => array(
+    	'title' => t('Grievance Contract'),
+    	'description' => t('Permission to edit contracts and contract templates.')
+    ),
  );
 }
 
@@ -87,7 +127,7 @@ function grievance_node_access_grievance($node, $op, $account) {
 	return NODE_ACCESS_IGNORE;
 }
 
-function grievance_views_query_alter(&$view, &$query) {
+function grievance_views_query_alter_permission(&$view, &$query) {
 	if ($view->name != 'grievances') { return; }
 
 	global $user;

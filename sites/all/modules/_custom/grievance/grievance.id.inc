@@ -1,28 +1,71 @@
 <?php
 
+function grievaince_id_algorithms() {
+	$algorithms = array();
+
+	$algorithms['grievance_id_algorithm_nid'] = array(
+		'name' => t('Node ID'),
+		'description' => t('Grievance IDs are generated using the internal system node ID.  This is typically a 4, 5, or 6-digit number.  Examples: 2356; 12994'),
+	);
+
+	$algorithms['grievance_id_algorithm_nidmd5'] = array(
+		'name' => t('Node ID MD5'),
+		'description' => t('Grievance IDs are generated using an MD5 hash of the internal system node ID.  This obfuscates the ID number, meaning that the sequence cannot be deduced.  Example: 0aae0fede9a4d278e2f9a171e62fc76b'),
+	);
+
+	$algorithms['grievance_id_algorithm_year4'] = array(
+		'name' => t('Sequential by year'),
+		'description' => t('Grievance IDs are generated using the year as a prefix, followed by a four-digit sequential number.  Examples: 20160001; 20150963.'),
+	);
+
+	return $algorithms;
+}
+
 function grievance_id_set($node, $op) {
+
 	// Assign an ID if one hasn't been set already.
-	/*
 	if ($node->type != 'grievance') { return; }
 	if ($op != 'update' && $op != 'insert') { return; }
 	if ($node->field_grievance_id['und'][0]['value']) { return; }
+	if ($node->grievance_no_recurse) { return; }
 
+	$algorithm = variable_get('grievance_id_algorithm', '');
+	if (!$algorithm) { return; }
+
+	// We couidl be calling $algorithm() here.  But for security purposes we're reluctant to use eval()'d code unless
+	// we really need to.  So at the moment, we're just hardcoding the functions.
+	if ($algorithm == 'grievance_id_algorithm_nid') 		{ $id = grievance_id_algorithm_nid($node); }
+	if ($algorithm == 'grievance_id_algorithm_nidmd5') 	{ $id = grievance_id_algorithm_nidmd5($node); }
+	if ($algorithm == 'grievance_id_algorithm_year4') 	{ $id = grievance_id_algorithm_year4($node); }
+
+	if ($id) {
+		$node->field_grievance_id['und'][0]['value'] = $id;
+		$node->grievance_no_recurse = TRUE;
+		node_save($node);
+	}
+}
+
+function grievance_id_algorithm_nid($node) { 
+	return $node->nid;
+}
+
+function grievance_id_algorithm_nidmd5($node) {
+	return md5($node->nid);
+}
+
+function grievance_id_algorithm_year4($node) {
 	$year = date('Y');
 
 	$sql = "select max(field_grievance_id_value) as m ";
 	$sql .= "from field_data_field_grievance_id ";
-	$sql .= "where entity_type = 'node' and bundle = 'grievance' and field_grievance_id_value like '$year\-%' ";
+	$sql .= "where entity_type = 'node' and bundle = 'grievance' and field_grievance_id_value like '$year%' ";
 	$stmt = db_query($sql, array());
 	$hr = $stmt->fetchAssoc();
 	$last_id = $hr['m'];
 	list ($ignore, $number) = explode('-', $last_id);
-	watchdog("whatever", "Here with $last_id, $ignore, $number");
 	$number++;
-	while (strlen($number) < 6) { $number = "0$number"; }
-	$next_id = "$year-$number";
+	while (strlen($number) < 4) { $number = "0$number"; }
+	$id = "$year$number";
 
-	$node->field_grievance_id['und'][0]['value'] = $next_id;
-	node_save($node);
-	watchdog('grievance', "Setting ID for " . $node->nid . " to $next_id.");
-	*/
+	return $id;
 }

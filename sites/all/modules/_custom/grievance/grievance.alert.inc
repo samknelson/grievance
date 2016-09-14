@@ -48,6 +48,7 @@ function grievance_alert($node) {
 		// How many days ahead should we warn?
 		$days = variable_get('grievance_alert_days_warning' . $i, -999);
 		if ($days == -999) { continue; }
+		if ($days < 0) { continue; }
 
 		// Is it due yet?
 		if (strtotime("+$days days") < strtotime($deadline)) { continue; }
@@ -94,13 +95,23 @@ function grievance_alert($node) {
 }
 
 function grievance_alert_list_recipients($node) {
-	$fields = array(
-		'field_grievance_rep_filed',
-		'field_grievance_rep_organizer',
-		'field_grievance_rep_lead',
-		'field_grievance_rep_manager',
-		'field_grievance_rep_watching'
-	);
+	$fields = array();
+	$tmp = variable_get('grievance_alert_recipients', NULL);
+	if (is_null($tmp)) {
+		$fields = array(
+			'field_grievance_rep_filed',
+			'field_grievance_rep_organizer',
+			'field_grievance_rep_lead',
+			'field_grievance_rep_manager',
+			'field_grievance_rep_watching'
+		);
+	} else {
+		foreach ($tmp as $key => $value) {
+			if ($value) {
+				$fields[] = $value;
+			}
+		}
+	}
 
 	$result = array();
 	foreach ($fields as $field) {

@@ -8,68 +8,155 @@
  
 function grievance_node_tabs() {
 	$node_tabs = array();
-	
-	$node_tabs['grievance']['forward'] = array(
-		'title' => 'Forward',
+
+	$node_tabs['grievance']['notification'] = array(
+		'title' => 'Notification',
+		'description' => '',
+		'callback' => 'grievance_node_tab_notification_base',
+		'permissions' => array('grievance notification'),
+	);
+
+	$node_tabs['grievance']['notification/notification'] = array(
+		'title' => 'Notification',
+		'description' => '',
+		'callback' => 'grievance_node_tab_notification',
+		'permissions' => array('grievance notification'),
+		'weight' => -1,
+	);
+
+	$node_tabs['grievance']['notification/member-forward'] = array(
+		'title' => 'Forward to the Employee',
+		'description' => '',
+		'callback' => 'grievance_node_tab_member_forward',
+		'permissions' => array('grievance forward'),
+		'weight' => 1,
+	);
+
+	$node_tabs['grievance']['notification/forward'] = array(
+		'title' => 'Forward to an email address',
 		'description' => '',
 		'callback' => 'grievance_node_tab_forward',
-		'permissions' => array('grievance admin'),
+		'permissions' => array('grievance forward'),
+		'weight' => 2,
 	);
 
 	$node_tabs['grievance']['statuslog'] = array(
-		'title' => 'Timeline',
+		'title' => 'Log',
 		'description' => '',
 		'callback' => 'grievance_node_tab_log',
-		'permissions' => array('grievance admin'),
+		'permissions' => array('grievance statuslog'),
+	);
+
+	$node_tabs['grievance']['timeline'] = array(
+		'title' => 'Timeline',
+		'description' => '',
+		'callback' => 'grievance_node_tab_timeline',
+		'permissions' => array('grievance statuslog'),
 	);
 
 	$node_tabs['grievance']['attachments'] = array(
 		'title' => 'Attachments',
 		'description' => '',
 		'callback' => 'grievance_node_tab_attachments',
-		'permissions' => array('grievance user'),
+		'permissions' => array('grievance attachment'),
 	);
 
 	$node_tabs['grievance']['settlements'] = array(
 		'title' => 'Settlements',
 		'description' => '',
 		'callback' => 'grievance_node_tab_settlements',
-		'permissions' => array('grievance admin'),
+		'permissions' => array('grievance settlement'),
 	);
 
 	$node_tabs['grievance']['gform'] = array(
+		'title' => 'Forms',
+		'description' => '',
+		'callback' => 'grievance_node_tab_gform',
+		'permissions' => array('grievance user'),
+	);
+
+	$node_tabs['grievance']['gform/gform'] = array(
 		'title' => 'Grievance Form',
 		'description' => '',
 		'callback' => 'grievance_node_tab_gform',
 		'permissions' => array('grievance user'),
 	);
 
-	$node_tabs['grievance']['arbitrationform'] = array(
+	$node_tabs['grievance']['gform/arbitrationform'] = array(
 		'title' => 'Arbitration Prep Form',
 		'description' => '',
 		'callback' => 'grievance_node_tab_arbitrationform',
-		'permissions' => array('grievance admin'),
+		'permissions' => array('grievance arbitrationform'),
 	);
 
-	$node_tabs['grievance']['notification'] = array(
-		'title' => 'Notification',
+	$node_tabs['grievance']['bundle'] = array(
+		'title' => 'Bundle',
 		'description' => '',
-		'callback' => 'grievance_node_tab_notification',
-		'permissions' => array('grievance user'),
+		'callback' => 'grievance_node_tab_bundle',
+		'permissions' => array('grievance admin'),
 	);
 
 	$node_tabs['grievance_shop']['contacts'] = array(
 		'title' => 'Contacts',
 		'description' => '',
 		'callback' => 'grievance_shop_node_tab_contacts',
-		'permissions' => array('grievance admin'),
+		'permissions' => array('grievance contact'),
 	);
 
 	$node_tabs['grievance_company']['contacts'] = array(
 		'title' => 'Contacts',
 		'description' => '',
 		'callback' => 'grievance_company_node_tab_contacts',
-		'permissions' => array('grievance admin'),
+		'permissions' => array('grievance contact'),
+	);
+
+	$node_tabs['grievance_contract_template']['rules'] = array(
+		'title' => 'Rules',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_rules',
+		'permissions' => array('grievance contract'),
+	);
+
+	$node_tabs['grievance_contract_template']['notifications'] = array(
+		'title' => 'Notifications',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_notifications',
+		'permissions' => array('grievance contract'),
+	);
+
+	$node_tabs['grievance_contract_template']['sections'] = array(
+		'title' => 'Articles',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_sections',
+		'permissions' => array('grievance contract'),
+	);
+
+	$node_tabs['grievance_contract_template']['clauses'] = array(
+		'title' => 'Clauses',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_clauses',
+		'permissions' => array('grievance contract'),
+	);
+
+	$node_tabs['grievance_contract_template']['full'] = array(
+		'title' => 'Full Text',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_full',
+		'permissions' => array('grievance user'),
+	);
+
+	$node_tabs['grievance_contract_template']['pdf'] = array(
+		'title' => 'PDF',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_pdf',
+		'permissions' => array('grievance user'),
+	);
+
+	$node_tabs['grievance_contract_template']['holidays'] = array(
+		'title' => 'Holidays',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_holidays',
+		'permissions' => array('grievance contract'),
 	);
 	
 	return $node_tabs;
@@ -93,8 +180,10 @@ function grievance_menu() {
 				'access callback' => 'grievance_node_tab_access',
 				'access arguments' => array(1, $tab_name),
 				'type' => MENU_LOCAL_TASK,
-				/* 'weight' => $tab_records['weight'], */
 			);
+			if ($tab_record['weight']) {
+				$items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
+			}
 		}
 	}
 
@@ -164,7 +253,7 @@ function grievance_menu() {
 		'description' => '',
 		'page callback' => 'grievance_report_bytype',
 		'page arguments' => array(),
-		'access arguments' => array('grievance admin'),
+		'access arguments' => array('grievance report'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 
@@ -182,14 +271,14 @@ function grievance_menu() {
 	$items['grievance/ajax/quicksearch'] = array(
 		'page callback' => 'grievance_quicksearch_autocomplete',
 		'page arguments' => array(),
-		'access arguments' => array('grievance admin'),
+		'access arguments' => array('grievance quicksearch'),
 		'type' => MENU_CALLBACK,
 	);
 
 	$items['grievance/admin/quicksearch/%'] = array(
 		'page callback' => 'grievance_quicksearch_page',
 		'page arguments' => array(3),
-		'access arguments' => array('grievance admin'),
+		'access arguments' => array('grievance quicksearch'),
 		'type' => MENU_CALLBACK,
 	);
 

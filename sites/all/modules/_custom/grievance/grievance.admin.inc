@@ -19,21 +19,62 @@ function grievance_admin() {
   $form['grievance_log']['grievance_log_notify_type'] = array(
     '#type' => 'select',
     '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
-    '#title' => t('Grievance Log Notify Type'),
+    '#title' => t('Grievance Log Company Notification Type'),
     '#default_value' => variable_get('grievance_log_notify_type', ''),
     '#description' => t("Grievance log type to be used for notification to the company."),
   );
+
+  $form['grievance_log']['grievance_log_member_forward_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Grievance Log Member Notification Type'),
+    '#default_value' => variable_get('grievance_log_member_forward_type', ''),
+    '#description' => t("Grievance log type to be used for notification to the member."),
+  );
+
+  $form['member_forward'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Member Notification'),
+  );
+
+  $form['member_forward']['member_forward_subject'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Member Notification Subject'),
+    '#default_value' => variable_get('member_notify_subject', ''),
+    '#description' => t('Enter the default subject of the e-mail notification to the member.'),
+  );
+
+  $form['member_forward']['member_forward_body'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Member Notification Body'),
+    '#default_value' => variable_get('member_notify_body', ''),
+    '#description' => t('Enter the default body of the e-mail notification to the member.'),
+  );
+
 
   $form['grievance_alerts'] = array(
     '#type' => 'fieldset',
     '#title' => t('Alerts'),
   );
 
+  $form['grievance_alerts']['grievance_alert_recipients'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Alert Recipients'),
+    '#default_value' => variable_get('grievance_alert_recipients', NULL),
+    '#options' => array(
+      'field_grievance_rep_filed' => t('The user who filed the grievance'),
+      'field_grievance_rep_organizer' => t('The organizer'),
+      'field_grievance_rep_lead' => t('The lead'),
+      'field_grievance_rep_manager' => t('The grievance admin'),
+      'field_grievance_rep_watching' => t('Watchers')
+    ),
+  );
+
   $form['grievance_alerts']['grievance_alert_days_warning1'] = array(
     '#type' => 'textfield',
     '#title' => t('Days Before Deadline - Warning 1'),
     '#default_value' => variable_get('grievance_alert_days_warning1', 14),
-    '#description' => t("Send the FIRST warning this many days before the deadline."),
+    '#description' => t("Send the FIRST warning this many days before the deadline.  (Enter -1 to omit this or any warning.)"),
   );
 
   $form['grievance_alerts']['grievance_alert_days_warning2'] = array(
@@ -83,6 +124,19 @@ function grievance_admin() {
     '#era_entity_type' => 'user',
   );
 
+  $form['grievance_contacts'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Contacts'),
+  );
+
+  $form['grievance_contacts']['grievance_contacts_hide_nostatusmatch'] = array(
+    '#type' => 'select',
+    '#title' => t('Hide Non-Matching Status?'),
+    '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
+    '#default_value' => variable_get('grievance_contacts_hide_nostatusmatch', ''),
+    '#description' => t('If "Yes" is selected, non-matching status contacts will be hidden by default (for example, Step 1 contacts will be hidden on Step 2 grievances.)'),
+  );
+
   $form['grievance_messaging'] = array(
     '#type' => 'fieldset',
     '#title' => t('Messaging'),
@@ -103,5 +157,42 @@ function grievance_admin() {
     '#type' => 'textarea',
   );
 
+  $algorithms = grievaince_id_algorithms();
+  $msg = t('Grievance IDs are unique strings used to identify a grievance.  They typically appear on the grievance form sent to the company, and can be used to find a grievance with the Quicksearch box.<br><br>Grievance IDs can be generated using various algorithms.  The available algorithms are:');
+  $msg .= '<dl>';
+  foreach ($algorithms as $key => $value) {
+    $msg .= '<dt>';
+    $msg .= $value['name'];
+    $msg .= '</dt>';
+
+    $msg .= '<dd>';
+    $msg .= $value['description'];
+    $msg .= '</dd>';
+  }
+  $msg .= '</dl>';
+  $form['grievance_id'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Grievance IDs'),
+    '#description' => $msg,
+  );
+  $options = array();
+  foreach ($algorithms as $key => $value) {
+    $options[$key] = $value['name'];
+  }
+  $form['grievance_id']['grievance_id_algorithm'] = array(
+    '#type' => 'radios',
+    '#title' => t('Algorithm'),
+    '#options' => $options,
+    '#default_value' => variable_get('grievance_id_algorithm', ''),
+  );
+
+  $form['grievance_id']['grievance_id_manual'] = array(
+    '#type' => 'select',
+    '#title' => t('Allow manual override?'),
+    '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
+    '#default_value' => variable_get('grievance_id_manual', ''),
+    '#description' => t('Select "Yes" to allow grievance admins to manually set or change the grievance ID.'),
+  );
+ 
   return system_settings_form($form);
 }

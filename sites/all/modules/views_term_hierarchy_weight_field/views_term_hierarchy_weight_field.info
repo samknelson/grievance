@@ -4,9 +4,9 @@ core = 7.x
 package = Views
 dependencies[] = views
 
-; Information added by Drupal.org packaging script on 2014-07-01
-version = "7.x-1.2"
+; Information added by Drupal.org packaging script on 2016-02-25
+version = "7.x-1.6"
 core = "7.x"
 project = "views_term_hierarchy_weight_field"
-datestamp = "1404237228"
+datestamp = "1456409172"
 

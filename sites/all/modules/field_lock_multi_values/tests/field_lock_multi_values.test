@@ -1,0 +1,562 @@
+<?php
+/**
+ * @file
+ * Tests the Field lock multi values module.
+ */
+
+/**
+ * Field lock multi values - Base class
+ */
+class FieldLockMultiValuesBase extends DrupalWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp('field_lock_multi_values', 'field_test', 'text');
+    // Create and log in our privileged user.
+    $account = $this->drupalCreateUser(array(
+      'administer site configuration',
+      'access field_test content',
+      'administer field_test content',
+    ));
+    $this->drupalLogin($account);
+  }
+
+  /**
+   * Tested core field types.
+   *
+   * @return array
+   *   Associated array with key the field type, and sub-array keys:
+   *    - widget: widget type (required)
+   *    - value_callback: callback function with random-generated return value (required)
+   *    - value_callback_params: value_callback function parameters (optional)
+   *    - form_element_name: field data store form element name (optional, default value: "value")
+   */
+  function testedFieldTypes() {
+    return array(
+      // field type => field data
+      'text' => array(
+        'widget' => 'text_textfield',
+        'value_callback' => array($this, 'randomString'),
+      ),
+      'number_integer' => array(
+        'widget' => 'number',
+        'value_callback' => 'rand',
+        'value_callback_params' => array(1, 1000),
+      ),
+      'text_long' => array(
+        'widget' => 'text_textarea',
+        'value_callback' => array($this, 'randomString'),
+      ),
+    );
+  }
+
+  /**
+   * Helper method: add field and instance.
+   */
+  function addFields($field_type, $widget_type, $field_settings = array(), $instance_settings = array(), $widget_settings = array()) {
+    $this->field = array(
+      'field_name' => drupal_strtolower($this->randomName()),
+      'type' => $field_type,
+      'settings' => $field_settings,
+      'cardinality' => -1, // unlimited
+    );
+    field_create_field($this->field);
+    $this->instance = array(
+      'field_name' => $this->field['field_name'],
+      'entity_type' => 'test_entity',
+      'bundle' => 'test_bundle',
+      'widget' => array(
+        'type' => $widget_type,
+        'settings' => $widget_settings,
+      ),
+      'settings' => $instance_settings,
+    );
+    field_create_instance($this->instance);
+    $this->field_name = $this->field['field_name'];
+    $this->verbose('field added: ' . $this->field_name);
+  }
+
+  /**
+   * Fill field with generated data.
+   *
+   * @return array
+   */
+  function fillField($field_name, $field_type, $langcode = LANGUAGE_NONE) {
+    $field_types = $this->testedFieldTypes();
+    $field_data = $field_types[$field_type];
+    $result = array();
+    // Fill the form
+    $max_delta = rand(5, 10);
+    for ($i = 0; $i < $max_delta; $i++) {
+      $value_params = isset($field_data['value_callback_params']) ? $field_data['value_callback_params'] : array();
+      $value = call_user_func_array($field_data['value_callback'], $value_params);
+      $form_element_name = isset($field_data['form_element_name']) ? $field_data['form_element_name'] : 'value';
+      $field_element_name = "{$field_name}[$langcode][$i][$form_element_name]";
+      $this->assertFieldByName($field_element_name, NULL);
+      $edit = array(
+        $field_element_name => $value,
+      );
+      $result[$i] = $value;
+      $button_name = "{$field_name}_add_more";
+      $this->drupalPostAJAX(NULL, $edit, $button_name);
+    }
+    return $result;
+  }
+
+  /**
+   * Convert HTML string to DOM object.
+   *
+   * @return DOMDocument
+   */
+  function HTML2DOM($text = '', $wrapper = FALSE) {
+    if (empty($text)) {
+      $text = $this->drupalGetContent();
+    }
+    if ($wrapper) {
+      $text = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $text . '</body></html>';
+    }
+    $dom_document = new DOMDocument();
+    @$dom_document->loadHTML($text);
+    return $dom_document;
+  }
+
+  /**
+   * Get value from document, based on xpath
+   */
+  function getXpathTextValue($document = '', $path) {
+    $result = array();
+    if (empty($document)) {
+      $document = $this->drupalGetContent();
+    }
+    $doc = new DOMDocument();
+    $doc->loadHTML($document);
+    $xpath = new DOMXPath($doc);
+    $elements = $xpath->query($path);
+    if (!is_null($elements)) {
+      foreach ($elements as $element) {
+        if (is_a($element, 'DOMText')) {
+          $result = $element->wholeText;
+        }
+        else {
+          $result = $element->nodeValue;
+        }
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Get submitted entity.
+   */
+  function getSubmittedEntity() {
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'test_entity')
+      ->execute();
+    if (!empty($result['test_entity'])) {
+      $entities = entity_load('test_entity', array_keys($result['test_entity']), array(), TRUE);
+      if (count($entities) == 1) {
+        return array_shift($entities);
+      }
+      else {
+        return $entities;
+      }
+    }
+  }
+}
+
+/**
+ * Class FieldLockMultiValuesLockPrevious
+ *
+ * Test "lock previous" function.
+ */
+class FieldLockMultiValuesLockPrevious extends FieldLockMultiValuesBase {
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Test "lock previous" function',
+      'description' => 'Test "lock previous" function.',
+      'group' => 'Field lock multi values',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+  }
+
+  /**
+   * Test some core fields: lock previous
+   */
+  public function testCoreFieldsLockPrevious() {
+    $fields = array();
+    $field_types = $this->testedFieldTypes();
+    foreach ($field_types as $field_type => $field_data) {
+      $instance_settings['field_lock_multi_values'] = array(
+        'lock_previous' => 1,
+      );
+      $this->addFields($field_type, $field_data['widget'], array(), $instance_settings);
+      $fields[$this->field_name] = $field_type;
+    }
+    // Display creation form.
+    $this->drupalGet('test-entity/add/test-bundle');
+    foreach ($fields as $field_name => $field_type) {
+      $this->fillField($field_name, $field_type);
+    }
+    $this->drupalPost(NULL, array(), t('Save'));
+    $entity = $this->getSubmittedEntity();
+    // Validate submitted data in form
+    $langcode = LANGUAGE_NONE;
+    $dom = $this->HTML2DOM();
+    foreach ($fields as $field_name => $field_type) {
+      $field_data = $field_types[$field_type];
+      $form_element_name = isset($field_data['form_element_name']) ? $field_data['form_element_name'] : 'value';
+      foreach ($entity->{$field_name}[$langcode] as $delta => $field_item) {
+        $field_value = $field_item[$form_element_name];
+        $field_element_name = "{$field_name}[$langcode][$delta][$form_element_name]";
+        $field_element_id ="edit-$field_name-$langcode-$delta-$form_element_name";
+        $this->assertFieldByName($field_element_name, $field_value);
+        $dom_element = $dom->getElementById($field_element_id);
+        $this->assertEqual($dom_element->getAttribute('disabled'), 'disabled');
+      }
+    }
+  }
+}
+
+/**
+ * Class FieldLockMultiValuesDisableReorder
+ *
+ * Test "disable reorder" function.
+ */
+class FieldLockMultiValuesDisableReorder extends FieldLockMultiValuesBase {
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Test "disable reorder" function',
+      'description' => 'Test "disable reorder" function.',
+      'group' => 'Field lock multi values',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+  }
+
+  /**
+   * Test some core fields: disable reorder
+   */
+  public function testCoreFieldsDisableReorder() {
+    $fields = array();
+    foreach ($this->testedFieldTypes() as $field_type => $field_data) {
+      $instance_settings['field_lock_multi_values'] = array(
+        'disable_reorder' => 1,
+      );
+      $this->addFields($field_type, $field_data['widget'], array(), $instance_settings);
+      $fields[$this->field_name] = $field_type;
+    }
+    // Display creation form.
+    $this->drupalGet('test-entity/add/test-bundle');
+    foreach ($fields as $field_name => $field_type) {
+      $this->fillField($field_name, $field_type);
+    }
+    $langcode = LANGUAGE_NONE;
+    $this->assertNoRaw('<th>Order</th>');
+    $this->assertNoRaw("{$this->field_name}[$langcode][0][_weight]");
+  }
+}
+
+/**
+ * Class FieldLockMultiValuesHideAddAnother
+ *
+ * Test "hide add another" function.
+ */
+class FieldLockMultiValuesHideAddAnother extends FieldLockMultiValuesBase {
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Test "hide add another" function',
+      'description' => 'Test "hide add another" function.',
+      'group' => 'Field lock multi values',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+  }
+
+  /**
+   * Test some core fields: hide add another
+   */
+  public function testCoreFieldsHideAddAnother() {
+    $fields = array();
+    foreach ($this->testedFieldTypes() as $field_type => $field_data) {
+      $instance_settings['field_lock_multi_values'] = array(
+        'hide_add_more' => 1,
+      );
+      $this->addFields($field_type, $field_data['widget'], array(), $instance_settings);
+      $fields[$this->field_name] = $field_type;
+    }
+    // Display creation form.
+    $this->drupalGet('test-entity/add/test-bundle');
+    $langcode = LANGUAGE_NONE;
+    $dom = $this->HTML2DOM();
+    foreach ($fields as $field_name => $field_type) {
+      $button_id = "edit-$field_name-$langcode-add-more";
+      $this->assertFalse($dom->getElementById($button_id), '"Add another item" button is not exist in field: ' . $field_name);
+    }
+  }
+}
+
+/**
+ * Class FieldLockMultiValuesRemoveTableHeader
+ *
+ * Test "remove table header" function.
+ */
+class FieldLockMultiValuesRemoveTableHeader extends FieldLockMultiValuesBase {
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Test "remove table header" function',
+      'description' => 'Test "remove table header" function.',
+      'group' => 'Field lock multi values',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+  }
+
+  /**
+   * Test some core fields: hide add another
+   */
+  public function testCoreFieldsRemoveTableHeader() {
+    $fields = array();
+    foreach ($this->testedFieldTypes() as $field_type => $field_data) {
+      $instance_settings['field_lock_multi_values'] = array(
+        'remove_header' => 1,
+      );
+      $this->addFields($field_type, $field_data['widget'], array(), $instance_settings);
+      $fields[$this->field_name] = $field_type;
+    }
+    // Display creation form.
+    $this->drupalGet('test-entity/add/test-bundle');
+    $dom = $this->HTML2DOM();
+    foreach ($fields as $field_name => $field_type) {
+      $dom_element = $dom->getElementById("$field_name-values");
+      $fragment = $dom->saveHTML($dom_element);
+      $this->assertFalse(strpos($fragment, '<thead'), 'Table header not found.');
+    }
+  }
+}
+
+/**
+ * Class FieldLockMultiValuesHideRemoveButton
+ *
+ * Test "hide add another" function.
+ */
+class FieldLockMultiValuesHideRemoveButton extends FieldLockMultiValuesBase {
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Test "hide remove button" function',
+      'description' => 'Test "hide remove button" function.',
+      'group' => 'Field lock multi values',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    DrupalWebTestCase::setUp(array(
+      'field_lock_multi_values',
+      'field_test',
+      'text',
+      'field_lock_multi_values_remove_button',
+    ));
+    // Create and log in our privileged user.
+    $account = $this->drupalCreateUser(array(
+      'administer site configuration',
+      'access field_test content',
+      'administer field_test content',
+    ));
+    $this->drupalLogin($account);
+  }
+
+  /**
+   * Tested core field types.
+   *
+   * @return array
+   *   Associated array with key the field type, and sub-array keys:
+   *    - widget: widget type (required)
+   *    - value_callback: callback function with random-generated return value (required)
+   *    - value_callback_params: value_callback function parameters (optional)
+   *    - form_element_name: field data store form element name (optional, default value: "value")
+   */
+  function testedFieldTypes() {
+    return array(
+      // field type => field data
+      'text' => array(
+        'widget' => 'textfield_with_remove_button',
+        'value_callback' => array($this, 'randomString'),
+      ),
+    );
+  }
+
+  /**
+   * Test some core fields: hide add another
+   */
+  public function testCoreFieldsHideRemoveButton() {
+    $fields = array();
+    foreach ($this->testedFieldTypes() as $field_type => $field_data) {
+      $instance_settings['field_lock_multi_values'] = array(
+        'hide_remove' => 1,
+      );
+      $this->addFields($field_type, $field_data['widget'], array(), $instance_settings);
+      $fields[$this->field_name] = $field_type;
+    }
+    // Display creation form.
+    $this->drupalGet('test-entity/add/test-bundle');
+    foreach ($fields as $field_name => $field_type) {
+      $this->fillField($field_name, $field_type);
+    }
+    $dom = $this->HTML2DOM();
+    foreach ($fields as $field_name => $field_type) {
+      $dom_element = $dom->getElementById("edit-$field_name");
+      $fragment = $dom->saveHTML($dom_element);
+      $this->assertFalse(preg_match('/<input.*(name=.+_remove_button)/', $fragment), 'Remove button not found.');
+    }
+  }
+}
+
+/**
+ * Class FieldLockMultiValuesHidePrevious
+ *
+ * Test "hide previous" function.
+ */
+class FieldLockMultiValuesHidePrevious extends FieldLockMultiValuesBase {
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Test "hide previous" function',
+      'description' => 'Test "hide previous" function.',
+      'group' => 'Field lock multi values',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+  }
+
+  /**
+   * Test some core fields: hide previous
+   */
+  public function testCoreFieldsHidePrevious() {
+    $fields = array();
+    $field_types = $this->testedFieldTypes();
+    $filled_values = array(); // store random-generated values
+    foreach ($field_types as $field_type => $field_data) {
+      $instance_settings['field_lock_multi_values'] = array(
+        'hide_previous' => 1,
+      );
+      $this->addFields($field_type, $field_data['widget'], array(), $instance_settings);
+      $fields[$this->field_name] = $field_type;
+    }
+    // Display creation form.
+    $this->drupalGet('test-entity/add/test-bundle');
+    foreach ($fields as $field_name => $field_type) {
+      $filled_values[$field_name] = $this->fillField($field_name, $field_type);
+    }
+    $this->drupalPost(NULL, array(), t('Save'));
+    $old_entity = $this->getSubmittedEntity();
+    $dom = $this->HTML2DOM();
+    // Validate submitted entity
+    $langcode = LANGUAGE_NONE;
+    foreach ($fields as $field_name => $field_type) {
+      $field_data = $field_types[$field_type];
+      $form_element_name = isset($field_data['form_element_name']) ? $field_data['form_element_name'] : 'value';
+      foreach ($old_entity->{$field_name}[$langcode] as $delta => $field_item) {
+        $field_value = $field_item[$form_element_name];
+        $field_element_id = "edit-$field_name-$langcode-$delta-$form_element_name";
+        $this->assertEqual($field_value, $filled_values[$field_name][$delta], "Submitted value is stored. (field: $field_name, delta: $delta");
+        $this->assertNull($dom->getElementById($field_element_id), 'Field element is not visible.');
+      }
+    }
+    // add new field value
+    $new_values = array(); // store newly generated field values
+    foreach ($fields as $field_name => $field_type) {
+      $field_data = $field_types[$field_type];
+      $form_element_name = isset($field_data['form_element_name']) ? $field_data['form_element_name'] : 'value';
+      $next_delta = count($filled_values[$field_name]);
+      $next_field_element_id = "edit-$field_name-$langcode-$next_delta-$form_element_name";
+      $this->assertNotNull($dom->getElementById($next_field_element_id), 'Next field element is visible.');
+      // add next field value
+      $value_params = isset($field_data['value_callback_params']) ? $field_data['value_callback_params'] : array();
+      $value = call_user_func_array($field_data['value_callback'], $value_params);
+      $form_element_name = isset($field_data['form_element_name']) ? $field_data['form_element_name'] : 'value';
+      $field_element_name = "{$field_name}[$langcode][$next_delta][$form_element_name]";
+      $this->assertFieldByName($field_element_name, NULL);
+      $edit = array(
+        $field_element_name => $value,
+      );
+      $button_name = "{$field_name}_add_more";
+      $this->drupalPostAJAX(NULL, $edit, $button_name);
+      $new_values[$field_name] = $value;
+    }
+    $edit = array(
+      'revision' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $new_entity = $this->getSubmittedEntity();
+    $dom = $this->HTML2DOM();
+    foreach ($fields as $field_name => $field_type) {
+      // previous value hidden and next field element visible?
+      $delta = count($new_entity->{$field_name}[$langcode]) - 1;
+      $field_data = $field_types[$field_type];
+      $form_element_name = isset($field_data['form_element_name']) ? $field_data['form_element_name'] : 'value';
+      $field_element_id = "edit-$field_name-$langcode-$delta-$form_element_name";
+      $this->assertNull($dom->getElementById($field_element_id), "Old field element is not visible. (field: $field_name)");
+      $delta++;
+      $field_element_id = "edit-$field_name-$langcode-$delta-$form_element_name";
+      $this->assertNotNull($dom->getElementById($field_element_id), "Next field element is visible. (field: $field_name)");
+      // field previous value stored?
+      $old_field_delta = count($old_entity->{$field_name}[$langcode]);
+      $new_field_delta = count($new_entity->{$field_name}[$langcode]);
+      $this->assertEqual($old_field_delta + 1, $new_field_delta, "New field delta is correct. (field: $field_name)");
+      for ($i = 0; $i < $old_field_delta; $i++) {
+        $old_field_value = $old_entity->{$field_name}[$langcode][$i][$form_element_name];
+        $new_field_value = $new_entity->{$field_name}[$langcode][$i][$form_element_name];
+        $this->assertEqual($old_field_value, $new_field_value, 'Field previous value stored');
+      }
+      $this->assertEqual($new_values[$field_name], $new_entity->{$field_name}[$langcode][$new_field_delta - 1][$form_element_name], 'Newly submitted value stored.');
+    }
+  }
+}

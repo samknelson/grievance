@@ -24,6 +24,11 @@ function field_lock_multi_values_form_field_ui_field_edit_form_alter(&$form, &$f
       '#title' => t('Lock previous value'),
       '#default_value' => isset($settings['lock_previous']) ? $settings['lock_previous'] : FALSE,
     );
+    $form['instance']['settings']['field_lock_multi_values']['hide_previous'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Hide previous value'),
+      '#default_value' => isset($settings['hide_previous']) ? $settings['hide_previous'] : FALSE,
+    );
     if ($form['#instance']['widget']['type'] != 'field_collection_table') {
       $form['instance']['settings']['field_lock_multi_values']['disable_reorder'] = array(
         '#type' => 'checkbox',
@@ -31,6 +36,21 @@ function field_lock_multi_values_form_field_ui_field_edit_form_alter(&$form, &$f
         '#default_value' => isset($settings['disable_reorder']) ? $settings['disable_reorder'] : FALSE,
       );
     }
+    $form['instance']['settings']['field_lock_multi_values']['hide_add_more'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Hide "Add more" button'),
+      '#default_value' => isset($settings['hide_add_more']) ? $settings['hide_add_more'] : FALSE,
+    );
+    $form['instance']['settings']['field_lock_multi_values']['hide_remove'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Hide "Remove" button'),
+      '#default_value' => isset($settings['hide_remove']) ? $settings['hide_remove'] : FALSE,
+    );
+    $form['instance']['settings']['field_lock_multi_values']['remove_header'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Remove table header'),
+      '#default_value' => isset($settings['remove_header']) ? $settings['remove_header'] : FALSE,
+    );
   }
 }
 
@@ -44,6 +64,15 @@ function field_lock_multi_values_field_widget_form_alter(&$element, &$form_state
   if (isset($settings['lock_previous']) && $settings['lock_previous']) {
     if ($context['delta'] < count($context['items'])) {
       $element['#disabled'] = TRUE;
+    }
+  }
+  if (isset($settings['hide_remove']) && $settings['hide_remove'] && isset($element['remove_button'])) {
+    unset($element['remove_button']);
+  }
+  if (isset($settings['hide_previous']) && $settings['hide_previous']) {
+    if ($context['delta'] < count($context['items'])) {
+      $element['#access'] = FALSE;
+      $element['#field_lock_multi_values_hide_row'] = TRUE;
     }
   }
 }
@@ -66,6 +95,8 @@ function field_lock_multi_values_theme_registry_alter(&$theme_registry) {
 function field_lock_multi_values_field_multiple_value_form($variables) {
   $element = $variables['element'];
   $disable_reorder = FALSE;
+  $hide_add_more = FALSE;
+  $remove_header = FALSE;
   $output = '';
   if ($element['#cardinality'] > 1 || $element['#cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
     // "disable reorder" settings.
@@ -73,6 +104,12 @@ function field_lock_multi_values_field_multiple_value_form($variables) {
     $field_info = field_info_instance($element[$max_delta]['#field_lock_multi_values_entity_type'], $element['#field_name'], $element[$max_delta]['#field_lock_multi_values_bundle']);
     if (isset($field_info['settings']['field_lock_multi_values']['disable_reorder']) && $field_info['settings']['field_lock_multi_values']['disable_reorder']) {
       $disable_reorder = TRUE;
+    }
+    if (isset($field_info['settings']['field_lock_multi_values']['hide_add_more']) && $field_info['settings']['field_lock_multi_values']['hide_add_more']) {
+      $hide_add_more = TRUE;
+    }
+    if (isset($field_info['settings']['field_lock_multi_values']['remove_header']) && $field_info['settings']['field_lock_multi_values']['remove_header']) {
+      $remove_header = TRUE;
     }
     // Create table.
     $table_id = drupal_html_id($element['#field_name'] . '_values');
@@ -87,6 +124,9 @@ function field_lock_multi_values_field_multiple_value_form($variables) {
     );
     if (!$disable_reorder) {
       $header[] = t('Order');
+    }
+    if ($remove_header) {
+      $header = array();
     }
     $rows = array();
     // Sort items according to '_weight' (needed when the form comes back after
@@ -105,6 +145,9 @@ function field_lock_multi_values_field_multiple_value_form($variables) {
     foreach ($items as $key => $item) {
       if ($disable_reorder) {
         $item['_weight']['#access'] = FALSE;
+      }
+      if (isset($item['#field_lock_multi_values_hide_row']) && $item['#field_lock_multi_values_hide_row']) {
+        continue;
       }
       $item['_weight']['#attributes']['class'] = array($order_class);
       $delta_element = drupal_render($item['_weight']);
@@ -133,7 +176,9 @@ function field_lock_multi_values_field_multiple_value_form($variables) {
       ),
     ));
     $output .= $element['#description'] ? '<div class="description">' . $element['#description'] . '</div>' : '';
-    $output .= '<div class="clearfix">' . drupal_render($add_more_button) . '</div>';
+    if (!$hide_add_more) {
+      $output .= '<div class="clearfix">' . drupal_render($add_more_button) . '</div>';
+    }
     $output .= '</div>';
     if (!$disable_reorder) {
       drupal_add_tabledrag($table_id, 'order', 'sibling', $order_class);

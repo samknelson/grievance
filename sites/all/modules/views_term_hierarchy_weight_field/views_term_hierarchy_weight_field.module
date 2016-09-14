@@ -18,24 +18,44 @@ function views_term_hierarchy_weight_field_form_taxonomy_overview_terms_alter(&$
  * Custom submit handler that saves the hierarchical weight.
  */
 function views_term_hierarchy_weight_field_submit($form, &$form_state) {
+  $operations = array();
   foreach (array_values($form_state['input']) as $hweight => $term) {
     if (is_array($term)) {
       $hdepth = count(taxonomy_get_parents_all($term['tid'])) - 1;
-      views_term_hierarchy_weight_field_update_hweight($term['tid'], $hweight);
-      views_term_hierarchy_weight_field_update_hdepth($term['tid'], $hdepth);
+      $operations[] = array('views_term_hierarchy_weight_field_update_hweight', array($term['tid'], $hweight));
+      $operations[] = array('views_term_hierarchy_weight_field_update_hdepth', array($term['tid'], $hdepth));
     }
   }
+
+  $batch = array(
+    'operations' => $operations,
+    'title' => t('Computing the weight and depth of each term...'),
+    'init_message' => t('Initializing'),
+    'error_message' => t('An error occurred'),
+  );
+
+  batch_set($batch);
 }
 
 /**
  * Implements hook_taxonomy_term_insert().
  */
 function views_term_hierarchy_weight_field_taxonomy_term_insert($term) {
+  $operations = array();
   foreach (taxonomy_get_tree($term->vid) as $hweight => $term) {
     $hdepth = count(taxonomy_get_parents_all($term->tid)) - 1;
-    views_term_hierarchy_weight_field_update_hweight($term->tid, $hweight);
-    views_term_hierarchy_weight_field_update_hdepth($term->tid, $hdepth);
+    $operations[] = array('views_term_hierarchy_weight_field_update_hweight', array($term->tid, $hweight));
+    $operations[] = array('views_term_hierarchy_weight_field_update_hdepth', array($term->tid, $hdepth));
   }
+
+  $batch = array(
+    'operations' => $operations,
+    'title' => t('Computing the weight and depth of each term...'),
+    'init_message' => t('Initializing'),
+    'error_message' => t('An error occurred'),
+  );
+
+  batch_set($batch);
 }
 
 /**
@@ -74,4 +94,54 @@ function views_term_hierarchy_weight_field_update_hdepth($tid, $hdepth) {
     ->fields(array('hdepth' => $hdepth))
     ->condition('tid', $tid, '=')
     ->execute();
+}
+
+/**
+ * Implements hook_menu_link_insert().
+ */
+function views_term_hierarchy_weight_field_menu_link_insert($menu_link) {
+  views_term_hierarchy_weight_field_menu_link_update($menu_link);
+}
+
+/**
+ * Implements hook_menu_link_update().
+ */
+function views_term_hierarchy_weight_field_menu_link_update($menu_link) {
+  $menu_tree = menu_tree_all_data($menu_link['menu_name']);
+  $menu_flatten = array();
+  _views_term_hierarchy_weight_field_flatten_menu($menu_tree, $menu_flatten);
+
+  foreach(array_values($menu_flatten) as $index => $menu_link) {
+    db_update('menu_links')
+      ->fields(array('hweight' => $index))
+      ->condition('mlid', $menu_link['mlid'], '=')
+      ->execute();
+  }
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function views_term_hierarchy_weight_field_modules_installed($modules) {
+  if (in_array('entity_menu_links', $modules)) {
+    $field = 'hweight';
+    $schema = drupal_get_schema('menu_links');
+    if (!db_field_exists('menu_links_revision', $field)) {
+      db_add_field('menu_links_revision', $field, $schema['fields'][$field]);
+    }
+  }
+}
+
+/**
+ * Helper function. Flatten a menu tree into a single flat array keyed by mlid.
+ */
+function _views_term_hierarchy_weight_field_flatten_menu($tree, &$flat) {
+  foreach ($tree as $data) {
+    if (!$data['link']['hidden']) {
+      $flat[$data['link']['mlid']] = $data['link'];
+      if ($data['below']) {
+        _views_term_hierarchy_weight_field_flatten_menu($data['below'], $flat);
+      }
+    }
+  }
 }

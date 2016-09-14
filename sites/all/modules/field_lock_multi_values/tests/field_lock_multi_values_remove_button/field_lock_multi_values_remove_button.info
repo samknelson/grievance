@@ -1,0 +1,13 @@
+name = Field lock multi values - hide Remove button test
+description = Testing "Field lock multi values - hide Remove button test" functionality.
+core = 7.x
+hidden = TRUE
+
+dependencies[] = text
+
+; Information added by Drupal.org packaging script on 2016-06-03
+version = "7.x-1.4"
+core = "7.x"
+project = "field_lock_multi_values"
+datestamp = "1464946141"
+

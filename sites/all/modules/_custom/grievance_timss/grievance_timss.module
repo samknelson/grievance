@@ -1,0 +1,247 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_timss') . "/grievance_timss.menu.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_timss') . "/grievance_timss.admin.inc";
+
+/**
+ * Implement hook_cron() 
+ */
+
+function grievance_timss_cron() {
+  // grievance_alert_all();
+}
+
+function grievance_timss_login() {
+  drupal_set_message("Connecting to TIMSS");
+  $timss_url = variable_get('grievance_timss_url', '');
+  $timss_user = variable_get('grievance_timss_user', '');
+  $timss_pass = variable_get('grievance_timss_pass', '');
+
+  if (!$timss_url || !$timss_user || !$timss_pass) {
+    drupal_set_message(t('TIMSS access is not configured.'), 'error');
+    return NULL;
+  }
+
+  $timss_url .= '/token';
+  $headers = array('Content-Type' => 'application/x-www-form-urlencoded');
+  $params = array (
+    'grant_type' => 'password',
+    'username' => $timss_user,
+    'password' => $timss_pass,
+  );
+  $options = array(
+    'headers' => $headers,
+    'method' => 'POST',
+    'data' => http_build_query($params),
+  );
+  $response = drupal_http_request($timss_url, $options);
+
+  // HTTP Request execute
+  if ($response->code != 200) {
+    drupal_set_message(
+      t(
+        'Unable to connect to server at @url: @error (@code)', 
+        array(
+          '@url' => $timss_url,
+          '@error' => $response->error,
+          '@code' => $response->code
+        )
+      ),
+      'error'
+    );
+    return NULL;
+  }
+  
+  // Decode the response
+  $json_token = drupal_json_decode($response->data);
+  $json_token['granted'] = time();
+  $token = $json_result['access_token'];
+  if (!$json_token['access_token']) {
+    drupal_set_message(t('Connection to TIMSS succeeded, but no valid access_token was returned.'), 'error');
+    return NULL;
+  }
+
+  $json_token_encoded = drupal_json_encode($json_token);
+  variable_set('grievance_timss_token', $json_token_encoded);
+  
+  return $json_token;
+}
+
+function grievance_timss_get_token() {
+  $json_token_encoded = variable_get('grievance_timss_token', '');
+  $json_token = drupal_json_decode($json_token_encoded);
+  if (!$json_token) {
+    $json_token = grievance_timss_login();
+  } else if ($json_token['granted'] + $json_token['expires_in'] <= time() - 100) {
+    $json_token = grievance_timss_login();
+  } 
+
+  return $json_token;
+}
+
+function grievance_timss_search($str) {
+  $json_token = grievance_timss_get_token();
+  $timss_url = variable_get('grievance_timss_url', '');
+  $timss_user = variable_get('grievance_timss_user', '');
+  $timss_pass = variable_get('grievance_timss_pass', '');
+
+  if (!$timss_url || !$timss_user || !$timss_pass) {
+    drupal_set_message(t('TIMSS access is not configured.'), 'error');
+    return NULL;
+  }
+
+  $timss_url .= '/api/Employees';
+  if (preg_match('/\-/', $str)) {
+    $timss_url .= '?ssn=' . urlencode($str);
+  } else {
+    $timss_url .= '?lastname=' . urlencode($str);
+  }
+
+  $options = array(
+    'headers' => array('Authorization' => 'Bearer ' . $json_token['access_token']),
+    'method' => 'GET',
+  );
+  $response = drupal_http_request($timss_url, $options);
+
+  // HTTP Request execute
+  if ($response->code != 200) {
+    drupal_set_message(
+      t(
+        'Unable to connect to server at @url: @error (@code)', 
+        array(
+          '@url' => $timss_url,
+          '@error' => $response->error,
+          '@code' => $response->code
+        )
+      ),
+      'error'
+    );
+    return NULL;
+  }
+
+  return json_decode($response->data);
+}
+
+function grievance_timss_lookup($timss_id) {
+  $json_token = grievance_timss_get_token();
+  $timss_url = variable_get('grievance_timss_url', '');
+  $timss_user = variable_get('grievance_timss_user', '');
+  $timss_pass = variable_get('grievance_timss_pass', '');
+
+  if (!$timss_url || !$timss_user || !$timss_pass) {
+    drupal_set_message(t('TIMSS access is not configured.'), 'error');
+    return NULL;
+  }
+
+  $timss_url .= '/api/TimssMembers';
+  $timss_url .= '?TimssId=' . urlencode($timss_id);
+
+  $options = array(
+    'headers' => array('Authorization' => 'Bearer ' . $json_token['access_token']),
+    'method' => 'GET',
+  );
+  $response = drupal_http_request($timss_url, $options);
+
+  // HTTP Request execute
+  if ($response->code != 200) {
+    drupal_set_message(
+      t(
+        'Unable to connect to server at @url: @error (@code)', 
+        array(
+          '@url' => $timss_url,
+          '@error' => $response->error,
+          '@code' => $response->code
+        )
+      ),
+      'error'
+    );
+    return NULL;
+  }
+
+  drupal_json_output($response->data);
+  exit;
+}
+
+
+function grievance_timss_form_grievance_node_callback_replace($form, $form_state) {
+  $commands = array();
+  // $commands[] = ajax_command_replace("#grievance-timss-search-result", render($form['grievance_timss_search_result']));
+  $commands[] = ajax_command_replace("#grievance-timss-search-result", $form['grievance_timss_search_result']['#markup']);
+
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands
+  );
+}
+
+function grievance_timss_form_grievance_node_callback_submit($form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
+}
+
+function grievance_timss_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
+  // Add TIMSS Search elements to the form
+  $form['grievance_timss_search'] = array(
+    '#type' => 'textfield',
+    '#title' => t('TIMSS Search'),
+    '#description' => t('Enter the last name or SSN of the employee.'),
+  );
+  $form['#groups']['group_grievance_employee']->children[] = 'grievance_timss_search';
+  $form['#group_children']['grievance_timss_search'] = 'group_grievance_employee';
+
+  $form['grievance_timss_search_submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Search TIMSS'),
+    '#submit' => array('grievance_timss_form_grievance_node_callback_submit'),
+    '#ajax' => array(
+      'callback' => 'grievance_timss_form_grievance_node_callback_replace',
+      'method' => 'replace',
+    ),
+  );
+  $form['#groups']['group_grievance_employee']->children[] = 'grievance_timss_search_submit';
+  $form['#group_children']['grievance_timss_search_submit'] = 'group_grievance_employee';
+
+  $candidates = array();
+  if ($form_state['values']['grievance_timss_search']) {
+    $candidates = grievance_timss_search($form_state['values']['grievance_timss_search']);
+
+    /*
+    foreach ($json_ids as $json_id) {
+      $timss_id = $json_id->timsS_Member_ID;
+      $candidate = grievance_timss_fetch($timss_id);
+      $candidates[] = $candidate;
+    }
+    */
+
+    $result_body = '';
+    if (!$candidates) {
+      $result_body = t('No members match your search criteria: ') . '<strong>' . $form_state['values']['grievance_timss_search'] . '</strong>';
+    } else {
+      $header = array(
+        t('TIMSS ID'),
+        t('Name'),
+        t('Employer'),
+      );
+      $attributes = array();
+      $rows = array();
+      foreach ($candidates as $candidate) {
+        $row = array();
+        $row[] = '<a href="#" class="grievance-timss-id-for-insert">' . $candidate->timsS_Member_ID . '</a>';
+        $row[] = $candidate->name;
+        $row[] = $candidate->employer_Name;
+        $rows[] = $row;
+      }
+      $result_body = theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
+    }
+  }
+
+  $form['grievance_timss_search_result'] = array(
+    '#type' => 'markup',
+    '#markup' => '<div id="grievance-timss-search-result">' . $result_body . '</div>',
+  );
+  $form['#groups']['group_grievance_employee']->children[] = 'grievance_timss_search_result';
+  $form['#group_children']['grievance_timss_search_result'] = 'group_grievance_employee';
+
+}

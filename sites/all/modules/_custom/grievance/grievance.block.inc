@@ -54,11 +54,18 @@ function grievance_block_timeleft() {
   }
   $alert_date = $grievance_node->field_grievance_alert_date['und'][0]['value'];
   $alert_date = strtotime($alert_date);
+  $actor = $alert_term->field_grievance_actor['und'][0]['value'];
 
   $need_alert = TRUE;
   if (!$alert) { $need_alert = FALSE; }
   if (!$alert_date) { $need_alert = FALSE; }
   if ($alert_date < date('-3000 days')) { $need_alert = FALSE; }
+
+  $status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
+  $status_term = taxonomy_term_load($status_tid);
+  if ($status_term && $status_term->description) {
+    $status_msg = $status_term->description;
+  }
 
   if ($need_alert) {
     if (time() <= $alert_date) {
@@ -67,27 +74,20 @@ function grievance_block_timeleft() {
       $interval = format_interval(time() - $alert_date, 2) . t(' overdue');
     }
 
-    $datestr = date('l, F j, Y', $alert_date);
+    $datestr = date('l, F j', $alert_date);
 
-    $alert_msg = '<strong>' . 
-      t('The Union must') . 
-      '</strong> <u>' . 
-      $alert . 
-      '</u> <strong>' . 
-      t('not later than') . 
-      '</strong> <u>' .
-      $datestr . 
-      '</u> <strong>(' .
-      $interval . 
-      ')</strong>';
+    $alert_msg = t(
+      'This grievance has status <strong>@status</strong>. The <strong>@actor</strong> must <strong>@alert</strong> not later than <strong>@deadline</strong> (@interval)',
+      array(
+        '@actor' => $actor, 
+        '@status' => $status_term->name,
+        '@alert' => $alert_term->name, 
+        '@deadline' => $datestr,
+        '@interval' => $interval
+      )
+    );
   }
 
-
-  $status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
-  $status_term = taxonomy_term_load($status_tid);
-  if ($status_term && $status_term->description) {
-    $status_msg = $status_term->description;
-  }
 
   if ($alert_msg && $status_msg) { 
     $msg = $alert_msg . '<hr>' . $status_msg;

@@ -1,12 +1,16 @@
 <?php
 
+function grievance_node_tab_notification_base($grievance_node) {
+	drupal_goto('node/' . $grievance_node->nid . '/notification/notification');
+}
+
 function grievance_node_tab_notification($grievance_node) {
   drupal_set_title($grievance_node->title . ': ' . t('Notification'));
 
 	return drupal_get_form('grievance_notify_form', $grievance_node);
 }
 
-function grievance_notify_conmpany_contacts($shop_nid) {
+function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 	// Find shop contacts associated with the shop
 	$recipients = array();
 	$shop_node = node_load($shop_nid);
@@ -22,6 +26,17 @@ function grievance_notify_conmpany_contacts($shop_nid) {
 			$contact_nodes = node_load_multiple($contact_nids);
 			foreach ($contact_nodes as $contact_nid => $contact_node) {
 				$recipient = array();
+
+				if (!isset($contact_node->field_grievance_statuses['und'])) {
+					$recipient['statusmatch'] = TRUE;
+				} else {
+					foreach ($contact_node->field_grievance_statuses['und'] as $tmp) {
+						if ($tmp['tid'] == $status_tid) {
+							$recipient['matching_status'] = TRUE;
+						}
+					}
+				}
+
 				$role = $contact_node->field_grievance_co_role['und'][0]['value'];
 				if ($role) {
 					$recipient['type'] = $role . t(' for ') . $shop_node->title;
@@ -32,7 +47,8 @@ function grievance_notify_conmpany_contacts($shop_nid) {
 				$recipient['nid'] = $contact_node->nid;
 				$recipient['name'] = $contact_node->field_grievance_co_name['und'][0]['value'];
 				$recipient['email'] = $contact_node->field_grievance_co_email['und'][0]['email'];
-				$recipients[] = $recipient;
+				$recipient['shop_contact'] = TRUE;
+				$recipients[$contact_node->nid] = $recipient;
 			}
 		}
 	}
@@ -51,7 +67,19 @@ function grievance_notify_conmpany_contacts($shop_nid) {
 			$contact_nids = array_keys($stmt['node']);
 			$contact_nodes = node_load_multiple($contact_nids);
 			foreach ($contact_nodes as $contact_nid => $contact_node) {
+
 				$recipient = array();
+
+				if (!isset($contact_node->field_grievance_statuses['und'])) {
+					$recipient['statusmatch'] = TRUE;
+				} else {
+					foreach ($contact_node->field_grievance_statuses['und'] as $tmp) {
+						if ($tmp['tid'] == $status_tid) {
+							$recipient['matching_status'] = TRUE;
+						}
+					}
+				}
+				
 				$role = $contact_node->field_grievance_co_role['und'][0]['value'];
 				if ($role) {
 					$recipient['type'] = $role . t(' for ') . $company_node->title;
@@ -62,41 +90,11 @@ function grievance_notify_conmpany_contacts($shop_nid) {
 				$recipient['nid'] = $contact_node->nid;
 				$recipient['name'] = $contact_node->field_grievance_co_name['und'][0]['value'];
 				$recipient['email'] = $contact_node->field_grievance_co_email['und'][0]['email'];
-				$recipients[] = $recipient;
+				$recipient['company_contact'] = TRUE;
+				$recipients[$contact_node->nid] = $recipient;
 			}
 		}
 	}
-
-	/*
-	// Find shop contacts associated with the status
-	$status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
-	$status_term = taxonomy_term_load($status_tid);
-	if ($status_tid) {
-		$query = new EntityFieldQuery();
-		$query->entityCondition('entity_type', 'node');
-	  $query->entityCondition('bundle', 'grievance_shop_contact');
-	  $query->fieldCondition('field_grievance_statuses', 'tid', $status_tid);
-		$stmt = $query->execute();
-		if ($stmt['node']) {
-			$contact_nids = array_keys($stmt['node']);
-			$contact_nodes = node_load_multiple($contact_nids);
-			foreach ($contact_nodes as $contact_nid => $contact_node) {
-				$recipient = array();
-				$role = $contact_node->field_grievance_co_role['und'][0]['value'];
-				if ($role) {
-					$recipient['type'] = $role . t(' for ') . $status_term->name;
-				} else {
-					$recipient['type'] = t('Status contact for: ') . $status_term->name;
-				}
-				$recipient['nid'] = $contact_node->nid;
-				$recipient['name'] = $contact_node->field_grievance_co_name['und'][0]['value'];
-				$recipient['email'] = $contact_node->field_grievance_co_email['und'][0]['email'];
-
-				$recipients[] = $recipient;
-			}
-		}
-	}
-	*/
 
 	return $recipients;
 }
@@ -124,7 +122,7 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 	);
 
 	$shop_nid = $grievance_node->field_grievance_shop['und'][0]['target_id'];
-	$recipients = grievance_notify_conmpany_contacts($shop_nid);
+	$recipients = grievance_notify_company_contacts($shop_nid, $status_tid);
 
 	// Additional contacts
   if (!$form_state['num_addl_company_recipients']) {
@@ -143,6 +141,49 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 		'#type' => 'markup',
 		'#markup' => '',
 		'#prefix' => '<div class="grievance-recipients" id="grievance-recipients-company">'
+	);
+
+  $contact_count_company = 0;
+  $contact_count_shop = 0;
+  $contact_count_statusmatch = 0;
+  $contact_count_nostatusmatch = 0;
+  foreach ($recipients as $contact) {
+  	if ($contact['is_blank']) { continue; }
+    if ($contact['statusmatch']) { ++$contact_count_statusmatch; } else { ++$contact_count_nostatusmatch; }
+    if ($contact['shop_contact']) { ++$contact_count_shop; }
+    if ($contact['company_contact']) { ++$contact_count_company; }
+  }
+  $contacts_markup = '';
+  $contacts_markup .= '<div style="clear: both" id="grievance_contact_controls">';
+
+  if ($contact_count_shop) {
+    $contacts_markup .= '<a href="#" id="grievance-contact-hide-shop">[' . t('Hide shop contacts') . ']</a> ';
+    $contacts_markup .= '<a href="#" id="grievance-contact-show-shop" style="display: none;">[' . t('Show shop contacts') . ']</a> ';
+  }
+
+  if ($contact_count_company) {
+    $contacts_markup .= '<a href="#" id="grievance-contact-hide-company">[' . t('Hide company contacts') . ']</a> ';
+    $contacts_markup .= '<a href="#" id="grievance-contact-show-company" style="display: none;">[' . t('Show company contacts') . ']</a> ';
+  }
+
+  $grievance_contacts_hide_nostatusmatch = variable_get('grievance_contacts_hide_nostatusmatch', '');
+  if ($grievance_contacts_hide_nostatusmatch == "Yes") {
+    if ($contact_count_nostatusmatch) {
+      $contacts_markup .= '<a href="#" id="grievance-contact-hide-nostatusmatch" style="display: none;">[' . t('Hide non-matching statuses') . ']</a> ';
+      $contacts_markup .= '<a href="#" id="grievance-contact-show-nostatusmatch">[' . t('Show non-matching statuses') . ']</a> ';
+    }
+  } else {
+    if ($contact_count_statusmatch) {
+      $contacts_markup .= '<a href="#" id="grievance-contact-hide-nostatusmatch">[' . t('Hide non-matching statuses') . ']</a> ';
+      $contacts_markup .= '<a href="#" id="grievance-contact-show-nostatusmatch" style="display: none;">[' . t('Show non-matching statuses') . ']</a> ';
+    }
+  }
+  $contacts_markup .= '</div>';
+
+	$form['grievance_recipients_company']['grievance_company_contacts_wrapper_intro'] = array(
+		'#title' => '',
+		'#type' => 'markup',
+		'#markup' => $contacts_markup,
 	);
 
 	$count = 0;
@@ -168,13 +209,34 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 			);
 
 		} else {
+
+      $classes = 'grievance-recipient';
+      if ($recipient['statusmatch']) {
+        $classes .= ' grievance-recipient-statusmatch';
+      } else {
+        $classes .= ' grievance-recipient-nostatusmatch';
+      }
+
+      if ($recipient['shop_contact']) {
+        $classes .= ' grievance-recipient-shop';
+      }
+      if ($recipient['company_contact']) {
+        $classes .= ' grievance-recipient-company';
+      }
+
+      $stle = '';
+      if ($grievance_contacts_hide_nostatusmatch == "Yes" && !$recipient['statusmatch']) {
+        $style .= 'display: none;';
+      }
+
+
 			$form['grievance_recipients_company']["company_recipient_${count}_intro"] = array(
 				'#title' => '',
 				'#type' => 'markup',
 				'#markup' => '<div class="grievance-recipient-name">' . $recipient['name'] . '</div>' . 
 					'<div class="grievance-recipient-email">' . grievance_email_trim($recipient['email'], 25) . '</div>' . 
 					'<div class="grievance-recipient-type">(' . $recipient['type'] . ')</div>',
-				'#prefix' => '<div class="grievance-recipient">',
+				'#prefix' => '<div class="' . $classes . '" style="' . $style . '">',
 			);
 
 			$form['grievance_recipients_company']["company_recipient_${count}_name"] = array(
@@ -203,11 +265,11 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 				'primary' => t('Main recipient (TO)'),
 				'secondary' => t('Copied (CC)')
 			),
-			'#suffix' => '</div>'
+			'#suffix' => '</div>',
+			'#default_value' => 'none',
 		);
 	}
 
-	// HERE1
   $form['grievance_recipients_company']['addl_company_recipient'] = array(
     '#type' => 'submit',
     '#value' => t('Add Company Recipient'),
@@ -379,7 +441,6 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 		);
 	}
 
-	// HERE2
   $form['grievance_recipients_union']['addl_union_recipient'] = array(
     '#type' => 'submit',
     '#value' => t('Add Union Recipient'),
@@ -403,16 +464,20 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 	$form['grievance_message_intro'] = array(
 		'#title' => '',
 		'#type' => 'markup',
-		'#markup' => '<h2>' . t('Message') . '</h2>' . t('The following union contacts may be CC\'d or BCC\'d.'),
-		'#prefix' => '<div class="grievance-union-recipients-intro">',
-		'#suffix' => '</div>'
+		'#markup' => '<h2>' . t('Message') . '</h2>' . t('Enter the message that the contacts selected above should receive.'),
+		'#prefix' => '<div class="grievance-message-intro">',
+		'#suffix' => '</div>',
 	);
+
+	$hr = grievance_notify_template($grievance_node);
+	$default_subject = $hr['subject'];
+	$default_body = $hr['body'];
 
   $form['subject'] = array(
     '#title' => t('Subject'),
     '#type' => 'textfield',
     '#required' => 1,
-    '#default_value' => $status_term->field_grievance_notify_subject['und'][0]['value'],
+    '#default_value' => $default_subject,
    );
 
   $form['body'] = array(
@@ -420,14 +485,48 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
     '#type' => 'textarea',
 		'#rows' => 20,
     '#required' => 1,
-    '#default_value' => $status_term->field_grievance_notify_body['und'][0]['value'],
+    '#default_value' => $default_body,
 	);
+
+  // Update the status
+
+	$form['grievance_status_intro'] = array(
+		'#title' => '',
+		'#type' => 'markup',
+		'#markup' => '<h2>' . t('Change Status') . '</h2>' . t('After sending the notification, change the grievance status and deadline.'),
+	);
+
+	module_load_include('inc', 'node', 'node.pages');
+	$node_form = drupal_get_form('grievance_node_form', $grievance_node);	
+
+	foreach (array(
+		'field_grievance_status', 
+		'field_grievance_alert_tid', 
+		) as $key) {
+		$form[$key] = $node_form[$key];
+		unset($form[$key]['#weight']);
+		unset($form[$key]['#tree']);
+		unset($form[$key]['#parents']);
+		unset($form[$key]['#after_build']);
+	}
+
+	// Date field was getting messed up with warnings when I tried to clone from the node form, so I'm just adding it manually
+  $form['field_grievance_alert_date'] = array(
+  	'#title' => 'Next deadline date',
+    '#type' => 'date_popup',
+    '#date_format' => 'm/d/Y',
+    '#default_value' => $grievance_node->field_grievance_alert_date['und'][0]['value'],
+    '#prefix' => '<div class="field-grievance-alert-date-wrapper">',
+    '#suffix' => '</div>',
+  );	
 
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Send and Log Grievance Notification',
+    '#prefix' => '<div class="field-grievance-submit-wrapper">',
+    '#suffix' => '</div>',
   );
-	
+
 	return $form;
 }
 
@@ -642,3 +741,39 @@ function grievance_email_trim($email, $length) {
 	return substr($email, 0, $length-3) . '&hellip;';
 }
 
+function grievance_notify_template($grievance_node) {
+	$result = array();
+
+	$status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
+	if (!$status_tid) { return NULL; }
+
+	$status_term = taxonomy_term_load($status_tid);
+	if (!$status_term) { return NULL; }
+
+	$contract_template_nid = $grievance_node->field_grievance_contract_tplt['und'][0]['target_id'];
+	if ($contract_template_nid) {
+		$query = new EntityFieldQuery();
+		$query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'grievance_contract_rule');
+	  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_template_nid);
+	  $query->fieldCondition('field_grievance_status', 'tid', $status_tid);
+		$stmt = $query->execute();
+		if ($stmt['node']) {
+			$rule_nids = array_keys($stmt['node']);
+			$rule_nodes = node_load_multiple($rule_nids);
+			foreach ($rule_nodes as $rule_node) {
+				if ($rule_node->field_grievance_notify_body['und'][0]['value']) {
+					$result['subject'] = $rule_node->field_grievance_notify_subject['und'][0]['value'];
+					$result['body'] = $rule_node->field_grievance_notify_body['und'][0]['value'];
+				}
+			}
+		}
+	}
+
+	if (!$result['body']) {
+		$result['subject'] = $status_term->field_grievance_notify_subject['und'][0]['value'];
+		$result['body'] = $status_term->field_grievance_notify_body['und'][0]['value'];
+	}
+
+	return $result;
+}

@@ -22,6 +22,9 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.contacts.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.quicksearch.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.id.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.contract.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.holidays.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.bundle.inc";
 
 /**
  * Implement hook_cron() 
@@ -108,7 +111,7 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
-  $defaultable_fields = array();
+  $defaultable_fields = array('grievance_contract_tplt');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $form['field_' . $field]["und"]['#default_value'][0] = $_GET[$field];
@@ -120,10 +123,13 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     $form['field_grievance_data_alert']['#access'] = FALSE;
 
     // ID is a system-only field
-    $form['field_grievance_id']['#access'] = FALSE;
+    $grievance_id_manual = variable_get('grievance_id_manual', '');
+    if ($grievance_id_manual != 'Yes' || !user_access('grievance admin')) {
+      $form['field_grievance_id']['#access'] = FALSE;
+    }
 
     // Arbitration fields are restricted by admin
-    if (!user_access('grievance admin')) {
+    if (!user_access('grievance arbitrationform')) {
       $fields = array(
         'field_grievance_arbitration_a',
         'field_grievance_arbitration_b',
@@ -144,6 +150,19 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
       }
     }
   }
+
+  if ($form_id == 'grievance_contract_template_node_form') { 
+    // Holidays is a system-only field
+    $form['field_grievance_holidays']['#access'] = FALSE;
+  }
+
+  if ($form_id == 'grievance_log_node_form') { 
+    $form['field_grievance_status']['#access'] = FALSE;
+    $form['field_grievance_alert']['#access'] = FALSE;
+    $form['field_grievance_alert_tid']['#access'] = FALSE;
+    $form['field_grievance_alert_date']['#access'] = FALSE;
+  }
+
 }
 
 function grievance_classes_array($new_classes = null) {
@@ -165,5 +184,45 @@ function grievance_preprocess_html(&$variables) {
   $classes= grievance_classes_array();
   foreach ($classes as $class) {
     $variables['classes_array'][] = $class;
+  }
+}
+
+
+function grievance_views_query_alter(&$view, &$query) {
+  grievance_views_query_alter_permission($view, $query); 
+}
+
+/*
+function grievance_contract_template_nid_getset($incoming = 0) {
+  static $nid;
+  if ($incoming) {
+    $nid = $incoming;
+  }
+  watchdog('wahtever', "Incoming $incoming, returning $nid");
+  return $nid;
+}
+*/
+
+function grievance_views_pre_build(&$view) {
+  // When an admin is editing a grievance clause, they select the contract section from a view.  The view should be restricted
+  // to just the contract template that they're working i.
+  if ($view->name == 'grievance_contract_sections' && $view->current_display == 'entityreference_1') { 
+    $template_nid = 0;
+    $clause_node = menu_get_object();
+    if ($clause_node) {
+      $template_nid = $clause_node->field_grievance_contract_tplt['und'][0]['target_id'];
+    }
+    if (!$template_nid && isset($_REQUEST['grievance_contract_tplt'])) {
+      $template_nid = $_REQUEST['grievance_contract_tplt'];
+    }
+    if ($template_nid) {
+      $view->args[0] = $template_nid;
+    }
+  }
+
+  // Similarly, when a user is selecting a contract clause, it should come from the contract template corresponding to the
+  // shop that they're in.
+  if ($view->name == 'grievance_contract_clauses' && $view->current_display == 'entityreference_1') { 
+    // $view->args[0] = 3215;
   }
 }
