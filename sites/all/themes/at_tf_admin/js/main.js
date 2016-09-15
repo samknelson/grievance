@@ -1,5 +1,17 @@
 (function ($) {
 
+	$.fn.grievance_select_set = function(select_id, value) {
+		// Don't set to empty
+		if (!value) { return; }
+
+		// Don't overwrite an existing selection
+		old_value = $('#' + select_id).val();
+		if (old_value && (old_value != '_none')) { return; }
+
+		// Set the new value.
+		$('#' + select_id).val(value);
+	}
+
 	// This should move into the grievance module.  But for now....
   Drupal.behaviors.grievance = {
     attach: function(context, settings) {
@@ -31,9 +43,84 @@
 				$('#edit-field-grievance-co-zip-und-0-value').val(val);
 			};
 
+			// Hide and show contacts as needed
+			$("#grievance-contact-hide-shop").click(function(event) {
+				event.preventDefault();
+				$("#grievance-contact-hide-shop").hide();
+				$("#grievance-contact-show-shop").show();
+				$(".grievance-recipient-shop").hide();
+			});
+			$("#grievance-contact-show-shop").click(function() {
+				event.preventDefault();
+				$("#grievance-contact-hide-shop").show();
+				$("#grievance-contact-show-shop").hide();
+				$(".grievance-recipient-shop").show();
+			});
+			$("#grievance-contact-hide-company").click(function(event) {
+				event.preventDefault();
+				$("#grievance-contact-hide-company").hide();
+				$("#grievance-contact-show-company").show();
+				$(".grievance-recipient-company").hide();
+			});
+			$("#grievance-contact-show-company").click(function() {
+				event.preventDefault();
+				$("#grievance-contact-hide-company").show();
+				$("#grievance-contact-show-company").hide();
+				$(".grievance-recipient-company").show();
+			});
+			$("#grievance-contact-hide-nostatusmatch").click(function(event) {
+				event.preventDefault();
+				$("#grievance-contact-hide-nostatusmatch").hide();
+				$("#grievance-contact-show-nostatusmatch").show();
+				$(".grievance-recipient-nostatusmatch").hide();
+			});
+			$("#grievance-contact-show-nostatusmatch").click(function() {
+				event.preventDefault();
+				$("#grievance-contact-hide-nostatusmatch").show();
+				$("#grievance-contact-show-nostatusmatch").hide();
+				$(".grievance-recipient-nostatusmatch").show();
+			});
+
+			// Set "corrected" when demographic information changes
+			$('.node-grievance-form .field-name-field-grievance-first-name-form input, .node-grievance-form .field-name-field-grievance-last-name-form input, .node-grievance-form .field-name-field-grievance-phone-name-form input, .node-grievance-form .field-name-field-grievance-email-name-form input, .node-grievance-form .field-name-field-grievance-address-name-form input, .node-grievance-form .field-name-field-grievance-address-2-name-form input, .node-grievance-form .field-name-field-grievance-city-name-form input, .node-grievance-form .field-name-field-grievance-state-name-form input, .node-grievance-form .field-name-field-grievance-hire-date-name-form input, .node-grievance-form .field-name-field-grievance-ein-form input, .node-grievance-form .field-name-field-grievance-min-form input, .node-grievance-form .field-name-field-grievance-classification-form input').change(function() {
+				if ($('.node-grievance-form .field-name-field-grievance-corrected-form select').length) {
+					$('.node-grievance-form .field-name-field-grievance-corrected-form select').val('Pending');
+				}
+			});
     },
   }
 
+	// This should move into the grievance timss module.  But for now....
+  Drupal.behaviors.grievance_timss = {
+    attach: function(context, settings) {
+			$('.grievance-timss-id-for-insert').once().click(function(event) {
+				event.preventDefault(); 
+				grievance_timss_handle_recipient_click($(this));
+			});
+
+			function grievance_timss_handle_recipient_click(elt) {
+				val = elt.html();
+
+				var jqxhr = $.getJSON('/grievance/timss/lookup/' + val);
+				jqxhr.complete(function(data) {
+					var json = jQuery.parseJSON(data.responseJSON);
+					// console.log(json);
+					$('#edit-field-grievance-first-name-und-0-value').val(json[0].first_Name);
+					$('#edit-field-grievance-last-name-und-0-value').val(json[0].last_Name);
+					$('#edit-field-grievance-city-und-0-value').val(json[0].house_Address.city);
+					$('#edit-field-grievance-state-und-0-value').val(json[0].house_Address.state);
+					$('#edit-field-grievance-address-und-0-value').val(json[0].house_Address.street_Address);
+					$('#edit-field-grievance-zip-und-0-value').val(json[0].house_Address.zip);
+					$('#edit-field-grievance-phone-und-0-value').val(json[0].phone_Number);
+					$('#edit-field-grievance-email-und-0-email').val(json[0].email_Address);
+					$('#edit-field-grievance-department-und-0-value').val(json[0].department);
+					$('#edit-field-grievance-classification-und-0-value').val(json[0].classification);
+					$('#edit-field-grievance-min-und-0-value').val(json[0].timsS_Member_ID);
+				});
+
+			}
+		},
+	}
 
 	jQuery(document).ready(function() {
 
@@ -58,7 +145,6 @@
 
 
 		$('.grievance-recipient .form-type-radios input').change(function () {
-
 			$(this).closest('.grievance-recipient').removeClass('grievance-recipient-none');
 			$(this).closest('.grievance-recipient').removeClass('grievance-recipient-primary');
 			$(this).closest('.grievance-recipient').removeClass('grievance-recipient-secondary');

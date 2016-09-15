@@ -3284,7 +3284,8 @@ fieldset legend {
 }
 
 .grievance-union-recipients-intro,
-.grievance-company-recipients-intro {
+.grievance-company-recipients-intro,
+.grievance-message-intro {
   clear: both;
 }
 
@@ -3312,3 +3313,91 @@ fieldset legend {
   display: none;
 }
 
+
+
+#edit-grievance-id dl dt { 
+  font-weight: bold;
+}
+
+#edit-grievance-id dl dd {
+  padding-bottom: 10px;
+}
+
+
+
+
+.popup-layout pre {
+  white-space: pre-wrap;
+}
+
+
+
+
+.view-id-grievance_contract_clauses .views-row {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #666666;
+}
+
+
+.view-grievances.view-display-id-page_1 #view-grievances-savedsearches-container {
+  display: none;
+}
+
+
+
+.field-type-text-long { 
+  white-space: pre-line;
+}
+
+
+.view-id-grievances table {
+  width: auto;
+}
+
+#block-views-grievance-news-block {
+  float: right;
+  width: 300px;
+  border-left: 1px solid #666666;
+  padding-left: 20px;
+  margin-left: 20px;
+  min-height: 300px;
+}
+
+#content #block-views-grievance-news-block h2 {
+  padding-top: 0;
+}
+
+#block-views-grievance-news-block div.node-grievance-news {
+  padding-bottom: 20px;
+}
+
+
+@media only screen and (max-width: 600px) {
+  #block-views-grievance-news-block {
+    display: none;
+  }
+}
+
+
+#grievance-notify-form .form-type-date-popup .form-item label {
+  display: none;
+}
+
+table.grievance-timeline tr.overdue {
+  background-color: #FFBABA;
+}
+
+table.grievance-timeline tr.complete {
+  background-color: #DFF2BF;
+}
+
+table.grievance-timeline tr.pending {
+  background-color: #FEEFB3;
+}
+
+
+
+#grievance-timss-search-result {
+  padding-top: 10px;
+}
