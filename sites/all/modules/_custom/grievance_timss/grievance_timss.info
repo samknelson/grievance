@@ -1,4 +1,4 @@
 name = Grievance TIMSS
-description = 
+description = Functionality to connect the Grievance application to the TIMSS CRM
 package = grievance
 core = 7.x
