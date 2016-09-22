@@ -111,6 +111,25 @@ function grievance_block_timeleft() {
     }
   }
 
-  return "<div class=\"$class\">$msg</div>";
+
+  $msg = "<div class=\"$class\">$msg</div>";
+
+  $prior_content = views_embed_view('grievance_prior_grievances', 'block', $grievance_node->field_grievance_min['und'][0]['value'], $grievance_node->nid);
+  if ($prior_content) {
+
+    drupal_add_js('misc/form.js');
+    drupal_add_js('misc/collapse.js');
+
+    $msg .= '<fieldset class="collapsible collapsed">';
+    $msg .= '<legend><span class="fieldset-legend">';
+    $msg .= t('Other grievances by this employee');
+    $msg .= '</span></legend>';
+    $msg .= '<div class="fieldset-wrapper">';
+    $msg .= $prior_content;
+    $msg .= '</div>';
+    $msg .= '</fieldset>';
+  }
+
+  return $msg;
 }
 
