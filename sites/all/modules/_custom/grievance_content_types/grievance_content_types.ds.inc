@@ -17,8 +17,13 @@ function grievance_content_types_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'grievance_log';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'author' => array(
-      'weight' => '1',
+      'weight' => '2',
       'label' => 'inline',
       'format' => 'author',
       'formatter_settings' => array(
@@ -28,7 +33,7 @@ function grievance_content_types_ds_field_settings_info() {
       ),
     ),
     'post_date' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'inline',
       'format' => 'ds_post_date_long',
       'formatter_settings' => array(
@@ -56,11 +61,6 @@ function grievance_content_types_ds_field_settings_info() {
         'ft' => array(
           'lb' => 'Entry Type',
         ),
-      ),
-    ),
-    'field_grievance_status' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
       ),
     ),
     'field_grievance_alert_date' => array(
@@ -388,17 +388,19 @@ function grievance_content_types_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'post_date',
-        1 => 'author',
-        2 => 'field_grievance_log_type',
-        3 => 'field_grievance_status',
-        4 => 'field_grievance_alert_tid',
-        5 => 'field_grievance_alert_date',
-        6 => 'body',
-        7 => 'field_grievance_attachments',
+        0 => 'title',
+        1 => 'post_date',
+        2 => 'author',
+        3 => 'field_grievance_log_type',
+        4 => 'field_grievance_status',
+        5 => 'field_grievance_alert_tid',
+        6 => 'field_grievance_alert_date',
+        7 => 'body',
+        8 => 'field_grievance_attachments',
       ),
     ),
     'fields' => array(
+      'title' => 'ds_content',
       'post_date' => 'ds_content',
       'author' => 'ds_content',
       'field_grievance_log_type' => 'ds_content',
@@ -417,6 +419,7 @@ function grievance_content_types_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
     'hide_page_title' => '0',
     'page_option_title' => '',
   );
