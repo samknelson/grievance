@@ -8,12 +8,28 @@ function grievance_admin() {
     '#title' => t('Log Types'),
   );
 
+  $form['grievance_log']['grievance_log_incident_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Grievance Log Incident Type'),
+    '#default_value' => variable_get('grievance_log_incident_type', ''),
+    '#description' => t("Grievance log type to be used for incidents -- i.e. an entry of this type is created the date that the incident occurred."),
+  );
+
+  $form['grievance_log']['grievance_log_incident_status'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_status')),
+    '#title' => t('Grievance Log Incident Status'),
+    '#default_value' => variable_get('grievance_log_incident_status', ''),
+    '#description' => t("Grievance log status to be used for incidents -- i.e. an entry with this status is created the date that the incident occurred."),
+  );
+
   $form['grievance_log']['grievance_log_update_type'] = array(
     '#type' => 'select',
     '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
     '#title' => t('Grievance Log Update Type'),
     '#default_value' => variable_get('grievance_log_update_type', ''),
-    '#description' => t("Grievance log type to be used for updates."),
+    '#description' => t("Grievance log type to be used for updates -- i.e. an entry is created each time the grievance is saved."),
   );
 
   $form['grievance_log']['grievance_log_notify_type'] = array(

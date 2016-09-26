@@ -13,11 +13,40 @@ function grievance_node_tab_log($node) {
   return $result;
 }
 
-function grievance_log_update($grievance_node, $title) {
+function grievance_log_update($grievance_node, $op) {
 	global $user;
 
+  if ($op == 'insert') {
+
+    $grievance_date = $grievance_node->field_grievance_date_1['und'][0]['value'];
+
+    if ($grievance_date) {
+      $ts = strtotime($grievance_date);
+      $log_node = new stdClass();
+      $log_node->title = t('Incident Occurred');
+      $log_node->type = 'grievance_log';
+      node_object_prepare($log_node);
+      $log_node->language = LANGUAGE_NONE;
+      $log_node->uid = $user->uid; 
+      $log_node->status = 1;
+      $log_node->promote = 0;
+      $log_node->comment = 0;
+
+      $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+      $log_node->field_grievance_status['und'][0]['tid'] =  variable_get('grievance_log_incident_status', '');
+      $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_incident_type', '');
+
+      $log_node = node_submit($log_node); // Prepare node for saving
+      node_save($log_node);
+
+      // Now coerce the created, updated date
+      $sql = "update node set created = :created, changed = :changed where nid = :nid";
+      $stmt = db_query($sql, array(':created' => $ts, ':changed' => $ts, ':nid' => $log_node->nid));
+    }
+  }
+
   $log_node = new stdClass();
-  $log_node->title = $title;
+  $log_node->title = $op;
   $log_node->type = 'grievance_log';
   node_object_prepare($log_node);
   $log_node->language = LANGUAGE_NONE;
@@ -163,11 +192,12 @@ function grievance_log_member_forward(
   node_save($log_node);
 }
 
-function grievance_log_list($grievance_node, $type_tid) {
+function grievance_log_list($grievance_node, $type_tids) {
+  if (!is_array($log_tids)) { $log_tids = array($log_tids); }
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance_log_type', 'tid', $type_tid);
+  $query->fieldCondition('field_grievance_log_type', 'tid', $type_tids, 'in');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
   $query->propertyOrderBy('created');
   $stmt = $query->execute();
@@ -208,8 +238,8 @@ function grievance_node_tab_timeline($grievance_node) {
   $alert_terms = taxonomy_term_load_multiple($alert_tids);
 
   // Get the timeline
-  $log_update_tid = variable_get('grievance_log_update_type', '');
-  $log_nodes = grievance_log_list($grievance_node, $log_update_tid);
+  $log_update_tids = array(variable_get('grievance_log_update_type', ''), variable_get('grievance_log_incident_type', ''));
+  $log_nodes = grievance_log_list($grievance_node, $log_update_tids);
   $dates_entered = array();
   $dates_left = array();
   $prev_status_tid = 0;
