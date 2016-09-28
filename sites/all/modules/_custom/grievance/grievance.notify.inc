@@ -695,6 +695,7 @@ function grievance_notify_form_submit($form, &$form_state) {
 	if ($new_status_tid != $grievance_node->field_grievance_status['und'][0]['tid']) {
 		drupal_set_message("And ... saving.");
 		$grievance_node->field_grievance_status['und'][0]['tid'] = $new_status_tid;
+		$grievance_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d');
 		node_save($grievance_node);
 	}
 
