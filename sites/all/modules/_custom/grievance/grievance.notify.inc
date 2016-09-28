@@ -224,7 +224,7 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
         $classes .= ' grievance-recipient-company';
       }
 
-      $stle = '';
+      $style = '';
       if ($grievance_contacts_hide_nostatusmatch == "Yes" && !$recipient['statusmatch']) {
         $style .= 'display: none;';
       }
