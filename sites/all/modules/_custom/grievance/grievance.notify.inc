@@ -493,32 +493,15 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 	$form['grievance_status_intro'] = array(
 		'#title' => '',
 		'#type' => 'markup',
-		'#markup' => '<h2>' . t('Change Status') . '</h2>' . t('After sending the notification, change the grievance status and deadline.'),
+		'#markup' => '<h2>' . t('Change Status') . '</h2>' . t('After sending the notification, change the grievance status.'),
 	);
 
-	module_load_include('inc', 'node', 'node.pages');
-	$node_form = drupal_get_form('grievance_node_form', $grievance_node);	
-
-	foreach (array(
-		'field_grievance_status', 
-		'field_grievance_alert_tid', 
-		) as $key) {
-		$form[$key] = $node_form[$key];
-		unset($form[$key]['#weight']);
-		unset($form[$key]['#tree']);
-		unset($form[$key]['#parents']);
-		unset($form[$key]['#after_build']);
-	}
-
-	// Date field was getting messed up with warnings when I tried to clone from the node form, so I'm just adding it manually
-  $form['field_grievance_alert_date'] = array(
-  	'#title' => 'Next deadline date',
-    '#type' => 'date_popup',
-    '#date_format' => 'm/d/Y',
-    '#default_value' => $grievance_node->field_grievance_alert_date['und'][0]['value'],
-    '#prefix' => '<div class="field-grievance-alert-date-wrapper">',
-    '#suffix' => '</div>',
-  );	
+  $form['grievance_new_status'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_status')),
+    '#title' => t('Change Status To'),
+    '#default_value' => $grievance_node->field_grievance_status['und'][0]['tid'],
+   );
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -704,6 +687,16 @@ function grievance_notify_form_submit($form, &$form_state) {
 		$params['body'],
 		$params['attachments']
 	);
+
+	// Now update the node, if the status has changed.
+	$new_status_tid = $form_state['values']['grievance_new_status'];
+	drupal_set_message("Here with $new_status_tid");
+	drupal_set_message("Comparing with: " . $grievance_node->field_grievance_status['und'][0]['tid']);
+	if ($new_status_tid != $grievance_node->field_grievance_status['und'][0]['tid']) {
+		drupal_set_message("And ... saving.");
+		$grievance_node->field_grievance_status['und'][0]['tid'] = $new_status_tid;
+		node_save($grievance_node);
+	}
 
 	drupal_set_message(t('Notification FROM: ') . htmlspecialchars($from));
 	drupal_set_message(t('Notification TO: ') . htmlspecialchars($to));

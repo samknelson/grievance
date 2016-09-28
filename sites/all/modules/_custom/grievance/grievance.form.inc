@@ -53,6 +53,9 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     'method' => 'replace',
   );
 
+  // Reset the status update date
+  $form['field_grievance_status_date']['und'][0]['#default_value']['value'] = date('Y-m-d');
+
   // Find the current user
   global $user;
   if (!$user) { return; }

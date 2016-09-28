@@ -36,17 +36,19 @@ function grievance_log_update($grievance_node, $op) {
       $log_node->field_grievance_status['und'][0]['tid'] =  variable_get('grievance_log_incident_status', '');
       $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_incident_type', '');
 
+      $log_node->field_grievance_status_date = $grievance_node->field_grievance_date_1;
+
       $log_node = node_submit($log_node); // Prepare node for saving
       node_save($log_node);
-
-      // Now coerce the created, updated date
-      $sql = "update node set created = :created, changed = :changed where nid = :nid";
-      $stmt = db_query($sql, array(':created' => $ts, ':changed' => $ts, ':nid' => $log_node->nid));
     }
   }
 
   $log_node = new stdClass();
-  $log_node->title = $op;
+  if ($op == 'insert') {
+    $log_node->title = t('Grievance Record Created');
+  } else {
+    $log_node->title = t('Grievance Record Updated');
+  }
   $log_node->type = 'grievance_log';
   node_object_prepare($log_node);
   $log_node->language = LANGUAGE_NONE;
@@ -61,6 +63,11 @@ function grievance_log_update($grievance_node, $op) {
   $log_node->field_grievance_alert_tid = $grievance_node->field_grievance_alert_tid;
   $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
   $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_update_type', '');
+
+  $log_node->field_grievance_status_date = $grievance_node->field_grievance_status_date;
+  if (!$log_node->field_grievance_status_date['und'][0]['value']) {
+    $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d');
+  }
 
   $log_node = node_submit($log_node); // Prepare node for saving
   node_save($log_node);
@@ -100,7 +107,7 @@ function grievance_log_notify(
   global $user;
 
   $log_node = new stdClass();
-  $log_node->title = t('Notification sent to ') . htmlspecialchars($to);
+  $log_node->title = t('Notification sent to ') . $to;
   $log_node->type = 'grievance_log';
   node_object_prepare($log_node);
   $log_node->language = LANGUAGE_NONE;
@@ -114,6 +121,7 @@ function grievance_log_notify(
   $log_node->field_grievance_alert = $grievance_node->field_grievance_alert;
   $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
   $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_notify_type', '');
+  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d'); 
 
   $comments = t("COMPANY NOTIFICATION SENT\n");
   $comments .= t('From: ') . $from . "\n";
@@ -167,6 +175,7 @@ function grievance_log_member_forward(
   $log_node->field_grievance_alert = $grievance_node->field_grievance_alert;
   $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
   $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_member_forward_type', '');
+  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d'); 
 
   $comments = t("MEMBER NOTIFICATION SENT\n");
   $comments .= t('To: ') . $to . "\n";
@@ -246,11 +255,11 @@ function grievance_node_tab_timeline($grievance_node) {
   foreach ($log_nodes as $log_node) {
     $status_tid = $log_node->field_grievance_status['und'][0]['tid'];
     if ($dates_entered[$status_tid]) { continue; }
-    $dates_entered[$status_tid] = $log_node->created;
+    $dates_entered[$status_tid] = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
 
     if ($status_tid != $prev_status_tid) {
       if (!$dates_left[$prev_status_tid]) {
-        $dates_left[$prev_status_tid] = $log_node->created;
+        $dates_left[$prev_status_tid] = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
       }
       $prev_status_tid = $status_tid;
     }
@@ -264,7 +273,7 @@ function grievance_node_tab_timeline($grievance_node) {
     t('Next Status'),
     t('Date Entered'),
     t('Deadline'),
-    t('Date Left'),
+    t('Date Completed'),
     t('State'),
   );
   $attributes = array('class' => array('grievance-timeline'));;
@@ -297,7 +306,7 @@ function grievance_node_tab_timeline($grievance_node) {
     if ($date_entered) {
       if ($date_left) { 
         if ($deadline && (strtotime($date_left) > strtotime($deadline))) {
-          $state = t('Overdue');
+          $state = t('Complete (late)');
           $state_class = 'overdue';
         } else {
           $state = t('Complete');

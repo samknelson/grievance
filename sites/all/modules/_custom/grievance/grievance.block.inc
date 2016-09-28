@@ -115,8 +115,8 @@ function grievance_block_timeleft() {
   $msg = "<div class=\"$class\">$msg</div>";
 
   $prior_content = views_embed_view('grievance_prior_grievances', 'block', $grievance_node->field_grievance_min['und'][0]['value'], $grievance_node->nid);
-  if ($prior_content) {
-
+  $probe = trim(strip_tags($prior_content));
+  if ($probe) {
     drupal_add_js('misc/form.js');
     drupal_add_js('misc/collapse.js');
 

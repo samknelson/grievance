@@ -12,11 +12,39 @@ function grievance_content_types_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|grievance_contract_clause|default';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'grievance_contract_clause';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '2',
+      'label' => 'inline',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '0',
+        'wrapper' => 'div',
+        'class' => '',
+        'ft' => array(
+          'lb' => 'Brief Statement',
+        ),
+      ),
+    ),
+  );
+  $export['node|grievance_contract_clause|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|grievance_log|default';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'grievance_log';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'edit_link' => array(
+      'weight' => '7',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -63,15 +91,38 @@ function grievance_content_types_ds_field_settings_info() {
         ),
       ),
     ),
-    'field_grievance_alert_date' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'Next Deadline',
-        ),
-      ),
-    ),
   );
   $export['node|grievance_log|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|grievance_news|teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'grievance_news';
+  $ds_fieldsetting->view_mode = 'teaser';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'node_link' => array(
+      'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'author' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'author',
+    ),
+    'post_date' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'ds_post_date_long',
+    ),
+  );
+  $export['node|grievance_news|teaser'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -258,6 +309,25 @@ function grievance_content_types_ds_custom_fields_info() {
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
+  $ds_field->field = 'edit_link';
+  $ds_field->label = 'Edit Link';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<p>[<a href="/node/[node:nid]/edit?destination=[current-page:url:path]">Edit</a>]</p>
+',
+      'format' => 'full_html',
+    ),
+    'use_token' => 1,
+  );
+  $export['edit_link'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
   $ds_field->field = 'grievance_address_combined';
   $ds_field->label = 'Grievant\'s Address';
   $ds_field->field_type = 5;
@@ -380,6 +450,47 @@ function grievance_content_types_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|grievance_contract_clause|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'grievance_contract_clause';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_grievance_contract_section',
+        1 => 'field_grievance_label',
+        2 => 'title',
+        3 => 'field_grievance_clause',
+        4 => 'field_grievance_type',
+        5 => 'field_grievance_remedy',
+      ),
+    ),
+    'fields' => array(
+      'field_grievance_contract_section' => 'ds_content',
+      'field_grievance_label' => 'ds_content',
+      'title' => 'ds_content',
+      'field_grievance_clause' => 'ds_content',
+      'field_grievance_type' => 'ds_content',
+      'field_grievance_remedy' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|grievance_contract_clause|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|grievance_log|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'grievance_log';
@@ -393,10 +504,9 @@ function grievance_content_types_ds_layout_settings_info() {
         2 => 'author',
         3 => 'field_grievance_log_type',
         4 => 'field_grievance_status',
-        5 => 'field_grievance_alert_tid',
-        6 => 'field_grievance_alert_date',
-        7 => 'body',
-        8 => 'field_grievance_attachments',
+        5 => 'body',
+        6 => 'field_grievance_attachments',
+        7 => 'edit_link',
       ),
     ),
     'fields' => array(
@@ -405,10 +515,9 @@ function grievance_content_types_ds_layout_settings_info() {
       'author' => 'ds_content',
       'field_grievance_log_type' => 'ds_content',
       'field_grievance_status' => 'ds_content',
-      'field_grievance_alert_tid' => 'ds_content',
-      'field_grievance_alert_date' => 'ds_content',
       'body' => 'ds_content',
       'field_grievance_attachments' => 'ds_content',
+      'edit_link' => 'ds_content',
     ),
     'classes' => array(),
     'wrappers' => array(
@@ -424,6 +533,45 @@ function grievance_content_types_ds_layout_settings_info() {
     'page_option_title' => '',
   );
   $export['node|grievance_log|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|grievance_news|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'grievance_news';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'post_date',
+        2 => 'author',
+        3 => 'body',
+        4 => 'node_link',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'ds_content',
+      'post_date' => 'ds_content',
+      'author' => 'ds_content',
+      'body' => 'ds_content',
+      'node_link' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|grievance_news|teaser'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;

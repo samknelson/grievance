@@ -2,6 +2,7 @@ name = Grievance Views
 core = 7.x
 package = grievance
 dependencies[] = better_exposed_filters
+dependencies[] = entity
 dependencies[] = entityreference
 dependencies[] = views_aggregator
 dependencies[] = views_calc
