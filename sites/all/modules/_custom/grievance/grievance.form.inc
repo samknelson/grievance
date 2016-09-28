@@ -69,8 +69,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   }
   if (!$shop_nid) {
     $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
-  }  
-  $shop_node = node_load($shop_nid);
+  }
+  if ($shop_nid) {
+    $shop_node = node_load($shop_nid);
+  }
 
   // Set the contract template from the contract
   if ($shop_node) {
@@ -80,33 +82,37 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     }
   }
 
+  /*
   // Set the list of clauses
-  $clauses_view = views_get_view('grievance_contract_clauses');
-  $clauses_view->args[0] = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
-  $clauses_view->execute('entityreference_1');
-  $clauses_options = array();
-  $clauses_options['_none'] = t('- None -');
-  foreach ($clauses_view->result as $clause) {
-    $clauses_options[$clause->nid] = 
-      'Article ' . 
-      $clause->field_field_grievance_section_number[0]['rendered']['#markup'] . 
-      ': ' . 
-      $clause->field_field_grievance_contract_section[0]['rendered']['#markup'] . 
-      ' - Clause ' .
-      $clause->field_data_field_grievance_label_field_grievance_label_value .
-      ': ' . $clause->node_title;
+  $contract_tplt_id = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
+  if ($contract_tplt_id) {
+    $clauses_view = views_get_view('grievance_contract_clauses');
+    $clauses_view->args[0] = $contract_tplt_id;
+    $clauses_view->execute('entityreference_1');
+    $clauses_options = array();
+    $clauses_options['_none'] = t('- None -');
+    foreach ($clauses_view->result as $clause) {
+      $clauses_options[$clause->nid] = 
+        'Article ' . 
+        $clause->field_field_grievance_section_number[0]['rendered']['#markup'] . 
+        ': ' . 
+        $clause->field_field_grievance_contract_section[0]['rendered']['#markup'] . 
+        ' - Clause ' .
+        $clause->field_data_field_grievance_label_field_grievance_label_value .
+        ': ' . $clause->node_title;
+    }
+    $form['field_grievance_clauseref']['und']['#options'] = $clauses_options;
+    $idx = 0;
+    while (isset($form['field_grievance_clauseref']['und'][$idx]['target_id']['#options'])) {
+      $form['field_grievance_clauseref']['und'][$idx]['target_id']['#options'] = $clauses_options;
+      ++$idx;
+    }
   }
-  $form['field_grievance_clauseref']['und']['#options'] = $clauses_options;
-  $idx = 0;
-  while (isset($form['field_grievance_clauseref']['und'][$idx]['target_id']['#options'])) {
-    $form['field_grievance_clauseref']['und'][$idx]['target_id']['#options'] = $clauses_options;
-    ++$idx;
-  }
+  */
 
   // Link to contract
   $contract_link_text = '';
-  if ($shop_nid) {
-    $shop_node = node_load($shop_nid);
+  if ($shop_node) {
     $contract_uri = $shop_node->field_grievance_contract['und'][0]['uri'];
     if ($contract_uri) {
       $contract_url = file_create_url($contract_uri);
@@ -264,7 +270,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     }
 
     // Shop
-    if ($shop_nid) {
+    if ($shop_node) {
       $form['field_grievance_shop']['und'][0]['target_id']['#default_value'] = "$shop_node->title ($shop_node->nid)";
     }
   }
