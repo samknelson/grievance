@@ -666,7 +666,7 @@ function grievance_notify_form_submit($form, &$form_state) {
 	// Attach the grievance as a PDF
 	$params['attachments'][] = array(
 		'filecontent' => grievance_gform_pdf_contents($grievance_node),
-		'filename' => 'grievance_' . $node->nid . '.pdf',
+		'filename' => 'grievance_' . $node->nid . '_' . time() . '.pdf',
 		'filemime' => 'grievance/pdf',
 	);
 
@@ -690,10 +690,7 @@ function grievance_notify_form_submit($form, &$form_state) {
 
 	// Now update the node, if the status has changed.
 	$new_status_tid = $form_state['values']['grievance_new_status'];
-	drupal_set_message("Here with $new_status_tid");
-	drupal_set_message("Comparing with: " . $grievance_node->field_grievance_status['und'][0]['tid']);
 	if ($new_status_tid != $grievance_node->field_grievance_status['und'][0]['tid']) {
-		drupal_set_message("And ... saving.");
 		$grievance_node->field_grievance_status['und'][0]['tid'] = $new_status_tid;
 		$grievance_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d');
 		node_save($grievance_node);
