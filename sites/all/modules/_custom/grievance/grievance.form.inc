@@ -193,7 +193,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
         $classes .= ' grievance-recipient-company';
       }
 
-      $stle = '';
+      $style = '';
       if ($grievance_contacts_hide_nostatusmatch == "Yes" && !$contact['statusmatch']) {
         $style .= 'display: none;';
       }
