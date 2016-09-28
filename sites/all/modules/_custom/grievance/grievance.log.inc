@@ -208,7 +208,7 @@ function grievance_log_list($grievance_node, $type_tids) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_log_type', 'tid', $type_tids, 'in');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  $query->propertyOrderBy('created');
+  $query->fieldOrderBy('field_grievance_status_date', 'value');
   $stmt = $query->execute();
 
   if (!$stmt['node']) { return array(); }
