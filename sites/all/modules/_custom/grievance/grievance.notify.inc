@@ -754,8 +754,18 @@ function grievance_notify_template($grievance_node) {
 			$rule_nodes = node_load_multiple($rule_nids);
 			foreach ($rule_nodes as $rule_node) {
 				if ($rule_node->field_grievance_notify_body['und'][0]['value']) {
-					$result['subject'] = $rule_node->field_grievance_notify_subject['und'][0]['value'];
-					$result['body'] = $rule_node->field_grievance_notify_body['und'][0]['value'];
+					$result['subject'] = token_replace(
+						$rule_node->field_grievance_notify_subject['und'][0]['value'], 
+						array('node' => $grievance_node), 
+						array()
+					);
+
+
+					$result['body'] = token_replace(
+						$rule_node->field_grievance_notify_body['und'][0]['value'], 
+						array('node' => $grievance_node), 
+						array()
+					);
 				}
 			}
 		}

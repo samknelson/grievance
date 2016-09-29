@@ -122,3 +122,16 @@ function grievance_contract_next_alert_tid($contract_tplt_nid, $status_tid) {
   if (!$rule_node) { return NULL; }
   return $rule_node->field_grievance_alert_tid['und'][0]['tid'];
 }
+
+function grievance_form_grievance_contract_rule_node_form_alter(&$form, &$form_state, $form_id) {
+  $weight = $form['field_grievance_notify_body']['#weight'] + 0.5;
+
+  $form['token_tree'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Replacement patterns'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#description' => theme('token_tree', array('token_types' => array('node'))),
+    '#weight' => $weight
+  );
+}
