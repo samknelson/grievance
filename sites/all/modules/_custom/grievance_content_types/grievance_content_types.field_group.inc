@@ -814,6 +814,7 @@ function grievance_content_types_field_group_info() {
       3 => 'field_grievance_type_other',
       4 => 'field_grievance_violation',
       5 => 'field_grievance_inforeq',
+      6 => 'field_grievance_document_types',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -848,6 +849,7 @@ function grievance_content_types_field_group_info() {
       5 => 'field_grievance_violation',
       6 => 'field_grievance_inforeq',
       7 => 'field_grievance_clauseref',
+      8 => 'field_grievance_document_types',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(

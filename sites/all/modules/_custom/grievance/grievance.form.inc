@@ -8,6 +8,7 @@ function grievance_form_grievance_node_callback_replace($form, $form_state) {
   $commands[] = ajax_command_replace("#edit-field-grievance-clauseref", render($form['field_grievance_clauseref']));
   $commands[] = ajax_command_replace("#field-grievance-alert-date-wrapper", render($form['field_grievance_alert_date']));
   $commands[] = ajax_command_replace("#field-grievance-alert-tid-wrapper", render($form['field_grievance_alert_tid']));
+  $commands[] = ajax_command_replace("#field-grievance-document-types-wrapper", render($form['field_grievance_document_types']));
   $commands[] = ajax_command_invoke(NULL, "grievance_select_set", array('edit-field-grievance-contract-tplt-und', $form_state['grievance_contract_tplt_nid']));
 
   return array(
@@ -281,7 +282,12 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
   $form['field_grievance_alert_date']['#prefix'] = '<div id="field-grievance-alert-date-wrapper">';
   $form['field_grievance_alert_date']['#suffix'] = '</div>';
+
   $contract_tplt_nid = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
+  if ($contract_tplt_nid) { 
+    $contract_tplt_node = node_load($contract_tplt_nid);
+  }
+  
   $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
   $alert_date = grievance_form_current_value('field_grievance_alert_date', 'value', $form, $form_state);
 
@@ -290,6 +296,24 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       $next_deadline = grievance_contract_next_deadline($contract_tplt_nid, $status_tid);
       // $form['field_grievance_alert_date']['und'][0]['#default_value'] = $next_deadline;
       $form_state['input']['field_grievance_alert_date']['und'][0]['value']['date'] = date('m/d/Y', strtotime($next_deadline));
+    }
+  }
+
+  //
+  // Compute the default information requests
+  // @TODO: Broken
+  //
+
+  $form['field_grievance_document_types']['#prefix'] = '<div id="field-grievance-document-types-wrapper">';
+  $form['field_grievance_document_types']['#suffix'] = '</div>';
+  $document_types = grievance_form_current_value('field_grievance_document_types', 'value', $form, $form_state);
+  if (!$document_types || $form_state['triggering_element']['#field_name'] == 'field_grievance_contract_tplt') {
+    if ($contract_tplt_node && $contract_tplt_node->field_grievance_document_types['und']) {
+      $val = array();
+      foreach ($contract_tplt_node->field_grievance_document_types['und'] as $tmp) {
+        $val[$tmp['tid']] = $tmp['tid'];
+      }
+      $form_state['input']['field_grievance_document_types']['und'] = $val;
     }
   }
 
@@ -309,3 +333,4 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     }
   }
 }
+
