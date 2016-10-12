@@ -17,7 +17,7 @@ function grievance_timss_menu() {
 	);
 
 	$items['grievance/timss/lookup/%'] = array(
-		'page callback' => 'grievance_timss_lookup',
+		'page callback' => 'grievance_timss_lookup_ajax',
 		'page arguments' => array(3),
 		'access arguments' => array('grievance user'),
 		'type' => MENU_CALLBACK,
