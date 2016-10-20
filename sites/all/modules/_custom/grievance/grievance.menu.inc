@@ -89,12 +89,14 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance arbitrationform'),
 	);
 
+	/*
 	$node_tabs['grievance']['bundle'] = array(
 		'title' => 'Bundle',
 		'description' => '',
 		'callback' => 'grievance_node_tab_bundle',
 		'permissions' => array('grievance admin'),
 	);
+	*/
 
 	$node_tabs['grievance_shop']['contacts'] = array(
 		'title' => 'Contacts',
