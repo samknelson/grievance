@@ -97,6 +97,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
     ),
     'module' => 'flood_unblock',
   );
@@ -106,6 +107,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'name' => 'access private fields',
     'roles' => array(
       'administrator' => 'administrator',
+      'grievance admin' => 'grievance admin',
     ),
     'module' => 'field_permissions',
   );
@@ -270,6 +272,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'name' => 'administer field permissions',
     'roles' => array(
       'administrator' => 'administrator',
+      'grievance admin' => 'grievance admin',
     ),
     'module' => 'field_permissions',
   );
@@ -625,6 +628,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
   $permissions['create grievance content'] = array(
     'name' => 'create grievance content',
     'roles' => array(
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'node',
@@ -634,6 +638,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
   $permissions['create grievance_attachment content'] = array(
     'name' => 'create grievance_attachment content',
     'roles' => array(
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'node',
@@ -709,6 +714,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
   $permissions['create grievance_log content'] = array(
     'name' => 'create grievance_log content',
     'roles' => array(
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'node',
@@ -724,7 +730,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'create grievance_settlement content'.
   $permissions['create grievance_settlement content'] = array(
     'name' => 'create grievance_settlement content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -741,7 +749,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'create grievance_shop_contact content'.
   $permissions['create grievance_shop_contact content'] = array(
     'name' => 'create grievance_shop_contact content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -795,14 +805,18 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'delete any grievance content'.
   $permissions['delete any grievance content'] = array(
     'name' => 'delete any grievance content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
   // Exported permission: 'delete any grievance_attachment content'.
   $permissions['delete any grievance_attachment content'] = array(
     'name' => 'delete any grievance_attachment content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -875,7 +889,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'delete any grievance_log content'.
   $permissions['delete any grievance_log content'] = array(
     'name' => 'delete any grievance_log content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -889,7 +905,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'delete any grievance_settlement content'.
   $permissions['delete any grievance_settlement content'] = array(
     'name' => 'delete any grievance_settlement content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -906,7 +924,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'delete any grievance_shop_contact content'.
   $permissions['delete any grievance_shop_contact content'] = array(
     'name' => 'delete any grievance_shop_contact content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -923,14 +943,18 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'delete own grievance content'.
   $permissions['delete own grievance content'] = array(
     'name' => 'delete own grievance content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
   // Exported permission: 'delete own grievance_attachment content'.
   $permissions['delete own grievance_attachment content'] = array(
     'name' => 'delete own grievance_attachment content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -1003,7 +1027,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'delete own grievance_log content'.
   $permissions['delete own grievance_log content'] = array(
     'name' => 'delete own grievance_log content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -1017,7 +1043,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'delete own grievance_settlement content'.
   $permissions['delete own grievance_settlement content'] = array(
     'name' => 'delete own grievance_settlement content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -1034,7 +1062,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'delete own grievance_shop_contact content'.
   $permissions['delete own grievance_shop_contact content'] = array(
     'name' => 'delete own grievance_shop_contact content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -1249,6 +1279,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
   $permissions['edit any grievance content'] = array(
     'name' => 'edit any grievance content',
     'roles' => array(
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'node',
@@ -1258,6 +1289,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
   $permissions['edit any grievance_attachment content'] = array(
     'name' => 'edit any grievance_attachment content',
     'roles' => array(
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'node',
@@ -1333,6 +1365,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
   $permissions['edit any grievance_log content'] = array(
     'name' => 'edit any grievance_log content',
     'roles' => array(
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'node',
@@ -1348,7 +1381,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'edit any grievance_settlement content'.
   $permissions['edit any grievance_settlement content'] = array(
     'name' => 'edit any grievance_settlement content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -1365,7 +1400,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'edit any grievance_shop_contact content'.
   $permissions['edit any grievance_shop_contact content'] = array(
     'name' => 'edit any grievance_shop_contact content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -1453,6 +1490,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
   $permissions['edit own grievance content'] = array(
     'name' => 'edit own grievance content',
     'roles' => array(
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'node',
@@ -1462,6 +1500,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
   $permissions['edit own grievance_attachment content'] = array(
     'name' => 'edit own grievance_attachment content',
     'roles' => array(
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'node',
@@ -1537,6 +1576,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
   $permissions['edit own grievance_log content'] = array(
     'name' => 'edit own grievance_log content',
     'roles' => array(
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'node',
@@ -1552,7 +1592,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'edit own grievance_settlement content'.
   $permissions['edit own grievance_settlement content'] = array(
     'name' => 'edit own grievance_settlement content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -1569,7 +1611,9 @@ function grievance_roles_and_permissions_user_default_permissions() {
   // Exported permission: 'edit own grievance_shop_contact content'.
   $permissions['edit own grievance_shop_contact content'] = array(
     'name' => 'edit own grievance_shop_contact content',
-    'roles' => array(),
+    'roles' => array(
+      'grievance staff' => 'grievance staff',
+    ),
     'module' => 'node',
   );
 
@@ -1695,6 +1739,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
     ),
     'module' => 'grievance',
   );
@@ -1705,6 +1750,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'grievance',
@@ -1716,6 +1762,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
     ),
     'module' => 'grievance',
   );
@@ -1736,6 +1783,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
     ),
     'module' => 'grievance',
   );
@@ -1746,6 +1794,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'grievance',
@@ -1757,6 +1806,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
     ),
     'module' => 'grievance',
   );
@@ -1767,6 +1817,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
     ),
     'module' => 'grievance',
   );
@@ -1777,6 +1828,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
     ),
     'module' => 'grievance',
   );
@@ -1787,6 +1839,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'roles' => array(
       'administrator' => 'administrator',
       'grievance admin' => 'grievance admin',
+      'grievance staff' => 'grievance staff',
       'grievance user' => 'grievance user',
     ),
     'module' => 'grievance',

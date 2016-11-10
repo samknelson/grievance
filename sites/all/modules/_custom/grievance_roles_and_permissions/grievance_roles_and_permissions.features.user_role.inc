@@ -19,7 +19,7 @@ function grievance_roles_and_permissions_user_default_roles() {
   // Exported role: grievance staff.
   $roles['grievance staff'] = array(
     'name' => 'grievance staff',
-    'weight' => 4,
+    'weight' => 5,
   );
 
   // Exported role: grievance user.
@@ -31,7 +31,7 @@ function grievance_roles_and_permissions_user_default_roles() {
   // Exported role: grievance view.
   $roles['grievance view'] = array(
     'name' => 'grievance view',
-    'weight' => 5,
+    'weight' => 4,
   );
 
   return $roles;
