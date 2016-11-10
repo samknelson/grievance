@@ -356,6 +356,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'name' => 'administer masquerade',
     'roles' => array(
       'administrator' => 'administrator',
+      'grievance admin' => 'grievance admin',
     ),
     'module' => 'masquerade',
   );
@@ -1888,6 +1889,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'name' => 'masquerade as admin',
     'roles' => array(
       'administrator' => 'administrator',
+      'grievance admin' => 'grievance admin',
     ),
     'module' => 'masquerade',
   );
@@ -1897,6 +1899,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'name' => 'masquerade as any user',
     'roles' => array(
       'administrator' => 'administrator',
+      'grievance admin' => 'grievance admin',
     ),
     'module' => 'masquerade',
   );
@@ -1906,6 +1909,7 @@ function grievance_roles_and_permissions_user_default_permissions() {
     'name' => 'masquerade as user',
     'roles' => array(
       'administrator' => 'administrator',
+      'grievance admin' => 'grievance admin',
     ),
     'module' => 'masquerade',
   );
