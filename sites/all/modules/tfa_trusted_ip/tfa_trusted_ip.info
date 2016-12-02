@@ -1,0 +1,7 @@
+name = "TFA Trusted IP Plugin"
+description = "TFA plugin for trusted IPs"
+core = 7.x
+
+dependencies[] = tfa
+
+files[] = includes/tfa_trusted_ip.inc
