@@ -110,11 +110,13 @@ function google_fonts_api_preprocess_html(&$vars) {
       } // if
       else {
 
-        $base = 'http://fonts.googleapis.com/css?family=';
+        $base = '//fonts.googleapis.com/css?family=';
 
+        /*
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
           $base = 'https://fonts.googleapis.com/css?family=';
         } // if
+        */
 
         $url = $base . implode('|', $families) . '&subset=' . implode(',', $all_subsets);
 
