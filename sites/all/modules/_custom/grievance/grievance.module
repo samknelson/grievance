@@ -6,7 +6,6 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.menu.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.form.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.forward.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.letter.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.log.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.attachment.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.settlement.inc";
@@ -15,6 +14,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.gform.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.arbitrationform.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.report_bytype.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.report_average_time.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.block.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.notify.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.alert.inc";
@@ -119,7 +119,7 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
-  $defaultable_fields = array('grievance_contract_tplt');
+  $defaultable_fields = array('grievance_contract_tplt', 'grievance_classaction');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $form['field_' . $field]["und"]['#default_value'][0] = $_GET[$field];
@@ -170,7 +170,6 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     $form['field_grievance_alert_tid']['#access'] = FALSE;
     $form['field_grievance_alert_date']['#access'] = FALSE;
   }
-
 }
 
 function grievance_classes_array($new_classes = null) {
@@ -233,4 +232,23 @@ function grievance_views_pre_build(&$view) {
   if ($view->name == 'grievance_contract_clauses' && $view->current_display == 'entityreference_1') { 
     // $view->args[0] = 3215;
   }
+}
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function grievance_report_cache_info() {
+  $items = array();
+
+  $items['grievance-report-average-time'] = array(
+    'name' => t('Average Time between Statuses'),
+    'description' => '',
+    'fields' => grievance_report_average_time_fields(),
+    'access' => 'grievance report',
+    'path' => 'grievance/report/average-time',
+    'pk_list_callback' => 'grievance_report_average_time_pks',
+    'batch_callback' => 'grievance_report_average_time_batch',
+  );
+  return $items;
 }
