@@ -112,10 +112,17 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance contact'),
 	);
 
-	$node_tabs['grievance_contract_template']['rules'] = array(
-		'title' => 'Rules',
+	$node_tabs['grievance_contract_template']['rules-individual'] = array(
+		'title' => 'Rules (Individual)',
 		'description' => '',
-		'callback' => 'grievance_contract_template_node_tab_rules',
+		'callback' => 'grievance_contract_template_node_tab_rules_individual',
+		'permissions' => array('grievance contract'),
+	);
+
+	$node_tabs['grievance_contract_template']['rules-classaction'] = array(
+		'title' => 'Rules (Class Action)',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_rules_classaction',
 		'permissions' => array('grievance contract'),
 	);
 
@@ -251,9 +258,18 @@ function grievance_menu() {
 	);
 
 	$items['grievance/report/bytype'] = array(
-		'title' => 'Report by Type',
+		'title' => 'Report: Count by Type',
 		'description' => '',
 		'page callback' => 'grievance_report_bytype',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['grievance/report/average-time'] = array(
+		'title' => 'Report: Average Time Between Statuses',
+		'description' => '',
+		'page callback' => 'grievance_report_average_time',
 		'page arguments' => array(),
 		'access arguments' => array('grievance report'),
 		'type' => MENU_NORMAL_ITEM,

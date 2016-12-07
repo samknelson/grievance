@@ -82,10 +82,17 @@
 			});
 
 			// Set "corrected" when demographic information changes
+			/*
 			$('.node-grievance-form .field-name-field-grievance-first-name-form input, .node-grievance-form .field-name-field-grievance-last-name-form input, .node-grievance-form .field-name-field-grievance-phone-name-form input, .node-grievance-form .field-name-field-grievance-email-name-form input, .node-grievance-form .field-name-field-grievance-address-name-form input, .node-grievance-form .field-name-field-grievance-address-2-name-form input, .node-grievance-form .field-name-field-grievance-city-name-form input, .node-grievance-form .field-name-field-grievance-state-name-form input, .node-grievance-form .field-name-field-grievance-hire-date-name-form input, .node-grievance-form .field-name-field-grievance-ein-form input, .node-grievance-form .field-name-field-grievance-min-form input, .node-grievance-form .field-name-field-grievance-classification-form input').change(function() {
 				if ($('.node-grievance-form .field-name-field-grievance-corrected-form select').length) {
 					$('.node-grievance-form .field-name-field-grievance-corrected-form select').val('Pending');
 				}
+			});
+			*/
+
+			$('.node-grievance-form .field-name-field-grievance-status-date-form').once().hide();
+			$('.node-grievance-form #edit-field-grievance-status-und').change(function(event) {
+				$('.field-name-field-grievance-status-date-form').show();
 			});
     },
   }
@@ -109,7 +116,11 @@
 					$('#edit-field-grievance-last-name-und-0-value').val(json[0].last_Name);
 					$('#edit-field-grievance-city-und-0-value').val(json[0].house_Address.city);
 					$('#edit-field-grievance-state-und-0-value').val(json[0].house_Address.state);
-					$('#edit-field-grievance-address-und-0-value').val(json[0].house_Address.street_Address);
+
+					tmp = json[0].house_Address.street_Address;
+					tmp = tmp.replace(/(?:\r\n|\r|\n)/g, ', ');
+					alert(tmp);
+					$('#edit-field-grievance-address-und-0-value').val(tmp);
 					$('#edit-field-grievance-zip-und-0-value').val(json[0].house_Address.zip);
 					$('#edit-field-grievance-phone-und-0-value').val(json[0].phone_Number);
 					$('#edit-field-grievance-email-und-0-email').val(json[0].email_Address);

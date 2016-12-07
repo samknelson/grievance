@@ -42,11 +42,24 @@ function grievance_block_view($delta = '') {
   return $block;
 }
 
+/**
+ * Return the content of the "Time Left" block for a grievance
+ *
+ * This content consists of three parts:
+ * - A "time remaining" notification before the next task must be completed, if any
+ * - A description of the next task to be completed, if any
+ * - A view of previous grievances by this member, if any
+ *
+ * @todo: The "previous grievances by this member" should probably be its own block.
+ */
+
 function grievance_block_timeleft() {
+  // Get the current grievance node
   $grievance_node = menu_get_object();
   if (!$grievance_node) { return ''; }
   if ($grievance_node->type != 'grievance') { return ''; }
 
+  // Get the "alert term" and "alert date" -- i.e. the next task to be completed, and the due date for that task.
   $alert_tid = $grievance_node->field_grievance_alert_tid['und'][0]['tid'];
   $alert_term = taxonomy_term_load($alert_tid);
   if ($alert_term) {

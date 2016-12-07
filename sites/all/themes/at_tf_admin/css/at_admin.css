@@ -3401,3 +3401,15 @@ table.grievance-timeline tr.pending {
 #grievance-timss-search-result {
   padding-top: 10px;
 }
+
+.view-grievance-prior-grievances {
+  padding-top: 10px;
+}
+
+
+
+#block-grievance-grievance-timeleft fieldset legend a {
+  color: #ffffff;
+  font-weight: bold;
+}
+

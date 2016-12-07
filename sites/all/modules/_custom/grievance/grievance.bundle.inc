@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @todo: bundle functionality is incomplete at this time.
+ */
+
 function grievance_node_tab_bundle($grievance_node) {
   drupal_set_title($grievance_node->title . ': ' . t('Bundle'));
 

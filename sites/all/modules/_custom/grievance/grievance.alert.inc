@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Iterate through all grievances, and send alerts to any that have a due date in the future.
+ */
+
 function grievance_alert_all() {
 	watchdog('grievance_alert', t('Starting alert generation.'));
 
@@ -23,9 +27,16 @@ function grievance_alert_all() {
 	return;
 }
 
+/**
+ * Send email alerts to appropriate users based on the due date and status of the grievance.
+ *
+ * @param node The grievance node to examine.
+ */
+
 function grievance_alert($node) {
 	watchdog('grievance_alert', t('Processing alerts for: ') . $node->title);
 
+	// Load previous alert data for this node.  We should only send one alert per person per status
 	$alert_data_serialized = $node->field_grievance_data_alert['und'][0]['value'];
 	if ($alert_data_serialized) {
 		$alert_data = unserialize($alert_data_serialized);
@@ -33,6 +44,7 @@ function grievance_alert($node) {
 		$alert_data = array();
 	}
 
+	// Get the deadline and alert term
 	$deadline = $node->field_grievance_alert_date['und'][0]['value'];
 	$alert = '';
 	$alert_tid = $node->field_grievance_alert['und'][0]['tid'];
@@ -41,6 +53,7 @@ function grievance_alert($node) {
 
 	$need_save = FALSE;
 
+	// We send up to five alerts.  For each possible deliver ...
 	for ($i=1; $i<=5; ++$i) {
 		// Have we already sent this alert?
 		if ($alert_data[$alert][$deadline][$i]) { continue; }
@@ -93,6 +106,13 @@ function grievance_alert($node) {
 
 	return;
 }
+
+/**
+ * List the possible recipients for an alert.
+ *
+ * @param node The grievance node to examine.
+ * @return string[] A unique array of email addresses who should receive the alert.
+ */
 
 function grievance_alert_list_recipients($node) {
 	$fields = array();
