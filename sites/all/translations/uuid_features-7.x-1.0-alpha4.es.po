@@ -1,0 +1,26 @@
+# Spanish translation of UUID Features Integration (7.x-1.0-alpha4)
+# Copyright (c) 2014 by the Spanish translation team
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: UUID Features Integration (7.x-1.0-alpha4)\n"
+"POT-Creation-Date: 2014-02-23 19:53+0000\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Language-Team: Spanish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+msgid "Content"
+msgstr "Contenido"
+msgid "File"
+msgstr "Archivo"
+msgid "Features"
+msgstr "Características"
+msgid "Taxonomy Term"
+msgstr "Término de taxonomía"
+msgid "Could not open '@file' for reading."
+msgstr "No pudo abrirse '@file' para lectura."
+msgid "Could not open '@file' for writing."
+msgstr "No pudo abrirse '@file' para escritura."

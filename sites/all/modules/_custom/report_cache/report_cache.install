@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Fieldgroup module install file.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function report_cache_schema() {
+  $schema['report_cache'] = array(
+    'description' => t('Table that contains report cache data.'),
+
+    'fields' => array(
+      'report_id' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'report_row_pk' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'report_type' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'report_data' => array(
+        'type' => 'blob',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('report_type', 'report_id', 'report_row_pk'),
+    'indexes' => array(
+      'report_id' => array('report_id'),
+      'report_row_pk' => array('report_row_pk'),
+      'report_type' => array('report_type'),
+    ),
+  );
+  return $schema;
+}
+

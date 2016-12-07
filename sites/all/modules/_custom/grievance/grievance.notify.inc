@@ -1,31 +1,14 @@
 <?php
 
-/**
- * Simply redirect to the main notification page
- */
-
 function grievance_node_tab_notification_base($grievance_node) {
 	drupal_goto('node/' . $grievance_node->nid . '/notification/notification');
 }
-
-/**
- * Load the notification form
- */
 
 function grievance_node_tab_notification($grievance_node) {
   drupal_set_title($grievance_node->title . ': ' . t('Notification'));
 
 	return drupal_get_form('grievance_notify_form', $grievance_node);
 }
-
-/**
- * Fetch the company contacts associated wiht a shop and (optional) status
- *
- * @param int The NID of the shop
- * @param int The TID of the status
- * @return array Array of arrays containing the valid contacts.
- * @todo Weird to be doing this as an array of values.  Should just be passing around node references.
- */ 
 
 function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 	// Find shop contacts associated with the shop
@@ -49,7 +32,7 @@ function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 				} else {
 					foreach ($contact_node->field_grievance_statuses['und'] as $tmp) {
 						if ($tmp['tid'] == $status_tid) {
-							$recipient['matching_status'] = TRUE;
+							$recipient['statusmatch'] = TRUE;
 						}
 					}
 				}
@@ -92,7 +75,7 @@ function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 				} else {
 					foreach ($contact_node->field_grievance_statuses['und'] as $tmp) {
 						if ($tmp['tid'] == $status_tid) {
-							$recipient['matching_status'] = TRUE;
+							$recipient['statusmatch'] = TRUE;
 						}
 					}
 				}

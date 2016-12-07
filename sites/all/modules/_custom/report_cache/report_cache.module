@@ -1,0 +1,115 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_landing.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.form.inc";
+
+
+/***
+ * Implements hook_menu
+ */
+function report_cache_menu() {
+  $items = array();
+
+	// Report Cache
+	$items['admin/reports/report-cache'] = array(
+		'title' => 'Report Cache',
+		'description' => '',
+		'page callback' => 'report_cache_page_landing',
+		'page arguments' => array(3),
+		'access arguments' => array('access site reports'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+
+	$items['admin/reports/report-cache/%'] = array(
+		'title' => 'Report Cache',
+		'description' => '',
+		'page callback' => 'report_cache_page_report',
+		'page arguments' => array(3),
+   	'access callback' => 'report_cache_access',
+    'access arguments' => array(3),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['admin/config/system/report-cache'] = array(
+		'title' => 'Report Cache',
+		'description' => 'Settings for the Report Cache',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('report_cache_admin'),
+		'access arguments' => array('access site reports'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+  return $items;
+}
+
+function report_cache_admin() {
+  $form = array();
+	
+	/*
+  $form['trustfund_cron_denormalize_max_rows'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Denormalize Max Rows'),
+    '#default_value' => variable_get('trustfund_cron_denormalize_max_rows', 20),
+    '#description' => t("Maximum number of members to recompute for a given cron run."),
+    '#required' => FALSE,
+  );
+  */
+
+  return system_settings_form($form);
+}
+
+function report_cache_access($report_type) {
+	$report_type_infos = module_invoke_all('report_cache_info');
+	$report_type_info = $report_type_infos[$report_type];
+
+	if (!$report_type_info) {
+		drupal_set_message(t('Report type is not defined.'), 'error');
+		return FALSE;
+	}
+	
+	$access = $report_type_info['access'];
+	if (!$access) { $access = 'access site reports'; }
+
+	return user_access($access);
+}
+
+function report_cache_purge($report_type, $report_id) {
+
+	$stmt = db_delete('report_cache');
+	$stmt->condition('report_type', $report_type);
+	$stmt->condition('report_id', $report_id);
+	$count = $stmt->execute();
+
+	return $count;
+}
+
+function report_cache_purge_date($report_type, $start_ts = NULL, $end_ts = NULL) {
+	if (!$start_ts) { $start_ts = strtotime('1970-1-1'); }
+	if (!$end_ts) { $end_ts = strtotime('-30 days'); }
+
+	watchdog('report-cache', "Purge $report_type - Purging old reports from $from_ts to $end_ts.");
+
+	$sql = "select distinct report_id from report_cache where report_type = :report_type";
+	$stmt = db_query($sql, array(':report_type' => $report_type));
+	while ($hr = $stmt->fetchAssoc()) {
+		$report_id = $hr['report_id'];
+
+		$report_id_clean = preg_replace('/ \- (.+)/', '', $report_id);
+
+		$ts = strtotime($report_id_clean);
+		if ($ts < 1) {
+			watchdog('report-cache', "Purge $report_type - Skipping $report_id (couldn't parse the date).");
+			continue;
+		}
+
+		if ($ts < $start_ts || $ts > $end_ts) {
+			watchdog('report-cache', "Purge $report_type - Skipping $report_id (date not in range).");
+			continue;
+		}
+
+		watchdog('report-cache', "Purge $report_type - Purging $report_id.");
+		report_cache_purge($report_type, $report_id);
+	}
+}

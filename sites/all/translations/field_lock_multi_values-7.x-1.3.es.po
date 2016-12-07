@@ -1,0 +1,18 @@
+# Spanish translation of Field lock multi values (7.x-1.3)
+# Copyright (c) 2015 by the Spanish translation team
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Field lock multi values (7.x-1.3)\n"
+"POT-Creation-Date: 2015-04-02 05:41+0000\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Language-Team: Spanish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+msgid "Order"
+msgstr "Pedido"
+msgid "!title !required"
+msgstr "!title !required"

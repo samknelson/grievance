@@ -1,0 +1,4 @@
+name = Report Cache
+description = Functionality for implementing a cached reporting framework
+package = Administration
+core = 7.x
