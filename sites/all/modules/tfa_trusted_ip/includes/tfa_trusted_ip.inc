@@ -26,34 +26,6 @@ class TfaTrustedIP extends TfaBasePlugin implements TfaLoginPluginInterface {
 
     return FALSE;
   }
-
-  public function getForm(array $form, array &$form_state) { 
-    watchdog('Whatever', 'getForm');
-
-    $form = array();
-
-    $form['ignore'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Ignore me.'),
-    );
-    return $form;
-  }
-
-  public function validateForm(array $form, array &$form_state) {
-    watchdog('Whatever', 'validateForm');
-    return TRUE;
-  }
-
-  public function submitForm(array $form, array &$form_state) {
-    watchdog('Whatever', 'validateForm');
-    return TRUE;
-  }
-
-  public function finalize() {
-    watchdog('Whatever', 'finalize');
-    $name = $this->getAgent();
-    $this->setTrusted($this->generateBrowserId(), $name);
-  }
 }
 
 /**

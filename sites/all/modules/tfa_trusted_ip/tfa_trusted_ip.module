@@ -14,16 +14,28 @@ function tfa_trusted_ip_menu() {
     'access arguments' => array('grievance admin'),
   );
 
+  $items['admin/config/people/tfa-trusted-ip'] = array(
+    'title' => t('Two-Factor Authentication Trusted IPs'),
+    'description' => t('Set trusted IP addresses for two-factor authentication') ,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tfa_trusted_ip_admin'),
+    'access arguments' => array('grievance admin'),
+  );
+
   return $items;
 }
 
 function tfa_trusted_ip_admin() {
   $form = array();
 
+  $ip_address = ip_address();
+
+
   $form['tfa_trusted_ip'] = array(
     '#type' => 'textarea',
     '#title' => t('Trusted IPs'),
     '#default_value' => variable_get('tfa_trusted_ip', ''),
+    '#prefix' => t('<strong>Your IP address is currently: @ip_address', array('@ip_address' => $ip_address)),
   );
 
 
