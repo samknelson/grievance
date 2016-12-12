@@ -112,17 +112,10 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance contact'),
 	);
 
-	$node_tabs['grievance_contract_template']['rules-individual'] = array(
-		'title' => 'Rules (Individual)',
+	$node_tabs['grievance_contract_template']['rules'] = array(
+		'title' => 'Rules',
 		'description' => '',
-		'callback' => 'grievance_contract_template_node_tab_rules_individual',
-		'permissions' => array('grievance contract'),
-	);
-
-	$node_tabs['grievance_contract_template']['rules-classaction'] = array(
-		'title' => 'Rules (Class Action)',
-		'description' => '',
-		'callback' => 'grievance_contract_template_node_tab_rules_classaction',
+		'callback' => 'grievance_contract_template_node_tab_rules',
 		'permissions' => array('grievance contract'),
 	);
 

@@ -1,31 +1,15 @@
 <?php
 
-function grievance_contract_template_node_tab_rules_individual($contract_template_node) {
-  drupal_set_title($contract_template_node->title . ': ' . t('Rules (Individual Grievance)'));
+function grievance_contract_template_node_tab_rules($contract_template_node) {
+  drupal_set_title($contract_template_node->title . ': ' . t('Rules'));
   $entity_nid = $contract_template_node->nid;
 
-  $result = views_embed_view('grievance_contract_rules', 'block', $entity_nid, 'No');
+  $result = views_embed_view('grievance_contract_rules', 'block', $entity_nid);
   $result .= grievance_node_tab_get_addlink(
     "grievance-contract-rule", 
     array(
       "grievance_contract_tplt" => $entity_nid,
       "grievance_classaction" => 'No',
-    )
-  );
-
-  return $result;
-}
-
-function grievance_contract_template_node_tab_rules_classaction($contract_template_node) {
-  drupal_set_title($contract_template_node->title . ': ' . t('Rules (Class Action)'));
-  $entity_nid = $contract_template_node->nid;
-
-  $result = views_embed_view('grievance_contract_rules', 'block', $entity_nid, 'Yes');
-  $result .= grievance_node_tab_get_addlink(
-    "grievance-contract-rule", 
-    array(
-      "grievance_contract_tplt" => $entity_nid,
-      "grievance_classaction" => 'Yes',
     )
   );
 

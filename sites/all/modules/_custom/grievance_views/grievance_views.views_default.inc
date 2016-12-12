@@ -1026,6 +1026,15 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['summary_options']['items_per_page'] = '25';
+  /* Contextual filter: Content: Class Action or General Grievance? (field_grievance_classaction) */
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['id'] = 'field_grievance_classaction_value';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['table'] = 'field_data_field_grievance_classaction';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['field'] = 'field_grievance_classaction_value';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['limit'] = '0';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -4234,7 +4243,7 @@ Grievance Form',
     'group-field_grievance_status_tid' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_status_tid',
-      'weight' => '-11',
+      'weight' => '-17',
     ),
     'group-uid' => array(
       'group' => '2',
@@ -4259,12 +4268,12 @@ Grievance Form',
     'group-field_grievance_alert_date_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_alert_date_value',
-      'weight' => '-11',
+      'weight' => '-16',
     ),
     'group-field_grievance_open_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_open_value',
-      'weight' => '-11',
+      'weight' => '-15',
     ),
     'group-field_grievance_remedy_tid' => array(
       'group' => '4',
@@ -4289,12 +4298,17 @@ Grievance Form',
     'group-field_grievance_id_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_id_value',
-      'weight' => '-16',
+      'weight' => '-14',
     ),
     'group-field_grievance_tags_tid' => array(
       'group' => '1',
       'filter_name' => 'field_grievance_tags_tid',
       'weight' => '-16',
+    ),
+    'group-field_grievance_classaction_value' => array(
+      'group' => '0',
+      'filter_name' => 'field_grievance_classaction_value',
+      'weight' => '-18',
     ),
   );
   $handler->display->display_options['defaults']['header'] = FALSE;
@@ -4611,6 +4625,24 @@ Grievance Form',
     4 => 0,
   );
   $handler->display->display_options['filters']['field_grievance_tags_tid']['vocabulary'] = 'grievance_tags';
+  /* Filter criterion: Content: Class Action or General Grievance? (field_grievance_classaction) */
+  $handler->display->display_options['filters']['field_grievance_classaction_value']['id'] = 'field_grievance_classaction_value';
+  $handler->display->display_options['filters']['field_grievance_classaction_value']['table'] = 'field_data_field_grievance_classaction';
+  $handler->display->display_options['filters']['field_grievance_classaction_value']['field'] = 'field_grievance_classaction_value';
+  $handler->display->display_options['filters']['field_grievance_classaction_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_classaction_value']['expose']['operator_id'] = 'field_grievance_classaction_value_op';
+  $handler->display->display_options['filters']['field_grievance_classaction_value']['expose']['label'] = 'Class Action or General Grievance?';
+  $handler->display->display_options['filters']['field_grievance_classaction_value']['expose']['operator'] = 'field_grievance_classaction_value_op';
+  $handler->display->display_options['filters']['field_grievance_classaction_value']['expose']['identifier'] = 'field_grievance_classaction_value';
+  $handler->display->display_options['filters']['field_grievance_classaction_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+    5 => 0,
+    6 => 0,
+    7 => 0,
+    4 => 0,
+  );
   $handler->display->display_options['path'] = 'grievances/all';
   $handler->display->display_options['menu']['type'] = 'tab';
   $handler->display->display_options['menu']['title'] = 'All Grievances';
@@ -4682,6 +4714,7 @@ Grievance Form',
     t('Date of Grievance'),
     t('Grievance ID'),
     t('Shop Tags'),
+    t('Class Action or General Grievance?'),
   );
   $export['grievances'] = $view;
 
