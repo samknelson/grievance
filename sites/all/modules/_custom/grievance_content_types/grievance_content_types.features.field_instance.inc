@@ -4855,6 +4855,45 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_contract_template-field_grievance_classifications'.
+  $field_instances['node-grievance_contract_template-field_grievance_classifications'] = array(
+    'bundle' => 'grievance_contract_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_classifications',
+    'label' => 'Possible Classifications',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_buttons',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_contract_template-field_grievance_comments'.
   $field_instances['node-grievance_contract_template-field_grievance_comments'] = array(
     'bundle' => 'grievance_contract_template',
@@ -4894,7 +4933,7 @@ function grievance_content_types_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => -3,
+      'weight' => 1,
     ),
   );
 
@@ -4960,7 +4999,46 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => -1,
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_contract_template-field_grievance_departments'.
+  $field_instances['node-grievance_contract_template-field_grievance_departments'] = array(
+    'bundle' => 'grievance_contract_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_departments',
+    'label' => 'Possible Departments',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_buttons',
+      'weight' => 6,
     ),
   );
 
@@ -4999,7 +5077,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 1,
+      'weight' => 4,
     ),
   );
 
@@ -5040,7 +5118,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 0,
+      'weight' => 3,
     ),
   );
 
@@ -7025,6 +7103,39 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_job_classification-field_grievance_departments'.
+  $field_instances['taxonomy_term-grievance_job_classification-field_grievance_departments'] = array(
+    'bundle' => 'grievance_job_classification',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_departments',
+    'label' => 'Possible Departments',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_buttons',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_status-field_grievance_contract_tplts'.
   $field_instances['taxonomy_term-grievance_status-field_grievance_contract_tplts'] = array(
     'bundle' => 'grievance_status',
@@ -7325,6 +7436,8 @@ function grievance_content_types_field_default_field_instances() {
   t('Notification Subject');
   t('Organizer');
   t('Phone');
+  t('Possible Classifications');
+  t('Possible Departments');
   t('Postal Code');
   t('Recommended Remedy');
   t('Recommended Statement of Grievance');
