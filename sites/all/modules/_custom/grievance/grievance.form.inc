@@ -73,6 +73,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',
   );
+  $form['field_grievance_type']['und'][0]['tid']['#ajax'] = array(
+    'callback' => 'grievance_form_grievance_node_callback_replace',
+    'method' => 'replace',
+  );
   $form['field_grievance_contract_tplt']['und']['#ajax'] = array(
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',
@@ -85,6 +89,15 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',
   );
+
+  //
+  // Open the correct accordion group
+  //
+
+  if ($form_state['triggering_element']['#field_name'] == 'field_grievance_type') {
+    $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'closed';
+    $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';
+  }
 
   //////////////////////////////////////////////////////
   // These things happen on rebuild
@@ -340,17 +353,17 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // @TODO: Broken
   //
 
-  $form['field_grievance_document_types']['#prefix'] = '<div id="field-grievance-document-types-wrapper">';
-  $form['field_grievance_document_types']['#suffix'] = '</div>';
   $document_types = grievance_form_current_value('field_grievance_document_types', 'value', $form, $form_state);
-  if (!$document_types || $form_state['triggering_element']['#field_name'] == 'field_grievance_contract_tplt') {
-    if ($contract_tplt_node && $contract_tplt_node->field_grievance_document_types['und']) {
-      $val = array();
-      foreach ($contract_tplt_node->field_grievance_document_types['und'] as $tmp) {
+  if (!$document_types || $form_state['triggering_element']['#field_name'] == 'field_grievance_type') {
+    $type_tid = grievance_form_current_value('field_grievance_type', 'tid', $form, $form_state);
+    $type_term = taxonomy_term_load($type_tid);
+    $val = array();
+    if ($type_term && $type_term->field_grievance_document_types['und']) {
+      foreach ($type_term->field_grievance_document_types['und'] as $tmp) {
         $val[$tmp['tid']] = $tmp['tid'];
       }
-      $form_state['input']['field_grievance_document_types']['und'] = $val;
     }
+    $form_state['input']['field_grievance_document_types']['und'] = $val;
   }
 
   //
@@ -408,5 +421,11 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form[$field_name]['#access'] = FALSE;
   }
 
+  /*
+  dpm(array_keys($form_state));
+  dpm($form_state['values']);
+  dpm($form_state['groups']);
+  dpm($form_state['triggering_element']['#field_name']);
+  dpm($form);
+  */
 }
-

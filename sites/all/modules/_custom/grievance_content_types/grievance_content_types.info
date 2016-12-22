@@ -337,6 +337,7 @@ features[field_instance][] = taxonomy_term-grievance_status-field_grievance_noti
 features[field_instance][] = taxonomy_term-grievance_status-field_grievance_open
 features[field_instance][] = taxonomy_term-grievance_status-field_grievance_roles
 features[field_instance][] = taxonomy_term-grievance_status-field_grievance_timeline_show
+features[field_instance][] = taxonomy_term-grievance_types-field_grievance_document_types
 features[node][] = grievance
 features[node][] = grievance_attachment
 features[node][] = grievance_basic_page
