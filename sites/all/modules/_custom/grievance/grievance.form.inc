@@ -177,6 +177,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   //
 
   $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
+  $status_term = taxonomy_term_load($status_tid);
 
   $contacts = grievance_notify_company_contacts($shop_nid, $status_tid);
   if ($contacts) {
@@ -421,11 +422,24 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form[$field_name]['#access'] = FALSE;
   }
 
-  /*
-  dpm(array_keys($form_state));
-  dpm($form_state['values']);
-  dpm($form_state['groups']);
-  dpm($form_state['triggering_element']['#field_name']);
-  dpm($form);
-  */
+  //
+  // Show or hide fields based on value of the "Resolution Procedure"
+  // 
+
+  $resproc_tid = $status_term->field_grievance_resproc['und'][0]['tid'];
+  $resproc_term = taxonomy_term_load($resproc_tid);
+  if ($resproc_term) {
+    $form['#groups']['group_grievance_resproc']->label = $resproc_term->name;
+    $form['#groups']['group_grievance_resproc']->format_settings['label'] = $resproc_term->name;
+    $form['#groups']['group_grievance_resproc']->format_settings['instance_settings']['description'] = $resproc_term->description;
+
+    if (!preg_match('/arbit/', $resproc_term->name)) {
+      $form['field_grievance_resproc_an']['#access'] = FALSE;
+    }
+
+  } else {
+    foreach ( $form['#groups']['group_grievance_resproc']->children as $field_name) {
+      $form[$field_name]['#access'] = FALSE;
+    }
+  }
 }

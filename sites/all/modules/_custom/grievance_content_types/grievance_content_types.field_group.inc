@@ -71,7 +71,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_arbitration|node|grievance|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_arbitration|node|grievance|form';
   $field_group->group_name = 'group_grievance_arbitration';
@@ -1056,6 +1056,40 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_resproc|node|grievance|form';
+  $field_group->group_name = 'group_grievance_resproc';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_grievance';
+  $field_group->data = array(
+    'label' => 'Resolution Procedure',
+    'weight' => '11',
+    'children' => array(
+      0 => 'field_grievance_arbitration_a',
+      1 => 'field_grievance_arbitration_b',
+      2 => 'field_grievance_arbitration_c',
+      3 => 'field_grievance_arbitration_d',
+      4 => 'field_grievance_resproc_atname',
+      5 => 'field_grievance_resproc_lh',
+      6 => 'field_grievance_resproc_an',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'label' => 'Resolution Procedure',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-grievance-resproc field-group-accordion-item',
+        'description' => '...',
+      ),
+      'formatter' => 'closed',
+    ),
+  );
+  $field_groups['group_grievance_resproc|node|grievance|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_status|node|grievance|form';
   $field_group->group_name = 'group_grievance_status';
   $field_group->entity_type = 'node';
@@ -1326,10 +1360,10 @@ function grievance_content_types_field_group_info() {
       3 => 'group_grievance_form',
       4 => 'group_grievance_union_rep',
       5 => 'group_grievance_company',
-      6 => 'group_grievance_arbitration',
-      7 => 'group_grievance_status',
-      8 => 'group_inforeq',
-      9 => 'group_grievance_classaction',
+      6 => 'group_grievance_status',
+      7 => 'group_inforeq',
+      8 => 'group_grievance_classaction',
+      9 => 'group_grievance_resproc',
     ),
     'format_type' => 'accordion',
     'format_settings' => array(
@@ -1434,6 +1468,7 @@ function grievance_content_types_field_group_info() {
   t('Name and Role');
   t('Notifications');
   t('Phone and Email');
+  t('Resolution Procedure');
   t('Shops and Statuses');
   t('Status');
   t('Supervisor');

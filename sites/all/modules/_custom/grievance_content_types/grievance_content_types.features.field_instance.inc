@@ -640,7 +640,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 53,
+      'weight' => 52,
     ),
   );
 
@@ -704,7 +704,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 54,
+      'weight' => 53,
     ),
   );
 
@@ -1909,7 +1909,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 33,
+      'weight' => 2,
     ),
   );
 
@@ -3442,6 +3442,194 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'entityreference_autocomplete',
       'weight' => 24,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance-field_grievance_resproc_an'.
+  $field_instances['node-grievance-field_grievance_resproc_an'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 55,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_resproc_an',
+    'label' => 'Arbitrator Name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 56,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance-field_grievance_resproc_atname'.
+  $field_instances['node-grievance-field_grievance_resproc_atname'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 53,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_resproc_atname',
+    'label' => 'Employer Attorney Name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 54,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance-field_grievance_resproc_lh'.
+  $field_instances['node-grievance-field_grievance_resproc_lh'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '(in days)',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 54,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_resproc_lh',
+    'label' => 'Length of Hearing',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 55,
     ),
   );
 
@@ -8017,6 +8205,7 @@ function grievance_content_types_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('(in days)');
   t('A grievance at this status should have available fields for the specified resolution procedure.');
   t('Actor');
   t('Address');
@@ -8024,6 +8213,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Alert Data');
   t('Amount Received');
   t('Annual?');
+  t('Arbitrator Name');
   t('Article');
   t('Article Number');
   t('Attachment');
@@ -8071,6 +8261,7 @@ function grievance_content_types_field_default_field_instances() {
   t('E.g. 4.01 or A. II.');
   t('Email');
   t('Employee ID #');
+  t('Employer Attorney Name');
   t('Enter the article of the contract that was violated, for example: Article ....');
   t('Enter the company that this shop is associated with.');
   t('Enter the employee ID # as assigned by the company.');
@@ -8101,6 +8292,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Last Name');
   t('Lead Organizer');
   t('Lead\'s Recommendaiton');
+  t('Length of Hearing');
   t('Meeting Date');
   t('Member ID #');
   t('Name');
