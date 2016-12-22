@@ -5584,47 +5584,6 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'node-grievance_contract_template-field_grievance_document_types'.
-  $field_instances['node-grievance_contract_template-field_grievance_document_types'] = array(
-    'bundle' => 'grievance_contract_template',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'taxonomy',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'taxonomy_term_reference_plain',
-        'weight' => 2,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_grievance_document_types',
-    'label' => 'Default Information Request',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_buttons',
-      'weight' => 4,
-    ),
-  );
-
-  // Exported field_instance:
   // 'node-grievance_contract_template-field_grievance_holidays'.
   $field_instances['node-grievance_contract_template-field_grievance_holidays'] = array(
     'bundle' => 'grievance_contract_template',
@@ -8033,7 +7992,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Days Off');
   t('Deadlines Waived');
   t('Deadlines have been waived as of this date.');
-  t('Default Information Request');
   t('Default Value');
   t('Department');
   t('Description');

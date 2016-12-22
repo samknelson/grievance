@@ -285,7 +285,6 @@ features[field_instance][] = node-grievance_contract_template-field_grievance_cl
 features[field_instance][] = node-grievance_contract_template-field_grievance_comments
 features[field_instance][] = node-grievance_contract_template-field_grievance_contract
 features[field_instance][] = node-grievance_contract_template-field_grievance_departments
-features[field_instance][] = node-grievance_contract_template-field_grievance_document_types
 features[field_instance][] = node-grievance_contract_template-field_grievance_holidays
 features[field_instance][] = node-grievance_field_overrides-field_grievance_bundle
 features[field_instance][] = node-grievance_field_overrides-field_grievance_default
