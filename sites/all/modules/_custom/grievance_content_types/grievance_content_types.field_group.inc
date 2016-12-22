@@ -1073,6 +1073,7 @@ function grievance_content_types_field_group_info() {
       4 => 'field_grievance_resproc_atname',
       5 => 'field_grievance_resproc_lh',
       6 => 'field_grievance_resproc_an',
+      7 => 'field_grievance_resproc_er',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
