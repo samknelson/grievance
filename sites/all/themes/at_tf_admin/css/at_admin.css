@@ -3423,3 +3423,8 @@ table.grievance-timeline tr.pending {
 .field-name-field-grievance-daysoff .field-item {
   display: inline;
 }
+
+.form-item-field-grievance-document-types-und .form-type-checkbox {
+  display: inline;
+  width: 200px;
+}
