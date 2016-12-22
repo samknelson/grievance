@@ -3413,3 +3413,13 @@ table.grievance-timeline tr.pending {
   font-weight: bold;
 }
 
+
+
+.form-item-field-grievance-daysoff-und .form-type-checkbox {
+  display: inline;
+  width: 200px;
+}
+
+.field-name-field-grievance-daysoff .field-item {
+  display: inline;
+}

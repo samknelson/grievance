@@ -418,6 +418,35 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'file',
   );
 
+  // Exported field_base: 'field_grievance_broughtby'.
+  $field_bases['field_grievance_broughtby'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_broughtby',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'grievance_broughtby',
+          'parent' => 0,
+        ),
+      ),
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
+  );
+
   // Exported field_base: 'field_grievance_bundle'.
   $field_bases['field_grievance_bundle'] = array(
     'active' => 1,
@@ -1204,6 +1233,39 @@ function grievance_content_types_field_default_field_bases() {
       'allowed_values' => array(
         'Business Days' => 'Business Days',
         'Calendar Days' => 'Calendar Days',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
+  // Exported field_base: 'field_grievance_daysoff'.
+  $field_bases['field_grievance_daysoff'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_daysoff',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Monday' => 'Monday',
+        'Tuesday' => 'Tuesday',
+        'Wednesday' => 'Wednesday',
+        'Thursday' => 'Thursday',
+        'Friday' => 'Friday',
+        'Saturday' => 'Saturday',
+        'Sunday' => 'Sunday',
       ),
       'allowed_values_function' => '',
     ),
@@ -2086,6 +2148,35 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'number_integer',
   );
 
+  // Exported field_base: 'field_grievance_shift'.
+  $field_bases['field_grievance_shift'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_shift',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'grievance_shift',
+          'parent' => 0,
+        ),
+      ),
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
+  );
+
   // Exported field_base: 'field_grievance_shop'.
   $field_bases['field_grievance_shop'] = array(
     'active' => 1,
@@ -2489,6 +2580,35 @@ function grievance_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'text',
+  );
+
+  // Exported field_base: 'field_grievance_work_status'.
+  $field_bases['field_grievance_work_status'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_work_status',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'grievance_work_status',
+          'parent' => 0,
+        ),
+      ),
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
   );
 
   // Exported field_base: 'field_grievance_zip'.

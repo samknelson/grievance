@@ -32,6 +32,29 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'grievance_broughtby' => array(
+      'name' => 'Grievance Brought By',
+      'machine_name' => 'grievance_broughtby',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'grievance_department' => array(
       'name' => 'Grievance Department',
       'machine_name' => 'grievance_department',
@@ -147,6 +170,29 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'grievance_shift' => array(
+      'name' => 'Grievance Shift',
+      'machine_name' => 'grievance_shift',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'grievance_status' => array(
       'name' => 'Grievance Status',
       'machine_name' => 'grievance_status',
@@ -198,6 +244,29 @@ function grievance_content_types_taxonomy_default_vocabularies() {
       'machine_name' => 'grievance_types',
       'description' => '',
       'hierarchy' => 1,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'grievance_work_status' => array(
+      'name' => 'Grievance Work Status',
+      'machine_name' => 'grievance_work_status',
+      'description' => '',
+      'hierarchy' => 0,
       'module' => 'taxonomy',
       'weight' => 0,
       'rdf_mapping' => array(

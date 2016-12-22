@@ -3,12 +3,8 @@
 function grievance_form_grievance_node_callback_replace($form, $form_state) {
 
   $commands = array();
-  $commands[] = ajax_command_replace("#grievance-form-contract-link", render($form['#groups']['group_grievance_form']->format_settings['instance_settings']['description']));
-  $commands[] = ajax_command_replace("#grievance-form-contacts-link", render($form['field_grievance_contact_selector']['und'][0]['markup']['#markup']));
-  $commands[] = ajax_command_replace("#edit-field-grievance-clauseref", render($form['field_grievance_clauseref']));
-  $commands[] = ajax_command_replace("#field-grievance-alert-date-wrapper", render($form['field_grievance_alert_date']));
-  $commands[] = ajax_command_replace("#field-grievance-alert-tid-wrapper", render($form['field_grievance_alert_tid']));
-  $commands[] = ajax_command_replace("#field-grievance-document-types-wrapper", render($form['field_grievance_document_types']));
+
+  $commands[] = ajax_command_replace("#grievance-node-form-replaceme", render($form));
   $commands[] = ajax_command_invoke(NULL, "grievance_select_set", array('edit-field-grievance-contract-tplt-und', $form_state['grievance_contract_tplt_nid']));
 
   return array(
@@ -37,10 +33,42 @@ function grievance_form_current_value($field, $column, $form, $form_state) {
 }
 
 function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
-  // Base node
-  $grievance_node = $form_state['node'];
+  // 
+  // Base node and user
+  // 
 
-  // Changing various fields causes the form to recompute
+  $grievance_node = $form_state['node'];
+  global $user;
+  if (!$user) { return; }
+  $user_full = user_load($user->uid);
+  if (!$user_full) { return; }
+
+  // 
+  // Shop ID
+  // 
+  
+  $shop_nid = $form_state['values']['field_grievance_shop']['und'][0]['target_id'];
+  if (!$shop_nid) {
+    $shop_nid = $grievance_node->field_grievance_shop['und'][0]['target_id'];
+  }
+  if (!$shop_nid) {
+    $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
+  }
+  if ($shop_nid) {
+    $shop_node = node_load($shop_nid);
+  }
+
+  //
+  // Wrapper because we're replacing the entire form on ajax
+  // 
+
+  $form['#prefix'] = '<div id="grievance-node-form-replaceme">';
+  $form['#suffix'] = '</div>';
+
+  //
+  // These are the list of fields which cause the form to be rebuilt.
+  // 
+
   $form['field_grievance_shop']['und'][0]['target_id']['#ajax'] = array(
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',
@@ -53,29 +81,25 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',
   );
+  $form['field_grievance_classaction']['und']['#ajax'] = array(
+    'callback' => 'grievance_form_grievance_node_callback_replace',
+    'method' => 'replace',
+  );
 
-  // Reset the status update date
+  //////////////////////////////////////////////////////
+  // These things happen on rebuild
+  //////////////////////////////////////////////////////
+
+  //
+  // Set the status date, for status changes
+  // 
+
   $form['field_grievance_status_date']['und'][0]['#default_value']['value'] = date('Y-m-d');
 
-  // Find the current user
-  global $user;
-  if (!$user) { return; }
-  $user_full = user_load($user->uid);
-  if (!$user_full) { return; }
-
-  // Get the shop ID
-  $shop_nid = $form_state['values']['field_grievance_shop']['und'][0]['target_id'];
-  if (!$shop_nid) {
-    $shop_nid = $grievance_node->field_grievance_shop['und'][0]['target_id'];
-  }
-  if (!$shop_nid) {
-    $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
-  }
-  if ($shop_nid) {
-    $shop_node = node_load($shop_nid);
-  }
-
+  //
   // Set the contract template from the contract
+  // 
+
   if ($shop_node) {
     $form_state['grievance_contract_tplt_nid'] = $shop_node->field_grievance_contract_tplt['und'][0]['target_id'];
     if (!$form['field_grievance_contract_tplt']['und']['#default_value']) {
@@ -84,7 +108,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   }
 
   /*
+  // 
   // Set the list of clauses
+  //
+
   $contract_tplt_id = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
   if ($contract_tplt_id) {
     $clauses_view = views_get_view('grievance_contract_clauses');
@@ -111,7 +138,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   }
   */
 
+  //
   // Link to contract
+  //
+
   $contract_link_text = '';
   if ($shop_node) {
     $contract_uri = $shop_node->field_grievance_contract['und'][0]['uri'];
@@ -129,7 +159,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $form['#groups']['group_grievance_form']->format_settings['instance_settings']['description'] = 
     '<div id="grievance-form-contract-link">' . $contract_link_text . '</div>';
 
+  // 
   // Recipients
+  //
+
   $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
 
   $contacts = grievance_notify_company_contacts($shop_nid, $status_tid);
@@ -209,8 +242,11 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   }
   $form['field_grievance_contact_selector']['und'][0]['markup']['#markup'] = '<div id="grievance-form-contacts-link">' . $contacts_markup . '</div>';
 
+  // 
   // Set default values for manager, organizer, etc.
-  // This should be on insert only, not edit.  We never set defaults on edit.
+  // (This should be on insert only, not edit.  We never set defaults on edit.)
+  //
+
   if (!$grievance_node->nid) {
     // Filed by
     $form['field_grievance_rep_filed']['und'][0]['target_id']['#default_value'] = "$user_full->name ($user_full->uid)";
@@ -332,5 +368,45 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       $form_state['input']['field_grievance_alert_tid']['und'] = $next_alert_tid;
     }
   }
+
+  //
+  // Show or hide fields based on value of the class action toggle
+  // 
+
+  $classaction = grievance_form_current_value('field_grievance_classaction', 'value', $form, $form_state);
+  $field_to_hide = array();
+  if ($classaction == 'Yes') {
+    $fields_to_hide[] = 'field_grievance_first_name';
+    $fields_to_hide[] = 'field_grievance_last_name';
+    $fields_to_hide[] = 'field_grievance_phone';
+    $fields_to_hide[] = 'field_grievance_email';
+    $fields_to_hide[] = 'field_grievance_address';
+    $fields_to_hide[] = 'field_grievance_address_2';
+    $fields_to_hide[] = 'field_grievance_city';
+    $fields_to_hide[] = 'field_grievance_state';
+    $fields_to_hide[] = 'field_grievance_zip';
+    $fields_to_hide[] = 'field_grievance_hire_date';
+    $fields_to_hide[] = 'field_grievance_class_tid';
+    $fields_to_hide[] = 'field_grievance_classification';
+    $fields_to_hide[] = 'field_grievance_department_tid';
+    $fields_to_hide[] = 'field_grievance_department';
+    $fields_to_hide[] = 'field_grievance_work_status';
+    $fields_to_hide[] = 'field_grievance_shift';
+    $fields_to_hide[] = 'field_grievance_daysoff';
+    $fields_to_hide[] = 'field_grievance_ein';
+    $fields_to_hide[] = 'field_grievance_min';
+    $fields_to_hide[] = 'field_grievance_corrected';
+    $fields_to_hide[] = 'field_grievance_supervisor_name';
+    $fields_to_hide[] = 'field_grievance_supervisor_title';
+    $fields_to_hide[] = 'field_grievance_supervisor_unit';
+    $fields_to_hide[] = 'field_grievance_timss_search';
+    $fields_to_hide[] = 'field_grievance_timss_search_result';
+  } else {
+    $fields_to_hide[] = 'field_grievance_broughtby';
+  }
+  foreach ($fields_to_hide as $field_name) {
+    $form[$field_name]['#access'] = FALSE;
+  }
+
 }
 

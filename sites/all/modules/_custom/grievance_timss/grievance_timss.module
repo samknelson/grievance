@@ -324,6 +324,9 @@ function grievance_timss_form_grievance_node_callback_submit($form, &$form_state
 
 function grievance_timss_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
   // Add TIMSS Search elements to the form
+  $classaction = grievance_form_current_value('field_grievance_classaction', 'value', $form, $form_state);
+  if ($classaction == 'Yes') { return; }
+
   $form['grievance_timss_search'] = array(
     '#type' => 'textfield',
     '#title' => t('TIMSS Search'),
