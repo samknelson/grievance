@@ -1035,11 +1035,10 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Notifications',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(
-      0 => 'field_grievance_notify',
-      1 => 'field_grievance_notify_subject',
-      2 => 'field_grievance_notify_body',
+      0 => 'field_grievance_notify_subject',
+      1 => 'field_grievance_notify_body',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

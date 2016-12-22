@@ -7876,6 +7876,41 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_status-field_grievance_resproc'.
+  $field_instances['taxonomy_term-grievance_status-field_grievance_resproc'] = array(
+    'bundle' => 'grievance_status',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'A grievance at this status should have available fields for the specified resolution procedure.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 8,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_resproc',
+    'label' => 'Resolution Procedure',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_status-field_grievance_roles'.
   $field_instances['taxonomy_term-grievance_status-field_grievance_roles'] = array(
     'bundle' => 'grievance_status',
@@ -7982,6 +8017,7 @@ function grievance_content_types_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('A grievance at this status should have available fields for the specified resolution procedure.');
   t('Actor');
   t('Address');
   t('Address 2');
@@ -8085,6 +8121,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Recommended Statement of Grievance');
   t('Remedy');
   t('Remedy (Other)');
+  t('Resolution Procedure');
   t('Role');
   t('Roles');
   t('Select a Contact');
