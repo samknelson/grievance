@@ -938,7 +938,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_classaction',
-    'label' => 'Class Action or General Grievance?',
+    'label' => 'General Grievance?',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -1986,9 +1986,10 @@ function grievance_content_types_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_date_1',
-    'label' => 'Date of Grievance',
+    'label' => 'Incident Date',
     'required' => 0,
     'settings' => array(
       'default_value' => 'blank',
@@ -3804,9 +3805,10 @@ function grievance_content_types_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_shop',
-    'label' => 'Shop',
+    'label' => 'Employer',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -8306,7 +8308,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Data Corrected');
   t('Date');
   t('Date Received');
-  t('Date of Grievance');
   t('Date of Hire');
   t('Days');
   t('Days Off');
@@ -8320,6 +8321,7 @@ function grievance_content_types_field_default_field_instances() {
   t('E.g. 4.01 or A. II.');
   t('Email');
   t('Employee ID #');
+  t('Employer');
   t('Employer Attorney Name');
   t('Employer Representative');
   t('Enter the article of the contract that was violated, for example: Article ....');
@@ -8336,6 +8338,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Filed By');
   t('First Name');
   t('Full Clause');
+  t('General Grievance?');
   t('Grievance');
   t('Grievance Admin');
   t('Grievance Document Type');
@@ -8345,6 +8348,7 @@ function grievance_content_types_field_default_field_instances() {
   t('If selected, this contact will appear for all shops associated with this company.');
   t('If the grievance does not fit one of the options above, enter an alternative grievance statement here.');
   t('If the remedy does not fit one of the options above, enter an alternative remedy here.');
+  t('Incident Date');
   t('Information Request');
   t('Is this status considered "Un-Resolved"?  Only unresolved grievances are displayed on the "my grievances" list.');
   t('Label');
@@ -8381,7 +8385,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Select the roles with permission to edit grievances at this step.');
   t('Settlement Amount');
   t('Shift');
-  t('Shop');
   t('Shops');
   t('Show on Timeline?');
   t('State or Province');

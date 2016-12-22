@@ -559,7 +559,7 @@ function grievance_content_types_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         'No' => 'No - This is an individual grievance',
-        'Yes' => 'Yes - This is a general or class action grievance',
+        'Yes' => 'Yes - This is a general grievance',
       ),
       'allowed_values_function' => '',
     ),
@@ -1172,6 +1172,9 @@ function grievance_content_types_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_date_1',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'date',
@@ -2300,6 +2303,9 @@ function grievance_content_types_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_shop',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',

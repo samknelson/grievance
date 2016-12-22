@@ -187,19 +187,20 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
-    'label' => 'Class Action or General',
+    'label' => 'General Grievance',
     'weight' => '6',
     'children' => array(
       0 => 'field_grievance_broughtby',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'General Grievance',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-grievance-classaction field-group-accordion-item',
         'required_fields' => 1,
+        'classes' => 'group-grievance-classaction field-group-accordion-item',
+        'description' => '',
       ),
+      'formatter' => 'closed',
     ),
   );
   $field_groups['group_grievance_classaction|node|grievance|form'] = $field_group;
@@ -491,7 +492,13 @@ function grievance_content_types_field_group_info() {
       'instance_settings' => array(
         'required_fields' => 1,
         'classes' => '',
-        'description' => '',
+        'description' => 'Use the space below to enter:
+<ul>
+<li>Agency Charges (NLRB, EEOC, Etc.)</li>
+<li>Related Grievances</li>
+<li>Prior Arbitration Awards</li>
+<li>Other</li>
+</ul>',
       ),
       'formatter' => 'closed',
     ),
@@ -1455,7 +1462,6 @@ function grievance_content_types_field_group_info() {
   t('Arbitration');
   t('Arbitration Comments');
   t('Attachments');
-  t('Class Action or General');
   t('Comments');
   t('Comments and Attachments');
   t('Company Represenatives');
@@ -1463,6 +1469,7 @@ function grievance_content_types_field_group_info() {
   t('Company Representatives');
   t('Email and Phone');
   t('Employee');
+  t('General Grievance');
   t('Grievance');
   t('Grievance Form');
   t('Information Request');
