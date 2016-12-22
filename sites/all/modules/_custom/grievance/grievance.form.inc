@@ -433,7 +433,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form['#groups']['group_grievance_resproc']->format_settings['label'] = $resproc_term->name;
     $form['#groups']['group_grievance_resproc']->format_settings['instance_settings']['description'] = $resproc_term->description;
 
-    if (!preg_match('/arbit/', $resproc_term->name)) {
+    if (!preg_match('/arbit/i', $resproc_term->name)) {
       $form['field_grievance_resproc_an']['#access'] = FALSE;
     }
 
