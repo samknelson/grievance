@@ -120,7 +120,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     }
   }
 
-  /*
   // 
   // Set the list of clauses
   //
@@ -134,13 +133,9 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $clauses_options['_none'] = t('- None -');
     foreach ($clauses_view->result as $clause) {
       $clauses_options[$clause->nid] = 
-        'Article ' . 
-        $clause->field_field_grievance_section_number[0]['rendered']['#markup'] . 
+        $clause->field_data_field_grievance_label_field_grievance_label_value . 
         ': ' . 
-        $clause->field_field_grievance_contract_section[0]['rendered']['#markup'] . 
-        ' - Clause ' .
-        $clause->field_data_field_grievance_label_field_grievance_label_value .
-        ': ' . $clause->node_title;
+        $clause->node_title;
     }
     $form['field_grievance_clauseref']['und']['#options'] = $clauses_options;
     $idx = 0;
@@ -149,7 +144,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       ++$idx;
     }
   }
-  */
 
   //
   // Link to contract
