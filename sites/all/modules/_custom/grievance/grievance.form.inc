@@ -125,7 +125,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   //
 
   $contract_tplt_id = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
-  drupal_set_message("Found $contract_tplt_id");
   if ($contract_tplt_id) {
     $clauses_view = views_get_view('grievance_contract_clauses');
     $clauses_view->args[0] = $contract_tplt_id;
@@ -133,8 +132,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $clauses_options = array();
     $clauses_options['_none'] = t('- None -');
     foreach ($clauses_view->result as $clause) {
-      dpm($clause);
-      drupal_set_message("found " . $clause->node_title);
       $clauses_options[$clause->nid] = 
         $clause->field_data_field_grievance_label_field_grievance_label_value . 
         ': ' . 
