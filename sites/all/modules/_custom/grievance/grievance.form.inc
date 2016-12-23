@@ -133,6 +133,8 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $clauses_options = array();
     $clauses_options['_none'] = t('- None -');
     foreach ($clauses_view->result as $clause) {
+      dpm($clause);
+      drupal_set_message("found " . $clause->node_title);
       $clauses_options[$clause->nid] = 
         $clause->field_data_field_grievance_label_field_grievance_label_value . 
         ': ' . 
