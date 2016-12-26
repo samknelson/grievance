@@ -58,6 +58,30 @@ function grievance_permission() {
     	'title' => t('Grievance Contract'),
     	'description' => t('Permission to edit contracts and contract templates.')
     ),
+    'grievance form contract template' => array(
+    	'title' => t('Grievance Form - Change Contract Template'),
+    ),
+    'grievance form status date' => array(
+    	'title' => t('Grievance Form - Change Status Date'),
+    ),
+    'grievance form alert tid' => array(
+    	'title' => t('Grievance Form - Change Alert (aka Next Step)'),
+    ),
+    'grievance form alert date' => array(
+    	'title' => t('Grievance Form - Change Next Deadline Date'),
+    ),
+    'grievance form grievance type' => array(
+    	'title' => t('Grievance Form - Change Grievance Type'),
+    ),
+    'grievance form grievance type other' => array(
+    	'title' => t('Grievance Form - Change Grievance Type (Other)'),
+    ),
+    'grievance form grievance remedy' => array(
+    	'title' => t('Grievance Form - Change Remedy'),
+    ),
+    'grievance form grievance remedy other' => array(
+    	'title' => t('Grievance Form - Change Remedy (Other)'),
+    ),
  );
 }
 

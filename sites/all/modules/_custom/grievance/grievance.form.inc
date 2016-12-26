@@ -1,12 +1,8 @@
 <?php
 
 function grievance_form_grievance_node_callback_replace($form, $form_state) {
-
   $commands = array();
-
   $commands[] = ajax_command_replace("#grievance-node-form-replaceme", render($form));
-  $commands[] = ajax_command_invoke(NULL, "grievance_select_set", array('edit-field-grievance-contract-tplt-und', $form_state['grievance_contract_tplt_nid']));
-
   return array(
     '#type' => 'ajax',
     '#commands' => $commands
@@ -110,21 +106,59 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $form['field_grievance_status_date']['und'][0]['#default_value']['value'] = date('Y-m-d');
 
   //
-  // Set the contract template from the contract
-  // 
+  // Restrict the list of available statuses based on the user's role.
+  //
 
-  if ($shop_node) {
-    $form_state['grievance_contract_tplt_nid'] = $shop_node->field_grievance_contract_tplt['und'][0]['target_id'];
-    if (!$form['field_grievance_contract_tplt']['und']['#default_value']) {
-      $form['field_grievance_contract_tplt']['und']['#default_value'] = $shop_node->field_grievance_contract_tplt['und'][0]['target_id'];
+  if (!user_access('grievance admin')) {
+    $status_vid = taxonomy_vocabulary_machine_name_load('grievance_status')->vid;
+    $status_terms = taxonomy_get_tree($status_vid);
+
+    $user_roles = array_keys($user_full->roles);
+
+    $status_tids_to_disable = array();
+    foreach ($status_terms as $status_term) {
+      $status_tid = $status_term->tid;
+      $status_term_full = taxonomy_term_load($status_tid);
+      $status_term_roles = array();
+      if ($status_term_full->field_grievance_roles['und']) {
+        foreach ($status_term_full->field_grievance_roles['und'] as $delta => $tmp) {
+          $status_term_roles[] = $tmp['value'];
+        }
+      }
+
+      if (!array_intersect($status_term_roles, $user_roles)) {
+        $status_tids_to_disable[] = $status_tid;
+      }
+    }
+
+    foreach ($status_tids_to_disable as $status_tid) {
+      unset($form['field_grievance_status']['und']['#options'][$status_tid]);
     }
   }
+
+  //
+  // Set the contract template from the shop
+  // 
+
+  $contract_tplt_id = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
+  if ($shop_node) {
+    if (!$contract_tplt_id || $form_state['triggering_element']['#field_name'] == 'field_grievance_shop') {
+      $contract_tplt_id = $shop_node->field_grievance_contract_tplt['und'][0]['target_id'];
+
+      if ($form['field_grievance_contract_tplt']['#disabled']) {
+        $form['field_grievance_contract_tplt']['und']['#default_value'][0] = $contract_tplt_id;
+        $form['field_grievance_contract_tplt']['und']['#value'] = $form['field_grievance_contract_tplt']['und']['#default_value'];
+      } else {
+        $form_state['input']['field_grievance_contract_tplt']['und'] = $contract_tplt_id;
+      }
+    }
+  }
+
 
   // 
   // Set the list of clauses
   //
 
-  $contract_tplt_id = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
   if ($contract_tplt_id) {
     $clauses_view = views_get_view('grievance_contract_clauses');
     $clauses_view->args[0] = $contract_tplt_id;
@@ -324,9 +358,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Compute the next deadline date
   //
 
-  $form['field_grievance_alert_date']['#prefix'] = '<div id="field-grievance-alert-date-wrapper">';
-  $form['field_grievance_alert_date']['#suffix'] = '</div>';
-
   $contract_tplt_nid = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
   if ($contract_tplt_nid) { 
     $contract_tplt_node = node_load($contract_tplt_nid);
@@ -335,17 +366,25 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
   $alert_date = grievance_form_current_value('field_grievance_alert_date', 'value', $form, $form_state);
 
+
   if (!$alert_date || $form_state['triggering_element']['#field_name'] == 'field_grievance_status') {
     if ($contract_tplt_nid && $status_tid) {
       $next_deadline = grievance_contract_next_deadline($contract_tplt_nid, $status_tid);
-      // $form['field_grievance_alert_date']['und'][0]['#default_value'] = $next_deadline;
-      $form_state['input']['field_grievance_alert_date']['und'][0]['value']['date'] = date('m/d/Y', strtotime($next_deadline));
+    
+      if ($next_deadline) {
+        if ($form['field_grievance_alert_date']['#disabled']) {
+          $form['field_grievance_alert_date']["und"][0]['#default_value']['value'] = date('m/d/Y', strtotime($next_deadline));
+          $form['field_grievance_alert_date']["und"][0]['#value'] = $form['field_grievance_alert_date']["und"][0]['#default_value'];
+          $form['field_grievance_alert_date']['und'][0]['#date_items']['value'] =  date('Y-m-d', strtotime($next_deadline));
+        } else {
+          $form_state['input']['field_grievance_alert_date']['und'][0]['value']['date'] = date('m/d/Y', strtotime($next_deadline));
+        }
+      }
     }
   }
 
   //
   // Compute the default information requests
-  // @TODO: Broken
   //
 
   $document_types = grievance_form_current_value('field_grievance_document_types', 'value', $form, $form_state);
@@ -365,15 +404,17 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Compute the next alert tid
   //
 
-  $form['field_grievance_alert_tid']['#prefix'] = '<div id="field-grievance-alert-tid-wrapper">';
-  $form['field_grievance_alert_tid']['#suffix'] = '</div>';
   $alert_tid = grievance_form_current_value('field_grievance_alert_tid', 'tid', $form, $form_state);
 
   if (!$alert_tid || $form_state['triggering_element']['#field_name'] == 'field_grievance_status') {
     if ($contract_tplt_nid && $status_tid) {
-      $next_alert_tid = grievance_contract_next_alert_tid($contract_tplt_nid, $status_tid);
-      $form['field_grievance_alert_tid']['und'][0]['#default_value'] = $next_alert_tid;
-      $form_state['input']['field_grievance_alert_tid']['und'] = $next_alert_tid;
+      $next_alert_tid = grievance_contract_next_alert_tid($contract_tplt_nid, $status_tid);      
+      if ($form['field_grievance_alert_tid']['#disabled']) {
+        $form['field_grievance_alert_tid']['und']['#default_value'][0] = $next_alert_tid;
+        $form['field_grievance_alert_tid']['und']['#value'] = $form['field_grievance_alert_tid']['und']['#default_value'];
+      } else {
+        $form_state['input']['field_grievance_alert_tid']['und'] = $next_alert_tid;
+      }
     }
   }
 

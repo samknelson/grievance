@@ -38,6 +38,9 @@ function grievance_content_types_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -46,6 +49,7 @@ function grievance_content_types_field_default_field_bases() {
     'locked' => 0,
     'module' => 'entityreference',
     'settings' => array(
+      'delete_on_parent_delete' => 'always',
       'handler' => 'base',
       'handler_settings' => array(
         'behaviors' => array(
@@ -410,6 +414,7 @@ function grievance_content_types_field_default_field_bases() {
     'locked' => 0,
     'module' => 'file',
     'settings' => array(
+      'delete_on_parent_delete' => '',
       'display_default' => 0,
       'display_field' => 0,
       'uri_scheme' => 'private',
@@ -1172,6 +1177,38 @@ function grievance_content_types_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_date_1',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'date',
+    'settings' => array(
+      'cache_count' => 4,
+      'cache_enabled' => 0,
+      'granularity' => array(
+        'day' => 'day',
+        'hour' => 0,
+        'minute' => 0,
+        'month' => 'month',
+        'second' => 0,
+        'year' => 'year',
+      ),
+      'timezone_db' => '',
+      'todate' => '',
+      'tz_handling' => 'none',
+    ),
+    'translatable' => 0,
+    'type' => 'datetime',
+  );
+
+  // Exported field_base: 'field_grievance_date_2'.
+  $field_bases['field_grievance_date_2'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_date_2',
     'field_permissions' => array(
       'type' => 0,
     ),

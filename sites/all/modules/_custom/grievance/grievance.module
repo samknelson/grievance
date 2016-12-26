@@ -25,6 +25,8 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.contract.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.holidays.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.bundle.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.replicate.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.delete.inc";
 
 /**
  * Implement hook_cron() 
@@ -169,6 +171,44 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     $form['field_grievance_alert']['#access'] = FALSE;
     $form['field_grievance_alert_tid']['#access'] = FALSE;
     $form['field_grievance_alert_date']['#access'] = FALSE;
+  }
+
+
+  // Various fields in the grievance form are locked down for various users.
+  if ($form_id == 'grievance_node_form') {
+
+    if (!user_access('grievance form contract template')) {
+      $form['field_grievance_contract_tplt']['#disabled'] = TRUE;
+      $form['field_grievance_contract_tplt']['#type'] = 'hidden';
+    }
+
+    if (!user_access('grievance form status date')) {
+      $form['field_grievance_status_date']['#disabled'] = TRUE;
+      $form['field_grievance_status_date']['#type'] = 'hidden';
+    }
+
+    if (!user_access('grievance form alert tid')) {
+      $form['field_grievance_alert_tid']['#disabled'] = TRUE;
+      $form['field_grievance_alert_tid']['#type'] = 'hidden';
+    }
+
+    if (!user_access('grievance form alert date')) {
+      $form['field_grievance_alert_date']['#disabled'] = TRUE;
+      // $form['field_grievance_alert_date']['#type'] = 'hidden';
+    }
+
+    if (!user_access('grievance form grievance type')) {
+      $form['field_grievance_type']['#access'] = FALSE;
+    }
+    if (!user_access('grievance form grievance type other')) {
+      $form['field_grievance_type_other']['#access'] = FALSE;
+    }
+    if (!user_access('grievance form remedy')) {
+      $form['field_grievance_remedy']['#access'] = FALSE;
+    }
+    if (!user_access('grievance form remedy other')) {
+      $form['field_grievance_remedy_other']['#access'] = FALSE;
+    }
   }
 }
 

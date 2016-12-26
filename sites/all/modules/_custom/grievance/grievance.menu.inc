@@ -161,6 +161,13 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance contract'),
 	);
 	
+	$node_tabs['grievance_contract_template']['replicate'] = array(
+		'title' => 'Duplicate',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_replicate',
+		'permissions' => array('grievance contract'),
+	);
+
 	return $node_tabs;
 }
 

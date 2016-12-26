@@ -90,10 +90,12 @@
 			});
 			*/
 
+			/*
 			$('.node-grievance-form .field-name-field-grievance-status-date-form').once().hide();
 			$('.node-grievance-form #edit-field-grievance-status-und').change(function(event) {
 				$('.field-name-field-grievance-status-date-form').show();
 			});
+*/
     },
   }
 
