@@ -15,32 +15,32 @@
 	// This should move into the grievance module.  But for now....
   Drupal.behaviors.grievance = {
     attach: function(context, settings) {
-			$('#grievance-form-contacts-link .grievance-recipient').click(function() { grievance_handle_recipient_click($(this)); });
+			$('#grievance-form-contacts-link .grievance-recipient').one('click', function() { grievance_handle_recipient_click($(this)); });
 
 			function grievance_handle_recipient_click(elt) {
 				val = elt.find('.field-name-field-grievance-co-name .field-item').html();
-				$('#edit-field-grievance-co-name-und-0-value').val(val);
+				$('.form-item-field-grievance-co-name-und-0-value input').val(val);
 
 				val = elt.find('.field-name-field-grievance-co-email .field-item').html();
-				$('#edit-field-grievance-co-email-und-0-email').val(val);
+				$('.form-item-field-grievance-co-email-und-0-email input').val(val);
 
 				val = elt.find('.field-name-field-grievance-co-phone .field-item').html();
-				$('#edit-field-grievance-co-phone-und-0-value').val(val);
+				$('.form-item-field-grievance-co-phone-und-0-value input').val(val);
 
 				val = elt.find('.field-name-field-grievance-co-address .field-item').html();
-				$('#edit-field-grievance-co-address-und-0-value').val(val);
+				$('.form-item-field-grievance-co-address-und-0-value input').val(val);
 
 				val = elt.find('.field-name-field-grievance-co-address-2 .field-item').html();
-				$('#edit-field-grievance-co-address-2-und-0-value').val(val);
+				$('.form-item-field-grievance-co-address-2-und-0-value input').val(val);
 
 				val = elt.find('.field-name-field-grievance-co-city .field-item').html();
-				$('#edit-field-grievance-co-city-und-0-value').val(val);
+				$('.form-item-field-grievance-co-city-und-0-value input').val(val);
 
 				val = elt.find('.field-name-field-grievance-co-state .field-item').html();
-				$('#edit-field-grievance-co-state-und-0-value').val(val);
+				$('.form-item-field-grievance-co-state-und-0-value input').val(val);
 
 				val = elt.find('.field-name-field-grievance-co-zip .field-item').html();
-				$('#edit-field-grievance-co-zip-und-0-value').val(val);
+				$('.form-item-field-grievance-co-zip-und-0-value input').val(val);
 			};
 
 			// Hide and show contacts as needed
