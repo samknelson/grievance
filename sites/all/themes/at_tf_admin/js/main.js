@@ -121,7 +121,6 @@
 
 					tmp = json[0].house_Address.street_Address;
 					tmp = tmp.replace(/(?:\r\n|\r|\n)/g, ', ');
-					alert(tmp);
 					$('#edit-field-grievance-address-und-0-value').val(tmp);
 					$('#edit-field-grievance-zip-und-0-value').val(json[0].house_Address.zip);
 					$('#edit-field-grievance-phone-und-0-value').val(json[0].phone_Number);
