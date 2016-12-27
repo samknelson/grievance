@@ -87,6 +87,15 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   );
 
   //
+  // Override the "Add More" buttons, and then simulate their operation.
+  //
+
+  $form['field_grievance_clauseref']['und']['add_more']['#ajax'] = array(
+    'callback' => 'grievance_form_grievance_node_callback_replace',
+    'method' => 'replace',
+  );
+
+  //
   // Open the correct accordion group
   //
 
@@ -94,7 +103,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'closed';
     $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';
   }
-
+  if ($form_state['triggering_element']['#field_name'] == 'field_grievance_clauseref') {
+    $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'closed';
+    $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';
+  }
   //////////////////////////////////////////////////////
   // These things happen on rebuild
   //////////////////////////////////////////////////////
@@ -159,11 +171,11 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Set the list of clauses
   //
 
+  $clauses_options = array();
   if ($contract_tplt_id) {
     $clauses_view = views_get_view('grievance_contract_clauses');
     $clauses_view->args[0] = $contract_tplt_id;
     $clauses_view->execute('entityreference_1');
-    $clauses_options = array();
     $clauses_options['_none'] = t('- None -');
     foreach ($clauses_view->result as $clause) {
       $clauses_options[$clause->nid] = 
@@ -171,12 +183,12 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
         ': ' . 
         $clause->node_title;
     }
-    $form['field_grievance_clauseref']['und']['#options'] = $clauses_options;
-    $idx = 0;
-    while (isset($form['field_grievance_clauseref']['und'][$idx]['target_id']['#options'])) {
-      $form['field_grievance_clauseref']['und'][$idx]['target_id']['#options'] = $clauses_options;
-      ++$idx;
-    }
+  }
+  $form['field_grievance_clauseref']['und']['#options'] = $clauses_options;
+  $idx = 0;
+  while (isset($form['field_grievance_clauseref']['und'][$idx]['target_id']['#options'])) {
+    $form['field_grievance_clauseref']['und'][$idx]['target_id']['#options'] = $clauses_options;
+    ++$idx;
   }
 
   //

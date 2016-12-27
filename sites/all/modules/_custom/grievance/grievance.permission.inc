@@ -82,6 +82,23 @@ function grievance_permission() {
     'grievance form grievance remedy other' => array(
     	'title' => t('Grievance Form - Change Remedy (Other)'),
     ),
+
+    'grievance form rep filed' => array(
+    	'title' => t('Grievance Form - Change Filed By'),
+    ),
+    'grievance form rep organizer' => array(
+    	'title' => t('Grievance Form - Change Organizer'),
+    ),
+    'grievance form rep lead' => array(
+    	'title' => t('Grievance Form - Change Lead'),
+    ),
+    'grievance form rep manager' => array(
+    	'title' => t('Grievance Form - Change Grievance Admin'),
+    ),
+    'grievance form rep watching' => array(
+    	'title' => t('Grievance Form - Change Watching'),
+    ),
+
  );
 }
 
