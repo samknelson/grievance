@@ -166,6 +166,13 @@ function grievance_admin() {
     '#description' => t('Enter the footer copy for the site.  May contain HTML.'),
   );
 
+  $form['grievance_loopback_ip'] = array(
+    '#default_value' => variable_get('grievance_loopback_ip', ''),
+    '#title' => t('Loopback IP'),
+    '#description' => t('The server needs to make "loopback" calls to itself, which sometimes come in as an IP different from the server\'s public IP.  Enter a privileged IP address which is permitted to make unrestricted requests to the loopback functions.'),
+    '#type' => 'textarea',
+  );
+
   $form['grievance_hidefields'] = array(
     '#default_value' => variable_get('grievance_hidefields', ''),
     '#title' => t('Hide Fields'),

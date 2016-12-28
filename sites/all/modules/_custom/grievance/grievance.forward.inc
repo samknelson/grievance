@@ -14,8 +14,11 @@ function grievance_forward_loopback($node) {
 }
 
 function grievance_forward_loopback_access($node) {
-	if ($_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR']) { return TRUE; }
-	if ($_SERVER['HTTP_X_FORWARDED_FOR'] == $_SERVER['SERVER_ADDR']) { return TRUE; }
+	if ($_SERVER['SERVER_ADDR'] == $_SERVER['REMOTE_ADDR'] ||
+		  $_SERVER['SERVER_ADDR'] == $_SERVER['HTTP_X_FORWARDED_FOR'] ||
+		  $_SERVER['SERVER_ADDR'] == variable_get('grievance_loopback_ip', '')) { 
+		return TRUE; 
+	}
 	return FALSE;
 }
 
