@@ -67,7 +67,8 @@ function grievance_gform_pdf_contents($node) {
 	$html_path = DRUPAL_ROOT . '/sites/default/files/private/grievance_gform/node_' . $node->nid . '.html';
 
 	global $is_https;
-	if ($is_https) {
+	if ($is_https ||
+		(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) {
 		$url = 'https://';
 	} else { 
 		$url = 'http://';
