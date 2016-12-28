@@ -170,7 +170,7 @@ function grievance_admin() {
     '#default_value' => variable_get('grievance_loopback_ip', ''),
     '#title' => t('Loopback IP'),
     '#description' => t('The server needs to make "loopback" calls to itself, which sometimes come in as an IP different from the server\'s public IP.  Enter a privileged IP address which is permitted to make unrestricted requests to the loopback functions.'),
-    '#type' => 'textarea',
+    '#type' => 'textfield',
   );
 
   $form['grievance_hidefields'] = array(

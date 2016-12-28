@@ -7967,42 +7967,6 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'taxonomy_term-grievance_alert_types-field_grievance_contract_tplts'.
-  $field_instances['taxonomy_term-grievance_alert_types-field_grievance_contract_tplts'] = array(
-    'bundle' => 'grievance_alert_types',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 1,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'taxonomy_term',
-    'field_name' => 'field_grievance_contract_tplts',
-    'label' => 'Contract Templates',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_buttons',
-      'weight' => 4,
-    ),
-  );
-
-  // Exported field_instance:
   // 'taxonomy_term-grievance_job_classification-field_grievance_departments'.
   $field_instances['taxonomy_term-grievance_job_classification-field_grievance_departments'] = array(
     'bundle' => 'grievance_job_classification',
