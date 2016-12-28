@@ -65,7 +65,14 @@ function grievance_node_tab_gform_pdf($node) {
 function grievance_gform_pdf_contents($node) {
 	// Loopback to generate the HTML.
 	$html_path = DRUPAL_ROOT . '/sites/default/files/private/grievance_gform/node_' . $node->nid . '.html';
-	$url = 'http://' . $_SERVER['SERVER_NAME'] . '/node/' . $node->nid . '/loopback-gform';
+
+	global $is_https;
+	if ($is_https) {
+		$url = 'https://';
+	} else { 
+		$url = 'http://';
+	}
+	$url .= $_SERVER['SERVER_NAME'] . '/node/' . $node->nid . '/loopback-gform';
 	$html = file_get_contents($url);
 	file_put_contents($html_path, $html);
 
