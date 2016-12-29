@@ -170,6 +170,7 @@ function grievance_timss_login() {
     'headers' => $headers,
     'method' => 'POST',
     'data' => http_build_query($params),
+    'context' => stream_context_create(array('ssl' => ['verify_peer' => FALSE, 'verify_peer_name' => FALSE])),
   );
   $response = drupal_http_request($timss_url, $options);
 
@@ -237,6 +238,7 @@ function grievance_timss_search($str) {
   $options = array(
     'headers' => array('Authorization' => 'Bearer ' . $json_token['access_token']),
     'method' => 'GET',
+    'context' => stream_context_create(array('ssl' => ['verify_peer' => FALSE, 'verify_peer_name' => FALSE])),
   );
   $response = drupal_http_request($timss_url, $options);
 
@@ -286,9 +288,22 @@ function grievance_timss_lookup_raw($timss_id) {
     'headers' => array('Authorization' => 'Bearer ' . $json_token['access_token']),
     'method' => 'GET',
   );
+
+  // @TODO: drupal_http_request expects a cert, but the cert here is invalid; fails on php 5.6.
   $response = drupal_http_request($timss_url, $options);
 
+  /*
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $timss_url);
+  curl_setopt($ch, CURLOPT_HEADER, 0);
+  // grab URL and pass it to the browser
+  curl_exec($ch);
+  // close cURL resource, and free up system resources
+  curl_close($ch);
+  */
+
   // HTTP Request execute
+  /*
   if ($response->code != 200) {
     drupal_set_message(
       t(
@@ -303,6 +318,9 @@ function grievance_timss_lookup_raw($timss_id) {
     );
     return NULL;
   }
+  */
+
+  dpm($response);
 
   return $response->data;
 }
