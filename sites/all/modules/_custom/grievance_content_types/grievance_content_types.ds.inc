@@ -155,6 +155,41 @@ function grievance_content_types_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|grievance|grievance_form_226';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'grievance';
+  $ds_fieldsetting->view_mode = 'grievance_form_226';
+  $ds_fieldsetting->settings = array(
+    'grievance_address_combined' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'grievance_company_rep_ad_combine' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'grievant_name' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'field_grievance_broughtby' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_ds_field_expert',
+          'lb-def-at' => TRUE,
+          'prefix' => '<div class="field-name-field-grievance-broughtby-wrapper">',
+          'suffix' => ' grieves violation of the collective bargaining agreement.</div>',
+        ),
+      ),
+    ),
+  );
+  $export['node|grievance|grievance_form_226'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|grievance|grievance_gform';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'grievance';
@@ -344,6 +379,26 @@ function grievance_content_types_ds_custom_fields_info() {
     'use_token' => 1,
   );
   $export['grievance_address_combined'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'grievance_company_rep_ad_combine';
+  $ds_field->label = 'Employer\'s Address';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<p>[node:field_grievance_co_address]&nbsp;[node:field_grievance_co_address_2]<br />
+[node:field_grievance_co_city], [node:field_grievance_co_state] [node:field_grievance_co_zip]</p>
+',
+      'format' => 'full_html',
+    ),
+    'use_token' => 1,
+  );
+  $export['grievance_company_rep_ad_combine'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -952,6 +1007,84 @@ function grievance_content_types_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|grievance|grievance_form_226';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'grievance';
+  $ds_layout->view_mode = 'grievance_form_226';
+  $ds_layout->layout = 'ds_2col_stacked';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'header' => array(
+        0 => 'field_grievance_broughtby',
+      ),
+      'left' => array(
+        1 => 'field_grievance_shop',
+        2 => 'group_grievance_226_1',
+        4 => 'field_grievance_co_name',
+        7 => 'grievance_company_rep_ad_combine',
+        9 => 'field_grievance_co_email',
+        12 => 'field_grievance_co_phone',
+      ),
+      'right' => array(
+        3 => 'group_grievance_226_2',
+        5 => 'grievant_name',
+        8 => 'grievance_address_combined',
+        11 => 'field_grievance_class_tid',
+        14 => 'field_grievance_department_tid',
+      ),
+      'footer' => array(
+        6 => 'field_grievance_clauseref',
+        10 => 'field_grievance_date_1',
+        13 => 'field_grievance_date_2',
+        15 => 'field_grievance_remedy',
+        16 => 'field_grievance_remedy_other',
+        17 => 'group_grievance_226_3',
+        18 => 'field_grievance_document_types',
+        19 => 'field_grievance_inforeq',
+      ),
+    ),
+    'fields' => array(
+      'field_grievance_broughtby' => 'header',
+      'field_grievance_shop' => 'left',
+      'group_grievance_226_1' => 'left',
+      'group_grievance_226_2' => 'right',
+      'field_grievance_co_name' => 'left',
+      'grievant_name' => 'right',
+      'field_grievance_clauseref' => 'footer',
+      'grievance_company_rep_ad_combine' => 'left',
+      'grievance_address_combined' => 'right',
+      'field_grievance_co_email' => 'left',
+      'field_grievance_date_1' => 'footer',
+      'field_grievance_class_tid' => 'right',
+      'field_grievance_co_phone' => 'left',
+      'field_grievance_date_2' => 'footer',
+      'field_grievance_department_tid' => 'right',
+      'field_grievance_remedy' => 'footer',
+      'field_grievance_remedy_other' => 'footer',
+      'group_grievance_226_3' => 'footer',
+      'field_grievance_document_types' => 'footer',
+      'field_grievance_inforeq' => 'footer',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'header' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'footer' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|grievance|grievance_form_226'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|grievance|grievance_gform';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'grievance';
@@ -1147,6 +1280,15 @@ function grievance_content_types_ds_view_modes_info() {
     'node' => 'node',
   );
   $export['grievance_arbitrationform'] = $ds_view_mode;
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'grievance_form_226';
+  $ds_view_mode->label = 'Grievance Form 226';
+  $ds_view_mode->entities = array(
+    'node' => 'node',
+  );
+  $export['grievance_form_226'] = $ds_view_mode;
 
   $ds_view_mode = new stdClass();
   $ds_view_mode->api_version = 1;
