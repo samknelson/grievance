@@ -399,6 +399,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Compute the default information requests
   //
 
+  /*
   $document_types = grievance_form_current_value('field_grievance_document_types', 'value', $form, $form_state);
   if (!$document_types || $form_state['triggering_element']['#field_name'] == 'field_grievance_type') {
     $type_tid = grievance_form_current_value('field_grievance_type', 'tid', $form, $form_state);
@@ -411,6 +412,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     }
     $form_state['input']['field_grievance_document_types']['und'] = $val;
   }
+  */
 
   //
   // Compute the next alert tid
