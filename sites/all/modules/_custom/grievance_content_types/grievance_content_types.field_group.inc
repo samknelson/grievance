@@ -122,7 +122,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Information Request',
-    'weight' => '8',
+    'weight' => '10',
     'children' => array(
       0 => 'field_grievance_inforeq',
       1 => 'field_grievance_document_types',
