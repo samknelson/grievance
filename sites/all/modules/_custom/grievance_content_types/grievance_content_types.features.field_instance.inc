@@ -928,9 +928,12 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_form_226' => array(
         'label' => 'inline',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 4,
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 3,
       ),
       'grievance_gform' => array(
         'label' => 'above',
@@ -1435,11 +1438,8 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_form_226' => array(
         'label' => 'hidden',
-        'module' => 'email',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'email_plain',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 4,
       ),
       'grievance_gform' => array(
@@ -1587,11 +1587,8 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_form_226' => array(
         'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 5,
       ),
       'grievance_gform' => array(
@@ -3821,9 +3818,13 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_form_226' => array(
         'label' => 'inline',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 59,
+        'module' => 'entityreference',
+        'settings' => array(
+          'field_delimiter' => '',
+          'link' => 0,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 4,
       ),
       'grievance_gform' => array(
         'label' => 'inline',
@@ -6197,7 +6198,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
           'field_delimiter' => '',
@@ -6239,7 +6240,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'number',
         'settings' => array(
           'decimal_separator' => '.',

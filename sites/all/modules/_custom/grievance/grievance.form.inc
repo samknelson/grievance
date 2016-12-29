@@ -69,10 +69,12 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',
   );
+  /*
   $form['field_grievance_type']['und'][0]['tid']['#ajax'] = array(
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',
   );
+  */
   $form['field_grievance_contract_tplt']['und']['#ajax'] = array(
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',

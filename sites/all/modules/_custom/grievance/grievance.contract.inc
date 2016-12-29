@@ -36,6 +36,29 @@ function grievance_contract_template_node_tab_clauses($contract_template_node) {
   return $result;
 }
 
+function grievance_contract_section_node_tab_clauses($contract_section_node) {
+  drupal_set_title($contract_section_node->title . ': ' . t('Clauses'));
+  $contract_section_nid = $contract_section_node->nid;
+
+  $contract_template_nid = $contract_section_node->field_grievance_contract_tplt['und'][0]['target_id'];
+  $contract_template_node = node_load($contract_template_nid);
+
+  $result = '';
+
+  $result .= '[' . l(t('Back to @title', array('@title' => $contract_template_node->title)), 'node/' . $contract_template_nid . '/sections') . ']';
+
+  $result .= views_embed_view('grievance_contract_clauses', 'block_2', $contract_template_nid, $contract_section_nid);
+  $result .= grievance_node_tab_get_addlink(
+    "grievance-contract-clause", 
+    array(
+      "grievance_contract_tplt" => $contract_template_nid,
+      "grievance_contract_section" => $contract_section_nid,
+    )
+  );
+
+  return $result;
+}
+
 function grievance_contract_template_node_tab_sections($contract_template_node) {
   drupal_set_title($contract_template_node->title . ': ' . t('Articles'));
   $entity_nid = $contract_template_node->nid;

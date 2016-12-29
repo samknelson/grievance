@@ -55,9 +55,7 @@ function grievance_content_types_field_group_info() {
     'children' => array(
       0 => 'field_grievance_shop',
       1 => 'field_grievance_co_name',
-      2 => 'field_grievance_co_email',
-      3 => 'field_grievance_co_phone',
-      4 => 'grievance_company_rep_ad_combine',
+      2 => 'grievance_company_rep_ad_combine',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -89,7 +87,9 @@ function grievance_content_types_field_group_info() {
     'label' => 'Employee Contact',
     'weight' => '2',
     'children' => array(
-      0 => 'grievant_name',
+      0 => 'field_grievance_rep_organizer',
+      1 => 'field_grievance_class_tid',
+      2 => 'grievant_name',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -132,7 +132,7 @@ function grievance_content_types_field_group_info() {
         'classes' => 'group-grievance-226-3 field-group-div',
         'description' => '',
         'show_label' => '1',
-        'label_element' => 'h3',
+        'label_element' => 'h2',
         'effect' => 'none',
         'speed' => 'fast',
       ),

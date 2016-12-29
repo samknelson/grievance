@@ -121,7 +121,7 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
-  $defaultable_fields = array('grievance_contract_tplt', 'grievance_classaction');
+  $defaultable_fields = array('grievance_contract_tplt', 'grievance_contract_section', 'grievance_classaction');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $form['field_' . $field]["und"]['#default_value'][0] = $_GET[$field];

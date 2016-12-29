@@ -585,24 +585,6 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_remedy']['field'] = 'field_grievance_remedy';
   $handler->display->display_options['fields']['field_grievance_remedy']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_grievance_remedy']['type'] = 'taxonomy_term_reference_plain';
-  /* Field: Global: Popup */
-  $handler->display->display_options['fields']['popup']['id'] = 'popup';
-  $handler->display->display_options['fields']['popup']['table'] = 'popup_views_integration';
-  $handler->display->display_options['fields']['popup']['field'] = 'popup';
-  $handler->display->display_options['fields']['popup']['label'] = 'Full text';
-  $handler->display->display_options['fields']['popup']['title'] = 'full text';
-  $handler->display->display_options['fields']['popup']['text'] = '<pre>[field_grievance_clause]</pre>
-<hr>
-<strong>Recommended Statement</strong>: [field_grievance_type]
-<hr>
-<strong>Recommended Remedy</strong>: [field_grievance_remedy]';
-  $handler->display->display_options['fields']['popup']['activate'] = 'click';
-  $handler->display->display_options['fields']['popup']['close'] = 1;
-  $handler->display->display_options['fields']['popup']['origin'] = 'top-right';
-  $handler->display->display_options['fields']['popup']['expand'] = 'bottom-left';
-  $handler->display->display_options['fields']['popup']['width'] = '600';
-  $handler->display->display_options['fields']['popup']['height'] = '400';
-  $handler->display->display_options['fields']['popup']['style'] = 'White';
   /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
@@ -896,6 +878,27 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_remedy']['field'] = 'field_grievance_remedy';
   $handler->display->display_options['fields']['field_grievance_remedy']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_grievance_remedy']['type'] = 'taxonomy_term_reference_plain';
+
+  /* Display: by template and section */
+  $handler = $view->new_display('block', 'by template and section', 'block_2');
+  $handler->display->display_options['defaults']['arguments'] = FALSE;
+  /* Contextual filter: Content: Contract Template (field_grievance_contract_tplt) */
+  $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['id'] = 'field_grievance_contract_tplt_target_id';
+  $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['table'] = 'field_data_field_grievance_contract_tplt';
+  $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['field'] = 'field_grievance_contract_tplt_target_id';
+  $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['default_action'] = 'empty';
+  $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['summary_options']['items_per_page'] = '25';
+  /* Contextual filter: Content: Article (field_grievance_contract_section) */
+  $handler->display->display_options['arguments']['field_grievance_contract_section_target_id']['id'] = 'field_grievance_contract_section_target_id';
+  $handler->display->display_options['arguments']['field_grievance_contract_section_target_id']['table'] = 'field_data_field_grievance_contract_section';
+  $handler->display->display_options['arguments']['field_grievance_contract_section_target_id']['field'] = 'field_grievance_contract_section_target_id';
+  $handler->display->display_options['arguments']['field_grievance_contract_section_target_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['field_grievance_contract_section_target_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_grievance_contract_section_target_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_grievance_contract_section_target_id']['summary_options']['items_per_page'] = '25';
   $translatables['grievance_contract_clauses'] = array(
     t('Master'),
     t('Grievance Contract Clauses'),
@@ -922,12 +925,12 @@ function grievance_views_views_default_views() {
     t('Full Clause'),
     t('Recommended Statement of Grievance'),
     t('Recommended Remedy'),
-    t('Full text'),
     t('Edit'),
     t('All'),
     t('Text Search'),
     t('Block'),
     t('Entity Reference'),
+    t('by template and section'),
   );
   $export['grievance_contract_clauses'] = $view;
 
@@ -1231,6 +1234,12 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['label'] = 'Edit';
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = 'Clauses';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/clauses">clauses</a>';
   /* Sort criterion: Draggableviews: Weight */
   $handler->display->display_options['sorts']['weight']['id'] = 'weight';
   $handler->display->display_options['sorts']['weight']['table'] = 'draggableviews_structure';
@@ -1327,6 +1336,8 @@ function grievance_views_views_default_views() {
     t('Article Number'),
     t('Title'),
     t('Edit'),
+    t('Clauses'),
+    t('<a href="/node/[nid]/clauses">clauses</a>'),
     t('All'),
     t('Block'),
     t('Entity Reference'),
@@ -2114,11 +2125,10 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
-  /* Field: Content: Status Change Date */
+  /* Field: Content: Date */
   $handler->display->display_options['fields']['field_grievance_status_date']['id'] = 'field_grievance_status_date';
   $handler->display->display_options['fields']['field_grievance_status_date']['table'] = 'field_data_field_grievance_status_date';
   $handler->display->display_options['fields']['field_grievance_status_date']['field'] = 'field_grievance_status_date';
-  $handler->display->display_options['fields']['field_grievance_status_date']['label'] = 'Date';
   $handler->display->display_options['fields']['field_grievance_status_date']['settings'] = array(
     'format_type' => 'short',
     'fromto' => 'both',
@@ -2159,7 +2169,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
-  /* Sort criterion: Content: Status Change Date (field_grievance_status_date) */
+  /* Sort criterion: Content: Date (field_grievance_status_date) */
   $handler->display->display_options['sorts']['field_grievance_status_date_value']['id'] = 'field_grievance_status_date_value';
   $handler->display->display_options['sorts']['field_grievance_status_date_value']['table'] = 'field_data_field_grievance_status_date';
   $handler->display->display_options['sorts']['field_grievance_status_date_value']['field'] = 'field_grievance_status_date_value';
@@ -3028,11 +3038,10 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_company']['settings'] = array(
     'link' => 1,
   );
-  /* Field: Field: Shop */
+  /* Field: Field: Shops */
   $handler->display->display_options['fields']['field_grievance_shops']['id'] = 'field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['field'] = 'field_grievance_shops';
-  $handler->display->display_options['fields']['field_grievance_shops']['label'] = 'Shops';
   $handler->display->display_options['fields']['field_grievance_shops']['settings'] = array(
     'link' => 1,
   );
@@ -3132,7 +3141,7 @@ function grievance_views_views_default_views() {
   $handler = $view->new_display('block', 'By Shop', 'block_1');
   $handler->display->display_options['defaults']['footer'] = FALSE;
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: Field: Shop (field_grievance_shops) */
+  /* Contextual filter: Field: Shops (field_grievance_shops) */
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['id'] = 'field_grievance_shops_target_id';
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['field'] = 'field_grievance_shops_target_id';
@@ -3921,7 +3930,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_alert_tid']['table'] = 'field_data_field_grievance_alert_tid';
   $handler->display->display_options['fields']['field_grievance_alert_tid']['field'] = 'field_grievance_alert_tid';
   $handler->display->display_options['fields']['field_grievance_alert_tid']['type'] = 'taxonomy_term_reference_plain';
-  /* Field: Content: Next Deadline Date */
+  /* Field: Content: Next Deadline */
   $handler->display->display_options['fields']['field_grievance_alert_date']['id'] = 'field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['field'] = 'field_grievance_alert_date';
@@ -4091,7 +4100,7 @@ function grievance_views_views_default_views() {
     4 => 0,
     5 => 0,
   );
-  /* Filter criterion: Content: Next Deadline Date (field_grievance_alert_date) */
+  /* Filter criterion: Content: Next Deadline (field_grievance_alert_date) */
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['id'] = 'field_grievance_alert_date_value';
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['field'] = 'field_grievance_alert_date_value';
@@ -4157,10 +4166,11 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['nid']['table'] = 'node';
   $handler->display->display_options['fields']['nid']['field'] = 'nid';
   $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
-  /* Field: Content: Next Deadline Date */
+  /* Field: Content: Next Deadline */
   $handler->display->display_options['fields']['field_grievance_alert_date']['id'] = 'field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['field'] = 'field_grievance_alert_date';
+  $handler->display->display_options['fields']['field_grievance_alert_date']['label'] = 'Next Deadline Date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_grievance_alert_date']['settings'] = array(
     'format_type' => 'short',
@@ -4170,7 +4180,7 @@ function grievance_views_views_default_views() {
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Next Deadline Date */
+  /* Field: Content: Next Deadline */
   $handler->display->display_options['fields']['field_grievance_alert_date_1']['id'] = 'field_grievance_alert_date_1';
   $handler->display->display_options['fields']['field_grievance_alert_date_1']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date_1']['field'] = 'field_grievance_alert_date';
@@ -4255,7 +4265,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['nothing_3']['alter']['text'] = '[<a href="/node/[nid]">view</a>]&nbsp;[<a href="/node/[nid]/edit">edit</a>]<br>
 [<a href="/node/[nid]/gform">form</a>]&nbsp;[<a href="/node/[nid]/notification">notify</a>]';
   $handler->display->display_options['defaults']['sorts'] = FALSE;
-  /* Sort criterion: Content: Next Deadline Date (field_grievance_alert_date) */
+  /* Sort criterion: Content: Next Deadline (field_grievance_alert_date) */
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['id'] = 'field_grievance_alert_date_value';
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['field'] = 'field_grievance_alert_date_value';
@@ -4606,7 +4616,7 @@ Grievance Form',
     4 => 0,
     5 => 0,
   );
-  /* Filter criterion: Content: Next Deadline Date (field_grievance_alert_date) */
+  /* Filter criterion: Content: Next Deadline (field_grievance_alert_date) */
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['id'] = 'field_grievance_alert_date_value';
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['field'] = 'field_grievance_alert_date_value';
@@ -4816,7 +4826,7 @@ Grievance Form',
     t('Recommended Statement of Grievance'),
     t('Next Actor'),
     t('Next Step'),
-    t('Next Deadline Date'),
+    t('Next Deadline'),
     t('Actions'),
     t('[<a href="/node/[nid]">view</a>]&nbsp;[<a href="/node/[nid]/edit">edit</a>]<br>
 [<a href="/node/[nid]/gform">form</a>]&nbsp;[<a href="/node/[nid]/notification">notify</a>]
@@ -4826,8 +4836,8 @@ Grievance Form',
     t('My Grievances'),
     t('The list below includes only <strong>unresolved</strong> grievances which were filed by the <strong>current user</strong> (or for which the current user is the organizer, lead organizer, manager, or is watching, or filed by another organizer at your shop).'),
     t('There are no unreseloved grievances which are assigned to you, or which you are watching.'),
+    t('Next Deadline Date'),
     t('Time Remaining'),
-    t('Next Deadline'),
     t('[field_grievance_alert_date]<br>([field_grievance_alert_date_1])'),
     t('[field_grievance_status]<br>
 [field_grievance_actor] must: [field_grievance_alert_tid]'),

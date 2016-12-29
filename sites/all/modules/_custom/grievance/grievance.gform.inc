@@ -127,6 +127,8 @@ function grievance_gform_admin() {
 
 function  grievance_node_view($node, $view_mode, $langcode) {
 	if ($node->type == 'grievance') {
+
+		// Clausref field should show the clause number as well as the clause name.
 		if ($node->content['field_grievance_clauseref']['#items']) {
 			$delta = 0;
 			foreach ($node->content['field_grievance_clauseref']['#items'] as $item) {
@@ -136,6 +138,19 @@ function  grievance_node_view($node, $view_mode, $langcode) {
 				$title = $clause_node->field_grievance_label['und'][0]['value'] . ': ' . $clause_node->title;
 				$node->content['field_grievance_clauseref'][$delta]['#markup'] = $title;
 				++$delta;
+			}
+		}
+
+		// "Organizer" should show the phone number as well as the name
+		if ($view_mode == 'grievance_form_226') {
+			$organizer_uid = $node->content['field_grievance_rep_organizer']['#object']->uid;
+			$organizer_user = user_load($organizer_uid);
+			if ($organizer_user) {
+				$phone = $organizer_user->field_grievance_phone['und'][0]['value'];
+				if ($phone) {
+					$node->content['field_grievance_rep_organizer'][0]['#markup'] .= '<br>' . $phone;
+				}
+				$node->content['field_grievance_rep_organizer'][0]['#markup'] .= '<br>' . $organizer_user->mail;
 			}
 		}
 	}
