@@ -2572,6 +2572,13 @@ function grievance_content_types_field_default_field_instances() {
     'settings' => array(
       'user_register_form' => FALSE,
     ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => 'term_reference_1',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => 'grievance_information_request_types',
+    ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
@@ -8543,6 +8550,41 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_document_types-field_grievance_can_ir'.
+  $field_instances['taxonomy_term-grievance_document_types-field_grievance_can_ir'] = array(
+    'bundle' => 'grievance_document_types',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Select "Yes" if this document type should appear as an "Information Request" option.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_can_ir',
+    'label' => 'Information Request?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_job_classification-field_grievance_departments'.
   $field_instances['taxonomy_term-grievance_job_classification-field_grievance_departments'] = array(
     'bundle' => 'grievance_job_classification',
@@ -8953,6 +8995,7 @@ function grievance_content_types_field_default_field_instances() {
   t('If the remedy does not fit one of the options above, enter an alternative remedy here.');
   t('Incident Date');
   t('Information Request');
+  t('Information Request?');
   t('Is this status considered "Un-Resolved"?  Only unresolved grievances are displayed on the "my grievances" list.');
   t('Label');
   t('Labor charges or other relevant shop issues');
@@ -8984,6 +9027,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Resolution Procedure');
   t('Role');
   t('Roles');
+  t('Select "Yes" if this document type should appear as an "Information Request" option.');
   t('Select a Contact');
   t('Select the date that the status changed.  For example, if the status is "Step 1 Meeting", enter the date that the meeting occurred.  If no date is entered, today\'s date will be used.');
   t('Select the roles with permission to edit grievances at this step.');
