@@ -6241,16 +6241,12 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'number',
+        'module' => 'text',
         'settings' => array(
-          'decimal_separator' => '.',
           'field_delimiter' => '',
-          'prefix_suffix' => TRUE,
-          'scale' => 0,
-          'thousand_separator' => '',
         ),
-        'type' => 'number_integer',
-        'weight' => 0,
+        'type' => 'text_default',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -6265,17 +6261,16 @@ function grievance_content_types_field_default_field_instances() {
     'label' => 'Article Number',
     'required' => 0,
     'settings' => array(
-      'max' => '',
-      'min' => '',
-      'prefix' => '',
-      'suffix' => '',
+      'text_processing' => 0,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'number',
-      'settings' => array(),
-      'type' => 'number',
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 12,
+      ),
+      'type' => 'text_textfield',
       'weight' => 1,
     ),
   );
