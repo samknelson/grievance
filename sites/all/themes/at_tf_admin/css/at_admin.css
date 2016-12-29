@@ -3482,7 +3482,10 @@ table.grievance-timeline tr.pending {
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-clauseref, 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-date-1, 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-date-2, 
+.grievance_form_body_grievance_form_226 .field-name-field-grievance-type, 
+.grievance_form_body_grievance_form_226 .field-name-field-grievance-type-other, 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-remedy, 
+.grievance_form_body_grievance_form_226 .field-name-field-grievance-remedy-other, 
 .grievance_form_body_grievance_form_226 .group-grievance-226-3 {
   padding-bottom: 10px;
 }
