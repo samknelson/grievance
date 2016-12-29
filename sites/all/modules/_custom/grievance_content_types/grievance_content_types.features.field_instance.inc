@@ -5880,47 +5880,6 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'node-grievance_contract_rule-field_grievance_classaction'.
-  $field_instances['node-grievance_contract_rule-field_grievance_classaction'] = array(
-    'bundle' => 'grievance_contract_rule',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'list',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'list_default',
-        'weight' => 9,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_grievance_classaction',
-    'label' => 'Class Action or General Grievance?',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_select',
-      'weight' => 2,
-    ),
-  );
-
-  // Exported field_instance:
   // 'node-grievance_contract_rule-field_grievance_contract_tplt'.
   $field_instances['node-grievance_contract_rule-field_grievance_contract_tplt'] = array(
     'bundle' => 'grievance_contract_rule',
@@ -6053,6 +6012,47 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_contract_rule-field_grievance_from_status'.
+  $field_instances['node-grievance_contract_rule-field_grievance_from_status'] = array(
+    'bundle' => 'grievance_contract_rule',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 10,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_from_status',
+    'label' => 'From Status',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'multiple_selects',
+      'settings' => array(),
+      'type' => 'multiple_selects',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_contract_rule-field_grievance_next_status'.
   $field_instances['node-grievance_contract_rule-field_grievance_next_status'] = array(
     'bundle' => 'grievance_contract_rule',
@@ -6086,9 +6086,9 @@ function grievance_content_types_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'multiple_selects',
       'settings' => array(),
-      'type' => 'options_select',
+      'type' => 'multiple_selects',
       'weight' => 9,
     ),
   );
@@ -6178,47 +6178,6 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textfield',
       'weight' => 7,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'node-grievance_contract_rule-field_grievance_status'.
-  $field_instances['node-grievance_contract_rule-field_grievance_status'] = array(
-    'bundle' => 'grievance_contract_rule',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'When a grievance has status ...',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'taxonomy',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'taxonomy_term_reference_link',
-        'weight' => 1,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_grievance_status',
-    'label' => 'Status',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_select',
-      'weight' => 3,
     ),
   );
 
@@ -8930,7 +8889,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Can and should this case be settled?');
   t('Check Number');
   t('City');
-  t('Class Action or General Grievance?');
   t('Classification');
   t('Clause Number');
   t('Comments');
@@ -8979,6 +8937,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Field name to override, e.g. "field_grievance_organizer"');
   t('Filed By');
   t('First Name');
+  t('From Status');
   t('Full Clause');
   t('General Grievance?');
   t('Grievance');
@@ -9048,7 +9007,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Valid');
   t('Violation');
   t('Watching');
-  t('When a grievance has status ...');
   t('When a notification for this status is sent to the company, what subject should be used?');
   t('When a notification is sent to the company, what should the body of the email be? ');
   t('When the grievance admin selects this clause, which "statement of grievance" should be selected?');

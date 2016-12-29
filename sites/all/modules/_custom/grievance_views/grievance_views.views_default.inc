@@ -37,16 +37,6 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['footer']['area']['field'] = 'area';
   $handler->display->display_options['footer']['area']['content'] = '[<a href="/admin/structure/taxonomy/grievance_alert_types/add?destination=grievance/admin/alert-types">Add an Alert Type</a>]';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
-  /* Field: Taxonomy term: Contract Templates */
-  $handler->display->display_options['fields']['field_grievance_contract_tplts']['id'] = 'field_grievance_contract_tplts';
-  $handler->display->display_options['fields']['field_grievance_contract_tplts']['table'] = 'field_data_field_grievance_contract_tplts';
-  $handler->display->display_options['fields']['field_grievance_contract_tplts']['field'] = 'field_grievance_contract_tplts';
-  $handler->display->display_options['fields']['field_grievance_contract_tplts']['label'] = 'Contract';
-  $handler->display->display_options['fields']['field_grievance_contract_tplts']['settings'] = array(
-    'link' => 0,
-  );
-  $handler->display->display_options['fields']['field_grievance_contract_tplts']['delta_offset'] = '0';
-  $handler->display->display_options['fields']['field_grievance_contract_tplts']['separator'] = '<br>';
   /* Field: Taxonomy term: Actor */
   $handler->display->display_options['fields']['field_grievance_actor']['id'] = 'field_grievance_actor';
   $handler->display->display_options['fields']['field_grievance_actor']['table'] = 'field_data_field_grievance_actor';
@@ -102,7 +92,6 @@ function grievance_views_views_default_views() {
     t('next ›'),
     t('last »'),
     t('[<a href="/admin/structure/taxonomy/grievance_alert_types/add?destination=grievance/admin/alert-types">Add an Alert Type</a>]'),
-    t('Contract'),
     t('Actor'),
     t('Action'),
     t('Description'),
@@ -503,7 +492,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '100';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '1000';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['pager']['options']['id'] = '0';
   $handler->display->display_options['pager']['options']['quantity'] = '9';
@@ -1003,12 +992,16 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['nid']['table'] = 'node';
   $handler->display->display_options['fields']['nid']['field'] = 'nid';
   $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
-  /* Field: Content: Status */
-  $handler->display->display_options['fields']['field_grievance_status']['id'] = 'field_grievance_status';
-  $handler->display->display_options['fields']['field_grievance_status']['table'] = 'field_data_field_grievance_status';
-  $handler->display->display_options['fields']['field_grievance_status']['field'] = 'field_grievance_status';
-  $handler->display->display_options['fields']['field_grievance_status']['label'] = 'When a grievance has this status';
-  $handler->display->display_options['fields']['field_grievance_status']['type'] = 'taxonomy_term_reference_plain';
+  /* Field: Content: From Status */
+  $handler->display->display_options['fields']['field_grievance_from_status']['id'] = 'field_grievance_from_status';
+  $handler->display->display_options['fields']['field_grievance_from_status']['table'] = 'field_data_field_grievance_from_status';
+  $handler->display->display_options['fields']['field_grievance_from_status']['field'] = 'field_grievance_from_status';
+  $handler->display->display_options['fields']['field_grievance_from_status']['label'] = 'When a grievance has this status';
+  $handler->display->display_options['fields']['field_grievance_from_status']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_grievance_from_status']['settings'] = array(
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_from_status']['delta_offset'] = '0';
   /* Field: Content: Days */
   $handler->display->display_options['fields']['field_grievance_days']['id'] = 'field_grievance_days';
   $handler->display->display_options['fields']['field_grievance_days']['table'] = 'field_data_field_grievance_days';
@@ -1066,7 +1059,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['summary_options']['items_per_page'] = '25';
-  /* Contextual filter: Content: Class Action or General Grievance? (field_grievance_classaction) */
+  /* Contextual filter: Content: General Grievance? (field_grievance_classaction) */
   $handler->display->display_options['arguments']['field_grievance_classaction_value']['id'] = 'field_grievance_classaction_value';
   $handler->display->display_options['arguments']['field_grievance_classaction_value']['table'] = 'field_data_field_grievance_classaction';
   $handler->display->display_options['arguments']['field_grievance_classaction_value']['field'] = 'field_grievance_classaction_value';
@@ -3122,7 +3115,7 @@ function grievance_views_views_default_views() {
 
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Grievance Shops';
+  $handler->display->display_options['title'] = 'Grievance Employers';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'role';
   $handler->display->display_options['access']['role'] = array(
@@ -3265,7 +3258,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
   $handler->display->display_options['footer']['area']['empty'] = TRUE;
-  $handler->display->display_options['footer']['area']['content'] = '[<a href="/node/add/grievance-shop">Add a shop</a>]';
+  $handler->display->display_options['footer']['area']['content'] = '[<a href="/node/add/grievance-shop">Add an item</a>]';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
   /* Relationship: Entity Reference: Referencing entity */
   $handler->display->display_options['relationships']['reverse_field_grievance_shops_user']['id'] = 'reverse_field_grievance_shops_user';
@@ -3452,7 +3445,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['path'] = 'grievance/admin/shops';
   $translatables['grievance_shops'] = array(
     t('Master'),
-    t('Grievance Shops'),
+    t('Grievance Employers'),
     t('more'),
     t('Apply'),
     t('Reset'),
@@ -3466,7 +3459,7 @@ function grievance_views_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('[<a href="/node/add/grievance-shop">Add a shop</a>]'),
+    t('[<a href="/node/add/grievance-shop">Add an item</a>]'),
     t('User'),
     t('Company'),
     t('Nid'),
@@ -4681,7 +4674,7 @@ Grievance Form',
     4 => 0,
   );
   $handler->display->display_options['filters']['field_grievance_tags_tid']['vocabulary'] = 'grievance_tags';
-  /* Filter criterion: Content: Class Action or General Grievance? (field_grievance_classaction) */
+  /* Filter criterion: Content: General Grievance? (field_grievance_classaction) */
   $handler->display->display_options['filters']['field_grievance_classaction_value']['id'] = 'field_grievance_classaction_value';
   $handler->display->display_options['filters']['field_grievance_classaction_value']['table'] = 'field_data_field_grievance_classaction';
   $handler->display->display_options['filters']['field_grievance_classaction_value']['field'] = 'field_grievance_classaction_value';
