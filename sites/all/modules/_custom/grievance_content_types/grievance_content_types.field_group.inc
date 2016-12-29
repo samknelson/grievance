@@ -51,7 +51,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Arbitration',
-    'weight' => '15',
+    'weight' => '14',
     'children' => array(
       0 => 'field_grievance_arbitration_a',
       1 => 'field_grievance_arbitration_b',
@@ -455,7 +455,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Comments and Attachments',
-    'weight' => '14',
+    'weight' => '13',
     'children' => array(
       0 => 'field_grievance_comments',
     ),
@@ -516,7 +516,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Company Represenatives',
-    'weight' => '11',
+    'weight' => '10',
     'children' => array(
       0 => 'field_grievance_co_name',
       1 => 'field_grievance_co_email',
@@ -693,7 +693,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Employee',
-    'weight' => '10',
+    'weight' => '9',
     'children' => array(
       0 => 'field_grievance_department',
       1 => 'field_grievance_phone',
@@ -850,7 +850,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Grievance Form',
-    'weight' => '13',
+    'weight' => '12',
     'children' => array(
       0 => 'field_grievance_type',
       1 => 'field_grievance_remedy_other',
@@ -1065,6 +1065,38 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_resproc|node|grievance|default';
+  $field_group->group_name = 'group_grievance_resproc';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Resolution Procedure',
+    'weight' => '39',
+    'children' => array(
+      0 => 'field_grievance_resproc_lh',
+      1 => 'field_grievance_resproc_an',
+      2 => 'field_grievance_resproc_er',
+      3 => 'field_grievance_resproc_ea',
+      4 => 'field_grievance_resproc_ur',
+      5 => 'field_grievance_outcome',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-grievance-resproc field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_grievance_resproc|node|grievance|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_resproc|node|grievance|form';
   $field_group->group_name = 'group_grievance_resproc';
   $field_group->entity_type = 'node';
@@ -1079,10 +1111,12 @@ function grievance_content_types_field_group_info() {
       1 => 'field_grievance_arbitration_b',
       2 => 'field_grievance_arbitration_c',
       3 => 'field_grievance_arbitration_d',
-      4 => 'field_grievance_resproc_atname',
-      5 => 'field_grievance_resproc_lh',
-      6 => 'field_grievance_resproc_an',
-      7 => 'field_grievance_resproc_er',
+      4 => 'field_grievance_resproc_lh',
+      5 => 'field_grievance_resproc_an',
+      6 => 'field_grievance_resproc_er',
+      7 => 'field_grievance_resproc_ea',
+      8 => 'field_grievance_resproc_ur',
+      9 => 'field_grievance_outcome',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1147,7 +1181,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Supervisor',
-    'weight' => '12',
+    'weight' => '11',
     'children' => array(
       0 => 'field_grievance_supervisor_name',
       1 => 'field_grievance_supervisor_title',
@@ -1236,7 +1270,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Timeline',
-    'weight' => '16',
+    'weight' => '15',
     'children' => array(
       0 => 'field_grievance_date_1',
       1 => 'field_grievance_date_2',
@@ -1265,7 +1299,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Union Representatives',
-    'weight' => '9',
+    'weight' => '8',
     'children' => array(
       0 => 'field_grievance_rep_filed',
       1 => 'field_grievance_rep_organizer',

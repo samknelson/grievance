@@ -188,7 +188,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 27,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'inline',
@@ -254,7 +254,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => 1,
         ),
         'type' => 'date_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'inline',
@@ -387,7 +387,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 8,
+        'weight' => 7,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -576,7 +576,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 52,
+      'weight' => 51,
     ),
   );
 
@@ -640,7 +640,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 53,
+      'weight' => 52,
     ),
   );
 
@@ -704,7 +704,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 54,
+      'weight' => 53,
     ),
   );
 
@@ -719,7 +719,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 33,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -1694,7 +1694,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 29,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -1812,7 +1812,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 31,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -1867,7 +1867,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 28,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -2825,7 +2825,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 30,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -2948,6 +2948,64 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textfield',
       'weight' => 29,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance-field_grievance_outcome'.
+  $field_instances['node-grievance-field_grievance_outcome'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 39,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_outcome',
+    'label' => 'Outcome',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 59,
     ),
   );
 
@@ -3530,10 +3588,13 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 38,
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 35,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -3576,22 +3637,25 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 57,
+      'weight' => 55,
     ),
   );
 
-  // Exported field_instance: 'node-grievance-field_grievance_resproc_atname'.
-  $field_instances['node-grievance-field_grievance_resproc_atname'] = array(
+  // Exported field_instance: 'node-grievance-field_grievance_resproc_ea'.
+  $field_instances['node-grievance-field_grievance_resproc_ea'] = array(
     'bundle' => 'grievance',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 36,
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 38,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -3620,8 +3684,8 @@ function grievance_content_types_field_default_field_instances() {
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'field_grievance_resproc_atname',
-    'label' => 'Employer Attorney Name',
+    'field_name' => 'field_grievance_resproc_ea',
+    'label' => 'Employer Attorney',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -3634,7 +3698,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 55,
+      'weight' => 57,
     ),
   );
 
@@ -3646,10 +3710,13 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 39,
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 36,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -3690,7 +3757,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 58,
+      'weight' => 56,
     ),
   );
 
@@ -3702,10 +3769,17 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '(in days)',
     'display' => array(
       'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 37,
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 34,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -3749,7 +3823,68 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 56,
+      'weight' => 54,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance-field_grievance_resproc_ur'.
+  $field_instances['node-grievance-field_grievance_resproc_ur'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 37,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_resproc_ur',
+    'label' => 'Union Representative',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 58,
     ),
   );
 
@@ -4021,7 +4156,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 32,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -8347,7 +8482,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Email');
   t('Employee ID #');
   t('Employer');
-  t('Employer Attorney Name');
+  t('Employer Attorney');
   t('Employer Representative');
   t('Enter the article of the contract that was violated, for example: Article ....');
   t('Enter the company that this shop is associated with.');
@@ -8394,6 +8529,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Notification Body');
   t('Notification Subject');
   t('Organizer');
+  t('Outcome');
   t('Phone');
   t('Possible Classifications');
   t('Possible Departments');
@@ -8423,6 +8559,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Supervisor Unit');
   t('Tags');
   t('Type of Days');
+  t('Union Representative');
   t('Unresolved?');
   t('Upload the current contract document for this shop.  The contract will be used by stewards to identify violations.');
   t('Use this field to indicate that member data in the grievance system has changed from the Union\'s member management system, and that the new data needs to be uploaded back to the member management system.  "Unchanged" means that the data is the same in both places; "Pending" means that corrected data has been entered here and needs to be entered in the member management system.  After the information has been changed, it will be flagged as "Complete".');

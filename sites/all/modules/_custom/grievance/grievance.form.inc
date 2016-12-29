@@ -480,9 +480,26 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form['#groups']['group_grievance_resproc']->format_settings['label'] = $resproc_term->name;
     $form['#groups']['group_grievance_resproc']->format_settings['instance_settings']['description'] = $resproc_term->description;
 
-    if (!preg_match('/arbit/i', $resproc_term->name)) {
-      $form['field_grievance_resproc_an']['#access'] = FALSE;
-    }
+    // * Length of Hearing (full arbitration)
+    // * Arbitrator Name (full & expedited arbitration)
+    // * Employer Representative (adr & mediation)
+    // * Employer Attorney (full & expedited arbitration)
+    // * Union Representative (adr & mediation)
+    // Outcomes (all four) (list)
+
+    // @TODO These should be in admin settings
+    $is_adr = $is_expedited_arbitration = $is_formal_arbitration = $is_mediation = FALSE;
+
+    if (preg_match('/Expedited Arbitration/i', $resproc_term->name)) { $is_expedited_arbitration = TRUE; }
+    if (preg_match('/Arbitration/i', $resproc_term->name) && !$is_expedited_arbitration) { $is_formal_arbitration = TRUE; }
+    if (preg_match('/adr/i', $resproc_term->name)) { $is_adr = TRUE; }
+    if (preg_match('/mediation/i', $resproc_term->name)) { $is_mediation = TRUE; }
+
+    $form['field_grievance_resproc_an']['#access'] = ($is_expedited_arbitration || $is_formal_arbitration);
+    $form['field_grievance_resproc_ea']['#access'] = ($is_expedited_arbitration || $is_formal_arbitration);
+    $form['field_grievance_resproc_lh']['#access'] = $is_formal_arbitration;
+    $form['field_grievance_resproc_er']['#access'] = ($is_adr || $is_mediation);
+    $form['field_grievance_resproc_ur']['#access'] = ($is_adr || $is_mediation);
 
   } else {
     foreach ( $form['#groups']['group_grievance_resproc']->children as $field_name) {
