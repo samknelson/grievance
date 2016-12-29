@@ -89,10 +89,7 @@ function grievance_content_types_field_group_info() {
     'label' => 'Employee Contact',
     'weight' => '2',
     'children' => array(
-      0 => 'field_grievance_class_tid',
-      1 => 'field_grievance_department_tid',
-      2 => 'grievance_address_combined',
-      3 => 'grievant_name',
+      0 => 'grievant_name',
     ),
     'format_type' => 'div',
     'format_settings' => array(

@@ -928,11 +928,8 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_form_226' => array(
         'label' => 'inline',
-        'module' => 'taxonomy',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'taxonomy_term_reference_plain',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 4,
       ),
       'grievance_gform' => array(
@@ -2474,11 +2471,8 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_form_226' => array(
         'label' => 'inline',
-        'module' => 'taxonomy',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'taxonomy_term_reference_plain',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 6,
       ),
       'grievance_gform' => array(
@@ -4924,7 +4918,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_type',
-    'label' => 'Statement of Grievance',
+    'label' => 'Grievance Complaint',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -5000,7 +4994,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_type_other',
-    'label' => 'Statement of Grievance (Other)',
+    'label' => 'Grievance Complaint (Other)',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -8948,6 +8942,8 @@ function grievance_content_types_field_default_field_instances() {
   t('General Grievance?');
   t('Grievance');
   t('Grievance Admin');
+  t('Grievance Complaint');
+  t('Grievance Complaint (Other)');
   t('Grievance Document Type');
   t('Grievance Log Type');
   t('Holidays');
@@ -8996,8 +8992,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Shops');
   t('Show on Timeline?');
   t('State or Province');
-  t('Statement of Grievance');
-  t('Statement of Grievance (Other)');
   t('Status');
   t('Status Change Date');
   t('Statuses');
