@@ -463,10 +463,12 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $fields_to_hide[] = 'field_grievance_timss_search';
     $fields_to_hide[] = 'field_grievance_timss_search_result';
   } else {
-    $fields_to_hide[] = 'field_grievance_broughtby';
+    // $fields_to_hide[] = 'field_grievance_broughtby';
   }
-  foreach ($fields_to_hide as $field_name) {
-    $form[$field_name]['#access'] = FALSE;
+  if ($fields_to_hide) {
+    foreach ($fields_to_hide as $field_name) {
+      $form[$field_name]['#access'] = FALSE;
+    }
   }
 
   //

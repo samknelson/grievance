@@ -118,3 +118,25 @@ function grievance_gform_admin() {
 
   return system_settings_form($form);
 }
+
+/**
+ * Implements hook_node_view
+ *
+ * @todo: should be in the .module file, calling a sub-function just for grievance-type nodes.
+ */
+
+function  grievance_node_view($node, $view_mode, $langcode) {
+	if ($node->type == 'grievance') {
+		if ($node->content['field_grievance_clauseref']['#items']) {
+			$delta = 0;
+			foreach ($node->content['field_grievance_clauseref']['#items'] as $item) {
+				$clause_node = $item['entity'];
+				// $article_nid = $clause_node->field_grievance_contract_section['und'][0]['target_id'];
+				// $article_node = node_load($article_nid);
+				$title = $clause_node->field_grievance_label['und'][0]['value'] . ': ' . $clause_node->title;
+				$node->content['field_grievance_clauseref'][$delta]['#markup'] = $title;
+				++$delta;
+			}
+		}
+	}
+}
