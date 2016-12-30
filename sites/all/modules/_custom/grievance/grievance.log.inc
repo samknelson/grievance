@@ -239,11 +239,15 @@ function grievance_node_tab_timeline($grievance_node) {
   $status_tids = array();
   $alert_tids = array();
   foreach ($rule_nodes as $rule_node) {
-    foreach ($rule_node->field_grievance_from_status['und'] as $tmp) {
-      $status_tids[] = $tmp['tid'];
+    if ($rule_node->field_grievance_from_status['und']) {
+      foreach ($rule_node->field_grievance_from_status['und'] as $tmp) {
+        $status_tids[] = $tmp['tid'];
+      }
     }
-    foreach ($rule_node->field_grievance_next_status['und'] as $tmp) {
-      $status_tids[] = $tmp['tid'];
+    if ($rule_node->field_grievance_next_status['und']) {
+      foreach ($rule_node->field_grievance_next_status['und'] as $tmp) {
+        $status_tids[] = $tmp['tid'];
+      }
     }
     $alert_tids[] = $rule_node->field_grievance_alert_tid['und'][0]['tid'];
   }
@@ -283,26 +287,42 @@ function grievance_node_tab_timeline($grievance_node) {
   $attributes = array('class' => array('grievance-timeline'));;
   $rows = array();
   foreach ($rule_nodes as $rule_node) {
-    $status_tid = $rule_node->field_grievance_from_status['und'][0]['tid'];
-    $status_term = $status_terms[$status_tid];
+    $from_status_tids = array();
+    $from_status_terms = array();
+    if ($rule_node->field_grievance_from_status['und']) {
+      foreach ($rule_node->field_grievance_from_status['und'] as $tmp) {
+        $from_status_tids[] = $tmp['tid'];
+        $from_status_terms[] = $status_terms[$tmp['tid']];
+      }
+    }
 
-    $next_status_tid = $rule_node->field_grievance_next_status['und'][0]['tid'];
-    $next_status_term = $status_terms[$next_status_tid];
+    $next_status_tids = array();
+    $next_status_terms = array();
+    if ($rule_node->field_grievance_next_status['und']) {
+      foreach ($rule_node->field_grievance_next_status['und'] as $tmp) {
+        $next_status_tids[] = $tmp['tid'];
+        $next_status_terms[] = $status_terms[$tmp['tid']];
+      }
+    }
 
     $alert_tid = $rule_node->field_grievance_alert_tid['und'][0]['tid'];
     $alert_term = $alert_terms[$alert_tid];
 
     $date_entered = '';
+    $date_left = '';
     $deadline = '';
-    if ($dates_entered[$status_tid]) {
-      $date_entered = date('m/d/Y', $dates_entered[$status_tid]);
-      $deadline = date('m/d/Y', strtotime(grievance_contract_next_deadline($contract_tplt_nid, $status_tid, $dates_entered[$status_tid])));
+
+    foreach ($from_status_tids as $from_status_tid) {
+      // @TODO need the earliest here.
+      if ($dates_entered[$from_status_tid]) {
+        $date_entered = date('m/d/Y', $dates_entered[$from_status_tid]);
+        $deadline = date('m/d/Y', strtotime(grievance_contract_next_deadline($contract_tplt_nid, $from_status_tid, $dates_entered[$from_status_tid])));
+      }
+      if ($dates_left[$status_tid]) {
+        $date_left = date('m/d/Y', $dates_left[$status_tid]);
+      }
     }
 
-    $date_left = '';
-    if ($dates_left[$status_tid]) {
-      $date_left = date('m/d/Y', $dates_left[$status_tid]);
-    }
 
     $state = '';
     $state_class = '';
@@ -325,10 +345,22 @@ function grievance_node_tab_timeline($grievance_node) {
 
     $data = array();
 
-    $data[] = $status_term->name;
+    $from_status_display = '';
+    foreach ($from_status_terms as $from_status_term) {
+      if ($from_status_display) { $from_status_display .= ', '; }
+      $from_status_display .= $from_status_term->name;
+    }
+
+    $next_status_display = '';
+    foreach ($next_status_terms as $next_status_term) {
+      if ($next_status_display) { $next_status_display .= ', '; }
+      $next_status_display .= $next_status_term->name;
+    }
+
+    $data[] = $from_status_display;
     $data[] = $alert_term->field_grievance_actor['und'][0]['value'];
     $data[] = $alert_term->name;
-    $data[] = $next_status_term->name;
+    $data[] = $next_status_display;
     $data[] = $date_entered;
     $data[] = $deadline;
     $data[] = $date_left;
