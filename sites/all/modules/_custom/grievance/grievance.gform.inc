@@ -86,10 +86,21 @@ function grievance_gform_pdf_contents($node) {
 	file_put_contents($html_path, $html);
 
 	// Execute wkhtmltopdf
+
+	$wkhtmltopdfargs .= token_replace(
+		variable_get('grievance_gform_wkhtmltopdfargs', ''),
+		array('node' => $node), 
+		array()
+	);
+
+
 	$pdf_path = DRUPAL_ROOT . '/sites/default/files/private/grievance_gform/node_' . $node->nid . '.pdf';
 	$cmd = '/usr/bin/xvfb-run -a ';
 	$cmd .= '--server-args="-screen 0 1024x768x24" ';
 	$cmd .= '/usr/local/bin/wkhtmltopdf ';
+	if ($wkhtmltopdfargs) {
+		$cmd .= $wkhtmltopdfargs . ' ';
+	}
 	$cmd .= '-q ';
 	$cmd .= $url;
 	$cmd .= ' ';
@@ -114,6 +125,13 @@ function grievance_gform_admin() {
 		'#default_value' => variable_get('grievance_gform_footer', ''),
     '#title' => t('Grievance Form Footer'),
     '#description' => t('This will appear at the bottom of the grievance form.  May contain HTML.'),
+    '#type' => 'textarea',
+  );
+
+  $form['grievance_gform_wkhtmltopdfargs'] = array(
+		'#default_value' => variable_get('grievance_gform_wkhtmltopdfargs', ''),
+    '#title' => t('WKHTMLTOPDF Additional Args'),
+    '#description' => t('Additional arguments to pass to wkhtmltopdf.  May contain tokens.'),
     '#type' => 'textarea',
   );
 
