@@ -22,7 +22,6 @@ function grievaince_id_algorithms() {
 }
 
 function grievance_id_set($node, $op) {
-
 	// Assign an ID if one hasn't been set already.
 	if ($node->type != 'grievance') { return; }
 	if ($op != 'update' && $op != 'insert') { return; }
@@ -62,7 +61,7 @@ function grievance_id_algorithm_year4($node) {
 	$stmt = db_query($sql, array());
 	$hr = $stmt->fetchAssoc();
 	$last_id = $hr['m'];
-	list ($ignore, $number) = explode('-', $last_id);
+	$number = substr($last_id, 4);
 	$number++;
 	while (strlen($number) < 4) { $number = "0$number"; }
 	$id = "$year$number";
