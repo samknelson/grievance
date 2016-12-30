@@ -55,7 +55,8 @@ function grievance_content_types_field_group_info() {
     'children' => array(
       0 => 'field_grievance_shop',
       1 => 'field_grievance_co_name',
-      2 => 'grievance_company_rep_ad_combine',
+      2 => 'field_grievance_co_role',
+      3 => 'grievance_company_rep_ad_combine',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -627,6 +628,7 @@ function grievance_content_types_field_group_info() {
       5 => 'field_grievance_co_city',
       6 => 'field_grievance_co_state',
       7 => 'field_grievance_co_zip',
+      8 => 'field_grievance_co_role',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -662,6 +664,7 @@ function grievance_content_types_field_group_info() {
       6 => 'field_grievance_co_state',
       7 => 'field_grievance_co_zip',
       8 => 'field_grievance_contact_selector',
+      9 => 'field_grievance_co_role',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1509,8 +1512,7 @@ function grievance_content_types_field_group_info() {
       5 => 'group_grievance_company',
       6 => 'group_grievance_status',
       7 => 'group_inforeq',
-      8 => 'group_grievance_classaction',
-      9 => 'group_grievance_resproc',
+      8 => 'group_grievance_resproc',
     ),
     'format_type' => 'accordion',
     'format_settings' => array(

@@ -21,6 +21,9 @@
 				val = elt.find('.field-name-field-grievance-co-name .field-item').html();
 				$('.form-item-field-grievance-co-name-und-0-value input').val(val);
 
+				val = elt.find('.field-name-field-grievance-co-role .field-item').html();
+				$('.form-item-field-grievance-co-role-und-0-value input').val(val);
+
 				val = elt.find('.field-name-field-grievance-co-email .field-item').html();
 				$('.form-item-field-grievance-co-email-und-0-email input').val(val);
 

@@ -234,6 +234,7 @@ features[field_instance][] = node-grievance-field_grievance_co_city
 features[field_instance][] = node-grievance-field_grievance_co_email
 features[field_instance][] = node-grievance-field_grievance_co_name
 features[field_instance][] = node-grievance-field_grievance_co_phone
+features[field_instance][] = node-grievance-field_grievance_co_role
 features[field_instance][] = node-grievance-field_grievance_co_state
 features[field_instance][] = node-grievance-field_grievance_co_zip
 features[field_instance][] = node-grievance-field_grievance_comments
