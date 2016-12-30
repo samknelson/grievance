@@ -169,7 +169,7 @@ function  grievance_node_view($node, $view_mode, $langcode) {
 
 		// "Organizer" should show the phone number as well as the name
 		if ($view_mode == 'grievance_form_226') {
-			$organizer_uid = $node->content['field_grievance_rep_organizer']['#object']->uid;
+			$organizer_uid = $node->field_grievance_rep_organizer['und'][0]['target_id'];
 			if ($organizer_uid) {
 				$organizer_user = user_load($organizer_uid);
 				if ($organizer_user) {
