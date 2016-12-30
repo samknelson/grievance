@@ -30,7 +30,11 @@ function grievance_node_tab_gform($node, $is_loopback = FALSE) {
 	$result .= "<div class=\"grievance_form_wrapper grievance_form_wrapper_$display_mode\">";
 
 	$result .= "<div class=\"grievance_form_header grievance_form_header_$display_mode\">";
-	$result .= variable_get('grievance_gform_header', '');
+	$result .= token_replace(
+		variable_get('grievance_gform_header', ''),
+		array('node' => $node), 
+		array()
+	);
 	$result .= "</div>";
 
 	$result .= "<div class=\"grievance_form_body grievance_form_body_$display_mode\">";
