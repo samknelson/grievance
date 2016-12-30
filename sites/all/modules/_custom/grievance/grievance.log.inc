@@ -239,8 +239,12 @@ function grievance_node_tab_timeline($grievance_node) {
   $status_tids = array();
   $alert_tids = array();
   foreach ($rule_nodes as $rule_node) {
-    $status_tids[] = $rule_node->field_grievance_status['und'][0]['tid'];
-    $status_tids[] = $rule_node->field_grievance_next_status['und'][0]['tid'];
+    foreach ($rule_node->field_grievance_from_status['und'] as $tmp) {
+      $status_tids[] = $tmp['tid'];
+    }
+    foreach ($rule_node->field_grievance_next_status['und'] as $tmp) {
+      $status_tids[] = $tmp['tid'];
+    }
     $alert_tids[] = $rule_node->field_grievance_alert_tid['und'][0]['tid'];
   }
   $status_terms = taxonomy_term_load_multiple($status_tids);
@@ -279,7 +283,7 @@ function grievance_node_tab_timeline($grievance_node) {
   $attributes = array('class' => array('grievance-timeline'));;
   $rows = array();
   foreach ($rule_nodes as $rule_node) {
-    $status_tid = $rule_node->field_grievance_status['und'][0]['tid'];
+    $status_tid = $rule_node->field_grievance_from_status['und'][0]['tid'];
     $status_term = $status_terms[$status_tid];
 
     $next_status_tid = $rule_node->field_grievance_next_status['und'][0]['tid'];

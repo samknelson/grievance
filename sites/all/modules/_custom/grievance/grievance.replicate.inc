@@ -32,14 +32,19 @@ function grievance_replicate_form_submit($form, &$form_state) {
 
 	drupal_set_message(t('Duplicating: @title', array('@title' => $node->title)));
 
-	$query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $node->nid);
-  $query->entityCondition('bundle', array('grievance_contract_section', 'grievance_contract_clause', 'grievance_contract_rule'), 'IN');
-  $stmt = $query->execute();
+  // Iterate over the bundles, because we want to do all the sections first (so the clauses will know which section they're in)
   $child_nids = array();
-  if ($stmt['node']) {
-    $child_nids = array_keys($stmt['node']);
+  foreach (array('grievance_contract_section', 'grievance_contract_clause', 'grievance_contract_rule') as $bundle) {
+  	$query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node');
+    $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $node->nid);
+    $query->entityCondition('bundle', $bundle);
+    $stmt = $query->execute();
+    if ($stmt['node']) {
+      foreach (array_keys($stmt['node']) as $child_nid) {
+        $child_nids[] = $child_nid;
+      }
+    }
   }
 
 	// Init
@@ -78,7 +83,18 @@ function grievance_replicate_batch($child_nid, &$context) {
   $replica_nid = replicate_entity('node', $child_node);
   $replica_node = node_load($replica_nid);
   $replica_node->field_grievance_contract_tplt['und'][0]['target_id'] = $context['results']['to_nid'];
+  if ($replica_node->type == 'grievance_contract_clause') {
+    $replica_node->field_grievance_contract_section['und'][0]['target_id'] = 
+      $context['results']['section_map'][$replica_node->field_grievance_contract_section['und'][0]['target_id']];
+  }
   node_save($replica_node);
+
+  if ($replica_node->type == 'grievance_contract_section') {
+    if (!$context['results']['section_map']) {
+      $context['results']['section_map'] = array();
+    }
+    $context['results']['section_map'][$child_node->nid] = $replica_node->nid;
+  }
 
   $context['message'] = t('Replicated: @title', array('@title' => $child_node->title));
 }

@@ -110,7 +110,7 @@ function grievance_contract_find_rule($contract_tplt_nid, $status_tid) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_contract_rule');
   $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_tplt_nid);
-  $query->fieldCondition('field_grievance_status', 'tid', $status_tid);
+  $query->fieldCondition('field_grievance_from_status', 'tid', $status_tid);
   $stmt = $query->execute();
   $rule_nids = $rule_nodes = array();
   if ($stmt['node']) {
