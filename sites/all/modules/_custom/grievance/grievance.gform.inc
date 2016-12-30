@@ -43,7 +43,11 @@ function grievance_node_tab_gform($node, $is_loopback = FALSE) {
 	$result .= "</div>";
 
 	$result .= "<div class=\"grievance_form_footer grievance_form_footer_$display_mode\">";
-	$result .= variable_get('grievance_gform_footer', '');
+	$result .= token_replace(
+		variable_get('grievance_gform_footer', ''),
+		array('node' => $node), 
+		array()
+	);
 	$result .= "</div>";
 
 	$result .= "</div>";
@@ -145,6 +149,7 @@ function  grievance_node_view($node, $view_mode, $langcode) {
 			}
 		}
 
+		/*
 		// "Organizer" should show the phone number as well as the name
 		if ($view_mode == 'grievance_form_226') {
 			$organizer_uid = $node->content['field_grievance_rep_organizer']['#object']->uid;
@@ -157,5 +162,6 @@ function  grievance_node_view($node, $view_mode, $langcode) {
 				$node->content['field_grievance_rep_organizer'][0]['#markup'] .= '<br>' . $organizer_user->mail;
 			}
 		}
+		*/
 	}
 }
