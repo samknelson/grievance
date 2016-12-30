@@ -631,24 +631,6 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'grievance_contract_clause' => 'grievance_contract_clause',
   );
-  /* Filter criterion: Content: Full Clause (field_grievance_clause) */
-  $handler->display->display_options['filters']['field_grievance_clause_value']['id'] = 'field_grievance_clause_value';
-  $handler->display->display_options['filters']['field_grievance_clause_value']['table'] = 'field_data_field_grievance_clause';
-  $handler->display->display_options['filters']['field_grievance_clause_value']['field'] = 'field_grievance_clause_value';
-  $handler->display->display_options['filters']['field_grievance_clause_value']['operator'] = 'contains';
-  $handler->display->display_options['filters']['field_grievance_clause_value']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_grievance_clause_value']['expose']['operator_id'] = 'field_grievance_clause_value_op';
-  $handler->display->display_options['filters']['field_grievance_clause_value']['expose']['label'] = 'Text Search';
-  $handler->display->display_options['filters']['field_grievance_clause_value']['expose']['operator'] = 'field_grievance_clause_value_op';
-  $handler->display->display_options['filters']['field_grievance_clause_value']['expose']['identifier'] = 'field_grievance_clause_value';
-  $handler->display->display_options['filters']['field_grievance_clause_value']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    5 => 0,
-    6 => 0,
-    4 => 0,
-  );
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block');
@@ -918,7 +900,6 @@ function grievance_views_views_default_views() {
     t('Recommended Remedy'),
     t('Edit'),
     t('All'),
-    t('Text Search'),
     t('Block'),
     t('Entity Reference'),
     t('by template and section'),
