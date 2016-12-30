@@ -593,6 +593,11 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['sorts']['weight_1']['relationship'] = 'field_grievance_contract_section_target_id';
   $handler->display->display_options['sorts']['weight_1']['draggableviews_setting_view'] = 'grievance_contract_clauses:block';
   $handler->display->display_options['sorts']['weight_1']['draggableviews_setting_new_items_bottom_list'] = 1;
+  /* Sort criterion: Content: Article Number (field_grievance_section_number) */
+  $handler->display->display_options['sorts']['field_grievance_section_number_value']['id'] = 'field_grievance_section_number_value';
+  $handler->display->display_options['sorts']['field_grievance_section_number_value']['table'] = 'field_data_field_grievance_section_number';
+  $handler->display->display_options['sorts']['field_grievance_section_number_value']['field'] = 'field_grievance_section_number_value';
+  $handler->display->display_options['sorts']['field_grievance_section_number_value']['relationship'] = 'field_grievance_contract_section_target_id';
   /* Sort criterion: Draggableviews: Weight */
   $handler->display->display_options['sorts']['weight']['id'] = 'weight';
   $handler->display->display_options['sorts']['weight']['table'] = 'draggableviews_structure';
@@ -603,11 +608,6 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['sorts']['field_grievance_label_value']['id'] = 'field_grievance_label_value';
   $handler->display->display_options['sorts']['field_grievance_label_value']['table'] = 'field_data_field_grievance_label';
   $handler->display->display_options['sorts']['field_grievance_label_value']['field'] = 'field_grievance_label_value';
-  /* Sort criterion: Content: Article Number (field_grievance_section_number) */
-  $handler->display->display_options['sorts']['field_grievance_section_number_value']['id'] = 'field_grievance_section_number_value';
-  $handler->display->display_options['sorts']['field_grievance_section_number_value']['table'] = 'field_data_field_grievance_section_number';
-  $handler->display->display_options['sorts']['field_grievance_section_number_value']['field'] = 'field_grievance_section_number_value';
-  $handler->display->display_options['sorts']['field_grievance_section_number_value']['relationship'] = 'field_grievance_contract_section_target_id';
   /* Contextual filter: Content: Contract Template (field_grievance_contract_tplt) */
   $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['id'] = 'field_grievance_contract_tplt_target_id';
   $handler->display->display_options['arguments']['field_grievance_contract_tplt_target_id']['table'] = 'field_data_field_grievance_contract_tplt';
