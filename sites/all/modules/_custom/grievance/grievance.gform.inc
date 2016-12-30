@@ -130,7 +130,6 @@ function grievance_gform_pdf_contents($node) {
 	$cmd .= $url;
 	$cmd .= ' ';
 	$cmd .= $pdf_path;
-	dpm($cmd);
 	exec($cmd);
 
 	return file_get_contents($pdf_path);
