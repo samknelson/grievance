@@ -62,17 +62,44 @@ function grievance_node_tab_gform($node, $is_loopback = FALSE) {
 }
 
 function grievance_node_tab_gform_pdf($node) {
+	$basename = grievance_gform_pdf_basename($node);
 	// Spool the PDF
 	header('Content-Type: application/pdf');
-	header("Content-Disposition: attachment; filename=grievance_" . $node->nid . ".pdf");
+	header("Content-Disposition: attachment; filename=$basename.pdf");
 
 	print grievance_gform_pdf_contents($node);
 	drupal_exit();
 }
 
+function grievance_gform_pdf_basename($node) {
+	$basename = '';
+
+	if ($node->field_grievance_last_name['und'][0]['value']) {
+		$tmp = strtolower($node->field_grievance_last_name['und'][0]['value']);
+		$tmp = preg_replace('/[^a-z]/', '', $tmp);
+		if ($tmp) { $basename .= $tmp . '_'; }
+	}
+	if ($node->field_grievance_first_name['und'][0]['value']) {
+		$tmp = strtolower($node->field_grievance_first_name['und'][0]['value']);
+		$tmp = preg_replace('/[^a-z]/', '', $tmp);
+		if ($tmp) { $basename .= $tmp . '_'; }
+	}
+	if ($node->field_grievance_id['und'][0]['value']) {
+		$tmp = strtolower($node->field_grievance_id['und'][0]['value']);
+		$tmp = preg_replace('/[^a-z0-9]/', '', $tmp);
+		if ($tmp) { $basename .= $tmp; }
+	}
+	if (!$basename) { $basename = $node->nid; }
+
+	return $basename;
+}
+
 function grievance_gform_pdf_contents($node) {
+	$basename = grievance_gform_pdf_basename($node);
+
 	// Loopback to generate the HTML.
-	$html_path = DRUPAL_ROOT . '/sites/default/files/private/grievance_gform/node_' . $node->nid . '.html';
+	$html_path = DRUPAL_ROOT . '/sites/default/files/private/grievance_gform/' . $basename . '.html';
+	$pdf_path = DRUPAL_ROOT . '/sites/default/files/private/grievance_gform/' . $basename . '.pdf';
 
 	global $is_https;
 	if ($is_https ||
@@ -93,8 +120,6 @@ function grievance_gform_pdf_contents($node) {
 		array()
 	);
 
-
-	$pdf_path = DRUPAL_ROOT . '/sites/default/files/private/grievance_gform/node_' . $node->nid . '.pdf';
 	$cmd = '/usr/bin/xvfb-run -a ';
 	$cmd .= '--server-args="-screen 0 1024x768x24" ';
 	$cmd .= '/usr/local/bin/wkhtmltopdf ';
@@ -105,6 +130,7 @@ function grievance_gform_pdf_contents($node) {
 	$cmd .= $url;
 	$cmd .= ' ';
 	$cmd .= $pdf_path;
+	dpm($cmd);
 	exec($cmd);
 
 	return file_get_contents($pdf_path);
