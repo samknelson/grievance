@@ -675,7 +675,7 @@ function grievance_content_types_field_default_field_bases() {
   // Exported field_base: 'field_grievance_clauseref'.
   $field_bases['field_grievance_clauseref'] = array(
     'active' => 1,
-    'cardinality' => -1,
+    'cardinality' => 8,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_clauseref',
