@@ -48,6 +48,14 @@ function grievance_admin() {
     '#description' => t("Grievance log type to be used for notification to the member."),
   );
 
+  $form['grievance_log']['grievance_log_assignment_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Grievance Log Assignment Type'),
+    '#default_value' => variable_get('grievance_log_assignment_type', ''),
+    '#description' => t("Grievance log type to be used for assignment to a staff member."),
+  );
+
   $form['member_forward'] = array(
     '#type' => 'fieldset',
     '#title' => t('Member Notification'),

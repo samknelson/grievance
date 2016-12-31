@@ -134,14 +134,14 @@ function grievance_node_tabs() {
 	);
 
 	$node_tabs['grievance_contract_template']['clauses'] = array(
-		'title' => 'Clauses',
+		'title' => 'Sections',
 		'description' => '',
 		'callback' => 'grievance_contract_template_node_tab_clauses',
 		'permissions' => array('grievance contract'),
 	);
 
 	$node_tabs['grievance_contract_section']['clauses'] = array(
-		'title' => 'Clauses',
+		'title' => 'Sections',
 		'description' => '',
 		'callback' => 'grievance_contract_section_node_tab_clauses',
 		'permissions' => array('grievance contract'),

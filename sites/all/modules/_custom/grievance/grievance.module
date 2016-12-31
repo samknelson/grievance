@@ -36,30 +36,22 @@ function grievance_cron() {
   grievance_alert_all();
 }
 
-/*
 function grievance_node_update($node) {
   if ($node->type == 'grievance') {
-    grievance_status_update_date_set($node);
+    if ($node->field_grievance_rep_assignee['und'][0]['target_id'] != $node->original->field_grievance_rep_assignee['und'][0]['target_id']) {
+      $node->grievance_assignment_changed = TRUE;
+    }
+    if ($node->field_grievance_assignee_notes['und'][0]['value'] != $node->original->field_grievance_assignee_notes['und'][0]['value']) {
+      $node->grievance_assignment_changed = TRUE;
+    }
   }
 }
 
 function grievance_node_insert($node) {
   if ($node->type == 'grievance') {
-    grievance_status_update_date_set($node);
+    $node->grievance_assignment_changed = TRUE;
  }
 }
-
-function grievance_status_update_date_set($node) {
-  if ($node->field_grievance_status_date['und'][0]['value']) { return; }
-
-  if ($node->field_grievance_status['und'][0]['tid'] == variable_get('grievance_log_incident_status', '') &&
-    $node->field_grievance_date_1['und'][0]['value']) {
-    $node->field_grievance_status_date = $node->field_grievance_date_1;
-  } else {
-    $node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d');
-  }
-}
-*/
 
 function grievance_node_postsave($node, $op) {
   if ($node->type == 'grievance') {
@@ -307,4 +299,22 @@ function grievance_report_cache_info() {
     'batch_callback' => 'grievance_report_average_time_batch',
   );
   return $items;
+}
+
+/***
+ * Implements hook_views_pre_render() 
+ */
+
+function grievance_views_pre_render(&$view) {
+
+  // Highlight my assignments in the main grievances view
+  if ($view->name == 'grievances' && $view->current_display == 'page_1') {
+    global $user; 
+    if (!$user || !$user->uid) { return; }
+    foreach ($view->result as &$row) {
+      if ($row->field_field_grievance_rep_assignee[0]['raw']['target_id'] == $user->uid) {
+        $row->field_field_grievance_rep_assignee[0]['rendered']['#markup'] = '<strong>' . $row->field_field_grievance_rep_assignee[0]['rendered']['#markup'] . '</strong>';
+      }
+    }
+  }
 }

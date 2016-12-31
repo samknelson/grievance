@@ -71,6 +71,32 @@ function grievance_log_update($grievance_node, $op) {
 
   $log_node = node_submit($log_node); // Prepare node for saving
   node_save($log_node);
+
+  if ($grievance_node->grievance_assignment_changed) {
+    $log_node = new stdClass();
+    $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+    $assignee_uid = $grievance_node->field_grievance_rep_assignee['und'][0]['target_id'];
+    if ($assignee_uid) {
+      $assignee_user = user_load($assignee_uid);
+      $title = t('Grievance assigned to: ') . $assignee_user->name;
+    } else {
+      $title = t('Grievance Unassigned');
+    }
+    $log_node->title = $title;
+    $log_node->type = 'grievance_log';
+    node_object_prepare($log_node);
+    $log_node->language = LANGUAGE_NONE;
+    $log_node->uid = $user->uid; 
+    $log_node->status = 1;
+    $log_node->promote = 0;
+    $log_node->comment = 0;
+    $log_node->body['und'][0]['value'] = $grievance_node->field_grievance_assignee_notes['und'][0]['value'];
+    $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_assignment_type', '');
+    $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d');
+
+    $log_node = node_submit($log_node); // Prepare node for saving
+    node_save($log_node);
+  }
 }
 
 function grievance_log_notify_check($grievance_node) {

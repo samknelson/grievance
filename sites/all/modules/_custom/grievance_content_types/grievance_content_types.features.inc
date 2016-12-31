@@ -62,7 +62,7 @@ function grievance_content_types_node_info() {
       'help' => '',
     ),
     'grievance_contract_clause' => array(
-      'name' => t('Grievance Contract Clause'),
+      'name' => t('Grievance Contract Section'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',

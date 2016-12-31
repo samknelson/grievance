@@ -206,6 +206,34 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_assignment|node|grievance|form';
+  $field_group->group_name = 'group_grievance_assignment';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_grievance';
+  $field_group->data = array(
+    'label' => 'Assignment',
+    'weight' => '10',
+    'children' => array(
+      0 => 'field_grievance_rep_assignee',
+      1 => 'field_grievance_assignee_notes',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-grievance-assignment field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_grievance_assignment|node|grievance|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_a|node|grievance|grievance_arbitrationform';
   $field_group->group_name = 'group_grievance_a';
   $field_group->entity_type = 'node';
@@ -584,7 +612,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Comments',
-    'weight' => '9',
+    'weight' => '8',
     'children' => array(
       0 => 'field_grievance_comments',
     ),
@@ -988,7 +1016,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Grievance Form',
-    'weight' => '7',
+    'weight' => '6',
     'children' => array(
       0 => 'field_grievance_type',
       1 => 'field_grievance_date_1',
@@ -1210,7 +1238,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Resolution Procedure',
-    'weight' => '11',
+    'weight' => '9',
     'children' => array(
       0 => 'field_grievance_arbitration_a',
       1 => 'field_grievance_arbitration_b',
@@ -1513,6 +1541,7 @@ function grievance_content_types_field_group_info() {
       6 => 'group_grievance_status',
       7 => 'group_inforeq',
       8 => 'group_grievance_resproc',
+      9 => 'group_grievance_assignment',
     ),
     'format_type' => 'accordion',
     'format_settings' => array(
@@ -1536,7 +1565,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Information Request',
-    'weight' => '8',
+    'weight' => '7',
     'children' => array(
       0 => 'field_grievance_inforeq',
       1 => 'field_grievance_document_types',
@@ -1602,6 +1631,7 @@ function grievance_content_types_field_group_info() {
   t('Address');
   t('Arbitration');
   t('Arbitration Comments');
+  t('Assignment');
   t('Attachments');
   t('Comments');
   t('Comments and Attachments');

@@ -768,6 +768,73 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-grievance-field_grievance_assignee_notes'.
+  $field_instances['node-grievance-field_grievance_assignee_notes'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 54,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_form_226' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_assignee_notes',
+    'label' => 'Assignee Notes',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 62,
+    ),
+  );
+
   // Exported field_instance: 'node-grievance-field_grievance_broughtby'.
   $field_instances['node-grievance-field_grievance_broughtby'] = array(
     'bundle' => 'grievance',
@@ -927,7 +994,7 @@ function grievance_content_types_field_default_field_instances() {
         'weight' => 0,
       ),
       'grievance_form_226' => array(
-        'label' => 'inline',
+        'label' => 'hidden',
         'module' => 'taxonomy',
         'settings' => array(
           'field_delimiter' => '',
@@ -2175,7 +2242,7 @@ function grievance_content_types_field_default_field_instances() {
   $field_instances['node-grievance-field_grievance_date_1'] = array(
     'bundle' => 'grievance',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action (if unknown, choose "Investigation").',
     'display' => array(
       'default' => array(
         'label' => 'inline',
@@ -2292,7 +2359,7 @@ function grievance_content_types_field_default_field_instances() {
   $field_instances['node-grievance-field_grievance_date_2'] = array(
     'bundle' => 'grievance',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'The date the employee received discipline.',
     'display' => array(
       'default' => array(
         'label' => 'inline',
@@ -3606,7 +3673,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_remedy_other',
-    'label' => 'Remedy (Other)',
+    'label' => 'Additional Remedy',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -3620,6 +3687,75 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textarea',
       'weight' => 18,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance-field_grievance_rep_assignee'.
+  $field_instances['node-grievance-field_grievance_rep_assignee'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 53,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_form_226' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_rep_assignee',
+    'label' => 'Assignee',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 61,
     ),
   );
 
@@ -5072,7 +5208,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_type_other',
-    'label' => 'Grievance Complaint (Other)',
+    'label' => 'Additional Grievance Complaint',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -5693,7 +5829,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_clause',
-    'label' => 'Full Clause',
+    'label' => 'Full Text',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -5817,7 +5953,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_label',
-    'label' => 'Clause Number',
+    'label' => 'Section Number',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -8977,6 +9113,8 @@ function grievance_content_types_field_default_field_instances() {
   t('(in days)');
   t('A grievance at this status should have available fields for the specified resolution procedure.');
   t('Actor');
+  t('Additional Grievance Complaint');
+  t('Additional Remedy');
   t('Address');
   t('Address 2');
   t('Alert Data');
@@ -8985,6 +9123,8 @@ function grievance_content_types_field_default_field_instances() {
   t('Arbitrator Name');
   t('Article');
   t('Article Number');
+  t('Assignee');
+  t('Assignee Notes');
   t('Attachment');
   t('Attachment Type');
   t('Attachments');
@@ -8998,7 +9138,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Check Number');
   t('City');
   t('Classification');
-  t('Clause Number');
   t('Comments');
   t('Company');
   t('Company Rep Address');
@@ -9046,13 +9185,13 @@ function grievance_content_types_field_default_field_instances() {
   t('Field name to override, e.g. "field_grievance_organizer"');
   t('Filed By');
   t('First Name');
+  t('For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action (if unknown, choose "Investigation").');
   t('From Status');
-  t('Full Clause');
+  t('Full Text');
   t('General Grievance?');
   t('Grievance');
   t('Grievance Admin');
   t('Grievance Complaint');
-  t('Grievance Complaint (Other)');
   t('Grievance Document Type');
   t('Grievance Log Type');
   t('Holidays');
@@ -9090,10 +9229,10 @@ function grievance_content_types_field_default_field_instances() {
   t('Recommended Remedy');
   t('Recommended Statement of Grievance');
   t('Remedy');
-  t('Remedy (Other)');
   t('Resolution Procedure');
   t('Role');
   t('Roles');
+  t('Section Number');
   t('Select "Yes" if this document type should appear as an "Information Request" option.');
   t('Select a Contact');
   t('Select the date that the status changed.  For example, if the status is "Step 1 Meeting", enter the date that the meeting occurred.  If no date is entered, today\'s date will be used.');
@@ -9110,6 +9249,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Supervisor Title');
   t('Supervisor Unit');
   t('Tags');
+  t('The date the employee received discipline.');
   t('Type of Days');
   t('Union Representative');
   t('Unresolved?');
