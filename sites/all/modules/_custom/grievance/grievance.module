@@ -217,6 +217,18 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     if (!user_access('grievance form rep watching')) {
       $form['field_grievance_rep_watching']['#access'] = FALSE;
     }
+    if (!user_access('grievance form company contacts')) {
+      $form['field_grievance_contact_selector']['#access'] = FALSE;
+      $form['field_grievance_co_name']['#access'] = FALSE;
+      $form['field_grievance_co_role']['#access'] = FALSE;
+      $form['field_grievance_co_email']['#access'] = FALSE;
+      $form['field_grievance_co_phone']['#access'] = FALSE;
+      $form['field_grievance_co_address']['#access'] = FALSE;
+      $form['field_grievance_co_address_2']['#access'] = FALSE;
+      $form['field_grievance_co_city']['#access'] = FALSE;
+      $form['field_grievance_co_state']['#access'] = FALSE;
+      $form['field_grievance_co_zip']['#access'] = FALSE;
+    }
   }
 }
 

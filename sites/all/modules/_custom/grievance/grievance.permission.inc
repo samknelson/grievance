@@ -98,6 +98,9 @@ function grievance_permission() {
     'grievance form rep watching' => array(
     	'title' => t('Grievance Form - Change Watching'),
     ),
+    'grievance form company contacts' => array(
+        'title' => t('Grievance Form - Change Company Represenative'),
+    ),
 
  );
 }

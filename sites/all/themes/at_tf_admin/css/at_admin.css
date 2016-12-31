@@ -3430,6 +3430,12 @@ table.grievance-timeline tr.pending {
 }
 
 
+@media print {
+  body {
+    font-size: 9pt;
+  }
+}
+
 
 
 
@@ -3479,9 +3485,10 @@ table.grievance-timeline tr.pending {
   margin: 0;
 }
 
-.grievance_form_body_grievance_form_226 .field-name-field-grievance-class-tid ul {
+#content .grievance_form_body_grievance_form_226 .group-grievance-226-3 h2 {
   margin: 0;
   padding: 0;
+  font-size: 13px;
 }
 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-clauseref, 
@@ -3497,8 +3504,3 @@ table.grievance-timeline tr.pending {
 
 
 
-@media print {
-  body {
-    font-size: 9pt;
-  }
-}

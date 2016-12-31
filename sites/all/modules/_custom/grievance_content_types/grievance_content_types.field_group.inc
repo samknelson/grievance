@@ -992,6 +992,7 @@ function grievance_content_types_field_group_info() {
       5 => 'field_grievance_inforeq',
       6 => 'field_grievance_clauseref',
       7 => 'field_grievance_document_types',
+      8 => 'field_grievance_broughtby',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -1439,6 +1440,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_grievance_rep_lead',
       3 => 'field_grievance_rep_manager',
       4 => 'field_grievance_rep_watching',
+      5 => 'field_grievance_rep_assignee',
+      6 => 'field_grievance_assignee_notes',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
