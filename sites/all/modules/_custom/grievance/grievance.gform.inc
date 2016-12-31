@@ -207,5 +207,20 @@ function  grievance_node_view($node, $view_mode, $langcode) {
 				}
 			}
 		}
+
+		// Show the longer information requests.
+		if ($node->content['field_grievance_document_types']['#items']) {
+			$delta = 0;
+			foreach ($node->content['field_grievance_document_types']['#items'] as $item) {
+				$term = $item['taxonomy_term'];
+				if ($term->field_grievance_emp_name['und'][0]['value']) {
+					$name = $term->field_grievance_emp_name['und'][0]['value'];
+				} else {
+					$name = $term->name;
+				}
+				$node->content['field_grievance_document_types'][$delta]['#markup'] = $name;
+				++$delta;
+			}
+		}
 	}
 }

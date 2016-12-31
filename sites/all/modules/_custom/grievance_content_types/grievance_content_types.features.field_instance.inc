@@ -8790,6 +8790,44 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_document_types-field_grievance_emp_name'.
+  $field_instances['taxonomy_term-grievance_document_types-field_grievance_emp_name'] = array(
+    'bundle' => 'grievance_document_types',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'If the company should see a longer or more descriptive name, enter it here.  (I.e. the name might be "Guest Complaints" and the employer name might be " Guest complaints (with complete mailing and/or email address and phone number)").  This longer name will be used on information requests and grievance forms sent to the company.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_emp_name',
+    'label' => 'Employer Name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_job_classification-field_grievance_departments'.
   $field_instances['taxonomy_term-grievance_job_classification-field_grievance_departments'] = array(
     'bundle' => 'grievance_job_classification',
@@ -9174,6 +9212,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Employee ID #');
   t('Employer');
   t('Employer Attorney');
+  t('Employer Name');
   t('Employer Representative');
   t('Enter the article of the contract that was violated, for example: Article ....');
   t('Enter the company that this shop is associated with.');
@@ -9200,6 +9239,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Holidays');
   t('ID');
   t('If selected, this contact will appear for all shops associated with this company.');
+  t('If the company should see a longer or more descriptive name, enter it here.  (I.e. the name might be "Guest Complaints" and the employer name might be " Guest complaints (with complete mailing and/or email address and phone number)").  This longer name will be used on information requests and grievance forms sent to the company.');
   t('If the grievance does not fit one of the options above, enter an alternative grievance statement here.');
   t('If the remedy does not fit one of the options above, enter an alternative remedy here.');
   t('Incident Date');
