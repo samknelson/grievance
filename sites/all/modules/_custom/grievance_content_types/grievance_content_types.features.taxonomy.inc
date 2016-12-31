@@ -55,6 +55,29 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'grievance_category' => array(
+      'name' => 'Grievance Category',
+      'machine_name' => 'grievance_category',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'grievance_department' => array(
       'name' => 'Grievance Department',
       'machine_name' => 'grievance_department',
