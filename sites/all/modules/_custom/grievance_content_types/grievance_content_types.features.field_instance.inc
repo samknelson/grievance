@@ -4023,7 +4023,7 @@ function grievance_content_types_field_default_field_instances() {
         'weight' => 40,
       ),
       'grievance_form_226' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
           'field_delimiter' => '',

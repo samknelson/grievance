@@ -3479,6 +3479,11 @@ table.grievance-timeline tr.pending {
   margin: 0;
 }
 
+.grievance_form_body_grievance_form_226 .field-name-field-grievance-class-tid ul {
+  margin: 0;
+  padding: 0;
+}
+
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-clauseref, 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-date-1, 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-date-2, 

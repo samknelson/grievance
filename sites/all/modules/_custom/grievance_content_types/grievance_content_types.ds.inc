@@ -209,11 +209,6 @@ function grievance_content_types_ds_field_settings_info() {
         ),
       ),
     ),
-    'field_grievance_document_types' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
     'field_grievance_broughtby' => array(
       'formatter_settings' => array(
         'ft' => array(
