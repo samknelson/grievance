@@ -16,32 +16,9 @@ function grievance_node_tab_log($node) {
 function grievance_log_update($grievance_node, $op) {
 	global $user;
 
-  if ($op == 'insert') {
-
-    $grievance_date = $grievance_node->field_grievance_date_1['und'][0]['value'];
-
-    if ($grievance_date) {
-      $ts = strtotime($grievance_date);
-      $log_node = new stdClass();
-      $log_node->title = t('Incident Occurred');
-      $log_node->type = 'grievance_log';
-      node_object_prepare($log_node);
-      $log_node->language = LANGUAGE_NONE;
-      $log_node->uid = $user->uid; 
-      $log_node->status = 1;
-      $log_node->promote = 0;
-      $log_node->comment = 0;
-
-      $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
-      $log_node->field_grievance_status['und'][0]['tid'] =  variable_get('grievance_log_incident_status', '');
-      $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_incident_type', '');
-
-      $log_node->field_grievance_status_date = $grievance_node->field_grievance_date_1;
-
-      $log_node = node_submit($log_node); // Prepare node for saving
-      node_save($log_node);
-    }
-  }
+  // 
+  // Log the update / insert event
+  //
 
   $log_node = new stdClass();
   if ($op == 'insert') {
@@ -71,6 +48,48 @@ function grievance_log_update($grievance_node, $op) {
 
   $log_node = node_submit($log_node); // Prepare node for saving
   node_save($log_node);
+
+  //
+  // Log the event date, which starts the timeline.  But only if we don't already have one.
+  //
+
+  $incident_type_tid = variable_get('grievance_log_incident_type', '');
+  $probe = grievance_log_list($grievance_node, array($incident_type_tid));
+  if (!$probe) {
+    $event_date = $grievance_node->field_grievance_date_2['und'][0]['value'];
+    if (!$event_date) {
+      $event_date = $grievance_node->field_grievance_date_1['und'][0]['value'];
+    }
+    if (!$event_date) {
+      $event_date = date('Y-m-d 00:00:00', strtotime('-15 days'));
+    }
+
+    if ($event_date) {
+      $ts = strtotime($event_date);
+      $log_node = new stdClass();
+      $log_node->title = t('Event date, timeline starts');
+      $log_node->type = 'grievance_log';
+      node_object_prepare($log_node);
+      $log_node->language = LANGUAGE_NONE;
+      $log_node->uid = $user->uid; 
+      $log_node->status = 1;
+      $log_node->promote = 0;
+      $log_node->comment = 0;
+
+      $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+      $log_node->field_grievance_status['und'][0]['tid'] =  variable_get('grievance_log_incident_status', '');
+      $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_incident_type', '');
+
+      $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d 00:00:00', strtotime($event_date));
+
+      $log_node = node_submit($log_node); // Prepare node for saving
+      node_save($log_node);
+    }
+  }
+
+  //
+  // Log the assignment
+  //
 
   if ($grievance_node->grievance_assignment_changed) {
     $log_node = new stdClass();
