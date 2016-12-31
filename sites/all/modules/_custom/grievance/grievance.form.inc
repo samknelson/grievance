@@ -87,6 +87,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',
   );
+  $form['field_grievance_category']['und']['#ajax'] = array(
+    'callback' => 'grievance_form_grievance_node_callback_replace',
+    'method' => 'replace',
+  );
 
   //
   // Override the "Add More" buttons, and then simulate their operation.
@@ -101,11 +105,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Open the correct accordion group
   //
 
-  if ($form_state['triggering_element']['#field_name'] == 'field_grievance_type') {
-    $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'closed';
-    $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';
-  }
-  if ($form_state['triggering_element']['#field_name'] == 'field_grievance_clauseref') {
+  if ($form_state['triggering_element']['#field_name'] == 'field_grievance_type' ||
+    $form_state['triggering_element']['#field_name'] == 'field_grievance_clauseref' ||
+    $form_state['triggering_element']['#field_name'] == 'field_grievance_classaction' ||
+    $form_state['triggering_element']['#field_name'] == 'field_grievance_category') {
     $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'closed';
     $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';
   }
@@ -147,6 +150,25 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
     foreach ($status_tids_to_disable as $status_tid) {
       unset($form['field_grievance_status']['und']['#options'][$status_tid]);
+    }
+  }
+
+  //
+  // Change field visibility based on category
+  //
+
+  $category_tid = grievance_form_current_value('field_grievance_category', 'tid', $form, $form_state);
+  if ($category_tid) {
+    $category_term = taxonomy_term_load($category_tid);
+    if ($category_term){
+      if ($category_term->name == 'Contract') {
+        $form['field_grievance_remedy']['#access'] = FALSE;
+        $form['field_grievance_type']['#access'] = FALSE;
+      } else if ($category_term->name == 'Discipline') {
+        $form['field_grievance_classaction']['#access'] = FALSE;
+        $form['field_grievance_remedy_other']['#access'] = FALSE;
+        $form['field_grievance_type_other']['#access'] = FALSE;
+      }
     }
   }
 

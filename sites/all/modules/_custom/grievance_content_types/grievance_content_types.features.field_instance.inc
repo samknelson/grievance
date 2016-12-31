@@ -898,7 +898,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 19,
+      'weight' => 42,
     ),
   );
 
@@ -1332,7 +1332,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 15,
+      'weight' => 38,
     ),
   );
 
@@ -2425,7 +2425,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 10,
+      'weight' => 34,
     ),
   );
 
@@ -2515,7 +2515,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 11,
+      'weight' => 35,
     ),
   );
 
@@ -3681,7 +3681,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 17,
+      'weight' => 40,
     ),
   );
 
@@ -3690,7 +3690,7 @@ function grievance_content_types_field_default_field_instances() {
     'bundle' => 'grievance',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'If the remedy does not fit one of the options above, enter an alternative remedy here.',
+    'description' => '',
     'display' => array(
       'default' => array(
         'label' => 'inline',
@@ -3747,7 +3747,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_remedy_other',
-    'label' => 'Additional Remedy',
+    'label' => 'Remedy',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -3760,7 +3760,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 18,
+      'weight' => 41,
     ),
   );
 
@@ -5216,7 +5216,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 12,
+      'weight' => 36,
     ),
   );
 
@@ -5225,7 +5225,7 @@ function grievance_content_types_field_default_field_instances() {
     'bundle' => 'grievance',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'If the grievance does not fit one of the options above, enter an alternative grievance statement here.',
+    'description' => '',
     'display' => array(
       'default' => array(
         'label' => 'inline',
@@ -5282,7 +5282,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_type_other',
-    'label' => 'Additional Grievance Complaint',
+    'label' => 'Grievance Complaint',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -5295,7 +5295,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 13,
+      'weight' => 37,
     ),
   );
 
@@ -5371,7 +5371,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 16,
+      'weight' => 39,
     ),
   );
 
@@ -9225,8 +9225,6 @@ function grievance_content_types_field_default_field_instances() {
   t('(in days)');
   t('A grievance at this status should have available fields for the specified resolution procedure.');
   t('Actor');
-  t('Additional Grievance Complaint');
-  t('Additional Remedy');
   t('Address');
   t('Address 2');
   t('Alert Data');
@@ -9312,8 +9310,6 @@ function grievance_content_types_field_default_field_instances() {
   t('ID');
   t('If selected, this contact will appear for all shops associated with this company.');
   t('If the company should see a longer or more descriptive name, enter it here.  (I.e. the name might be "Guest Complaints" and the employer name might be " Guest complaints (with complete mailing and/or email address and phone number)").  This longer name will be used on information requests and grievance forms sent to the company.');
-  t('If the grievance does not fit one of the options above, enter an alternative grievance statement here.');
-  t('If the remedy does not fit one of the options above, enter an alternative remedy here.');
   t('Incident Date');
   t('Information Request');
   t('Information Request?');
