@@ -126,6 +126,7 @@ function grievance_gform_pdf_contents($node) {
 	if ($wkhtmltopdfargs) {
 		$cmd .= $wkhtmltopdfargs . ' ';
 	}
+	$cmd .= '--print-media-type ';
 	$cmd .= '-q ';
 	$cmd .= $url;
 	$cmd .= ' ';
