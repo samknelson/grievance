@@ -117,20 +117,23 @@
 				jqxhr.complete(function(data) {
 					var json = jQuery.parseJSON(data.responseJSON);
 					// console.log(json);
-					$('#edit-field-grievance-first-name-und-0-value').val(json[0].first_Name);
-					$('#edit-field-grievance-last-name-und-0-value').val(json[0].last_Name);
-					$('#edit-field-grievance-city-und-0-value').val(json[0].house_Address.city);
-					$('#edit-field-grievance-state-und-0-value').val(json[0].house_Address.state);
+					$('').val(val);
+
+
+					$('.form-item-field-grievance-first-name-und-0-value input').val(json[0].first_Name);
+					$('.form-item-field-grievance-last-name-und-0-value input').val(json[0].last_Name);
+					$('.form-item-field-grievance-city-und-0-value input').val(json[0].house_Address.city);
+					$('.form-item-field-grievance-state-und-0-value input').val(json[0].house_Address.state);
 
 					tmp = json[0].house_Address.street_Address;
 					tmp = tmp.replace(/(?:\r\n|\r|\n)/g, ', ');
-					$('#edit-field-grievance-address-und-0-value').val(tmp);
-					$('#edit-field-grievance-zip-und-0-value').val(json[0].house_Address.zip);
-					$('#edit-field-grievance-phone-und-0-value').val(json[0].phone_Number);
-					$('#edit-field-grievance-email-und-0-email').val(json[0].email_Address);
-					$('#edit-field-grievance-department-und-0-value').val(json[0].department);
-					$('#edit-field-grievance-classification-und-0-value').val(json[0].classification);
-					$('#edit-field-grievance-min-und-0-value').val(json[0].timsS_Member_ID);
+					$('.form-item-field-grievance-address-und-0-value input').val(tmp);
+					$('.form-item-field-grievance-zip-und-0-value input').val(json[0].house_Address.zip);
+					$('.form-item-field-grievance-phone-und-0-value input').val(json[0].phone_Number);
+					$('.form-item-field-grievance-email-und-0-value input').val(json[0].email_Address);
+					$('.form-item-field-grievance-department-und-0-value input').val(json[0].department);
+					$('.form-item-field-grievance-classification-und-0-value input').val(json[0].classification);
+					$('.form-item-field-grievance-min-und-0-value input').val(json[0].timsS_Member_ID);
 				});
 
 			}
