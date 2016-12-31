@@ -366,6 +366,17 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     if ($shop_node) {
       $form['field_grievance_shop']['und'][0]['target_id']['#default_value'] = "$shop_node->title ($shop_node->nid)";
     }
+
+    // assignee
+    $assignee = variable_get('grievance_rep_assignee', '');
+    if ($assignee) {
+      $form['field_grievance_rep_assignee']['und'][0]['target_id']['#default_value'] = "$assignee[entity_label] ($assignee[entity_id])";
+    }
+    $assignee_notes = variable_get('grievance_assignee_notes', '');
+    if ($assignee_notes) {
+      $form['field_grievance_assignee_notes']['und'][0]['value']['#default_value'] = $assignee_notes;
+    }
+  
   }
 
   //

@@ -204,7 +204,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_arbitration|node|grievance|form'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_assignment|node|grievance|form';
   $field_group->group_name = 'group_grievance_assignment';
@@ -1470,6 +1470,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_grievance_rep_lead',
       3 => 'field_grievance_rep_manager',
       4 => 'field_grievance_rep_watching',
+      5 => 'field_grievance_rep_assignee',
+      6 => 'field_grievance_assignee_notes',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(

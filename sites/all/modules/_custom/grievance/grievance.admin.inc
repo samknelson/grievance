@@ -148,6 +148,21 @@ function grievance_admin() {
     '#era_entity_type' => 'user',
   );
 
+  $form['grievance_managers']['grievance_rep_assignee'] = array(
+    '#default_value' => variable_get('grievance_rep_assignee', ''),
+    '#title' => t('Default Assignee'),
+    '#description' => t('This user will be set as the default assignee for newly created grievances'),
+    '#type' => 'entityreference',
+    '#era_entity_type' => 'user',
+  );
+
+  $form['grievance_managers']['grievance_assignee_notes'] = array(
+    '#default_value' => variable_get('grievance_assignee_notes', ''),
+    '#title' => t('Default Assignee Notes'),
+    '#description' => t('Default assignment notes (e.g. "Intake complete ready for review.").'),
+    '#type' => 'textfield',
+  );
+
   $form['grievance_contacts'] = array(
     '#type' => 'fieldset',
     '#title' => t('Contacts'),
