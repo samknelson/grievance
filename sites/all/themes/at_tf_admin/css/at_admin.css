@@ -3471,12 +3471,12 @@ table.grievance-timeline tr.pending {
 }
 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-document-types li {
-  list-style: disc;
+  display: inline;
 }
 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-document-types ul {
-  padding-top: 0;
-  padding-bottom: 0;
+  padding: 0;
+  margin: 0;
 }
 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-clauseref, 
