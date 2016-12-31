@@ -2092,7 +2092,7 @@ function grievance_content_types_field_default_field_bases() {
   // Exported field_base: 'field_grievance_remedy'.
   $field_bases['field_grievance_remedy'] = array(
     'active' => 1,
-    'cardinality' => 1,
+    'cardinality' => 5,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_remedy',
@@ -2876,7 +2876,7 @@ function grievance_content_types_field_default_field_bases() {
   // Exported field_base: 'field_grievance_type'.
   $field_bases['field_grievance_type'] = array(
     'active' => 1,
-    'cardinality' => 1,
+    'cardinality' => 5,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_type',
@@ -2975,6 +2975,24 @@ function grievance_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'text',
+  );
+
+  // Exported field_base: 'field_grievance_weight'.
+  $field_bases['field_grievance_weight'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_weight',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'number',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'number_integer',
   );
 
   // Exported field_base: 'field_grievance_work_status'.
