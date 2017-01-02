@@ -3685,9 +3685,9 @@ function grievance_content_types_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'multiple_selects',
       'settings' => array(),
-      'type' => 'options_select',
+      'type' => 'multiple_selects',
       'weight' => 40,
     ),
   );
