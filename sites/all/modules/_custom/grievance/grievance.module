@@ -50,17 +50,79 @@ function grievance_node_update($node) {
 function grievance_node_insert($node) {
   if ($node->type == 'grievance') {
     $node->grievance_assignment_changed = TRUE;
- }
+  }
 }
 
+/*
+ * Post-save
+ *
+ * After saving a node, we do various things:
+ * - Log the updates, assignment changes, etc.
+ * - Set the node's ID
+ * - Set the alert date and time
+ * 
+ * This is registered as a shutdown function, because it shouldn't run
+ * during the same transaction as when the node is created.
+ */
+
 function grievance_node_postsave($node, $op) {
-  if ($node->type == 'grievance') {
-    if ($op == 'insert' || $op == 'update') {
-      grievance_id_set($node, $op);
-      grievance_log_update($node, $op);
+  if ($node->type == 'grievance' && 
+    ($op == 'insert' || $op == 'update') &&
+    !$node->grievance_no_recurse) {
+
+    //
+    // Avoid re-calling this function
+    //
+
+    $node->grievance_no_recurse = TRUE;
+    $need_save = FALSE;
+
+    //
+    // Log the update
+    //
+
+    grievance_log_update($node, $op);
+
+    //
+    // Set the ID
+    //
+
+    if (!$node->field_grievance_id['und'][0]['value']) { 
+      $id = grievance_id_generate($node);
+      if ($id) {
+        $node->field_grievance_id['und'][0]['value'] = $id;
+        $need_save = TRUE;
+      }
+    }
+
+    //
+    // Set the alert TID and date
+    //
+
+    list($next_alert_tid, $next_alert_ts) = grievance_contract_next_alert($node);
+    if ($node->field_grievance_alert_tid['und'][0]['tid'] != $next_alert_tid) {
+      $node->field_grievance_alert_tid['und'][0]['tid'] = $next_alert_tid;
+      $need_save = TRUE;
+    }
+    if (strtotime($node->field_grievance_alert_date['und'][0]['value']) != $next_alert_ts) {
+      if ($next_alert_ts) {
+        $node->field_grievance_alert_date['und'][0]['value'] = date('Y-m-d', $next_alert_ts);
+      } else {
+        $node->field_grievance_alert_date['und'][0]['value'] = NULL;
+      }
+      $need_save = TRUE;
+    }
+
+    // 
+    // Save the node
+    //
+
+    if ($need_save) {
+      node_save($node);
     }
   }
 }
+
 
 
 function grievance_mail($key, &$message, $params) {
@@ -161,13 +223,13 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'grievance_log_node_form') { 
     $form['field_grievance_status']['#access'] = FALSE;
     $form['field_grievance_alert']['#access'] = FALSE;
-    $form['field_grievance_alert_tid']['#access'] = FALSE;
-    $form['field_grievance_alert_date']['#access'] = FALSE;
   }
-
 
   // Various fields in the grievance form are locked down for various users.
   if ($form_id == 'grievance_node_form') {
+
+    $form['field_grievance_alert_tid']['#access'] = FALSE;
+    $form['field_grievance_alert_date']['#access'] = FALSE;
 
     if (!user_access('grievance form contract template')) {
       $form['field_grievance_contract_tplt']['#disabled'] = TRUE;
@@ -258,17 +320,6 @@ function grievance_preprocess_html(&$variables) {
 function grievance_views_query_alter(&$view, &$query) {
   grievance_views_query_alter_permission($view, $query); 
 }
-
-/*
-function grievance_contract_template_nid_getset($incoming = 0) {
-  static $nid;
-  if ($incoming) {
-    $nid = $incoming;
-  }
-  watchdog('wahtever', "Incoming $incoming, returning $nid");
-  return $nid;
-}
-*/
 
 function grievance_views_pre_build(&$view) {
   // When an admin is editing a grievance clause, they select the contract section from a view.  The view should be restricted

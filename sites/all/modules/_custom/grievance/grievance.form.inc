@@ -405,6 +405,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
   //
   // Compute the next deadline date
+  // *** not relevant any more we're doing this post-save ***
   //
 
   $contract_tplt_nid = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
@@ -412,9 +413,9 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $contract_tplt_node = node_load($contract_tplt_nid);
   }
   
+  /*
   $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
   $alert_date = grievance_form_current_value('field_grievance_alert_date', 'value', $form, $form_state);
-
 
   if (!$alert_date || $form_state['triggering_element']['#field_name'] == 'field_grievance_status') {
     if ($contract_tplt_nid && $status_tid) {
@@ -431,6 +432,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       }
     }
   }
+  */
 
   //
   // Compute the default information requests
@@ -455,8 +457,8 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Compute the next alert tid
   //
 
+  /*
   $alert_tid = grievance_form_current_value('field_grievance_alert_tid', 'tid', $form, $form_state);
-
   if (!$alert_tid || $form_state['triggering_element']['#field_name'] == 'field_grievance_status') {
     if ($contract_tplt_nid && $status_tid) {
       $next_alert_tid = grievance_contract_next_alert_tid($contract_tplt_nid, $status_tid);      
@@ -468,6 +470,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       }
     }
   }
+  */
 
   //
   // Show or hide fields based on value of the class action toggle

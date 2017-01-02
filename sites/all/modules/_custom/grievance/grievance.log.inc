@@ -266,57 +266,7 @@ function grievance_log_list($grievance_node, $type_tids) {
 function grievance_node_tab_timeline($grievance_node) {
   drupal_set_title($grievance_node->title . ': ' . t('Timeline'));
 
-  // Get the contract template
-  $contract_tplt_nid = $grievance_node->field_grievance_contract_tplt['und'][0]['target_id'];
-  if (!$contract_tplt_nid) {
-    drupal_set_message(t('This grievance does not have a contract configured.'), 'warning');
-    return '';
-  }
-
-  // Get all the contract rules
-  $rule_nodes = grievance_contract_list_rules($contract_tplt_nid);
-  if (!$rule_nodes) {
-    drupal_set_message(t('This contract has no rules configured.'), 'warning');
-    return '';
-  }
-
-  // Get the relevant statuses and alerts
-  $status_tids = array();
-  $alert_tids = array();
-  foreach ($rule_nodes as $rule_node) {
-    if ($rule_node->field_grievance_from_status['und']) {
-      foreach ($rule_node->field_grievance_from_status['und'] as $tmp) {
-        $status_tids[] = $tmp['tid'];
-      }
-    }
-    if ($rule_node->field_grievance_next_status['und']) {
-      foreach ($rule_node->field_grievance_next_status['und'] as $tmp) {
-        $status_tids[] = $tmp['tid'];
-      }
-    }
-    $alert_tids[] = $rule_node->field_grievance_alert_tid['und'][0]['tid'];
-  }
-  $status_terms = taxonomy_term_load_multiple($status_tids);
-  $alert_terms = taxonomy_term_load_multiple($alert_tids);
-
-  // Get the timeline
-  $log_update_tids = array(variable_get('grievance_log_update_type', ''), variable_get('grievance_log_incident_type', ''));
-  $log_nodes = grievance_log_list($grievance_node, $log_update_tids);
-  $dates_entered = array();
-  $dates_left = array();
-  $prev_status_tid = 0;
-  foreach ($log_nodes as $log_node) {
-    $status_tid = $log_node->field_grievance_status['und'][0]['tid'];
-    if ($dates_entered[$status_tid]) { continue; }
-    $dates_entered[$status_tid] = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
-
-    if ($status_tid != $prev_status_tid) {
-      if (!$dates_left[$prev_status_tid]) {
-        $dates_left[$prev_status_tid] = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
-      }
-      $prev_status_tid = $status_tid;
-    }
-  }
+  $timeline = grievance_contract_compute_timeline($grievance_node);
 
   // Theme our output
   $header = array(
@@ -331,32 +281,91 @@ function grievance_node_tab_timeline($grievance_node) {
   );
   $attributes = array('class' => array('grievance-timeline'));;
   $rows = array();
-  foreach ($rule_nodes as $rule_node) {
-    $from_status_tids = array();
-    $from_status_terms = array();
-    if ($rule_node->field_grievance_from_status['und']) {
-      foreach ($rule_node->field_grievance_from_status['und'] as $tmp) {
-        $from_status_tids[] = $tmp['tid'];
-        $from_status_terms[] = $status_terms[$tmp['tid']];
-      }
-    }
 
-    $next_status_tids = array();
-    $next_status_terms = array();
-    if ($rule_node->field_grievance_next_status['und']) {
-      foreach ($rule_node->field_grievance_next_status['und'] as $tmp) {
-        $next_status_tids[] = $tmp['tid'];
-        $next_status_terms[] = $status_terms[$tmp['tid']];
-      }
-    }
-
+  foreach ($timeline['rule_nodes'] as $rule_node) {
+    $rule_nid = $rule_node->nid;
     $alert_tid = $rule_node->field_grievance_alert_tid['und'][0]['tid'];
-    $alert_term = $alert_terms[$alert_tid];
+    $alert_term = $timeline['alert_terms'][$alert_tid];
 
-    $date_entered = '';
-    $date_left = '';
-    $deadline = '';
+    if ($timeline[$rule_nid]['entries']) {
 
+      foreach ($timeline[$rule_nid]['entries'] as $entry) {
+
+        $row = array();
+
+        $state = '';
+        $state_class = '';
+        $is_overdue = FALSE;
+        if ($entry['entered_on']) {
+          if ($entry['left_on']) { 
+            if ($entry['deadline'] && ($entry['left_on'] > $entry['deadline'])) {
+              $state = t('Complete (late)');
+              $state_class = 'overdue';
+            } else {
+              $state = t('Complete');
+              $state_class = 'complete';
+            }
+          } else {
+            $state = t('Pending');
+            $state_class = 'pending';
+          }
+        }
+
+        $row[] = $timeline['status_terms'][$entry['entered_because']]->name;
+        $row[] = $alert_term->field_grievance_actor['und'][0]['value'];
+        $row[] = $alert_term->name;
+
+        if ($entry['left_because']) {
+          $row[] = $timeline['status_terms'][$entry['left_because']]->name;
+        } else {
+          $row[] = $timeline[$rule_nid]['next_status_display'];
+        }
+
+        if ($entry['entered_on']) {
+          $row[] = date('m/d/Y', $entry['entered_on']);
+        } else {
+          $row[] = '';
+        }
+
+        if ($entry['deadline']) {
+          $row[] = date('m/d/Y', $entry['deadline']);
+        } else {
+          $row[] = '';
+        }
+
+
+        if ($entry['left_on']) {
+          $row[] = date('m/d/Y', $entry['left_on']);
+        } else {
+          $row[] = '';
+        }
+
+        $row[] = $state;
+
+        $rows[] = array('data' => $row, 'class' => array($state_class));
+
+      }
+
+    } else {
+
+      $row = array();
+
+      $state_class = '';
+
+      $row[] = $timeline[$rule_nid]['from_status_display'];
+      $row[] = $alert_term->field_grievance_actor['und'][0]['value'];
+      $row[] = $alert_term->name;
+      $row[] = $timeline[$rule_nid]['next_status_display'];
+      $row[] = '';
+      $row[] = '';
+      $row[] = '';
+      $row[] = '';
+
+      $rows[] = array('data' => $row, 'class' => array($state_class));
+
+    }
+
+    /*
     foreach ($from_status_tids as $from_status_tid) {
       // @TODO need the earliest here.
       if ($dates_entered[$from_status_tid]) {
@@ -368,24 +377,6 @@ function grievance_node_tab_timeline($grievance_node) {
       }
     }
 
-
-    $state = '';
-    $state_class = '';
-    $is_overdue = FALSE;
-    if ($date_entered) {
-      if ($date_left) { 
-        if ($deadline && (strtotime($date_left) > strtotime($deadline))) {
-          $state = t('Complete (late)');
-          $state_class = 'overdue';
-        } else {
-          $state = t('Complete');
-          $state_class = 'complete';
-        }
-      } else {
-        $state = t('Pending');
-        $state_class = 'pending';
-      }
-    }
 
 
     $data = array();
@@ -412,6 +403,7 @@ function grievance_node_tab_timeline($grievance_node) {
     $data[] = $state;
 
     $rows[] = array('data' => $data, 'class' => array($state_class));
+    */
   }
 
   return theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => $attributes));

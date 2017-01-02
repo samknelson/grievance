@@ -21,27 +21,17 @@ function grievaince_id_algorithms() {
 	return $algorithms;
 }
 
-function grievance_id_set($node, $op) {
-	// Assign an ID if one hasn't been set already.
-	if ($node->type != 'grievance') { return; }
-	if ($op != 'update' && $op != 'insert') { return; }
-	if ($node->field_grievance_id['und'][0]['value']) { return; }
-	if ($node->grievance_no_recurse) { return; }
+function grievance_id_generate($node) {
+	$id = NULL;
+  $algorithm = variable_get('grievance_id_algorithm', '');
 
-	$algorithm = variable_get('grievance_id_algorithm', '');
-	if (!$algorithm) { return; }
+  // We could be calling $algorithm() here.  But for security purposes we're reluctant to use eval()'d code unless
+  // we really need to.  So at the moment, we're just hardcoding the functions.
+  if ($algorithm == 'grievance_id_algorithm_nid')     { $id = grievance_id_algorithm_nid($node); }
+  if ($algorithm == 'grievance_id_algorithm_nidmd5')  { $id = grievance_id_algorithm_nidmd5($node); }
+  if ($algorithm == 'grievance_id_algorithm_year4')   { $id = grievance_id_algorithm_year4($node); }
 
-	// We couidl be calling $algorithm() here.  But for security purposes we're reluctant to use eval()'d code unless
-	// we really need to.  So at the moment, we're just hardcoding the functions.
-	if ($algorithm == 'grievance_id_algorithm_nid') 		{ $id = grievance_id_algorithm_nid($node); }
-	if ($algorithm == 'grievance_id_algorithm_nidmd5') 	{ $id = grievance_id_algorithm_nidmd5($node); }
-	if ($algorithm == 'grievance_id_algorithm_year4') 	{ $id = grievance_id_algorithm_year4($node); }
-
-	if ($id) {
-		$node->field_grievance_id['und'][0]['value'] = $id;
-		$node->grievance_no_recurse = TRUE;
-		node_save($node);
-	}
+  return $id;
 }
 
 function grievance_id_algorithm_nid($node) { 
