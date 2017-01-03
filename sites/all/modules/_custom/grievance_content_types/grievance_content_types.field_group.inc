@@ -89,8 +89,9 @@ function grievance_content_types_field_group_info() {
     'weight' => '2',
     'children' => array(
       0 => 'field_grievance_rep_organizer',
-      1 => 'field_grievance_class_tid',
-      2 => 'grievant_name',
+      1 => 'field_grievance_rep_lead',
+      2 => 'field_grievance_class_tid',
+      3 => 'grievant_name',
     ),
     'format_type' => 'div',
     'format_settings' => array(
