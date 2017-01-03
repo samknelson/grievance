@@ -2220,7 +2220,7 @@ function grievance_content_types_field_default_field_bases() {
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_lead',
     'field_permissions' => array(
-      'type' => 2,
+      'type' => 0,
     ),
     'indexes' => array(
       'target_id' => array(
@@ -2292,7 +2292,7 @@ function grievance_content_types_field_default_field_bases() {
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_organizer',
     'field_permissions' => array(
-      'type' => 2,
+      'type' => 0,
     ),
     'indexes' => array(
       'target_id' => array(

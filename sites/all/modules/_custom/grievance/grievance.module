@@ -223,6 +223,8 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'grievance_log_node_form') { 
     $form['field_grievance_status']['#access'] = FALSE;
     $form['field_grievance_alert']['#access'] = FALSE;
+    $form['field_grievance_alert_tid']['#access'] = FALSE;
+    $form['field_grievance_alert_date']['#access'] = FALSE;
   }
 
   // Various fields in the grievance form are locked down for various users.

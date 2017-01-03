@@ -3986,7 +3986,11 @@ function grievance_content_types_field_default_field_instances() {
     'settings' => array(
       'field_lock_multi_values' => array(
         'disable_reorder' => 1,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
         'lock_previous' => 0,
+        'remove_header' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -4148,7 +4152,11 @@ function grievance_content_types_field_default_field_instances() {
     'settings' => array(
       'field_lock_multi_values' => array(
         'disable_reorder' => 1,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
         'lock_previous' => 0,
+        'remove_header' => 0,
       ),
       'user_register_form' => FALSE,
     ),
@@ -4156,7 +4164,6 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
-        'apply_chosen' => '',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
