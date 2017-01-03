@@ -131,7 +131,8 @@ function grievance_node_access_grievance($node, $op, $account) {
 		'field_grievance_rep_organizer',
 		'field_grievance_rep_lead',
 		'field_grievance_rep_manager',
-		'field_grievance_rep_watching'
+		'field_grievance_rep_watching',
+        'field_grievance_rep_assignee',
 	);
 	$found = FALSE;
 	foreach ($fields as $field) {

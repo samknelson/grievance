@@ -65,41 +65,15 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // These are the list of fields which cause the form to be rebuilt.
   // 
 
-  $form['field_grievance_shop']['und'][0]['target_id']['#ajax'] = array(
+  $replace = array(
     'callback' => 'grievance_form_grievance_node_callback_replace',
     'method' => 'replace',
   );
-  /*
-  $form['field_grievance_type']['und'][0]['tid']['#ajax'] = array(
-    'callback' => 'grievance_form_grievance_node_callback_replace',
-    'method' => 'replace',
-  );
-  */
-  $form['field_grievance_contract_tplt']['und']['#ajax'] = array(
-    'callback' => 'grievance_form_grievance_node_callback_replace',
-    'method' => 'replace',
-  );
-  $form['field_grievance_status']['und']['#ajax'] = array(
-    'callback' => 'grievance_form_grievance_node_callback_replace',
-    'method' => 'replace',
-  );
-  $form['field_grievance_classaction']['und']['#ajax'] = array(
-    'callback' => 'grievance_form_grievance_node_callback_replace',
-    'method' => 'replace',
-  );
-  $form['field_grievance_category']['und']['#ajax'] = array(
-    'callback' => 'grievance_form_grievance_node_callback_replace',
-    'method' => 'replace',
-  );
-
-  //
-  // Override the "Add More" buttons, and then simulate their operation.
-  //
-
-  $form['field_grievance_clauseref']['und']['add_more']['#ajax'] = array(
-    'callback' => 'grievance_form_grievance_node_callback_replace',
-    'method' => 'replace',
-  );
+  $form['field_grievance_shop']['und'][0]['target_id']['#ajax'] = $replace;
+  $form['field_grievance_contract_tplt']['und']['#ajax'] = $replace;
+  $form['field_grievance_status']['und']['#ajax'] = $replace;
+  $form['field_grievance_classaction']['und']['#ajax'] = $replace;
+  $form['field_grievance_category']['und']['#ajax'] = $replace;
 
   //
   // Open the correct accordion group
@@ -112,6 +86,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'closed';
     $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';
   }
+  
   //////////////////////////////////////////////////////
   // These things happen on rebuild
   //////////////////////////////////////////////////////
@@ -189,7 +164,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       }
     }
   }
-
 
   // 
   // Set the list of clauses
@@ -404,74 +378,37 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   }
 
   //
-  // Compute the next deadline date
-  // *** not relevant any more we're doing this post-save ***
+  // Constrain the list of possible classifications and departments (set in the contract template)
   //
 
-  $contract_tplt_nid = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
-  if ($contract_tplt_nid) { 
-    $contract_tplt_node = node_load($contract_tplt_nid);
+  if ($contract_tplt_id) { 
+    $contract_tplt_node = node_load($contract_tplt_id);
+
+    $map = array('_none' => TRUE);
+    $to_disable = array();
+    foreach ($contract_tplt_node->field_grievance_classifications['und'] as $tmp) {
+      $map[$tmp["tid"]] = TRUE;
+    }
+    foreach ($form['field_grievance_class_tid']['und']['#options'] as $tid => $name) {
+      if (!$map[$tid]) { $to_disable[] = $tid; }
+    }
+    foreach ($to_disable as $tid) {
+      unset($form['field_grievance_class_tid']['und']['#options'][$tid]);
+    }
+
+    $map = array('_none' => TRUE);
+    $to_disable = array();
+    foreach ($contract_tplt_node->field_grievance_departments['und'] as $tmp) {
+      $map[$tmp["tid"]] = TRUE;
+    }
+    foreach ($form['field_grievance_department_tid']['und']['#options'] as $tid => $name) {
+      if (!$map[$tid]) { $to_disable[] = $tid; }
+    }
+    foreach ($to_disable as $tid) {
+      unset($form['field_grievance_department_tid']['und']['#options'][$tid]);
+    }
   }
   
-  /*
-  $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
-  $alert_date = grievance_form_current_value('field_grievance_alert_date', 'value', $form, $form_state);
-
-  if (!$alert_date || $form_state['triggering_element']['#field_name'] == 'field_grievance_status') {
-    if ($contract_tplt_nid && $status_tid) {
-      $next_deadline = grievance_contract_next_deadline($contract_tplt_nid, $status_tid);
-    
-      if ($next_deadline) {
-        if ($form['field_grievance_alert_date']['#disabled']) {
-          $form['field_grievance_alert_date']["und"][0]['#default_value']['value'] = date('m/d/Y', strtotime($next_deadline));
-          $form['field_grievance_alert_date']["und"][0]['#value'] = $form['field_grievance_alert_date']["und"][0]['#default_value'];
-          $form['field_grievance_alert_date']['und'][0]['#date_items']['value'] =  date('Y-m-d', strtotime($next_deadline));
-        } else {
-          $form_state['input']['field_grievance_alert_date']['und'][0]['value']['date'] = date('m/d/Y', strtotime($next_deadline));
-        }
-      }
-    }
-  }
-  */
-
-  //
-  // Compute the default information requests
-  //
-
-  /*
-  $document_types = grievance_form_current_value('field_grievance_document_types', 'value', $form, $form_state);
-  if (!$document_types || $form_state['triggering_element']['#field_name'] == 'field_grievance_type') {
-    $type_tid = grievance_form_current_value('field_grievance_type', 'tid', $form, $form_state);
-    $type_term = taxonomy_term_load($type_tid);
-    $val = array();
-    if ($type_term && $type_term->field_grievance_document_types['und']) {
-      foreach ($type_term->field_grievance_document_types['und'] as $tmp) {
-        $val[$tmp['tid']] = $tmp['tid'];
-      }
-    }
-    $form_state['input']['field_grievance_document_types']['und'] = $val;
-  }
-  */
-
-  //
-  // Compute the next alert tid
-  //
-
-  /*
-  $alert_tid = grievance_form_current_value('field_grievance_alert_tid', 'tid', $form, $form_state);
-  if (!$alert_tid || $form_state['triggering_element']['#field_name'] == 'field_grievance_status') {
-    if ($contract_tplt_nid && $status_tid) {
-      $next_alert_tid = grievance_contract_next_alert_tid($contract_tplt_nid, $status_tid);      
-      if ($form['field_grievance_alert_tid']['#disabled']) {
-        $form['field_grievance_alert_tid']['und']['#default_value'][0] = $next_alert_tid;
-        $form['field_grievance_alert_tid']['und']['#value'] = $form['field_grievance_alert_tid']['und']['#default_value'];
-      } else {
-        $form_state['input']['field_grievance_alert_tid']['und'] = $next_alert_tid;
-      }
-    }
-  }
-  */
-
   //
   // Show or hide fields based on value of the class action toggle
   // 
@@ -523,13 +460,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form['#groups']['group_grievance_resproc']->label = $resproc_term->name;
     $form['#groups']['group_grievance_resproc']->format_settings['label'] = $resproc_term->name;
     $form['#groups']['group_grievance_resproc']->format_settings['instance_settings']['description'] = $resproc_term->description;
-
-    // * Length of Hearing (full arbitration)
-    // * Arbitrator Name (full & expedited arbitration)
-    // * Employer Representative (adr & mediation)
-    // * Employer Attorney (full & expedited arbitration)
-    // * Union Representative (adr & mediation)
-    // Outcomes (all four) (list)
 
     // @TODO These should be in admin settings
     $is_adr = $is_expedited_arbitration = $is_formal_arbitration = $is_mediation = FALSE;
