@@ -194,6 +194,7 @@ function  grievance_node_view($node, $view_mode, $langcode) {
 		}
 
 		// "Organizer" should show the phone number as well as the name
+		/*
 		if ($view_mode == 'grievance_form_226') {
 			$organizer_uid = $node->field_grievance_rep_organizer['und'][0]['target_id'];
 			if ($organizer_uid) {
@@ -207,6 +208,7 @@ function  grievance_node_view($node, $view_mode, $langcode) {
 				}
 			}
 		}
+		*/
 
 		// Show the longer information requests.
 		if ($node->content['field_grievance_document_types']['#items']) {
