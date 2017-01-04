@@ -3452,13 +3452,13 @@ table.grievance-timeline tr.pending {
 #grievance-letter-body .field-name-grievant-name,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-shop,
 .grievance_form_body_grievance_form_226 .field-name-grievant-name {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
 }
 
 #grievance-letter-body .field-name-field-grievance-broughtby-wrapper,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-broughtby-wrapper {
-  font-size: 16px;
+  font-size: 14px;
   font-style: italic;
   padding-bottom: 10px;
 }
