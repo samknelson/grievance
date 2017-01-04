@@ -79,7 +79,7 @@ function grievance_letter_pdf_contents($node, $letter_nid, $values) {
 	}
 	$url .= $_SERVER['SERVER_NAME'] . '/node/' . $node->nid . '/loopback-letter';
 	$url .= '?letter_nid=' . $letter_nid;
-	$url .= "\&" . 'delivery=' . urlencode($values['delivery']);
+	$url .= "\&" . 'delivery_tid=' . urlencode($values['delivery_tid']);
 	$html = file_get_contents($url);
 	watchdog('debug', 'Calling ' . $url);
 	file_put_contents($html_path, $html);
@@ -156,6 +156,17 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     '#title' => t('Delivery'),
   );
 
+	$delivery_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_delivery');
+	$delivery_terms = taxonomy_get_tree($delivery_vocabulary->vid);
+	$delivery_options = array(NULL => t('-- select --'));
+	foreach ($delivery_terms as $term) {
+		$delivery_options[$term->tid] = str_repeat('-', $term->depth) . $term->name;
+	}
+   $form['delivery_tid'] = array(
+    '#type' => 'select',
+    '#options' => $delivery_options,
+    '#title' => t('Delivery'),
+  );
 
   $form['output'] = array(
     '#type' => 'select',
@@ -210,7 +221,7 @@ function grievance_letter_form_submit($form, &$form_state) {
 		$grievance_node, 
 		$letter_node, 
 		array(
-			'delivery' => $form_state['values']['delivery'],
+			'delivery_tid' => $form_state['values']['delivery_tid'],
 		)
 	);
 }
@@ -242,7 +253,13 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
     foreach ($tokens as $name => $original) {
     	// Add "Deliverry" as a siml=ple replacement token
     	if ($name == 'delivery') {
-				$replacements[$original] = $record['delivery'];
+    		$delivery_tid = $record['delivery_tid'];
+    		$delivery_term = taxonomy_term_load($delivery_tid);
+    		$replacement = $delivery_term->description;
+    		if (!$replacement) {
+    			$replacement = $delivery_term->name;
+    		}
+				$replacements[$original] = $replacement;
 			}
 
 			// Add "render:display_mode" to render the grievance with the specified display mode.

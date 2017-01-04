@@ -402,6 +402,7 @@ features[node][] = grievance_shop_contact
 features[taxonomy][] = grievance_alert_types
 features[taxonomy][] = grievance_broughtby
 features[taxonomy][] = grievance_category
+features[taxonomy][] = grievance_delivery
 features[taxonomy][] = grievance_department
 features[taxonomy][] = grievance_document_types
 features[taxonomy][] = grievance_job_classification

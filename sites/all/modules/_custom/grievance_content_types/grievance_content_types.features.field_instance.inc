@@ -859,11 +859,8 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_form_226' => array(
         'label' => 'hidden',
-        'module' => 'taxonomy',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'taxonomy_term_reference_plain',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 0,
       ),
       'grievance_gform' => array(

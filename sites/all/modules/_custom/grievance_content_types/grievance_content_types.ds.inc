@@ -216,16 +216,6 @@ function grievance_content_types_ds_field_settings_info() {
         ),
       ),
     ),
-    'field_grievance_broughtby' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'func' => 'theme_ds_field_expert',
-          'lb-def-at' => TRUE,
-          'prefix' => '<div class="field-name-field-grievance-broughtby-wrapper">',
-          'suffix' => ' grieves violation of the collective bargaining agreement.</div>',
-        ),
-      ),
-    ),
   );
   $export['node|grievance|grievance_form_226'] = $ds_fieldsetting;
 
@@ -1065,38 +1055,34 @@ function grievance_content_types_ds_layout_settings_info() {
   $ds_layout->layout = 'ds_2col_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'header' => array(
-        0 => 'field_grievance_broughtby',
-      ),
       'left' => array(
-        1 => 'group_grievance_226_1',
-        2 => 'field_grievance_shop',
-        5 => 'field_grievance_co_name',
-        8 => 'field_grievance_co_role',
-        9 => 'grievance_company_rep_ad_combine',
+        0 => 'group_grievance_226_1',
+        1 => 'field_grievance_shop',
+        4 => 'field_grievance_co_name',
+        7 => 'field_grievance_co_role',
+        8 => 'grievance_company_rep_ad_combine',
       ),
       'right' => array(
-        3 => 'group_grievance_226_2',
-        4 => 'grievant_name',
-        7 => 'field_grievance_class_tid',
-        10 => 'field_grievance_rep_organizer',
-        13 => 'field_grievance_rep_lead',
+        2 => 'group_grievance_226_2',
+        3 => 'grievant_name',
+        6 => 'field_grievance_class_tid',
+        9 => 'field_grievance_rep_organizer',
+        12 => 'field_grievance_rep_lead',
       ),
       'footer' => array(
-        6 => 'field_grievance_clauseref',
-        11 => 'field_grievance_date_1',
-        12 => 'field_grievance_date_2',
-        14 => 'field_grievance_type',
-        15 => 'field_grievance_type_other',
-        16 => 'field_grievance_remedy',
-        17 => 'field_grievance_document_types',
-        18 => 'field_grievance_remedy_other',
-        19 => 'group_grievance_226_3',
-        20 => 'field_grievance_inforeq',
+        5 => 'field_grievance_clauseref',
+        10 => 'field_grievance_date_1',
+        11 => 'field_grievance_date_2',
+        13 => 'field_grievance_type',
+        14 => 'field_grievance_type_other',
+        15 => 'field_grievance_remedy',
+        16 => 'field_grievance_document_types',
+        17 => 'field_grievance_remedy_other',
+        18 => 'group_grievance_226_3',
+        19 => 'field_grievance_inforeq',
       ),
     ),
     'fields' => array(
-      'field_grievance_broughtby' => 'header',
       'group_grievance_226_1' => 'left',
       'field_grievance_shop' => 'left',
       'group_grievance_226_2' => 'right',
