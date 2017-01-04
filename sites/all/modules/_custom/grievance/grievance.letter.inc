@@ -81,15 +81,16 @@ function grievance_letter_pdf_contents($node, $letter_nid, $values) {
 	$url .= '?letter_nid=' . $letter_nid;
 	$url .= "\&" . 'delivery_tid=' . urlencode($values['delivery_tid']);
 	$html = file_get_contents($url);
-	watchdog('debug', 'Calling ' . $url);
 	file_put_contents($html_path, $html);
 
 	// Execute wkhtmltopdf
-	$wkhtmltopdfargs .= token_replace(
-		variable_get('grievance_gform_wkhtmltopdfargs', ''),
-		array('node' => $node), 
-		array()
-	);
+	if ($values['letterhead'] == 'yes') {
+		$wkhtmltopdfargs .= token_replace(
+			variable_get('grievance_gform_wkhtmltopdfargs', ''),
+			array('node' => $node), 
+			array()
+		);
+	}
 
 	$cmd = '/usr/bin/xvfb-run -a ';
 	$cmd .= '--server-args="-screen 0 1024x768x24" ';
@@ -156,6 +157,15 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     '#type' => 'select',
     '#options' => $delivery_options,
     '#title' => t('Delivery'),
+  );
+
+  $form['letterhead'] = array(
+    '#type' => 'select',
+    '#options' => array(
+    	'no' => t('No Letterhead'),
+    	'yes' => t('Standard Letterhead'),
+    ),
+    '#title' => t('Letterhead'),
   );
 
   $form['output'] = array(
