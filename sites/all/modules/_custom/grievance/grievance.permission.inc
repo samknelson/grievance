@@ -98,7 +98,7 @@ function grievance_permission() {
     'grievance form rep watching' => array(
     	'title' => t('Grievance Form - Change Watching'),
     ),
-    'grievance form rep asignee' => array(
+    'grievance form rep assignee' => array(
         'title' => t('Grievance Form - Change Assignee'),
     ),   
     'grievance form company contacts' => array(
