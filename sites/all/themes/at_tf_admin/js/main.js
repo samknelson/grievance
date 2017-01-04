@@ -122,13 +122,20 @@
 
 					$('.form-item-field-grievance-first-name-und-0-value input').val(json[0].first_Name);
 					$('.form-item-field-grievance-last-name-und-0-value input').val(json[0].last_Name);
-					$('.form-item-field-grievance-city-und-0-value input').val(json[0].house_Address.city);
-					$('.form-item-field-grievance-state-und-0-value input').val(json[0].house_Address.state);
 
+					$('.form-item-field-grievance-city-und-0-value input').val(json[0].city);
+					$('.form-item-field-grievance-state-und-0-value input').val(json[0].state);
+					$('.form-item-field-grievance-zip-und-0-value input').val(json[0].zip);
+					$('.form-item-field-grievance-address-und-0-value input').val(json[0].street_Address);
+
+					/*
 					tmp = json[0].house_Address.street_Address;
 					tmp = tmp.replace(/(?:\r\n|\r|\n)/g, ', ');
+					$('.form-item-field-grievance-city-und-0-value input').val(json[0].house_Address.city);
+					$('.form-item-field-grievance-state-und-0-value input').val(json[0].house_Address.state);
 					$('.form-item-field-grievance-address-und-0-value input').val(tmp);
 					$('.form-item-field-grievance-zip-und-0-value input').val(json[0].house_Address.zip);
+					*/
 					$('.form-item-field-grievance-phone-und-0-value input').val(json[0].phone_Number);
 					$('.form-item-field-grievance-email-und-0-value input').val(json[0].email_Address);
 					$('.form-item-field-grievance-department-und-0-value input').val(json[0].department);

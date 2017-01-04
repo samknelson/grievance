@@ -14,7 +14,7 @@ class TfaTrustedIP extends TfaBasePlugin implements TfaLoginPluginInterface {
 
   public function loginAllowed() {
     $ip_text = variable_get('tfa_trusted_ip', '');
-    $ip_regexs = explode('/\s+/', $ip_text);
+    $ip_regexs = explode('|', $ip_text);    
     $ip_address = ip_address();
 
     foreach ($ip_regexs as $ip_regex) {

@@ -34,6 +34,7 @@ function tfa_trusted_ip_admin() {
   $form['tfa_trusted_ip'] = array(
     '#type' => 'textarea',
     '#title' => t('Trusted IPs'),
+    '#description' => t('Pipe-separated, no spaces.'),
     '#default_value' => variable_get('tfa_trusted_ip', ''),
     '#prefix' => t('<strong>Your IP address is currently: @ip_address', array('@ip_address' => $ip_address)),
   );
