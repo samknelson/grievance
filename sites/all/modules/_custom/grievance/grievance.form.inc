@@ -141,7 +141,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
         $form['field_grievance_type']['#access'] = FALSE;
       } else if ($category_term->name == 'Discipline') {
         $form['field_grievance_classaction']['#access'] = FALSE;
-        $form['field_grievance_remedy_other']['#access'] = FALSE;
+        // $form['field_grievance_remedy_other']['#access'] = FALSE;
         // $form['field_grievance_type_other']['#access'] = FALSE;
       }
     }
