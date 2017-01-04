@@ -3442,33 +3442,40 @@ table.grievance-timeline tr.pending {
 
 
 
+.grievance-letter-body .field-name-grievance-company-rep-ad-combine p,
 .grievance_form_body_grievance_form_226 .field-name-grievance-company-rep-ad-combine p {
   padding: 0;
   margin: 0;
 }
 
+.grievance-letter-body .field-name-field-grievance-shop,
+.grievance-letter-body .field-name-grievant-name,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-shop,
 .grievance_form_body_grievance_form_226 .field-name-grievant-name {
   font-size: 16px;
   font-weight: bold;
 }
 
+.grievance-letter-body .field-name-field-grievance-broughtby-wrapper,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-broughtby-wrapper {
   font-size: 16px;
   font-style: italic;
   padding-bottom: 10px;
 }
 
+.grievance-letter-body .field-name-field-grievance-broughtby-wrapper div,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-broughtby-wrapper div {
   display: inline;
 }
 
+.grievance-letter-body .group-leftright,
 .grievance_form_body_grievance_form_226 .group-leftright {
   margin-bottom: 10px;
   padding-bottom: 10px;
   border-bottom: 2px solid #000000;
 }
 
+.grievance-letter-body .field-group-div h3,
 .grievance_form_body_grievance_form_226 .field-group-div h3 {
   font-weight: bold;
   padding: 0;
@@ -3476,21 +3483,26 @@ table.grievance-timeline tr.pending {
   font-size: 13px;
 }
 
+.grievance-letter-body .field-name-field-grievance-document-types li,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-document-types li {
   display: inline;
 }
 
+.grievance-letter-body .field-name-field-grievance-document-types ul,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-document-types ul {
   padding: 0;
   margin: 0;
 }
 
+#content .grievance-letter-body .group-grievance-226-3 h2,
 #content .grievance_form_body_grievance_form_226 .group-grievance-226-3 h2 {
   margin: 0;
   padding: 0;
   font-size: 13px;
 }
 
+.grievance-letter-body .field-name-field-grievance-class-tid ul,
+.grievance-letter-body .field-name-field-grievance-class-tid li,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-class-tid ul,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-class-tid li {
   margin: 0;
@@ -3498,6 +3510,14 @@ table.grievance-timeline tr.pending {
 }
 
 
+.grievance-letter-body .field-name-field-grievance-clauseref, 
+.grievance-letter-body .field-name-field-grievance-date-1, 
+.grievance-letter-body .field-name-field-grievance-date-2, 
+.grievance-letter-body .field-name-field-grievance-type, 
+.grievance-letter-body .field-name-field-grievance-type-other, 
+.grievance-letter-body .field-name-field-grievance-remedy, 
+.grievance-letter-body .field-name-field-grievance-remedy-other, 
+.grievance-letter-body .group-grievance-226-3,
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-clauseref, 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-date-1, 
 .grievance_form_body_grievance_form_226 .field-name-field-grievance-date-2, 
