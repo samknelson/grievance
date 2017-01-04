@@ -3511,3 +3511,8 @@ table.grievance-timeline tr.pending {
 
 
 
+#grievance-letter-body table,
+#grievance-letter-body tbody {
+  border: none;
+}
+

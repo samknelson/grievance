@@ -31,25 +31,33 @@ function grievance_node_tab_letter_pdf($node, $letter_nid) {
 	drupal_exit();
 }
 
-function grievance_letter_pdf_basename($node, $letter_nid) {
+function grievance_letter_pdf_basename($grievance_node, $letter_nid) {
 	$basename = '';
 
-	if ($node->field_grievance_last_name['und'][0]['value']) {
-		$tmp = strtolower($node->field_grievance_last_name['und'][0]['value']);
+	$letter_node = node_load($letter_nid);
+
+	if ($grievance_node->field_grievance_last_name['und'][0]['value']) {
+		$tmp = strtolower($grievance_node->field_grievance_last_name['und'][0]['value']);
 		$tmp = preg_replace('/[^a-z]/', '', $tmp);
 		if ($tmp) { $basename .= $tmp . '_'; }
 	}
-	if ($node->field_grievance_first_name['und'][0]['value']) {
-		$tmp = strtolower($node->field_grievance_first_name['und'][0]['value']);
+	if ($grievance_node->field_grievance_first_name['und'][0]['value']) {
+		$tmp = strtolower($grievance_node->field_grievance_first_name['und'][0]['value']);
 		$tmp = preg_replace('/[^a-z]/', '', $tmp);
 		if ($tmp) { $basename .= $tmp . '_'; }
 	}
-	if ($node->field_grievance_id['und'][0]['value']) {
-		$tmp = strtolower($node->field_grievance_id['und'][0]['value']);
+	if ($grievance_node->field_grievance_id['und'][0]['value']) {
+		$tmp = strtolower($grievance_node->field_grievance_id['und'][0]['value']);
 		$tmp = preg_replace('/[^a-z0-9]/', '', $tmp);
-		if ($tmp) { $basename .= $tmp; }
+		if ($tmp) { $basename .= $tmp . '_'; }
 	}
-	if (!$basename) { $basename = $node->nid; }
+	if ($letter_node->field_grievance_shortname['und'][0]['value']) {
+		$tmp = strtolower($letter_node->field_grievance_shortname['und'][0]['value']);
+		$tmp = preg_replace('/[^a-z0-9]/', '', $tmp);
+		if ($tmp) { $basename .= $tmp . '_'; }
+	}
+	$basename .= date('Ymd');
+	if (!$basename) { $basename = $grievance_node->nid; }
 
 	return $basename;
 }
@@ -210,6 +218,8 @@ function grievance_letter_render_html($grievance_node, $letter_node, $other_toke
 			'grievance-letter' => $other_tokens,
 		)
 	);
+
+	$body = '<div id="grievance-letter-body">' . $body . '</div>';
 
 	return $body;
 }
