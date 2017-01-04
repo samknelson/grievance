@@ -48,9 +48,7 @@ function grievance_node_update($node) {
   }
 
   if ($node->type == 'grievance_log') {
-    dpm($node->field_grievance_time);
     if (!isset($node->field_grievance_time['und'][0]['value'])) {
-      dpm(timefield_time_to_integer(date('h:i:s a')));
       $node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
     }
   }
@@ -115,7 +113,11 @@ function grievance_node_postsave($node, $op) {
 
     list($next_alert_tid, $next_alert_ts) = grievance_contract_next_alert($node);
     if ($node->field_grievance_alert_tid['und'][0]['tid'] != $next_alert_tid) {
-      $node->field_grievance_alert_tid['und'][0]['tid'] = $next_alert_tid;
+      if ($next_alert_tid) {
+        $node->field_grievance_alert_tid['und'][0]['tid'] = $next_alert_tid;
+      } else {
+        unset($node->field_grievance_alert_tid['und'][0]);
+      }
       $need_save = TRUE;
     }
     if (strtotime($node->field_grievance_alert_date['und'][0]['value']) != $next_alert_ts) {
