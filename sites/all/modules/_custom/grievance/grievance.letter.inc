@@ -147,6 +147,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     '#options' => array(
     	'By Fax' => t('By Fax'),
     	'By Mail' => t('By Mail'),
+    	'CERTIFIED MAIL, RETURN RECEIPT REQUESTED' => t('By Certified Mail'),
     ),
     '#title' => t('Delivery'),
   );
