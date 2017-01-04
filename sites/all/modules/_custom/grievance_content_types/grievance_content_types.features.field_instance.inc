@@ -1270,7 +1270,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 34,
+        'weight' => 32,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -1332,7 +1332,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 38,
+      'weight' => 36,
     ),
   );
 
@@ -5179,7 +5179,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 31,
+        'weight' => 33,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -5241,7 +5241,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 36,
+      'weight' => 37,
     ),
   );
 
@@ -5259,7 +5259,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 32,
+        'weight' => 34,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -5320,7 +5320,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 37,
+      'weight' => 38,
     ),
   );
 
@@ -5338,7 +5338,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 33,
+        'weight' => 31,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -7349,7 +7349,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -7397,7 +7397,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -7434,7 +7434,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -7501,7 +7501,7 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -7638,6 +7638,72 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'date_popup',
       'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance_log-field_grievance_time'.
+  $field_instances['node-grievance_log-field_grievance_time'] = array(
+    'bundle' => 'grievance_log',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'timefield',
+        'settings' => array(
+          'display_format' => array(
+            'hour' => 'g',
+            'minute' => 'i',
+            'period' => 'a',
+            'period_separator' => '',
+            'separator' => ':',
+          ),
+          'field_delimiter' => '',
+        ),
+        'type' => 'timefield_default',
+        'weight' => 21,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_time',
+    'label' => 'Time',
+    'required' => 0,
+    'settings' => array(
+      'disable_plugin' => 0,
+      'input_format' => array(
+        'am_text' => 'AM',
+        'atPosition' => 'left bottom',
+        'closeButtonText' => 'Done',
+        'deselectButtonText' => 'Deselect',
+        'myPosition' => 'left top',
+        'nowButtonText' => 'Now',
+        'periodSeparator' => '',
+        'pm_text' => 'PM',
+        'separator' => ':',
+        'showCloseButton' => 0,
+        'showDeselectButton' => 0,
+        'showLeadingZero' => 0,
+        'showNowButton' => 0,
+        'showPeriod' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'timefield',
+      'settings' => array(
+        'label_position' => 'above',
+      ),
+      'type' => 'timefield_standard',
+      'weight' => 6,
     ),
   );
 
@@ -9435,6 +9501,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Supervisor Unit');
   t('Tags');
   t('The date the employee received discipline.');
+  t('Time');
   t('Type of Days');
   t('Union Representative');
   t('Unresolved?');
