@@ -45,11 +45,24 @@ function grievance_node_update($node) {
       $node->grievance_assignment_changed = TRUE;
     }
   }
+
+  if ($node->type == 'grievance_log') {
+    dpm($node->field_grievance_time);
+    if (!isset($node->field_grievance_time['und'][0]['value'])) {
+      dpm(timefield_time_to_integer(date('h:i:s a')));
+      $node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
+    }
+  }
 }
 
 function grievance_node_insert($node) {
   if ($node->type == 'grievance') {
     $node->grievance_assignment_changed = TRUE;
+  }
+  if ($node->type == 'grievance_log') {
+    if (!isset($form->field_grievance_time['und'][0]['value'])) {
+      $node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
+    }
   }
 }
 
@@ -225,6 +238,7 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     $form['field_grievance_alert']['#access'] = FALSE;
     $form['field_grievance_alert_tid']['#access'] = FALSE;
     $form['field_grievance_alert_date']['#access'] = FALSE;
+    $form['field_grievance_time']['und'][0]['value']['#default_value'] = date('h:i:s a');
   }
 
   // Various fields in the grievance form are locked down for various users.
