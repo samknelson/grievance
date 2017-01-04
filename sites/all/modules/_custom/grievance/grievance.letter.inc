@@ -146,16 +146,6 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     '#required' => TRUE,
   );
 
-   $form['delivery'] = array(
-    '#type' => 'select',
-    '#options' => array(
-    	'By Fax' => t('By Fax'),
-    	'By Mail' => t('By Mail'),
-    	'CERTIFIED MAIL, RETURN RECEIPT REQUESTED' => t('By Certified Mail'),
-    ),
-    '#title' => t('Delivery'),
-  );
-
 	$delivery_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_delivery');
 	$delivery_terms = taxonomy_get_tree($delivery_vocabulary->vid);
 	$delivery_options = array(NULL => t('-- select --'));
