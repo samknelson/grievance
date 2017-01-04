@@ -2017,7 +2017,8 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['footer']['area']['id'] = 'area';
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
-  $handler->display->display_options['footer']['area']['content'] = '[<a href="/node/add/grievance-letter-template?destination=grievance/admin/letter-templates">Add a holiday</a>]';
+  $handler->display->display_options['footer']['area']['empty'] = TRUE;
+  $handler->display->display_options['footer']['area']['content'] = '[<a href="/node/add/grievance-letter-template?destination=grievance/admin/letter-templates">Add a letter template</a>]';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
@@ -2025,6 +2026,10 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  /* Field: Content: Edit link */
+  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
   /* Sort criterion: Content: Title */
   $handler->display->display_options['sorts']['title']['id'] = 'title';
   $handler->display->display_options['sorts']['title']['table'] = 'node';
@@ -2064,8 +2069,9 @@ function grievance_views_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('[<a href="/node/add/grievance-letter-template?destination=grievance/admin/letter-templates">Add a holiday</a>]'),
+    t('[<a href="/node/add/grievance-letter-template?destination=grievance/admin/letter-templates">Add a letter template</a>]'),
     t('Title'),
+    t('Edit link'),
     t('Page'),
   );
   $export['grievance_letter_templates'] = $view;
@@ -3155,11 +3161,10 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_company']['settings'] = array(
     'link' => 1,
   );
-  /* Field: Field: Employer */
+  /* Field: Field: Shops */
   $handler->display->display_options['fields']['field_grievance_shops']['id'] = 'field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['field'] = 'field_grievance_shops';
-  $handler->display->display_options['fields']['field_grievance_shops']['label'] = 'Shops';
   $handler->display->display_options['fields']['field_grievance_shops']['settings'] = array(
     'link' => 1,
   );
@@ -3259,7 +3264,7 @@ function grievance_views_views_default_views() {
   $handler = $view->new_display('block', 'By Shop', 'block_1');
   $handler->display->display_options['defaults']['footer'] = FALSE;
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: Field: Employer (field_grievance_shops) */
+  /* Contextual filter: Field: Shops (field_grievance_shops) */
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['id'] = 'field_grievance_shops_target_id';
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['field'] = 'field_grievance_shops_target_id';

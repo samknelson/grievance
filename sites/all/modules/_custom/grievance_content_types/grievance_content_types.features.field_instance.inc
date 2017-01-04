@@ -7283,7 +7283,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => 'Should contain only letters and numbers and underscore, used to generate filenames.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
