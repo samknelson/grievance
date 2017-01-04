@@ -238,6 +238,11 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
     	if ($name == 'delivery') {
 				$replacements[$original] = $record['delivery'];
 			}
+			if (preg_match('/^render:/', $name)) {
+				list ($ignore, $display_mode) = explode(':', $name);
+				$renderable = node_view($data['node'], $display_mode);
+				$replacements[$original] = drupal_render($renderable);
+			}
     }
   }
 
