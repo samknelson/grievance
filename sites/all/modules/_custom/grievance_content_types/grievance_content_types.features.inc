@@ -109,6 +109,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'grievance_letter_template' => array(
+      'name' => t('Grievance Letter Template'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'grievance_log' => array(
       'name' => t('Grievance Log'),
       'base' => 'node_content',

@@ -7225,6 +7225,99 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-grievance_letter_template-body'.
+  $field_instances['node-grievance_letter_template-body'] = array(
+    'bundle' => 'grievance_letter_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+          'trim_length' => 600,
+        ),
+        'type' => 'text_summary_or_trimmed',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'body',
+    'label' => 'Body',
+    'required' => 0,
+    'settings' => array(
+      'display_summary' => 1,
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 20,
+        'summary_rows' => 5,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => -4,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_letter_template-field_grievance_shortname'.
+  $field_instances['node-grievance_letter_template-field_grievance_shortname'] = array(
+    'bundle' => 'grievance_letter_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Should contain only letters and numbers and underscore, used to generate filenames.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_shortname',
+    'label' => 'Short Name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => -3,
+    ),
+  );
+
   // Exported field_instance: 'node-grievance_log-body'.
   $field_instances['node-grievance_log-body'] = array(
     'bundle' => 'grievance_log',
@@ -9491,6 +9584,8 @@ function grievance_content_types_field_default_field_instances() {
   t('Settlement Amount');
   t('Shift');
   t('Shops');
+  t('Short Name');
+  t('Should contain only letters and numbers and underscore, used to generate filenames.');
   t('Show on Timeline?');
   t('State or Province');
   t('Status');

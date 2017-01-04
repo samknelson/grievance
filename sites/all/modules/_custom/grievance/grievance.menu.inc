@@ -9,6 +9,13 @@
 function grievance_node_tabs() {
 	$node_tabs = array();
 
+	$node_tabs['grievance']['letter'] = array(
+		'title' => 'Letter',
+		'description' => '',
+		'callback' => 'grievance_node_tab_letter',
+		'permissions' => array('grievance user'),
+	);
+
 	$node_tabs['grievance']['notification'] = array(
 		'title' => 'Notification',
 		'description' => '',
@@ -213,6 +220,14 @@ function grievance_menu() {
 
 	$items['node/%node/loopback-gform'] = array(
 		'page callback' => 'grievance_gform_loopback',
+		'page arguments' => array(1),
+		'access callback' => 'grievance_forward_loopback_access',
+		'access arguments' => array(1),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['node/%node/loopback-letter'] = array(
+		'page callback' => 'grievance_letter_loopback',
 		'page arguments' => array(1),
 		'access callback' => 'grievance_forward_loopback_access',
 		'access arguments' => array(1),
