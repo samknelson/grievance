@@ -31,6 +31,8 @@ function grievance_id_generate($node) {
   if ($algorithm == 'grievance_id_algorithm_nidmd5')  { $id = grievance_id_algorithm_nidmd5($node); }
   if ($algorithm == 'grievance_id_algorithm_year4')   { $id = grievance_id_algorithm_year4($node); }
 
+  if ($id) { $id .= variable_get('grievance_id_suffix', ''); }
+
   return $id;
 }
 
@@ -51,6 +53,10 @@ function grievance_id_algorithm_year4($node) {
 	$stmt = db_query($sql, array());
 	$hr = $stmt->fetchAssoc();
 	$last_id = $hr['m'];
+	$suffix = variable_get('grievance_id_suffix', '');
+	if ($suffix) {
+		$last_id = preg_replace("/$suffix\$/", '', $last_id);
+	}
 	$number = substr($last_id, 4);
 	$number++;
 	while (strlen($number) < 4) { $number = "0$number"; }

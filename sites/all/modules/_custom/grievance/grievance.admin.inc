@@ -239,6 +239,13 @@ function grievance_admin() {
     '#default_value' => variable_get('grievance_id_manual', ''),
     '#description' => t('Select "Yes" to allow grievance admins to manually set or change the grievance ID.'),
   );
+
+  $form['grievance_id']['grievance_id_suffix'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Suffix'),
+    '#default_value' => variable_get('grievance_id_suffix', ''),
+    '#description' => t('Enter a suffix to be appended to each grievance ID.'),
+  );
  
   return system_settings_form($form);
 }
