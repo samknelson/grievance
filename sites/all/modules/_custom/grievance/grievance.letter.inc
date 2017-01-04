@@ -104,9 +104,9 @@ function grievance_letter_pdf_contents($node, $letter_nid) {
 	return file_get_contents($pdf_path);
 }
 
-
-
 function grievance_form_grievance_letter_template_node_form_alter(&$form, &$form_state, $form_id) {
+	// Getting memory errors, I hate token tree.
+	/*
   $weight = $form['body']['#weight'] + 0.5;
 
   $form['token_tree'] = array(
@@ -117,6 +117,7 @@ function grievance_form_grievance_letter_template_node_form_alter(&$form, &$form
     '#description' => theme('token_tree', array('token_types' => array('node'))),
     '#weight' => $weight
   );
+  */
 }
 
 function grievance_letter_form($form, &$form_state, $grievance_node) {
@@ -236,16 +237,28 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
   if ($type == 'grievance-letter') {
     $record = $data['grievance-letter'];
     foreach ($tokens as $name => $original) {
+    	// Add "Deliverry" as a siml=ple replacement token
     	if ($name == 'delivery') {
 				$replacements[$original] = $record['delivery'];
 			}
+
+			// Add "render:display_mode" to render the grievance with the specified display mode.
 			if (preg_match('/^render:/', $name)) {
 				list ($ignore, $display_mode) = explode(':', $name);
 				$renderable = node_view($data['node'], $display_mode);
 				$replacements[$original] = drupal_render($renderable);
+			}
+
+			// [grievance-letter:rep:organizer:field_grievance_phone_off]
+			if (preg_match('/^rep:/', $name)) {
+				list ($ignore, $which, $user_field) = explode(':', $name);
+				$uid = $data['node']->{"field_greivance_rep_$which"}['und'][0]['target_id'];
+				drupal_set_message("Hee with $uid");
 			}
     }
   }
 
   return $replacements;
 }
+
+

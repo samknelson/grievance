@@ -103,10 +103,10 @@ function grievance_timss_resync() {
     $subsections = array();
     $subsections['field_grievance_first_name']     = NULL;
     $subsections['field_grievance_last_name']      = NULL;
-    $subsections['field_grievance_city']           = 'house_Address';
-    $subsections['field_grievance_state']          = 'house_Address';
-    $subsections['field_grievance_address']        = 'house_Address';
-    $subsections['field_grievance_city']           = 'house_Address';
+    $subsections['field_grievance_city']           = NULL;
+    $subsections['field_grievance_state']          = NULL;
+    $subsections['field_grievance_address']        = NULL;
+    $subsections['field_grievance_city']           = NULL;
     $subsections['field_grievance_phone']          = NULL;
     $subsections['field_grievance_email']          = NULL;
     $subsections['field_grievance_department']     = NULL;
