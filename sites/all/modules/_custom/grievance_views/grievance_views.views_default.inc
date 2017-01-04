@@ -3161,10 +3161,11 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_company']['settings'] = array(
     'link' => 1,
   );
-  /* Field: Field: Shops */
+  /* Field: Field: Employer */
   $handler->display->display_options['fields']['field_grievance_shops']['id'] = 'field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['field'] = 'field_grievance_shops';
+  $handler->display->display_options['fields']['field_grievance_shops']['label'] = 'Shops';
   $handler->display->display_options['fields']['field_grievance_shops']['settings'] = array(
     'link' => 1,
   );
@@ -3264,7 +3265,7 @@ function grievance_views_views_default_views() {
   $handler = $view->new_display('block', 'By Shop', 'block_1');
   $handler->display->display_options['defaults']['footer'] = FALSE;
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: Field: Shops (field_grievance_shops) */
+  /* Contextual filter: Field: Employer (field_grievance_shops) */
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['id'] = 'field_grievance_shops_target_id';
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['field'] = 'field_grievance_shops_target_id';
@@ -4355,7 +4356,6 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_shop']['id'] = 'field_grievance_shop';
   $handler->display->display_options['fields']['field_grievance_shop']['table'] = 'field_data_field_grievance_shop';
   $handler->display->display_options['fields']['field_grievance_shop']['field'] = 'field_grievance_shop';
-  $handler->display->display_options['fields']['field_grievance_shop']['label'] = 'Shop';
   $handler->display->display_options['fields']['field_grievance_shop']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_grievance_shop']['settings'] = array(
     'link' => 0,
@@ -4544,22 +4544,22 @@ Grievance Form',
     'group-uid' => array(
       'group' => '2',
       'filter_name' => 'uid',
-      'weight' => '-11',
+      'weight' => '-19',
     ),
     'group-uid_1' => array(
       'group' => '2',
       'filter_name' => 'uid_1',
-      'weight' => '-11',
+      'weight' => '-18',
     ),
     'group-title' => array(
       'group' => '1',
       'filter_name' => 'title',
-      'weight' => '-17',
+      'weight' => '-19',
     ),
     'group-title_1' => array(
       'group' => '1',
       'filter_name' => 'title_1',
-      'weight' => '-15',
+      'weight' => '-18',
     ),
     'group-field_grievance_alert_date_value' => array(
       'group' => '0',
@@ -4599,12 +4599,17 @@ Grievance Form',
     'group-field_grievance_tags_tid' => array(
       'group' => '1',
       'filter_name' => 'field_grievance_tags_tid',
-      'weight' => '-16',
+      'weight' => '-17',
     ),
     'group-field_grievance_classaction_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_classaction_value',
       'weight' => '-18',
+    ),
+    'group-uid_2' => array(
+      'group' => '2',
+      'filter_name' => 'uid_2',
+      'weight' => '-17',
     ),
   );
   $handler->display->display_options['defaults']['header'] = FALSE;
@@ -4722,15 +4727,18 @@ Grievance Form',
   $handler->display->display_options['filters']['uid_1']['group'] = 1;
   $handler->display->display_options['filters']['uid_1']['exposed'] = TRUE;
   $handler->display->display_options['filters']['uid_1']['expose']['operator_id'] = 'uid_1_op';
-  $handler->display->display_options['filters']['uid_1']['expose']['label'] = 'Organizer';
+  $handler->display->display_options['filters']['uid_1']['expose']['label'] = 'Grievance Sprecialist';
   $handler->display->display_options['filters']['uid_1']['expose']['operator'] = 'uid_1_op';
   $handler->display->display_options['filters']['uid_1']['expose']['identifier'] = 'uid_1';
   $handler->display->display_options['filters']['uid_1']['expose']['remember_roles'] = array(
     2 => '2',
     1 => 0,
     3 => 0,
-    4 => 0,
     5 => 0,
+    6 => 0,
+    8 => 0,
+    7 => 0,
+    4 => 0,
   );
   /* Filter criterion: Content: Title */
   $handler->display->display_options['filters']['title']['id'] = 'title';
@@ -4741,15 +4749,18 @@ Grievance Form',
   $handler->display->display_options['filters']['title']['group'] = 1;
   $handler->display->display_options['filters']['title']['exposed'] = TRUE;
   $handler->display->display_options['filters']['title']['expose']['operator_id'] = 'title_op';
-  $handler->display->display_options['filters']['title']['expose']['label'] = 'Shop';
+  $handler->display->display_options['filters']['title']['expose']['label'] = 'Employer';
   $handler->display->display_options['filters']['title']['expose']['operator'] = 'title_op';
   $handler->display->display_options['filters']['title']['expose']['identifier'] = 'title';
   $handler->display->display_options['filters']['title']['expose']['remember_roles'] = array(
     2 => '2',
     1 => 0,
     3 => 0,
-    4 => 0,
     5 => 0,
+    6 => 0,
+    8 => 0,
+    7 => 0,
+    4 => 0,
   );
   /* Filter criterion: Content: Title */
   $handler->display->display_options['filters']['title_1']['id'] = 'title_1';
@@ -4890,7 +4901,7 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_id_value']['operator'] = 'contains';
   $handler->display->display_options['filters']['field_grievance_id_value']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_grievance_id_value']['expose']['operator_id'] = 'field_grievance_id_value_op';
-  $handler->display->display_options['filters']['field_grievance_id_value']['expose']['label'] = 'Grievance ID';
+  $handler->display->display_options['filters']['field_grievance_id_value']['expose']['label'] = 'Grievance Number';
   $handler->display->display_options['filters']['field_grievance_id_value']['expose']['operator'] = 'field_grievance_id_value_op';
   $handler->display->display_options['filters']['field_grievance_id_value']['expose']['identifier'] = 'field_grievance_id_value';
   $handler->display->display_options['filters']['field_grievance_id_value']['expose']['remember_roles'] = array(
@@ -4899,6 +4910,8 @@ Grievance Form',
     3 => 0,
     5 => 0,
     6 => 0,
+    8 => 0,
+    7 => 0,
     4 => 0,
   );
   /* Filter criterion: Content: Tags (field_grievance_tags) */
@@ -4936,6 +4949,27 @@ Grievance Form',
     3 => 0,
     5 => 0,
     6 => 0,
+    7 => 0,
+    4 => 0,
+  );
+  /* Filter criterion: User: Name */
+  $handler->display->display_options['filters']['uid_2']['id'] = 'uid_2';
+  $handler->display->display_options['filters']['uid_2']['table'] = 'users';
+  $handler->display->display_options['filters']['uid_2']['field'] = 'uid';
+  $handler->display->display_options['filters']['uid_2']['relationship'] = 'field_grievance_rep_assignee_target_id';
+  $handler->display->display_options['filters']['uid_2']['value'] = '';
+  $handler->display->display_options['filters']['uid_2']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['uid_2']['expose']['operator_id'] = 'uid_2_op';
+  $handler->display->display_options['filters']['uid_2']['expose']['label'] = 'Assignee';
+  $handler->display->display_options['filters']['uid_2']['expose']['operator'] = 'uid_2_op';
+  $handler->display->display_options['filters']['uid_2']['expose']['identifier'] = 'uid_2';
+  $handler->display->display_options['filters']['uid_2']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+    5 => 0,
+    6 => 0,
+    8 => 0,
     7 => 0,
     4 => 0,
   );
@@ -5009,11 +5043,12 @@ Grievance Form',
     t('All Grievances'),
     t('The list below shows all grievances on the system.  Use the form to filer by grievant name, status, etc.'),
     t('No grievances match your search criteria.'),
+    t('Grievance Sprecialist'),
     t('Remedy'),
     t('Statement of Grievance'),
     t('Violation'),
     t('Date of Grievance'),
-    t('Grievance ID'),
+    t('Grievance Number'),
     t('Shop Tags'),
     t('Class Action or General Grievance?'),
   );
