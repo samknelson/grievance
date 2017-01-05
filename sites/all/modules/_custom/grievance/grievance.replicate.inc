@@ -84,8 +84,10 @@ function grievance_replicate_batch($child_nid, &$context) {
   $replica_node = node_load($replica_nid);
   $replica_node->field_grievance_contract_tplt['und'][0]['target_id'] = $context['results']['to_nid'];
   if ($replica_node->type == 'grievance_contract_clause') {
-    $replica_node->field_grievance_contract_section['und'][0]['target_id'] = 
-      $context['results']['section_map'][$replica_node->field_grievance_contract_section['und'][0]['target_id']];
+    $target = $context['results']['section_map'][$replica_node->field_grievance_contract_section['und'][0]['target_id']];
+    if ($target) {
+      $replica_node->field_grievance_contract_section['und'][0]['target_id'] = $target;
+    }
   }
   node_save($replica_node);
 
