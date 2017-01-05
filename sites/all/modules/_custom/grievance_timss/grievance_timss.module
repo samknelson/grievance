@@ -229,7 +229,7 @@ function grievance_timss_search($str) {
   }
 
   $timss_url .= '/api/Employees';
-  if (preg_match('/\-/', $str)) {
+  if (preg_match('/[0-9\-]/', $str)) {
     $timss_url .= '?ssn=' . urlencode($str);
   } else {
     $timss_url .= '?lastname=' . urlencode($str);
