@@ -512,13 +512,11 @@ function grievance_content_types_ds_layout_settings_info() {
       'ds_content' => array(
         0 => 'field_grievance_document_type',
         1 => 'field_grievance_attachments',
-        2 => 'field_s3_file',
       ),
     ),
     'fields' => array(
       'field_grievance_document_type' => 'ds_content',
       'field_grievance_attachments' => 'ds_content',
-      'field_s3_file' => 'ds_content',
     ),
     'classes' => array(),
     'wrappers' => array(
@@ -529,6 +527,7 @@ function grievance_content_types_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
     'hide_page_title' => '0',
     'page_option_title' => '',
   );

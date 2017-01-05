@@ -214,6 +214,13 @@ function grievance_letter_form_submit($form, &$form_state) {
 	}
 
 	if ($form_state['values']['output'] == 'pdf') {
+		// Sometimes a "letter" is just an attachment.  If so, we just redirect there.
+		if ($letter_node->field_grievance_attachments['und'][0]['uri']) {
+			$url = file_create_url($letter_node->field_grievance_attachments['und'][0]['uri']);
+			if ($url) {
+				drupal_goto($url);
+			}
+		}
 		return grievance_node_tab_letter_pdf($grievance_node, $letter_nid, $form_state['values']);
 	}
 
@@ -251,7 +258,7 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
   if ($type == 'grievance-letter') {
     $record = $data['grievance-letter'];
     foreach ($tokens as $name => $original) {
-    	// Add "Deliverry" as a siml=ple replacement token
+    	// Add "Delivery" as a siml=ple replacement token
     	if ($name == 'delivery') {
     		$delivery_tid = $record['delivery_tid'];
     		$delivery_term = taxonomy_term_load($delivery_tid);
@@ -269,12 +276,6 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				$replacements[$original] = drupal_render($renderable);
 			}
 
-			// [grievance-letter:rep:organizer:field_grievance_phone_off]
-			if (preg_match('/^rep:/', $name)) {
-				list ($ignore, $which, $user_field) = explode(':', $name);
-				$uid = $data['node']->{"field_greivance_rep_$which"}['und'][0]['target_id'];
-				drupal_set_message("Hee with $uid");
-			}
     }
   }
 

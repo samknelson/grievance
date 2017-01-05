@@ -2346,7 +2346,7 @@ function grievance_content_types_field_default_field_instances() {
         'weight' => 0,
       ),
       'grievance_form_226' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'date',
         'settings' => array(
           'field_delimiter' => '',
@@ -2454,7 +2454,7 @@ function grievance_content_types_field_default_field_instances() {
         'weight' => 0,
       ),
       'grievance_form_226' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'date',
         'settings' => array(
           'field_delimiter' => '',
@@ -5639,7 +5639,7 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -5680,7 +5680,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 2,
     ),
   );
 
@@ -7236,7 +7236,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 0,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -7267,7 +7267,75 @@ function grievance_content_types_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => -4,
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_letter_template-field_grievance_attachments'.
+  $field_instances['node-grievance_letter_template-field_grievance_attachments'] = array(
+    'bundle' => 'grievance_letter_template',
+    'deleted' => 0,
+    'description' => 'Use this field for a "letter" which has no customization, and which is simply meant to be downloaded.  No drop-in tokens are supported.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'file',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'file_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_attachments',
+    'label' => 'Attachments',
+    'required' => 0,
+    'settings' => array(
+      'description_field' => 1,
+      'file_directory' => '',
+      'file_extensions' => 'txt pdf doc png mov mp3 mp4 jpg jpeg gif docx xls xlsx rtf',
+      'filefield_paths' => array(
+        'active_updating' => 0,
+        'file_name' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => '[node:nid]_[file:fid].[file:ffp-extension-original]',
+        ),
+        'file_path' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => 'grievance_letter_templates',
+        ),
+        'redirect' => FALSE,
+        'retroactive_update' => 0,
+      ),
+      'filefield_paths_enabled' => 1,
+      'max_filesize' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'file',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+      ),
+      'type' => 'file_generic',
+      'weight' => 2,
     ),
   );
 
@@ -7286,7 +7354,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -7311,7 +7379,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => -3,
+      'weight' => 1,
     ),
   );
 
@@ -9598,6 +9666,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Union Representative');
   t('Unresolved?');
   t('Upload the current contract document for this shop.  The contract will be used by stewards to identify violations.');
+  t('Use this field for a "letter" which has no customization, and which is simply meant to be downloaded.  No drop-in tokens are supported.');
   t('Use this field to indicate that member data in the grievance system has changed from the Union\'s member management system, and that the new data needs to be uploaded back to the member management system.  "Unchanged" means that the data is the same in both places; "Pending" means that corrected data has been entered here and needs to be entered in the member management system.  After the information has been changed, it will be flagged as "Complete".');
   t('Used for sorting; generally set by drag-and-drop.');
   t('Valid');
