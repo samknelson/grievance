@@ -386,11 +386,16 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
     $map = array('_none' => TRUE);
     $to_disable = array();
-    foreach ($contract_tplt_node->field_grievance_classifications['und'] as $tmp) {
-      $map[$tmp["tid"]] = TRUE;
+    if ($contract_tplt_node->field_grievance_classifications['und']) {
+      foreach ($contract_tplt_node->field_grievance_classifications['und'] as $tmp) {
+        $map[$tmp["tid"]] = TRUE;
+      }
     }
-    foreach ($form['field_grievance_class_tid']['und']['#options'] as $tid => $name) {
-      if (!$map[$tid]) { $to_disable[] = $tid; }
+
+    if ($form['field_grievance_class_tid']['und']['#options']) {
+      foreach ($form['field_grievance_class_tid']['und']['#options'] as $tid => $name) {
+        if (!$map[$tid]) { $to_disable[] = $tid; }
+      }
     }
     foreach ($to_disable as $tid) {
       unset($form['field_grievance_class_tid']['und']['#options'][$tid]);
@@ -398,11 +403,15 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
     $map = array('_none' => TRUE);
     $to_disable = array();
-    foreach ($contract_tplt_node->field_grievance_departments['und'] as $tmp) {
-      $map[$tmp["tid"]] = TRUE;
+    if ($contract_tplt_node->field_grievance_departments['und']) {
+      foreach ($contract_tplt_node->field_grievance_departments['und'] as $tmp) {
+        $map[$tmp["tid"]] = TRUE;
+      }
     }
-    foreach ($form['field_grievance_department_tid']['und']['#options'] as $tid => $name) {
-      if (!$map[$tid]) { $to_disable[] = $tid; }
+    if ($form['field_grievance_department_tid']['und']['#options']) {
+      foreach ($form['field_grievance_department_tid']['und']['#options'] as $tid => $name) {
+        if (!$map[$tid]) { $to_disable[] = $tid; }
+      }
     }
     foreach ($to_disable as $tid) {
       unset($form['field_grievance_department_tid']['und']['#options'][$tid]);

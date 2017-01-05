@@ -18,6 +18,10 @@ function grievance_permission() {
     	'title' => t('Grievance View'),
     	'description' => t('Permission to view any grievance on the system.  Does not grant any editing permissions.')
     ),
+    'grievance edit' => array(
+        'title' => t('Grievance Edit'),
+        'description' => t('Permission to edit any grievane on the system.')
+    ),
     'grievance attachment' => array(
     	'title' => t('Grievance Attachments'),
     	'description' => t('Permission to upload attachments to grievances.')
@@ -122,8 +126,11 @@ function grievance_node_access($node, $op, $account) {
 }
 
 function grievance_node_access_grievance($node, $op, $account) {
-	// Admins can do anything
+ 	// Admins can do anything
 	if (user_access('grievance admin', $account)) { return NODE_ACCESS_IGNORE; }
+
+    // Editors can do anything.  @todo probably should treate delete specially.
+    if (user_access('grievance edit')) { return NODE_ACCESS_IGNORE; }
 
 	// Viewers can view
 	if ($op == 'view' && user_access('grievance view', $account)) { return NODE_ACCESS_IGNORE; }
