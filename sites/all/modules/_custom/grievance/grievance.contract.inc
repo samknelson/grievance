@@ -4,7 +4,16 @@ function grievance_contract_template_node_tab_rules($contract_template_node) {
   drupal_set_title($contract_template_node->title . ': ' . t('Rules'));
   $entity_nid = $contract_template_node->nid;
 
+  $result .= grievance_node_tab_get_addlink(
+    "grievance-contract-rule", 
+    array(
+      "grievance_contract_tplt" => $entity_nid,
+      "grievance_classaction" => 'No',
+    )
+  );
+
   $result = views_embed_view('grievance_contract_rules', 'block', $entity_nid);
+
   $result .= grievance_node_tab_get_addlink(
     "grievance-contract-rule", 
     array(
@@ -20,7 +29,10 @@ function grievance_contract_template_node_tab_notifications($contract_template_n
   drupal_set_title($contract_template_node->title . ': ' . t('Notifications'));
   $entity_nid = $contract_template_node->nid;
 
+  $result .= grievance_node_tab_get_addlink("grievance-contract-rule", array("grievance_contract_tplt" => $entity_nid));
+
   $result = views_embed_view('grievance_contract_rules', 'block_1', $entity_nid);
+
   $result .= grievance_node_tab_get_addlink("grievance-contract-rule", array("grievance_contract_tplt" => $entity_nid));
 
   return $result;
@@ -30,7 +42,10 @@ function grievance_contract_template_node_tab_clauses($contract_template_node) {
   drupal_set_title($contract_template_node->title . ': ' . t('Sections'));
   $entity_nid = $contract_template_node->nid;
 
+  $result .= grievance_node_tab_get_addlink("grievance-contract-clause", array("grievance_contract_tplt" => $entity_nid));
+
   $result = views_embed_view('grievance_contract_clauses', 'block', $entity_nid);
+
   $result .= grievance_node_tab_get_addlink("grievance-contract-clause", array("grievance_contract_tplt" => $entity_nid));
 
   return $result;
@@ -45,7 +60,15 @@ function grievance_contract_section_node_tab_clauses($contract_section_node) {
 
   $result = '';
 
-  $result .= '[' . l(t('Back to @title', array('@title' => $contract_template_node->title)), 'node/' . $contract_template_nid . '/sections') . ']';
+  $result .= '[' . l(t('Back to @title', array('@title' => $contract_template_node->title)), 'node/' . $contract_template_nid . '/sections') . '] ';
+
+  $result .= grievance_node_tab_get_addlink(
+    "grievance-contract-clause", 
+    array(
+      "grievance_contract_tplt" => $contract_template_nid,
+      "grievance_contract_section" => $contract_section_nid,
+    )
+  );
 
   $result .= views_embed_view('grievance_contract_clauses', 'block_2', $contract_template_nid, $contract_section_nid);
   $result .= grievance_node_tab_get_addlink(
@@ -63,6 +86,7 @@ function grievance_contract_template_node_tab_sections($contract_template_node) 
   drupal_set_title($contract_template_node->title . ': ' . t('Articles'));
   $entity_nid = $contract_template_node->nid;
 
+  $result .= grievance_node_tab_get_addlink("grievance-contract-section", array("grievance_contract_tplt" => $entity_nid));
   $result = views_embed_view('grievance_contract_sections', 'block', $entity_nid);
   $result .= grievance_node_tab_get_addlink("grievance-contract-section", array("grievance_contract_tplt" => $entity_nid));
 
