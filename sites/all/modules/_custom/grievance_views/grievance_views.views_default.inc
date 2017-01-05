@@ -4091,8 +4091,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['nothing_1']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing_1']['label'] = 'Actions';
   $handler->display->display_options['fields']['nothing_1']['alter']['text'] = '[<a href="/node/[nid]">view</a>]&nbsp;[<a href="/node/[nid]/edit">edit</a>]<br>
-[<a href="/node/[nid]/gform">form</a>]&nbsp;[<a href="/node/[nid]/notification">notify</a>]
-';
+[<a href="/node/[nid]/statuslog">log</a>]&nbsp;[<a href="/node/[nid]/letter">letters</a>]';
   /* Sort criterion: Content: ID (field_grievance_id) */
   $handler->display->display_options['sorts']['field_grievance_id_value']['id'] = 'field_grievance_id_value';
   $handler->display->display_options['sorts']['field_grievance_id_value']['table'] = 'field_data_field_grievance_id';
@@ -4422,7 +4421,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['nothing_3']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing_3']['label'] = 'Actions';
   $handler->display->display_options['fields']['nothing_3']['alter']['text'] = '[<a href="/node/[nid]">view</a>]&nbsp;[<a href="/node/[nid]/edit">edit</a>]<br>
-[<a href="/node/[nid]/gform">form</a>]&nbsp;[<a href="/node/[nid]/notification">notify</a>]';
+[<a href="/node/[nid]/statuslog">log</a>]&nbsp;[<a href="/node/[nid]/letter">letters</a>]';
   $handler->display->display_options['defaults']['sorts'] = FALSE;
   /* Sort criterion: Content: Next Deadline Date (field_grievance_alert_date) */
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['id'] = 'field_grievance_alert_date_value';
@@ -5030,8 +5029,7 @@ Grievance Form',
     t('Next Deadline Date'),
     t('Actions'),
     t('[<a href="/node/[nid]">view</a>]&nbsp;[<a href="/node/[nid]/edit">edit</a>]<br>
-[<a href="/node/[nid]/gform">form</a>]&nbsp;[<a href="/node/[nid]/notification">notify</a>]
-'),
+[<a href="/node/[nid]/statuslog">log</a>]&nbsp;[<a href="/node/[nid]/letter">letters</a>]'),
     t('Union Deadline Before'),
     t('Show Unresolved Grievances?'),
     t('My Grievances'),
@@ -5050,8 +5048,6 @@ Grievance Form',
     t('Assignee Notes'),
     t('Assigned To'),
     t('[field_grievance_rep_assignee]<br>[field_grievance_assignee_notes]'),
-    t('[<a href="/node/[nid]">view</a>]&nbsp;[<a href="/node/[nid]/edit">edit</a>]<br>
-[<a href="/node/[nid]/gform">form</a>]&nbsp;[<a href="/node/[nid]/notification">notify</a>]'),
     t('All Grievances'),
     t('The list below shows all grievances on the system.  Use the form to filer by grievant name, status, etc.'),
     t('No grievances match your search criteria.'),
