@@ -230,6 +230,10 @@ function grievance_timss_search($str) {
 
   $timss_url .= '/api/Employees';
   if (preg_match('/[0-9\-]/', $str)) {
+    $str = preg_replace('/[^0-9]/', '', $str);
+    if (strlen($str) == 9) {
+      $str = substr($str, 0, 3) . '-' . substr($str, 3, 2) . '-' . substr($str, 5, 4);
+    }
     $timss_url .= '?ssn=' . urlencode($str);
   } else {
     $timss_url .= '?lastname=' . urlencode($str);
