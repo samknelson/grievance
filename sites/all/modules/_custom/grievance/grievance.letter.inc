@@ -124,6 +124,27 @@ function grievance_form_grievance_letter_template_node_form_alter(&$form, &$form
   */
 }
 
+// @todo pass in $account, instead of assuming current user
+function grievance_letter_permission_check($letter_node) {
+	global $user;
+
+	// Admin can send any letter
+	if (user_access('grievance admin')) { return TRUE; }
+
+	// No permissions set, return false
+	if (!isset($letter_node->field_grievance_roles['und'])) { return FALSE; }
+
+	// Does the user have nay of the specified roles?
+	foreach ($letter_node->field_grievance_roles['und'] as $tmp) {
+		if (user_has_role($tmp['value'], $account)) {
+			return TRUE;
+		}
+	}
+
+	// Apparently not.
+	return FALSE;
+}
+
 function grievance_letter_form($form, &$form_state, $grievance_node) {
 	$form_state['grievance_node'] = $grievance_node;
 
@@ -136,7 +157,10 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
   if ($stmt['node']) {
   	$letter_nodes = node_load_multiple(array_keys($stmt['node']));
   	foreach ($letter_nodes as $letter_nid => $letter_node) {
-  		$options[$letter_nid] = $letter_node->title;
+  		// Check permissions on the letter
+			if (grievance_letter_permission_check($letter_node)) {
+	  		$options[$letter_nid] = $letter_node->title;
+	  	}
   	}
   }
 
