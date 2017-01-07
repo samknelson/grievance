@@ -39,7 +39,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => -4,
     ),
@@ -392,7 +394,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 37,
     ),
@@ -893,7 +897,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 33,
     ),
@@ -964,7 +970,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 32,
     ),
@@ -1100,11 +1108,22 @@ function grievance_content_types_field_default_field_instances() {
     'settings' => array(
       'user_register_form' => FALSE,
     ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => '',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => '',
+    ),
     'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_select',
+      'active' => 0,
+      'module' => 'taxonomy',
+      'settings' => array(
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'content_taxonomy_autocomplete_new_terms' => 'deny',
+        'size' => 60,
+      ),
+      'type' => 'taxonomy_autocomplete',
       'weight' => 22,
     ),
   );
@@ -1171,7 +1190,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 34,
     ),
@@ -2174,7 +2195,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 31,
     ),
@@ -2239,7 +2262,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 31,
     ),
@@ -2710,7 +2735,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 24,
     ),
@@ -3525,7 +3552,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 60,
     ),
@@ -3828,6 +3857,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -3906,6 +3936,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'entityreference',
       'settings' => array(
         'apply_chosen' => '',
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -3995,6 +4026,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -4072,6 +4104,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -4161,6 +4194,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -4238,6 +4272,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -4643,7 +4678,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 27,
     ),
@@ -4725,6 +4762,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -4865,7 +4903,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 34,
     ),
@@ -5455,7 +5495,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 26,
     ),
@@ -5566,6 +5608,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -5678,7 +5721,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 2,
     ),
@@ -5835,7 +5880,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 1,
     ),
@@ -5978,7 +6025,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 1,
     ),
@@ -6016,7 +6065,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 0,
     ),
@@ -6101,7 +6152,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 7,
     ),
@@ -6142,7 +6195,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 5,
     ),
@@ -6183,7 +6238,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 6,
     ),
@@ -6225,7 +6282,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 1,
     ),
@@ -6315,7 +6374,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 5,
     ),
@@ -6576,7 +6637,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 0,
     ),
@@ -7503,6 +7566,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -7631,7 +7695,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 8,
     ),
@@ -7737,7 +7803,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 2,
     ),
@@ -7777,7 +7845,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 4,
     ),
@@ -8056,6 +8126,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -8413,6 +8484,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -8525,7 +8597,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 2,
     ),
@@ -8567,6 +8641,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'taxonomy',
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
@@ -9033,6 +9108,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -9079,6 +9155,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -9158,7 +9235,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 0,
     ),
@@ -9193,7 +9272,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 1,
     ),
@@ -9413,7 +9494,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 3,
     ),
@@ -9448,7 +9531,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 6,
     ),
@@ -9518,7 +9603,9 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
       'type' => 'options_select',
       'weight' => 5,
     ),
