@@ -87,6 +87,10 @@ function grievance_permission() {
     	'title' => t('Grievance Form - Change Remedy (Other)'),
     ),
 
+    'grievance form supervisor' => array(
+        'title' => t('Grievance Form - Change Supervisor'),
+    ),
+
     'grievance form rep filed' => array(
     	'title' => t('Grievance Form - Change Filed By'),
     ),

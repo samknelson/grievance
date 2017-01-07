@@ -302,6 +302,12 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
       $form['field_grievance_rep_assignee']['#access'] = FALSE;
       $form['field_grievance_assignee_notes']['#access'] = FALSE;
     }
+    if (!user_access('grievance form supervisor')) {
+      $form['field_grievance_supervisor_name']['#access'] = FALSE;
+      $form['field_grievance_supervisor_title']['#access'] = FALSE;
+      $form['field_grievance_supervisor_unit']['#access'] = FALSE;
+    }
+
     if (!user_access('grievance form company contacts')) {
       $form['field_grievance_contact_selector']['#access'] = FALSE;
       $form['field_grievance_co_name']['#access'] = FALSE;
