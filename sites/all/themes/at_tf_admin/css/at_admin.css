@@ -3434,13 +3434,16 @@ table.grievance-timeline tr.pending {
   body {
     font-size: 10pt;
   }
+  div.grievance-letter-page-break {
+    page-break-after: always;
+  }
 }
 
-
-
-
-
-
+@media screen {
+  div.grievance-letter-page-break {
+    border-bottom: 2px dashed #000000;
+  }
+}
 
 #grievance-letter-body .field-name-grievance-company-rep-ad-combine p,
 .grievance_form_body_grievance_form_226 .field-name-grievance-company-rep-ad-combine p {
@@ -3540,3 +3543,4 @@ table.grievance-timeline tr.pending {
   display: inline-block;
   padding-right: 10px;
 }
+
