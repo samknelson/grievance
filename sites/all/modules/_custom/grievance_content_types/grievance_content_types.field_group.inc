@@ -154,7 +154,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Arbitration',
-    'weight' => '15',
+    'weight' => '16',
     'children' => array(
       0 => 'field_grievance_arbitration_a',
       1 => 'field_grievance_arbitration_b',
@@ -585,15 +585,16 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'default';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Comments and Attachments',
-    'weight' => '14',
+    'label' => 'Comments',
+    'weight' => '15',
     'children' => array(
       0 => 'field_grievance_comments',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
-      'label' => 'Comments and Attachments',
+      'label' => 'Comments',
       'instance_settings' => array(
+        'id' => '',
         'classes' => 'group-grievance-comments field-group-fieldset',
         'description' => '',
       ),
@@ -990,10 +991,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_grievance_remedy',
       3 => 'field_grievance_type_other',
       4 => 'field_grievance_violation',
-      5 => 'field_grievance_inforeq',
-      6 => 'field_grievance_clauseref',
-      7 => 'field_grievance_document_types',
-      8 => 'field_grievance_broughtby',
+      5 => 'field_grievance_clauseref',
+      6 => 'field_grievance_broughtby',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -1147,6 +1146,35 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_h|node|grievance|grievance_arbitrationform'] = $field_group;
 
   $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_inforeq|node|grievance|default';
+  $field_group->group_name = 'group_grievance_inforeq';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Information Request',
+    'weight' => '14',
+    'children' => array(
+      0 => 'field_grievance_inforeq',
+      1 => 'field_grievance_document_types',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Information Request',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-grievance-inforeq field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_grievance_inforeq|node|grievance|default'] = $field_group;
+
+  $field_group = new stdClass();
   $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_notifications|node|grievance_shop|default';
@@ -1210,7 +1238,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Resolution Procedure',
-    'weight' => '17',
+    'weight' => '18',
     'children' => array(
       0 => 'field_grievance_resproc_lh',
       1 => 'field_grievance_resproc_an',
@@ -1221,12 +1249,13 @@ function grievance_content_types_field_group_info() {
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
-      'formatter' => 'collapsible',
+      'label' => 'Resolution Procedure',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-grievance-resproc field-group-fieldset',
         'id' => '',
+        'classes' => 'group-grievance-resproc field-group-fieldset',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_grievance_resproc|node|grievance|default'] = $field_group;
@@ -1406,7 +1435,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Timeline',
-    'weight' => '16',
+    'weight' => '17',
     'children' => array(
       0 => 'field_grievance_date_1',
       1 => 'field_grievance_date_2',
@@ -1640,7 +1669,6 @@ function grievance_content_types_field_group_info() {
   t('Assignment');
   t('Attachments');
   t('Comments');
-  t('Comments and Attachments');
   t('Company Contact');
   t('Company Represenatives');
   t('Company Representative');

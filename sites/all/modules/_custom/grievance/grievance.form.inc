@@ -73,7 +73,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $form['field_grievance_contract_tplt']['und']['#ajax'] = $replace;
   $form['field_grievance_status']['und']['#ajax'] = $replace;
   $form['field_grievance_classaction']['und']['#ajax'] = $replace;
-  $form['field_grievance_category']['und']['#ajax'] = $replace;
+  //$form['field_grievance_category']['und']['#ajax'] = $replace;
 
   //
   // Open the correct accordion group

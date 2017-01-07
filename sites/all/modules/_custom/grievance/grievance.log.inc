@@ -4,11 +4,16 @@ function grievance_node_tab_log($node) {
   drupal_set_title($node->title . ': ' . t('Log'));
   $entity_nid = $node->nid;
 
+  $headfoot = grievance_node_tab_get_addlink("grievance-log", array("grievance" => $entity_nid), 'Add a new log entry');
+  if ($node->field_grievance_phone['und'][0]['value']) {
+    $headfoot .= t('(Grievant phone: <strong>@phone</strong>)', array('@phone' => $node->field_grievance_phone['und'][0]['value']));
+  }
+
   $result = '';
-  $result .= grievance_node_tab_get_addlink("grievance-log", array("grievance" => $entity_nid), 'Add a new log entry');
+  $result .= $headfoot;
   $result .= '<br>';
   $result .= views_embed_view('grievance_log', 'block', $entity_nid);
-  $result .= grievance_node_tab_get_addlink("grievance-log", array("grievance" => $entity_nid), 'Add a new log entry');
+  $result .= $headfoot;
 
   return $result;
 }

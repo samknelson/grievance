@@ -3536,3 +3536,7 @@ table.grievance-timeline tr.pending {
   border: none;
 }
 
+.page-node-statuslog .unite-addlink {
+  display: inline-block;
+  padding-right: 10px;
+}

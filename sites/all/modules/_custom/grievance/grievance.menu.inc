@@ -10,7 +10,7 @@ function grievance_node_tabs() {
 	$node_tabs = array();
 
 	$node_tabs['grievance']['letter'] = array(
-		'title' => 'Letter',
+		'title' => 'Letters',
 		'description' => '',
 		'callback' => 'grievance_node_tab_letter',
 		'permissions' => array('grievance user'),

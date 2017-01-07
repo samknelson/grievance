@@ -9,7 +9,7 @@ function grievance_letter_loopback($grievance_node) {
 	$user = user_load(1);
 
 	// And display the node
-	drupal_set_title($node->title . ' - Letter');
+	drupal_set_title($node->title . ' - Letters');
 	grievance_classes_array('loopback');
 
 	$letter_nid = $_GET['letter_nid'];
@@ -171,8 +171,8 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
   $form['output'] = array(
     '#type' => 'select',
     '#options' => array(
-    	'preview' => t('Screen Preview'),
     	'pdf' => t('Download PDF'),
+    	'preview' => t('Screen Preview'),
     ),
     '#title' => t('Output'),
   );
