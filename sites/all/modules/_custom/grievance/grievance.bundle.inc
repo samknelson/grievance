@@ -52,6 +52,7 @@ function grievance_bundle_form_submit($form, &$form_state) {
 	// batch_set($batch);
 	// /usr/bin/xvfb-run -a --server-args="-screen 0 1024x768x24" /usr/local/bin/wkhtmltopdf -q tmp.html tmp.pdf
 
+  /*
 	ob_start();
 	menu_execute_active_handler('node/464');
 	$output = ob_get_clean();
@@ -61,8 +62,20 @@ function grievance_bundle_form_submit($form, &$form_state) {
 	file_put_contents($output_path, $output);
 
 	drupal_set_message("Returned.");
+	*/
 
-	return;
+	/*
+	$renderable = node_view($grievance_node);
+	$html = drupal_render($renderable);
+	*/
+
+	$renderable = menu_execute_active_handler('node/464', FALSE);
+	$html = drupal_render($renderable);
+
+	drupal_set_message($html);
+	file_put_contents($output_path, $html);
+
+	return $html;
 }
 
 function grievance_bundle_init($grievance_node, &$context) {
@@ -77,6 +90,7 @@ function grievance_bundle_init($grievance_node, &$context) {
 function grievance_bundle_output_path($grievance_node, $path, $filename) {
 	$working_directory = grievance_bundle_working_directory($grievance_node);
 	$output_path = $working_directory . '/' . $filename;
+
 
 	ob_start();
 	menu_execute_active_handler('node/464');
@@ -99,12 +113,12 @@ function grievance_bundle_working_directory($grievance_node) {
 
 function grievance_bundle_path($grievance_node) {
 	$base_path = grievance_bundle_base_path($grievance_node);
-	return $base_path . '.zip';
+	return $base_path . '.html';
 }
 
 function grievance_bundle_base_path($grievance_node) {
 	$path = DRUPAL_ROOT;
-	$path .= '/' . variable_get('grievance_bundle_base_path', 'sites/default/files/private/grievance_bundle');
+	$path .= '/' . variable_get('grievance_bundle_base_path', 'sites/default/files/test');
 
 	$id = $grievance_node->field_grievance_id['und'][0]['value'];
 	if (!$id) { $id = $grievance_node->nid; }

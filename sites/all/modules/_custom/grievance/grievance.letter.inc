@@ -162,7 +162,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	  		$options[$letter_nid] = $letter_node->title;
 	  		if ($letter_node->field_grievance_attachments['und'][0]['uri']) {
 	  			$options[$letter_nid] .= '*';
-	  			$footnote = '* These letters must be printed individually, they cannot be bundled with other letters.';
+	  			$footnote = t('* These letters must be printed individually, they cannot be bundled with other letters.');
 	  		}
 	  	}
   	}

@@ -1348,7 +1348,13 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 0,
       'module' => 'multiple_selects',
-      'settings' => array(),
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'content_taxonomy_opt_groups' => FALSE,
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
       'type' => 'multiple_selects',
       'weight' => 37,
     ),
@@ -6840,7 +6846,7 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -6922,7 +6928,51 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 3,
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_contract_template-field_grievance_pullclause'.
+  $field_instances['node-grievance_contract_template-field_grievance_pullclause'] = array(
+    'bundle' => 'grievance_contract_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '(i.e. "... accordance with the provisions of [clause goes here] of our Collective Bargaining Agreement ...")',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_pullclause',
+    'label' => 'Arbitration Clause',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
     ),
   );
 
@@ -9648,6 +9698,7 @@ function grievance_content_types_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('(i.e. "... accordance with the provisions of [clause goes here] of our Collective Bargaining Agreement ...")');
   t('(in days)');
   t('A grievance at this status should have available fields for the specified resolution procedure.');
   t('Actor');
@@ -9656,6 +9707,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Alert Data');
   t('Amount Received');
   t('Annual?');
+  t('Arbitration Clause');
   t('Arbitrator Name');
   t('Article');
   t('Article Number');
