@@ -28,6 +28,9 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.replicate.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.delete.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.letter.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.letter_pdf.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.letter_form.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.letter_submit.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.phone.inc";
 
 /**
@@ -413,12 +416,16 @@ function grievance_views_pre_render(&$view) {
 }
 
 function grievance_node_presave($node) {
-  if ($node->type == 'grievance') {
-    if (isset($node->field_grievance_phone['und'][0]['value'])) {
-      $node->field_grievance_phone['und'][0]['value'] = grievance_format_phone_number($node->field_grievance_phone['und'][0]['value']);
-    }
-    if (isset($node->field_grievance_co_phone['und'][0]['value'])) {
-      $node->field_grievance_co_phone['und'][0]['value'] = grievance_format_phone_number($node->field_grievance_co_phone['und'][0]['value']);
+  if ($node->type == 'grievance' || $node->type == 'grievance_shop_contact') {
+    $fields = array(
+      'field_grievance_phone', 
+      'field_grievance_co_phone', 
+      'field_grievance_co_fax'
+    );
+    foreach ($fields as $field) {
+      if (isset($node->{$field}['und'][0]['value'])) {
+        $node->{$field}['und'][0]['value'] = grievance_format_phone_number($node->{$field}['und'][0]['value']);
+      }
     }
   }
 }

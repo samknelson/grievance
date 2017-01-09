@@ -303,7 +303,8 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 		'field_grievance_rep_organizer',
 		'field_grievance_rep_lead',
 		'field_grievance_rep_manager',
-		'field_grievance_rep_watching'
+		'field_grievance_rep_watching',
+		'field_grievance_rep_assignee',
 	);
 
 	$nodupes = array();
