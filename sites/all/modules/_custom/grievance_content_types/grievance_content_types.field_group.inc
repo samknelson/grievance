@@ -414,6 +414,7 @@ function grievance_content_types_field_group_info() {
     'children' => array(
       0 => 'field_grievance_co_phone',
       1 => 'field_grievance_co_email',
+      2 => 'field_grievance_co_fax',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -443,6 +444,7 @@ function grievance_content_types_field_group_info() {
     'children' => array(
       0 => 'field_grievance_co_phone',
       1 => 'field_grievance_co_email',
+      2 => 'field_grievance_co_fax',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
