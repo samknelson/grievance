@@ -81,7 +81,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
   if ($form_state['triggering_element']['#field_name'] == 'field_grievance_type' ||
     $form_state['triggering_element']['#field_name'] == 'field_grievance_clauseref' ||
-    $form_state['triggering_element']['#field_name'] == 'field_grievance_classaction' ||
     $form_state['triggering_element']['#field_name'] == 'field_grievance_category') {
     $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'closed';
     $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';

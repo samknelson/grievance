@@ -182,7 +182,7 @@ function grievance_contract_list_rules($contract_tplt_nid) {
 
 function grievance_contract_next_alert($grievance_node) {
   $timeline = grievance_contract_compute_timeline($grievance_node);
-  dpm($timeline);
+  if (!$timeline) { return array(NULL, NULL); }
 
   $rule_nid = $timeline['current_rule'];
   if (!$rule_nid) { return array(NULL, NULL); }

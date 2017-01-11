@@ -113,13 +113,13 @@
 			function grievance_timss_handle_recipient_click(elt) {
 				val = elt.html();
 
-				var jqxhr = $.getJSON('/grievance/timss/lookup/' + val);
+				broughtby_tid = $('#grievance-timss-broughtby-tid-for-insert').html();
+				if (!broughtby_tid) { return; }
+
+				var jqxhr = $.getJSON('/grievance/timss/lookup/' + val + '?broughtby_tid=' + broughtby_tid);
 				jqxhr.complete(function(data) {
 					var json = jQuery.parseJSON(data.responseJSON);
 					// console.log(json);
-					$('').val(val);
-
-
 					$('.form-item-field-grievance-first-name-und-0-value input').val(json[0].first_Name);
 					$('.form-item-field-grievance-last-name-und-0-value input').val(json[0].last_Name);
 

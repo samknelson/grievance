@@ -4557,7 +4557,7 @@ Grievance Form',
     'group-field_grievance_status_tid' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_status_tid',
-      'weight' => '-17',
+      'weight' => '-19',
     ),
     'group-uid' => array(
       'group' => '2',
@@ -4582,12 +4582,12 @@ Grievance Form',
     'group-field_grievance_alert_date_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_alert_date_value',
-      'weight' => '-16',
+      'weight' => '-18',
     ),
     'group-field_grievance_open_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_open_value',
-      'weight' => '-15',
+      'weight' => '-17',
     ),
     'group-field_grievance_remedy_tid' => array(
       'group' => '4',
@@ -4612,7 +4612,7 @@ Grievance Form',
     'group-field_grievance_id_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_id_value',
-      'weight' => '-14',
+      'weight' => '-16',
     ),
     'group-field_grievance_tags_tid' => array(
       'group' => '1',
@@ -4622,12 +4622,17 @@ Grievance Form',
     'group-field_grievance_classaction_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_classaction_value',
-      'weight' => '-18',
+      'weight' => '-15',
     ),
     'group-uid_2' => array(
       'group' => '2',
       'filter_name' => 'uid_2',
       'weight' => '-17',
+    ),
+    'group-field_grievance_broughtby_tid' => array(
+      'group' => '0',
+      'filter_name' => 'field_grievance_broughtby_tid',
+      'weight' => '-20',
     ),
   );
   $handler->display->display_options['defaults']['header'] = FALSE;
@@ -4991,6 +4996,28 @@ Grievance Form',
     7 => 0,
     4 => 0,
   );
+  /* Filter criterion: Content: Brought By (field_grievance_broughtby) */
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['id'] = 'field_grievance_broughtby_tid';
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['table'] = 'field_data_field_grievance_broughtby';
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['field'] = 'field_grievance_broughtby_tid';
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['expose']['operator_id'] = 'field_grievance_broughtby_tid_op';
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['expose']['label'] = 'Brought By';
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['expose']['operator'] = 'field_grievance_broughtby_tid_op';
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['expose']['identifier'] = 'field_grievance_broughtby_tid';
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+    5 => 0,
+    6 => 0,
+    8 => 0,
+    7 => 0,
+    4 => 0,
+  );
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['vocabulary'] = 'grievance_broughtby';
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['hierarchy'] = 1;
   $handler->display->display_options['path'] = 'grievances/all';
   $handler->display->display_options['menu']['type'] = 'tab';
   $handler->display->display_options['menu']['title'] = 'All Grievances';
@@ -5066,6 +5093,7 @@ Grievance Form',
     t('Grievance Number'),
     t('Shop Tags'),
     t('Class Action or General Grievance?'),
+    t('Brought By'),
   );
   $export['grievances'] = $view;
 

@@ -124,7 +124,13 @@ function grievance_node_postsave($node, $op) {
       }
       $need_save = TRUE;
     }
-    if (strtotime($node->field_grievance_alert_date['und'][0]['value']) != $next_alert_ts) {
+
+    if (isset($node->field_grievance_alert_date['und'][0]['value'])) { 
+      $tmp = $node->field_grievance_alert_date['und'][0]['value'];
+    } else {
+      $tmp = NULL;
+    }
+    if (strtotime($tmp) != $next_alert_ts) {
       if ($next_alert_ts) {
         $node->field_grievance_alert_date['und'][0]['value'] = date('Y-m-d', $next_alert_ts);
       } else {

@@ -1028,10 +1028,8 @@ function grievance_content_types_field_group_info() {
       4 => 'field_grievance_type_other',
       5 => 'field_grievance_violation',
       6 => 'field_grievance_clauseref',
-      7 => 'field_grievance_classaction',
-      8 => 'field_grievance_broughtby',
-      9 => 'field_grievance_date_2',
-      10 => 'field_grievance_category',
+      7 => 'field_grievance_date_2',
+      8 => 'field_grievance_category',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1322,7 +1320,9 @@ function grievance_content_types_field_group_info() {
       7 => 'field_grievance_meeting_date',
       8 => 'field_grievance_contract_tplt',
       9 => 'field_grievance_status_date',
-      10 => 'title',
+      10 => 'field_grievance_classaction',
+      11 => 'field_grievance_broughtby',
+      12 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(

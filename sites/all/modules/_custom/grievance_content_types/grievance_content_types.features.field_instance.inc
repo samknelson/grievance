@@ -251,7 +251,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 36,
+      'weight' => 34,
     ),
   );
 
@@ -398,7 +398,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 37,
+      'weight' => 35,
     ),
   );
 
@@ -901,7 +901,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 33,
+      'weight' => 36,
     ),
   );
 
@@ -1194,7 +1194,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 34,
+      'weight' => 37,
     ),
   );
 
@@ -4917,7 +4917,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 34,
+      'weight' => 32,
     ),
   );
 
@@ -4989,7 +4989,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 35,
+      'weight' => 33,
     ),
   );
 
