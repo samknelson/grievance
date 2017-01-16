@@ -3437,7 +3437,15 @@ table.grievance-timeline tr.pending {
   div.grievance-letter-page-break {
     page-break-after: always;
   }
+
+  .block-masquerade,
+  #admin-menu-wrapper,
+  .block-superfish,
+  .block-grievance-timeleft {
+    display: none;
+  }
 }
+
 
 @media screen {
   div.grievance-letter-page-break {

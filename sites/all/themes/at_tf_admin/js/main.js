@@ -114,7 +114,7 @@
 				val = elt.html();
 
 				broughtby_tid = $('#grievance-timss-broughtby-tid-for-insert').html();
-				if (!broughtby_tid) { return; }
+				if (!broughtby_tid) { broughtby_tid = 'DEFAULT'; }
 
 				var jqxhr = $.getJSON('/grievance/timss/lookup/' + val + '?broughtby_tid=' + broughtby_tid);
 				jqxhr.complete(function(data) {
