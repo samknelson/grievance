@@ -171,12 +171,16 @@ function grievance_bundle_batch_add($grievance_node, $drupal_path, &$context) {
 	$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 	$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
 
-	$cmd = '/usr/bin/pdfunite ';
 	if (file_exists($bundled_file)) {
-		$cmd .= $bundled_file . ' ';		
+		$cmd = '/usr/bin/pdfunite ';
+		$cmd .= $bundled_file . ' ';
+		$cmd .= grievance_bundle_output_path($grievance_node, $drupal_path) . '.pdf ';
+		$cmd .= $tmp_file . ' ';
+	} else {
+		$cmd = '/bin/cp ';
+		$cmd .= grievance_bundle_output_path($grievance_node, $drupal_path) . '.pdf ';
+		$cmd .= $tmp_file . ' ';
 	}
-	$cmd .= grievance_bundle_output_path($grievance_node, $drupal_path) . '.pdf ';
-	$cmd .= $tmp_file . ' ';
 	watchdog('grievance_bundle', 'Executing: ' . $cmd);
 	exec($cmd);
 
