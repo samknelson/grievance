@@ -352,6 +352,9 @@ function grievance_timss_form_grievance_node_form_alter(&$form, &$form_state, $f
   if ($classaction == 'Yes') { return; }
 
   $broughtby_tid = grievance_form_current_value('field_grievance_broughtby', 'tid', $form, $form_state);
+  if (!$broughtby_tid) { 
+    $broughtby_tid = 'DEFAULT';
+  }
 
   $form['grievance_timss_search'] = array(
     '#type' => 'textfield',

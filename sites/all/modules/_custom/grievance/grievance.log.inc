@@ -272,6 +272,8 @@ function grievance_node_tab_timeline($grievance_node) {
   drupal_set_title($grievance_node->title . ': ' . t('Timeline'));
 
   $timeline = grievance_contract_compute_timeline($grievance_node);
+  if (!$timeline) { $timeline = array(); }
+  if (!$timeline['rule_nodes']) { $timeline['rule_nodes'] = array(); }
 
   // Theme our output
   $header = array(

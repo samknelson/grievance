@@ -54,6 +54,10 @@ function grievance_permission() {
     	'title' => t('Grievance Report'),
     	'description' => t('Permission to view grievance reports.')
     ),
+    'grievance bundle' => array(
+        'title' => t('Grievance Bundle'),
+        'description' => t('Permission to generate and download grievance bundles.')
+    ),
     'grievance quicksearch' => array(
     	'title' => t('Grievance Quicksearch'),
     	'description' => t('Permission to use the "quicksearch" grievance search.')

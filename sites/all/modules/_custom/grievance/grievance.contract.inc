@@ -181,18 +181,28 @@ function grievance_contract_list_rules($contract_tplt_nid) {
 }
 
 function grievance_contract_next_alert($grievance_node) {
+  // Closed grievances have no alerts or deadlines
+  $status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
+  if (!$status_tid) { return array(NULL, NULL); }
+  $status_term = taxonomy_term_load($status_tid);
+  if (!$status_term) { return array(NULL, NULL); }
+  $open = $status_term->field_grievance_open['und'][0]['value'];
+  if (!$open) { return array(NULL, NULL); }
+
+
+
   $timeline = grievance_contract_compute_timeline($grievance_node);
   if (!$timeline) { return array(NULL, NULL); }
 
   $rule_nid = $timeline['current_rule'];
   if (!$rule_nid) { return array(NULL, NULL); }
-
+  
   $rule_node = $timeline['rule_nodes'][$rule_nid];
+
   $delta = $timeline[$rule_nid]['current_delta'];
   if ($delta == -1) { return array(NULL, NULL); }
 
   $entry = $timeline[$rule_nid]['entries'][$delta];
-  $rule_node = $timeline[$rule_nid]['rule_node'];
   $next_alert_tid = $rule_node->field_grievance_alert_tid['und'][0]['tid'];
   $next_alert_ts = $entry['deadline'];
 
