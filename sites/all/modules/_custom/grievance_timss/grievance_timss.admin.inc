@@ -48,6 +48,10 @@ function grievance_timss_admin_submit($form, &$form_state) {
 
   $broughtby_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_broughtby');
   $broughtby_terms = taxonomy_get_tree($broughtby_vocabulary->vid);
+  $broughtby_terms[] = (object) array(
+    'tid' => 'DEFAULT',
+    'name' => t('Default')
+  );
   foreach ($broughtby_terms as $broughtby_term) {
     $prefix = 'grievance_timss_broughtby_' . $broughtby_term->tid ;
     if (empty($form_state['values']["${prefix}_pass"])) {
