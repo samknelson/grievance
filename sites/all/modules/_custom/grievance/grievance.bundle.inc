@@ -161,8 +161,8 @@ function grievance_bundle_finished($success, $results, $operations) {
 
 function grievance_bundle_batch_cleanup($grievance_node, $drupal_path, &$context) {
 	$context['message'] = t('Cleaning up: @path', array('@path' => $drupal_path)); 
-	unlink(grievance_bundle_output_path($grievance_node, $drupal_path) . '.html');
-	unlink(grievance_bundle_output_path($grievance_node, $drupal_path) . '.pdf');
+	// unlink(grievance_bundle_output_path($grievance_node, $drupal_path) . '.html');
+	// unlink(grievance_bundle_output_path($grievance_node, $drupal_path) . '.pdf');
 }
 
 function grievance_bundle_batch_add($grievance_node, $drupal_path, &$context) {
@@ -221,7 +221,7 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		exec($cmd);
 
 		unlink($bundled_file);
-		unlink($dest);
+		// unlink($dest);
 
 		$cmd = "mv $tmp_file $bundled_file";
 		watchdog('grievance_bundle', 'Executing: ' . $cmd);
