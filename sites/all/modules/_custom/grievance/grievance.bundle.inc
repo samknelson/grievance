@@ -49,7 +49,7 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
 
 	$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 	if (file_exists($bundled_file)) {
-		$msg = "The most recently generated bundle for this grievance can be downloaded <a href=\"/node/" . $grievance_node->nid . "/bundle/download\">here</a>";
+		$msg = "The most recently generated bundle for this grievance can be downloaded <a href=\"/node/" . $grievance_node->nid . "/bundle/download\">here</a>.";
 	} else {
 		$msg = "The bundle for this grievance has not yet been generated.";
 	}

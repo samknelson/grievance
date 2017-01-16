@@ -152,7 +152,6 @@ function grievance_contract_find_rule($contract_tplt_nid, $status_tid) {
   $query->entityCondition('bundle', 'grievance_contract_rule');
   $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_tplt_nid);
   $query->fieldCondition('field_grievance_from_status', 'tid', $status_tid);
-  $query->fieldOrderBy('field_grievance_weight', 'value');
   $stmt = $query->execute();
   $rule_nids = $rule_nodes = array();
   if ($stmt['node']) {
@@ -170,13 +169,26 @@ function grievance_contract_list_rules($contract_tplt_nid) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_contract_rule');
   $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_tplt_nid);
-  $query->fieldOrderBy('field_grievance_weight', 'value');
+
+  // We really want to sort by field_grievance_weight, but we can't because it's sometimes null.
+  // Which is why the atrocity of a uasort below.
+  // $query->fieldOrderBy('field_grievance_weight', 'value');
+
   $stmt = $query->execute();
   $rule_nids = $rule_nodes = array();
   if ($stmt['node']) {
     $rule_nids = array_keys($stmt['node']);
     $rule_nodes = node_load_multiple($rule_nids);
   }
+
+  uasort($rule_nodes, function($a, $b) { 
+    if ($a->field_grievance_weight['und'][0]['value'] > $b->field_grievance_weight['und'][0]['value']) { return 1; }
+    else if ($a->field_grievance_weight['und'][0]['value'] < $b->field_grievance_weight['und'][0]['value']) { return -1; }
+    else if ($a->nid > $b->nid) { return 1; }
+    else if ($a->nid < $b->nid) { return -1; }
+    else { return 0; }
+  });
+
   return $rule_nodes;
 }
 
