@@ -382,11 +382,26 @@ function grievance_timss_form_grievance_node_form_alter(&$form, &$form_state, $f
 
   $candidates = array();
   if ($form_state['values']['grievance_timss_search']) {
-    $candidates = grievance_timss_search($form_state['values']['grievance_timss_search'], $broughtby_tid);
+    if (!$broughtby_tid) { 
+      $broughtby_tid = 'DEFAULT';
+      $broughtby_name = 'Default';
+    } else {
+      $broughtby_term = taxonomy_term_load($broughtby_tid);
+      $broughtby_name = $broughtby_term->name;
+    }
+    $timss_url = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_url');
+    $timss_user = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_user');
+    $timss_pass = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_pass');
+    if ($timss_url && $timss_user && $timss_pass) {
+      $candidates = grievance_timss_search($form_state['values']['grievance_timss_search'], $broughtby_tid);
+      $result_body = '';
+    } else {
+      $candidates = array();
+      $result_body = '<strong>' . t('TIMSS access is not configured for [@broughtby_name].', array('@broughtby_name' => $broughtby_name)) . '</strong><br><br>';
+    }
 
-    $result_body = '';
     if (!$candidates) {
-      $result_body = t('No members match your search criteria: ') . '<strong>' . $form_state['values']['grievance_timss_search'] . '</strong>';
+      $result_body .= t('No members match your search criteria: ') . '<strong>' . $form_state['values']['grievance_timss_search'] . '</strong>';
     } else {
       $header = array(
         t('TIMSS ID'),
