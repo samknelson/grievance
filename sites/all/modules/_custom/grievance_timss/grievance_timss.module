@@ -382,7 +382,7 @@ function grievance_timss_form_grievance_node_form_alter(&$form, &$form_state, $f
 
   $candidates = array();
   if ($form_state['values']['grievance_timss_search']) {
-    if (!$broughtby_tid) { 
+    if (!$broughtby_tid || $broughtby_tid == 'DEFAULT') { 
       $broughtby_tid = 'DEFAULT';
       $broughtby_name = 'Default';
     } else {
