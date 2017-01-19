@@ -6,12 +6,15 @@
 
 
 function grievance_node_tab_bundle_download($grievance_node) {
+	// Path to the bundled file
 	$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 	if (!file_exists($bundled_file)) { 
 		drupal_set_mesage(t('Bundle does not exist.'), 'error');
 		return 'Error.';
 	}
 
+	// "basename" is the filename we'll give to the downloaded file.  Following the logic for
+	// the "letters" funnctionality.
 	$basename = '';
 	if ($grievance_node->field_grievance_last_name['und'][0]['value']) {
 		$tmp = strtolower($grievance_node->field_grievance_last_name['und'][0]['value']);
@@ -31,7 +34,7 @@ function grievance_node_tab_bundle_download($grievance_node) {
 	$basename .= 'bundle_';
 	$basename .= date('Ymd');
 
-
+	// Stream the bundled PDF.
 	header('Content-Type: application/pdf');
 	header("Content-Disposition: attachment; filename=$basename.pdf");
 	print file_get_contents($bundled_file);
@@ -55,7 +58,6 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
 	}
 
 	drupal_set_message($msg);
-
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -110,18 +112,21 @@ function grievance_bundle_form_submit($form, &$form_state) {
 		array($grievance_node),
 	);
 
+	// Fetch each path as an HTML page
 	foreach ($paths_to_bundle as $target_nid => $target_paths) {
 		foreach ($target_paths as $target_path) {
 			$operations[] = array('grievance_bundle_batch_generate', array($grievance_node, $target_path));
 		}
 	}
 
+	// Convert all the HTML paths into PDF documents
 	foreach ($paths_to_bundle as $target_nid => $target_paths) {
 		foreach ($target_paths as $target_path) {
 			$operations[] = array('grievance_bundle_batch_pdf', array($grievance_node, $target_path));
 		}
 	}
 
+	// Append each PDF document, including attachments, into the large bundle.
 	foreach ($paths_to_bundle as $target_nid => $target_paths) {
 		foreach ($target_paths as $target_path) {
 			$operations[] = array('grievance_bundle_batch_add', array($grievance_node, $target_path));
@@ -129,6 +134,7 @@ function grievance_bundle_form_submit($form, &$form_state) {
 		$operations[] = array('grievance_bundle_batch_add_attachments', array($grievance_node, $target_nid));
 	}
 
+	// Clean up the generated HTML and PDF documents
 	foreach ($paths_to_bundle as $target_nid => $target_paths) {
 		foreach ($target_paths as $target_path) {
 			$operations[] = array('grievance_bundle_batch_cleanup', array($grievance_node, $target_path));
@@ -142,7 +148,7 @@ function grievance_bundle_form_submit($form, &$form_state) {
   );
   batch_set($batch);
 
-  drupal_set_message("Bundle Complete");
+  drupal_set_message("Bundling for this grievance is complete.");
 	return;
 }
 
@@ -202,7 +208,6 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		$uri = $tmp['uri'];
 		$extension = preg_replace('/[^a-z0-9_]/', '', strtolower(substr(strrchr($uri, '.'), 1)));
 
-
 		if ($extension != 'pdf') {
 			drupal_set_message("The node <a href=\"/node/$target_nid\" target=\"_blank\">" . $target_node->title . "</a> has a non-PDF attachment which will not be included in the bundle.", 'warning');
 			continue;
@@ -211,6 +216,10 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		$dest = grievance_bundle_output_path($grievance_node, "node/$target_nid") . "_attachment_" . $delta . '.' . $extension;
 
 		file_unmanaged_copy($uri, $dest);
+
+		if (!file_exists($dest)) {
+			continue;
+		}
 
 		$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 		$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
@@ -260,8 +269,6 @@ function grievance_bundle_batch_pdf($grievance_node, $drupal_path, &$context) {
 	watchdog('grievance_bundle', 'Executing: ' . $cmd);
 	exec($cmd);
 }
-
-
 
 function grievance_bundle_working_directory($source_node) {
 	$path = DRUPAL_ROOT;

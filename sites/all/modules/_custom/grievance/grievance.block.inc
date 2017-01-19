@@ -50,7 +50,7 @@ function grievance_block_view($delta = '') {
  * - A description of the next task to be completed, if any
  * - A view of previous grievances by this member, if any
  *
- * @todo: The "previous grievances by this member" should probably be its own block.
+ * @todo: These three (or at least the "previous grievances by this member") should probably be separate blocks, not one
  */
 
 function grievance_block_timeleft() {

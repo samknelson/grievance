@@ -14,6 +14,7 @@ function grievance_timss_cron() {
   grievance_timss_resync();
 }
 
+// @todo: not currently resyncing if there's no "broughtby" term
 function grievance_timss_resync() {
   watchdog('grievance_timss', 'TIMSS resync: Starting');
 
@@ -157,6 +158,8 @@ function grievance_timss_resync() {
   watchdog('grievance_timss', "TIMSS resync: Complete. Examined $examined_count nodes, updated $updated_count.");
 }
 
+// @todo Currently each function does its own REST query.  Would probably be AGoodThing(tm) to 
+//       abstract the network layer.
 function grievance_timss_login($broughtby_tid) {
   if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
   drupal_set_message("Connecting to TIMSS");
@@ -279,6 +282,7 @@ function grievance_timss_search($str, $broughtby_tid) {
 
 function grievance_timss_lookup_ajax($timss_id) {
   $broughtby_tid = $_GET['broughtby_tid'];
+  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
   drupal_json_output(grievance_timss_lookup_raw($timss_id, $broughtby_tid));
   exit;
 }
@@ -379,14 +383,6 @@ function grievance_timss_form_grievance_node_form_alter(&$form, &$form_state, $f
   $candidates = array();
   if ($form_state['values']['grievance_timss_search']) {
     $candidates = grievance_timss_search($form_state['values']['grievance_timss_search'], $broughtby_tid);
-
-    /*
-    foreach ($json_ids as $json_id) {
-      $timss_id = $json_id->timsS_Member_ID;
-      $candidate = grievance_timss_fetch($timss_id);
-      $candidates[] = $candidate;
-    }
-    */
 
     $result_body = '';
     if (!$candidates) {

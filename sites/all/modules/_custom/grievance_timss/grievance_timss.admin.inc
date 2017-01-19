@@ -1,7 +1,6 @@
 <?php
 
 function grievance_timss_admin() {
-
   $broughtby_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_broughtby');
   $broughtby_terms = taxonomy_get_tree($broughtby_vocabulary->vid);
   $broughtby_terms[] = (object) array(
@@ -37,12 +36,14 @@ function grievance_timss_admin() {
     );
   }
 
+  // Add our own submit handler
   $form['#submit'][] = 'grievance_timss_admin_submit';
+
   return system_settings_form($form);
 }
 
 function grievance_timss_admin_submit($form, &$form_state) {
-  // A little hack. When form is presentend, the password is not shown (Drupal
+  // A little hack. When form is presented, the password is not shown (Drupal
   // way of doing). So, if user submits the form without changing the password,
   // we must prevent it from being reset.
 

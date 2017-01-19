@@ -201,8 +201,6 @@ function grievance_contract_next_alert($grievance_node) {
   $open = $status_term->field_grievance_open['und'][0]['value'];
   if (!$open) { return array(NULL, NULL); }
 
-
-
   $timeline = grievance_contract_compute_timeline($grievance_node);
   if (!$timeline) { return array(NULL, NULL); }
 

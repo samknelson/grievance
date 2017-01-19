@@ -1348,13 +1348,7 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'active' => 0,
       'module' => 'multiple_selects',
-      'settings' => array(
-        'content_taxonomy_autocomplete_new_terms' => 'allow',
-        'content_taxonomy_opt_groups' => FALSE,
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
-      ),
+      'settings' => array(),
       'type' => 'multiple_selects',
       'weight' => 37,
     ),

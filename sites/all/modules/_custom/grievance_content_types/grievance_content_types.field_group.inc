@@ -616,7 +616,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Comments',
-    'weight' => '8',
+    'weight' => '6',
     'children' => array(
       0 => 'field_grievance_comments',
     ),
@@ -685,7 +685,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Company Representatives',
-    'weight' => '2',
+    'weight' => '7',
     'children' => array(
       0 => 'field_grievance_co_name',
       1 => 'field_grievance_co_email',
@@ -874,7 +874,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Employee',
-    'weight' => '4',
+    'weight' => '2',
     'children' => array(
       0 => 'field_grievance_department',
       1 => 'field_grievance_phone',
@@ -1019,7 +1019,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Grievance Form',
-    'weight' => '6',
+    'weight' => '5',
     'children' => array(
       0 => 'field_grievance_type',
       1 => 'field_grievance_date_1',
@@ -1377,7 +1377,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Supervisor',
-    'weight' => '5',
+    'weight' => '3',
     'children' => array(
       0 => 'field_grievance_supervisor_name',
       1 => 'field_grievance_supervisor_title',
@@ -1499,7 +1499,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Union Representatives',
-    'weight' => '3',
+    'weight' => '4',
     'children' => array(
       0 => 'field_grievance_rep_filed',
       1 => 'field_grievance_rep_organizer',
@@ -1602,7 +1602,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Information Request',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
       0 => 'field_grievance_inforeq',
       1 => 'field_grievance_document_types',
