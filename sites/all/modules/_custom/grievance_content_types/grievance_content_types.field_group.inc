@@ -685,7 +685,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Company Representatives',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
       0 => 'field_grievance_co_name',
       1 => 'field_grievance_co_email',
@@ -1602,7 +1602,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Information Request',
-    'weight' => '8',
+    'weight' => '7',
     'children' => array(
       0 => 'field_grievance_inforeq',
       1 => 'field_grievance_document_types',
