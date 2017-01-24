@@ -84,6 +84,8 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form_state['triggering_element']['#field_name'] == 'field_grievance_category') {
     $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'closed';
     $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';
+  } else if ($form_state['triggering_element']['#field_name']) {
+    $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'open';
   }
   
   //////////////////////////////////////////////////////

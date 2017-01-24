@@ -1332,7 +1332,7 @@ function grievance_content_types_field_group_info() {
         'classes' => '',
         'description' => '',
       ),
-      'formatter' => 'open',
+      'formatter' => 'closed',
     ),
   );
   $field_groups['group_grievance_status|node|grievance|form'] = $field_group;

@@ -3491,11 +3491,6 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['footer']['area']['empty'] = TRUE;
   $handler->display->display_options['footer']['area']['content'] = '[<a href="/node/add/grievance-shop">Add an item</a>]';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
-  /* Relationship: Entity Reference: Referencing entity */
-  $handler->display->display_options['relationships']['reverse_field_grievance_shops_user']['id'] = 'reverse_field_grievance_shops_user';
-  $handler->display->display_options['relationships']['reverse_field_grievance_shops_user']['table'] = 'node';
-  $handler->display->display_options['relationships']['reverse_field_grievance_shops_user']['field'] = 'reverse_field_grievance_shops_user';
-  $handler->display->display_options['relationships']['reverse_field_grievance_shops_user']['label'] = 'User';
   /* Relationship: Entity Reference: Referenced Entity */
   $handler->display->display_options['relationships']['field_grievance_company_target_id']['id'] = 'field_grievance_company_target_id';
   $handler->display->display_options['relationships']['field_grievance_company_target_id']['table'] = 'field_data_field_grievance_company';
@@ -3573,14 +3568,6 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_contract_tplt']['settings'] = array(
     'link' => 1,
   );
-  /* Field: User: Name */
-  $handler->display->display_options['fields']['name']['id'] = 'name';
-  $handler->display->display_options['fields']['name']['table'] = 'users';
-  $handler->display->display_options['fields']['name']['field'] = 'name';
-  $handler->display->display_options['fields']['name']['relationship'] = 'reverse_field_grievance_shops_user';
-  $handler->display->display_options['fields']['name']['label'] = 'Steward';
-  $handler->display->display_options['fields']['name']['link_to_user'] = FALSE;
-  $handler->display->display_options['fields']['name']['overwrite_anonymous'] = TRUE;
   /* Field: Content: Company */
   $handler->display->display_options['fields']['field_grievance_company_1']['id'] = 'field_grievance_company_1';
   $handler->display->display_options['fields']['field_grievance_company_1']['table'] = 'field_data_field_grievance_company';
@@ -3597,14 +3584,18 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['nothing']['label'] = 'Actions';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '[<a href="/node/[nid]/edit">Edit</a>] [<a href="/node/[nid]/contacts">Contacts</a>]';
   /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
+  $handler->display->display_options['sorts']['title']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['title']['expose']['label'] = 'Employer';
+  /* Sort criterion: Content: Title */
   $handler->display->display_options['sorts']['title_1']['id'] = 'title_1';
   $handler->display->display_options['sorts']['title_1']['table'] = 'node';
   $handler->display->display_options['sorts']['title_1']['field'] = 'title';
   $handler->display->display_options['sorts']['title_1']['relationship'] = 'field_grievance_company_target_id';
-  /* Sort criterion: Content: Title */
-  $handler->display->display_options['sorts']['title']['id'] = 'title';
-  $handler->display->display_options['sorts']['title']['table'] = 'node';
-  $handler->display->display_options['sorts']['title']['field'] = 'title';
+  $handler->display->display_options['sorts']['title_1']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['title_1']['expose']['label'] = 'Company';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -3702,7 +3693,6 @@ function grievance_views_views_default_views() {
     t('next ›'),
     t('last »'),
     t('[<a href="/node/add/grievance-shop">Add an item</a>]'),
-    t('User'),
     t('Company'),
     t('Nid'),
     t('Content'),
@@ -3711,7 +3701,6 @@ function grievance_views_views_default_views() {
     t('Contract'),
     t('Attachments'),
     t('Contract Template'),
-    t('Steward'),
     t('Actions'),
     t('[<a href="/node/[nid]/edit">Edit</a>] [<a href="/node/[nid]/contacts">Contacts</a>]'),
     t('Tags'),
