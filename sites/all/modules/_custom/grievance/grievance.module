@@ -212,6 +212,9 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     // Alert data is a system-only field
     $form['field_grievance_data_alert']['#access'] = FALSE;
 
+    // External ID is a system-only field (for now)
+    $form['field_grievance_external_id']['#access'] = FALSE;
+
     // ID is a system-only field
     $grievance_id_manual = variable_get('grievance_id_manual', '');
     if ($grievance_id_manual != 'Yes' || !user_access('grievance admin')) {

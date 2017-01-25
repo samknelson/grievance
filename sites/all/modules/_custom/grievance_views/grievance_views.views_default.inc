@@ -3577,6 +3577,10 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_company_1']['settings'] = array(
     'link' => 0,
   );
+  /* Field: Content: External ID */
+  $handler->display->display_options['fields']['field_grievance_external_id']['id'] = 'field_grievance_external_id';
+  $handler->display->display_options['fields']['field_grievance_external_id']['table'] = 'field_data_field_grievance_external_id';
+  $handler->display->display_options['fields']['field_grievance_external_id']['field'] = 'field_grievance_external_id';
   /* Field: Global: Custom text */
   $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
@@ -3701,6 +3705,7 @@ function grievance_views_views_default_views() {
     t('Contract'),
     t('Attachments'),
     t('Contract Template'),
+    t('External ID'),
     t('Actions'),
     t('[<a href="/node/[nid]/edit">Edit</a>] [<a href="/node/[nid]/contacts">Contacts</a>]'),
     t('Tags'),
