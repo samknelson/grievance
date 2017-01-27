@@ -3,130 +3,54 @@
 // I hate notice errors
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
-function grievance_uhmigrate_import() {
-  // Source file
-  $source_filename = DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/data/import.csv";
-  $source_handle = fopen($source_filename, "r");
-  if (!$source_handle) {
-    die("Unable to open $source_filename");
-  }
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1.inc";
 
-  // Headers
-  $headers = fgetcsv($source_handle, 1000);
-
-  /*
-  Array
-  (
-      [0] => RecId                // External ID
-      [1] => Griev#               // Grievance Number, aka "Grievance ID"
-      [2] => GrvLoc               // DON'T IMPORT
-      [3] => GrvCft               // DON'T IMPORT
-      [4] => Violation            // Match to the CBA as best as possible
-      [5] => ViolType
-      [6] => CntSubSec
-      [7] => ViolDesc
-      [8] => ViolCde
-      [9] => DispDte
-      [10] => DspAction
-      [11] => ExpeditedARB
-      [12] => Amount
-      [13] => Initial
-      [14] => In_TakeDte
-      [15] => DeleteCde
-      [16] => GrievTaker
-      [17] => GreivAssign
-      [18] => GrievShopSteward
-      [19] => GrievAttny
-      [20] => GrievSupervisor
-      [21] => Union_Lead
-      [22] => Occurence_Dte
-      [23] => Occurence_Time
-      [24] => Email_Addr
-      [25] => Interpreter
-      [26] => Language
-      [27] => Loc_Wrk_Dept
-      [28] => Coordinator
-      [29] => Date1
-      [30] => Date2
-      [31] => Date3
-      [32] => Date4
-      [33] => Date5
-      [34] => Date6
-      [35] => Date7
-      [36] => Date8
-      [37] => Date9
-      [38] => Date10
-      [39] => Date11
-      [40] => Date12
-      [41] => Date13
-      [42] => Date14
-      [43] => Date15
-      [44] => Time1
-      [45] => Text1
-      [46] => Text2
-      [47] => Text3
-      [48] => Check1
-      [49] => Check2
-      [50] => GrievDOH
-      [51] => GrievDayoff1
-      [52] => GrievDayoff2
-      [53] => GrievDayoff3
-      [54] => Phone1
-      [55] => Phone2
-      [56] => GreivEmplyStat
-      [57] => GreivShift
-      [58] => Check3
-      [59] => Check4
-      [60] => Check5
-      [61] => YN1
-      [62] => Grievant
-      [63] => GCustId
-      [64] => Disp_Pro
-      [65] => Hard_copy_Lost
-      [66] => Purge
-  )
-  */
-
-  // Load our rows one at a time
-  $row = 1;
-  while ($row_raw = fgetcsv($source_handle, 1000, ",")) {
-    // Generate an associative array from the input
-    $row = array();
-    $col = 0;
-    foreach ($headers as $header) {
-      $row[$header] = $row_raw[$col];
-      ++$col;
-    }
-
-    // Find the node to create or update
-    $external_id = $row['RecId'];
-    $grievance_node = grievance_uhmigrate_find_by_external_id($external_id);
-
-    // Dump everything into "Comments"
-    $grievance_node->field_grievance_comments['und'][0]['value'] = 
-      t('Imported from CSV via migration script; last updated on ') . 
-      date('r') . 
-      "\n\nRaw data:\n" .
-      print_r($row, 1);
-
-    // Grievance ID
-    $grievance_id = $row['Griev#'];
-    $grievance_node->field_grievance_id['und'][0]['value'] = $grievance_id;
-
-    // Save the grievance node
-    $nid = $grievance_node->nid;
-    if (!$nid) { $nid = "[new]"; }
-    print "Saving: External ID $external_id, Grievance ID $grievance_id, Node ID $nid\n";
-    node_save($grievance_node);
-    break;
-  }
-  fclose($source_handle);
+function grievance_uhmigrate_base_dir() {
+  $dir = DRUPAL_ROOT;
+  $dir = preg_replace('/\/httpdocs/', '/private/migrate', $dir);
+  return $dir;
 }
 
-function grievance_uhmigrate_find_by_external_id($external_id) {
+$grievance_uhmigrate_base = '/var/www/vhosts/grievances.clevernamehere.com/private/migrate';
+
+function grievance_uhmigrate_log($type, $row, $msg) {
+  print "Row #" . $row['Row'] . ': ' . $type . ': ' . $msg . "\n";
+}
+
+function grievance_uhmigrate_find_by_title($content_type, $title) {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance');
+  $query->entityCondition('bundle', $content_type);
+  $query->propertyCondition('title', $title);
+  $query->propertyOrderBy('nid');
+  $stmt = $query->execute();
+
+  // Found one, return the first.
+  if ($stmt['node']) {
+    $tmp = array_keys($stmt['node']);
+    $nid = $tmp[0];
+    return node_load($nid);
+  }
+
+  // Didn't find one, return an empty node
+  global $user;
+  $node = new stdClass();
+  $node->type = $content_type;
+  node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+  $node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+  $node->uid = $user->uid; 
+  $node->status = 1;
+  $node->promote = 0;
+  $node->comment = 0;
+  $node->title = $title;
+  return $node;
+}
+
+function grievance_uhmigrate_find_by_external_id($content_type, $external_id) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', $content_type);
   $query->fieldCondition('field_grievance_external_id', 'value', $external_id);
   $query->propertyOrderBy('nid');
   $stmt = $query->execute();
@@ -141,7 +65,7 @@ function grievance_uhmigrate_find_by_external_id($external_id) {
   // Didn't find one, return an empty node
   global $user;
   $node = new stdClass();
-  $node->type = "grievance";
+  $node->type = $content_type;
   node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
   $node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
   $node->uid = $user->uid; 
@@ -151,3 +75,9 @@ function grievance_uhmigrate_find_by_external_id($external_id) {
   $node->field_grievance_external_id['und'][0]['value'] = $external_id;
   return $node;
 }
+
+function grievance_uhmigrate_node_save(&$node) {
+  // return NULL;
+  return node_save($node); 
+}
+
