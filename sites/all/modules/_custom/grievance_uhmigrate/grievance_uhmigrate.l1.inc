@@ -97,7 +97,7 @@ function grievance_uhmigrate_l1_import_contacts($limit = 0) {
 	  $contact_node->field_grievance_co_role['und'][0]['value'] = $row['Title'];
 	  $contact_node->field_grievance_co_phone['und'][0]['value'] = $row['Phone'];
 	  $contact_node->field_grievance_co_fax['und'][0]['value'] = $row['Fax'];
-	  $contact_node->field_grievance_co_email['und'][0]['email'] = $row['Email'];
+	  $contact_node->field_grievance_co_email['und'][0]['email'] = trim($row['Email']);
 	  $contact_node->field_grievance_shops['und'][0]['target_id'] = $shop_node->nid;
 
     grievance_uhmigrate_node_save($contact_node);
