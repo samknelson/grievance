@@ -1,6 +1,6 @@
 <?php
 
-function grievance_uhmigrate_l1_import_contacts() {
+function grievance_uhmigrate_l1_import_contacts($limit = 0) {
   // Source file
   // $source_filename = DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/data/import.csv";
   $source_filename = grievance_uhmigrate_base_dir() . '/uh_1/uh_1_contacts.csv';
@@ -34,7 +34,7 @@ function grievance_uhmigrate_l1_import_contacts() {
   $seen_before = array();
   while ($row_raw = fgetcsv($source_handle, 1000, ",")) {
     ++$rowcount;
-    if ($rowcount > 10) { break; }
+    if ($limit && ($rowcount > $limit)) { break; }
 
     // Generate an associative array from the input
     $row = array("Row" => $rowcount);
