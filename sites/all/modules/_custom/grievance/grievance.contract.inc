@@ -302,6 +302,7 @@ function grievance_contract_compute_timeline($grievance_node) {
     if ($timeline_lookup_from_status[$status_tid]) {
       foreach ($timeline_lookup_from_status[$status_tid] as $rule_nid) {
         // Make sure we don't have an open entry at the moment (can't open it twice)
+        $rule_node = $timeline['rule_nodes'][$rule_nid];
         $current_delta = $timeline[$rule_nid]['current_delta'];
         if ($current_delta > -1) { continue; }
 
