@@ -3552,3 +3552,7 @@ table.grievance-timeline tr.pending {
   padding-right: 10px;
 }
 
+.node-full .field-name-field-grievance-comments {
+  white-space: pre;
+  word-wrap: break-word;
+}
