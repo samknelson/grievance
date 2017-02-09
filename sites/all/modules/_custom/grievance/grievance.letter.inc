@@ -55,6 +55,31 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				$replacements[$original] = drupal_render($renderable);
 			}
 
+			// Add the clauserfs as a rendered list
+			if ($name == 'clauseref') {
+				// @TODO
+				$html = '';
+				foreach ($data['node']->field_grievance_clauseref['und'] as $item) {
+					if ($html) { 
+						$html .= '<br>';
+					}
+					$clause_node = node_load($item['target_id']);
+					$html .= $clause_node->field_grievance_label['und'][0]['value'] . ': ' . $clause_node->title;
+				}
+				$replacements[$original] = $html;
+				/*
+				if ($node->content['field_grievance_clauseref']['#items']) {
+					$html = '';
+					foreach ($data['node']->content['field_grievance_clauseref']['#items'] as $item) {
+						$clause_node = $item['entity'];
+						$title = 
+						$node->content['field_grievance_clauseref'][$delta]['#markup'] = $title;
+						++$delta;
+					}
+				}
+				*/
+			}
+
     }
   }
 
