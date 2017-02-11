@@ -175,6 +175,8 @@ function grievance_letter_render_html($grievance_node, $letter_nids, $other_toke
 			array(
 				'node' => $grievance_node,
 				'grievance-letter' => $other_tokens,
+			),
+			array(
 				'clear' => TRUE,
 			)
 		);
