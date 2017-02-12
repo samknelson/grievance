@@ -49,6 +49,9 @@ function grievance_node_update($node) {
     if ($node->field_grievance_assignee_notes['und'][0]['value'] != $node->original->field_grievance_assignee_notes['und'][0]['value']) {
       $node->grievance_assignment_changed = TRUE;
     }
+    if ($node->field_grievance_status['und'][0]['tid'] != $node->original->field_grievance_status['und'][0]['tid']) {
+      $node->grievance_status_changed = TRUE;
+    }
   }
 
   if ($node->type == 'grievance_log') {

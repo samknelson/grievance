@@ -28,8 +28,15 @@ function grievance_log_update($grievance_node, $op) {
   $log_node = new stdClass();
   if ($op == 'insert') {
     $log_node->title = t('Grievance Record Created');
+    $log_type_tid = variable_get('grievance_log_insert_type', '');
   } else {
-    $log_node->title = t('Grievance Record Updated');
+    if ($grievance_node->grievance_status_changed) {
+      $log_node->title = t('Grievance Record Updated with status change');
+      $log_type_tid = variable_get('grievance_log_update_type_with_status_change', '');
+    } else {
+      $log_node->title = t('Grievance Record Updated');
+      $log_type_tid = variable_get('grievance_log_update_type_without_status_change', '');
+    }
   }
   $log_node->type = 'grievance_log';
   node_object_prepare($log_node);
@@ -44,7 +51,7 @@ function grievance_log_update($grievance_node, $op) {
   $log_node->field_grievance_alert = $grievance_node->field_grievance_alert;
   $log_node->field_grievance_alert_tid = $grievance_node->field_grievance_alert_tid;
   $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
-  $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_update_type', '');
+  $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
 
   $log_node->field_grievance_status_date = $grievance_node->field_grievance_status_date;
   if (!$log_node->field_grievance_status_date['und'][0]['value']) {

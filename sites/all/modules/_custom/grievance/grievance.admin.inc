@@ -24,12 +24,28 @@ function grievance_admin() {
     '#description' => t("Grievance log status to be used for incidents -- i.e. an entry with this status is created the date that the incident occurred."),
   );
 
-  $form['grievance_log']['grievance_log_update_type'] = array(
+  $form['grievance_log']['grievance_log_insert_type'] = array(
     '#type' => 'select',
     '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
-    '#title' => t('Grievance Log Update Type'),
-    '#default_value' => variable_get('grievance_log_update_type', ''),
-    '#description' => t("Grievance log type to be used for updates -- i.e. an entry is created each time the grievance is saved."),
+    '#title' => t('Grievance Log Insert Type'),
+    '#default_value' => variable_get('grievance_log_insert_type', ''),
+    '#description' => t("Grievance log type to be used when a grievance record is first saved into the database."),
+  );
+
+  $form['grievance_log']['grievance_log_update_type_with_status_change'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Grievance Log Update Type With Status Change'),
+    '#default_value' => variable_get('grievance_log_update_type_with_status_change', ''),
+    '#description' => t("Grievance log type to be used for updates where the status changes -- i.e. when the record is saved and the status is different."),
+  );
+
+  $form['grievance_log']['grievance_log_update_type_without_status_change'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Grievance Log Update Type Without Status Change'),
+    '#default_value' => variable_get('grievance_log_update_type_with_status_change', ''),
+    '#description' => t("Grievance log type to be used for updates where the status does not change -- i.e. an entry is created each time the grievance is saved."),
   );
 
   $form['grievance_log']['grievance_log_notify_type'] = array(
