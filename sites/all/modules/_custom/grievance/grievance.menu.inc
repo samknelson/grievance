@@ -187,6 +187,20 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance contract'),
 	);
 
+	$node_tabs['grievance_contract_template']['replicate/all'] = array(
+		'title' => 'Duplicate All',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_replicate_all',
+		'permissions' => array('grievance contract'),
+	);
+
+	$node_tabs['grievance_contract_template']['replicate/rules'] = array(
+		'title' => 'Duplicate Timeline Only',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_replicate_rules',
+		'permissions' => array('grievance contract'),
+	);
+
 	return $node_tabs;
 }
 

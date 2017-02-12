@@ -1,21 +1,23 @@
 <?php
-function grievance_contract_template_node_tab_replicate($node) {
-  drupal_set_title($node->title . ': ' . t('Duplicate'));
 
-	return drupal_get_form('grievance_replicate_form', $node);
+function grievance_contract_template_node_tab_replicate($node) {
+  drupal_goto('node/' . $node->nid . '/replicate/all');
 }
 
-function grievance_replicate_form($form, &$form_state, $node) {
-	$form_state['node'] = $node;
+function grievance_contract_template_node_tab_replicate_all($node) {
+  drupal_set_title($node->title . ': ' . t('Duplicate Entire Contract'));
 
-	/*
-  $form['holidays'] = array(
- 		'#type' => 'checkboxes',
-  	'#options' => $options,
-  	'#title' => t('Select the holidays that are observed under this conrtract.'),
-  	'#default_value' => $default_value,
-  );
-  */
+	return drupal_get_form('grievance_contract_template_replicate_form_all', $node);
+}
+
+function grievance_contract_template_node_tab_replicate_rules($node) {
+  drupal_set_title($node->title . ': ' . t('Duplicate Rules Only'));
+
+  return drupal_get_form('grievance_contract_template_replicate_form_rules', $node);
+}
+
+function grievance_contract_template_replicate_form_all($form, &$form_state, $node) {
+	$form_state['node'] = $node;
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -25,7 +27,7 @@ function grievance_replicate_form($form, &$form_state, $node) {
 	return $form;
 }
 
-function grievance_replicate_form_submit($form, &$form_state) {
+function grievance_contract_template_replicate_form_all_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 
 	$node = $form_state['node'];
@@ -105,12 +107,6 @@ function grievance_replicate_batch_finished($success, $results, $operations) {
 	drupal_set_message(t('Duplication complete.  The new entity can be viewed ' . l(t('here'), 'node/' . $results['to_nid'])));
 }
 
-
-
-
-
-
-
 /**
  * Implements hook_replicate_entity_ENITYT_TYPE
  */
@@ -119,4 +115,106 @@ function grievance_replicate_entity_node(&$replica) {
 		$replica->title = 'Copy of ' . $replica->title;
 		drupal_set_message("Replicating grievance contract template.");
 	}
+}
+
+
+
+
+
+function grievance_contract_template_replicate_form_rules($form, &$form_state, $node) {
+  $form_state['node'] = $node;
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_contract_template');
+  $query->propertyCondition('nid', $node->nid, '!=');
+  $query->propertyOrderBy('title');
+  $stmt = $query->execute();
+
+  $options = array(NULL => t('-- Target Contract --'));
+  if ($stmt['node']) {
+    $target_contract_nodes = node_load_multiple(array_keys($stmt['node']));
+    foreach ($target_contract_nodes as $target_contract_nid => $target_contract_node) {
+      $options[$target_contract_nid] = $target_contract_node->title;
+    }
+  }
+
+  $form['target'] = array(
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#options' => $options,
+    '#title' => t('Target Contract'),
+    '#description' => t('The rules from this contract template will REPLACE the rules in the target contract.')
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Copy Now',
+  );
+  
+  return $form;
+}
+
+function grievance_contract_template_replicate_form_rules_submit($form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
+
+  $source_node = $form_state['node'];
+  $source_nid = $source_node->nid;
+  $target_nid = $form_state['values']['target'];
+  $target_node = node_load($target_nid);
+  if (!$target_node) {
+    drupal_set_message(t('Target could not be loaded'), 'error');
+    return;
+  }
+
+  // First clear the rules from the target node
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $target_nid);
+  $query->entityCondition('bundle', 'grievance_contract_rule');
+  $stmt = $query->execute();
+  $delete_count = 0;
+  if ($stmt['node']) {
+    foreach (array_keys($stmt['node']) as $child_nid) {
+      ++$delete_count;
+      node_delete($child_nid);
+    }
+  }
+
+  // Now copy all the rules from the source node
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $source_nid);
+  $query->entityCondition('bundle', 'grievance_contract_rule');
+  $stmt = $query->execute();
+  $insert_count = 0;
+  if ($stmt['node']) {
+    foreach (array_keys($stmt['node']) as $child_nid) {
+      ++$insert_count;      $child_node = node_load($child_nid);
+
+      $replica_nid = replicate_entity('node', $child_node);
+      $replica_node = node_load($replica_nid);
+      $replica_node->field_grievance_contract_tplt['und'][0]['target_id'] = $target_nid;
+      node_save($replica_node);
+    }
+  }
+
+  $msg = t('Success! Copied <strong>@insert_count</strong> new rules from [<strong>@source_title</strong>] to [<strong>@target_title</strong>].', 
+    array(
+      '@insert_count' => $insert_count, 
+      '@source_title' => $source_node->title,
+      '@target_title' => $target_node->title
+    )
+  );
+  
+  if ($delete_count) {
+    $msg .= t(' (<strong>@delete_count</strong> old rules were deleted from <strong>@target_title</strong>.)', 
+      array(
+        '@delete_count' => $delete_count, 
+        '@target_title' => $target_node->title
+      )
+    );
+  }
+
+  drupal_set_message($msg);
 }
