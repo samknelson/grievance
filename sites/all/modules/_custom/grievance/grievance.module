@@ -337,6 +337,11 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
       $form['field_grievance_co_zip']['#access'] = FALSE;
     }
   }
+
+  // Set some default values for views
+  if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'grievance_log') {
+    grievance_log_views_exposed_form_alter($form, $form_state);
+  }
 }
 
 function grievance_classes_array($new_classes = null) {

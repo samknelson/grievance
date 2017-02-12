@@ -421,5 +421,26 @@ function grievance_node_tab_timeline($grievance_node) {
   }
 
   return theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => $attributes));
+}
 
+function grievance_log_views_exposed_form_alter($form, &$form_state) {
+  if (isset($form['field_grievance_log_type_tid']['#options'])) {
+
+    $tmp = array_keys($form['field_grievance_log_type_tid']['#options']);
+    $skip_tid = variable_get('grievance_log_update_type_without_status_change', '');
+    $default = array();
+    foreach (array_keys($form['field_grievance_log_type_tid']['#options']) as $tid) {
+      if ($tid != $skip_tid) {
+        $default[$tid] = $tid;
+      }
+    }
+
+    // This is what we want to do, but it doesn't work with AHAH checkboxes grr.
+    // $form['field_grievance_log_type_tid']['#default_value'] = $default;
+
+    // So this is the garbage that we have to do.
+    if (!$form_state['input']['field_grievance_log_type_tid']) {
+      $form_state['input']['field_grievance_log_type_tid'] = $default;
+    }
+  }
 }
