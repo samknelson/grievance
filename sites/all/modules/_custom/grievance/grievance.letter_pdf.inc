@@ -13,7 +13,8 @@ function grievance_letter_loopback($grievance_node) {
 	grievance_classes_array('loopback');
 
 	$letter_nids = explode(',', $_GET['letter_nids']);
-	return grievance_letter_render_html($grievance_node, $letter_nids, $_GET);
+
+	return grievance_letter_render_html($grievance_node, $letter_nids, array_merge($_GET, $_POST));
 }
 
 function grievance_node_tab_letter_pdf($node, $letter_nids, $values) {
@@ -72,8 +73,26 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 	}
 	$url .= $_SERVER['SERVER_NAME'] . '/node/' . $node->nid . '/loopback-letter';
 	$url .= '?letter_nids=' . join(',', $letter_nids);
-	$url .= "\&" . 'delivery_tid=' . urlencode($values['delivery_tid']);
-	$html = file_get_contents($url);
+	$url .= "&" . 'delivery_tid=' . urlencode($values['delivery_tid']);
+
+	// $html = file_get_contents($url);
+
+	$postfields = array();
+	if ($values['letter_body']) {
+		$postfields['letter_body'] = $values['letter_body']['value'];
+	}
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_HEADER, 0);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  if ($postfields) {
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+	}
+  $html = curl_exec($ch);
+  curl_close($ch);
+
 	file_put_contents($html_path, $html);
 
 	// Execute wkhtmltopdf
@@ -93,9 +112,10 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 	}
 	$cmd .= '--print-media-type ';
 	$cmd .= '-q ';
-	$cmd .= $url;
+	$cmd .= $html_path;
 	$cmd .= ' ';
 	$cmd .= $pdf_path;
+
 	exec($cmd);
 
 	return file_get_contents($pdf_path);

@@ -59,12 +59,14 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 			if ($name == 'clauseref') {
 				// @TODO
 				$html = '';
-				foreach ($data['node']->field_grievance_clauseref['und'] as $item) {
-					if ($html) { 
-						$html .= '<br>';
+				if ($data['node']->field_grievance_clauseref['und'][0]) {
+					foreach ($data['node']->field_grievance_clauseref['und'] as $item) {
+						if ($html) { 
+							$html .= '<br>';
+						}
+						$clause_node = node_load($item['target_id']);
+						$html .= $clause_node->field_grievance_label['und'][0]['value'] . ': ' . $clause_node->title;
 					}
-					$clause_node = node_load($item['target_id']);
-					$html .= $clause_node->field_grievance_label['und'][0]['value'] . ': ' . $clause_node->title;
 				}
 				$replacements[$original] = $html;
 				/*

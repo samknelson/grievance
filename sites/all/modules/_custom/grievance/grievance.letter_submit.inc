@@ -47,6 +47,20 @@ function grievance_letter_form_submit($form, &$form_state) {
 			$letter_nids, 
 			array(
 				'delivery_tid' => $form_state['values']['delivery_tid'],
+				'letter_body' => $form_state['values']['letter_body']['value'],
+			)
+		);
+		return;
+	}
+
+	if ($output == 'edit') {
+		drupal_set_message(t('The letter(s) can be edited at the bottom of this page.'));
+		$form_state['edit_result'] = grievance_letter_render_html(
+			$grievance_node, 
+			$letter_nids, 
+			array(
+				'delivery_tid' => $form_state['values']['delivery_tid'],
+				'body' => $form_state['values']['letter_body'],
 			)
 		);
 		return;
@@ -166,6 +180,9 @@ function grievance_letter_form_submit($form, &$form_state) {
 }
 
 function grievance_letter_render_html($grievance_node, $letter_nids, $other_tokens) {
+	if ($other_tokens['letter_body']) {
+		return '<div id="grievance-letter-body">' . $other_tokens['letter_body'] . '</div>';
+	}
 	$letter_nodes = node_load_multiple($letter_nids);
 	$body = '';
 	foreach ($letter_nodes as $letter_nid => $letter_node) {
@@ -185,7 +202,6 @@ function grievance_letter_render_html($grievance_node, $letter_nids, $other_toke
 			$body .= '<div class="grievance-letter-page-break">&nbsp;</div>';
 		}
 		$body .= '<div class="grievance-letter-part">' . $letter_part . '</div>';
-
 	}
 
 	$body = '<div id="grievance-letter-body">' . $body . '</div>';

@@ -444,6 +444,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     '#options' => array(
     	'pdf' => t('Download the letter in PDF format'),
     	'preview' => t('Preview the letter on the screen'),
+    	'edit' => t('Edit the letter before sending'),
     ),
     '#title' => t('Output'),
   );
@@ -457,7 +458,17 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	// On-Screen Preview
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // Screen Preview
+  // Edit
+  if ($form_state['edit_result']) {
+		$form['letter_body'] = array(
+			'#title' => 'Edit the Letter',
+			'#type' => 'text_format',
+			'#default_value' => $form_state['edit_result'],
+			'#format' => 'full_html',
+		);
+  }
+	
+	// Screen Preview
   if ($form_state['result']) {
   	$markup = '<h2>' . t('Preview') . '</h2>';
   	$markup .= '<hr>';
@@ -468,7 +479,8 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
   		'#markup' => $markup,
   	);
   }
-	
+
+
 	return $form;
 }
 
