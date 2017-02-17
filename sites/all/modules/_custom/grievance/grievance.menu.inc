@@ -229,6 +229,7 @@ function grievance_menu() {
 		}
 	}
 
+	/*
 	$items['grievances/reminder'] = array(
 		'title' => t('Reminders'),
 		'page callback' => 'grievance_reminders',
@@ -237,6 +238,7 @@ function grievance_menu() {
 		'type' => MENU_LOCAL_TASK,
 		'weight' => 10,
 	);
+	*/
 
 	$items['node/%node/loopback'] = array(
 		'page callback' => 'grievance_forward_loopback',
