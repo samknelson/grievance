@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * Change "Employer Name" field to be a long-text field.
+ */
+
+function grievance_update_7001() {
+  // Manual database changes.
+  db_query("UPDATE {field_config} SET type = 'text_long' WHERE field_name = 'field_grievance_emp_name'");
+  db_change_field('field_data_field_grievance_emp_name', 'field_grievance_emp_name_value', 'field_grievance_emp_name_value', array(
+    'type' => 'text',
+    'size' => 'big',
+    'not null' => FALSE,
+  ));
+  db_change_field('field_revision_field_grievance_emp_name', 'field_grievance_emp_name_value', 'field_grievance_emp_name_value', array(
+    'type' => 'text',
+    'size' => 'big',
+    'not null' => FALSE,
+  ));
+
+  // Clear caches.
+  field_cache_clear(TRUE);
+}
