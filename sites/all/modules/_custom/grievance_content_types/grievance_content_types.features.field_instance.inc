@@ -646,7 +646,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -716,7 +716,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -2353,7 +2353,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 33,
+        'weight' => 4,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'inline',
@@ -2470,7 +2470,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 34,
+        'weight' => 5,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -3803,7 +3803,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 36,
+        'weight' => 37,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -9536,9 +9536,10 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'text',
       'settings' => array(
+        'rows' => 5,
         'size' => 60,
       ),
-      'type' => 'text_textfield',
+      'type' => 'text_textarea',
       'weight' => 2,
     ),
   );

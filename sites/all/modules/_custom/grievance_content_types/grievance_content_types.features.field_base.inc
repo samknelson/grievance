@@ -1662,7 +1662,7 @@ function grievance_content_types_field_default_field_bases() {
       'max_length' => 255,
     ),
     'translatable' => 0,
-    'type' => 'text',
+    'type' => 'text_long',
   );
 
   // Exported field_base: 'field_grievance_entity_type'.

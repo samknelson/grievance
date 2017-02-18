@@ -1443,6 +1443,7 @@ function grievance_content_types_field_group_info() {
       0 => 'field_grievance_date_1',
       1 => 'field_grievance_date_2',
       2 => 'grievance_timeline',
+      3 => 'post_date',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
