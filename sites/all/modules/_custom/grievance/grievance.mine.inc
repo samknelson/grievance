@@ -1,8 +1,6 @@
 <?php
 
 function grievance_views_post_execute_grievances_mine(&$view) {
-	dpm($view);
-
 	if (isset($view->result)) {
 		foreach ($view->result as &$result) {
 			$grievance_nid = $result->nid;
