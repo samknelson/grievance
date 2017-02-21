@@ -16,14 +16,6 @@ function grievance_admin() {
     '#description' => t("Grievance log type to be used for incidents -- i.e. an entry of this type is created the date that the incident occurred."),
   );
 
-  $form['grievance_log']['grievance_log_incident_status'] = array(
-    '#type' => 'select',
-    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_status')),
-    '#title' => t('Grievance Log Incident Status'),
-    '#default_value' => variable_get('grievance_log_incident_status', ''),
-    '#description' => t("Grievance log status to be used for incidents -- i.e. an entry with this status is created the date that the incident occurred."),
-  );
-
   $form['grievance_log']['grievance_log_insert_type'] = array(
     '#type' => 'select',
     '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
@@ -70,6 +62,35 @@ function grievance_admin() {
     '#title' => t('Grievance Log Assignment Type'),
     '#default_value' => variable_get('grievance_log_assignment_type', ''),
     '#description' => t("Grievance log type to be used for assignment to a staff member."),
+  );
+
+  $form['grievance_log']['grievance_log_first_call_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Grievance Log First Call Type'),
+    '#default_value' => variable_get('grievance_log_first_call_type', ''),
+    '#description' => t("Grievance log type to be used for initial call to grievant.  Used for reporting."),
+  );
+
+  $form['grievance_status'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Status Types'),
+  );
+
+  $form['grievance_status']['grievance_log_incident_status'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_status')),
+    '#title' => t('Grievance Incident Status'),
+    '#default_value' => variable_get('grievance_log_incident_status', ''),
+    '#description' => t("Grievance log status to be used for incidents -- i.e. an entry with this status is created the date that the incident occurred."),
+  );
+
+  $form['grievance_status']['grievance_log_filed_status'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_status')),
+    '#title' => t('Grievance Filed Status'),
+    '#default_value' => variable_get('grievance_log_filed_status', ''),
+    '#description' => t("Grievance status for filed, used for generating reports"),
   );
 
   $form['member_forward'] = array(

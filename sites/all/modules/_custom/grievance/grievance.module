@@ -33,6 +33,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.letter_submit.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.phone.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.reminder.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.mine.inc";
 
 /**
  * Implement hook_cron() 
@@ -420,9 +421,9 @@ function grievance_report_cache_info() {
  */
 
 function grievance_views_pre_render(&$view) {
-
   // Highlight my assignments in the main grievances view
-  if ($view->name == 'grievances' && $view->current_display == 'page_1') {
+  if ($view->name == 'grievances' && $view->current_display == 'page_1' ||
+    $view->name == 'grievances_mine') {
     global $user; 
     if (!$user || !$user->uid) { return; }
     foreach ($view->result as &$row) {
@@ -430,6 +431,13 @@ function grievance_views_pre_render(&$view) {
         $row->field_field_grievance_rep_assignee[0]['rendered']['#markup'] = '<strong>' . $row->field_field_grievance_rep_assignee[0]['rendered']['#markup'] . '</strong>';
       }
     }
+  }
+
+}
+
+function grievance_views_post_execute(&$view) {
+  if ($view->name == 'grievances_mine') {
+    grievance_views_post_execute_grievances_mine($view);
   }
 }
 

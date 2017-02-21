@@ -258,13 +258,17 @@ function grievance_log_member_forward(
   node_save($log_node);
 }
 
-function grievance_log_list($grievance_node, $type_tids) {
+function grievance_log_list($grievance_nid, $type_tids) {
+  if (is_object($grievance_nid)) {
+    $grievance_nid = $grievance_nid->nid;
+  }
+
   if (!is_array($log_tids)) { $log_tids = array($log_tids); }
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_log_type', 'tid', $type_tids, 'in');
-  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
   $query->fieldOrderBy('field_grievance_status_date', 'value');
   $stmt = $query->execute();
 
@@ -274,6 +278,88 @@ function grievance_log_list($grievance_node, $type_tids) {
   $log_nodes = node_load_multiple($log_nids);
   return $log_nodes;
 }
+
+function grievance_log_status_date($grievance_nid, $status_tid, $direction = 'asc') {
+  $log_update_tids = array(
+    variable_get('grievance_log_insert_type', ''), 
+    variable_get('grievance_log_update_type_with_status_change', ''), 
+    variable_get('grievance_log_update_type_without_status_change', ''), 
+    variable_get('grievance_log_incident_type', '')
+  );
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  if (is_array($status_tid)) {
+    $query->fieldCondition('field_grievance_status', 'tid', $status_tid, 'in');
+  } else {
+    $query->fieldCondition('field_grievance_status', 'tid', $status_tid);
+  }
+  $query->fieldOrderBy('field_grievance_status_date', 'value', $direction);
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $tmp = array_keys($stmt['node']);
+    $log_nid = array_shift($tmp);
+    $log_node = node_load($log_nid);
+    return strtotime($log_node->field_grievance_status_date['und'][0]['value']);
+  }
+
+  return NULL;
+}
+
+function grievance_log_status_entry($grievance_nid, $status_tid, $direction = 'asc') {
+  $log_update_tids = array(
+    variable_get('grievance_log_insert_type', ''), 
+    variable_get('grievance_log_update_type_with_status_change', ''), 
+    variable_get('grievance_log_update_type_without_status_change', ''), 
+    variable_get('grievance_log_incident_type', '')
+  );
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  if (is_array($status_tid)) {
+    $query->fieldCondition('field_grievance_status', 'tid', $status_tid, 'in');
+  } else {
+    $query->fieldCondition('field_grievance_status', 'tid', $status_tid);
+  }
+  $query->fieldOrderBy('field_grievance_status_date', 'value', $direction);
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $tmp = array_keys($stmt['node']);
+    $log_nid = array_shift($tmp);
+    $log_node = node_load($log_nid);
+    return $log_node;
+  }
+
+  return NULL;
+}
+
+
+function grievance_log_entry_date($grievance_nid, $log_type_tid) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  if (is_array($log_type_tid)) {
+    $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_tid, 'in');
+  } else {
+    $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_tid);
+  }
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  $query->fieldOrderBy('field_grievance_status_date', 'value');
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $tmp = array_keys($stmt['node']);
+    $log_nid = array_shift($tmp);
+    $log_node = node_load($log_nid);
+    return strtotime($log_node->field_grievance_status_date['und'][0]['value']);
+  }
+
+  return NULL;
+}
+
 
 function grievance_node_tab_timeline($grievance_node) {
   drupal_set_title($grievance_node->title . ': ' . t('Timeline'));
