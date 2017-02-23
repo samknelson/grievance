@@ -1,5 +1,17 @@
 <?php
 
+function grievance_home() {
+	drupal_goto('grievances/mine');
+}
+
+function grievance_mine() {
+  return views_embed_view('grievances_mine', 'page_1');
+}
+
+function grievance_all() {
+  return views_embed_view('grievances', 'page');
+}
+
 function grievance_views_post_execute_grievances_mine(&$view) {
 	if (isset($view->result)) {
 		foreach ($view->result as &$result) {

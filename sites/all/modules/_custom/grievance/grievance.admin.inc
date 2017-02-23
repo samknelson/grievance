@@ -98,7 +98,7 @@ function grievance_admin() {
     $form['grievance_status']['grievance_log_step_1_status_' . $i] = array(
       '#type' => 'select',
       '#options' => taxonomy_allowed_values(field_info_field('field_grievance_status')),
-      '#title' => t('Grievance Step 1 Statuse #' . $i),
+      '#title' => t('Grievance Step 1 Status #' . $i),
       '#default_value' => variable_get('grievance_log_step_1_status_' . $i, ''),
       '#description' => t("All Step 1 statuses, used for generating reports"),
     );

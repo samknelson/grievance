@@ -229,6 +229,30 @@ function grievance_menu() {
 		}
 	}
 
+	$items['grievances'] = array(
+		'title' => t('My Grievances'),
+		'page callback' => 'grievance_home',
+		'access arguments' => array('grievance user'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['grievances/mine'] = array(
+		'title' => t('My Grievances'),
+		'page callback' => 'grievance_mine',
+		'access arguments' => array('grievance user'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 1,
+	);
+
+	$items['grievances/all'] = array(
+		'title' => t('All Grievances'),
+		'page callback' => 'grievance_all',
+		'page arguments' => array(),
+		'access arguments' => array('grievance user'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 2,
+	);
+
 	/*
 	$items['grievances/reminder'] = array(
 		'title' => t('Reminders'),
@@ -239,6 +263,17 @@ function grievance_menu() {
 		'weight' => 10,
 	);
 	*/
+
+	$items['node/%node/' . $tab_name] = array(
+		'title' => $tab_record['title'],
+		'description' => $tab_record['description'],
+		'page callback' => 'grievance_node_tab_content',
+		'page arguments' => array(1, $tab_name),
+		'access callback' => 'grievance_node_tab_access',
+		'access arguments' => array(1, $tab_name),
+		'type' => MENU_LOCAL_TASK,
+	);
+
 
 	$items['node/%node/loopback'] = array(
 		'page callback' => 'grievance_forward_loopback',
