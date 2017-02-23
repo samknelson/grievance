@@ -36,7 +36,7 @@ function grievance_admin() {
     '#type' => 'select',
     '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
     '#title' => t('Grievance Log Update Type Without Status Change'),
-    '#default_value' => variable_get('grievance_log_update_type_with_status_change', ''),
+    '#default_value' => variable_get('grievance_log_update_type_without_status_change', ''),
     '#description' => t("Grievance log type to be used for updates where the status does not change -- i.e. an entry is created each time the grievance is saved."),
   );
 
