@@ -320,7 +320,6 @@ function grievance_contract_compute_timeline($grievance_node) {
           'deadline' => $deadline,
         );
         $timeline[$rule_nid]['current_delta'] = count($timeline[$rule_nid]['entries'])-1;
-        $timeline['current_rule'] = $rule_nid;
       }
     }
 
@@ -335,12 +334,27 @@ function grievance_contract_compute_timeline($grievance_node) {
         $timeline[$rule_nid]['entries'][$current_delta]['left_on'] = $status_ts;
         $timeline[$rule_nid]['entries'][$current_delta]['left_because'] = $status_tid;
         $timeline[$rule_nid]['current_delta'] = -1;
-        if ($rule_nid == $timeline['current_rule']) {
-          $timeline['current_rule'] = NULL;
-        }
       }
     }
   }
+
+  // Find the "current" rule -- i.e. first rule without an end time
+  $found = FALSE;
+  foreach ($rule_nodes as $rule_node) {
+    $rule_nid = $rule_node->nid;
+    if (isset($timeline[$rule_nid]['entries'])) {
+      foreach ($timeline[$rule_nid]['entries'] as $entry) {
+        dpm($entry);
+        if (!$entry['left_on']) {
+          $timeline['current_rule'] = $rule_nid;
+          $found = TRUE;
+          break;
+        }
+      }
+      if ($found) { break; }
+    }
+  }
+
   dpm($timeline);
   return $timeline;
 }
