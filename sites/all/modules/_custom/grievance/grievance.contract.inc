@@ -339,6 +339,6 @@ function grievance_contract_compute_timeline($grievance_node) {
       }
     }
   }
-
+  dpm($timeline);
   return $timeline;
 }
