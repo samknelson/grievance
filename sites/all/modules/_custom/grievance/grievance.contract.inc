@@ -335,7 +335,9 @@ function grievance_contract_compute_timeline($grievance_node) {
         $timeline[$rule_nid]['entries'][$current_delta]['left_on'] = $status_ts;
         $timeline[$rule_nid]['entries'][$current_delta]['left_because'] = $status_tid;
         $timeline[$rule_nid]['current_delta'] = -1;
-        $timeline['current_rule'] = NULL;
+        if ($rule_nid == $timeline['current_rule']) {
+          $timeline['current_rule'] = NULL;
+        }
       }
     }
   }
