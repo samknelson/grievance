@@ -344,7 +344,6 @@ function grievance_contract_compute_timeline($grievance_node) {
     $rule_nid = $rule_node->nid;
     if (isset($timeline[$rule_nid]['entries'])) {
       foreach ($timeline[$rule_nid]['entries'] as $entry) {
-        dpm($entry);
         if (!$entry['left_on']) {
           $timeline['current_rule'] = $rule_nid;
           $found = TRUE;
@@ -355,6 +354,5 @@ function grievance_contract_compute_timeline($grievance_node) {
     }
   }
 
-  dpm($timeline);
   return $timeline;
 }
