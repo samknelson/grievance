@@ -12,10 +12,50 @@ function grievance_all() {
   return views_embed_view('grievances', 'page');
 }
 
+function grievance_mine_reminder_30() {
+  return views_embed_view('grievances_mine', 'page_1', 'reminder_30');
+}
+
+function grievance_mine_reminder_60() {
+  return views_embed_view('grievances_mine', 'page_1', 'reminder_60');
+}
+
+function grievance_mine_reminder_90() {
+  return views_embed_view('grievances_mine', 'page_1', 'reminder_90');
+}
+
 function grievance_views_post_execute_grievances_mine(&$view) {
 	if (isset($view->result)) {
-		foreach ($view->result as &$result) {
+		// Array of deltas to remove
+		$to_remove = array();
+
+		foreach ($view->result as $delta => &$result) {
 			$grievance_nid = $result->nid;
+
+			//
+			// Handle reminders
+			//
+
+			if ($view->args[0] == 'reminder_30' || $view->args[0] == 'reminder_60' || $view->args[0] == 'reminder_90') {
+				// 
+				// n-day reminders.  Remove anything if it has a log entry less than n days ago
+				//
+
+				if ($view->args[0] == 'reminder_30') { $cutoff = date('Y-m-d', strtotime('-30 days')); }
+				if ($view->args[0] == 'reminder_60') { $cutoff = date('Y-m-d', strtotime('-60 days')); }
+				if ($view->args[0] == 'reminder_90') { $cutoff = date('Y-m-d', strtotime('-90 days')); }
+
+			  $query = new EntityFieldQuery();
+			  $query->entityCondition('entity_type', 'node');
+			  $query->entityCondition('bundle', 'grievance_log');
+			  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+			  $query->fieldCondition('field_grievance_status_date', 'value', $cutoff, '>=');
+			  $stmt = $query->execute();
+			  if ($stmt['node']) {
+			  	$to_remove[] = $delta;
+			  	continue;
+			  }
+			}
 
 			//
 			// Replace "comments" with the "Processed" date for the node, and the first call date
@@ -32,7 +72,7 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 			$ts = grievance_log_entry_date($grievance_nid, $first_call_tid);
 		  if ($ts) {
 		  	if ($html) { $html .= '<br />'; }
-				$html .= t('First&nbps;Call:&nbsp;') . date('m/d/Y', $ts);
+				$html .= t('First&nbsp;Call:&nbsp;') . date('m/d/Y', $ts);
 		  }
 
 		  $result->field_field_grievance_comments[0]['rendered']['#markup'] = $html;
@@ -75,6 +115,17 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 		    	$result->field_field_grievance_status[0]['rendered']['#markup'] .= '<br />' . '(' . $step_1_term->name . ')';
 		    }
 		  }
+		}
+
+		//
+		// If we have any to remove, remove them.  Make sure to reverse the array first so indices are correct.
+		//
+
+		if ($to_remove) {
+			$to_remove = array_reverse($to_remove);
+			foreach ($to_remove as $delta) {
+				unset($view->result[$delta]);
+			}
 		}
 	}
 }

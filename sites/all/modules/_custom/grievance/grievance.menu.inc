@@ -253,16 +253,34 @@ function grievance_menu() {
 		'weight' => 2,
 	);
 
-	/*
-	$items['grievances/reminder'] = array(
-		'title' => t('Reminders'),
-		'page callback' => 'grievance_reminders',
+	$items['grievances/reminder-30'] = array(
+		'title' => t('30-Day'),
+		'page callback' => 'grievance_mine_reminder_30',
 		'page arguments' => array(),
 		'access arguments' => array('grievance user'),
 		'type' => MENU_LOCAL_TASK,
-		'weight' => 10,
+		'weight' => 3,
 	);
-	*/
+
+
+	$items['grievances/reminder-60'] = array(
+		'title' => t('60-Day'),
+		'page callback' => 'grievance_mine_reminder_60',
+		'page arguments' => array(),
+		'access arguments' => array('grievance user'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 4,
+	);
+
+
+	$items['grievances/reminder-90'] = array(
+		'title' => t('90-Day'),
+		'page callback' => 'grievance_mine_reminder_90',
+		'page arguments' => array(),
+		'access arguments' => array('grievance user'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 5,
+	);
 
 	$items['node/%node/' . $tab_name] = array(
 		'title' => $tab_record['title'],
