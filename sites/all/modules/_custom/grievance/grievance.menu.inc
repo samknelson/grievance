@@ -282,6 +282,15 @@ function grievance_menu() {
 		'weight' => 5,
 	);
 
+	$items['grievances/reminder-no-first-call'] = array(
+		'title' => t('No First Call'),
+		'page callback' => 'grievance_mine_reminder_no_first_call',
+		'page arguments' => array(),
+		'access arguments' => array('grievance user'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 5,
+	);
+
 	$items['node/%node/' . $tab_name] = array(
 		'title' => $tab_record['title'],
 		'description' => $tab_record['description'],
