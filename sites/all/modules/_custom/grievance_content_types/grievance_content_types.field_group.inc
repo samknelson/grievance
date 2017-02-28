@@ -649,7 +649,7 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'default';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Company Represenatives',
+    'label' => 'Company Rep',
     'weight' => '12',
     'children' => array(
       0 => 'field_grievance_co_name',
@@ -664,8 +664,9 @@ function grievance_content_types_field_group_info() {
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
-      'label' => 'Company Represenatives',
+      'label' => 'Company Rep',
       'instance_settings' => array(
+        'id' => '',
         'classes' => 'group-grievance-company field-group-fieldset',
         'description' => '',
       ),
@@ -1467,7 +1468,7 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'default';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Union Representatives',
+    'label' => 'Union Rep',
     'weight' => '10',
     'children' => array(
       0 => 'field_grievance_rep_filed',
@@ -1480,8 +1481,9 @@ function grievance_content_types_field_group_info() {
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
-      'label' => 'Union Representatives',
+      'label' => 'Union Rep',
       'instance_settings' => array(
+        'id' => '',
         'classes' => 'group-grievance-union-rep field-group-fieldset',
         'description' => '',
       ),
@@ -1674,7 +1676,7 @@ function grievance_content_types_field_group_info() {
   t('Attachments');
   t('Comments');
   t('Company Contact');
-  t('Company Represenatives');
+  t('Company Rep');
   t('Company Representative');
   t('Company Representatives');
   t('Email and Phone');
@@ -1692,6 +1694,7 @@ function grievance_content_types_field_group_info() {
   t('Status');
   t('Supervisor');
   t('Timeline');
+  t('Union Rep');
   t('Union Representatives');
 
   return $field_groups;
