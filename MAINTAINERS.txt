@@ -305,4 +305,3 @@ Seven theme
 
 Stark theme
 - John Albin Wilkins 'JohnAlbin' https://www.drupal.org/u/johnalbin
-... source ...
