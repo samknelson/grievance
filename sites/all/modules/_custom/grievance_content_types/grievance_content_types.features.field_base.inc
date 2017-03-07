@@ -1154,7 +1154,9 @@ function grievance_content_types_field_default_field_bases() {
           ),
         ),
         'sort' => array(
-          'type' => 'none',
+          'direction' => 'ASC',
+          'property' => 'title',
+          'type' => 'property',
         ),
         'target_bundles' => array(
           'grievance_contract_template' => 'grievance_contract_template',
@@ -2275,6 +2277,9 @@ function grievance_content_types_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_filed',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -2416,6 +2421,9 @@ function grievance_content_types_field_default_field_bases() {
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_watching',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',

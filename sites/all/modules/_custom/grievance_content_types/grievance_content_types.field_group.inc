@@ -788,6 +788,41 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_grievance_default_ureps|node|grievance_shop|form';
+  $field_group->group_name = 'group_grievance_default_ureps';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Default Union Reps',
+    'weight' => '7',
+    'children' => array(
+      0 => 'field_grievance_rep_assignee',
+      1 => 'field_grievance_rep_filed',
+      2 => 'field_grievance_rep_lead',
+      3 => 'field_grievance_rep_manager',
+      4 => 'field_grievance_rep_organizer',
+      5 => 'field_grievance_rep_watching',
+      6 => 'field_grievance_assignee_notes',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Default Union Reps',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-grievance-default-ureps field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_grievance_default_ureps|node|grievance_shop|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_d|node|grievance|grievance_arbitrationform';
   $field_group->group_name = 'group_grievance_d';
   $field_group->entity_type = 'node';
@@ -1679,6 +1714,7 @@ function grievance_content_types_field_group_info() {
   t('Company Rep');
   t('Company Representative');
   t('Company Representatives');
+  t('Default Union Reps');
   t('Email and Phone');
   t('Employee');
   t('Employee Contact');

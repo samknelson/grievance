@@ -8517,6 +8517,50 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'node-grievance_shop-field_grievance_assignee_notes'.
+  $field_instances['node-grievance_shop-field_grievance_assignee_notes'] = array(
+    'bundle' => 'grievance_shop',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 12,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_assignee_notes',
+    'label' => 'Assignee Notes',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 9,
+    ),
+  );
+
   // Exported field_instance: 'node-grievance_shop-field_grievance_attachments'.
   $field_instances['node-grievance_shop-field_grievance_attachments'] = array(
     'bundle' => 'grievance_shop',
@@ -8781,6 +8825,315 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textfield',
       'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_shop-field_grievance_rep_assignee'.
+  $field_instances['node-grievance_shop-field_grievance_rep_assignee'] = array(
+    'bundle' => 'grievance_shop',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_rep_assignee',
+    'label' => 'Assignee',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance_shop-field_grievance_rep_filed'.
+  $field_instances['node-grievance_shop-field_grievance_rep_filed'] = array(
+    'bundle' => 'grievance_shop',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_rep_filed',
+    'label' => 'Filed By',
+    'required' => 0,
+    'settings' => array(
+      'field_lock_multi_values' => array(
+        'disable_reorder' => 0,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
+        'lock_previous' => 0,
+        'remove_header' => 0,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 10,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance_shop-field_grievance_rep_lead'.
+  $field_instances['node-grievance_shop-field_grievance_rep_lead'] = array(
+    'bundle' => 'grievance_shop',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 8,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_rep_lead',
+    'label' => 'Lead Organizer',
+    'required' => FALSE,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 12,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance_shop-field_grievance_rep_manager'.
+  $field_instances['node-grievance_shop-field_grievance_rep_manager'] = array(
+    'bundle' => 'grievance_shop',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 9,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_rep_manager',
+    'label' => 'Grievance Admin',
+    'required' => 0,
+    'settings' => array(
+      'field_lock_multi_values' => array(
+        'disable_reorder' => 0,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
+        'lock_previous' => 0,
+        'remove_header' => 0,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 13,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_shop-field_grievance_rep_organizer'.
+  $field_instances['node-grievance_shop-field_grievance_rep_organizer'] = array(
+    'bundle' => 'grievance_shop',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 10,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_rep_organizer',
+    'label' => 'Organizer',
+    'required' => 0,
+    'settings' => array(
+      'field_lock_multi_values' => array(
+        'disable_reorder' => 0,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
+        'lock_previous' => 0,
+        'remove_header' => 0,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_shop-field_grievance_rep_watching'.
+  $field_instances['node-grievance_shop-field_grievance_rep_watching'] = array(
+    'bundle' => 'grievance_shop',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_rep_watching',
+    'label' => 'Watching',
+    'required' => 0,
+    'settings' => array(
+      'field_lock_multi_values' => array(
+        'disable_reorder' => 0,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
+        'lock_previous' => 0,
+        'remove_header' => 0,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 14,
     ),
   );
 
