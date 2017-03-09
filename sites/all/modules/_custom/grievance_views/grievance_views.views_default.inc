@@ -1414,6 +1414,35 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['footer']['area']['empty'] = TRUE;
   $handler->display->display_options['footer']['area']['content'] = '[<a href="/node/add/grievance-contract-template">Add a Template</a>]';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
+  /* Field: Bulk operations: Content */
+  $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['display_type'] = '0';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['enable_select_all_pages'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['row_clickable'] = 0;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
+    'action::views_bulk_operations_modify_action' => array(
+      'selected' => 1,
+      'postpone_processing' => 0,
+      'skip_confirmation' => 0,
+      'skip_permission_check' => 0,
+      'override_label' => 0,
+      'label' => '',
+      'settings' => array(
+        'show_all_tokens' => 1,
+        'display_values' => array(
+          'grievance_contract_template::field_grievance_holidays' => 'grievance_contract_template::field_grievance_holidays',
+          'grievance_contract_template::field_grievance_departments' => 'grievance_contract_template::field_grievance_departments',
+          'grievance_contract_template::field_grievance_classifications' => 'grievance_contract_template::field_grievance_classifications',
+          'grievance_contract_template::field_grievance_pullclause' => 'grievance_contract_template::field_grievance_pullclause',
+          'grievance_contract_template::field_grievance_artsel' => 'grievance_contract_template::field_grievance_artsel',
+        ),
+      ),
+    ),
+  );
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
   $handler->display->display_options['fields']['nid']['table'] = 'node';
@@ -1480,6 +1509,8 @@ function grievance_views_views_default_views() {
     t('next ›'),
     t('last »'),
     t('[<a href="/node/add/grievance-contract-template">Add a Template</a>]'),
+    t('Content'),
+    t('- Choose an operation -'),
     t('Nid'),
     t('Title'),
     t('Notes'),
