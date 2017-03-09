@@ -400,6 +400,34 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'text_long',
   );
 
+  // Exported field_base: 'field_grievance_artsel'.
+  $field_bases['field_grievance_artsel'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_artsel',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'No' => 'No',
+        'Yes' => 'Yes',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_grievance_assignee_notes'.
   $field_bases['field_grievance_assignee_notes'] = array(
     'active' => 1,
@@ -1605,6 +1633,34 @@ function grievance_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
+  );
+
+  // Exported field_base: 'field_grievance_dummy'.
+  $field_bases['field_grievance_dummy'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_dummy',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'No' => 'No',
+        'Yes' => 'Yes',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
   );
 
   // Exported field_base: 'field_grievance_ein'.

@@ -323,6 +323,8 @@ function grievance_uhmigrate_l226_import_grievances() {
     }
   }
   fclose($source_handle);
+
+  grievance_uhmigrate_log_summary();
 }
 
 function grievance_uhmigrate_create_log($row, $grievance_node) {

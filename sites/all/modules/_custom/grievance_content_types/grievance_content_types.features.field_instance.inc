@@ -6116,7 +6116,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -6141,6 +6141,49 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'options_select',
       'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_contract_clause-field_grievance_dummy'.
+  $field_instances['node-grievance_contract_clause-field_grievance_dummy'] = array(
+    'bundle' => 'grievance_contract_clause',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Is this a "dummy" or "placeholder" section?  This field should be left blank or set to "No" except for automatically-generated placeholder sections created when the article itself is meant to be selectable.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_dummy',
+    'label' => 'Dummy?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 8,
     ),
   );
 
@@ -6761,6 +6804,49 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_contract_template-field_grievance_artsel'.
+  $field_instances['node-grievance_contract_template-field_grievance_artsel'] = array(
+    'bundle' => 'grievance_contract_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Can the articles in this contract be selected?  If "Yes", then a "dummy" section will be created for each article.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_artsel',
+    'label' => 'Articles Selectable?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_contract_template-field_grievance_classifications'.
   $field_instances['node-grievance_contract_template-field_grievance_classifications'] = array(
     'bundle' => 'grievance_contract_template',
@@ -7023,7 +7109,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '(i.e. "... accordance with the provisions of [clause goes here] of our Collective Bargaining Agreement ...")',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
@@ -10248,6 +10334,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Arbitrator Name');
   t('Article');
   t('Article Number');
+  t('Articles Selectable?');
   t('Assignee');
   t('Assignee Notes');
   t('Attachment');
@@ -10260,6 +10347,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Bundle to overried, e.g. "grievance"');
   t('CBA Provision(s) Violated');
   t('Can and should this case be settled?');
+  t('Can the articles in this contract be selected?  If "Yes", then a "dummy" section will be created for each article.');
   t('Category');
   t('Check Number');
   t('City');
@@ -10292,6 +10380,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Description');
   t('Discipline Date');
   t('Does this holiday repeat every year on the same date?');
+  t('Dummy?');
   t('E.g. 4.01 or A. II.');
   t('Email');
   t('Employee ID #');
@@ -10330,6 +10419,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Incident Date');
   t('Information Request');
   t('Information Request?');
+  t('Is this a "dummy" or "placeholder" section?  This field should be left blank or set to "No" except for automatically-generated placeholder sections created when the article itself is meant to be selectable.');
   t('Is this status considered "Un-Resolved"?  Only unresolved grievances are displayed on the "my grievances" list.');
   t('Label');
   t('Labor charges or other relevant shop issues');

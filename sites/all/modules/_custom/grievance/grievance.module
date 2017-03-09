@@ -151,6 +151,13 @@ function grievance_node_postsave($node, $op) {
       node_save($node);
     }
   }
+
+  // After saving a contract template, create or update "dummy" section nodes
+  if ( ($node->type == 'grievance_contract_template' || $node->type == 'grievance_contract_section' || $node->type == 'grievance_contract_clause') && 
+    ($op == 'insert' || $op == 'update') &&
+    !$node->grievance_no_recurse) {
+    grievance_contract_update_dummies($node);
+  }
 }
 
 
@@ -431,7 +438,6 @@ function grievance_views_pre_render(&$view) {
       }
     }
   }
-
 }
 
 function grievance_views_post_execute(&$view) {

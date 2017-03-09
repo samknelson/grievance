@@ -560,6 +560,7 @@ function grievance_content_types_ds_layout_settings_info() {
         3 => 'field_grievance_clause',
         4 => 'field_grievance_type',
         5 => 'field_grievance_remedy',
+        6 => 'field_grievance_dummy',
       ),
     ),
     'fields' => array(
@@ -569,6 +570,7 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_grievance_clause' => 'ds_content',
       'field_grievance_type' => 'ds_content',
       'field_grievance_remedy' => 'ds_content',
+      'field_grievance_dummy' => 'ds_content',
     ),
     'classes' => array(),
     'wrappers' => array(

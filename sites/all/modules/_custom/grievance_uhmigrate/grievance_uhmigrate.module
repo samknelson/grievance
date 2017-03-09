@@ -15,7 +15,30 @@ function grievance_uhmigrate_base_dir() {
 $grievance_uhmigrate_base = '/var/www/vhosts/grievances.clevernamehere.com/private/migrate';
 
 function grievance_uhmigrate_log($type, $row, $msg) {
+  global $grievance_uhmigrate_log_data;
+
+  if (!$grievance_uhmigrate_log_data[$type][$msg]) {
+    $grievance_uhmigrate_log_data[$type][$msg] = array(
+      'count' => 0,
+      'first_row' => $row['Row'],
+    );
+  }
+
+  $grievance_uhmigrate_log_data[$type][$msg]['count']++;
+
   print "Row #" . $row['Row'] . ': ' . $type . ': ' . $msg . "\n";
+}
+
+function grievance_uhmigrate_log_summary() {
+  print "\n\nSUMMARY\n";
+
+  global $grievance_uhmigrate_log_data;
+  foreach ($grievance_uhmigrate_log_data as $type => $messages) {
+    print "*** $type ***\n";
+    foreach ($messages as $message => $entry) {
+      print "$msg (Count $entry[count], first row $entry[first_row]\n";
+    }
+  }
 }
 
 function grievance_uhmigrate_find_by_title($content_type, $title) {

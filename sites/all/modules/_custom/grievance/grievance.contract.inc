@@ -356,3 +356,102 @@ function grievance_contract_compute_timeline($grievance_node) {
 
   return $timeline;
 }
+
+function grievance_contract_update_dummies($trigger_node) {
+  // Find the contract template
+  $contract_tplt_node = NULL;
+  if ($trigger_node->type == 'grievance_contract_template') {
+    $contract_tplt_node = $trigger_node;
+    $contract_tplt_nid = $contract_tplt_node->nid;
+  } else {
+    $contract_tplt_nid = $trigger_node->field_grievance_contract_tplt['und'][0]['target_id'];
+    $contract_tplt_node = node_load($contract_tplt_nid);
+  }
+  if (!$contract_tplt_node) { return; }
+
+  // Do we want dummies? "Yes" or "No"; NULL means we don't know so just go away.
+  $want_dummies = $contract_tplt_node->field_grievance_artsel['und'][0]['value'];
+  if (!$want_dummies) { return; }
+
+  // Find the list of sections
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_contract_section');
+  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_tplt_nid);
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return; }
+  $contract_section_nids = array_keys($stmt['node']);
+  $contract_section_nodes = node_load_multiple($contract_section_nids);
+
+  // For each section ...
+  foreach ($contract_section_nodes as $contract_section_node) {
+    // Find any current dummies
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance_contract_clause');
+    $query->fieldCondition('field_grievance_contract_section', 'target_id', $contract_section_node->nid);
+    $query->fieldCondition('field_grievance_dummy', 'value', 'Yes');
+    $stmt = $query->execute();
+    $dummy_clause_nids = array();
+    if ($stmt['node']) { $dummy_clause_nids = array_keys($stmt['node']); }
+
+    //
+    // Do we want dummies?
+    //
+
+    if ($want_dummies == 'Yes') {
+
+      // 
+      // Yes we want dummies.  Do we have any?
+      //
+
+      if (!$dummy_clause_nids) {
+
+        // 
+        // No we don't have any.  Create one.
+        //
+
+        global $user;
+        $dummy_node = new stdClass();
+        $dummy_node->title = $contract_section_node->title;
+        $dummy_node->type = 'grievance_contract_clause';
+        $dummy_node->no_recurse = TRUE;
+        node_object_prepare($dummy_node);
+        $dummy_node->language = LANGUAGE_NONE;
+        $dummy_node->uid = $user->uid; 
+        $dummy_node->status = 1;
+        $dummy_node->promote = 0;
+        $dummy_node->comment = 0;
+        $dummy_node->field_grievance_contract_tplt = array('und' => array(array('target_id' => $contract_tplt_nid)));
+        $dummy_node->field_grievance_contract_section = array('und' => array(array('target_id' => $contract_section_node->nid)));
+        $dummy_node->field_grievance_label = array('und' => array(array('value' => $contract_section_node->field_grievance_section_number['und'][0]['value'])));
+        $dummy_node->field_grievance_dummy = array('und' => array(array('value' => 'Yes')));
+        $dummy_node->grievance_no_recurse = TRUE;
+        node_save($dummy_node);
+      } else {
+
+        //
+        // Yes we have one.  Update it.
+        //
+
+        $dummy_node = node_load($dummy_clause_nids[0]);
+        $dummy_node->field_grievance_label = array('und' => array(array('value' => $contract_section_node->field_grievance_section_number['und'][0]['value'])));
+        $dummy_node->title = $contract_section_node->title;
+        $dummy_node->grievance_no_recurse = TRUE;
+        node_save($dummy_node);
+
+      }
+    } else {
+
+      // 
+      // No we don't want dummies.  Delete them.
+      //
+
+      if ($dummy_clause_nids) {
+        node_delete_multiple($dummy_clause_nids);
+      }
+    }
+  }
+}
+
+
