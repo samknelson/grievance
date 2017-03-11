@@ -21,3 +21,31 @@ function grievance_update_7001() {
   // Clear caches.
   field_cache_clear(TRUE);
 }
+
+/**
+ * Set the "status date" = "creation date" for log entries with no status date.
+ */
+
+function grievance_update_7002() {
+  $sql = 
+  $sql .= "select node.nid ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_grievance_status_date on (field_data_field_grievance_status_date.entity_type = 'node' and field_data_field_grievance_status_date.entity_id = node.nid) ";
+  $sql .= "where node.type = 'grievance_log' ";
+  $sql .= "and field_grievance_status_date_value is null ";
+  $sql .= "order by node.nid ";
+
+  $stmt = db_query($sql, array());
+  $nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $nids[] = $hr['nid'];
+  }
+
+  foreach ($nids as $nid) {
+    $node = node_load($nid);
+    $node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d', $node->created);
+    node_save($node);
+    entity_get_controller('node')->resetCache();
+  }
+}
+
