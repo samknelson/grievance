@@ -42,6 +42,7 @@ function grievance_update_7002() {
   }
 
   foreach ($nids as $nid) {
+    print "Updating log node $nid\n";
     $node = node_load($nid);
     $node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d', $node->created);
     node_save($node);
