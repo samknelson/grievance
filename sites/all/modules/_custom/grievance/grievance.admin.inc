@@ -258,14 +258,14 @@ function grievance_admin() {
     '#type' => 'textarea',
   );
 
-  $form['grievance_log']['grievance_mine_view_name'] = array(
+  $form['grievance_mine_view_name'] = array(
     '#type' => 'textfield',
     '#title' => t('My Grievances View Name'),
     '#default_value' => variable_get('grievance_mine_view_name', ''),
     '#description' => t("Enter the system name for the Drupal View to be used for the 'My Grievances' page."),
   );
 
-  $form['grievance_log']['grievance_mine_view_display'] = array(
+  $form['grievance_mine_view_display'] = array(
     '#type' => 'textfield',
     '#title' => t('My Grievances View Display'),
     '#default_value' => variable_get('grievance_mine_view_display', ''),
