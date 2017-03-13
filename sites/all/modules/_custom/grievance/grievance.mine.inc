@@ -92,7 +92,8 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 
 	  $html = '';
 	  $filed_status_tid = variable_get('grievance_log_filed_status', '');
-		$ts = grievance_log_status_date($grievance_nid, $filed_status_tid);
+	  $filed_status_tid_2 = variable_get('grievance_log_filed_status_2', '');
+		$ts = grievance_log_status_date($grievance_nid, array($filed_status_tid, $filed_status_tid_2));
 	  if ($ts) {
 			$html .= t('Processed:&nbsp;') . date('m/d/Y', $ts);
 	  }

@@ -93,6 +93,13 @@ function grievance_admin() {
     '#description' => t("Grievance status for filed, used for generating reports"),
   );
 
+  $form['grievance_status']['grievance_log_filed_status_2'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_status')),
+    '#title' => t('Grievance Filed Status 2'),
+    '#default_value' => variable_get('grievance_log_filed_status', ''),
+  );
+
   // Here's where I wish system_settings_form supported multiple values.  @todo this is something of a hack.
   for ($i=0; $i<10; ++$i) {
     $form['grievance_status']['grievance_log_step_1_status_' . $i] = array(
