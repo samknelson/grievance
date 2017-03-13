@@ -11,7 +11,7 @@ function grievance_all() {
 function grievance_mine() {
 	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
 	$display_name = variable_get('grievance_mine_view_display', 'page_1');
-  return views_embed_view($view_name, $display_name, 'page_1');
+  return views_embed_view($view_name, $display_name);
 }
 
 function grievance_mine_reminder_30() {
@@ -180,9 +180,11 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 
 	if ($view->args[0]) {
 		$entry = $reminders[$view->args[0]];
-		$to_remove = array_reverse($entry['no_match']);
-		foreach ($to_remove as $delta) {
-			unset($view->result[$delta]);
+		if ($entry && $entry['no_match']) {
+			$to_remove = array_reverse($entry['no_match']);
+			foreach ($to_remove as $delta) {
+				unset($view->result[$delta]);
+			}
 		}
 	} else {
 		foreach ($msgs as $msg) { drupal_set_message($msg, 'warning'); }

@@ -100,6 +100,7 @@ function grievance_alert($node) {
 
 	if ($need_save) {
 		$node->field_grievance_data_alert['und'][0]['value'] = serialize($alert_data);
+		$node->grievance_no_recurse = TRUE;
 		node_save($node);
 		watchdog('grievance_alert', t('Alerts sent for: ') . $node->title);
 	}
