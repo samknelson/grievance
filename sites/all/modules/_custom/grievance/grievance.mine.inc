@@ -4,28 +4,38 @@ function grievance_home() {
 	drupal_goto('grievances/mine');
 }
 
-function grievance_mine() {
-  return views_embed_view('grievances_mine', 'page_1');
-}
-
 function grievance_all() {
   return views_embed_view('grievances', 'page');
 }
 
+function grievance_mine() {
+	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
+	$display_name = variable_get('grievance_mine_view_display', 'page_1');
+  return views_embed_view($view_name, $display_name, 'page_1');
+}
+
 function grievance_mine_reminder_30() {
-  return views_embed_view('grievances_mine', 'page_1', 'reminder_30');
+	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
+	$display_name = variable_get('grievance_mine_view_display', 'page_1');
+  return views_embed_view($view_name, $display_name, 'reminder_30');
 }
 
 function grievance_mine_reminder_60() {
-  return views_embed_view('grievances_mine', 'page_1', 'reminder_60');
+	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
+	$display_name = variable_get('grievance_mine_view_display', 'page_1');
+  return views_embed_view($view_name, $display_name, 'page_1', 'reminder_60');
 }
 
 function grievance_mine_reminder_90() {
-  return views_embed_view('grievances_mine', 'page_1', 'reminder_90');
+	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
+	$display_name = variable_get('grievance_mine_view_display', 'page_1');
+  return views_embed_view($view_name, $display_name, 'page_1', 'reminder_90');
 }
 
 function grievance_mine_reminder_no_first_call() {
-  return views_embed_view('grievances_mine', 'page_1', 'reminder_no_first_call');
+	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
+	$display_name = variable_get('grievance_mine_view_display', 'page_1');
+  return views_embed_view($view_name, $display_name, 'page_1', 'reminder_no_first_call');
 }
 
 function grievance_views_post_execute_grievances_mine(&$view) {

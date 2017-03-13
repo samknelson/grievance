@@ -258,6 +258,21 @@ function grievance_admin() {
     '#type' => 'textarea',
   );
 
+  $form['grievance_log']['grievance_mine_view_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('My Grievances View Name'),
+    '#default_value' => variable_get('grievance_mine_view_name', ''),
+    '#description' => t("Enter the system name for the Drupal View to be used for the 'My Grievances' page."),
+  );
+
+  $form['grievance_log']['grievance_mine_view_display'] = array(
+    '#type' => 'textfield',
+    '#title' => t('My Grievances View Display'),
+    '#default_value' => variable_get('grievance_mine_view_display', ''),
+    '#description' => t("Enter the system name for the Drupal Display to be used for the 'My Grievances' page."),
+  );
+
+
   $algorithms = grievaince_id_algorithms();
   $msg = t('Grievance IDs are unique strings used to identify a grievance.  They typically appear on the grievance form sent to the company, and can be used to find a grievance with the Quicksearch box.<br><br>Grievance IDs can be generated using various algorithms.  The available algorithms are:');
   $msg .= '<dl>';
@@ -304,3 +319,5 @@ function grievance_admin() {
  
   return system_settings_form($form);
 }
+
+
