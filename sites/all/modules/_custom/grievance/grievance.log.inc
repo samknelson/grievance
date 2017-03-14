@@ -529,3 +529,24 @@ function grievance_log_views_exposed_form_alter($form, &$form_state) {
     }
   }
 }
+
+
+function grievance_log_node_form_alter(&$form, &$form_state, $form_id) {
+  $form['field_grievance_alert']['#access'] = FALSE;
+  $form['field_grievance_alert_tid']['#access'] = FALSE;
+  $form['field_grievance_alert_date']['#access'] = FALSE;
+  $form['field_grievance_time']['und'][0]['value']['#default_value'] = date('h:i:s a');
+
+  // Can change the status for update types
+  $form['field_grievance_status']['#access'] = FALSE;
+  if (isset($form['#node']) && isset($form['#node']->field_grievance_log_type['und'][0]['tid'])) {
+    if (
+      $form['#node']->field_grievance_log_type['und'][0]['tid'] == variable_get('grievance_log_update_type_with_status_change', '') ||
+      $form['#node']->field_grievance_log_type['und'][0]['tid'] == variable_get('grievance_log_update_type_without_status_change', '')
+    ) {
+      $form['field_grievance_status']['#access'] = TRUE;
+    }
+
+  }
+}
+

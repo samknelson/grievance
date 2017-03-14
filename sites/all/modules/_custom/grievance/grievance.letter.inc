@@ -82,6 +82,16 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				*/
 			}
 
+			// Add "Arbitration Clause"
+			if ($name == 'arbitration_clause') {
+				$contract_tplt_nid = $data['node']->field_grievance_contract_tplt['und'][0]['target_id'];
+				if ($contract_tplt_nid) { 
+					$contract_tplt_node = node_load($contract_tplt_nid);
+				}
+				if ($contract_tplt_node) {
+					$replacements[$original] = $contract_tplt_node->field_grievance_pullclause['und'][0]['value'];
+				}
+			}
     }
   }
 

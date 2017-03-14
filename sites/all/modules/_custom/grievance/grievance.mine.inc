@@ -189,16 +189,4 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 	} else {
 		foreach ($msgs as $msg) { drupal_set_message($msg, 'warning'); }
 	}
-
-	//
-	// Just messing around...
-	//
-
-	/*
-	dpm($view);
-	$row = new stdClass();
-	$row->nothing_3 = array(array('rendered' => array('#markup' => 'Hello, world.')));
-	$view->result[] = $row;
-	// unset($view->result[2]->field_field_grievance_status);
-	*/
 }

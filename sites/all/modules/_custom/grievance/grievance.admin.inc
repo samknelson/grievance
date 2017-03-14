@@ -261,14 +261,14 @@ function grievance_admin() {
   $form['grievance_mine_view_name'] = array(
     '#type' => 'textfield',
     '#title' => t('My Grievances View Name'),
-    '#default_value' => variable_get('grievance_mine_view_name', ''),
+    '#default_value' => variable_get('grievance_mine_view_name', 'grievances_mine'),
     '#description' => t("Enter the system name for the Drupal View to be used for the 'My Grievances' page."),
   );
 
   $form['grievance_mine_view_display'] = array(
     '#type' => 'textfield',
     '#title' => t('My Grievances View Display'),
-    '#default_value' => variable_get('grievance_mine_view_display', ''),
+    '#default_value' => variable_get('grievance_mine_view_display', 'page_1'),
     '#description' => t("Enter the system name for the Drupal Display to be used for the 'My Grievances' page."),
   );
 

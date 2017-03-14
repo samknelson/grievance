@@ -152,18 +152,21 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Set the contract template from the shop
   // 
 
-  $contract_tplt_id = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
+  $contract_tplt_nid = grievance_form_current_value('field_grievance_contract_tplt', 'target_id', $form, $form_state);
   if ($shop_node) {
-    if (!$contract_tplt_id || $form_state['triggering_element']['#field_name'] == 'field_grievance_shop' || $form['field_grievance_contract_tplt']['#disabled']) {
-      $contract_tplt_id = $shop_node->field_grievance_contract_tplt['und'][0]['target_id'];
+    if (!$contract_tplt_nid || $form_state['triggering_element']['#field_name'] == 'field_grievance_shop' || $form['field_grievance_contract_tplt']['#disabled']) {
+      $contract_tplt_nid = $shop_node->field_grievance_contract_tplt['und'][0]['target_id'];
 
       if ($form['field_grievance_contract_tplt']['#disabled']) {
-        $form['field_grievance_contract_tplt']['und']['#default_value'][0] = $contract_tplt_id;
+        $form['field_grievance_contract_tplt']['und']['#default_value'][0] = $contract_tplt_nid;
         $form['field_grievance_contract_tplt']['und']['#value'] = $form['field_grievance_contract_tplt']['und']['#default_value'];
       } else {
-        $form_state['input']['field_grievance_contract_tplt']['und'] = $contract_tplt_id;
+        $form_state['input']['field_grievance_contract_tplt']['und'] = $contract_tplt_nid;
       }
     }
+  }
+  if ($contract_tplt_nid) {
+    $contract_tplt_node = node_load($contract_tplt_nid);
   }
 
   // 
@@ -171,9 +174,9 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   //
 
   $clauses_options = array();
-  if ($contract_tplt_id) {
+  if ($contract_tplt_nid) {
     $clauses_view = views_get_view('grievance_contract_clauses');
-    $clauses_view->args[0] = $contract_tplt_id;
+    $clauses_view->args[0] = $contract_tplt_nid;
     $clauses_view->execute('entityreference_1');
     $clauses_options['_none'] = t('- None -');
     foreach ($clauses_view->result as $clause) {
@@ -200,12 +203,26 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     if ($contract_uri) {
       $contract_url = file_create_url($contract_uri);
 
-      $contract_link_text = '<strong>' . 
-        t('The contract for ') .
+      $contract_link_text .= '<strong>' . 
+        t('The contract for the shop ') .
         $shop_node->title . 
         t(' can be downloaded ') .
         l(t('here'), $contract_url, array('attributes' => array('target'=>'_blank'))) .
-        '</strong>';
+        '</strong>.';
+    }
+  }
+  if ($contract_tplt_node) {
+    $contract_uri = $contract_tplt_node->field_grievance_contract['und'][0]['uri'];
+    if ($contract_uri) {
+      $contract_url = file_create_url($contract_uri);
+
+      if ($contract_link_text) { $contract_link_text .= '<br>'; }
+      $contract_link_text .= '<strong>' . 
+        t('The contract template for ') .
+        $contract_tplt_node->title . 
+        t(' can be downloaded ') .
+        l(t('here'), $contract_url, array('attributes' => array('target'=>'_blank'))) .
+        '</strong>.';
     }
   }
   $form['#groups']['group_grievance_form']->format_settings['instance_settings']['description'] = 
@@ -382,9 +399,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Constrain the list of possible classifications and departments (set in the contract template)
   //
 
-  if ($contract_tplt_id) { 
-    $contract_tplt_node = node_load($contract_tplt_id);
-
+  if ($contract_tplt_node) { 
     $map = array('_none' => TRUE);
     $to_disable = array();
     if ($contract_tplt_node->field_grievance_classifications['und']) {
