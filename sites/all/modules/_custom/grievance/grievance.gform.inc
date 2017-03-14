@@ -180,6 +180,14 @@ function grievance_gform_admin() {
 function  grievance_node_view($node, $view_mode, $langcode) {
 	if ($node->type == 'grievance') {
 
+		// Hide all our hide fields
+    $hidefields = preg_split('/\s+/', variable_get('grievance_hidefields', ''));
+    foreach ($hidefields as $hidefield) {
+      if (preg_match('/^field_/', $hidefield) && isset($node->content[$hidefield])) {
+        unset($node->content[$hidefield]);
+      }
+    }
+
 		// Clausref field should show the clause number as well as the clause name.
 		if ($node->content['field_grievance_clauseref']['#items']) {
 			$delta = 0;
