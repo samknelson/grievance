@@ -143,19 +143,22 @@ function grievance_views_post_execute_grievances_mine(&$view) {
     // We also want to show whichever was the most recent from a previous set of statuses
     //
 
-	  $step_1_status_tids = array();
-	  for ($i=0; $i<10; ++$i) {
-	  	$step_1_status_tids[] = variable_get('grievance_log_step_1_status_' . $i, '');
-	  }
-    $current_status_tid = $result->field_field_grievance_status[0]['raw']['tid'];
-    if (!in_array($current_status_tid, $step_1_status_tids)) {
-	    $step_1_entry= grievance_log_status_entry($grievance_nid, $step_1_status_tids, 'desc');
-	    if ($step_1_entry) {
-	    	$step_1_tid = $step_1_entry->field_grievance_status['und'][0]['tid'];
-	    	$step_1_term = taxonomy_term_load($step_1_tid);
-	    	$result->field_field_grievance_status[0]['rendered']['#markup'] .= '<br />' . '(' . $step_1_term->name . ')';
-	    }
-	  }
+	  $grievance_log_step_1_status_display = variable_get('grievance_log_step_1_status_display', NULL);
+	  if ($grievance_log_step_1_status_display != 'No') {
+		  $step_1_status_tids = array();
+		  for ($i=0; $i<10; ++$i) {
+		  	$step_1_status_tids[] = variable_get('grievance_log_step_1_status_' . $i, '');
+		  }
+	    $current_status_tid = $result->field_field_grievance_status[0]['raw']['tid'];
+	    if (!in_array($current_status_tid, $step_1_status_tids)) {
+		    $step_1_entry= grievance_log_status_entry($grievance_nid, $step_1_status_tids, 'desc');
+		    if ($step_1_entry) {
+		    	$step_1_tid = $step_1_entry->field_grievance_status['und'][0]['tid'];
+		    	$step_1_term = taxonomy_term_load($step_1_tid);
+		    	$result->field_field_grievance_status[0]['rendered']['#markup'] .= '<br />' . '(' . $step_1_term->name . ')';
+		    }
+		  }
+		}
 	}
 
 	//

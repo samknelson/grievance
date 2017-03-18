@@ -110,7 +110,7 @@ function grievance_admin() {
     '#type' => 'select',
     '#title' => t('Display last Step 1 Status?'),
     '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
-    '#default_value' => variable_get('grievance_contacts_hide_nostatusmatch', ''),
+    '#default_value' => variable_get('grievance_log_step_1_status_display', ''),
   );
 
   // Here's where I wish system_settings_form supported multiple values.  @todo this is something of a hack.
