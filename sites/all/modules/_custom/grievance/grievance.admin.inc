@@ -100,9 +100,22 @@ function grievance_admin() {
     '#default_value' => variable_get('grievance_log_filed_status_2', ''),
   );
 
+  $form['grievance_status']['step_1'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Step 1 Status'),
+    '#description' => t('On "My Grievances", there is an option to display the last Step 1 status for a grievance (i.e. to show what status a grievance passed through).  Select the possible statuses here.'),
+  );
+
+  $form['grievance_status']['step_1']['grievance_log_step_1_status_display'] = array(
+    '#type' => 'select',
+    '#title' => t('Display last Step 1 Status?'),
+    '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
+    '#default_value' => variable_get('grievance_contacts_hide_nostatusmatch', ''),
+  );
+
   // Here's where I wish system_settings_form supported multiple values.  @todo this is something of a hack.
   for ($i=0; $i<10; ++$i) {
-    $form['grievance_status']['grievance_log_step_1_status_' . $i] = array(
+    $form['grievance_status']['step_1'] ['grievance_log_step_1_status_' . $i] = array(
       '#type' => 'select',
       '#options' => taxonomy_allowed_values(field_info_field('field_grievance_status')),
       '#title' => t('Grievance Step 1 Status #' . $i),
