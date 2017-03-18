@@ -267,8 +267,13 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
   // Various fields in the grievance form are locked down for various users.
   if ($form_id == 'grievance_node_form') {
 
-    $form['field_grievance_alert_tid']['#access'] = FALSE;
-    $form['field_grievance_alert_date']['#access'] = FALSE;
+    if (!user_access('grievance form alert tid')) {
+      $form['field_grievance_alert_tid']['#access'] = FALSE;
+    }
+
+    if (!user_access('grievance form alert date')) {
+      $form['field_grievance_alert_date']['#access'] = FALSE;
+    }
 
     if (!user_access('grievance form contract template')) {
       $form['field_grievance_contract_tplt']['#disabled'] = TRUE;
