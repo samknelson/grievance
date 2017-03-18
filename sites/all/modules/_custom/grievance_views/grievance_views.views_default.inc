@@ -5787,7 +5787,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_grievance_comments']['id'] = 'field_grievance_comments';
   $handler->display->display_options['fields']['field_grievance_comments']['table'] = 'field_data_field_grievance_comments';
   $handler->display->display_options['fields']['field_grievance_comments']['field'] = 'field_grievance_comments';
-  $handler->display->display_options['fields']['field_grievance_comments']['label'] = 'Processed';
+  $handler->display->display_options['fields']['field_grievance_comments']['label'] = 'Key Dates';
   /* Field: Global: Custom text */
   $handler->display->display_options['fields']['nothing_3']['id'] = 'nothing_3';
   $handler->display->display_options['fields']['nothing_3']['table'] = 'views';
@@ -6009,7 +6009,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_grievance_comments']['id'] = 'field_grievance_comments';
   $handler->display->display_options['fields']['field_grievance_comments']['table'] = 'field_data_field_grievance_comments';
   $handler->display->display_options['fields']['field_grievance_comments']['field'] = 'field_grievance_comments';
-  $handler->display->display_options['fields']['field_grievance_comments']['label'] = 'Processed';
+  $handler->display->display_options['fields']['field_grievance_comments']['label'] = 'Key Dates';
   /* Field: Global: Custom text */
   $handler->display->display_options['fields']['nothing_3']['id'] = 'nothing_3';
   $handler->display->display_options['fields']['nothing_3']['table'] = 'views';
@@ -6159,7 +6159,7 @@ Grievance Form',
     t('Assignee Notes'),
     t('Assigned To'),
     t('[field_grievance_rep_assignee]<br>[field_grievance_assignee_notes]'),
-    t('Processed'),
+    t('Key Dates'),
     t('Variant: Exclude Intake'),
     t('Exclude "Intake Staff" (aka "Filed By") from the list.'),
   );
