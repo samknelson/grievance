@@ -105,14 +105,14 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 	  $filed_status_tid_2 = variable_get('grievance_log_filed_status_2', '');
 		$ts = grievance_log_status_date($grievance_nid, array($filed_status_tid, $filed_status_tid_2));
 	  if ($ts) {
-			$html .= t('Processed:&nbsp;') . date('m/d/Y', $ts);
+			$html .= variable_get('grievances_mine_processed_title', 'Processed') . ':&nbsp;' . date('m/d/Y', $ts);
 	  }
 
 	  $first_call_tid = variable_get('grievance_log_first_call_type', '');
 		$ts = grievance_log_entry_date($grievance_nid, $first_call_tid);
 	  if ($ts) {
 	  	if ($html) { $html .= '<br />'; }
-			$html .= t('First&nbsp;Call:&nbsp;') . date('m/d/Y', $ts);
+			$html .= variable_get('grievances_mine_first_call_title', 'First&nbsp;Call') . ':&nbsp;' . date('m/d/Y', $ts);
 			$reminders['reminder_no_first_call']['no_match'][] = $delta;
 	  }
 

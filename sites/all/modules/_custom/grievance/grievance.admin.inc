@@ -271,18 +271,36 @@ function grievance_admin() {
     '#type' => 'textarea',
   );
 
-  $form['grievance_mine_view_name'] = array(
+  $form['grievances_mine'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('My Grievances'),
+  );
+
+  $form['grievances_mine']['grievance_mine_view_name'] = array(
     '#type' => 'textfield',
     '#title' => t('My Grievances View Name'),
     '#default_value' => variable_get('grievance_mine_view_name', 'grievances_mine'),
     '#description' => t("Enter the system name for the Drupal View to be used for the 'My Grievances' page."),
   );
 
-  $form['grievance_mine_view_display'] = array(
+  $form['grievances_mine']['grievance_mine_view_display'] = array(
     '#type' => 'textfield',
     '#title' => t('My Grievances View Display'),
     '#default_value' => variable_get('grievance_mine_view_display', 'page_1'),
     '#description' => t("Enter the system name for the Drupal Display to be used for the 'My Grievances' page."),
+  );
+
+  $form['grievances_mine']['grievances_mine_processed_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('My Grievances "Processed" title'),
+    '#default_value' => variable_get('grievances_mine_processed_title', 'Processed'),
+    '#description' => t("Enter the label to be used for 'Processed' grievances."),
+  );
+  $form['grievances_mine']['grievances_mine_first_call_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('My Grievances "First Call" title'),
+    '#default_value' => variable_get('grievances_mine_first_call_title', 'First&nbsp;Call'),
+    '#description' => t("Enter the label to be used for 'First Call'."),
   );
 
 
