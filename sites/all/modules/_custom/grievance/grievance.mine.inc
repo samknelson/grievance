@@ -11,6 +11,12 @@ function grievance_all() {
 function grievance_mine() {
 	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
 	$display_name = variable_get('grievance_mine_view_display', 'page_1');
+  return views_embed_view($view_name, $display_name, 'upcoming');
+}
+
+function grievance_mine_all() {
+	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
+	$display_name = variable_get('grievance_mine_view_display', 'page_1');
   return views_embed_view($view_name, $display_name);
 }
 
@@ -36,6 +42,15 @@ function grievance_mine_reminder_no_first_call() {
 	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
 	$display_name = variable_get('grievance_mine_view_display', 'page_1');
   return views_embed_view($view_name, $display_name, 'reminder_no_first_call');
+}
+
+function grievance_views_query_alter_grievances_mine(&$view, &$query) {
+	if (isset($view->args) && ($view->args[0] == 'upcoming')) {
+		$query->where[1]['conditions'][] = array(
+			'field' => 'field_grievance_alert_date_value',
+			'operator' => 'is not null',
+		);
+	}
 }
 
 function grievance_views_post_execute_grievances_mine(&$view) {

@@ -379,7 +379,11 @@ function grievance_preprocess_html(&$variables) {
 
 
 function grievance_views_query_alter(&$view, &$query) {
+
   grievance_views_query_alter_permission($view, $query); 
+  if ($view->name == 'grievances_mine') {
+    grievance_views_query_alter_grievances_mine($view, $query);
+  }
 }
 
 function grievance_views_pre_build(&$view) {

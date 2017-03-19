@@ -237,8 +237,16 @@ function grievance_menu() {
 	);
 
 	$items['grievances/mine'] = array(
-		'title' => t('My Grievances'),
+		'title' => t('My Upcoming Grievances'),
 		'page callback' => 'grievance_mine',
+		'access arguments' => array('grievance user'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 1,
+	);
+
+	$items['grievances/mine-all'] = array(
+		'title' => t('All My Grievances'),
+		'page callback' => 'grievance_mine_all',
 		'access arguments' => array('grievance user'),
 		'type' => MENU_LOCAL_TASK,
 		'weight' => 1,
