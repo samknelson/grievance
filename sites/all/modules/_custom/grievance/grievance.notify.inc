@@ -514,17 +514,6 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 	return $form;
 }
 
-function grievance_notify_form_validate($form, &$form_state) {
-	/*
-	// Need exactly one primary recipient
-	dpm($form_state);
-  $year_of_birth = $form_state['values']['year_of_birth'];
-  if ($year_of_birth && ($year_of_birth < 1900 || $year_of_birth > 2000)) {
-    form_set_error('year_of_birth', 'Enter a year between 1900 and 2000.');
-  }
-	*/
-}
-
 function grievance_notify_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 

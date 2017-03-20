@@ -201,7 +201,7 @@ function grievance_mail($key, &$message, $params) {
   }
 
   // @TODO Put this into a configuration variable!!!!
-  $message['From'] = 'L100Grievances@unitehere.org';
+  $message['headers']['From'] = 'L100Grievances@unitehere.org';
 }
 
 function grievance_form_alter(&$form, &$form_state, $form_id) {
