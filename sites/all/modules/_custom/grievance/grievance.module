@@ -207,7 +207,6 @@ function grievance_mail($key, &$message, $params) {
     $message['headers']['Sender'] = 
     $message['headers']['Return-Path'] = 
     'L100Grievances@unitehere.org';
-  dpm($message);
 }
 
 function grievance_form_alter(&$form, &$form_state, $form_id) {
