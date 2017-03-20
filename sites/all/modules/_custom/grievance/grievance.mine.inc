@@ -93,22 +93,24 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 		++$total;
 		$grievance_nid = $result->nid;
 
-		// 
-		// n-day reminders.  Remove anything if it has a log entry less than n days ago
-		//
+		if ($view->name == 'grievances_mine') {
+			// 
+			// n-day reminders.  Remove anything if it has a log entry less than n days ago
+			//
 
-		foreach (array(30, 60, 90) as $days) {
-			$cutoff = date('Y-m-d', strtotime("-$days days"));
+			foreach (array(30, 60, 90) as $days) {
+				$cutoff = date('Y-m-d', strtotime("-$days days"));
 
-		  $query = new EntityFieldQuery();
-		  $query->entityCondition('entity_type', 'node');
-		  $query->entityCondition('bundle', 'grievance_log');
-		  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
-		  $query->fieldCondition('field_grievance_status_date', 'value', $cutoff, '>=');
-		  $stmt = $query->execute();
-		  if ($stmt['node']) {
-		  	$reminders["reminder_$days"]['no_match'][] = $delta;
-		  }
+			  $query = new EntityFieldQuery();
+			  $query->entityCondition('entity_type', 'node');
+			  $query->entityCondition('bundle', 'grievance_log');
+			  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+			  $query->fieldCondition('field_grievance_status_date', 'value', $cutoff, '>=');
+			  $stmt = $query->execute();
+			  if ($stmt['node']) {
+			  	$reminders["reminder_$days"]['no_match'][] = $delta;
+			  }
+			}
 		}
 
 		//
@@ -180,31 +182,33 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 	// If we have any to remove, remove them.  Make sure to reverse the array first so indices are correct.
 	//
 
-	$msgs = array();
-	foreach ($reminders as $type => &$entry) {
-		$entry['count'] = $total - count($entry['no_match']);
+	if ($view->name == 'grievances_mine') {
+		$msgs = array();
+		foreach ($reminders as $type => &$entry) {
+			$entry['count'] = $total - count($entry['no_match']);
 
-		if ($entry['count']) {
-			$msgs[] = t(
-				'Warning: there are <strong>@count</strong> messages with <a href="@url">@title</a>.', 
-				array(
-					'@count' => $entry['count'], 
-					'@title' => $entry['title'], 
-					'@url' => url($entry['path']),
-				)
-			);
-		}
-	}
-
-	if ($view->args[0]) {
-		$entry = $reminders[$view->args[0]];
-		if ($entry && $entry['no_match']) {
-			$to_remove = array_reverse($entry['no_match']);
-			foreach ($to_remove as $delta) {
-				unset($view->result[$delta]);
+			if ($entry['count']) {
+				$msgs[] = t(
+					'Warning: there are <strong>@count</strong> messages with <a href="@url">@title</a>.', 
+					array(
+						'@count' => $entry['count'], 
+						'@title' => $entry['title'], 
+						'@url' => url($entry['path']),
+					)
+				);
 			}
 		}
-	} else {
-		foreach ($msgs as $msg) { drupal_set_message($msg, 'warning'); }
+
+		if ($view->args[0]) {
+			$entry = $reminders[$view->args[0]];
+			if ($entry && $entry['no_match']) {
+				$to_remove = array_reverse($entry['no_match']);
+				foreach ($to_remove as $delta) {
+					unset($view->result[$delta]);
+				}
+			}
+		} else {
+			foreach ($msgs as $msg) { drupal_set_message($msg, 'warning'); }
+		}
 	}
 }
