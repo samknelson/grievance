@@ -6261,7 +6261,6 @@ Grievance Form',
   );
   $handler->display->display_options['fields']['field_grievance_clauseref']['group_column'] = 'entity_id';
   $handler->display->display_options['fields']['field_grievance_clauseref']['delta_offset'] = '0';
-  $handler->display->display_options['fields']['field_grievance_clauseref']['multi_type'] = 'ul';
   $handler->display->display_options['defaults']['sorts'] = FALSE;
   /* Sort criterion: Content: Title */
   $handler->display->display_options['sorts']['title']['id'] = 'title';
