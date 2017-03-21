@@ -49,6 +49,7 @@ function grievance_node_tab_bundle($grievance_node) {
 
 function grievance_bundle_form($form, &$form_state, $grievance_node) {
 	$form_state['grievance_node'] = $grievance_node;
+	$grievance_nid = $grievance_node->nid;
 
 	$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 	if (file_exists($bundled_file)) {
@@ -58,6 +59,28 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
 	}
 
 	drupal_set_message($msg);
+
+
+	// Which attachments to include?
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_attachment');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+	$stmt = $query->execute();
+	if ($stmt['node']) {
+		$attachment_nodes = node_load_multiple(array_keys($stmt['node']));
+		$options = array();
+		foreach ($attachment_nodes as $attachment_node) {
+			$options[$attachment_node->nid] = $attachment_node->title;
+		}
+
+	  $form['attachment_nids'] = array(
+	    '#type' => 'checkboxes',
+	    '#title' => 'Attachments to Include',
+	    '#options' => $options,
+	  );
+	}
+
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -95,8 +118,13 @@ function grievance_bundle_form_submit($form, &$form_state) {
 		if ($stmt['node']) {
 			$tmp = array_keys($stmt['node']);
 			foreach ($tmp as $sub_nid) {
+				// Only include the checked attachments
+				if ($entity_bundle == 'grievance_attachment' && !$form_state['values']['attachment_nids'][$sub_nid]) {
+					continue;
+				}
+
+				// Don't bundle the node itself, just the attachments.  (Nodes appear on the list.)
 				if ($entity_bundle == 'grievance_attachment' || $entity_bundle == 'grievance_log') {
-					// Don't bundle the node itself, just the attahcments.  (Nodes appear on the list.)
 					$paths_to_bundle[$sub_nid] = array();
 				} else {
 					$paths_to_bundle[$sub_nid] = array("node/$sub_nid");
