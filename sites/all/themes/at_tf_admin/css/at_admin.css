@@ -3565,3 +3565,7 @@ table.grievance-timeline tr.pending {
   font-size: 16px;
   padding-bottom: 5px;
 }
+
+.view-id-grievances_mine .views-field-field-grievance-clauseref ul {
+  padding: 0;
+}
