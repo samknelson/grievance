@@ -143,7 +143,6 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 	  }
 
 	  $result->field_field_grievance_comments[0]['rendered']['#markup'] = $html;
-	  if ($html) { drupal_set_message("Found $html"); }
 
 	  //
 	  // Add a class to the "due date"
