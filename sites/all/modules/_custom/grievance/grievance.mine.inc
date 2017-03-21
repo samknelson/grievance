@@ -44,6 +44,10 @@ function grievance_mine_reminder_no_first_call() {
   return views_embed_view($view_name, $display_name, 'reminder_no_first_call');
 }
 
+function grievance_mine_views_exposed_form_alter($form, &$form_state) {
+	
+}
+
 function grievance_views_query_alter_grievances_mine(&$view, &$query) {
 	if (isset($view->args) && ($view->args[0] == 'upcoming')) {
 		$query->where[1]['conditions'][] = array(
@@ -89,6 +93,14 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 	);
 	$total = 0;
 
+	// 
+	// Look up various TID's
+	//
+
+  $first_call_tid = variable_get('grievance_log_first_call_type', '');
+  $filed_status_tid = variable_get('grievance_log_filed_status', '');
+  $filed_status_tid_2 = variable_get('grievance_log_filed_status_2', '');
+
 	foreach ($view->result as $delta => &$result) {
 		++$total;
 		$grievance_nid = $result->nid;
@@ -118,14 +130,11 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 		//
 
 	  $html = '';
-	  $filed_status_tid = variable_get('grievance_log_filed_status', '');
-	  $filed_status_tid_2 = variable_get('grievance_log_filed_status_2', '');
 		$ts = grievance_log_status_date($grievance_nid, array($filed_status_tid, $filed_status_tid_2));
 	  if ($ts) {
 			$html .= variable_get('grievances_mine_processed_title', 'Processed') . ':&nbsp;' . date('m/d/Y', $ts);
 	  }
 
-	  $first_call_tid = variable_get('grievance_log_first_call_type', '');
 		$ts = grievance_log_entry_date($grievance_nid, $first_call_tid);
 	  if ($ts) {
 	  	if ($html) { $html .= '<br />'; }
@@ -134,6 +143,7 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 	  }
 
 	  $result->field_field_grievance_comments[0]['rendered']['#markup'] = $html;
+	  if ($html) { drupal_set_message("Found $html"); }
 
 	  //
 	  // Add a class to the "due date"
