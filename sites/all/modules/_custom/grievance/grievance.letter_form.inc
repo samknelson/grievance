@@ -72,6 +72,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	// Company Recipients
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  /*
   $form['company'] = array(
   	'#type' => 'fieldset',
   	'#collapsible' => TRUE,
@@ -247,11 +248,13 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 		'#markup' => '',
 		'#prefix' => '</div>'
 	);
+	*/
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Union Recipients
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/*
   $form['union'] = array(
   	'#type' => 'fieldset',
   	'#title' => t('Who at the <strong>UNION</strong> should receive the letter?'),
@@ -417,6 +420,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 		'#markup' => '',
 		'#prefix' => '</div>'
 	);
+	*/
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Output and Logging
@@ -444,7 +448,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     	'pdf' => t('Download the letter in PDF format'),
     	'preview' => t('Preview the letter on the screen'),
     	'edit' => t('Edit the letter before sending'),
-    	'send-email' => t('Send the letter by email'),
+    	/* 'send-email' => t('Send the letter by email'), */
     ),
     '#title' => t('Output'),
   );
