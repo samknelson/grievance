@@ -1,7 +1,7 @@
 <?php
 
 function grievance_home() {
-	drupal_goto('grievances/mine');
+	drupal_goto('grievances/mine/');
 }
 
 function grievance_all() {
@@ -12,6 +12,11 @@ function grievance_mine() {
 	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
 	$display_name = variable_get('grievance_mine_view_display', 'page_1');
   return views_embed_view($view_name, $display_name, 'upcoming');
+}
+
+function grievance_mine_expanded() {
+	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
+  return views_embed_view($view_name, 'page_3', 'upcoming');
 }
 
 function grievance_mine_all() {
@@ -70,25 +75,25 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 			'title' => t('no log entries for 30 days'),
 			'no_match' => array(),
 			'count' => 0,
-			'path' => 'grievances/reminder-30',
+			'path' => 'grievances/mine/reminder-30',
 		),
 		'reminder_60' => array(
 			'title' => t('no log entries for 60 days'),
 			'no_match' => array(),
 			'count' => 0,
-			'path' => 'grievances/reminder-60',
+			'path' => 'grievances/mine/reminder-60',
 		),
 		'reminder_90' => array(
 			'title' => t('no log entries for 90 days'),
 			'no_match' => array(),
 			'count' => 0,
-			'path' => 'grievances/reminder-90',
+			'path' => 'grievances/mine/reminder-90',
 		),
 		'reminder_no_first_call' => array(
 			'title' => t('no first call'),
 			'no_match' => array(),
 			'count' => 0,
-			'path' => 'grievances/reminder-no-first-call',
+			'path' => 'grievances/mine/reminder-no-first-call',
 		),		
 	);
 	$total = 0;

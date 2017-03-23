@@ -209,7 +209,10 @@ function grievance_node_tabs() {
  */
 function grievance_menu() {
   $items = array();
+
+  //
 	// Node Tabs
+  // 
 
 	$node_tabs = grievance_node_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
@@ -229,6 +232,10 @@ function grievance_menu() {
 		}
 	}
 
+  //
+	// Home
+  // 
+  
 	$items['grievances'] = array(
 		'title' => t('My Grievances'),
 		'page callback' => 'grievance_home',
@@ -236,32 +243,44 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+  //
+	// My Grievances
+  // 
+  
 	$items['grievances/mine'] = array(
-		'title' => t('My Upcoming Grievances'),
+		'title' => t('My Grievances'),
 		'page callback' => 'grievance_mine',
 		'access arguments' => array('grievance user'),
 		'type' => MENU_LOCAL_TASK,
 		'weight' => 1,
 	);
 
-	$items['grievances/mine-all'] = array(
-		'title' => t('All My Grievances'),
-		'page callback' => 'grievance_mine_all',
+	$items['grievances/mine/upcoming'] = array(
+		'title' => t('My Upcoming Grievances'),
+		'page callback' => 'grievance_mine',
+		'access arguments' => array('grievance user'),
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'weight' => 0,
+	);
+
+	$items['grievances/mine/expanded'] = array(
+		'title' => t('Tickler'),
+		'page callback' => 'grievance_mine_expanded',
+		'page arguments' => array(),
 		'access arguments' => array('grievance user'),
 		'type' => MENU_LOCAL_TASK,
 		'weight' => 1,
 	);
 
-	$items['grievances/all'] = array(
-		'title' => t('All Grievances'),
-		'page callback' => 'grievance_all',
-		'page arguments' => array(),
+	$items['grievances/mine/mine-all'] = array(
+		'title' => t('All My Grievances'),
+		'page callback' => 'grievance_mine_all',
 		'access arguments' => array('grievance user'),
 		'type' => MENU_LOCAL_TASK,
 		'weight' => 2,
 	);
 
-	$items['grievances/reminder-30'] = array(
+	$items['grievances/mine/reminder-30'] = array(
 		'title' => t('30-Day'),
 		'page callback' => 'grievance_mine_reminder_30',
 		'page arguments' => array(),
@@ -271,7 +290,7 @@ function grievance_menu() {
 	);
 
 
-	$items['grievances/reminder-60'] = array(
+	$items['grievances/mine/reminder-60'] = array(
 		'title' => t('60-Day'),
 		'page callback' => 'grievance_mine_reminder_60',
 		'page arguments' => array(),
@@ -281,7 +300,7 @@ function grievance_menu() {
 	);
 
 
-	$items['grievances/reminder-90'] = array(
+	$items['grievances/mine/reminder-90'] = array(
 		'title' => t('90-Day'),
 		'page callback' => 'grievance_mine_reminder_90',
 		'page arguments' => array(),
@@ -290,25 +309,28 @@ function grievance_menu() {
 		'weight' => 5,
 	);
 
-	$items['grievances/reminder-no-first-call'] = array(
+	$items['grievances/mine/reminder-no-first-call'] = array(
 		'title' => t('No First Call'),
 		'page callback' => 'grievance_mine_reminder_no_first_call',
 		'page arguments' => array(),
 		'access arguments' => array('grievance user'),
 		'type' => MENU_LOCAL_TASK,
-		'weight' => 5,
+		'weight' => 6,
 	);
 
-	$items['node/%node/' . $tab_name] = array(
-		'title' => $tab_record['title'],
-		'description' => $tab_record['description'],
-		'page callback' => 'grievance_node_tab_content',
-		'page arguments' => array(1, $tab_name),
-		'access callback' => 'grievance_node_tab_access',
-		'access arguments' => array(1, $tab_name),
+  //
+	// All Grievances
+  // 
+  
+
+	$items['grievances/all'] = array(
+		'title' => t('All Grievances'),
+		'page callback' => 'grievance_all',
+		'page arguments' => array(),
+		'access arguments' => array('grievance user'),
 		'type' => MENU_LOCAL_TASK,
+		'weight' => 2,
 	);
-
 
 	$items['node/%node/loopback'] = array(
 		'page callback' => 'grievance_forward_loopback',
