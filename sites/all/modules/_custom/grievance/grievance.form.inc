@@ -451,10 +451,12 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $fields_to_hide[] = 'field_grievance_state';
     $fields_to_hide[] = 'field_grievance_zip';
     $fields_to_hide[] = 'field_grievance_hire_date';
+    /*
     $fields_to_hide[] = 'field_grievance_class_tid';
     $fields_to_hide[] = 'field_grievance_classification';
     $fields_to_hide[] = 'field_grievance_department_tid';
     $fields_to_hide[] = 'field_grievance_department';
+    */
     $fields_to_hide[] = 'field_grievance_work_status';
     $fields_to_hide[] = 'field_grievance_shift';
     $fields_to_hide[] = 'field_grievance_daysoff';

@@ -201,12 +201,17 @@ function grievance_mail($key, &$message, $params) {
   }
 
   // @TODO Put this into a configuration variable!!!!
+  $from_email = variable_get('grievance_from_email', '');
+  if (!$from_email) {
+    drupal_set_message(t('The from_email for this server has not been configured.  Mails will not be delivered correctly!'), 'error');
+  }
+
   $message['from'] = 
     $message['params']['from'] = 
     $message['headers']['From'] = 
     $message['headers']['Sender'] = 
     $message['headers']['Return-Path'] = 
-    'L100Grievances@unitehere.org';
+    $from_email;
 }
 
 function grievance_form_alter(&$form, &$form_state, $form_id) {

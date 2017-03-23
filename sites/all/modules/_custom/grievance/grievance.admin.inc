@@ -271,6 +271,13 @@ function grievance_admin() {
     '#type' => 'textarea',
   );
 
+  $form['grievance_from_email'] = array(
+    '#default_value' => variable_get('grievance_from_email', ''),
+    '#title' => t('From Email'),
+    '#description' => t('The "From" email for the system; must be configured so that the server is a legitimate sender from this email.'),
+    '#type' => 'textfield',
+  );
+
   $form['grievances_mine'] = array(
     '#type' => 'fieldset',
     '#title' => t('My Grievances'),
