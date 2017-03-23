@@ -3566,6 +3566,49 @@ table.grievance-timeline tr.pending {
   padding-bottom: 5px;
 }
 
+
 .view-id-grievances_mine .views-field-field-grievance-clauseref ul {
   padding: 0;
 }
+
+/*
+ * Multiple tables on same page have different column widths darn it.
+ */
+
+.view-id-grievances_mine.view-display-id-page_3 td.views-field-nothing-1, 
+.view-id-grievances_mine.view-display-id-page_3 th.views-field-nothing-1 {
+  width: 130px;
+}
+
+.view-id-grievances_mine.view-display-id-page_3 td.views-field-field-grievance-alert-date, 
+.view-id-grievances_mine.view-display-id-page_3 th.views-field-field-grievance-alert-date {
+  width: 89px;
+}
+
+.view-id-grievances_mine.view-display-id-page_3 td.views-field-nothing-4, 
+.view-id-grievances_mine.view-display-id-page_3 th.views-field-nothing-4 {
+  width: 156px;
+}
+
+.view-id-grievances_mine.view-display-id-page_3 td.views-field-field-grievance-status, 
+.view-id-grievances_mine.view-display-id-page_3 th.views-field-field-grievance-status {
+  width: 105px;
+}
+
+.view-id-grievances_mine.view-display-id-page_3 td.views-field-nothing-5, 
+.view-id-grievances_mine.view-display-id-page_3 th.views-field-nothing-5 {
+  width: 104px;
+}
+
+.view-id-grievances_mine.view-display-id-page_3 td.views-field-field-grievance-comments, 
+.view-id-grievances_mine.view-display-id-page_3 th.views-field-field-grievance-comments {
+  width: 178px;
+}
+
+.view-id-grievances_mine.view-display-id-page_3 td.views-field-nothing-3, 
+.view-id-grievances_mine.view-display-id-page_3 th.views-field-nothing-3 {
+  width: 100px;
+}
+
+
+
