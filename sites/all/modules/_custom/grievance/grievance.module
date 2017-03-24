@@ -170,6 +170,7 @@ function grievance_mail($key, &$message, $params) {
   switch($key) {
     case 'grievance':
     case 'alert':
+    case 'mailattach':
       $message['subject'] = $params['subject'];
       $message['body'][] = $params['body'];
       if (isset($params['attachments'])) {

@@ -64,3 +64,15 @@ function grievance_id_algorithm_year4($node) {
 
 	return $id;
 }
+
+function grievance_fetch_by_id($id) {
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'node');
+	$query->entityCondition('bundle', 'grievance');
+	$query->propertyCondition('status', 1);
+	$query->fieldCondition('field_grievance_id', 'value', $id);
+	$result = $query->execute();
+	if (!isset($result['node'])) { return NULL; }
+	$nid = array_keys($result['node'])[0];
+	return node_load($nid);
+}

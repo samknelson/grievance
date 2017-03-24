@@ -119,7 +119,7 @@
 				var jqxhr = $.getJSON('/grievance/timss/lookup/' + val + '?broughtby_tid=' + broughtby_tid);
 				jqxhr.complete(function(data) {
 					var json = jQuery.parseJSON(data.responseJSON);
-					// console.log(json);
+					console.log(json);
 					$('.form-item-field-grievance-first-name-und-0-value input').val(json[0].first_Name);
 					$('.form-item-field-grievance-last-name-und-0-value input').val(json[0].last_Name);
 
@@ -127,6 +127,7 @@
 					$('.form-item-field-grievance-state-und-0-value input').val(json[0].state);
 					$('.form-item-field-grievance-zip-und-0-value input').val(json[0].zip);
 					$('.form-item-field-grievance-address-und-0-value input').val(json[0].street_Address);
+					$('.form-item-field-grievance-gender-und-0-value input').val(json[0].Gender);
 
 					/*
 					tmp = json[0].house_Address.street_Address;

@@ -886,6 +886,7 @@ function grievance_content_types_field_group_info() {
       16 => 'field_grievance_work_status',
       17 => 'field_grievance_shift',
       18 => 'field_grievance_daysoff',
+      19 => 'field_grievance_gender',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -932,6 +933,7 @@ function grievance_content_types_field_group_info() {
       17 => 'field_grievance_work_status',
       18 => 'field_grievance_shift',
       19 => 'field_grievance_daysoff',
+      20 => 'field_grievance_gender',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(

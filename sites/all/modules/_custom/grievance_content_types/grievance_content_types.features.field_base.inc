@@ -1840,6 +1840,35 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
+  // Exported field_base: 'field_grievance_gender'.
+  $field_bases['field_grievance_gender'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_gender',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'F' => 'Female',
+        'M' => 'Male',
+        'U' => 'Unknown',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_grievance_hire_date'.
   $field_bases['field_grievance_hire_date'] = array(
     'active' => 1,
