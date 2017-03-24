@@ -29,6 +29,12 @@ function grievance_form_current_value($field, $column, $form, $form_state) {
 }
 
 function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
+  //
+  // Hide the title, we're auto-generating
+  //
+
+  $form['title']['#access'] = FALSE;
+
   // 
   // Base node and user
   // 

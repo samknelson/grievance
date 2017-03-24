@@ -480,6 +480,10 @@ function grievance_node_presave($node) {
       }
     }
   }
+
+  if ($node->type == 'grievance') {
+    grievance_node_set_title($node);
+  }
 }
 
 function grievance_user_presave(&$edit, $account, $category) {
@@ -490,3 +494,38 @@ function grievance_user_presave(&$edit, $account, $category) {
     $edit['field_grievance_phone_off']['und'][0]['value'] = grievance_format_phone_number($edit['field_grievance_phone_off']['und'][0]['value']);
   }
 }
+
+function grievance_node_set_title(&$node) {
+  $title = '';
+
+  // Employer
+  $shop_nid = $node->field_grievance_shop['und'][0]['target_id'];
+  if ($shop_nid) { 
+    $shop_node = node_load($shop_nid);
+  }
+  if ($shop_node) {
+    $shop = $shop_node->title;
+  } else {
+    $shop = 'Unknown Employer';
+  }
+
+  // Name
+  if ($node->field_grievance_classaction['und'][0]['value'] == 'Yes') {
+    $name .= 'General Grievance';
+  } else {
+    $name = '';
+    if ($node->field_grievance_first_name['und'][0]['value']) {
+      $name = $node->field_grievance_first_name['und'][0]['value'];
+    }
+    if ($node->field_grievance_last_name['und'][0]['value']) {
+      if ($name) { $name .= ' '; }
+      $name .= $node->field_grievance_last_name['und'][0]['value'];
+    }
+    if (!$name) {
+      $name = 'Unknown Name';
+    }
+  }
+
+  $node->title = "$shop - $name";
+}
+
