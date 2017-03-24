@@ -7,7 +7,7 @@
 
 function grievance_node_tab_bundle_download($grievance_node) {
 	// Path to the bundled file
-	$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
+	$bundled_file = grievance_bundle_working_directory($grievance_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 	if (!file_exists($bundled_file)) { 
 		drupal_set_mesage(t('Bundle does not exist.'), 'error');
 		return 'Error.';
@@ -60,7 +60,6 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
 
 	drupal_set_message($msg);
 
-
 	// Which attachments to include?
 	$query = new EntityFieldQuery();
 	$query->entityCondition('entity_type', 'node');
@@ -76,11 +75,22 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
 
 	  $form['attachment_nids'] = array(
 	    '#type' => 'checkboxes',
-	    '#title' => 'Attachments to Include',
+	    '#title' => t('Attachments to Include'),
 	    '#options' => $options,
 	  );
 	}
 
+	// What else to include?
+  $form['other_include'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Other components to include'),
+    '#options' => array(
+    	'cover' => t('Cover Page'),
+    	'attachments' => t('Attachment List'),
+    	'statuslog' => t('Log'),
+    	'settlements' => t('Settlements'),
+    ),
+  );
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -100,15 +110,26 @@ function grievance_bundle_form_submit($form, &$form_state) {
 	$paths_to_bundle = array();
 
 	// Start with the grievance itself.
-	$paths_to_bundle[$grievance_nid] = array(
-		"node/$grievance_nid",
-		// "node/$grievance_nid/timeline",
-		"node/$grievance_nid/attachments",
-		"node/$grievance_nid/statuslog"
-	);
+	$paths_to_bundle[$grievance_nid] = array();
+
+	if ($form_state['values']['other_include']['cover']) {
+		$paths_to_bundle[$grievance_nid][] = "node/$grievance_nid";
+	}
+	if ($form_state['values']['other_include']['attachments']) {
+		$paths_to_bundle[$grievance_nid][] = "node/$grievance_nid/attachments";
+	}
+	if ($form_state['values']['other_include']['statuslog']) {
+		$paths_to_bundle[$grievance_nid][] = "node/$grievance_nid/statuslog";
+	}
 
 	// Add all the nodes that reference the grievance
-	$entity_bundles = array('grievance_attachment', 'grievance_log', 'grievance_settlement');
+	$entity_bundles = array('grievance_attachment');
+	if ($form_state['values']['other_include']['statuslog']) {
+		$entity_bundles[] = 'grievance_log';
+	}
+	if ($form_state['values']['other_include']['settlements']) {
+		$entity_bundles[] = 'grievance_settlement';
+	}
 	foreach ($entity_bundles as $entity_bundle) {
 		$query = new EntityFieldQuery();
 		$query->entityCondition('entity_type', 'node');
@@ -186,6 +207,11 @@ function grievance_bundle_init($grievance_node, &$context) {
 	$working_directory = grievance_bundle_working_directory($grievance_node);
 	if (!file_exists($working_directory)) {
 		mkdir($working_directory);
+	}
+
+	$old_bundle = grievance_bundle_working_directory($grievance_node) . '/bundled_' . $grievance_node->nid . '.pdf';
+	if (file_exists($old_bundle)) {
+		unlink($old_bundle);
 	}
 }
 
