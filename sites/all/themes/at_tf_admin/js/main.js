@@ -127,7 +127,7 @@
 					$('.form-item-field-grievance-state-und-0-value input').val(json[0].state);
 					$('.form-item-field-grievance-zip-und-0-value input').val(json[0].zip);
 					$('.form-item-field-grievance-address-und-0-value input').val(json[0].street_Address);
-					$('.form-item-field-grievance-gender-und-0-value input').val(json[0].Gender);
+					$('.form-item-field-grievance-gender-und-0-value input').val(json[0].gender);
 
 					/*
 					tmp = json[0].house_Address.street_Address;
