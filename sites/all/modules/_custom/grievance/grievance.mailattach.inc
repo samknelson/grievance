@@ -149,8 +149,8 @@ function grievance_mailattach_fetch_reject($from_mail, $msg) {
 	$params = array();
 	$params['subject'] = "Attachment rejected";
 	$params['body'] =  "Your email to $grievance_mailattach_user was rejected: $msg";
-	// drupal_mail('grievance', 'mailattach', $from_mail, LANGUAGE_NONE, $params);
-	print "Failing with $msg\n";
+	drupal_mail('grievance', 'mailattach', $from_mail, LANGUAGE_NONE, $params);
+	// print "Failing with $msg\n";
 }
 
 function grievance_imap_fetch_all_parts($mbox, $msgno, $structure, $path = NULL) {
