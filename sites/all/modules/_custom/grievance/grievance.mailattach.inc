@@ -52,7 +52,7 @@ function grievance_mailattach_fetch() {
 		$user = user_load_by_mail($from_mail);
 		if (!$user) {
 			watchdog('grievance_mailattach', "Message not sent by a valid user ($from_mail); rejecting: <pre>" . print_r($message, 1) . "</pre>");
-			grievance_mailattach_fetch_reject($from_mail, "The sender's email address ($from_email) does not correspond to a valid system user.");
+			grievance_mailattach_fetch_reject($from_mail, "The sender's email address ($from_mail) does not correspond to a valid system user.");
 			continue;
 		}
 
@@ -79,7 +79,7 @@ function grievance_mailattach_fetch() {
 		$grievance_node = grievance_fetch_by_id($grievance_id);
 		if (!$grievance_node) {
 			watchdog('grievance_mailattach', "Unable to find grievance id ($grievance_id); rejecting: <pre>" . print_r($message, 1) . "</pre>");
-			grievance_mailattach_fetch_reject($from_mail, "Unable to determine which grievance you want to use (couldn't find a grievance with id [$grievance_id].  Make sure to put the ID number at the very beginning of the subject of your emails.");
+			grievance_mailattach_fetch_reject($from_mail, "Unable to determine which grievance you want to use (couldn't find a grievance with id [$grievance_id]).  Make sure to put the ID number at the very beginning of the subject of your emails.");
 			continue;
 		}
 

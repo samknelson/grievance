@@ -213,7 +213,7 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 			}
 		}
 
-		if ($view->args[0]) {
+		if ($view->args[0] != 'upcoming') {
 			$entry = $reminders[$view->args[0]];
 			if ($entry && $entry['no_match']) {
 				$to_remove = array_reverse($entry['no_match']);

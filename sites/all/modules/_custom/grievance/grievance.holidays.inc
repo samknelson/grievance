@@ -66,7 +66,7 @@ function grievance_holiday_form_submit($form, &$form_state) {
 function grievance_holidays_date($days, $days_type, $contract_nid, $from_ts = NULL) {
 	$contract_node = node_load($contract_nid);
 
-	if ($days_type == 'Calendar Days') {
+	if ($days_type != 'Business Days') {
 		return date('Y-m-d', strtotime("+$days days", $from_ts));
 	}
 

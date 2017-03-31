@@ -36,6 +36,7 @@ function grievance_settings_strongarm() {
       'pages-and-selector' => array(
         'include-pages' => 'grievance/admin/shops
 grievance/admin/shops/companies
+grievance/admin/shops/contacts
 admin/people
 grievances/mine
 grievances/mine/mine-all
