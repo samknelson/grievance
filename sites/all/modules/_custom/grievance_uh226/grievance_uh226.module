@@ -195,6 +195,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $query->entityCondition('bundle', 'grievance');
     $query->fieldCondition('field_grievance_clauseref', 'target_id', $spi_nids, 'in');
     $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
+    $query->fieldCondition('field_grievance_rep_organizer', 'target_id', $user['uid']);
     $stmt = $query->execute();
     if (!$stmt['node']) { continue; }
     $report_row['spi'] = 0;
