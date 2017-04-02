@@ -184,9 +184,25 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     // $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
     $query->propertyCondition('created', $start_ts, ">=");
     $stmt = $query->execute();
-    $report_row['new_this_week'] = count(array_keys($stmt['node']));
+    $report_row['new_this_week'] = 0;
+    if ($stmt['node']) {
+      $report_row['new_this_week'] = count(array_keys($stmt['node']));
+    }
 
-    // 
+    // Fetch SPIs
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance');
+    $query->fieldCondition('field_grievance_clauseref', 'target_id', $spi_nids, 'in');
+    $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
+    $query->fieldCondition('field_grievance_')
+    $stmt = $query->execute();
+    if (!$stmt['node']) { continue; }
+    $report_row['spi'] = 0;
+    if ($stmt['node']) {
+      $report_row['spi'] = count(array_keys($stmt['node']));
+    }
+
 
     $report_rows[] = $report_row;
   }
