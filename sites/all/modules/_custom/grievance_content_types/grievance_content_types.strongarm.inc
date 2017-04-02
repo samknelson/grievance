@@ -598,6 +598,9 @@ function grievance_content_types_strongarm() {
       'grievance_gform_a' => array(
         'custom_settings' => FALSE,
       ),
+      'grievance_form_226' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
