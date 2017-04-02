@@ -42,16 +42,16 @@ function grievance_uh226_report_summary_form($form, &$form_state) {
 }
 
 /*
-Total Calls
-  - Total calls this week
-  - = Initial Call / Call to Grievant / ...
+ * Total Calls
+ *  - Total calls this week
+ *  - = Initial Call / Call to Grievant / ...
 
-Left Msg
-  - Add checkbox to flag "Left Message"
+ * Left Msg
+ *  - Add checkbox to flag "Left Message"
 
-* Total Open Grievs
+ * Total Open Grievs
 
-New This Week
+ New This Week
   - Based on intake date
 
 SPI and Terms
@@ -115,7 +115,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
 
   // Start date
   $start_date = date('Y-m-d', strtotime("-7 days"));
-  dpm($start_date);
+  $start_ts = strtotime($start_date);
 
   // Our report data
   $report_rows = array();
@@ -131,7 +131,6 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $query->entityCondition('bundle', 'grievance');
     $query->fieldCondition('field_grievance_rep_organizer', 'target_id', $user['uid']);
     $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
-    $query->propertyOrderBy('created');
     $stmt = $query->execute();
     if (!$stmt['node']) { continue; }
     $report_row['name'] = $user['name'];
@@ -141,7 +140,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'grievance_log');
-    $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_call_tids, 'in');
+    // $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_call_tids, 'in');
     $query->fieldCondition('field_grievance_status_date', 'value', $start_date, ">=");
     $query->propertyCondition('uid', $user['uid']);
     $stmt = $query->execute();
@@ -163,6 +162,17 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if ($stmt['node']) {
       $report_row['left_message'] = count(array_keys($stmt['node']));
     }
+
+    // Fetch "New This Week" 
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance');
+    $query->fieldCondition('field_grievance_rep_organizer', 'target_id', $user['uid']);
+    // $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
+    $query->propertyCondition('created', $start_ts, ">=");
+    $stmt = $query->execute();
+    if (!$stmt['node']) { continue; }
+    $report_row['new_this_week'] = count(array_keys($stmt['node']));
 
     $report_rows[] = $report_row;
   }
