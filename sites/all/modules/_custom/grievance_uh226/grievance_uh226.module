@@ -121,6 +121,9 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
 
   // For each user
   foreach ($users as $user) {
+    // Our report row
+    $report_row = array();
+
     // Fetch the number of open grievances for each user
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node');
@@ -144,12 +147,6 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if ($stmt['node']) {
       $report_row['calls_this_week'] = count(array_keys($stmt['node']));
     }
-
-    // Tag each grievance
-    $nids = array_keys($stmt['node']);
-
-    $report_row = array();
-
 
     $report_rows[] = $report_row;
   }
