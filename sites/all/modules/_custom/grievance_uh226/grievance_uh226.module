@@ -51,8 +51,8 @@ function grievance_uh226_report_summary_form($form, &$form_state) {
 
  * Total Open Grievs
 
- New This Week
-  - Based on intake date
+ * New This Week
+ *  - Based on intake date
 
 SPI and Terms
   - Search for "Suspension Pending Investigation"
@@ -99,6 +99,19 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
       $open_status_tids[] = $tid;
     }
   }
+
+  // Get the list of "SPI" nids
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_contract_clause');
+  $query->propertyCondition('title', 'Suspension Pending Investigation', 'like');
+  $stmt = $query->execute();
+  $spi_nids = array();
+  if ($stmt['node']) {
+    $spi_nids = array_keys($stmt['node']);
+  }
+  dpm($spi_nids);
+
 
   // Get the list of log types corresponding to "call to grievant".
   // @todo this should be configurable, but what the heck.
@@ -171,8 +184,9 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     // $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
     $query->propertyCondition('created', $start_ts, ">=");
     $stmt = $query->execute();
-    if (!$stmt['node']) { continue; }
     $report_row['new_this_week'] = count(array_keys($stmt['node']));
+
+    // 
 
     $report_rows[] = $report_row;
   }
