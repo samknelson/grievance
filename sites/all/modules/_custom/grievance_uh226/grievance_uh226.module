@@ -103,7 +103,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if ($term->field_grievance_open['und'][0]['value'] == 0) {
       $closed_status_tids[] = $tid;
     }
-    if (preg_match('/arbitration/i', $term->title)) {
+    if (preg_match('/arbitration/i', $term->name)) {
       $arbitration_status_tids[] = $tid;
     }
   }
