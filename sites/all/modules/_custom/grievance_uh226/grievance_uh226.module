@@ -79,8 +79,8 @@ BOA Date
  * Closed
  * - Entered a "resolved"-type status this week
 
-Victories
-  - Status is "Resolved" or "Won"
+ * Victories
+ * - Status is "Resolved" or "Won"
 */
 
 function grievance_uh226_report_summary_form_submit($form, &$form_state) {
@@ -101,6 +101,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $formal_arb_held_status_tids = array();
   $expedited_arb_held_status_tids = array();
   $victory_status_tids = array();
+  $boa_held_status_tids = array();
 
   foreach ($status_terms as $tid => $term) {
     if ($term->field_grievance_open['und'][0]['value'] == 1) {
@@ -126,6 +127,9 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     }
     if (preg_match('/(resolved|won)/i', $term->name)) {
       $victory_status_tids[] = $tid;
+    }
+    if (preg_match('/BOA Held/i', $term->name)) {
+      $boa_held_status_tids[] = $tid;
     }
   }
 
@@ -167,6 +171,8 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $users = array();
   while ($hr = $stmt->fetchAssoc()) {
     $hr['closed'] = 0;
+    $hr['victories'] = 0;
+    $hr['boa_held'] = 0;
     $users[$hr['uid']] = $hr;
   }
 
@@ -216,6 +222,29 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     }
   }
 
+  // Fetch BOA Held
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance_status_date', 'value', $start_date, ">=");
+  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
+  $query->fieldCondition('field_grievance_status', 'tid', $boa_held_status_tids, 'in');
+  $stmt = $query->execute();
+  $count_once = array();
+  if ($stmt['node']) {
+    $log_nids = array_keys($stmt['node']);
+    foreach ($log_nids as $log_nid) {
+      $log_node = node_load($log_nid);
+      $grievance_nid = $log_node->field_grievance['und'][0]['target_id'];
+      if ($count_once[$grievance_nid]) { continue; }
+      $count_once[$grievance_nid] = TRUE;
+      $grievance_node = node_load($grievance_nid);
+      if ($grievance_node->field_grievance_rep_organizer['und'][0]['target_id']) {
+        $users[$grievance_node->field_grievance_rep_organizer['und'][0]['target_id']]['boa_held']++;
+      }
+    }
+  }
+
   // Our report data
   $report_rows = array();
 
@@ -226,6 +255,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $report_row['name'] = $user['name'];
     $report_row['closed'] = $user['closed'];
     $report_row['victories'] = $user['victories'];
+    $report_row['boa_held'] = $user['victories'];
 
     // Fetch the number of open grievances for each user
     $query = new EntityFieldQuery;
