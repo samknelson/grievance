@@ -69,6 +69,7 @@ admin/modules*',
       ),
       'pages-and-selector' => array(
         'include-pages' => 'grievances/all
+grievance/report/uh226-report-summary
 ',
         'exclude-pages' => 'admin/reports/status
 admin/modules*',
