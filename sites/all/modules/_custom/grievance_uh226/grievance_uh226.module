@@ -349,7 +349,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
       'rows' => $report_rows,
       'header' => $header, 
       'attributes' => array(),
-    ),
+    )
   );
   dpm($report_rows);
 
