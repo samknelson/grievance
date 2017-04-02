@@ -398,14 +398,40 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
       $report_row['expedited_arb_held'] = count(array_keys($stmt['node']));
     }
 
-    $report_rows[] = array_values($report_row);
-    $header = array_keys($report_row);
+    $report_rows[] = $report_row;
+  }
+
+  $headers = array(
+    'name' => t('Specialist'),
+    'calls_this_week' => t('Total Calls'),
+    'left_message' => t('Left Message'),
+    'open_count' => t('Total Open Grievances'),
+    'new_this_week' => t('New This Week'),
+    'spi' => t('SPIs'),
+    'terms' => t('Terms'),
+    'boa_held' => t('BOA Held'),
+    'arbitration' => t('In Arbitration'),
+    'fmcs' => t('FMCS Date'),
+    'adr' => t('ADR Date'),
+    'formal_arb_held' => t('Formal Arb Held'),
+    'expedited_arb_held' => t('Expedited Arb Held'),
+    'closed' => t('Closed'),
+    'victories' => t('Victories'),
+  );
+
+  $rows = array();
+  foreach ($report_rows as $report_row) {
+    $row = array();
+    foreach ($headers as $key => $value) {
+      $row[] = $report_row[$key];
+    }
+    $rows[] = array('no_striping' => TRUE, 'data' => $row);
   }
 
   $form_state['results'] = theme_table(
     array(
-      'rows' => $report_rows,
-      'header' => $header, 
+      'rows' => $rows,
+      'header' => $headers, 
       'attributes' => array(),
     )
   );
