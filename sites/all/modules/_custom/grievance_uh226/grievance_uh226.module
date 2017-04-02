@@ -153,6 +153,10 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $log_tag_left_message_tid = 874;
   $status_boa_held_tid = 112;
 
+  // Start date
+  $start_date = date('Y-m-d', strtotime("-7 days"));
+  $start_ts = strtotime($start_date);
+
   // Get all users.  We really only want organizers, but potentially some non-organizers might be assigned...
   $sql = "select * from users where status = 1 order by name";
   $stmt = db_query($sql, array());
@@ -162,7 +166,6 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   }
 
   // Fetch everything closed this week
-  dpm($closed_status_tids);
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
@@ -173,10 +176,6 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   if ($stmt['node']) {
     dpm($stmt['node']);
   }
-
-  // Start date
-  $start_date = date('Y-m-d', strtotime("-7 days"));
-  $start_ts = strtotime($start_date);
 
   // Our report data
   $report_rows = array();
