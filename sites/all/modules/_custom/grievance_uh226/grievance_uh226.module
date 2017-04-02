@@ -61,8 +61,8 @@ function grievance_uh226_report_summary_form($form, &$form_state) {
 BOA Date
   - Entered the status "BOA Held" sometime during the specified week
 
-In Arbitration
-  - CURRENTLY has the status "Referred to Arbitration" or "Referred to Expedited Arbitration".
+ * In Arbitration
+ * - CURRENTLY has the status "Referred to Arbitration" or "Referred to Expedited Arbitration".
 
 FMCS Date
   - CURRENTLY has the status "FMCS Held"
@@ -96,6 +96,9 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $open_status_tids = array();
   $closed_status_tids = array();
   $arbitration_status_tids = array();
+  $fmcs_status_tids = array();
+  $adr_status_tids = array();
+
   foreach ($status_terms as $tid => $term) {
     if ($term->field_grievance_open['und'][0]['value'] == 1) {
       $open_status_tids[] = $tid;
@@ -106,8 +109,13 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if (preg_match('/arbitration/i', $term->name)) {
       $arbitration_status_tids[] = $tid;
     }
+    if (preg_match('/FMCS Held/i', $term->name)) {
+      $fmcs_status_tids[] = $tid;
+    }
+    if (preg_match('/ADR Held/i', $term->name)) {
+      $adr_status_tids[] = $tid;
+    }
   }
-  dpm($arbitration_status_tids);
 
   // Get the list of "SPI" nids
   $query = new EntityFieldQuery;
@@ -245,6 +253,32 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $report_row['arbitration'] = 0;
     if ($stmt['node']) {
       $report_row['arbitration'] = count(array_keys($stmt['node']));
+    }
+
+    // Fetch FMCS
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance');
+    $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
+    $query->fieldCondition('field_grievance_status', 'tid', $fmcs_status_tids, 'in');
+    $query->fieldCondition('field_grievance_rep_organizer', 'target_id', $user['uid']);
+    $stmt = $query->execute();
+    $report_row['fmcs'] = 0;
+    if ($stmt['node']) {
+      $report_row['fmcs'] = count(array_keys($stmt['node']));
+    }
+
+    // Fetch ADR
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance');
+    $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
+    $query->fieldCondition('field_grievance_status', 'tid', $adr_status_tids, 'in');
+    $query->fieldCondition('field_grievance_rep_organizer', 'target_id', $user['uid']);
+    $stmt = $query->execute();
+    $report_row['adr'] = 0;
+    if ($stmt['node']) {
+      $report_row['adr'] = count(array_keys($stmt['node']));
     }
 
     $report_rows[] = $report_row;
