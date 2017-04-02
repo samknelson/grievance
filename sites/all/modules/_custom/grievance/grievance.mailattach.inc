@@ -213,5 +213,3 @@ function grievance_imap_fetch_all_parts($mbox, $msgno, $structure, $path = NULL)
 
 	return $attachments;
 }
-
-
