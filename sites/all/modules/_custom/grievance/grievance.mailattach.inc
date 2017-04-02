@@ -130,6 +130,9 @@ function grievance_mailattach_fetch() {
 
 	  $attachment_node = node_submit($attachment_node); // Prepare node for saving
 	  node_save($attachment_node);
+
+		grievance_mailattach_fetch_accept($from_mail, t("Your email has been added as an attachment to: ") . $grievance_node->title);
+
 	}
 
 	// Delete all the messages
@@ -149,6 +152,14 @@ function grievance_mailattach_fetch_reject($from_mail, $msg) {
 	$params = array();
 	$params['subject'] = "Attachment rejected";
 	$params['body'] =  "Your email to $grievance_mailattach_user was rejected: $msg";
+	drupal_mail('grievance', 'mailattach', $from_mail, LANGUAGE_NONE, $params);
+	// print "Failing with $msg\n";
+}
+
+function grievance_mailattach_fetch_accept($from_mail, $msg) {
+	$params = array();
+	$params['subject'] = "Attachment accepted";
+	$params['body'] =  "Your email to $grievance_mailattach_user was accepted: $msg";
 	drupal_mail('grievance', 'mailattach', $from_mail, LANGUAGE_NONE, $params);
 	// print "Failing with $msg\n";
 }
