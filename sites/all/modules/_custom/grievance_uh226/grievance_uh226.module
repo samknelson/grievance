@@ -340,9 +340,17 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
       $report_row['expedited_arb_held'] = count(array_keys($stmt['node']));
     }
 
-    $report_rows[] = $report_row;
+    $report_rows[] = array_values($report_row);
+    $header = array_keys($report_row);
   }
 
+  $form_state['results'] = theme_table(
+    array(
+      'rows' => $report_rows,
+      'header' => $header, 
+      'attributes' => array(),
+    ),
+  );
   dpm($report_rows);
 
   drupal_set_message("Report generated.");
