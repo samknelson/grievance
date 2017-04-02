@@ -121,6 +121,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   if ($stmt['node']) {
     $term_nids = array_keys($stmt['node']);
   }
+  dpm($term_nids);
 
   // Get the list of log types corresponding to "call to grievant".
   // @todo this should be configurable, but what the heck.
