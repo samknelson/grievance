@@ -1,0 +1,160 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1.inc";
+
+function grievance_uh226_menu() {
+  $items = array();
+
+  $items['grievance/report/uh226-report-summary'] = array(
+    'title' => 'Report: Weekly Summary Report',
+    'description' => '',
+    'page callback' => 'grievance_uh226_report_summary',
+    'page arguments' => array(),
+    'access arguments' => array('grievance report'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+function grievance_uh226_report_summary() {
+  return drupal_get_form('grievance_uh226_report_summary_form');
+}
+
+function grievance_uh226_report_summary_form($form, &$form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Generate Report',
+  );
+
+  if ($form_state['results']) {
+    $form['results'] = array(
+      '#type' => 'markup',
+      '#markup' => $form_state['results'],
+    );
+  }
+
+  return $form;
+}
+
+/*
+Total Calls
+  - Total calls this week
+  - = Initial Call / Call to Grievant / ...
+
+Left Msg
+  - Add checkbox to flag "Left Message"
+
+* Total Open Grievs
+
+New This Week
+  - Based on intake date
+
+SPI and Terms
+  - Search for "Suspension Pending Investigation"
+  - Search for "Discharge"
+
+BOA Date
+  - Entered the status "BOA Held" sometime during the specified week
+
+In Arbitration
+  - CURRENTLY has the status "Referred to Arbitration" or "Referred to Expedited Arbitration".
+
+FMCS Date
+  - CURRENTLY has the status "FMCS Held"
+
+ADR Date
+  - CURRENTLY has the status "ADR Held"
+
+Regular Arb Date
+  - CURRENTLY has the status "Formal Arb Held"
+
+Expedited Arb Date
+  - CURRENTLY has the status "Expedited Arb Held"
+
+Closed
+  - Entered a "resolved"-type status this week
+
+Victories
+  - Status is "Resolved" or "Won"
+*/
+
+function grievance_uh226_report_summary_form_submit($form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
+
+  // Get the list of open statuses
+  $status_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_status');
+  $status_terms = array();
+  $tmp = taxonomy_get_tree($status_vocabulary->vid);
+  foreach ($tmp as $status_term) {
+    $status_terms[$status_term->tid] = taxonomy_term_load($status_term->tid);
+  }
+  $open_status_tids = array();
+  foreach ($status_terms as $tid => $term) {
+    if ($term->field_grievance_open['und'][0]['value'] == 1) {
+      $open_status_tids[] = $tid;
+    }
+  }
+
+  // Get the list of log types corresponding to "call to grievant".
+  // @todo this should be configurable, but what the heck.
+  $log_type_call_tids = array(441, 503, 85);
+
+
+  // Get all users.  We really only want organizers, but potentially some non-organizers might be assigned...
+  $sql = "select * from users where status = 1 order by name";
+  $stmt = db_query($sql, array());
+  $users = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $users[] = $hr;
+  }
+
+  // Start date
+  $start_date = date('Y-m-d', "-7 days");
+
+  // Our report data
+  $report_rows = array();
+
+  // For each user
+  foreach ($users as $user) {
+    // Fetch the number of open grievances for each user
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance');
+    $query->fieldCondition('field_grievance_rep_organizer', 'target_id', $user['uid']);
+    $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
+    $query->propertyOrderBy('created');
+    $stmt = $query->execute();
+    if (!$stmt['node']) { continue; }
+    $report_row['name'] = $user['name'];
+    $report_row['open_count'] = count(array_keys($stmt['node']));
+
+    // Fetch the total calls this week
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance_log');
+    $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_call_tids, 'in');
+    $query->fieldCondition('field_grievance_status_date', 'value', $start_date, ">=");
+    $stmt = $query->execute();
+    $report_row['calls_this_week'] = 0;
+    if ($stmt['node']) {
+      $report_row['calls_this_week'] = count(array_keys($stmt['node']));
+    }
+
+    // Tag each grievance
+    $nids = array_keys($stmt['node']);
+
+    $report_row = array();
+
+
+    $report_rows[] = $report_row;
+  }
+
+  dpm($report_rows);
+
+  drupal_set_message("Report generated.");
+}
