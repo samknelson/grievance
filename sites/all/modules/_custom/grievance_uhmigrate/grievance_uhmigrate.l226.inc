@@ -248,7 +248,7 @@ function grievance_uhmigrate_l226_import_grievances($limit = 100) {
     }
 
 
-    if ($row['Row'] > 27350) {
+    if ($row['Row'] > 20890) {
       print "Skipping $row[Row]\n";
       continue;
     }
