@@ -247,6 +247,10 @@ function grievance_uhmigrate_l226_import_grievances($limit = 100) {
       ++$col;
     }
 
+
+    if ($row['Row'] > 27350) {
+      print "Skipping $row[Row]\n";
+    }
     /*
     grievance_uhmigrate_log('DEBUG', $row, 'DispDte = ' . $row['DispDte']);
     grievance_uhmigrate_log('DEBUG', $row, 'DspAction = ' . $row['DspAction']);
