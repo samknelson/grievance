@@ -4,6 +4,7 @@
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_clausemap.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1.inc";
 
 function grievance_uhmigrate_base_dir() {
@@ -14,6 +15,33 @@ function grievance_uhmigrate_base_dir() {
 
 $grievance_uhmigrate_base = '/var/www/vhosts/grievances.clevernamehere.com/private/migrate';
 
+function grievance_uhmigrate_log_summary() {
+  global $grievance_uhmigrate_log_data;
+
+  if ($grievance_uhmigrate_log_data) {
+    ksort($grievance_uhmigrate_log_data);
+  }
+
+  print "\n\nSUMMARY\n";
+
+  foreach ($grievance_uhmigrate_log_data as $type => &$messages) {
+    if ($type == 'SUCCESS') { continue; }
+    print "*** $type ***\n";
+    
+    ksort($messages);
+    foreach ($messages as $msg => $entry) {
+      print "$msg (Count $entry[count], first row $entry[first_row])\n";
+    }
+  }
+
+  global $violations_not_found;
+  print "\n\nVIOLATIONS\n";
+  print "Shop\tClause\tExample Row\t\n";
+  foreach ($violations_not_found as $key => $value) {
+    print "$key\t$value\n";
+  }
+}
+
 function grievance_uhmigrate_log($type, $row, $msg) {
   global $grievance_uhmigrate_log_data;
 
@@ -23,22 +51,9 @@ function grievance_uhmigrate_log($type, $row, $msg) {
       'first_row' => $row['Row'],
     );
   }
-
   $grievance_uhmigrate_log_data[$type][$msg]['count']++;
 
-  print "Row #" . $row['Row'] . ': ' . $type . ': ' . $msg . "\n";
-}
-
-function grievance_uhmigrate_log_summary() {
-  print "\n\nSUMMARY\n";
-
-  global $grievance_uhmigrate_log_data;
-  foreach ($grievance_uhmigrate_log_data as $type => $messages) {
-    print "*** $type ***\n";
-    foreach ($messages as $message => $entry) {
-      print "$msg (Count $entry[count], first row $entry[first_row]\n";
-    }
-  }
+  print "Row #" . $row['Row'] . ' / ' . $row['Griev#'] . ': ' . $type . ': ' . $msg . "\n";
 }
 
 function grievance_uhmigrate_find_by_title($content_type, $title) {
@@ -104,3 +119,19 @@ function grievance_uhmigrate_node_save(&$node) {
   return node_save($node); 
 }
 
+/**
+ * Implements hook_requirements
+ */
+
+function grievance_uhmigrate_requirements($phase) {
+  if ($phase == 'runtime') {
+    return array(
+      'grievance_uhmigrate_rm' => array(
+        'title' => 'Grievance UH Migrate',
+        'value' => 'Should be disabled on production systems',
+        'description' => 'This module should be uninstalled after the appropriate migration script has been run.',
+        'severity' => REQUIREMENT_INFO,
+      ),
+    );
+  }
+}
