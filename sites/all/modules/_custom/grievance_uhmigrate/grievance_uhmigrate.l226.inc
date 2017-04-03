@@ -768,7 +768,10 @@ function grievance_uhmigrate_create_log_entry($row, $grievance_node, $log_type, 
   $node->type = "grievance_log";
   node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
   $node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
-  $node->uid = $user->uid; 
+  $node->uid = $grievance_node->field_grievance_rep_organizer['und'][0]['target_id'];
+  if (!$node->uid) {
+    $node->uid = $user->uid; 
+  }
   $node->status = 1;
   $node->promote = 0;
   $node->comment = 0;
