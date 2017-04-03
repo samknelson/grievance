@@ -703,6 +703,8 @@ function grievance_uhmigrate_create_log($row, $grievance_node) {
     else if ($final_status_name == 'BOA Held' && $row['DspAction'] == 'LOST') { $status_name = 'BOA NFA'; }
     else if ($final_status_name == 'BOA Letter Processed' && $row['DspAction'] == 'LOST') { $status_name = 'Formal Arbitration Lost'; }
     else if ($final_status_name == 'BOA Letter Processed') { $status_name = 'BOA Resolved'; }
+    else if ($final_status_name == 'BOA Held' && $row['DspAction'] == 'WON') { $status_name = 'ADR Resolved'; }
+    else if ($final_status_name == 'Mediation Held' && $row['DspAction'] == 'LOST') { $status_name = 'Mediation NFA'; }
     else if ($row['DspAction'] == 'NFA') { $status_name = 'Pre-Processed NFA'; }
     else if ($row['DspAction'] == 'RSLVD') { $status_name = 'Pre-Processed Resolved'; }
 

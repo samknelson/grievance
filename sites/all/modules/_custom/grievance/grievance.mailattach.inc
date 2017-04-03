@@ -157,7 +157,6 @@ function grievance_mailattach_fetch_reject($from_mail, $msg) {
 }
 
 function grievance_mailattach_fetch_accept($from_mail, $msg) {
-	watchdog('grievance_mailattach', 'Sent confirmation message to ' .$from_mail);
 	$params = array();
 	$params['subject'] = "Attachment accepted";
 	$params['body'] =  "Your email to $grievance_mailattach_user was accepted: $msg";
