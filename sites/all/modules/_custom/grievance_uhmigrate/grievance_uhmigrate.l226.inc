@@ -532,9 +532,8 @@ function grievance_uhmigrate_l226_import_grievances($limit = 100) {
     $intake_ts = strtotime($intake_date);
     $sql = "update node set created = :intake_ts where nid = :nid";
     $stmt = db_query($sql, array(':intake_ts' => $intake_ts, ':nid' => $grievance_node->nid));
-    if (!($grievance_node->nid)) {
-      print "$sql $intake_ts " . $grievance_node->nid . "\n";
-    }
+    print "$sql $intake_ts " . $grievance_node->nid . "\n";
+    print_r($stmt);
 
     // Create Settlements
     grievance_uhmigrate_create_settlements($row, $grievance_node);
