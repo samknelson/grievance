@@ -528,12 +528,6 @@ function grievance_uhmigrate_l226_import_grievances($limit = 100) {
     grievance_uhmigrate_node_save($grievance_node);
     grievance_uhmigrate_log('SUCCESS', $row, "External ID $external_id, Grievance ID $grievance_id, Node ID $nid, intake $intake_date");
 
-    // Set the creation date
-    $intake_ts = strtotime($intake_date);
-    $sql = "update node set created = :intake_ts where nid = :nid";
-    $stmt = db_query($sql, array(':intake_ts' => $intake_ts, ':nid' => $grievance_node->nid));
-    print "$sql $intake_ts " . $grievance_node->nid . "\n";
-
     // Create Settlements
     grievance_uhmigrate_create_settlements($row, $grievance_node);
 
@@ -543,6 +537,12 @@ function grievance_uhmigrate_l226_import_grievances($limit = 100) {
       $grievance_node->field_grievance_status['und'][0]['tid'] = $final_status_tid;
       grievance_uhmigrate_node_save($grievance_node);
     }
+
+    // Set the creation date
+    $intake_ts = strtotime($intake_date);
+    $sql = "update node set created = :intake_ts where nid = :nid";
+    $stmt = db_query($sql, array(':intake_ts' => $intake_ts, ':nid' => $grievance_node->nid));
+    // print "$sql $intake_ts " . $grievance_node->nid . "\n";
 
     /*
     if ($row['GrievDayoff1']) {
