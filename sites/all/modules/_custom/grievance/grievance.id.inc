@@ -46,6 +46,9 @@ function grievance_id_algorithm_nidmd5($node) {
 
 function grievance_id_algorithm_year4($node) {
 	$suffix = variable_get('grievance_id_suffix', '');
+
+	print "Here with $suffix\n";
+	
 	$year = date('Y');
 
 	$values = array();
