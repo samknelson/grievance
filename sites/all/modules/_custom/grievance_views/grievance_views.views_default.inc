@@ -4774,7 +4774,7 @@ Grievance Form',
   $handler->display->display_options['filters']['uid_1']['group'] = 1;
   $handler->display->display_options['filters']['uid_1']['exposed'] = TRUE;
   $handler->display->display_options['filters']['uid_1']['expose']['operator_id'] = 'uid_1_op';
-  $handler->display->display_options['filters']['uid_1']['expose']['label'] = 'Grievance Sprecialist';
+  $handler->display->display_options['filters']['uid_1']['expose']['label'] = 'Grievance Specialist';
   $handler->display->display_options['filters']['uid_1']['expose']['operator'] = 'uid_1_op';
   $handler->display->display_options['filters']['uid_1']['expose']['identifier'] = 'uid_1';
   $handler->display->display_options['filters']['uid_1']['expose']['remember_roles'] = array(
@@ -5079,7 +5079,7 @@ Grievance Form',
     t('All Grievances'),
     t('The list below shows all grievances on the system.  Use the form to filer by grievant name, status, etc.'),
     t('No grievances match your search criteria.'),
-    t('Grievance Sprecialist'),
+    t('Grievance Specialist'),
     t('Remedy'),
     t('Violation'),
     t('Date of Grievance'),
