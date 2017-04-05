@@ -10,7 +10,7 @@ function grievance_uh226_menu() {
   $items = array();
 
   $items['grievance/report/uh226-report-summary'] = array(
-    'title' => 'Report: Weekly Summary Report',
+    'title' => 'Weekly Summary Report',
     'description' => '',
     'page callback' => 'grievance_uh226_report_summary',
     'page arguments' => array(),
@@ -27,21 +27,26 @@ function grievance_uh226_report_summary() {
 
 function grievance_uh226_report_summary_form($form, &$form_state) {
 
-  $from_date = $form_state['values']['from_date']['year'] . '-' . $form_state['values']['from_date']['month'] . '-' . $form_state['values']['from_date']['day'];
-  $from_ts = strtotime($from_date);
+  if ($form_state['values']['from_date'] && $form_state['values']['to_date']) {
+    $from_date = $form_state['values']['from_date']['year'] . '-' . $form_state['values']['from_date']['month'] . '-' . $form_state['values']['from_date']['day'];
+    $from_ts = strtotime($from_date);
 
-  $to_date = $form_state['values']['to_date']['year'] . '-' . $form_state['values']['to_date']['month'] . '-' . $form_state['values']['to_date']['day'];
-  $to_ts = strtotime($to_date);
+    $to_date = $form_state['values']['to_date']['year'] . '-' . $form_state['values']['to_date']['month'] . '-' . $form_state['values']['to_date']['day'];
+    $to_ts = strtotime($to_date);
 
-  if ($from_date && $to_date) {
-    drupal_set_title("Summary report: $from_date - $to_date");
+    drupal_set_title("Weekly Summary Report: $from_date - $to_date");
   }
 
-
+  $from_ts = strtotime('-7 days');
   $form['from_date'] = array(
     '#type' => 'date',
     '#title' => t('From Date'),
     '#required' => TRUE,
+    '#default_value' => array(
+      'year' => date('Y', $from_ts),
+      'month' => date('n', $from_ts),
+      'day' => date('j', $from_ts),
+    ),
   );
 
   $form['to_date'] = array(
@@ -196,6 +201,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $sql = "select * from users where status = 1 order by name";
   $stmt = db_query($sql, array());
   $users = array();
+
   while ($hr = $stmt->fetchAssoc()) {
     $hr['closed'] = 0;
     $hr['victories'] = 0;
@@ -452,6 +458,19 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     'victories' => t('Victories'),
   );
 
+  $totals = array();
+  foreach ($report_rows as $report_row) {
+    foreach ($headers as $key => $value) {
+      if ($key == 'name') {
+        $totals[$key] = 'Total';
+      } else {
+        $totals[$key] += $report_row[$key];
+      }
+    }
+  }
+
+  /*
+  // Damn theme_table doesn't take a footer row.
   $rows = array();
   foreach ($report_rows as $report_row) {
     $row = array();
@@ -468,6 +487,42 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
       'attributes' => array(),
     )
   );
+  */
+
+  $html = '';
+
+  $html .= '<table>';
+
+  $html .= '<thead>';
+  $html .= '<tr>';
+  foreach ($headers as $key => $value) {
+    $html .= '<th>' . htmlspecialchars($value) . '</th>';
+  }
+  $html .= '</tr>';
+  $html .= '</thead>';
+
+  $html .= '<tbody>';
+  foreach ($report_rows as $report_row) {
+    $html .= '<tr>';
+    foreach ($headers as $key => $value) {
+      $html .= '<td>' . htmlspecialchars($report_row[$key]) . '</td>';
+    }
+    $html .= '</tr>';
+  }
+  $html .= '</tr>';
+  $html .= '</tbody>';
+
+  $html .= '<tfoot>';
+  $html .= '<tr>';
+  foreach ($headers as $key => $value) {
+    $html .= '<th>' . htmlspecialchars($totals[$key]) . '</th>';
+  }
+  $html .= '</tr>';
+  $html .= '</tfoot>';
+
+  $html .= '</table>';
+
+  $form_state['results'] = $html;
 
   drupal_set_message("Report generated.");
 }
