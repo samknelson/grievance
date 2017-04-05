@@ -59,6 +59,7 @@ function grievance_id_algorithm_year4($node) {
 	} else {
 		$sql .= "and field_grievance_id_value like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' ";
 	}
+	print "$sql\n";
 
 	$stmt = db_query($sql, $values);
 	$hr = $stmt->fetchAssoc();
