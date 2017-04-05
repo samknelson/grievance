@@ -45,15 +45,22 @@ function grievance_id_algorithm_nidmd5($node) {
 }
 
 function grievance_id_algorithm_year4($node) {
+	$suffix = variable_get('grievance_id_suffix', '');
 	$year = date('Y');
 
+	$values = array();
 	$sql = "select max(field_grievance_id_value) as m ";
 	$sql .= "from field_data_field_grievance_id ";
 	$sql .= "where entity_type = 'node' and bundle = 'grievance' and field_grievance_id_value like '$year%' ";
-	$stmt = db_query($sql, array());
+	if ($suffix) {
+		$sql .= "and field_grievance_id_value like :suffix ";
+		$values[':suffix'] = '%' . $suffix;
+	} else {
+		$sql .= "and field_grievance_id_value like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]";
+	}
+	$stmt = db_query($sql, $values);
 	$hr = $stmt->fetchAssoc();
 	$last_id = $hr['m'];
-	$suffix = variable_get('grievance_id_suffix', '');
 	if ($suffix) {
 		$last_id = preg_replace("/$suffix\$/", '', $last_id);
 	}
