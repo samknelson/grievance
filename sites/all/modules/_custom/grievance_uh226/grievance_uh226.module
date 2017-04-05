@@ -26,6 +26,18 @@ function grievance_uh226_report_summary() {
 }
 
 function grievance_uh226_report_summary_form($form, &$form_state) {
+  $form['from_date'] = array(
+    '#type' => 'date',
+    '#title' => t('From Date'),
+    '#required' => TRUE,
+  );
+
+  $form['to_date'] = array(
+    '#type' => 'date',
+    '#title' => t('Through Date'),
+    '#required' => TRUE,
+  );
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Generate Report',
@@ -93,15 +105,15 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   foreach ($tmp as $status_term) {
     $status_terms[$status_term->tid] = taxonomy_term_load($status_term->tid);
   }
-  $open_status_tids = array();
-  $closed_status_tids = array();
-  $arbitration_status_tids = array();
-  $fmcs_status_tids = array();
-  $adr_status_tids = array();
-  $formal_arb_held_status_tids = array();
-  $expedited_arb_held_status_tids = array();
-  $victory_status_tids = array();
-  $boa_held_status_tids = array();
+  $open_status_tids = array(-999);
+  $closed_status_tids = array(-999);
+  $arbitration_status_tids = array(-999);
+  $fmcs_status_tids = array(-999);
+  $adr_status_tids = array(-999);
+  $formal_arb_held_status_tids = array(-999);
+  $expedited_arb_held_status_tids = array(-999);
+  $victory_status_tids = array(-999);
+  $boa_held_status_tids = array(-999);
 
   foreach ($status_terms as $tid => $term) {
     if ($term->field_grievance_open['und'][0]['value'] == 1) {
@@ -162,8 +174,11 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $status_boa_held_tid = 112;
 
   // Start date
-  $start_date = date('Y-m-d', strtotime("-7 days"));
-  $start_ts = strtotime($start_date);
+  $from_date = $form_state['values']['from_date']['year'] . '-' . $form_state['values']['from_date']['month'] . '-' . $form_state['values']['from_date']['day'];
+  $from_ts = strtotime($from_date);
+
+  $to_date = $form_state['values']['to_date']['year'] . '-' . $form_state['values']['to_date']['month'] . '-' . $form_state['values']['to_date']['day'];
+  $to_ts = strtotime($to_date);
 
   // Get all users.  We really only want organizers, but potentially some non-organizers might be assigned...
   $sql = "select * from users where status = 1 order by name";
@@ -180,7 +195,8 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance_status_date', 'value', $start_date, ">=");
+  $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
+  $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
   $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
   $query->fieldCondition('field_grievance_status', 'tid', $closed_status_tids, 'in');
   $stmt = $query->execute();
@@ -203,7 +219,8 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance_status_date', 'value', $start_date, ">=");
+  $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
+  $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
   $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
   $query->fieldCondition('field_grievance_status', 'tid', $victory_status_tids, 'in');
   $stmt = $query->execute();
@@ -226,7 +243,8 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance_status_date', 'value', $start_date, ">=");
+  $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
+  $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
   $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
   $query->fieldCondition('field_grievance_status', 'tid', $boa_held_status_tids, 'in');
   $stmt = $query->execute();
@@ -272,7 +290,8 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'grievance_log');
     $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_call_tids, 'in');
-    $query->fieldCondition('field_grievance_status_date', 'value', $start_date, ">=");
+    $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
+    $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
     $query->propertyCondition('uid', $user['uid']);
     $stmt = $query->execute();
     $report_row['calls_this_week'] = 0;
@@ -286,7 +305,8 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $query->entityCondition('bundle', 'grievance_log');
     $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_call_tids, 'in');
     $query->fieldCondition('field_grievance_log_tags', 'tid', $log_tag_left_message_tid);
-    $query->fieldCondition('field_grievance_status_date', 'value', $start_date, ">=");
+    $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
+    $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
     $query->propertyCondition('uid', $user['uid']);
     $stmt = $query->execute();
     $report_row['left_message'] = 0;
@@ -300,7 +320,8 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $query->entityCondition('bundle', 'grievance');
     $query->fieldCondition('field_grievance_rep_organizer', 'target_id', $user['uid']);
     // $query->fieldCondition('field_grievance_status', 'tid', $open_status_tids, 'in');
-    $query->propertyCondition('created', $start_ts, ">=");
+    $query->propertyCondition('created', $from_ts, ">=");
+    $query->propertyCondition('created', $to_ts, "<=");
     $stmt = $query->execute();
     $report_row['new_this_week'] = 0;
     if ($stmt['node']) {
