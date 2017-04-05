@@ -26,6 +26,18 @@ function grievance_uh226_report_summary() {
 }
 
 function grievance_uh226_report_summary_form($form, &$form_state) {
+
+  $from_date = $form_state['values']['from_date']['year'] . '-' . $form_state['values']['from_date']['month'] . '-' . $form_state['values']['from_date']['day'];
+  $from_ts = strtotime($from_date);
+
+  $to_date = $form_state['values']['to_date']['year'] . '-' . $form_state['values']['to_date']['month'] . '-' . $form_state['values']['to_date']['day'];
+  $to_ts = strtotime($to_date);
+
+  if ($from_date && $to_date) {
+    drupal_set_title("Summary report: $from_date - $to_date");
+  }
+
+
   $form['from_date'] = array(
     '#type' => 'date',
     '#title' => t('From Date'),
