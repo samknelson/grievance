@@ -57,7 +57,7 @@ function grievance_id_algorithm_year4($node) {
 		$sql .= "and field_grievance_id_value like :suffix ";
 		$values[':suffix'] = '%' . $suffix;
 	} else {
-		$sql .= "and field_grievance_id_value like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' ";
+		$sql .= "and field_grievance_id_value  regexp '^[0-9]+\$' ";
 	}
 	print "$sql\n";
 
