@@ -359,6 +359,7 @@ features[field_instance][] = node-grievance_log-field_grievance_alert
 features[field_instance][] = node-grievance_log-field_grievance_alert_date
 features[field_instance][] = node-grievance_log-field_grievance_alert_tid
 features[field_instance][] = node-grievance_log-field_grievance_attachments
+features[field_instance][] = node-grievance_log-field_grievance_external_id
 features[field_instance][] = node-grievance_log-field_grievance_log_tags
 features[field_instance][] = node-grievance_log-field_grievance_log_type
 features[field_instance][] = node-grievance_log-field_grievance_status

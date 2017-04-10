@@ -536,6 +536,7 @@ function grievance_log_node_form_alter(&$form, &$form_state, $form_id) {
   $form['field_grievance_alert_tid']['#access'] = FALSE;
   $form['field_grievance_alert_date']['#access'] = FALSE;
   $form['field_grievance_time']['und'][0]['value']['#default_value'] = date('h:i:s a');
+  $form['field_grievance_external_id']['#access'] = FALSE;
 
   // Can change the status for update types
   $form['field_grievance_status']['#access'] = FALSE;
