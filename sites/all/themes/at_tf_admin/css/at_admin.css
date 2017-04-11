@@ -3442,9 +3442,12 @@ table.grievance-timeline tr.pending {
   .block-masquerade,
   #admin-menu-wrapper,
   .block-superfish,
-  .block-grievance-timeleft {
+  .block-grievance-timeleft,
+  div.views-exposed-form {
     display: none;
   }
+
+
 }
 
 
