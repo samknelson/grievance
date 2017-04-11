@@ -600,7 +600,7 @@ function grievance_content_types_field_group_info() {
         'classes' => 'group-grievance-comments field-group-fieldset',
         'description' => '',
       ),
-      'formatter' => 'open',
+      'formatter' => 'collapsible',
     ),
   );
   $field_groups['group_grievance_comments|node|grievance|default'] = $field_group;
