@@ -3614,5 +3614,7 @@ table.grievance-timeline tr.pending {
   width: 100px;
 }
 
-
-
+.view-grievance-open-report table caption {
+  font-size: 125%;
+  padding-bottom: 5px;
+}
