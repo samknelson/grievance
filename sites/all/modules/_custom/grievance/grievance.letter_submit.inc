@@ -201,7 +201,14 @@ function grievance_letter_render_html($grievance_node, $letter_nids, $other_toke
 		if ($body) {
 			$body .= '<div class="grievance-letter-page-break">&nbsp;</div>';
 		}
-		$body .= '<div class="grievance-letter-part">' . $letter_part . '</div>';
+		if ($letter_node->field_grievance_css['und'][0]['value']) {
+			$body .= '<style>';
+			$body .= $letter_node->field_grievance_css['und'][0]['value'];
+			$body .= '</style>';
+		}
+		$body .= '<div class="grievance-letter-part">';
+		$body .= $letter_part;
+		$body .= '</div>';
 	}
 
 	$body = '<div id="grievance-letter-body">' . $body . '</div>';
