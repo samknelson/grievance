@@ -127,9 +127,9 @@ function grievance_report_year_summary_form_submit($form, &$form_state) {
 	foreach ($months as $month => $month_name) {
 		$row = array();
 		$row[] = $month_name;
-		if (!$open_count[$month]) { $open_count[$month] = 0; }
+		if (!$opened_count[$month]) { $opened_count[$month] = 0; }
 		if (!$closed_count[$month]) { $closed_count[$month] = 0; }
-		$row[] = $open_count[$month];
+		$row[] = $opened_count[$month];
 		$row[] = $closed_count[$month];
 
 		$rows[] = $row;
