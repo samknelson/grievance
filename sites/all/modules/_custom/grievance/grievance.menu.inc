@@ -419,6 +419,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['grievance/report/year-summary'] = array(
+		'title' => 'Report: Yearly Summary',
+		'description' => '',
+		'page callback' => 'grievance_report_year_summary',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['admin/config/grievances/fieldoverrides/apply'] = array(
 		'title' => 'Apply Field Overrides',
 		'description' => '',
