@@ -431,17 +431,6 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
   	'#title' => t('Ready to send the letter?'),
   );
 
-  /*
-  $form['dest']['output'] = array(
-    '#type' => 'select',
-    '#options' => array(
-    	'pdf' => t('Do not send, just download the PDF'),
-    	'preview' => t('Do not send, just preview to the screen'),
-    	'send' => t('Send and log the letter'),
-    ),
-    '#title' => t('Output'),
-  );
-  */
   $form['dest']['output'] = array(
     '#type' => 'select',
     '#options' => array(
@@ -451,6 +440,20 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     	/* 'send-email' => t('Send the letter by email'), */
     ),
     '#title' => t('Output'),
+  );
+
+  $log_types_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_log_types');
+  $log_type_options = array(NULL => '[select]');
+  $tmp = taxonomy_get_tree($log_types_vocabulary->vid);
+  $found = FALSE;
+  foreach ($tmp as $term) {
+    $log_type_options[$term->tid] = $term->name;
+  }
+
+  $form['dest']['logging'] = array(
+    '#type' => 'select',
+    '#options' => $log_type_options,
+    '#title' => t('Save letter to the log as'),
   );
 
   $form['dest']['submit'] = array(

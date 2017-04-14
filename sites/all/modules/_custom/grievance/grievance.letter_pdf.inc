@@ -17,15 +17,6 @@ function grievance_letter_loopback($grievance_node) {
 	return grievance_letter_render_html($grievance_node, $letter_nids, array_merge($_GET, $_POST));
 }
 
-function grievance_node_tab_letter_pdf($node, $letter_nids, $values) {
-	$basename = grievance_letter_pdf_basename($node, $letter_nids);
-	// Spool the PDF
-	header('Content-Type: application/pdf');
-	header("Content-Disposition: attachment; filename=$basename.pdf");
-	print grievance_letter_pdf_contents($node, $letter_nids, $values);
-	drupal_exit();
-}
-
 function grievance_letter_pdf_basename($grievance_node, $letter_nids) {
 	$basename = '';
 

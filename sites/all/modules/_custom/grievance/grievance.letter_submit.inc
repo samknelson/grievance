@@ -35,8 +35,60 @@ function grievance_letter_form_submit($form, &$form_state) {
 				}
 			}
 		}
-		// Build the PDF and dump it to the browser.  Processing ends here.
-		return grievance_node_tab_letter_pdf($grievance_node, $letter_nids, $form_state['values']);
+
+		// Build the PDF
+		$pdf_contents = grievance_letter_pdf_contents($grievance_node, $letter_nids, $form_state['values']);
+		$basename = grievance_letter_pdf_basename($grievance_node, $letter_nids);
+
+		// Log the letter
+		if ($form_state['values']['logging']) {
+			$log_type_tid = $form_state['values']['logging'];
+			$log_title = "Generated Letter: ";
+			$is_first = TRUE;
+			foreach ($letter_nodes as $letter_node) {
+				if ($is_first) {
+					$is_first = FALSE;
+				} else {
+					$log_title .= ' / ';
+				}
+				$log_title .= $letter_node->title;
+			}
+
+		  global $user;
+
+		  $log_node = new stdClass();
+		  $log_node->title =$log_title;
+		  $log_node->type = 'grievance_log';
+		  node_object_prepare($log_node);
+		  $log_node->language = LANGUAGE_NONE;
+		  $log_node->uid = $user->uid; 
+		  $log_node->status = 1;
+		  $log_node->promote = 0;
+		  $log_node->comment = 0;
+
+		  $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+		  $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
+		  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d'); 
+			$log_node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
+		  // $log_node->body['und'][0]['value'] = $log_title;
+
+      $file = file_save_data(
+        $pdf_contents, 
+        'private://grievance_attachments/' . $basename . '.pdf', 
+        FILE_EXISTS_RENAME
+      );
+      $file->display = 1;
+      $log_node->field_grievance_attachments["und"][0] = (array) $file;
+
+		  $log_node = node_submit($log_node); // Prepare node for saving
+		  node_save($log_node);
+		}
+
+		// Dump to browser and exit
+		header('Content-Type: application/pdf');
+		header("Content-Disposition: attachment; filename=$basename.pdf");
+		print $pdf_contents;
+		drupal_exit();
 	}
 
 	// For screen preview, just output it and end processing.
@@ -53,6 +105,7 @@ function grievance_letter_form_submit($form, &$form_state) {
 		return;
 	}
 
+	// For edit, just output the letter and return
 	if ($output == 'edit') {
 		drupal_set_message(t('The letter(s) can be edited at the bottom of this page.'));
 		$form_state['edit_result'] = grievance_letter_render_html(
