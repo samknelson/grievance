@@ -294,6 +294,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     	'preview' => t('Preview the letter on the screen'),
     	'edit' => t('Edit the letter before sending'),
     	'send-email' => t('Send the letter by email'), 
+    	'send-fax' => t('Send the letter by fax'), 
     ),
     '#title' => t('Output'),
   );

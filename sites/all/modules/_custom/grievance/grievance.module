@@ -36,6 +36,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.mine.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.mailattach.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.assignee.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.phaxio.inc";
 
 /**
  * Implement hook_cron() 

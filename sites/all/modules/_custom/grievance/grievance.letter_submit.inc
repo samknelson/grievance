@@ -278,6 +278,15 @@ function grievance_letter_form_submit($form, &$form_state) {
 		return;
 	}
 
+	// ////////////////////////////////////////////
+	// Send Email
+	// ////////////////////////////////////////////
+
+	if ($output == 'send-fax') {
+		drupal_set_message("Sending fax.");
+		return;
+	}
+
 	drupal_set_message(t('Unknown output: [@output]', array('@output' => $output)), 'error');
 	return;
 }

@@ -401,6 +401,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['admin/config/grievance/phaxio'] = array(
+		'title' => 'Grievance Module - Phaxio',
+		'description' => t('Settings for the Phaxio fax library'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_phaxio_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['grievance/report/bytype'] = array(
 		'title' => 'Report: Count by Type',
 		'description' => '',
