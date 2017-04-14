@@ -46,6 +46,10 @@
 				$('.form-item-field-grievance-co-zip-und-0-value input').val(val);
 			};
 
+	    $('.grievance_assignee_notes_dropdown').once().change(function () {
+	    	$('.field-name-field-grievance-assignee-notes-form textarea').val($(this).val());
+	    });
+
 			// Hide and show contacts as needed
 			$("#grievance-contact-hide-shop").click(function(event) {
 				event.preventDefault();
@@ -179,5 +183,3 @@
     });
 	}); // END: DRF
 }(jQuery));
-
-
