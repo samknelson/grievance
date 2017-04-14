@@ -3258,6 +3258,11 @@ fieldset legend {
   overflow: hidden;
 }
 
+
+#grievance-letter-form .grievance-recipient {
+  height: 250px;
+}
+
 .grievance-recipient:hover {
   background-color: #FFC384;
   border-color: #ff8500;
