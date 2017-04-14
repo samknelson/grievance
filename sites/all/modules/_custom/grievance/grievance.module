@@ -195,17 +195,11 @@ function grievance_mail($key, &$message, $params) {
       $message['headers']['Reply-To'] = $from;
       $message['headers']['From'] = $from;
       $message['headers']['Return-Path'] = $from;
-      if ($params['Cc']) {
-        $message['headers']['Cc'] = $params['Cc'];
+      if ($params['headers']['Cc']) {
+        $message['headers']['Cc'] = $params['headers']['Cc'];
       } 
-      if ($params['Bcc']) {
-        $message['headers']['Bcc'] = $params['Bcc'];
-      } 
-      if ($message['params']['Cc']) {
-        $message['headers']['Cc'] = $message['params']['Cc'];
-      } 
-      if ($message['params']['Bcc']) {
-        $message['headers']['Bcc'] = $message['params']['Bcc'];
+      if ($params['headers']['Bcc']) {
+        $message['headers']['Bcc'] = $params['headers']['Bcc'];
       } 
 
       break;
