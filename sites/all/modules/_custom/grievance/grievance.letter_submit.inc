@@ -24,7 +24,10 @@ function grievance_letter_form_submit($form, &$form_state) {
 
 	$letter_nodes = node_load_multiple($letter_nids);
 
-	// For PDF output, just go there now.
+	// ////////////////////////////////////////////
+	// PDF
+	// ////////////////////////////////////////////
+
 	if ($output == 'pdf') {
 		// Sometimes a "letter" is just an attachment.  If so, we shortcut and just redirect to the attachment.
 		foreach ($letter_nodes as $letter_nid => $letter_node) {
@@ -42,7 +45,6 @@ function grievance_letter_form_submit($form, &$form_state) {
 
 		// Log the letter
 		if ($form_state['values']['logging']) {
-			$log_type_tid = $form_state['values']['logging'];
 			$log_title = "Generated Letter: ";
 			$is_first = TRUE;
 			foreach ($letter_nodes as $letter_node) {
@@ -54,34 +56,8 @@ function grievance_letter_form_submit($form, &$form_state) {
 				$log_title .= $letter_node->title;
 			}
 
-		  global $user;
-
-		  $log_node = new stdClass();
-		  $log_node->title =$log_title;
-		  $log_node->type = 'grievance_log';
-		  node_object_prepare($log_node);
-		  $log_node->language = LANGUAGE_NONE;
-		  $log_node->uid = $user->uid; 
-		  $log_node->status = 1;
-		  $log_node->promote = 0;
-		  $log_node->comment = 0;
-
-		  $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
-		  $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
-		  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d'); 
-			$log_node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
-		  // $log_node->body['und'][0]['value'] = $log_title;
-
-      $file = file_save_data(
-        $pdf_contents, 
-        'private://grievance_attachments/' . $basename . '.pdf', 
-        FILE_EXISTS_RENAME
-      );
-      $file->display = 1;
-      $log_node->field_grievance_attachments["und"][0] = (array) $file;
-
-		  $log_node = node_submit($log_node); // Prepare node for saving
-		  node_save($log_node);
+			$log_body = '';
+			grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents, $basename);
 		}
 
 		// Dump to browser and exit
@@ -91,7 +67,10 @@ function grievance_letter_form_submit($form, &$form_state) {
 		drupal_exit();
 	}
 
-	// For screen preview, just output it and end processing.
+	// ////////////////////////////////////////////
+	// Screen
+	// ////////////////////////////////////////////
+
 	if ($output == 'preview') {
 		drupal_set_message(t('The letter(s) are displayed at the bottom of this page.'));
 		$form_state['result'] = grievance_letter_render_html(
@@ -105,7 +84,10 @@ function grievance_letter_form_submit($form, &$form_state) {
 		return;
 	}
 
-	// For edit, just output the letter and return
+	// ////////////////////////////////////////////
+	// Edit
+	// ////////////////////////////////////////////
+
 	if ($output == 'edit') {
 		drupal_set_message(t('The letter(s) can be edited at the bottom of this page.'));
 		$form_state['edit_result'] = grievance_letter_render_html(
@@ -119,117 +101,185 @@ function grievance_letter_form_submit($form, &$form_state) {
 		return;
 	}
 
-	// The only other output we know is "Send".  If it's not, we're in trouble.
-	if ($output != 'send') {
-		drupal_set_message(t('Unknown output: [@output]', array('@output' => $output)), 'error');
-		return;
-	}
+	// ////////////////////////////////////////////
+	// Send Email
+	// ////////////////////////////////////////////
 
-	// Get the company recipients.  @TODO harcoding 100 is lazy.
-	$company_recipients = array();
-	for ($i=0; $i<100; ++$i) {
-		$name = $form_state['values']["company_recipient_{$i}_name"];
-		$email = $form_state['values']["company_recipient_{$i}_email"];
-		$disposition = $form_state['values']["company_recipient_{$i}_disposition"];
-		$company_contact_nid = $form_state['values']["company_recipient_{$i}_nid"];
+	if ($output == 'send-email') {
+		// Get the company recipients.  @TODO harcoding 100 is lazy.
+		$recipients = array();
+		for ($i=0; $i<100; ++$i) {
+			$name = $form_state['values']["recipient_{$i}_name"];
+			$email = $form_state['values']["recipient_{$i}_email"];
+			$disposition = $form_state['values']["recipient_{$i}_disposition"];
+			$contact_nid = $form_state['values']["recipient_{$i}_nid"];
 
-		// Skip unless we have at least one value
-		if (!$name && !$email && !$disposition) { 
-			continue;
+			// Skip unless we have at least one value
+			if (!$name && !$email && !$disposition) { 
+				continue;
+			}
+
+			// Need email and disposition
+			if (!$email || !$disposition) {
+				if ($disposition != 'none') {
+					drupal_set_message(t('For each contact, enter the email address and how the contact should be handled (Skip, TO, Sender, CC, or BCC)'), 'error');
+					return;
+				}
+			}
+
+			$recipients[$disposition][] = array(
+				'name' => $name, 
+				'email' => $email,
+				'nid' => $contact_nid,
+			);
+		}
+		if (count($recipients['to']) <> 1) {
+			drupal_set_message(t('Exactly one contact must be the primary recipient (TO).'), 'error');
+			return;
 		}
 
-		// Need email and disposition
-		if (!$email || !$disposition) {
-			if ($disposition != 'none') {
-				drupal_set_message(t('For each company contact, enter the email address and how the contact should be handled (Skip, TO, or CC)'), 'error');
-				return;
+		if (count($recipients['from']) <> 1) {
+			drupal_set_message(t('Exactly one contact must be the sender (FROM).'), 'error');
+			return;
+		}
+
+		$subject = $form_state['values']['subject'];
+		$body = $form_state['values']['body'];
+		if (!$subject || !$body) {
+			drupal_set_message(t('Enter a subject and a body for the email.  The letter will be attached as a PDF document.'), 'error');
+			return;
+		}
+
+		// We've passed the tests, and we're committed to sending the email.
+		// First, we want to update the node with the primary recipient.
+		$grievance_node = $form_state['grievance_node'];
+		$is_changed = FALSE;
+
+		if ($grievance_node->field_grievance_co_name['und'][0]['value'] != $recipients['to'][0]['name']) {
+			$grievance_node->field_grievance_co_name['und'][0]['value'] = $recipients['to'][0]['name'];
+			$is_changed = TRUE;
+		}
+
+		if ($grievance_node->field_grievance_co_email['und'][0]['email'] != $recipients['to'][0]['email']) {
+			$grievance_node->field_grievance_co_email['und'][0]['email'] = $recipients['to'][0]['email'];
+			$is_changed = TRUE;
+		}
+
+		if ($recipients['to'][0]['nid']) {
+			$recipient_node = node_load($recipients['to'][0]['nid']);
+			$fields = array(
+				'field_grievance_co_phone',
+				'field_grievance_co_address',
+				'field_grievance_co_address_2',
+				'field_grievance_co_city',
+				'field_grievance_co_state',
+				'field_grievance_co_zip'
+			);
+			foreach ($fields as $field) {
+				if ($grievance_node->{$field}['und'][0]['value'] != $recipient_node->{$field}['und'][0]['value']) {
+					$grievance_node->{$field}['und'][0]['value'] = $recipient_node->{$field}['und'][0]['value'];
+					$is_changed = TRUE;
+				}
 			}
 		}
 
-		$company_recipients[$disposition][] = array(
-			'name' => $name, 
-			'email' => $email,
-			'nid' => $company_contact_nid,
+		if ($is_changed) {
+			node_save($grievance_node);
+		}
+
+
+		$to = $recipients['to'][0]['name'] . ' <' . $recipients['to'][0]['email'] . '>';
+		$from = $recipients['from'][0]['name'] . ' <' . $recipients['from'][0]['email'] . '>';
+
+		$cc = '';
+		if ($recipients['cc']) {
+			foreach ($recipients['cc'] as $recipient) {
+				if ($cc) { $cc .= ', '; }
+				$cc .= $recipient['name'] . ' <' . $recipient['email'] . '>';
+			}
+		}
+		$bcc = '';
+		if ($recipients['bcc']) {
+			foreach ($recipients['bcc'] as $recipient) {
+				if ($bcc) { $bcc .= ', '; }
+				$bcc .= $recipient['name'] . ' <' . $recipient['email'] . '>';
+			}
+		}
+
+		// Build the PDF
+		$pdf_contents = grievance_letter_pdf_contents($grievance_node, $letter_nids, $form_state['values']);
+		$basename = grievance_letter_pdf_basename($grievance_node, $letter_nids);
+
+		// Log the letter
+		if ($form_state['values']['logging']) {
+			$log_title = "Letter Sent by Email: ";
+			$is_first = TRUE;
+			foreach ($letter_nodes as $letter_node) {
+				if ($is_first) {
+					$is_first = FALSE;
+				} else {
+					$log_title .= ' / ';
+				}
+				$log_title .= $letter_node->title;
+			}
+
+			$log_body = '';
+			$log_body .= "From: $from\n";
+			$log_body .= "To: $to\n";
+			if ($cc) {
+				$log_body .= "Cc: $cc\n";
+			}
+			if ($bcc) {
+				$log_body .= "Bcc: $bcc\n";
+			}
+			$log_body .= "Subject: $subject\n";
+			$log_body .= "\n$body";
+
+			grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents, $basename);
+		}
+
+		$params = array();
+		$params['body'] = $body;
+		$params['subject'] =  $subject;
+		if ($cc) {
+			$params['headers']['Cc'] = $cc;
+		}
+		if ($bcc) {
+			$params['headers']['Bcc'] = $bcc;
+		}
+		$params['from'] = $from;
+		$params['attachments'] = array();
+
+		// Attach the grievance as a PDF
+		$params['attachments'][] = array(
+			'filecontent' => $pdf_contents,
+			'filename' => 'grievance_' . $grievance_node->nid . '_' . time() . '.pdf',
+			'filemime' => 'grievance/pdf',
 		);
-	}
-	if (count($company_recipients['primary']) <> 1) {
-		drupal_set_message(t('Exactly one company contact must be the primary recipient (TO).'), 'error');
-		return;
-	}
 
-	// Get the union recipients.  @TODO harcoding 100 is lazy.
-	$union_recipients = array();
-	for ($i=0; $i<100; ++$i) {
-		$name = $form_state['values']["union_recipient_{$i}_name"];
-		$email = $form_state['values']["union_recipient_{$i}_email"];
-		$disposition = $form_state['values']["union_recipient_{$i}_disposition"];
-
-		// Skip unless we have at least one value
-		if (!$name && !$email && !$disposition) { 
-			continue;
-		}
-
-		// Need email and disposition
-		if (!$email || !$disposition) {
-			if ($disposition != 'none') {
-				drupal_set_message(t('For each union contact, enter the email address and how the contact should be handled (Skip, TO, or CC)'), 'error');
-				return;
-			}
-		}
-
-		$union_recipients[$disposition][] = array('name' => $name, 'email' => $email);
-	}
-	if (count($union_recipients['primary']) <> 1) {
-		drupal_set_message(t('Exactly one union contact must be the sender (FROM).'), 'error');
-		return;
-	}
-
-	// We've passed the tests, and we're committed to sending the email.
-	// First, we want to update the node with the primary recipient.
-	$grievance_node = $form_state['grievance_node'];
-	$is_changed = FALSE;
-
-	if ($grievance_node->field_grievance_co_name['und'][0]['value'] != $company_recipients['primary'][0]['name']) {
-		$grievance_node->field_grievance_co_name['und'][0]['value'] = $company_recipients['primary'][0]['name'];
-		$is_changed = TRUE;
-	}
-
-	if ($grievance_node->field_grievance_co_email['und'][0]['email'] != $company_recipients['primary'][0]['email']) {
-		$grievance_node->field_grievance_co_email['und'][0]['email'] = $company_recipients['primary'][0]['email'];
-		$is_changed = TRUE;
-	}
-
-	if ($company_recipients['primary'][0]['nid']) {
-		$company_recipient_node = node_load($company_recipients['primary'][0]['nid']);
-		$fields = array(
-			'field_grievance_co_phone',
-			'field_grievance_co_address',
-			'field_grievance_co_address_2',
-			'field_grievance_co_city',
-			'field_grievance_co_state',
-			'field_grievance_co_zip'
+		drupal_mail(
+			'grievance', 
+			'notify', 
+			$to, 
+			LANGUAGE_NONE, 
+			$params
 		);
-		foreach ($fields as $field) {
-			if ($grievance_node->{$field}['und'][0]['value'] != $company_recipient_node->{$field}['und'][0]['value']) {
-				$grievance_node->{$field}['und'][0]['value'] = $company_recipient_node->{$field}['und'][0]['value'];
-				$is_changed = TRUE;
-			}
+
+		drupal_set_message(t('Sent Notification: ') . htmlspecialchars($subject));
+		drupal_set_message(t('Notification FROM: ') . htmlspecialchars($from));
+		drupal_set_message(t('Notification TO: ') . htmlspecialchars($to));
+		if ($cc) {
+			drupal_set_message(t('Notification CC: ') . htmlspecialchars($cc));
 		}
+		if ($bcc) {
+			drupal_set_message(t('Notification BCC: ') . htmlspecialchars($bcc));
+		}
+
+		return;
 	}
 
-	if ($is_changed) {
-		node_save($grievance_node);
-	}
-
-	drupal_set_message(t('Notification FROM: ') . htmlspecialchars($from));
-	drupal_set_message(t('Notification TO: ') . htmlspecialchars($to));
-	if ($cc) {
-		drupal_set_message(t('Notification CC: ') . htmlspecialchars($cc));
-	}
-	if ($bcc) {
-		drupal_set_message(t('Notification BCC: ') . htmlspecialchars($bcc));
-	}
-
+	drupal_set_message(t('Unknown output: [@output]', array('@output' => $output)), 'error');
+	return;
 }
 
 function grievance_letter_render_html($grievance_node, $letter_nids, $other_tokens) {
@@ -267,4 +317,37 @@ function grievance_letter_render_html($grievance_node, $letter_nids, $other_toke
 	$body = '<div id="grievance-letter-body">' . $body . '</div>';
 
 	return $body;
+}
+
+function grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents, $basename) {
+	$grievance_node = $form_state['grievance_node'];
+	$log_type_tid = $form_state['values']['logging'];
+
+  global $user;
+  $log_node = new stdClass();
+  $log_node->title =$log_title;
+  $log_node->type = 'grievance_log';
+  node_object_prepare($log_node);
+  $log_node->language = LANGUAGE_NONE;
+  $log_node->uid = $user->uid; 
+  $log_node->status = 1;
+  $log_node->promote = 0;
+  $log_node->comment = 0;
+
+  $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+  $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
+  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d'); 
+	$log_node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
+  $log_node->body['und'][0]['value'] = $log_body;
+
+  $file = file_save_data(
+    $pdf_contents, 
+    'private://grievance_attachments/' . $basename . '.pdf', 
+    FILE_EXISTS_RENAME
+  );
+  $file->display = 1;
+  $log_node->field_grievance_attachments["und"][0] = (array) $file;
+
+  $log_node = node_submit($log_node); // Prepare node for saving
+  node_save($log_node);
 }

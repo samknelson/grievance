@@ -69,201 +69,32 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
   );
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Company Recipients
+	// Recipients
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  /*
-  $form['company'] = array(
+  $form['recipients'] = array(
   	'#type' => 'fieldset',
   	'#collapsible' => TRUE,
   	'#collapsed' => TRUE,
-  	'#title' => t('Who at the <strong>COMPANY</strong> should receive the letter?'),
-  	'#description' => t('Select <strong>at most one</strong> company contact as the primary recipient of the notification.  This contact will be entered into the grievance form.  Arbitrarily many company contacts may also be selected as secondary recipients.  These contacts will be CC\'d on the notification.'),
+  	'#title' => t('Email Recipients'),
+  	'#description' => t('Select the email recipients for this letter'),
 	);
 
-	$recipients = grievance_notify_company_contacts($shop_nid, $status_tid);
-
-	// Additional contacts
-  if (!$form_state['num_addl_company_recipients']) {
-    $form_state['num_addl_company_recipients'] = 0;
-  }
-  for ($i=0; $i<$form_state['num_addl_company_recipients']; $i++) {
-		$recipient = array();
-		$recipient['name'] = t('Other Company Contact #') . ($i+1);
-		$recipient['is_blank'] = TRUE;
-
-		$recipients[] = $recipient;
-	}
-
-	$form['company']['grievance_recipients_company']['grievance_company_contacts_wrapper_open'] = array(
-		'#title' => '',
-		'#type' => 'markup',
-		'#markup' => '',
-		'#prefix' => '<div class="grievance-recipients" id="grievance-recipients-company">'
+	$form['recipients']['extra']['subject'] = array(
+		'#title' => 'Subject',
+		'#type' => 'textfield',
+		'#prefix' => '<div>',
 	);
 
-  $contact_count_company = 0;
-  $contact_count_shop = 0;
-  $contact_count_statusmatch = 0;
-  $contact_count_nostatusmatch = 0;
-  foreach ($recipients as $contact) {
-  	if ($contact['is_blank']) { continue; }
-    if ($contact['statusmatch']) { ++$contact_count_statusmatch; } else { ++$contact_count_nostatusmatch; }
-    if ($contact['shop_contact']) { ++$contact_count_shop; }
-    if ($contact['company_contact']) { ++$contact_count_company; }
-  }
-  $contacts_markup = '';
-  $contacts_markup .= '<div style="clear: both" id="grievance_contact_controls">';
-
-  if ($contact_count_shop) {
-    $contacts_markup .= '<a href="#" id="grievance-contact-hide-shop">[' . t('Hide shop contacts') . ']</a> ';
-    $contacts_markup .= '<a href="#" id="grievance-contact-show-shop" style="display: none;">[' . t('Show shop contacts') . ']</a> ';
-  }
-
-  if ($contact_count_company) {
-    $contacts_markup .= '<a href="#" id="grievance-contact-hide-company">[' . t('Hide company contacts') . ']</a> ';
-    $contacts_markup .= '<a href="#" id="grievance-contact-show-company" style="display: none;">[' . t('Show company contacts') . ']</a> ';
-  }
-
-  $grievance_contacts_hide_nostatusmatch = variable_get('grievance_contacts_hide_nostatusmatch', '');
-  if ($grievance_contacts_hide_nostatusmatch == "Yes") {
-    if ($contact_count_nostatusmatch) {
-      $contacts_markup .= '<a href="#" id="grievance-contact-hide-nostatusmatch" style="display: none;">[' . t('Hide non-matching statuses') . ']</a> ';
-      $contacts_markup .= '<a href="#" id="grievance-contact-show-nostatusmatch">[' . t('Show non-matching statuses') . ']</a> ';
-    }
-  } else {
-    if ($contact_count_statusmatch) {
-      $contacts_markup .= '<a href="#" id="grievance-contact-hide-nostatusmatch">[' . t('Hide non-matching statuses') . ']</a> ';
-      $contacts_markup .= '<a href="#" id="grievance-contact-show-nostatusmatch" style="display: none;">[' . t('Show non-matching statuses') . ']</a> ';
-    }
-  }
-  $contacts_markup .= '</div>';
-
-	$form['company']['grievance_recipients_company']['grievance_company_contacts_wrapper_intro'] = array(
-		'#title' => '',
-		'#type' => 'markup',
-		'#markup' => $contacts_markup,
-	);
-
-	$count = 0;
-	foreach ($recipients as $recipient) {
-		++$count;
-
-		if ($recipient['is_blank']) {
-			$form['company']['grievance_recipients_company']["company_recipient_${count}_intro"] = array(
-				'#title' => '',
-				'#type' => 'markup',
-				'#markup' => '<div class="grievance-recipient-name">' . $recipient['name'] . '</div>',
-				'#prefix' => "<div class=\"grievance-recipient grievance-recipient-$default_value\">",
-			);
-
-			$form['company']['grievance_recipients_company']["company_recipient_${count}_name"] = array(
-				'#title' => 'Name',
-				'#type' => 'textfield',
-			);
-
-			$form['company']['grievance_recipients_company']["company_recipient_${count}_email"] = array(
-				'#title' => 'Email',
-				'#type' => 'textfield',
-			);
-
-		} else {
-
-      $classes = 'grievance-recipient';
-      if ($recipient['statusmatch']) {
-        $classes .= ' grievance-recipient-statusmatch';
-      } else {
-        $classes .= ' grievance-recipient-nostatusmatch';
-      }
-
-      if ($recipient['shop_contact']) {
-        $classes .= ' grievance-recipient-shop';
-      }
-      if ($recipient['company_contact']) {
-        $classes .= ' grievance-recipient-company';
-      }
-
-      $style = '';
-      if ($grievance_contacts_hide_nostatusmatch == "Yes" && !$recipient['statusmatch']) {
-        $style .= 'display: none;';
-      }
-
-
-			$form['company']['grievance_recipients_company']["company_recipient_${count}_intro"] = array(
-				'#title' => '',
-				'#type' => 'markup',
-				'#markup' => '<div class="grievance-recipient-name">' . $recipient['name'] . '</div>' . 
-					'<div class="grievance-recipient-email">' . grievance_email_trim($recipient['email'], 25) . '</div>' . 
-					'<div class="grievance-recipient-type">(' . $recipient['type'] . ')</div>',
-				'#prefix' => '<div class="' . $classes . '" style="' . $style . '">',
-			);
-
-			$form['company']['grievance_recipients_company']["company_recipient_${count}_name"] = array(
-				'#type' => 'hidden',
-				'#value' => $recipient['name'],
-			);
-
-			$form['company']['grievance_recipients_company']["company_recipient_${count}_email"] = array(
-				'#type' => 'hidden',
-				'#value' => $recipient['email'],
-			);
-		}
-
-		if ($recipient['nid']) {
-			$form['company']['grievance_recipients_company']["company_recipient_${count}_nid"] = array(
-				'#type' => 'hidden',
-				'#value' => $recipient['nid'],
-			);
-		}
-
-		$form['company']['grievance_recipients_company']["company_recipient_${count}_disposition"] = array(
-			'#title' => t('This contact should be:'),
-			'#type' => 'radios',
-			'#options' => array(
-				'none' => t('Skipped'),
-				'primary' => t('Main recipient (TO)'),
-				'secondary' => t('Copied (CC)')
-			),
-			'#suffix' => '</div>',
-			'#default_value' => 'none',
-		);
-	}
-
-  $form['company']['grievance_recipients_company']['addl_company_recipient'] = array(
-    '#type' => 'submit',
-    '#value' => t('Add Company Recipient'),
-    '#submit' => array('grievance_letter_form_add_one_company'),
-    '#ajax' => array(
-      'callback' => 'grievance_letter_form_add_one_company_callback',
-      'wrapper' => 'grievance-recipients-company',
-    ),
-		'#prefix' => '<div class="grievance-recipient">' . 
-			'<div class="grievance-recipient-name">' . t('Other Company Contact #') . ($i+1) . '</div><br><br>',
+	$form['recipients']['extra']['body'] = array(
+		'#title' => 'Body',
+		'#type' => 'textarea',
 		'#suffix' => '</div>',
 	);
-	
-	$form['company']['grievance_recipients_company']['grievance_company_contacts_wrapper_conclusion'] = array(
-		'#title' => '',
-		'#type' => 'markup',
-		'#markup' => '',
-		'#prefix' => '</div>'
-	);
-	*/
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Union Recipients
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/*
-  $form['union'] = array(
-  	'#type' => 'fieldset',
-  	'#title' => t('Who at the <strong>UNION</strong> should receive the letter?'),
-  	'#collapsible' => TRUE,
-  	'#collapsed' => TRUE,
-  	'#description' => t(''),
-	);
-
-	$union_recipients = array();
+  // Get the company contacts
+	$recipients = grievance_notify_company_contacts($shop_nid, $status_tid);
 
 	$fields = array(
 		'field_grievance_rep_filed',
@@ -298,8 +129,9 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 				if ($field == 'field_grievance_rep_watching') {
 					$recipient['secret'] = TRUE;
 				}
+				$recipient['union'] = TRUE;
 
-				$union_recipients[] = $recipient;
+				$recipients[] = $recipient;
 			}
 		}
 	}
@@ -312,115 +144,139 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 		$recipient['uid'] = $user->uid;
 		$recipient['name'] = $user->name;
 		$recipient['email'] = $user->mail;
-		$union_recipients[] = $recipient;
+		$recipients[] = $recipient;
+	}
+
+	if ($grievance_node->field_grievance_email['und'][0]['email'] && !$nodupes[$grievance_node->field_grievance_email['und'][0]['email']]) {
+		$recipient = array();
+		$recipient['type'] = 'Grievant';
+		$recipient['name'] = $grievance_node->field_grievance_first_name['und'][0]['value'] . ' ' . $grievance_node->field_grievance_last_name['und'][0]['value'];
+		$recipient['email'] = $grievance_node->field_grievance_email['und'][0]['email'];
+		$recipients[] = $recipient;
 	}
 
 	// Additional contacts
-  if (!$form_state['num_addl_union_recipients']) {
-    $form_state['num_addl_union_recipients'] = 0;
+  if (!$form_state['num_addl_recipients']) {
+    $form_state['num_addl_recipients'] = 0;
   }
-	for ($i=0; $i<$form_state['num_addl_union_recipients']; ++$i) {
+  for ($i=0; $i<$form_state['num_addl_recipients']; $i++) {
 		$recipient = array();
-		$recipient['name'] = t('Other Union Contact #') . ($i+1);
+		$recipient['name'] = t('Other Contact #') . ($i+1);
 		$recipient['is_blank'] = TRUE;
-		$union_recipients[] = $recipient;
+
+		$recipients[] = $recipient;
 	}
 
-	$form['union']['grievance_recipients_union']['grievance_union_contacts_wrapper_open'] = array(
+	$form['recipients']['grievance_recipients']['grievance_recipients_wrapper_open'] = array(
 		'#title' => '',
 		'#type' => 'markup',
 		'#markup' => '',
-		'#prefix' => '<div class="grievance-recipients" id="grievance-recipients-union">'
+		'#prefix' => '<div class="grievance-recipients" id="grievance-recipients">'
 	);
 
+  $recipient_count = 0;
+
 	$count = 0;
-	foreach ($union_recipients as $recipient) {
+	foreach ($recipients as $recipient) {
 		++$count;
 
-		if ($recipient['email'] == $user->mail) {
-			$default_value = 'primary';
-		} else if ($recipient['secret']) {
-			$default_value = 'secret';
-		} else if ($recipient['email']) {
-			$default_value = 'secondary';
-		} else {
-			$default_value = 'none';
-		}
-
 		if ($recipient['is_blank']) {
-			$form['union']['grievance_recipients_union']["union_recipient_${count}_intro"] = array(
+			$form['recipients']['grievance_recipients']["recipient_${count}_intro"] = array(
 				'#title' => '',
 				'#type' => 'markup',
 				'#markup' => '<div class="grievance-recipient-name">' . $recipient['name'] . '</div>',
-				'#prefix' => '<div class="grievance-recipient">',
+				'#prefix' => "<div class=\"grievance-recipient grievance-recipient-$default_value\">",
 			);
 
-			$form['union']['grievance_recipients_union']["union_recipient_${count}_name"] = array(
+			$form['recipients']['grievance_recipients']["recipient_${count}_name"] = array(
 				'#title' => 'Name',
 				'#type' => 'textfield',
 			);
 
-			$form['union']['grievance_recipients_union']["union_recipient_${count}_email"] = array(
+			$form['recipients']['grievance_recipients']["recipient_${count}_email"] = array(
 				'#title' => 'Email',
 				'#type' => 'textfield',
 			);
 
 		} else {
 
-			$form['union']['grievance_recipients_union']["union_recipient_${count}_intro"] = array(
+      $classes = 'grievance-recipient ';
+
+			$form['recipients']['grievance_recipients']["recipient_${count}_intro"] = array(
 				'#title' => '',
 				'#type' => 'markup',
 				'#markup' => '<div class="grievance-recipient-name">' . $recipient['name'] . '</div>' . 
 					'<div class="grievance-recipient-email">' . grievance_email_trim($recipient['email'], 25) . '</div>' . 
 					'<div class="grievance-recipient-type">(' . $recipient['type'] . ')</div>',
-				'#prefix' => "<div class=\"grievance-recipient grievance-recipient-$default_value\">",
+				'#prefix' => '<div class="' . $classes . '" style="' . $style . '">',
 			);
 
-			$form['union']['grievance_recipients_union']["union_recipient_${count}_name"] = array(
+			$form['recipients']['grievance_recipients']["recipient_${count}_name"] = array(
 				'#type' => 'hidden',
 				'#value' => $recipient['name'],
 			);
 
-			$form['union']['grievance_recipients_union']["union_recipient_${count}_email"] = array(
+			$form['recipients']['grievance_recipients']["recipient_${count}_email"] = array(
 				'#type' => 'hidden',
 				'#value' => $recipient['email'],
 			);
 		}
 
-		$form['union']['grievance_recipients_union']["union_recipient_${count}_disposition"] = array(
+		if ($recipient['nid']) {
+			$form['recipients']['grievance_recipients']["recipient_${count}_nid"] = array(
+				'#type' => 'hidden',
+				'#value' => $recipient['nid'],
+			);
+		}
+
+
+		$default_value = NULL;
+		if ($recipient['email'] == $user->mail) {
+			$default_value = 'from';
+		} else if ($recipient['email'] == $grievance_node->field_grievance_co_email['und'][0]['email']) {
+			$default_value = 'to';
+		} else if ($recipient['secret']) {
+			$default_value = 'bcc';
+		} else if ($recipient['union']) {
+			$default_value = 'cc';
+		} else {
+			$default_value = 'none';
+		}
+
+		$form['recipients']['grievance_recipients']["recipient_${count}_disposition"] = array(
 			'#title' => t('This contact should be:'),
 			'#type' => 'radios',
 			'#options' => array(
 				'none' => t('Skipped'),
-				'primary' => t('Sender (FROM)'),
-				'secondary' => t('Copied (CC)'),
-				'secret' => t('Blind copied (BCC)'),
+				'from' => t('Sender (FROM)'),
+				'to' => t('Main Recipient (TO)'),
+				'cc' => t('Copied (CC)'),
+				'bcc' => t('Blind Copied (BCC)'),
 			),
+			'#suffix' => '</div>',
 			'#default_value' => $default_value,
-			'#suffix' => '</div>'
 		);
 	}
 
-  $form['union']['grievance_recipients_union']['addl_union_recipient'] = array(
+  $form['recipients']['grievance_recipients']['addl_recipient'] = array(
     '#type' => 'submit',
-    '#value' => t('Add Union Recipient'),
-    '#submit' => array('grievance_letter_form_add_one_union'),
+    '#value' => t('Add Recipient'),
+    '#submit' => array('grievance_letter_form_add_one'),
     '#ajax' => array(
-      'callback' => 'grievance_letter_form_add_one_union_callback',
-      'wrapper' => 'grievance-recipients-union',
+      'callback' => 'grievance_letter_form_add_one_callback',
+      'wrapper' => 'grievance-recipients',
     ),
 		'#prefix' => '<div class="grievance-recipient">' . 
-			'<div class="grievance-recipient-name">' . t('Other Union Contact #') . ($i+1) . '</div><br><br>',
+			'<div class="grievance-recipient-name">' . t('Other Contact #') . ($i+1) . '</div><br><br>',
 		'#suffix' => '</div>',
 	);
 
-	$form['union']['grievance_recipients_union']['grievance_union_contacts_wrapper_conclusion'] = array(
+	$form['recipients']['grievance_recipients']['grievance_recipients_wrapper_conclusion'] = array(
 		'#title' => '',
 		'#type' => 'markup',
 		'#markup' => '',
 		'#prefix' => '</div>'
 	);
-	*/
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Output and Logging
@@ -437,7 +293,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     	'pdf' => t('Download the letter in PDF format'),
     	'preview' => t('Preview the letter on the screen'),
     	'edit' => t('Edit the letter before sending'),
-    	/* 'send-email' => t('Send the letter by email'), */
+    	'send-email' => t('Send the letter by email'), 
     ),
     '#title' => t('Output'),
   );
@@ -491,20 +347,12 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	return $form;
 }
 
-function grievance_letter_form_add_one_company_callback($form, $form_state) {
-  return $form['company']['grievance_recipients_company'];
+function grievance_letter_form_add_one_callback($form, $form_state) {
+  return $form['recipients']['grievance_recipients'];
 }
 
-function grievance_letter_form_add_one_company($form, &$form_state) {
-  $form_state['num_addl_company_recipients']++;
+function grievance_letter_form_add_one($form, &$form_state) {
+  $form_state['num_addl_recipients']++;
   $form_state['rebuild'] = TRUE;
 }
 
-function grievance_letter_form_add_one_union($form, &$form_state) {
-  $form_state['num_addl_union_recipients']++;
-  $form_state['rebuild'] = TRUE;
-}
-
-function grievance_letter_form_add_one_union_callback($form, $form_state) {
-  return $form['union']['grievance_recipients_union'];
-}
