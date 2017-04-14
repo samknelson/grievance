@@ -832,6 +832,13 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'text',
       'settings' => array(
+        'available_options' => '',
+        'available_options_php' => '',
+        'markup_available_options_php' => '&lt;none&gt;',
+        'other' => 'Other',
+        'other_size' => 60,
+        'other_title' => '',
+        'other_unknown_defaults' => 'other',
         'rows' => 5,
       ),
       'type' => 'text_textarea',
@@ -4611,6 +4618,13 @@ function grievance_content_types_field_default_field_instances() {
     'widget' => array(
       'module' => 'text',
       'settings' => array(
+        'available_options' => '',
+        'available_options_php' => '',
+        'markup_available_options_php' => '&lt;none&gt;',
+        'other' => 'Other',
+        'other_size' => 60,
+        'other_title' => '',
+        'other_unknown_defaults' => 'other',
         'size' => 60,
       ),
       'type' => 'text_textfield',
@@ -7694,7 +7708,7 @@ function grievance_content_types_field_default_field_instances() {
     'bundle' => 'grievance_letter_template',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Enter CSS directives which should be included inline in the print version of this letter.  E.g. "#grievance-letter-body: { font-size: 10pt; }"',
+    'description' => 'Enter CSS directives which should be included inline in the print version of this letter.  E.g. "#grievance-letter-body { font-size: 10pt; }"',
     'display' => array(
       'default' => array(
         'label' => 'inline',
@@ -8185,9 +8199,11 @@ function grievance_content_types_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 0,
-      'module' => 'multiple_selects',
-      'settings' => array(),
-      'type' => 'multiple_selects',
+      'module' => 'options',
+      'settings' => array(
+        'checkall' => FALSE,
+      ),
+      'type' => 'options_buttons',
       'weight' => 3,
     ),
   );
@@ -10570,7 +10586,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Employer Attorney');
   t('Employer Name');
   t('Employer Representative');
-  t('Enter CSS directives which should be included inline in the print version of this letter.  E.g. "#grievance-letter-body: { font-size: 10pt; }"');
+  t('Enter CSS directives which should be included inline in the print version of this letter.  E.g. "#grievance-letter-body { font-size: 10pt; }"');
   t('Enter the article of the contract that was violated, for example: Article ....');
   t('Enter the company that this shop is associated with.');
   t('Enter the employee ID # as assigned by the company.');

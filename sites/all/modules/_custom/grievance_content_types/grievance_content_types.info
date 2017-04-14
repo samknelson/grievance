@@ -431,6 +431,7 @@ features[node][] = grievance_settlement
 features[node][] = grievance_shop
 features[node][] = grievance_shop_contact
 features[taxonomy][] = grievance_alert_types
+features[taxonomy][] = grievance_assignee_notes
 features[taxonomy][] = grievance_broughtby
 features[taxonomy][] = grievance_category
 features[taxonomy][] = grievance_delivery

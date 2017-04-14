@@ -439,6 +439,36 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       unset($form['field_grievance_department_tid']['und']['#options'][$tid]);
     }
   }
+
+  //
+  // Add the "Assignee Notes" dropdown
+  //
+
+  if ($form['field_grievance_assignee_notes']['#access']) {
+    $assignee_notes_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_assignee_notes');
+    $assignee_notes_options = array(NULL => '[select]');
+    $tmp = taxonomy_get_tree($assignee_notes_vocabulary->vid);
+    $found = FALSE;
+    foreach ($tmp as $term) {
+      $found = TRUE;
+      $assignee_notes_options[$term->name] = $term->name;
+    }
+
+    if ($found) {
+      $weight = $form['field_grievance_assignee_notes']['#weight'] - 0.5;
+      $form['grievance_assignee_notes_dropdown'] = array(
+        '#type' => 'select',
+        '#weight' => $weight,
+        '#tree' => TRUE,
+        '#options' => $assignee_notes_options,
+        '#title' => t('Select Assignee Notes'),
+        '#attributes' => array('class' => array('grievance_assignee_notes_dropdown')),
+      );
+
+      $form['#groups']['group_grievance_union_rep']->children[] = 'grievance_assignee_notes_dropdown';
+      $form['#group_children']['grievance_assignee_notes_dropdown'] = 'group_grievance_union_rep';
+    }
+  }
   
   //
   // Show or hide fields based on value of the class action toggle

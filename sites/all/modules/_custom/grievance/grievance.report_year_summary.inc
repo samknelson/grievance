@@ -74,11 +74,13 @@ function grievance_report_year_summary_form_submit($form, &$form_state) {
 
 	$stmt = db_query($sql, array(':insert_log_tid' => $insert_log_tid));
 	$opened_count = array();
+	$opened_count_total = 0;
 	$already_seen = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		if ($already_seen[$hr['grievance_nid']]) { continue; }
 		$already_seen[$hr['grievance_nid']] = TRUE;
 		$opened_count[$hr['m']]++;
+		$opened_count_total++;
 	}
 
   //
@@ -102,10 +104,12 @@ function grievance_report_year_summary_form_submit($form, &$form_state) {
 	$stmt = db_query($sql, array(':update_log_tid' => $update_log_tid, ':closed_status_tids' => $closed_status_tids));
 	$closed_count = array();
 	$already_seen = array();
+	$closed_count_total = 0;
 	while ($hr = $stmt->fetchAssoc()) {
 		if ($already_seen[$hr['grievance_nid']]) { continue; }
 		$already_seen[$hr['grievance_nid']] = TRUE;
 		$closed_count[$hr['m']]++;
+		$closed_count_total++;
 	}
 
 
@@ -134,6 +138,12 @@ function grievance_report_year_summary_form_submit($form, &$form_state) {
 
 		$rows[] = $row;
 	}
+
+	$row = array();
+	$row[] = '<strong>' . t('Total') . '</strong>';
+	$row[] = '<strong>' . number_format($opened_count_total, 0) . '</strong>';
+	$row[] = '<strong>' . number_format($closed_count_total, 0) . '</strong>';
+	$rows[] = $row;
 
 	$header = array(
 		'Month',
