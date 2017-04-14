@@ -149,6 +149,13 @@ function grievance_admin() {
     '#title' => t('Alerts'),
   );
 
+  $form['grievance_alerts']['grievance_alert_disable'] = array(
+    '#type' => 'select',
+    '#title' => t('Disable Alerts?'),
+    '#default_value' => variable_get('grievance_alert_disable', NULL),
+    '#options' => array('No' => 'No', 'Yes' => 'Yes'),
+  );
+
   $form['grievance_alerts']['grievance_alert_recipients'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Alert Recipients'),

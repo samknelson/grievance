@@ -5,6 +5,8 @@
  */
 
 function grievance_alert_all() {
+	if (variable_get('grievance_alert_disable', NULL) == 'Yes') { return; }
+
 	watchdog('grievance_alert', t('Starting alert generation.'));
 
 	$query = new EntityFieldQuery();
