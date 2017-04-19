@@ -512,10 +512,18 @@ function grievance_node_tab_timeline($grievance_node) {
 function grievance_log_views_exposed_form_alter($form, &$form_state) {
   if (isset($form['field_grievance_log_type_tid']['#options'])) {
 
-    $skip_tid = variable_get('grievance_log_update_type_without_status_change', '');
+    $skip_tids = array();
+    foreach (array('grievance_log_update_type_without_status_change', 'grievance_log_phaxio_callback_type') as $skip_variable_name) {
+      $skip_tids[] = variable_get($skip_variable_name, '');
+    }
+
     $default = array();
     foreach (array_keys($form['field_grievance_log_type_tid']['#options']) as $tid) {
-      if ($tid != $skip_tid) {
+      $found = FALSE;
+      foreach ($skip_tids as $skip_tid) {
+        if ($tid == $skip_tid) { $found = TRUE; }
+      }
+      if (!$found) {
         $default[$tid] = $tid;
       }
     }

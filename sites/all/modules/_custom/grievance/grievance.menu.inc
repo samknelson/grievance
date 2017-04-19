@@ -446,6 +446,16 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['grievances/phaxio/callback-sent/%'] = array(
+		'title' => 'Phaxio Sent',
+		'description' => '',
+		'page callback' => 'grievance_phaxio_callback_sent',
+		'page arguments' => array(),
+		'access callback' => 'grievance_phaxio_callback_access',
+		'access arguments' => array(3),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	// QuickSearch
 	
 	$items['grievance/ajax/quicksearch'] = array(

@@ -278,6 +278,63 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 		'#prefix' => '</div>'
 	);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Fax Recipients
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  $form['fax'] = array(
+  	'#type' => 'fieldset',
+  	'#collapsible' => TRUE,
+  	'#collapsed' => TRUE,
+  	'#title' => t('Fax Recipient'),
+  	'#description' => t('Select or type in the fax recipient for this letter'),
+	);
+
+  // Get the company contacts
+	$fax_recipients = grievance_notify_company_contacts($shop_nid, $status_tid);
+	$found = FALSE;
+	$fax_options = array(NULL => t('[select]'));
+	foreach ($fax_recipients as $recipient) {
+		if ($recipient['fax']) {
+			$found = TRUE;
+			$fax_options[$recipient['fax']] = $recipient['fax'] . ': ' . $recipient['name'] . ' (' . $recipient['role'] . ')';
+		}
+	}
+	if ($found) {
+		$form['fax']['fax_recipient_dropdown'] = array(
+			'#title' => 'Company Contacts',
+			'#type' => 'select',	
+			'#options' => $fax_options,
+			'#attributes' => array('class' => array('grievance_fax_recipient_dropdown')),
+		);
+	}
+
+	$form['fax']['fax_recipient'] = array(
+		'#title' => 'Fax Number',
+		'#type' => 'textfield',	
+		'#attributes' => array('class' => array('grievance_fax_recipient')),
+	);
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Output and Logging
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

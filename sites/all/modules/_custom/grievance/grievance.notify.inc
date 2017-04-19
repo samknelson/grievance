@@ -47,6 +47,7 @@ function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 				$recipient['nid'] = $contact_node->nid;
 				$recipient['name'] = $contact_node->field_grievance_co_name['und'][0]['value'];
 				$recipient['email'] = $contact_node->field_grievance_co_email['und'][0]['email'];
+				$recipient['fax'] = $contact_node->field_grievance_co_fax['und'][0]['value'];
 				$recipient['shop_contact'] = TRUE;
 				$recipients[$contact_node->nid] = $recipient;
 			}

@@ -72,6 +72,14 @@ function grievance_admin() {
     '#description' => t("Grievance log type to be used for initial call to grievant.  Used for reporting."),
   );
 
+  $form['grievance_log']['grievance_log_phaxio_callback_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Phaxio Callback Type'),
+    '#default_value' => variable_get('grievance_log_phaxio_callback_type', ''),
+    '#description' => t("Grievance log type to be used for Phaxio callback -- i.e. fax confirmation receipts."),
+  );
+
   $form['grievance_status'] = array(
     '#type' => 'fieldset',
     '#title' => t('Status Types'),
