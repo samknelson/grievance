@@ -415,7 +415,7 @@ function grievance_menu() {
 		'description' => '',
 		'page callback' => 'grievance_report_bytype',
 		'page arguments' => array(),
-		'access arguments' => array('grievance report'),
+		'access arguments' => array('grievance report bytype'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 
