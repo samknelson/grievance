@@ -54,7 +54,7 @@ function grievance_permission() {
     	'title' => t('Grievance Report'),
     	'description' => t('Permission to view most grievance reports.')
     ),
-    'grievance report' => array(
+    'grievance report bytype' => array(
         'title' => t('Grievance Report Bytype'),
         'description' => t('Permission to view the "by type and status" report.')
     ),
