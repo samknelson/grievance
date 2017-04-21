@@ -50,6 +50,10 @@
 	    	$('.field-name-field-grievance-assignee-notes-form textarea').val($(this).val());
 	    });
 
+	    $('.grievance_fax_recipient_dropdown').once().change(function () {
+	    	$('.grievance_fax_recipient').val($(this).val());
+	    });
+
 			// Hide and show contacts as needed
 			$("#grievance-contact-hide-shop").click(function(event) {
 				event.preventDefault();
