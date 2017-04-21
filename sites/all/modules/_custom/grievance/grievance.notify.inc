@@ -50,6 +50,7 @@ function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 				$recipient['fax'] = $contact_node->field_grievance_co_fax['und'][0]['value'];
 				$recipient['shop_contact'] = TRUE;
 				$recipients[$contact_node->nid] = $recipient;
+				dpm($contact_node);
 			}
 		}
 	}
