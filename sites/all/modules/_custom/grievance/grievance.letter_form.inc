@@ -311,7 +311,6 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 
   // Get the company contacts
 	$fax_recipients = grievance_notify_company_contacts($shop_nid, $status_tid);
-	dpm($fax_recipients);
 	$found = FALSE;
 	$fax_options = array(NULL => t('[select]'));
 	foreach ($fax_recipients as $recipient) {
