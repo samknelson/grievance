@@ -47,20 +47,61 @@ function grievance_report_average_time_fields() {
 }
 
 function grievance_report_average_time_pks() {
-	ini_set('memory_limit', '512M');
 	$query = new EntityFieldQuery();
 	$query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance');
   $query->fieldOrderBy('field_grievance_shop', 'target_id');
+  $query->propertyOrderBy('nid');
 	$stmt = $query->execute();
 	if (!$stmt['node']) { return array(); }
 
-	$result = array_keys($stmt['node']);
+	$all_nids = array_keys($stmt['node']);
+
+	$result = array();
+	$count = 0;
+	$start = 0;
+	$end = 0;
+	$last_nid = 0;
+
+	foreach ($all_nids as $nid) {
+		++$count;
+		if ($count % 5 == 0) {
+			$result[] = "$start-$last_nid";
+			$start = $nid;
+		}
+
+		$end = $nid;
+		$last_nid = $nid;
+	}
+
+	$result[] = "$last_nid-10000000";
 	$result[] = 'PLACEHOLDER_FINAL_NID';
 	return $result;
 }
 
-function grievance_report_average_time_batch($grievance_nid, $values, $report_id, $report_action, &$context) {
+function grievance_report_average_time_batch($grievance_nid_range, $values, $report_id, $report_action, &$context) {
+	if ($grievance_nid_range == 'PLACEHOLDER_FINAL_NID') {
+		grievance_report_average_time_batch_nid($grievance_nid_range, $values, $report_id, $report_action, $context);
+	} else {
+		list ($from_nid, $to_nid) = explode('-', $grievance_nid_range);
+		$query = new EntityFieldQuery();
+		$query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'grievance');
+	  $query->propertyCondition('nid', $from_nid, '>=');
+	  $query->propertyCondition('nid', $to_nid, '<=');
+	  $query->fieldOrderBy('field_grievance_shop', 'target_id');
+	  $query->propertyOrderBy('nid');
+		$stmt = $query->execute();
+		if ($stmt['node']) {
+			$nids = array_keys($stmt['node']);
+			foreach ($nids as $nid) {
+				grievance_report_average_time_batch_nid($nid, $values, $report_id, $report_action, $context);
+			}
+		}
+	}
+}
+
+function grievance_report_average_time_batch_nid($grievance_nid, $values, $report_id, $report_action, &$context) {
 	$grievance_node = node_load($grievance_nid);
 	$shop_nid = $grievance_node->field_grievance_shop['und'][0]['target_id'];
 	$last_shop_nid = $context['results']['last_shop_nid'];
