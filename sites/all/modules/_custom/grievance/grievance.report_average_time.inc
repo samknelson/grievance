@@ -49,6 +49,7 @@ function grievance_report_average_time_fields() {
 function grievance_report_average_time_pks() {
 	ini_set('memory_limit', '512M');
 	phpinfo();
+	exit();
 	return array();
 	$query = new EntityFieldQuery();
 	$query->entityCondition('entity_type', 'node');
