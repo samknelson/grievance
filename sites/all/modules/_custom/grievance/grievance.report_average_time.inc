@@ -65,7 +65,7 @@ function grievance_report_average_time_pks() {
 
 	foreach ($all_nids as $nid) {
 		++$count;
-		if ($count % 500 == 0) {
+		if ($count % 50 == 0) {
 			$result[] = "$start-$last_nid";
 			$start = $nid;
 		}
@@ -80,6 +80,7 @@ function grievance_report_average_time_pks() {
 }
 
 function grievance_report_average_time_batch($grievance_nid_range, $values, $report_id, $report_action, &$context) {
+	drupal_set_message("Computing: $grievance_nid_range");
 	if ($grievance_nid_range == 'PLACEHOLDER_FINAL_NID') {
 		grievance_report_average_time_batch_nid($grievance_nid_range, $values, $report_id, $report_action, $context);
 	} else {
