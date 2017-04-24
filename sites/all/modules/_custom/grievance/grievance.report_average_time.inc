@@ -65,7 +65,7 @@ function grievance_report_average_time_pks() {
 
 	foreach ($all_nids as $nid) {
 		++$count;
-		if ($count % 5 == 0) {
+		if ($count % 500 == 0) {
 			$result[] = "$start-$last_nid";
 			$start = $nid;
 		}
