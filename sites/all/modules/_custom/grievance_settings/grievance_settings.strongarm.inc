@@ -70,7 +70,9 @@ admin/modules*',
       'pages-and-selector' => array(
         'include-pages' => 'grievances/all
 grievance/report/uh226-report-summary
-grievance/report/settlement',
+grievance/report/settlement
+grievance/admin/contract-templates/section-search
+grievance/admin/contract-templates/clause-search',
         'exclude-pages' => 'admin/reports/status
 admin/modules*',
         'table-selector' => '',
