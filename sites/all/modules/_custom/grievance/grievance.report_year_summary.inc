@@ -18,6 +18,35 @@ function grievance_report_year_summary_form($form, &$form_state) {
     '#options' => $options,
 	);
 
+	$options = array(
+		1 => 'January',
+		2 => 'February',
+		3 => 'March',
+		4 => 'April',
+		5 => 'May',
+		6 => 'June',
+		7 => 'July',
+		8 => 'August',
+		9 => 'September',
+		10 => 'October',
+		11 => 'November',
+		12 => 'December',
+	);
+
+  $form['start_month'] = array(
+    '#title' => t('Start Month'),
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#options' => $options,
+	);
+
+  $form['end_month'] = array(
+    '#title' => t('End Month'),
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#options' => $options,
+	);
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Generate Report',
@@ -55,6 +84,9 @@ function grievance_report_year_summary_form_submit($form, &$form_state) {
 
   // A grievance might be opened and closed multiple times, so we need to pull them all and sort in memory; simply doing a "group by ... distinct" in the SQL doesn't work.
 
+	$start_month = $form_state['values']['start_month'];
+	$end_month = $form_state['values']['end_month'];
+
   //
   // Count the grievances opened, by month. 
   //
@@ -77,6 +109,10 @@ function grievance_report_year_summary_form_submit($form, &$form_state) {
 	$opened_count_total = 0;
 	$already_seen = array();
 	while ($hr = $stmt->fetchAssoc()) {
+		$month = $hr['m'];
+		if ($start_month && $month < $start_month) { continue; }
+		if ($end_month && $month > $end_month) { continue; }
+
 		if ($already_seen[$hr['grievance_nid']]) { continue; }
 		$already_seen[$hr['grievance_nid']] = TRUE;
 		$opened_count[$hr['m']]++;
@@ -106,9 +142,13 @@ function grievance_report_year_summary_form_submit($form, &$form_state) {
 	$already_seen = array();
 	$closed_count_total = 0;
 	while ($hr = $stmt->fetchAssoc()) {
+		$month = $hr['m'];
+		if ($start_month && $month < $start_month) { continue; }
+		if ($end_month && $month > $end_month) { continue; }
+
 		if ($already_seen[$hr['grievance_nid']]) { continue; }
 		$already_seen[$hr['grievance_nid']] = TRUE;
-		$closed_count[$hr['m']]++;
+		$closed_count[$month]++;
 		$closed_count_total++;
 	}
 
@@ -128,7 +168,11 @@ function grievance_report_year_summary_form_submit($form, &$form_state) {
 		11 => 'November', 
 		12 => 'December', 
 	);
+
 	foreach ($months as $month => $month_name) {
+		if ($start_month && $month < $start_month) { continue; }
+		if ($end_month && $month > $end_month) { continue; }
+
 		$row = array();
 		$row[] = $month_name;
 		if (!$opened_count[$month]) { $opened_count[$month] = 0; }
