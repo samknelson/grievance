@@ -355,14 +355,6 @@ function grievance_admin() {
     '#default_value' => variable_get('grievance_id_algorithm', ''),
   );
 
-  $form['grievance_id']['grievance_id_manual'] = array(
-    '#type' => 'select',
-    '#title' => t('Allow manual override?'),
-    '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
-    '#default_value' => variable_get('grievance_id_manual', ''),
-    '#description' => t('Select "Yes" to allow grievance admins to manually set or change the grievance ID.'),
-  );
-
   $form['grievance_id']['grievance_id_suffix'] = array(
     '#type' => 'textfield',
     '#title' => t('Suffix'),
