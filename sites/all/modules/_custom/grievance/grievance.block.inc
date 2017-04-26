@@ -110,6 +110,11 @@ function grievance_block_timeleft() {
     $msg = $status_msg;
   }
 
+  if ($grievance_node->field_grievance_id['und'][0]['value']) {
+    if ($msg) { $msg .= ' '; }
+    $msg .= '[' . t('Grievance ID ') . '<strong>' . $grievance_node->field_grievance_id['und'][0]['value'] . '</strong>' . ']';
+  }
+
   $class = "alert-box ";
 
   if ($need_alert) {
