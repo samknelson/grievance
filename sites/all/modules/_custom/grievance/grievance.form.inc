@@ -326,79 +326,105 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   //
 
   if (!$grievance_node->nid) {
-    // Filed by
-    $form['field_grievance_rep_filed']['und'][0]['target_id']['#default_value'] = "$user_full->name ($user_full->uid)";
+    $user_defaults = array(
+      'field_grievance_rep_assignee' => array(),
+      'field_grievance_rep_filed' => array(),
+      'field_grievance_rep_organizer' => array(),
+      'field_grievance_rep_lead' => array(),
+      'field_grievance_rep_admin' => array(),
+      'field_grievance_rep_watching' => array(),
+    );
 
-    // leads
-    $leads = array();
-    if (isset($user_full->field_grievance_rep_lead['und'])) {
-      foreach ($user_full->field_grievance_rep_lead['und'] as $tmp) {
-        $lead_uid = $tmp['target_id'];
-        $leads[] = user_load($lead_uid);
-      }
-    }
-
-    // Organizers (and leads from organizers)
-    $organizers = array();
-    if (isset($user_full->field_grievance_rep_organizer['und'])) {
-      foreach ($user_full->field_grievance_rep_organizer['und'] as $tmp) {
-        $organizer_uid = $tmp['target_id'];
-        $organizer = user_load($organizer_uid);
-        $organizers[] = $organizer;
-        if (isset($organizer->field_grievance_rep_lead['und'])) {
-          foreach ($organizer->field_grievance_rep_lead['und'] as $tmp) {
-            $lead_uid = $tmp['target_id'];
-            $leads[] = user_load($lead_uid);
+    // We might get these from the shop node
+    if ($shop_node) {
+      foreach ($user_defaults as $field_name => $ignore) {
+        if ($shop_node->{$field_name}['und'][0]) {
+          foreach ($shop_node->{$field_name}['und'] as $tmp) {
+            $shop_uid = $tmp['target_id'];
+            $shop_user = user_load($shop_uid);
+            $user_defaults[$field_name][] = $shop_user;
           }
         }
       }
     }
 
-    $delta = 0;
-    foreach ($organizers as $organizer) {
-      if ($organizer) {
-        $form['field_grievance_rep_organizer']['und'][$delta]['target_id']['#default_value'] = "$organizer->name ($organizer->uid)";
-        ++$delta;
+    // If we didn't get the "filed by" from the shop, make it me
+    if (!$user_defaults['field_grievance_rep_filed']) {
+      $user_defaults['field_grievance_rep_filed'][] = $user;
+
+      // Also set *my* organizer and my organizer's lead, if any
+      if (isset($user_full->field_grievance_rep_organizer['und'])) {
+        foreach ($user_full->field_grievance_rep_organizer['und'] as $tmp) {
+          $organizer_uid = $tmp['target_id'];
+          $organizer = user_load($organizer_uid);
+          $user_defaults['field_grievance_rep_organizer'][] = $organizer;
+          if (isset($organizer->field_grievance_rep_lead['und'])) {
+            foreach ($organizer->field_grievance_rep_lead['und'] as $tmp) {
+              $lead_uid = $tmp['target_id'];
+              $user_defaults['field_grievance_rep_lead'][] = user_load($lead_uid);
+            }
+          }
+        }
+      }
+
+      // Also set *my* lead
+      if (isset($user_full->field_grievance_rep_lead['und'])) {
+        foreach ($user_full->field_grievance_rep_lead['und'] as $tmp) {
+          $lead_uid = $tmp['target_id'];
+          $user_defaults['field_grievance_rep_lead'][] = user_load($lead_uid);
+        }
       }
     }
 
-    $delta = 0;
-    foreach ($leads as $lead) {
-      if ($lead) {
-        $form['field_grievance_rep_lead']['und'][$delta]['target_id']['#default_value'] = "$lead->name ($lead->uid)";
-        ++$delta;
+    // Also add the global watcher (if any)
+    if (variable_get('grievance_rep_watching', '')) {
+      $user_defaults['field_grievance_rep_watching'][] = user_load(variable_get('grievance_rep_watching', '')['entity_id']);
+    }
+
+    // Also add the global manager (if any)
+    if (variable_get('grievance_rep_manager', '')) {
+      $user_defaults['field_grievance_rep_manager'][] = user_load(variable_get('grievance_rep_manager', '')['entity_id']);
+    }
+
+    // Also add the global assignee (if any)
+    if (!$user_defaults['field_grievance_rep_assignee']) {
+      if (variable_get('grievance_rep_assignee', '')) {
+        $user_defaults['field_grievance_rep_assignee'][] = user_load(variable_get('grievance_rep_assignee', '')['entity_id']);
       }
     }
 
-    // Manager
-    $manager = variable_get('grievance_rep_manager', '');
-    if ($manager) {
-      if ($manager) {
-        $form['field_grievance_rep_manager']['und'][0]['target_id']['#default_value'] = "$manager[entity_label] ($manager[entity_id])";
+    // Now turn these "default" arrays into default values in the form
+    foreach ($user_defaults as $field_name => $values) {
+      unset($form_state['input'][$field_name]['und']);
+      $delta = 0;
+      if ($values) {
+        foreach ($values as $value) {
+          if ($value) {
+            $form[$field_name]['und'][$delta]['target_id']['#default_value'] = "$value->name ($value->uid)";
+            $form_state['input'][$field_name]['und'][$delta]['target_id'] = "$value->name ($value->uid)";
+            $form_state['input'][$field_name]['und'][$delta]['_weight'] = NULL;
+            ++$delta;
+          }
+        }
       }
+      // $form_state['field'][$field_name]['und']['items_count'] = $delta+1;
+      // $form_state['field'][$field_name]['und']['field']['cardinality'] = $delta+1;
     }
 
-    // Obeserver
-    $watching = variable_get('grievance_rep_watching', '');
-    if ($watching) {
-      $form['field_grievance_rep_watching']['und'][0]['target_id']['#default_value'] = "$watching[entity_label] ($watching[entity_id])";
+    // Set the assignee notes
+    if ($shop_node->field_grievance_assignee_notes['und']) {
+      $form['field_grievance_assignee_notes']['und'][0]['value']['#default_value'] = $shop_node->field_grievance_assignee_notes['und']['0']['value'];
+    } else {
+      $assignee_notes = variable_get('grievance_assignee_notes', '');
+      if ($assignee_notes) {
+        $form['field_grievance_assignee_notes']['und'][0]['value']['#default_value'] = $assignee_notes;
+      }
     }
 
     // Shop
     if ($shop_node) {
       $form['field_grievance_shop']['und'][0]['target_id']['#default_value'] = "$shop_node->title ($shop_node->nid)";
     }
-
-    // assignee
-    $assignee = variable_get('grievance_rep_assignee', '');
-    if ($assignee) {
-      $form['field_grievance_rep_assignee']['und'][0]['target_id']['#default_value'] = "$assignee[entity_label] ($assignee[entity_id])";
-    }
-    $assignee_notes = variable_get('grievance_assignee_notes', '');
-    if ($assignee_notes) {
-      $form['field_grievance_assignee_notes']['und'][0]['value']['#default_value'] = $assignee_notes;
-    }
-  
   }
 
   //

@@ -2447,7 +2447,7 @@ function grievance_content_types_field_default_field_bases() {
   // Exported field_base: 'field_grievance_rep_lead'.
   $field_bases['field_grievance_rep_lead'] = array(
     'active' => 1,
-    'cardinality' => -1,
+    'cardinality' => 3,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_lead',
@@ -2483,7 +2483,7 @@ function grievance_content_types_field_default_field_bases() {
   // Exported field_base: 'field_grievance_rep_manager'.
   $field_bases['field_grievance_rep_manager'] = array(
     'active' => 1,
-    'cardinality' => -1,
+    'cardinality' => 3,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_manager',
@@ -2519,7 +2519,7 @@ function grievance_content_types_field_default_field_bases() {
   // Exported field_base: 'field_grievance_rep_organizer'.
   $field_bases['field_grievance_rep_organizer'] = array(
     'active' => 1,
-    'cardinality' => -1,
+    'cardinality' => 3,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_organizer',
@@ -2555,7 +2555,7 @@ function grievance_content_types_field_default_field_bases() {
   // Exported field_base: 'field_grievance_rep_watching'.
   $field_bases['field_grievance_rep_watching'] = array(
     'active' => 1,
-    'cardinality' => -1,
+    'cardinality' => 3,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_grievance_rep_watching',
