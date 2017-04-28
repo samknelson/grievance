@@ -21,7 +21,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
   $query->entityCondition('bundle', 'grievance_letter_template');
   $query->propertyOrderBy('title');
   $stmt = $query->execute();
-  $options = array();
+  $options = array(NULL => '- Select -');
   $footnote = '';
   if ($stmt['node']) {
   	$letter_nodes = node_load_multiple(array_keys($stmt['node']));
@@ -31,19 +31,24 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	  		$options[$letter_nid] = $letter_node->title;
 	  		if ($letter_node->field_grievance_attachments['und'][0]['uri']) {
 	  			$options[$letter_nid] .= '*';
-	  			$footnote = t('* These letters can only be downloaded individually.  They cannot be sent, logged, or bundled with other letters.');
+	  			$footnote = t('* Letters marked with a star can only be downloaded individually.  They cannot be sent, logged, or bundled with other letters.');
 	  		}
 	  	}
   	}
   }
 
-  $form['letter']['letter_nid'] = array(
-    '#type' => 'checkboxes',
-    '#options' => $options,
-    '#title' => t('Select Letter(s)'),
-    '#required' => TRUE,
-    '#description' => $footnote,
-  );
+  for ($i=0; $i<5; ++$i) {
+	  $form['letter']['letter_nid_' . $i] = array(
+	    '#type' => 'select',
+	    '#options' => $options,
+	    '#title' => t('Select Letter #') . ($i+1),
+	  );
+	  if ($i == 0) {
+			$form['letter']['letter_nid_' . $i]['#description'] = $footnote;
+	    $form['letter']['letter_nid_' . $i]['#required'] = TRUE;
+
+	  }
+	}
 
   // Get the delivery options, as a substitution variable
 	$delivery_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_delivery');

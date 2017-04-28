@@ -12,7 +12,8 @@ function grievance_letter_form_submit($form, &$form_state) {
 
 	// Get the letter nid
 	$letter_nids = array();
-	foreach ($form_state['values']['letter_nid'] as $ignore => $letter_nid) {
+	for ($i=0; $i<5; ++$i) {
+		$letter_nid = $form_state['values']['letter_nid_' . $i];
 		if ($letter_nid) {
 			$letter_nids[] = $letter_nid;
 		}
