@@ -2548,16 +2548,18 @@ function grievance_views_views_default_views() {
   );
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '1000';
-  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_plugin'] = 'break_row';
+  $handler->display->display_options['style_options']['row_class_special'] = FALSE;
   $handler->display->display_options['style_options']['columns'] = array(
     'title' => 'title',
-    'created' => 'created',
+    'field_grievance_status_date' => 'field_grievance_status_date',
     'field_grievance_log_type' => 'field_grievance_log_type',
     'name' => 'name',
     'field_grievance_status' => 'field_grievance_status',
+    'edit_node' => 'edit_node',
     'field_grievance_attachments' => 'field_grievance_attachments',
     'body' => 'body',
-    'edit_node' => 'edit_node',
+    'nothing' => 'nothing',
   );
   $handler->display->display_options['style_options']['default'] = '-1';
   $handler->display->display_options['style_options']['info'] = array(
@@ -2567,13 +2569,19 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
+      'break' => '0',
+      'separator2' => '',
+      'colspan' => '',
     ),
-    'created' => array(
+    'field_grievance_status_date' => array(
       'sortable' => 0,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
+      'break' => '0',
+      'separator2' => '',
+      'colspan' => '',
     ),
     'field_grievance_log_type' => array(
       'sortable' => 0,
@@ -2581,6 +2589,9 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
+      'break' => '0',
+      'separator2' => '',
+      'colspan' => '',
     ),
     'name' => array(
       'sortable' => 0,
@@ -2588,6 +2599,9 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
+      'break' => '0',
+      'separator2' => '',
+      'colspan' => '',
     ),
     'field_grievance_status' => array(
       'sortable' => 0,
@@ -2595,11 +2609,25 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
+      'break' => '0',
+      'separator2' => '',
+      'colspan' => '',
+    ),
+    'edit_node' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+      'break' => '0',
+      'separator2' => '',
+      'colspan' => '',
     ),
     'field_grievance_attachments' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
+      'break' => '0',
+      'separator2' => '',
+      'colspan' => '',
     ),
     'body' => array(
       'sortable' => 0,
@@ -2607,11 +2635,17 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
+      'break' => '0',
+      'separator2' => '',
+      'colspan' => '',
     ),
-    'edit_node' => array(
+    'nothing' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
+      'break' => 'nothing',
+      'separator2' => '',
+      'colspan' => '6',
     ),
   );
   /* Relationship: Content: Author */
@@ -2656,20 +2690,31 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_status']['table'] = 'field_data_field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['field'] = 'field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['type'] = 'taxonomy_term_reference_plain';
+  /* Field: Content: Edit link */
+  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
   /* Field: Content: Attachments */
   $handler->display->display_options['fields']['field_grievance_attachments']['id'] = 'field_grievance_attachments';
   $handler->display->display_options['fields']['field_grievance_attachments']['table'] = 'field_data_field_grievance_attachments';
   $handler->display->display_options['fields']['field_grievance_attachments']['field'] = 'field_grievance_attachments';
+  $handler->display->display_options['fields']['field_grievance_attachments']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_grievance_attachments']['click_sort_column'] = 'fid';
+  $handler->display->display_options['fields']['field_grievance_attachments']['settings'] = array(
+    'field_delimiter' => '',
+  );
   $handler->display->display_options['fields']['field_grievance_attachments']['delta_offset'] = '0';
   /* Field: Content: Body */
   $handler->display->display_options['fields']['body']['id'] = 'body';
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
-  /* Field: Content: Edit link */
-  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
-  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
-  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
+  $handler->display->display_options['fields']['body']['exclude'] = TRUE;
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = 'Body';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<pre>[body] [field_grievance_attachments]</pre><hr>';
   /* Sort criterion: Content: Status Change Date (field_grievance_status_date) */
   $handler->display->display_options['sorts']['field_grievance_status_date_value']['id'] = 'field_grievance_status_date_value';
   $handler->display->display_options['sorts']['field_grievance_status_date_value']['table'] = 'field_data_field_grievance_status_date';
@@ -2749,9 +2794,10 @@ function grievance_views_views_default_views() {
     t('Entry Type'),
     t('Author'),
     t('Status'),
+    t('Edit link'),
     t('Attachments'),
     t('Body'),
-    t('Edit link'),
+    t('<pre>[body] [field_grievance_attachments]</pre><hr>'),
     t('All'),
     t('Show only log entries of type:'),
     t('Block'),
