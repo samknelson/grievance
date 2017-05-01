@@ -7755,6 +7755,74 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_letter_template-field_grievance_images'.
+  $field_instances['node-grievance_letter_template-field_grievance_images'] = array(
+    'bundle' => 'grievance_letter_template',
+    'deleted' => 0,
+    'description' => 'Upload images to include in letter templates, such as a scanned signature.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'file',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'file_default',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_images',
+    'label' => 'Images',
+    'required' => 0,
+    'settings' => array(
+      'description_field' => 0,
+      'file_directory' => '',
+      'file_extensions' => 'png gif pdf jpg jpeg',
+      'filefield_paths' => array(
+        'active_updating' => 0,
+        'file_name' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => '[node:nid]_[file:fid].[file:ffp-extension-original]',
+        ),
+        'file_path' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => 'grievance_images',
+        ),
+        'redirect' => FALSE,
+        'retroactive_update' => 0,
+      ),
+      'filefield_paths_enabled' => 1,
+      'max_filesize' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'file',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+      ),
+      'type' => 'file_generic',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_letter_template-field_grievance_roles'.
   $field_instances['node-grievance_letter_template-field_grievance_roles'] = array(
     'bundle' => 'grievance_letter_template',
@@ -10624,6 +10692,7 @@ function grievance_content_types_field_default_field_instances() {
   t('ID');
   t('If selected, this contact will appear for all shops associated with this company.');
   t('If the company should see a longer or more descriptive name, enter it here.  (I.e. the name might be "Guest Complaints" and the employer name might be " Guest complaints (with complete mailing and/or email address and phone number)").  This longer name will be used on information requests and grievance forms sent to the company.');
+  t('Images');
   t('Incident Date');
   t('Information Request');
   t('Information Request?');
@@ -10682,6 +10751,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Type of Days');
   t('Union Representative');
   t('Unresolved?');
+  t('Upload images to include in letter templates, such as a scanned signature.');
   t('Upload the current contract document for this shop.  The contract will be used by stewards to identify violations.');
   t('Use this field for a "letter" which has no customization, and which is simply meant to be downloaded.  No drop-in tokens are supported.');
   t('Use this field to indicate that member data in the grievance system has changed from the Union\'s member management system, and that the new data needs to be uploaded back to the member management system.  "Unchanged" means that the data is the same in both places; "Pending" means that corrected data has been entered here and needs to be entered in the member management system.  After the information has been changed, it will be flagged as "Complete".');
