@@ -4061,19 +4061,18 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['relationships']['field_grievance_company_target_id']['relationship'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['relationships']['field_grievance_company_target_id']['label'] = 'Company';
   /* Field: Content: Title */
-  $handler->display->display_options['fields']['title_1']['id'] = 'title_1';
-  $handler->display->display_options['fields']['title_1']['table'] = 'node';
-  $handler->display->display_options['fields']['title_1']['field'] = 'title';
-  $handler->display->display_options['fields']['title_1']['relationship'] = 'field_grievance_company_target_id';
-  $handler->display->display_options['fields']['title_1']['label'] = 'Company';
-  $handler->display->display_options['fields']['title_1']['link_to_node'] = FALSE;
-  /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['relationship'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['fields']['title']['label'] = 'Employer';
   $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
+  /* Field: Content: ID */
+  $handler->display->display_options['fields']['field_grievance_id']['id'] = 'field_grievance_id';
+  $handler->display->display_options['fields']['field_grievance_id']['table'] = 'field_data_field_grievance_id';
+  $handler->display->display_options['fields']['field_grievance_id']['field'] = 'field_grievance_id';
+  $handler->display->display_options['fields']['field_grievance_id']['relationship'] = 'field_grievance_target_id';
+  $handler->display->display_options['fields']['field_grievance_id']['label'] = 'Grievance ID';
   /* Field: Content: First Name */
   $handler->display->display_options['fields']['field_grievance_first_name']['id'] = 'field_grievance_first_name';
   $handler->display->display_options['fields']['field_grievance_first_name']['table'] = 'field_data_field_grievance_first_name';
@@ -4122,18 +4121,25 @@ function grievance_views_views_default_views() {
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Comments */
-  $handler->display->display_options['fields']['field_grievance_comments']['id'] = 'field_grievance_comments';
-  $handler->display->display_options['fields']['field_grievance_comments']['table'] = 'field_data_field_grievance_comments';
-  $handler->display->display_options['fields']['field_grievance_comments']['field'] = 'field_grievance_comments';
-  /* Field: Content: Check Number */
-  $handler->display->display_options['fields']['field_grievance_checkno']['id'] = 'field_grievance_checkno';
-  $handler->display->display_options['fields']['field_grievance_checkno']['table'] = 'field_data_field_grievance_checkno';
-  $handler->display->display_options['fields']['field_grievance_checkno']['field'] = 'field_grievance_checkno';
-  /* Sort criterion: Content: Grievance (field_grievance) */
-  $handler->display->display_options['sorts']['field_grievance_target_id']['id'] = 'field_grievance_target_id';
-  $handler->display->display_options['sorts']['field_grievance_target_id']['table'] = 'field_data_field_grievance';
-  $handler->display->display_options['sorts']['field_grievance_target_id']['field'] = 'field_grievance_target_id';
+  /* Sort criterion: Content: Date Received (field_grievance_date_1) */
+  $handler->display->display_options['sorts']['field_grievance_date_1_value']['id'] = 'field_grievance_date_1_value';
+  $handler->display->display_options['sorts']['field_grievance_date_1_value']['table'] = 'field_data_field_grievance_date_1';
+  $handler->display->display_options['sorts']['field_grievance_date_1_value']['field'] = 'field_grievance_date_1_value';
+  /* Sort criterion: Content: First Name (field_grievance_first_name) */
+  $handler->display->display_options['sorts']['field_grievance_first_name_value']['id'] = 'field_grievance_first_name_value';
+  $handler->display->display_options['sorts']['field_grievance_first_name_value']['table'] = 'field_data_field_grievance_first_name';
+  $handler->display->display_options['sorts']['field_grievance_first_name_value']['field'] = 'field_grievance_first_name_value';
+  $handler->display->display_options['sorts']['field_grievance_first_name_value']['relationship'] = 'field_grievance_shop_target_id';
+  /* Sort criterion: Content: Last Name (field_grievance_last_name) */
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['id'] = 'field_grievance_last_name_value';
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['table'] = 'field_data_field_grievance_last_name';
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['field'] = 'field_grievance_last_name_value';
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['relationship'] = 'field_grievance_target_id';
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
+  $handler->display->display_options['sorts']['title']['relationship'] = 'field_grievance_target_id';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -4231,14 +4237,13 @@ function grievance_views_views_default_views() {
     t('Shop'),
     t('Company'),
     t('Employer'),
+    t('Grievance ID'),
     t('First Name'),
     t('Last Name'),
     t('Classification'),
     t('Settlement Amount'),
     t('Amount Received'),
     t('Date Received'),
-    t('Comments'),
-    t('Check Number'),
     t('Page'),
   );
   $export['grievance_settlement_report'] = $view;
