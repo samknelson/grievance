@@ -105,7 +105,8 @@ function report_cache_form_submit($form, &$form_state) {
 	// Launch the batch processor.
   $batch = array(
     'operations' => $operations,
-		'finished' => 'report_cache_batch_finished'
+		'finished' => 'report_cache_batch_finished',
+		'progressive' => TRUE,
   );
 	
 	batch_set($batch);
