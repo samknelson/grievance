@@ -75,26 +75,28 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance settlement'),
 	);
 
+	// These will be obsolete any minute, as soon as Local 100 moves over to letters.
 	$node_tabs['grievance']['gform'] = array(
 		'title' => 'Forms',
 		'description' => '',
 		'callback' => 'grievance_node_tab_gform',
-		'permissions' => array('grievance user'),
+		'permissions' => array('grievance form'),
 	);
 
 	$node_tabs['grievance']['gform/gform'] = array(
 		'title' => 'Grievance Form',
 		'description' => '',
 		'callback' => 'grievance_node_tab_gform',
-		'permissions' => array('grievance user'),
+		'permissions' => array('grievance form'),
 	);
 
 	$node_tabs['grievance']['gform/arbitrationform'] = array(
 		'title' => 'Arbitration Prep Form',
 		'description' => '',
 		'callback' => 'grievance_node_tab_arbitrationform',
-		'permissions' => array('grievance arbitrationform'),
+		'permissions' => array('grievance form'),
 	);
+	
 
 	$node_tabs['grievance']['bundle'] = array(
 		'title' => 'Bundle',
@@ -423,6 +425,15 @@ function grievance_menu() {
 		'title' => 'Report: Average Time Between Statuses',
 		'description' => '',
 		'page callback' => 'grievance_report_average_time',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['grievance/report/spi-term'] = array(
+		'title' => 'Report: SPI and Term',
+		'description' => '',
+		'page callback' => 'grievance_report_spi_term',
 		'page arguments' => array(),
 		'access arguments' => array('grievance report'),
 		'type' => MENU_NORMAL_ITEM,

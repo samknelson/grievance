@@ -15,6 +15,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grie
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.arbitrationform.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.report_bytype.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.report_average_time.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.report_spi_term.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.report_year_summary.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.block.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance') . "/grievance.notify.inc";
@@ -440,6 +441,17 @@ function grievance_report_cache_info() {
     'pk_list_callback' => 'grievance_report_average_time_pks',
     'batch_callback' => 'grievance_report_average_time_batch',
   );
+
+  $items['grievance-report-spi-term'] = array(
+    'name' => t('SPI / Term Report'),
+    'description' => '',
+    'access' => 'grievance report',
+    'path' => 'grievance/report/spi-term',
+    'fields' => grievance_report_spi_term_fields(),
+    'pk_list_callback' => 'grievance_report_spi_term_pks',
+    'batch_callback' => 'grievance_report_spi_term_batch',
+  );
+
   return $items;
 }
 

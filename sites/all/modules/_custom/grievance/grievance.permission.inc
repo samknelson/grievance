@@ -40,7 +40,11 @@ function grievance_permission() {
     ),
     'grievance notification' => array(
     	'title' => t('Grievance Notification'),
-    	'description' => t('Permission to send notifications for a grievance.')
+    	'description' => t('DEPRECATED - Permission to use the Notification tab.')
+    ),
+    'grievance form' => array(
+        'title' => t('Grievance Form'),
+        'description' => t('DEPRECATED - Permission to use the Forms tab.')
     ),
     'grievance settlement' => array(
     	'title' => t('Grievance Settlements'),
