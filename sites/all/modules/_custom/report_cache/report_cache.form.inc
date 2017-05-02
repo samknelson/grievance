@@ -140,7 +140,7 @@ function report_cache_batch($pk, $values, $report_type_info, &$context) {
 
 	$context['message'] = t('Generating statement for: @pk', array('@pk' => $pk));
 
-	// $row = $batch_callback($pk, $values, $report_id, $report_action, $context);
+	$row = $batch_callback($pk, $values, $report_id, $report_action, $context);
 
 	if (!$row) {
 		return;

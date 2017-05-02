@@ -40,16 +40,28 @@ function grievance_report_spi_term_pks() {
 	$stmt = $query->execute();
 	if (!$stmt['node']) { return array(); }
 
-	return array_keys($stmt['node']);
+	return array_chunk(array_keys($stmt['node']), 100, TRUE);
 }
 
-function grievance_report_spi_term_batch($grievance_nid, $values, $report_id, $report_action, &$context) {
+function grievance_report_spi_term_batch($grievance_nids, $values, $report_id, $report_action, &$context) {
+	$rows = array(
+		'is_multiple' => TRUE,
+		'rows' => array(),
+	);
+	foreach ($grievance_nids as $grievance_nid) {
+		$row = grievance_report_spi_term_batch_nid($grievance_nid, $values, $report_id, $report_action, $context);
+		if ($row) {
+			$rows['rows'][$grievance_nid] = $row;
+		}
+	}
+	return $rows;
+}
+
+function grievance_report_spi_term_batch_nid($grievance_nid, $values, $report_id, $report_action, &$context) {
 	$grievance_node = node_load($grievance_nid);
 	$context['message'] = t('Generating statement for: @title', array('@title' => $grievance_node->title));
 
 	return array(
 		$grievance_node->field_grievance_id['und'][0]['value']
 	);
-
-	return NULL;
 }
