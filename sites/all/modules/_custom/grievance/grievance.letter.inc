@@ -69,17 +69,6 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 					}
 				}
 				$replacements[$original] = $html;
-				/*
-				if ($node->content['field_grievance_clauseref']['#items']) {
-					$html = '';
-					foreach ($data['node']->content['field_grievance_clauseref']['#items'] as $item) {
-						$clause_node = $item['entity'];
-						$title = 
-						$node->content['field_grievance_clauseref'][$delta]['#markup'] = $title;
-						++$delta;
-					}
-				}
-				*/
 			}
 
 			// Add "Arbitration Clause"
@@ -90,6 +79,31 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				}
 				if ($contract_tplt_node) {
 					$replacements[$original] = $contract_tplt_node->field_grievance_pullclause['und'][0]['value'];
+				}
+			}
+
+			// Add log date for status changes
+			if (preg_match('/^log\:/', $name)) {
+				list ($ignore, $status_name, $log_field) = explode(':', $name);
+				$status_terms = taxonomy_get_term_by_name($status_name, 'grievance_status');
+				if ($status_terms) {
+					$status_tids = array_keys($status_terms);
+					$status_tid = $status_tids[0];
+
+				  $query = new EntityFieldQuery();
+				  $query->entityCondition('entity_type', 'node');
+				  $query->entityCondition('bundle', 'grievance_log');
+				  $query->fieldCondition('field_grievance', 'target_id', $data['node']->nid);
+				  $query->fieldCondition('field_grievance_status', 'tid', $status_tid);
+				  $query->fieldOrderBy('field_grievance_status_date', 'value');
+				  $query->range(0,1);
+				  $stmt = $query->execute();
+				  if ($stmt['node']) {
+				  	$log_nids = array_keys($stmt['node']);
+				  	$log_nid = $log_nids[0];
+				  	$log_node = node_load($log_nid);
+				  	$replacements[$original] = date('m/d/Y', strtotime($log_node->field_grievance_status_date['und'][0]['value']));
+				  }
 				}
 			}
     }
