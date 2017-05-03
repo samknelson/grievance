@@ -147,6 +147,21 @@ function grievance_content_types_ds_field_settings_info() {
         'field_delimiter' => '',
       ),
     ),
+    'field_grievance_hire_date' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_grievance_date_1' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_grievance_alert_date' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
     'field_grievance_alert_waived' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -159,6 +174,11 @@ function grievance_content_types_ds_field_settings_info() {
         'ft' => array(
           'lb' => 'Grievance ID',
         ),
+      ),
+    ),
+    'field_grievance_date_2' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
       ),
     ),
   );
