@@ -27,7 +27,6 @@ function grievance_update_7001() {
  */
 
 function grievance_update_7002() {
-  $sql = 
   $sql .= "select node.nid ";
   $sql .= "from node ";
   $sql .= "left join field_data_field_grievance_status_date on (field_data_field_grievance_status_date.entity_type = 'node' and field_data_field_grievance_status_date.entity_id = node.nid) ";
@@ -45,6 +44,42 @@ function grievance_update_7002() {
     print "Updating log node $nid\n";
     $node = node_load($nid);
     $node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d', $node->created);
+    node_save($node);
+    entity_get_controller('node')->resetCache();
+  }
+}
+
+/**
+ * Move weight from the native DraggableViews handler into a standard Drupal field
+ */
+
+function grievance_update_7003() {
+  // First set all to 0
+  $sql = "select * from node where type in ('grievance_contract_clause', 'grievance_contract_section') ";
+  $sql .= "order by nid ";
+  $stmt = db_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    $nid = $hr['nid'];
+    $node = node_load($nid);
+    print "Initializing weight for $nid (" . $node->title . ")\n";
+    $node->field_grievance_weight['und'][0]['value'] = 0;
+    node_save($node);
+    entity_get_controller('node')->resetCache();
+  }
+
+
+  print "Updating weight...\n";
+  $sql = "select * from draggableviews_structure ";
+  $sql .= "where view_name in ('grievance_contract_clauses', 'grievance_contract_sections') ";
+  $sql .= "order by view_name, entity_id ";
+
+  $stmt = db_query($sql, array());
+
+  while ($hr = $stmt->fetchAssoc()) {
+    $nid = $hr['entity_id'];
+    $node = node_load($nid);
+    print "Updating weight for $nid (" . $node->title . ")\n";
+    $node->field_grievance_weight['und'][0]['value'] = $hr['weight'];
     node_save($node);
     entity_get_controller('node')->resetCache();
   }

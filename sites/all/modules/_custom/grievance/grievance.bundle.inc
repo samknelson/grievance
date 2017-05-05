@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @todo: bundle functionality is incomplete at this time.
- */
-
-
 function grievance_node_tab_bundle_download($grievance_node) {
 	// Path to the bundled file
 	$bundled_file = grievance_bundle_working_directory($grievance_node) . '/bundled_' . $grievance_node->nid . '.pdf';
@@ -71,6 +66,9 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
 		$options = array();
 		foreach ($attachment_nodes as $attachment_node) {
 			$options[$attachment_node->nid] = $attachment_node->title;
+			if ($attachment_node->field_grievance_label['und'][0]['value']) {
+				$options[$attachment_node->nid] .= ' (' . $attachment_node->field_grievance_label['und'][0]['value'] . ')';
+			}
 		}
 
 	  $form['attachment_nids'] = array(
@@ -262,7 +260,7 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		$uri = $tmp['uri'];
 		$extension = preg_replace('/[^a-z0-9_]/', '', strtolower(substr(strrchr($uri, '.'), 1)));
 
-		if ($extension != 'pdf') {
+		if ($extension != 'pdf' && $extension != 'txt' && $extension != 'htm' && $extension != 'html') {
 			drupal_set_message("The node <a href=\"/node/$target_nid\" target=\"_blank\">" . $target_node->title . "</a> has a non-PDF attachment which will not be included in the bundle.", 'warning');
 			continue;
 		}
@@ -270,6 +268,25 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		$dest = grievance_bundle_output_path($grievance_node, "node/$target_nid") . "_attachment_" . $delta . '.' . $extension;
 
 		file_unmanaged_copy($uri, $dest);
+
+		if ($extension == 'txt' || $extension == 'htm' || $extension == 'html') {
+			$txt_path = $dest;
+			$dest = grievance_bundle_output_path($grievance_node, "node/$target_nid") . "_attachment_" . $delta . '.' . 'pdf';
+
+			// Execute wkhtmltopdf
+			$cmd = '/usr/bin/xvfb-run -a ';
+			$cmd .= '--server-args="-screen 0 1024x768x24" ';
+			$cmd .= '/usr/local/bin/wkhtmltopdf ';
+			$cmd .= $wkhtmltopdfargs . ' ';
+			$cmd .= '--print-media-type ';
+			$cmd .= '-q ';
+			$cmd .= $txt_path;
+			$cmd .= ' ';
+			$cmd .= $dest;
+
+			exec($cmd);
+			unlink($txt_path);
+		}
 
 		if (!file_exists($dest)) {
 			continue;

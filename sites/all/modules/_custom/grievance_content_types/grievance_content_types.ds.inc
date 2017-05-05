@@ -522,11 +522,13 @@ function grievance_content_types_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'field_grievance_document_type',
-        1 => 'field_grievance_attachments',
+        1 => 'field_grievance_label',
+        2 => 'field_grievance_attachments',
       ),
     ),
     'fields' => array(
       'field_grievance_document_type' => 'ds_content',
+      'field_grievance_label' => 'ds_content',
       'field_grievance_attachments' => 'ds_content',
     ),
     'classes' => array(),

@@ -66,7 +66,7 @@ function grievance_mailattach_fetch() {
 			grievance_mailattach_fetch_reject($from_mail, "The subject of the email was not found.");
 			continue;
 		}
-		$grievance_id = $subject;
+		list ($grievance_id, $rest) = explode(':', $subject);
 		$grievance_id = preg_replace('/re\:?/i', '', $grievance_id);
 		$grievance_id = trim($grievance_id);
 		$grievance_id = preg_replace('/ .+/', '', $grievance_id);
@@ -110,12 +110,21 @@ function grievance_mailattach_fetch() {
 	  $attachment_node->promote = 0;
 	  $attachment_node->comment = 0;
 	  $attachment_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+	  if ($rest) {
+	  	$attachment_node->field_grievance_label['und'][0]['value'] = trim($rest);
+	  }
 	  if (variable_get('grievance_mailattach_type', '')) {
 	  	$attachment_node->field_grievance_document_type['und'][0]['tid'] = variable_get('grievance_mailattach_type', '');
 	  }
 	  $idx = 0;
 	  foreach ($attachments as $idx => &$attachment) {
-  		if (!$attachment['filename']) { $attachment['filename'] = "body-$idx.txt"; }
+  		if (!$attachment['filename']) {
+  			if ($idx == 0) {
+  				$attachment['filename'] = "body-$idx.txt";
+  			} else {
+  				$attachment['filename'] = "body-$idx.html";
+  			}
+  		}
       $file = file_save_data(
         $attachment['bindata'], 
         'private://grievance_attachments/' . $attachment['filename'],

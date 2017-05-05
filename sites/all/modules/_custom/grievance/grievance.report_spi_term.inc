@@ -67,6 +67,7 @@ function grievance_report_spi_term_batch_nid($grievance_nid, $lookups) {
 	// $context['message'] = t('Processing: @title', array('@title' => $grievance_node->title));
 
 	// Load all the violations
+	$found = FALSE;
 	foreach ($grievance_node->field_grievance_clauseref['und'] as $tmp) {
 		$clause_nid = $tmp['target_id'];
 		$clause = node_load($clause_nid);
