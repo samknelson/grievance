@@ -72,7 +72,7 @@ function grievance_update_7003() {
     entity_get_controller('node')->resetCache();
   }
   */
-  
+
   print "Updating weight...\n";
   $sql = "select * from draggableviews_structure ";
   $sql .= "where view_name in ('grievance_contract_clauses', 'grievance_contract_sections') ";
@@ -86,6 +86,7 @@ function grievance_update_7003() {
 
   foreach ($nids as $nid => $weight) {
     $node = node_load($nid);
+    if (!$node->title) { continue; }
     print "Updating weight for $nid (" . $node->title . ")\n";
     $node->field_grievance_weight['und'][0]['value'] = $weight;
     node_save($node);
