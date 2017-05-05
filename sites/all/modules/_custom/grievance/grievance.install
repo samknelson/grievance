@@ -58,8 +58,12 @@ function grievance_update_7003() {
   $sql = "select * from node where type in ('grievance_contract_clause', 'grievance_contract_section') ";
   $sql .= "order by nid ";
   $stmt = db_query($sql, array());
+  $nids = array();
   while ($hr = $stmt->fetchAssoc()) {
-    $nid = $hr['nid'];
+    $nids[] = $hr['nid'];
+  }
+
+  foreach ($nids as $nid) {
     $node = node_load($nid);
     print "Initializing weight for $nid (" . $node->title . ")\n";
     $node->field_grievance_weight['und'][0]['value'] = 0;
@@ -67,19 +71,21 @@ function grievance_update_7003() {
     entity_get_controller('node')->resetCache();
   }
 
-
   print "Updating weight...\n";
   $sql = "select * from draggableviews_structure ";
   $sql .= "where view_name in ('grievance_contract_clauses', 'grievance_contract_sections') ";
   $sql .= "order by view_name, entity_id ";
 
   $stmt = db_query($sql, array());
-
+  $nids = array();
   while ($hr = $stmt->fetchAssoc()) {
-    $nid = $hr['entity_id'];
+    $nids[$hr['entity_id']] = $hr['weight'];
+  }
+
+  foreach ($nids as $nid => $weight) {
     $node = node_load($nid);
     print "Updating weight for $nid (" . $node->title . ")\n";
-    $node->field_grievance_weight['und'][0]['value'] = $hr['weight'];
+    $node->field_grievance_weight['und'][0]['value'] = $weight;
     node_save($node);
     entity_get_controller('node')->resetCache();
   }
