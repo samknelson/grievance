@@ -55,7 +55,6 @@ function grievance_update_7002() {
 
 function grievance_update_7003() {
   // First set all to 0
-  /*
   $sql = "select * from node where type in ('grievance_contract_clause', 'grievance_contract_section') ";
   $sql .= "order by nid ";
   $stmt = db_query($sql, array());
@@ -71,7 +70,6 @@ function grievance_update_7003() {
     node_save($node);
     entity_get_controller('node')->resetCache();
   }
-  */
 
   print "Updating weight...\n";
   $sql = "select * from draggableviews_structure ";
