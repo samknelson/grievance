@@ -3570,7 +3570,59 @@ table.grievance-timeline tr.pending {
   white-space: -o-pre-wrap;    /* Opera 7 */
   word-wrap: break-word;       /* Internet Explorer 5.5+ */
   font-family: arial, helvetica, san-serif; /* Since Esther Dyer */
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
+
+.view-grievance-log hr,
+.view-grievance-log-all hr {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.view-grievance-log pre:empty,
+.view-grievance-log-all pre:empty {
+  display: none;
+}
+
+.view-grievance-log td,
+.view-grievance-log-all td {
+  padding-top: 6px;
+  padding-bottom: 0;
+}
+
+@media print {
+  .node-full .field-name-field-grievance-comments,
+  .view-grievance-log pre,
+  .view-grievance-log-all pre {
+    font-family: "Times New Roman", Times, serif;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
+  .view-grievance-log hr,
+  .view-grievance-log-all hr {
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  .view-grievance-log .views-field-edit-node, 
+  .view-grievance-log-all .views-field-edit-node {
+    display: none;
+  }
+
+  .unite-addlink,
+  .page-node-statuslog .unite-addlink {
+    display: none;
+  }
+
+  .view-grievance-log pre:empty,
+  .view-grievance-log-all pre:empty {
+    display: none;
+  }
+}
+
+
 
 
 .view-id-grievances_mine table caption {
