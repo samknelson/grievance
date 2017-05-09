@@ -22,7 +22,7 @@ function grievance_mine_expanded() {
 function grievance_mine_all() {
 	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
 	$display_name = variable_get('grievance_mine_view_display', 'page_1');
-  return views_embed_view($view_name, $display_name);
+  return views_embed_view($view_name, $display_name, NULL, 'show_warnings');
 }
 
 function grievance_mine_reminder_30() {
@@ -221,7 +221,9 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 					unset($view->result[$delta]);
 				}
 			}
-		} else {
+		}
+
+		if ($view->args[1] == 'show_warnings') {
 			foreach ($msgs as $msg) { drupal_set_message($msg, 'warning'); }
 		}
 	}

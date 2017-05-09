@@ -483,6 +483,17 @@ function grievance_menu() {
 		'type' => MENU_CALLBACK,
 	);
 
+
+  $items['grievance/modal/%node/log-add'] = array(
+    'title'            => 'Add Log Entry',
+    'page callback'    => 'grievance_log_modal_add',
+    'page arguments'   => array(2),
+    'access arguments' => array('grievance statuslog'),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
   return $items;
 }
 
@@ -561,4 +572,32 @@ function grievance_node_tab_get_addlink($content_type, $query, $prompt = NULL) {
 	$result .= "</div>";
 	
 	return $result;
+}
+
+/**
+ * Implments hook_modal_paths
+ */
+
+function grievance_modal_paths() {
+  $paths = array();
+
+  $paths['grievance/modal/%node/log-add'] = array(
+    'style' => 'grievance-modal-style',
+  );
+
+  return $paths;
+}
+
+function grievance_modal_styles() {
+  $styles = array();
+
+  $styles['grievance-modal-style'] = array(
+    'modalSize' => array(
+      'type' => 'fixed',
+      'width' => 500,
+      'height' => 300,
+    ),
+  );
+
+  return $styles;
 }

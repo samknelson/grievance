@@ -115,6 +115,9 @@ function grievance_block_timeleft() {
     $msg .= '[' . t('Grievance ID ') . '<strong>' . $grievance_node->field_grievance_id['und'][0]['value'] . '</strong>' . ']';
   }
 
+  // @todo
+  // $msg .= '&nbsp;[' . l("Add a Log Entry", 'grievance/modal/' . $grievance_node->nid . '/log-add') . ']';
+
   $class = "alert-box ";
 
   if ($need_alert) {
