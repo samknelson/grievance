@@ -3,9 +3,9 @@ description = Provides an easy to use automatic modal page API.
 core = 7.x
 dependencies[] = ctools
 
-; Information added by drupal.org packaging script on 2012-01-22
-version = "7.x-1.1"
+; Information added by drupal.org packaging script on 2013-09-30
+version = "7.x-1.1+1-dev"
 core = "7.x"
 project = "ctools_automodal"
-datestamp = "1327208138"
+datestamp = "1380568281"
 
