@@ -2566,7 +2566,7 @@ function grievance_content_types_field_default_field_instances() {
     'bundle' => 'grievance',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Admin data never displayed.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -11475,6 +11475,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Actor');
   t('Address');
   t('Address 2');
+  t('Admin data never displayed.');
   t('Alert Data');
   t('Amount Received');
   t('Annual?');
