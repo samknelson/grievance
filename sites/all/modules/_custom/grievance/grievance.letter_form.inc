@@ -50,28 +50,32 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	  }
 	}
 
-  // Get the delivery options, as a substitution variable
-	$delivery_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_delivery');
-	$delivery_terms = taxonomy_get_tree($delivery_vocabulary->vid);
-	$delivery_options = array(NULL => t('-- select --'));
-	foreach ($delivery_terms as $term) {
-		$delivery_options[$term->tid] = str_repeat('-', $term->depth) . $term->name;
+	if (user_access('grievance letter variable delivery')) {
+	  // Get the delivery options, as a substitution variable
+		$delivery_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_delivery');
+		$delivery_terms = taxonomy_get_tree($delivery_vocabulary->vid);
+		$delivery_options = array(NULL => t('-- select --'));
+		foreach ($delivery_terms as $term) {
+			$delivery_options[$term->tid] = str_repeat('-', $term->depth) . $term->name;
+		}
+	   $form['letter']['delivery_tid'] = array(
+	    '#type' => 'select',
+	    '#options' => $delivery_options,
+	    '#title' => t('Delivery'),
+	  );
 	}
-   $form['letter']['delivery_tid'] = array(
-    '#type' => 'select',
-    '#options' => $delivery_options,
-    '#title' => t('Delivery'),
-  );
 
-  // Letterhead
-  $form['letter']['letterhead'] = array(
-    '#type' => 'select',
-    '#options' => array(
-    	'no' => t('No Letterhead'),
-    	'yes' => t('Standard Letterhead'),
-    ),
-    '#title' => t('Letterhead'),
-  );
+	if (user_access('grievance letter variable letterhead')) {
+	  // Letterhead
+	  $form['letter']['letterhead'] = array(
+	    '#type' => 'select',
+	    '#options' => array(
+	    	'no' => t('No Letterhead'),
+	    	'yes' => t('Standard Letterhead'),
+	    ),
+	    '#title' => t('Letterhead'),
+	  );
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Recipients
