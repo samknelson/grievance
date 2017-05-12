@@ -3324,7 +3324,7 @@ function grievance_content_types_field_default_field_instances() {
         'settings' => array(
           'field_delimiter' => '',
         ),
-        'type' => 'email_default',
+        'type' => 'email_plain',
         'weight' => 37,
       ),
     ),
