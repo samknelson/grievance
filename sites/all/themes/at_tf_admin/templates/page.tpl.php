@@ -102,7 +102,9 @@
         <div class="content-inner">
 
           <?php print render($page['highlighted']); ?>
-          <?php print $messages; ?>
+          <div id="messages-wrapper">
+            <?php print $messages; ?>
+          </div>
           <?php print render($page['help']); ?>
 
           <?php if ($action_links): ?>
