@@ -3678,3 +3678,58 @@ table.grievance-timeline tr.pending {
   font-size: 125%;
   padding-bottom: 5px;
 }
+
+#modal-content div.messages {
+  padding: 0;
+  margin: 0;
+}
+
+#modal-content #messages div.messages {
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 50px;
+}
+
+#modal-content .form-type-date-popup .description {
+  display: none;
+}
+
+
+#modal-content div.form-item {
+  margin-top: 0;
+}
+
+div.ctools-modal-content .form-item label {
+  width: 100px;
+}
+
+div.ctools-modal-content .resizable-textarea {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+div.ctools-modal-content .form-checkboxes {
+  float: left;
+  clear: none;
+  padding-bottom: 10;
+}
+
+#modal-content .form-type-checkbox {
+  float: left;
+  width: auto;
+  padding-right: 10px;
+}
+
+.grievance-status-tools {
+  float: right;
+  font-size: 85%;
+  text-transform: uppercase;
+}
+
+.alert-box hr {
+  border: 0;
+  height: 1px;
+  background: #666;
+}
