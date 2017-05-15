@@ -352,6 +352,9 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     if (!user_access('grievance form id')) {
       $form['field_grievance_id']['#access'] = FALSE;
     }
+    if (!user_access('grievance form chapter')) {
+      $form['field_grievance_chapter']['#access'] = FALSE;
+    }
     if (!user_access('grievance form company contacts')) {
       $form['field_grievance_contact_selector']['#access'] = FALSE;
       $form['field_grievance_co_name']['#access'] = FALSE;

@@ -99,6 +99,13 @@ function grievance_block_timeleft() {
         '@interval' => $interval
       )
     );
+  } else {
+    $alert_msg = t(
+      'This grievance has status <strong>@status</strong>.',
+      array(
+        '@status' => $status_term->name,
+      )
+    );
   }
 
 
@@ -110,13 +117,8 @@ function grievance_block_timeleft() {
     $msg = $status_msg;
   }
 
-  if ($grievance_node->field_grievance_id['und'][0]['value']) {
-    if ($msg) { $msg .= ' '; }
-    $msg .= '[' . t('Grievance ID ') . '<strong>' . $grievance_node->field_grievance_id['und'][0]['value'] . '</strong>' . ']';
-  }
-
-  // @todo
-  // $msg .= '&nbsp;[' . l("Add a Log Entry", 'grievance/modal/' . $grievance_node->nid . '/log-add') . ']';
+  $msg .= '<span class="grievance-status-tools">' . t('ID #') . $grievance_node->field_grievance_id['und'][0]['value'];
+  $msg .= '&nbsp;/&nbsp;' . l("Quick log", 'grievance/modal/' . $grievance_node->nid . '/log-add') . '</span><br>';
 
   $class = "alert-box ";
 

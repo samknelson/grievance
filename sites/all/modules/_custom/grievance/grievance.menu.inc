@@ -595,9 +595,12 @@ function grievance_modal_styles() {
     'modalSize' => array(
       'type' => 'fixed',
       'width' => 500,
-      'height' => 300,
+      'height' => 350,
     ),
   );
 
   return $styles;
 }
+
+
+

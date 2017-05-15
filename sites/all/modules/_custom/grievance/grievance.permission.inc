@@ -127,6 +127,9 @@ function grievance_permission() {
     'grievance form id' => array(
         'title' => t('Grievance Form - Change Grievance ID'),
     ),
+    'grievance form chapter' => array(
+        'title' => t('Grievance Form - Change Chapter'),
+    ),
     'grievance letter variable delivery' => array(
         'title' => t('Grievance Letter - Change the Delivery drop-in variable'),
     ),

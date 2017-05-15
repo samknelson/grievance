@@ -570,4 +570,22 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       $form[$field_name]['#access'] = FALSE;
     }
   }
+
+  //
+  // Add some log timeline dates
+  //
+  /*
+  if ($form['field_grievance_assignee_notes']['#access']) {
+    $weight = $form['field_grievance_date_2']['#weight'] + 0.5;
+    $form['grievance_intake_log_a'] = array(
+      '#type' => 'date_popup',
+      '#weight' => $weight,
+      '#tree' => TRUE,
+      '#title' => t('I am a new date field.'),
+    );
+
+    $form['#groups']['group_grievance_form']->children[] = 'grievance_intake_log_a';
+    $form['#group_children']['grievance_intake_log_a'] = 'group_grievance_form';
+  }
+  */
 }

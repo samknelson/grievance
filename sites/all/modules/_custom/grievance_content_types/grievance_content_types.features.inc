@@ -48,6 +48,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'grievance_chapter' => array(
+      'name' => t('Grievance Chapter'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Chapter Name'),
+      'help' => '',
+    ),
     'grievance_company' => array(
       'name' => t('Grievance Company'),
       'base' => 'node_content',

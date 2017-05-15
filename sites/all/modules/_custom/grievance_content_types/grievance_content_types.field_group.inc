@@ -1033,6 +1033,7 @@ function grievance_content_types_field_group_info() {
       4 => 'field_grievance_violation',
       5 => 'field_grievance_clauseref',
       6 => 'field_grievance_broughtby',
+      7 => 'field_grievance_chapter',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -1361,7 +1362,8 @@ function grievance_content_types_field_group_info() {
       10 => 'field_grievance_classaction',
       11 => 'field_grievance_broughtby',
       12 => 'field_grievance_external_id',
-      13 => 'title',
+      13 => 'field_grievance_chapter',
+      14 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
