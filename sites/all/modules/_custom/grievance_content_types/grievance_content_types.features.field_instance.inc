@@ -6668,11 +6668,18 @@ function grievance_content_types_field_default_field_instances() {
     'settings' => array(
       'user_register_form' => FALSE,
     ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => 'term_reference_1',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => 'grievance_attachment_types',
+    ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'content_taxonomy_opt_groups' => FALSE,
+        'content_taxonomy_opt_groups' => 0,
       ),
       'type' => 'options_select',
       'weight' => 2,

@@ -22,3 +22,27 @@ function grievance_node_tab_attachments($node) {
   return $result;
 }
 
+function grievance_attachment_views_exposed_form_alter($form, &$form_state) {
+  if (isset($form['field_grievance_document_type_tid']['#options'])) {
+    foreach ($form['field_grievance_document_type_tid']['#options'] as $delta => $tmp) {
+      if ($delta === 'All') { continue; }
+      $tid = array_keys($tmp->option)[0];
+      $term = taxonomy_term_load($tid);
+      if ($term->field_grievance_can_attach['und'][0]['value'] != 'Yes') {
+        $to_erase[] = $delta;
+        unset($tmp->option[$tid]);
+      }
+    }
+
+    /*
+    $to_erase = array_reverse($to_erase);
+    foreach ($to_erase as $delta) {
+      drupal_set_message("Erasing: $delta");
+      unset($form['field_grievance_document_type_tid']['#options'][$delta]);
+    }
+
+    unset($form['field_grievance_document_type_tid']);
+    dpm($form['field_grievance_document_type_tid']['#options']);
+    */
+  }
+}
