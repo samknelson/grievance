@@ -412,6 +412,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['admin/config/grievance/intake-log'] = array(
+		'title' => 'Grievance Module - Intake Log',
+		'description' => t('Intake logging'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_log_intake_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['grievance/report/bytype'] = array(
 		'title' => 'Report: Count by Type',
 		'description' => '',

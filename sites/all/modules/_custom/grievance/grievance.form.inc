@@ -572,20 +572,28 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   }
 
   //
-  // Add some log timeline dates
+  // Add some log timeline dates to the intake form
   //
-  /*
-  if ($form['field_grievance_assignee_notes']['#access']) {
-    $weight = $form['field_grievance_date_2']['#weight'] + 0.5;
-    $form['grievance_intake_log_a'] = array(
-      '#type' => 'date_popup',
-      '#weight' => $weight,
-      '#tree' => TRUE,
-      '#title' => t('I am a new date field.'),
-    );
 
-    $form['#groups']['group_grievance_form']->children[] = 'grievance_intake_log_a';
-    $form['#group_children']['grievance_intake_log_a'] = 'group_grievance_form';
+  if (!$grievance_node->nid) {
+    for ($i=1; $i<=5; ++$i) {
+      $log_type_tid = variable_get("grievance_log_intake_${i}_type", '');
+      if (!$log_type_tid) { continue; }
+      $log_type_term = taxonomy_term_load($log_type_tid);
+
+      $weight = $form['field_grievance_date_2']['#weight'] + (0.1 * $i);
+      $form["grievance_intake_log_${i}"] = array(
+        '#type' => 'date_popup',
+        '#weight' => $weight,
+        '#tree' => TRUE,
+        '#title' => $log_type_term->name,
+        '#date_format'    => 'm/d/Y',
+        '#date_label_position'  => 'none',
+        '#prefix' => '<div class="form-item form-type-date-popup">',
+        '#suffix' => '</div>'
+      );
+      $form['#groups']['group_grievance_form']->children[] = "grievance_intake_log_${i}";
+      $form['#group_children']["grievance_intake_log_${i}"] = 'group_grievance_form';
+    }
   }
-  */
 }

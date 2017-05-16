@@ -128,6 +128,35 @@ function grievance_log_update($grievance_node, $op) {
     $log_node = node_submit($log_node); // Prepare node for saving
     node_save($log_node);
   }
+
+  //
+  // Log any intake dates
+  //
+
+  if ($op == 'insert') {
+    for ($i=1; $i<=5; ++$i) {
+      $log_type_tid = variable_get("grievance_log_intake_${i}_type", '');
+      if (!$log_type_tid) { continue; }
+      $log_type_term = taxonomy_term_load($log_type_tid);
+      $date = $grievance_node->{"grievance_intake_log_${i}"};
+      if (!$date) { continue; }
+
+      $log_node = new stdClass();
+      $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+      $log_node->title = $log_type_term->name;
+      $log_node->type = 'grievance_log';
+      node_object_prepare($log_node);
+      $log_node->language = LANGUAGE_NONE;
+      $log_node->uid = $user->uid; 
+      $log_node->status = 1;
+      $log_node->promote = 0;
+      $log_node->comment = 0;
+      $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
+      $log_node->field_grievance_status_date['und'][0]['value'] = $date;
+      $log_node = node_submit($log_node); // Prepare node for saving
+      node_save($log_node);
+    }
+  }
 }
 
 function grievance_log_notify_check($grievance_node) {
@@ -557,5 +586,23 @@ function grievance_log_node_form_alter(&$form, &$form_state, $form_id) {
     }
 
   }
+}
+
+function grievance_log_intake_admin() {
+  $form = array();
+
+  $options = array(NULL => t('- Select -'));
+  $options += taxonomy_allowed_values(field_info_field('field_grievance_log_type'));
+
+  for ($i=1; $i<=5; ++$i) {
+    $form["grievance_log_intake_${i}_type"] = array(
+      '#type' => 'select',
+      '#options' => $options,
+      '#title' => t("Intake Log Type $i"),
+      '#default_value' => variable_get("grievance_log_intake_${i}_type", ''),
+    );
+  }
+
+  return system_settings_form($form);
 }
 
