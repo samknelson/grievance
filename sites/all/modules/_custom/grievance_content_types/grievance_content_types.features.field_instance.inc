@@ -11387,12 +11387,16 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'taxonomy_term-grievance_document_types-field_grievance_can_ir'.
-  $field_instances['taxonomy_term-grievance_document_types-field_grievance_can_ir'] = array(
+  // 'taxonomy_term-grievance_document_types-field_grievance_can_attach'.
+  $field_instances['taxonomy_term-grievance_document_types-field_grievance_can_attach'] = array(
     'bundle' => 'grievance_document_types',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => 'Yes',
+      ),
+    ),
     'deleted' => 0,
-    'description' => 'Select "Yes" if this document type should appear as an "Information Request" option.',
+    'description' => 'Is this an "attachment", meaning that it can be used as an attachment type for the grievance?',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -11401,7 +11405,44 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 0,
+        'weight' => 2,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_can_attach',
+    'label' => 'Attachment?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-grievance_document_types-field_grievance_can_ir'.
+  $field_instances['taxonomy_term-grievance_document_types-field_grievance_can_ir'] = array(
+    'bundle' => 'grievance_document_types',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Select "Yes" if this document type should appear as an "Information Request" option.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -11419,7 +11460,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -11432,13 +11473,13 @@ function grievance_content_types_field_default_field_instances() {
     'description' => 'If the company should see a longer or more descriptive name, enter it here.  (I.e. the name might be "Guest Complaints" and the employer name might be " Guest complaints (with complete mailing and/or email address and phone number)").  This longer name will be used on information requests and grievance forms sent to the company.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 0,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -11458,7 +11499,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textarea',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -11819,6 +11860,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Assignee Notes');
   t('Attachment');
   t('Attachment Type');
+  t('Attachment?');
   t('Attachments');
   t('Body');
   t('Brought By');
@@ -11905,6 +11947,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Information Request');
   t('Information Request?');
   t('Is this a "dummy" or "placeholder" section?  This field should be left blank or set to "No" except for automatically-generated placeholder sections created when the article itself is meant to be selectable.');
+  t('Is this an "attachment", meaning that it can be used as an attachment type for the grievance?');
   t('Is this status considered "Un-Resolved"?  Only unresolved grievances are displayed on the "my grievances" list.');
   t('Label');
   t('Labor charges or other relevant shop issues');

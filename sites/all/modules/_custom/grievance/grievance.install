@@ -92,3 +92,21 @@ function grievance_update_7003() {
   }
 }
 
+/**
+ * Set default values for all document types
+ */
+
+function grievance_update_7004() {
+  print "Setting default values for all document types\n";
+  $vocabulary = taxonomy_vocabulary_machine_name_load('grievance_document_types');
+  $terms = taxonomy_get_tree($vocabulary->vid);
+  foreach ($terms as $term) {
+    $tid = $term->tid;
+    $term_full = taxonomy_term_load($tid);
+    if (!$term_full->field_grievance_can_attach['und'][0]['value']) {
+      $term_full->field_grievance_can_attach['und'][0]['value'] = 'Yes';
+      taxonomy_term_save($term_full);
+      print "Saved " . $term_full->name . "\n";
+    }
+  }
+}
