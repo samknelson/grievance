@@ -3733,3 +3733,12 @@ div.ctools-modal-content .form-checkboxes {
   height: 1px;
   background: #666;
 }
+
+
+fieldset.date-combo .container-inline-date .date-padding {
+  padding: 0;
+}
+
+.form-type-date-popup .date-padding .description {
+  display: none;
+}
