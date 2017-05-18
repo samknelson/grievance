@@ -118,7 +118,7 @@ function grievance_block_timeleft() {
   }
 
   $msg .= '<span class="grievance-status-tools">' . t('ID #') . $grievance_node->field_grievance_id['und'][0]['value'];
-  $msg .= '&nbsp;/&nbsp;' . l("Quick log", 'grievance/modal/' . $grievance_node->nid . '/log-add') . '</span><br>';
+  $msg .= '&nbsp;/&nbsp;' . l("Quick log", 'grievance/modal/' . $grievance_node->nid . '/log-add') . '</span><br clear="right">';
 
   $class = "alert-box ";
 
