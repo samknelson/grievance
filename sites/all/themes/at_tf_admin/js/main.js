@@ -51,7 +51,9 @@
 	    });
 
 	    $('.grievance_fax_recipient_dropdown').once().change(function () {
-	    	$('.grievance_fax_recipient').val($(this).val());
+	    	tmp = $(this).val();
+	    	number = tmp.substring(tmp.indexOf('|')+1);
+	    	$('.grievance_fax_recipient').val(number);
 	    });
 
 			// Hide and show contacts as needed
