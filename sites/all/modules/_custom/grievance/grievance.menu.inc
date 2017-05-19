@@ -503,6 +503,14 @@ function grievance_menu() {
     'modal'            => TRUE,
   );
 
+	$items['grievance/autocomplete/grievance-job-class-tid/%'] = array(
+		'page callback' => 'grievance_autocompete_job_class_tid',
+		'page arguments' => array(3),
+		'access arguments' => array('grievance user'),
+		'type' => MENU_CALLBACK,
+	);
+
+
   return $items;
 }
 
