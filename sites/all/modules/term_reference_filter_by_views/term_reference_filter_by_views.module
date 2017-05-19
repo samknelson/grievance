@@ -1,8 +1,15 @@
 <?php
+
+// SKN I've hacked this module slightly
+function term_reference_filter_by_views_update_projects_alter(&$projects){
+  unset($projects['term_reference_filter_by_views']);
+}
+
 /**
  * Implements hook_menu().
  */
 function term_reference_filter_by_views_menu() {
+
   $items['term_reference_filter_by_views/autocomplete/%/%/%'] = array(
     'title' => 'Autocomplete taxonomy',
     'page callback' => 'term_reference_filter_by_views_taxonomy_autocomplete',
@@ -62,6 +69,10 @@ function term_reference_filter_by_views_field_widget_form_alter(&$element, &$for
           $element['tid']['#element_validate'] = array('_term_reference_autocomplete_validate');
           $element['tid']['#autocomplete_path'] = 'term_reference_filter_by_views/autocomplete/' . $element['tid']['#field_name'] . '/' . $context['instance']['entity_type']. '/' . $context['instance']['bundle'] . '/';
         }
+
+        // SKN: Added hook to alter autocomplete path
+        drupal_alter('term_reference_filter_by_views_autocomplete', $element, $context);
+
       }
       // for Widgets that uses Autocomplete Deluxe
       elseif (isset($element['#autocomplete_deluxe_path']) && module_exists('autocomplete_deluxe')) {
@@ -324,6 +335,13 @@ function _get_view_results_for_term_reference_field($field, $instance, $match = 
   $view->display_handler->set_option('term_reference_options', $term_reference_options);
   // Get the results.
   $result = $view->execute_display($display_name, $args);
+
+  /*
+  // SKN: Added hook to alter view result
+  $context = array('field' => $field, 'instance' => $instance, 'match' => $match);
+  drupal_alter('term_reference_filter_by_views_results', $result, $context);
+  */
+
   return $result;
 }
 
