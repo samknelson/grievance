@@ -322,10 +322,14 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	$fax_recipients = grievance_notify_company_contacts($shop_nid, $status_tid);
 	$found = FALSE;
 	$fax_options = array(NULL => t('[select]'));
+	$delta = 0;
 	foreach ($fax_recipients as $recipient) {
 		if ($recipient['fax']) {
+			++$delta;
+			$key = "$delta|" . $recipient['fax'];
 			$found = TRUE;
-			$fax_options[$recipient['fax']] = $recipient['fax'] . ': ' . $recipient['name'] . ' (' . $recipient['role'] . ')';
+			$fax_options[$key] = $recipient['fax'] . ': ' . $recipient['name'];
+			if ($recipient['role']) { $fax_options[$key] .= ' (' . $recipient['role'] . ')'; }
 		}
 	}
 	if ($found) {
