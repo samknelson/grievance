@@ -137,20 +137,29 @@ function grievance_block_timeleft() {
 
   $msg = "<div class=\"$class\">$msg</div>";
 
-  $prior_content = views_embed_view('grievance_prior_grievances', 'block', $grievance_node->field_grievance_min['und'][0]['value'], $grievance_node->nid);
-  $probe = trim(strip_tags($prior_content));
-  if ($probe) {
-    drupal_add_js('misc/form.js');
-    drupal_add_js('misc/collapse.js');
+  // 
+  // Prior grievances by this member
+  // - Don't show for "General Grievances"
+  // - Don't show if "member ID" is missing
+  //
 
-    $msg .= '<fieldset class="collapsible collapsed">';
-    $msg .= '<legend><span class="fieldset-legend">';
-    $msg .= t('Other grievances by this employee');
-    $msg .= '</span></legend>';
-    $msg .= '<div class="fieldset-wrapper">';
-    $msg .= $prior_content;
-    $msg .= '</div>';
-    $msg .= '</fieldset>';
+  if ($grievance_node->field_grievance_classaction['und'][0]['value'] != 'Yes' && 
+      $grievance_node->field_grievance_min['und'][0]['value']) {
+    $prior_content = views_embed_view('grievance_prior_grievances', 'block', $grievance_node->field_grievance_min['und'][0]['value'], $grievance_node->nid);
+    $probe = trim(strip_tags($prior_content));
+    if ($probe) {
+      drupal_add_js('misc/form.js');
+      drupal_add_js('misc/collapse.js');
+
+      $msg .= '<fieldset class="collapsible collapsed">';
+      $msg .= '<legend><span class="fieldset-legend">';
+      $msg .= t('Other grievances by this employee');
+      $msg .= '</span></legend>';
+      $msg .= '<div class="fieldset-wrapper">';
+      $msg .= $prior_content;
+      $msg .= '</div>';
+      $msg .= '</fieldset>';
+    }
   }
 
   return $msg;
