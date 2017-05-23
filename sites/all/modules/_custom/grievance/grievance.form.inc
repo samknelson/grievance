@@ -432,6 +432,11 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   //
 
   if ($contract_tplt_node) { 
+    //
+    // Disable classifications based on the contract template.
+    // (I think this code is not used, because we're doing it by ajax.)
+    //
+
     $map = array('_none' => TRUE);
     $to_disable = array();
     if ($contract_tplt_node->field_grievance_classifications['und']) {
@@ -449,6 +454,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       unset($form['field_grievance_class_tid']['und']['#options'][$tid]);
     }
 
+    //
+    // Disable departments based on the contract template.
+    //
+
     $map = array('_none' => TRUE);
     $to_disable = array();
     if ($contract_tplt_node->field_grievance_departments['und']) {
@@ -464,6 +473,14 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     foreach ($to_disable as $tid) {
       unset($form['field_grievance_department_tid']['und']['#options'][$tid]);
     }
+
+    // 
+    // Disable departments based on the classification.
+    // @TODO may be unnecessary to trigger a form rebuild at this point.  need to discuss
+    // 
+
+    //$classification_tid = grievance_form_current_value('field_grievance_class_tid', 'tid', $form, $form_state); 
+    //drupal_set_message("Here with $classification_tid");
   }
 
   //

@@ -78,6 +78,33 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
 	  );
 	}
 
+	// Which logged attachments to include?
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  $query->fieldCondition('field_grievance_attachments', 'fid', 0, '>');
+	$stmt = $query->execute();
+	if ($stmt['node']) {
+		$log_nodes = node_load_multiple(array_keys($stmt['node']));
+		$options = array();
+		foreach ($log_nodes as $log_node) {
+			$log_node_type_tid = $log_node->field_grievance_log_type['und'][0]['tid'];
+			if (!$log_node_type_tid) { continue; }
+			$log_node_type_term = taxonomy_term_load($log_node_type_tid);
+			$options[$log_node->nid] = 
+				$log_node->title . 
+				' / ' . $log_node_type_term->name . 
+				' (' . date('m/d/Y', strtotime($log_node->field_grievance_status_date['und'][0]['value'])) . ')';
+		}
+
+	  $form['log_nids'] = array(
+	    '#type' => 'checkboxes',
+	    '#title' => t('Logged Attachments to Include'),
+	    '#options' => $options,
+	  );
+	}
+
 	// What else to include?
   $form['other_include'] = array(
     '#type' => 'checkboxes',
@@ -121,7 +148,7 @@ function grievance_bundle_form_submit($form, &$form_state) {
 	}
 
 	// Add all the nodes that reference the grievance
-	$entity_bundles = array('grievance_attachment');
+	$entity_bundles = array('grievance_attachment', 'grievance_log');
 	if ($form_state['values']['other_include']['statuslog']) {
 		$entity_bundles[] = 'grievance_log';
 	}
@@ -139,6 +166,11 @@ function grievance_bundle_form_submit($form, &$form_state) {
 			foreach ($tmp as $sub_nid) {
 				// Only include the checked attachments
 				if ($entity_bundle == 'grievance_attachment' && !$form_state['values']['attachment_nids'][$sub_nid]) {
+					continue;
+				}
+
+				// Only include the checked log entries
+				if ($entity_bundle == 'grievance_log' &&  !$form_state['values']['log_nids'][$sub_nid]) {
 					continue;
 				}
 
