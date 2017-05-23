@@ -218,6 +218,9 @@ function grievance_bundle_form_submit($form, &$form_state) {
 		}
 	}
 
+	dpm($operations);
+	return;
+
 	// Launch the batch processor.
   $batch = array(
     'operations' => $operations,
@@ -281,7 +284,7 @@ function grievance_bundle_batch_add($grievance_node, $drupal_path, &$context) {
 }
 
 function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$context) {
-	$context['message'] = t('Adding attachments: @path', array('@path' => $drupal_path)); 
+	$context['message'] = t('Adding attachments: @target_nid', array('@target_nid' => $target_nid)); 
 	drupal_set_message($context['message']);
 
 	$target_node = node_load($target_nid);
