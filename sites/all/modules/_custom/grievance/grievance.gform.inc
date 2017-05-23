@@ -232,5 +232,106 @@ function  grievance_node_view($node, $view_mode, $langcode) {
 				++$delta;
 			}
 		}
+
+		if ($node->content['grievance_timeline_short'][0]) {
+			$node->content['grievance_timeline_short'][0]['#markup'] = grievance_timeline_short($node);
+		}
 	}
+}
+
+function grievance_timeline_short($grievance_node) {
+	// Get a list of log types to show on the timeline
+  $log_type_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_log_types');
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'taxonomy_term');
+  $query->propertyCondition('vid', $log_type_vocabulary->vid);
+ 	$query->fieldCondition('field_grievance_timeline_show', $value, 'Yes');
+  $stmt = $query->execute();
+  $log_type_tids = array();
+  if ($stmt['taxonomy_term']) {
+  	$log_type_tids = array_keys($stmt['taxonomy_term']);
+  }
+  $log_type_terms = taxonomy_term_load_multiple($log_type_tids);
+
+	// Get a list of statuses to show on the timeline
+  $status_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_status');
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'taxonomy_term');
+  $query->propertyCondition('vid', $status_vocabulary->vid);
+ 	$query->fieldCondition('field_grievance_timeline_show', $value, 'Yes');
+  $stmt = $query->execute();
+  $status_tids = array();
+  if ($stmt['taxonomy_term']) {
+  	$status_tids = array_keys($stmt['taxonomy_term']);
+  }
+  $status_terms = taxonomy_term_load_multiple($status_tids);
+
+	// This will be our list of dates
+	$dates = array();
+
+	// Add the intake date
+	$dates['Intake'] = (integer) $grievance_node->created;
+
+	// Add the last modified date
+	$dates['Last Modified'] = (integer) $grievance_node->changed;
+
+	// Add the incident date and discipline date
+	if ($grievance_node->field_grievance_date_1['und'][0]['value']) {
+		$dates['Incident Date'] = strtotime($grievance_node->field_grievance_date_1['und'][0]['value']);
+	}
+	if ($grievance_node->field_grievance_date_2['und'][0]['value']) {
+		$dates['Discipline Date'] = strtotime($grievance_node->field_grievance_date_2['und'][0]['value']);
+	}
+
+	// Add any log entries of the right type
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_tids, 'in');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+  	$log_nodes = node_load_multiple(array_keys($stmt['node']));
+  	foreach ($log_nodes as $log_nid => $log_node) {
+  		$dates[$log_type_terms[$log_node->field_grievance_log_type['und'][0]['tid']]->name] = 
+  			strtotime($log_node->field_grievance_status_date['und'][0]['value']);
+  	}
+  }
+
+	// Add any "log status changed" entries of the right type.
+  $log_update_tids = array(
+    variable_get('grievance_log_insert_type', ''), 
+    variable_get('grievance_log_update_type_with_status_change', ''), 
+    variable_get('grievance_log_incident_type', '')
+  );
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+  	$log_nodes = node_load_multiple(array_keys($stmt['node']));
+  	foreach ($log_nodes as $log_nid => $log_node) {
+  		if (!$status_terms[$log_node->field_grievance_status['und'][0]['tid']]) { continue; }
+  		$dates[$status_terms[$log_node->field_grievance_status['und'][0]['tid']]->name] = 
+  			strtotime($log_node->field_grievance_status_date['und'][0]['value']);
+  	}
+  }
+
+	// Build our output
+	asort($dates);
+	$result = '';
+	foreach ($dates as $key => $ts) {
+		$result .= '<section class="field field-name-field-grievance-timeline-short field-label-inline clearfix view-mode-full">';
+		$result .= '<h2 class="field-label">';
+		$result .= $key;
+		$result .= ':&nbsp;</h2>';
+
+		$result .= '<div class="field-items"><div class="field-item even">';
+		$result .= date('m/d/Y', $ts);
+		$result .= '</span></div></div></section>';
+	}
+
+	return $result;
 }

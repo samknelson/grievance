@@ -2639,17 +2639,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'date',
-        'settings' => array(
-          'field_delimiter' => '',
-          'format_type' => 'date_only',
-          'fromto' => 'both',
-          'multiple_from' => '',
-          'multiple_number' => '',
-          'multiple_to' => '',
-          'show_remaining_days' => 0,
-        ),
-        'type' => 'date_default',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 4,
       ),
       'grievance_arbitrationform' => array(
@@ -2771,17 +2762,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'date',
-        'settings' => array(
-          'field_delimiter' => '',
-          'format_type' => 'date_only',
-          'fromto' => 'both',
-          'multiple_from' => '',
-          'multiple_number' => '',
-          'multiple_to' => '',
-          'show_remaining_days' => 0,
-        ),
-        'type' => 'date_default',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 5,
       ),
       'grievance_arbitrationform' => array(
@@ -4110,7 +4092,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 39,
+        'weight' => 40,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -5078,7 +5060,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 38,
+        'weight' => 39,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -5320,7 +5302,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 37,
+        'weight' => 38,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -11475,6 +11457,43 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_log_types-field_grievance_timeline_show'.
+  $field_instances['taxonomy_term-grievance_log_types-field_grievance_timeline_show'] = array(
+    'bundle' => 'grievance_log_types',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_timeline_show',
+    'label' => 'Show on Timeline?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_status-field_grievance_contract_tplts'.
   $field_instances['taxonomy_term-grievance_status-field_grievance_contract_tplts'] = array(
     'bundle' => 'grievance_status',
@@ -11745,13 +11764,13 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'taxonomy',
         'settings' => array(
           'field_delimiter' => '',
         ),
-        'type' => 'taxonomy_term_reference_link',
-        'weight' => 0,
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',

@@ -375,6 +375,10 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     grievance_attachment_views_exposed_form_alter($form, $form_state);
   }
 
+  // Clean up the taxonomy term form
+  if ($form_id == 'taxonomy_form_term') {
+    // dpm($form);
+  }
 
 }
 

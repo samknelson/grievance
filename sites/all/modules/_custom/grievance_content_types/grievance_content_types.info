@@ -419,6 +419,7 @@ features[field_instance][] = taxonomy_term-grievance_document_types-field_grieva
 features[field_instance][] = taxonomy_term-grievance_document_types-field_grievance_can_ir
 features[field_instance][] = taxonomy_term-grievance_document_types-field_grievance_emp_name
 features[field_instance][] = taxonomy_term-grievance_job_classification-field_grievance_departments
+features[field_instance][] = taxonomy_term-grievance_log_types-field_grievance_timeline_show
 features[field_instance][] = taxonomy_term-grievance_status-field_grievance_contract_tplts
 features[field_instance][] = taxonomy_term-grievance_status-field_grievance_notify_body
 features[field_instance][] = taxonomy_term-grievance_status-field_grievance_notify_subject
