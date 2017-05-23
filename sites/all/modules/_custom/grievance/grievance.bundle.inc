@@ -149,9 +149,7 @@ function grievance_bundle_form_submit($form, &$form_state) {
 
 	// Add all the nodes that reference the grievance
 	$entity_bundles = array('grievance_attachment', 'grievance_log');
-	if ($form_state['values']['other_include']['statuslog']) {
-		$entity_bundles[] = 'grievance_log';
-	}
+	$entity_bundles[] = 'grievance_log';
 	if ($form_state['values']['other_include']['settlements']) {
 		$entity_bundles[] = 'grievance_settlement';
 	}
