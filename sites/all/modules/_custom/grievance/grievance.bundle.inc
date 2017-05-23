@@ -328,15 +328,23 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 			continue;
 		}
 
+		drupal_set_message("Here with: " . file_exists($dest) . " for $dest.");
+		return;
+
 		$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 		$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
 
-		$cmd = '/usr/bin/pdfunite ';
 		if (file_exists($bundled_file)) {
+			$cmd = '/usr/bin/pdfunite ';
 			$cmd .= $bundled_file . ' ';		
+			$cmd .= $dest . ' ';
+			$cmd .= $tmp_file . ' ';
+		} else {
+			$cmd = '/bin/cp ';
+			$cmd .= $bundled_file . '.pdf ';
+			$cmd .= $tmp_file . ' ';
 		}
-		$cmd .= $dest . ' ';
-		$cmd .= $tmp_file . ' ';
+
 		watchdog('grievance_bundle', 'Executing: ' . $cmd);
 		exec($cmd);
 		drupal_set_message("Executing: $cmd");
