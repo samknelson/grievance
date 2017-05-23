@@ -363,7 +363,7 @@ function grievance_timeline_short($grievance_node) {
 		$result .= '<div class="field-items"><div class="field-item even">';
 		$result .= date('m/d/Y', $record['ts']);
 		if ($record['extra']) {
-			$result .= ' (' . $record['extra'] . ')';
+			// $result .= ' (' . $record['extra'] . ')';
 		}
 		$result .= '</span></div></div></section>';
 	}
