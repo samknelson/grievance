@@ -270,17 +270,33 @@ function grievance_timeline_short($grievance_node) {
 	$dates = array();
 
 	// Add the intake date
-	$dates['Intake'] = (integer) $grievance_node->created;
+	$dates[] = array(
+		'key' => 'Intake', 
+		'ts' => (integer) $grievance_node->created,
+		'extra' => 'Record created.',
+	);
 
 	// Add the last modified date
-	$dates['Last Modified'] = (integer) $grievance_node->changed;
+	$dates[] = array(
+		'key' => 'Last Modified', 
+		'ts' => (integer) $grievance_node->changed,
+		'extra' => 'Record last modified.',
+	);
 
 	// Add the incident date and discipline date
 	if ($grievance_node->field_grievance_date_1['und'][0]['value']) {
-		$dates['Incident Date'] = strtotime($grievance_node->field_grievance_date_1['und'][0]['value']);
+		$dates[] = array(
+			'key' => 'Incident',
+			'ts' => strtotime($grievance_node->field_grievance_date_1['und'][0]['value']),
+			'extra' => '"Incident" date entered in the record.'
+		);
 	}
 	if ($grievance_node->field_grievance_date_2['und'][0]['value']) {
-		$dates['Discipline Date'] = strtotime($grievance_node->field_grievance_date_2['und'][0]['value']);
+		$dates[] = array(
+			'key' => 'Discipline',
+			'ts' => strtotime($grievance_node->field_grievance_date_2['und'][0]['value']),
+			'extra' => '"Discipline" date entered in the record.'
+		);
 	}
 
 	// Add any log entries of the right type
@@ -293,8 +309,11 @@ function grievance_timeline_short($grievance_node) {
   if ($stmt['node']) {
   	$log_nodes = node_load_multiple(array_keys($stmt['node']));
   	foreach ($log_nodes as $log_nid => $log_node) {
-  		$dates[$log_type_terms[$log_node->field_grievance_log_type['und'][0]['tid']]->name] = 
-  			strtotime($log_node->field_grievance_status_date['und'][0]['value']);
+			$dates[] = array(
+				'key' => $log_type_terms[$log_node->field_grievance_log_type['und'][0]['tid']]->name,
+				'ts' => strtotime($log_node->field_grievance_status_date['und'][0]['value']),
+				'extra' => 'Log entry',
+			);
   	}
   }
 
@@ -314,22 +333,38 @@ function grievance_timeline_short($grievance_node) {
   	$log_nodes = node_load_multiple(array_keys($stmt['node']));
   	foreach ($log_nodes as $log_nid => $log_node) {
   		if (!$status_terms[$log_node->field_grievance_status['und'][0]['tid']]) { continue; }
-  		$dates[$status_terms[$log_node->field_grievance_status['und'][0]['tid']]->name] = 
-  			strtotime($log_node->field_grievance_status_date['und'][0]['value']);
+			$dates[] = array(
+				'key' => $status_terms[$log_node->field_grievance_status['und'][0]['tid']]->name,
+				'ts' => strtotime($log_node->field_grievance_status_date['und'][0]['value']),
+				'extra' => 'Status change'
+			);
   	}
   }
 
+  // Sort
+  usort(
+  	$dates, 
+  	function($a, $b) { 
+  		if ($a['ts'] < $b['ts']) { return -1; }
+  		if ($a['ts'] > $b['ts']) { return 1; }
+  		return 0;
+  	}
+  );
+
 	// Build our output
-	asort($dates);
+	// asort($dates);
 	$result = '';
-	foreach ($dates as $key => $ts) {
+	foreach ($dates as $record) {
 		$result .= '<section class="field field-name-field-grievance-timeline-short field-label-inline clearfix view-mode-full">';
 		$result .= '<h2 class="field-label">';
-		$result .= $key;
+		$result .= $record['key'];
 		$result .= ':&nbsp;</h2>';
 
 		$result .= '<div class="field-items"><div class="field-item even">';
-		$result .= date('m/d/Y', $ts);
+		$result .= date('m/d/Y', $record['ts']);
+		if ($record['extra']) {
+			$result .= ' (' . $record['extra'] . ')';
+		}
 		$result .= '</span></div></div></section>';
 	}
 
