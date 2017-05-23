@@ -324,6 +324,7 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		}
 
 		if (!file_exists($dest)) {
+			drupal_set_message("Why no $dest?");
 			continue;
 		}
 
@@ -340,7 +341,7 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		exec($cmd);
 
 		unlink($bundled_file);
-		unlink($dest);
+		// unlink($dest);
 
 		$cmd = "mv $tmp_file $bundled_file";
 		watchdog('grievance_bundle', 'Executing: ' . $cmd);
