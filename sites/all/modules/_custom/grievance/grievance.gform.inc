@@ -293,7 +293,7 @@ function grievance_timeline_short($grievance_node) {
   if ($stmt['node']) {
   	$log_nodes = node_load_multiple(array_keys($stmt['node']));
   	foreach ($log_nodes as $log_nid => $log_node) {
-  		$dates['Log Entry: ' . $log_type_terms[$log_node->field_grievance_log_type['und'][0]['tid']]->name] = 
+  		$dates[$log_type_terms[$log_node->field_grievance_log_type['und'][0]['tid']]->name] = 
   			strtotime($log_node->field_grievance_status_date['und'][0]['value']);
   	}
   }
@@ -314,7 +314,7 @@ function grievance_timeline_short($grievance_node) {
   	$log_nodes = node_load_multiple(array_keys($stmt['node']));
   	foreach ($log_nodes as $log_nid => $log_node) {
   		if (!$status_terms[$log_node->field_grievance_status['und'][0]['tid']]) { continue; }
-  		$dates['Status Change: ' . $status_terms[$log_node->field_grievance_status['und'][0]['tid']]->name] = 
+  		$dates[$status_terms[$log_node->field_grievance_status['und'][0]['tid']]->name] = 
   			strtotime($log_node->field_grievance_status_date['und'][0]['value']);
   	}
   }
