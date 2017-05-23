@@ -474,6 +474,24 @@ function grievance_content_types_ds_custom_fields_info() {
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
+  $ds_field->field = 'grievance_timeline_short';
+  $ds_field->label = 'Timeline';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<!-- replace me -->',
+      'format' => 'full_html',
+    ),
+    'use_token' => 0,
+  );
+  $export['grievance_timeline_short'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
   $ds_field->field = 'grievant_name';
   $ds_field->label = 'Grievant Name';
   $ds_field->field_type = 5;
