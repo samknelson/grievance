@@ -338,7 +338,7 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 			$cmd .= $tmp_file . ' ';
 		} else {
 			$cmd = '/bin/cp ';
-			$cmd .= $dest . '.pdf ';
+			$cmd .= $dest . ' ';
 			$cmd .= $tmp_file . ' ';
 		}
 
