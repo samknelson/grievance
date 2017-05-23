@@ -255,6 +255,7 @@ function grievance_bundle_batch_cleanup($grievance_node, $drupal_path, &$context
 
 function grievance_bundle_batch_add($grievance_node, $drupal_path, &$context) {
 	$context['message'] = t('Adding to bundle: @path', array('@path' => $drupal_path)); 
+	drupal_set_message($context['message']);
 
 	$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 	$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
@@ -281,6 +282,7 @@ function grievance_bundle_batch_add($grievance_node, $drupal_path, &$context) {
 
 function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$context) {
 	$context['message'] = t('Adding attachments: @path', array('@path' => $drupal_path)); 
+	drupal_set_message($context['message']);
 
 	$target_node = node_load($target_nid);
 	if (!$target_node) { return; }
