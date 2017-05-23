@@ -3440,6 +3440,10 @@ table.grievance-timeline tr.pending {
     font-size: 12pt;
     font-family: "Times New Roman", Times, serif;
   }
+  #grievance-letter-body {
+    padding-left: 5mm;
+    padding-right: 5mm;
+  }
   div.grievance-letter-page-break {
     page-break-after: always;
   }
