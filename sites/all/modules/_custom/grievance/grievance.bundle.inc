@@ -181,6 +181,8 @@ function grievance_bundle_form_submit($form, &$form_state) {
 			}
 		}
 	}
+	dpm($paths_to_bundle);
+	return;
 
 	// Init
 	$operations = array();
