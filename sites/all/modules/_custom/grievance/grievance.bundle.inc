@@ -298,6 +298,7 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		}
 
 		$dest = grievance_bundle_output_path($grievance_node, "node/$target_nid") . "_attachment_" . $delta . '.' . $extension;
+		drupal_set_message("Here with $delta, $dest");
 
 		file_unmanaged_copy($uri, $dest);
 
