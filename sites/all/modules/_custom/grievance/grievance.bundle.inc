@@ -255,7 +255,6 @@ function grievance_bundle_batch_cleanup($grievance_node, $drupal_path, &$context
 
 function grievance_bundle_batch_add($grievance_node, $drupal_path, &$context) {
 	$context['message'] = t('Adding to bundle: @path', array('@path' => $drupal_path)); 
-	drupal_set_message($context['message']);
 
 	$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 	$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
@@ -282,7 +281,6 @@ function grievance_bundle_batch_add($grievance_node, $drupal_path, &$context) {
 
 function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$context) {
 	$context['message'] = t('Adding attachments: @target_nid', array('@target_nid' => $target_nid)); 
-	drupal_set_message($context['message']);
 
 	$target_node = node_load($target_nid);
 	if (!$target_node) { return; }
@@ -298,11 +296,8 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		}
 
 		$dest = grievance_bundle_output_path($grievance_node, "node/$target_nid") . "_attachment_" . $delta . '.' . $extension;
-		drupal_set_message("Here with $delta, $uri");
 
 		file_unmanaged_copy($uri, $dest);
-
-		drupal_set_message("Copied to $dest.");
 
 		if ($extension == 'txt' || $extension == 'htm' || $extension == 'html') {
 			$txt_path = $dest;
@@ -324,7 +319,6 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		}
 
 		if (!file_exists($dest)) {
-			drupal_set_message("Why no $dest?");
 			continue;
 		}
 
@@ -344,15 +338,13 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 
 		watchdog('grievance_bundle', 'Executing: ' . $cmd);
 		exec($cmd);
-		drupal_set_message("Executing: $cmd");
 
 		unlink($bundled_file);
-		// unlink($dest);
+		unlink($dest);
 
 		$cmd = "mv $tmp_file $bundled_file";
 		watchdog('grievance_bundle', 'Executing: ' . $cmd);
 		exec($cmd);
-		drupal_set_message("Executing: $cmd");
 	}
 }
 
