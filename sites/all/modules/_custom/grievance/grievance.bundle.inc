@@ -328,9 +328,6 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 			continue;
 		}
 
-		drupal_set_message("Here with: " . file_exists($dest) . " for $dest.");
-		return;
-
 		$bundled_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '.pdf';
 		$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
 
