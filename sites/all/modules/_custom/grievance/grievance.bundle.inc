@@ -218,9 +218,6 @@ function grievance_bundle_form_submit($form, &$form_state) {
 		}
 	}
 
-	dpm($operations);
-	return;
-
 	// Launch the batch processor.
   $batch = array(
     'operations' => $operations,
