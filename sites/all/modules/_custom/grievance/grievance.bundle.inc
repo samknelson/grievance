@@ -339,6 +339,7 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		$cmd .= $tmp_file . ' ';
 		watchdog('grievance_bundle', 'Executing: ' . $cmd);
 		exec($cmd);
+		drupal_set_message("Executing: $cmd");
 
 		unlink($bundled_file);
 		// unlink($dest);
