@@ -302,6 +302,8 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 
 		file_unmanaged_copy($uri, $dest);
 
+		drupal_set_message("Copied to $dest.");
+
 		if ($extension == 'txt' || $extension == 'htm' || $extension == 'html') {
 			$txt_path = $dest;
 			$dest = grievance_bundle_output_path($grievance_node, "node/$target_nid") . "_attachment_" . $delta . '.' . 'pdf';
