@@ -3746,3 +3746,42 @@ fieldset.date-combo .container-inline-date .date-padding {
 .form-type-date-popup .date-padding .description {
   display: none;
 }
+
+.page-grievance-report-open td.views-field-field-grievance-shop, 
+.page-grievance-report-open th.views-field-field-grievance-shop { 
+  width: 20%;
+}
+
+.page-grievance-report-open td.views-field-field-grievance-id, 
+.page-grievance-report-open th.views-field-field-grievance-id { 
+  width: 7%;
+}
+
+.page-grievance-report-open td.views-field-field-grievance-first-name, 
+.page-grievance-report-open th.views-field-field-grievance-first-name,
+.page-grievance-report-open td.views-field-field-grievance-last-name, 
+.page-grievance-report-open th.views-field-field-grievance-last-name { 
+  width: 10%;
+}
+
+.page-grievance-report-open td.views-field-created, 
+.page-grievance-report-open th.views-field-created { 
+  width: 12%;
+}
+
+.page-grievance-report-open td.views-field-field-grievance-class-tid, 
+.page-grievance-report-open th.views-field-field-grievance-class-tid { 
+  width: 15%;
+}
+
+.page-grievance-report-open td.views-field-field-grievance-clauseref, 
+.page-grievance-report-open th.views-field-field-grievance-clauseref { 
+  width: 27%;
+}
+
+@media print {
+  .page-grievance-report-open .form-start { 
+    display: none;
+  }
+}
+
