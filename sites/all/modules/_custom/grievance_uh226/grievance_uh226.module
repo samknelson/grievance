@@ -6,6 +6,25 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1.inc";
 
+/**
+ * implements hook_node_view()
+ * 
+ * Silly function to hide comments from the print view if they have 
+ * the word "Array" in them.
+ */
+
+function grievance_uh226_node_view($node, $view_mode, $langcode) {
+  if ($node->type != 'grievance') { return; }
+  if (!isset($node->field_grievance_comments)) { return; }
+  if (!isset($node->field_grievance_comments['und'][0]['value'])) { return; }
+  if (!preg_match('/Array/', $node->field_grievance_comments['und'][0]['value'])) { return; }
+  
+  drupal_add_css(
+    '@media print { .group-grievance-comments { display: none; } }',
+    array('type' => 'inline')
+  );
+}
+
 function grievance_uh226_menu() {
   $items = array();
 
