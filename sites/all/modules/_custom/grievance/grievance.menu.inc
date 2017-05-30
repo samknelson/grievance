@@ -457,6 +457,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['grievance/report/open'] = array(
+		'title' => 'Report: Open Grievances by Specialist',
+		'description' => '',
+		'page callback' => 'grievance_report_open_by_specialist',
+		'page arguments' => array(),
+		'access arguments' => array('grievance view'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['admin/config/grievances/fieldoverrides/apply'] = array(
 		'title' => 'Apply Field Overrides',
 		'description' => '',

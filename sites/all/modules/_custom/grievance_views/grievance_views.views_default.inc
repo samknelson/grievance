@@ -3857,21 +3857,14 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['access']['perm'] = 'grievance view';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['exposed_form']['type'] = 'input_required';
-  $handler->display->display_options['exposed_form']['options']['text_input_required_format'] = 'full_html';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['options']['expose_sort_order'] = FALSE;
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '1000';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['pager']['options']['id'] = '0';
   $handler->display->display_options['pager']['options']['quantity'] = '9';
-  $handler->display->display_options['style_plugin'] = 'views_calc';
-  $handler->display->display_options['style_options']['grouping'] = array(
-    0 => array(
-      'field' => 'field_grievance_rep_organizer',
-      'rendered' => 1,
-      'rendered_strip' => 0,
-    ),
-  );
+  $handler->display->display_options['style_plugin'] = 'views_aggregator';
   $handler->display->display_options['style_options']['columns'] = array(
     'nid' => 'nid',
     'field_grievance_rep_organizer' => 'field_grievance_rep_organizer',
@@ -3891,17 +3884,27 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
-      'has_calc' => 0,
-      'calc' => array(
-        'COUNT' => 'COUNT',
+      'has_aggr' => 0,
+      'aggr' => array(
+        'views_aggregator_first' => 'views_aggregator_first',
       ),
+      'aggr_par' => '',
+      'has_aggr_column' => 0,
+      'aggr_column' => 'views_aggregator_sum',
+      'aggr_par_column' => '',
     ),
     'field_grievance_rep_organizer' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
-      'has_calc' => 0,
-      'calc' => array(),
+      'has_aggr' => 0,
+      'aggr' => array(
+        'views_aggregator_first' => 'views_aggregator_first',
+      ),
+      'aggr_par' => '',
+      'has_aggr_column' => 0,
+      'aggr_column' => 'views_aggregator_sum',
+      'aggr_par_column' => '',
     ),
     'field_grievance_shop' => array(
       'sortable' => 0,
@@ -3909,8 +3912,14 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
-      'has_calc' => 0,
-      'calc' => array(),
+      'has_aggr' => 0,
+      'aggr' => array(
+        'views_aggregator_first' => 'views_aggregator_first',
+      ),
+      'aggr_par' => '',
+      'has_aggr_column' => 1,
+      'aggr_column' => 'views_aggregator_replace',
+      'aggr_par_column' => 'Total',
     ),
     'field_grievance_id' => array(
       'sortable' => 0,
@@ -3918,10 +3927,14 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
-      'has_calc' => 1,
-      'calc' => array(
-        'COUNT' => 'COUNT',
+      'has_aggr' => 0,
+      'aggr' => array(
+        'views_aggregator_count' => 'views_aggregator_count',
       ),
+      'aggr_par' => '',
+      'has_aggr_column' => 1,
+      'aggr_column' => 'views_aggregator_count',
+      'aggr_par_column' => '',
     ),
     'field_grievance_first_name' => array(
       'sortable' => 0,
@@ -3929,8 +3942,14 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
-      'has_calc' => 0,
-      'calc' => array(),
+      'has_aggr' => 0,
+      'aggr' => array(
+        'views_aggregator_first' => 'views_aggregator_first',
+      ),
+      'aggr_par' => '',
+      'has_aggr_column' => 0,
+      'aggr_column' => 'views_aggregator_sum',
+      'aggr_par_column' => '',
     ),
     'field_grievance_last_name' => array(
       'sortable' => 0,
@@ -3938,8 +3957,14 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
-      'has_calc' => 0,
-      'calc' => array(),
+      'has_aggr' => 0,
+      'aggr' => array(
+        'views_aggregator_first' => 'views_aggregator_first',
+      ),
+      'aggr_par' => '',
+      'has_aggr_column' => 0,
+      'aggr_column' => 'views_aggregator_sum',
+      'aggr_par_column' => '',
     ),
     'created' => array(
       'sortable' => 0,
@@ -3947,8 +3972,14 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
-      'has_calc' => 0,
-      'calc' => array(),
+      'has_aggr' => 0,
+      'aggr' => array(
+        'views_aggregator_first' => 'views_aggregator_first',
+      ),
+      'aggr_par' => '',
+      'has_aggr_column' => 0,
+      'aggr_column' => 'views_aggregator_sum',
+      'aggr_par_column' => '',
     ),
     'field_grievance_class_tid' => array(
       'sortable' => 0,
@@ -3956,19 +3987,35 @@ function grievance_views_views_default_views() {
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
-      'has_calc' => 0,
-      'calc' => array(),
+      'has_aggr' => 0,
+      'aggr' => array(
+        'views_aggregator_first' => 'views_aggregator_first',
+      ),
+      'aggr_par' => '',
+      'has_aggr_column' => 0,
+      'aggr_column' => 'views_aggregator_sum',
+      'aggr_par_column' => '',
     ),
     'field_grievance_clauseref' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
-      'has_calc' => 0,
-      'calc' => array(),
+      'has_aggr' => 0,
+      'aggr' => array(
+        'views_aggregator_first' => 'views_aggregator_first',
+      ),
+      'aggr_par' => '',
+      'has_aggr_column' => 0,
+      'aggr_column' => 'views_aggregator_sum',
+      'aggr_par_column' => '',
     ),
   );
-  $handler->display->display_options['style_options']['detailed_values'] = '0';
-  $handler->display->display_options['style_options']['precision'] = '0';
+  $handler->display->display_options['style_options']['column_aggregation']['totals_per_page'] = '1';
+  $handler->display->display_options['style_options']['column_aggregation']['totals_row_position'] = array(
+    1 => 0,
+    2 => '2',
+  );
+  $handler->display->display_options['style_options']['column_aggregation']['precision'] = '2';
   /* Relationship: Content: Status (field_grievance_status) */
   $handler->display->display_options['relationships']['field_grievance_status_tid']['id'] = 'field_grievance_status_tid';
   $handler->display->display_options['relationships']['field_grievance_status_tid']['table'] = 'field_data_field_grievance_status';
@@ -4058,6 +4105,26 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['sorts']['field_grievance_id_value']['id'] = 'field_grievance_id_value';
   $handler->display->display_options['sorts']['field_grievance_id_value']['table'] = 'field_data_field_grievance_id';
   $handler->display->display_options['sorts']['field_grievance_id_value']['field'] = 'field_grievance_id_value';
+  /* Contextual filter: Field: Organizer (field_grievance_rep_organizer) */
+  $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['id'] = 'field_grievance_rep_organizer_target_id';
+  $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['table'] = 'field_data_field_grievance_rep_organizer';
+  $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['field'] = 'field_grievance_rep_organizer_target_id';
+  $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['default_action'] = 'empty';
+  $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['default_argument_options']['argument'] = 'NULL';
+  $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['summary_options']['items_per_page'] = '25';
+  /* Contextual filter: Content: Employer (field_grievance_shop) */
+  $handler->display->display_options['arguments']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['arguments']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
+  $handler->display->display_options['arguments']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['arguments']['field_grievance_shop_target_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['field_grievance_shop_target_id']['default_argument_options']['argument'] = '1+2+3';
+  $handler->display->display_options['arguments']['field_grievance_shop_target_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_grievance_shop_target_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_grievance_shop_target_id']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['field_grievance_shop_target_id']['break_phrase'] = TRUE;
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -4080,54 +4147,10 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['filters']['field_grievance_open_value']['value'] = array(
     1 => '1',
   );
-  /* Filter criterion: Content: Title */
-  $handler->display->display_options['filters']['title']['id'] = 'title';
-  $handler->display->display_options['filters']['title']['table'] = 'node';
-  $handler->display->display_options['filters']['title']['field'] = 'title';
-  $handler->display->display_options['filters']['title']['relationship'] = 'field_grievance_shop_target_id';
-  $handler->display->display_options['filters']['title']['operator'] = 'contains';
-  $handler->display->display_options['filters']['title']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['title']['expose']['operator_id'] = 'title_op';
-  $handler->display->display_options['filters']['title']['expose']['label'] = 'Employer';
-  $handler->display->display_options['filters']['title']['expose']['use_operator'] = TRUE;
-  $handler->display->display_options['filters']['title']['expose']['operator'] = 'title_op';
-  $handler->display->display_options['filters']['title']['expose']['identifier'] = 'title';
-  $handler->display->display_options['filters']['title']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    5 => 0,
-    6 => 0,
-    8 => 0,
-    7 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: User: Name (raw) */
-  $handler->display->display_options['filters']['name']['id'] = 'name';
-  $handler->display->display_options['filters']['name']['table'] = 'users';
-  $handler->display->display_options['filters']['name']['field'] = 'name';
-  $handler->display->display_options['filters']['name']['relationship'] = 'field_grievance_rep_organizer_target_id';
-  $handler->display->display_options['filters']['name']['operator'] = 'contains';
-  $handler->display->display_options['filters']['name']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['name']['expose']['operator_id'] = 'name_op';
-  $handler->display->display_options['filters']['name']['expose']['label'] = 'Specialist';
-  $handler->display->display_options['filters']['name']['expose']['description'] = '(substring ok)';
-  $handler->display->display_options['filters']['name']['expose']['operator'] = 'name_op';
-  $handler->display->display_options['filters']['name']['expose']['identifier'] = 'name';
-  $handler->display->display_options['filters']['name']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    5 => 0,
-    6 => 0,
-    8 => 0,
-    7 => 0,
-    4 => 0,
-  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'grievance/report/open';
+  $handler->display->display_options['path'] = 'grievance/report/open/ignore';
   $translatables['grievance_open_report'] = array(
     t('Master'),
     t('Open Grievances Report'),
@@ -4137,7 +4160,6 @@ function grievance_views_views_default_views() {
     t('Sort by'),
     t('Asc'),
     t('Desc'),
-    t('Select any filter and click on Apply to see results'),
     t('Items per page'),
     t('- All -'),
     t('Offset'),
@@ -4157,7 +4179,7 @@ function grievance_views_views_default_views() {
     t('Intake Date'),
     t('Classification'),
     t('CBA Provision(s) Violated'),
-    t('(substring ok)'),
+    t('All'),
     t('Page'),
   );
   $export['grievance_open_report'] = $view;

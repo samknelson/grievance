@@ -16,12 +16,15 @@ function grievance_alert_all() {
 	$stmt = $query->execute();
 	if (!$stmt['node']) {
 		watchdog('grievance_alert', t('No grievances have alert dates in the future.'));
+		return;
 	}
 
 	$nids = array_keys($stmt['node']);
-	foreach ($nids as $nid) {
-		$node = node_load($nid);
-		grievance_alert($node);
+	if ($nids) {
+		foreach ($nids as $nid) {
+			$node = node_load($nid);
+			grievance_alert($node);
+		}
 	}
 
 	watchdog('grievance_alert', t('Alert generation complete'));
