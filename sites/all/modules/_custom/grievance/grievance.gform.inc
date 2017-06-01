@@ -300,22 +300,24 @@ function grievance_timeline_short($grievance_node) {
 	}
 
 	// Add any log entries of the right type
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_tids, 'in');
-  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  $stmt = $query->execute();
-  if ($stmt['node']) {
-  	$log_nodes = node_load_multiple(array_keys($stmt['node']));
-  	foreach ($log_nodes as $log_nid => $log_node) {
-			$dates[] = array(
-				'key' => $log_type_terms[$log_node->field_grievance_log_type['und'][0]['tid']]->name,
-				'ts' => strtotime($log_node->field_grievance_status_date['und'][0]['value']),
-				'extra' => 'Log entry',
-			);
-  	}
-  }
+	if ($log_type_terms) {
+	  $query = new EntityFieldQuery();
+	  $query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'grievance_log');
+	  $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_tids, 'in');
+	  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
+	  $stmt = $query->execute();
+	  if ($stmt['node']) {
+	  	$log_nodes = node_load_multiple(array_keys($stmt['node']));
+	  	foreach ($log_nodes as $log_nid => $log_node) {
+				$dates[] = array(
+					'key' => $log_type_terms[$log_node->field_grievance_log_type['und'][0]['tid']]->name,
+					'ts' => strtotime($log_node->field_grievance_status_date['und'][0]['value']),
+					'extra' => 'Log entry',
+				);
+	  	}
+	  }
+	}
 
 	// Add any "log status changed" entries of the right type.
   $log_update_tids = array(
