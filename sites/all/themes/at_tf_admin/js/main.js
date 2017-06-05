@@ -147,7 +147,7 @@
 					$('.form-item-field-grievance-zip-und-0-value input').val(json[0].house_Address.zip);
 					*/
 					$('.form-item-field-grievance-phone-und-0-value input').val(json[0].phone_Number);
-					$('.form-item-field-grievance-email-und-0-value input').val(json[0].email_Address);
+					$('.form-item-field-grievance-email-und-0-email input').val(json[0].email_Address);
 					alert(json[0].email_Address);
 					$('.form-item-field-grievance-department-und-0-value input').val(json[0].department);
 					$('.form-item-field-grievance-classification-und-0-value input').val(json[0].classification);
