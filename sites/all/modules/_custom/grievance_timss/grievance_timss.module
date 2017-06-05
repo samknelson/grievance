@@ -331,6 +331,8 @@ function grievance_timss_lookup_raw($timss_id, $broughtby_tid) {
     return NULL;
   }
 
+  dpm($response->data);
+
   return $response->data;
 }
 
