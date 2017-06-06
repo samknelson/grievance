@@ -499,7 +499,7 @@ function grievance_views_pre_render(&$view) {
 }
 
 function grievance_views_post_execute(&$view) {
-  if ($view->name == 'grievances_mine' || $view->name == 'grievances') {
+  if ($view->name == 'grievances_mine' || $view->name == 'grievances' || $view->name == 'grievances_without_status') {
     grievance_views_post_execute_grievances_mine($view);
   }
 }

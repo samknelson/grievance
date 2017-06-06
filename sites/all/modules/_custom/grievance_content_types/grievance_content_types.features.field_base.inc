@@ -3026,6 +3026,7 @@ function grievance_content_types_field_default_field_bases() {
         0 => array(
           'vocabulary' => 'grievance_status',
           'parent' => 0,
+          'depth' => '',
         ),
       ),
       'options_list_callback' => 'content_taxonomy_allowed_values',

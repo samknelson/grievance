@@ -62,3 +62,43 @@ function grievance_autocompete_job_class_tid($contract_tid, $tid = '', $match = 
   }
   drupal_json_output($matches);
 }
+
+/**
+ * Return a map of avaiable department TIDs based on classification TIDs for a given contract template.
+ */
+
+function grievance_classification_department_map($contract_tplt_node) {
+  // Universe of department TIDs
+  $department_tids = array();
+  if (isset($contract_tplt_node->field_grievance_departments['und'])) { 
+    foreach ($contract_tplt_node->field_grievance_departments['und'] as $tmp) {
+      $department_tids[] = $tmp['tid'];
+    }
+  }
+  if (!$department_tids) { return NULL; }
+  $department_terms = taxonomy_term_load_multiple($department_tids);
+
+  // Universe of classification TIDs
+  $classification_tids = array();
+  if (isset($contract_tplt_node->field_grievance_classifications['und'])) { 
+    foreach ($contract_tplt_node->field_grievance_classifications['und'] as $tmp) {
+      $classification_tids[] = $tmp['tid'];
+    }
+  }
+  if (!$classification_tids) { return NULL; }
+  $classification_terms = taxonomy_term_load_multiple($classification_tids);
+
+  // Create the map
+  $map = array();
+  foreach ($classification_terms as $classification_tid => $classification_term) {
+    $map[$classification_tid] = array();
+    if (isset($classification_term->field_grievance_departments['und'])) {
+      foreach ($classification_term->field_grievance_departments['und'] as $tmp) {
+        $department_tid = $tmp['tid'];
+        $map[$classification_tid][$department_tid] = $department_terms[$department_tid]->name;
+      }
+    }
+  }
+
+  return $map;
+}

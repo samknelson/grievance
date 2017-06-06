@@ -30,6 +30,12 @@ function grievance_form_current_value($field, $column, $form, $form_state) {
 
 function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
   //
+  // Load our custom javascript
+  //
+
+  drupal_add_js(drupal_get_path('module', 'grievance') . '/js/grievance.form-grievance.js');
+
+  //
   // Hide the title, we're auto-generating
   //
 
@@ -479,6 +485,15 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     // @TODO may be unnecessary to trigger a form rebuild at this point.  need to discuss
     // 
 
+    $grievance_classification_department_map = grievance_classification_department_map($contract_tplt_node);
+    drupal_add_js(
+      array(
+        'grievance' => array(
+          'grievance_classification_department_map' => $grievance_classification_department_map,
+        )
+      ), 
+      'setting'
+    );
     //$classification_tid = grievance_form_current_value('field_grievance_class_tid', 'tid', $form, $form_state); 
     //drupal_set_message("Here with $classification_tid");
   }
