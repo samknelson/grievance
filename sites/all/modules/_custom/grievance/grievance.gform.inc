@@ -353,10 +353,26 @@ function grievance_timeline_short($grievance_node) {
   	}
   );
 
+  // dedupe
+  $dates_clean = array();
+  $last_key = $last_datestr = $last_extra = NULL;
+  foreach ($dates as $record) {
+  	$datestr = date('m/d/Y', $record['ts']);
+  	$key = $record['key'];
+  	$extra = $record['extra'];
+
+  	if ( ($datestr != $last_datestr) || ($key != $last_key) || ($extra != $last_extra) ) {
+  		$dates_clean[] = $date;
+  	}
+
+  	$last_datestr = $datestr;
+  	$last_key = $key;
+  	$last_extra = $extra;
+  }
+
 	// Build our output
-	// asort($dates);
 	$result = '';
-	foreach ($dates as $record) {
+	foreach ($dates_clean as $record) {
 		$result .= '<section class="field field-name-field-grievance-timeline-short field-label-inline clearfix view-mode-full">';
 		$result .= '<h2 class="field-label">';
 		$result .= $record['key'];
