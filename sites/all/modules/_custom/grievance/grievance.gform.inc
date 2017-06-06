@@ -362,7 +362,7 @@ function grievance_timeline_short($grievance_node) {
   	$extra = $record['extra'];
 
   	if ( ($datestr != $last_datestr) || ($key != $last_key) || ($extra != $last_extra) ) {
-  		$dates_clean[] = $date;
+  		$dates_clean[] = $record;
   	}
 
   	$last_datestr = $datestr;
