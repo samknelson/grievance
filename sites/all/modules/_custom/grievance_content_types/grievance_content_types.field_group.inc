@@ -796,7 +796,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Default Union Reps',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
       0 => 'field_grievance_rep_assignee',
       1 => 'field_grievance_rep_filed',
