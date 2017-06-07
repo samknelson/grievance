@@ -269,7 +269,7 @@ function grievance_menu() {
 		'title' => t('Tickler'),
 		'page callback' => 'grievance_mine_expanded',
 		'page arguments' => array(),
-		'access arguments' => array('grievance user'),
+		'access arguments' => array('grievance mine expanded'),
 		'type' => MENU_LOCAL_TASK,
 		'weight' => 1,
 	);
