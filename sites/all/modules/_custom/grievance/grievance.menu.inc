@@ -315,7 +315,7 @@ function grievance_menu() {
 		'title' => t('No First Call'),
 		'page callback' => 'grievance_mine_reminder_no_first_call',
 		'page arguments' => array(),
-		'access arguments' => array('grievance user'),
+		'access arguments' => array('grievance reminder no first call'),
 		'type' => MENU_LOCAL_TASK,
 		'weight' => 6,
 	);

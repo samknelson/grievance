@@ -98,11 +98,9 @@ function grievance_permission() {
     'grievance form grievance remedy other' => array(
     	'title' => t('Grievance Form - Change Remedy (Other)'),
     ),
-
     'grievance form supervisor' => array(
         'title' => t('Grievance Form - Change Supervisor'),
     ),
-
     'grievance form rep filed' => array(
     	'title' => t('Grievance Form - Change Filed By'),
     ),
@@ -133,7 +131,12 @@ function grievance_permission() {
     'grievance letter variable letterhead' => array(
         'title' => t('Grievance Letter - User letterhead'),
     ),
-
+    'grievance mine no first call' => array(
+        'title' => t('My Grievances - No First Call'),
+    ),
+    'grievance mine expanded' => array(
+        'title' => t('My Grievances - Tickler'),
+    ),
  );
 }
 
