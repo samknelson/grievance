@@ -21,3 +21,28 @@ function grievance_company_node_tab_contacts($company_node) {
 
   return $result;
 }
+
+
+function grievance_views_post_execute_shop_contacts(&$view) {
+  if (!isset($view->result)) { return; }
+
+  foreach ($view->result as &$row) {
+    if (!isset($row->field_field_grievance_shops_1)) { continue; }
+    if (!is_array($row->field_field_grievance_shops_1)) { continue; }
+    foreach ($row->field_field_grievance_shops_1 as &$item) {
+      $item['rendered']['#markup'] = 'Title for ' . $item['raw']['target_id'];
+      $sql = 'select field_grievance_external_id_value from field_data_field_grievance_external_id ';
+      $sql .= 'where deleted = 0 ';
+      $sql .= 'and entity_type = \'node\' ';
+      $sql .= 'and bundle = \'grievance_shop\' ';
+      $sql .= 'and entity_id = :nid ';
+      $stmt = db_query($sql, array(':nid' => $item['raw']['target_id']));
+      $hr = $stmt->fetchAssoc();
+      if ($hr) {
+        $item['rendered']['#markup'] = $hr['field_grievance_external_id_value'];
+      } else {
+        $item['rendered']['#markup'] = '';
+      }
+    }
+  }
+}

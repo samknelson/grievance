@@ -496,11 +496,16 @@ function grievance_views_pre_render(&$view) {
       }
     }
   }
+
 }
 
 function grievance_views_post_execute(&$view) {
   if ($view->name == 'grievances_mine' || $view->name == 'grievances' || $view->name == 'grievances_without_status') {
     grievance_views_post_execute_grievances_mine($view);
+  }
+
+  if ($view->name == 'grievance_shop_contacts' && $view->current_display == 'views_data_export_1') {
+    grievance_views_post_execute_shop_contacts($view);
   }
 }
 
@@ -509,7 +514,9 @@ function grievance_node_presave($node) {
     $fields = array(
       'field_grievance_phone', 
       'field_grievance_co_phone', 
-      'field_grievance_co_fax'
+      'field_grievance_co_fax',
+      'field_grievance_co_phone_2',
+      'field_grievance_phone_off',
     );
     foreach ($fields as $field) {
       if (isset($node->{$field}['und'][0]['value'])) {

@@ -2265,22 +2265,25 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_address']['id'] = 'field_grievance_address';
   $handler->display->display_options['fields']['field_grievance_address']['table'] = 'field_data_field_grievance_address';
   $handler->display->display_options['fields']['field_grievance_address']['field'] = 'field_grievance_address';
-  /* Field: Content: Address 2 */
+  /* Field: Content: Company Rep Address 2 */
   $handler->display->display_options['fields']['field_grievance_co_address_2']['id'] = 'field_grievance_co_address_2';
   $handler->display->display_options['fields']['field_grievance_co_address_2']['table'] = 'field_data_field_grievance_co_address_2';
   $handler->display->display_options['fields']['field_grievance_co_address_2']['field'] = 'field_grievance_co_address_2';
+  $handler->display->display_options['fields']['field_grievance_co_address_2']['label'] = 'Address 2';
   /* Field: Content: City */
   $handler->display->display_options['fields']['field_grievance_city']['id'] = 'field_grievance_city';
   $handler->display->display_options['fields']['field_grievance_city']['table'] = 'field_data_field_grievance_city';
   $handler->display->display_options['fields']['field_grievance_city']['field'] = 'field_grievance_city';
-  /* Field: Content: State or Province */
+  /* Field: Content: Company Rep State or Province */
   $handler->display->display_options['fields']['field_grievance_co_state']['id'] = 'field_grievance_co_state';
   $handler->display->display_options['fields']['field_grievance_co_state']['table'] = 'field_data_field_grievance_co_state';
   $handler->display->display_options['fields']['field_grievance_co_state']['field'] = 'field_grievance_co_state';
-  /* Field: Content: Postal Code */
+  $handler->display->display_options['fields']['field_grievance_co_state']['label'] = 'State or Province';
+  /* Field: Content: Company Rep Postal Code */
   $handler->display->display_options['fields']['field_grievance_co_zip']['id'] = 'field_grievance_co_zip';
   $handler->display->display_options['fields']['field_grievance_co_zip']['table'] = 'field_data_field_grievance_co_zip';
   $handler->display->display_options['fields']['field_grievance_co_zip']['field'] = 'field_grievance_co_zip';
+  $handler->display->display_options['fields']['field_grievance_co_zip']['label'] = 'Postal Code';
   /* Field: Content: Date of Hire */
   $handler->display->display_options['fields']['field_grievance_hire_date']['id'] = 'field_grievance_hire_date';
   $handler->display->display_options['fields']['field_grievance_hire_date']['table'] = 'field_data_field_grievance_hire_date';
@@ -2302,10 +2305,11 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_email']['table'] = 'field_data_field_grievance_email';
   $handler->display->display_options['fields']['field_grievance_email']['field'] = 'field_grievance_email';
   $handler->display->display_options['fields']['field_grievance_email']['type'] = 'email_plain';
-  /* Field: Content: Phone */
+  /* Field: Content: Company Rep Phone */
   $handler->display->display_options['fields']['field_grievance_co_phone']['id'] = 'field_grievance_co_phone';
   $handler->display->display_options['fields']['field_grievance_co_phone']['table'] = 'field_data_field_grievance_co_phone';
   $handler->display->display_options['fields']['field_grievance_co_phone']['field'] = 'field_grievance_co_phone';
+  $handler->display->display_options['fields']['field_grievance_co_phone']['label'] = 'Phone';
   /* Field: Content: Employee ID # */
   $handler->display->display_options['fields']['field_grievance_ein']['id'] = 'field_grievance_ein';
   $handler->display->display_options['fields']['field_grievance_ein']['table'] = 'field_data_field_grievance_ein';
@@ -4904,14 +4908,16 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['footer']['area']['empty'] = TRUE;
   $handler->display->display_options['footer']['area']['content'] = '[<a href="/node/add/grievance-shop-contact">Add a contact</a>]';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
-  /* Field: Content: Name */
+  /* Field: Content: Company Rep Name */
   $handler->display->display_options['fields']['field_grievance_co_name']['id'] = 'field_grievance_co_name';
   $handler->display->display_options['fields']['field_grievance_co_name']['table'] = 'field_data_field_grievance_co_name';
   $handler->display->display_options['fields']['field_grievance_co_name']['field'] = 'field_grievance_co_name';
-  /* Field: Content: Role */
+  $handler->display->display_options['fields']['field_grievance_co_name']['label'] = 'Name';
+  /* Field: Content: Company Rep Title */
   $handler->display->display_options['fields']['field_grievance_co_role']['id'] = 'field_grievance_co_role';
   $handler->display->display_options['fields']['field_grievance_co_role']['table'] = 'field_data_field_grievance_co_role';
   $handler->display->display_options['fields']['field_grievance_co_role']['field'] = 'field_grievance_co_role';
+  $handler->display->display_options['fields']['field_grievance_co_role']['label'] = 'Role';
   /* Field: Content: Company */
   $handler->display->display_options['fields']['field_grievance_company']['id'] = 'field_grievance_company';
   $handler->display->display_options['fields']['field_grievance_company']['table'] = 'field_data_field_grievance_company';
@@ -4928,14 +4934,16 @@ function grievance_views_views_default_views() {
     'link' => 1,
   );
   $handler->display->display_options['fields']['field_grievance_shops']['delta_offset'] = '0';
-  /* Field: Content: Phone */
+  /* Field: Content: Company Rep Phone */
   $handler->display->display_options['fields']['field_grievance_co_phone']['id'] = 'field_grievance_co_phone';
   $handler->display->display_options['fields']['field_grievance_co_phone']['table'] = 'field_data_field_grievance_co_phone';
   $handler->display->display_options['fields']['field_grievance_co_phone']['field'] = 'field_grievance_co_phone';
-  /* Field: Content: Email */
+  $handler->display->display_options['fields']['field_grievance_co_phone']['label'] = 'Phone';
+  /* Field: Content: Company Rep Email */
   $handler->display->display_options['fields']['field_grievance_co_email']['id'] = 'field_grievance_co_email';
   $handler->display->display_options['fields']['field_grievance_co_email']['table'] = 'field_data_field_grievance_co_email';
   $handler->display->display_options['fields']['field_grievance_co_email']['field'] = 'field_grievance_co_email';
+  $handler->display->display_options['fields']['field_grievance_co_email']['label'] = 'Email';
   $handler->display->display_options['fields']['field_grievance_co_email']['type'] = 'email_plain';
   /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
@@ -4961,7 +4969,7 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'grievance_shop_contact' => 'grievance_shop_contact',
   );
-  /* Filter criterion: Content: Name (field_grievance_co_name) */
+  /* Filter criterion: Content: Company Rep Name (field_grievance_co_name) */
   $handler->display->display_options['filters']['field_grievance_co_name_value']['id'] = 'field_grievance_co_name_value';
   $handler->display->display_options['filters']['field_grievance_co_name_value']['table'] = 'field_data_field_grievance_co_name';
   $handler->display->display_options['filters']['field_grievance_co_name_value']['field'] = 'field_grievance_co_name_value';
@@ -4978,7 +4986,7 @@ function grievance_views_views_default_views() {
     4 => 0,
     5 => 0,
   );
-  /* Filter criterion: Content: Role (field_grievance_co_role) */
+  /* Filter criterion: Content: Company Rep Title (field_grievance_co_role) */
   $handler->display->display_options['filters']['field_grievance_co_role_value']['id'] = 'field_grievance_co_role_value';
   $handler->display->display_options['filters']['field_grievance_co_role_value']['table'] = 'field_data_field_grievance_co_role';
   $handler->display->display_options['filters']['field_grievance_co_role_value']['field'] = 'field_grievance_co_role_value';
@@ -5050,14 +5058,16 @@ function grievance_views_views_default_views() {
   /* Display: All Fields */
   $handler = $view->new_display('page', 'All Fields', 'page_1');
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Field: Content: Name */
+  /* Field: Content: Company Rep Name */
   $handler->display->display_options['fields']['field_grievance_co_name']['id'] = 'field_grievance_co_name';
   $handler->display->display_options['fields']['field_grievance_co_name']['table'] = 'field_data_field_grievance_co_name';
   $handler->display->display_options['fields']['field_grievance_co_name']['field'] = 'field_grievance_co_name';
-  /* Field: Content: Role */
+  $handler->display->display_options['fields']['field_grievance_co_name']['label'] = 'Name';
+  /* Field: Content: Company Rep Title */
   $handler->display->display_options['fields']['field_grievance_co_role']['id'] = 'field_grievance_co_role';
   $handler->display->display_options['fields']['field_grievance_co_role']['table'] = 'field_data_field_grievance_co_role';
   $handler->display->display_options['fields']['field_grievance_co_role']['field'] = 'field_grievance_co_role';
+  $handler->display->display_options['fields']['field_grievance_co_role']['label'] = 'Role';
   /* Field: Content: Company */
   $handler->display->display_options['fields']['field_grievance_company']['id'] = 'field_grievance_company';
   $handler->display->display_options['fields']['field_grievance_company']['table'] = 'field_data_field_grievance_company';
@@ -5074,35 +5084,45 @@ function grievance_views_views_default_views() {
     'link' => 1,
   );
   $handler->display->display_options['fields']['field_grievance_shops']['delta_offset'] = '0';
-  /* Field: Content: Phone */
+  /* Field: Content: Company Rep Phone */
   $handler->display->display_options['fields']['field_grievance_co_phone']['id'] = 'field_grievance_co_phone';
   $handler->display->display_options['fields']['field_grievance_co_phone']['table'] = 'field_data_field_grievance_co_phone';
   $handler->display->display_options['fields']['field_grievance_co_phone']['field'] = 'field_grievance_co_phone';
+  $handler->display->display_options['fields']['field_grievance_co_phone']['label'] = 'Phone';
+  /* Field: Content: Personal Phone */
+  $handler->display->display_options['fields']['field_grievance_co_phone_2']['id'] = 'field_grievance_co_phone_2';
+  $handler->display->display_options['fields']['field_grievance_co_phone_2']['table'] = 'field_data_field_grievance_co_phone_2';
+  $handler->display->display_options['fields']['field_grievance_co_phone_2']['field'] = 'field_grievance_co_phone_2';
   /* Field: Content: Fax */
   $handler->display->display_options['fields']['field_grievance_co_fax']['id'] = 'field_grievance_co_fax';
   $handler->display->display_options['fields']['field_grievance_co_fax']['table'] = 'field_data_field_grievance_co_fax';
   $handler->display->display_options['fields']['field_grievance_co_fax']['field'] = 'field_grievance_co_fax';
-  /* Field: Content: Email */
+  /* Field: Content: Company Rep Email */
   $handler->display->display_options['fields']['field_grievance_co_email']['id'] = 'field_grievance_co_email';
   $handler->display->display_options['fields']['field_grievance_co_email']['table'] = 'field_data_field_grievance_co_email';
   $handler->display->display_options['fields']['field_grievance_co_email']['field'] = 'field_grievance_co_email';
+  $handler->display->display_options['fields']['field_grievance_co_email']['label'] = 'Email';
   $handler->display->display_options['fields']['field_grievance_co_email']['type'] = 'email_plain';
-  /* Field: Content: Address */
+  /* Field: Content: Company Rep Address */
   $handler->display->display_options['fields']['field_grievance_co_address']['id'] = 'field_grievance_co_address';
   $handler->display->display_options['fields']['field_grievance_co_address']['table'] = 'field_data_field_grievance_co_address';
   $handler->display->display_options['fields']['field_grievance_co_address']['field'] = 'field_grievance_co_address';
-  /* Field: Content: City */
+  $handler->display->display_options['fields']['field_grievance_co_address']['label'] = 'Address';
+  /* Field: Content: Company Rep City */
   $handler->display->display_options['fields']['field_grievance_co_city']['id'] = 'field_grievance_co_city';
   $handler->display->display_options['fields']['field_grievance_co_city']['table'] = 'field_data_field_grievance_co_city';
   $handler->display->display_options['fields']['field_grievance_co_city']['field'] = 'field_grievance_co_city';
-  /* Field: Content: State or Province */
+  $handler->display->display_options['fields']['field_grievance_co_city']['label'] = 'City';
+  /* Field: Content: Company Rep State or Province */
   $handler->display->display_options['fields']['field_grievance_co_state']['id'] = 'field_grievance_co_state';
   $handler->display->display_options['fields']['field_grievance_co_state']['table'] = 'field_data_field_grievance_co_state';
   $handler->display->display_options['fields']['field_grievance_co_state']['field'] = 'field_grievance_co_state';
-  /* Field: Content: Postal Code */
+  $handler->display->display_options['fields']['field_grievance_co_state']['label'] = 'State or Province';
+  /* Field: Content: Company Rep Postal Code */
   $handler->display->display_options['fields']['field_grievance_co_zip']['id'] = 'field_grievance_co_zip';
   $handler->display->display_options['fields']['field_grievance_co_zip']['table'] = 'field_data_field_grievance_co_zip';
   $handler->display->display_options['fields']['field_grievance_co_zip']['field'] = 'field_grievance_co_zip';
+  $handler->display->display_options['fields']['field_grievance_co_zip']['label'] = 'Postal Code';
   /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
@@ -5123,14 +5143,16 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['style_options']['header'] = 1;
   $handler->display->display_options['style_options']['keep_html'] = 0;
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Field: Content: Name */
+  /* Field: Content: Company Rep Name */
   $handler->display->display_options['fields']['field_grievance_co_name']['id'] = 'field_grievance_co_name';
   $handler->display->display_options['fields']['field_grievance_co_name']['table'] = 'field_data_field_grievance_co_name';
   $handler->display->display_options['fields']['field_grievance_co_name']['field'] = 'field_grievance_co_name';
-  /* Field: Content: Role */
+  $handler->display->display_options['fields']['field_grievance_co_name']['label'] = 'Name';
+  /* Field: Content: Company Rep Title */
   $handler->display->display_options['fields']['field_grievance_co_role']['id'] = 'field_grievance_co_role';
   $handler->display->display_options['fields']['field_grievance_co_role']['table'] = 'field_data_field_grievance_co_role';
   $handler->display->display_options['fields']['field_grievance_co_role']['field'] = 'field_grievance_co_role';
+  $handler->display->display_options['fields']['field_grievance_co_role']['label'] = 'Role';
   /* Field: Content: Company */
   $handler->display->display_options['fields']['field_grievance_company']['id'] = 'field_grievance_company';
   $handler->display->display_options['fields']['field_grievance_company']['table'] = 'field_data_field_grievance_company';
@@ -5147,39 +5169,60 @@ function grievance_views_views_default_views() {
     'link' => 1,
   );
   $handler->display->display_options['fields']['field_grievance_shops']['delta_offset'] = '0';
-  /* Field: Content: Phone */
+  /* Field: Field: Employer */
+  $handler->display->display_options['fields']['field_grievance_shops_1']['id'] = 'field_grievance_shops_1';
+  $handler->display->display_options['fields']['field_grievance_shops_1']['table'] = 'field_data_field_grievance_shops';
+  $handler->display->display_options['fields']['field_grievance_shops_1']['field'] = 'field_grievance_shops';
+  $handler->display->display_options['fields']['field_grievance_shops_1']['label'] = 'Shop External ID';
+  $handler->display->display_options['fields']['field_grievance_shops_1']['settings'] = array(
+    'link' => 0,
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_shops_1']['delta_offset'] = '0';
+  /* Field: Content: Company Rep Phone */
   $handler->display->display_options['fields']['field_grievance_co_phone']['id'] = 'field_grievance_co_phone';
   $handler->display->display_options['fields']['field_grievance_co_phone']['table'] = 'field_data_field_grievance_co_phone';
   $handler->display->display_options['fields']['field_grievance_co_phone']['field'] = 'field_grievance_co_phone';
+  $handler->display->display_options['fields']['field_grievance_co_phone']['label'] = 'Phone';
+  /* Field: Content: Personal Phone */
+  $handler->display->display_options['fields']['field_grievance_co_phone_2']['id'] = 'field_grievance_co_phone_2';
+  $handler->display->display_options['fields']['field_grievance_co_phone_2']['table'] = 'field_data_field_grievance_co_phone_2';
+  $handler->display->display_options['fields']['field_grievance_co_phone_2']['field'] = 'field_grievance_co_phone_2';
   /* Field: Content: Fax */
   $handler->display->display_options['fields']['field_grievance_co_fax']['id'] = 'field_grievance_co_fax';
   $handler->display->display_options['fields']['field_grievance_co_fax']['table'] = 'field_data_field_grievance_co_fax';
   $handler->display->display_options['fields']['field_grievance_co_fax']['field'] = 'field_grievance_co_fax';
-  /* Field: Content: Email */
+  /* Field: Content: Company Rep Email */
   $handler->display->display_options['fields']['field_grievance_co_email']['id'] = 'field_grievance_co_email';
   $handler->display->display_options['fields']['field_grievance_co_email']['table'] = 'field_data_field_grievance_co_email';
   $handler->display->display_options['fields']['field_grievance_co_email']['field'] = 'field_grievance_co_email';
+  $handler->display->display_options['fields']['field_grievance_co_email']['label'] = 'Email';
   $handler->display->display_options['fields']['field_grievance_co_email']['type'] = 'email_plain';
-  /* Field: Content: Address */
+  /* Field: Content: Company Rep Address */
   $handler->display->display_options['fields']['field_grievance_co_address']['id'] = 'field_grievance_co_address';
   $handler->display->display_options['fields']['field_grievance_co_address']['table'] = 'field_data_field_grievance_co_address';
   $handler->display->display_options['fields']['field_grievance_co_address']['field'] = 'field_grievance_co_address';
-  /* Field: Content: Address 2 */
+  $handler->display->display_options['fields']['field_grievance_co_address']['label'] = 'Address';
+  /* Field: Content: Company Rep Address 2 */
   $handler->display->display_options['fields']['field_grievance_co_address_2']['id'] = 'field_grievance_co_address_2';
   $handler->display->display_options['fields']['field_grievance_co_address_2']['table'] = 'field_data_field_grievance_co_address_2';
   $handler->display->display_options['fields']['field_grievance_co_address_2']['field'] = 'field_grievance_co_address_2';
-  /* Field: Content: City */
+  $handler->display->display_options['fields']['field_grievance_co_address_2']['label'] = 'Address 2';
+  /* Field: Content: Company Rep City */
   $handler->display->display_options['fields']['field_grievance_co_city']['id'] = 'field_grievance_co_city';
   $handler->display->display_options['fields']['field_grievance_co_city']['table'] = 'field_data_field_grievance_co_city';
   $handler->display->display_options['fields']['field_grievance_co_city']['field'] = 'field_grievance_co_city';
-  /* Field: Content: State or Province */
+  $handler->display->display_options['fields']['field_grievance_co_city']['label'] = 'City';
+  /* Field: Content: Company Rep State or Province */
   $handler->display->display_options['fields']['field_grievance_co_state']['id'] = 'field_grievance_co_state';
   $handler->display->display_options['fields']['field_grievance_co_state']['table'] = 'field_data_field_grievance_co_state';
   $handler->display->display_options['fields']['field_grievance_co_state']['field'] = 'field_grievance_co_state';
-  /* Field: Content: Postal Code */
+  $handler->display->display_options['fields']['field_grievance_co_state']['label'] = 'State or Province';
+  /* Field: Content: Company Rep Postal Code */
   $handler->display->display_options['fields']['field_grievance_co_zip']['id'] = 'field_grievance_co_zip';
   $handler->display->display_options['fields']['field_grievance_co_zip']['table'] = 'field_data_field_grievance_co_zip';
   $handler->display->display_options['fields']['field_grievance_co_zip']['field'] = 'field_grievance_co_zip';
+  $handler->display->display_options['fields']['field_grievance_co_zip']['label'] = 'Postal Code';
   $handler->display->display_options['path'] = 'grievance/admin/shops/contacts/all/csv';
   $handler->display->display_options['displays'] = array(
     'page' => 'page',
@@ -5218,12 +5261,14 @@ function grievance_views_views_default_views() {
     t('All'),
     t('By Company'),
     t('All Fields'),
+    t('Personal Phone'),
     t('Fax'),
     t('Address'),
     t('City'),
     t('State or Province'),
     t('Postal Code'),
     t('Data export'),
+    t('Shop External ID'),
     t('Address 2'),
   );
   $export['grievance_shop_contacts'] = $view;
