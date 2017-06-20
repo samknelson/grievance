@@ -43,7 +43,7 @@ function grievance_uh226_report_spi_term_summary_fields() {
     'boa_held' => 'BOA Held',
     'rslvd' => 'RSLVD',
     'nfa' => 'NFA',
-    'arb_submitted' => 'ARB Submitted',
+    'arb' => 'ARB Submitted',
     'won' => 'Won',
     'lost' => 'Lost',
   );
@@ -166,6 +166,18 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
     $row['nfa'] = TRUE;
   } 
 
+  // Arb
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  $query->fieldCondition('field_grievance_status', 'tid', $lookups['arb_status_tids'], 'in');
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $row['arb'] = TRUE;
+  } 
+
   // Won
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
@@ -207,6 +219,7 @@ function grievance_uh226_report_spi_term_summary_lookups() {
   $nfa_status_tids = array(-999);
   $won_status_tids = array(-999);
   $lost_status_tids = array(-999);
+  $arb_status_tids = array(-999);
   $boa_held_status_tids = array(-999);
 
   foreach ($status_terms as $tid => $term) {
@@ -228,6 +241,9 @@ function grievance_uh226_report_spi_term_summary_lookups() {
     if (preg_match('/BOA Held/i', $term->name)) {
       $boa_held_status_tids[] = $tid;
     }
+    if (preg_match('/Arbitration/i', $term->name)) {
+      $arb_held_status_tids[] = $tid;
+    }
     if (preg_match('/Won/i', $term->name)) {
       $won_held_status_tids[] = $tid;
     }
@@ -242,6 +258,7 @@ function grievance_uh226_report_spi_term_summary_lookups() {
 		'arbitration_status_tids'					=> $arbitration_status_tids,
     'rslvd_status_tids'               => $rslvd_status_tids,
     'nfa_status_tids'                 => $nfa_status_tids,
+    'arb_status_tids'                 => $arb_status_tids,
     'won_status_tids'                 => $won_status_tids,
     'lost_status_tids'                => $lost_status_tids,
 		'boa_held_status_tids' 						=> $boa_held_status_tids,
@@ -276,7 +293,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
         'boa_held',
         'rslvd',
         'nfa',
-        'arb_submitted',
+        'arb',
         'won',
         'lost') as $field) {
       if ($hr[$field]) { $data[$hr['specialist_name']][$field]++; }
@@ -308,7 +325,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
     $row[] = $hr['boa_held'];
     $row[] = $hr['rslvd'];
     $row[] = $hr['nfa'];
-    $row[] = $hr['arb_submitted'];
+    $row[] = $hr['arb'];
     $row[] = $hr['won'];
     $row[] = $hr['lost'];
     $rows[] = $row;
