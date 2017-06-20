@@ -351,24 +351,24 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   $row[] = '<strong>' . $sub_totals['arb'] . '</strong>';
   $row[] = '<strong>' . $sub_totals['won'] . '</strong>';
   $row[] = '<strong>' . $sub_totals['lost'] . '</strong>';
-  $rows[] = $row;
+  $rows[] = array('data' => $row, 'no_striping' => TRUE);
 
   $row = array();
   $row[] = '<strong>' . t('Total') . '</strong>';
   $row[] = '<strong>' . $sub_totals['total'] . '</strong>';
   $row[] = array(
     'data' => '<strong>' . ($sub_totals['1st_call'] + $sub_totals['no_activity']) . '</strong>',
-    'colspan' => 2
+    'colspan' => 2,
   );
   $row[] = array(
     'data' => '<strong>' . ($sub_totals['no_boa_held'] + $sub_totals['boa_held']) . '</strong>',
     'colspan' => 2
   );
   $row[] = array(
-    'data' => '<strong>' . ($sub_totals['rslvd'] + $sub_totals['nfa'] + $sub_totals['won'] + $sub_totals['lost'] ) . '</strong>',
-    'colspan' => 4
+    'data' => '<strong>' . ($sub_totals['rslvd'] + $sub_totals['nfa'] + $sub_totals['arb'] + $sub_totals['won'] + $sub_totals['lost'] ) . '</strong>',
+    'colspan' => 5
   );
-  $rows[] = $row;
+  $rows[] = array('data' => $row, 'no_striping' => TRUE);
 
   $attributes = array();
 
