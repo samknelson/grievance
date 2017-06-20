@@ -37,6 +37,7 @@ function grievance_uh226_report_spi_term_summary_fields() {
   return array(
     'grievance_nid' => 'Grievance NID',
     'specialist_name' => 'Specialist Name',
+    'employer_name' => 'Employer Name',
     '1st_call' => '1st Call',
     'no_activity' => 'No Activity',
     'no_boa_held' => 'No BOA Held',
@@ -104,10 +105,19 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
 	$grievance_node = node_load($grievance_nid);
 
   // Specialist name
+  // @todo user_load is expensive.
   if ($grievance_node->field_grievance_rep_organizer['und'][0]['target_id']) {
     $user = user_load($grievance_node->field_grievance_rep_organizer['und'][0]['target_id']);
     $row['specialist_name'] = $user->name;
   }
+
+  // Employer name
+  // @todo node_load is expensive
+  if ($grievance_node->field_grievance_shop['und'][0]['target_id']) {
+    $employer_node = node_load($grievance_node->field_grievance_shop['und'][0]['target_id']);
+    $row['employer_name'] = $employer_node->title;
+  }
+
 
   // 1st call?
   $first_call_log_type_tid = variable_get('grievance_log_first_call_type', '');
@@ -267,7 +277,15 @@ function grievance_uh226_report_spi_term_summary_lookups() {
   );
 }
 
-function grievance_uh226_report_spi_term_summary_render($report_type, $report_id) {
+function grievance_uh226_report_spi_term_summary_render_specialist($report_type, $report_id) {
+  return grievance_uh226_report_spi_term_summary_render($report_type, $report_id, 'specialist');
+}
+
+function grievance_uh226_report_spi_term_summary_render_employer($report_type, $report_id) {
+  return grievance_uh226_report_spi_term_summary_render($report_type, $report_id, 'employer');
+}
+
+function grievance_uh226_report_spi_term_summary_render($report_type, $report_id, $which) {
   // Iterate through the results and build our aggregates
   /*
     'grievance_nid' => 'Grievance NID',
@@ -286,13 +304,18 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
 
   $html = '';
   $html .= '<div class="uh-226-report-spi-term-summary-render">';
-  $html .= '<h2>' .
-    t('Grievances from @from_date to @to_date', array(
-        '@from_date' => date('m/d/Y', strtotime($parameters['from_date'])),
-        '@to_date' => date('m/d/Y', strtotime($parameters['to_date'])),
-      )
-    ) .
-    '</h2>';
+  $html .= '<h2>';
+  $html .= t('Grievances from @from_date to @to_date', array(
+      '@from_date' => date('m/d/Y', strtotime($parameters['from_date'])),
+      '@to_date' => date('m/d/Y', strtotime($parameters['to_date'])),
+    )
+  );
+  if ($which == 'specialist') { 
+    $html .= ' -- By Specialist'; 
+  } else {
+    $html .= ' -- By Employer'; 
+  }
+  $html .= '</h2>';
 
   $data = array();
   $query = db_select('report_cache');
@@ -304,7 +327,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   $totals = array();
   while ($hr = $stmt->fetchAssoc()) {
     $hr = unserialize($hr['report_data']);
-    $data[$hr['specialist_name']]['total']++;
+    $data[$hr[$which . '_name']]['total']++;
     $sub_totals['total']++;
 
     foreach (
@@ -320,7 +343,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
         'lost') as $field) {
 
       if ($hr[$field]) {
-        $data[$hr['specialist_name']][$field]++;
+        $data[$hr[$which . '_name']][$field]++;
         $sub_totals[$field]++;
       }
     }
@@ -328,19 +351,22 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
 
   ksort($data);
 
-  $header = array(
-    'Specialist',
-    'Total SPIs/Terms',
-    '1st Calls',
-    'No Activity',
-    'No BOA Held',
-    'BOAs Held',
-    'RSLVD',
-    'NFA',
-    'Arbs Submitted',
-    'Won', 
-    'Lost'
-  );
+  $header = array();
+  if ($which == 'specialist') {
+    $header[] = 'Specialist';
+  } else {
+    $header[] = 'Employer';
+  }
+  $header[] = 'Total SPIs/Terms';
+  $header[] = '1st Calls';
+  $header[] = 'No Activity';
+  $header[] = 'No BOA Held';
+  $header[] = 'BOAs Held';
+  $header[] = 'RSLVD';
+  $header[] = 'NFA';
+  $header[] = 'Arbs Submitted';
+  $header[] = 'Won';
+  $header[] = 'Lost';
 
   $rows = array();
   foreach ($data as $specialist_name => $hr) {

@@ -60,7 +60,8 @@ function grievance_uh226_report_cache_info() {
     'pk_list_callback' => 'grievance_uh226_report_spi_term_summary_pks',
     'batch_callback' => 'grievance_uh226_report_spi_term_summary_batch',
     'render_callbacks' => array(
-      'Table' => 'grievance_uh226_report_spi_term_summary_render',
+      'Summary By Specialist' => 'grievance_uh226_report_spi_term_summary_render_specialist',
+      'Summary By Employer' => 'grievance_uh226_report_spi_term_summary_render_employer',
     ),
   );
 
