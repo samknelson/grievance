@@ -166,6 +166,30 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
     $row['nfa'] = TRUE;
   } 
 
+  // Won
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  $query->fieldCondition('field_grievance_status', 'tid', $lookups['won_status_tids'], 'in');
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $row['won'] = TRUE;
+  } 
+
+  // Lost
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  $query->fieldCondition('field_grievance_status', 'tid', $lookups['lost_status_tids'], 'in');
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $row['lost'] = TRUE;
+  } 
+
   return $row;
 }
 
@@ -181,6 +205,8 @@ function grievance_uh226_report_spi_term_summary_lookups() {
   $closed_status_tids = array(-999);
   $rslvd_status_tids = array(-999);
   $nfa_status_tids = array(-999);
+  $won_status_tids = array(-999);
+  $lost_status_tids = array(-999);
   $boa_held_status_tids = array(-999);
 
   foreach ($status_terms as $tid => $term) {
@@ -202,6 +228,12 @@ function grievance_uh226_report_spi_term_summary_lookups() {
     if (preg_match('/BOA Held/i', $term->name)) {
       $boa_held_status_tids[] = $tid;
     }
+    if (preg_match('/Won/i', $term->name)) {
+      $won_held_status_tids[] = $tid;
+    }
+    if (preg_match('/Lost/i', $term->name)) {
+      $lost_held_status_tids[] = $tid;
+    }
   }
 
   return array(
@@ -210,6 +242,8 @@ function grievance_uh226_report_spi_term_summary_lookups() {
 		'arbitration_status_tids'					=> $arbitration_status_tids,
     'rslvd_status_tids'               => $rslvd_status_tids,
     'nfa_status_tids'                 => $nfa_status_tids,
+    'won_status_tids'                 => $won_status_tids,
+    'lost_status_tids'                => $lost_status_tids,
 		'boa_held_status_tids' 						=> $boa_held_status_tids,
     'spi_log_type_tid'                => variable_get('grievance_log_spi_type', ''),
     'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
