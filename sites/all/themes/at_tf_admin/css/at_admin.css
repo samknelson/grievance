@@ -3788,7 +3788,8 @@ fieldset.date-combo .container-inline-date .date-padding {
 
 @media print {
   .page-grievance-report-open .form-start,
-  .report-cache-backlink { 
+  .report-cache-backlink,
+  #page-footer { 
     display: none;
   }
 }
