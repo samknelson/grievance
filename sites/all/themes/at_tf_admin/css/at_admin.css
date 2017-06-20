@@ -3251,7 +3251,7 @@ fieldset legend {
   float: left;
   margin-right: 20px;
   margin-top: 20px;
-  height: 190px;
+  height: 210px;
   border: 1px solid #000000;
   background-color: #ffffff;
   border-radius: 10px;
@@ -3261,6 +3261,11 @@ fieldset legend {
 
 #grievance-letter-form .grievance-recipient {
   height: 250px;
+}
+
+.grievance-recipient .field-name-field-grievance-description,
+.grievance-recipient .grievance-recipient-description {
+  font-style: italic;
 }
 
 .grievance-recipient:hover {
@@ -3314,11 +3319,13 @@ fieldset legend {
   height: 140px;
 }
 
-.page-grievance-report-bytype .form-type-date-popup .form-item label {
+.page-grievance-report .form-type-date-popup .form-item label {
   display: none;
 }
 
-
+.page-grievance-report-spi-term-summary .form-submit {
+  margin-top: 10px;
+}
 
 #edit-grievance-id dl dt { 
   font-weight: bold;

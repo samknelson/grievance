@@ -81,18 +81,6 @@
 				$("#grievance-contact-show-company").hide();
 				$(".grievance-recipient-company").show();
 			});
-			$("#grievance-contact-hide-nostatusmatch").click(function(event) {
-				event.preventDefault();
-				$("#grievance-contact-hide-nostatusmatch").hide();
-				$("#grievance-contact-show-nostatusmatch").show();
-				$(".grievance-recipient-nostatusmatch").hide();
-			});
-			$("#grievance-contact-show-nostatusmatch").click(function() {
-				event.preventDefault();
-				$("#grievance-contact-hide-nostatusmatch").show();
-				$("#grievance-contact-show-nostatusmatch").hide();
-				$(".grievance-recipient-nostatusmatch").show();
-			});
 
 			// Set "corrected" when demographic information changes
 			/*
