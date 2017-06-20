@@ -305,6 +305,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   while ($hr = $stmt->fetchAssoc()) {
     $hr = unserialize($hr['report_data']);
     $data[$hr['specialist_name']]['total']++;
+    $sub_totals['total']++;
 
     foreach (
       array(
