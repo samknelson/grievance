@@ -3794,10 +3794,10 @@ fieldset.date-combo .container-inline-date .date-padding {
   }
 }
 
-.page-admin-reports-report-cache-grievance-uh226-report-spi-term-summary #main-content table,
-.page-admin-reports-report-cache-grievance-uh226-report-spi-term-summary #main-content th,
-.page-admin-reports-report-cache-grievance-uh226-report-spi-term-summary #main-content tr,
-.page-admin-reports-report-cache-grievance-uh226-report-spi-term-summary #main-content td {
+.uh-226-report-spi-term-summary-render table,
+.uh-226-report-spi-term-summary-render th,
+.uh-226-report-spi-term-summary-render tr,
+.uh-226-report-spi-term-summary-render td {
   border: 1px solid #000000;
   border-collapse: collapse;
   text-align: center;

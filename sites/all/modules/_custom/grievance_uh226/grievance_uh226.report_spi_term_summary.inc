@@ -285,6 +285,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   $parameters = unserialize($hr['report_data']);
 
   $html = '';
+  $html .= '<div class="uh-226-report-spi-term-summary-render">';
   $html .= '<h2>' .
     t('Grievances from @from_date to @to_date', array(
         '@from_date' => date('m/d/Y', strtotime($parameters['from_date'])),
@@ -391,6 +392,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   $attributes = array();
 
   $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
+  $html .= '</div>';
 
   return $html;
 }
