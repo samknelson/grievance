@@ -300,6 +300,8 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
     }
   }
 
+  ksort($data);
+
   $header = array(
     'Specialist',
     'Total SPIs/Terms',
