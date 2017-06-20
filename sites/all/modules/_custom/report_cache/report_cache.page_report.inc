@@ -18,6 +18,8 @@ function report_cache_page_report($report_type) {
 		report_cache_download($report_type, $report_id, $report_type_info);
 	} elseif ($action == 'preview') {
 		$preview .= report_cache_preview($report_type, $report_id, $report_type_info);
+	} elseif ($action == 'render') {
+		$render .= report_cache_render($report_type, $report_id, $report_type_info, $_REQUEST['callback-name']);
 	}
 
 
@@ -32,12 +34,16 @@ function report_cache_page_report($report_type) {
 		drupal_set_message(t('No reports of type @report_type have been generated yet.', array('@report_type' => $report_type)));
 	}
 
-	$header = array(
-		t('Report ID'),
-		t('Preview'),
-		t('Download'),
-		t('Purge')
-	);
+	$header = array();
+	$header[] = t('Report ID');
+	$header[] = t('Preview');
+	$header[] = t('Download');
+	if ($report_type_info['render_callbacks']) {
+		foreach ($report_type_info['render_callbacks'] as $name => $callback) {
+			$header[] = $name;
+		}
+	}
+	$header[] = t('Purge');
 
 	$attributes = array();
 
@@ -48,6 +54,21 @@ function report_cache_page_report($report_type) {
 		$row[] = $tmp_report_id;
 		$row[] = l(t('Preview'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
 		$row[] = l(t('Download'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
+		if ($report_type_info['render_callbacks']) {
+			foreach ($report_type_info['render_callbacks'] as $name => $callback) {
+				$row[] = l(
+					$name, 
+					"admin/reports/report-cache/$report_type", 
+					array(
+						'query' => array(
+							'report_id' => $tmp_report_id, 
+							'action' => 'render',
+							'callback-name' => $name,
+						)
+					)
+				);
+			}
+		}
 		$row[] = l(t('Purge'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
 
 		$rows[] = $row;
@@ -60,6 +81,11 @@ function report_cache_page_report($report_type) {
 	if ($preview) {
 		$result .= '<hr>';
 		$result .= $preview;
+	}
+
+	if ($render) {
+		$result .= '<hr>';
+		$result .= $render;
 	}
 
 	$result .= l(t('Generate a new report'), $report_type_info['path']);
@@ -99,6 +125,16 @@ function report_cache_preview($report_type, $report_id, $report_type_info) {
 	$result .= theme('pager', array('tags' => array()));
 
 	return $result;
+}
+
+function report_cache_render($report_type, $report_id, $report_type_info, $callback_name) {
+	$callback = $report_type_info['render_callbacks'][$callback_name];
+	if (!$callback) { 
+		drupal_set_message(t('Unable to find callback named "@name"', array('@name' => $callback_name)), 'error');
+		return NULL;
+	}
+
+	return $callback($report_type, $report_id);
 }
 
 

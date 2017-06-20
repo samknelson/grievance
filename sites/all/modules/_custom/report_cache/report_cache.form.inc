@@ -95,10 +95,13 @@ function report_cache_form_submit($form, &$form_state) {
 	}
 
 	$operations = array();
+	$count = 0;
+	$total = count($pks);
 	foreach ($pks as $pk) {
+		++$count;
 		$operations[] = array(
 			'report_cache_batch', 
-			array($pk, $form_state['values'], $report_type_info),
+			array($pk, $count, $total, $form_state['values'], $report_type_info),
 		);
 	}
 	
@@ -113,7 +116,7 @@ function report_cache_form_submit($form, &$form_state) {
 	return;
 }
 
-function report_cache_batch($pk, $values, $report_type_info, &$context) {
+function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$context) {
 	$report_type = $values['report_type'];
 	$report_id = $values['report_id'];
 	$report_action = $values['report_action'];
@@ -138,7 +141,11 @@ function report_cache_batch($pk, $values, $report_type_info, &$context) {
 		return;
 	}
 
-	$context['message'] = t('Generating statement for: @pk', array('@pk' => $pk));
+	$msg = t('Generating statement for batch @count / @total', array('@count' => $count, '@total' => $total));
+	if (!is_array($pk)) {
+		$msg .= ': ' . $pk;
+	}
+	$context['message'] = $msg;
 
 	$row = $batch_callback($pk, $values, $report_id, $report_action, $context);
 
