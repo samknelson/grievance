@@ -1,7 +1,6 @@
 <?php
 
 function report_cache_page_report($report_type) {
-	drupal_set_title(t('Report Cache: @report_type', array('@report_type' => $report_type)));
 	
 	$report_id = $_REQUEST['report_id'];
 	$action = $_REQUEST['action'];
@@ -9,6 +8,7 @@ function report_cache_page_report($report_type) {
 	$report_type_infos = module_invoke_all('report_cache_info');
 	$report_type_info = $report_type_infos[$report_type];
 	$fields = $report_type_info['fields'];
+	drupal_set_title(t('Report - @report_type', array('@report_type' => $report_type_info['name'])));
 
 
 	if ($action == 'purge') {
@@ -22,6 +22,11 @@ function report_cache_page_report($report_type) {
 		$render .= report_cache_render($report_type, $report_id, $report_type_info, $_REQUEST['callback-name']);
 	}
 
+	if ($render) {
+		$html = '<div class="report-cache-backlink">' . '[' . l(t('Back to report list'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'preview'))) . ']' . '</div>';
+		$html .= $render;
+		return $html;
+	}
 
 	$sql = "select distinct report_id from report_cache where report_type = :report_type order by report_id desc";
 	$stmt = db_query($sql, array(':report_type' => $report_type));
@@ -81,11 +86,6 @@ function report_cache_page_report($report_type) {
 	if ($preview) {
 		$result .= '<hr>';
 		$result .= $preview;
-	}
-
-	if ($render) {
-		$result .= '<hr>';
-		$result .= $render;
 	}
 
 	$result .= l(t('Generate a new report'), $report_type_info['path']);
