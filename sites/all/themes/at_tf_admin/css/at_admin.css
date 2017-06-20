@@ -3787,8 +3787,17 @@ fieldset.date-combo .container-inline-date .date-padding {
 }
 
 @media print {
-  .page-grievance-report-open .form-start { 
+  .page-grievance-report-open .form-start,
+  .report-cache-backlink { 
     display: none;
   }
 }
 
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-summary #main-content table,
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-summary #main-content th,
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-summary #main-content tr,
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-summary #main-content td {
+  border: 1px solid #000000;
+  border-collapse: collapse;
+  text-align: center;
+}
