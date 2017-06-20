@@ -53,13 +53,7 @@ function grievance_uh226_report_spi_term_summary_pks(&$form_state) {
   $from_ts = strtotime($form_state['values']['from_date']);
   $to_ts = strtotime($form_state['values']['to_date']);
 
-  $spi_log_type_tid = variable_get('grievance_log_spi_type', '');
-  $term_log_type_tid = variable_get('grievance_log_term_type', '');
-
-  if (!$spi_log_type_tid || !$term_log_type_tid) {
-    drupal_set_message(t('Unable to generate this report.  Please go to the configuration screen and set the SPI Log Type and Termination Log Type.'), 'error');
-    return array();
-  }
+  $lookups = grievance_uh226_report_spi_term_summary_lookups();
 
   $sql = "select distinct node.nid ";
   $sql .= "from field_data_field_grievance_log_type, field_data_field_grievance, node ";
@@ -67,7 +61,7 @@ function grievance_uh226_report_spi_term_summary_pks(&$form_state) {
   $sql .= "and field_data_field_grievance_log_type.entity_type = 'node' ";
   $sql .= "and field_data_field_grievance.entity_id = field_data_field_grievance_log_type.entity_id ";
   $sql .= "and node.nid = field_data_field_grievance.field_grievance_target_id ";
-  $sql .= "and field_data_field_grievance_log_type.field_grievance_log_type_tid in ($spi_log_type_tid, $term_log_type_tid) ";
+  $sql .= "and field_data_field_grievance_log_type.field_grievance_log_type_tid in ($lookups[spi_log_type_tid], $lookups[term_log_type_tid]) ";
   $sql .= "and node.type = 'grievance' ";
   $sql .= "and node.created >= :from_ts ";
   $sql .= "and node.created <= :to_ts ";
@@ -89,8 +83,10 @@ function grievance_uh226_report_spi_term_summary_batch($grievance_nids, $values,
 		'is_multiple' => TRUE,
 		'rows' => array(),
 	);
+
+  $lookups = grievance_uh226_report_spi_term_summary_lookups();
 	foreach ($grievance_nids as $grievance_nid) {
-		$row = grievance_uh226_report_spi_term_summary_nid($grievance_nid, $values, $report_id, $report_action, $context);
+		$row = grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups);
 		if ($row) {
 			$rows['rows'][$grievance_nid] = $row;
 		}
@@ -99,8 +95,6 @@ function grievance_uh226_report_spi_term_summary_batch($grievance_nids, $values,
 }
 
 function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
-  $spi_log_type_tid = variable_get('grievance_log_spi_type', '');
-  $term_log_type_tid = variable_get('grievance_log_term_type', '');
 
   // Our result row
   $row = array();
@@ -135,13 +129,12 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
     variable_get('grievance_log_insert_type', ''), 
     variable_get('grievance_log_update_type_with_status_change', ''), 
   );
-  $boa_status_tid = 112;
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
   $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
-  $query->fieldCondition('field_grievance_status', 'tid', $boa_status_tid);
+  $query->fieldCondition('field_grievance_status', 'tid', $lookups['boa_held_status_tids'], 'in');
   $stmt = $query->execute();
   if ($stmt['node']) {
     $row['boa_held'] = TRUE;
@@ -149,26 +142,19 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
     $row['no_boa_held'] = TRUE;
   }
 
+  // resolved
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  $query->fieldCondition('field_grievance_status', 'tid', $lookups['rslvd_status_tids'], 'in');
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $row['rslvd'] = TRUE;
+  } 
+  
   return $row;
-
-	// Load the log
-	$found = FALSE;
-	foreach ($grievance_node->field_grievance_clauseref['und'] as $tmp) {
-		$clause_nid = $tmp['target_id'];
-		$clause = node_load($clause_nid);
-	}
-
-	$shop_nid = $grievance_node->field_grievance_shop['und'][0]['target_id'];
-	if (!$shop_nid) { return NULL; }
-	$shop_node = node_load($shop_nid);
-	if (!$shop_node) { return NULL; }
-
-	$row = array();
-	$row[] = $shop_node->title;
-	$row[] = $grievance_node->field_grievance_last_name['und'][0]['value'] . ', ' . $grievance_node->field_grievance_first_name['und'][0]['value'];
-	$row[] = $grievance_node->field_grievance_id['und'][0]['value'];
-
-	return $row;
 }
 
 function grievance_uh226_report_spi_term_summary_lookups() {
@@ -181,12 +167,8 @@ function grievance_uh226_report_spi_term_summary_lookups() {
   }
   $open_status_tids = array(-999);
   $closed_status_tids = array(-999);
-  $arbitration_status_tids = array(-999);
-  $fmcs_status_tids = array(-999);
-  $adr_status_tids = array(-999);
-  $formal_arb_held_status_tids = array(-999);
-  $expedited_arb_held_status_tids = array(-999);
-  $victory_status_tids = array(-999);
+  $rslvd_status_tids = array(-999);
+  $nfa_status_tids = array(-999);
   $boa_held_status_tids = array(-999);
 
   foreach ($status_terms as $tid => $term) {
@@ -199,65 +181,92 @@ function grievance_uh226_report_spi_term_summary_lookups() {
     if (preg_match('/arbitration/i', $term->name)) {
       $arbitration_status_tids[] = $tid;
     }
-    if (preg_match('/FMCS Held/i', $term->name)) {
-      $fmcs_status_tids[] = $tid;
-    }
-    if (preg_match('/ADR Held/i', $term->name)) {
-      $adr_status_tids[] = $tid;
-    }
-    if (preg_match('/Formal Arbitration Held/i', $term->name)) {
-      $formal_arb_held_status_tids[] = $tid;
-    }
-    if (preg_match('/Expedited Arbitration Held/i', $term->name)) {
-      $expedited_arb_held_status_tids[] = $tid;
-    }
-    if (preg_match('/(resolved|won)/i', $term->name)) {
-      $victory_status_tids[] = $tid;
+    if (preg_match('/resolved/i', $term->name)) {
+      $rslvd_status_tids[] = $tid;
     }
     if (preg_match('/BOA Held/i', $term->name)) {
       $boa_held_status_tids[] = $tid;
     }
   }
 
-  // Get the list of "SPI" nids
-  $query = new EntityFieldQuery;
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_contract_clause');
-  $query->propertyCondition('title', '%Suspension Pending Investigation%', 'like');
-  $stmt = $query->execute();
-  $spi_nids = array(-999);
-  if ($stmt['node']) {
-    $spi_nids = array_keys($stmt['node']);
-  }
-
-  // Get the list of "Term" nids
-  $query = new EntityFieldQuery;
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_contract_clause');
-  $query->propertyCondition('title', '%Discharge%', 'like');
-  $stmt = $query->execute();
-  $term_nids = array(-999);
-  if ($stmt['node']) {
-    $term_nids = array_keys($stmt['node']);
-  }
-
   return array(
 		'open_status_tids' 								=> $open_status_tids,
 		'closed_status_tids'							=> $closed_status_tids,
 		'arbitration_status_tids'					=> $arbitration_status_tids,
-		'fmcs_status_tids' 								=> $fmcs_status_tids,
-		'adr_status_tids' 								=> $adr_status_tids,
-		'formal_arb_held_status_tids' 		=> $formal_arb_held_status_tids,
-		'expedited_arb_held_status_tids' 	=> $expedited_arb_held_status_tids,
-		'victory_status_tids' 						=> $victory_status_tids,
+		'rslvd_status_tids' 						  => $rslvd_status_tids,
 		'boa_held_status_tids' 						=> $boa_held_status_tids,
-		'spi_nids' 												=> $spi_nids,
-		'term_nids' 											=> $term_nids,
+    'spi_log_type_tid'                => variable_get('grievance_log_spi_type', ''),
+    'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
   );
 }
 
 function grievance_uh226_report_spi_term_summary_render($report_type, $report_id) {
-  return 'Render goes here...';
+  // Iterate through the results and build our aggregates
+  /*
+    'grievance_nid' => 'Grievance NID',
+    'specialist_name' => 'Specialist Name',
+    '
+  */
+
+  $data = array();
+  $query = db_select('report_cache');
+  $query->fields('report_cache');
+  $query->condition('report_id', $report_id);
+  $query->condition('report_type', $report_type);
+  $stmt = $query->execute();
+  while ($hr = $stmt->fetchAssoc()) {
+    $hr = unserialize($hr['report_data']);
+    $data[$hr['specialist_name']]['total']++;
+
+    foreach (
+      array(
+        '1st_call',
+        'no_activity',
+        'no_boa_held',
+        'boa_held',
+        'rslvd',
+        'nfa',
+        'arb_submitted',
+        'won',
+        'lost') as $field) {
+      if ($hr[$field]) { $data[$hr['specialist_name']][$field]++; }
+    }
+  }
+
+  $header = array(
+    'Specialist',
+    'Total SPIs/Terms',
+    '1st Calls',
+    'No Activity',
+    'No BOA Held',
+    'BOAs Held',
+    'RSLVD',
+    'NFA',
+    'Arbs Submitted',
+    'Won', 
+    'Lost'
+  );
+
+  $rows = array();
+  foreach ($data as $specialist_name => $hr) {
+    $row = array();
+    $row[] = $specialist_name;
+    $row[] = $hr['total'];
+    $row[] = $hr['1st_call'];
+    $row[] = $hr['no_activity'];
+    $row[] = $hr['no_boa_held'];
+    $row[] = $hr['boa_held'];
+    $row[] = $hr['rslvd'];
+    $row[] = $hr['nfa'];
+    $row[] = $hr['arb_submitted'];
+    $row[] = $hr['won'];
+    $row[] = $hr['lost'];
+    $rows[] = $row;
+  }
+
+  $attributes = array();
+
+  return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
 }
 
 
