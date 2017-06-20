@@ -281,6 +281,8 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   $query->condition('report_id', $report_id);
   $query->condition('report_type', $report_type);
   $stmt = $query->execute();
+  $sub_totals = array();
+  $totals = array();
   while ($hr = $stmt->fetchAssoc()) {
     $hr = unserialize($hr['report_data']);
     $data[$hr['specialist_name']]['total']++;
@@ -296,7 +298,11 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
         'arb',
         'won',
         'lost') as $field) {
-      if ($hr[$field]) { $data[$hr['specialist_name']][$field]++; }
+
+      if ($hr[$field]) {
+        $data[$hr['specialist_name']][$field]++;
+        $sub_totals[$field]++;
+      }
     }
   }
 
@@ -332,6 +338,37 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
     $row[] = $hr['lost'];
     $rows[] = $row;
   }
+
+  $row = array();
+  $row[] = '<strong>' . t('Sub-Total') . '</strong>';
+  $row[] = '<strong>' . $sub_totals['total'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['1st_call'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['no_activity'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['no_boa_held'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['boa_held'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['rslvd'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['nfa'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['arb'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['won'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['lost'] . '</strong>';
+  $rows[] = $row;
+
+  $row = array();
+  $row[] = '<strong>' . t('Total') . '</strong>';
+  $row[] = '<strong>' . $sub_totals['total'] . '</strong>';
+  $row[] = array(
+    'data' => '<strong>' . ($sub_totals['1st_call'] + $sub_totals['no_activity']) . '</strong>',
+    'colspan' => 2
+  );
+  $row[] = array(
+    'data' => '<strong>' . ($sub_totals['no_boa_held'] + $sub_totals['boa_held']) . '</strong>',
+    'colspan' => 2
+  );
+  $row[] = array(
+    'data' => '<strong>' . ($sub_totals['rslvd'] + $sub_totals['nfa'] + $sub_totals['won'] + $sub_totals['lost'] ) . '</strong>',
+    'colspan' => 4
+  );
+  $rows[] = $row;
 
   $attributes = array();
 

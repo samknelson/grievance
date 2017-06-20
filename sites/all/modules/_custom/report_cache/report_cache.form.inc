@@ -198,9 +198,6 @@ function report_cache_batch_finished($success, $results, $operations) {
 	}
 }
 
-
-
-
 function report_cache_run($report_type, $values = array()) {
 	// Become user 1
 	global $user;
