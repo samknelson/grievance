@@ -23,7 +23,7 @@ function report_cache_page_report($report_type) {
 	}
 
 	if ($render) {
-		$html = '<div class="report-cache-backlink">' . '[' . l(t('Back to report list'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'preview'))) . ']' . '</div>';
+		$html = '<div class="report-cache-backlink">' . '[' . l(t('Back to report list'), "admin/reports/report-cache/$report_type") . ']' . '</div>';
 		$html .= $render;
 		return $html;
 	}
