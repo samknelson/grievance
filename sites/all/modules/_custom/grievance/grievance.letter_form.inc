@@ -211,10 +211,16 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 
       $classes = 'grievance-recipient ';
 
+			$description = '';
+			if ($recipient['description']) {
+				$description = '<div class="grievance-recipient-description">' . $recipient['description'] . '</div>';
+			}
+
 			$form['recipients']['grievance_recipients']["recipient_${count}_intro"] = array(
 				'#title' => '',
 				'#type' => 'markup',
-				'#markup' => '<div class="grievance-recipient-name">' . $recipient['name'] . '</div>' . 
+				'#markup' => $description . 
+				  '<div class="grievance-recipient-name">' . $recipient['name'] . '</div>' . 
 					'<div class="grievance-recipient-email">' . grievance_email_trim($recipient['email'], 25) . '</div>' . 
 					'<div class="grievance-recipient-type">(' . $recipient['type'] . ')</div>',
 				'#prefix' => '<div class="' . $classes . '" style="' . $style . '">',
@@ -330,6 +336,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 			$found = TRUE;
 			$fax_options[$key] = $recipient['fax'] . ': ' . $recipient['name'];
 			if ($recipient['role']) { $fax_options[$key] .= ' (' . $recipient['role'] . ')'; }
+			if ($recipient['description']) { $fax_options[$key] .= ' (' . $recipient['description'] . ')'; }
 		}
 	}
 	if ($found) {

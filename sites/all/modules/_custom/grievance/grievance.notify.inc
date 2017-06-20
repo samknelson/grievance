@@ -27,16 +27,6 @@ function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 			foreach ($contact_nodes as $contact_nid => $contact_node) {
 				$recipient = array();
 
-				if (!isset($contact_node->field_grievance_statuses['und'])) {
-					$recipient['statusmatch'] = TRUE;
-				} else {
-					foreach ($contact_node->field_grievance_statuses['und'] as $tmp) {
-						if ($tmp['tid'] == $status_tid) {
-							$recipient['statusmatch'] = TRUE;
-						}
-					}
-				}
-
 				$role = $contact_node->field_grievance_co_role['und'][0]['value'];
 				if ($role) {
 					$recipient['type'] = $role . t(' for ') . $shop_node->title;
@@ -49,6 +39,7 @@ function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 				$recipient['email'] = $contact_node->field_grievance_co_email['und'][0]['email'];
 				$recipient['fax'] = $contact_node->field_grievance_co_fax['und'][0]['value'];
 				$recipient['shop_contact'] = TRUE;
+				$recipient['description'] = $contact_node->field_grievance_description['und'][0]['value'];
 				$recipients[$contact_node->nid] = $recipient;
 			}
 		}
@@ -71,16 +62,6 @@ function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 
 				$recipient = array();
 
-				if (!isset($contact_node->field_grievance_statuses['und'])) {
-					$recipient['statusmatch'] = TRUE;
-				} else {
-					foreach ($contact_node->field_grievance_statuses['und'] as $tmp) {
-						if ($tmp['tid'] == $status_tid) {
-							$recipient['statusmatch'] = TRUE;
-						}
-					}
-				}
-				
 				$role = $contact_node->field_grievance_co_role['und'][0]['value'];
 				if ($role) {
 					$recipient['type'] = $role . t(' for ') . $company_node->title;
@@ -93,6 +74,7 @@ function grievance_notify_company_contacts($shop_nid, $status_tid = NULL) {
 				$recipient['email'] = $contact_node->field_grievance_co_email['und'][0]['email'];
 				$recipient['company_contact'] = TRUE;
 				$recipient['fax'] = $contact_node->field_grievance_co_fax['und'][0]['value'];
+				$recipient['description'] = $contact_node->field_grievance_description['und'][0]['value'];
 				$recipients[$contact_node->nid] = $recipient;
 			}
 		}
@@ -147,11 +129,8 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 
   $contact_count_company = 0;
   $contact_count_shop = 0;
-  $contact_count_statusmatch = 0;
-  $contact_count_nostatusmatch = 0;
   foreach ($recipients as $contact) {
   	if ($contact['is_blank']) { continue; }
-    if ($contact['statusmatch']) { ++$contact_count_statusmatch; } else { ++$contact_count_nostatusmatch; }
     if ($contact['shop_contact']) { ++$contact_count_shop; }
     if ($contact['company_contact']) { ++$contact_count_company; }
   }
@@ -168,18 +147,6 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
     $contacts_markup .= '<a href="#" id="grievance-contact-show-company" style="display: none;">[' . t('Show company contacts') . ']</a> ';
   }
 
-  $grievance_contacts_hide_nostatusmatch = variable_get('grievance_contacts_hide_nostatusmatch', '');
-  if ($grievance_contacts_hide_nostatusmatch == "Yes") {
-    if ($contact_count_nostatusmatch) {
-      $contacts_markup .= '<a href="#" id="grievance-contact-hide-nostatusmatch" style="display: none;">[' . t('Hide non-matching statuses') . ']</a> ';
-      $contacts_markup .= '<a href="#" id="grievance-contact-show-nostatusmatch">[' . t('Show non-matching statuses') . ']</a> ';
-    }
-  } else {
-    if ($contact_count_statusmatch) {
-      $contacts_markup .= '<a href="#" id="grievance-contact-hide-nostatusmatch">[' . t('Hide non-matching statuses') . ']</a> ';
-      $contacts_markup .= '<a href="#" id="grievance-contact-show-nostatusmatch" style="display: none;">[' . t('Show non-matching statuses') . ']</a> ';
-    }
-  }
   $contacts_markup .= '</div>';
 
 	$form['grievance_recipients_company']['grievance_company_contacts_wrapper_intro'] = array(
@@ -213,11 +180,6 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
 		} else {
 
       $classes = 'grievance-recipient';
-      if ($recipient['statusmatch']) {
-        $classes .= ' grievance-recipient-statusmatch';
-      } else {
-        $classes .= ' grievance-recipient-nostatusmatch';
-      }
 
       if ($recipient['shop_contact']) {
         $classes .= ' grievance-recipient-shop';
@@ -227,10 +189,6 @@ function grievance_notify_form($form, &$form_state, $grievance_node) {
       }
 
       $style = '';
-      if ($grievance_contacts_hide_nostatusmatch == "Yes" && !$recipient['statusmatch']) {
-        $style .= 'display: none;';
-      }
-
 
 			$form['grievance_recipients_company']["company_recipient_${count}_intro"] = array(
 				'#title' => '',

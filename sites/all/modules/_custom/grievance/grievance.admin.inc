@@ -80,6 +80,21 @@ function grievance_admin() {
     '#description' => t("Grievance log type to be used for Phaxio callback -- i.e. fax confirmation receipts."),
   );
 
+  $form['grievance_log']['grievance_log_spi_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('SPI Type'),
+    '#default_value' => variable_get('grievance_log_spi_type', ''),
+  );
+
+  $form['grievance_log']['grievance_log_term_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Term Type'),
+    '#default_value' => variable_get('grievance_log_term_type', ''),
+  );
+
+
   $form['grievance_status'] = array(
     '#type' => 'fieldset',
     '#title' => t('Status Types'),
@@ -249,14 +264,6 @@ function grievance_admin() {
   $form['grievance_contacts'] = array(
     '#type' => 'fieldset',
     '#title' => t('Contacts'),
-  );
-
-  $form['grievance_contacts']['grievance_contacts_hide_nostatusmatch'] = array(
-    '#type' => 'select',
-    '#title' => t('Hide Non-Matching Status?'),
-    '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
-    '#default_value' => variable_get('grievance_contacts_hide_nostatusmatch', ''),
-    '#description' => t('If "Yes" is selected, non-matching status contacts will be hidden by default (for example, Step 1 contacts will be hidden on Step 2 grievances.)'),
   );
 
   $form['grievance_messaging'] = array(
