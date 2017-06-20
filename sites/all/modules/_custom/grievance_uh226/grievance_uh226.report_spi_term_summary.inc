@@ -153,7 +153,19 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
   if ($stmt['node']) {
     $row['rslvd'] = TRUE;
   } 
-  
+
+  // NFA
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  $query->fieldCondition('field_grievance_status', 'tid', $lookups['nfa_status_tids'], 'in');
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $row['nfa'] = TRUE;
+  } 
+
   return $row;
 }
 
@@ -184,6 +196,9 @@ function grievance_uh226_report_spi_term_summary_lookups() {
     if (preg_match('/resolved/i', $term->name)) {
       $rslvd_status_tids[] = $tid;
     }
+    if (preg_match('/nfa/i', $term->name)) {
+      $nfa_status_tids[] = $tid;
+    }
     if (preg_match('/BOA Held/i', $term->name)) {
       $boa_held_status_tids[] = $tid;
     }
@@ -193,7 +208,8 @@ function grievance_uh226_report_spi_term_summary_lookups() {
 		'open_status_tids' 								=> $open_status_tids,
 		'closed_status_tids'							=> $closed_status_tids,
 		'arbitration_status_tids'					=> $arbitration_status_tids,
-		'rslvd_status_tids' 						  => $rslvd_status_tids,
+    'rslvd_status_tids'               => $rslvd_status_tids,
+    'nfa_status_tids'                 => $nfa_status_tids,
 		'boa_held_status_tids' 						=> $boa_held_status_tids,
     'spi_log_type_tid'                => variable_get('grievance_log_spi_type', ''),
     'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
