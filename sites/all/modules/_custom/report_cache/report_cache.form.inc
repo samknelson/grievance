@@ -95,6 +95,18 @@ function report_cache_form_submit($form, &$form_state) {
 		$pks = array_slice($pks, 0, $limit);
 	}
 
+  $stmt = db_insert('report_cache');
+	$stmt->fields(
+		array(
+			'report_id' => $report_id,
+			'report_row_pk' => 'PARAMETERS',
+			'report_type' => $report_type . ' :: PARAMETERS',
+			'report_data' => serialize($form_state['values']),
+		)
+	);
+	$stmt->execute();
+
+
 	$operations = array();
 	$count = 0;
 	$total = count($pks);

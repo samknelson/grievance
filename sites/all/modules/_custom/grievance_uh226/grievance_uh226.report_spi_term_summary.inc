@@ -275,6 +275,24 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
     '
   */
 
+  // Load the parameters
+  $query = db_select('report_cache');
+  $query->fields('report_cache');
+  $query->condition('report_id', $report_id);
+  $query->condition('report_type', $report_type . ' :: PARAMETERS');
+  $stmt = $query->execute();
+  $hr = $stmt->fetchAssoc();
+  $parameters = unserialize($hr['report_data']);
+
+  $html = '';
+  $html .= '<h2>' .
+    t('Grievances from @from_date to @to_date', array(
+        '@from_date' => date('m/d/Y', strtotime($parameters['from_date'])),
+        '@to_date' => date('m/d/Y', strtotime($parameters['to_date'])),
+      )
+    ) .
+    '</h2>';
+
   $data = array();
   $query = db_select('report_cache');
   $query->fields('report_cache');
@@ -372,7 +390,9 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
 
   $attributes = array();
 
-  return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
+  $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
+
+  return $html;
 }
 
 
