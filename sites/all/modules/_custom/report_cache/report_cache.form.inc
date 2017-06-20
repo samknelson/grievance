@@ -14,9 +14,10 @@ function report_cache_form_prepare($report_type, &$form, &$form_state) {
 	$form['report_cache']['report_intro'] = array(
 		'#type' => 'markup',
 		'#markup' => 
-			t('Use the form below to re-generate the report.  The results from previous runs may be downloaded ') .
+			t('Use the form below to re-generate the report.  The results from previous runs may be seen ') .
+			'<strong>' . 
 			l(t('here'), "admin/reports/report-cache/$report_type") .
-			t(' in csv format.'),
+			'</strong>',
 	);
 	
 	$form['report_cache']['report_id'] = array(
@@ -121,6 +122,9 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 	$report_id = $values['report_id'];
 	$report_action = $values['report_action'];
 
+	$context['results']['report_type'] = $report_type;
+	$context['results']['count']++;
+
 	if ($report_action == 'continue') {
 		$stmt = db_query(
 			'select count(*) as c from report_cache where report_id = :report_id and report_row_pk = :pk',
@@ -182,7 +186,16 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 }
 
 function report_cache_batch_finished($success, $results, $operations) {
-	drupal_set_message("Report generated.");
+	if ($results['count']) {
+		$report_type = $results['report_type'];
+		$count = $results['count'];
+		drupal_set_message(
+			t('The report has been generated and may be viewed ') . 
+			l(t('here.'), "admin/reports/report-cache/$report_type")
+		);
+	} else {
+		drupal_set_message(t('No records found.'));
+	}
 }
 
 
