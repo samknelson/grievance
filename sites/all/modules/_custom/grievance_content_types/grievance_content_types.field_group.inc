@@ -379,7 +379,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance_co';
   $field_group->data = array(
     'label' => 'Address',
-    'weight' => '8',
+    'weight' => '25',
     'children' => array(
       0 => 'field_grievance_co_address',
       1 => 'field_grievance_co_address_2',
@@ -415,6 +415,7 @@ function grievance_content_types_field_group_info() {
       0 => 'field_grievance_co_phone',
       1 => 'field_grievance_co_email',
       2 => 'field_grievance_co_fax',
+      3 => 'field_grievance_co_phone_2',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -440,11 +441,12 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance_co';
   $field_group->data = array(
     'label' => 'Phone and Email',
-    'weight' => '9',
+    'weight' => '26',
     'children' => array(
       0 => 'field_grievance_co_phone',
       1 => 'field_grievance_co_email',
       2 => 'field_grievance_co_fax',
+      3 => 'field_grievance_co_phone_2',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -474,6 +476,8 @@ function grievance_content_types_field_group_info() {
     'children' => array(
       0 => 'field_grievance_co_name',
       1 => 'field_grievance_co_role',
+      2 => 'field_grievance_description',
+      3 => 'field_grievance_min',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -499,11 +503,13 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance_co';
   $field_group->data = array(
     'label' => 'Name and Role',
-    'weight' => '7',
+    'weight' => '24',
     'children' => array(
       0 => 'field_grievance_co_name',
       1 => 'field_grievance_co_role',
-      2 => 'title',
+      2 => 'field_grievance_description',
+      3 => 'field_grievance_min',
+      4 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -527,16 +533,15 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'default';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Shops and Statuses',
+    'label' => 'Shops and Company',
     'weight' => '3',
     'children' => array(
       0 => 'field_grievance_shops',
-      1 => 'field_grievance_statuses',
-      2 => 'field_grievance_company',
+      1 => 'field_grievance_company',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
-      'label' => 'Shops and Statuses',
+      'label' => 'Shops and Company',
       'instance_settings' => array(
         'id' => '',
         'classes' => 'group-grievance-co-shops field-group-fieldset',
@@ -557,20 +562,19 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_grievance_co';
   $field_group->data = array(
-    'label' => 'Shops and Statuses',
-    'weight' => '10',
+    'label' => 'Shops and Company',
+    'weight' => '27',
     'children' => array(
       0 => 'field_grievance_shops',
-      1 => 'field_grievance_statuses',
-      2 => 'field_grievance_company',
+      1 => 'field_grievance_company',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
-      'label' => 'Shops and Statuses',
+      'label' => 'Shops and Company',
       'instance_settings' => array(
         'required_fields' => 1,
         'classes' => 'group-grievance-co-shops field-group-accordion-item',
-        'description' => 'This contact will appear as an option for any of the shops selected.  If you select statuses, then the contact will also appear as an option for <strong>every</strong> grievance with that status.',
+        'description' => 'This contact will appear as an option for any of the shops selected.  If you select a company, it will appear as an option for all shops in that company.',
       ),
       'formatter' => 'closed',
     ),
@@ -1726,7 +1730,7 @@ function grievance_content_types_field_group_info() {
   t('Notifications');
   t('Phone and Email');
   t('Resolution Procedure');
-  t('Shops and Statuses');
+  t('Shops and Company');
   t('Status');
   t('Supervisor');
   t('Timeline');
