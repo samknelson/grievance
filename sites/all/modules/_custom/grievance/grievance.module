@@ -366,6 +366,12 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
       $form['field_grievance_co_state']['#access'] = FALSE;
       $form['field_grievance_co_zip']['#access'] = FALSE;
     }
+    if (!user_access('grievance form st contacts')) {
+      $form['field_grievance_st_selector']['#access'] = FALSE;
+      $form['field_grievance_st_name']['#access'] = FALSE;
+      $form['field_grievance_st_email']['#access'] = FALSE;
+      $form['field_grievance_st_phone']['#access'] = FALSE;
+    }
   }
 
   // Set some default values for views
