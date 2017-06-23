@@ -300,6 +300,7 @@ function grievance_timeline_short($grievance_node) {
 	}
 
 	// Add any log entries of the right type
+	dpm($log_type_terms);
 	if ($log_type_terms) {
 		dpm($log_type_terms);
 		$already_seen = array();
