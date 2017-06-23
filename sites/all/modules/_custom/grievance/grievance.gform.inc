@@ -300,10 +300,7 @@ function grievance_timeline_short($grievance_node) {
 	}
 
 	// Add any log entries of the right type
-	dpm($log_type_terms);
 	if ($log_type_terms) {
-		dpm($log_type_terms);
-		$already_seen = array();
 	  $query = new EntityFieldQuery();
 	  $query->entityCondition('entity_type', 'node');
 	  $query->entityCondition('bundle', 'grievance_log');
@@ -315,8 +312,6 @@ function grievance_timeline_short($grievance_node) {
 	  	$log_nodes = node_load_multiple(array_keys($stmt['node']));
 	  	foreach ($log_nodes as $log_nid => $log_node) {
 	  		if ($already_seen[$log_node->field_grievance_log_type['und'][0]['tid']]) { continue; }
-	  		$already_seen[$log_node->field_grievance_log_type['und'][0]['tid']] = TRUE;
-	  		dpm($already_seen);
 				$dates[] = array(
 					'key' => $log_type_terms[$log_node->field_grievance_log_type['und'][0]['tid']]->name,
 					'ts' => strtotime($log_node->field_grievance_status_date['und'][0]['value']),
@@ -338,11 +333,15 @@ function grievance_timeline_short($grievance_node) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
+  $query->fieldOrderBy('field_grievance_date', 'value', 'desc');
   $stmt = $query->execute();
   if ($stmt['node']) {
   	$log_nodes = node_load_multiple(array_keys($stmt['node']));
+  	$already_seen = array();
   	foreach ($log_nodes as $log_nid => $log_node) {
   		if (!$status_terms[$log_node->field_grievance_status['und'][0]['tid']]) { continue; }
+  		if ($already_seen[$log_node->field_grievance_status['und'][0]['tid']]) { continue; }
+  		$already_seen[$log_node->field_grievance_status['und'][0]['tid']] = TRUE;
 			$dates[] = array(
 				'key' => $status_terms[$log_node->field_grievance_status['und'][0]['tid']]->name,
 				'ts' => strtotime($log_node->field_grievance_status_date['und'][0]['value']),
