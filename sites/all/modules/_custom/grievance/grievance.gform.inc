@@ -300,6 +300,7 @@ function grievance_timeline_short($grievance_node) {
 	}
 
 	// Add any log entries of the right type
+	drupal_set_message("Here...");
 	if ($log_type_terms) {
 		$already_seen = array();
 	  $query = new EntityFieldQuery();
@@ -323,6 +324,7 @@ function grievance_timeline_short($grievance_node) {
 	  	}
 	  }
 	}
+	
 
 	// Add any "log status changed" entries of the right type.
   $log_update_tids = array(
