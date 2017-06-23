@@ -335,18 +335,12 @@ function grievance_timeline_short($grievance_node) {
   $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
   $query->fieldOrderBy('field_grievance_status_date', 'value', 'desc');
   $stmt = $query->execute();
-  drupal_set_message("A");
   if ($stmt['node']) {
   	$log_nodes = node_load_multiple(array_keys($stmt['node']));
-  	dpm($log_nodes);
   	$already_seen = array();
   	foreach ($log_nodes as $log_nid => $log_node) {
-  		drupal_set_message("$log_nid A");
   		if (!$status_terms[$log_node->field_grievance_status['und'][0]['tid']]) { continue; }
-  		drupal_set_message("$log_nid B");
   		if ($already_seen[$log_node->field_grievance_status['und'][0]['tid']]) { continue; }
-  		drupal_set_message("$log_nid C");
-  		dpm($already_seen);
   		$already_seen[$log_node->field_grievance_status['und'][0]['tid']] = TRUE;
 			$dates[] = array(
 				'key' => $status_terms[$log_node->field_grievance_status['und'][0]['tid']]->name,
