@@ -122,6 +122,9 @@ function grievance_permission() {
     'grievance form company contacts' => array(
         'title' => t('Grievance Form - Change Company Represenative'),
     ),
+    'grievance form st contacts' => array(
+        'title' => t('Grievance Form - Change Shop Steward'),
+    ),
     'grievance form id' => array(
         'title' => t('Grievance Form - Change Grievance ID'),
     ),

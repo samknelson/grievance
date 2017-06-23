@@ -248,58 +248,13 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $status_term = taxonomy_term_load($status_tid);
 
   if ($form['field_grievance_contact_selector']['#access']) {
-    $contacts = grievance_notify_company_contacts($shop_nid, $status_tid);
-    if ($contacts) {
-      $contacts_markup = '';
-      $contacts_markup .= t('The contacts below are associated with the shop or company.  Select the contact who should appear on the grievance form.');
-
-      $contact_count_company = 0;
-      $contact_count_shop = 0;
-      foreach ($contacts as $contact) {
-        if ($contact['shop_contact']) { ++$contact_count_shop; }
-        if ($contact['company_contact']) { ++$contact_count_company; }
-      }
-
-
-      $contacts_markup .= '<div style="clear: both" id="grievance_contact_controls">';
-
-      if ($contact_count_shop) {
-        $contacts_markup .= '<a href="#" id="grievance-contact-hide-shop">[' . t('Hide shop contacts') . ']</a> ';
-        $contacts_markup .= '<a href="#" id="grievance-contact-show-shop" style="display: none;">[' . t('Show shop contacts') . ']</a> ';
-      }
-
-      if ($contact_count_company) {
-        $contacts_markup .= '<a href="#" id="grievance-contact-hide-company">[' . t('Hide company contacts') . ']</a> ';
-        $contacts_markup .= '<a href="#" id="grievance-contact-show-company" style="display: none;">[' . t('Show company contacts') . ']</a> ';
-      }
-
-      $contacts_markup .= '</div>';
-
-      foreach ($contacts as $contact) {
-        $contact_nid = $contact['nid'];
-        $contact_node = node_load($contact_nid);
-        $contact_node_view = node_view($contact_node, 'teaser');
-
-        $classes = 'grievance-recipient';
-        if ($contact['shop_contact']) {
-          $classes .= ' grievance-recipient-shop';
-        }
-        if ($contact['company_contact']) {
-          $classes .= ' grievance-recipient-company';
-        }
-
-        $style = '';
-
-        $contacts_markup .= '<div class="' . $classes . '" style="' . $style . '">';
-        $contacts_markup .= drupal_render($contact_node_view);
-        $contacts_markup .= '</div>';
-      }
-      $contacts_markup .= '<div style="clear: both">&nbsp;</div>';
-    } else {
-      $contacts_markup = t('This shop has no contacts configured.  Please enter the company contact manually.');
-    }
-    $form['field_grievance_contact_selector']['und'][0]['markup']['#markup'] = '<div id="grievance-form-contacts-link">' . $contacts_markup . '</div>';
+    $form['field_grievance_contact_selector']['und'][0]['markup']['#markup'] = grievance_contacts_create_selector($shop_nid, $status_tid, 'contact', FALSE);
   }
+
+  if ($form['field_grievance_st_selector']['#access']) {
+    $form['field_grievance_st_selector']['und'][0]['markup']['#markup'] = grievance_contacts_create_selector($shop_nid, $status_tid, 'st', TRUE);
+  }
+
 
   // 
   // Set default values for manager, organizer, etc.
@@ -604,3 +559,4 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     }
   }
 }
+

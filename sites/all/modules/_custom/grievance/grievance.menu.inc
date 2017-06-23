@@ -421,6 +421,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['admin/config/grievance/contacts'] = array(
+		'title' => 'Grievance Module - Contacts',
+		'description' => t('Contact-related settings'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_contacts_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['grievance/report/bytype'] = array(
 		'title' => 'Report: Count by Type',
 		'description' => '',

@@ -103,7 +103,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 
 
   // Get the company contacts
-	$recipients = grievance_notify_company_contacts($shop_nid, $status_tid);
+	$recipients = grievance_notify_company_contacts(array('shop_nid' => $shop_nid, 'status_nid' => $status_tid));
 
 	$fields = array(
 		'field_grievance_rep_filed',
@@ -211,15 +211,22 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 
       $classes = 'grievance-recipient ';
 
-			$description = '';
-			if ($recipient['description']) {
-				$description = '<div class="grievance-recipient-description">' . $recipient['description'] . '</div>';
+			$type_text = '';
+			if ($recipient['contact_types']) {
+				$type_text = '<div class="field-name-field-grievance-contact-types">';
+				$type_text .= '<ul>';
+				foreach ($recipient['contact_types'] as $tmp) {
+					$term = taxonomy_term_load($tmp['tid']);
+					$type_text .= '<li>' . $term->name . '</li>';
+				}
+				$type_text .= '</ul>';
+				$type_text .= '</div>';
 			}
 
 			$form['recipients']['grievance_recipients']["recipient_${count}_intro"] = array(
 				'#title' => '',
 				'#type' => 'markup',
-				'#markup' => $description . 
+				'#markup' => $type_text . 
 				  '<div class="grievance-recipient-name">' . $recipient['name'] . '</div>' . 
 					'<div class="grievance-recipient-email">' . grievance_email_trim($recipient['email'], 25) . '</div>' . 
 					'<div class="grievance-recipient-type">(' . $recipient['type'] . ')</div>',
@@ -325,7 +332,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	);
 
   // Get the company contacts
-	$fax_recipients = grievance_notify_company_contacts($shop_nid, $status_tid);
+	$fax_recipients = grievance_notify_company_contacts(array('shop_nid' => $shop_nid, 'status_nid' => $status_tid));
 	$found = FALSE;
 	$fax_options = array(NULL => t('[select]'));
 	$delta = 0;

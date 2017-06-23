@@ -1,5 +1,20 @@
 <?php
 
+function grievance_contacts_admin() {
+  $form = array();
+
+  $form['grievance_contacts_st_type'] = array(
+    '#default_value' => variable_get('grievance_contacts_st_type', ''),
+    '#title' => t('Shop Steward Contact Type'),
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_contact_types')),
+  );
+
+  return system_settings_form($form);
+}
+
+
+
 function grievance_shop_node_tab_contacts($shop_node) {
   drupal_set_title($shop_node->title . ': ' . t('Contacts'));
   $entity_nid = $shop_node->nid;
@@ -45,4 +60,69 @@ function grievance_views_post_execute_shop_contacts(&$view) {
       }
     }
   }
+}
+
+function grievance_contacts_create_selector($shop_nid, $status_tid, $which, $is_stewards) {
+  $params = array(
+    'shop_nid' => $shop_nid,
+    'status_tid' => $status_tid
+  );
+  $steward_type_tid = variable_get('grievance_contacts_st_type', '');
+  if ($is_stewards) {
+    $params['include_contact_type_tid'] = $steward_type_tid;
+  } else {
+    $params['exclude_contact_type_tid'] = $steward_type_tid;
+  }
+  $contacts = grievance_notify_company_contacts($params);
+
+  if ($contacts) {
+    $contacts_markup = '';
+    $contacts_markup .= t('The contacts below are associated with the shop or company.  Select the contact who should appear on the grievance form.');
+
+    $contact_count_company = 0;
+    $contact_count_shop = 0;
+    foreach ($contacts as $contact) {
+      if ($contact['shop_contact']) { ++$contact_count_shop; }
+      if ($contact['company_contact']) { ++$contact_count_company; }
+    }
+
+
+    $contacts_markup .= '<div style="clear: both" id="grievance_contact_controls">';
+
+    if ($contact_count_shop) {
+      $contacts_markup .= '<a href="#" id="grievance-' . $which . '-hide-shop">[' . t('Hide shop contacts') . ']</a> ';
+      $contacts_markup .= '<a href="#" id="grievance-' . $which . '-show-shop" style="display: none;">[' . t('Show shop contacts') . ']</a> ';
+    }
+
+    if ($contact_count_company) {
+      $contacts_markup .= '<a href="#" id="grievance-' . $which . '-hide-company">[' . t('Hide company contacts') . ']</a> ';
+      $contacts_markup .= '<a href="#" id="grievance-' . $which . '-show-company" style="display: none;">[' . t('Show company contacts') . ']</a> ';
+    }
+
+    $contacts_markup .= '</div>';
+
+    foreach ($contacts as $contact) {
+      $contact_nid = $contact['nid'];
+      $contact_node = node_load($contact_nid);
+      $contact_node_view = node_view($contact_node, 'teaser');
+
+      $classes = 'grievance-recipient';
+      if ($contact['shop_contact']) {
+        $classes .= ' grievance-recipient-shop';
+      }
+      if ($contact['company_contact']) {
+        $classes .= ' grievance-recipient-company';
+      }
+
+      $style = '';
+
+      $contacts_markup .= '<div class="' . $classes . '" style="' . $style . '">';
+      $contacts_markup .= drupal_render($contact_node_view);
+      $contacts_markup .= '</div>';
+    }
+    $contacts_markup .= '<div style="clear: both">&nbsp;</div>';
+  } else {
+    $contacts_markup = t('This shop has no contacts configured.  Please enter the company contact manually.');
+  }
+  return '<div id="grievance-form-' . $which . 's-link">' . $contacts_markup . '</div>';
 }

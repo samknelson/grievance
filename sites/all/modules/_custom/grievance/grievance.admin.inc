@@ -261,11 +261,6 @@ function grievance_admin() {
     '#type' => 'textfield',
   );
 
-  $form['grievance_contacts'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Contacts'),
-  );
-
   $form['grievance_messaging'] = array(
     '#type' => 'fieldset',
     '#title' => t('Messaging'),
