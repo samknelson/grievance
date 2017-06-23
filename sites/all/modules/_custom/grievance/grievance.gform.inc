@@ -314,6 +314,7 @@ function grievance_timeline_short($grievance_node) {
 	  	foreach ($log_nodes as $log_nid => $log_node) {
 	  		if ($already_seen[$log_node->field_grievance_log_type['und'][0]['tid']]) { continue; }
 	  		$already_seen[$log_node->field_grievance_log_type['und'][0]['tid']] = TRUE;
+	  		dpm($already_seen);
 				$dates[] = array(
 					'key' => $log_type_terms[$log_node->field_grievance_log_type['und'][0]['tid']]->name,
 					'ts' => strtotime($log_node->field_grievance_status_date['und'][0]['value']),
