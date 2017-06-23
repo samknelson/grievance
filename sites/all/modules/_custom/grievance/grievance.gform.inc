@@ -306,7 +306,7 @@ function grievance_timeline_short($grievance_node) {
 	  $query->entityCondition('bundle', 'grievance_log');
 	  $query->fieldCondition('field_grievance_log_type', 'tid', $log_type_tids, 'in');
 	  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-	  $query->fieldOrderBy('field_grievance_date', 'value', 'desc');
+	  $query->fieldOrderBy('field_grievance_status_date', 'value', 'desc');
 	  $stmt = $query->execute();
 	  if ($stmt['node']) {
 	  	$log_nodes = node_load_multiple(array_keys($stmt['node']));
@@ -333,7 +333,7 @@ function grievance_timeline_short($grievance_node) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  $query->fieldOrderBy('field_grievance_date', 'value', 'desc');
+  $query->fieldOrderBy('field_grievance_status_date', 'value', 'desc');
   $stmt = $query->execute();
   drupal_set_message("A");
   if ($stmt['node']) {
