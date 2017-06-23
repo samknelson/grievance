@@ -3263,8 +3263,9 @@ fieldset legend {
   height: 250px;
 }
 
-.grievance-recipient .field-name-field-grievance-description,
-.grievance-recipient .grievance-recipient-description {
+.grievance-recipient .field-name-field-grievance-contact-types ul {
+  padding: 0;
+  margin: 0;
   font-style: italic;
 }
 
@@ -3802,3 +3803,4 @@ fieldset.date-combo .container-inline-date .date-padding {
   border-collapse: collapse;
   text-align: center;
 }
+

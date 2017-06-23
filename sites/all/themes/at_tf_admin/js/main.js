@@ -14,10 +14,11 @@
 
 	// This should move into the grievance module.  But for now....
   Drupal.behaviors.grievance = {
-    attach: function(context, settings) {
-			$('#grievance-form-contacts-link .grievance-recipient').one('click', function() { grievance_handle_recipient_click($(this)); });
 
-			function grievance_handle_recipient_click(elt) {
+    attach: function(context, settings) {
+			$('#grievance-form-contacts-link .grievance-recipient').off('click').on('click', function() { grievance_handle_contact_click($(this)); });
+
+			function grievance_handle_contact_click(elt) {
 				val = elt.find('.field-name-field-grievance-co-name .field-item').html();
 				$('.form-item-field-grievance-co-name-und-0-value input').val(val);
 
@@ -44,6 +45,20 @@
 
 				val = elt.find('.field-name-field-grievance-co-zip .field-item').html();
 				$('.form-item-field-grievance-co-zip-und-0-value input').val(val);
+			};
+
+			$('#grievance-form-sts-link .grievance-recipient').off('click').on('click', function() { grievance_handle_st_click($(this)); });
+
+			function grievance_handle_st_click(elt) {
+
+				val = elt.find('.field-name-field-grievance-co-name .field-item').html();
+				$('.field-name-field-grievance-st-name-form input').val(val);
+
+				val = elt.find('.field-name-field-grievance-co-email .field-item').html();
+				$('.field-name-field-grievance-st-email-form input').val(val);
+
+				val = elt.find('.field-name-field-grievance-co-phone .field-item').html();
+				$('.field-name-field-grievance-st-phone-form input').val(val);
 			};
 
 	    $('.grievance_assignee_notes_dropdown').once().change(function () {
