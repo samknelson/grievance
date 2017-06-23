@@ -1171,6 +1171,7 @@ function grievance_content_types_ds_layout_settings_info() {
         0 => 'grievance_timeline_short',
         1 => 'field_grievance_meeting_date',
         2 => 'field_grievance_alert_waived',
+        34 => 'field_grievance_rep_filed',
       ),
       'left' => array(
         3 => 'field_grievance_co_state',
@@ -1245,6 +1246,7 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_grievance_remedy_other' => 'footer',
       'field_grievance_document_types' => 'footer',
       'field_grievance_inforeq' => 'footer',
+      'field_grievance_rep_filed' => 'header',
     ),
     'classes' => array(),
     'wrappers' => array(

@@ -4523,8 +4523,12 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'grievance_gform' => array(
         'label' => 'inline',
-        'settings' => array(),
-        'type' => 'hidden',
+        'module' => 'entityreference',
+        'settings' => array(
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
         'weight' => 49,
       ),
       'grievance_gform_a' => array(

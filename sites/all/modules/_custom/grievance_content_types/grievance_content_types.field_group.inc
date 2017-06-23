@@ -1637,10 +1637,9 @@ function grievance_content_types_field_group_info() {
     'label' => 'Union Representatives',
     'weight' => '80',
     'children' => array(
-      0 => 'field_grievance_rep_filed',
-      1 => 'field_grievance_rep_organizer',
-      2 => 'field_grievance_rep_lead',
-      3 => 'field_grievance_rep_manager',
+      0 => 'field_grievance_rep_organizer',
+      1 => 'field_grievance_rep_lead',
+      2 => 'field_grievance_rep_manager',
     ),
     'format_type' => 'div',
     'format_settings' => array(
