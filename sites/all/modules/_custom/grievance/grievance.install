@@ -110,3 +110,11 @@ function grievance_update_7004() {
     }
   }
 }
+
+function grievance_update_7005() {
+  print "---------------------------------------------------------------------------\n\n\n";
+  print "DON'T FORGET TO ENABLE watchdog_queue\n";
+  print "(Should have done this with module_enable() but I couldn't be bothered.)\n\n\n";
+  print "---------------------------------------------------------------------------\n";
+}
+

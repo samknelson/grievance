@@ -142,6 +142,7 @@ function grievance_mailattach_fetch() {
 
 		grievance_mailattach_fetch_accept($from_mail, t("Your email has been added as an attachment to: ") . $grievance_node->title);
 
+		watchdog('grievance_mailattach', "Attachment added to grievance " . $grievance_id);
 	}
 
 	// Delete all the messages
@@ -222,5 +223,3 @@ function grievance_imap_fetch_all_parts($mbox, $msgno, $structure, $path = NULL)
 
 	return $attachments;
 }
-
-

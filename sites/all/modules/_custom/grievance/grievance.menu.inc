@@ -320,6 +320,16 @@ function grievance_menu() {
 		'weight' => 6,
 	);
 
+	$items['grievances/mine/assigned-today'] = array(
+		'title' => t('Assigned Today'),
+		'page callback' => 'grievance_mine_assigned_today',
+		'page arguments' => array(),
+		'access arguments' => array('grievance form rep assignee'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 6,
+	);
+	
+
   //
 	// All Grievances
   // 
@@ -491,6 +501,15 @@ function grievance_menu() {
 		'page arguments' => array(),
 		'access callback' => 'grievance_phaxio_callback_access',
 		'access arguments' => array(3),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['grievance/admin/shops/bulk-reassign'] = array(
+		'title' => 'Bulk Re-Assign Grievances',
+		'description' => '',
+		'page callback' => 'grievance_shop_bulk_reassign',
+		'page arguments' => array(),
+		'access arguments' => array('grievance admin'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 

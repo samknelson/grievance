@@ -8,6 +8,12 @@ function grievance_all() {
   return views_embed_view('grievances', 'page');
 }
 
+function grievance_mine_assigned_today() {
+	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
+	$display_name = variable_get('grievance_mine_view_display', 'page_1');
+  return views_embed_view($view_name, $display_name, 'assigned_today');
+}
+
 function grievance_mine() {
 	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
 	$display_name = variable_get('grievance_mine_view_display', 'page_1');
@@ -66,36 +72,53 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 	if (!isset($view->result)) { return; }
 
 	//
+	// "Upcoming" doesn't compute reminders
+	//
+
+	$reminders_enabled = TRUE;
+	if ($view->name != 'grievances_mine') { $reminders_enabled = FALSE; }
+	if ($view->args[0] == 'upcoming') { $reminders_enabled = FALSE; }
+
+	//
 	// Array of reminders.  We're doing something a little weird here -- we're iterating through the whole list and
 	// removing entries which are *not* reminders.  Yes that's cumbersome and @todo may need to be cached some day.
 	// 
 
-	$reminders = array(
-		'reminder_30' => array(
-			'title' => t('no log entries for 30 days'),
-			'no_match' => array(),
-			'count' => 0,
-			'path' => 'grievances/mine/reminder-30',
-		),
-		'reminder_60' => array(
-			'title' => t('no log entries for 60 days'),
-			'no_match' => array(),
-			'count' => 0,
-			'path' => 'grievances/mine/reminder-60',
-		),
-		'reminder_90' => array(
-			'title' => t('no log entries for 90 days'),
-			'no_match' => array(),
-			'count' => 0,
-			'path' => 'grievances/mine/reminder-90',
-		),
-		'reminder_no_first_call' => array(
-			'title' => t('no first call'),
-			'no_match' => array(),
-			'count' => 0,
-			'path' => 'grievances/mine/reminder-no-first-call',
-		),		
-	);
+	$reminders = array();
+	if ($reminders_enabled) {
+		$reminders = array(
+			'reminder_30' => array(
+				'title' => t('no log entries for 30 days'),
+				'no_match' => array(),
+				'count' => 0,
+				'path' => 'grievances/mine/reminder-30',
+			),
+			'reminder_60' => array(
+				'title' => t('no log entries for 60 days'),
+				'no_match' => array(),
+				'count' => 0,
+				'path' => 'grievances/mine/reminder-60',
+			),
+			'reminder_90' => array(
+				'title' => t('no log entries for 90 days'),
+				'no_match' => array(),
+				'count' => 0,
+				'path' => 'grievances/mine/reminder-90',
+			),
+			'reminder_no_first_call' => array(
+				'title' => t('no first call'),
+				'no_match' => array(),
+				'count' => 0,
+				'path' => 'grievances/mine/reminder-no-first-call',
+			),
+			'assigned_today' => array(
+				'title' => t('assigned today'),
+				'no_match' => array(),
+				'count' => 0,
+				'path' => 'grievances/mine/assigned-today',
+			),
+		);
+	}
 	$total = 0;
 
 	// 
@@ -105,27 +128,46 @@ function grievance_views_post_execute_grievances_mine(&$view) {
   $first_call_tid = variable_get('grievance_log_first_call_type', '');
   $filed_status_tid = variable_get('grievance_log_filed_status', '');
   $filed_status_tid_2 = variable_get('grievance_log_filed_status_2', '');
+  $log_assignment_type = variable_get('grievance_log_assignment_type', '');
 
 	foreach ($view->result as $delta => &$result) {
 		++$total;
 		$grievance_nid = $result->nid;
 
 		if ($view->name == 'grievances_mine') {
-			// 
-			// n-day reminders.  Remove anything if it has a log entry less than n days ago
-			//
+			if ($reminders_enabled) {
+				// 
+				// n-day reminders.  Remove anything if it has a log entry less than n days ago
+				//
 
-			foreach (array(30, 60, 90) as $days) {
-				$cutoff = date('Y-m-d', strtotime("-$days days"));
+				foreach (array(30, 60, 90) as $days) {
+					$cutoff = date('Y-m-d', strtotime("-$days days"));
 
+				  $query = new EntityFieldQuery();
+				  $query->entityCondition('entity_type', 'node');
+				  $query->entityCondition('bundle', 'grievance_log');
+				  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+				  $query->fieldCondition('field_grievance_status_date', 'value', $cutoff, '>=');
+				  $stmt = $query->execute();
+				  if ($stmt['node']) {
+				  	$reminders["reminder_$days"]['no_match'][] = $delta;
+				  }
+				}
+
+				//
+				// Assigned today
+				//
+
+				$cutoff = date('Y-m-d');
 			  $query = new EntityFieldQuery();
 			  $query->entityCondition('entity_type', 'node');
 			  $query->entityCondition('bundle', 'grievance_log');
 			  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
 			  $query->fieldCondition('field_grievance_status_date', 'value', $cutoff, '>=');
+			  $query->fieldCondition('field_grievance_log_type', 'tid', $log_assignment_type);
 			  $stmt = $query->execute();
-			  if ($stmt['node']) {
-			  	$reminders["reminder_$days"]['no_match'][] = $delta;
+			  if (!$stmt['node']) {
+			  	$reminders["assigned_today"]['no_match'][] = $delta;
 			  }
 			}
 		}
@@ -196,7 +238,7 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 	// If we have any to remove, remove them.  Make sure to reverse the array first so indices are correct.
 	//
 
-	if ($view->name == 'grievances_mine') {
+	if ($reminders_enabled) {
 		$msgs = array();
 		foreach ($reminders as $type => &$entry) {
 			$entry['count'] = $total - count($entry['no_match']);
