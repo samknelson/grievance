@@ -1,0 +1,4 @@
+name = Watchdog Queue
+description = Tiny module to queue watchdog entries for the duration of a page load, and allow them to be fetched.
+package = Administration
+core = 7.x

@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * Implements hook_watchdog()
+ */
+
+function watchdog_queue_watchdog($entry = NULL) {
+	static $type_to_watch = NULL;
+	static $queue = array();
+
+	if (is_string($entry)) { $type_to_watch = $entry; }
+	elseif (is_array($entry)) {
+		if ($entry['type'] == $type_to_watch) {
+			$queue[] = $entry;
+		}
+	} else {
+		return $queue;
+	}
+}
