@@ -1861,6 +1861,30 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'email',
   );
 
+  // Exported field_base: 'field_grievance_emails'.
+  $field_bases['field_grievance_emails'] = array(
+    'active' => 1,
+    'cardinality' => 5,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_grievance_emails',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
   // Exported field_base: 'field_grievance_emp_name'.
   $field_bases['field_grievance_emp_name'] = array(
     'active' => 1,

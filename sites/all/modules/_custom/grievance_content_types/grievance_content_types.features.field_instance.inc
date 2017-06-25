@@ -8027,94 +8027,6 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'node-grievance_contract_rule-field_grievance_notify_body'.
-  $field_instances['node-grievance_contract_rule-field_grievance_notify_body'] = array(
-    'bundle' => 'grievance_contract_rule',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
-        'weight' => 7,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_grievance_notify_body',
-    'label' => 'Notification Body',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 5,
-      ),
-      'type' => 'text_textarea',
-      'weight' => 8,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'node-grievance_contract_rule-field_grievance_notify_subject'.
-  $field_instances['node-grievance_contract_rule-field_grievance_notify_subject'] = array(
-    'bundle' => 'grievance_contract_rule',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
-        'weight' => 6,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_grievance_notify_subject',
-    'label' => 'Notification Subject',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 7,
-    ),
-  );
-
-  // Exported field_instance:
   // 'node-grievance_contract_rule-field_grievance_weight'.
   $field_instances['node-grievance_contract_rule-field_grievance_weight'] = array(
     'bundle' => 'grievance_contract_rule',
@@ -9168,6 +9080,58 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_letter_template-field_grievance_emails'.
+  $field_instances['node-grievance_letter_template-field_grievance_emails'] = array(
+    'bundle' => 'grievance_letter_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'These email addresses will be CC\'d on EVERY letter sent using this template.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_emails',
+    'label' => 'CC Emails',
+    'required' => 0,
+    'settings' => array(
+      'field_lock_multi_values' => array(
+        'disable_reorder' => 0,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
+        'lock_previous' => 0,
+        'remove_header' => 0,
+      ),
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_letter_template-field_grievance_images'.
   $field_instances['node-grievance_letter_template-field_grievance_images'] = array(
     'bundle' => 'grievance_letter_template',
@@ -9232,6 +9196,94 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'file_generic',
       'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_letter_template-field_grievance_notify_body'.
+  $field_instances['node-grievance_letter_template-field_grievance_notify_body'] = array(
+    'bundle' => 'grievance_letter_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 8,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_notify_body',
+    'label' => 'Body',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_letter_template-field_grievance_notify_subject'.
+  $field_instances['node-grievance_letter_template-field_grievance_notify_subject'] = array(
+    'bundle' => 'grievance_letter_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_notify_subject',
+    'label' => 'Subject',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 9,
     ),
   );
 
@@ -11977,82 +12029,6 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'taxonomy_term-grievance_status-field_grievance_notify_body'.
-  $field_instances['taxonomy_term-grievance_status-field_grievance_notify_body'] = array(
-    'bundle' => 'grievance_status',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'When a notification is sent to the company, what should the body of the email be? ',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
-        'weight' => 5,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'taxonomy_term',
-    'field_name' => 'field_grievance_notify_body',
-    'label' => 'Notification Body',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 5,
-      ),
-      'type' => 'text_textarea',
-      'weight' => 6,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'taxonomy_term-grievance_status-field_grievance_notify_subject'.
-  $field_instances['taxonomy_term-grievance_status-field_grievance_notify_subject'] = array(
-    'bundle' => 'grievance_status',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'When a notification for this status is sent to the company, what subject should be used?',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
-        'weight' => 4,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'taxonomy_term',
-    'field_name' => 'field_grievance_notify_subject',
-    'label' => 'Notification Subject',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 5,
-    ),
-  );
-
-  // Exported field_instance:
   // 'taxonomy_term-grievance_status-field_grievance_open'.
   $field_instances['taxonomy_term-grievance_status-field_grievance_open'] = array(
     'bundle' => 'grievance_status',
@@ -12266,6 +12242,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Bundle');
   t('Bundle to overried, e.g. "grievance"');
   t('CBA Provision(s) Violated');
+  t('CC Emails');
   t('CSS');
   t('Can and should this case be settled?');
   t('Can the articles in this contract be selected?  If "Yes", then a "dummy" section will be created for each article.');
@@ -12363,8 +12340,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Next Step');
   t('Next Step in the Grievance Procedure');
   t('Notes');
-  t('Notification Body');
-  t('Notification Subject');
   t('Office Phone');
   t('Organizer');
   t('Outcome');
@@ -12397,11 +12372,13 @@ function grievance_content_types_field_default_field_instances() {
   t('State or Province');
   t('Status');
   t('Status Change Date');
+  t('Subject');
   t('Supervisor Name');
   t('Supervisor Title');
   t('Supervisor Unit');
   t('Tags');
   t('The date the employee received discipline.');
+  t('These email addresses will be CC\'d on EVERY letter sent using this template.');
   t('Time');
   t('Type of Days');
   t('Union Representative');
@@ -12415,8 +12392,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Violation');
   t('Watching');
   t('Weight');
-  t('When a notification for this status is sent to the company, what subject should be used?');
-  t('When a notification is sent to the company, what should the body of the email be? ');
   t('When the grievance admin selects this clause, which "statement of grievance" should be selected?');
   t('When the grievance enters this status, should it be displayed on the timeline presented to the company?');
   t('Work Status');
