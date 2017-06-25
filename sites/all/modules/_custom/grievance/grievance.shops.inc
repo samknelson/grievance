@@ -16,7 +16,7 @@ function grievance_shop_bulk_reassign_form($form, &$form_state) {
 			'<br><br>' .
 			t('This action cannot be undone, and may potentially update every grievance on the system.  Do not proceed unless you are sure that this is what you want to do.'),
 	);
-	$form['confirm'] = array(
+	$form['action'] = array(
 		'#type' => 'checkbox',
 		'#title' => t('Yes, I really mean it.'),
 		'#description' => t('This tool will permanently and irrevocably update every open grievance on the system.  Do not proceed unless you are sure that this is what you want to do.'),

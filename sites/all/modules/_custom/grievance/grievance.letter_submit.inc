@@ -25,6 +25,16 @@ function grievance_letter_form_submit($form, &$form_state) {
 
 	$letter_nodes = node_load_multiple($letter_nids);
 
+	$global_cc_recipients = array();
+	foreach ($letter_nodes as $letter_node) {
+		if ($letter_node->field_grievance_emails['und']) {
+			foreach ($letter_node->field_grievance_emails['und'] as $tmp) {
+				$global_cc_recipients[$tmp['value']] = TRUE;
+			}
+		}
+	}
+	$global_cc_recipients = array_keys($global_cc_recipients);
+
 	// ////////////////////////////////////////////
 	// PDF
 	// ////////////////////////////////////////////
@@ -198,6 +208,10 @@ function grievance_letter_form_submit($form, &$form_state) {
 				if ($cc) { $cc .= ', '; }
 				$cc .= $recipient['name'] . ' <' . $recipient['email'] . '>';
 			}
+		}
+		foreach ($global_cc_recipients as $global_cc_recipient) {
+			if ($cc) { $cc .= ', '; }
+			$cc .= $global_cc_recipient;
 		}
 		$bcc = '';
 		if ($recipients['bcc']) {

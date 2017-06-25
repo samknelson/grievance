@@ -1,5 +1,19 @@
 <?php
 
+function grievance_letter_form_change_letter_callback($form, $form_state) {
+  $commands = array();
+
+  $commands[] = ajax_command_replace("#grievance-letter-form-replace-global-cc", render($form['recipients']['extra']['global_cc']));
+  $commands[] = ajax_command_replace("#grievance-letter-form-replace-subject", render($form['recipients']['extra']['subject']));
+  $commands[] = ajax_command_replace("#grievance-letter-form-replace-body", render($form['recipients']['extra']['body']));
+
+
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands
+  );
+}
+
 function grievance_letter_form($form, &$form_state, $grievance_node) {
 	$form_state['grievance_node'] = $grievance_node;
 	$status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
@@ -42,6 +56,10 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	    '#type' => 'select',
 	    '#options' => $options,
 	    '#title' => t('Select Letter #') . ($i+1),
+	    '#ajax' => array(
+	      'callback' => 'grievance_letter_form_change_letter_callback',
+	      'method' => 'replace',
+	    ),
 	  );
 	  if ($i == 0) {
 			$form['letter']['letter_nid_' . $i]['#description'] = $footnote;
@@ -86,18 +104,57 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
   	'#collapsible' => TRUE,
   	'#collapsed' => TRUE,
   	'#title' => t('Email Recipients'),
-  	'#description' => t('Select the email recipients for this letter'),
+  	'#description' => t('Select the email recipients for this letter.'),
+	);
+
+	$global_ccs = array();
+	$default_subject = '';
+	$default_body = '';
+	for ($i=0; $i<5; ++$i) {
+		if ($form_state['values']['letter_nid_' . $i] > 0) {
+			$letter_nid = $form_state['values']['letter_nid_' . $i];
+			$letter_node = node_load($letter_nid);
+			if ($letter_node->field_grievance_emails['und']) {
+				foreach ($letter_node->field_grievance_emails['und'] as $tmp) {
+					$global_ccs[$tmp['value']] = TRUE;
+				}
+			}
+			if ($letter_node->field_grievance_notify_subject['und'][0]['value']) { 
+				$default_subject = $letter_node->field_grievance_notify_subject['und'][0]['value'];
+			}
+			if ($letter_node->field_grievance_notify_body['und'][0]['value']) { 
+				$default_body = $letter_node->field_grievance_notify_body['und'][0]['value'];
+			}
+		}
+	}
+	if ($default_subject) {
+		$default_subject = token_replace($default_subject, array('node' => $grievance_node), array());
+	}
+	if ($default_body) {
+		$default_body = token_replace($default_body, array('node' => $grievance_node), array());
+	}
+	$form_state['input']['body'] = $default_body;
+	$form_state['input']['subject'] = $default_subject;
+	$global_cc_msg = join(', ', array_keys($global_ccs));
+	if ($global_cc_msg) {
+		$global_cc_msg = '<br>' . t("Note: the following address(es) will also be CC'd on this email: ") . '<strong>' .  $global_cc_msg . '</strong>';
+	}
+	$form['recipients']['extra']['global_cc'] = array(
+		'#type' => 'markup',
+		'#markup' => '<div id="grievance-letter-form-replace-global-cc">' . $global_cc_msg . '</div>',
 	);
 
 	$form['recipients']['extra']['subject'] = array(
 		'#title' => 'Subject',
 		'#type' => 'textfield',
-		'#prefix' => '<div>',
+		'#prefix' => '<div id="grievance-letter-form-replace-subject">',
+		'#suffix' => '</div>',
 	);
 
 	$form['recipients']['extra']['body'] = array(
 		'#title' => 'Body',
 		'#type' => 'textarea',
+		'#prefix' => '<div id="grievance-letter-form-replace-body">',
 		'#suffix' => '</div>',
 	);
 
@@ -299,8 +356,6 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 		'#markup' => '',
 		'#prefix' => '</div>'
 	);
-
-
 
 
 
