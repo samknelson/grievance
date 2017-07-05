@@ -146,3 +146,9 @@ function grievance_update_700xyz() {
  */
 
  
+function grievance_update_7007() {
+  print "---------------------------------------------------------------------------\n\n\n";
+  print "DON'T FORGET TO ENABLE environment_indicator\n";
+  print "(Should have done this with module_enable() but I couldn't be bothered.)\n\n\n";
+  print "---------------------------------------------------------------------------\n";
+}
