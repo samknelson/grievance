@@ -33,7 +33,7 @@ function grievance_settings_default_environment_indicator_environment() {
   $environment->regexurl = 'stage';
   $environment->settings = array(
     'color' => '#5fff2e',
-    'text_color' => '#ffffff',
+    'text_color' => '#000000',
     'weight' => '',
     'position' => 'top',
     'fixed' => 1,
