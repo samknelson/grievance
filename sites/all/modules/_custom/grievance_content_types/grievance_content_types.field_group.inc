@@ -509,7 +509,8 @@ function grievance_content_types_field_group_info() {
       1 => 'field_grievance_co_role',
       2 => 'field_grievance_min',
       3 => 'field_grievance_contact_types',
-      4 => 'title',
+      4 => 'field_grievance_external_id',
+      5 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(

@@ -429,6 +429,7 @@ features[field_instance][] = node-grievance_shop_contact-field_grievance_co_stat
 features[field_instance][] = node-grievance_shop_contact-field_grievance_co_zip
 features[field_instance][] = node-grievance_shop_contact-field_grievance_company
 features[field_instance][] = node-grievance_shop_contact-field_grievance_contact_types
+features[field_instance][] = node-grievance_shop_contact-field_grievance_external_id
 features[field_instance][] = node-grievance_shop_contact-field_grievance_min
 features[field_instance][] = node-grievance_shop_contact-field_grievance_shops
 features[field_instance][] = taxonomy_term-grievance_alert_types-field_grievance_actor
