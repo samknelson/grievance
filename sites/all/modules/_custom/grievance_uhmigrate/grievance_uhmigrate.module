@@ -13,6 +13,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate'
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1.inc";
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l23.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l23_stewards.inc";
 
 
 function grievance_uhmigrate_base_dir() {
