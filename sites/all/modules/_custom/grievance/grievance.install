@@ -115,6 +115,7 @@ function grievance_update_7005() {
   print "---------------------------------------------------------------------------\n\n\n";
   print "DON'T FORGET TO ENABLE watchdog_queue\n";
   print "(Should have done this with module_enable() but I couldn't be bothered.)\n\n\n";
+  print "Also, don't forget to grant anonymous users permission, and disable default environment\n\n\n";
   print "---------------------------------------------------------------------------\n";
 }
 
@@ -150,5 +151,6 @@ function grievance_update_7007() {
   print "---------------------------------------------------------------------------\n\n\n";
   print "DON'T FORGET TO ENABLE environment_indicator\n";
   print "(Should have done this with module_enable() but I couldn't be bothered.)\n\n\n";
+  print "Also, don't forget to grant all users permission to view environment indicators.\n";
   print "---------------------------------------------------------------------------\n";
 }

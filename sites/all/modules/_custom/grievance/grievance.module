@@ -245,6 +245,12 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
+
+  if ($form_id == 'grievance_shop_contact_node_form') { 
+    // External ID is a system-only field (for now)
+    $form['field_grievance_external_id']['#access'] = FALSE;
+  }
+
   if ($form_id == 'grievance_node_form') { 
     // Alert data is a system-only field
     $form['field_grievance_data_alert']['#access'] = FALSE;
