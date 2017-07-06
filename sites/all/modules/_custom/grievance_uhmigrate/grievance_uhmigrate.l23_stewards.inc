@@ -71,9 +71,10 @@ function grievance_uhmigrate_l23_stewards_import($limit = 100) {
       $shop_node = grievance_uhmigrate_find_by_external_id('grievance_shop', $timss_shop);
       if (!$shop_node->nid) {
         grievance_uhmigrate_log('ERROR - SHOP NOT FOUND', $row, "Unable to find the shop with TIMSS ID [$timss_shop]");
-        continue;
+        // continue;
+      } else {
+        $shop_nodes[] = $shop_node;
       }
-      $shop_nodes[] = $shop_node;
     }
 
     // Find the contact
@@ -81,16 +82,17 @@ function grievance_uhmigrate_l23_stewards_import($limit = 100) {
 		$contact_node = grievance_uhmigrate_find_by_external_id('grievance_shop_contact', $timss_contact);
 
     // Set the variables
+    $contact_node->field_grievance_co_name['und'][0]['value'] = trim($row['name']);
     $contact_node->field_grievance_co_address['und'][0]['value'] = trim($row['address']);
-    $contact_node->field_grievance_co_address_2['und'][0]['value'] = trim($row['address_2']);
+    $contact_node->field_grievance_co_address_2['und'][0]['value'] = trim($row['Address_2']);
     $contact_node->field_grievance_co_city['und'][0]['value'] = trim($row['city']);
     $contact_node->field_grievance_co_state['und'][0]['value'] = trim($row['state']);
     $contact_node->field_grievance_co_zip['und'][0]['value'] = trim($row['zip']);
     $row['email'] = preg_replace('/\s/', '', $row['email']);
     $contact_node->field_grievance_co_email['und'][0]['email'] = trim($row['email']);
 
-    $contact_node->field_grievance_co_phone['und'][0]['email'] = trim($row['phone']);
-    $contact_node->field_grievance_co_phone_2['und'][0]['email'] = trim($row['mobile']);
+    $contact_node->field_grievance_co_phone['und'][0]['value'] = trim($row['phone']);
+    $contact_node->field_grievance_co_phone_2['und'][0]['value'] = trim($row['mobile']);
 
     $contact_node->field_grievance_min['und'][0]['value'] = $row['timss_contact'];
 
@@ -98,10 +100,15 @@ function grievance_uhmigrate_l23_stewards_import($limit = 100) {
     foreach ($shop_nodes as $shop_node) {
       $contact_node->field_grievance_shops['und'][] = array('target_id' => $shop_node->nid);
     }
+    $contact_node->field_grievance_contact_types = array(
+      'und' => array(
+        array('tid' => 282)
+      )
+    );
 
 		// Save the node
 		node_save($contact_node);
-    grievance_uhmigrate_log('SUCCESS', $row, "Saved node " . $log_node->nid);
+    grievance_uhmigrate_log('SUCCESS', $row, "Saved node " . $contact_node->nid);
   }
 
   grievance_uhmigrate_log_summary();
