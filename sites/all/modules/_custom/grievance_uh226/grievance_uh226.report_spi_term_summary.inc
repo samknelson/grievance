@@ -53,8 +53,7 @@ function grievance_uh226_report_spi_term_summary_fields() {
 function grievance_uh226_report_spi_term_summary_pks(&$form_state) {
   $from_ts = strtotime($form_state['values']['from_date']);
   $to_ts = strtotime($form_state['values']['to_date']);
-  $from_date = date('Y-m-d', $from_ts);
-  $to_date = date('Y-m-d', $to_ts);
+
 
   $lookups = grievance_uh226_report_spi_term_summary_lookups();
 
@@ -89,7 +88,7 @@ function grievance_uh226_report_spi_term_summary_batch($grievance_nids, $values,
 
   $lookups = grievance_uh226_report_spi_term_summary_lookups();
 	foreach ($grievance_nids as $grievance_nid) {
-		$row = grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups);
+		$row = grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups, $values);
 		if ($row) {
 			$rows['rows'][$grievance_nid] = $row;
 		}
@@ -97,7 +96,7 @@ function grievance_uh226_report_spi_term_summary_batch($grievance_nids, $values,
 	return $rows;
 }
 
-function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
+function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups, $values) {
 
   // Our result row
   $row = array();
@@ -120,20 +119,10 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
     $row['employer_name'] = $employer_node->title;
   }
 
-  // Get the list of taxonomy terms which begin "Communication - Grievant".  
-  $log_type_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_log_types');
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'taxonomy_term');
-  $query->propertyCondition('vid', $log_type_vocabulary->vid);
-  $query->propertyCondition('name', 'Communication - Grievant%', 'LIKE');
-  $stmt = $query->execute();
-  $communication_log_type_tids = array();
-  if ($stmt['taxonomy_term']) {
-    $communication_log_type_tids = array_keys($stmt['taxonomy_term']);
-  }
-
   // 1st call?
   $first_call_log_type_tid = variable_get('grievance_log_first_call_type', '');
+  $from_date = date('Y-m-d 00:00:00', strtotime($values['from_date']));
+  $to_date = date('Y-m-d 00:00:00', strtotime($values['to_date']));
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
@@ -151,7 +140,7 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
-  $query->fieldCondition('field_grievance_log_type', 'tid', $communication_log_type_tids, 'IN');
+  $query->fieldCondition('field_grievance_log_type', 'tid', $lookups['communication_log_type_tids'], 'IN');
   $query->fieldCondition('field_grievance_status_date', 'value', $from_date, '>=');
   $query->fieldCondition('field_grievance_status_date', 'value', $to_date, '<=');
   $stmt = $query->execute();
@@ -290,6 +279,18 @@ function grievance_uh226_report_spi_term_summary_lookups() {
     }
   }
 
+  // Get the list of taxonomy terms which begin "Communication - Grievant".  
+  $log_type_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_log_types');
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'taxonomy_term');
+  $query->propertyCondition('vid', $log_type_vocabulary->vid);
+  $query->propertyCondition('name', 'Communication - Grievant%', 'LIKE');
+  $stmt = $query->execute();
+  $communication_log_type_tids = array();
+  if ($stmt['taxonomy_term']) {
+    $communication_log_type_tids = array_keys($stmt['taxonomy_term']);
+  }
+
   return array(
 		'open_status_tids' 								=> $open_status_tids,
 		'closed_status_tids'							=> $closed_status_tids,
@@ -302,6 +303,7 @@ function grievance_uh226_report_spi_term_summary_lookups() {
 		'boa_held_status_tids' 						=> $boa_held_status_tids,
     'spi_log_type_tid'                => variable_get('grievance_log_spi_type', ''),
     'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
+    'communication_log_type_tids'     => $communication_log_type_tids,
   );
 }
 
