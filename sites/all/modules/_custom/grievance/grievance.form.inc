@@ -3,6 +3,7 @@
 function grievance_form_grievance_node_callback_replace($form, $form_state) {
   $commands = array();
   $commands[] = ajax_command_replace("#grievance-node-form-replaceme", render($form));
+  $commands[] = ajax_command_invoke(NULL, "grievance_bind_classification_term_map", array());
   return array(
     '#type' => 'ajax',
     '#commands' => $commands
@@ -395,19 +396,23 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     //
 
     $map = array('_none' => TRUE);
-    $to_disable = array();
+    $has_map = FALSE;
     if ($contract_tplt_node->field_grievance_departments['und']) {
       foreach ($contract_tplt_node->field_grievance_departments['und'] as $tmp) {
         $map[$tmp["tid"]] = TRUE;
+        $has_map = TRUE;
       }
     }
-    if ($form['field_grievance_department_tid']['und']['#options']) {
-      foreach ($form['field_grievance_department_tid']['und']['#options'] as $tid => $name) {
-        if (!$map[$tid]) { $to_disable[] = $tid; }
+    if ($has_map) {
+      $to_disable = array();
+      if ($form['field_grievance_department_tid']['und']['#options']) {
+        foreach ($form['field_grievance_department_tid']['und']['#options'] as $tid => $name) {
+          if (!$map[$tid]) { $to_disable[] = $tid; }
+        }
       }
-    }
-    foreach ($to_disable as $tid) {
-      unset($form['field_grievance_department_tid']['und']['#options'][$tid]);
+      foreach ($to_disable as $tid) {
+        unset($form['field_grievance_department_tid']['und']['#options'][$tid]);
+      }
     }
 
     // 
