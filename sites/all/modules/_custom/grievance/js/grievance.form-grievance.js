@@ -20,6 +20,7 @@
 			// Get our map
 			map = Drupal.settings.grievance.grievance_classification_department_map;
 			if (!map) { return; }
+			console.log(map);
 
 			// Start by enabling everything.
 			$(".form-item-field-grievance-department-tid-und option").each(function() { 
