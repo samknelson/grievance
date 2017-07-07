@@ -91,11 +91,10 @@ function grievance_classification_department_map($contract_tplt_node) {
   // Create the map
   $map = array();
   foreach ($classification_terms as $classification_tid => $classification_term) {
-    $map[$classification_tid] = array();
     if (isset($classification_term->field_grievance_departments['und'])) {
       foreach ($classification_term->field_grievance_departments['und'] as $tmp) {
         $department_tid = $tmp['tid'];
-        $map[$classification_tid][$department_tid] = $department_terms[$department_tid]->name;
+        $map[$classification_term->name][$department_tid] = TRUE;
       }
     }
   }
