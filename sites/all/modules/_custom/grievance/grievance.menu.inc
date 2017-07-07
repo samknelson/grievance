@@ -458,6 +458,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['grievance/report/settlement/summary'] = array(
+		'title' => 'Report: Settlement Summary',
+		'description' => '',
+		'page callback' => 'grievance_report_settlement_summary',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['grievance/report/spi-term'] = array(
 		'title' => 'Report: SPI and Term',
 		'description' => '',

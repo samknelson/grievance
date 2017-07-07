@@ -19,6 +19,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.repor
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_spi_term.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_by_specialist.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_settlement_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.block.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.notify.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.alert.inc";
@@ -475,6 +476,20 @@ function grievance_report_cache_info() {
     'fields' => grievance_report_spi_term_fields(),
     'pk_list_callback' => 'grievance_report_spi_term_pks',
     'batch_callback' => 'grievance_report_spi_term_batch',
+  );
+
+  $items['grievance-report-settlement-summary'] = array(
+    'name' => t('Settlement Summary Report'),
+    'description' => '',
+    'access' => 'grievance report',
+    'path' => 'grievance/report/settlement/summary',
+    'fields' => grievance_report_settlement_summary_fields(),
+    'pk_list_callback' => 'grievance_report_settlement_summary_pks',
+    'batch_callback' => 'grievance_report_settlement_summary_batch',
+    'render_callbacks' => array(
+      'Summary By Specialist' => 'grievance_report_settlement_summary_render_specialist',
+      'Summary By Employer' => 'grievance_report_settlement_summary_render_employer',
+    ),
   );
 
   return $items;
