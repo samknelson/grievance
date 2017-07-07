@@ -53,6 +53,8 @@ function grievance_uh226_report_spi_term_summary_fields() {
 function grievance_uh226_report_spi_term_summary_pks(&$form_state) {
   $from_ts = strtotime($form_state['values']['from_date']);
   $to_ts = strtotime($form_state['values']['to_date']);
+  $from_date = date('Y-m-d', $from_ts);
+  $to_date = date('Y-m-d', $to_ts);
 
   $lookups = grievance_uh226_report_spi_term_summary_lookups();
 
@@ -118,6 +120,17 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
     $row['employer_name'] = $employer_node->title;
   }
 
+  // Get the list of taxonomy terms which begin "Communication - Grievant".  
+  $log_type_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_log_types');
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'taxonomy_term');
+  $query->propertyCondition('vid', $log_type_vocabulary->vid);
+  $query->propertyCondition('name', 'Communication - Grievant%', 'LIKE');
+  $stmt = $query->execute();
+  $communication_log_type_tids = array();
+  if ($stmt['taxonomy_term']) {
+    $communication_log_type_tids = array_keys($stmt['taxonomy_term']);
+  }
 
   // 1st call?
   $first_call_log_type_tid = variable_get('grievance_log_first_call_type', '');
@@ -126,12 +139,27 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
   $query->fieldCondition('field_grievance_log_type', 'tid', $first_call_log_type_tid);
+  $query->fieldCondition('field_grievance_status_date', 'value', $from_date, '>=');
+  $query->fieldCondition('field_grievance_status_date', 'value', $to_date, '<=');
   $stmt = $query->execute();
   if ($stmt['node']) {
     $row['1st_call'] = TRUE;
   }
 
-  // no_activity @todo what does no activity mean?
+  // no_activity
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  $query->fieldCondition('field_grievance_log_type', 'tid', $communication_log_type_tids, 'IN');
+  $query->fieldCondition('field_grievance_status_date', 'value', $from_date, '>=');
+  $query->fieldCondition('field_grievance_status_date', 'value', $to_date, '<=');
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $row['no_activity'] = FALSE;
+  } else {
+    $row['no_activity'] = TRUE;
+  }
 
   // no_boa_held
   // boa_held
