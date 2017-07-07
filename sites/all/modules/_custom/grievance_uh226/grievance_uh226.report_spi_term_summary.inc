@@ -268,7 +268,7 @@ function grievance_uh226_report_spi_term_summary_lookups() {
     if (preg_match('/BOA Held/i', $term->name)) {
       $boa_held_status_tids[] = $tid;
     }
-    if (preg_match('/Arbitration/i', $term->name)) {
+    if (preg_match('/Referred/i', $term->name)) {
       $arb_held_status_tids[] = $tid;
     }
     if (preg_match('/Won/i', $term->name)) {
