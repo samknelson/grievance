@@ -75,6 +75,13 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance settlement'),
 	);
 
+	$node_tabs['grievance']['prior'] = array(
+		'title' => 'Prior',
+		'description' => '',
+		'callback' => 'grievance_node_tab_prior',
+		'permissions' => array('grievance view'),
+	);
+
 	// These will be obsolete any minute, as soon as Local 100 moves over to letters.
 	$node_tabs['grievance']['gform'] = array(
 		'title' => 'Forms',

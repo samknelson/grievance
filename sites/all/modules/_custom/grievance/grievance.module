@@ -38,6 +38,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.lette
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.letter_submit.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.phone.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.mine.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.prior.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.mailattach.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.assignee.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.phaxio.inc";

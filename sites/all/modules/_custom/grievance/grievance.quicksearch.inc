@@ -115,6 +115,7 @@ function grievance_quicksearch_results($string, $limit = 20) {
 		$query->entityCondition('bundle', array('grievance'), 'in');
 		$query->propertyCondition('status', 1);
 		$query->propertyCondition('title', '%' . $string . '%', 'like');
+		$query->propertyOrderBy('created', 'desc');
 		$query->range(0, $limit);
 		$result = $query->execute();
 		if (isset($result['node'])) {
@@ -132,6 +133,7 @@ function grievance_quicksearch_results($string, $limit = 20) {
 		$query->entityCondition('entity_type', 'node');
 		$query->entityCondition('bundle', array('grievance'), 'in');
 		$query->propertyCondition('status', 1);
+		$query->propertyOrderBy('created', 'desc');
 		$query->fieldCondition('field_grievance_id', 'value', '%' . $string . '%', 'like');
 		$query->range(0, $limit);
 		$result = $query->execute();

@@ -118,8 +118,17 @@ function grievance_block_timeleft() {
   }
 
   $msg .= '<span class="grievance-status-tools">' . t('ID #') . $grievance_node->field_grievance_id['und'][0]['value'];
-  $msg .= '&nbsp;/&nbsp;' . l("Quick log", 'grievance/modal/' . $grievance_node->nid . '/log-add') . '</span><br clear="right">';
-
+  $prior_count = grievance_prior_count($grievance_node->field_grievance_min['und'][0]['value']) - 1;
+  $msg .= '&nbsp;/&nbsp;' . l("Quick log", 'grievance/modal/' . $grievance_node->nid . '/log-add');
+  if ($prior_count > 0) {
+    $msg .= '&nbsp;/&nbsp;';
+    if ($prior_count == 1) {
+      $msg .=  l("$prior_count prior grievance", 'node/' . $grievance_node->nid . '/prior');
+    } else {
+      $msg .=  l("$prior_count prior grievances", 'node/' . $grievance_node->nid . '/prior');
+    }
+  }
+  $msg .= '</span><br clear="right">';
   $class = "alert-box ";
 
   if ($need_alert) {
@@ -136,31 +145,6 @@ function grievance_block_timeleft() {
 
 
   $msg = "<div class=\"$class\">$msg</div>";
-
-  // 
-  // Prior grievances by this member
-  // - Don't show for "General Grievances"
-  // - Don't show if "member ID" is missing
-  //
-
-  if ($grievance_node->field_grievance_classaction['und'][0]['value'] != 'Yes' && 
-      $grievance_node->field_grievance_min['und'][0]['value']) {
-    $prior_content = views_embed_view('grievance_prior_grievances', 'block', $grievance_node->field_grievance_min['und'][0]['value'], $grievance_node->nid);
-    $probe = trim(strip_tags($prior_content));
-    if ($probe) {
-      drupal_add_js('misc/form.js');
-      drupal_add_js('misc/collapse.js');
-
-      $msg .= '<fieldset class="collapsible collapsed">';
-      $msg .= '<legend><span class="fieldset-legend">';
-      $msg .= t('Other grievances by this employee');
-      $msg .= '</span></legend>';
-      $msg .= '<div class="fieldset-wrapper">';
-      $msg .= $prior_content;
-      $msg .= '</div>';
-      $msg .= '</fieldset>';
-    }
-  }
 
   return $msg;
 }

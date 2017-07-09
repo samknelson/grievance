@@ -5,8 +5,18 @@ function grievance_node_tab_log($node) {
   $entity_nid = $node->nid;
 
   $headfoot = grievance_node_tab_get_addlink("grievance-log", array("grievance" => $entity_nid), 'Add a new log entry');
-  if ($node->field_grievance_phone['und'][0]['value']) {
-    $headfoot .= t('(Grievant phone: <strong>@phone</strong>)', array('@phone' => $node->field_grievance_phone['und'][0]['value']));
+  if ($node->field_grievance_phone['und'][0]['value'] || $node->field_grievance_email['und'][0]['email']) {
+    $headfoot .= t('(Grievant: ');
+    if ($node->field_grievance_phone['und'][0]['value']) {
+      $headfoot .= '<strong>' . $node->field_grievance_phone['und'][0]['value'] . '</strong>';
+    }
+    if ($node->field_grievance_phone['und'][0]['value'] && $node->field_grievance_email['und'][0]['email']) {
+      $headfoot .= ' / ';
+    }
+    if ($node->field_grievance_email['und'][0]['email']) {
+      $headfoot .= '<strong>' . $node->field_grievance_email['und'][0]['email'] . '</strong>';
+    }
+    $headfoot .= ')';
   }
 
   $result = '';

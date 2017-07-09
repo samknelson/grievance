@@ -29,6 +29,24 @@ function grievance_log_modal_add_form($form, &$form_state, $grievance_node) {
   $form = array();
   $form_state['grievance_node'] = $grievance_node;
 
+  if ($grievance_node->field_grievance_phone['und'][0]['value'] || $grievance_node->field_grievance_email['und'][0]['email']) {
+    $headfoot = t('(Grievant: ');
+    if ($grievance_node->field_grievance_phone['und'][0]['value']) {
+      $headfoot .= '<strong>' . $grievance_node->field_grievance_phone['und'][0]['value'] . '</strong>';
+    }
+    if ($grievance_node->field_grievance_phone['und'][0]['value'] && $grievance_node->field_grievance_email['und'][0]['email']) {
+      $headfoot .= ' / ';
+    }
+    if ($grievance_node->field_grievance_email['und'][0]['email']) {
+      $headfoot .= '<strong>' . $grievance_node->field_grievance_email['und'][0]['email'] . '</strong>';
+    }
+    $headfoot .= ')<br><br>';
+    $form['headfoot'] = array(
+      '#type' => 'markup',
+      '#markup' => $headfoot,
+    );
+  }
+
   $form['grievance_log_type'] = array(
     '#type'           => 'select',
     '#title'          => 'Type',
