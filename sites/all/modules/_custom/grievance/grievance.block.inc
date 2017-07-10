@@ -118,15 +118,11 @@ function grievance_block_timeleft() {
   }
 
   $msg .= '<span class="grievance-status-tools">' . t('ID #') . $grievance_node->field_grievance_id['und'][0]['value'];
-  $prior_count = grievance_prior_count($grievance_node->field_grievance_min['und'][0]['value']) - 1;
+  $prior_count = grievance_prior_count($grievance_node->nid, $grievance_node->field_grievance_min['und'][0]['value']);
   $msg .= '&nbsp;/&nbsp;' . l("Quick log", 'grievance/modal/' . $grievance_node->nid . '/log-add');
   if ($prior_count > 0) {
     $msg .= '&nbsp;/&nbsp;';
-    if ($prior_count == 1) {
-      $msg .=  l("$prior_count prior grievance", 'node/' . $grievance_node->nid . '/prior');
-    } else {
-      $msg .=  l("$prior_count prior grievances", 'node/' . $grievance_node->nid . '/prior');
-    }
+    $msg .=  l("$prior_count prior", 'node/' . $grievance_node->nid . '/prior');
   }
   $msg .= '</span><br clear="right">';
   $class = "alert-box ";
