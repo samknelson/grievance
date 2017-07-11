@@ -39,6 +39,7 @@ function grievance_uh226_report_spi_term_summary_fields() {
     'specialist_name' => 'Specialist Name',
     'employer_name' => 'Employer Name',
     '1st_call' => '1st Call',
+    'other_call' => 'Other Call',
     'no_activity' => 'No Activity',
     'no_boa_held' => 'No BOA Held',
     'boa_held' => 'BOA Held',
@@ -136,17 +137,20 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups, $
   }
 
   // no_activity
-  $query = new EntityFieldQuery;
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
-  $query->fieldCondition('field_grievance_log_type', 'tid', $lookups['communication_log_type_tids'], 'IN');
-  $query->fieldCondition('field_grievance_status_date', 'value', $from_date, '>=');
-  $query->fieldCondition('field_grievance_status_date', 'value', $to_date, '<=');
-  $stmt = $query->execute();
-  if ($stmt['node']) {
-    $row['no_activity'] = FALSE;
-  } else {
+  if (!$row['1st_call']) {
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance_log');
+    $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+    $query->fieldCondition('field_grievance_log_type', 'tid', $lookups['communication_log_type_tids'], 'IN');
+    $query->fieldCondition('field_grievance_status_date', 'value', $from_date, '>=');
+    $query->fieldCondition('field_grievance_status_date', 'value', $to_date, '<=');
+    $stmt = $query->execute();
+    if ($stmt['node']) {
+      $row['other_call'] = TRUE;
+    } 
+  }
+  if (!$row['1st_call'] && !$row['other_call']) {
     $row['no_activity'] = TRUE;
   }
 
@@ -199,7 +203,7 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups, $
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
   $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
-  $query->fieldCondition('field_grievance_status', 'tid', $lookups['arb_status_tids'], 'in');
+  $query->fieldCondition('field_grievance_status', 'tid', $lookups['arb_tids'], 'in');
   $stmt = $query->execute();
   if ($stmt['node']) {
     $row['arb'] = TRUE;
@@ -211,7 +215,7 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups, $
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
   $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
-  $query->fieldCondition('field_grievance_status', 'tid', $lookups['won_status_tids'], 'in');
+  $query->fieldCondition('field_grievance_status', 'tid', $lookups['won_tids'], 'in');
   $stmt = $query->execute();
   if ($stmt['node']) {
     $row['won'] = TRUE;
@@ -223,7 +227,7 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups, $
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
   $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
-  $query->fieldCondition('field_grievance_status', 'tid', $lookups['lost_status_tids'], 'in');
+  $query->fieldCondition('field_grievance_status', 'tid', $lookups['lost_tids'], 'in');
   $stmt = $query->execute();
   if ($stmt['node']) {
     $row['lost'] = TRUE;
@@ -256,9 +260,6 @@ function grievance_uh226_report_spi_term_summary_lookups() {
     if ($term->field_grievance_open['und'][0]['value'] == 0) {
       $closed_status_tids[] = $tid;
     }
-    if (preg_match('/arbitration/i', $term->name)) {
-      $arbitration_status_tids[] = $tid;
-    }
     if (preg_match('/resolved/i', $term->name)) {
       $rslvd_status_tids[] = $tid;
     }
@@ -269,13 +270,13 @@ function grievance_uh226_report_spi_term_summary_lookups() {
       $boa_held_status_tids[] = $tid;
     }
     if (preg_match('/Referred/i', $term->name)) {
-      $arb_held_status_tids[] = $tid;
+      $arb_tids[] = $tid;
     }
     if (preg_match('/Won/i', $term->name)) {
-      $won_held_status_tids[] = $tid;
+      $won_tids[] = $tid;
     }
     if (preg_match('/Lost/i', $term->name)) {
-      $lost_held_status_tids[] = $tid;
+      $lost_tids[] = $tid;
     }
   }
 
@@ -291,20 +292,22 @@ function grievance_uh226_report_spi_term_summary_lookups() {
     $communication_log_type_tids = array_keys($stmt['taxonomy_term']);
   }
 
-  return array(
+  $result = array(
 		'open_status_tids' 								=> $open_status_tids,
 		'closed_status_tids'							=> $closed_status_tids,
 		'arbitration_status_tids'					=> $arbitration_status_tids,
     'rslvd_status_tids'               => $rslvd_status_tids,
     'nfa_status_tids'                 => $nfa_status_tids,
-    'arb_status_tids'                 => $arb_status_tids,
-    'won_status_tids'                 => $won_status_tids,
-    'lost_status_tids'                => $lost_status_tids,
+    'arb_tids'                 => $arb_tids,
+    'won_tids'                 => $won_tids,
+    'lost_tids'                => $lost_tids,
 		'boa_held_status_tids' 						=> $boa_held_status_tids,
     'spi_log_type_tid'                => variable_get('grievance_log_spi_type', ''),
     'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
     'communication_log_type_tids'     => $communication_log_type_tids,
   );
+
+  return $result;
 }
 
 function grievance_uh226_report_spi_term_summary_render_specialist($report_type, $report_id) {
@@ -363,6 +366,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
     foreach (
       array(
         '1st_call',
+        'other_call',
         'no_activity',
         'no_boa_held',
         'boa_held',
@@ -389,6 +393,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   }
   $header[] = 'Total SPIs/Terms';
   $header[] = '1st Calls';
+  $header[] = 'Other Calls';
   $header[] = 'No Activity';
   $header[] = 'No BOA Held';
   $header[] = 'BOAs Held';
@@ -404,6 +409,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
     $row[] = $specialist_name;
     $row[] = $hr['total'];
     $row[] = $hr['1st_call'];
+    $row[] = $hr['other_call'];
     $row[] = $hr['no_activity'];
     $row[] = $hr['no_boa_held'];
     $row[] = $hr['boa_held'];
@@ -419,6 +425,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   $row[] = '<strong>' . t('Sub-Total') . '</strong>';
   $row[] = '<strong>' . $sub_totals['total'] . '</strong>';
   $row[] = '<strong>' . $sub_totals['1st_call'] . '</strong>';
+  $row[] = '<strong>' . $sub_totals['other_call'] . '</strong>';
   $row[] = '<strong>' . $sub_totals['no_activity'] . '</strong>';
   $row[] = '<strong>' . $sub_totals['no_boa_held'] . '</strong>';
   $row[] = '<strong>' . $sub_totals['boa_held'] . '</strong>';
@@ -433,8 +440,8 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   $row[] = '<strong>' . t('Total') . '</strong>';
   $row[] = '<strong>' . $sub_totals['total'] . '</strong>';
   $row[] = array(
-    'data' => '<strong>' . ($sub_totals['1st_call'] + $sub_totals['no_activity']) . '</strong>',
-    'colspan' => 2,
+    'data' => '<strong>' . ($sub_totals['1st_call'] + $sub_totals['other_call'] + $sub_totals['no_activity']) . '</strong>',
+    'colspan' => 3,
   );
   $row[] = array(
     'data' => '<strong>' . ($sub_totals['no_boa_held'] + $sub_totals['boa_held']) . '</strong>',
