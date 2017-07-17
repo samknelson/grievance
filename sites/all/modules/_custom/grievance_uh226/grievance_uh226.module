@@ -4,6 +4,7 @@
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uh226') . "/grievance_uh226.report_spi_term_summary.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uh226') . "/grievance_uh226.report_spi_term_detail.inc";
 
 /**
  * implements hook_node_view()
@@ -45,6 +46,15 @@ function grievance_uh226_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['grievance/report/uh226/spi-term-detail'] = array(
+    'title' => 'Report: SPI and Term Summary',
+    'description' => '',
+    'page callback' => 'grievance_uh226_report_spi_term_detail',
+    'page arguments' => array(),
+    'access arguments' => array('grievance report'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   return $items;
 }
 
@@ -62,6 +72,19 @@ function grievance_uh226_report_cache_info() {
     'render_callbacks' => array(
       'Summary By Specialist' => 'grievance_uh226_report_spi_term_summary_render_specialist',
       'Summary By Employer' => 'grievance_uh226_report_spi_term_summary_render_employer',
+    ),
+  );
+
+  $items['grievance-uh226-report-spi-term-detail'] = array(
+    'name' => t('UH226: SPI / Term Summary Report'),
+    'description' => '',
+    'access' => 'grievance report',
+    'path' => 'grievance/report/uh226/spi-term-detail',
+    'fields' => grievance_uh226_report_spi_term_detail_fields(),
+    'pk_list_callback' => 'grievance_uh226_report_spi_term_detail_pks',
+    'batch_callback' => 'grievance_uh226_report_spi_term_detail_batch',
+    'render_callbacks' => array(
+      'Detail' => 'grievance_uh226_report_spi_term_detail_render',
     ),
   );
 
