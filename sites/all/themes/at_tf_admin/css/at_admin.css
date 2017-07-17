@@ -3804,3 +3804,37 @@ fieldset.date-combo .container-inline-date .date-padding {
   text-align: center;
 }
 
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render td:nth-child(1), 
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render th:nth-child(1) { 
+  width: 20%;
+}
+
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render td:nth-child(2),  
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render th:nth-child(2) { 
+  width: 10%;
+}
+
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render td:nth-child(3),  
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render th:nth-child(3) { 
+  width: 30%;
+}
+
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render td:nth-child(4),  
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render th:nth-child(4) { 
+  width: 10%;
+}
+
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render td:nth-child(5),  
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render th:nth-child(5) { 
+  width: 10%;
+}
+
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render td:nth-child(6),  
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render th:nth-child(6) { 
+  width: 10%;
+}
+
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render td:nth-child(7),  
+.page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render th:nth-child(7) { 
+  width: 10%;
+}
