@@ -70,7 +70,7 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				}
 				$replacements[$original] = $html;
 			}
-
+			
 			// Add the clauserefs as a one-line rendered list.
 			if ($name == 'clauseref-oneline') {
 				// @TODO
@@ -103,7 +103,6 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				if ($html) { $html = '<ul>' . $html . '</ul>'; }
 				$replacements[$original] = $html;
 			}
-
 
 			// Add "Arbitration Clause"
 			if ($name == 'arbitration_clause') {
