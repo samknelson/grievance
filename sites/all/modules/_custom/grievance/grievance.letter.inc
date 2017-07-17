@@ -71,6 +71,40 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				$replacements[$original] = $html;
 			}
 
+			// Add the clauserefs as a one-line rendered list.
+			if ($name == 'clauseref-oneline') {
+				// @TODO
+				$html = '';
+				if ($data['node']->field_grievance_clauseref['und'][0]) {
+					foreach ($data['node']->field_grievance_clauseref['und'] as $item) {
+						if ($html) { 
+							$html .= ', ';
+						}
+						$clause_node = node_load($item['target_id']);
+						$html .= $clause_node->field_grievance_label['und'][0]['value'] . ': ' . $clause_node->title;
+					}
+				}
+				$replacements[$original] = $html;
+			}
+
+			// Add the clauserefs as a one-line rendered list.
+			if ($name == 'inforeq') {
+				// @TODO
+				$html = '';
+				if ($data['node']->field_grievance_document_types['und'][0]) {
+					foreach ($data['node']->field_grievance_document_types['und'] as $item) {
+						$term = taxonomy_term_load($item['tid']);
+						$html .= '<li>' . $term->name . '</li>';
+					}
+				}
+				if ($data['node']->field_grievance_inforeq['und'][0]['value']) {
+					$html .= '<li>' . $data['node']->field_grievance_inforeq['und'][0]['value'] . '</li>';
+				}
+				if ($html) { $html = '<ul>' . $html . '</ul>'; }
+				$replacements[$original] = $html;
+			}
+
+
 			// Add "Arbitration Clause"
 			if ($name == 'arbitration_clause') {
 				$contract_tplt_nid = $data['node']->field_grievance_contract_tplt['und'][0]['target_id'];
