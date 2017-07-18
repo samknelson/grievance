@@ -6354,98 +6354,99 @@ function grievance_views_views_default_views() {
   $handler->display->display_options['exposed_form']['type'] = 'views_exposed_groups';
   $handler->display->display_options['exposed_form']['options']['views_exposed_groups'] = array(
     'format_groups' => 'vertical_tabs',
-    'groups' => 'Status
+    'groups' => 'General
+Status
 Company Representatives
 Union Representatives
 Employee
 Grievance Form',
     'group-field_grievance_first_name_value' => array(
-      'group' => '3',
+      'group' => '4',
       'filter_name' => 'field_grievance_first_name_value',
       'weight' => '-20',
     ),
     'group-field_grievance_last_name_value' => array(
-      'group' => '3',
+      'group' => '4',
       'filter_name' => 'field_grievance_last_name_value',
       'weight' => '-19',
     ),
     'group-field_grievance_status_tid' => array(
-      'group' => '0',
+      'group' => '1',
       'filter_name' => 'field_grievance_status_tid',
-      'weight' => '-19',
+      'weight' => '-15',
     ),
     'group-uid' => array(
-      'group' => '2',
+      'group' => '3',
       'filter_name' => 'uid',
       'weight' => '-20',
     ),
     'group-uid_1' => array(
-      'group' => '2',
+      'group' => '3',
       'filter_name' => 'uid_1',
       'weight' => '-19',
     ),
     'group-title' => array(
-      'group' => '1',
+      'group' => '2',
       'filter_name' => 'title',
-      'weight' => '-19',
+      'weight' => '-20',
     ),
     'group-title_1' => array(
-      'group' => '1',
+      'group' => '2',
       'filter_name' => 'title_1',
-      'weight' => '-18',
+      'weight' => '-19',
     ),
     'group-field_grievance_alert_date_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_alert_date_value',
-      'weight' => '-18',
+      'weight' => '-19',
     ),
     'group-field_grievance_open_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_open_value',
-      'weight' => '-17',
+      'weight' => '-20',
     ),
     'group-field_grievance_remedy_tid' => array(
-      'group' => '4',
+      'group' => '5',
       'filter_name' => 'field_grievance_remedy_tid',
-      'weight' => '-13',
+      'weight' => '-20',
     ),
     'group-field_grievance_violation_value' => array(
-      'group' => '4',
+      'group' => '5',
       'filter_name' => 'field_grievance_violation_value',
-      'weight' => '-14',
+      'weight' => '-19',
     ),
     'group-field_grievance_date_1_value' => array(
-      'group' => '4',
+      'group' => '5',
       'filter_name' => 'field_grievance_date_1_value',
-      'weight' => '-12',
+      'weight' => '-18',
     ),
     'group-field_grievance_id_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_id_value',
-      'weight' => '-16',
+      'weight' => '-18',
     ),
     'group-field_grievance_tags_tid' => array(
-      'group' => '1',
+      'group' => '2',
       'filter_name' => 'field_grievance_tags_tid',
-      'weight' => '-17',
+      'weight' => '-18',
     ),
     'group-field_grievance_classaction_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_classaction_value',
-      'weight' => '-15',
+      'weight' => '-17',
     ),
     'group-uid_2' => array(
-      'group' => '2',
+      'group' => '3',
       'filter_name' => 'uid_2',
-      'weight' => '-17',
+      'weight' => '-18',
     ),
     'group-field_grievance_broughtby_tid' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_broughtby_tid',
-      'weight' => '-20',
+      'weight' => '-16',
     ),
     'group-field_grievance_min_value' => array(
-      'group' => '3',
+      'group' => '4',
       'filter_name' => 'field_grievance_min_value',
       'weight' => '-18',
     ),
@@ -6528,12 +6529,16 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_status_tid']['expose']['label'] = 'Status';
   $handler->display->display_options['filters']['field_grievance_status_tid']['expose']['operator'] = 'field_grievance_status_tid_op';
   $handler->display->display_options['filters']['field_grievance_status_tid']['expose']['identifier'] = 'field_grievance_status_tid';
+  $handler->display->display_options['filters']['field_grievance_status_tid']['expose']['multiple'] = TRUE;
   $handler->display->display_options['filters']['field_grievance_status_tid']['expose']['remember_roles'] = array(
     2 => '2',
     1 => 0,
     3 => 0,
-    4 => 0,
     5 => 0,
+    6 => 0,
+    8 => 0,
+    7 => 0,
+    4 => 0,
   );
   $handler->display->display_options['filters']['field_grievance_status_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_grievance_status_tid']['vocabulary'] = 'grievance_status';
