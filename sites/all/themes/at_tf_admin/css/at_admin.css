@@ -3838,3 +3838,8 @@ fieldset.date-combo .container-inline-date .date-padding {
 .page-admin-reports-report-cache-grievance-uh226-report-spi-term-detail .uh-226-report-spi-term-detail-render th:nth-child(7) { 
   width: 10%;
 }
+
+.view-id-grievances .view-filters .form-item-field-grievance-status-tid .form-type-bef-checkbox {
+  width: 50%;
+  float: left;
+}
