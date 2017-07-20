@@ -11,14 +11,12 @@ function grievance_uh226_report_spi_term_detail_form($form, &$form_state) {
   $form['from_date'] = array(
     '#type' => 'date_popup',
     '#title' => 'Start Date',
-    '#required' => TRUE,
     '#date_format' => 'm/d/Y',
   );
 
   $form['to_date'] = array(
     '#type' => 'date_popup',
     '#title' => 'End Date',
-    '#required' => TRUE,
     '#date_format' => 'm/d/Y',
   );
 
@@ -38,7 +36,7 @@ function grievance_uh226_report_spi_term_detail_form($form, &$form_state) {
     '#era_entity_type' => 'user',
     '#era_bundles' => array(),
     '#era_query_settings' => array(),
-    '#description' => t('Leave blank to select all specialists.'),
+      '#description' => t('Leave blank to select all specialists.'),
     '#prefix' => '<div class="form-start">',
   );
 
@@ -68,16 +66,18 @@ function grievance_uh226_report_spi_term_detail_fields() {
 }
 
 function grievance_uh226_report_spi_term_detail_pks(&$form_state) {
-  $from_ts = strtotime($form_state['values']['from_date']);
-  $to_ts = strtotime($form_state['values']['to_date']);
+  $values = array();
 
+  if ($form_state['values']['from_date']) {
+    $from_ts = strtotime($form_state['values']['from_date']);
+    $values[':from_ts'] = $from_ts;
+  }
+  if ($form_state['values']['to_date']) {
+    $to_ts = strtotime($form_state['values']['to_date']);
+    $values[':to_ts'] = $to_ts;
+  }
 
   $lookups = grievance_uh226_report_spi_term_detail_lookups();
-
-  $values = array(
-    ':from_ts' => $from_ts,
-    ':to_ts' => $to_ts,
-  );
 
   $sql = "select distinct node.nid ";
   $sql .= "from field_data_field_grievance_log_type, field_data_field_grievance, node ";
@@ -95,8 +95,12 @@ function grievance_uh226_report_spi_term_detail_pks(&$form_state) {
   $sql .= "and field_data_field_grievance_log_type.field_grievance_log_type_tid in ($lookups[spi_log_type_tid], $lookups[term_log_type_tid]) ";
 
   $sql .= "and node.type = 'grievance' ";
-  $sql .= "and node.created >= :from_ts ";
-  $sql .= "and node.created <= :to_ts ";
+  if ($from_ts) {
+    $sql .= "and node.created >= :from_ts ";
+  }
+  if ($to_ts) {
+    $sql .= "and node.created <= :to_ts ";
+  }
 
   if ($form_state['values']['open_only'] == 'yes') {
     $sql .= "and field_data_field_grievance_status.entity_type = 'node' ";
@@ -164,15 +168,23 @@ function grievance_uh226_report_spi_term_detail_nid($grievance_nid, $lookups, $v
   $row['grievance_id'] = $grievance_node->field_grievance_id['und'][0]['value'];
 
   // SPI date
-  $from_date = date('Y-m-d 00:00:00', strtotime($values['from_date']));
-  $to_date = date('Y-m-d 00:00:00', strtotime($values['to_date']));
+  if ($values['from_date']) {
+    $from_date = date('Y-m-d 00:00:00', strtotime($values['from_date']));
+  }
+  if ($values['to_date']) {
+    $to_date = date('Y-m-d 00:00:00', strtotime($values['to_date']));
+  }
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
   $query->fieldCondition('field_grievance_log_type', 'tid', $lookups['spi_log_type_tid']);
-  $query->fieldCondition('field_grievance_status_date', 'value', $from_date, '>=');
-  $query->fieldCondition('field_grievance_status_date', 'value', $to_date, '<=');
+  if ($from_date) {
+    $query->fieldCondition('field_grievance_status_date', 'value', $from_date, '>=');
+  }
+  if ($to_date) {
+    $query->fieldCondition('field_grievance_status_date', 'value', $to_date, '<=');
+  }
   $query->fieldOrderBy('field_grievance_status_date', 'value');
   $query->range(0, 1);
   $stmt = $query->execute();
@@ -190,8 +202,12 @@ function grievance_uh226_report_spi_term_detail_nid($grievance_nid, $lookups, $v
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
   $query->fieldCondition('field_grievance_log_type', 'tid', $lookups['term_log_type_tid']);
-  $query->fieldCondition('field_grievance_status_date', 'value', $from_date, '>=');
-  $query->fieldCondition('field_grievance_status_date', 'value', $to_date, '<=');
+  if ($from_date) {
+    $query->fieldCondition('field_grievance_status_date', 'value', $from_date, '>=');
+  }
+  if ($to_date) {
+    $query->fieldCondition('field_grievance_status_date', 'value', $to_date, '<=');
+  }
   $query->fieldOrderBy('field_grievance_status_date', 'value');
   $query->range(0, 1);
   $stmt = $query->execute();
@@ -355,10 +371,15 @@ function grievance_uh226_report_spi_term_detail_lookups() {
   return $result;
 }
 
-function grievance_uh226_report_spi_term_detail_render($report_type, $report_id) {
-  // Iterate through the results and build our aggregates
-  $which = 'specialist';
+function grievance_uh226_report_spi_term_detail_render_specialist($report_type, $report_id) {
+  return grievance_uh226_report_spi_term_detail_render($report_type, $report_id, 'specialist');
+}
 
+function grievance_uh226_report_spi_term_detail_render_employer($report_type, $report_id) {
+  return grievance_uh226_report_spi_term_detail_render($report_type, $report_id, 'employer');
+}
+
+function grievance_uh226_report_spi_term_detail_render($report_type, $report_id, $which) {
   // Load the parameters
   $query = db_select('report_cache');
   $query->fields('report_cache');
@@ -368,14 +389,29 @@ function grievance_uh226_report_spi_term_detail_render($report_type, $report_id)
   $hr = $stmt->fetchAssoc();
   $parameters = unserialize($hr['report_data']);
 
+  // Construct the page title
   $html = '';
   $html .= '<div class="uh-226-report-spi-term-detail-render">';
   $html .= '<h2>';
-  $html .= t('Grievances from @from_date to @to_date', array(
-      '@from_date' => date('m/d/Y', strtotime($parameters['from_date'])),
-      '@to_date' => date('m/d/Y', strtotime($parameters['to_date'])),
-    )
-  );
+  if ($parameters['from_date'] && $parameters['to_date']) {
+    $html .= t('Grievances from @from_date to @to_date', array(
+        '@from_date' => date('m/d/Y', strtotime($parameters['from_date'])),
+        '@to_date' => date('m/d/Y', strtotime($parameters['to_date'])),
+      )
+    );
+  } else if ($parameters['from_date']) {
+    $html .= t('Grievances from @from_date', array(
+        '@from_date' => date('m/d/Y', strtotime($parameters['from_date'])),
+      )
+    );
+  } else if ($parameters['to_date']) {
+    $html .= t('Grievances through @to_date', array(
+        '@to_date' => date('m/d/Y', strtotime($parameters['to_date'])),
+      )
+    );
+  } else {
+    $html .= 'All Dates';
+  }
   if ($parameters['open_only'] == 'yes') {
     $html .= ' -- Open Grievances Only';
   } else {
@@ -385,6 +421,11 @@ function grievance_uh226_report_spi_term_detail_render($report_type, $report_id)
     $html .= ' -- ' . $parameters['organizer']['entity_label'];
   } else {
     $html .= ' -- All Specialists';
+  }
+  if ($which == 'specialist') {
+    $html .= ' -- By Specialist';
+  } else {
+    $html .= ' -- By Employer';
   }
   $html .= '</h2>';
 
@@ -400,7 +441,12 @@ function grievance_uh226_report_spi_term_detail_render($report_type, $report_id)
   $data = array();
   while ($hr = $stmt->fetchAssoc()) {
     $hr = unserialize($hr['report_data']);
-    $data[$hr['employer_name']][] = $hr;
+    if ($which == 'specialist') {
+      $key = $hr['specialist_name'];
+    } else {
+      $key = $hr['employer_name'];
+    }
+    $data[$key][] = $hr;
   }
 
   /*
@@ -428,11 +474,11 @@ function grievance_uh226_report_spi_term_detail_render($report_type, $report_id)
   $attributes = array();
 
   ksort($data);
-  foreach ($data as $employer_name => $employer_data) {
-    $html .= '<h3>' . $employer_name . '</h3>';
+  foreach ($data as $key => $sub_data) {
+    $html .= '<h3>' . $key . '</h3>';
 
     $rows = array();
-    foreach ($employer_data as $hr) {
+    foreach ($sub_data as $hr) {
       $row = array();
       $row[] = $hr['grievant_name'];
       $row[] = $hr['grievance_id'];
@@ -477,63 +523,4 @@ function grievance_uh226_report_spi_term_detail_render($report_type, $report_id)
     $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
   }
   return $html;
-
-
-  $rows = array();
-  foreach ($data as $specialist_name => $hr) {
-    $row = array();
-    $row[] = $specialist_name;
-    $row[] = $hr['total'];
-    $row[] = $hr['1st_call'];
-    $row[] = $hr['other_call'];
-    $row[] = $hr['no_activity'];
-    $row[] = $hr['no_boa_held'];
-    $row[] = $hr['boa_held'];
-    $row[] = $hr['rslvd'];
-    $row[] = $hr['nfa'];
-    $row[] = $hr['arb'];
-    $row[] = $hr['won'];
-    $row[] = $hr['lost'];
-    $rows[] = $row;
-  }
-
-  $row = array();
-  $row[] = '<strong>' . t('Sub-Total') . '</strong>';
-  $row[] = '<strong>' . $sub_totals['total'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['1st_call'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['other_call'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['no_activity'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['no_boa_held'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['boa_held'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['rslvd'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['nfa'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['arb'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['won'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['lost'] . '</strong>';
-  $rows[] = array('data' => $row, 'no_striping' => TRUE);
-
-  $row = array();
-  $row[] = '<strong>' . t('Total') . '</strong>';
-  $row[] = '<strong>' . $sub_totals['total'] . '</strong>';
-  $row[] = array(
-    'data' => '<strong>' . ($sub_totals['1st_call'] + $sub_totals['other_call'] + $sub_totals['no_activity']) . '</strong>',
-    'colspan' => 3,
-  );
-  $row[] = array(
-    'data' => '<strong>' . ($sub_totals['no_boa_held'] + $sub_totals['boa_held']) . '</strong>',
-    'colspan' => 2
-  );
-  $row[] = array(
-    'data' => '<strong>' . ($sub_totals['rslvd'] + $sub_totals['nfa'] + $sub_totals['arb'] + $sub_totals['won'] + $sub_totals['lost'] ) . '</strong>',
-    'colspan' => 5
-  );
-  $rows[] = array('data' => $row, 'no_striping' => TRUE);
-
-  $attributes = array();
-
-  $html .= '</div>';
-
-  return $html;
 }
-
-

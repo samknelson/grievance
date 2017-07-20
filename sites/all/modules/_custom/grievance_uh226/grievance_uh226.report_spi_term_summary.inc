@@ -319,13 +319,6 @@ function grievance_uh226_report_spi_term_summary_render_employer($report_type, $
 }
 
 function grievance_uh226_report_spi_term_summary_render($report_type, $report_id, $which) {
-  // Iterate through the results and build our aggregates
-  /*
-    'grievance_nid' => 'Grievance NID',
-    'specialist_name' => 'Specialist Name',
-    '
-  */
-
   // Load the parameters
   $query = db_select('report_cache');
   $query->fields('report_cache');
@@ -335,6 +328,7 @@ function grievance_uh226_report_spi_term_summary_render($report_type, $report_id
   $hr = $stmt->fetchAssoc();
   $parameters = unserialize($hr['report_data']);
 
+  // Construct the page title
   $html = '';
   $html .= '<div class="uh-226-report-spi-term-summary-render">';
   $html .= '<h2>';
