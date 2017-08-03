@@ -124,6 +124,75 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'grievance_contract_clause_tags' => array(
+      'name' => 'Grievance Contract Section Tags',
+      'machine_name' => 'grievance_contract_clause_tags',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'grievance_contract_section_tags' => array(
+      'name' => 'Grievance Contract Article Tags',
+      'machine_name' => 'grievance_contract_section_tags',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'grievance_contract_template_tags' => array(
+      'name' => 'Grievance Contract Template Tags',
+      'machine_name' => 'grievance_contract_template_tags',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'grievance_delivery' => array(
       'name' => 'Grievance Delivery',
       'machine_name' => 'grievance_delivery',
