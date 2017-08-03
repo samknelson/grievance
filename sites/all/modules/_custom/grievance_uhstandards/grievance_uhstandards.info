@@ -1,0 +1,11 @@
+name = Grievance UH Standards
+description = UNITE HERE standard tags
+core = 7.x
+package = grievance
+dependencies[] = grievance_content_types
+dependencies[] = taxonomy
+dependencies[] = uuid
+dependencies[] = uuid_features
+features[features_api][] = api:2
+features[uuid_term][] = 48991447-da8f-44e6-ae49-fd89bb2f5a9a
+project path = sites/all/modules/_custom
