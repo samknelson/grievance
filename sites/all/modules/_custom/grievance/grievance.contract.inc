@@ -455,3 +455,12 @@ function grievance_contract_update_dummies($trigger_node) {
 }
 
 
+
+function grievance_contract_clause_updateinsert($node) {
+}
+
+function grievance_contract_section_updateinsert($node) {
+}
+
+function grievance_contract_template_updateinsert($node) {
+}
