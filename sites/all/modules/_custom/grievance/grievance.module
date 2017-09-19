@@ -512,6 +512,7 @@ function grievance_report_cache_info() {
     ),
   );
 
+  /*
   $items['grievance-report-status-summary'] = array(
     'name' => t('Status Summary Report'),
     'description' => '',
@@ -525,6 +526,7 @@ function grievance_report_cache_info() {
       'Summary By Chapter' => 'grievance_report_status_summary_render_chapter',
     ),
   );
+  */
 
   return $items;
 }
