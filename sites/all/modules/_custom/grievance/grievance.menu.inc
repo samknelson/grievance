@@ -402,6 +402,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['admin/config/grievance/log_types'] = array(
+		'title' => 'Grievance Module - Log Types',
+		'description' => t('Settings for the Grievance Module log types'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_admin_log_types'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['admin/config/grievance/gform'] = array(
 		'title' => 'Grievance Module - Form',
 		'description' => t('Settings for the Grievance Form'),
