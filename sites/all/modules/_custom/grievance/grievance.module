@@ -12,6 +12,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.attac
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.settlement.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.permission.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.admin.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.admin_log_types.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.gform.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.arbitrationform.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_bytype.inc";

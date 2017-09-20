@@ -352,8 +352,10 @@ function grievance_timss_form_grievance_node_callback_submit($form, &$form_state
 
 function grievance_timss_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
   // Add TIMSS Search elements to the form
-  $classaction = grievance_form_current_value('field_grievance_classaction', 'value', $form, $form_state);
-  if ($classaction == 'Yes') { return; }
+
+  // Don't show TIMSS search for class action grievances (obsoleted by request from 226)
+  // $classaction = grievance_form_current_value('field_grievance_classaction', 'value', $form, $form_state);
+  // if ($classaction == 'Yes') { return; }
 
   $broughtby_tid = grievance_form_current_value('field_grievance_broughtby', 'tid', $form, $form_state);
   if (!$broughtby_tid) { 
