@@ -112,6 +112,16 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $form['field_grievance_status_date']['und'][0]['#default_value']['value'] = date('Y-m-d H:i:s');
 
   //
+  // Remove access to the "shop" field for stewards
+  //
+
+  if ($user_full->field_grievance_shops['und'][0]['target_id'] && 
+     !$user_full->field_grievance_shops['und'][1]['target_id'] && 
+     !user_access('grievance edit')) {
+    $form['field_grievance_shop']['#access'] = FALSE;
+  }
+
+  //
   // Restrict the list of available statuses based on the user's role.
   //
 
