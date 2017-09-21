@@ -346,7 +346,7 @@ function grievance_menu() {
 		'title' => t('All Grievances'),
 		'page callback' => 'grievance_all',
 		'page arguments' => array(),
-		'access arguments' => array('grievance user'),
+		'access arguments' => array('grievance view'),
 		'type' => MENU_LOCAL_TASK,
 		'weight' => 2,
 	);
