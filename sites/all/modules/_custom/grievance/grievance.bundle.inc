@@ -1,5 +1,32 @@
 <?php
 
+/**
+ * Purge old bundles.
+ * 
+ * @todo: This purges things older than 90 days.  Should be a configuration variable.
+ * @todo: This purges both bundles and "gforms".  Should probably be separate functions, or at least not bundled into 'bundle'.
+ * @todo: Improve scanning and logging.  We might be purging things we shouldn't.
+ */
+
+function grievance_bundle_cleanup() {
+	$dirs = array(
+		grievance_bundle_working_directory(NULL),
+		DRUPAL_ROOT . '/sites/default/files/private/grievance_gform'
+	);
+
+	foreach ($dirs as $dir) {
+		$candidates = scandir($dir);
+		$too_old = time() - 24*60*60*90;
+		foreach ($candidates as $candidate) {
+			if (preg_match('/^\./', $candidate)) { continue; }
+			$mtime = filemtime("$dir/$candidate");
+			if ($mtime >= $too_old) { continue; }
+			watchdog('grievance_bundle', "Purging old bundle $dir/$candidate");
+			unlink("$dir/$candidate");
+		}
+	}
+}
+
 function grievance_node_tab_bundle_download($grievance_node) {
 	// Path to the bundled file
 	$bundled_file = grievance_bundle_working_directory($grievance_node) . '/bundled_' . $grievance_node->nid . '.pdf';

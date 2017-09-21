@@ -12,6 +12,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.attac
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.settlement.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.permission.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.admin.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.admin_log_types.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.gform.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.arbitrationform.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_bytype.inc";
@@ -20,6 +21,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.repor
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_by_specialist.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_settlement_summary.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_status_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.block.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.notify.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.alert.inc";
@@ -52,6 +54,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.shops
 function grievance_cron() {
   grievance_alert_all();
   grievance_mailattach_fetch();
+  grievance_bundle_cleanup();
 }
 
 function grievance_node_update($node) {
@@ -72,6 +75,10 @@ function grievance_node_update($node) {
       $node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
     }
   }
+
+  if ($node->type == 'grievance_contract_clause')     { grievance_contract_clause_updateinsert($node); }
+  if ($node->type == 'grievance_contract_section')    { grievance_contract_section_updateinsert($node); }
+  if ($node->type == 'grievance_contract_template')   { grievance_contract_template_updateinsert($node); }
 }
 
 function grievance_node_insert($node) {
@@ -83,6 +90,10 @@ function grievance_node_insert($node) {
       $node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
     }
   }
+
+  if ($node->type == 'grievance_contract_clause')     { grievance_contract_clause_updateinsert($node); }
+  if ($node->type == 'grievance_contract_section')    { grievance_contract_section_updateinsert($node); }
+  if ($node->type == 'grievance_contract_template')   { grievance_contract_template_updateinsert($node); }
 }
 
 /*
@@ -502,6 +513,22 @@ function grievance_report_cache_info() {
     ),
   );
 
+  /*
+  $items['grievance-report-status-summary'] = array(
+    'name' => t('Status Summary Report'),
+    'description' => '',
+    'access' => 'grievance report',
+    'path' => 'grievance/report/status-summary',
+    'fields' => grievance_report_status_summary_fields(),
+    'pk_list_callback' => 'grievance_report_status_summary_pks',
+    'batch_callback' => 'grievance_report_status_summary_batch',
+    'render_callbacks' => array(
+      'Summary By Specialist' => 'grievance_report_status_summary_render_specialist',
+      'Summary By Chapter' => 'grievance_report_status_summary_render_chapter',
+    ),
+  );
+  */
+
   return $items;
 }
 
@@ -538,7 +565,10 @@ function grievance_views_pre_render(&$view) {
 }
 
 function grievance_views_post_execute(&$view) {
-  if ($view->name == 'grievances_mine' || $view->name == 'grievances' || $view->name == 'grievances_without_status') {
+  if ($view->name == 'grievances_mine' || 
+      $view->name == 'grievances' || 
+      $view->name == 'grievances_without_status' ||
+      $view->name == 'grievances_without_member_id') {
     grievance_views_post_execute_grievances_mine($view);
   }
 

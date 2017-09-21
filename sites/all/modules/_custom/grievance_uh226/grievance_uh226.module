@@ -7,6 +7,27 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uh226') . 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uh226') . "/grievance_uh226.report_spi_term_detail.inc";
 
 /**
+ * Implements hook_permission()
+ */
+
+function grievance_uh226_permission() {
+  return array(
+    'grievance uh226 report summary' => array(
+      'title' => t('Grievance UH226 Summary Report Access'), 
+      'description' => '',
+    ),
+    'grievance uh226 report spi term summary' => array(
+      'title' => t('Grievance UH226 SPI / Term Summary Report Access'), 
+      'description' => '',
+    ),
+    'grievance uh226 report spi term detail' => array(
+      'title' => t('Grievance UH226 SPI Term Detail Report Access'), 
+      'description' => '',
+    ),
+  );
+}
+
+/**
  * implements hook_node_view()
  * 
  * Silly function to hide comments from the print view if they have 
@@ -33,7 +54,7 @@ function grievance_uh226_menu() {
     'description' => '',
     'page callback' => 'grievance_uh226_report_summary',
     'page arguments' => array(),
-    'access arguments' => array('grievance report'),
+    'access arguments' => array('grievance uh226 report summary'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -42,7 +63,7 @@ function grievance_uh226_menu() {
     'description' => '',
     'page callback' => 'grievance_uh226_report_spi_term_summary',
     'page arguments' => array(),
-    'access arguments' => array('grievance report'),
+    'access arguments' => array('grievance uh226 report spi term summary'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -51,7 +72,7 @@ function grievance_uh226_menu() {
     'description' => '',
     'page callback' => 'grievance_uh226_report_spi_term_detail',
     'page arguments' => array(),
-    'access arguments' => array('grievance report'),
+    'access arguments' => array('grievance uh226 report spi term detail'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -64,7 +85,7 @@ function grievance_uh226_report_cache_info() {
   $items['grievance-uh226-report-spi-term-summary'] = array(
     'name' => t('UH226: SPI / Term Summary Report'),
     'description' => '',
-    'access' => 'grievance report',
+    'access' => 'grievance uh226 report spi term summary',
     'path' => 'grievance/report/uh226/spi-term-summary',
     'fields' => grievance_uh226_report_spi_term_summary_fields(),
     'pk_list_callback' => 'grievance_uh226_report_spi_term_summary_pks',
@@ -78,7 +99,7 @@ function grievance_uh226_report_cache_info() {
   $items['grievance-uh226-report-spi-term-detail'] = array(
     'name' => t('UH226: SPI / Term Detail Report'),
     'description' => '',
-    'access' => 'grievance report',
+    'access' => 'grievance uh226 report spi term detail',
     'path' => 'grievance/report/uh226/spi-term-detail',
     'fields' => grievance_uh226_report_spi_term_detail_fields(),
     'pk_list_callback' => 'grievance_uh226_report_spi_term_detail_pks',

@@ -109,7 +109,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // Set the status date, for status changes
   // 
 
-  $form['field_grievance_status_date']['und'][0]['#default_value']['value'] = date('Y-m-d');
+  $form['field_grievance_status_date']['und'][0]['#default_value']['value'] = date('Y-m-d H:i:s');
 
   //
   // Restrict the list of available statuses based on the user's role.
@@ -470,8 +470,14 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $classaction = grievance_form_current_value('field_grievance_classaction', 'value', $form, $form_state);
   $field_to_hide = array();
   if ($classaction == 'Yes') {
-    $fields_to_hide[] = 'field_grievance_first_name';
-    $fields_to_hide[] = 'field_grievance_last_name';
+
+    $form['field_grievance_first_name']['und']['#title'] = 
+      $form['field_grievance_first_name']['und'][0]['#title'] = 
+      $form['field_grievance_first_name']['und'][0]['value']['#title'] = t('Group or Class Name');
+    $form['field_grievance_last_name']['und']['#title'] = 
+      $form['field_grievance_last_name']['und'][0]['#title'] = 
+      $form['field_grievance_last_name']['und'][0]['value']['#title'] = t('Group or Class Description');
+
     $fields_to_hide[] = 'field_grievance_phone';
     $fields_to_hide[] = 'field_grievance_email';
     $fields_to_hide[] = 'field_grievance_address';
@@ -491,14 +497,20 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $fields_to_hide[] = 'field_grievance_shift';
     $fields_to_hide[] = 'field_grievance_daysoff';
     $fields_to_hide[] = 'field_grievance_ein';
-    $fields_to_hide[] = 'field_grievance_min';
+    // $fields_to_hide[] = 'field_grievance_min';
     $fields_to_hide[] = 'field_grievance_corrected';
     $fields_to_hide[] = 'field_grievance_supervisor_name';
     $fields_to_hide[] = 'field_grievance_supervisor_title';
     $fields_to_hide[] = 'field_grievance_supervisor_unit';
-    $fields_to_hide[] = 'field_grievance_timss_search';
-    $fields_to_hide[] = 'field_grievance_timss_search_result';
+    // $fields_to_hide[] = 'field_grievance_timss_search';
+    // $fields_to_hide[] = 'field_grievance_timss_search_result';
   } else {
+    $form['field_grievance_first_name']['und']['#title'] = 
+      $form['field_grievance_first_name']['und'][0]['#title'] = 
+      $form['field_grievance_first_name']['und'][0]['value']['#title'] = t('First Name');
+    $form['field_grievance_last_name']['und']['#title'] = 
+      $form['field_grievance_last_name']['und'][0]['#title'] = 
+      $form['field_grievance_last_name']['und'][0]['value']['#title'] = t('Last Name');
     // $fields_to_hide[] = 'field_grievance_broughtby';
   }
   if ($fields_to_hide) {
