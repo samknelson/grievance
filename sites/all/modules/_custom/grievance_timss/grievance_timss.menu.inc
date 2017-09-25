@@ -7,6 +7,15 @@
 function grievance_timss_menu() {
   $items = array();
 
+	$items['admin/config/grievance/timss/test'] = array(
+		'title' => 'Grievance Module - TIMSS - Test',
+		'description' => t('Test the TIMSS connection and search'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_timss_test_form'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['admin/config/grievance/timss'] = array(
 		'title' => 'Grievance Module - TIMSS',
 		'description' => t('Settings for the TIMSS integration'),
