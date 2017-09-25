@@ -141,7 +141,6 @@ function grievance_uh226_report_spi_term_detail_batch($grievance_nids, $values, 
 }
 
 function grievance_uh226_report_spi_term_detail_nid($grievance_nid, $lookups, $values) {
-
   // Our result row
   $row = array();
   $row['grievance_nid'] = $grievance_nid;
@@ -216,6 +215,33 @@ function grievance_uh226_report_spi_term_detail_nid($grievance_nid, $lookups, $v
     $log_nid = $log_nids[0];
     $log_node = node_load($log_nid);
     $row['term_date'] = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
+  }
+
+  // 
+  // if there is a written warning, final warning, or suspension *after* the SPI or Term,
+  // then this row can be excluded from the report.
+  //
+
+  $exclude_start_ts = max($row['term_date'], $row['spi_date']);
+  if ($exclude_start_ts) {
+    $written_warning_log_type_tid = $lookups['written_warning_log_type_tid'];
+    $final_warning_log_type_tid = $lookups['final_warning_log_type_tid'];
+    $suspension_log_type_tid = $lookups['suspension_log_type_tid'];
+
+    $exclude_start_date = date('Y-m-d H:i:s', $exclude_start_ts);
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance_log');
+    $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+    $query->fieldCondition('field_grievance_log_type', 'tid', array($written_warning_log_type_tid, $final_warning_log_type_tid, $suspension_log_type_tid), 'in');
+    if ($from_date) {
+      $query->fieldCondition('field_grievance_status_date', 'value', $exclude_start_date, '>');
+    }
+    $query->range(0, 1);
+    $stmt = $query->execute();
+    if ($stmt['node']) {
+      return array();
+    }
   }
 
   // BOA date
@@ -360,11 +386,14 @@ function grievance_uh226_report_spi_term_detail_lookups() {
     'nfa_status_tids'                 => $nfa_status_tids,
     'arb_sub_status_tids'             => $arb_sub_status_tids,
     'arb_held_status_tids'            => $arb_held_status_tids,
-    'won_tids'                 => $won_tids,
-    'lost_tids'                => $lost_tids,
+    'won_tids'                        => $won_tids,
+    'lost_tids'                       => $lost_tids,
 		'boa_held_status_tids' 						=> $boa_held_status_tids,
     'spi_log_type_tid'                => variable_get('grievance_log_spi_type', ''),
     'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
+    'written_warning_log_type_tid'    => variable_get('grievance_log_written_warning_type', ''),
+    'final_warning_log_type_tid'      => variable_get('grievance_log_final_warning_type', ''),
+    'suspension_log_type_tid'         => variable_get('grievance_log_suspension_type', ''),
     'communication_log_type_tids'     => $communication_log_type_tids,
   );
 
