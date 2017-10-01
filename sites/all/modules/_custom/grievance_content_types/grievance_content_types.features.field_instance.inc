@@ -1453,6 +1453,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -1469,6 +1470,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 0,
         ),
@@ -1479,6 +1481,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 0,
         ),
@@ -1501,6 +1504,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -2422,6 +2426,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -2462,6 +2467,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4419,6 +4425,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4459,6 +4466,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4499,6 +4507,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4509,6 +4518,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4525,6 +4535,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4547,6 +4558,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4592,6 +4604,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4602,6 +4615,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4612,6 +4626,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 0,
         ),
@@ -4628,6 +4643,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 0,
         ),
@@ -4644,6 +4660,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4692,6 +4709,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4702,6 +4720,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4736,6 +4755,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4784,6 +4804,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4794,6 +4815,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4804,6 +4826,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 0,
         ),
@@ -4820,6 +4843,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 0,
         ),
@@ -4836,6 +4860,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4884,6 +4909,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4894,6 +4920,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -4928,6 +4955,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -5445,6 +5473,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -5455,6 +5484,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -5465,6 +5495,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'hidden',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 0,
         ),
@@ -5475,6 +5506,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -5485,6 +5517,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 0,
         ),
@@ -5501,6 +5534,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -6056,7 +6090,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
-        'increment' => 15,
+        'increment' => 1,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
@@ -7322,6 +7356,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -7467,6 +7502,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -7790,6 +7826,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -8113,6 +8150,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -9957,7 +9995,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
-        'increment' => 15,
+        'increment' => 1,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
@@ -10151,6 +10189,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -10553,6 +10592,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -10596,6 +10636,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 1,
         ),
@@ -10710,6 +10751,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => 1,
         ),
@@ -10797,6 +10839,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -10843,6 +10886,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -10897,6 +10941,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -10941,6 +10986,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -10996,6 +11042,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -11051,6 +11098,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -11660,6 +11708,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -11850,6 +11899,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -12191,6 +12241,49 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_log_types-field_grievance_roles'.
+  $field_instances['taxonomy_term-grievance_log_types-field_grievance_roles'] = array(
+    'bundle' => 'grievance_log_types',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'If only certain roles have access to edit log entries of this type, select the roles that should have access.  If no roles are checked, all roles will have access.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'role_field',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'role_field_formatter',
+        'weight' => 2,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_roles',
+    'label' => 'Roles',
+    'required' => 0,
+    'settings' => array(
+      'checkall' => array(
+        'checkall' => 0,
+        'checkall-check-all' => 1,
+        'checkall-toggle' => 1,
+        'checkall-uncheck-all' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'checkall' => FALSE,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_log_types-field_grievance_timeline_show'.
   $field_instances['taxonomy_term-grievance_log_types-field_grievance_timeline_show'] = array(
     'bundle' => 'grievance_log_types',
@@ -12205,7 +12298,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 0,
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -12239,6 +12332,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
           'link' => FALSE,
         ),
@@ -12555,6 +12649,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Grievance Log Type');
   t('Holidays');
   t('ID');
+  t('If only certain roles have access to edit log entries of this type, select the roles that should have access.  If no roles are checked, all roles will have access.');
   t('If selected, this contact will appear for all shops associated with this company.');
   t('If the company should see a longer or more descriptive name, enter it here.  (I.e. the name might be "Guest Complaints" and the employer name might be " Guest complaints (with complete mailing and/or email address and phone number)").  This longer name will be used on information requests and grievance forms sent to the company.');
   t('Images');
