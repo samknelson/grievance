@@ -449,26 +449,9 @@ function grievance_views_query_alter(&$view, &$query) {
 }
 
 function grievance_views_pre_build(&$view) {
-  // When an admin is editing a grievance clause, they select the contract section from a view.  The view should be restricted
-  // to just the contract template that they're working i.
-  if ($view->name == 'grievance_contract_sections' && $view->current_display == 'entityreference_1') { 
-    $template_nid = 0;
-    $clause_node = menu_get_object();
-    if ($clause_node) {
-      $template_nid = $clause_node->field_grievance_contract_tplt['und'][0]['target_id'];
-    }
-    if (!$template_nid && isset($_REQUEST['grievance_contract_tplt'])) {
-      $template_nid = $_REQUEST['grievance_contract_tplt'];
-    }
-    if ($template_nid) {
-      $view->args[0] = $template_nid;
-    }
-  }
-
-  // Similarly, when a user is selecting a contract clause, it should come from the contract template corresponding to the
-  // shop that they're in.
-  if ($view->name == 'grievance_contract_clauses' && $view->current_display == 'entityreference_1') { 
-    // $view->args[0] = 3215;
+  // Contract view alterations
+  if ($view->name == 'grievance_contract_sections' || $view->name == 'grievance_contract_clauses') {
+    grievance_contract_views_pre_build($view);
   }
 }
 
@@ -561,7 +544,6 @@ function grievance_views_pre_render(&$view) {
       }
     }
   }
-
 }
 
 function grievance_views_post_execute(&$view) {

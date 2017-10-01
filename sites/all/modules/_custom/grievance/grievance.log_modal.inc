@@ -50,7 +50,7 @@ function grievance_log_modal_add_form($form, &$form_state, $grievance_node) {
   $form['grievance_log_type'] = array(
     '#type'           => 'select',
     '#title'          => 'Type',
-    '#options'        => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#options'        => grievance_log_types_i_can_edit(),
     '#required'       => TRUE,
   );
 
@@ -124,3 +124,5 @@ function grievance_log_modal_add_form_submit($form, &$form_state) {
 
   return;
 }
+
+

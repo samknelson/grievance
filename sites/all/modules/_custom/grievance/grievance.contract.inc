@@ -454,13 +454,54 @@ function grievance_contract_update_dummies($trigger_node) {
   }
 }
 
+//
+// Not using these functions at the moment, @todo probably safe to remove
+//
+
+function grievance_contract_clause_updateinsert($node) { }
+function grievance_contract_section_updateinsert($node) { }
+function grievance_contract_template_updateinsert($node) { }
 
 
-function grievance_contract_clause_updateinsert($node) {
-}
+function grievance_contract_views_pre_build(&$view) {
+  // When an admin is editing a grievance clause, they select the contract section from a view.  The view should be restricted
+  // to just the contract template that they're working i.
+  if ($view->name == 'grievance_contract_sections' && $view->current_display == 'entityreference_1') { 
+    $template_nid = 0;
+    $clause_node = menu_get_object();
+    if ($clause_node) {
+      $template_nid = $clause_node->field_grievance_contract_tplt['und'][0]['target_id'];
+    }
+    if (!$template_nid && isset($_REQUEST['grievance_contract_tplt'])) {
+      $template_nid = $_REQUEST['grievance_contract_tplt'];
+    }
+    if ($template_nid) {
+      $view->args[0] = $template_nid;
+    }
+  }
 
-function grievance_contract_section_updateinsert($node) {
-}
+  //dpm($view->display_handler);
+  //dpm($view);
+  if ( ($view->name == 'grievance_contract_clauses' && $view->current_display == 'views_data_export_1') ||
+       ($view->name == 'grievance_contract_clauses' && $view->current_display == 'views_data_export_2') ||
+       ($view->name == 'grievance_contract_sections' && $view->current_display == 'views_data_export_1') ) {
+    $contract_tplt_nid = $view->args[0];
+    $contract_tplt_node = node_load($contract_tplt_nid);
 
-function grievance_contract_template_updateinsert($node) {
+    $contract_section_nid = $view->args[1];
+
+    $filename = $contract_tplt_node->title;
+    if ($contract_section_nid) {
+      $contract_section_node = node_load($contract_section_nid);
+      $filename .= ' - ' . $contract_section_node->title;      
+    }
+
+    if ($view->name == 'grievance_contract_sections') {
+      $filename .= ' - ' . "Articles";
+    }
+
+    $filename .= '.csv';
+
+    $view->display_handler->options['style_options']['filename'] = $filename;
+  }
 }

@@ -594,15 +594,16 @@ function grievance_log_node_form_alter(&$form, &$form_state, $form_id) {
     ) {
       $form['field_grievance_status']['#access'] = TRUE;
     }
-
   }
+
+  // Restrict dropdown options for log type
+  $form['field_grievance_log_type']['und']['#options'] = grievance_log_types_i_can_edit();
 }
 
 function grievance_log_intake_admin() {
   $form = array();
 
-  $options = array(NULL => t('- Select -'));
-  $options += taxonomy_allowed_values(field_info_field('field_grievance_log_type'));
+  $options = grievance_log_types_i_can_edit();
 
   for ($i=1; $i<=5; ++$i) {
     $form["grievance_log_intake_${i}_type"] = array(
@@ -614,5 +615,68 @@ function grievance_log_intake_admin() {
   }
 
   return system_settings_form($form);
+}
+
+function grievance_node_access_grievance_log($node, $op, $account) {
+  if ($op == 'view') { return NODE_ACCESS_IGNORE; }
+  $log_type_tid = $node->field_grievance_log_type['und'][0]['tid'];
+  if (!$log_type_tid) { return NODE_ACCESS_IGNORE; }
+  $log_type_term = taxonomy_term_load($log_type_tid);
+  if (!$log_type_term) { return NODE_ACCESS_IGNORE; }
+  $types = grievance_log_types_i_can_edit($account);
+  if (!$types[$log_type_tid]) { return NODE_ACCESS_DENY; }
+
+  return NODE_ACCESS_IGNORE;
+}
+
+function grievance_log_types_i_can_edit($account = NULL) {
+  // Get the account
+  if ($account) {
+    $uid = $account->uid;
+  } else  {
+    global $user;
+    $uid = $user->uid;
+  }
+  if (!$uid) { return NULL; }
+
+  // Use drupal_static to only compute once per user
+  $result = &drupal_static(__FUNCTION__);
+  if (isset($result) && isset($result[$uid])) { return $result[$uid]; }
+
+  // Ok, do our computations
+  if (!$result) { $result = array(); }
+  $user_full = user_load($uid);
+
+  // Generate the full set of options initially
+  $options = array(NULL => t('- Select -'));
+  $terms = taxonomy_allowed_values(field_info_field('field_grievance_log_type'));
+  foreach ($terms as $tid => $term_name) {
+    // Load the term
+    $term = taxonomy_term_load($tid);
+
+    // No roles means all roles
+    if (!$term->field_grievance_roles['und'][0]['value']) { 
+      $options[$tid] = $term_name; 
+      continue;
+    }
+
+    // Check to see if we have any of the roles
+    $found = FALSE;
+    foreach ($term->field_grievance_roles['und'] as $tmp) {
+      $rid = $tmp['value'];
+      if ($user_full->roles[$rid]) {
+        $found = TRUE; 
+        break;
+      }
+    }
+
+    // We do!
+    if ($found) { 
+      $options[$tid] = $term_name; 
+    }
+  }
+
+  $result[$uid] = $options;
+  return $result[$uid];
 }
 
