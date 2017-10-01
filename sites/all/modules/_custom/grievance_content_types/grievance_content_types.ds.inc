@@ -41,7 +41,7 @@ function grievance_content_types_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
     'edit_link' => array(
-      'weight' => '8',
+      'weight' => '9',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -51,22 +51,12 @@ function grievance_content_types_ds_field_settings_info() {
       'format' => 'default',
     ),
     'author' => array(
-      'weight' => '2',
+      'weight' => '3',
       'label' => 'inline',
       'format' => 'author',
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Submitted By',
-        ),
-      ),
-    ),
-    'post_date' => array(
-      'weight' => '1',
-      'label' => 'inline',
-      'format' => 'ds_post_date_long',
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'Date',
         ),
       ),
     ),
@@ -607,19 +597,21 @@ function grievance_content_types_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'title',
-        1 => 'post_date',
-        2 => 'author',
-        3 => 'field_grievance_log_type',
-        4 => 'field_grievance_log_tags',
-        5 => 'field_grievance_status',
-        6 => 'body',
-        7 => 'field_grievance_attachments',
-        8 => 'edit_link',
+        1 => 'field_grievance_status_date',
+        2 => 'field_grievance_time',
+        3 => 'author',
+        4 => 'field_grievance_log_type',
+        5 => 'field_grievance_log_tags',
+        6 => 'field_grievance_status',
+        7 => 'body',
+        8 => 'field_grievance_attachments',
+        9 => 'edit_link',
       ),
     ),
     'fields' => array(
       'title' => 'ds_content',
-      'post_date' => 'ds_content',
+      'field_grievance_status_date' => 'ds_content',
+      'field_grievance_time' => 'ds_content',
       'author' => 'ds_content',
       'field_grievance_log_type' => 'ds_content',
       'field_grievance_log_tags' => 'ds_content',

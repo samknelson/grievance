@@ -420,8 +420,7 @@ function grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents,
 
   $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
   $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
-  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d'); 
-	$log_node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
+  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s'); 
 	if ($external_id) {
 		$log_node->field_grievance_external_id['und'][0]['value'] = $external_id;
 	}

@@ -3442,28 +3442,6 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_grievance_time'.
-  $field_bases['field_grievance_time'] = array(
-    'active' => 1,
-    'cardinality' => 1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_grievance_time',
-    'field_permissions' => array(
-      'type' => 0,
-    ),
-    'indexes' => array(),
-    'locked' => 0,
-    'module' => 'timefield',
-    'settings' => array(
-      'totime' => '',
-      'weekly_summary' => 0,
-      'weekly_summary_with_label' => 0,
-    ),
-    'translatable' => 0,
-    'type' => 'timefield',
-  );
-
   // Exported field_base: 'field_grievance_timeline_show'.
   $field_bases['field_grievance_timeline_show'] = array(
     'active' => 1,
