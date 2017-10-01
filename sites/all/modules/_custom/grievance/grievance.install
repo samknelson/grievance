@@ -166,6 +166,8 @@ function grievance_update_7008() {
   $stmt = db_query($sql);
 
   while ($hr = $stmt->fetchAssoc()) {
+    entity_get_controller('node')->resetCache();
+
     $log_nid = $hr['entity_id'];
     print "Scanning: $log_nid\n";
 
@@ -188,6 +190,5 @@ function grievance_update_7008() {
 
     $log_node->field_grievance_status_date['und'][0]['value'] = $fullstr;
     node_save($log_node);
-    entity_get_controller('node')->resetCache();
   }
 }
