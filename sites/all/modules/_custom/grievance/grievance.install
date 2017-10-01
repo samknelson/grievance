@@ -192,3 +192,10 @@ function grievance_update_7008() {
     node_save($log_node);
   }
 }
+
+function grievance_update_7009() {
+  if ($instance = field_info_instance('node', 'field_grievance_time', 'grievance_log')) {
+    print "Deleting: field_grievance_time from grievance_log.\n";
+    field_delete_instance($instance);
+  }
+}
