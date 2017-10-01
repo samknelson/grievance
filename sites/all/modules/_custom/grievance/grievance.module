@@ -70,27 +70,13 @@ function grievance_node_update($node) {
     }
   }
 
-  //if ($node->type == 'grievance_log') {
-  //  if (!isset($node->field_grievance_time['und'][0]['value'])) {
-  //    $node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
-  //  }
-  //}
-
   if ($node->type == 'grievance_contract_clause')     { grievance_contract_clause_updateinsert($node); }
   if ($node->type == 'grievance_contract_section')    { grievance_contract_section_updateinsert($node); }
   if ($node->type == 'grievance_contract_template')   { grievance_contract_template_updateinsert($node); }
 }
 
 function grievance_node_insert($node) {
-  if ($node->type == 'grievance') {
-    $node->grievance_assignment_changed = TRUE;
-  }
-  //if ($node->type == 'grievance_log') {
-  //  if (!isset($form->field_grievance_time['und'][0]['value'])) {
-  //    $node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
-  //  }
-  //}
-
+  if ($node->type == 'grievance') { $node->grievance_assignment_changed = TRUE; }
   if ($node->type == 'grievance_contract_clause')     { grievance_contract_clause_updateinsert($node); }
   if ($node->type == 'grievance_contract_section')    { grievance_contract_section_updateinsert($node); }
   if ($node->type == 'grievance_contract_template')   { grievance_contract_template_updateinsert($node); }

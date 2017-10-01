@@ -76,8 +76,7 @@ function grievance_phaxio_callback_sent() {
   	'grievance_log_phaxio_callback_type',
   	$original_log_node->field_grievance_log_type['und'][0]['tid']
   );
-  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d'); 
-	$log_node->field_grievance_time['und'][0]['value'] = timefield_time_to_integer(date('h:i:s a'));
+  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s'); 
   $log_node->body['und'][0]['value'] = print_r($data, 1);
   $log_node = node_submit($log_node); // Prepare node for saving
   node_save($log_node);
