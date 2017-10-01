@@ -535,7 +535,8 @@ function grievance_views_post_execute(&$view) {
   if ($view->name == 'grievances_mine' || 
       $view->name == 'grievances' || 
       $view->name == 'grievances_without_status' ||
-      $view->name == 'grievances_without_member_id') {
+      $view->name == 'grievances_without_member_id' ||
+      $view->name == 'grievances_without_brought_by') {
     grievance_views_post_execute_grievances_mine($view);
   }
 
