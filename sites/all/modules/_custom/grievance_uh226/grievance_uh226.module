@@ -165,6 +165,8 @@ function grievance_uh226_report_summary_form($form, &$form_state) {
 }
 
 /*
+ * The specification here is OBSOLETE and no longer matches the code.  Sorry.
+ *
  * Total Calls
  *  - Total calls this week
  *  - = Initial Call / Call to Grievant / ...
@@ -180,8 +182,9 @@ function grievance_uh226_report_summary_form($form, &$form_state) {
  * SPI and Terms
  * - Search for "Suspension Pending Investigation"
  * - Search for "Discharge"
+ * - Note: This specification is OBSOLETE and no longer matches the code
 
-BOA Date
+ * BOA Date
   - Entered the status "BOA Held" sometime during the specified week
 
  * In Arbitration
@@ -233,7 +236,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if ($term->field_grievance_open['und'][0]['value'] == 0) {
       $closed_status_tids[] = $tid;
     }
-    if (preg_match('/arbitration/i', $term->name)) {
+    if (preg_match('/referred/i', $term->name)) {
       $arbitration_status_tids[] = $tid;
     }
     if (preg_match('/FMCS Held/i', $term->name)) {
@@ -440,7 +443,9 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
       $report_row['new_this_week'] = count(array_keys($stmt['node']));
     }
 
-    // Fetch SPIs
+    // Fetch SPIs and terms.
+    // This used to be the right way to do it.  Those were the days.
+    /*
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'grievance');
@@ -465,6 +470,164 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if ($stmt['node']) {
       $report_row['terms'] = count(array_keys($stmt['node']));
     }
+    */
+
+    // An SPI is a grievance with a SPI log entry not followed by a written warning, final warning, suspension, or term.
+    // A term is a grievance with a Term log entry not followed by a written warning, final warning, or suspension.
+
+    $spi_log_type_tid                 = variable_get('grievance_log_spi_type', 0);
+    $term_log_type_tid                = variable_get('grievance_log_term_type', 0);
+    $written_warning_log_type_tid     = variable_get('grievance_log_written_warning_type', 0);
+    $final_warning_log_type_tid       = variable_get('grievance_log_final_warning_type', 0);
+    $suspension_log_type_tid          = variable_get('grievance_log_suspension_type', 0);
+
+    $open_status_str = join(",", $open_status_tids);
+
+    $sql = "select count(distinct node_grievance.nid) as c ";
+
+    $sql .= "from ";
+    $sql .= "node node_grievance, ";
+    $sql .= "field_data_field_grievance_status, ";
+    $sql .= "field_data_field_grievance_rep_organizer, ";
+    $sql .= "field_data_field_grievance, ";
+    $sql .= "node node_log, ";
+    $sql .= "field_data_field_grievance_log_type, ";
+    $sql .= "field_data_field_grievance_status_date ";
+
+    $sql .= "where ";
+
+    $sql .= "field_data_field_grievance_status.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance_status.entity_id = node_grievance.nid and ";
+    $sql .= "field_data_field_grievance_status.field_grievance_status_tid in ($open_status_str) and ";
+
+    $sql .= "field_data_field_grievance_rep_organizer.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance_rep_organizer.entity_id = node_grievance.nid and ";
+    $sql .= "field_data_field_grievance_rep_organizer.field_grievance_rep_organizer_target_id = " . $user['uid'] . " and ";
+
+    $sql .= "field_data_field_grievance.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance.bundle = 'grievance_log' and ";
+    $sql .= "field_data_field_grievance.field_grievance_target_id = node_grievance.nid and ";
+
+    $sql .= "node_log.type = 'grievance_log' and ";
+    $sql .= "node_log.nid = field_data_field_grievance.entity_id and ";
+
+    $sql .= "field_data_field_grievance_log_type.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance_log_type.entity_id = node_log.nid and ";
+    $sql .= "field_data_field_grievance_log_type.field_grievance_log_type_tid = $spi_log_type_tid and ";
+
+    $sql .= "field_data_field_grievance_status_date.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance_status_date.entity_id = node_log.nid and ";
+
+    $sql .= "node_grievance.type = 'grievance' ";
+
+    $sql .= "and not exists ( ";
+    $sql .= "  select 1 from ";
+
+    $sql .= "  node node_log_a, "; 
+    $sql .= "  field_data_field_grievance field_data_field_grievance_a, ";
+    $sql .= "  field_data_field_grievance_log_type field_data_field_grievance_log_type_a, ";
+    $sql .= "  field_data_field_grievance_status_date field_data_field_grievance_status_date_a ";
+
+    $sql .= "  where ";
+
+    $sql .= "  field_data_field_grievance_a.entity_type = 'node' and ";
+    $sql .= "  field_data_field_grievance_a.bundle = 'grievance_log' and ";
+    $sql .= "  field_data_field_grievance_a.field_grievance_target_id = node_grievance.nid and ";
+    $sql .= "  field_data_field_grievance_a.entity_id = node_log_a.nid and ";
+
+    $sql .= "  field_data_field_grievance_log_type_a.entity_type = 'node' and ";
+    $sql .= "  field_data_field_grievance_log_type_a.entity_id = node_log_a.nid and ";
+    $sql .= "  field_data_field_grievance_log_type_a.field_grievance_log_type_tid in ";
+    $sql .= "    ($term_log_type_tid, $written_warning_log_type_tid, $final_warning_log_type_tid, $suspension_log_type_tid) and ";
+
+    $sql .= "  field_data_field_grievance_status_date_a.entity_type = 'node' and ";
+    $sql .= "  field_data_field_grievance_status_date_a.entity_id = node_log_a.nid and ";
+
+    $sql .= "  field_data_field_grievance_status_date_a.field_grievance_status_date_value > field_data_field_grievance_status_date.field_grievance_status_date_value ";
+
+    $sql .= ") ";
+
+    $stmt = db_query($sql, array());
+    $hr = $stmt->fetchAssoc();
+    $report_row['spi'] = $hr['c'];
+
+
+    $sql = "select count(distinct node_grievance.nid) as c ";
+
+    $sql .= "from ";
+    $sql .= "node node_grievance, ";
+    $sql .= "field_data_field_grievance_status, ";
+    $sql .= "field_data_field_grievance_rep_organizer, ";
+    $sql .= "field_data_field_grievance, ";
+    $sql .= "node node_log, ";
+    $sql .= "field_data_field_grievance_log_type, ";
+    $sql .= "field_data_field_grievance_status_date ";
+
+    $sql .= "where ";
+
+    $sql .= "field_data_field_grievance_status.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance_status.entity_id = node_grievance.nid and ";
+    $sql .= "field_data_field_grievance_status.field_grievance_status_tid in ($open_status_str) and ";
+
+    $sql .= "field_data_field_grievance_rep_organizer.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance_rep_organizer.entity_id = node_grievance.nid and ";
+    $sql .= "field_data_field_grievance_rep_organizer.field_grievance_rep_organizer_target_id = " . $user['uid'] . " and ";
+
+    $sql .= "field_data_field_grievance.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance.bundle = 'grievance_log' and ";
+    $sql .= "field_data_field_grievance.field_grievance_target_id = node_grievance.nid and ";
+
+    $sql .= "node_log.type = 'grievance_log' and ";
+    $sql .= "node_log.nid = field_data_field_grievance.entity_id and ";
+
+    $sql .= "field_data_field_grievance_log_type.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance_log_type.entity_id = node_log.nid and ";
+    $sql .= "field_data_field_grievance_log_type.field_grievance_log_type_tid = $term_log_type_tid and ";
+
+    $sql .= "field_data_field_grievance_status_date.entity_type = 'node' and ";
+    $sql .= "field_data_field_grievance_status_date.entity_id = node_log.nid and ";
+
+    $sql .= "node_grievance.type = 'grievance' ";
+
+    $sql .= "and not exists ( ";
+    $sql .= "  select 1 from ";
+
+    $sql .= "  node node_log_a, "; 
+    $sql .= "  field_data_field_grievance field_data_field_grievance_a, ";
+    $sql .= "  field_data_field_grievance_log_type field_data_field_grievance_log_type_a, ";
+    $sql .= "  field_data_field_grievance_status_date field_data_field_grievance_status_date_a ";
+
+    $sql .= "  where ";
+
+    $sql .= "  field_data_field_grievance_a.entity_type = 'node' and ";
+    $sql .= "  field_data_field_grievance_a.bundle = 'grievance_log' and ";
+    $sql .= "  field_data_field_grievance_a.field_grievance_target_id = node_grievance.nid and ";
+    $sql .= "  field_data_field_grievance_a.entity_id = node_log_a.nid and ";
+
+    $sql .= "  field_data_field_grievance_log_type_a.entity_type = 'node' and ";
+    $sql .= "  field_data_field_grievance_log_type_a.entity_id = node_log_a.nid and ";
+    $sql .= "  field_data_field_grievance_log_type_a.field_grievance_log_type_tid in ";
+    $sql .= "    ($written_warning_log_type_tid, $final_warning_log_type_tid, $suspension_log_type_tid) and ";
+
+    $sql .= "  field_data_field_grievance_status_date_a.entity_type = 'node' and ";
+    $sql .= "  field_data_field_grievance_status_date_a.entity_id = node_log_a.nid and ";
+
+    $sql .= "  field_data_field_grievance_status_date_a.field_grievance_status_date_value > field_data_field_grievance_status_date.field_grievance_status_date_value ";
+
+    $sql .= ") ";
+
+    $stmt = db_query($sql, array());
+    $hr = $stmt->fetchAssoc();
+    $report_row['terms'] = $hr['c'];
+
+
+
+
+
+
+
+
+
 
     // Fetch Arbitrations
     $query = new EntityFieldQuery;
