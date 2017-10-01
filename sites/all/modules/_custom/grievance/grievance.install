@@ -161,7 +161,7 @@ function grievance_update_7007() {
 
 function grievance_update_7008() {
   $sql = "select * from field_data_field_grievance_time ";
-  $sql .= "where entity_type = 'node' and bundle = 'grievance_log' and field_grievance_time_value > 0 ";
+  $sql .= "where entity_type = 'node' and bundle = 'grievance_log' and field_grievance_time_value > 0 and entity_id > 305362 ";
   $sql .= "order by entity_id ";
   $stmt = db_query($sql);
 
