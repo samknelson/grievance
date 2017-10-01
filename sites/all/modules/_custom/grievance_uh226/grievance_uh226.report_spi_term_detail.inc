@@ -503,11 +503,15 @@ function grievance_uh226_report_spi_term_detail_render($report_type, $report_id,
   $attributes = array();
 
   ksort($data);
+  $grand_total = 0;
   foreach ($data as $key => $sub_data) {
     $html .= '<h3>' . $key . '</h3>';
 
     $rows = array();
+    $total = 0;
     foreach ($sub_data as $hr) {
+      ++$total;
+      ++$grand_total;
       $row = array();
       $row[] = $hr['grievant_name'];
       $row[] = $hr['grievance_id'];
@@ -546,10 +550,24 @@ function grievance_uh226_report_spi_term_detail_render($report_type, $report_id,
         $row[] = '';
       }
 
-
       $rows[] = $row;
     }
+
+    $total_row = array();
+    $total_row[] = '<strong>' . t('Grievance Count') . '</strong>';
+    $total_row[] = $total;
+    $total_row[] = '';
+    $total_row[] = '';
+    $total_row[] = '';
+    $total_row[] = '';
+    $total_row[] = '';
+
+    $rows[] = $total_row;
+
     $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
   }
+
+  $html .= '<br>';
+  $html .= '<strong>' . t('Total Grievance Count: ') . $grand_total . '</strong>';
   return $html;
 }
