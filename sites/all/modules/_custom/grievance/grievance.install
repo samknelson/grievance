@@ -183,6 +183,6 @@ function grievance_update_7008() {
     print "Node $log_nid: converted " . $log_node->field_grievance_status_date['und'][0]['value'] . " to $fullstr\n";
 
     $log_node->field_grievance_status_date['und'][0]['value'] = $fullstr;
-    // node_save($log_node);
+    node_save($log_node);
   }
 }
