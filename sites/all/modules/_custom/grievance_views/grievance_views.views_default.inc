@@ -1472,7 +1472,8 @@ function grievance_views_views_default_views() {
 
   /* Display: Entire Contract - CSV */
   $handler = $view->new_display('views_data_export', 'Entire Contract - CSV', 'views_data_export_1');
-  $handler->display->display_options['pager']['type'] = 'some';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
   $handler->display->display_options['style_options']['provide_file'] = 1;
   $handler->display->display_options['style_options']['filename'] = '%1-title.csv';
@@ -1520,7 +1521,8 @@ function grievance_views_views_default_views() {
 
   /* Display: By Section - CSV */
   $handler = $view->new_display('views_data_export', 'By Section - CSV', 'views_data_export_2');
-  $handler->display->display_options['pager']['type'] = 'some';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
   $handler->display->display_options['style_options']['provide_file'] = 1;
   $handler->display->display_options['style_options']['filename'] = '%1-title - %2-title.csv';
@@ -2152,7 +2154,8 @@ function grievance_views_views_default_views() {
 
   /* Display: Data export */
   $handler = $view->new_display('views_data_export', 'Data export', 'views_data_export_1');
-  $handler->display->display_options['pager']['type'] = 'some';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
   $handler->display->display_options['style_options']['provide_file'] = 1;
   $handler->display->display_options['style_options']['filename'] = '%1-title Articles.csv';
