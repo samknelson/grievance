@@ -67,9 +67,9 @@ function grievance_log_modal_add_form($form, &$form_state, $grievance_node) {
     '#type'           => 'date_popup',
     '#title'          => 'Date',
     '#required'       => TRUE,
-    '#date_format'    => 'm/d/Y',
+    '#date_format'    => 'm/d/Y H:i',
     '#date_label_position'  => 'none',
-    '#default_value'  =>  date('Y-m-d'),
+    '#default_value'  =>  date('Y-m-d H:i'),
   );
 
   $form['body'] = array(
@@ -114,7 +114,7 @@ function grievance_log_modal_add_form_submit($form, &$form_state) {
     }
   }
 
-  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d', strtotime($form_state['values']['grievance_status_date']));
+  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s', strtotime($form_state['values']['grievance_status_date']));
   $log_node->body['und'][0]['value'] = $form_state['values']['body'];
 
   $log_node = node_submit($log_node); // Prepare node for saving
