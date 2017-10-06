@@ -200,7 +200,6 @@ function  grievance_node_view($node, $view_mode, $langcode) {
 				$node->content['field_grievance_clauseref'][$delta]['#label'] = $title;
 				++$delta;
 			}
-			dpm($node);
 		}
 
 		// "Organizer" should show the phone number as well as the name
