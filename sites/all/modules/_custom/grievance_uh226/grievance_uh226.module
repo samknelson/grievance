@@ -388,7 +388,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $report_row['name'] = $user['name'];
     $report_row['closed'] = $user['closed'];
     $report_row['victories'] = $user['victories'];
-    $report_row['boa_held'] = $user['victories'];
+    $report_row['boa_held'] = $user['boa_held'];
 
     // Fetch the number of open grievances for each user
     $query = new EntityFieldQuery;
@@ -613,7 +613,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $sql .= "  field_data_field_grievance_log_type_a.entity_type = 'node' and ";
     $sql .= "  field_data_field_grievance_log_type_a.entity_id = node_log_a.nid and ";
     $sql .= "  field_data_field_grievance_log_type_a.field_grievance_log_type_tid in ";
-    $sql .= "    ($written_warning_log_type_tid, $final_warning_log_type_tid, $suspension_log_type_tid) and ";
+    $sql .= "    ($spi_log_type_tid, $written_warning_log_type_tid, $final_warning_log_type_tid, $suspension_log_type_tid) and ";
 
     $sql .= "  field_data_field_grievance_status_date_a.entity_type = 'node' and ";
     $sql .= "  field_data_field_grievance_status_date_a.entity_id = node_log_a.nid and ";
