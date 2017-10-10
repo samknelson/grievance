@@ -543,7 +543,13 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $sql .= "  field_data_field_grievance_status_date_a.entity_type = 'node' and ";
     $sql .= "  field_data_field_grievance_status_date_a.entity_id = node_log_a.nid and ";
 
-    $sql .= "  field_data_field_grievance_status_date_a.field_grievance_status_date_value > field_data_field_grievance_status_date.field_grievance_status_date_value ";
+    $sql .= "  ( ";
+    $sql .= "    field_data_field_grievance_status_date_a.field_grievance_status_date_value > field_data_field_grievance_status_date.field_grievance_status_date_value or ";
+    $sql .= "    ( ";
+    $sql .= "      field_data_field_grievance_status_date_a.field_grievance_status_date_value = field_data_field_grievance_status_date.field_grievance_status_date_value and ";
+    $sql .= "      field_data_field_grievance_status_date_a.entity_id > field_data_field_grievance_status_date.entity_id ";
+    $sql .= "    ) ";
+    $sql .= "  )";
 
     $sql .= ") ";
 
@@ -612,7 +618,13 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $sql .= "  field_data_field_grievance_status_date_a.entity_type = 'node' and ";
     $sql .= "  field_data_field_grievance_status_date_a.entity_id = node_log_a.nid and ";
 
-    $sql .= "  field_data_field_grievance_status_date_a.field_grievance_status_date_value > field_data_field_grievance_status_date.field_grievance_status_date_value ";
+    $sql .= "  ( ";
+    $sql .= "    field_data_field_grievance_status_date_a.field_grievance_status_date_value > field_data_field_grievance_status_date.field_grievance_status_date_value or ";
+    $sql .= "    ( ";
+    $sql .= "      field_data_field_grievance_status_date_a.field_grievance_status_date_value = field_data_field_grievance_status_date.field_grievance_status_date_value and ";
+    $sql .= "      field_data_field_grievance_status_date_a.entity_id > field_data_field_grievance_status_date.entity_id ";
+    $sql .= "    ) ";
+    $sql .= "  ) ";
 
     $sql .= ") ";
 
