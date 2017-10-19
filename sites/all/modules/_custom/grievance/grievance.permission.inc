@@ -62,6 +62,14 @@ function grievance_permission() {
         'title' => t('Grievance Report Bytype'),
         'description' => t('Permission to view the "by type and status" report.')
     ),
+    'grievance report missing broughtby' => array(
+        'title' => t('Grievance Report Missing Brought-By'),
+        'description' => t('Permission to view the "grievances with missing brought-by" report.')
+    ),
+    'grievance report missing member id' => array(
+        'title' => t('Grievance Report Missing Member ID'),
+        'description' => t('Permission to view the "grievances with missing Member ID" report.')
+    ),
     'grievance bundle' => array(
         'title' => t('Grievance Bundle'),
         'description' => t('Permission to generate and download grievance bundles.')
