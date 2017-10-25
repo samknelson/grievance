@@ -1,0 +1,4 @@
+name = Grievance UH 23
+description = Implements custom reporting and other features for UNITE HERE Local 23
+package = grievance
+core = 7.x
