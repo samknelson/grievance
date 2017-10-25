@@ -343,6 +343,7 @@ function grievance_uh23_report_summary_render($report_type, $report_id, $which) 
     }
   }
   ksort($data);
+  ksort($totals);
 
   $rows = array();
 
