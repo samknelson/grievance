@@ -8,39 +8,10 @@ function grievance_uh23_report_summary_form($form, &$form_state) {
   $report_type = 'grievance-uh23-report-summary';
   report_cache_form_prepare($report_type, $form, $form_state);
 
-  /*
-  $form['from_date'] = array(
-    '#type' => 'date_popup',
-    '#title' => 'Start Date',
-    '#date_format' => 'm/d/Y',
+  $form['date'] = array(
+    '#type' => 'hidden',
+    '#value' => date('l, F j, Y'),
   );
-
-  $form['to_date'] = array(
-    '#type' => 'date_popup',
-    '#title' => 'End Date',
-    '#date_format' => 'm/d/Y',
-  );
-
-  $form['open_only'] = array(
-    '#type' => 'select',
-    '#title' => 'Open Grievances Only?',
-    '#required' => TRUE,
-    '#options' => array(
-      'yes' => 'Yes - Include only open grievances', 
-      'no' => 'No - Include both open and closed grievances'
-    ),
-  );
-
-  $form['organizer'] = array(
-    '#type' => 'entityreference',
-    '#title' => t('Specialist'),
-    '#era_entity_type' => 'user',
-    '#era_bundles' => array(),
-    '#era_query_settings' => array(),
-      '#description' => t('Leave blank to select all specialists.'),
-    '#prefix' => '<div class="form-start">',
-  );
-  */
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -296,9 +267,10 @@ function grievance_uh23_report_summary_render($report_type, $report_id, $which) 
 
   // Construct the page title
   $html = '';
-  $html .= '<h2>';
-  $html .= 'Summary Report';
-  $html .= '</h2>';
+  //$html .= '<h2>';
+  //$html .= 'Summary Report: ' . $parameters['date'];
+  //$html .= '</h2>';
+  drupal_set_title('Local 23 Summary Report: ' . $parameters['date']);
 
   // Our columns
   $header = array(
@@ -368,5 +340,7 @@ function grievance_uh23_report_summary_render($report_type, $report_id, $which) 
   }
   $rows[] = $row;
 
-  return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
+  $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
+
+  return $html;
 }
