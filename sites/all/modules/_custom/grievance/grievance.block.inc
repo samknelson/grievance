@@ -34,7 +34,7 @@ function grievance_block_view($delta = '') {
     $block['content'] = variable_get('grievance_messaging_footer', '');
     if (variable_get('grievance_last_updated', '')) {
       if ($block['content']) {
-        $block['content'] .= '<br>' 
+        $block['content'] .= '<br>';
       }
       $block['content'] .= t('Last updated: ') . '<strong>' . variable_get('grievance_last_updated', '') . '</strong>';
     }
