@@ -199,3 +199,8 @@ function grievance_update_7009() {
     field_delete_instance($instance);
   }
 }
+
+function grievance_update_7010() {
+  print "Enabling views_record_count.\n";
+  module_enable('views_record_count');
+}
