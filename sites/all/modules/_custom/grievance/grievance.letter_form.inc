@@ -158,6 +158,15 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 		'#suffix' => '</div>',
 	);
 
+	$form['recipients']['extra']['update_company_representative'] = array(
+		'#title' => 'Update grievance company representative?',
+		'#type' => 'select',
+		'#options' => array(
+			'yes' => 'Yes - The main recipient of this letter is the "Company Recipient" for the grievance',
+			'no' => 'No - Leave the "Company Recipient" unchanged.'
+		),
+		'#default_value' => 'yes',
+	);
 
   // Get the company contacts
 	$recipients = grievance_notify_company_contacts(array('shop_nid' => $shop_nid, 'status_nid' => $status_tid));

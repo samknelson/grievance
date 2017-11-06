@@ -164,38 +164,41 @@ function grievance_letter_form_submit($form, &$form_state) {
 		// We've passed the tests, and we're committed to sending the email.
 		// First, we want to update the node with the primary recipient.
 		$grievance_node = $form_state['grievance_node'];
-		$is_changed = FALSE;
 
-		if ($grievance_node->field_grievance_co_name['und'][0]['value'] != $recipients['to'][0]['name']) {
-			$grievance_node->field_grievance_co_name['und'][0]['value'] = $recipients['to'][0]['name'];
-			$is_changed = TRUE;
-		}
+		if ($form_state['values']['update_company_representative'] == 'yes') {
+			$is_changed = FALSE;
 
-		if ($grievance_node->field_grievance_co_email['und'][0]['email'] != $recipients['to'][0]['email']) {
-			$grievance_node->field_grievance_co_email['und'][0]['email'] = $recipients['to'][0]['email'];
-			$is_changed = TRUE;
-		}
+			if ($grievance_node->field_grievance_co_name['und'][0]['value'] != $recipients['to'][0]['name']) {
+				$grievance_node->field_grievance_co_name['und'][0]['value'] = $recipients['to'][0]['name'];
+				$is_changed = TRUE;
+			}
 
-		if ($recipients['to'][0]['nid']) {
-			$recipient_node = node_load($recipients['to'][0]['nid']);
-			$fields = array(
-				'field_grievance_co_phone',
-				'field_grievance_co_address',
-				'field_grievance_co_address_2',
-				'field_grievance_co_city',
-				'field_grievance_co_state',
-				'field_grievance_co_zip'
-			);
-			foreach ($fields as $field) {
-				if ($grievance_node->{$field}['und'][0]['value'] != $recipient_node->{$field}['und'][0]['value']) {
-					$grievance_node->{$field}['und'][0]['value'] = $recipient_node->{$field}['und'][0]['value'];
-					$is_changed = TRUE;
+			if ($grievance_node->field_grievance_co_email['und'][0]['email'] != $recipients['to'][0]['email']) {
+				$grievance_node->field_grievance_co_email['und'][0]['email'] = $recipients['to'][0]['email'];
+				$is_changed = TRUE;
+			}
+
+			if ($recipients['to'][0]['nid']) {
+				$recipient_node = node_load($recipients['to'][0]['nid']);
+				$fields = array(
+					'field_grievance_co_phone',
+					'field_grievance_co_address',
+					'field_grievance_co_address_2',
+					'field_grievance_co_city',
+					'field_grievance_co_state',
+					'field_grievance_co_zip'
+				);
+				foreach ($fields as $field) {
+					if ($grievance_node->{$field}['und'][0]['value'] != $recipient_node->{$field}['und'][0]['value']) {
+						$grievance_node->{$field}['und'][0]['value'] = $recipient_node->{$field}['und'][0]['value'];
+						$is_changed = TRUE;
+					}
 				}
 			}
-		}
 
-		if ($is_changed) {
-			node_save($grievance_node);
+			if ($is_changed) {
+				node_save($grievance_node);
+			}
 		}
 
 
