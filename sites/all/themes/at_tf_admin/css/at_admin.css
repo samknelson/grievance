@@ -3843,3 +3843,9 @@ fieldset.date-combo .container-inline-date .date-padding {
   width: 50%;
   float: left;
 }
+
+
+.printonly { display: none; }
+@media print {
+  .printonly { display: inherit; }
+}
