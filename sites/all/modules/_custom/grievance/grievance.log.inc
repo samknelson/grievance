@@ -21,6 +21,7 @@ function grievance_node_tab_log($node) {
 
   $result = '';
   $result .= $headfoot;
+  $result .= '<span class="printonly"><br>' . t('Grievance ID: ') . $node->field_grievance_id['und'][0]['value'] . '</span>';
   $result .= '<br>';
   $result .= views_embed_view('grievance_log', 'block', $entity_nid);
   $result .= $headfoot;
