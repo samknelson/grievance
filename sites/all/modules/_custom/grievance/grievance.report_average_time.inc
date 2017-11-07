@@ -136,17 +136,19 @@ function grievance_report_average_time_batch($grievance_nids, $values, $report_i
 function grievance_report_average_time_nid($grievance_nid, $open_status_tids, $closed_status_tids, $from_status_tids, $to_status_tids, $values) {
 	$grievance_node = node_load($grievance_nid);
 
+	/*
   $log_update_tids = array(
     variable_get('grievance_log_insert_type', ''), 
     variable_get('grievance_log_update_type_with_status_change', ''), 
   );
+  */
  
  	// Start date
  	$query = new EntityFieldQuery();
 	$query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  // $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
  	$query->fieldCondition('field_grievance_status', 'tid', $from_status_tids, 'in');
   $query->fieldOrderBy('field_grievance_status_date', 'value');
   $query->range(0,1);
@@ -160,7 +162,7 @@ function grievance_report_average_time_nid($grievance_nid, $open_status_tids, $c
 	$query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  // $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
  	$query->fieldCondition('field_grievance_status', 'tid', $to_status_tids, 'in');
   $query->fieldOrderBy('field_grievance_status_date', 'value');
   $query->range(0,1);
@@ -177,7 +179,7 @@ function grievance_report_average_time_nid($grievance_nid, $open_status_tids, $c
 	$query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+  // $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
  	$query->fieldCondition('field_grievance_status', 'tid', $closed_status_tids, 'in');
   $query->fieldOrderBy('field_grievance_status_date', 'value');
   $query->range(0,1);
