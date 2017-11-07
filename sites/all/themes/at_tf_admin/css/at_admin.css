@@ -3844,6 +3844,30 @@ fieldset.date-combo .container-inline-date .date-padding {
   float: left;
 }
 
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time td:nth-child(1),  
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time th:nth-child(1) { 
+  width: 40%;
+}
+
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time td:nth-child(2),  
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time th:nth-child(2) { 
+  width: 15%;
+}
+
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time td:nth-child(3),  
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time th:nth-child(3) { 
+  width: 15%;
+}
+
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time td:nth-child(4),  
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time th:nth-child(4) { 
+  width: 15%;
+}
+
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time td:nth-child(5),  
+.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time th:nth-child(5) { 
+  width: 15%;
+}
 
 .printonly { display: none; }
 @media print {
