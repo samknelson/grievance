@@ -373,7 +373,7 @@ function grievance_report_average_time_batch_render_detail($report_type, $report
 	      $row[] = $hr['grievance_id'];
 	      $row[] = $hr['intake_date'];
 	      $row[] = $hr['closed_date'];
-	      $row[] = $hr['days'];
+	      $row[] = round($hr['days'], 2);
 	      $rows[] = $row;
 	    }
     }
