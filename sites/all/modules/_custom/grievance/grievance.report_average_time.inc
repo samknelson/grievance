@@ -10,7 +10,7 @@ function grievance_report_average_time_form($form, &$form_state) {
 
   $status_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_status');
   $status_terms = taxonomy_get_tree($status_vocabulary->vid);
-  $status_options = array();
+  $status_options = array(NULL => '-- Select --');
   foreach ($status_terms as $status_term) {
     $status_options[$status_term->tid] = $status_term->name;
   }
@@ -29,18 +29,26 @@ function grievance_report_average_time_form($form, &$form_state) {
     '#description' => t('Leave blank for all dates'),
   );
 
-  $form["from_status"] = array(
-    '#type' => 'checkboxes',
-    '#options' => $status_options,
-    '#title' => t('Compute average time FROM any of these statuses'),
-  );
+  for ($phase=0; $phase<6; ++$phase) {
+    if ($phase == 0) { $title = "Compute average time FROM any of these statuses ..."; } 
+    else if ($phase == 1) { $title = "... TO any of these statuses ..."; }
+    else if ($phase == 5) {  $title = "... AND THEN TO any of these statuses."; }
+    else { $title = "... AND THEN TO any of these statuses ..."; }
 
-  $form["to_status"] = array(
-    '#type' => 'checkboxes',
-    '#options' => $status_options,
-    '#title' => t('Compute average time TO any of these statuses'),
-  );
-  
+    $form["phase_$phase"] = array(
+      '#type' => 'fieldset',
+      '#title' => $title,
+      '#attributes' => array('class' => array('status-list')),
+    );
+
+    for ($i=0; $i<6; ++$i) {
+      $form["phase_$phase"]["status_${phase}_$i"] = array(
+        '#type' => 'select',
+        '#options' => $status_options,
+      );
+    }
+  }
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Generate',
@@ -61,7 +69,24 @@ function grievance_report_average_time_fields() {
     'grievance_id' => 'Griev#',
     'intake_date' => 'Intake Date',
     'closed_date' => 'Closed Date',
-    'days' => 'Number of Days',
+    'date_0' => 'Phase 1 Date',
+    'date_1' => 'Phase 2 Date',
+    'date_2' => 'Phase 3 Date',
+    'date_3' => 'Phase 4 Date',
+    'date_4' => 'Phase 5 Date',
+    'date_5' => 'Phase 6 Date',
+    'days_0' => 'Phase 1 Days',
+    'days_1' => 'Phase 2 Days',
+    'days_2' => 'Phase 3 Days',
+    'days_3' => 'Phase 4 Days',
+    'days_4' => 'Phase 5 Days',
+    'days_5' => 'Phase 6 Days',
+    'total_days_0' => 'Phase 1 Total Days',
+    'total_days_1' => 'Phase 2 Total Days',
+    'total_days_2' => 'Phase 3 Total Days',
+    'total_days_3' => 'Phase 4 Total Days',
+    'total_days_4' => 'Phase 5 Total Days',
+    'total_days_5' => 'Phase 6 Total Days',
   );
 }
 
@@ -93,16 +118,15 @@ function grievance_report_average_time_batch($grievance_nids, $values, $report_i
 		'rows' => array(),
 	);
 
-	$from_status_tids = array();
-	foreach (array_values($values['from_status']) as $status_tid) {
-		if ($status_tid) { $from_status_tids[] = $status_tid; }
-	}
-
-	$to_status_tids = array();
-	foreach (array_values($values['to_status']) as $status_tid) {
-		if ($status_tid) { $to_status_tids[] = $status_tid; }
-	}
-
+  // Get the status IDs we're using
+  $from_to_status_tids = array();
+  for ($phase=0; $phase<6; ++$phase) {
+    for ($i=0; $i<10; ++$i) {
+      if ($values["status_${phase}_$i"]) {
+        $from_to_status_tids[$phase][$i] = $values["status_${phase}_$i"];
+      }
+    }
+  }
 
   // Get the list of open and closed statuses
   $status_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_status');
@@ -124,7 +148,7 @@ function grievance_report_average_time_batch($grievance_nids, $values, $report_i
   }
 
 	foreach ($grievance_nids as $grievance_nid) {
-		$row = grievance_report_average_time_nid($grievance_nid, $open_status_tids, $closed_status_tids, $from_status_tids, $to_status_tids, $values);
+		$row = grievance_report_average_time_nid($grievance_nid, $open_status_tids, $closed_status_tids, $from_to_status_tids, $values);
 		if ($row) {
 			$rows['rows'][$grievance_nid] = $row;
 		}
@@ -133,7 +157,7 @@ function grievance_report_average_time_batch($grievance_nids, $values, $report_i
 	return $rows;
 }
 
-function grievance_report_average_time_nid($grievance_nid, $open_status_tids, $closed_status_tids, $from_status_tids, $to_status_tids, $values) {
+function grievance_report_average_time_nid($grievance_nid, $open_status_tids, $closed_status_tids, $from_to_status_tids, $values) {
 	$grievance_node = node_load($grievance_nid);
 
 	/*
@@ -142,37 +166,45 @@ function grievance_report_average_time_nid($grievance_nid, $open_status_tids, $c
     variable_get('grievance_log_update_type_with_status_change', ''), 
   );
   */
- 
- 	// Start date
- 	$query = new EntityFieldQuery();
-	$query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  // $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
- 	$query->fieldCondition('field_grievance_status', 'tid', $from_status_tids, 'in');
-  $query->fieldOrderBy('field_grievance_status_date', 'value');
-  $query->range(0,1);
-	$stmt = $query->execute();
-	if (!$stmt['node']) { return NULL; }
-	$log_node = node_load(array_keys($stmt['node'])[0]);
-	$from_ts = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
 
- 	// End date
- 	$query = new EntityFieldQuery();
-	$query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  // $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
- 	$query->fieldCondition('field_grievance_status', 'tid', $to_status_tids, 'in');
-  $query->fieldOrderBy('field_grievance_status_date', 'value');
-  $query->range(0,1);
-	$stmt = $query->execute();
-	if (!$stmt['node']) { return NULL; }
-	$log_node = node_load(array_keys($stmt['node'])[0]);
-	$to_ts = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
-	if ($to_ts < $from_ts) { return NULL; }
+  // Find break points for each status
+  $all_ts = array();
+  $found_count = 0;
+  foreach ($from_to_status_tids as $phase => $statuses) {
+    $status_tids = array_values($statuses);
+    if (!$status_tids) { continue; }
 
-	$row['days'] = ($to_ts - $from_ts) / (60*60*24);
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance_log');
+    $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
+    // $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
+    $query->fieldCondition('field_grievance_status', 'tid', $status_tids, 'in');
+    $query->fieldOrderBy('field_grievance_status_date', 'value');
+    // Eliminate some stupid bad data.
+    $query->fieldCondition('field_grievance_status_date', 'value', '1980-1-1', '>=');
+    $query->fieldCondition('field_grievance_status_date', 'value', '2050-1-1', '<=');
+    $query->range(0,1);
+    $stmt = $query->execute();
+    if (!$stmt['node']) { continue; }
+    $log_node = node_load(array_keys($stmt['node'])[0]);
+    $all_ts[$phase] = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
+    $row["date_$phase"] = date('m/d/Y', $all_ts[$phase]);
+    ++$found_count;
+  }
+  if ($found_count < 2) { return NULL; }
+
+  // Compute the days
+  foreach (array_keys($from_to_status_tids) as $phase) {
+    if (!$all_ts[$phase]) { continue; }
+
+    if ($all_ts[$phase-1] && $all_ts[$phase] >= $all_ts[$phase-1]) {
+      $row["days_$phase"] = round( ($all_ts[$phase] - $all_ts[$phase-1]) / (60*60*24), 2);
+    }
+    if ($all_ts[0] && $all_ts[$phase] >= $all_ts[0]) {
+      $row["total_days_$phase"] = round( ($all_ts[$phase] - $all_ts[0]) / (60*60*24), 2);
+    }
+  }
 
 	// Closed date
  	$query = new EntityFieldQuery();
@@ -182,6 +214,9 @@ function grievance_report_average_time_nid($grievance_nid, $open_status_tids, $c
   // $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
  	$query->fieldCondition('field_grievance_status', 'tid', $closed_status_tids, 'in');
   $query->fieldOrderBy('field_grievance_status_date', 'value');
+  // Eliminate some stupid bad data.
+  $query->fieldCondition('field_grievance_status_date', 'value', '1980-1-1', '>=');
+  $query->fieldCondition('field_grievance_status_date', 'value', '2050-1-1', '<=');
   $query->range(0,1);
 	$stmt = $query->execute();
 	if ($stmt['node']) { 
@@ -214,47 +249,6 @@ function grievance_report_average_time_nid($grievance_nid, $open_status_tids, $c
 	return $row;
 }
 
-function grievance_report_average_time_time_between_statuses($grievance_node, $from_status_tids, $to_status_tids) {
-  $log_update_tids = array(
-    variable_get('grievance_log_insert_type', ''), 
-    variable_get('grievance_log_update_type_with_status_change', ''), 
-  );
- 
- 	// Start date
- 	$query = new EntityFieldQuery();
-	$query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
- 	$query->fieldCondition('field_grievance_status', 'tid', $from_status_tids, 'in');
-  $query->fieldOrderBy('field_grievance_status_date', 'value');
-  $query->range(0,1);
-	$stmt = $query->execute();
-	if (!$stmt['node']) { return NULL; }
-	$log_node = node_load(array_keys($stmt['node'])[0]);
-	$from_ts = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
-
- 	// End date
- 	$query = new EntityFieldQuery();
-	$query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
-  $query->fieldCondition('field_grievance_log_type', 'tid', $log_update_tids, 'in');
- 	$query->fieldCondition('field_grievance_status', 'tid', $to_status_tids, 'in');
-  $query->fieldOrderBy('field_grievance_status_date', 'value');
-  $query->range(0,1);
-	$stmt = $query->execute();
-	if (!$stmt['node']) { return NULL; }
-	$log_node = node_load(array_keys($stmt['node'])[0]);
-	$to_ts = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
-
-	if ($to_ts < $from_ts) { return NULL; }
-
-	return ($to_ts - $from_ts) / (60*60*24);
-}
-
-
-
 function grievance_report_average_time_batch_render_specialist_summary($report_type, $report_id) {
   return grievance_report_average_time_batch_render_detail($report_type, $report_id, 'specialist', FALSE);
 }
@@ -280,6 +274,16 @@ function grievance_report_average_time_batch_render_detail($report_type, $report
   $stmt = $query->execute();
   $hr = $stmt->fetchAssoc();
   $parameters = unserialize($hr['report_data']);
+
+  // Get the status IDs we're using
+  $from_to_status_tids = array();
+  for ($phase=0; $phase<6; ++$phase) {
+    for ($i=0; $i<10; ++$i) {
+      if ($parameters["status_${phase}_$i"]) {
+        $from_to_status_tids[$phase][$i] = $parameters["status_${phase}_$i"];
+      }
+    }
+  }
 
   // Construct the page title
   $html = '';
@@ -314,6 +318,22 @@ function grievance_report_average_time_batch_render_detail($report_type, $report
   if ($which == 'employer') { $html .= 'Employer'; } else { $html .= 'Specialist'; }
   $html .= '</h2>';
 
+  // Introductory text
+  foreach ($from_to_status_tids as $phase => $statuses) {
+    $status_tids = array_values($statuses);
+    if (!$status_tids) { continue; }
+
+    $status_terms = taxonomy_term_load_multiple($status_tids);
+    $status_name = '';
+    foreach ($status_terms as $ignore => $term) {
+      if ($status_name) { $status_name .= ', '; }
+      $status_name .= $term->name; 
+    }
+
+    $html .= "<strong>Phase " . ($phase+1) . ":</strong> " . $status_name . '<br>';
+  }
+
+
   // Walk the data
   $data = array();
   $query = db_select('report_cache');
@@ -337,37 +357,65 @@ function grievance_report_average_time_batch_render_detail($report_type, $report
 
   ksort($data);
 
-  $grand_total_count = 0;
-  $grand_total_sum = 0;
+  $grand_total_count = $grand_total_sum = $grand_total_running_sum = array();
 
   if ($detail) {
-	  $header = array();
+    $header = array();
+    $super_header = array();
+
 	  $header[] = 'Grievant';
 	  $header[] = 'Griev#';
 	  $header[] = 'Intake Date';
 	  $header[] = 'Closed Date';
-	  $header[] = 'Number of Days';
+    foreach ($from_to_status_tids as $phase => $ignore) {
+      $header[] = "Phase " . ($phase+1) . " Entered";
+      if ($phase > 0) {
+        $header[] = "Phase " . ($phase+1) . " Days";
+      }
+      if ($phase > 1) {
+        $header[] = "Phase " . ($phase+1) . " Total Days";
+      }
+    }
   } else {
 	  $header = array();
 	  if ($which == 'specialist') { $header[] = 'Specialist'; } else { $header[] = 'Employer'; }
-	  $header[] = 'Number of Days';
+    foreach ($from_to_status_tids as $phase => $ignore) {
+      if ($phase > 0) {
+        $header[] = "Phase " . ($phase+1) . " Days";
+      }
+      if ($phase > 1) {
+        $header[] = "Phase " . ($phase+1) . " Total Days";
+      }
+    }
   }
+  $col_count = count($header);
 
   foreach ($data as $key => $sub_data) {
+    $total_count = $total_sum = $total_running_sum = array();
+
   	if ($detail) { 
-  		$html .= '<h3>' . $key . '</h3>';
-	    $rows = array();
+      $row = array();
+      $row[] = array('data' => "<h2>$key</h2>", 'colspan' => $col_count);
+      $rows[] = $row;
 	  } else {
 	  	$row = array();
 	  	$row[] = $key;
 	  }
-    $total_count = 0;
-    $total_sum = 0;
+
+
     foreach ($sub_data as $hr) {
-      ++$total_count;
-      $total_sum += $hr['days'];
-      ++$grand_total_count;
-      $grand_total_sum += $hr['days'];
+
+      foreach ($from_to_status_tids as $phase => $ignore) {
+        if ($hr["date_$phase"]) {
+          $total_count[$phase]++;
+          $total_sum[$phase] += $hr["days_$phase"];
+          $total_running_sum[$phase] += $hr["total_days_$phase"];
+
+          $grand_total_count[$phase]++;
+          $grand_total_sum[$phase] += $hr["days_$phase"];
+          $grand_total_running_sum[$phase] += $hr["total_days_$phase"];
+        }
+      }
 
       if ($detail) {
 	      $row = array();
@@ -375,39 +423,70 @@ function grievance_report_average_time_batch_render_detail($report_type, $report
 	      $row[] = $hr['grievance_id'];
 	      $row[] = $hr['intake_date'];
 	      $row[] = $hr['closed_date'];
-	      $row[] = round($hr['days'], 2);
+
+        foreach ($from_to_status_tids as $phase => $ignore) {
+          $row[] = $hr["date_$phase"];
+          if ($phase > 0) {
+            $row[] = $hr["days_$phase"];
+          }
+          if ($phase > 1) {
+            $row[] = $hr["total_days_$phase"];
+          }
+        }
+
 	      $rows[] = $row;
 	    }
     }
 
     $avg = 0;
-    if ($total_count) { $avg = round($total_sum / $total_count, 2); }
-
     if ($detail) {
 	    $total_row = array();
 	    $total_row[] = '<strong>' . t('Average') . '</strong>';
 	    $total_row[] = '';
 	    $total_row[] = '';
 	    $total_row[] = '';
-	    $total_row[] = $avg;
+      foreach ($from_to_status_tids as $phase => $ignore) {
+        $total_row[] = '';
+        if ($phase > 0) {
+          $total_row[] = ($total_count[$phase] ? round($total_sum[$phase] / $total_count[$phase], 2) : 'n/a');
+        }
+        if ($phase > 1) {
+          $total_row[] = ($total_count[$phase] ? round($total_running_sum[$phase] / $total_count[$phase], 2) : 'n/a');
+        }
+      }
 
 	    $rows[] = $total_row;
 
-	    $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
 	  } else {
-	  	$row[] = $avg;
+      foreach ($from_to_status_tids as $phase => $ignore) {
+        if ($phase > 0) {
+          $row[] = ($total_count[$phase] ? round($total_sum[$phase] / $total_count[$phase], 2) : 'n/a');
+        }
+        if ($phase > 1) {
+          $row[] = ($total_count[$phase] ? round($total_running_sum[$phase] / $total_count[$phase], 2) : 'n/a');
+        }
+      }
 	  	$rows[] = $row;
 	  }
   }
 
-  if (!$detail) {
-    $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
-  }
+  $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
 
   $html .= '<br>';
-  $grand_total_avg = 0;
-  if ($grand_total_count) { $grand_total_avg = round($grand_total_sum / $grand_total_count, 2); }
-  $html .= '<strong>' . t('Overall Average: ') . $grand_total_avg . '</strong>';
+
+  foreach ($from_to_status_tids as $phase => $ignore) {
+    if ($phase > 0) {
+      $html .= '<br>';
+      $html .= "<strong>Phase " . ($phase+1) . " Overall Average:</strong> ";
+      $html .= ($grand_total_count[$phase] ? round($grand_total_sum[$phase] / $grand_total_count[$phase], 2) : 'n/a');
+    }
+    if ($phase > 1) {
+      $html .= '<br>';
+      $html .= "<strong>Phase " . ($phase+1) . " Overall Total Average:</strong> ";
+      $html .= ($grand_total_count[$phase] ? round($grand_total_running_sum[$phase] / $grand_total_count[$phase], 2) : 'n/a');
+    }
+  }
+
   $html .= '</div>';
   return $html;
 }
