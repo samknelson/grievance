@@ -16,13 +16,31 @@ function grievance_uhstandards_uuid_features_default_terms() {
     'format' => 'full_html',
     'weight' => 0,
     'uuid' => '48991447-da8f-44e6-ae49-fd89bb2f5a9a',
-    'hweight' => 0,
+    'hweight' => 1,
     'hdepth' => 0,
     'vocabulary_machine_name' => 'grievance_contract_template_tags',
     'field_grievance_external_id' => array(
       'und' => array(
         0 => array(
           'value' => 'first-contract-template-tag',
+          'format' => NULL,
+        ),
+      ),
+    ),
+  );
+  $terms[] = array(
+    'name' => 'Harassment',
+    'description' => '',
+    'format' => 'full_html',
+    'weight' => 0,
+    'uuid' => 'fdb46276-31f0-45e3-ab35-998672ea912b',
+    'hweight' => 0,
+    'hdepth' => 0,
+    'vocabulary_machine_name' => 'grievance_contract_template_tags',
+    'field_grievance_external_id' => array(
+      'und' => array(
+        0 => array(
+          'value' => 'harassment',
           'format' => NULL,
         ),
       ),

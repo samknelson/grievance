@@ -32,6 +32,12 @@ function grievance_block_view($delta = '') {
   if ($delta == 'grievance_messaging_footer') { 
     $block['subject'] = t('');
     $block['content'] = variable_get('grievance_messaging_footer', '');
+    if (variable_get('grievance_last_updated', '')) {
+      if ($block['content']) {
+        $block['content'] .= '<br>';
+      }
+      $block['content'] .= t('Last updated: ') . '<strong>' . variable_get('grievance_last_updated', '') . '</strong>';
+    }
   }
 
   if ($delta == 'grievance_quicksearch') { 
