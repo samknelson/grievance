@@ -8,4 +8,5 @@ dependencies[] = uuid
 dependencies[] = uuid_features
 features[features_api][] = api:2
 features[uuid_term][] = 48991447-da8f-44e6-ae49-fd89bb2f5a9a
+features[uuid_term][] = fdb46276-31f0-45e3-ab35-998672ea912b
 project path = sites/all/modules/_custom

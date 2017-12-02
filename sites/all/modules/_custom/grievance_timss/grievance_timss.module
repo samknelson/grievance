@@ -12,7 +12,116 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_timss') . 
 
 function grievance_timss_cron() {
   grievance_timss_resync();
+  grievance_timss_resync_shop_stewards();
 }
+
+// @todo: not currently resyncing if there's no "broughtby" term
+function grievance_timss_resync_shop_stewards() {
+  watchdog('grievance_timss', 'TIMSS shop steward resync: Starting');
+
+	$steward_type_tid = variable_get('grievance_contacts_st_type', '');
+	if (!$steward_type_tid) { 
+  	watchdog('grievance_timss', 'TIMSS shop steward resync: No steward_type_tid.  Skipping.');
+  	return;
+	}
+
+  // Find all open grievances where the data hasn't been changed manually.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_shop_contact');
+  $query->fieldCondition('field_grievance_contact_types', 'tid',  $steward_type_tid);
+  $stmt = $query->execute();
+  if (!$stmt['node']) { continue; }
+  $contact_nids = array_keys($stmt['node']);
+
+  foreach ($contact_nids as $contact_nid) {
+    ++$examined_count;
+    watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: Scanning");
+
+    // Load the steward
+    $contact_node = node_load($contact_nid);
+
+    // Find the member ID
+    $member_id = $contact_node->field_grievance_min['und'][0]['value'];
+    if (!$member_id) {
+      watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: No member ID. Skipping.");
+      continue;
+    }
+
+    // Load the candidate from TIMSS
+    $candidate = grievance_timss_lookup($member_id, 'DEFAULT');
+    if (!$candidate || !is_array($candidate)) {
+      watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: TIMSS record not found. Skipping.");
+      continue;
+    }
+    $candidate = $candidate[0];
+    if (!$candidate) { 
+      watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: TIMSS record not found. Skipping.");
+      continue;
+    }
+
+    // Update the member
+    $fields = array();
+    $fields['field_grievance_co_city']           = 'city';
+    $fields['field_grievance_co_state']          = 'state';
+    $fields['field_grievance_co_address']        = 'street_Address';
+    $fields['field_grievance_co_phone']          = 'phone_Number';
+    $fields['field_grievance_co_email']          = 'email_Address';
+
+    $columns = array();
+    $columns['field_grievance_co_city']           = 'value';
+    $columns['field_grievance_co_state']          = 'value';
+    $columns['field_grievance_co_address']        = 'value';
+    $columns['field_grievance_co_phone']          = 'value';
+    $columns['field_grievance_co_email']          = 'email';
+
+    $subsections = array();
+    $subsections['field_grievance_co_city']           = NULL;
+    $subsections['field_grievance_co_state']          = NULL;
+    $subsections['field_grievance_co_address']        = NULL;
+    $subsections['field_grievance_co_phone']          = NULL;
+    $subsections['field_grievance_co_email']          = NULL;
+
+    $is_changed = FALSE;
+    foreach ($fields as $drupal_field => $json_field) {
+      $column = $columns[$drupal_field];
+      $subsection = $subsections[$drupal_field];
+
+      $old_value = $contact_node->{$drupal_field}['und'][0][$column];
+
+      $new_value = NULL;
+      if ($subsection) {
+        $new_value = $candidate->{$subsection}->{$json_field};
+      } else {
+        $new_value = $candidate->{$json_field};
+      }
+      $new_value = preg_replace("/(?:\r\n|\r|\n)/", ', ', $new_value);
+      if ($drupal_field == 'field_grievance_co_phone') {
+      	if ($new_value) {
+      		$new_value = grievance_format_phone_number($new_value);
+      	}
+      }
+
+      if (!$new_value) { continue; }
+      if ($new_value == $old_value) { continue; }
+
+      $contact_node->{$drupal_field}['und'][0][$column] = $new_value;
+      $is_changed = TRUE;
+    }
+
+    if (!$is_changed) {
+      watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: No changes. Skipping.");
+      continue;
+    }
+
+    watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: Data has changed in TIMSS. Updating the node.");
+    node_save($contact_node);
+    ++$updated_count;
+  }
+
+  watchdog('grievance_timss', 'TIMSS shop steward resync: Finishing.');
+}
+
 
 // @todo: not currently resyncing if there's no "broughtby" term
 function grievance_timss_resync() {

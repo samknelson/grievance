@@ -455,6 +455,12 @@ function grievance_report_cache_info() {
     'path' => 'grievance/report/average-time',
     'pk_list_callback' => 'grievance_report_average_time_pks',
     'batch_callback' => 'grievance_report_average_time_batch',
+    'render_callbacks' => array(
+      'Detail By Specialist' => 'grievance_report_average_time_batch_render_specialist_detail',
+      'Detail By Employer' => 'grievance_report_average_time_batch_render_employer_detail',
+      'Summary By Specialist' => 'grievance_report_average_time_batch_render_specialist_summary',
+      'Summary By Employer' => 'grievance_report_average_time_batch_render_employer_summary',
+    ),
   );
 
   $items['grievance-report-spi-term'] = array(
