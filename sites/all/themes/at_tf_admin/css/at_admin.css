@@ -2555,7 +2555,9 @@ input#edit-save.form-submit {
 
 
 a.button-no, 
-input[value~=Cancel], 
+input[type=button][value~=Cancel],
+input[type=reset][value~=Cancel],
+input[type=submit][value~=Cancel],
 input#edit-delete.form-submit, 
 #system-modules-uninstall input#edit-submit, 
 #user-multiple-delete-confirm input#edit-submit {
