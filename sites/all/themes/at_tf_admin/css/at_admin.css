@@ -1010,7 +1010,9 @@ input#edit-save.form-submit {
   background-image: url(images/green-button.png);
 }
 a.button-no,
-input[value~=Cancel],
+input[type=button][value~=Cancel],
+input[type=reset][value~=Cancel],
+input[type=submit][value~=Cancel],
 input#edit-delete.form-submit,
 #system-modules-uninstall input#edit-submit,
 #user-multiple-delete-confirm input#edit-submit {
@@ -3844,17 +3846,6 @@ fieldset.date-combo .container-inline-date .date-padding {
   float: left;
 }
 
-/* 
-.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time td,  
-.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time th { 
-  width: 10%;
-}
-
-.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time td:nth-child(1),  
-.page-admin-reports-report-cache-grievance-report-average-time .grievance-report-average-time th:nth-child(1) { 
-  width: 20%;
-}
-*/
 
 .printonly { display: none; }
 @media print {
@@ -3862,7 +3853,3 @@ fieldset.date-combo .container-inline-date .date-padding {
 }
 
 
-.page-grievance-report-average-time .status-list .form-item {
-  float: left;
-  padding-right: 10px;
-}
