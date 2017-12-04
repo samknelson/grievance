@@ -7624,7 +7624,7 @@ function grievance_content_types_field_default_field_instances() {
     'bundle' => 'grievance_contract_clause',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'E.g. 4.01 or A. II.',
+    'description' => 'E.g. 04.01 or 04.01.01 or 04.01.A',
     'display' => array(
       'default' => array(
         'label' => 'inline',
@@ -12563,7 +12563,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Discipline Date');
   t('Does this holiday repeat every year on the same date?');
   t('Dummy?');
-  t('E.g. 4.01 or A. II.');
+  t('E.g. 04.01 or 04.01.01 or 04.01.A');
   t('Email');
   t('Employee ID #');
   t('Employer');
