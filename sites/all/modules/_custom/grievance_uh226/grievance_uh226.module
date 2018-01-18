@@ -5,6 +5,7 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uh226') . "/grievance_uh226.report_spi_term_summary.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uh226') . "/grievance_uh226.report_spi_term_detail.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uh226') . "/grievance_uh226.report_violation.inc";
 
 /**
  * Implements hook_permission()
@@ -76,6 +77,15 @@ function grievance_uh226_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['grievance/report/uh226/violation'] = array(
+    'title' => 'Report: Violation',
+    'description' => '',
+    'page callback' => 'grievance_uh226_report_violation',
+    'page arguments' => array(),
+    'access arguments' => array('grievance uh226 report spi term summary'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   return $items;
 }
 
@@ -107,6 +117,20 @@ function grievance_uh226_report_cache_info() {
     'render_callbacks' => array(
       'Detail By Specialist' => 'grievance_uh226_report_spi_term_detail_render_specialist',
       'Detail By Employer' => 'grievance_uh226_report_spi_term_detail_render_employer',
+    ),
+  );
+
+  $items['grievance-uh226-report-violation'] = array(
+    'name' => t('UH226: Violation Report'),
+    'description' => '',
+    'access' => 'grievance uh226 report spi term detail',
+    'path' => 'grievance/report/uh226/violation',
+    'fields' => grievance_uh226_report_violation_fields(),
+    'pk_list_callback' => 'grievance_uh226_report_violation_pks',
+    'batch_callback' => 'grievance_uh226_report_violation_batch',
+    'render_callbacks' => array(
+      'Summary' => 'grievance_uh226_report_violation_render_summary',
+      'Detail' => 'grievance_uh226_report_violation_render_detail',
     ),
   );
 
