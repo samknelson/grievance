@@ -36,19 +36,20 @@ function grievance_uh226_report_violation_form_submit($form, &$form_state) { ret
 function grievance_uh226_report_violation_fields() {
   return array(
     'grievance_nid' => 'Grievance NID',
+    'id' => 'Grievance ID',
     'specialist_name' => 'Specialist Name',
     'employer_name' => 'Employer Name',
-    '1st_call' => '1st Call',
-    'other_call' => 'Other Call',
-    'no_activity' => 'No Activity',
-    'no_boa_held' => 'No BOA Held',
-    'boa_held' => 'BOA Held',
     'rslvd' => 'RSLVD',
     'nfa' => 'NFA',
     'arb' => 'ARB Submitted',
-    'won' => 'Won',
-    'lost' => 'Lost',
-  );
+    'ww' => 'WW',
+    'suspension' => 'Suspension',
+    'spi' => 'SPI',
+    'term' => 'Term',
+    'cv' => 'CV',
+    '8.01' => '8.01',
+    'general' => 'General',
+	);
 }
 
 function grievance_uh226_report_violation_pks(&$form_state) {
@@ -98,6 +99,7 @@ function grievance_uh226_report_violation_nid($grievance_nid, $lookups, $values)
 
 	// Load the grievance
 	$grievance_node = node_load($grievance_nid);
+  $row['id'] = $grievance_node->field_grievance_id['und'][0]['value'];
 
   // Specialist name
   // @todo user_load is expensive.
@@ -199,14 +201,24 @@ function grievance_uh226_report_violation_nid($grievance_nid, $lookups, $values)
 
   // Is general?
   if ($grievance_node->field_grievance_classaction['und'][0]['value'] == 'Yes') {
-    drupal_set_message("Found a general grievance: $nid.");
     $row['general'] = TRUE;
   }
 
   // CV?
-  if (!$row['general'] && $grievance_node->field_grievance_category['und'][0]['target_id'] == 421) {
-    drupal_set_message("Found a CV grievance: $nid.");
+  if (!$row['general'] && $grievance_node->field_grievance_category['und'][0]['tid'] == 421) {
     $row['cv'] = TRUE;
+  }
+
+  // 8.01?
+  foreach ($grievance_node->field_grievance_clauseref['und'] as $tmp) {
+    if (in_array($tmp['target_id'], $lookups['discrimination_nids'])) {
+      $row['8.01'] = TRUE;
+    }
+  }
+
+  // Must fall into one of the categories
+  if (!$row['ww'] && !$row['suspension'] && !$row['spi'] && !$row['term'] && !$row['cv'] && !$row['general'] && !$row['8.01']) {
+    return NULL;
   }
 
   return $row;
@@ -256,6 +268,17 @@ function grievance_uh226_report_violation_lookups() {
     }
   }
 
+  // Discrimination CBAs clauses.  I shouldn't do it this way.  
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_contract_clause');
+  $query->propertyCondition('title', '%discrimination%', 'like');
+  $stmt = $query->execute();
+  $discrimination_nids = array();
+  if ($stmt['node']) {
+    $discrimination_nids = array_keys($stmt['node']);
+  } 
+
   $result = array(
 		'open_status_tids' 								=> $open_status_tids,
 		'closed_status_tids'							=> $closed_status_tids,
@@ -270,6 +293,7 @@ function grievance_uh226_report_violation_lookups() {
     'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
     'suspension_log_type_tid'         => variable_get('grievance_log_suspension_type', ''),
     'written_warning_log_type_tid'    => variable_get('grievance_log_written_warning_type', ''),
+    'discrimination_nids'             => $discrimination_nids,
   );
 
   return $result;
@@ -317,150 +341,27 @@ function grievance_uh226_report_violation_render_summary($report_type, $report_i
     }
   }
 
-  $html .= '<pre>' . print_r($totals, 1) . '</pre>';
-
-  return $html;
-}
-
-function grievance_uh226_report_violation_render_detail($report_type, $report_id) {
-  return grievance_uh226_report_violation_render($report_type, $report_id, 'employer');
-}
-
-function grievance_uh226_report_violation_render($report_type, $report_id, $which) {
-  // Load the parameters
-  $query = db_select('report_cache');
-  $query->fields('report_cache');
-  $query->condition('report_id', $report_id);
-  $query->condition('report_type', $report_type . ' :: PARAMETERS');
-  $stmt = $query->execute();
-  $hr = $stmt->fetchAssoc();
-  $parameters = unserialize($hr['report_data']);
-
-  // Construct the page title
-  $html = '';
-  $html .= '<div class="uh-226-report-spi-term-summary-render">';
-  $html .= '<h2>';
-  $html .= t('Grievances from @from_date to @to_date', array(
-      '@from_date' => date('m/d/Y', strtotime($parameters['from_date'])),
-      '@to_date' => date('m/d/Y', strtotime($parameters['to_date'])),
-    )
-  );
-  if ($which == 'specialist') { 
-    $html .= ' -- By Specialist'; 
-  } else {
-    $html .= ' -- By Employer'; 
-  }
-  $html .= '</h2>';
-
-  $data = array();
-  $query = db_select('report_cache');
-  $query->fields('report_cache');
-  $query->condition('report_id', $report_id);
-  $query->condition('report_type', $report_type);
-  $stmt = $query->execute();
-  $sub_totals = array();
-  $totals = array();
-  while ($hr = $stmt->fetchAssoc()) {
-    $hr = unserialize($hr['report_data']);
-    $data[$hr[$which . '_name']]['total']++;
-    $sub_totals['total']++;
-
-    foreach (
-      array(
-        '1st_call',
-        'other_call',
-        'no_activity',
-        'no_boa_held',
-        'boa_held',
-        'rslvd',
-        'nfa',
-        'arb',
-        'won',
-        'lost') as $field) {
-
-      if ($hr[$field]) {
-        $data[$hr[$which . '_name']][$field]++;
-        $sub_totals[$field]++;
-      }
-    }
-  }
-
-  ksort($data);
-
-  $header = array();
-  if ($which == 'specialist') {
-    $header[] = 'Specialist';
-  } else {
-    $header[] = 'Employer';
-  }
-  $header[] = 'Total SPIs/Terms';
-  $header[] = '1st Calls';
-  $header[] = 'Other Calls';
-  $header[] = 'No Activity';
-  $header[] = 'No BOA Held';
-  $header[] = 'BOAs Held';
-  $header[] = 'RSLVD';
-  $header[] = 'NFA';
-  $header[] = 'Arbs Submitted';
-  $header[] = 'Won';
-  $header[] = 'Lost';
-
   $rows = array();
-  foreach ($data as $specialist_name => $hr) {
+  foreach (array('suspension', 'spi', '8.01', 'ww', 'term', 'cv', 'general') as $key) {
     $row = array();
-    $row[] = $specialist_name;
-    $row[] = $hr['total'];
-    $row[] = $hr['1st_call'];
-    $row[] = $hr['other_call'];
-    $row[] = $hr['no_activity'];
-    $row[] = $hr['no_boa_held'];
-    $row[] = $hr['boa_held'];
-    $row[] = $hr['rslvd'];
-    $row[] = $hr['nfa'];
-    $row[] = $hr['arb'];
-    $row[] = $hr['won'];
-    $row[] = $hr['lost'];
+    $row[] = $key;
+    $row[] = $totals[$key]['all'];
+    $row[] = $totals[$key]['rslvd'];
+    $row[] = $totals[$key]['nfa'];
+    $row[] = $totals[$key]['arb'];
     $rows[] = $row;
   }
 
-  $row = array();
-  $row[] = '<strong>' . t('Sub-Total') . '</strong>';
-  $row[] = '<strong>' . $sub_totals['total'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['1st_call'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['other_call'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['no_activity'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['no_boa_held'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['boa_held'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['rslvd'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['nfa'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['arb'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['won'] . '</strong>';
-  $row[] = '<strong>' . $sub_totals['lost'] . '</strong>';
-  $rows[] = array('data' => $row, 'no_striping' => TRUE);
-
-  $row = array();
-  $row[] = '<strong>' . t('Total') . '</strong>';
-  $row[] = '<strong>' . $sub_totals['total'] . '</strong>';
-  $row[] = array(
-    'data' => '<strong>' . ($sub_totals['1st_call'] + $sub_totals['other_call'] + $sub_totals['no_activity']) . '</strong>',
-    'colspan' => 3,
+  $header = array(
+    'Type',
+    'All',
+    'Resolved',
+    'NFA',
+    'Arb',
   );
-  $row[] = array(
-    'data' => '<strong>' . ($sub_totals['no_boa_held'] + $sub_totals['boa_held']) . '</strong>',
-    'colspan' => 2
-  );
-  $row[] = array(
-    'data' => '<strong>' . ($sub_totals['rslvd'] + $sub_totals['nfa'] + $sub_totals['arb'] + $sub_totals['won'] + $sub_totals['lost'] ) . '</strong>',
-    'colspan' => 5
-  );
-  $rows[] = array('data' => $row, 'no_striping' => TRUE);
-
-  $attributes = array();
-
-  $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
-  $html .= '</div>';
+  
+  $html .= theme_table(array('header' => $header, 'attributes' => array(), 'rows' => $rows));
 
   return $html;
 }
-
 

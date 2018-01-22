@@ -130,7 +130,6 @@ function grievance_uh226_report_cache_info() {
     'batch_callback' => 'grievance_uh226_report_violation_batch',
     'render_callbacks' => array(
       'Summary' => 'grievance_uh226_report_violation_render_summary',
-      'Detail' => 'grievance_uh226_report_violation_render_detail',
     ),
   );
 
