@@ -47,7 +47,7 @@ function grievance_report_settlement_summary_pks(&$form_state) {
   $from_ts = strtotime($form_state['values']['from_date']);
   $to_ts = strtotime($form_state['values']['to_date']);
   $from_date = date('Y-m-d 00:00:00', $from_ts);
-  $to_date = date('Y-m-d 00:00:00', $to_ts);
+  $to_date = date('Y-m-d 00:00:00', strtotime('+1 day', $to_ts));
 
   $lookups = grievance_report_settlement_summary_lookups();
 
@@ -55,7 +55,7 @@ function grievance_report_settlement_summary_pks(&$form_state) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_settlement');
   $query->fieldCondition('field_grievance_date_1', 'value', $from_date, '>=');
-  $query->fieldCondition('field_grievance_date_1', 'value', $to_date, '<=');
+  $query->fieldCondition('field_grievance_date_1', 'value', $to_date, '<');
   $query->fieldCondition('field_grievance_amt', 'value', 0, '>');
   $stmt = $query->execute();
   $nids = array();
