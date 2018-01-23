@@ -42,12 +42,13 @@ function grievance_uh226_report_violation_fields() {
     'rslvd' => 'RSLVD',
     'nfa' => 'NFA',
     'arb' => 'ARB Submitted',
-    'ww' => 'WW',
+    'ww' => 'Written Warning',
+    'fw' => 'Final Warning',
     'suspension' => 'Suspension',
     'spi' => 'SPI',
     'term' => 'Term',
-    'cv' => 'CV',
     '8.01' => '8.01',
+    'cv' => 'CV',
     'general' => 'General',
 	);
 }
@@ -199,6 +200,17 @@ function grievance_uh226_report_violation_nid($grievance_nid, $lookups, $values)
     $row['ww'] = TRUE;
   }
 
+  // FW?
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_nid);
+  $query->fieldCondition('field_grievance_log_type', 'tid', $lookups['final_warning_log_type_tid']);
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+    $row['fw'] = TRUE;
+  }
+
   // Is general?
   if ($grievance_node->field_grievance_classaction['und'][0]['value'] == 'Yes') {
     $row['general'] = TRUE;
@@ -293,6 +305,7 @@ function grievance_uh226_report_violation_lookups() {
     'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
     'suspension_log_type_tid'         => variable_get('grievance_log_suspension_type', ''),
     'written_warning_log_type_tid'    => variable_get('grievance_log_written_warning_type', ''),
+    'final_warning_log_type_tid'      => variable_get('grievance_log_final_warning_type', ''),
     'discrimination_nids'             => $discrimination_nids,
   );
 
@@ -331,7 +344,7 @@ function grievance_uh226_report_violation_render_summary($report_type, $report_i
   while ($hr = $stmt->fetchAssoc()) {
     $hr = unserialize($hr['report_data']);
 
-    foreach (array('suspension', 'spi', '8.01', 'ww', 'term', 'cv', 'general') as $key) {
+    foreach (array('ww', 'fw', 'suspension', 'spi', 'term', '8.01', 'cv', 'general') as $key) {
       if ($hr[$key]) {
         $totals[$key]['all']++;
         if ($hr['rslvd']) { $totals[$key]['rslvd']++; }
@@ -342,7 +355,7 @@ function grievance_uh226_report_violation_render_summary($report_type, $report_i
   }
 
   $rows = array();
-  foreach (array('suspension', 'spi', '8.01', 'ww', 'term', 'cv', 'general') as $key) {
+  foreach (array('ww', 'fw', 'suspension', 'spi', 'term', '8.01', 'cv', 'general') as $key) {
     $row = array();
     $row[] = $key;
     $row[] = $totals[$key]['all'];
