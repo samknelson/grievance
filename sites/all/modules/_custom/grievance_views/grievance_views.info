@@ -32,6 +32,7 @@ features[views_view][] = grievance_information_request_types
 features[views_view][] = grievance_letter_templates
 features[views_view][] = grievance_log
 features[views_view][] = grievance_log_all
+features[views_view][] = grievance_log_status
 features[views_view][] = grievance_news
 features[views_view][] = grievance_open_report
 features[views_view][] = grievance_prior_grievances
