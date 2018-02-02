@@ -174,7 +174,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_arbitration|node|grievance|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_arbitration|node|grievance|form';
   $field_group->group_name = 'group_grievance_arbitration';
@@ -1218,7 +1218,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_inforeq|node|grievance|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_notifications|node|grievance_shop|default';
   $field_group->group_name = 'group_grievance_notifications';
