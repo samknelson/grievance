@@ -717,6 +717,9 @@ function grievance_content_types_strongarm() {
       'revision' => array(
         'custom_settings' => FALSE,
       ),
+      'grievance_form_226' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
