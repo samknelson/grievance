@@ -2,8 +2,26 @@
 
 /**
  * @file
- * Field formatter class install file.
+ * Field Delimiter install file.
  */
+
+/**
+ * Implements hook_install().
+ */
+function field_delimiter_install() {
+  // Set module weight for it to run after most modules.
+  _field_delimiter_update_weight();
+}
+
+/**
+ * Helper Function to update weight.
+ */
+function _field_delimiter_update_weight($weight = 10) {
+  db_update('system')
+    ->fields(array('weight' => 10))
+    ->condition('name', 'field_delimiter', '=')
+    ->execute();
+}
 
 /**
  * Implements hook_uninstall().
@@ -15,7 +33,7 @@ function field_delimiter_uninstall() {
     foreach ($field['bundles'] as $entity_type => $bundles) {
       foreach ($bundles as $bundle) {
 
-        // get the instance settings from the database
+        // Get the instance settings from the database.
         $instance = db_select('field_config_instance', 'fci')
           ->fields('fci', array('data'))
           ->condition('field_name', $field['field_name'])
@@ -26,14 +44,14 @@ function field_delimiter_uninstall() {
 
         $instance = unserialize($instance);
 
-        // remove the display settings provided by this module
+        // Remove the display settings provided by this module.
         foreach ($instance['display'] as &$display) {
           if (isset($display['settings']['field_delimiter'])) {
             unset($display['settings']['field_delimiter']);
           }
         }
 
-        // re-serialize the instance, then save back to the database
+        // Re-serialize the instance, then save back to the database.
         $instance = serialize($instance);
         db_update('field_config_instance')
           ->fields(array('data' => $instance))
@@ -46,7 +64,7 @@ function field_delimiter_uninstall() {
   }
   field_cache_clear();
 
-  // views displays
+  // Views displays.
   if (db_table_exists('views_display')) {
     // Getting all view displays from database.
     $view_displays = db_select('views_display', 'vd')
@@ -60,7 +78,7 @@ function field_delimiter_uninstall() {
 
       $display_options = unserialize($view_display->display_options);
 
-      // remove the display settings provided by this module
+      // Remove the display settings provided by this module.
       if (isset($display_options['fields'])) {
         foreach ($display_options['fields'] as &$field) {
           $settings = &$field['settings'];
@@ -80,4 +98,11 @@ function field_delimiter_uninstall() {
         ->execute();
     }
   }
+}
+
+/**
+ * Set weight of the Field Delimiter module to 10.
+ */
+function field_delimiter_update_7001() {
+  _field_delimiter_update_weight();
 }
