@@ -201,7 +201,8 @@ function grievance_update_7009() {
 }
 
 function grievance_update_7010() {
-  print "Enabling views_record_count.\n";
-  module_enable('views_record_count');
+  // Throwing this away because views_record_count is not feature-enabled, and there's less stupid ways to do it.
+  // print "Enabling views_record_count.\n";
+  // module_enable('views_record_count');
 }
 
