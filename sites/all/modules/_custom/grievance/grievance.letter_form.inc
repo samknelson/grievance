@@ -486,6 +486,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 			'#type' => 'text_format',
 			'#default_value' => $form_state['edit_result'],
 			'#format' => 'full_html',
+			'#rows' => 25,
 		);
   }
 	
