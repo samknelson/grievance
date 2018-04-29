@@ -6,7 +6,7 @@ function grievance_letter_form_change_letter_callback($form, $form_state) {
   $commands[] = ajax_command_replace("#grievance-letter-form-replace-global-cc", render($form['recipients']['extra']['global_cc']));
   $commands[] = ajax_command_replace("#grievance-letter-form-replace-subject", render($form['recipients']['extra']['subject']));
   $commands[] = ajax_command_replace("#grievance-letter-form-replace-body", render($form['recipients']['extra']['body']));
-
+  $commands[] = ajax_command_replace("#grievance-letter-form-replace-update-rep", render($form['recipients']['extra']['update_company_representative']));
 
   return array(
     '#type' => 'ajax',
@@ -110,6 +110,7 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	$global_ccs = array();
 	$default_subject = '';
 	$default_body = '';
+	$default_update_rep = '';
 	for ($i=0; $i<5; ++$i) {
 		if ($form_state['values']['letter_nid_' . $i] > 0) {
 			$letter_nid = $form_state['values']['letter_nid_' . $i];
@@ -125,6 +126,9 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 			if ($letter_node->field_grievance_notify_body['und'][0]['value']) { 
 				$default_body = $letter_node->field_grievance_notify_body['und'][0]['value'];
 			}
+			if ($letter_node->field_grievance_update_rep['und'][0]['value']) {
+				$default_update_rep = $letter_node->field_grievance_update_rep['und'][0]['value'];
+			}
 		}
 	}
 	if ($default_subject) {
@@ -133,8 +137,11 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	if ($default_body) {
 		$default_body = token_replace($default_body, array('node' => $grievance_node), array());
 	}
+	if (!$default_update_rep) { $default_update_rep = 'Yes'; }
+	$default_update_rep = strtolower($default_update_rep);
 	$form_state['input']['body'] = $default_body;
 	$form_state['input']['subject'] = $default_subject;
+	$form_state['input']['update_company_representative'] = $default_update_rep;
 	$global_cc_msg = join(', ', array_keys($global_ccs));
 	if ($global_cc_msg) {
 		$global_cc_msg = '<br>' . t("Note: the following address(es) will also be CC'd on this email: ") . '<strong>' .  $global_cc_msg . '</strong>';
@@ -165,7 +172,9 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 			'yes' => 'Yes - The main recipient of this letter is the "Company Recipient" for the grievance',
 			'no' => 'No - Leave the "Company Recipient" unchanged.'
 		),
-		'#default_value' => 'yes',
+		'#default_value' => $default_update_rep,
+		'#prefix' => '<div id="grievance-letter-form-replace-update-rep">',
+		'#suffix' => '</div>',
 	);
 
   // Get the company contacts

@@ -4569,7 +4569,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_rep_filed',
-    'label' => 'Intake Person',
+    'label' => 'Grievance Intake Staff',
     'required' => 0,
     'settings' => array(
       'field_lock_multi_values' => array(
@@ -4671,7 +4671,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_rep_lead',
-    'label' => 'Lead Organizer',
+    'label' => 'Grievance Director',
     'required' => 0,
     'settings' => array(
       'field_lock_multi_values' => array(
@@ -4871,7 +4871,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_rep_organizer',
-    'label' => 'Organizer',
+    'label' => 'Grievance Specialist',
     'required' => 0,
     'settings' => array(
       'field_lock_multi_values' => array(
@@ -9454,7 +9454,7 @@ function grievance_content_types_field_default_field_instances() {
     'bundle' => 'grievance_letter_template',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Use this field to enter the default body of the email; it should generally be something like "Please refer to the attached document re. a grievance filed against your company."',
     'display' => array(
       'default' => array(
         'label' => 'inline',
@@ -9475,7 +9475,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_notify_body',
-    'label' => 'Body',
+    'label' => 'Body (Email)',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -9620,6 +9620,53 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textfield',
       'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_letter_template-field_grievance_update_rep'.
+  $field_instances['node-grievance_letter_template-field_grievance_update_rep'] = array(
+    'bundle' => 'grievance_letter_template',
+    'default_value' => array(
+      0 => array(
+        'value' => 'Yes',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'If "Yes", then the default will be that any letter sent using this template will also set the grievance\'s "company representative" field to be the main recipient of the letter.  Generally this should be "Yes" for notifications to the company -- grievance filings and so forth -- and "No" for notifications to the grievant or letters that are meant to be sent internally.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 9,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_update_rep',
+    'label' => 'Update Company Representative',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 12,
     ),
   );
 
@@ -11933,6 +11980,53 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_shop_contact-field_grievance_description'.
+  $field_instances['node-grievance_shop_contact-field_grievance_description'] = array(
+    'bundle' => 'grievance_shop_contact',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'E.g. "Step 1 Contact" or "Contact for Arbitration Only"',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_plain',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_description',
+    'label' => 'Description',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_shop_contact-field_grievance_external_id'.
   $field_instances['node-grievance_shop_contact-field_grievance_external_id'] = array(
     'bundle' => 'grievance_shop_contact',
@@ -12528,6 +12622,82 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_status-field_grievance_notify_body'.
+  $field_instances['taxonomy_term-grievance_status-field_grievance_notify_body'] = array(
+    'bundle' => 'grievance_status',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'When a notification is sent to the company, what should the body of the email be? ',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_notify_body',
+    'label' => 'Notification Body',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-grievance_status-field_grievance_notify_subject'.
+  $field_instances['taxonomy_term-grievance_status-field_grievance_notify_subject'] = array(
+    'bundle' => 'grievance_status',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'When a notification for this status is sent to the company, what subject should be used?',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_notify_subject',
+    'label' => 'Notification Subject',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_status-field_grievance_open'.
   $field_instances['taxonomy_term-grievance_status-field_grievance_open'] = array(
     'bundle' => 'grievance_status',
@@ -12738,6 +12908,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Attachment?');
   t('Attachments');
   t('Body');
+  t('Body (Email)');
   t('Brought By');
   t('Building the Union with this case');
   t('Bundle');
@@ -12782,6 +12953,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Discipline Date');
   t('Does this holiday repeat every year on the same date?');
   t('Dummy?');
+  t('E.g. "Step 1 Contact" or "Contact for Arbitration Only"');
   t('E.g. 04.01 or 04.01.01 or 04.01.A');
   t('Email');
   t('Employee ID #');
@@ -12814,18 +12986,21 @@ function grievance_content_types_field_default_field_instances() {
   t('Grievance');
   t('Grievance Admin');
   t('Grievance Complaint');
+  t('Grievance Director');
   t('Grievance Document Type');
+  t('Grievance Intake Staff');
   t('Grievance Log Type');
   t('Grievance Settlement Tags');
+  t('Grievance Specialist');
   t('Holidays');
   t('ID');
+  t('If "Yes", then the default will be that any letter sent using this template will also set the grievance\'s "company representative" field to be the main recipient of the letter.  Generally this should be "Yes" for notifications to the company -- grievance filings and so forth -- and "No" for notifications to the grievant or letters that are meant to be sent internally.');
   t('If only certain roles have access to edit log entries of this type, select the roles that should have access.  If no roles are checked, all roles will have access.');
   t('If selected, this contact will appear for all shops associated with this company.');
   t('If the company should see a longer or more descriptive name, enter it here.  (I.e. the name might be "Guest Complaints" and the employer name might be " Guest complaints (with complete mailing and/or email address and phone number)").  This longer name will be used on information requests and grievance forms sent to the company.');
   t('Images');
   t('Incident Date');
   t('Information Request?');
-  t('Intake Person');
   t('Is this a "dummy" or "placeholder" section?  This field should be left blank or set to "No" except for automatically-generated placeholder sections created when the article itself is meant to be selectable.');
   t('Is this an "attachment", meaning that it can be used as an attachment type for the grievance?');
   t('Is this status considered "Un-Resolved"?  Only unresolved grievances are displayed on the "my grievances" list.');
@@ -12844,6 +13019,8 @@ function grievance_content_types_field_default_field_instances() {
   t('Next Step');
   t('Next Step in the Grievance Procedure');
   t('Notes');
+  t('Notification Body');
+  t('Notification Subject');
   t('Office Phone');
   t('Organizer');
   t('Outcome');
@@ -12889,15 +13066,19 @@ function grievance_content_types_field_default_field_instances() {
   t('Type of Days');
   t('Union Representative');
   t('Unresolved?');
+  t('Update Company Representative');
   t('Upload images to include in letter templates, such as a scanned signature.');
   t('Upload the current contract document for this shop.  The contract will be used by stewards to identify violations.');
   t('Use this field for a "letter" which has no customization, and which is simply meant to be downloaded.  No drop-in tokens are supported.');
+  t('Use this field to enter the default body of the email; it should generally be something like "Please refer to the attached document re. a grievance filed against your company."');
   t('Use this field to indicate that member data in the grievance system has changed from the Union\'s member management system, and that the new data needs to be uploaded back to the member management system.  "Unchanged" means that the data is the same in both places; "Pending" means that corrected data has been entered here and needs to be entered in the member management system.  After the information has been changed, it will be flagged as "Complete".');
   t('Used for sorting; generally set by drag-and-drop.');
   t('Valid');
   t('Violation');
   t('Watching');
   t('Weight');
+  t('When a notification for this status is sent to the company, what subject should be used?');
+  t('When a notification is sent to the company, what should the body of the email be? ');
   t('When the grievance admin selects this clause, which "statement of grievance" should be selected?');
   t('When the grievance enters this status, should it be displayed on the timeline presented to the company?');
   t('Work Status');

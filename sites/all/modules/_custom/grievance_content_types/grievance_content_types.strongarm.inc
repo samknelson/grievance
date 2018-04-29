@@ -886,6 +886,20 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'i18n_node_extended_grievance_holiday';
+  $strongarm->value = 1;
+  $export['i18n_node_extended_grievance_holiday'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'i18n_node_extended_grievance_letter_template';
+  $strongarm->value = 1;
+  $export['i18n_node_extended_grievance_letter_template'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'i18n_node_extended_grievance_log';
   $strongarm->value = 1;
   $export['i18n_node_extended_grievance_log'] = $strongarm;
@@ -959,6 +973,20 @@ function grievance_content_types_strongarm() {
   $strongarm->name = 'i18n_node_options_grievance_field_overrides';
   $strongarm->value = array();
   $export['i18n_node_options_grievance_field_overrides'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'i18n_node_options_grievance_holiday';
+  $strongarm->value = array();
+  $export['i18n_node_options_grievance_holiday'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'i18n_node_options_grievance_letter_template';
+  $strongarm->value = array();
+  $export['i18n_node_options_grievance_letter_template'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
