@@ -10623,9 +10623,15 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_settlement_tags',
-    'label' => 'Grievance Settlement Tags',
+    'label' => 'Settlement Tags',
     'required' => 0,
     'settings' => array(
+      'checkall' => array(
+        'checkall' => 0,
+        'checkall-check-all' => 1,
+        'checkall-toggle' => 1,
+        'checkall-uncheck-all' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'view' => array(
@@ -10639,9 +10645,9 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'content_taxonomy_opt_groups' => 0,
+        'checkall' => FALSE,
       ),
-      'type' => 'options_select',
+      'type' => 'options_buttons',
       'weight' => 7,
     ),
   );
@@ -12990,7 +12996,6 @@ function grievance_content_types_field_default_field_instances() {
   t('Grievance Document Type');
   t('Grievance Intake Staff');
   t('Grievance Log Type');
-  t('Grievance Settlement Tags');
   t('Grievance Specialist');
   t('Holidays');
   t('ID');
@@ -13043,6 +13048,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Select the date that the status changed.  For example, if the status is "Step 1 Meeting", enter the date that the meeting occurred.  If no date is entered, today\'s date will be used.');
   t('Select the roles with permission to edit grievances at this step.');
   t('Settlement Amount');
+  t('Settlement Tags');
   t('Shift');
   t('Shop Steward Email');
   t('Shop Steward Name');
