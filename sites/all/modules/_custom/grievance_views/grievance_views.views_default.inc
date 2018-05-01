@@ -2209,6 +2209,27 @@ Section',
     7 => 0,
     4 => 0,
   );
+  /* Filter criterion: Content: Article Tags (field_grievance_cont_sec_tags) */
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['id'] = 'field_grievance_cont_sec_tags_tid';
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['table'] = 'field_data_field_grievance_cont_sec_tags';
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['field'] = 'field_grievance_cont_sec_tags_tid';
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['expose']['operator_id'] = 'field_grievance_cont_sec_tags_tid_op';
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['expose']['label'] = 'Article Tag';
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['expose']['operator'] = 'field_grievance_cont_sec_tags_tid_op';
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['expose']['identifier'] = 'field_grievance_cont_sec_tags_tid';
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+    5 => 0,
+    6 => 0,
+    7 => 0,
+    4 => 0,
+    8 => 0,
+  );
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_grievance_cont_sec_tags_tid']['vocabulary'] = 'grievance_contract_section_tags';
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -2255,6 +2276,7 @@ Section',
     t('Title'),
     t('Article Tags'),
     t('Article Title'),
+    t('Article Tag'),
     t('Page'),
     t('Data export'),
   );
