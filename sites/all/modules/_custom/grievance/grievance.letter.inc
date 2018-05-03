@@ -37,7 +37,11 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
   if ($type == 'grievance-letter') {
     $record = $data['grievance-letter'];
     foreach ($tokens as $name => $original) {
+
+    	//
     	// Add "Delivery" as a siml=ple replacement token
+    	//
+
     	if ($name == 'delivery') {
     		$delivery_tid = $record['delivery_tid'];
     		$delivery_term = taxonomy_term_load($delivery_tid);
@@ -48,14 +52,20 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				$replacements[$original] = $replacement;
 			}
 
+			//
 			// Add "render:display_mode" to render the grievance with the specified display mode.
+			//
+
 			if (preg_match('/^render:/', $name)) {
 				list ($ignore, $display_mode) = explode(':', $name);
 				$renderable = node_view($data['node'], $display_mode);
 				$replacements[$original] = drupal_render($renderable);
 			}
 
+			//
 			// Add the clauserfs as a rendered list
+			//
+
 			if ($name == 'clauseref') {
 				// @TODO
 				$html = '';
@@ -71,7 +81,10 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				$replacements[$original] = $html;
 			}
 			
+			//
 			// Add the clauserefs as a one-line rendered list.
+			//
+
 			if ($name == 'clauseref-oneline') {
 				// @TODO
 				$html = '';
@@ -87,7 +100,10 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				$replacements[$original] = $html;
 			}
 
-			// Add the clauserefs as a one-line rendered list.
+			//
+			// Add the information request as a one-line rendered list.
+			//
+
 			if ($name == 'inforeq') {
 				// @TODO
 				$html = '';
@@ -104,7 +120,12 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				$replacements[$original] = $html;
 			}
 
+			//
 			// Add "Arbitration Clause"
+			// @todo: This is defunct and should be replaced with article tags from the contract
+			//        Still relied on by a couple of letters in use, so we can't get rid of it yet.
+			//
+
 			if ($name == 'arbitration_clause') {
 				$contract_tplt_nid = $data['node']->field_grievance_contract_tplt['und'][0]['target_id'];
 				if ($contract_tplt_nid) { 
@@ -115,7 +136,130 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				}
 			}
 
+			//
+			// Add specially tagged articles from contract templates
+			//
+
+			if (preg_match('/^article-tag:/', $name)) {
+				list ($ignore, $tag_name, $format) = explode(':', $name);
+				if (!$format) { $format = full; }
+
+				$replacement = '';
+				// Find the contract template
+				$contract_tplt_nid = $data['node']->field_grievance_contract_tplt['und'][0]['target_id'];
+				if (!$contract_tplt_nid) {
+					$replacement = '(no contract found)';
+				}
+
+				// Find the relevant article tag.  Stupidly "Articles" mave the machine name "section", and "Sections" have the machine name "clause".
+				if (!$replacement) {
+					$section_terms = taxonomy_get_term_by_name($tag_name, 'grievance_contract_section_tags');
+					$section_tids = array_keys($section_terms);
+					if (!$section_tids) {
+						$replacement = '(No article tag found: ' . $tag_name . ')';
+					}
+				}
+	
+				// Look up the relevant article
+				if (!$replacement) {
+				  $query = new EntityFieldQuery();
+				  $query->entityCondition('entity_type', 'node');
+				  $query->entityCondition('bundle', 'grievance_contract_section');
+				  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_tplt_nid);
+				  $query->fieldCondition('field_grievance_cont_sec_tags', 'tid', $section_tids, 'in');
+				  $query->fieldOrderBy('field_grievance_weight', 'value');
+				  $query->range(0,1);
+				  $stmt = $query->execute();
+				  if (!$stmt['node']) {
+				  	$replacement = '(No section was tagged with: ' . $tag_name . ')';
+				  } else {
+				  	$section_nodes = node_load_multiple(array_keys($stmt['node']));
+				  }
+				}
+
+				// Generate our text
+				if (!$replacement) {
+					foreach ($section_nodes as $section_node) {
+						if ($replacement) { $replacement .= ', '; }
+
+						$replacement .= $section_node->field_grievance_section_number['und'][0]['value'];
+						if ($format == 'full') {
+							$replacement .= ': ';
+							$replacement .= $section_node->title;
+						}
+					}
+				}
+
+		  	$replacements[$original] = $replacement;
+			}
+
+
+
+
+
+			//
+			// Add specially tagged clauses from contract templates
+			//
+
+			if (preg_match('/^section-tag:/', $name)) {
+				list ($ignore, $tag_name, $format) = explode(':', $name);
+				if (!$format) { $format = full; }
+
+				$replacement = '';
+				// Find the contract template
+				$contract_tplt_nid = $data['node']->field_grievance_contract_tplt['und'][0]['target_id'];
+				if (!$contract_tplt_nid) {
+					$replacement = '(no contract found)';
+				}
+
+				// Find the relevant article tag.  Stupidly "Articles" mave the machine name "section", and "Sections" have the machine name "clause".
+				if (!$replacement) {
+					$clause_terms = taxonomy_get_term_by_name($tag_name, 'grievance_contract_clause_tags');
+					$clause_tids = array_keys($clause_terms);
+					if (!$clause_tids) {
+						$replacement = '(No section tag found: ' . $tag_name . ')';
+					}
+				}
+	
+				// Look up the relevant article
+				if (!$replacement) {
+				  $query = new EntityFieldQuery();
+				  $query->entityCondition('entity_type', 'node');
+				  $query->entityCondition('bundle', 'grievance_contract_clause');
+				  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_tplt_nid);
+				  $query->fieldCondition('field_grievanct_cont_clse_tags', 'tid', $clause_tids, 'in');
+				  $query->fieldOrderBy('field_grievance_weight', 'value');
+				  $query->range(0,1);
+				  $stmt = $query->execute();
+				  if (!$stmt['node']) {
+				  	$replacement = '(No section was tagged with: ' . $tag_name . ')';
+				  } else {
+				  	$clause_nodes = node_load_multiple(array_keys($stmt['node']));
+				  }
+				}
+
+				// Generate our text
+				if (!$replacement) {
+					foreach ($clause_nodes as $clause_node) {
+						if ($replacement) { $replacement .= ', '; }
+
+						$replacement .= $clause_node->field_grievance_label['und'][0]['value'];
+						if ($format == 'full') {
+							$replacement .= ': ';
+							$replacement .= $clause_node->title;
+						}
+					}
+				}
+
+		  	$replacements[$original] = $replacement;
+			}
+
+
+
+			//
 			// Add log date for status changes
+			//
+
 			if (preg_match('/^log\:/', $name)) {
 				list ($ignore, $status_name, $log_field) = explode(':', $name);
 				$status_terms = taxonomy_get_term_by_name($status_name, 'grievance_status');
@@ -144,5 +288,3 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 
   return $replacements;
 }
-
-
