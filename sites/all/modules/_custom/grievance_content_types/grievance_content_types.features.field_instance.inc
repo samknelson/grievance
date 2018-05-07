@@ -4569,7 +4569,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_rep_filed',
-    'label' => 'Grievance Intake Staff',
+    'label' => 'Intake Person',
     'required' => 0,
     'settings' => array(
       'field_lock_multi_values' => array(
@@ -4871,7 +4871,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_rep_organizer',
-    'label' => 'Grievance Specialist',
+    'label' => 'Organizer',
     'required' => 0,
     'settings' => array(
       'field_lock_multi_values' => array(
@@ -12994,9 +12994,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Grievance Complaint');
   t('Grievance Director');
   t('Grievance Document Type');
-  t('Grievance Intake Staff');
   t('Grievance Log Type');
-  t('Grievance Specialist');
   t('Holidays');
   t('ID');
   t('If "Yes", then the default will be that any letter sent using this template will also set the grievance\'s "company representative" field to be the main recipient of the letter.  Generally this should be "Yes" for notifications to the company -- grievance filings and so forth -- and "No" for notifications to the grievant or letters that are meant to be sent internally.');
@@ -13006,6 +13004,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Images');
   t('Incident Date');
   t('Information Request?');
+  t('Intake Person');
   t('Is this a "dummy" or "placeholder" section?  This field should be left blank or set to "No" except for automatically-generated placeholder sections created when the article itself is meant to be selectable.');
   t('Is this an "attachment", meaning that it can be used as an attachment type for the grievance?');
   t('Is this status considered "Un-Resolved"?  Only unresolved grievances are displayed on the "my grievances" list.');
