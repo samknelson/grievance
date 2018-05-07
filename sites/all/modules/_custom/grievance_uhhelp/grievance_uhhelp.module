@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the grievance_uhhelp feature.
+ */
+
+include_once 'grievance_uhhelp.features.inc';
