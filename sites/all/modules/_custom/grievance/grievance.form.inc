@@ -550,6 +550,9 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
     $form['field_grievance_resproc_an']['#access'] = ($is_expedited_arbitration || $is_formal_arbitration);
     $form['field_grievance_resproc_ea']['#access'] = ($is_expedited_arbitration || $is_formal_arbitration);
+    $form['field_grievance_resproc_ua']['#access'] = ($is_expedited_arbitration || $is_formal_arbitration);
+    $form['field_grievance_resproc_hd']['#access'] = ($is_expedited_arbitration || $is_formal_arbitration);
+    $form['field_grievance_resproc_cd']['#access'] = ($is_expedited_arbitration || $is_formal_arbitration);
     $form['field_grievance_resproc_lh']['#access'] = $is_formal_arbitration;
     $form['field_grievance_resproc_er']['#access'] = ($is_adr || $is_mediation);
     $form['field_grievance_resproc_ur']['#access'] = ($is_adr || $is_mediation);

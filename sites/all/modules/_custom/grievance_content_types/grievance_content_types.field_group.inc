@@ -174,7 +174,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_arbitration|node|grievance|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_arbitration|node|grievance|form';
   $field_group->group_name = 'group_grievance_arbitration';
@@ -888,9 +888,9 @@ function grievance_content_types_field_group_info() {
       13 => 'field_grievance_min',
       14 => 'field_grievance_class_tid',
       15 => 'field_grievance_department_tid',
-      16 => 'field_grievance_work_status',
+      16 => 'field_grievance_daysoff',
       17 => 'field_grievance_shift',
-      18 => 'field_grievance_daysoff',
+      18 => 'field_grievance_work_status',
       19 => 'field_grievance_gender',
     ),
     'format_type' => 'fieldset',
@@ -935,9 +935,9 @@ function grievance_content_types_field_group_info() {
       14 => 'field_grievance_corrected',
       15 => 'field_grievance_class_tid',
       16 => 'field_grievance_department_tid',
-      17 => 'field_grievance_work_status',
+      17 => 'field_grievance_daysoff',
       18 => 'field_grievance_shift',
-      19 => 'field_grievance_daysoff',
+      19 => 'field_grievance_work_status',
       20 => 'field_grievance_gender',
     ),
     'format_type' => 'accordion-item',
@@ -1218,7 +1218,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_inforeq|node|grievance|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_notifications|node|grievance_shop|default';
   $field_group->group_name = 'group_grievance_notifications';
@@ -1283,12 +1283,15 @@ function grievance_content_types_field_group_info() {
     'label' => 'Resolution Procedure',
     'weight' => '20',
     'children' => array(
-      0 => 'field_grievance_resproc_lh',
-      1 => 'field_grievance_resproc_an',
+      0 => 'field_grievance_resproc_an',
+      1 => 'field_grievance_resproc_lh',
       2 => 'field_grievance_resproc_er',
-      3 => 'field_grievance_resproc_ea',
-      4 => 'field_grievance_resproc_ur',
-      5 => 'field_grievance_outcome',
+      3 => 'field_grievance_outcome',
+      4 => 'field_grievance_resproc_ea',
+      5 => 'field_grievance_resproc_ur',
+      6 => 'field_field_grievance_resproc_ua',
+      7 => 'field_grievance_resproc_hd',
+      8 => 'field_grievance_resproc_cd',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -1320,12 +1323,15 @@ function grievance_content_types_field_group_info() {
       1 => 'field_grievance_arbitration_b',
       2 => 'field_grievance_arbitration_c',
       3 => 'field_grievance_arbitration_d',
-      4 => 'field_grievance_resproc_lh',
-      5 => 'field_grievance_resproc_an',
+      4 => 'field_grievance_resproc_an',
+      5 => 'field_grievance_resproc_lh',
       6 => 'field_grievance_resproc_er',
-      7 => 'field_grievance_resproc_ea',
-      8 => 'field_grievance_resproc_ur',
-      9 => 'field_grievance_outcome',
+      7 => 'field_grievance_outcome',
+      8 => 'field_grievance_resproc_ea',
+      9 => 'field_grievance_resproc_ur',
+      10 => 'field_field_grievance_resproc_ua',
+      11 => 'field_grievance_resproc_hd',
+      12 => 'field_grievance_resproc_cd',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1394,8 +1400,8 @@ function grievance_content_types_field_group_info() {
     'label' => 'Shop Stewards',
     'weight' => '9',
     'children' => array(
-      0 => 'field_grievance_st_name',
-      1 => 'field_grievance_st_email',
+      0 => 'field_grievance_st_email',
+      1 => 'field_grievance_st_name',
       2 => 'field_grievance_st_phone',
       3 => 'field_grievance_st_selector',
     ),
@@ -1424,8 +1430,8 @@ function grievance_content_types_field_group_info() {
     'label' => 'Shop Steward',
     'weight' => '11',
     'children' => array(
-      0 => 'field_grievance_st_name',
-      1 => 'field_grievance_st_email',
+      0 => 'field_grievance_st_email',
+      1 => 'field_grievance_st_name',
       2 => 'field_grievance_st_phone',
     ),
     'format_type' => 'fieldset',
@@ -1575,8 +1581,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_grievance_rep_lead',
       3 => 'field_grievance_rep_manager',
       4 => 'field_grievance_rep_watching',
-      5 => 'field_grievance_rep_assignee',
-      6 => 'field_grievance_assignee_notes',
+      5 => 'field_grievance_assignee_notes',
+      6 => 'field_grievance_rep_assignee',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -1609,8 +1615,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_grievance_rep_lead',
       3 => 'field_grievance_rep_manager',
       4 => 'field_grievance_rep_watching',
-      5 => 'field_grievance_rep_assignee',
-      6 => 'field_grievance_assignee_notes',
+      5 => 'field_grievance_assignee_notes',
+      6 => 'field_grievance_rep_assignee',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1672,16 +1678,16 @@ function grievance_content_types_field_group_info() {
     'label' => 'Grievance',
     'weight' => '0',
     'children' => array(
-      0 => 'group_grievance_employee',
-      1 => 'group_grievance_comments',
-      2 => 'group_grievance_supervisor',
+      0 => 'group_grievance_comments',
+      1 => 'group_grievance_company',
+      2 => 'group_grievance_employee',
       3 => 'group_grievance_form',
-      4 => 'group_grievance_union_rep',
-      5 => 'group_grievance_company',
-      6 => 'group_grievance_status',
-      7 => 'group_inforeq',
-      8 => 'group_grievance_resproc',
-      9 => 'group_grievance_stewards',
+      4 => 'group_grievance_resproc',
+      5 => 'group_grievance_status',
+      6 => 'group_grievance_stewards',
+      7 => 'group_grievance_supervisor',
+      8 => 'group_grievance_union_rep',
+      9 => 'group_inforeq',
     ),
     'format_type' => 'accordion',
     'format_settings' => array(
