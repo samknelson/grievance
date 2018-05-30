@@ -104,3 +104,21 @@ function views_term_hierarchy_weight_field_update($tid, $hweight, $hdepth) {
     ->condition('tid', $tid, '=')
     ->execute();
 }
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function views_term_hierarchy_weight_field_entity_property_info_alter(&$info) {
+  $info['taxonomy_term']['properties']['hweight'] = array(
+    'label' => t('Hweight'),
+    'description' => t('Hierarchical weight (Views Term Hierarchy Weight Field module)'),
+    'type' => 'integer',
+    'schema field' => 'hweight',
+  );
+  $info['taxonomy_term']['properties']['hdepth'] = array(
+    'label' => t('Hdepth'),
+    'description' => t('Hierarchical depth (Views Term Hierarchy Weight Field module)'),
+    'type' => 'integer',
+    'schema field' => 'hdepth',
+  );
+}

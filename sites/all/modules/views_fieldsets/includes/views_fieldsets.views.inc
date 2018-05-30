@@ -16,6 +16,5 @@ function views_fieldsets_views_data() {
       'handler' => 'views_fieldsets_fieldset_field_handler',
     ),
   );
-
   return $data;
 }
