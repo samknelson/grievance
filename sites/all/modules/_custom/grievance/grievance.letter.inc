@@ -171,14 +171,15 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				  $query->range(0,1);
 				  $stmt = $query->execute();
 				  if (!$stmt['node']) {
-				  	$replacement = '(No section was tagged with: ' . $tag_name . ')';
+				  	// $replacement = '(No section was tagged with: ' . $tag_name . ')';
+				  	$replacement = '';
 				  } else {
 				  	$section_nodes = node_load_multiple(array_keys($stmt['node']));
 				  }
 				}
 
 				// Generate our text
-				if (!$replacement) {
+				if (!$replacement && $section_nodes) {
 					foreach ($section_nodes as $section_node) {
 						if ($replacement) { $replacement .= ', '; }
 
@@ -232,14 +233,15 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				  $query->range(0,1);
 				  $stmt = $query->execute();
 				  if (!$stmt['node']) {
-				  	$replacement = '(No section was tagged with: ' . $tag_name . ')';
+				  	// $replacement = '(No section was tagged with: ' . $tag_name . ')';
+				  	$replacement = '';
 				  } else {
 				  	$clause_nodes = node_load_multiple(array_keys($stmt['node']));
 				  }
 				}
 
 				// Generate our text
-				if (!$replacement) {
+				if (!$replacement && $section_nodes) {
 					foreach ($clause_nodes as $clause_node) {
 						if ($replacement) { $replacement .= ', '; }
 

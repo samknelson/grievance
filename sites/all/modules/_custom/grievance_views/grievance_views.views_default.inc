@@ -1917,6 +1917,7 @@ Section',
     'field_delimiter' => '',
   );
   $handler->display->display_options['fields']['field_grievance_from_status']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_grievance_from_status']['separator'] = '<br>';
   /* Field: Content: Days */
   $handler->display->display_options['fields']['field_grievance_days']['id'] = 'field_grievance_days';
   $handler->display->display_options['fields']['field_grievance_days']['table'] = 'field_data_field_grievance_days';
@@ -1956,6 +1957,11 @@ Section',
   $handler->display->display_options['fields']['field_grievance_next_status']['field'] = 'field_grievance_next_status';
   $handler->display->display_options['fields']['field_grievance_next_status']['label'] = 'After which the status will be';
   $handler->display->display_options['fields']['field_grievance_next_status']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_grievance_next_status']['settings'] = array(
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_next_status']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_grievance_next_status']['separator'] = '<br>';
   /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
@@ -2437,6 +2443,15 @@ Section',
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
+  /* Field: Content: Article Tags */
+  $handler->display->display_options['fields']['field_grievance_cont_sec_tags']['id'] = 'field_grievance_cont_sec_tags';
+  $handler->display->display_options['fields']['field_grievance_cont_sec_tags']['table'] = 'field_data_field_grievance_cont_sec_tags';
+  $handler->display->display_options['fields']['field_grievance_cont_sec_tags']['field'] = 'field_grievance_cont_sec_tags';
+  $handler->display->display_options['fields']['field_grievance_cont_sec_tags']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_grievance_cont_sec_tags']['settings'] = array(
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_cont_sec_tags']['delta_offset'] = '0';
   /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
@@ -2571,6 +2586,7 @@ Section',
     t('Nid'),
     t('Article Number'),
     t('Title'),
+    t('Article Tags'),
     t('Edit'),
     t('Sections'),
     t('<a href="/node/[nid]/clauses">sections</a>'),
@@ -5806,7 +5822,7 @@ Section',
   $handler->display->display_options['fields']['field_grievance_company']['settings'] = array(
     'link' => 1,
   );
-  /* Field: Field: Employer */
+  /* Field: Field: Shop */
   $handler->display->display_options['fields']['field_grievance_shops']['id'] = 'field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['field'] = 'field_grievance_shops';
@@ -5912,7 +5928,7 @@ Section',
   $handler = $view->new_display('block', 'By Shop', 'block_1');
   $handler->display->display_options['defaults']['footer'] = FALSE;
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: Field: Employer (field_grievance_shops) */
+  /* Contextual filter: Field: Shop (field_grievance_shops) */
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['id'] = 'field_grievance_shops_target_id';
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['arguments']['field_grievance_shops_target_id']['field'] = 'field_grievance_shops_target_id';
@@ -5954,7 +5970,7 @@ Section',
   $handler->display->display_options['fields']['field_grievance_company']['settings'] = array(
     'link' => 1,
   );
-  /* Field: Field: Employer */
+  /* Field: Field: Shop */
   $handler->display->display_options['fields']['field_grievance_shops']['id'] = 'field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['field'] = 'field_grievance_shops';
@@ -6031,7 +6047,7 @@ Section',
   $handler->display->display_options['fields']['field_grievance_company']['settings'] = array(
     'link' => 1,
   );
-  /* Field: Field: Employer */
+  /* Field: Field: Shop */
   $handler->display->display_options['fields']['field_grievance_shops']['id'] = 'field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops']['field'] = 'field_grievance_shops';
@@ -6039,7 +6055,7 @@ Section',
     'link' => 1,
   );
   $handler->display->display_options['fields']['field_grievance_shops']['delta_offset'] = '0';
-  /* Field: Field: Employer */
+  /* Field: Field: Shop */
   $handler->display->display_options['fields']['field_grievance_shops_1']['id'] = 'field_grievance_shops_1';
   $handler->display->display_options['fields']['field_grievance_shops_1']['table'] = 'field_data_field_grievance_shops';
   $handler->display->display_options['fields']['field_grievance_shops_1']['field'] = 'field_grievance_shops';
@@ -6116,7 +6132,7 @@ Section',
     t('Name'),
     t('Role'),
     t('Company'),
-    t('Employer'),
+    t('Shop'),
     t('Phone'),
     t('Email'),
     t('Edit'),
