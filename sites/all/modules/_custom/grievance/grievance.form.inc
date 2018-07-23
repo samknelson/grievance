@@ -579,7 +579,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
         '#weight' => $weight,
         '#tree' => TRUE,
         '#title' => $log_type_term->name,
-        '#date_format'    => 'm/d/Y H:i',
+        '#date_format'    => 'm/d/Y',
         '#date_label_position'  => 'none',
         '#prefix' => '<div class="form-item form-type-date-popup">',
         '#suffix' => '</div>'
