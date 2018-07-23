@@ -103,7 +103,7 @@ function grievance_log_update($grievance_node, $op) {
       $log_node->field_grievance_status['und'][0]['tid'] =  variable_get('grievance_log_incident_status', '');
       $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_incident_type', '');
 
-      $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d 00:00:00', strtotime($event_date));
+      $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:00', strtotime($event_date));
 
       $log_node = node_submit($log_node); // Prepare node for saving
       node_save($log_node);

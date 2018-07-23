@@ -409,6 +409,35 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/**
+ * Implements hook_date_popup_pre_validate()
+ *
+ * If a date field has granularity "Minute", then the value "1/1/2017" is invalid.
+ *
+ * This defaults any such date field to "1/1/2017 00:00".
+ */
+
+function grievance_date_popup_pre_validate_alter(&$element, &$form_state, &$input) {
+  // Not necessary but 
+  if ($element['#type'] != 'date_popup') { return; }
+
+  // Only want minute-granularity.  This is pretty specific to our needs, but what the heck.
+  if ($element['#date_format'] != 'm/d/Y H:i' && 
+      $element['#date_format'] != 'm/d/Y - H:i') { return; }
+
+  // If there's no "date" input, do nothing.
+  if (!$input['date']) { return; }
+
+  // If there is a "time" input, do nothing
+  if ($input['time']) { return; }
+
+  // Default time to 00:00.
+  $name = $element['#name'];
+  $name = preg_replace('/\[.*$/', '', $name);
+  $input['time'] = '00:00';
+  $form_state['input'][$name]['und'][0]['value']['time'] = '00:00';
+}
+
 function grievance_classes_array($new_classes = null) {
   static $classes = array();
   if ($new_classes) {

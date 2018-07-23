@@ -14,6 +14,7 @@ Employers {"url":"grievance\/admin\/shops","lang":"und","weight":"-47"}
 --Add a Contact {"url":"node\/add\/grievance-shop-contact","lang":"und","weight":"-50"}
 -Companies {"url":"grievance\/admin\/shops\/companies","lang":"und","weight":"-49"}
 --Add a Company {"url":"node\/add\/grievance-company","lang":"und","weight":"0"}
+-Bulk-Reassign Organizers {"url":"grievance\/admin\/shops\/bulk-reassign","lang":"und","weight":"0"}
 Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
 -Grievance Form Settings {"url":"admin\/config\/grievance\/gform","lang":"und","weight":"-47"}
 -Arbitration Form Settings {"url":"admin\/config\/grievance\/arbitrationform","lang":"und","weight":"-50"}
@@ -69,3 +70,8 @@ Reports {"url":"<front>","lang":"und","weight":"-48"}
 -UH226 Violation Report {"url":"grievance\/report\/uh226\/violation","lang":"und","weight":"0"}
 -Grievances with no Category {"url":"grievance\/report\/missing-category","lang":"und","weight":"-47"}
 -Log Status Search {"url":"grievances\/log\/status","lang":"und","weight":"-49"}
+-UH23 Summary Report {"url":"grievance\/report\/uh23-report-summary","lang":"und","weight":"0"}
+Help {"url":"grievances\/uh\/help","lang":"und","weight":"50"}
+-Emailing Attachments {"url":"grievances\/uh\/help\/emailing_attachments","lang":"und","weight":"-48"}
+-Logging In and Out {"url":"grievances\/uh\/help\/logging_in_and_out","lang":"und","weight":"-50"}
+-Find A Grievance {"url":"grievances\/uh\/help\/find_a_grievance","lang":"und","weight":"-49"}
