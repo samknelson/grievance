@@ -206,3 +206,22 @@ function grievance_update_7010() {
   // module_enable('views_record_count');
 }
 
+
+function grievance_update_7011() {
+  // Enable FPA
+  print "Enabling FPA module\n";
+  module_enable(array('fpa'), TRUE);
+
+  // Enable the new Sirius LinkField module
+  print "Enabling sirius views linkfield module\n";
+  module_enable(array('sirius_views_linkfield'), TRUE);
+
+  // Grant "grievance contract view" for anybody with 
+  print "Granting new permission [grievance contract view] to anybody with permission [grievance view] ...\n";
+  $roles = user_roles(FALSE, 'grievance view');
+  foreach ($roles as $rid => $name) {
+    print "... granting [grievance contract view] to [$name]\n";
+    user_role_grant_permissions($rid, array('grievance contract view'));
+  }
+}
+
