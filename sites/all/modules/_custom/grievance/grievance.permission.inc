@@ -22,10 +22,6 @@ function grievance_permission() {
         'title' => t('Grievance Edit'),
         'description' => t('Permission to edit any grievane on the system.')
     ),
-    'grievance contract view' => array(
-        'title' => t('Grievance Contract View'),
-        'description' => t('Permission to view any contract.')
-    ),
     'grievance attachment' => array(
     	'title' => t('Grievance Attachments'),
     	'description' => t('Permission to upload attachments to grievances.')
@@ -85,6 +81,10 @@ function grievance_permission() {
     'grievance contract' => array(
     	'title' => t('Grievance Contract'),
     	'description' => t('Permission to edit contracts and contract templates.')
+    ),
+    'grievance contract view' => array(
+        'title' => t('Grievance Contract View'),
+        'description' => t('Permission to view any contract.')
     ),
     'grievance form contract template' => array(
     	'title' => t('Grievance Form - Change Contract Template'),
