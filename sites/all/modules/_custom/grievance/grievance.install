@@ -225,3 +225,8 @@ function grievance_update_7011() {
   }
 }
 
+function grievance_update_7012() {
+  // Enable FPA
+  print "Enabling SaveGuard\n";
+  module_enable(array('saveguard'), TRUE);
+}
