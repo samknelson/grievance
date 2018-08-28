@@ -151,28 +151,28 @@ function grievance_node_tabs() {
 		'title' => 'Articles',
 		'description' => '',
 		'callback' => 'grievance_contract_template_node_tab_sections',
-		'permissions' => array('grievance contract'),
+		'permissions' => array('grievance contract view'),
 	);
 
 	$node_tabs['grievance_contract_template']['clauses'] = array(
 		'title' => 'Sections',
 		'description' => '',
 		'callback' => 'grievance_contract_template_node_tab_clauses',
-		'permissions' => array('grievance contract'),
+		'permissions' => array('grievance contract view'),
 	);
 
 	$node_tabs['grievance_contract_section']['clauses'] = array(
 		'title' => 'Sections',
 		'description' => '',
 		'callback' => 'grievance_contract_section_node_tab_clauses',
-		'permissions' => array('grievance contract'),
+		'permissions' => array('grievance contract view'),
 	);
 
 	$node_tabs['grievance_contract_template']['full'] = array(
 		'title' => 'Full Text',
 		'description' => '',
 		'callback' => 'grievance_contract_template_node_tab_full',
-		'permissions' => array('grievance user'),
+		'permissions' => array('grievance user view'),
 	);
 
 	$node_tabs['grievance_contract_template']['pdf'] = array(

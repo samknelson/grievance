@@ -1,0 +1,76 @@
+<?php
+
+
+/**
+ * Implements hook_views_data().
+ */
+
+function sirius_views_linkfield_views_data() {
+  $data['sirius']['table']['group'] = t('Sirius');
+  $data['sirius']['table']['join'] = array(
+    '#global' => array(),
+  );
+
+  $data['sirius']['linkfield'] = array(
+    'title' => t('Sirius LinkField'),
+    'help' => t('Create a permissioned, translated link.'),
+    'field' => array(
+      'handler' => 'sirius_views_linkfield_field',
+    ),
+  );
+
+  return $data;
+}
+
+
+class sirius_views_linkfield_field extends views_handler_field {
+
+  public function query() {
+    // Do nothing -- to override the parent query.
+  }
+
+  public function option_definition() {
+    $options = parent::option_definition();
+    $options['sirius_linkfield_text']['default'] = '';
+    $options['sirius_linkfield_path']['default'] = '';
+
+    // Override the alter text option to always alter the text.
+    // $options['alter']['contains']['alter_text'] = array('default' => TRUE, 'bool' => TRUE);
+    // $options['hide_alter_empty'] = array('default' => FALSE, 'bool' => TRUE);
+
+    return $options;
+  }
+
+  public function options_form(&$form, &$form_state) {
+    $form['sirius_linkfield_text'] = array(
+      '#title' => t('Link Text'),
+      '#description' => t("Link text. May contain replacement patterns."),
+      '#type' => 'textfield',
+      '#default_value' => $this->options['sirius_linkfield_text'],
+    );
+
+    $form['sirius_linkfield_path'] = array(
+      '#title' => t('Link Path'),
+      '#description' => t("Path that the text should link to. May include replacement tokens. Must be a path suitable for passing into Drupal's l()."),
+      '#type' => 'textfield',
+      '#default_value' => $this->options['sirius_linkfield_path'],
+    );
+
+    parent::options_form($form, $form_state);
+  }
+
+  public function render($values) {
+    // Return the text, so the code never thinks the value is empty.
+    $text = $this->options['sirius_linkfield_text'];
+    $path = $this->options['sirius_linkfield_path'];
+
+    $text = $this->tokenize_value($text, $this->view->row_index);
+    $path = $this->tokenize_value($path, $this->view->row_index);
+
+    if (!drupal_valid_path($path)) {
+      return NULL;
+    }
+
+    return l($text, $path);
+  }
+}

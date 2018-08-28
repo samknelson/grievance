@@ -82,6 +82,10 @@ function grievance_permission() {
     	'title' => t('Grievance Contract'),
     	'description' => t('Permission to edit contracts and contract templates.')
     ),
+    'grievance contract view' => array(
+        'title' => t('Grievance Contract View'),
+        'description' => t('Permission to view any contract.')
+    ),
     'grievance form contract template' => array(
     	'title' => t('Grievance Form - Change Contract Template'),
     ),
