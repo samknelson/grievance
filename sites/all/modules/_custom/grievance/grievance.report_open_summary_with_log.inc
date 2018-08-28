@@ -43,15 +43,6 @@ function grievance_report_open_summary_with_log_form($form, &$form_state) {
     '#options' => $options,
   );
 
-  $form['which'] = array(
-    '#type' => 'select',
-    '#title' => 'Report on:',
-    '#options' => array(
-    	'specialist' => 'Specialist',
-    	'shop' => 'Employer',
-    ),
-  );
-
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Generate Report',
