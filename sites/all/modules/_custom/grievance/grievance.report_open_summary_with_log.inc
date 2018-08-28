@@ -43,15 +43,6 @@ function grievance_report_open_summary_with_log_form($form, &$form_state) {
     '#options' => $options,
   );
 
-  $form['which'] = array(
-    '#type' => 'select',
-    '#title' => 'Report on:',
-    '#options' => array(
-    	'specialist' => 'Specialist',
-    	'shop' => 'Employer',
-    ),
-  );
-
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Generate Report',
@@ -139,10 +130,6 @@ function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $value
   $stmt = db_query($sql, array(':nid' => $grievance_nid));
   $hr = $stmt->fetchAssoc();
   $row[] = $hr['name'];
-  if ($grievance_nid == 11512) {
-    drupal_set_message($sql);
-    dpm($values);
-  }
 
   $sql = "select title from node, field_data_field_grievance_shop ";
   $sql .= "where node.nid = field_data_field_grievance_shop.field_grievance_shop_target_id ";
