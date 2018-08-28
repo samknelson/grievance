@@ -20,6 +20,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.repor
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_spi_term.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_by_specialist.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_settlement_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_status_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.block.inc";
