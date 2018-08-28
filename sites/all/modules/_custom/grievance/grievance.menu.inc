@@ -510,6 +510,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['grievance/report/open-summary-log'] = array(
+		'title' => 'Report: Open Grievances: Summary with Log',
+		'description' => '',
+		'page callback' => 'grievance_report_open_summary_with_log',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['grievance/report/open'] = array(
 		'title' => 'Report: Open Grievances: By Specialist',
 		'description' => '',
