@@ -43,6 +43,7 @@ features[views_view][] = grievance_shops
 features[views_view][] = grievance_timeline
 features[views_view][] = grievances
 features[views_view][] = grievances_mine
+features[views_view][] = grievances_without_assignee
 features[views_view][] = grievances_without_brought_by
 features[views_view][] = grievances_without_category
 features[views_view][] = grievances_without_member_id
