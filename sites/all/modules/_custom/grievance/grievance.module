@@ -593,7 +593,8 @@ function grievance_views_post_execute(&$view) {
       $view->name == 'grievances_without_status' ||
       $view->name == 'grievances_without_member_id' ||
       $view->name == 'grievances_without_brought_by' ||
-      $view->name == 'grievances_without_category') {
+      $view->name == 'grievances_without_category' ||
+      $view->name == 'grievances_without_assignee') {
     grievance_views_post_execute_grievances_mine($view);
   }
 

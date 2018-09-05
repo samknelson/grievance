@@ -54,26 +54,29 @@ Contracts {"url":"grievance\/admin\/contract-templates","lang":"und","weight":"-
 -Article Search {"url":"grievance\/admin\/contract-templates\/section-search","lang":"und","weight":"0"}
 -Section Search {"url":"grievance\/admin\/contract-templates\/clause-search","lang":"und","weight":"0"}
 Reports {"url":"<front>","lang":"und","weight":"-48"}
--Type and Status {"url":"grievance\/report\/bytype","lang":"und","weight":"-37"}
--Settlement Detail {"url":"grievance\/report\/settlement","lang":"und","weight":"-39"}
--Corrected Member Data {"url":"grievance\/admin\/corrected","lang":"und","weight":"-47"}
--Average Time Between Statuses {"url":"grievance\/report\/average-time","lang":"und","weight":"-48"}
--UH226 Weekly Summary {"url":"grievance\/report\/uh226-report-summary","lang":"und","weight":"-35"}
--Open Grievances: By Specialist {"url":"grievance\/report\/open","lang":"und","weight":"-42"}
--Yearly Summary {"url":"grievance\/report\/year-summary","lang":"und","weight":"-36"}
+-Type and Status {"url":"grievance\/report\/bytype","lang":"und","weight":"-41"}
+-Settlement Detail {"url":"grievance\/report\/settlement","lang":"und","weight":"-43"}
+-Average Time Between Statuses {"url":"grievance\/report\/average-time","lang":"und","weight":"-47"}
+-UH226 Weekly Summary {"url":"grievance\/report\/uh226-report-summary","lang":"und","weight":"-39"}
+-Open Grievances: By Specialist {"url":"grievance\/report\/open","lang":"und","weight":"-46"}
+-Yearly Summary {"url":"grievance\/report\/year-summary","lang":"und","weight":"-40"}
 -Log Search {"url":"grievances\/log","lang":"und","weight":"-50"}
--Grievances with no Status {"url":"grievance\/report\/missing-status","lang":"und","weight":"-45"}
--Settlement Summary {"url":"grievance\/report\/settlement\/summary","lang":"und","weight":"-38"}
--UH226 SPI Term Summary {"url":"grievance\/report\/uh226\/spi-term-summary","lang":"und","weight":"-34"}
--UH226 SPI Term Detail {"url":"grievance\/report\/uh226\/spi-term-detail","lang":"und","weight":"-33"}
--Grievances with no Member ID {"url":"grievance\/report\/missing-member-id","lang":"und","weight":"-43"}
--Grievances with no "Brought By" {"url":"grievance\/report\/missing-broughtby","lang":"und","weight":"-44"}
--UH226 Violation Report {"url":"grievance\/report\/uh226\/violation","lang":"und","weight":"-32"}
--Grievances with no Category {"url":"grievance\/report\/missing-category","lang":"und","weight":"-46"}
+-Settlement Summary {"url":"grievance\/report\/settlement\/summary","lang":"und","weight":"-42"}
+-UH226 SPI Term Summary {"url":"grievance\/report\/uh226\/spi-term-summary","lang":"und","weight":"-38"}
+-UH226 SPI Term Detail {"url":"grievance\/report\/uh226\/spi-term-detail","lang":"und","weight":"-37"}
+-UH226 Violation Report {"url":"grievance\/report\/uh226\/violation","lang":"und","weight":"-36"}
 -Log Status Search {"url":"grievances\/log\/status","lang":"und","weight":"-49"}
--UH23 Summary Report {"url":"grievance\/report\/uh23-report-summary","lang":"und","weight":"-31"}
--Open Grievances: Summary {"url":"grievance\/report\/open-summary","lang":"und","weight":"-41"}
--Open Grievances: Summary With Log {"url":"grievance\/report\/open-summary-log","lang":"und","weight":"-40"}
+-UH23 Summary Report {"url":"grievance\/report\/uh23-report-summary","lang":"und","weight":"-35"}
+-Open Grievances: Summary {"url":"grievance\/report\/open-summary","lang":"und","weight":"-45"}
+-Open Grievances: Summary With Log {"url":"grievance\/report\/open-summary-log","lang":"und","weight":"-44"}
+-Data Integrity Reports {"url":"grievance\/admin\/corrected","lang":"und","weight":"-48"}
+--Corrected Member Data {"url":"grievance\/admin\/corrected","lang":"und","weight":"-50"}
+--No Status {"url":"grievance\/report\/missing-status","lang":"und","weight":"-47"}
+--No Member ID {"url":"grievance\/report\/missing-member-id","lang":"und","weight":"-46"}
+--No "Brought By" {"url":"grievance\/report\/missing-broughtby","lang":"und","weight":"-49"}
+--No Category {"url":"grievance\/report\/missing-category","lang":"und","weight":"-48"}
+--No Assignee {"url":"grievance\/report\/missing-assignee","lang":"und","weight":"0"}
+--No Specialist / Organizer {"url":"grievance\/report\/missing-specialist","lang":"und","weight":"0"}
 Help {"url":"grievances\/uh\/help","lang":"und","weight":"50"}
 -Emailing Attachments {"url":"grievances\/uh\/help\/emailing_attachments","lang":"und","weight":"-48"}
 -Logging In and Out {"url":"grievances\/uh\/help\/logging_in_and_out","lang":"und","weight":"-50"}
