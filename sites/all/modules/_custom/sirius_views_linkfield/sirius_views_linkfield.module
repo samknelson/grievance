@@ -34,9 +34,16 @@ class sirius_views_linkfield_field extends views_handler_field {
     $options['sirius_linkfield_text']['default'] = '';
     $options['sirius_linkfield_path']['default'] = '';
 
+
     // Override the alter text option to always alter the text.
-    // $options['alter']['contains']['alter_text'] = array('default' => TRUE, 'bool' => TRUE);
-    // $options['hide_alter_empty'] = array('default' => FALSE, 'bool' => TRUE);
+    $options['alter']['contains']['alter_text'] = array(
+      'default' => TRUE, 
+      'bool' => TRUE,
+    );
+    $options['hide_alter_empty'] = array(
+      'default' => FALSE, 
+      'bool' => FALSE
+    );
 
     return $options;
   }
@@ -64,12 +71,42 @@ class sirius_views_linkfield_field extends views_handler_field {
     $text = $this->options['sirius_linkfield_text'];
     $path = $this->options['sirius_linkfield_path'];
 
-    $text = $this->tokenize_value($text, $this->view->row_index);
-    $path = $this->tokenize_value($path, $this->view->row_index);
+    // It ought to be this simple.  But it's not, because tokenize_value only exists if one of the preceding fields on this row
+    // has "rewrite" implemented.  And I can't figure out how to force it.
+    // $text = $this->tokenize_value($text, $this->view->row_index);
+    // $path = $this->tokenize_value($path, $this->view->row_index);
 
-    if (!drupal_valid_path($path)) {
-      return NULL;
+    // So instead I'm implementing my own damn token function.
+    $tokens = array();
+    $vars = get_object_vars($values);
+    foreach ($vars as $name => $value) {
+      if (is_array($value)) {
+        // This is my half-assed render routine
+        if ($value[0]['rendered']['#markup']) {
+          $tokens["[$name]"] = $value[0]['rendered']['#markup'];
+        }
+      } else if (is_object($value)) {
+        // Just plain not dealing with objects
+      } else {
+        $tokens["[$name]"] = $value;
+      }
     }
+
+    $fake_item = array(
+      'alter_text' => TRUE,
+      'text' => $path
+    );
+    $path = strip_tags($this->render_altered($fake_item, $tokens));
+
+    $fake_item = array(
+      'alter_text' => TRUE,
+      'text' => $text
+    );
+    $text = strip_tags($this->render_altered($fake_item, $tokens));
+
+    //if (!drupal_valid_path($path)) {
+    //  return NULL;
+    //}
 
     return l($text, $path);
   }
