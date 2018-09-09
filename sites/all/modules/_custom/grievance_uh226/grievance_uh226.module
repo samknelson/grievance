@@ -274,7 +274,8 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if (preg_match('/Expedited Arbitration Held/i', $term->name)) {
       $expedited_arb_held_status_tids[] = $tid;
     }
-    if (preg_match('/(resolved|won)/i', $term->name)) {
+    if (preg_match('/(resolved|won)/i', $term->name) && 
+        !preg_match('/unresolved/i', $term->name)) {
       $victory_status_tids[] = $tid;
     }
     if (preg_match('/BOA Held/i', $term->name)) {
