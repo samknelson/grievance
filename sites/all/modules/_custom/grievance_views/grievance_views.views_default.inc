@@ -3561,8 +3561,10 @@ Section',
   $handler->display->display_options['fields']['field_grievance_status_date']['id'] = 'field_grievance_status_date';
   $handler->display->display_options['fields']['field_grievance_status_date']['table'] = 'field_data_field_grievance_status_date';
   $handler->display->display_options['fields']['field_grievance_status_date']['field'] = 'field_grievance_status_date';
+  $handler->display->display_options['fields']['field_grievance_status_date']['label'] = 'Log Date';
   $handler->display->display_options['fields']['field_grievance_status_date']['settings'] = array(
     'format_type' => 'short',
+    'custom_date_format' => '',
     'fromto' => 'both',
     'multiple_number' => '',
     'multiple_from' => '',
@@ -3687,7 +3689,7 @@ Section',
     t('last »'),
     t('author'),
     t('Title'),
-    t('Status Change Date'),
+    t('Log Date'),
     t('Entry Type'),
     t('Author'),
     t('Status'),
@@ -4401,6 +4403,10 @@ Section',
   $handler->display->display_options['header']['area']['field'] = 'area';
   $handler->display->display_options['header']['area']['content'] = 'The view below searches the grievance log for entries with a specific status.  In other words, it searches for all grievances that have <em>ever</em> entered the specified status.  It displays the intake date, the date that the grievance first entered the selected status, and also the <em>current</em> status that the grievance has.';
   $handler->display->display_options['header']['area']['format'] = 'full_html';
+  /* Footer: Global: Result summary */
+  $handler->display->display_options['footer']['result']['id'] = 'result';
+  $handler->display->display_options['footer']['result']['table'] = 'views';
+  $handler->display->display_options['footer']['result']['field'] = 'result';
   /* Relationship: Entity Reference: Referenced Entity */
   $handler->display->display_options['relationships']['field_grievance_target_id']['id'] = 'field_grievance_target_id';
   $handler->display->display_options['relationships']['field_grievance_target_id']['table'] = 'field_data_field_grievance';
@@ -4438,6 +4444,7 @@ Section',
   $handler->display->display_options['fields']['field_grievance_status_date']['table'] = 'field_data_field_grievance_status_date';
   $handler->display->display_options['fields']['field_grievance_status_date']['field'] = 'field_grievance_status_date';
   $handler->display->display_options['fields']['field_grievance_status_date']['group_type'] = 'min';
+  $handler->display->display_options['fields']['field_grievance_status_date']['label'] = 'Log Date';
   $handler->display->display_options['fields']['field_grievance_status_date']['settings'] = array(
     'format_type' => 'date_only_sortable',
     'custom_date_format' => '',
@@ -4495,10 +4502,12 @@ Section',
   $handler->display->display_options['filters']['type']['value'] = array(
     'grievance_log' => 'grievance_log',
   );
+  $handler->display->display_options['filters']['type']['group'] = 1;
   /* Filter criterion: Content: Status (field_grievance_status) */
   $handler->display->display_options['filters']['field_grievance_status_tid']['id'] = 'field_grievance_status_tid';
   $handler->display->display_options['filters']['field_grievance_status_tid']['table'] = 'field_data_field_grievance_status';
   $handler->display->display_options['filters']['field_grievance_status_tid']['field'] = 'field_grievance_status_tid';
+  $handler->display->display_options['filters']['field_grievance_status_tid']['group'] = 1;
   $handler->display->display_options['filters']['field_grievance_status_tid']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_grievance_status_tid']['expose']['operator_id'] = 'field_grievance_status_tid_op';
   $handler->display->display_options['filters']['field_grievance_status_tid']['expose']['label'] = 'Where the status was, at some point:';
@@ -4524,6 +4533,7 @@ Section',
   $handler->display->display_options['filters']['created']['field'] = 'created';
   $handler->display->display_options['filters']['created']['relationship'] = 'field_grievance_target_id';
   $handler->display->display_options['filters']['created']['operator'] = 'between';
+  $handler->display->display_options['filters']['created']['group'] = 1;
   $handler->display->display_options['filters']['created']['exposed'] = TRUE;
   $handler->display->display_options['filters']['created']['expose']['operator_id'] = 'created_op';
   $handler->display->display_options['filters']['created']['expose']['label'] = 'Where the intake date is between:';
@@ -4540,11 +4550,36 @@ Section',
     8 => 0,
     9 => 0,
   );
+  /* Filter criterion: Content: Status Change Date (field_grievance_status_date) */
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['id'] = 'field_grievance_status_date_value';
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['table'] = 'field_data_field_grievance_status_date';
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['field'] = 'field_grievance_status_date_value';
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['operator'] = 'between';
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['group'] = 1;
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['expose']['operator_id'] = 'field_grievance_status_date_value_op';
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['expose']['label'] = 'Where the log date is between:';
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['expose']['operator'] = 'field_grievance_status_date_value_op';
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['expose']['identifier'] = 'field_grievance_status_date_value';
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+    5 => 0,
+    6 => 0,
+    7 => 0,
+    4 => 0,
+    8 => 0,
+    9 => 0,
+  );
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['form_type'] = 'date_text';
+  $handler->display->display_options['filters']['field_grievance_status_date_value']['year_range'] = '-10:+10';
   /* Filter criterion: Taxonomy term: Unresolved? (field_grievance_open) */
   $handler->display->display_options['filters']['field_grievance_open_value']['id'] = 'field_grievance_open_value';
   $handler->display->display_options['filters']['field_grievance_open_value']['table'] = 'field_data_field_grievance_open';
   $handler->display->display_options['filters']['field_grievance_open_value']['field'] = 'field_grievance_open_value';
   $handler->display->display_options['filters']['field_grievance_open_value']['relationship'] = 'field_grievance_status_tid';
+  $handler->display->display_options['filters']['field_grievance_open_value']['group'] = 1;
   $handler->display->display_options['filters']['field_grievance_open_value']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_grievance_open_value']['expose']['operator_id'] = 'field_grievance_open_value_op';
   $handler->display->display_options['filters']['field_grievance_open_value']['expose']['label'] = 'Show only open grievances?';
@@ -4602,17 +4637,19 @@ Section',
     t('next ›'),
     t('last »'),
     t('The view below searches the grievance log for entries with a specific status.  In other words, it searches for all grievances that have <em>ever</em> entered the specified status.  It displays the intake date, the date that the grievance first entered the selected status, and also the <em>current</em> status that the grievance has.'),
+    t('Displaying @start - @end of @total'),
     t('Content entity referenced from field_grievance'),
     t('Status Term'),
     t('Grievance NID'),
     t('Status Now'),
     t('Intake Date'),
-    t('Status Change Date'),
+    t('Log Date'),
     t('Employer'),
     t('Specialist'),
     t('Grievance ID'),
     t('Where the status was, at some point:'),
     t('Where the intake date is between:'),
+    t('Where the log date is between:'),
     t('Show only open grievances?'),
     t('Page'),
     t('Data export'),
