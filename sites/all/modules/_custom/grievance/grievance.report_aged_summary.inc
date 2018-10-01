@@ -1,10 +1,10 @@
 <?php
 
-function grievance_report_open_summary() {
-	return drupal_get_form('grievance_report_open_summary_form');
+function grievance_report_aged_summary() {
+	return drupal_get_form('grievance_report_aged_summary_form');
 }
 
-function grievance_report_open_summary_form($form, &$form_state) {
+function grievance_report_aged_summary_form($form, &$form_state) {
   $form['which'] = array(
     '#type' => 'select',
     '#title' => 'Report on:',
@@ -30,7 +30,7 @@ function grievance_report_open_summary_form($form, &$form_state) {
   return $form;
 }
 
-function grievance_report_open_summary_form_submit($form, &$form_state) {
+function grievance_report_aged_summary_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 
 	// Get the list of open and closed statuses

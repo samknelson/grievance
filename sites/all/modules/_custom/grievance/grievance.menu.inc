@@ -502,9 +502,9 @@ function grievance_menu() {
 	);
 
 	$items['grievance/report/open-summary'] = array(
-		'title' => 'Report: Open Grievances: Summary',
+		'title' => 'Report: Aged Summary',
 		'description' => '',
-		'page callback' => 'grievance_report_open_summary',
+		'page callback' => 'grievance_report_aged_summary',
 		'page arguments' => array(),
 		'access arguments' => array('grievance report'),
 		'type' => MENU_NORMAL_ITEM,
