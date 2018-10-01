@@ -501,7 +501,7 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
-	$items['grievance/report/open-summary'] = array(
+	$items['grievance/report/aged-summary'] = array(
 		'title' => 'Report: Aged Summary',
 		'description' => '',
 		'page callback' => 'grievance_report_aged_summary',
@@ -698,6 +698,3 @@ function grievance_modal_styles() {
 
   return $styles;
 }
-
-
-
