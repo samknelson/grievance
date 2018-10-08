@@ -17,15 +17,15 @@ Employers {"url":"grievance\/admin\/shops","lang":"und","weight":"-47"}
 -Bulk-Reassign Organizers {"url":"grievance\/admin\/shops\/bulk-reassign","lang":"und","weight":"0"}
 -Chapters {"url":"grievance\/admin\/chapters","lang":"und","weight":"0"}
 Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
--Grievance Form Settings {"url":"admin\/config\/grievance\/gform","lang":"und","weight":"-47"}
--Arbitration Form Settings {"url":"admin\/config\/grievance\/arbitrationform","lang":"und","weight":"-50"}
--Field Overrides {"url":"admin\/config\/grievances\/fieldoverrides","lang":"und","weight":"-48"}
--Holidays {"url":"grievance\/admin\/holidays","lang":"und","weight":"-46"}
--TIMSS Configuration {"url":"admin\/config\/grievance\/timss","lang":"und","weight":"-42"}
+-Grievance Form Settings {"url":"admin\/config\/grievance\/gform","lang":"und","weight":"-46"}
+--Arbitration Form Settings {"url":"admin\/config\/grievance\/arbitrationform","lang":"und","weight":"-50"}
+-Field Overrides {"url":"admin\/config\/grievances\/fieldoverrides","lang":"und","weight":"-47"}
+-Holidays {"url":"grievance\/admin\/holidays","lang":"und","weight":"-45"}
+-TIMSS Configuration {"url":"admin\/config\/grievance\/timss","lang":"und","weight":"-41"}
 --Test TIMSS Connection {"url":"admin\/config\/grievance\/timss\/test","lang":"und","weight":"0"}
--Tags {"url":"admin\/structure\/taxonomy\/grievance_tags","lang":"und","weight":"-43"}
--Two-Factor Trusted IPs {"url":"admin\/config\/people\/tfa-trusted-ip","lang":"und","weight":"-41"}
--Drop-down Lists {"url":"admin\/structure\/taxonomy","lang":"und","weight":"-49"}
+-Two-Factor Trusted IPs {"url":"admin\/config\/people\/tfa-trusted-ip","lang":"und","weight":"-40"}
+-Drop-down Lists {"url":"admin\/structure\/taxonomy","lang":"und","weight":"-48"}
+--Tags {"url":"admin\/structure\/taxonomy\/grievance_tags","lang":"und","weight":"-34"}
 --Grievance Types {"url":"admin\/structure\/taxonomy\/grievance_types","lang":"und","weight":"-43"}
 --Statuses {"url":"admin\/structure\/taxonomy\/grievance_status","lang":"und","weight":"-36"}
 --Log Types {"url":"admin\/structure\/taxonomy\/grievance_log_types","lang":"und","weight":"-41"}
@@ -42,11 +42,12 @@ Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
 --Delivery Options {"url":"admin\/structure\/taxonomy\/grievance_delivery","lang":"und","weight":"-45"}
 --Log Tags {"url":"admin\/structure\/taxonomy\/grievance_log_tags","lang":"und","weight":"-42"}
 --Assignee Notes {"url":"admin\/structure\/taxonomy\/grievance_assignee_notes","lang":"und","weight":"-49"}
--Letter Templates {"url":"grievance\/admin\/letter-templates","lang":"und","weight":"-44"}
--Phaxio {"url":"admin\/config\/grievance\/phaxio","lang":"und","weight":"-40"}
--Intake Log {"url":"admin\/config\/grievance\/intake-log","lang":"und","weight":"-45"}
--Special Log Types {"url":"admin\/config\/grievance\/log_types","lang":"und","weight":"0"}
--Special Contact Types {"url":"admin\/config\/grievance\/contacts","lang":"und","weight":"0"}
+-Letter Templates {"url":"grievance\/admin\/letter-templates","lang":"und","weight":"-43"}
+-Phaxio {"url":"admin\/config\/grievance\/phaxio","lang":"und","weight":"-39"}
+-Intake Log {"url":"admin\/config\/grievance\/intake-log","lang":"und","weight":"-44"}
+-Special Log Types {"url":"admin\/config\/grievance\/log_types","lang":"und","weight":"-37"}
+-Special Contact Types {"url":"admin\/config\/grievance\/contacts","lang":"und","weight":"-38"}
+-Statuses {"url":"grievance\/admin\/statuses","lang":"und","weight":"-49"}
 File a Grievance {"url":"node\/add\/grievance","lang":"und","weight":"-50"}
 My Grievances {"url":"grievances","lang":"und","weight":"-49"}
 -All Grievances {"url":"grievances\/all","lang":"und","weight":"-50"}
