@@ -119,6 +119,13 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance bundle'),
 	);
 
+	$node_tabs['grievance']['grievance_merge'] = array(
+		'title' => 'Merge',
+		'description' => '',
+		'callback' => 'grievance_node_tab_merge',
+		'permissions' => array('grievance admin'),
+	);
+
 	$node_tabs['grievance_shop']['contacts'] = array(
 		'title' => 'Contacts',
 		'description' => '',

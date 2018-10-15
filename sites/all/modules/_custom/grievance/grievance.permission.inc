@@ -20,7 +20,7 @@ function grievance_permission() {
     ),
     'grievance edit' => array(
         'title' => t('Grievance Edit'),
-        'description' => t('Permission to edit any grievane on the system.')
+        'description' => t('Permission to edit any grievance on the system.')
     ),
     'grievance attachment' => array(
     	'title' => t('Grievance Attachments'),

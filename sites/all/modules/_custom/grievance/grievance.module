@@ -48,6 +48,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.assig
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.phaxio.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.classification.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.shops.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.merge.inc";
 
 /**
  * Implement hook_cron() 

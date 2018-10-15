@@ -114,5 +114,13 @@ function grievance_admin_log_types() {
     '#default_value' => variable_get('grievance_log_suspension_type', ''),
   );
 
+  $form['grievance_log_merge_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Merge Type'),
+    '#default_value' => variable_get('grievance_log_merge_type', ''),
+    '#description' => t('Log type to be used when a grievance is merged into another grievance.'),
+  );
+
   return system_settings_form($form);
 }
