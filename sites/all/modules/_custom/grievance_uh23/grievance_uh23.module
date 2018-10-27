@@ -21,7 +21,7 @@ function grievance_uh23_permission() {
 function grievance_uh23_menu() {
   $items = array();
 
-  $items['grievance/report/uh23-report-summary'] = array(
+  $items['grievance/report/custom/uh23-report-summary'] = array(
     'title' => 'Report: Summary',
     'description' => '',
     'page callback' => 'grievance_uh23_report_summary',
