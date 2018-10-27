@@ -492,7 +492,8 @@ function menu_import_save_menu($menu, $options) {
 
       // Ensure we link to at least front page.
       if (empty($menuitem['link_path'])) {
-        $menuitem['link_path'] = '<front>';
+        // SKN I don't actually want to import items with no link
+        // $menuitem['link_path'] = '<front>';
       }
 
       // Save description if available.
