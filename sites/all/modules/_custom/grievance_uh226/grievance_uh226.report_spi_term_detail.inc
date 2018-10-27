@@ -12,6 +12,7 @@ function grievance_uh226_report_spi_term_detail_form($form, &$form_state) {
     '#type' => 'date_popup',
     '#title' => 'Start Date',
     '#date_format' => 'm/d/Y',
+    '#description' => t('Leave blank for all dates.'),
   );
 
   $form['to_date'] = array(
