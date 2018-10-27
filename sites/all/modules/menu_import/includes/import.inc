@@ -446,6 +446,9 @@ function menu_import_save_menu($menu, $options) {
       // Internal link to not-a-content (settings, custom module path etc).
       elseif ($menuitem['link_path'] && empty($menuitem['node_view'])) {
         $unknown_links_cnt++;
+        // SKN I don't actually want to import items with no link
+        print "Item does not exist: " . $menuitem['link_path'] . " -- skipping.\n";
+        continue;
       }
       // Handle links to nodes or missing links.
       else {
@@ -492,8 +495,8 @@ function menu_import_save_menu($menu, $options) {
 
       // Ensure we link to at least front page.
       if (empty($menuitem['link_path'])) {
-        // SKN I don't actually want to import items with no link
         // $menuitem['link_path'] = '<front>';
+        // SKN I don't actually want to import items with no link
         print "Item does not exist: " . $menuitem['link_path'] . " -- skipping.\n";
         continue;
       }
