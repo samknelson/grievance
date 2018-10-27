@@ -494,6 +494,8 @@ function menu_import_save_menu($menu, $options) {
       if (empty($menuitem['link_path'])) {
         // SKN I don't actually want to import items with no link
         // $menuitem['link_path'] = '<front>';
+        print "Item does not exist: " . $menuitem['link_path'] . " -- skipping.\n";
+        continue;
       }
 
       // Save description if available.
