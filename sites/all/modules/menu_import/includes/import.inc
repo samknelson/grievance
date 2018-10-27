@@ -485,7 +485,10 @@ function menu_import_save_menu($menu, $options) {
           // Recreate menu item.
           else {
             $unknown_links_cnt++;
-            $menuitem['link_path'] = '<front>';
+            // $menuitem['link_path'] = '<front>';
+            // SKN I don't actually want to import items with no link
+            // print "Item does not exist: " . $menuitem['link_path'] . " -- skipping.\n";
+            continue;
           }
         }
       }

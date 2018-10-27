@@ -597,9 +597,21 @@ function grievance_menu() {
 		'type' => MENU_CALLBACK,
 	);
 
+	// Custom search home -- should be denied to all
+
+	$items['grievance/report/custom'] = array(
+		'page callback' => 'grievance_menu_deny',
+		'page arguments' => array(),
+		'access callback' => 'grievance_menu_deny_access',
+		'access arguments' => array(),
+		'type' => MENU_CALLBACK,
+	);
 
   return $items;
 }
+
+function grievance_menu_deny() { return 'Access denied.'; }
+function grievance_menu_deny_access() { return FALSE; }
 
 function grievance_node_tab_content($node, $in_tab_name) {
 	$node_tabs = grievance_node_tabs();

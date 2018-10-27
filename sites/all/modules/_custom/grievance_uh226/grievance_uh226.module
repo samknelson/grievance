@@ -51,7 +51,7 @@ function grievance_uh226_node_view($node, $view_mode, $langcode) {
 function grievance_uh226_menu() {
   $items = array();
 
-  $items['grievance/report/uh226-report-summary'] = array(
+  $items['grievance/report/custom/uh226-report-summary'] = array(
     'title' => 'Weekly Summary Report',
     'description' => '',
     'page callback' => 'grievance_uh226_report_summary',
@@ -60,7 +60,7 @@ function grievance_uh226_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['grievance/report/uh226/spi-term-summary'] = array(
+  $items['grievance/report/custom/uh226-spi-term-summary'] = array(
     'title' => 'Report: SPI and Term Summary',
     'description' => '',
     'page callback' => 'grievance_uh226_report_spi_term_summary',
@@ -69,7 +69,7 @@ function grievance_uh226_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['grievance/report/uh226/spi-term-detail'] = array(
+  $items['grievance/report/custom/uh226-spi-term-detail'] = array(
     'title' => 'Report: SPI and Term Detail',
     'description' => '',
     'page callback' => 'grievance_uh226_report_spi_term_detail',
@@ -78,7 +78,7 @@ function grievance_uh226_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['grievance/report/uh226/violation'] = array(
+  $items['grievance/report/custom/uh226-violation'] = array(
     'title' => 'Report: Violation',
     'description' => '',
     'page callback' => 'grievance_uh226_report_violation',
