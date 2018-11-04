@@ -1,0 +1,43 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_document_retention/sirius_document_retention.permission.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_document_retention/sirius_document_retention.menu.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_document_retention/sirius_document_retention.policy.inc";
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_document_retention/sirius_document_retention.page_landing.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_document_retention/sirius_document_retention.page_configure.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_document_retention/sirius_document_retention.page_execute.inc";
+
+/**
+ * Implement hook_cron() 
+ */
+
+function sirius_document_retention_cron() {
+}
+
+/**
+ * Just a utility function for storing a TEMPORARY log array in a static variable.
+ *
+ * This is NOT a wrapper for watchdog, just a tool to accumulate log information about a particular transaction.
+ */
+
+function sirius_document_retention_log($msg = NULL, $type = 'info') {
+  static $log = array();
+  if ($type == 'reset') { $log = array(); }
+  if (!$msg) { return $log; }
+  $log[] = array('ts' => time(), 'msg' => $msg, 'type' => $type);
+}
+
+function sirius_document_retention_log_render() {
+  $log = sirius_document_retention_log();
+  $result = '';
+  foreach ($log as $log_entry) {
+    if (!$log_entry['type']) { $log_entry['type'] = 'status'; }
+    $result .= date('Y-m-d H:i:s', $log_entry['ts']) . ': ' . $log_entry['type'] . ': ' . $log_entry['msg'] . "\n";
+  }
+
+  return $result;
+}

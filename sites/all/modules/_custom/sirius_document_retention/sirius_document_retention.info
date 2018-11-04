@@ -1,0 +1,4 @@
+name = Sirius Document Retention
+description = Implements document retention schemes
+package = sirius
+core = 7.x
