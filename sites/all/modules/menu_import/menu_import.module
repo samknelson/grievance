@@ -1,4 +1,10 @@
 <?php
+
+// SKN I've hacked this module slightly
+function menu_import_update_projects_alter(&$projects){
+  unset($projects['menu_import']);
+}
+
 /**
  * @file
  * Module's main file, general definitions and hooks.
