@@ -3866,3 +3866,29 @@ fieldset.date-combo .container-inline-date .date-padding {
 .view-grievance-log-status .views-widget-filter-created .views-widget input {
   width: 150px;
 }
+
+
+
+
+div.sirius_help {
+  background: url(images/help.png) no-repeat 8px 5px #f0f8ff;
+  border: 0;
+  margin: 10px 10px 0;
+  padding: 0;
+  border-radius: 2px;
+}
+
+
+div.sirius_help .inner {
+  margin: 0;
+  padding: 7px 0 10px 40px;
+}
+
+div.sirius_help .inner p {
+  margin-top: 0;
+}
+
+div.node-sirius-dispatch.node-teaser {
+  padding: 10px;
+  margin: 10px;
+}
