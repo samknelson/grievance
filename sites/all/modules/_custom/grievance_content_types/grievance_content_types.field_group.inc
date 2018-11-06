@@ -174,7 +174,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_arbitration|node|grievance|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_arbitration|node|grievance|form';
   $field_group->group_name = 'group_grievance_arbitration';
@@ -800,27 +800,27 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Default Union Reps',
+    'label' => 'Default Union Grievance Reps',
     'weight' => '8',
     'children' => array(
-      0 => 'field_grievance_rep_assignee',
-      1 => 'field_grievance_rep_filed',
-      2 => 'field_grievance_rep_lead',
-      3 => 'field_grievance_rep_manager',
-      4 => 'field_grievance_rep_organizer',
-      5 => 'field_grievance_rep_watching',
-      6 => 'field_grievance_assignee_notes',
+      0 => 'field_grievance_assignee_notes',
+      1 => 'field_grievance_rep_assignee',
+      2 => 'field_grievance_rep_filed',
+      3 => 'field_grievance_rep_lead',
+      4 => 'field_grievance_rep_manager',
+      5 => 'field_grievance_rep_organizer',
+      6 => 'field_grievance_rep_watching',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
-      'label' => 'Default Union Reps',
+      'label' => 'Default Union Grievance Reps',
       'instance_settings' => array(
         'required_fields' => 1,
         'id' => '',
         'classes' => 'group-grievance-default-ureps field-group-fieldset',
         'description' => '',
       ),
-      'formatter' => 'open',
+      'formatter' => 'collapsed',
     ),
   );
   $field_groups['group_grievance_default_ureps|node|grievance_shop|form'] = $field_group;
@@ -1218,7 +1218,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_inforeq|node|grievance|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_notifications|node|grievance_shop|default';
   $field_group->group_name = 'group_grievance_notifications';
@@ -1784,7 +1784,7 @@ function grievance_content_types_field_group_info() {
   t('Company Rep');
   t('Company Representative');
   t('Company Representatives');
-  t('Default Union Reps');
+  t('Default Union Grievance Reps');
   t('Email and Phone');
   t('Employee');
   t('Employee Contact');
