@@ -6329,7 +6329,7 @@ Section',
 
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Grievance Employers';
+  $handler->display->display_options['title'] = 'Employers';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'grievance contact';
@@ -6692,7 +6692,7 @@ Section',
   $handler->display->display_options['path'] = 'grievance/admin/shops';
   $translatables['grievance_shops'] = array(
     t('Master'),
-    t('Grievance Employers'),
+    t('Employers'),
     t('more'),
     t('Apply'),
     t('Reset'),
