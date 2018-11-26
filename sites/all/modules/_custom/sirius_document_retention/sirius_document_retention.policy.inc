@@ -49,10 +49,14 @@ function grievance_document_retention_policy_delete_after_close($key, $mode) {
 	if ($days < 30) {
 		sirius_document_retention_log("$key - Variable [$key-days] is $days. Please set this variable to a value larger than 30.", 'error');
 	}
-	$date = date('Y-m-d 00:00:00', strtotime("-$days"));
+	$ts = strtotime(-1 * $days . " days");
+	$date = date('Y-m-d 00:00:00', $ts);
 	sirius_document_retention_log("$key - Searching for grievances closed at least $days ago (prior to $date).");
 
+	//
   // Get the list of closed statuses
+  //
+
   $status_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_status');
   $status_terms = array();
   $tmp = taxonomy_get_tree($status_vocabulary->vid);
@@ -66,53 +70,56 @@ function grievance_document_retention_policy_delete_after_close($key, $mode) {
     }
   }
 
-  // Get the list of log entries closing a grievance prior to $date
+  //
+  // Get the list of closed grievances that were created prior to the given date
+  //
+
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance_status_date', 'value', $date, '<');
+  $query->entityCondition('bundle', 'grievance');
+  $query->propertyCondition('created', $ts, '<');
   $query->fieldCondition('field_grievance_status', 'tid', $closed_status_tids, 'in');
-  $query->fieldOrderBy('field_grievance_status_date', 'value');
-  $query->range(0, 25);
+  $query->propertyOrderBy('nid');
   $stmt = $query->execute();
   if (!$stmt['node']) {
-		sirius_document_retention_log("$key - No log entries found.");
+		sirius_document_retention_log("$key - No grievances found.");
 		return;
   }
-  $log_nids = array_keys($stmt['node']);
+  $grievance_nids = array_keys($stmt['node']);
 
-  // Walk the log entries, looking for grievances that they reference
-  $grievance_nids = array();
-  foreach ($log_nids as $log_nid) {
-		sirius_document_retention_log("$key - Looking at log entry $log_nid.");
-		$log_node = node_load($log_nid);
-		if (!$log_node) {
-			sirius_document_retention_log("$key - Log entry $log_nid not found. Skipping.", 'warning');
-			continue;
-		}
-		$grievance_nid = $log_node->field_grievance['und'][0]['target_id'];
-		$grievance_nids[$grievance_nid] = TRUE;
-  }
+  //
+  // Walk the grievances, deleting if appropriate
+  //
 
-  // Walk the grievances, deleting
   $purged_count = 0;
-  foreach ($grievance_nids as $grievance_nid => $ignore) {
-		sirius_document_retention_log("$key - Looking at grievance $grievance_nid.");
-		$grievance_node = node_load($grievance_nid);
-		if (!$log_node) {
-			sirius_document_retention_log("$key - Log entry $log_nid not found. Skipping.", 'warning');
-			continue;
-		}
-		$status_tid = $grievance_node->field_grievance_status['und'][0]['tid'];
-		if (!in_array($status_tid, $closed_status_tids)) {
-			sirius_document_retention_log("$key - Grievance #$grievance_nid has a non-closed status. Skipping.", 'warning');
+  foreach ($grievance_nids as $grievance_nid) {
+		sirius_document_retention_log("$key - Grievance $grievance_nid - Scanning.");
+
+		// Find out if there are any log entries after $date
+		$sql = "select node.nid, count(*) as c ";
+		$sql .= "from node, field_data_field_grievance ";
+		$sql .= "where node.nid = field_data_field_grievance.entity_id ";
+		$sql .= "and field_data_field_grievance.entity_type = 'node' ";
+		$sql .= "and field_data_field_grievance.field_grievance_target_id = :grievance_nid ";
+		$sql .= "and node.created > :ts ";
+		$stmt = db_query($sql, array('grievance_nid' => $grievance_nid, ':ts' => $ts));
+		$hr = $stmt->fetchAssoc();
+		if ($hr['c']) {
+			sirius_document_retention_log("$key - Grievance $grievance_nid - Has a more recent log entry (" . $hr['nid'] . "). Skipping.");
 			continue;
 		}
 
+		sirius_document_retention_log("$key - Grievance $grievance_nid - Preparing to delete.");
 		if ($mode == 'live') {
-			node_delete($grievance_nid);
-		}
+			// node_delete($grievance_nid);
+			sirius_document_retention_log("$key - Grievance $grievance_nid - Deleted.");
+		} 
+
 		++$purged_count;
+		if ($purged_count > 25) { 
+			sirius_document_retention_log("$key - Can only deleted 25 grievances at a time. Terminating this run.");
+			break;
+		}
   }
 
 	sirius_document_retention_log("$key - Purged $purged_count records. (Mode=$mode)");
