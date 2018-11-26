@@ -42,13 +42,7 @@ function sirius_document_retention_page_execute_form($form, &$form_state, $key) 
 
 function sirius_document_retention_page_execute_form_submit($form, &$form_state) {
 	$key = $form_state['values']['key'];
-	$policy = sirius_document_retention_policy_info($key);
 	$mode = $form_state['values']['mode'];
-	
-	sirius_document_retention_log(NULL, 'reset');
-	sirius_document_retention_log('Starting: ' . $key . ' (MODE: ' . $mode . ')');
-	$status = $policy['purge_callback']($key, $mode);
-	sirius_document_retention_log('Finishing: ' . $key);
-
+	sirius_document_retention_policy_execute($key, $mode);
 	drupal_set_message('<strong>Results</strong><pre>' . sirius_document_retention_log_render() . '</pre>');
 }

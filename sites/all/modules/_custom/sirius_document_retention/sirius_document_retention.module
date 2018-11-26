@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * Code for the sirius_document_retention feature.
+ */
+
+include_once 'sirius_document_retention.features.inc';
 
 // I hate notice errors
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
