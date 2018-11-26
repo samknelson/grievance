@@ -233,8 +233,8 @@ function grievance_update_7012() {
 
 function grievance_update_7013() {
   // Enable document retention
-  print "Enabling Docuemnt Retention\n";
-  module_enable(array('sirius_docuement_retention'), TRUE);
+  print "Enabling Document Retention\n";
+  module_enable(array('sirius_document_retention'), TRUE);
 
   // Grant "" for anybody with 
   print "Granting new permission [sirius document retention admin] to anybody with permission [grievance view] ...\n";
