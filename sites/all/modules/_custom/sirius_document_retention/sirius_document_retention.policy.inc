@@ -230,7 +230,7 @@ function grievance_document_retention_policy_delete_after_close($key, $mode) {
 
 		sirius_document_retention_log("$key - Grievance " . l($grievance_nid, "node/$grievance_nid") . " Preparing to delete.");
 		if ($mode == 'live') {
-			// node_delete($grievance_nid);
+			node_delete($grievance_nid);
 			sirius_document_retention_log("$key - Grievance " . l($grievance_nid, "node/$grievance_nid") . " Deleted.");
 		} 
 
