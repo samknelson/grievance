@@ -48,6 +48,9 @@ Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
 -Special Log Types {"url":"admin\/config\/grievance\/log_types","lang":"und","weight":"-37"}
 -Special Contact Types {"url":"admin\/config\/grievance\/contacts","lang":"und","weight":"-38"}
 -Statuses {"url":"grievance\/admin\/statuses","lang":"und","weight":"-49"}
+-Document Retention {"url":"sirius\/document-retention","lang":"und","weight":"0"}
+--Configure {"url":"sirius\/document-retention\/configure","lang":"und","weight":"0"}
+--Log {"url":"sirius\/document-retention\/log","lang":"und","weight":"0"}
 File a Grievance {"url":"node\/add\/grievance","lang":"und","weight":"-50"}
 My Grievances {"url":"grievances","lang":"und","weight":"-49"}
 -All Grievances {"url":"grievances\/all","lang":"und","weight":"-50"}
