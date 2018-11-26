@@ -232,7 +232,15 @@ function grievance_update_7012() {
 }
 
 function grievance_update_7013() {
-  // Enable FPA
+  // Enable document retention
   print "Enabling Docuemnt Retention\n";
   module_enable(array('sirius_docuement_retention'), TRUE);
+
+  // Grant "" for anybody with 
+  print "Granting new permission [sirius document retention admin] to anybody with permission [grievance view] ...\n";
+  $roles = user_roles(FALSE, 'grievance admin');
+  foreach ($roles as $rid => $name) {
+    print "... granting [sirius document retention admin] to [$name]\n";
+    user_role_grant_permissions($rid, array('sirius document retention admin'));
+  }
 }
