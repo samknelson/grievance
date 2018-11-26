@@ -122,5 +122,13 @@ function grievance_admin_log_types() {
     '#description' => t('Log type to be used when a grievance is merged into another grievance.'),
   );
 
+  $form['grievance_log_timelines_extended_type'] = array(
+    '#type' => 'select',
+    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_log_type')),
+    '#title' => t('Timelines Extended Type'),
+    '#default_value' => variable_get('grievance_log_timelines_extended_type', ''),
+    '#description' => t('Log type to be used when a when timelines are extended by mutual agreement.'),
+  );
+
   return system_settings_form($form);
 }

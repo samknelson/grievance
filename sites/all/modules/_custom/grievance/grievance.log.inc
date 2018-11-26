@@ -598,6 +598,18 @@ function grievance_log_node_form_alter(&$form, &$form_state, $form_id) {
 
   // Restrict dropdown options for log type
   $form['field_grievance_log_type']['und']['#options'] = grievance_log_types_i_can_edit();
+
+  // Make the "days" field conditional
+  $timelines_extended_tid = variable_get('grievance_log_timelines_extended_type', '');
+  if (!$timelines_extended_tid) {
+    $form['field_grievance_days']['#access'] = FALSE;
+  } else {
+    $form['field_grievance_days']['#states'] = array(
+      'visible' => array(
+        ':input[name="field_grievance_log_type[und]"]' => array('value' => $timelines_extended_tid),
+      ),
+    );
+  }
 }
 
 function grievance_log_intake_admin() {

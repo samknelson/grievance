@@ -261,7 +261,8 @@ function grievance_contract_compute_timeline($grievance_node) {
     variable_get('grievance_log_insert_type', ''), 
     variable_get('grievance_log_update_type_with_status_change', ''), 
     variable_get('grievance_log_update_type_without_status_change', ''), 
-    variable_get('grievance_log_incident_type', '')
+    variable_get('grievance_log_incident_type', ''),
+    variable_get('grievance_log_timelines_extended_type', ''),
   );
   $log_nodes = grievance_log_list($grievance_node, $log_update_tids);
 
@@ -334,6 +335,27 @@ function grievance_contract_compute_timeline($grievance_node) {
         $timeline[$rule_nid]['entries'][$current_delta]['left_on'] = $status_ts;
         $timeline[$rule_nid]['entries'][$current_delta]['left_because'] = $status_tid;
         $timeline[$rule_nid]['current_delta'] = -1;
+      }
+    }
+  }
+
+  // Walk the log again and extend any timelines
+  foreach ($log_nodes as $log_node) {
+    if ($log_node->field_grievance_log_type['und'][0]['tid'] != variable_get('grievance_log_timelines_extended_type', '')) { continue; }
+    $days = $log_node->field_grievance_days['und'][0]['value'];
+    $status_ts = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
+    foreach ($rule_nodes as $rule_node) {
+      $rule_nid = $rule_node->nid;
+      if (isset($timeline[$rule_nid]['entries'])) {
+        foreach ($timeline[$rule_nid]['entries'] as $delta => $entry) {
+          // Only applies to timeline entries that were active when the log entry was made.
+          if ($entry['entered_on'] > $status_ts) { continue; }
+          if ($entry['deadline'] < $status_ts) { continue; }
+
+          // Extend the deadline by $days
+          // $entry['deadline'] = strtotime("+$days days", $entry['deadline']);
+          $timeline[$rule_nid]['entries'][$delta]['deadline'] = strtotime("+$days days", $entry['deadline']);
+        }
       }
     }
   }
