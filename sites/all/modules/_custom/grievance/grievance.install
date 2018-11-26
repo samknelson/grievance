@@ -230,3 +230,9 @@ function grievance_update_7012() {
   print "Enabling SaveGuard\n";
   module_enable(array('saveguard'), TRUE);
 }
+
+function grievance_update_7013() {
+  // Enable FPA
+  print "Enabling Docuemnt Retention\n";
+  module_enable(array('sirius_docuement_retention'), TRUE);
+}
