@@ -19,16 +19,20 @@ function s3fs_settings() {
     'us-west-1' => t('US West - Northern California  (us-west-1)'),
     'us-west-2' => t('US West - Oregon (us-west-2)'),
     'us-gov-west-1' => t('USA GovCloud Standard (us-gov-west-1)'),
+    'ca-central-1' => t('Canada - Central (ca-central-1)'),
     'eu-west-1' => t('EU - Ireland  (eu-west-1)'),
     'eu-west-2' => t('EU - London (eu-west-2)'),
+    'eu-west-3' => t('EU - Paris (eu-west-3)'),
     'eu-central-1' => t('EU - Frankfurt (eu-central-1)'),
     'ap-southeast-1' => t('Asia Pacific - Singapore (ap-southeast-1)'),
     'ap-southeast-2' => t('Asia Pacific - Sydney (ap-southeast-2)'),
     'ap-northeast-1' => t('Asia Pacific - Tokyo (ap-northeast-1)'),
     'ap-northeast-2' => t('Asia Pacific - Seoul (ap-northeast-2)'),
+    'ap-northeast-3' => t('Asia Pacific - Osaka-Local (ap-northeast-3)'),
     'ap-south-1' => t('Asia Pacific - Mumbai (ap-south-1)'),
     'sa-east-1' => t('South America - Sao Paulo (sa-east-1)'),
     'cn-north-1' => t('China - Beijing (cn-north-1)'),
+    'cn-northwest-1' => t('China - Ningxia (cn-northwest-1)'),
   );
 
   /////////////////////////////////////
@@ -76,7 +80,7 @@ function s3fs_settings() {
     '#type'          => 'textfield',
     '#title'         => t('Default Cache Location'),
     '#default_value' => _s3fs_get_setting('awssdk2_default_cache_config'),
-    '#description'   => t('The default location to which your EC2 Instance Profile Credentials should be cached.
+    '#description'   => t('The default folder in which your EC2 Instance Profile Credentials should be cached.
       This must be a path to a folder in which the webserver can read and write.'),
     '#states'        => array(
       'visible' => array(
@@ -146,6 +150,17 @@ function s3fs_settings() {
         "You will need to configure a DNS CNAME that maps from this domain to your bucket's URL."
       ),
     ),
+    's3fs_domain_s3_private' => array(
+      '#type'          => 'checkbox',
+      '#title'         => t('Remove access to files via S3 URL'),
+      '#default_value' => _s3fs_get_setting('domain_s3_private'),
+      '#description'   => t("If using a domain name to serve files, there is usually no need to provide " .
+        "access to the URLs shown on S3 objects. This can also be a cost concern, since accessing files from S3 " .
+        "is more expensive than edge services such as Cloudfront. Select this checkbox to remove access to files " .
+        "using the S3 URL. Users attempting to reach the S3 URL will receive an \"Access Denied\" message. Note: " .
+        "This option has no impact on previously uploaded files."
+      ),
+    ),
   );
 
   $form['advanced']['s3fs_use_customhost'] = array(
@@ -185,6 +200,16 @@ function s3fs_settings() {
       This may be undersirable for sites which use a CDN, so this checkbox was added to make S3FS upload
       the derivative to the client, instead. Doing so is less performant, but it allows the CDN to cache
       the file itself, instead of caching the redirect.'
+    ),
+  );
+
+  $form['advanced']['s3fs_use_versioning'] = array(
+    '#type'             => 'checkbox',
+    '#title'            =>  t('Use Bucket Versioning'),
+    '#default_value'    => _s3fs_get_setting('use_versioning'),
+    '#description'      => t(
+        'If your Bucket has Versioning enabled and you would like to store the version metadata
+        in the s3fs_file table'
     ),
   );
 
