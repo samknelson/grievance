@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * grievance_settings.strongarm.inc
@@ -68,8 +69,7 @@ admin/modules*',
         ),
       ),
       'pages-and-selector' => array(
-        'include-pages' => 'grievances/all
-grievance/report/uh226-report-summary
+        'include-pages' => 'grievance/report/uh226-report-summary
 grievance/report/settlement',
         'exclude-pages' => 'admin/reports/status
 admin/modules*',

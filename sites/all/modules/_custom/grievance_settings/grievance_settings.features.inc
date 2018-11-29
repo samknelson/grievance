@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * grievance_settings.features.inc
