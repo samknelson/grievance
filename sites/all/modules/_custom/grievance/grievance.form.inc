@@ -162,7 +162,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $hidefields = preg_split('/\s+/', $category_term->field_grievance_hidefields['und'][0]['value']);
     foreach ($hidefields as $hidefield) {
       if (preg_match('/^field_/', $hidefield) && $form[$hidefield]) {
-        drupal_set_message("Hiding $hidefield");
         $form[$hidefield]['#access'] = FALSE;
       }
     }
