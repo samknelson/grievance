@@ -159,6 +159,15 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $category_tid = grievance_form_current_value('field_grievance_category', 'tid', $form, $form_state);
   if ($category_tid) {
     $category_term = taxonomy_term_load($category_tid);
+    $hidefields = preg_split('/\s+/', $category_term->field_grievance_hidefields['und'][0]['value']);
+    foreach ($hidefields as $hidefield) {
+      if (preg_match('/^field_/', $hidefield) && $form[$hidefield]) {
+        drupal_set_message("Hiding $hidefield");
+        $form[$hidefield]['#access'] = FALSE;
+      }
+    }
+
+    /*
     if ($category_term){
       if ($category_term->name == 'Contract') {
         $form['field_grievance_remedy']['#access'] = FALSE;
@@ -169,6 +178,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
         // $form['field_grievance_type_other']['#access'] = FALSE;
       }
     }
+    */
   }
 
   //
