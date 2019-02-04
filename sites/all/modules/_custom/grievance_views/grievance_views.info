@@ -49,6 +49,7 @@ features[views_view][] = grievances_without_brought_by
 features[views_view][] = grievances_without_category
 features[views_view][] = grievances_without_member_id
 features[views_view][] = grievances_without_status
+features[views_view][] = sirius_grievance_quick_export
 features_exclude[dependencies][ctools] = ctools
 features_exclude[dependencies][views] = views
 project path = sites/all/modules/_custom
