@@ -4631,6 +4631,30 @@ Section',
     8 => 0,
     9 => 0,
   );
+  /* Filter criterion: Content: Grievance Log Type (field_grievance_log_type) */
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['id'] = 'field_grievance_log_type_tid';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['table'] = 'field_data_field_grievance_log_type';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['field'] = 'field_grievance_log_type_tid';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['operator_id'] = 'field_grievance_log_type_tid_op';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['label'] = 'Grievance Log Type';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['description'] = 'multiple select';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['operator'] = 'field_grievance_log_type_tid_op';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['identifier'] = 'field_grievance_log_type_tid';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['multiple'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+    5 => 0,
+    6 => 0,
+    7 => 0,
+    4 => 0,
+    8 => 0,
+    9 => 0,
+  );
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['vocabulary'] = 'grievance_log_types';
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -4686,6 +4710,8 @@ Section',
     t('Where the intake date is between:'),
     t('Where the log date is between:'),
     t('Show only open grievances?'),
+    t('Grievance Log Type'),
+    t('multiple select'),
     t('Page'),
     t('Data export'),
   );
@@ -7781,6 +7807,10 @@ Grievance Form',
   $handler->display->display_options['header']['area']['content'] = 'The list below shows all grievances on the system.  Use the form to filer by grievant name, status, etc.';
   $handler->display->display_options['header']['area']['format'] = 'full_html';
   $handler->display->display_options['defaults']['footer'] = FALSE;
+  /* Footer: Global: Result summary */
+  $handler->display->display_options['footer']['result']['id'] = 'result';
+  $handler->display->display_options['footer']['result']['table'] = 'views';
+  $handler->display->display_options['footer']['result']['field'] = 'result';
   $handler->display->display_options['defaults']['empty'] = FALSE;
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
@@ -8266,6 +8296,7 @@ Grievance Form',
     t('Show Unresolved Grievances?'),
     t('All Grievances'),
     t('The list below shows all grievances on the system.  Use the form to filer by grievant name, status, etc.'),
+    t('Displaying @start - @end of @total'),
     t('No grievances match your search criteria.'),
     t('Grievance Specialist'),
     t('Remedy'),
@@ -8958,7 +8989,9 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
-  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value']['value'] = '999';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value'] = array(
+    'value' => '999',
+  );
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['group'] = 2;
   $handler->display->display_options['path'] = 'ignore/grievances-mine/page';
   $handler->display->display_options['menu']['title'] = 'My Unresolved Grievances';
@@ -9173,7 +9206,9 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
-  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value']['value'] = '999';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value'] = array(
+    'value' => '999',
+  );
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['group'] = 2;
   $handler->display->display_options['path'] = 'ignore/grievances-mine/page-2';
   $handler->display->display_options['menu']['title'] = 'My Unresolved Grievances';
@@ -9593,7 +9628,9 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
-  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value']['value'] = '999';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value'] = array(
+    'value' => '999',
+  );
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['group'] = 2;
   /* Filter criterion: Content: Next Deadline Date (field_grievance_alert_date) */
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['id'] = 'field_grievance_alert_date_value';
@@ -15432,6 +15469,10 @@ Grievance Form',
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '100';
   $handler->display->display_options['style_plugin'] = 'table';
+  /* Footer: Global: Result summary */
+  $handler->display->display_options['footer']['result']['id'] = 'result';
+  $handler->display->display_options['footer']['result']['table'] = 'views';
+  $handler->display->display_options['footer']['result']['field'] = 'result';
   /* Relationship: Entity Reference: Referenced Entity */
   $handler->display->display_options['relationships']['field_grievance_shops_target_id']['id'] = 'field_grievance_shops_target_id';
   $handler->display->display_options['relationships']['field_grievance_shops_target_id']['table'] = 'field_data_field_grievance_shops';
@@ -15538,7 +15579,6 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
-  $handler->display->display_options['filters']['field_grievance_shop_target_id']['operator'] = 'in';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['operator_id'] = 'field_grievance_shop_target_id_op';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['label'] = 'Employer';
@@ -15595,6 +15635,7 @@ Grievance Form',
     t('‹ previous'),
     t('next ›'),
     t('last »'),
+    t('Displaying @start - @end of @total'),
     t('Content entity referenced from field_grievance_shops'),
     t('Employer'),
     t('ID'),
