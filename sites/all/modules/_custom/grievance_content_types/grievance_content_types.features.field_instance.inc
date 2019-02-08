@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * grievance_content_types.features.field_instance.inc
@@ -4642,7 +4643,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_rep_filed',
-    'label' => 'Grievance Intake Staff',
+    'label' => 'Intake Person',
     'required' => 0,
     'settings' => array(
       'field_lock_multi_values' => array(
@@ -4944,7 +4945,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_rep_organizer',
-    'label' => 'Grievance Specialist',
+    'label' => 'Organizer',
     'required' => 0,
     'settings' => array(
       'field_lock_multi_values' => array(
@@ -10026,7 +10027,7 @@ function grievance_content_types_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -10265,6 +10266,54 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-grievance_log-field_grievance_days'.
+  $field_instances['node-grievance_log-field_grievance_days'] = array(
+    'bundle' => 'grievance_log',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Number of days to extend the timelines',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 26,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_days',
+    'label' => 'Number of Days',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 3,
+    ),
+  );
+
   // Exported field_instance: 'node-grievance_log-field_grievance_external_id'.
   $field_instances['node-grievance_log-field_grievance_external_id'] = array(
     'bundle' => 'grievance_log',
@@ -10301,7 +10350,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 13,
+      'weight' => 12,
     ),
   );
 
@@ -10350,7 +10399,7 @@ function grievance_content_types_field_default_field_instances() {
         'checkall' => FALSE,
       ),
       'type' => 'options_buttons',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -10441,7 +10490,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -10498,7 +10547,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -12553,6 +12602,44 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_category-field_grievance_hidefields'.
+  $field_instances['taxonomy_term-grievance_category-field_grievance_hidefields'] = array(
+    'bundle' => 'grievance_category',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'For grievances with this category, hide the fields listed below. Enter one per line, using the machine name of the field (i.e. field_grievance_remedy)',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_hidefields',
+    'label' => 'Hide Fields',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_contract_clause_tags-field_grievance_external_id'.
   $field_instances['taxonomy_term-grievance_contract_clause_tags-field_grievance_external_id'] = array(
     'bundle' => 'grievance_contract_clause_tags',
@@ -13299,6 +13386,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Filed By');
   t('First Name');
   t('For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action (if unknown, choose "Investigation").');
+  t('For grievances with this category, hide the fields listed below. Enter one per line, using the machine name of the field (i.e. field_grievance_remedy)');
   t('From Status');
   t('Full Text');
   t('Gender');
@@ -13308,10 +13396,9 @@ function grievance_content_types_field_default_field_instances() {
   t('Grievance Complaint');
   t('Grievance Director');
   t('Grievance Document Type');
-  t('Grievance Intake Staff');
   t('Grievance Log Type');
-  t('Grievance Specialist');
   t('Hearing Date');
+  t('Hide Fields');
   t('Holidays');
   t('ID');
   t('If "Yes", then the default will be that any letter sent using this template will also set the grievance\'s "company representative" field to be the main recipient of the letter.  Generally this should be "Yes" for notifications to the company -- grievance filings and so forth -- and "No" for notifications to the grievant or letters that are meant to be sent internally.');
@@ -13321,6 +13408,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Images');
   t('Incident Date');
   t('Information Request?');
+  t('Intake Person');
   t('Is this a "dummy" or "placeholder" section?  This field should be left blank or set to "No" except for automatically-generated placeholder sections created when the article itself is meant to be selectable.');
   t('Is this an "attachment", meaning that it can be used as an attachment type for the grievance?');
   t('Is this status considered "Un-Resolved"?  Only unresolved grievances are displayed on the "my grievances" list.');
@@ -13341,6 +13429,8 @@ function grievance_content_types_field_default_field_instances() {
   t('Notes');
   t('Notification Body');
   t('Notification Subject');
+  t('Number of Days');
+  t('Number of days to extend the timelines');
   t('Office Phone');
   t('Organizer');
   t('Outcome');

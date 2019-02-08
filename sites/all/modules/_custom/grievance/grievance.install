@@ -230,3 +230,17 @@ function grievance_update_7012() {
   print "Enabling SaveGuard\n";
   module_enable(array('saveguard'), TRUE);
 }
+
+function grievance_update_7013() {
+  // Enable document retention
+  print "Enabling Document Retention\n";
+  module_enable(array('sirius_document_retention'), TRUE);
+
+  // Grant "" for anybody with 
+  print "Granting new permission [sirius document retention admin] to anybody with permission [grievance view] ...\n";
+  $roles = user_roles(FALSE, 'grievance admin');
+  foreach ($roles as $rid => $name) {
+    print "... granting [sirius document retention admin] to [$name]\n";
+    user_role_grant_permissions($rid, array('sirius document retention admin'));
+  }
+}

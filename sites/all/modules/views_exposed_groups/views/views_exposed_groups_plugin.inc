@@ -140,5 +140,49 @@ class views_exposed_groups_plugin extends views_plugin_exposed_form_basic {
         '#type' => 'submit',
       );
     }
+    $exposed_sorts = array();
+    foreach ($this->view->sort as $id => $handler) {
+      if ($handler->can_expose() && $handler->is_exposed()) {
+        $exposed_sorts[$id] = check_plain($handler->options['expose']['label']);
+      }
+    }
+    if (count($exposed_sorts)) {
+      $form['sort_by'] = array(
+        '#type' => 'select',
+        '#options' => $exposed_sorts,
+        '#title' => $this->options['exposed_sorts_label'],
+      );
+      $sort_order = array(
+        'ASC' => $this->options['sort_asc_label'],
+        'DESC' => $this->options['sort_desc_label'],
+      );
+      if (isset($form_state['input']['sort_by']) && isset($this->view->sort[$form_state['input']['sort_by']])) {
+        $default_sort_order = $this->view->sort[$form_state['input']['sort_by']]->options['order'];
+      } else {
+        $first_sort = reset($this->view->sort);
+        $default_sort_order = $first_sort->options['order'];
+      }
+      if (!isset($form_state['input']['sort_by'])) {
+        $keys = array_keys($exposed_sorts);
+        $form_state['input']['sort_by'] = array_shift($keys);
+      }
+      if ($this->options['expose_sort_order']) {
+        $form['sort_order'] = array(
+          '#type' => 'select',
+          '#options' => $sort_order,
+          '#title' => t('Order'),
+          '#default_value' => $default_sort_order,
+        );
+      }
+    }
+    $pager = $this->view->display_handler->get_plugin('pager');
+    if ($pager) {
+      $pager->exposed_form_alter($form, $form_state);
+      $form_state['pager_plugin'] = $pager;
+    }
+    $form['submit']['#weight'] = 10;
+    if (isset($form['reset'])) {
+      $form['reset']['#weight'] = 10;
+    }
   } 
 }

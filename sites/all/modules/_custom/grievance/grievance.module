@@ -98,6 +98,10 @@ function grievance_node_insert($node) {
  */
 
 function grievance_node_postsave($node, $op) {
+  //
+  // Handle grievances
+  //
+
   if ($node->type == 'grievance' && 
     ($op == 'insert' || $op == 'update') &&
     !$node->grievance_no_recurse) {
@@ -127,10 +131,7 @@ function grievance_node_postsave($node, $op) {
       }
     }
 
-    //
     // Set the alert TID and date
-    //
-
     if ($node->field_grievance_contract_tplt['und'][0]['target_id']) {
       list($next_alert_tid, $next_alert_ts) = grievance_contract_next_alert($node);
       if ($node->field_grievance_alert_tid['und'][0]['tid'] != $next_alert_tid) {
@@ -157,12 +158,55 @@ function grievance_node_postsave($node, $op) {
       }
     }
 
-    // 
     // Save the node
-    //
-
     if ($need_save) {
       node_save($node);
+    }
+  }
+
+  //
+  // Handle logs
+  // 
+
+  if ($node->type == 'grievance_log' && 
+    ($op == 'insert' || $op == 'update') &&
+    !$node->grievance_no_recurse) {
+
+    // Set the alert TID and date
+    $node->grievance_no_recurse = TRUE;
+    $grievance_nid = $node->field_grievance['und'][0]['target_id'];
+    $grievance_node = node_load($grievance_nid);
+    $grievance_node->grievance_no_recurse = TRUE;
+
+    if ($grievance_node && $grievance_node->field_grievance_contract_tplt['und'][0]['target_id']) {
+      list($next_alert_tid, $next_alert_ts) = grievance_contract_next_alert($grievance_node);
+      if ($grievance_node->field_grievance_alert_tid['und'][0]['tid'] != $next_alert_tid) {
+        if ($next_alert_tid) {
+          $grievance_node->field_grievance_alert_tid['und'][0]['tid'] = $next_alert_tid;
+        } else {
+          unset($grievance_node->field_grievance_alert_tid['und'][0]);
+        }
+        $need_save = TRUE;
+      }
+
+      if (isset($grievance_node->field_grievance_alert_date['und'][0]['value'])) { 
+        $tmp = $grievance_node->field_grievance_alert_date['und'][0]['value'];
+      } else {
+        $tmp = NULL;
+      }
+      if (strtotime($tmp) != $next_alert_ts) {
+        if ($next_alert_ts) {
+          $grievance_node->field_grievance_alert_date['und'][0]['value'] = date('Y-m-d', $next_alert_ts);
+        } else {
+          $grievance_node->field_grievance_alert_date['und'][0]['value'] = NULL;
+        }
+        $need_save = TRUE;
+      }
+    }
+
+    // Save the node
+    if ($need_save) {
+      node_save($grievance_node);
     }
   }
 

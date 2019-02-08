@@ -60,6 +60,13 @@ function role_field_field_is_empty($item, $field) {
   return FALSE;
 }
 
+/**
+ * Implements hook_views_api().
+ */
+function role_field_views_api() {
+  return array('api' => '3.0');
+}
+
 #############
 ## WIDGETS ##
 #############
@@ -134,7 +141,3 @@ function role_field_field_formatter_view($entity_type, $entity, $field, $instanc
   
   return $element;
 }
-
-
-
-

@@ -48,6 +48,9 @@ Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
 -Special Log Types {"url":"admin\/config\/grievance\/log_types","lang":"und","weight":"-37"}
 -Special Contact Types {"url":"admin\/config\/grievance\/contacts","lang":"und","weight":"-38"}
 -Statuses {"url":"grievance\/admin\/statuses","lang":"und","weight":"-49"}
+-Document Retention {"url":"sirius\/document-retention","lang":"und","weight":"0"}
+--Configure {"url":"sirius\/document-retention\/configure","lang":"und","weight":"0"}
+--Log {"url":"sirius\/document-retention\/log","lang":"und","weight":"0"}
 File a Grievance {"url":"node\/add\/grievance","lang":"und","weight":"-50"}
 My Grievances {"url":"grievances","lang":"und","weight":"-49"}
 -All Grievances {"url":"grievances\/all","lang":"und","weight":"-50"}
@@ -78,6 +81,7 @@ Reports {"url":"<front>","lang":"und","weight":"-48"}
 -UH226 SPI Term Detail {"url":"grievance\/report\/custom\/uh226-spi-term-detail","lang":"und","weight":"0"}
 -UH226 Violation {"url":"grievance\/report\/custom\/uh226-violation","lang":"und","weight":"0"}
 -UH23 Summary {"url":"grievance\/report\/custom\/uh23-report-summary","lang":"und","weight":"0"}
+-Quick Export {"url":"grievance\/report\/grievance-quick-export","lang":"und","weight":"0"}
 Help {"url":"grievances\/uh\/help","lang":"und","weight":"50"}
 -Emailing Attachments {"url":"grievances\/uh\/help\/emailing_attachments","lang":"und","weight":"-48"}
 -Logging In and Out {"url":"grievances\/uh\/help\/logging_in_and_out","lang":"und","weight":"-50"}

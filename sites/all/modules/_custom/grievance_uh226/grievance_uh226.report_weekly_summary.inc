@@ -363,8 +363,8 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     $report_row['boa_held'] = $user['boa_held'];
     $report_row['adr_held'] = $user['adr_held'];
     $report_row['fmcs_held'] = $user['fmcs_held'];
-    $report_row['mediation_held'] = $user['mediation_held'];
     $report_row['formal_held'] = $user['formal_held'];
+    $report_row['mediation_held'] = $user['mediation_held'];
     $report_row['exp_arb_held'] = $user['exp_arb_held'];
 
     // Fetch the number of open grievances for each user
@@ -579,7 +579,6 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     'adr_held' => t('ADR'),
     'exp_arb_held' => t('Exp. Arb.'),
     'fmcs_held' => t('FMCS'),
-    'mediation_held' => t('Mediation'),
     'formal_held' => t('Formal Arb'),
     'mediation_held' => t('Mediation'),
     'closed' => t('Closed'),

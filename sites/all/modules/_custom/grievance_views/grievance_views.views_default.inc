@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * grievance_views.views_default.inc
@@ -4630,6 +4631,30 @@ Section',
     8 => 0,
     9 => 0,
   );
+  /* Filter criterion: Content: Grievance Log Type (field_grievance_log_type) */
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['id'] = 'field_grievance_log_type_tid';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['table'] = 'field_data_field_grievance_log_type';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['field'] = 'field_grievance_log_type_tid';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['operator_id'] = 'field_grievance_log_type_tid_op';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['label'] = 'Grievance Log Type';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['description'] = 'multiple select';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['operator'] = 'field_grievance_log_type_tid_op';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['identifier'] = 'field_grievance_log_type_tid';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['multiple'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+    5 => 0,
+    6 => 0,
+    7 => 0,
+    4 => 0,
+    8 => 0,
+    9 => 0,
+  );
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_grievance_log_type_tid']['vocabulary'] = 'grievance_log_types';
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -4685,6 +4710,8 @@ Section',
     t('Where the intake date is between:'),
     t('Where the log date is between:'),
     t('Show only open grievances?'),
+    t('Grievance Log Type'),
+    t('multiple select'),
     t('Page'),
     t('Data export'),
   );
@@ -5087,6 +5114,10 @@ Section',
   );
   $handler->display->display_options['fields']['field_grievance_clauseref']['delta_offset'] = '0';
   $handler->display->display_options['fields']['field_grievance_clauseref']['separator'] = '<br>';
+  /* Field: Content: Edit link */
+  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
   /* Sort criterion: User: Name */
   $handler->display->display_options['sorts']['name']['id'] = 'name';
   $handler->display->display_options['sorts']['name']['table'] = 'users';
@@ -5147,6 +5178,91 @@ Section',
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['path'] = 'grievance/report/open/ignore';
+
+  /* Display: Data export */
+  $handler = $view->new_display('views_data_export', 'Data export', 'views_data_export_1');
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
+  $handler->display->display_options['style_options']['provide_file'] = 1;
+  $handler->display->display_options['style_options']['parent_sort'] = 0;
+  $handler->display->display_options['style_options']['quote'] = 1;
+  $handler->display->display_options['style_options']['trim'] = 0;
+  $handler->display->display_options['style_options']['replace_newlines'] = 0;
+  $handler->display->display_options['style_options']['newline_token'] = '1';
+  $handler->display->display_options['style_options']['header'] = 1;
+  $handler->display->display_options['style_options']['keep_html'] = 0;
+  $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'node';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
+  /* Field: Field: Organizer */
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['id'] = 'field_grievance_rep_organizer';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['table'] = 'field_data_field_grievance_rep_organizer';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['field'] = 'field_grievance_rep_organizer';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['label'] = '';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['empty'] = '[No Specialist Assigned]';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['settings'] = array(
+    'link' => 0,
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['delta_limit'] = 'all';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['delta_offset'] = '0';
+  /* Field: Content: Employer */
+  $handler->display->display_options['fields']['field_grievance_shop']['id'] = 'field_grievance_shop';
+  $handler->display->display_options['fields']['field_grievance_shop']['table'] = 'field_data_field_grievance_shop';
+  $handler->display->display_options['fields']['field_grievance_shop']['field'] = 'field_grievance_shop';
+  $handler->display->display_options['fields']['field_grievance_shop']['settings'] = array(
+    'link' => 0,
+  );
+  /* Field: Content: ID */
+  $handler->display->display_options['fields']['field_grievance_id']['id'] = 'field_grievance_id';
+  $handler->display->display_options['fields']['field_grievance_id']['table'] = 'field_data_field_grievance_id';
+  $handler->display->display_options['fields']['field_grievance_id']['field'] = 'field_grievance_id';
+  /* Field: Content: Status */
+  $handler->display->display_options['fields']['field_grievance_status']['id'] = 'field_grievance_status';
+  $handler->display->display_options['fields']['field_grievance_status']['table'] = 'field_data_field_grievance_status';
+  $handler->display->display_options['fields']['field_grievance_status']['field'] = 'field_grievance_status';
+  $handler->display->display_options['fields']['field_grievance_status']['type'] = 'taxonomy_term_reference_plain';
+  /* Field: Content: First Name */
+  $handler->display->display_options['fields']['field_grievance_first_name']['id'] = 'field_grievance_first_name';
+  $handler->display->display_options['fields']['field_grievance_first_name']['table'] = 'field_data_field_grievance_first_name';
+  $handler->display->display_options['fields']['field_grievance_first_name']['field'] = 'field_grievance_first_name';
+  /* Field: Content: Last Name */
+  $handler->display->display_options['fields']['field_grievance_last_name']['id'] = 'field_grievance_last_name';
+  $handler->display->display_options['fields']['field_grievance_last_name']['table'] = 'field_data_field_grievance_last_name';
+  $handler->display->display_options['fields']['field_grievance_last_name']['field'] = 'field_grievance_last_name';
+  /* Field: Content: Post date */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'node';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  $handler->display->display_options['fields']['created']['label'] = 'Intake Date';
+  $handler->display->display_options['fields']['created']['date_format'] = 'date_only_sortable';
+  $handler->display->display_options['fields']['created']['second_date_format'] = 'long';
+  /* Field: Content: Classification */
+  $handler->display->display_options['fields']['field_grievance_class_tid']['id'] = 'field_grievance_class_tid';
+  $handler->display->display_options['fields']['field_grievance_class_tid']['table'] = 'field_data_field_grievance_class_tid';
+  $handler->display->display_options['fields']['field_grievance_class_tid']['field'] = 'field_grievance_class_tid';
+  $handler->display->display_options['fields']['field_grievance_class_tid']['type'] = 'taxonomy_term_reference_plain';
+  /* Field: Content: CBA Provision(s) Violated */
+  $handler->display->display_options['fields']['field_grievance_clauseref']['id'] = 'field_grievance_clauseref';
+  $handler->display->display_options['fields']['field_grievance_clauseref']['table'] = 'field_data_field_grievance_clauseref';
+  $handler->display->display_options['fields']['field_grievance_clauseref']['field'] = 'field_grievance_clauseref';
+  $handler->display->display_options['fields']['field_grievance_clauseref']['settings'] = array(
+    'link' => 0,
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_clauseref']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_grievance_clauseref']['separator'] = '<br>';
+  $handler->display->display_options['path'] = 'grievance/report/open/csv';
+  $handler->display->display_options['displays'] = array(
+    'page' => 'page',
+    'default' => 0,
+  );
   $translatables['grievance_open_report'] = array(
     t('Master'),
     t('Open Grievances Report'),
@@ -5176,8 +5292,10 @@ Section',
     t('Intake Date'),
     t('Classification'),
     t('CBA Provision(s) Violated'),
+    t('Edit link'),
     t('All'),
     t('Page'),
+    t('Data export'),
   );
   $export['grievance_open_report'] = $view;
 
@@ -7047,7 +7165,6 @@ Section',
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '100';
   $handler->display->display_options['style_plugin'] = 'table';
-  $handler->display->display_options['style_options']['row_class_special'] = FALSE;
   $handler->display->display_options['style_options']['columns'] = array(
     'nid' => 'nid',
     'field_grievance_id' => 'field_grievance_id',
@@ -7357,6 +7474,34 @@ Section',
   $handler->display->display_options['sorts']['field_grievance_id_value']['id'] = 'field_grievance_id_value';
   $handler->display->display_options['sorts']['field_grievance_id_value']['table'] = 'field_data_field_grievance_id';
   $handler->display->display_options['sorts']['field_grievance_id_value']['field'] = 'field_grievance_id_value';
+  $handler->display->display_options['sorts']['field_grievance_id_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_grievance_id_value']['expose']['label'] = 'Grievance ID';
+  /* Sort criterion: Content: First Name (field_grievance_first_name) */
+  $handler->display->display_options['sorts']['field_grievance_first_name_value']['id'] = 'field_grievance_first_name_value';
+  $handler->display->display_options['sorts']['field_grievance_first_name_value']['table'] = 'field_data_field_grievance_first_name';
+  $handler->display->display_options['sorts']['field_grievance_first_name_value']['field'] = 'field_grievance_first_name_value';
+  $handler->display->display_options['sorts']['field_grievance_first_name_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_grievance_first_name_value']['expose']['label'] = 'First Name';
+  /* Sort criterion: Content: Last Name (field_grievance_last_name) */
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['id'] = 'field_grievance_last_name_value';
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['table'] = 'field_data_field_grievance_last_name';
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['field'] = 'field_grievance_last_name_value';
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['expose']['label'] = 'Last Name';
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
+  $handler->display->display_options['sorts']['title']['relationship'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['sorts']['title']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['title']['expose']['label'] = 'Employer';
+  /* Sort criterion: Taxonomy term: Name */
+  $handler->display->display_options['sorts']['name']['id'] = 'name';
+  $handler->display->display_options['sorts']['name']['table'] = 'taxonomy_term_data';
+  $handler->display->display_options['sorts']['name']['field'] = 'name';
+  $handler->display->display_options['sorts']['name']['relationship'] = 'term_node_tid';
+  $handler->display->display_options['sorts']['name']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['name']['expose']['label'] = 'Status';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -7662,6 +7807,10 @@ Grievance Form',
   $handler->display->display_options['header']['area']['content'] = 'The list below shows all grievances on the system.  Use the form to filer by grievant name, status, etc.';
   $handler->display->display_options['header']['area']['format'] = 'full_html';
   $handler->display->display_options['defaults']['footer'] = FALSE;
+  /* Footer: Global: Result summary */
+  $handler->display->display_options['footer']['result']['id'] = 'result';
+  $handler->display->display_options['footer']['result']['table'] = 'views';
+  $handler->display->display_options['footer']['result']['field'] = 'result';
   $handler->display->display_options['defaults']['empty'] = FALSE;
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
@@ -8142,10 +8291,12 @@ Grievance Form',
     t('Actions'),
     t('[<a href="/node/[nid]" target="_blank">view</a>]&nbsp;[<a href="/node/[nid]/edit" target="_blank">edit</a>]<br>
 [<a href="/node/[nid]/statuslog" target="_blank">log</a>]&nbsp;[<a href="/node/[nid]/letter" target="_blank">letters</a>]'),
+    t('Grievance ID'),
     t('Union Deadline Before'),
     t('Show Unresolved Grievances?'),
     t('All Grievances'),
     t('The list below shows all grievances on the system.  Use the form to filer by grievant name, status, etc.'),
+    t('Displaying @start - @end of @total'),
     t('No grievances match your search criteria.'),
     t('Grievance Specialist'),
     t('Remedy'),
@@ -8838,7 +8989,9 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
-  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value']['value'] = '999';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value'] = array(
+    'value' => '999',
+  );
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['group'] = 2;
   $handler->display->display_options['path'] = 'ignore/grievances-mine/page';
   $handler->display->display_options['menu']['title'] = 'My Unresolved Grievances';
@@ -9053,7 +9206,9 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
-  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value']['value'] = '999';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value'] = array(
+    'value' => '999',
+  );
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['group'] = 2;
   $handler->display->display_options['path'] = 'ignore/grievances-mine/page-2';
   $handler->display->display_options['menu']['title'] = 'My Unresolved Grievances';
@@ -9473,7 +9628,9 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
-  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value']['value'] = '999';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['value'] = array(
+    'value' => '999',
+  );
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['group'] = 2;
   /* Filter criterion: Content: Next Deadline Date (field_grievance_alert_date) */
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['id'] = 'field_grievance_alert_date_value';
@@ -15288,6 +15445,214 @@ Grievance Form',
     t('Member ID #'),
   );
   $export['grievances_without_status'] = $view;
+
+  $view = new view();
+  $view->name = 'sirius_grievance_quick_export';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'Grievance Quick Export';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Grievance Quick Export';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'grievance view';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '100';
+  $handler->display->display_options['style_plugin'] = 'table';
+  /* Footer: Global: Result summary */
+  $handler->display->display_options['footer']['result']['id'] = 'result';
+  $handler->display->display_options['footer']['result']['table'] = 'views';
+  $handler->display->display_options['footer']['result']['field'] = 'result';
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_grievance_shops_target_id']['id'] = 'field_grievance_shops_target_id';
+  $handler->display->display_options['relationships']['field_grievance_shops_target_id']['table'] = 'field_data_field_grievance_shops';
+  $handler->display->display_options['relationships']['field_grievance_shops_target_id']['field'] = 'field_grievance_shops_target_id';
+  /* Field: Content: Employer */
+  $handler->display->display_options['fields']['field_grievance_shop']['id'] = 'field_grievance_shop';
+  $handler->display->display_options['fields']['field_grievance_shop']['table'] = 'field_data_field_grievance_shop';
+  $handler->display->display_options['fields']['field_grievance_shop']['field'] = 'field_grievance_shop';
+  $handler->display->display_options['fields']['field_grievance_shop']['settings'] = array(
+    'bypass_access' => 0,
+    'link' => 0,
+  );
+  /* Field: Content: ID */
+  $handler->display->display_options['fields']['field_grievance_id']['id'] = 'field_grievance_id';
+  $handler->display->display_options['fields']['field_grievance_id']['table'] = 'field_data_field_grievance_id';
+  $handler->display->display_options['fields']['field_grievance_id']['field'] = 'field_grievance_id';
+  /* Field: Content: First Name */
+  $handler->display->display_options['fields']['field_grievance_first_name']['id'] = 'field_grievance_first_name';
+  $handler->display->display_options['fields']['field_grievance_first_name']['table'] = 'field_data_field_grievance_first_name';
+  $handler->display->display_options['fields']['field_grievance_first_name']['field'] = 'field_grievance_first_name';
+  /* Field: Content: Last Name */
+  $handler->display->display_options['fields']['field_grievance_last_name']['id'] = 'field_grievance_last_name';
+  $handler->display->display_options['fields']['field_grievance_last_name']['table'] = 'field_data_field_grievance_last_name';
+  $handler->display->display_options['fields']['field_grievance_last_name']['field'] = 'field_grievance_last_name';
+  /* Field: Field: Organizer */
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['id'] = 'field_grievance_rep_organizer';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['table'] = 'field_data_field_grievance_rep_organizer';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['field'] = 'field_grievance_rep_organizer';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['settings'] = array(
+    'bypass_access' => 1,
+    'link' => 0,
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['delta_offset'] = '0';
+  /* Field: Content: Recommended Statement of Grievance */
+  $handler->display->display_options['fields']['field_grievance_type']['id'] = 'field_grievance_type';
+  $handler->display->display_options['fields']['field_grievance_type']['table'] = 'field_data_field_grievance_type';
+  $handler->display->display_options['fields']['field_grievance_type']['field'] = 'field_grievance_type';
+  $handler->display->display_options['fields']['field_grievance_type']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_grievance_type']['settings'] = array(
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_type']['delta_offset'] = '0';
+  /* Field: Content: Grievance Complaint */
+  $handler->display->display_options['fields']['field_grievance_type_other']['id'] = 'field_grievance_type_other';
+  $handler->display->display_options['fields']['field_grievance_type_other']['table'] = 'field_data_field_grievance_type_other';
+  $handler->display->display_options['fields']['field_grievance_type_other']['field'] = 'field_grievance_type_other';
+  /* Field: Content: CBA Provision(s) Violated */
+  $handler->display->display_options['fields']['field_grievance_clauseref']['id'] = 'field_grievance_clauseref';
+  $handler->display->display_options['fields']['field_grievance_clauseref']['table'] = 'field_data_field_grievance_clauseref';
+  $handler->display->display_options['fields']['field_grievance_clauseref']['field'] = 'field_grievance_clauseref';
+  $handler->display->display_options['fields']['field_grievance_clauseref']['settings'] = array(
+    'bypass_access' => 0,
+    'link' => 0,
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_clauseref']['delta_offset'] = '0';
+  /* Field: Content: Classification */
+  $handler->display->display_options['fields']['field_grievance_class_tid']['id'] = 'field_grievance_class_tid';
+  $handler->display->display_options['fields']['field_grievance_class_tid']['table'] = 'field_data_field_grievance_class_tid';
+  $handler->display->display_options['fields']['field_grievance_class_tid']['field'] = 'field_grievance_class_tid';
+  $handler->display->display_options['fields']['field_grievance_class_tid']['type'] = 'taxonomy_term_reference_plain';
+  /* Field: Field: Phone */
+  $handler->display->display_options['fields']['field_grievance_phone']['id'] = 'field_grievance_phone';
+  $handler->display->display_options['fields']['field_grievance_phone']['table'] = 'field_data_field_grievance_phone';
+  $handler->display->display_options['fields']['field_grievance_phone']['field'] = 'field_grievance_phone';
+  /* Field: Content: Email */
+  $handler->display->display_options['fields']['field_grievance_email']['id'] = 'field_grievance_email';
+  $handler->display->display_options['fields']['field_grievance_email']['table'] = 'field_data_field_grievance_email';
+  $handler->display->display_options['fields']['field_grievance_email']['field'] = 'field_grievance_email';
+  /* Sort criterion: Content: Employer (field_grievance_shop) */
+  $handler->display->display_options['sorts']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['sorts']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
+  $handler->display->display_options['sorts']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['sorts']['field_grievance_shop_target_id']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_grievance_shop_target_id']['expose']['label'] = 'Employer';
+  /* Sort criterion: Content: Last Name (field_grievance_last_name) */
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['id'] = 'field_grievance_last_name_value';
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['table'] = 'field_data_field_grievance_last_name';
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['field'] = 'field_grievance_last_name_value';
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_grievance_last_name_value']['expose']['label'] = 'Last Name';
+  /* Sort criterion: Content: ID (field_grievance_id) */
+  $handler->display->display_options['sorts']['field_grievance_id_value']['id'] = 'field_grievance_id_value';
+  $handler->display->display_options['sorts']['field_grievance_id_value']['table'] = 'field_data_field_grievance_id';
+  $handler->display->display_options['sorts']['field_grievance_id_value']['field'] = 'field_grievance_id_value';
+  $handler->display->display_options['sorts']['field_grievance_id_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_grievance_id_value']['expose']['label'] = 'Grievance ID';
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'grievance' => 'grievance',
+  );
+  /* Filter criterion: Content: Employer (field_grievance_shop) */
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['operator_id'] = 'field_grievance_shop_target_id_op';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['label'] = 'Employer';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['operator'] = 'field_grievance_shop_target_id_op';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['identifier'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+    8 => 0,
+    9 => 0,
+    10 => 0,
+    11 => 0,
+    12 => 0,
+  );
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['path'] = 'grievance/report/grievance-quick-export';
+
+  /* Display: Data export */
+  $handler = $view->new_display('views_data_export', 'Data export', 'views_data_export_1');
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
+  $handler->display->display_options['style_options']['provide_file'] = 1;
+  $handler->display->display_options['style_options']['parent_sort'] = 1;
+  $handler->display->display_options['style_options']['quote'] = 1;
+  $handler->display->display_options['style_options']['trim'] = 0;
+  $handler->display->display_options['style_options']['replace_newlines'] = 0;
+  $handler->display->display_options['style_options']['newline_token'] = '1';
+  $handler->display->display_options['style_options']['header'] = 1;
+  $handler->display->display_options['style_options']['keep_html'] = 0;
+  $handler->display->display_options['path'] = 'grievance/report/grievance-quick-export/csv';
+  $handler->display->display_options['displays'] = array(
+    'page' => 'page',
+    'default' => 0,
+  );
+  $translatables['sirius_grievance_quick_export'] = array(
+    t('Master'),
+    t('Grievance Quick Export'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
+    t('Displaying @start - @end of @total'),
+    t('Content entity referenced from field_grievance_shops'),
+    t('Employer'),
+    t('ID'),
+    t('First Name'),
+    t('Last Name'),
+    t('Organizer'),
+    t('Recommended Statement of Grievance'),
+    t('Grievance Complaint'),
+    t('CBA Provision(s) Violated'),
+    t('Classification'),
+    t('Phone'),
+    t('Email'),
+    t('Grievance ID'),
+    t('Page'),
+    t('Data export'),
+  );
+  $export['sirius_grievance_quick_export'] = $view;
 
   return $export;
 }

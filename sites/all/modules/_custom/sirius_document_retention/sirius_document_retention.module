@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * Code for the sirius_document_retention feature.
+ */
+
+include_once 'sirius_document_retention.features.inc';
 
 // I hate notice errors
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
@@ -16,6 +22,25 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_document_retention
  */
 
 function sirius_document_retention_cron() {
+  // Don't run more than once every three hours
+  watchdog('sirius-document-retention', 'Cron - Starting.');
+  $last_ts = variable_get('sirius_document_retention_cron_last_ts', 0);
+  if ($last_ts > time() - 60*60*3) {
+    watchdog('sirius-document-retention', 'Cron - too soon. Aborting.');
+    return;
+  }
+  variable_set('sirius_document_retention_cron_last_ts', time());
+
+  $policies = sirius_document_retention_policy_list();
+  foreach ($policies as $key => $policy) {
+    $enabled = variable_get("sirius_document_retention_policy_$key", '');
+    if (!$enabled) {
+      watchdog('sirius-document-retention', "Cron - $key - Not enabled.");
+      continue;
+    }
+    watchdog('sirius-document-retention', "Cron - $key - Executing.");
+    sirius_document_retention_policy_execute($key, 'live');
+  }
 }
 
 /**

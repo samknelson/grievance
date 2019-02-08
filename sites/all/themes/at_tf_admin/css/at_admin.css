@@ -3892,3 +3892,20 @@ div.node-sirius-dispatch.node-teaser {
   padding: 10px;
   margin: 10px;
 }
+
+
+.view-grievances .form-item-sort-order, 
+.view-grievances .form-item-sort-by { 
+  float: left;
+}
+
+.view-grievances .form-item-sort-order{
+  margin-left: 20px;
+}
+
+
+.view-grievances .form-submit {
+  clear: left;
+  display: block;
+}
+}
