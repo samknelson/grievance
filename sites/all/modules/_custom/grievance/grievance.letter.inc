@@ -110,11 +110,21 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 				if ($data['node']->field_grievance_document_types['und'][0]) {
 					foreach ($data['node']->field_grievance_document_types['und'] as $item) {
 						$term = taxonomy_term_load($item['tid']);
-						$html .= '<li>' . $term->name . '</li>';
+						if ($term->field_grievance_emp_name['und'][0]['value']) {
+							$html .= '<li>' . $term->field_grievance_emp_name['und'][0]['value'] . '</li>';
+						} else {
+							$html .= '<li>' . $term->name . '</li>';
+						}
 					}
 				}
 				if ($data['node']->field_grievance_inforeq['und'][0]['value']) {
-					$html .= '<li>' . $data['node']->field_grievance_inforeq['und'][0]['value'] . '</li>';
+					$rows = explode("\n", $data['node']->field_grievance_inforeq['und'][0]['value']);
+					foreach ($rows as $row) {
+						$row = trim($row);
+						if (!preg_match('/^\s*$/', $row)) {
+							$html .= '<li>' . $row . '</li>';
+						}
+					}
 				}
 				if ($html) { $html = '<ul>' . $html . '</ul>'; }
 				$replacements[$original] = $html;
