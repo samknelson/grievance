@@ -26,6 +26,7 @@ features[views_view][] = grievance_contract_section_search
 features[views_view][] = grievance_contract_sections
 features[views_view][] = grievance_contract_templates
 features[views_view][] = grievance_corrected
+features[views_view][] = grievance_document_types
 features[views_view][] = grievance_field_overrides
 features[views_view][] = grievance_holidays
 features[views_view][] = grievance_information_request_types
