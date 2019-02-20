@@ -52,6 +52,7 @@ function grievance_log_modal_add_form($form, &$form_state, $grievance_node) {
     '#title'          => 'Type',
     '#options'        => grievance_log_types_i_can_edit(),
     '#required'       => TRUE,
+    '#default_value'  => variable_get('grievance_log_modal_default_type', NULL),
   );
 
 

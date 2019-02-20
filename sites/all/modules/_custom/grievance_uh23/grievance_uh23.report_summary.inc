@@ -85,8 +85,9 @@ function grievance_uh23_report_summary_pks(&$form_state) {
   // $sql .= "and field_data_field_grievance_log_type.field_grievance_log_type_tid in () "; // Whatever, any time we set the status field.
   $stmt = db_query($sql, $values);
   while ($hr = $stmt->fetchAssoc()) { $nids[] = $hr['nid']; }
+  $nids_unique = array_unique($nids);
 
-	return array_chunk($nids, 100, TRUE);
+	return array_chunk($nids_unique, 100, TRUE);
 }
 
 function grievance_uh23_report_summary_batch($grievance_nids, $values, $report_id, $report_action, &$context) {
