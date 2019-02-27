@@ -1,4 +1,4 @@
-name = Grievance
+name = Sirius Grievance
 description = Implements the functionality for a grievance-tracking system.  Developed by UNITE HERE.
 package = grievance
 core = 7.x
