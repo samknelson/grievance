@@ -1,0 +1,4 @@
+name = Grievance Worker
+description = Functionality to connect the Grievance application to the Worker database
+package = grievance
+core = 7.x
