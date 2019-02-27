@@ -1,0 +1,156 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+/**
+ * Implements hook_menu
+ */
+
+function sirius_help_menu() {
+  $items['sirius/modal/help-text-view/%node'] = array(
+    'title' => 'Full Help Text',
+    'page callback'    => 'sirius_help_modal_view',
+    'page arguments'   => array(3),
+    'access callback'  => 'sirius_help_modal_view_access',
+    'access arguments' => array(3),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
+  return $items;
+}
+
+/**
+ * Implments hook_modal_paths
+ */
+
+function sirius_help_modal_paths() {
+  $paths = array();
+
+  $paths['sirius/modal/help-text-view/%node'] = array(
+    'style' => 'ac-modal-style',
+  );
+
+  return $paths;
+}
+
+function sirius_help_modal_styles() {
+  $styles = array();
+
+  $styles['sirius-modal-style'] = array(
+    'modalSize' => array(
+      'type' => 'fixed',
+      'width' => 500,
+      'height' => 350,
+    ),
+  );
+
+  return $styles;
+}
+
+/**
+ * Implements hook_permission
+ */
+
+function sirius_help_permission() {
+  return array(
+    'sirius help view' => array(
+      'title' => t('Sirius Help View'),
+      'description' => t('View Sirius Help text.'),
+    ),
+    'sirius help admin' => array(
+      'title' => t('Sirius Help Admin'),
+      'description' => t('Administer Sirius Help text.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info
+ */
+
+function sirius_help_block_info() {
+  $blocks['sirius_help'] = array(
+    'info' => t('Sirius Help'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  return $blocks;
+}
+
+/** 
+ * Implements hook_block_view
+ */
+
+function sirius_help_block_view($delta = '') {
+  if ($delta == 'sirius_help') { 
+
+    // 
+    // We look for thre paths: 
+    // - "current_path()"
+    // - current path alias
+    // - the path as returned by the menu routing system, i.e. "node/%/edit".
+    // 
+
+    $paths = array();
+    $paths[] = current_path();
+    $paths[] = drupal_get_path_alias();
+    $menu_item = menu_get_item();
+    if ($menu_item['path']) { $paths[] = $menu_item['path']; }
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'sirius_help');
+    $query->fieldCondition('field_sirius_paths', 'value', $paths, 'in');
+    $stmt = $query->execute(); 
+    if (!$stmt['node']) { return NULL; }
+
+    $help_nodes = node_load_multiple(array_keys($stmt['node']));
+
+    $html = '';
+
+    foreach ($help_nodes as $help_node) {
+      $html .= sirius_help_render($help_node);
+    }
+
+    $block = array();
+    $block['subject'] = '';
+    $block['content'] = $html;
+    return $block;
+  }
+}
+
+function sirius_help_render($help_node) {
+  $html = '<div class="sirius_help"><div class="inner">';
+
+  $html .= $help_node->field_sirius_summary['und'][0]['value'];
+
+  if (strlen($help_node->body['und'][0]['value']) > 10) {
+    $html .= '<span class="sirius_help_morelink">';
+    $html .= l('Read more.', 'sirius/modal/help-text-view/' . $help_node->nid);
+    $html .= '</span>';
+  }
+
+  if (user_access('sirius help admin')) {
+    $html .= '<span class="sirius_help_editlink">';
+    $html .= l('[Edit]', 'node/' . $help_node->nid . '/edit', array('query' => array('destination' => current_path())));
+    $html .= '</span>';
+  }
+
+  $html .= '</div></div>';
+
+  return $html;
+}
+
+function sirius_help_modal_view_access($help_node) {
+  if ($help_node->type != 'sirius_help') { return FALSE; }
+  if (!user_access('sirius help view')) { return FALSE; }
+  return TRUE; 
+}
+
+function sirius_help_modal_view($help_node) {
+  drupal_set_title($help_node->title);
+  return $help_node->body['und'][0]['value'];
+}

@@ -1,0 +1,164 @@
+<?php
+
+/**
+ * Implements hook_field_info().
+ */
+
+function sirius_ssnfield_field_info() {  
+  return array(  
+    'sirius_ssnfield' => array(  
+      'label' => t('Sirius SSN Field'),  
+      'description' => t('A field storing an SSN number'),
+      'default_widget' => 'sirius_ssnfield_widget',
+      'default_formatter' => 'sirius_ssnfield_formatter_masked',
+    ), 
+  ); 
+} 
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function sirius_ssnfield_field_formatter_info() {
+  return array(   
+    'sirius_ssnfield_formatter_masked' => array(  
+      'label' => t('Sirius SSN Field Masked'),  
+      'field types' => array('sirius_ssnfield'),  
+    ), 
+    'sirius_ssnfield_formatter_full' => array(  
+      'label' => t('Sirius SSN Field Full'),  
+      'field types' => array('sirius_ssnfield'),  
+    ), 
+  ); 
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+
+/*
+function sirius_ssnfield_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $element = array();
+  if ($display['type'] == 'alsf_jsonfield_formatter_single') {
+    $element['sub_name'] = array(
+      '#title' => t('Field to Display'),
+      '#type' => 'textfield',
+      '#size' => 20,
+      '#default_value' => $settings['sub_name'],
+      '#required' => TRUE,
+    );
+  }
+  return $element;
+}
+*/
+
+/**
+ * Implements hook_field_widget_info().
+ */
+
+function sirius_ssnfield_field_widget_info() {
+  return array(
+    'sirius_ssnfield_widget' => array(
+      'label' => t('Sirius SSN Field Widget'),
+      'field types' => array('sirius_ssnfield'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function sirius_ssnfield_field_is_empty($item, $field) { 
+  return empty($item['value']) && empty($item['part1']) && empty($item['part2']) && empty($item['part3']);
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+
+function sirius_ssnfield_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $entity_type = $instance['entity_type'];
+  $bundle = $instance['bundle'];
+  $value = $items[$delta]['value'];
+  list ($part1, $part2, $part3) = explode('-', $value);
+
+  if ($instance['widget']['type'] == 'sirius_ssnfield_widget') {
+    $element['part1'] = array(
+      '#type' => 'textfield',
+      '#default_value' => $part1,
+      '#size' => 3,
+      '#maxlength' => 3,
+      '#prefix' => '<div class="sirius_ssnfield_wrapper">' . 
+        '<label class="sirius_ssnfield_label">' . 
+        $element['#title'] . 
+        '</label>' . 
+        '<div class="sirius_ssnfield_part" style="float: left; display: inline-block;">',
+      '#suffix' => '</div>',
+      '#element_validate' => array('sirius_ssnfield_element_validate'),
+    );
+    $element['part2'] = array(
+      '#type' => 'textfield',
+      '#default_value' => $part2,
+      '#size' => 2,
+      '#maxlength' => 2,
+      '#prefix' => '<div class="sirius_ssnfield_part" style="float: leftt; display: inline-block; margin-left: 5px;">',
+      '#suffix' => '</div>',
+    );
+    $element['part3'] = array(
+      '#type' => 'textfield',
+      '#default_value' => $part3,
+      '#size' => 4,
+      '#maxlength' => 4,
+      '#prefix' => '<div class="sirius_ssnfield_part" style="float: leftt; display: inline-block; margin-left: 5px;">',
+      '#suffix' => '</div><div class="clearfix"></div>',
+    );
+
+    // $element['#tree'] = TRUE;
+  }
+
+  return $element;
+}
+
+function sirius_ssnfield_element_validate($element, &$form_state) {
+  // Limits validation to posted values only.
+  if (empty($element['#needs_validation'])) {
+    return $element;
+  }
+  dpm($element);
+  // dpm($form_state);
+}
+
+/**
+ * Implements hook_field_presave().
+ */
+
+function sirius_ssnfield_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if ($field['type'] == 'sirius_ssnfield') {
+    foreach ($items as $delta => $item) {
+      if ($item['part1'] || $item['part2'] || $item['part3']) {
+        $items[$delta]['value'] = $item['part1'] . '-' . $item['part2'] . '-' . $item['part3'];
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+
+function sirius_ssnfield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $result = array();
+
+  foreach ($items as $delta => $item) {
+    $markup = '';
+    if ($display['type'] == 'sirius_ssnfield_formatter_full') {
+      $markup = $items[$delta]['value'];
+    } else if ($display['type'] == 'sirius_ssnfield_formatter_masked') {
+      $markup = 'xxx-xx-1234'; // $items[$delta]['value'];
+    }
+    $result[] = array('#markup' => $markup);
+  }
+
+  return $result;
+}
