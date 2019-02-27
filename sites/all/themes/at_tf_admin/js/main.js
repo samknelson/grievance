@@ -115,9 +115,43 @@
     },
   }
 
-	// This should move into the grievance timss module.  But for now....
-  Drupal.behaviors.grievance_timss = {
-    attach: function(context, settings) {
+  /**
+   * @todo - move these into their own modules, it's silly to load them all.
+   */
+
+	Drupal.behaviors.grievance_worker = {
+	    attach: function(context, settings) {
+			$('.grievance-worker-id-for-insert').once().click(function(event) {
+				event.preventDefault(); 
+				grievance_worker_handle_recipient_click($(this));
+			});
+
+			function grievance_worker_handle_recipient_click(elt) {
+				val = elt.html();
+
+				var jqxhr = $.getJSON('/grievance/worker/lookup/' + val);
+				jqxhr.complete(function(data) {
+					console.log(data);
+					console.log(data.responseJSON);
+					console.log(data.responseJSON.first_name);
+					$('.form-item-field-grievance-first-name-und-0-value input').val(data.responseJSON.first_name);
+					$('.form-item-field-grievance-last-name-und-0-value input').val(data.responseJSON.last_name);
+					$('.form-item-field-grievance-city-und-0-value input').val(data.responseJSON.city);
+					$('.form-item-field-grievance-state-und-0-value input').val(data.responseJSON.state);
+					$('.form-item-field-grievance-zip-und-0-value input').val(data.responseJSON.zip);
+					$('.form-item-field-grievance-address-und-0-value input').val(data.responseJSON.street);
+					$('.form-item-field-grievance-gender-und select').val(data.responseJSON.gender);
+					$('.form-item-field-grievance-phone-und-0-value input').val(data.responseJSON.phone);
+					$('.form-item-field-grievance-email-und-0-email input').val(data.responseJSON.email);
+					$('.form-item-field-grievance-min-und-0-value input').val(data.responseJSON.id);
+				});
+
+			}
+		},
+	}
+
+	Drupal.behaviors.grievance_timss = {
+	    attach: function(context, settings) {
 			$('.grievance-timss-id-for-insert').once().click(function(event) {
 				event.preventDefault(); 
 				grievance_timss_handle_recipient_click($(this));
@@ -180,8 +214,6 @@
 		
 		$(".showhide_b").hide();
 
-
-
 		$('.grievance-recipient .form-type-radios input').change(function () {
 			$(this).closest('.grievance-recipient').removeClass('grievance-recipient-none');
 			$(this).closest('.grievance-recipient').removeClass('grievance-recipient-primary');
@@ -191,3 +223,15 @@
     });
 	}); // END: DRF
 }(jQuery));
+
+
+function sirius_popup(url, name, width, height) {
+	remote = window.open(url, name, 'width=' + width + ',height=' + height +',resizable=yes,scrollbars=yes');
+	if (remote != null) {
+        if (remote.opener == null) {
+        	remote.opener = self;
+        }
+    	remote.location.href = url;
+	}
+}
+
