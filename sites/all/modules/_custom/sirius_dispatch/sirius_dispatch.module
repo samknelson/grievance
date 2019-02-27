@@ -1,0 +1,143 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.message_text.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.facility.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.dnc.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.skills.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.twilio.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.worker.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.job.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.run.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.hfe.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.threestrikes.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.notify.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.group.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_accept.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_decline.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_undecline.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_notify.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_resign.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_terminate.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_create.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_expire.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_landing.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_manage.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_manage.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_dispatch_facility_halls.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_operator.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_dispatch_worker_view.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dnc.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatches.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatch_preferences.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatch_status.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_bullpen.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_dispatch_preferences.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_landing.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_create.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_job_list.inc';
+
+/**
+ * Implements hook_cron
+ */
+
+function sirius_dispatch_cron() {
+  sirius_dispatch_run_all();
+  sirius_dispatch_threestrikes_cron();
+}
+
+/**
+ * Implements hook_node_presave
+ */
+
+function sirius_dispatch_node_presave($node) {
+	if ($node->type == 'sirius_dispatch' || $node->type == 'sirius_worker') { 
+    sirius_aat_set($node);
+  }
+
+  if ($node->type == 'sirius_dispatch') {
+    sirius_dispatch_compute_payrate($node);
+  }
+}
+
+function sirius_dispatch_get_current($worker_nid) {
+	$query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_dispatch');
+  $query->fieldCondition('field_sirius_worker', 'target_id', $worker_nid);
+  $query->fieldCondition('field_sirius_dispatch_status', 'value', 'accepted');
+  $query->propertyOrderBy('created', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) {
+  	return NULL;
+  }
+
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
+/**
+ * Implements hook_node_update
+ */
+
+function sirius_dispatch_node_update($node) {
+  if ($node->type == 'sirius_dispatch') {
+    sirius_dispatch_job_recompute_from_dispatch($node);
+    sirius_dispatch_worker_recompute_from_dispatch($node);
+    sirius_dispatch_notify_employer_dispatch($node);
+  }
+
+  if ($node->type == 'sirius_dispatch_job') {
+    sirius_dispatch_notify_employer_job($node);
+  }
+}
+
+/**
+ * Implements hook_node_insert
+ */
+
+function sirius_dispatch_node_insert($node) {
+  if ($node->type == 'sirius_dispatch') {
+    sirius_dispatch_job_recompute_from_dispatch($node);
+    sirius_dispatch_worker_recompute_from_dispatch($node);
+  }
+}
+
+/**
+ * Implements hook_node_delete
+ */
+
+function sirius_dispatch_node_delete($node) {
+  if ($node->type == 'sirius_dispatch') {
+    sirius_dispatch_job_recompute_from_dispatch($node, TRUE);
+    sirius_dispatch_worker_recompute_from_dispatch($node, TRUE);
+  }
+}
+
+function sirius_dispatch_compute_payrate($dispatch_node) {
+  if ($dispatch_node->field_sirius_payrate['und'][0]['value']) { return; }
+ 
+  $job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+  if (!$job_node) { return; }
+
+  $worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+  if (!$worker_node) { return; }
+
+  $member_status_term = taxonomy_term_load($worker_node->field_sirius_member_status['und'][0]['tid']);
+  if (!$member_status_term) { return; }
+
+  $is_skilled = FALSE;
+  if ($job_node->field_sirius_skill['und'][0]['tid']) { $is_skilled = TRUE; }
+
+  if ($is_skilled) {
+    $dispatch_node->field_sirius_payrate = $member_status_term->field_sirius_payrate_skilled; 
+  } else {
+    $dispatch_node->field_sirius_payrate = $member_status_term->field_sirius_payrate; 
+  }
+}

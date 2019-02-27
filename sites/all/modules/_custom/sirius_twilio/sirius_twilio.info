@@ -1,0 +1,4 @@
+name = Sirius Twilio
+description = Implements functionality specific to the Twilio SMS / Voice provider
+package = sirius
+core = 7.x

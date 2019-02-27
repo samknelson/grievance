@@ -1,0 +1,280 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.aat.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.ssn.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.news.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.banner.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phone.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.email.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.specialtid.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sns.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.qr.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
+
+/**
+ * Implements hook_node_presave()
+ */
+
+function sirius_node_presave($node) {
+  if ($node->type == 'sirius_worker') {
+    $fields = array(
+      'field_sirius_phone', 
+      'field_sirius_phone_alt', 
+      'field_grievance_phone', 
+      'field_grievance_co_phone', 
+      'field_grievance_co_fax',
+      'field_grievance_co_phone_2',
+      'field_grievance_phone_off',
+    );
+    foreach ($fields as $field) {
+      if (isset($node->{$field}['und'][0]['value'])) {
+        $node->{$field}['und'][0]['value'] = sirius_phone_format($node->{$field}['und'][0]['value']);
+      }
+    }
+  }
+
+  if ($node->type == 'sirius_worker') {
+    $fields = array(
+      'field_sirius_email', 
+    );
+    foreach ($fields as $field) {
+      if (isset($node->{$field}['und'][0]['value'])) {
+        $node->{$field}['und'][0]['value'] = sirius_email_format($node->{$field}['und'][0]['value']);
+      }
+    }
+  }
+}
+
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function sirius_field_formatter_info() {
+  return array(   
+    'sirius_ssn_formatter_masked' => array(  
+      'label' => t('Sirius SSN Masked'),  
+      'field types' => array('text'), 
+    ), 
+    'sirius_ssn_formatter_conditional' => array(  
+      'label' => t('Sirius SSN Conditional'),  
+      'field types' => array('text'), 
+    ), 
+  ); 
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+
+function sirius_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $result = array();
+
+  if ($display['type'] == 'sirius_ssn_formatter_masked' || $display['type'] == 'sirius_ssn_formatter_conditional') {
+    foreach ($items as $delta => $item) {
+
+      if ($display['type'] == 'sirius_ssn_formatter_conditional' && user_access('sirius ssn')) {
+        $markup = $items[$delta]['value'];
+      } else {
+        $markup = 'xxx-xx-' . substr($items[$delta]['value'], -4);
+      }
+      
+      $result[] = array('#markup' => $markup);
+    }
+  }
+
+  return $result;
+}
+
+/** 
+ * Implements hook_field_formatter_settings_summary
+ */
+
+function sirius_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = '';
+
+  if ($display['type'] == 'sirius_ssn_formatter_masked') {
+    $summary = 'xxx-xx-1234';
+  }
+  if ($display['type'] == 'sirius_ssn_formatter_conditional') {
+    $summary = '???-??-1234';
+  }
+  return $summary;
+}
+/**
+ * Implements hook_form_alter
+ */
+
+function sirius_form_alter(&$form, &$form_state, $form_id) {
+  // Set default values for entity fields with autocomplete widgets
+  $defaultable_fields = array('sirius_dispatch_facility', 'sirius_dispatch_job');
+  foreach ($defaultable_fields as $field) {
+    if (isset($_GET[$field]) && isset($form['field_' . $field])) {
+      $nid = $_GET[$field];
+      $entity_node = node_load($nid);
+      if ($entity_node) {
+        $form['field_' . $field]["und"][0]['target_id']['#default_value'] = "$entity_node->title ($nid)";
+      }
+    }
+  }
+
+  // Stupid patch for the "rolesfield" configuration form,
+  if ($form_id == 'field_ui_field_edit_form') {
+    if ($form['#field']['type'] == 'role') {
+      $form['field']['settings']['roles']['#required'] = FALSE;
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Clear account fields that users shouldn't have access to.
+ */
+
+function sirius_form_user_profile_form_alter(&$form, &$form_state) {
+  return;
+  if ($form['#user_category'] != 'account') { return; }
+
+  $account = $form['#user'];
+  unset($form['mimemail']);
+
+  if (!user_access('sirius dispatch admin')) {
+    $form['field_sirius_worker']['#access'] = FALSE;
+  }
+  if (!user_access('sirius dispatch admin') && !user_access('grievance admin')) {
+    $form['field_grievance_rep_lead']['#access'] = FALSE;
+    $form['field_grievance_rep_organizer']['#access'] = FALSE;
+    $form['field_grievance_shops']['#access'] = FALSE;
+    $form['field_grievance_phone']['#access'] = FALSE;
+    $form['field_grievance_phone_off']['#access'] = FALSE;
+    $form['account']['mail']['#access'] = FALSE;
+  }
+}
+
+function sirius_become_superuser($tf) {
+  global $user;
+  static $original_user;
+  static $old_state;
+
+  if ($tf) {
+    $original_user = $user; 
+    $old_state = drupal_save_session(); 
+    drupal_save_session(FALSE); 
+    $user = user_load(1); 
+  } else {
+    $user = $original_user; 
+    drupal_save_session($old_state); 
+  }
+}
+
+function sirius_log_render($text) {
+  // 2018-11-08T05:57:55-08:00:  
+  $entries = preg_split('/(\d\d\d\d\-\d\d\-\d\dT\d\d:\d\d:\d\d-\d\d:\d\d):/', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+
+  $html = '';
+  foreach ($entries as $entry) {
+    if (preg_match('/\d\d\d\d\-\d\d\-\d\dT\d\d:\d\d:\d\d-\d\d:\d\d/', $entry)) {
+      if ($html) { $html .= '<br />'; }
+      $html .= '<strong>' . date('Y-m-d H:i', strtotime($entry)) . '</strong> :: ';
+    } else {
+      $html .= $entry; 
+    }
+  }
+
+  return $html;
+}
+
+/**
+ * A stupid utility function to create dropdowns and mappings from taxonomies.
+ * Key can be:
+ * - 'tid' to create a mapping by tid
+ * - 'name' to create a mapping by name
+ * Value can be:
+ * - 'full' to return the fully loaded term
+ * - 'name' to return the term name
+ * - field_whatever to return the value of "field_whatever"
+ */
+
+function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE) {
+  $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
+  $terms = taxonomy_get_tree($vocabulary->vid, 0, NULL, TRUE);
+
+  $map = array();
+  if ($include_null) {
+    $map[NULL] = t('-- Select --');
+  }
+  
+  foreach ($terms as &$term) {
+    if ($value_type == 'full') {
+      $value = $term;
+    } else if ($value_type == 'name') {
+      $value = $term->name;
+    } else {
+      $value = $term->{$value_type}['und'][0]['value'];
+    }
+
+    if ($key_type == 'tid') {
+      $key = $term->tid;
+    } else {
+      $key = $term->name;
+    }
+
+    $map[$key] = $value;
+  }
+  return $map;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+
+function sirius_block_info() {
+  $blocks = array();
+  $blocks['sirius_news_popup'] = array(
+    'info' => t('Sirius News Popup'),
+    'cache' => DRUPAL_NO_CACHE,
+  );      
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+
+function sirius_block_view($delta = '') {
+  if ($delta == 'sirius_news_popup') {
+    return sirius_news_popup_block_view();
+  }
+}
+
+/**
+ * Implements hook_menu_alter()
+ */
+
+function sirius_menu_alter(&$items) {
+  $items['user/%user']['access callback'] = 'sirius_user_view_access';
+  $items['user/%user/edit']['access callback'] = 'sirius_user_edit_access';
+}
+
+function sirius_user_view_access($account) {
+  if (!user_access('sirius edit own user')) { return FALSE; }
+  return user_view_access($account);
+}
+
+function sirius_user_edit_access($account) {
+  if (!user_access('sirius edit own user')) { return FALSE; }
+  return user_edit_access($account);
+}
+

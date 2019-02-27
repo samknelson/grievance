@@ -1,0 +1,60 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.permission.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.menu.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.user.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.member_status.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.work_status.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.skill.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.admin.inc";
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.pages_worker_user.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_employer_worker_list.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_worker_work_status.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_worker_skill.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_worker_industry.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_me.inc";
+
+function sirius_worker_get_by_id($id) {
+	if (!$id) { return NULL; }
+
+	// Get the bullpens
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_worker');
+	$query->fieldCondition('field_sirius_id', 'value', $id);
+	$query->propertyOrderBy('nid', 'desc');
+	$stmt = $query->execute();
+	if (!$stmt['node']) { return NULL; }
+
+	return node_load(array_keys($stmt['node'])[0]);
+}
+
+/*
+ * Post-save
+ *
+ * After saving a worker node, sync the user
+ * 
+ * This is registered as a shutdown function, because it shouldn't run
+ * during the same transaction as when the node is created.
+ */
+
+function sirius_worker_node_postsave($node, $op) {
+  if ($node->type == 'sirius_worker' && 
+    ($op == 'insert' || $op == 'update') &&
+    !$node->grievance_no_recurse && 
+    !$node->sirius_no_recurse) {
+
+    // Avoid re-calling this function
+    $node->grievance_no_recurse = TRUE;
+    $node->sirius_no_recurse = TRUE;
+    $need_save = FALSE;
+
+    // Sync the user
+    sirius_worker_usersync($node->nid);
+  }
+}
+	
