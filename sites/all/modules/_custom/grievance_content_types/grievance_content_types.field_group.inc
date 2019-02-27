@@ -799,10 +799,10 @@ function grievance_content_types_field_group_info() {
   $field_group->entity_type = 'node';
   $field_group->bundle = 'grievance_shop';
   $field_group->mode = 'form';
-  $field_group->parent_name = '';
+  $field_group->parent_name = 'group_sirius_details';
   $field_group->data = array(
-    'label' => 'Default Union Grievance Reps',
-    'weight' => '8',
+    'label' => 'Grievance',
+    'weight' => '10',
     'children' => array(
       0 => 'field_grievance_assignee_notes',
       1 => 'field_grievance_rep_assignee',
@@ -812,16 +812,15 @@ function grievance_content_types_field_group_info() {
       5 => 'field_grievance_rep_organizer',
       6 => 'field_grievance_rep_watching',
     ),
-    'format_type' => 'fieldset',
+    'format_type' => 'accordion-item',
     'format_settings' => array(
-      'label' => 'Default Union Grievance Reps',
+      'label' => 'Grievance',
       'instance_settings' => array(
         'required_fields' => 1,
-        'id' => '',
-        'classes' => 'group-grievance-default-ureps field-group-fieldset',
+        'classes' => '',
         'description' => '',
       ),
-      'formatter' => 'collapsed',
+      'formatter' => 'closed',
     ),
   );
   $field_groups['group_grievance_default_ureps|node|grievance_shop|form'] = $field_group;
@@ -1773,6 +1772,886 @@ function grievance_content_types_field_group_info() {
   );
   $field_groups['group_notifications|node|grievance_shop|form'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_contract|node|grievance_shop|form';
+  $field_group->group_name = 'group_sirius_contract';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_sirius_details';
+  $field_group->data = array(
+    'label' => 'Contract',
+    'weight' => '9',
+    'children' => array(
+      0 => 'field_grievance_contract',
+      1 => 'field_grievance_contract_tplt',
+      2 => 'field_grievance_attachments',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => '',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_sirius_contract|node|grievance_shop|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_details|node|grievance_shop|form';
+  $field_group->group_name = 'group_sirius_details';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Details',
+    'weight' => '1',
+    'children' => array(
+      0 => 'group_grievance_default_ureps',
+      1 => 'group_sirius_contract',
+      2 => 'group_sirius_identity',
+      3 => 'group_sirius_dispatch',
+    ),
+    'format_type' => 'accordion',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'effect' => 'none',
+        'classes' => 'group-sirius-details field-group-accordion',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_sirius_details|node|grievance_shop|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_dispatch_details|node|sirius_dispatch_job|default';
+  $field_group->group_name = 'group_sirius_dispatch_details';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Dispatch Details',
+    'weight' => '4',
+    'children' => array(
+      0 => 'field_sirius_datetime_completed',
+      1 => 'field_sirius_timelimit',
+      2 => 'field_sirius_member_status',
+      3 => 'field_sirius_summary',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Dispatch Details',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-sirius-dispatch-details field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_dispatch_details|node|sirius_dispatch_job|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_dispatch_details|node|sirius_dispatch_job|form';
+  $field_group->group_name = 'group_sirius_dispatch_details';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Dispatch Details',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_sirius_count_yes',
+      1 => 'field_sirius_count_no',
+      2 => 'field_sirius_count_notified',
+      3 => 'field_sirius_timelimit',
+      4 => 'field_sirius_member_status',
+      5 => 'field_sirius_summary',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Dispatch Details',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-sirius-dispatch-details field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_dispatch_details|node|sirius_dispatch_job|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_dispatch|node|grievance_shop|form';
+  $field_group->group_name = 'group_sirius_dispatch';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_sirius_details';
+  $field_group->data = array(
+    'label' => 'Dispatch',
+    'weight' => '11',
+    'children' => array(
+      0 => 'field_sirius_dispatch_notesdef',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-sirius-dispatch field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_sirius_dispatch|node|grievance_shop|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_employer_info|node|sirius_dispatch_job|default';
+  $field_group->group_name = 'group_sirius_employer_info';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Employer Info',
+    'weight' => '0',
+    'children' => array(
+      0 => 'field_grievance_shop',
+      1 => 'field_sirius_id',
+      2 => 'field_sirius_industry',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Employer Info',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => '',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_employer_info|node|sirius_dispatch_job|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_employer_info|node|sirius_dispatch_job|form';
+  $field_group->group_name = 'group_sirius_employer_info';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Employer Info',
+    'weight' => '1',
+    'children' => array(
+      0 => 'field_grievance_shop',
+      1 => 'field_sirius_id',
+      2 => 'field_sirius_industry',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Employer Info',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => '',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_employer_info|node|sirius_dispatch_job|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_employer_notes|node|sirius_dispatch_job|default';
+  $field_group->group_name = 'group_sirius_employer_notes';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Employer Notes',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_sirius_address_parking',
+      1 => 'field_sirius_notes',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Employer Notes',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => '',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_employer_notes|node|sirius_dispatch_job|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_employer_notes|node|sirius_dispatch_job|form';
+  $field_group->group_name = 'group_sirius_employer_notes';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Employer Notes',
+    'weight' => '4',
+    'children' => array(
+      0 => 'field_sirius_address_parking',
+      1 => 'field_sirius_notes',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Employer Notes',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-sirius-employer-notes field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_employer_notes|node|sirius_dispatch_job|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_identity|node|grievance_shop|form';
+  $field_group->group_name = 'group_sirius_identity';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_shop';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_sirius_details';
+  $field_group->data = array(
+    'label' => 'Identity',
+    'weight' => '8',
+    'children' => array(
+      0 => 'field_grievance_company',
+      1 => 'field_grievance_tags',
+      2 => 'field_grievance_external_id',
+      3 => 'field_grievance_chapter',
+      4 => 'field_sirius_industry',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'label' => 'Identity',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-sirius-identity field-group-accordion-item',
+        'description' => '',
+      ),
+      'formatter' => 'closed',
+    ),
+  );
+  $field_groups['group_sirius_identity|node|grievance_shop|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_job_details|node|sirius_dispatch_job|default';
+  $field_group->group_name = 'group_sirius_job_details';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Job Details',
+    'weight' => '2',
+    'children' => array(
+      0 => 'field_sirius_datetime',
+      1 => 'field_sirius_dispatch_hall',
+      2 => 'field_sirius_dispatch_facility',
+      3 => 'field_sirius_address_notes',
+      4 => 'field_sirius_skill',
+      5 => 'field_sirius_dispatch_job_group',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Job Details',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-sirius-job-details field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_job_details|node|sirius_dispatch_job|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_job_details|node|sirius_dispatch_job|form';
+  $field_group->group_name = 'group_sirius_job_details';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Job Details',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_sirius_datetime',
+      1 => 'field_sirius_count',
+      2 => 'field_sirius_dispatch_hall',
+      3 => 'field_sirius_dispatch_facility',
+      4 => 'field_sirius_address_notes',
+      5 => 'field_sirius_skill',
+      6 => 'field_sirius_dispatch_job_group',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Job Details',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-sirius-job-details field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_job_details|node|sirius_dispatch_job|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_job_info|node|sirius_dispatch_job|default';
+  $field_group->group_name = 'group_sirius_job_info';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Job Info',
+    'weight' => '1',
+    'children' => array(
+      0 => 'field_sirius_datetime_created',
+      1 => 'field_sirius_dispatch_job_type',
+      2 => 'field_sirius_dispatch_job_status',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Job Info',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-sirius-job-info field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_job_info|node|sirius_dispatch_job|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_job_info|node|sirius_dispatch_job|form';
+  $field_group->group_name = 'group_sirius_job_info';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Job Info',
+    'weight' => '2',
+    'children' => array(
+      0 => 'field_sirius_datetime_created',
+      1 => 'field_sirius_datetime_completed',
+      2 => 'field_sirius_dispatch_job_type',
+      3 => 'field_sirius_dispatch_job_status',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Job Info',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => '',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_job_info|node|sirius_dispatch_job|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_notify|node|sirius_dispatch_job|default';
+  $field_group->group_name = 'group_sirius_notify';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Notification Settings',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_sirius_email',
+      1 => 'field_sirius_dispatch_job_nfcns',
+      2 => 'field_sirius_notify',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-sirius-notify field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_sirius_notify|node|sirius_dispatch_job|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_notify|node|sirius_dispatch_job|form';
+  $field_group->group_name = 'group_sirius_notify';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Notifications',
+    'weight' => '6',
+    'children' => array(
+      0 => 'field_sirius_email',
+      1 => 'field_sirius_dispatch_job_nfcns',
+      2 => 'field_sirius_notify',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-sirius-notify field-group-fieldset',
+        'required_fields' => 1,
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_sirius_notify|node|sirius_dispatch_job|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_contact|node|sirius_worker|default';
+  $field_group->group_name = 'group_sirius_worker_contact';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Contact',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_sirius_phone',
+      1 => 'field_sirius_address',
+      2 => 'field_sirius_phone_alt',
+      3 => 'field_sirius_email',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Contact',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-sirius-worker-contact field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_contact|node|sirius_worker|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_contact|node|sirius_worker|form';
+  $field_group->group_name = 'group_sirius_worker_contact';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Contact',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_sirius_phone',
+      1 => 'field_sirius_address',
+      2 => 'field_sirius_phone_alt',
+      3 => 'field_sirius_email',
+      4 => 'field_sirius_headshot',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Contact',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-sirius-worker-contact field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_contact|node|sirius_worker|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_contact|node|sirius_worker|sirius_worker';
+  $field_group->group_name = 'group_sirius_worker_contact';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'sirius_worker';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Contact',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_sirius_phone',
+      1 => 'field_sirius_address',
+      2 => 'field_sirius_phone_alt',
+      3 => 'field_sirius_email',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-sirius-worker-contact field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_sirius_worker_contact|node|sirius_worker|sirius_worker'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_counts|node|sirius_dispatch_job|default';
+  $field_group->group_name = 'group_sirius_worker_counts';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_dispatch_job';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Worker Counts',
+    'weight' => '9',
+    'children' => array(
+      0 => 'field_sirius_count',
+      1 => 'field_sirius_count_yes',
+      2 => 'field_sirius_count_no',
+      3 => 'field_sirius_count_notified',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Worker Counts',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-sirius-worker-counts field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_counts|node|sirius_dispatch_job|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_holds|node|sirius_worker|form';
+  $field_group->group_name = 'group_sirius_worker_holds';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_sirius_worker_preferences';
+  $field_group->data = array(
+    'label' => 'Holds',
+    'weight' => '25',
+    'children' => array(
+      0 => 'field_sirius_dispatch_hfe',
+      1 => 'field_sirius_dispatch_hfe_until',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Holds',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-sirius-worker-holds field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_holds|node|sirius_worker|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_identity|node|sirius_worker|default';
+  $field_group->group_name = 'group_sirius_worker_identity';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Identity',
+    'weight' => '1',
+    'children' => array(
+      0 => 'field_sirius_id',
+      1 => 'field_sirius_name',
+      2 => 'field_sirius_ssn',
+      3 => 'field_sirius_aat',
+      4 => 'field_sirius_id2',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Identity',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-sirius-worker-identity field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_identity|node|sirius_worker|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_identity|node|sirius_worker|form';
+  $field_group->group_name = 'group_sirius_worker_identity';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Identity',
+    'weight' => '2',
+    'children' => array(
+      0 => 'field_sirius_id',
+      1 => 'field_sirius_name',
+      2 => 'field_sirius_ssn',
+      3 => 'field_sirius_aat',
+      4 => 'field_sirius_id2',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Identity',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-sirius-worker-identity field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_identity|node|sirius_worker|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_identity|node|sirius_worker|sirius_worker';
+  $field_group->group_name = 'group_sirius_worker_identity';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'sirius_worker';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Identity',
+    'weight' => '0',
+    'children' => array(
+      0 => 'field_sirius_id',
+      1 => 'field_sirius_name',
+      2 => 'field_sirius_ssn',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-sirius-worker-identity field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_sirius_worker_identity|node|sirius_worker|sirius_worker'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_preferences|node|sirius_worker|default';
+  $field_group->group_name = 'group_sirius_worker_preferences';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Dispatch Preferences',
+    'weight' => '4',
+    'children' => array(
+      0 => 'field_sirius_skills_avail',
+      1 => 'field_sirius_dispatch_dncs2',
+      2 => 'field_sirius_dispatch_asi',
+      3 => 'field_sirius_dispatch_medium',
+      4 => 'field_sirius_dispatch_cbn',
+      5 => 'field_sirius_dispatch_hfe',
+      6 => 'field_sirius_dispatch_hfe_until',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Dispatch Preferences',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-sirius-worker-preferences field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_preferences|node|sirius_worker|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_preferences|node|sirius_worker|form';
+  $field_group->group_name = 'group_sirius_worker_preferences';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Dispatch Preferences',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_sirius_skills_avail',
+      1 => 'field_sirius_dispatch_dncs2',
+      2 => 'field_sirius_dispatch_asi',
+      3 => 'field_sirius_dispatch_medium',
+      4 => 'field_sirius_dispatch_cbn',
+      5 => 'group_sirius_worker_holds',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Dispatch Preferences',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-sirius-worker-preferences field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_preferences|node|sirius_worker|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_status|node|sirius_worker|default';
+  $field_group->group_name = 'group_sirius_worker_status';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Status',
+    'weight' => '2',
+    'children' => array(
+      0 => 'field_sirius_skill',
+      1 => 'field_grievance_shop',
+      2 => 'field_sirius_member_status',
+      3 => 'field_sirius_work_status',
+      4 => 'field_sirius_dispatch_dncs',
+      5 => 'field_sirius_worker_dispstatus',
+      6 => 'field_sirius_dispatch_availdate',
+      7 => 'field_sirius_industry',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Status',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-sirius-worker-status field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_status|node|sirius_worker|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_worker_status|node|sirius_worker|form';
+  $field_group->group_name = 'group_sirius_worker_status';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Status',
+    'weight' => '4',
+    'children' => array(
+      0 => 'field_sirius_skill',
+      1 => 'field_grievance_shop',
+      2 => 'field_sirius_member_status',
+      3 => 'field_sirius_work_status',
+      4 => 'field_sirius_dispatch_dncs',
+      5 => 'field_sirius_worker_dispstatus',
+      6 => 'field_sirius_dispatch_availdate',
+      7 => 'field_sirius_industry',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Status',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-sirius-worker-status field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_worker_status|node|sirius_worker|form'] = $field_group;
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Address');
@@ -1785,15 +2664,27 @@ function grievance_content_types_field_group_info() {
   t('Company Rep');
   t('Company Representative');
   t('Company Representatives');
-  t('Default Union Grievance Reps');
+  t('Contact');
+  t('Contract');
+  t('Details');
+  t('Dispatch');
+  t('Dispatch Details');
+  t('Dispatch Preferences');
   t('Email and Phone');
   t('Employee');
   t('Employee Contact');
+  t('Employer Info');
+  t('Employer Notes');
   t('General Grievance');
   t('Grievance');
   t('Grievance Form');
+  t('Holds');
+  t('Identity');
   t('Information Request');
+  t('Job Details');
+  t('Job Info');
   t('Name and Role');
+  t('Notification Settings');
   t('Notifications');
   t('Phone and Email');
   t('Resolution Procedure');
@@ -1805,6 +2696,7 @@ function grievance_content_types_field_group_info() {
   t('Timeline');
   t('Union Rep');
   t('Union Representatives');
+  t('Worker Counts');
 
   return $field_groups;
 }
