@@ -1,0 +1,55 @@
+table {
+	background-color: transparent;
+	border-bottom: 1px solid #5984be;	
+}
+thead tr, thead th {
+	background-color: transparent;
+	color: #1b4784;
+	font-weight: 400;
+}
+th {
+	padding: 0 0 22px 22px;
+}
+td {
+	padding: 22px 0 22px 22px;
+}
+
+thead tr {
+	border-bottom: 1px solid #5984be;
+}
+tbody tr {
+	border-left: 1px solid #5984be;
+	border-right: 1px solid #5984be;
+	border-bottom: 1px solid #5984be;	
+	background-color: #ffffff;
+}
+tbody td {
+	background-color: #ffffff;
+}
+a.tool-button {
+	padding: 4px 11px;
+	border: 1px solid #a0bbf5;
+	display: inline-block;
+}
+a.tool-button:hover {
+	color: #1b4784;
+	border-color: #1b4784;
+}
+
+a.action-button {
+	background-color: #1b4784;
+	color: #ffffff;
+	display: inline-block;
+	padding: 14px 42px;
+	font-size: 16px;
+	margin: 14px 0;
+}
+a.action-button:hover {
+	background-color: #0f3871;
+	color: #ffffff;
+}
+hr {
+	border: 0;
+	height: 0;
+	border-top: 1px dashed #5984be;
+}
