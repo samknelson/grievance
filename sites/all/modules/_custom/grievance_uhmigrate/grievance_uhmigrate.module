@@ -3,19 +3,20 @@
 // I hate notice errors
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_settlement_update.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_additional_violations.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_calllog.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_broughtby.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_clausemap.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_settlement_update.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_additional_violations.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_calllog.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_broughtby.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_clausemap.inc";
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1_calllog.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1_calllog.inc";
 
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l23.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l23_stewards.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l23.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l23_stewards.inc";
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_facilities.inc";
 
 function grievance_uhmigrate_base_dir() {
   $dir = DRUPAL_ROOT;
@@ -45,10 +46,12 @@ function grievance_uhmigrate_log_summary() {
   }
 
   global $violations_not_found;
-  print "\n\nVIOLATIONS\n";
-  print "Shop\tClause\tExample Row\t\n";
-  foreach ($violations_not_found as $key => $value) {
-    print "$key\t$value\n";
+  if ($violations_not_found) {
+    print "\n\nVIOLATIONS\n";
+    print "Shop\tClause\tExample Row\t\n";
+    foreach ($violations_not_found as $key => $value) {
+      print "$key\t$value\n";
+    }
   }
 }
 
@@ -121,6 +124,35 @@ function grievance_uhmigrate_find_by_external_id($content_type, $external_id) {
   $node->promote = 0;
   $node->comment = 0;
   $node->field_grievance_external_id['und'][0]['value'] = $external_id;
+  return $node;
+}
+
+function grievance_uhmigrate_find_by_sirius_id($content_type, $external_id) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', $content_type);
+  $query->fieldCondition('field_sirius_id', 'value', $external_id);
+  $query->propertyOrderBy('nid');
+  $stmt = $query->execute();
+
+  // Found one, return the first.
+  if ($stmt['node']) {
+    $tmp = array_keys($stmt['node']);
+    $nid = $tmp[0];
+    return node_load($nid);
+  }
+
+  // Didn't find one, return an empty node
+  global $user;
+  $node = new stdClass();
+  $node->type = $content_type;
+  node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+  $node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+  $node->uid = $user->uid; 
+  $node->status = 1;
+  $node->promote = 0;
+  $node->comment = 0;
+  $node->field_sirius_id['und'][0]['value'] = $external_id;
   return $node;
 }
 
