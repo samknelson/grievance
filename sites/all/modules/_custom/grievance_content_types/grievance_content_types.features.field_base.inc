@@ -3901,6 +3901,34 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'text',
   );
 
+  // Exported field_base: 'field_sirius_active'.
+  $field_bases['field_sirius_active'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_active',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'No' => 'No',
+        'Yes' => 'Yes',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_sirius_address'.
   $field_bases['field_sirius_address'] = array(
     'active' => 1,
@@ -4334,6 +4362,34 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'datetime',
   );
 
+  // Exported field_base: 'field_sirius_dispatch_3sen'.
+  $field_bases['field_sirius_dispatch_3sen'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_dispatch_3sen',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'No' => 'No',
+        'Yes' => 'Yes',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_sirius_dispatch_asi'.
   $field_bases['field_sirius_dispatch_asi'] = array(
     'active' => 1,
@@ -4452,6 +4508,24 @@ function grievance_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'list_text',
+  );
+
+  // Exported field_base: 'field_sirius_dispatch_days'.
+  $field_bases['field_sirius_dispatch_days'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_dispatch_days',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'number',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'number_integer',
   );
 
   // Exported field_base: 'field_sirius_dispatch_dncs'.
@@ -4849,6 +4923,37 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
+  // Exported field_base: 'field_sirius_dispatch_job_types'.
+  $field_bases['field_sirius_dispatch_job_types'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_dispatch_job_types',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'sirius_dispatch_job_type',
+          'parent' => 0,
+          'depth' => '',
+        ),
+      ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
+  );
+
   // Exported field_base: 'field_sirius_dispatch_medium'.
   $field_bases['field_sirius_dispatch_medium'] = array(
     'active' => 1,
@@ -5143,7 +5248,10 @@ function grievance_content_types_field_default_field_bases() {
           'grievance_shop_contact' => 'grievance_shop_contact',
           'sirius_bulk' => 'sirius_bulk',
           'sirius_dispatch' => 'sirius_dispatch',
+          'sirius_dispatch_facility' => 'sirius_dispatch_facility',
+          'sirius_dispatch_facility_hall' => 'sirius_dispatch_facility_hall',
           'sirius_dispatch_job' => 'sirius_dispatch_job',
+          'sirius_dispatch_job_group' => 'sirius_dispatch_job_group',
           'sirius_news' => 'sirius_news',
           'sirius_worker' => 'sirius_worker',
         ),
@@ -5372,6 +5480,30 @@ Prof.',
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_sirius_name_short',
+    'field_permissions' => array(
+      'type' => 0,
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_sirius_name_tts'.
+  $field_bases['field_sirius_name_tts'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_name_tts',
     'field_permissions' => array(
       'type' => 0,
     ),

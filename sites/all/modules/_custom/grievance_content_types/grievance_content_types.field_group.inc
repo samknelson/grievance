@@ -1812,7 +1812,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Details',
-    'weight' => '1',
+    'weight' => '2',
     'children' => array(
       0 => 'group_grievance_default_ureps',
       1 => 'group_sirius_contract',
@@ -1910,6 +1910,7 @@ function grievance_content_types_field_group_info() {
     'weight' => '11',
     'children' => array(
       0 => 'field_sirius_dispatch_notesdef',
+      1 => 'field_sirius_dispatch_job_types',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1922,6 +1923,37 @@ function grievance_content_types_field_group_info() {
     ),
   );
   $field_groups['group_sirius_dispatch|node|grievance_shop|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sirius_dispatch|taxonomy_term|sirius_industry|form';
+  $field_group->group_name = 'group_sirius_dispatch';
+  $field_group->entity_type = 'taxonomy_term';
+  $field_group->bundle = 'sirius_industry';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Dispatch',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_sirius_dispatch_3sen',
+      1 => 'field_sirius_dispatch_days',
+      2 => 'field_sirius_dispatch_notesdef',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Dispatch',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-sirius-dispatch field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_sirius_dispatch|taxonomy_term|sirius_industry|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -2061,6 +2093,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_grievance_external_id',
       3 => 'field_grievance_chapter',
       4 => 'field_sirius_industry',
+      5 => 'field_sirius_active',
+      6 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
