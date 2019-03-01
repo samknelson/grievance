@@ -53,17 +53,18 @@
         <div class="banner-wrapper">
           <div class="inner">
             <a href="/">
-              <span class="banner-logo-wrapper">
-                <?php 
-                $logo_file = file_load(variable_get('sirius_banner_logo', ''));
-                if ($logo_file) {
-                  $logo_url = file_create_url($logo_file->uri);
-                  global $base_url;
-                  $logo_url = str_replace($base_url, '', $logo_url);
-                  echo("<img class=\"banner-logo\" src=\"$logo_url\">");
-                }
-                ?>
-              </span>
+            
+              <?php 
+              $logo_file = file_load(variable_get('sirius_banner_logo', ''));
+              if ($logo_file) {
+                $logo_url = file_create_url($logo_file->uri);
+                global $base_url;
+                $logo_url = str_replace($base_url, '', $logo_url);
+                echo('<span class="banner-logo-wrapper">');
+                echo("<img class=\"banner-logo\" src=\"$logo_url\">");
+                echo('</span>');
+              }
+              ?>
               <span class="banner-name-wrapper">
                 <?php echo(variable_get('sirius_banner_name', '')); ?>
               </span>
