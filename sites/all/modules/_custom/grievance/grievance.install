@@ -228,7 +228,7 @@ function grievance_update_7011() {
 function grievance_update_7012() {
   // Enable FPA
   print "Enabling SaveGuard\n";
-  module_enable(array('saveguard'), TRUE);
+  // module_enable(array('saveguard'), TRUE);
 }
 
 function grievance_update_7013() {
@@ -242,5 +242,14 @@ function grievance_update_7013() {
   foreach ($roles as $rid => $name) {
     print "... granting [sirius document retention admin] to [$name]\n";
     user_role_grant_permissions($rid, array('sirius document retention admin'));
+  }
+}
+
+function grievance_update_7014() {
+  // Enable some modules
+  $modules = array('addressfield', 'geofield', 'sirius_jsonfield', 'imagefield_crop');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
   }
 }
