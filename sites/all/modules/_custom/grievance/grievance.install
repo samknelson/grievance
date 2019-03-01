@@ -253,3 +253,22 @@ function grievance_update_7014() {
     module_enable(array($module), TRUE);
   }
 }
+
+function grievance_update_7015() {
+  // Grant some permissions
+  $new_permissions = array(
+    'sirius',
+    'sirius ssn',
+    'sirius log view',
+    'sirius edit own user'
+  );
+  foreach ($new_permissions as $permission) {
+    print "Granting new permission [$permission] to anybody with permission [grievance view] ...\n";
+    $roles = user_roles(FALSE, 'grievance view');
+    foreach ($roles as $rid => $name) {
+      print "... granting [$permission] to [$name]\n";
+      user_role_grant_permissions($rid, array($permission));
+    }
+  }
+}
+
