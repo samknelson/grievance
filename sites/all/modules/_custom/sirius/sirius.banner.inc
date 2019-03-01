@@ -4,7 +4,7 @@ function sirius_banner_config() {
   $form = array();
 
   $form['sirius_banner_name'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
     '#title' => t('Site Name'),
     '#default_value' => variable_get('sirius_banner_name', ''),
     '#description' => t('May contain HTML'),
