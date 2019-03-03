@@ -3761,3 +3761,19 @@ div.node-sirius-dispatch.node-teaser {
   margin-left: 36px;
   margin-right: 36px;
 }
+
+
+.form-type-date-popup .form-item {
+  float: left;
+  padding-right: 5px;
+}
+
+.form-type-date-popup:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.form-type-date-popup .form-item label {
+  display: none;
+}
