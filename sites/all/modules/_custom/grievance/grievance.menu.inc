@@ -472,6 +472,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['grievance/report/shop-monthly'] = array(
+		'title' => 'Report: Count by Type',
+		'description' => '',
+		'page callback' => 'grievance_report_shop_monthly',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['grievance/report/average-time'] = array(
 		'title' => 'Report: Average Time Between Statuses',
 		'description' => '',

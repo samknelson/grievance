@@ -24,6 +24,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.repor
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_summary_with_log.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_settlement_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_status_summary.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_shop_monthly.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.block.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.notify.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.alert.inc";
@@ -579,6 +580,19 @@ function grievance_report_cache_info() {
     'render_callbacks' => array(
       'By Specialist' => 'grievance_report_open_summary_with_log_render_specialist',
       'By Employer' => 'grievance_report_open_summary_with_log_render_employer',
+    ),
+  );
+
+  $items['grievance-report-shop-monthly'] = array(
+    'name' => t('Monthly Grievances by Shop'),
+    'description' => '',
+    'access' => 'grievance report',
+    'path' => 'grievance/report/shop-montly',
+    'fields' => grievance_report_shop_monthly_fields(),
+    'pk_list_callback' => 'grievance_report_shop_monthly_pks',
+    'batch_callback' => 'grievance_report_shop_monthly_batch',
+    'render_callbacks' => array(
+      'View' => 'grievance_report_shop_monthly_render',
     ),
   );
 
