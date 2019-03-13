@@ -275,5 +275,5 @@ function grievance_update_7015() {
 function grievance_update_7016() {
   // Enable some modules
   print "Disabling search\n";
-  module_enable(array('search'), TRUE);
+  module_disable(array('search'), TRUE);
 }
