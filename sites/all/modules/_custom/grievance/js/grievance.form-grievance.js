@@ -62,5 +62,17 @@
 		// console.log("Ready...");
 		$.fn.grievance_bind_classification_term_map();
 
+ 		window.sirius_clause_pick = function(nid) {
+			$('.field-name-field-grievance-clauseref-form .form-item select.form-select').each(function(idx, elt) {
+				// Stupid row weight select fields. There doesn't seem to be a simpler way to skip 'em.'
+				current_class = $(this).attr('class');
+				if (current_class.includes('order')) { return true; }
+				current_val = $(this).val();
+				if (current_val && current_val != '_none') { return true; }
+				$(this).val(nid);
+  				return false;
+			});
+		}
+
 	});
 }(jQuery));
