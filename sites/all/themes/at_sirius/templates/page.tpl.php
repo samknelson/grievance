@@ -1,6 +1,5 @@
 <div id="page">
 
-  <?php if ($page['banner']): ?>
     <div id="page-banner">
       <div class="container">
       	<div class="user-links">
@@ -10,6 +9,7 @@
           
           if ($user->uid) 
           {
+            print t('<div class="user-links-content">');
             print t('Welcome, ');
             print $user->name;
 						print "&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -34,6 +34,7 @@
               print " / ";
             }
             print l(t("logout"),"user/logout");
+            print t('</div>');
           ?>
           <!--
             / <a href="#" onClick="javascript:sirius_popup('/sirius/dispatch/operator', 'sirius_operator', 1025, 600); return false;">operator window</a>
@@ -42,12 +43,15 @@
           }
           else 
           {
+            print t('<div class="user-links-content anon-user-links-content">');
             print l("login","user/login");
+            print t('</div>');
           }
           ?>
-          <br>
-
+          <div class="user-links-text">
           <?php print variable_get('sirius_banner_text', ''); ?>
+        </div>
+
         </div>
 
         <div class="banner-wrapper">
@@ -78,8 +82,14 @@
         -->
       </div>
     </div>
-  <?php endif; ?>
 
+
+      <!-- region: Banner Menu -->
+      <div class="banner-menu-outer-wrapper">
+        <div class="container">
+          <?php $banner_menu = render($page['banner_menu']); print $banner_menu; ?>
+        </div>
+      </div>
 
   <div class="topbar-wrapper">
     <div class="container">
@@ -113,7 +123,6 @@
       </header>
     </div>
   </div>
-
 
 
   <?php if ($primary_local_tasks): ?>
