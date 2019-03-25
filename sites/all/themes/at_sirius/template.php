@@ -32,6 +32,10 @@ function at_sirius_preprocess_page(&$vars) {
   $vars['content_header_attributes_array']['role'][] = 'banner';
 
 
+  if (variable_get('sirius_banner_css', '')) {
+    drupal_add_css(variable_get('sirius_banner_css', ''), 'inline');
+  }
+
 	drupal_add_js('sites/all/themes/at_sirius/js/main.js');
 }
 
