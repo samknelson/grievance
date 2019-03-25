@@ -1,5 +1,12 @@
 <?php
 
+function at_sirius_is_popup() {
+  if ($_REQUEST["popup"]) { return TRUE; }
+  $parts = explode('/', current_path());
+  if ($parts && array_pop($parts) == 'popup') { return TRUE; }
+  return FALSE;
+}
+
 /**
  * Override or insert variables into page templates.
  */

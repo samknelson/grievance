@@ -1,3 +1,57 @@
+<?php 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// POPUP VERSION
+////////////////////////////////////////////////////////////////////////////////////////////////////
+if (at_sirius_is_popup()) {
+?>
+
+<div id="page">
+ <div id="columns" class="columns clearfix">
+    <div class="container">
+      <div id="content-column" class="content-column" role="main">
+        <div class="content-inner">
+
+          <?php print render($page['highlighted']); ?>
+
+          <div id="messages-wrapper">
+            <?php print $messages; ?>
+          </div>
+          <?php print render($page['help']); ?>
+
+          <?php if ($action_links): ?>
+            <nav class="actions-wrapper menu-wrapper clearfix">
+              <ul class="action-links clearfix">
+                <?php print render($action_links); ?>
+              </ul>
+            </nav>
+          <?php endif; ?>
+
+          <<?php print $tag; ?> id="main-content">
+
+            <!-- region: Main Content -->
+            <?php if ($content = render($page['content'])): ?>
+              <div id="content">
+                <?php print $content; ?>
+              </div>
+            <?php endif; ?>
+
+            <!-- Feed icons (RSS, Atom icons etc -->
+            <?php print $feed_icons; ?>
+            
+          </<?php print $tag; ?>><!-- /end #main-content -->
+
+        </div><!-- /end .content-inner -->
+      </div><!-- /end #content-column -->
+
+    </div><!-- /end #columns -->
+  </div>
+</div>
+<?php 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// NORMAL VERSION
+////////////////////////////////////////////////////////////////////////////////////////////////////
+} else {
+?>
 <div id="page">
 
     <div id="page-banner">
@@ -198,4 +252,4 @@
   <?php endif; ?>
 
 </div>
-
+<?php } ?>
