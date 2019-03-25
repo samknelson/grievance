@@ -15,7 +15,7 @@ function grievance_content_types_user_default_permissions() {
   $permissions['create field_grievance_shops'] = array(
     'name' => 'create field_grievance_shops',
     'roles' => array(
-      'administrator' => 'administrator',
+      'systems admin' => 'systems admin',
     ),
     'module' => 'field_permissions',
   );
@@ -24,7 +24,7 @@ function grievance_content_types_user_default_permissions() {
   $permissions['edit field_grievance_shops'] = array(
     'name' => 'edit field_grievance_shops',
     'roles' => array(
-      'administrator' => 'administrator',
+      'systems admin' => 'systems admin',
     ),
     'module' => 'field_permissions',
   );
@@ -33,7 +33,7 @@ function grievance_content_types_user_default_permissions() {
   $permissions['edit own field_grievance_shops'] = array(
     'name' => 'edit own field_grievance_shops',
     'roles' => array(
-      'administrator' => 'administrator',
+      'systems admin' => 'systems admin',
     ),
     'module' => 'field_permissions',
   );
@@ -42,7 +42,7 @@ function grievance_content_types_user_default_permissions() {
   $permissions['view field_grievance_shops'] = array(
     'name' => 'view field_grievance_shops',
     'roles' => array(
-      'administrator' => 'administrator',
+      'systems admin' => 'systems admin',
     ),
     'module' => 'field_permissions',
   );
@@ -51,7 +51,7 @@ function grievance_content_types_user_default_permissions() {
   $permissions['view own field_grievance_shops'] = array(
     'name' => 'view own field_grievance_shops',
     'roles' => array(
-      'administrator' => 'administrator',
+      'systems admin' => 'systems admin',
     ),
     'module' => 'field_permissions',
   );

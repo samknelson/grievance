@@ -162,7 +162,7 @@ function grievance_content_types_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'ant_pattern_sirius_dispatch_job';
-  $strongarm->value = '';
+  $strongarm->value = '[node:field_grievance_shop] - [node:field_sirius_dispatch_job_type] - [node:field_sirius_datetime]';
   $export['ant_pattern_sirius_dispatch_job'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -491,7 +491,7 @@ function grievance_content_types_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'ant_sirius_dispatch_job';
-  $strongarm->value = '0';
+  $strongarm->value = '1';
   $export['ant_sirius_dispatch_job'] = $strongarm;
 
   $strongarm = new stdClass();

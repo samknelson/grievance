@@ -3748,6 +3748,7 @@ div.node-sirius-dispatch.node-teaser {
   display: none;
 }
 
+<<<<<<< HEAD
 
 /* /node/add/grievance */
 .ui-state-default, 
@@ -3851,3 +3852,25 @@ input.ajax-processed:hover {
 } 
 
 /* /node/add/sirius-worker */
+=======
+.banner-wrapper .inner {
+  margin-left: 36px;
+  margin-right: 36px;
+}
+
+
+.form-type-date-popup .form-item {
+  float: left;
+  padding-right: 5px;
+}
+
+.form-type-date-popup:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.form-type-date-popup .form-item label {
+  display: none;
+}
+>>>>>>> a6d1ffef75794c0fe090d797885f001ad7fe9ec0

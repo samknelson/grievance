@@ -1228,7 +1228,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Notifications',
-    'weight' => '2',
+    'weight' => '5',
     'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -1971,6 +1971,7 @@ function grievance_content_types_field_group_info() {
       0 => 'field_grievance_shop',
       1 => 'field_sirius_id',
       2 => 'field_sirius_industry',
+      3 => 'field_sirius_id2',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2001,6 +2002,7 @@ function grievance_content_types_field_group_info() {
       0 => 'field_grievance_shop',
       1 => 'field_sirius_id',
       2 => 'field_sirius_industry',
+      3 => 'field_sirius_id2',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2094,7 +2096,9 @@ function grievance_content_types_field_group_info() {
       3 => 'field_grievance_chapter',
       4 => 'field_sirius_industry',
       5 => 'field_sirius_active',
-      6 => 'title',
+      6 => 'field_sirius_name_tts',
+      7 => 'field_sirius_id',
+      8 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -2567,6 +2571,7 @@ function grievance_content_types_field_group_info() {
       4 => 'field_sirius_dispatch_cbn',
       5 => 'field_sirius_dispatch_hfe',
       6 => 'field_sirius_dispatch_hfe_until',
+      7 => 'field_sirius_aat_required',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2599,7 +2604,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_sirius_dispatch_asi',
       3 => 'field_sirius_dispatch_medium',
       4 => 'field_sirius_dispatch_cbn',
-      5 => 'group_sirius_worker_holds',
+      5 => 'field_sirius_aat_required',
+      6 => 'group_sirius_worker_holds',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
