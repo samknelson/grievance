@@ -3732,7 +3732,8 @@ div.node-sirius-dispatch.node-teaser {
 }
 */
 
-.checkboxes-inline .form-checkboxes .form-item {.progress .filled
+.checkboxes-inline .form-checkboxes .form-item,
+.field-name-field-sirius-skill-form .form-item .form-type-checkbox {
   float: left;
   width: 250px;
 }
@@ -3862,6 +3863,10 @@ input.ajax-processed:hover {
 .form-type-date-popup .form-item {
   float: left;
   padding-right: 5px;
+}
+
+.form-type-date-popup .description {
+  clear: left;
 }
 
 .form-type-date-popup:after {
