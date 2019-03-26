@@ -161,12 +161,65 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance contract view'),
 	);
 
+	$node_tabs['grievance_contract_template']['sections/list'] = array(
+		'title' => 'List',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_sections_list',
+		'permissions' => array('grievance contract view'),
+		'weight' => 1,
+	);
+
+	$node_tabs['grievance_contract_template']['sections/bulk'] = array(
+		'title' => 'Bulk Edit',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_sections_bulk',
+		'permissions' => array('grievance contract'),
+		'weight' => 2,
+	);
+
+
+
 	$node_tabs['grievance_contract_template']['clauses'] = array(
 		'title' => 'Sections',
 		'description' => '',
 		'callback' => 'grievance_contract_template_node_tab_clauses',
 		'permissions' => array('grievance contract view'),
 	);
+
+	$node_tabs['grievance_contract_template']['clauses/list'] = array(
+		'title' => 'Sections',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_clauses_list',
+		'permissions' => array('grievance contract view'),
+		'weight' => 1,
+	);
+
+	$node_tabs['grievance_contract_template']['clauses/full'] = array(
+		'title' => 'Full Text',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_full',
+		'permissions' => array('grievance user view'),
+		'weight' => 2,
+	);
+
+	$node_tabs['grievance_contract_template']['clauses/pdf'] = array(
+		'title' => 'PDF',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_pdf',
+		'permissions' => array('grievance user'),
+		'weight' => 3,
+	);
+
+	$node_tabs['grievance_contract_template']['clauses/picker'] = array(
+		'title' => 'Clause Picker',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_picker',
+		'permissions' => array('grievance user view'),
+		'weight' => 4,
+	);
+
+
+
 
 	$node_tabs['grievance_contract_section']['clauses'] = array(
 		'title' => 'Sections',
@@ -175,18 +228,20 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance contract view'),
 	);
 
-	$node_tabs['grievance_contract_template']['full'] = array(
-		'title' => 'Full Text',
+	$node_tabs['grievance_contract_section']['clauses/list'] = array(
+		'title' => 'List',
 		'description' => '',
-		'callback' => 'grievance_contract_template_node_tab_full',
-		'permissions' => array('grievance user view'),
+		'callback' => 'grievance_contract_section_node_tab_clauses_list',
+		'permissions' => array('grievance contract view'),
+		'weight' => 1,
 	);
 
-	$node_tabs['grievance_contract_template']['pdf'] = array(
-		'title' => 'PDF',
+	$node_tabs['grievance_contract_section']['clauses/bulk'] = array(
+		'title' => 'Bulk Edit',
 		'description' => '',
-		'callback' => 'grievance_contract_template_node_tab_pdf',
-		'permissions' => array('grievance user'),
+		'callback' => 'grievance_contract_section_node_tab_clauses_bulk',
+		'permissions' => array('grievance contract'),
+		'weight' => 2,
 	);
 
 	$node_tabs['grievance_contract_template']['holidays'] = array(
