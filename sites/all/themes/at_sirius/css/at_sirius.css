@@ -2488,41 +2488,6 @@ table.trustfund-payperiod tr.error {
 	background-color: #f4fbfe;
 }
 
-#block-grievance-grievance-quicksearch,
-#block-grievance-grievance-quicksearch-sub {
-	position: relative;
-}
-
-#grievance-quicksearch-form,
-#grievance-quicksearch-sub-form {
-	width: auto;
-	float: right;
-	position: absolute;
-	right: 0;
-	top: 100px;
-	text-align: right;
-	margin: 0;
-	padding: 0;
-	z-index: 10;
-}
-
-
-#grievance-quicksearch-form label,
-#grievance-quicksearch-sub-form label {
-	display: none;
-}
-
-#grievance-quicksearch-form .form-submit,
-#grievance-quicksearch-sub-form .form-submit {
-	margin-right: 0;
-}
-#grievance-quicksearch-form div.form-item,
-#grievance-quicksearch-sub-form div.form-item {
-	display: inline-block;
-	margin: 0;
-	padding: 0;
-	text-align: left;
-}
 
 
 a.button, 
