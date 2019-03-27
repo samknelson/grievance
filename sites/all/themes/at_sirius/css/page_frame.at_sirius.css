@@ -1,9 +1,10 @@
 img.banner-logo {
 	height: 70px;
-	width: 55px;
+	margin-top: -21px;
+	margin-right: 16px;
 }
-.banner-logo {
-	margin-top: 11px;
+.banner-logo-wrapper {
+	float: left;
 }
 .banner-name-wrapper {
 	font-family: roboto,arial, helvetica, san-serif;
@@ -12,12 +13,15 @@ img.banner-logo {
     color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 2px;
+    margin-bottom: 32px;
+    float: left;
 }
 .banner-name-wrapper:hover {
 	color: #ffffcb;
 }
 #page-banner {
-	padding: 32px 0;
+	padding: 32px 0 0 0;
+	height: 60px;
 }
 #page-banner .container {
     position: relative;
@@ -89,15 +93,39 @@ div.region-help {
     background-color: #ffffff;
 }
 
+#block-grievance-grievance-quicksearch,
+#block-grievance-grievance-quicksearch-sub {
+	position: absolute;
+	right: 0;
+}
+#grievance-quicksearch-form,
+#grievance-quicksearch-sub-form {
+}
+#grievance-quicksearch-form label,
+#grievance-quicksearch-sub-form label {
+	display: none;
+}
+#grievance-quicksearch-form .form-submit,
+#grievance-quicksearch-sub-form .form-submit {
+	margin-right: 0;
+}
+#grievance-quicksearch-form div.form-item,
+#grievance-quicksearch-sub-form div.form-item {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+}
+
 /* client-specific settings */
 #page-banner {
-    background-color: #1b4784; /*teamsters*/
-    background-color: #000000; /*unitehere*/
-    border-bottom: 10px solid #fdb82f; /*teamsters*/
-    border-bottom: 10px solid #ff0000; /*unitehere*/
-}
-.banner-name-wrapper {
-    /*left: 100px; teamsters, with logo*/
-    /*left: 32px; unitehere, no logo*/
+    /*
+    background-color: #1b4784; 
+    background-color: #000000;
+    border-bottom: 10px solid #fdb82f;
+    border-bottom: 10px solid #ff0000; 
+    */
+    background-color: #e89a00;
+    border-bottom: 0px solid #1b4784;
 }
 
