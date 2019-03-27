@@ -223,6 +223,52 @@ function grievance_contract_section_node_tab_clauses_bulk_form($form, &$form_sta
   return $form;
 }
 
+function grievance_contract_template_next_number($number) {
+  static $last = NULL;
+
+  $number = grievance_contract_template_clean_text($number);
+
+  $sequences = array(
+    array('i','ii','iii','iv','v','vi','vii','viii','ix','x','xi','xii','xiii','xiv','xv','xvi','xvii','xviii','xix','xx','xxi','xxii','xxiii','xxiv','xxv','xxvi'),
+    array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'),
+    array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'),
+    array(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,21,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50),
+  );
+
+  if ($number) {
+    if (!$last) {
+      // If we've never found a sequence, check them all.
+      foreach ($sequences as $idx => $sequence) {
+        $flip = array_flip($sequence);
+        if (isset($flip[$number])) {
+          $last = array($idx, $flip[$number]);
+          // drupal_set_message("Found INITIAL $number in " . print_r($flip, 1) . " and set last to " . print_r($last, 1));
+          break;
+        }
+      }
+    } else {
+      // Just check the seuqence we're in. 
+      $sequence = $sequences[$last[0]];
+      $flip = array_flip($sequence);
+      if (isset($flip[$number])) {
+        $last = array($last[0], $flip[$number]);
+        // drupal_set_message("Found $number in " . print_r($flip, 1) . " and set " . print_r($last, 1));
+      }
+    }
+
+    return $number;
+  }
+
+  if (!$last) {
+    return '';
+  }
+
+  dpm($last);
+  $last = array($last[0], $last[1]+1);
+  dpm($last);
+  return $sequences[$last[0]][$last[1]];
+}
+
 function grievance_contract_section_node_tab_clauses_bulk_form_submit($form, &$form_state) {
   $contract_section_node = $form_state['contract_section_node'];
   $contract_template_nid = $contract_section_node->field_grievance_contract_tplt['und'][0]['target_id'];
@@ -234,13 +280,13 @@ function grievance_contract_section_node_tab_clauses_bulk_form_submit($form, &$f
     $nid = $value['nid'];
     $title = grievance_contract_template_clean_text($value['title']);
     $weight = grievance_contract_template_clean_text($value['weight']);
-    $number = grievance_contract_template_clean_text($value['number']);
     $body = grievance_contract_template_clean_text($value['body']);
     if (!$weight) { $weight = 0; }
 
     if (!$title && !$body) {
       node_delete($nid);
     } else {
+      $number = grievance_contract_template_next_number($value['number']);
       $clause_node = node_load($nid);
       $clause_node->title = $title;
       $clause_node->field_grievance_weight['und'][0]['value'] = $weight;
@@ -257,11 +303,11 @@ function grievance_contract_section_node_tab_clauses_bulk_form_submit($form, &$f
     $nid = $value['nid'];
     $title = grievance_contract_template_clean_text($value['title']);
     $weight = grievance_contract_template_clean_text($value['weight']);
-    $number = grievance_contract_template_clean_text($value['number']);
     $body = grievance_contract_template_clean_text($value['body']);
     if (!$weight) { $weight = 0; }
     if (!$title && !$body) { continue; }
 
+    $number = grievance_contract_template_next_number($value['number']);
     $clause_node = new stdClass();
     $clause_node->title = $title;
     $clause_node->type = 'grievance_contract_clause';
@@ -918,6 +964,28 @@ function grievance_contract_template_clean_text($text) {
   // Get rid of leading and trailing.
   $text = trim($text);
   $text = preg_replace('/\r/', '', $text);
+
+  // 1. Whatever
+  $text = preg_replace('/\n(\d+)([\.\):])/', '{lf}$1$2', $text);
+
+  // ii. Whatever
+  $text = preg_replace('/\n([iv]+)([\.\):])/', '{lf}$1$2', $text);
+
+  // a. Whatever
+  $text = preg_replace('/\n([a-zA-Z])([\.\):])/', '{lf}$1$2', $text);
+
+  // (1) Whatever
+  $text = preg_replace('/\n\((\d+)\)/', '{lf}($1)', $text);
+
+  // Whatever:
+  $text = preg_replace('/:\n/', ':{lf}', $text);
+
+  // (a) Whatever
+  $text = preg_replace('/\n\(([a-z])\)\s+/', '{lf}($1) ', $text);
+
+  // (iv) Whatever
+  $text = preg_replace('/\n\(([iv]+)\)\s+/', '{lf}($1) ', $text);
+
   $text = preg_replace('/\s*\n\n\s*/', "{lf}", $text);
   $text = preg_replace('/\s+/', ' ', $text);
   $text = preg_replace('/({lf})+/', "\n\n", $text);
