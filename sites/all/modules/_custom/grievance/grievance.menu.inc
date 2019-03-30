@@ -198,7 +198,7 @@ function grievance_node_tabs() {
 		'title' => 'Full Text',
 		'description' => '',
 		'callback' => 'grievance_contract_template_node_tab_full',
-		'permissions' => array('grievance user view'),
+		'permissions' => array('grievance contract view'),
 		'weight' => 2,
 	);
 
@@ -206,7 +206,7 @@ function grievance_node_tabs() {
 		'title' => 'PDF',
 		'description' => '',
 		'callback' => 'grievance_contract_template_node_tab_pdf',
-		'permissions' => array('grievance user'),
+		'permissions' => array('grievance contract view'),
 		'weight' => 3,
 	);
 
@@ -214,7 +214,7 @@ function grievance_node_tabs() {
 		'title' => 'Clause Picker',
 		'description' => '',
 		'callback' => 'grievance_contract_template_node_tab_picker',
-		'permissions' => array('grievance user view'),
+		'permissions' => array('grievance contract view'),
 		'weight' => 4,
 	);
 
