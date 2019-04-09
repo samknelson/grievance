@@ -69,7 +69,7 @@ if (at_sirius_is_popup()) {
 						print "&nbsp;&nbsp;&nbsp;&nbsp;";
 
             $user_full = user_load($user->uid);
-            if ($user_full->field_grievance_shops['und'][0]['target_id']) {
+            if ($user_full->field_grievance_shops['und'][0]['target_id'] && !$user_full->field_grievance_shops['und'][1]['target_id']) {
               $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
               $shop_node = node_load($shop_nid);
               // print l($shop_node->title, 'node/' . $shop_node->nid);
