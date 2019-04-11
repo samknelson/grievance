@@ -17,10 +17,16 @@ function sirius_node_tab_worker_skill_form($form, &$form_state, $worker_node) {
 	$html = '';
 
 	if ($worker_node->field_sirius_skill['und']) {
-		foreach ($worker_node->field_sirius_skill['und'] as $tmp) {
+		foreach ($worker_node->field_sirius_skill['und'] as $delta => $tmp) {
 			$skill_tid = $tmp['tid'];
 			$skill_term = taxonomy_term_load($skill_tid);
-			$html .= '<li>' . $skill_term->name . '</li>';
+			$expires_ts = strtotime($worker_node->field_sirius_skill_expire['und'][$delta]['value']);
+			if (!$expires_ts || $expires_ts > time() + 60*60*24*365*50) {
+				$expires_display = 'Never';
+			} else {
+				$expires_display = date('m/d/Y', $expires_ts);
+			}
+			$html .= '<li>' . $skill_term->name . ' (expires: ' . $expires_display . ')</li>';
 		}
 	}
 	if ($html) {
@@ -36,12 +42,15 @@ function sirius_node_tab_worker_skill_form($form, &$form_state, $worker_node) {
 
 	if (user_access('sirius dispatch staff')) {
 		$skill_options = sirius_taxonomy_load('sirius_skill', 'tid', 'name', TRUE);
-		$form['skill_tid'] = array(
-			'#type' => 'select',
-			'#title' => 'Skill',
-			'#options' => $skill_options,
-			'#required' => TRUE,
-		);
+
+		for ($i=0; $i<5; ++$i) {
+			$form["skill_tid_$i"] = array(
+				'#type' => 'select',
+				'#title' => 'Skill #' . ($i+1),
+				'#options' => $skill_options,
+			);
+		}
+		$form['skill_tid_0']['#required'] = TRUE;
 
 		$form['action'] = array(
 			'#type' => 'select',
@@ -49,9 +58,22 @@ function sirius_node_tab_worker_skill_form($form, &$form_state, $worker_node) {
 			'#required' => TRUE,
 			'#options' => array(
 				NULL => t('-- Select --'),
-				TRUE => t('Add this skill'),
-				FALSE => t('Remove this skill'),
+				'add' => t('Add or renew these skills'),
+				'remove' => t('Remove these skills'),
 			),
+		);
+
+
+		$form['expires'] = array(
+	    '#type' => 'date_popup',
+	    '#title' => 'Expiration Date',
+	    '#date_format' => 'm/d/Y',
+			'#states' => array(
+		  	'visible' => array(
+		  		array(':input[name="action"]' => array('value' => 'add')),
+		  	)
+			),
+			'#description' => '<div>' . t('(Leave blank if the skill never expires.)') . '</div>',
 		);
 
 		$form['reason'] = array(
@@ -87,7 +109,7 @@ function sirius_node_tab_worker_skill_form_validate($form, &$form_state) {
 	  ));
 	  if ($file) {
 	    $name = rand();
-	    if ($file = file_move($file, 'private://tmp/' . rand())) {
+	    if ($file = file_move($file, 'private://attach_' . rand())) {
 	      $form_state['storage']["attach_$delta"] = $file;
 	    }
 	    else {
@@ -111,21 +133,26 @@ function sirius_node_tab_worker_skill_form_submit($form, &$form_state) {
   	}
   }
 
+  $expires = $form_state['values']['expires'];
+  $action = $form_state['values']['action'];
+  $skill_tids = array();
+  for ($i=0; $i<5; ++$i) {
+  	if ($form_state['values']['skill_tid_' . $i]) {
+  		$skill_tids[] = $form_state['values']['skill_tid_' . $i];
+  	}
+  }
+	$skill_terms = taxonomy_term_load_multiple($skill_tids);
 	$worker_node = $form_state['worker_node'];
-	$skill_tid = $form_state['values']['skill_tid'];
-	$skill_term = taxonomy_term_load($skill_tid);
+	$reason = $form_state['values']['reason'];
 
-	sirius_worker_skill_set(
+	$result = sirius_worker_skill_set(
 		$worker_node, 
-		$skill_term, 
-		$form_state['values']['action'], 
-		$form_state['values']['reason'],
+		$skill_tids,
+		$expires,
+		$action,
+		$reason,
 		$files
 	);
 
-	if ($form_state['values']['action']) {
-		drupal_set_message(t("Success! Worker @worker has added the skill @skill.", array('@worker' => $worker_node->title, '@skill' => $skill_term->name)));
-	} else {
-		drupal_set_message(t("Success! Worker @worker has removed the skill @skill.", array('@worker' => $worker_node->title, '@skill' => $skill_term->name)));
-	}
+	drupal_set_message($result['msg']);
 }
