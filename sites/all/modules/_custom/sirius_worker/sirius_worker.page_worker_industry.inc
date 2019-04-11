@@ -32,7 +32,45 @@ function sirius_node_tab_worker_industry_form($form, &$form_state, $worker_node)
 			$member_status_term = $member_status_terms[$member_status_tid];
 			$industry_tid = $member_status_term->field_sirius_industry['und'][0]['tid'];
 			$industry_term = $industry_terms[$industry_tid];
-			$html .= '<li>' . $member_status_term->name . ' (' . $industry_term->name . ')' . '</li>';
+			$html .= '<li>';
+			$html .= $industry_term->name . ': ' . $member_status_term->name;
+
+			$job_node = new stdClass();
+			$job_node->title = "Dummy";
+			$job_node->type = 'sirius_dispatch_job';
+			$job_node->language = LANGUAGE_NONE;
+			$job_node->uid = $user->uid;
+			$job_node->status = 1;
+			$job_node->promote = 0;
+			$job_node->comment = 0;
+			$job_node->field_grievance_shop['und'][0]['target_id'] = 0;
+			$job_node->field_sirius_dispatch_job_type['und'][0]['tid'] = sirius_get_special_tid('sirius_dispatch_job_type|OPEN');
+			$job_node->field_sirius_datetime['und'][0]['value'] = date('Y-m-d H:i:s');
+			$job_node->field_sirius_datetime_created['und'][0]['value'] = date('Y-m-d H:i:s');
+			$job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Pending';
+			$job_node->field_sirius_industry['und'][0]['tid'] = $industry_tid;
+			$member_status_tids = array_keys(sirius_worker_member_status_get_open_statuses($industry_tid, TRUE, sirius_get_special_tid('sirius_dispatch_job_type|OPEN')));
+			foreach ($member_status_tids as $tid) {
+				if ($tid) {
+					$job_node->field_sirius_member_status['und'][] = array('tid' => $tid);
+				}
+			}
+			$dispatchable = $workers = sirius_dispatch_job_get_dispatchable_workers_explain(
+				$job_node, 
+				$worker_node->nid,
+				array(
+					'ignore_skill' => TRUE,
+					'ignore_department' => TRUE,
+				)
+			);
+
+			$html .= '<br />';
+			if ($dispatchable['success']) {
+				$html .= 'Dispatch position: ' . $dispatchable['msg'];
+			} else {
+				$html .= 'Dispatch not available: ' . $dispatchable['msg'];
+			}
+			$html .= '</li>';
 		}
 	}
 	if ($html) {
