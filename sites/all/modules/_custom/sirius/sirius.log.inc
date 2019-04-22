@@ -66,7 +66,7 @@ function sirius_node_access_log($log_node, $op, $account) {
   $category = $log_node->field_sirius_category['und'][0]['value'];
 
   // Workers can see their own dispatch:dnc nodes
-  if ($category == 'dispatch:dnc') {
+  if ($category == 'dispatch:dnc' || $category == 'worker:member_status' || $category == 'worker:skill') {
     $worker_node = sirius_worker_get($account->uid);
     if ($log_node->field_sirius_log_handler['und'][0]['target_id'] == $worker_node->nid) {
       return NODE_ACCESS_ALLOW;

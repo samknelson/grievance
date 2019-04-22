@@ -31,6 +31,42 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
+  $node_tabs['sirius_dispatch_facility']['sirius_dispatch_facility_log'] = array(
+    'title' => 'Log',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_log',
+    'permissions' => array('sirius dispatch staff'),
+  );
+
+  $node_tabs['sirius_dispatch_facility_hall']['sirius_dispatch_facility_hall_log'] = array(
+    'title' => 'Log',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_log',
+    'permissions' => array('sirius dispatch staff'),
+  );
+
+  $node_tabs['grievance_shop']['grievance_shop_log'] = array(
+    'title' => 'Log',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_log',
+    'permissions' => array('sirius dispatch staff'),
+  );
+
+  $node_tabs['sirius_feed']['sirius_feed_log'] = array(
+    'title' => 'Log',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_log',
+    'permissions' => array('sirius dispatch staff'),
+  );
+
+
+  $node_tabs['sirius_feed']['sirius_feed_process'] = array(
+    'title' => 'Process',
+    'description' => '',
+    'callback' => 'sirius_node_tab_feed_process',
+    'permissions' => array('sirius admin'),
+  );
+
   return $node_tabs;
 }
 
@@ -118,6 +154,22 @@ function sirius_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_email_admin'),
     'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/config/sms'] = array(
+    'title' => 'SMS Configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_sms_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/voice/forward-to-operator'] = array(
+    'title' => 'Incoming Calls',
+    'page callback' => 'sirius_page_voice_forward_to_operator',
+    'page arguments' => array(),
+    'access arguments' => array('sirius log view'),
     'type' => MENU_NORMAL_ITEM,
   );
 

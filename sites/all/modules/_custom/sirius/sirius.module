@@ -5,21 +5,34 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATE
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.auditlog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.aat.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.menu.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.ssn.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.date.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.permission.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.banner.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phone.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phonetree.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.email.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.specialtid.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sns.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.qr.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_voice_forward_to_operator.inc';
+
+/**
+ * Implements hook_cron
+ */
+
+function sirius_cron() {
+  sirius_auditlog();
+}
 
 /**
  * Implements hook_node_presave()
@@ -135,6 +148,15 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
       $form['field']['settings']['roles']['#required'] = FALSE;
     }
   }
+
+  // Clean up taxonomy term forms
+  if ($form_id == 'taxonomy_form_term') {
+    $vocabulary = $form['#vocabulary'];
+    if ($vocabulary && $vocabulary->machine_name && preg_match('/^(sirius|grievance)/', $vocabulary->machine_name)) {
+      $form['path']['#access'] = FALSE;
+      $form['relations']['#access'] = FALSE;
+    }
+  }
 }
 
 /**
@@ -144,7 +166,6 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
  */
 
 function sirius_form_user_profile_form_alter(&$form, &$form_state) {
-  return;
   if ($form['#user_category'] != 'account') { return; }
 
   $account = $form['#user'];
@@ -153,13 +174,13 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
   if (!user_access('sirius dispatch admin')) {
     $form['field_sirius_worker']['#access'] = FALSE;
   }
-  if (!user_access('sirius dispatch admin') && !user_access('grievance admin')) {
+
+  if (!user_access('sirius dispatch admin') && !user_access('grievance user')) {
     $form['field_grievance_rep_lead']['#access'] = FALSE;
     $form['field_grievance_rep_organizer']['#access'] = FALSE;
     $form['field_grievance_shops']['#access'] = FALSE;
     $form['field_grievance_phone']['#access'] = FALSE;
     $form['field_grievance_phone_off']['#access'] = FALSE;
-    $form['account']['mail']['#access'] = FALSE;
   }
 }
 
@@ -278,3 +299,31 @@ function sirius_user_edit_access($account) {
   return user_edit_access($account);
 }
 
+
+
+/**
+ * Stupid utility function to get multiple values from a field
+ */
+
+function sirius_fieldvals($node, $field, $col = 'value') {
+  $result = array();
+  if (!$node->{$field}['und']) { return array(); }
+
+  foreach ($node->{$field}['und'] as $tmp) {
+    if ($col == 'ts') {
+      $result[] = strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']);
+    } else {
+      $result[] = $tmp[$col];
+    }
+  }
+
+  return $result;
+}
+
+function sirius_fieldval($node, $field, $col = 'value', $params = array()) {
+  if ($col == 'ts') { 
+    return strtotime($node->{$field}['und'][0]['value'] . ' ' . $node->{$field}['und'][0]['timezone_db']);
+  } else {
+    return $node->{$field}['und'][0][$col];
+  }
+}

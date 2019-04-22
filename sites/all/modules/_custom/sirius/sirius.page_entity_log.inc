@@ -48,7 +48,7 @@ function sirius_node_tab_entity_log_form_validate($form, &$form_state) {
 	  ));
 	  if ($file) {
 	    $name = rand();
-	    if ($file = file_move($file, 'temporary://attach_' . rand())) {
+	    if ($file = file_move($file, 'private://attach_' . rand())) {
 	      $form_state['storage']["attach_$delta"] = $file;
 	    }
 	    else {
