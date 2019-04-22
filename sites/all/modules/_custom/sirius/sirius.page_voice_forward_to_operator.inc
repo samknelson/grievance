@@ -55,7 +55,7 @@ function sirius_page_voice_forward_to_operator() {
 		  	$html .= 'No matching worker found.<br />';
 		  } else {
 		  	$worker_nodes = node_load_multiple(array_keys($stmt['node']));
-		  	foreach ($worker_nodes as $worker_node) {
+		  	foreach ($worker_nodes as $worker_nid => $worker_node) {
 		  		$html .= l('View', "node/$worker_nid", array('attributes' => array('class' => array('tool-button'))));
 		  		$html .= ' ';
 		  		$html .= l('Dispatch Status', "node/$worker_nid/sirius_worker_dispatch_status", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
@@ -63,7 +63,7 @@ function sirius_page_voice_forward_to_operator() {
 		  		$html .= l('Dispatches', "node/$worker_nid/sirius_worker_dispatches", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
 		  		$html .= ' ';
 		  		$html .= l('Preferences', "node/$worker_nid/sirius_worker_dispatch_preferences", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-		  		$html .= ' Signed in as: <strong>' . $worker_node->title . '</strong>';
+		  		$html .= ' Phone number lookup: <strong>' . $worker_node->title . '</strong>';
 		  		$html .= '<br />';
 		  	}
 		  }
