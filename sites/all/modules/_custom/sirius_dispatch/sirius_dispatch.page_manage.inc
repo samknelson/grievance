@@ -104,7 +104,7 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 	);
 
 	$send_medium_options = array(NULL => t('Use the worker\'s notification preference'));
-	$send_medium_options += sirius_dispatch_send_medium_options();
+	$send_medium_options += sirius_dispatch_send_medium_options($worker_node);
 	$form['send_medium'] = array(
 		'#title' => t('Send by:'),
 		'#type' => 'select',
