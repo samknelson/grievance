@@ -8,6 +8,19 @@ use Twilio\TwiML;
  **********************************************************************************/
 
 function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
+
+	if (strlen($msg) > 1595) {
+		return array('success' => FALSE, 'msg' => 'SMS sending failed: the outoing message length exceeded 1600 characters.');
+	}
+
+  // Are we in a global disable mode?
+  $disable = variable_get("sirius_sms_global_disable", '');
+  if ($disable == 'Yes') { 
+	  $whitelist = variable_get("sirius_sms_global_disable_whitelist", '');
+	  $probe = sirius_phone_format($phone);
+	  if (strpos($whitelist, $probe) === FALSE) { return array('success' => FALSE, 'msg' => "Global SMS disable is on and $probe is not whitelisted."); }
+	}
+
 	$phone = sirius_phone_format_e164($phone);
 	try {
 		$client = sirius_twilio_client_get();
@@ -40,8 +53,8 @@ function sirius_twilio_call_sid($call) {
 
 function sirius_twilio_outgoing_voice($phone, $context) {
 	global $base_url;
-
 	$phone = sirius_phone_format_e164($phone);
+	$context['phone'] = $phone;
 	$msg = "Outgoing call initiated to $phone";
 	try {
 		$client = sirius_twilio_client_get();
@@ -58,6 +71,15 @@ function sirius_twilio_outgoing_voice($phone, $context) {
 	return $result;
 }
 
+function sirius_twilio_outgoing_voice_repeat($call_sid, $context, $msg = NULL) {
+	header('Content-Type: text/xml');
+
+	$msg = $msg . $context['last_msg'];
+	$gather_digits = $context['last_gather_digits'];
+
+	sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_digits);
+}
+
 function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_digits) {
 	$client = sirius_twilio_client_get();
 	$response = new TwiML();
@@ -72,8 +94,9 @@ function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_dig
 	header('Content-Type: text/xml');
 	echo $response;
 
+	$context['last_msg'] = $msg;
+	$context['last_gather_digits'] = $gather_digits;
 	sirius_twilio_set_context($call_sid, $context, 'say', $msg);
-
 	exit();
 }
 
@@ -87,8 +110,6 @@ function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone) {
 	header('Content-Type: text/xml');
 	echo $response;
 
-	$context = sirius_twilio_get_context($call_sid);
 	sirius_twilio_set_context($call_sid, $context, 'dial', "Forwarded call from " . $context['phone'] . " to " . $phone);
-
 	exit();
 }
