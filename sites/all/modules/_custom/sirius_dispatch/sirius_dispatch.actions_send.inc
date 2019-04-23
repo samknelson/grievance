@@ -71,7 +71,7 @@ function sirius_dispatch_send(&$dispatch_node, $medium = NULL, $to = NULL, $note
 		if (!sirius_email_validate($to)) { return array('success' => FALSE, 'msg' => 'No valid email address.'); }
 		$subject = "Dispatch #" . $dispatch_node->nid;
 		$body = "Your dispatch can be found at:<br /><br /><a href=\"$ur;\">$url</a>";
-		if ($notes) { $body .= $notes; }
+		if ($notes) { $body .= '<br /><br />' . $notes; }
 		return sirius_email_send(array('to' => $to, 'subject' => $subject, 'body' => $body, 'handler_nids' => array($dispatch_node->nid)));
 	} else if ($medium == 'voice' || $medium == 'voice_alt') {
 		return array('success' => FALSE, 'msg' => 'Cannot send by voice.');
