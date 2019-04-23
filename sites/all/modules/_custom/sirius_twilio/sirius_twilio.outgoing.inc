@@ -96,6 +96,9 @@ function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_dig
 
 	$context['last_msg'] = $msg;
 	$context['last_gather_digits'] = $gather_digits;
+	if (isset($context['request']['Digits'])) {
+		$msg = "(User entered " . $context['request']['Digits'] . ") " . $msg;
+	}
 	sirius_twilio_set_context($call_sid, $context, 'say', $msg);
 	exit();
 }
@@ -110,6 +113,10 @@ function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone) {
 	header('Content-Type: text/xml');
 	echo $response;
 
-	sirius_twilio_set_context($call_sid, $context, 'dial', "Forwarded call from " . $context['phone'] . " to " . $phone);
+	$msg = "Forwarded call from " . $context['phone'] . " to " . $phone;
+	if (isset($context['request']['Digits'])) {
+		$msg = "(User entered " . $context['request']['Digits'] . ") " . $msg;
+	}
+	sirius_twilio_set_context($call_sid, $context, 'dial', $msg);
 	exit();
 }
