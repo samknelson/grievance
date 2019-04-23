@@ -1,8 +1,6 @@
 <?php
 
 function sirius_sns_handle($json) {
-	watchdog('debug', '... Sirius SNS Handler was called: <pre>' . print_r($json, 1) . '</pre>');
-
 	// @todo: We should handle SNS channels better. But for now, if we've got a message object, log it as an email delivery notifcation.
 	if ($json->Message) {
 		$message = json_decode($json->Message);
