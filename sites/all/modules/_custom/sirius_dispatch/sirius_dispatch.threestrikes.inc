@@ -58,6 +58,13 @@ function sirius_dispatch_threestrikes_admin() {
 		'#default_value' => variable_get('sirius_dispatch_threestrikes_worker_notification_body', ''),
 	);
 
+	$form['sirius_dispatch_threestrikes_worker_notification_sms'] = array(
+		'#type' => 'textarea',
+		'#title' => 'SMS notification body',
+		'#description' => 'Body of the SMS which is sent to the worker. No HTML is permitted.',
+		'#default_value' => variable_get('sirius_dispatch_threestrikes_worker_notification_sms', ''),
+	);
+
   return system_settings_form($form);
 }
 
@@ -109,6 +116,20 @@ function sirius_dispatch_threestrikes_form($form, &$form_state) {
 		),
 	);
 
+	$form['worker_force'] = array(
+		'#type' => 'select',
+		'#title' => t('FORCE a three-strikes block for this worker, no matter what'),
+		'#options' => array(
+			'No' => t('No, run the usual three-strikes test on this worker.'),
+			'Yes' => t('Yes, this worker should have a three-strikes block placed immediately.'),
+		),
+		'#states' => array(
+	  	'visible' => array(
+	  		array(':input[name="action"]' => array('value' => 'worker')),
+	  	)
+		),
+	);
+
 	$form['is_test'] = array(
 		'#type' => 'select',
 		'#options' => array(
@@ -140,6 +161,7 @@ function sirius_dispatch_threestrikes_form_submit($form, &$form_state) {
 	$action = $form_state['values']['action'];
 	$worker_nid = $form_state['values']['worker_nid'];
 	$is_test = $form_state['values']['is_test'];
+	$is_force = $form_state['values']['worker_force'];
 	unset($form_state['results']);
 
 	if ($is_test) {
@@ -148,8 +170,12 @@ function sirius_dispatch_threestrikes_form_submit($form, &$form_state) {
 		drupal_set_message("Operating in LIVE mode.");
 	}
 
+	if ($is_force) {
+		drupal_set_message("Forcing a three-strikes block without checking for declined dispatches.");
+	}
+
 	if ($action == 'worker') {
-		$result = sirius_dispatch_threestrikes_scan_worker($worker_nid, $is_test);
+		$result = sirius_dispatch_threestrikes_scan_worker($worker_nid, $is_test, $is_force);
 		drupal_set_message("Scanning a single worker: <pre>" . $result['msg'] . '</pre>');
 	} else {
 		$result = sirius_dispatch_threestrikes_scan($is_test);
@@ -180,7 +206,6 @@ function sirius_dispatch_threestrikes_form_submit($form, &$form_state) {
 			drupal_set_message(t("Scanned <strong>@count_scanned</strong> workers, signed out <strong>@count_signed_out</strong>. The details are below.", array('@count_scanned' => $result['count_scanned'], '@count_signed_out' => $result['count_signed_out'])));
 	}
 }
-
 
 function sirius_dispatch_threestrikes_scan($is_test = FALSE) {
 	// Fetch the currently signed-in workers
@@ -219,30 +244,34 @@ function sirius_dispatch_threestrikes_scan($is_test = FALSE) {
   );
 }
 
-function sirius_dispatch_threestrikes_scan_worker($worker_nid, $is_test = FALSE) {
-	$msg = "Scanning worker #<a href=\"/node/$worker_nid\">$worker_nid</a>:\n";
-	for ($day_start = 1; $day_start <=3; ++$day_start) {
-		$result = sirius_dispatch_threestrikes_scan_worker_day($worker_nid, $day_start);
-		$msg .= $result['msg'] . "\n";
-		if (!$result['dispatch_nid']) {
-			$msg .= "This worker will NOT be signed out.";
-			return array('success' => TRUE, 'msg' => $msg, 'signed_out' => FALSE);
-		} 
+function sirius_dispatch_threestrikes_scan_worker($worker_nid, $is_test = FALSE, $is_force = FALSE) {
+	if ($is_force) {
+		$msg = "Skipping scan for worker #<a href=\"/node/$worker_nid\">$worker_nid</a> (forcing three-strikes):\n";
+		$msg .= "The administrator is forcing a three-strikes block on this worker.";
+	} else {
+		$msg = "Scanning worker #<a href=\"/node/$worker_nid\">$worker_nid</a>:\n";
+		for ($day_start = 1; $day_start <=3; ++$day_start) {
+			$result = sirius_dispatch_threestrikes_scan_worker_day($worker_nid, $day_start);
+			$msg .= $result['msg'] . "\n";
+			if (!$result['dispatch_nid']) {
+				$msg .= "This worker will NOT be signed out.";
+				return array('success' => TRUE, 'msg' => $msg, 'signed_out' => FALSE);
+			} 
+		}
+		$msg .= "Dispatches were declined on three consecutive days, so this worker will be signed out.";
 	}
 
-	$msg .= "Dispatches were declined on three consecutive days, so this worker will be signed out.";
-
 	$worker_node = node_load($worker_nid);
-	$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_blocked');
+	$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
 	if (!$is_test) {
 		sirius_dispatch_worker_dispstatus_set($worker_node, $tid, $msg);
-
-		sirius_email_send(
+		sirius_dispatch_worker_dispstatus_block_set($worker_node, 'Yes', $msg);
+		sirius_worker_notify(
+			$worker_node, 
 			array(
-				'to' => $worker_node->field_sirius_email['und'][0]['value'],
 				'subject' => variable_get('sirius_dispatch_threestrikes_worker_notification_subject', ''),
 				'body' => variable_get('sirius_dispatch_threestrikes_worker_notification_body', ''),
-				'handler_nids' => array($worker_node->nid)
+				'sms' => variable_get('sirius_dispatch_threestrikes_worker_notification_sms', ''),
 			)
 		);
 
@@ -260,7 +289,7 @@ function sirius_dispatch_threestrikes_scan_worker_day($worker_nid, $day_start) {
 	// - Where the dispatch status is "declined" or "expired"
 	// - Where the job status is "filled" or "archived"
 	// - Where the dispatch is created between start_ts and end_ts
-	// Do in SQL for efficience
+	// Do in SQL for efficiency
 
 	$tables = array(
 		'field_data_field_sirius_dispatch_status',
@@ -271,11 +300,18 @@ function sirius_dispatch_threestrikes_scan_worker_day($worker_nid, $day_start) {
 	foreach ($tables as $table) {
 		$sql .= "left join $table on $table.entity_type = 'node' and $table.entity_id = node.nid ";
 	}
+
 	$sql .= "left join node job_node on job_node.nid = field_sirius_dispatch_job_target_id ";
 	$sql .= "left join field_data_field_sirius_dispatch_job_status on field_data_field_sirius_dispatch_job_status.entity_type = 'node' and field_data_field_sirius_dispatch_job_status.entity_id = job_node.nid ";
+
+	$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
+	$sql .= "left join field_data_field_sirius_industry on field_data_field_sirius_industry.entity_type = 'node' and field_data_field_sirius_industry.entity_id = field_grievance_shop_target_id ";
+	$sql .= "left join field_data_field_sirius_dispatch_3sen on field_data_field_sirius_dispatch_3sen.entity_type = 'taxonomy_term' and field_data_field_sirius_dispatch_3sen.entity_id = field_sirius_industry_tid ";
+
 	$sql .= "where node.type = 'sirius_dispatch' ";
 	$sql .= "and field_sirius_dispatch_status_value in ('expired', 'declined') ";
 	$sql .= "and field_sirius_dispatch_job_status_value in ('Filled', 'Archived') ";
+	$sql .= "and field_sirius_dispatch_3sen_value = 'Yes' ";
 	$sql .= "and node.created >= :start_ts ";
 	$sql .= "and node.created < :end_ts ";
 	$sql .= "and field_sirius_worker_target_id = :worker_nid ";

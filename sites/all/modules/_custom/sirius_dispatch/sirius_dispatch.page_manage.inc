@@ -17,34 +17,67 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 
 	$actions = array(NULL => t('-- Select --'));
 
+		/*
+	$form['impossible'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Action Info',
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
+		*/
+
 	$possible = sirius_dispatch_notify_possible($dispatch_node);
 	if ($possible['success']) {
 		$actions['notify'] 				= t('Send a notification');
-	} 
+	} else {
+		if ($_REQUEST['debug']) {
+			$form['impossible']['notify_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Notify not possible: ' . $possible['msg'] . '</div>');
+		}
+	}
 
 	$possible = sirius_dispatch_accept_possible($dispatch_node);
 	if ($possible['success']) {
 		$actions['accept'] 				= t('Accept this dispatch');
+	} else {
+		if ($_REQUEST['debug']) {
+			$form['impossible']['accept_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Accept not possible: ' . $possible['msg'] . '</div>');
+		}
 	}
 
 	$possible = sirius_dispatch_decline_possible($dispatch_node);
 	if ($possible['success']) {
 		$actions['decline'] 			= t('Decline this dispatch');
+	} else {
+		if ($_REQUEST['debug']) {
+			$form['impossible']['decline_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Decline not possible: ' . $possible['msg'] . '</div>');
+		}
 	}
 
 	$possible = sirius_dispatch_undecline_possible($dispatch_node);
 	if ($possible['success']) {
 		$actions['undecline'] 			= t('Un-Decline this dispatch');
+	} else {
+		if ($_REQUEST['debug']) {
+			$form['impossible']['undecline_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Un-Decline not possible: ' . $possible['msg'] . '</div>');
+		}
 	}
 
 	$possible = sirius_dispatch_terminate_possible($dispatch_node);
 	if ($possible['success']) {
-		$actions['terminate'] 		= t('Terminate this dispatch');
+		$actions['terminate'] 		= t('Layoff this dispatch');
+	} else {
+		if ($_REQUEST['debug']) {
+			$form['impossible']['terminate_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Layoff not possible: ' . $possible['msg'] . '</div>');
+		}
 	}
 
 	$possible = sirius_dispatch_resign_possible($dispatch_node);
 	if ($possible['success']) {
-		$actions['resign'] 			= t('Resign this dispatch');
+		$actions['resign'] 			= t('Voluntary layoff this dispatch');
+	} else {
+		if ($_REQUEST['debug']) {
+			$form['impossible']['resigh_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Voluntary layoff not possible: ' . $possible['msg'] . '</div>');
+		}
 	}
 
 	$form['action'] = array(

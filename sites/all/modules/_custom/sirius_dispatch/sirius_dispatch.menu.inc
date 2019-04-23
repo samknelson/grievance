@@ -20,7 +20,7 @@ function sirius_dispatch_node_tabs() {
   $node_tabs['sirius_dispatch']['sirius_dispatch_worker_view'] = array(
     'title' => 'Dispatch',
     'description' => '',
-    'callback' => 'sirius_node_tab_dispatch_worker_view',
+    'callback' => 'sirius_node_tab_dispatch_view',
     'permissions' => array(),
   );
 
@@ -31,12 +31,50 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch employer'),
   );
 
+
+
+
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen'] = array(
-    'title' => 'Bullpen',
+    'title' => 'Bullpen Details',
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_bullpen',
-    'permissions' => array('sirius dispatch bullpen'),
+    'permissions' => array('sirius dispatch bullpen view'),
+    'weight' => 1,
   );
+
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_signin_self'] = array(
+    'title' => 'Sign In Yourself',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_bullpen_signin_self',
+    'permissions' => array('sirius dispatch bullpen signin'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_signin_others'] = array(
+    'title' => 'Sign-in List',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_bullpen_signin_others',
+    'permissions' => array('sirius dispatch bullpen signin view'),
+    'weight' => 3,
+  );
+
+  /*
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_open'] = array(
+    'title' => 'Dispatch',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_bullpen',
+    'permissions' => array('sirius dispatch bullpen view'),
+    'weight' => 4,
+  );
+
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_cbn'] = array(
+    'title' => 'Dispatch by Name',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_bullpen',
+    'permissions' => array('sirius dispatch bullpen view'),
+    'weight' => 5,
+  );
+  */
 
   $node_tabs['sirius_dispatch_facility']['sirius_dispatch_facility_halls'] = array(
     'title' => 'Halls',
@@ -131,20 +169,21 @@ function sirius_dispatch_menu() {
   );
 
   $items['sirius/dispatch/job/create'] = array(
-    'title' => 'Sirius: Employer: Dispatch: Job: Create',
+    'title' => 'Create a Job',
     'description' => '',
-    'page callback' => 'sirius_dispatch_page_job_create',
+    'page callback' => 'sirius_dispatch_page_job_create_intro',
     'page arguments' => array(),
     'access arguments' => array('sirius dispatch employer'),
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/dispatch/job/create/%node'] = array(
-    'title' => 'Sirius: Employer: Dispatch: Job: Create',
+  $items['sirius/dispatch/job/create/%node/%'] = array(
+    'title' => 'Create a Job',
     'description' => '',
     'page callback' => 'sirius_dispatch_page_job_create',
-    'page arguments' => array(4),
-    'access arguments' => array('sirius dispatch staff'),
+    'page arguments' => array(4, 5),
+    'access callback' => 'sirius_dispatch_page_job_create_access',
+    'access arguments' => array(4, 5),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -191,6 +230,29 @@ function sirius_dispatch_menu() {
     'page arguments' => array('sirius_dispatch_run_admin'),
     'access arguments' => array('sirius dispatch admin'),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/dispatch/config/bullpen'] = array(
+    'title' => 'Bullpen Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_dispatch_bullpen_admin'),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/dispatch/config/view'] = array(
+    'title' => 'Dispatch View Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_dispatch_view_admin'),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/ajax/bullpen-quicksearch'] = array(
+    'page callback' => 'grievance_quicksearch_autocomplete',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch bullpen signin others'),
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/dispatch/config/threestrikes'] = array(
