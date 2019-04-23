@@ -76,7 +76,7 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 		$actions['resign'] 			= t('Voluntary layoff this dispatch');
 	} else {
 		if ($_REQUEST['debug']) {
-			$form['impossible']['resigh_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Voluntary layoff not possible: ' . $possible['msg'] . '</div>');
+			$form['impossible']['resign_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Voluntary layoff not possible: ' . $possible['msg'] . '</div>');
 		}
 	}
 
