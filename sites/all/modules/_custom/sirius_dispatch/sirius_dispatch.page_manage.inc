@@ -14,6 +14,7 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 	);
 
 	$status = $dispatch_node->field_sirius_dispatch_status['und'][0]['value'];
+	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
 
 	$actions = array(NULL => t('-- Select --'));
 
