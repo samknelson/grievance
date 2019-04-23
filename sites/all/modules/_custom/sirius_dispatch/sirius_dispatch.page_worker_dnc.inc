@@ -11,8 +11,6 @@ function sirius_node_tab_worker_dnc($worker_node) {
 function sirius_node_tab_worker_dnc_form($form, &$form_state, $worker_node) {
 	$form_state['worker_node'] = $worker_node;
 
-	drupal_set_title($worker_node->title . ': Employer-Initiated Do Not Call');
-
 	// Show dispatch staff all the DNCs, and let them pick the employer
 	$html = '';
 	if ($worker_node->field_sirius_dispatch_dncs['und']) {

@@ -1,13 +1,23 @@
 <?php
 
-function sirius_dispatch_notify_medium_options() {
-	return array(
+function sirius_dispatch_notify_medium_options($worker_node = NULL) {
+	$options = array(
+		'none' => t('None'),
 		'sms' => t('Text message to the primary phone number'),
 		'voice' => t('Voice call to the primary phone number'),
 		'sms_alt' => t('Text message to the secondary phone number'),
 		'voice_alt' => t('Voice call to the secondary phone number'),
 		'email' => t('Email'),
+		'none' => t('None'),
 	);
+
+	if ($worker_node) {
+		if (!$worker_node->field_sirius_email['und'][0]['value']) { unset($options['email']); }
+		if (!$worker_node->field_sirius_phone['und'][0]['value']) { unset($options['voice']); unset($options['sms']); }
+		if (!$worker_node->field_sirius_phone_alt['und'][0]['value']) { unset($options['voice_alt']); unset($options['sms_alt']); }
+	}
+
+	return $options;
 }
 
 function sirius_dispatch_notify_possible($dispatch_node) {
@@ -42,7 +52,8 @@ function sirius_dispatch_notify(&$dispatch_node, $medium = NULL, $notes = '') {
 		'worker_node' => $worker_node,
 	);
 	$context = array();
-	$context['handler_nid'] = $dispatch_node->nid;
+	$context['handler'] = 'dispatch';
+	$context['dispatch_nid'] = $dispatch_node->nid;
 	$context['worker_nid'] = $worker_node->nid;
 
 
@@ -53,9 +64,11 @@ function sirius_dispatch_notify(&$dispatch_node, $medium = NULL, $notes = '') {
 		if (!$worker_node->field_sirius_dispatch_medium['und'][0]) {
 			return array('success' => FALSE, 'msg' => 'This worker has no dispatch medium set.');
 		}
-		foreach ($worker_node->field_sirius_dispatch_medium['und'] as $tmp) {
+		foreach ($worker_node->field_sirius_dispatch_medium['und'] as $delta => $tmp) {
+			if ($delta > 1) { break; }
 			$medium = $tmp['value'];
 			if (!$medium) { continue; }
+			if ($medium == 'none') { continue; }
 			if ($is_primary) { 
 				$notes = "Primary notification.";
 				$is_primary = FALSE;
@@ -86,7 +99,7 @@ function sirius_dispatch_notify(&$dispatch_node, $medium = NULL, $notes = '') {
 
 	} else if ($medium == 'voice_alt') {
 
-		$phone =sirius_phone_format_e164($worker_node->field_sirius_phone_alt['und'][0]['value']);
+		$phone = sirius_phone_format_e164($worker_node->field_sirius_phone_alt['und'][0]['value']);
 		$result = sirius_twilio_outgoing_voice($phone, $context);
 
 	} else if ($medium == 'email') {
@@ -95,6 +108,10 @@ function sirius_dispatch_notify(&$dispatch_node, $medium = NULL, $notes = '') {
 		$subject =sirius_dispatch_message_text('email', 'dispatch_notify_subject', $tokens);
 		$body = sirius_dispatch_message_text('email', 'dispatch_notify_body', $tokens);
 		$result = sirius_email_send(array('to' => $email, 'subject' => $subject, 'body' => $body, 'handler_nids' => array($dispatch_node->nid)));
+
+	} else if ($medium == 'none') {
+
+		$result = array('success' => TRUE, 'msg' => 'Medium "none" selected, no notification sent.');
 
 	} else {
 
@@ -144,3 +161,4 @@ function sirius_dispatch_notify_schedule_ok() {
 
 	return array('success' => TRUE);
 }
+

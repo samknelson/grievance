@@ -46,7 +46,9 @@ function sirius_dispatch_run($job_node) {
 	sirius_dispatch_run_finalize($job_node);
 
 	// Log the end
-	sirius_log('job:run', 'poll', 'complete', '', '', array($job_node->nid));
+  if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+    sirius_log('job:run', 'poll', 'complete', '', '', array($job_node->nid));
+  }
 
 	return array('success' => TRUE);
 }
@@ -91,7 +93,9 @@ function sirius_dispatch_run_finalize($job_node) {
 		$job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Filled';
 		$job_node->field_sirius_summary['und'][0]['value'] = 'Filled on ' . date('c');
 		node_save($job_node);
-		sirius_log('job:run', 'complete', "There are $count_we_have dispatches with status accepted. This job is filled.", '', '', array($job_node->nid));
+    if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+      sirius_log('job:run', 'complete', "There are $count_we_have dispatches with status accepted. This job is filled.", '', '', array($job_node->nid));
+    }
   }
 }
 
@@ -99,7 +103,9 @@ function sirius_dispatch_run_notify($job_node) {
 	// Make sure we're ok to send automatic notifications
 	$result = sirius_dispatch_notify_schedule_ok();
 	if (!$result['success']) {
-		sirius_log('job:run', 'notify', $result['msg'], '', '', array($job_node->nid));
+    if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+      sirius_log('job:run', 'notify', $result['msg'], '', '', array($job_node->nid));
+    }
 		return array('success' => TRUE, 'msg' => $result['msg']);
 	}
 
@@ -113,7 +119,9 @@ function sirius_dispatch_run_notify($job_node) {
   $stmt = $query->execute();
   if (!$stmt['node']) {
 		$msg = "There are no dispatches with status 'requested'. No notifications will be sent.";
-		sirius_log('job:run', 'notify', $msg, '', '', array($job_node->nid));
+    if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+		  sirius_log('job:run', 'notify', $msg, '', '', array($job_node->nid));
+    }
 		return array('success' => TRUE, 'msg' => $msg);
   }
 
@@ -125,7 +133,9 @@ function sirius_dispatch_run_notify($job_node) {
   	++$count;
   }
 	$msg = "Sent $count notifications.";
-	sirius_log('job:run', 'notify', $msg, '', '', array($job_node->nid));
+  if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+  	sirius_log('job:run', 'notify', $msg, '', '', array($job_node->nid));
+  }
 	return array('success' => TRUE, 'msg' => $msg);
 }
 
@@ -161,7 +171,9 @@ function sirius_dispatch_run_create_dispatches($job_node) {
 	// We have just enough -- success
 	if ($count_we_need == $count_we_have) {
 		$msg = "There are $count_we_need dispatches already with status requested, notified, or pending. No new dispatches will be created.";
-		sirius_log('job:run', 'create_dispatches', $msg, '', '', array($job_node->nid));
+    if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+		  sirius_log('job:run', 'create_dispatches', $msg, '', '', array($job_node->nid));
+    }
 		return array('success' => TRUE, 'msg' => $msg);
 	}
 
@@ -191,7 +203,9 @@ function sirius_dispatch_run_create_dispatches($job_node) {
 
 	// All done
 	$msg = "Created $created dispatches.";
-	sirius_log('job:run', 'create_dispatches', $msg, '', '', array($job_node->nid));
+  if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+  	sirius_log('job:run', 'create_dispatches', $msg, '', '', array($job_node->nid));
+  }
 	return array('success' => TRUE, 'msg' => $msg);
 }
 
@@ -224,7 +238,9 @@ function sirius_dispatch_run_expire($job_node) {
   }
 
   $msg = "Expired $expired dispatches which were notified prior to $cutoff_str";
-	sirius_log('job:run', 'expire', $msg, '', '', array($job_node->nid));
+  if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+  	sirius_log('job:run', 'expire', $msg, '', '', array($job_node->nid));
+  }
 	return array('success' => TRUE, 'msg' => $msg, 'count' => $expired);
 }
 
@@ -334,6 +350,16 @@ function sirius_dispatch_run_admin() {
   		'#suffix' => '</div>',
   	);
   }
+
+  $form["sirius_dispatch_log_level"] = array(
+    '#type' => 'select',
+    '#title' => 'Log Level',
+    '#options' => array(
+      'standard' => t('Standard - only log errors'),
+      'debug' => t('Debug - log everything'),
+    ),
+    '#default_value' => variable_get('sirius_dispatch_log_level', 'standard'),
+  );
 
   return system_settings_form($form);
 }

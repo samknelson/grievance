@@ -7,8 +7,8 @@ function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
 	if (!$job_node) { return; }
 	if ($job_node->field_sirius_notify['und'][0]['value'] != 'Yes') { return; }
-	$email = $job_node->field_sirius_email['und'][0]['value'];
-	if (!$email) { return; }
+	$emails = sirius_fieldvals($job_node, 'field_sirius_emails');
+	if (!$emails) { return; }
 	if (!$job_node->field_sirius_dispatch_job_nfcns['und'][0]) { return; }
 
 	$notifications = array();
@@ -24,7 +24,8 @@ function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
 	$found = FALSE; 
 	if ($status_new == 'accepted' && $notifications['dispatch_accept']) { $found = TRUE; }
 	if ($status_new == 'declined' && $notifications['dispatch_decline']) { $found = TRUE; }
-	if ($status_new == 'expired' && $notifications['dispatch_expired']) { $found = TRUE; }
+	if ($status_new == 'expired' && $notifications['dispatch_expire']) { $found = TRUE; }
+	if ($status_new == 'resigned' && $notifications['dispatch_resign']) { $found = TRUE; }
 	if (!$found) { return; }
 
 	global $base_url;
@@ -36,21 +37,23 @@ function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
 	$body .= "Old status: <strong>$status_old</strong><br />";
 	$body .= "New status: <strong>$status_new</strong><br />";
 
-	sirius_email_send(
-		array(
-			'to' => $email,
-			'subject' => $subject,
-			'body' => $body,
-			'handler_nids' => array($dispatch_node->nid),
-		)
-	);
+	foreach ($emails as $email) {
+		sirius_email_send(
+			array(
+				'to' => $email,
+				'subject' => $subject,
+				'body' => $body,
+				'handler_nids' => array($dispatch_node->nid),
+			)
+		);
+	}
 }
 
 function sirius_dispatch_notify_employer_job($job_node) {
 	if (!$job_node) { return; }
 	if ($job_node->field_sirius_notify['und'][0]['value'] != 'Yes') { return; }
-	$email = $job_node->field_sirius_email['und'][0]['value'];
-	if (!$email) { return; }
+	$emails = sirius_fieldvals($job_node, 'field_sirius_emails');
+	if (!$emails) { return; }
 	if (!$job_node->field_sirius_dispatch_job_nfcns['und'][0]) { return; }
 
 	$notifications = array();
@@ -75,12 +78,14 @@ function sirius_dispatch_notify_employer_job($job_node) {
 	$body .= "Old status: <strong>$status_old</strong><br />";
 	$body .= "New status: <strong>$status_new</strong><br />";
 
-	sirius_email_send(
-		array(
-			'to' => $email,
-			'subject' => $subject,
-			'body' => $body,
-			'handler_nids' => array($job_node->nid),
-		)
-	);
+	foreach ($emails as $email) {
+		sirius_email_send(
+			array(
+				'to' => $email,
+				'subject' => $subject,
+				'body' => $body,
+				'handler_nids' => array($job_node->nid),
+			)
+		);
+	}
 }

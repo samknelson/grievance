@@ -30,19 +30,44 @@ function sirius_dispatch_permission() {
       'title' => t('Sirius Dispatch Signin'), 
       'description' => t('Permission to sign yourself in to the out-of-work list'),
     ),
-    'sirius dispatch bullpen' => array(
-      'title' => t('Sirius Dispatch Bullpen'), 
-      'description' => t('Permission to set sign-ins for a bullpen'),
+    'sirius dispatch bullpen view' => array(
+      'title' => t('Sirius Dispatch Bullpen View'), 
+      'description' => t('Permission to view the bullpens'),
+    ),
+    'sirius dispatch bullpen signin' => array(
+      'title' => t('Sirius Dispatch Bullpen Signin'), 
+      'description' => t('Permission to sign yourself into a bullpen'),
+    ),
+    'sirius dispatch bullpen signin others' => array(
+      'title' => t('Sirius Dispatch Bullpen Signin Others'), 
+      'description' => t('Permission to sign other workers into a bullpen'),
+    ),
+    'sirius dispatch bullpen signin view' => array(
+      'title' => t('Sirius Dispatch Bullpen Signin View'), 
+      'description' => t('Permission to view the signin list for a bullpen'),
+    ),
+    'sirius dispatch own preferences' => array(
+      'title' => t('Sirius Dispatch Own Preferences'), 
+      'description' => t('Permission to set your own dispatch preferences'),
     ),
   );
 }
 
 function sirius_dispatch_node_access($node, $op, $account) {
   if ($node->type == 'sirius_dispatch') { return sirius_dispatch_node_access_dispatch($node, $op, $account); }
+  if ($node->type == 'sirius_dispatch_job') { return sirius_dispatch_node_access_job($node, $op, $account); }
   return NODE_ACCESS_IGNORE;
 }
 
 function sirius_dispatch_node_access_dispatch($node, $op, $account) {
+  // Admins can access
+  if (user_access('sirius dispatch staff', $account)) { return NODE_ACCESS_ALLOW; }
+
+  // Nobody else can do anything
+  return NODE_ACCESS_DENY;
+}
+
+function sirius_dispatch_node_access_job($node, $op, $account) {
   // Admins can access
   if (user_access('sirius dispatch staff', $account)) { return NODE_ACCESS_ALLOW; }
 
