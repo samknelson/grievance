@@ -110,7 +110,7 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 		'#title' => t('Send by:'),
 		'#type' => 'select',
 		'#options' => $send_medium_options,
-		'#default_value' => $worker_node->field_sirius_dispatch_medium['und'][0]['value'],
+		'#default_value' => $worker_node->field_sirius_dispatch_medium['und'][2]['value'],
 		'#states' => array(
 			'visible' => array(
 				array(':input[name="action"]' => array('value' => 'send')),
