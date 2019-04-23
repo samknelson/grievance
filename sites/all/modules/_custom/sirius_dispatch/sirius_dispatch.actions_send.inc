@@ -5,7 +5,6 @@ function sirius_dispatch_send_medium_options($worker_node = NULL) {
 		'sms' => t('Text message to the primary phone number'),
 		'sms_alt' => t('Text message to the secondary phone number'),
 		'email' => t('Email'),
-		'none' => t('None'),
 	);
 
 	if ($worker_node) {
