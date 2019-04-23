@@ -29,6 +29,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_create.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_expire.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_bullpen_signin.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_send.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_member_status_ratios.inc';
 

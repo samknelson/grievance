@@ -80,6 +80,8 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 		}
 	}
 
+	$actions['send'] 				  = t('Send a copy');
+
 	$form['action'] = array(
 		'#type' => 'select',
 		'#title' => t('Action'),
@@ -97,6 +99,31 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 		'#states' => array(
 			'visible' => array(
 				array(':input[name="action"]' => array('value' => 'notify')),
+			)
+		),
+	);
+
+	$send_medium_options = array(NULL => t('Use the worker\'s notification preference'));
+	$send_medium_options += sirius_dispatch_send_medium_options();
+	$form['send_medium'] = array(
+		'#title' => t('Send by:'),
+		'#type' => 'select',
+		'#options' => $send_medium_options,
+		'#default_value' => $worker_node->field_sirius_dispatch_medium['und'][0]['value'],
+		'#states' => array(
+			'visible' => array(
+				array(':input[name="action"]' => array('value' => 'send')),
+			)
+		),
+	);
+
+	$form['recipient'] = array(
+		'#title' => t('Recipient:'),
+		'#type' => 'textfield',
+		'#description' => t('Leave blank to send to the worker.'),
+		'#states' => array(
+			'visible' => array(
+				array(':input[name="action"]' => array('value' => 'send')),
 			)
 		),
 	);
@@ -123,6 +150,7 @@ function sirius_node_tab_dispatch_manage_form_submit($form, &$form_state) {
 	$notes = $form_state['values']['notes'];
 
 	if ($action == 'notify') 				{ $result = sirius_dispatch_notify($dispatch_node, $form_state['values']['medium'], $notes); }
+	if ($action == 'send') 					{ $result = sirius_dispatch_send($dispatch_node, $form_state['values']['send_medium'], $form_state['values']['recipient'], $notes); }
 	if ($action == 'accept')				{ $result = sirius_dispatch_accept($dispatch_node, $notes); }
 	if ($action == 'decline')				{ $result = sirius_dispatch_decline($dispatch_node, $notes); }
 	if ($action == 'undecline')			{ $result = sirius_dispatch_undecline($dispatch_node, $notes); }
