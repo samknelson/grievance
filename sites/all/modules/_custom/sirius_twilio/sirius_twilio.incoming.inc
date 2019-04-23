@@ -55,6 +55,8 @@ function sirius_twilio_incoming_voice() {
 	$context['digits'] = $_REQUEST['Digits'];
   $context['direction'] = $_REQUEST['Direction'];
   $context['msg'] = $_REQUEST['msg'];
+  $context['request'] = $_REQUEST;
+  $context['request_digits'] = $_REQUEST['Digits'];
   if (preg_match('/outbound/', $context['direction'])) {
   	$context['phone'] = sirius_phone_format_e164($context['to']);
   } else {
@@ -72,7 +74,7 @@ function sirius_twilio_incoming_voice() {
 		$log_msg = "User entered: " . $context['digits'];
 	}
 
-	sirius_twilio_set_context($call_sid, $context, $log_type, $log_msg, '<pre>' . print_r($_REQUEST, 1) . '</pre>');
+	// sirius_twilio_set_context($call_sid, $context, $log_type, $log_msg, '<pre>' . print_r($_REQUEST, 1) . '</pre>');
   sirius_phonetree($call_sid, $context);
 	sirius_become_superuser(FALSE);
 }
