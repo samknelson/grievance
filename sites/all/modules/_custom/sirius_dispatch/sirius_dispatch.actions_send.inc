@@ -26,28 +26,8 @@ function sirius_dispatch_send(&$dispatch_node, $medium = NULL, $to = NULL, $note
 	$context['worker_nid'] = $worker_node->nid;
 
 
-	// No medium: use all the workers defaults
-	if (!$medium) {
-
-		$is_primary = TRUE;
-		if (!$worker_node->field_sirius_dispatch_medium['und'][0]) {
-			return array('success' => FALSE, 'msg' => 'This worker has no dispatch medium set.');
-		}
-		foreach ($worker_node->field_sirius_dispatch_medium['und'] as $delta => $tmp) {
-			if ($delta > 1) { break; }
-			$medium = $tmp['value'];
-			if (!$medium) { continue; }
-			if ($medium == 'none') { continue; }
-			if ($is_primary) { 
-				$notes = "Primary notification.";
-				$is_primary = FALSE;
-			} else {
-				$notes = "Secondary notification.";
-			}
-			$result = sirius_dispatch_send($dispatch_node, $medium, $to, $notes);
-		}
-		return $result;
-	}
+	// No medium: use the worker's default non-primary medium.
+	if (!$medium) { $medium = $worker_node->field_sirius_dispatch_medium['und'][2]['value']; }
 
 	global $base_url;
 	$url = "$base_url/d/" . $dispatch_node->nid . "/" . $dispatch_node->field_sirius_aat['und'][0]['value'];
