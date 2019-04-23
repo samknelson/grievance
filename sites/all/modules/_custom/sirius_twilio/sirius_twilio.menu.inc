@@ -10,6 +10,13 @@
 function sirius_twilio_node_tabs() {
   $node_tabs = array();
 
+  $node_tabs['sirius_log']['sirius_twilio_calllog'] = array(
+    'title' => 'Call Log',
+    'description' => '',
+    'callback' => 'sirius_node_tab_calllog',
+    'permissions' => array('sirius log view'),
+  );
+
   return $node_tabs;
 }
 
@@ -128,6 +135,14 @@ function sirius_twilio_node_tab_access($node, $in_tab_name) {
         if ($tab_name == $in_tab_name) {
           foreach ($tab_record['permissions'] as $permission) {
             if (!user_access($permission)) { return false; }
+          }
+          
+          // Check for a custom access permission
+          $access_function_name = $tab_record['callback'] . '_access';
+          if (function_exists($access_function_name)) {
+            if (!$access_function_name($node)) {
+              return false;
+            }
           }
           
           return true;

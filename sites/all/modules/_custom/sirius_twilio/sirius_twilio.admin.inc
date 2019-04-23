@@ -35,6 +35,13 @@ function sirius_twilio_config() {
     '#description' => t('Phone number in E164 format (i.e. "+15551234567".'),
   );
 
+  $form['sirius_twilio_site_name_tts'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Site Name (TTS)'),
+    '#default_value' => variable_get('sirius_twilio_site_name_tts', ''),
+    '#description' => t('Site name as it should be spoken (TTS format)'),
+  );
+
   return system_settings_form($form);
 }
 
