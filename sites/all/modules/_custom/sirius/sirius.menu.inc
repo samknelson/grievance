@@ -173,6 +173,26 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/voice/forward-to-operator/log'] = array(
+    'title' => 'Incoming Calls',
+    'page callback' => 'sirius_page_voice_forward_to_operator',
+    'page arguments' => array(),
+    'access arguments' => array('sirius log view'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/voice/forward-to-operator/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'access arguments' => array('sirius log view'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_page_voice_forward_to_operator_settings'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+
   return $items;
 }
 
