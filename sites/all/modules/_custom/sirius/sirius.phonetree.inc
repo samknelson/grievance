@@ -33,7 +33,7 @@ function sirius_phonetree($call_sid, $context) {
 
 	// Enter 9 to be connected with an operator.
 	if ($digits == 9) {
-		sirius_twilio_outgoing_voice_dial($call_sid, $context, "Please wait while we connect you with an operator.", variable_get('sirius_twilio_operator', ''));
+		sirius_phonetree_forward_to_operator($call_sid, $context); 
 	} 
 
 	// Enter * to hear this message again.
@@ -156,6 +156,9 @@ function sirius_phonetree_worker($call_sid, $context) {
 		$text .= "Enter 4 to hear your current dispatch.\n";
 	}
 
+	$text .= "Enter 9 at any time to be connected with the operator. ";
+	$text .= "Enter star to hear this message again. ";
+
 	sirius_twilio_outgoing_voice_say($call_sid, $context, $text, 1);
 }
 
@@ -212,7 +215,7 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 			$text .= "Report to " . $facility_node->title . " at " . date('h:i a', $ts) . " : \n";
 		}
 
-		$text .= "Press star to hear this list again.";
+		$text .= "Press star to hear this list again.\n";
 	}
 	$text .= 'Enter 8 to return to the previous menu. ';
 
@@ -506,4 +509,23 @@ function sirius_phonetree_dispatch_current($call_sid, $context) {
 	$text .= "Enter star to hear this message again.\n";
 
   sirius_twilio_outgoing_voice_say($call_sid, $context, $text, 2);
+}
+
+
+/**
+ * Forwward to Operator
+ */
+
+function sirius_phonetree_forward_to_operator($call_sid, $context) {
+	$status = variable_get('sirius_voice_forward_to_operator_status', 'open');
+	if ($status == 'closed') {
+		$which = variable_get('sirius_voice_forward_to_operator_disabled_which', 1);
+		$text = variable_get("sirius_voice_forward_to_operator_disabled_$which", "We're sorry, the office is closed right now.");
+		$text .= ": ";
+		$text .= "Enter 8 to return to the previous menu.\n";
+		$text .= "Enter star to hear this message again.\n";
+		$context['expect'] = $context['handler'] = $context['digits'] = NULL;
+	  sirius_twilio_outgoing_voice_say($call_sid, $context, $text, 1);
+	}
+	sirius_twilio_outgoing_voice_dial($call_sid, $context, "Please wait while we connect you with an operator.", variable_get('sirius_twilio_operator', ''));
 }
