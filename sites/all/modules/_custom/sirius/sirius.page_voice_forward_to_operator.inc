@@ -128,23 +128,13 @@ function sirius_page_voice_forward_to_operator_settings() {
       5 => 'Message #5',
     ),
     '#default_value' => variable_get('sirius_voice_forward_to_operator_disabled_which', 1),
-    '#states' => array(
-      'visible' => array(
-        array(':input[name="sirius_voice_forward_to_operator_status"]' => array('value' => 'closed')),
-      )
-    ),
   );
   for ($i=1; $i<=5; ++$i) {
     $form["sirius_voice_forward_to_operator_disabled_$i"] = array(
       '#title' => "Message #$i",
       '#type' => 'textarea',
-        '#default_value' => variable_get("sirius_voice_forward_to_operator_disabled_$i", ""),
-        '#states' => array(
-          'visible' => array(
-            array(':input[name="sirius_voice_forward_to_operator_status"]' => array('value' => 'closed')),
-          )
-        ),
-      );
+      '#default_value' => variable_get("sirius_voice_forward_to_operator_disabled_$i", ""),
+    );
   }
 
   return system_settings_form($form);
