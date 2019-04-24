@@ -31,19 +31,19 @@ function sirius_email_admin() {
     ),
   );
 
-	/*
-	$form["sirius_email_default_replyto_address"] = array(
+
+	$form["sirius_email_replyto_address"] = array(
 		'#type' => 'textfield',
-		'#title' => 'Default Reply-To Email Address',
-		'#default_value' => variable_get("sirius_email_default_replyto_address", ''),
+		'#title' => 'Global Reply-To Email',
+		'#default_value' => variable_get("sirius_email_replyto_address", ''),
+    '#description' => t('If set, ALL emails sent from the system will use this reply-to addres. If left blank, the reply-to address will be the name of the current user.')
 	);
 
-	$form["sirius_email_default_replyto_name"] = array(
+	$form["sirius_email_replyto_name"] = array(
 		'#type' => 'textfield',
-		'#title' => 'Default Reply-To Email Address',
-		'#default_value' => variable_get("sirius_email_default_replyto_name", ''),
+		'#title' => 'Global Reply-To Name',
+		'#default_value' => variable_get("sirius_email_replyto_name", ''),
 	);
-	*/
 
   return system_settings_form($form);
 }
@@ -152,7 +152,9 @@ function sirius_mail($key, &$message, $params) {
   $message['headers']['Content-Type'] = 'text/html; charset=UTF-8;';
 
   // Reply-to is either set, or it's the current user.
-  if ($params['reply-to']) {
+  if (variable_get("sirius_email_replyto_address", '')) {
+    $message['headers']['Reply-To'] = variable_get("sirius_email_replyto_name", '') . '<' . variable_get("sirius_email_replyto_address", '') . '>';
+  } else if ($params['reply-to']) {
     $message['headers']['Reply-To'] = $params['reply-to'];
   } else {
     $message['headers']['Reply-To'] = $user->mail;
@@ -174,7 +176,6 @@ function sirius_mail($key, &$message, $params) {
   }
 
   // Custom header: 
-
   $message['from'] = 
     $message['params']['from'] = 
     $message['headers']['From'] = 
