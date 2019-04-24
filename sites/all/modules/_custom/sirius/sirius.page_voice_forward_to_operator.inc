@@ -118,7 +118,7 @@ function sirius_page_voice_forward_to_operator_settings() {
   );
 
   $form['sirius_voice_forward_to_operator_disabled_which'] = array(
-    '#title' => t('When a user requests the operator, which message should be played?'),
+    '#title' => t('When the office is closed, and a user requests the operator, which message should be played?'),
     '#type' => 'select',
     '#options' => array(
       1 => 'Message #1',
