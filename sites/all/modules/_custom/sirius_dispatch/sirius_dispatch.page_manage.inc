@@ -133,6 +133,7 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 	$form['notes'] = array(
 		'#type' => 'textarea',
 		'#title' => t('Notes'),
+		'#description' => t('Notes will be appended to the log, which may be visible to the worker. If you choose the action "send a copy", the notes will be included in the email or text message sent to the worker.'),
 	);
 
 	$form['submit'] = array(
