@@ -1,14 +1,15 @@
 <?php
 
+
+///////////////////////////////////////////////////////////////////
+// View 
+///////////////////////////////////////////////////////////////////
+
 function sirius_node_tab_dispatch_bullpen_access($job_node) {
 	if ($job_node->field_sirius_dispatch_job_type['und'][0]['tid'] != sirius_get_special_tid('sirius_dispatch_job_type|BULL')) { return FALSE; }
 	// @todo: Who has access to this page?
 	return TRUE;
 }
-
-///////////////////////////////////////////////////////////////////
-// View 
-///////////////////////////////////////////////////////////////////
 
 function sirius_node_tab_dispatch_bullpen($job_node) {
 	drupal_set_title($job_node->title); 
@@ -36,6 +37,10 @@ function sirius_node_tab_dispatch_bullpen($job_node) {
 ///////////////////////////////////////////////////////////////////
 // Signin Self 
 ///////////////////////////////////////////////////////////////////
+
+function sirius_node_tab_dispatch_bullpen_signin_self_access($job_node) { 
+	return sirius_node_tab_dispatch_bullpen_access($job_node);
+}
 
 function sirius_node_tab_dispatch_bullpen_signin_self($job_node) {
 	drupal_set_title($job_node->title); 
@@ -116,6 +121,9 @@ function sirius_node_tab_dispatch_bullpen_signin_self_form_submit($form, &$form_
 ///////////////////////////////////////////////////////////////////
 
 function sirius_node_tab_dispatch_bullpen_signin_others_access($job_node) {
+	// Must have access to the bullpen
+	if (!sirius_node_tab_dispatch_bullpen_access($job_node)) { return FALSE; }
+
 	// If you have "sign-in others" permission, you can see this page
 	if (user_access('sirius dispatch bullpen signin others')) { return TRUE; }
 
