@@ -46,6 +46,8 @@ function sirius_dispatch_notify(&$dispatch_node, $medium = NULL, $notes = '') {
 
 	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+	$employer_node = node_load($job_node->field_grievance_shop['und'][0]['target_id']);
+	$job_type_term = taxonomy_term_load($job_node->field_sirius_dispatch_job_type['und'][0]['tid']);
 	$tokens = array(
 		'dispatch_node' => $dispatch_node,
 		'job_node' => $job_node,
@@ -56,6 +58,28 @@ function sirius_dispatch_notify(&$dispatch_node, $medium = NULL, $notes = '') {
 	$context['dispatch_nid'] = $dispatch_node->nid;
 	$context['worker_nid'] = $worker_node->nid;
 
+	global $base_url;
+	$url = "$base_url/d/" . $dispatch_node->nid . "/" . $dispatch_node->field_sirius_aat['und'][0]['value'];
+
+	$sms_text = "Teamsters 631 is announcing a job dispatch.\n";
+	$sms_text .= "Employer: " . $employer_node->title . "\n";
+	$sms_text .= "Call type: " . $job_type_term->name . "\n";
+	$sms_text .= "Report date: " . sirius_date_date($job_node, 'field_sirius_datetime', 'l, F j, y \a\t g:i A') . "\n";
+	$sms_text .= "Link: $url\n";
+	$sms_text .= "\n";
+	$sms_text .= "To accept this job, reply:\n";
+	$sms_text .= $dispatch_node->nid . " accept\n";
+	$sms_text .= "\n";
+	$sms_text .= "To decline this job, reply:\n";
+	$sms_text .= $dispatch_node->nid . " decline\n";
+
+	$email_subject = "Teamsters 631 job dispatch announcement: " . $employer_node->title;
+	$email_body = "Teamsters 631 is announcing a job dispatch.<br /><br />";
+	$email_body .= "Employer: <strong>" . $employer_node->title . "</strong><br />";
+	$email_body .= "Call type: <strong>" . $job_type_term->name . "</strong><br />";
+	$email_body .= "Report date: <strong>" . sirius_date_date($job_node, 'field_sirius_datetime', 'l, F j, y \a\t g:i A') . "</strong><br /><br />";
+	$email_body .= "To view the full dispatch and accept or decline, please follow the link below:<br /><br />";
+	$email_body .= "<a href=\"$url\">$url</a>";
 
 	// No medium: use all the workers defauls
 	if (!$medium) {
@@ -82,20 +106,18 @@ function sirius_dispatch_notify(&$dispatch_node, $medium = NULL, $notes = '') {
 	} else if ($medium == 'sms') {	
 
 		$phone = sirius_phone_format_e164($worker_node->field_sirius_phone['und'][0]['value']);
-		$text = sirius_dispatch_message_text('sms', 'dispatch_notify', $tokens);
-		$result = sirius_twilio_outgoing_sms($phone, $text, $dispatch_node->nid);
+		$result = sirius_twilio_outgoing_sms($phone, $sms_text, $dispatch_node->nid);
 
 	}
 	else if ($medium == 'voice') {
 
-		$phone =sirius_phone_format_e164( $worker_node->field_sirius_phone['und'][0]['value']);
+		$phone = sirius_phone_format_e164( $worker_node->field_sirius_phone['und'][0]['value']);
 		$result = sirius_twilio_outgoing_voice($phone, $context);
 
 	} else if ($medium == 'sms_alt') {
 
 		$phone = sirius_phone_format_e164($worker_node->field_sirius_phone_alt['und'][0]['value']);
-		$text = sirius_dispatch_message_text('sms', 'dispatch_notify', $tokens);
-		$result = sirius_twilio_outgoing_sms($phone, $text, $dispatch_node->nid);
+		$result = sirius_twilio_outgoing_sms($phone, $sms_text, $dispatch_node->nid);
 
 	} else if ($medium == 'voice_alt') {
 
@@ -105,9 +127,7 @@ function sirius_dispatch_notify(&$dispatch_node, $medium = NULL, $notes = '') {
 	} else if ($medium == 'email') {
 
 		$email = $worker_node->field_sirius_email['und'][0]['value'];
-		$subject =sirius_dispatch_message_text('email', 'dispatch_notify_subject', $tokens);
-		$body = sirius_dispatch_message_text('email', 'dispatch_notify_body', $tokens);
-		$result = sirius_email_send(array('to' => $email, 'subject' => $subject, 'body' => $body, 'handler_nids' => array($dispatch_node->nid)));
+		$result = sirius_email_send(array('to' => $email, 'subject' => $email_subject, 'body' => $email_body, 'handler_nids' => array($dispatch_node->nid)));
 
 	} else if ($medium == 'none') {
 
