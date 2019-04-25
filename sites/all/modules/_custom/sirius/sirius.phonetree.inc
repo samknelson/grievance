@@ -375,7 +375,8 @@ function sirius_phonetree_dispatch($call_sid, $context) {
 	$worker_node = node_load($worker_nid);
 	$employer_node = node_load($job_node->field_grievance_shop['und'][0]['target_id']);
 	$job_type_term = taxonomy_term_load($job_node->field_sirius_dispatch_job_type['und'][0]['tid']);
-	$facility_node = node_load($job_node->field_sirius_facility['und'][0]['target_id']);
+	$facility_node = node_load($job_node->field_sirius_dispatch_facility['und'][0]['target_id']);
+	$hall_node = node_load($job_node->field_sirius_dispatch_hall['und'][0]['target_id']);
 
 	$tokens = array(
 		'dispatch_node' => $dispatch_node,
@@ -417,10 +418,23 @@ function sirius_phonetree_dispatch($call_sid, $context) {
 	} 
 
 	else if ($digits == 2) {
-  	if (sirius_dispatch_accept($dispatch_node)) { 
-			$text = sirius_dispatch_message_text('voice', 'dispatch_accept_confirm', $tokens);
+		$result = sirius_dispatch_accept($dispatch_node);
+  	if ($result['success']) { 
+			$text = "The dispatch has been accepted. ";
+			$text .= "The report time is " . sirius_date_date($job_node, 'field_sirius_datetime', 'l, F d \a\t g i a') . ". ";
+			$text .= "Please report to: " . sirius_tts_title($facility_node) . ". ";
+			if ($hall_node) { $text .= sirius_tts_title($hall_node) . ". "; }
+			if ($job_node->field_sirius_address_notes['und'][0]['value']) { $text .= $job_node->field_sirius_address_notes['und'][0]['value'] . ". "; }
+			$text .= "Press 8 to return to the previous menu. ";
+			$text .= "Press 9 to be connected with the operator. ";
+			$text .= "Press star to hear this message again.";
+			$gather_digits = 1;
   	} else {
-			$text = sirius_dispatch_message_text('voice', 'dispatch_error', $tokens);
+			$text = "We were unable to process your request: " . $result['msg'];
+			$text .= "Press 8 to return to the previous menu. ";
+			$text .= "Press 9 to be connected with the operator. ";
+			$text .= "Press star to hear this message again.";
+			$gather_digits = 1;
 		}
 	} 
 
