@@ -215,6 +215,7 @@ function sirius_teamsters631_badge_contents_access() {
 	if ($_SERVER['SERVER_ADDR'] == $_SERVER['REMOTE_ADDR'] ||
 		  $_SERVER['SERVER_ADDR'] == $_SERVER['HTTP_X_FORWARDED_FOR'] ||
 		  $_SERVER['REMOTE_ADDR'] == '18.224.235.106' || 
+		  $_SERVER['REMOTE_ADDR'] == '127.0.0.1' || 
 		  $_SERVER['SERVER_ADDR'] == variable_get('grievance_loopback_ip', '')) { 
 		return TRUE; 
 	}
