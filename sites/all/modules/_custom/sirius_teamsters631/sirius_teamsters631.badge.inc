@@ -311,15 +311,15 @@ function sirius_teamsters631_badge_contents($worker_node) {
 	print '<div style="page-break-before: always;"></div>';
 
 	// Property of
-	print '<div style="background-color: #000000; color: #ffffff; font-weight: bold; text-align: center; padding-top: 5px; padding-bottom: 5px; margin-bottom: 10px; padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0;">';
-	print "Property of Teamsters Local Union 631";
+	print '<div style="background-color: #000000; color: #ffffff; font-weight: bold; text-align: center; padding-top: 5px; padding-bottom: 5px; margin-bottom: 10px; padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; font-family: arial, helvetica, sans-serif;">';
+	print "Property of<br />Teamsters Local Union 631";
 	print '</div>';
 
 	// Contact
 	print '<div style="text-align: center; background-image: url(\'https://test.dispatch.teamsters631.com/sites/all/modules/_custom/sirius_teamsters631/images/logo_bg.jpg\');  background-repeat: no-repeat;  background-position: top center; background-size: auto 100%; ">';
 
 	// Back text
-	print '<div style="height: 210px; overflow: hidden; white-space: pre; font-size: 75%">';
+	print '<div style="height: 210px; overflow: hidden; white-space: pre; font-size: 85%">';
 	print $_REQUEST['back'];
 	print '</div>';
 
