@@ -269,8 +269,9 @@ function sirius_teamsters631_badge_contents($worker_node) {
 		if ($str) { $skill_indicators[] = $str; }
 	}
 
-	print "<div style=\"width: 250px; height: 230px; overflow: hidden; padding: 0; background: linear-gradient(to bottom, $bt 0%, $bt 50%, $bb 50%, $bb 100%);\">";
-	print "<div style=\"width: 210px; height: 200px; overflow: hidden; padding: 0; display: block; margin-left: 20px; margin-right: 20px; margin-top: 15px; margin-bottom: 15px;\">";
+	print "<style>body { margin: 0; padding: 0; }</style>";
+	print "<div style=\"width: 100%; height: 230px; overflow: hidden; padding: 0; background: linear-gradient(to bottom, $bt 0%, $bt 50%, $bb 50%, $bb 100%);\">";
+	print "<div style=\"width: 220px; height: 200px; overflow: hidden; padding: 0; display: block; margin-left: 20px; margin-right: 20px; margin-top: 15px; margin-bottom: 15px;\">";
 	print "<img src=\"$url\" alt=\"" . htmlspecialchars($name) . "\" height=\"200\" style=\"height: 210px; display: block; margin-left: auto; margin-right: auto;\">";
 	print "</div>";
 	print "</div>";
@@ -281,13 +282,13 @@ function sirius_teamsters631_badge_contents($worker_node) {
 	print '</div>';
 
 	// Bottom wrapper
-	print '<div style="padding-top: 5px; text-align: right;">';
+	print '<div style="padding-top: 5px; text-align: right; padding-bottom: 4px; padding-left: 12px; padding-right: 12px;">';
 
 	// Logo
-	print '<img src="https://dispatch.teamsters631.com/sites/default/files/sirius/banner/logo/teamsters-union-631_3.png" style="float: left;" height="120">';
+	print '<img src="https://dispatch.teamsters631.com/sites/default/files/sirius/banner/logo/teamsters-union-631_3.png" style="float: left;" height="127">';
 
 	// Front text
-	print '<div style="height: 110px; overflow: hidden; white-space: pre;">';
+	print '<div style="height: 122px; overflow: hidden; white-space: pre;">';
 	print $_REQUEST['front'];
 	print '</div>';
 
