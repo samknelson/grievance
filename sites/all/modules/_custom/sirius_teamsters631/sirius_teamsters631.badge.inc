@@ -26,24 +26,24 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 	*/
 
 	$colors = array(
-		'blue' => 'Blue',
+		'#272967' => 'Teamsters Blue',
 		'yellow' => 'Yellow',
 		'red' => 'Red',
 		'green' => 'Green',
 		'orange' => 'Orange',
-		'brown' => 'brown'
+		'brown' => 'Brown'
 	);
 
 	$table = array();
 
 	$table[0] = array('bt' => 'white', 'bb' => 'white', 'msg' => 'No Match');
-	$table[1] = array('bt' => 'blue', 'bb' => 'blue', 'msg' => 'Journeyman / Active Member');
+	$table[1] = array('bt' => '#272967', 'bb' => '#272967', 'msg' => 'Journeyman / Active Member');
 	$table[2] = array('bt' => 'yellow', 'bb' => 'yellow', 'msg' => 'Journeyman / Hiring Hall Fee');
-	$table[3] = array('bt' => 'red', 'bb' => 'blue', 'msg' => 'Apprentice / Active Member');
+	$table[3] = array('bt' => 'red', 'bb' => '#272967', 'msg' => 'Apprentice / Active Member');
 	$table[4] = array('bt' => 'red', 'bb' => 'red', 'msg' => 'Apprentice / Non-Member');
 	$table[5] = array('bt' => 'orange', 'bb' => 'orange', 'msg' => 'Skilled Extraboard');
 	$table[6] = array('bt' => 'brown', 'bb' => 'brown', 'msg' => 'Unskilled Extraboard');
-	$table[7] = array('bt' => 'green', 'bb' => 'blue', 'msg' => 'Specialty Craft / Active Member');
+	$table[7] = array('bt' => 'green', 'bb' => '#272967', 'msg' => 'Specialty Craft / Active Member');
 	$table[8] = array('bt' => 'green', 'bb' => 'yellow', 'msg' => 'Specialty Craft / Non-Member');
 
 	$member_status_tids 		= sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
@@ -302,7 +302,7 @@ function sirius_teamsters631_badge_contents($worker_node) {
 	// Skill Indicators
 	print '<div style="height: 20px; overflow: hidden;">';
 	foreach ($skill_indicators as $skill) {
-		print '<span style="color: white; background-color: darkblue; padding-left: 2px; padding-right: 2px;">' . $skill . '</span> ';
+		print '<span style="color: white; background-color: #272967; padding-left: 2px; padding-right: 2px;">' . $skill . '</span> ';
 	}
 	print '</div>';
 
