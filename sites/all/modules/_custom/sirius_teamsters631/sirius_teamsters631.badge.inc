@@ -106,7 +106,7 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 				if ($default_back) { $default_back .= "\n"; }
 				$default_back .= $skill_term->name;
 				$expire_ts = strtotime($skill_expire[$delta]);
-				if ($expire_ts < time() + 60*60*24*365*25) {
+				if ($expire_ts > time() && $expire_ts < time() + 60*60*24*365*25) {
 					$default_back .= " - " . date('Y-m-d', $expire_ts);
 				}
 			}
