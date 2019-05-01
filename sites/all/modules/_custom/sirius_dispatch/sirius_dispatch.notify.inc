@@ -29,7 +29,13 @@ function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
 	if (!$found) { return; }
 
 	global $base_url;
-	$subject = "Dispatch update - Call #" . $job_node->field_sirius_id['und'][0]['value'] . ' / Worker ' . $worker_node->title . ' / ' . $status_new;
+	$subject = "Dispatch update - Call #";
+	if ($job_node->field_sirius_id['und'][0]['value']) {
+		$subject .= $job_node->field_sirius_id['und'][0]['value'];
+	} else {
+		$subject .= $job_node->nid;
+	}
+	$subject .= ' / Worker ' . $worker_node->title . ' / ' . $status_new;
 	$body = "This is a status update notification.<br />";
 	$body .= "Job: <a href=\"$base_url/node/" . $job_node->nid . "\">" . $job_node->field_sirius_id['und'][0]['value'] . "</a><br />";
 	$body .= "Dispatch: <a href=\"$base_url/node/" . $dispatch_node->nid . "\">" . $dispatch_node->nid . "</a><br />";
@@ -72,7 +78,13 @@ function sirius_dispatch_notify_employer_job($job_node) {
 	if (!$found) { return; }
 
 	global $base_url;
-	$subject = "Job update - Call #" . $job_node->field_sirius_id['und'][0]['value'] . ' / ' . $status_new;
+	$subject = "Job update - Call #";
+	if ($job_node->field_sirius_id['und'][0]['value']) {
+		$subject .= $job_node->field_sirius_id['und'][0]['value'];
+	} else {
+		$subject .= $job_node->nid;
+	}
+	$subject .= ' / ' . $status_new;
 	$body = "This is a status update notification.<br />";
 	$body .= "Job: <a href=\"$base_url/node/" . $job_node->nid . "\">" . $job_node->field_sirius_id['und'][0]['value'] . "</a><br />";
 	$body .= "Old status: <strong>$status_old</strong><br />";
