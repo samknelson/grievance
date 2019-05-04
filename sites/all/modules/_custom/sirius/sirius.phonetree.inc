@@ -180,7 +180,7 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 	  $query->entityCondition('entity_type', 'node');
 	  $query->entityCondition('bundle', 'sirius_dispatch_job');
 		$query->fieldCondition('field_sirius_dispatch_job_type', 'tid', sirius_get_special_tid('sirius_dispatch_job_type|BULL'));
-	  $query->fieldCondition('field_sirius_datetime', 'value', date('Y-m-d H:i:s', strtotime('-1 days')), '>=');
+	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d H:i:s', strtotime('-1 days')), '>=');
 	  $query->fieldCondition('field_sirius_member_status', 'tid', $worker_member_status_tids, 'in');
 	  $query->fieldOrderBy('field_sirius_datetime', 'value');
 	  $stmt = $query->execute();
@@ -200,7 +200,8 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 			++$i;
 			$employer_node = node_load($bullpen_node->field_grievance_shop['und'][0]['target_id']);
 			$facility_node = node_load($bullpen_node->field_sirius_dispatch_facility['und'][0]['target_id']);
-			$ts = strtotime($bullpen_node->field_sirius_datetime['und'][0]['value']);
+			// $ts = strtotime($bullpen_node->field_sirius_datetime['und'][0]['value']);
+			$ts = sirius_date_ts($bullpen_node, 'field_sirius_datetime');
 			$text .= "Bullpen number $i:\n";
 			$text .= sirius_tts_title($employer_node) . " on " . date('l, F d ', $ts) . ":\n\n";
 			$member_status_tids = sirius_fieldvals($bullpen_node, 'field_sirius_member_status', 'tid');
