@@ -404,9 +404,9 @@ function sirius_phonetree_dispatch($call_sid, $context) {
 	else if ($digits == 1) {
 		$text .= "The employer is " . sirius_tts_title($employer_node) . "\n";
 		if ($facility_node) {
-			$text .= "The facility " .  sirius_tts_title($facility_node) . "\n";
+			$text .= "The facility is " .  sirius_tts_title($facility_node) . "\n";
 		}
-		$text .= drupal_html_to_text($job_node->field_sirius_notes['und'][0]['value']) . "\n";
+		// $text .= drupal_html_to_text($job_node->field_sirius_notes['und'][0]['value']) . "\n";
 		$text .= "Press 1 for more details. ";
 		$text .= "Press 2 to accept. ";
 		$text .= "Press 3 to decline. ";
@@ -486,7 +486,7 @@ function sirius_phonetree_dispatch_current($call_sid, $context) {
 		$text = "You are currently on a dispatch from " . sirius_tts_title($employer_node) . "\n";
 		$text .= "The call type is " . sirius_tts_name($job_type_term) . "\n";
 		$text .= "The report date is " . sirius_date_date($job_node, 'field_sirius_datetime', 'l, F d') . ' at ' . sirius_date_date($job_node, 'field_sirius_datetime', 'g i a') . "\n";
-		$text .= drupal_html_to_text($job_node->field_sirius_notes['und'][0]['value']) . "\n";
+		// $text .= drupal_html_to_text($job_node->field_sirius_notes['und'][0]['value']) . "\n";
 	}
 
 	if ($dispatch_node) {
