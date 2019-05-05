@@ -21,6 +21,9 @@ function sirius_specialtid_keys() {
 			'OPEN' => 'Open',
 			'BULL' => 'Bullpen',
 		),
+		'sirius_dispatch_job_tags' => array(
+			'ASAP' => 'As Soon As Possible (ASAP)',
+		),
 	);
 }
 
