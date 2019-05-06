@@ -539,9 +539,55 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'sirius_dispatch_job_tags' => array(
+      'name' => 'Sirius Dispatch Job Tags',
+      'machine_name' => 'sirius_dispatch_job_tags',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'sirius_dispatch_job_type' => array(
       'name' => 'Sirius Dispatch Job Type',
       'machine_name' => 'sirius_dispatch_job_type',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'sirius_gender' => array(
+      'name' => 'Sirius Gender',
+      'machine_name' => 'sirius_gender',
       'description' => '',
       'hierarchy' => 0,
       'module' => 'taxonomy',
