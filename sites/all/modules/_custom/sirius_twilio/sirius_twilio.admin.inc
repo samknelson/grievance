@@ -42,6 +42,19 @@ function sirius_twilio_config() {
     '#description' => t('Site name as it should be spoken (TTS format)'),
   );
 
+  $form['sirius_twilio_twiml_open'] = array(
+    '#type' => 'textfield',
+    '#title' => t('TWIML Open'),
+    '#default_value' => variable_get('sirius_twilio_twiml_open', '<Say><prosody>'),
+    '#description' => t('Enter the default TWIML wrapper. This allows you to specify a voice and a prosody call.'),
+  );
+
+  $form['sirius_twilio_twiml_close'] = array(
+    '#type' => 'textfield',
+    '#title' => t('TWIML Close'),
+    '#default_value' => variable_get('sirius_twilio_twiml_close', '</prosody></Say>'),
+  );
+
   return system_settings_form($form);
 }
 

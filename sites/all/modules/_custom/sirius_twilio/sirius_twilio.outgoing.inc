@@ -22,24 +22,66 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
 	}
 
 	$phone = sirius_phone_format_e164($phone);
-	try {
-		$client = sirius_twilio_client_get();
-		$client->messages->create(
-	    $phone,
-	    array(
-	      'from' => variable_get('sirius_twilio_phone', ''),
-	      'body' => $msg,
-	    )
-		);
-		$result = array('success' => TRUE, 'msg' => 'Sent message ' . $msg . ' by SMS to ' . $phone);
-	} catch (Exception $e) {
-		sirius_log('twilio:conversation', 'error', $msg, $msg, $phone, array($handler_nid));
-		sirius_log('twilio:conversation', 'error', $e->getCode() . ' - ' . $e->getMessage(), '', '', array($handler_nid));
-		$result = array('success' => FALSE, 'msg' => "SMS message failed.");
+  if (!$phone)                        { return array('success' => FALSE, 'msg' => "No phone number"); }
+  if (!sirius_phone_validate($phone)) { return array('success' => FALSE, 'msg' => "[$phone] is not a valid phone number."); }
+
+  static $registered;
+  if (variable_get('sirius_twilio_sms_consolidate', TRUE)) {
+		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg);
+		if (!$registered) {
+			$registered = TRUE;
+			drupal_register_shutdown_function('sirius_twilio_outgoing_sms_queue', TRUE);
+		}
+  } else {
+		$result = sirius_twilio_outgoing_sms_queue(TRUE, $phone, $msg);
 	}
 
-	sirius_log('twilio:conversation', 'outgoing_sms', $msg, $msg, $phone, array($handler_nid));
+	if ($result['success']) {
+		sirius_log(
+			'twilio:conversation', 
+			'outgoing_sms', 
+			"Sending to $phone: $msg",
+			"Sending to $phone: $msg",
+			$phone, 
+			array($handler_nid)
+		);
+		$result['msg'] = "Sending to $phone: $msg";
+	}
+
 	return $result;
+}
+
+function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NULL) {
+	static $queue;
+
+	if ($phone) { 
+		if ($queue[$phone]) { $queue[$phone] .= "\n\n"; }
+		$queue[$phone] .= $msg;
+	}
+
+	if (!$deliver_now) { return array('success' => TRUE, 'msg' => "Queued for delivery: $phone, $msg"); }
+
+	drupal_set_message("Here with $deliver_now.");
+
+	foreach ($queue as $phone => $msg) {
+		try {
+			$client = sirius_twilio_client_get();
+			$client->messages->create(
+		    $phone,
+		    array(
+		      'from' => variable_get('sirius_twilio_phone', ''),
+		      'body' => $msg,
+		    )
+			);
+		} catch (Exception $e) {
+			$msg =  $e->getCode() . ' - ' . $e->getMessage() . ": " . $msg;
+			sirius_log('twilio:conversation', 'error', $msg, $msg, $phone, array($handler_nid));
+			$result = array('success' => FALSE, 'msg' => "SMS message failed.");
+		}
+	}
+
+	$queue = NULL;
+	return array('success' => TRUE, 'msg' => 'Queue delivered.');
 }
 
 /**********************************************************************************
@@ -92,7 +134,13 @@ function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_dig
 	}
 
 	header('Content-Type: text/xml');
-	echo $response;
+	print "<Response>";
+	if ($gather_digits) { print "<Gather numDigits=\"$gather_digits\">"; }
+	print variable_get('sirius_twilio_twiml_open', '<Say><prosody>');
+	print $msg;
+	print variable_get('sirius_twilio_twiml_close', '</prosody></Say>');
+	if ($gather_digits) { print "</Gather>"; }
+	print "</Response>";
 
 	$context['last_msg'] = $msg;
 	$context['last_gather_digits'] = $gather_digits;
