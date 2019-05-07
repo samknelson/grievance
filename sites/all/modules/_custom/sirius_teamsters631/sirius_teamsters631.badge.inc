@@ -26,6 +26,7 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 	*/
 
 	$colors = array(
+		'white' => 'White',
 		'#272967' => 'Teamsters Blue',
 		'yellow' => 'Yellow',
 		'red' => 'Red',
@@ -311,7 +312,7 @@ function sirius_teamsters631_badge_contents($worker_node) {
 	print '<div style="page-break-before: always;"></div>';
 
 	// Property of
-	print '<div style="background-color: #000000; color: #ffffff; font-weight: bold; text-align: center; padding-top: 5px; padding-bottom: 5px; margin-bottom: 10px; padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; font-family: arial, helvetica, sans-serif;">';
+	print "<div style=\"background: linear-gradient(to bottom, $bt 0%, $bt 50%, $bb 50%, $bb 100%); color: #ffffff; font-weight: bold; text-align: center; padding-top: 5px; padding-bottom: 5px; margin-bottom: 10px; padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; font-family: arial, helvetica, sans-serif;\">";
 	print "Property of<br />Teamsters Local Union 631";
 	print '</div>';
 
@@ -333,8 +334,9 @@ function sirius_teamsters631_badge_contents($worker_node) {
 
 	// QR
 	print '<div style="text-align: center; margin-top: 0; margin-bottom: 10px;">';
-	$url = $https . $_SERVER['SERVER_NAME'] . "/node/" . $worker_node->nid;
-	print sirius_qr_url($url);
+	// $url = $https . $_SERVER['SERVER_NAME'] . "/node/" . $worker_node->nid;
+	// print sirius_qr_url($url);
+	print sirius_qr_string($worker_node->title . ' / ' . $worker_node->field_sirius_id['und'][0]['value']);
 	print '</div>';
 
 	print "___NOSUFFIX___";
