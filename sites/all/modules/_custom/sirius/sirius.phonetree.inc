@@ -73,7 +73,7 @@ function sirius_phonetree_worker_login($call_sid, $context) {
 
 	if (!$expect) {
 
-		$text = "You have reached " . variable_get('sirius_twilio_site_name_tts', '') . ". Please enter your worker I D. "; 
+		$text .= "You have reached " . variable_get('sirius_twilio_site_name_tts', '') . ". Please enter your worker I D. "; 
 		$text .= "You may enter 9 at any time to be connected with the operator. Enter star to hear this message again. ";
 		$context['expect'] = 'worker_nid';
 		sirius_twilio_outgoing_voice_say($call_sid, $context, $text, 6);
@@ -422,7 +422,7 @@ function sirius_phonetree_dispatch($call_sid, $context) {
 		$result = sirius_dispatch_accept($dispatch_node);
   	if ($result['success']) { 
 			$text = "The dispatch has been accepted. ";
-			$text .= "The report time is " . sirius_date_date($job_node, 'field_sirius_datetime', 'l, F d \a\t g i a') . ". ";
+			$text .= "The report time is " . sirius_date_date($job_node, 'field_sirius_datetime', 'l, F d \a\t h:i a') . ". ";
 			$text .= "Please report to: " . sirius_tts_title($facility_node) . ". ";
 			if ($hall_node) { $text .= sirius_tts_title($hall_node) . ". "; }
 			if ($job_node->field_sirius_address_notes['und'][0]['value']) { $text .= $job_node->field_sirius_address_notes['und'][0]['value'] . ". "; }
