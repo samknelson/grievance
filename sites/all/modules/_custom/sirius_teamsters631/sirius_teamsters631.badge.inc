@@ -32,7 +32,7 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 		'red' => 'Red',
 		'green' => 'Green',
 		'orange' => 'Orange',
-		'brown' => 'Brown'
+		'saddlebrown' => 'Brown'
 	);
 
 	$table = array();
@@ -43,7 +43,7 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 	$table[3] = array('bt' => 'red', 'bb' => '#272967', 'msg' => 'Apprentice / Active Member');
 	$table[4] = array('bt' => 'red', 'bb' => 'red', 'msg' => 'Apprentice / Non-Member');
 	$table[5] = array('bt' => 'orange', 'bb' => 'orange', 'msg' => 'Skilled Extraboard');
-	$table[6] = array('bt' => 'brown', 'bb' => 'brown', 'msg' => 'Unskilled Extraboard');
+	$table[6] = array('bt' => 'saddlebrown', 'bb' => 'saddlebrown', 'msg' => 'Unskilled Extraboard');
 	$table[7] = array('bt' => 'green', 'bb' => '#272967', 'msg' => 'Specialty Craft / Active Member');
 	$table[8] = array('bt' => 'green', 'bb' => 'yellow', 'msg' => 'Specialty Craft / Non-Member');
 
