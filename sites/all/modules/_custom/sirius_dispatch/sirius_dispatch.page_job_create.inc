@@ -558,15 +558,9 @@ function sirius_dispatch_page_job_create_workers($form, $form_state) {
 
 function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	// Report date must be in the future
-	if ($form_state['values']['asap'] == 'Yes') {
-		$report_ts = time();
-	} else {
-		if (is_string($form_state['values']['datetime'])) {
-			$report_ts = strtotime($form_state['values']['datetime']);
-		}
-		if (!$report_ts) {
-	  	form_set_error('datetime', 'Please select a report date and time.');
-		} else if ($report_ts < time() + 60*60) {
+	if (is_string($form_state['values']['datetime'])) {
+		$report_ts = strtotime($form_state['values']['datetime']);
+		if ($report_ts < time() + 60*60*1) {
 	  	form_set_error('datetime', 'Report date must be at least one hour in the future.');
 	  }
 	}
