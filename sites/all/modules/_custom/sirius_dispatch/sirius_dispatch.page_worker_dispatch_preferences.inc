@@ -336,9 +336,24 @@ function sirius_node_tab_worker_dispatch_preferences_form_validate($form, &$form
 	}
 	*/
 
+	// If HFE, must select an employer
 	if ($form_state['values']['hfe_action'] == 'Set') {
 		if (!$form_state['values']['hfe']) {
 			form_set_error('hfe', t('Please select an employer.'));
+		}
+	}
+
+	// If restricting by skill, must select at least one skill or non-skilled
+	if ($form_state['values']['skills_restricted'] == 'restrict') {
+		$found = FALSE;
+		foreach (array_values($form_state['values']['skills_avail']) as $tid) {
+			if ($tid) { $found = TRUE; break; }
+		}
+		if (!$found) {
+			if ($form_state['values']['skills_availx'] == 'Yes') { $found = TRUE; }
+		}
+		if (!$found) {
+			form_set_error('skills_restricted', 'If you wish to receive dispatches only for certain skills, you must select at least one skill (or opt in to unskilled work.)');
 		}
 	}
 }
@@ -437,8 +452,19 @@ function sirius_node_tab_worker_dispatch_preferences_form_submit($form, &$form_s
 					$worker_node->field_sirius_skills_avail['und'][] = array('tid' => $tid);
 				}
 				$need_save = TRUE;
-				sirius_log('worker:skills_avail', 'set', 'Skill preferences have been set', '', '', array($worker_node->nid), array());
-				drupal_set_message('Skill preferences have been set.');
+				$new_skill_terms = taxonomy_term_load_multiple($new_skills);
+				if ($new_skill_terms) {
+					$msg = "Skill preferences have been set to ";
+					$is_first = TRUE;
+					foreach ($new_skill_terms as $tid => $term) {
+						if ($is_first) { $is_first = FALSE; } else { $msg .= ', '; }
+						$msg .= $term->name;
+					}
+				} else {
+					$msg = "Skill preferences have been set to [none].";
+				}
+				sirius_log('worker:skills_avail', 'set', $msg, '', '', array($worker_node->nid), array());
+				drupal_set_message($msg);
 			}
 
 			if ($form_state['values']['skills_availx'] && 
