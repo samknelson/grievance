@@ -258,10 +258,29 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	}
 
 	// Report Date
+	/*
+	$asap_tid = sirius_get_special_tid('sirius_dispatch_job_tags|ASAP');
+	if ($asap_tid) {
+		$form['asap'] = array(
+			'#type' => 'select',
+			'#title' => 'Report At',
+			'#options' => array(
+				'No' => t('A specific time at least two hours in the future'),
+				'Yes' => t('As Soon As Possible'),
+			),
+		);
+		$datetime_states = array(
+	  	'visible' => array(
+	  		array(':input[name="asap"]' => array('value' => 'No')),
+	  	)
+		);
+	} else {
+		$datetime_state = array();
+	}
+	*/
 	$form['datetime'] = array(
 		'#type' => 'date_popup',
 		'#title' => t('Report At Time'),
-		'#required' => TRUE,
 		'#timepicker' => 'timepicker',
 		'#timepicker_options' => array(
 			'rows' => 6,
@@ -274,6 +293,7 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		'#attributes' => array(
 			'autocomplete' => 'off',
 		),
+		// '#states' => $datetime_states,
 	);
 
 	// Call Number
@@ -409,6 +429,43 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		'#description' => t('Enter any parking instructions for workers.'),
 	);
 
+	$form['explain'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Check a Worker'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+		'#description' => t('Use this utility to determine if a <em>specific</em> worker may be dispatched to this job. Enter the worker\'s dispatch ID in the field below.'),
+	);
+
+	$form['explain']['wtf'] = array(
+		'#title' => t('Dispatch ID'),
+		'#type' => 'textfield',
+		'#size' => 10,
+    '#ajax' => array(
+      'callback' => 'sirius_dispatch_page_job_create_ajax_explain',
+      'wrapper' => 'sirius_dispatch_page_job_create_ajax_explain',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+	);
+
+	$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
+	if ($form_state['values']['wtf']) {
+		$explain_result = sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_node, $form_state['values']['wtf']);
+		$explain_result_html = "Worker id #" . $form_state['values']['wtf'] . ': <strong>';
+		if (!$explain_result['success']) {
+			$explain_result_html .= 'The worker cannot be dispatched to this job: ';
+		}
+		$explain_result_html .= $explain_result['msg'] . '</strong>';
+	}
+
+	$form['explain']['explain_result'] = array(
+		'#type' => 'markup',
+		'#markup' => $explain_result_html,
+		'#prefix' => '<div id="sirius_dispatch_page_job_create_ajax_explain">',
+		'#suffix' => '</div>',
+	);
+
 	$workers_visible = FALSE;
 	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|CBN') || 
 		$job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|FAN')) {
@@ -416,7 +473,6 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	}
 
 	if ($workers_visible) {
-		$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
 		$form += sirius_dispatch_job_get_dispatchable_workers_render_form($job_node, $workers_visible);
 	}
 
@@ -488,6 +544,10 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	return $form;
 }
 
+function sirius_dispatch_page_job_create_ajax_explain($form, &$form_state) {
+	return $form['explain']['explain_result'];
+}
+
 function sirius_dispatch_page_job_create_ajax_halls($form, $form_state) {
   return $form['hall'];
 }
@@ -498,10 +558,16 @@ function sirius_dispatch_page_job_create_workers($form, $form_state) {
 
 function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	// Report date must be in the future
-	if (is_string($form_state['values']['datetime'])) {
-		$report_ts = strtotime($form_state['values']['datetime']);
-		if ($report_ts < time() + 60*60*2) {
-	  	form_set_error('datetime', 'Report date must be in the future.');
+	if ($form_state['values']['asap'] == 'Yes') {
+		$report_ts = time();
+	} else {
+		if (is_string($form_state['values']['datetime'])) {
+			$report_ts = strtotime($form_state['values']['datetime']);
+		}
+		if (!$report_ts) {
+	  	form_set_error('datetime', 'Please select a report date and time.');
+		} else if ($report_ts < time() + 60*60) {
+	  	form_set_error('datetime', 'Report date must be at least one hour in the future.');
 	  }
 	}
 
@@ -524,6 +590,22 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 		if (!$found) {
 	  	form_set_error('eba_dates', 'If you wish to dispatch EBA workers, you must specify the dates when the job will take place');
 		}
+	}
+
+	// CBN must select workers
+	$job_type_tid = $form_state['job_type_tid'];	
+	$count = $form_state['values']['count'];
+	$selected = 0;
+	if ($form_state['values']['workers']) {
+		foreach ($form_state['values']['workers'] as $ignore => $worker_nid) {
+			if ($worker_nid) { ++$selected; }
+		}
+	}
+	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|CBN') && $count && $count != $selected) {
+		form_set_error('worker_id', t('For a call by name, please selected exactly @count workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
+	}
+	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|FAN') && $count && ($selected < 1 || $selected > $count)) {
+		form_set_error('worker_id', t('Please select between 1 and @count workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
 	}
 }
 
@@ -557,7 +639,11 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 
 	global $user;
 	$job_node = new stdClass();
-	$job_node->title = $employer_node->title . ' - ' . $job_type_term->name . ' - ' . date('Y-m-d', strtotime($form_state['values']['datetime']));
+	if ($form_state['values']['asap'] == 'Yes') {
+		$job_node->title = $employer_node->title . ' - ' . $job_type_term->name . ' - ASAP';
+	} else {
+		$job_node->title = $employer_node->title . ' - ' . $job_type_term->name . ' - ' . gmdate('Y-m-d', strtotime($form_state['values']['datetime']));
+	}
 	$job_node->type = 'sirius_dispatch_job';
 	node_object_prepare($job_node);
 	$job_node->language = LANGUAGE_NONE;
@@ -568,9 +654,13 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 
 	$job_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
 	$job_node->field_sirius_dispatch_job_type['und'][0]['tid'] = $job_type_term->tid;
-
-	$job_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['datetime']));
-	$job_node->field_sirius_datetime_created['und'][0]['value'] = gmdate('Y-m-d H:i:s');
+	if ($form_state['values']['asap'] == 'Yes') {
+  	$job_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s');
+		$job_node->field_sirius_dispatch_job_tags['und'][]['tid'] = sirius_get_special_tid('sirius_dispatch_job_tags|ASAP');
+  } else {
+  	$job_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['datetime']));
+  }
+  $job_node->field_sirius_datetime_created['und'][0]['value'] = gmdate('Y-m-d H:i:s');
 	$job_node->field_sirius_id['und'][0]['value'] = $form_state['values']['id'];
 	$job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Pending';
 	if ($form_state['values']['count']) {

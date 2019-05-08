@@ -47,6 +47,7 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 	$status = $job_node->field_sirius_dispatch_job_status['und'][0]['value'];
 
 	if (user_access('sirius dispatch staff')) {
+		// Staff form
 		$options = array();
 		$options[NULL] = t('-- Select --');
 		$options['refresh'] = t('Refresh this page');
@@ -101,18 +102,61 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 			),
 		);
 
-		$form['timelimit'] = array(
-			'#title' => 'Expire After',
-			'#type' => 'textfield',
-			'#size' => 5,
-			'#default_value' => $job_node->field_sirius_timelimit['und'][0]['value'],
-			'#description' => t('Enter the number of minutes before a dispatch notification should expire.'),
+		$form['run_settings'] = array(
+			'#type' => 'fieldset',
+			'#title' => t('Running Job Settings'),
 			'#states' => array(
 		  	'visible' => array(
 		  		array(':input[name="action"]' => array('value' => 'run')),
 		  	)
 			),
 		);
+
+		$form['run_settings']['timelimit'] = array(
+			'#title' => 'Expire After',
+			'#type' => 'textfield',
+			'#size' => 5,
+			'#default_value' => $job_node->field_sirius_timelimit['und'][0]['value'],
+			'#description' => t('Enter the number of minutes before a dispatch notification should expire.'),
+		);
+
+		/*
+		$form['run_settings']['max'] = array(
+			'#title' => 'Maximum Batch Size',
+			'#type' => 'textfield',
+			'#size' => 5,
+			'#default_value' => $job_node->field_sirius_timelimit['und'][0]['value'],
+			'#description' => t('Enter the maxminum number ofnotifications that will be sent in any given batch'),
+		);
+
+		$form['run_settings']['min'] = array(
+			'#title' => 'Minimum Batch Size',
+			'#type' => 'textfield',
+			'#size' => 5,
+			'#default_value' => $job_node->field_sirius_timelimit['und'][0]['value'],
+			'#description' => t('Enter the minimum numer of notifications that will be sent in any given batch. If this is greater than 1, then it is possible that more notifications will be sent than the number of open slots, meaning that there is no guarantee that the job will be filled in seniority order.'),
+		);
+
+		$form['run_settings']['factor'] = array(
+			'#title' => 'Ratio of Notifications to Slots',
+			'#type' => 'textfield',
+			'#size' => 5,
+			'#default_value' => $job_node->field_sirius_timelimit['und'][0]['value'],
+			'#description' => t('Enter the number of notifications to be sent for each open slot. If this is greater than 1, then there will be more than one notification sent for each slot, meaning that there is no guarantee that the job will be filled in seniority order.'),
+		);
+
+		$html = '<h2>Examples</h2>';
+		$html .= '<table>';
+		$html .= '<tr><th>Expire Time</th><th>Max</th><th>Min</th><th>Ratio</th><th>Number of Open Slots</th><th></th></tr>';
+		$html .= '<tr><td>5</td><td>50</td><td>10</td><td>2</td><td>10</td><td><strong>20 notifications every 5 minutes</strong></td></tr>';
+		$html .= '<tr><td>5</td><td>50</td><td>10</td><td>2</td><td>100</td><td><strong>50 notifications every 5 minutes</strong></td></tr>';
+		$html .= '<tr><td>5</td><td>50</td><td>10</td><td>2</td><td>1</td><td><strong>10 notifications every 5 minutes</strong></td></tr>';
+		$html .= '<tr><td>30</td><td>50</td><td>10</td><td>1.5</td><td>10</td><td><strong>15 notifications every 30 minutes</strong></td></tr>';
+		$html .= '<tr><td>30</td><td>50</td><td>1</td><td>1</td><td>5</td><td><strong>5 notifications every 30 minutes</strong></td></tr>';
+		$html .= '</table>';
+
+		$form['run_settings']['description'] = array('#markup' => $html);
+		*/
 
 		$description = '';
 		if (!$options) {
@@ -183,6 +227,34 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 		);
 
 		$form += sirius_log_render_form($job_node->nid);
+	} else {
+		// Employer form
+		$options = array();
+		$options[NULL] = t('-- Select --');
+		$options['refresh'] = t('Refresh this page');
+		$options['explain'] = t('Determine whether a specific worker is dispatchable to this job.');
+		$form['action'] = array(
+			'#type' => 'select',
+			'#title' => 'Action',
+			'#required' => TRUE,
+			'#options' => $options,
+		);
+
+		$form['wtf'] = array(
+			'#title' => t('Dispatch ID'),
+			'#type' => 'textfield',
+			'#size' => 5,
+			'#states' => array(
+		  	'visible' => array(
+		  		array(':input[name="action"]' => array('value' => 'explain')),
+		  	)
+			),
+		);
+
+		$form['submit'] = array(
+			'#type' => 'submit',
+			'#value' => 'Submit',
+		);
 	}
 
 	$html = '';
@@ -207,22 +279,12 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 	}
 
 	if ($action == 'explain') {
-		$worker_id = $form_state['values']['wtf'];
-		if (!$worker_id) {
-			drupal_set_message("Please select a worker.", 'warning');
-			return;
+		$result = sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_node, $form_state['values']['wtf']);
+		if ($result['success']) {
+			drupal_set_message($result['msg']);
+		} else {
+			drupal_set_message($result['msg'], 'warning');
 		}
-		$sql = "select entity_id from field_data_field_sirius_id where entity_type = 'node' and bundle = 'sirius_worker' and field_sirius_id_value = :id";
-		$stmt = db_query($sql, array(':id' => $worker_id));
-		$hr = $stmt->fetchAssoc();
-		$worker_nid = $hr['entity_id'];
-		if (!$worker_nid) {
-			drupal_set_message("The worker with dispatch ID #$worker_id was not found.", 'warning');
-			$form_state['rebuild'] = TRUE;
-			return;
-		}
-		$result = sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, $filters = array());
-		drupal_set_message($result['msg']);
 		return;
 	}
 
