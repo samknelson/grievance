@@ -232,7 +232,7 @@ function sirius_teamsters631_badge_headshot($worker_node) {
 	$uri = $worker_node->field_sirius_headshot['und'][0]['uri'];
 
 	$source = (object) $worker_node->field_sirius_headshot['und'][0];
-	$dest = 'temporary://sirius_headshot_for_streaming/' . $source->filename;
+	$dest = 'temporary://sirius_headshot_for_streaming_' . $source->filename;
 	
 	file_copy($source, $dest, FILE_EXISTS_REPLACE);
 	header("Content-Type: " . $source->filemime);
