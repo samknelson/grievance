@@ -189,6 +189,10 @@ function sirius_become_superuser($tf) {
   static $original_user;
   static $old_state;
 
+  // Signing in as a new user sometimes takes astonishingly long, because we're regenerating the admin menu.
+  // But we only call this function in the context where we're not actually rendering pages. So we don't need the admin menu.
+  if (function_exists('admin_menu_suppress')) { admin_menu_suppress(TRUE); }
+
   if ($tf) {
     $original_user = $user; 
     $old_state = drupal_save_session(); 
