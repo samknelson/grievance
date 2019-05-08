@@ -500,8 +500,8 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	// Report date must be in the future
 	if (is_string($form_state['values']['datetime'])) {
 		$report_ts = strtotime($form_state['values']['datetime']);
-		if ($report_ts < time() + 60*60*2) {
-	  	form_set_error('datetime', 'Report date must be in the future.');
+		if ($report_ts < time() + 60*60*1) {
+	  	form_set_error('datetime', 'Report date must be at least one hour in the future.');
 	  }
 	}
 
