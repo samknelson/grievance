@@ -1,32 +1,6 @@
 <?php
 
-/*
-Array
-(
-    [Row] => 110
-    [LocationID] => 130
-    [Abbrv] =>
-    [LongName] => YARD 5
-    [Address1] =>
-    [Address2] =>
-    [City] =>
-    [State] =>
-    [ZipCode] =>
-    [_CSZ] => ,
-    [MapLink] =>
-    [LoadData] =>
-    [Inactive] => TRUE
-    [--AUTO-ADDED_COLUMNS--] =>
-    [Note] =>
-    [DateAdd] => 3/25/2013
-    [LastUpdate] => 7/24/2018
-    [EmployeeID] =>
-    [BullPen] => FALSE
-    [TTSName] =>
-)
-*/
-
-function grievance_uhmigrate_l665_facilities($limit, $source_filename = 'facilities.csv') {
+function grievance_uhmigrate_l665_halls($limit, $source_filename = 'halls.csv') {
   // Give ourselves more memory
   ini_set('memory_limit', '4096M');
   
@@ -66,22 +40,35 @@ function grievance_uhmigrate_l665_facilities($limit, $source_filename = 'facilit
     }
 
     // Find the node to create or update
-    $external_id = $row['LocationID'];
+    $external_id = $row['HallID'];
     if (!$external_id) {
       grievance_uhmigrate_log('ERROR', $row, "No external ID (missing RecID)");
       continue;
     }
-    $node = grievance_uhmigrate_find_by_sirius_id('sirius_dispatch_facility', $external_id);
+    $node = grievance_uhmigrate_find_by_sirius_id('sirius_dispatch_facility_hall', $external_id);
     if ($node->nid) { 
       grievance_uhmigrate_log('DEBUG', $row, "Found existing node with $external_id, NID = " . $node->nid . ". It will be updated.");
     } else {
       grievance_uhmigrate_log('DEBUG', $row, "No node found with $external_id. It will be created.");
     }
 
+    // Facility
+    $facility_id = $row['LocationID'];
+    if (!$facility_id) {
+      grievance_uhmigrate_log('DEBUG', $row, "No facility ID found; skipping.");
+      continue;
+    }
+    $facility_node = grievance_uhmigrate_find_by_sirius_id('sirius_dispatch_facility', $facility_id);
+    if (!$facility_node || !$facility_node->nid) {
+      grievance_uhmigrate_log('DEBUG', $row, "No facility node found for $facility_id; skipping.");
+      continue;
+    }
+    $node->field_sirius_dispatch_facility['und'][0]['target_id'] = $facility_node->nid;
+
     // Title
     $node->title = $row['LongName'];
-    if ($row['TTSName']) {
-      $node->field_sirius_name_tts['und'][0]['value'] = $row['TTSName'];
+    if ($row['Abbrv']) {
+      $node->field_sirius_name_short['und'][0]['value'] = $row['Abbrv'];
     }
 
     // Save the grievance node
