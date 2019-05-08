@@ -37,18 +37,24 @@ function sirius_dispatch_send(&$dispatch_node, $medium = NULL, $to = NULL, $note
 		if (!sirius_phone_validate($to)) { return array('success' => FALSE, 'msg' => 'No valid phone number.'); }
 		$text = "Your dispatch can be found at:\n$url";
 		if ($notes) { $text .= "\n\n$notes\n"; }
-		return sirius_twilio_outgoing_sms($to, $text, $dispatch_node->nid);
+		$params['to'] = $to; 
+		$params['sms'] = $text; 
+		$params['handler_nids'] = array($dispatch_node->nid);
+		return sirius_sms_send($params);
 	} else if ($medium == 'sms_alt') {
 		if (!$to) { $to = sirius_phone_format_e164($worker_node->field_sirius_phone_alt['und'][0]['value']); }
 		if (!sirius_phone_validate($to)) { return array('success' => FALSE, 'msg' => 'No valid phone number.'); }
 		$text = "Your dispatch can be found at:\n$url";
 		if ($notes) { $text .= "\n\n$notes\n"; }
-		return sirius_twilio_outgoing_sms($to, $text, $dispatch_node->nid);
+		$params['to'] = $to; 
+		$params['sms'] = $text; 
+		$params['handler_nids'] = array($dispatch_node->nid);
+		return sirius_sms_send($params);
 	} else if ($medium == 'email') {
 		if (!$to) { $to = $worker_node->field_sirius_email['und'][0]['value']; }
 		if (!sirius_email_validate($to)) { return array('success' => FALSE, 'msg' => 'No valid email address.'); }
 		$subject = "Dispatch #" . $dispatch_node->nid;
-		$body = "Your dispatch can be found at:<br /><br /><a href=\"$ur;\">$url</a>";
+		$body = "Your dispatch can be found at:<br /><br /><a href=\"$url\">$url</a>";
 		if ($notes) { $body .= '<br /><br />' . $notes; }
 		return sirius_email_send(array('to' => $to, 'subject' => $subject, 'body' => $body, 'handler_nids' => array($dispatch_node->nid)));
 	} else if ($medium == 'voice' || $medium == 'voice_alt') {

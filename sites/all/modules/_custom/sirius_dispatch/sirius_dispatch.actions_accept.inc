@@ -30,25 +30,33 @@ function sirius_dispatch_accept_possible($dispatch_node) {
 }
 
 function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
+	// Is accept possible?
 	$possible = sirius_dispatch_accept_possible($dispatch_node);
 	if (!$possible['success']) {
 		sirius_log('dispatch:accept', 'fail', "Accept failed - " . $possible['msg'], '', '', array($dispatch_node->nid));
 		return $possible;
 	}
 
+	// Set the status
 	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
 	if ($worker_node->field_grievance_shop['und'][0]['target_id']) {
 		$new_status = 'accepted_secondary';
 	} else {
 		$new_status = 'accepted';
 	}
-
 	$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = $new_status;
+
+	// Set the timestamp
 	if (!$dispatch_node->field_sirius_datetime_completed['und'][0]['value']) {
 		$dispatch_node->field_sirius_datetime_completed['und'][0]['value'] = date('Y-m-d H:i:s');
 	}
+
+	// Save and log
 	node_save($dispatch_node);
 	sirius_log('dispatch:accept', 'complete', "Accept complete", $notes, '', array($dispatch_node->nid));
+
+	// Send the worker a copy of their dispatch
+	sirius_dispatch_send($dispatch_node, NULL, NULL, 'The dispatch has been accepted.');
 
 	return array('success' => TRUE, 'msg' => 'Accepted');
 }
