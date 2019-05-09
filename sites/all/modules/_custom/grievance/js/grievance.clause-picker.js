@@ -1,5 +1,5 @@
 (function($) {
-	$(document).ready(function () {
+	function grievance_clause_picker_change_edit_to_pick() {
 		// Only do this on popup windows.
 		if (!window.location.pathname.includes('popup')) { return; }
 
@@ -14,5 +14,17 @@
 				window.opener.sirius_clause_pick(nid);
 			}
 		});
+	}
+
+	$(document).ready(function () {
+
+		// Run on page load
+		grievance_clause_picker_change_edit_to_pick();
 	});
+
+	$(document).ajaxComplete(function(){
+		// run on ajax callback
+		grievance_clause_picker_change_edit_to_pick();
+	});
+
 }(jQuery));
