@@ -1242,7 +1242,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_notifications|node|grievance_shop|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_notify|taxonomy_term|grievance_status|form';
   $field_group->group_name = 'group_grievance_notify';
@@ -1850,6 +1850,9 @@ function grievance_content_types_field_group_info() {
       3 => 'field_sirius_summary',
       4 => 'field_sirius_dispatch_eba',
       5 => 'field_sirius_dispatch_eba_dates',
+      6 => 'field_sirius_batch_max',
+      7 => 'field_sirius_batch_min',
+      8 => 'field_sirius_batch_ratio',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -1885,6 +1888,9 @@ function grievance_content_types_field_group_info() {
       5 => 'field_sirius_summary',
       6 => 'field_sirius_dispatch_eba',
       7 => 'field_sirius_dispatch_eba_dates',
+      8 => 'field_sirius_batch_max',
+      9 => 'field_sirius_batch_min',
+      10 => 'field_sirius_batch_ratio',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2270,12 +2276,13 @@ function grievance_content_types_field_group_info() {
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
-      'formatter' => 'collapsible',
+      'label' => 'Notification Settings',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-sirius-notify field-group-fieldset',
         'id' => '',
+        'classes' => 'group-sirius-notify field-group-fieldset',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_sirius_notify|node|sirius_dispatch_job|default'] = $field_group;

@@ -14335,6 +14335,169 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_batch_max'.
+  $field_instances['node-sirius_dispatch_job-field_sirius_batch_max'] = array(
+    'bundle' => 'sirius_dispatch_job',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 20,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_batch_max',
+    'label' => 'Batch Max',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 18,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_batch_min'.
+  $field_instances['node-sirius_dispatch_job-field_sirius_batch_min'] = array(
+    'bundle' => 'sirius_dispatch_job',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 21,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_batch_min',
+    'label' => 'Batch Min',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 19,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_dispatch_job-field_sirius_batch_ratio'.
+  $field_instances['node-sirius_dispatch_job-field_sirius_batch_ratio'] = array(
+    'bundle' => 'sirius_dispatch_job',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 2,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_decimal',
+        'weight' => 22,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_batch_ratio',
+    'label' => 'Batch Ratio',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 20,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_count'.
   $field_instances['node-sirius_dispatch_job-field_sirius_count'] = array(
     'bundle' => 'sirius_dispatch_job',
@@ -14446,7 +14609,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 14,
+      'weight' => 13,
     ),
   );
 
@@ -14664,7 +14827,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 20,
+        'weight' => 23,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -14828,7 +14991,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 16,
+      'weight' => 15,
     ),
   );
 
@@ -14901,7 +15064,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 17,
+      'weight' => 16,
     ),
   );
 
@@ -15138,7 +15301,7 @@ function grievance_content_types_field_default_field_instances() {
         'checkall' => FALSE,
       ),
       'type' => 'options_buttons',
-      'weight' => 32,
+      'weight' => 38,
     ),
   );
 
@@ -15363,7 +15526,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 31,
+      'weight' => 37,
     ),
   );
 
@@ -15593,7 +15756,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 15,
+      'weight' => 14,
     ),
   );
 
@@ -15691,7 +15854,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 29,
+      'weight' => 35,
     ),
   );
 
@@ -15807,7 +15970,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 19,
+      'weight' => 21,
     ),
   );
 
@@ -15861,7 +16024,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 18,
+      'weight' => 17,
     ),
   );
 
@@ -20718,6 +20881,9 @@ function grievance_content_types_field_default_field_instances() {
   t('Available for Dispatch?');
   t('Available for Unskilled Work');
   t('Badge?');
+  t('Batch Max');
+  t('Batch Min');
+  t('Batch Ratio');
   t('Body');
   t('Body (Email)');
   t('Brought By');
