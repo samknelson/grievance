@@ -291,6 +291,6 @@ function grievance_update_7017() {
 function grievance_update_7018() {
   // Enable some modules
   print "Disabling field_permission\n";
-  module_disable(array('field_permission'), FALSE);
+  module_disable(array('field_permissions'), FALSE);
 }
 
