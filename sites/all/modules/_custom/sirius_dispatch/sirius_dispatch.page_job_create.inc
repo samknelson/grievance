@@ -596,7 +596,7 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 		}
 	}
 	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|CBN') && $count && $count != $selected) {
-		form_set_error('worker_id', t('For a call by name, please selected exactly @count workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
+		form_set_error('worker_id', t('For a call by name, please select exactly @count workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
 	}
 	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|FAN') && $count && ($selected < 1 || $selected > $count)) {
 		form_set_error('worker_id', t('Please select between 1 and @count workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
