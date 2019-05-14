@@ -993,3 +993,88 @@ function grievance_contract_template_clean_text($text) {
   // Convert 
   return $text;
 }
+
+function grievance_contract_template_node_tab_clause_bulk_rename($contract_template_node) { 
+  return drupal_get_form('grievance_contract_template_node_tab_clause_bulk_rename_form', $contract_template_node); 
+}
+
+function grievance_contract_template_node_tab_clause_bulk_rename_form($form, &$form_state, $contract_template_node) {
+  $form_state['contract_template_node'] = $contract_template_node;
+
+  $form['#markup'] = array('<div class="sirius_form_intro">' . t('Each section number should begin with the article number. This utility will rename all sections to include the article name, if it is not already there.'));
+
+  $form['mode'] = array(
+    '#type' => 'select', 
+    '#required' => TRUE, 
+    '#title' => t('Mode'),
+    '#options' => array(
+      'test' => t('Test Mode'),
+      'live' => t('Live Mode'),
+    ),
+  );
+
+  $form['separator'] = array(
+    '#type' => 'textfield', 
+    '#required' => TRUE, 
+    '#title' => t('Separator between the article number and the section number'),
+    '#default_value' => ': ',
+  );
+
+  $form['confirm'] = array('#type' => 'checkbox', '#required' => TRUE, '#title' => t('Yes, rename all sections in this contract now.'));
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+  return $form;
+}
+
+function grievance_contract_template_node_tab_clause_bulk_rename_form_submit($form, &$form_state) {
+  $contract_template_node = $form_state['contract_template_node'];
+
+  $separator = $form_state['values']['separator'];
+  $mode = $form_state['values']['mode'];
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_contract_clause');
+  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_template_node->nid);
+  $query->propertyOrderBy('nid');
+  $stmt = $query->execute();
+  $clause_nids = array();
+  if ($stmt['node']) {
+    $clause_nids = array_keys($stmt['node']);
+  }
+
+  $operations = array();
+  foreach ($clause_nids as $clause_nid) {
+    $operations[] = array(
+      'grievance_contract_template_node_tab_clause_bulk_rename_operation', 
+      array($clause_nid, $mode, $separator),
+    );
+  }
+  $batch = array('operations' => $operations);
+  batch_set($batch);
+}
+
+function grievance_contract_template_node_tab_clause_bulk_rename_operation($clause_nid, $mode, $separator) {
+  $clause_node = node_load($clause_nid);
+  $section_node = node_load($clause_node->field_grievance_contract_section['und'][0]['target_id']);
+
+  if (!$clause_node || !$section_node) { return; }
+  
+  $clause_label = $clause_node->field_grievance_label['und'][0]['value'];
+  $section_label = $section_node->field_grievance_section_number['und'][0]['value'];
+  if (!$clause_label || !$section_label) { return; }
+
+  if (strpos($clause_label, "$section_label$separator") !== FALSE) { return; }
+  $old_clause_label = $clause_label;
+  $clause_label = "$section_label$separator$clause_label";
+
+  drupal_set_message("Renaming $old_clause_label to $clause_label");
+
+  if ($mode == 'live') {
+    $clause_node->field_grievance_label['und'][0]['value'] = $clause_label;
+    node_save($clause_node);
+  }
+}
