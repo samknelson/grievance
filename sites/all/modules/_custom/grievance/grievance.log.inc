@@ -1,7 +1,6 @@
 <?php
 
 function grievance_node_tab_log($node) {
-  drupal_set_title($node->title . ': ' . t('Log'));
   $entity_nid = $node->nid;
 
   $headfoot = grievance_node_tab_get_addlink("grievance-log", array("grievance" => $entity_nid), 'Add a new log entry');
