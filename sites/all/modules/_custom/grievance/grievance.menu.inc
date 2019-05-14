@@ -218,6 +218,14 @@ function grievance_node_tabs() {
 		'weight' => 4,
 	);
 
+	$node_tabs['grievance_contract_template']['clauses/bulk-rename'] = array(
+		'title' => 'Bulk Rename',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_clause_bulk_rename',
+		'permissions' => array('grievance contract edit'),
+		'weight' => 5,
+	);
+
 
 
 
