@@ -1,7 +1,6 @@
 <?php
 
 function grievance_node_tab_letter($grievance_node, $is_loopback = FALSE) {
-  drupal_set_title($grievance_node->title . ': ' . t('Letter'));
   return drupal_get_form('grievance_letter_form', $grievance_node);
 }
 
