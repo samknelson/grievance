@@ -401,8 +401,6 @@ function grievance_log_entry_date($grievance_nid, $log_type_tid) {
 
 
 function grievance_node_tab_timeline($grievance_node) {
-  drupal_set_title($grievance_node->title . ': ' . t('Timeline'));
-
   $timeline = grievance_contract_compute_timeline($grievance_node);
   if (!$timeline) { $timeline = array(); }
   if (!$timeline['rule_nodes']) { $timeline['rule_nodes'] = array(); }
