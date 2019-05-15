@@ -245,7 +245,7 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 
 			if ($entry['count']) {
 				$msgs[] = t(
-					'Warning: there are <strong>@count</strong> messages with <a href="@url">@title</a>.', 
+					'Warning: there are <strong>@count</strong> grievances with <a href="@url">@title</a>.', 
 					array(
 						'@count' => $entry['count'], 
 						'@title' => $entry['title'], 

@@ -1,14 +1,16 @@
 <?php
 
-function sirius_worker_get_user($worker_nid) {
+function sirius_worker_get_uid($worker_nid) {
 	$sql = "select entity_id from field_data_field_sirius_worker ";
 	$sql .= "where entity_type = 'user' ";
 	$sql .= "and field_sirius_worker_target_id = :worker_nid ";
 	$stmt = db_query($sql, array(':worker_nid' => $worker_nid));
 	$hr = $stmt->fetchAssoc();
-	$worker_uid = $hr['entity_id'];
-	if (!$worker_uid) { return NULL; }
-	return user_load($worker_uid);
+	return $hr['entity_id'];
+}
+
+function sirius_worker_get_user($worker_nid) {
+	return user_load(sirius_worker_get_uid($worker_nid));
 }
 
 function sirius_worker_get($uid = NULL) {

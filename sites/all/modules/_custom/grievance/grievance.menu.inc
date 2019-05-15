@@ -218,6 +218,14 @@ function grievance_node_tabs() {
 		'weight' => 4,
 	);
 
+	$node_tabs['grievance_contract_template']['clauses/bulk-rename'] = array(
+		'title' => 'Bulk Rename',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_clause_bulk_rename',
+		'permissions' => array('grievance contract edit'),
+		'weight' => 5,
+	);
+
 
 
 
@@ -505,6 +513,15 @@ function grievance_menu() {
 		'description' => t('Intake logging'),
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('grievance_log_intake_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['admin/config/grievance/quicksearch'] = array(
+		'title' => 'Grievance Module - QuickSearch',
+		'description' => t('Settings for the quicksearch'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_quicksearch_admin'),
 		'access arguments' => array('grievance admin'),
 		'type' => MENU_NORMAL_ITEM,
 	);

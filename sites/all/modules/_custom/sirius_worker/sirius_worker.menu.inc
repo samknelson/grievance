@@ -31,6 +31,13 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_contact'] = array(
+    'title' => 'Contact',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_contact',
+    'permissions' => array('sirius'),
+  );
+
   $node_tabs['sirius_worker']['sirius_worker_industry'] = array(
     'title' => 'Industries',
     'description' => '',
@@ -99,12 +106,39 @@ function sirius_worker_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/worker/config'] = array(
-    'title' => 'Worker Configuration ',
+  $items['sirius/skill/expiring'] = array(
+    'title' => 'Skill Expiration Report',
     'description' => '',
     'access arguments' => array('sirius worker admin'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_worker_config'),
+    'page callback' => 'sirius_worker_page_skill_expiring',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/skill/expiring/%'] = array(
+    'title' => 'Skill Expiration Report',
+    'description' => '',
+    'access arguments' => array('sirius worker admin'),
+    'page callback' => 'sirius_worker_page_skill_expiring',
+    'page arguments' => array(3),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/worker/me'] = array(
+    'title' => 'Sirius: Worker: Me',
+    'description' => '',
+    'page callback' => 'sirius_worker_page_me',
+    'page arguments' => array(3),
+    'access arguments' => array('sirius dispatch worker'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/worker/skill-delete'] = array(
+    'title' => 'Delete a Skill',
+    'description' => '',
+    'page callback' => 'sirius_worker_skill_term_delete',
+    'page arguments' => array(3),
+    'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
   );
 

@@ -1,7 +1,6 @@
 <?php
 
 function grievance_node_tab_attachments($node) {
-  drupal_set_title($node->title . ': ' . t('Attachments'));
   $entity_nid = $node->nid;
 
   if ($_REQUEST['mailattach_fetch']) {

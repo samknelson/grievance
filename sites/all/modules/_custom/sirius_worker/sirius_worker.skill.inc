@@ -1,8 +1,70 @@
 <?php
 
-/*
- * Employer-initiated DNCs
+/**
+ * Delete a skill term
  */
+
+function sirius_worker_skill_term_delete() {
+	return drupal_get_form('sirius_worker_skill_term_delete_form');
+}
+
+function sirius_worker_skill_term_delete_form($form, &$form_state) {
+	$form['intro'] = array('#markup' => '<div class="sirius_form_intro">' . t('Use this form to delete a skill permanently and globally. This action cannot be undone.') . '</div>');
+
+	$form['tid'] = array(
+		'#title' => t('Skill'),
+		'#type' => 'select',
+		'#options' => sirius_taxonomy_load('sirius_skill', 'tid', 'name', TRUE),
+		'#required' => TRUE,
+	);
+
+	$form['confirm'] = array(
+		'#type' => 'checkbox',
+		'#title' => 'Yes, permanently and completely remove this skill from the system.',
+		'#value' => 1,
+		'#required' => TRUE,
+	);
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'Submit',
+	);
+
+	return $form;
+}
+
+function sirius_worker_skill_term_delete_form_submit($form, &$form_state) {
+	// Init
+	$tid = $form_state['values']['tid'];
+
+	$operations = array();
+	$sql = "select entity_id from field_data_field_sirius_skill ";
+	$sql .= "where entity_type = 'node' ";
+	$sql .= "and bundle = 'sirius_worker' ";
+	$sql .= "and field_sirius_skill_tid = :tid ";
+	$sql .= "order by entity_id ";
+	$stmt = db_query($sql, array(':tid' => $tid));
+	$worker_nids = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$worker_nids[] = $hr['entity_id'];
+	}
+
+	$count = 0;
+	foreach ($worker_nids as $worker_nid) {
+		$operations[] = array('sirius_worker_skill_set', array($worker_nid, array($tid), NULL, 'remove', 'Skill was deleted', array()));
+		++$count;
+		// if ($count > 5) { break; }
+	}
+  $operations[] = array('taxonomy_term_delete', array($tid));
+
+	// Launch the batch processor.
+  $batch = array(
+    'operations' => $operations,
+  );
+  batch_set($batch);
+
+	return;
+}
 
 function sirius_worker_skill_check($worker_node, $skill_term) {
 	if (!$worker_node->field_sirius_skill['und']) { return FALSE; }
@@ -15,6 +77,8 @@ function sirius_worker_skill_check($worker_node, $skill_term) {
 }
 
 function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason, $files) {
+	if (is_numeric($worker_node)) { $worker_node = node_load($worker_node); }
+
 	if ($expires) {
 		$expires_display = date('m/d/Y', strtotime($expires));
 	} else {
@@ -47,6 +111,46 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 	foreach ($tids as $tid) {
 		if (!isset($new[$tid])) {
 			$new[$tid] = $expires;
+		}
+	}
+
+	$msg = '';
+	if ($action == 'add') {
+		foreach ($new as $tid => $expires) {
+			$orig[$tid] = $expires;
+			$term = taxonomy_term_load($tid);
+			$msg .= "Add or renew $term->name (expires $expires_display); ";
+		}
+	} else {
+		foreach ($new as $tid => $ignore) {
+			unset($orig[$tid]);
+			$term = taxonomy_term_load($tid);
+			$msg .= "Remove $term->name; ";
+		}
+	}
+
+	$worker_node->field_sirius_skill['und'] = array();
+	$worker_node->field_sirius_skill_expire['und'] = array();
+	foreach ($orig as $tid => $exp) {
+		$worker_node->field_sirius_skill['und'][] = array('tid' => $tid);
+		$worker_node->field_sirius_skill_expire['und'][] = array('value' => date('Y-m-d', strtotime($exp)));
+	}
+
+	node_save($worker_node);
+	sirius_log('worker:skill', $action, $msg, $reason, '', array($worker_node->nid), $files);
+
+	return array('success' => TRUE, 'msg' => $msg);
+}
+
+
+function sirius_worker_skills($worker_node) {
+	$skill_tids = array();
+
+	// First add all the entries from the worker node
+	if ($worker_node->field_sirius_skill) {
+	foreach ($worker_node->field_sirius_skill['und'] as $tmp) {
+			$skill_tid = $tmp['tid'];
+			$skill_tids[$skill_tid] = TRUE;
 		}
 	}
 
