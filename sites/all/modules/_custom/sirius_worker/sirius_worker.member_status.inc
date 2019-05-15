@@ -1,6 +1,6 @@
 <?php
 
-function sirius_worker_member_status_get_open_statuses($industry_tid = NULL, $include_closed = FALSE) {
+function sirius_worker_member_status_get_open_statuses($industry_tid = NULL, $include_closed = FALSE, $job_type_tid = NULL) {
   global $user;
   $rids = array(-1);
   if ($user && $user->roles) {
@@ -16,11 +16,15 @@ function sirius_worker_member_status_get_open_statuses($industry_tid = NULL, $in
   if ($industry_tid) {
     $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid);
   }
+  if ($job_type_tid) {
+    $query->fieldCondition('field_sirius_dispatch_job_types', 'tid', $job_type_tid);
+  }
   $query->propertyOrderBy('weight');
   $stmt = $query->execute();
   if (!$stmt['taxonomy_term']) { return array(); }
   $tids = array_keys($stmt['taxonomy_term']);
   $terms = taxonomy_term_load_multiple($tids);
+
   return $terms;
 }
 
@@ -57,6 +61,7 @@ function sirius_worker_member_status_set($worker_node, $member_status_term, $tf,
   }
 
   // Fix industries
+  $orig_member_status_term = $member_status_term;
   if ($need_save) {
     $industry_tids = array();
     foreach ($worker_node->field_sirius_member_status[LANGUAGE_NONE] as $tmp) {
@@ -76,11 +81,11 @@ function sirius_worker_member_status_set($worker_node, $member_status_term, $tf,
   $category = 'worker:member_status';
   if ($tf) { 
     $type = 'set';
-    $message = $worker_node->title . ' has added the member status ' . $member_status_term->name;
+    $message = $worker_node->title . ' has added the member status ' . $orig_member_status_term->name;
   }
   else {
     $type = 'clear';
-    $message = $worker_node->title . ' has removed the member status ' . $member_status_term->name;
+    $message = $worker_node->title . ' has removed the member status ' . $orig_member_status_term->name;
   }
   $summary = $reason;
   $notes = $member_status_term->tid;
