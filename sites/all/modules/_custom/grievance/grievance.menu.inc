@@ -509,6 +509,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['admin/config/grievance/quicksearch'] = array(
+		'title' => 'Grievance Module - QuickSearch',
+		'description' => t('Settings for the quicksearch'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_quicksearch_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['admin/config/grievance/contacts'] = array(
 		'title' => 'Grievance Module - Contacts',
 		'description' => t('Contact-related settings'),
