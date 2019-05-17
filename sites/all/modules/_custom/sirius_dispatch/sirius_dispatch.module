@@ -19,6 +19,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.group.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.eba.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.vbo.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.dispstatus.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_accept.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_decline.inc';
@@ -102,6 +103,10 @@ function sirius_dispatch_node_update($node) {
 
   if ($node->type == 'sirius_dispatch_job') {
     sirius_dispatch_notify_employer_job($node);
+  }
+
+  if ($node->type == 'sirius_worker') {
+    sirius_dispatch_worker_recompute_from_work_status($node);
   }
 }
 
