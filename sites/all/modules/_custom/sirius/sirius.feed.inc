@@ -48,7 +48,7 @@ function sirius_node_tab_feed_process_form_submit($form, &$form_state) {
 	$feed_node = $form_state['feed_node'];
 
 	$source = (object) $feed_node->field_sirius_attachments['und'][0];
-	$destination = 'temporary://sirius_feed/' . $feed_node->nid;
+	$destination = 'temporary://sirius_feed_' . $feed_node->nid;
 	file_copy($source, $destination, FILE_EXISTS_REPLACE);
 
 	$path = drupal_realpath($destination);
