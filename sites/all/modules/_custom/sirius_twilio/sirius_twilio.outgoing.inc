@@ -26,7 +26,7 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
   if (!sirius_phone_validate($phone)) { return array('success' => FALSE, 'msg' => "[$phone] is not a valid phone number."); }
 
   static $registered;
-  if (variable_get('sirius_twilio_sms_consolidate', TRUE)) {
+  if (variable_get('sirius_twilio_sms_consolidate', FALSE)) {
 		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg);
 		if (!$registered) {
 			$registered = TRUE;
