@@ -148,6 +148,14 @@ function sirius_dispatch_run_create_dispatches($job_node) {
 	// How many do we need?
 	$count_we_need = $job_node->field_sirius_count['und'][0]['value'];
 
+  // Job settings
+  $batch_max = $job_node->field_sirius_batch_max['und'][0]['value'];
+  if (!$batch_max) { $batch_max = variable_get('sirius_dispatch_run_create_count', 25); }
+  $batch_min = $job_node->field_sirius_batch_min['und'][0]['value'];
+  if (!$batch_min) { $batch_min = 1; }
+  $batch_ratio = $job_node->field_sirius_batch_ratio['und'][0]['value'];
+  if (!$batch_ratio) { $batch_ratio = 1; }
+
 	// How many are requested, notified, or accepted?
 	$query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
@@ -179,6 +187,9 @@ function sirius_dispatch_run_create_dispatches($job_node) {
 
 	// We don't have enough
 	$count_to_create = $count_we_need - $count_we_have;
+  $count_to_create = $count_to_create * $batch_ratio;
+  if ($count_to_create > $batch_max) { $count_to_create = $batch_max; }
+  if ($count_to_create < $batch_min) { $count_to_create = $batch_min; }
 	$workers = sirius_dispatch_job_get_dispatchable_workers(
     $job_node, 
     'dispatch', 
@@ -261,17 +272,8 @@ function sirius_dispatch_run_admin() {
     '#type' => 'textfield',
     '#title' => t('Maximum Dispatches Created Per Poll'),
     '#size' => 6,
-    '#default_value' => variable_get('sirius_dispatch_run_create_count', 25),
-    '#description' => t("Maximum number of dispatches that will be created each time a running job is polled"),
-  );
-
-  $var = 'sirius_dispatch_run_notify_count';
-  $form[$var] = array(
-    '#type' => 'textfield',
-    '#title' => t('Maximum Notifications Per Poll'),
-    '#size' => 6,
     '#default_value' => variable_get($var, 25),
-    '#description' => t("Maximum number of notifications that will be sent each time a running job is polled"),
+    '#description' => t("Maximum number of dispatches that will be created each time a running job is polled"),
   );
 
   $days = array(
