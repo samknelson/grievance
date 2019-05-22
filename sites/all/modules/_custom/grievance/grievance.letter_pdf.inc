@@ -2,11 +2,7 @@
 
 function grievance_letter_loopback($grievance_node) {
 	// Become user 1
-	global $user;
-	$original_user = $user;
-	$old_state = drupal_save_session();
-	drupal_save_session(FALSE);
-	$user = user_load(1);
+	sirius_become_superuser(TRUE);
 
 	// And display the node
 	drupal_set_title($node->title . ' - Letters');

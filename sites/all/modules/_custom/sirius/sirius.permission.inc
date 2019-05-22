@@ -44,5 +44,6 @@ function sirius_permission() {
 function sirius_node_access($node, $op, $account) {
 	if ($node->type == 'sirius_log') { return sirius_node_access_log($node, $op, $account); }
   if ($node->type == 'sirius_news') { return sirius_node_access_news($node, $op, $account); }
+  if ($node->type == 'sirius_feed') { return sirius_node_access_feed($node, $op, $account); }
   return NODE_ACCESS_IGNORE;
 }

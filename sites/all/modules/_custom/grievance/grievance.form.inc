@@ -257,8 +257,14 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
         '</strong>.';
     }
   }
+
   $form['#groups']['group_grievance_form']->format_settings['instance_settings']['description'] = 
     '<div id="grievance-form-contract-link">' . $contract_link_text . '</div>';
+
+  // Add the clause picker as a new field
+  if ($contract_tplt_node && $contract_tplt_node->nid) {
+    $form['field_grievance_clauseref']['#prefix'] = '<a href="#" onClick="javascript:sirius_popup(\'/node/' . $contract_tplt_node->nid . '/clauses/picker/popup\', \'clause_picker\', 1025, 600); return false;">Clause Picker</a>';
+  }
 
   // 
   // Recipients

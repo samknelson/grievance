@@ -1,6 +1,59 @@
+<?php 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// POPUP VERSION
+////////////////////////////////////////////////////////////////////////////////////////////////////
+if (at_sirius_is_popup()) {
+?>
+
+<div id="page">
+ <div id="columns" class="columns clearfix">
+    <div class="container">
+      <div id="content-column" class="content-column" role="main">
+        <div class="content-inner">
+
+          <?php print render($page['highlighted']); ?>
+
+          <div id="messages-wrapper">
+            <?php print $messages; ?>
+          </div>
+          <?php print render($page['help']); ?>
+
+          <?php if ($action_links): ?>
+            <nav class="actions-wrapper menu-wrapper clearfix">
+              <ul class="action-links clearfix">
+                <?php print render($action_links); ?>
+              </ul>
+            </nav>
+          <?php endif; ?>
+
+          <<?php print $tag; ?> id="main-content">
+
+            <!-- region: Main Content -->
+            <?php if ($content = render($page['content'])): ?>
+              <div id="content">
+                <?php print $content; ?>
+              </div>
+            <?php endif; ?>
+
+            <!-- Feed icons (RSS, Atom icons etc -->
+            <?php print $feed_icons; ?>
+            
+          </<?php print $tag; ?>><!-- /end #main-content -->
+
+        </div><!-- /end .content-inner -->
+      </div><!-- /end #content-column -->
+
+    </div><!-- /end #columns -->
+  </div>
+</div>
+<?php 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// NORMAL VERSION
+////////////////////////////////////////////////////////////////////////////////////////////////////
+} else {
+?>
 <div id="page">
 
-  <?php if ($page['banner']): ?>
     <div id="page-banner">
       <div class="container">
       	<div class="user-links">
@@ -10,12 +63,13 @@
           
           if ($user->uid) 
           {
+            print t('<div class="user-links-content">');
             print t('Welcome, ');
             print $user->name;
 						print "&nbsp;&nbsp;&nbsp;&nbsp;";
 
             $user_full = user_load($user->uid);
-            if ($user_full->field_grievance_shops['und'][0]['target_id']) {
+            if ($user_full->field_grievance_shops['und'][0]['target_id'] && !$user_full->field_grievance_shops['und'][1]['target_id']) {
               $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
               $shop_node = node_load($shop_nid);
               // print l($shop_node->title, 'node/' . $shop_node->nid);
@@ -34,6 +88,7 @@
               print " / ";
             }
             print l(t("logout"),"user/logout");
+            print t('</div>');
           ?>
           <!--
             / <a href="#" onClick="javascript:sirius_popup('/sirius/dispatch/operator', 'sirius_operator', 1025, 600); return false;">operator window</a>
@@ -42,12 +97,15 @@
           }
           else 
           {
+            print t('<div class="user-links-content anon-user-links-content">');
             print l("login","user/login");
+            print t('</div>');
           }
           ?>
-          <br>
-
+          <div class="user-links-text">
           <?php print variable_get('sirius_banner_text', ''); ?>
+        </div>
+
         </div>
 
         <div class="banner-wrapper">
@@ -78,8 +136,14 @@
         -->
       </div>
     </div>
-  <?php endif; ?>
 
+
+      <!-- region: Banner Menu -->
+      <div class="banner-menu-outer-wrapper">
+        <div class="container">
+          <?php $banner_menu = render($page['banner_menu']); print $banner_menu; ?>
+        </div>
+      </div>
 
   <div class="topbar-wrapper">
     <div class="container">
@@ -113,7 +177,6 @@
       </header>
     </div>
   </div>
-
 
 
   <?php if ($primary_local_tasks): ?>
@@ -189,4 +252,4 @@
   <?php endif; ?>
 
 </div>
-
+<?php } ?>

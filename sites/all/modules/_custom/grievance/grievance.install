@@ -275,5 +275,22 @@ function grievance_update_7015() {
 function grievance_update_7016() {
   // Enable some modules
   print "Disabling search\n";
-  module_enable(array('search'), TRUE);
+  module_disable(array('search'), TRUE);
 }
+
+function grievance_update_7017() {
+  $table = 'field_data_field_sirius_id';
+  $column = 'field_sirius_id_value';
+  try { db_add_index($table, "${table}_${column}", array($column)); } catch (exception $ignore) { }
+
+  $table = 'field_data_field_sirius_id2';
+  $column = 'field_sirius_id2_value';
+  try { db_add_index($table, "${table}_${column}", array($column)); } catch (exception $ignore) { }
+}
+
+function grievance_update_7018() {
+  // Enable some modules
+  print "Disabling field_permission\n";
+  module_disable(array('field_permissions'), FALSE);
+}
+

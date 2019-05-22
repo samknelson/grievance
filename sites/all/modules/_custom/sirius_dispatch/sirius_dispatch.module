@@ -17,6 +17,9 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.threestrikes.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.notify.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.group.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.eba.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.vbo.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.dispstatus.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_accept.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_decline.inc';
@@ -26,13 +29,17 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_terminate.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_create.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_expire.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_bullpen_signin.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_send.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_member_status_ratios.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_landing.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_manage.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_manage.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_dispatch_facility_halls.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_operator.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_dispatch_worker_view.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_view.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dnc.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatches.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatch_preferences.inc';
@@ -87,6 +94,7 @@ function sirius_dispatch_get_current($worker_nid) {
  */
 
 function sirius_dispatch_node_update($node) {
+  if ($node->sirius_nohook) { return; }
   if ($node->type == 'sirius_dispatch') {
     sirius_dispatch_job_recompute_from_dispatch($node);
     sirius_dispatch_worker_recompute_from_dispatch($node);
@@ -96,6 +104,10 @@ function sirius_dispatch_node_update($node) {
   if ($node->type == 'sirius_dispatch_job') {
     sirius_dispatch_notify_employer_job($node);
   }
+
+  if ($node->type == 'sirius_worker') {
+    sirius_dispatch_worker_recompute_from_work_status($node);
+  }
 }
 
 /**
@@ -103,6 +115,7 @@ function sirius_dispatch_node_update($node) {
  */
 
 function sirius_dispatch_node_insert($node) {
+  if ($node->sirius_nohook) { return; }
   if ($node->type == 'sirius_dispatch') {
     sirius_dispatch_job_recompute_from_dispatch($node);
     sirius_dispatch_worker_recompute_from_dispatch($node);
@@ -141,3 +154,156 @@ function sirius_dispatch_compute_payrate($dispatch_node) {
     $dispatch_node->field_sirius_payrate = $member_status_term->field_sirius_payrate; 
   }
 }
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function sirius_dispatch_report_cache_info() {
+  $items = array();
+
+  $items['sirius-dispatch-member-status-ratios'] = array(
+    'name' => t('Member Status Ratios'),
+    'description' => '',
+    'access' => 'sirius report',
+    'fields' => sirius_dispatch_report_member_status_ratios_fields(),
+    'form_callback' => 'sirius_dispatch_report_member_status_ratios_form',
+    'pk_list_callback' => 'sirius_dispatch_report_member_status_ratios_pks',
+    'batch_callback' => 'sirius_dispatch_report_member_status_ratios_batch',
+    'render_callbacks' => array(
+      'Ratio' => 'sirius_dispatch_report_member_status_ratios_view',
+    ),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+
+function sirius_dispatch_block_info() {
+  $blocks = array();
+  $blocks['sirius_dispatch_listcounts'] = array(
+    'info' => t('Sirius Dispatch List Counts'),
+    'cache' => DRUPAL_NO_CACHE,
+  );      
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+
+function sirius_dispatch_block_view($delta = '') {
+  if ($delta == 'sirius_dispatch_listcounts') {
+    return sirius_dispatch_listcounts_block_view();
+  }
+}
+
+
+function sirius_dispatch_listcounts_block_view() {
+  $html = '';
+
+  $industries = array();
+  if (user_access('sirius dispatch staff')) {
+    $industries = sirius_taxonomy_load('sirius_industry', 'tid', 'full');
+  } else {
+    $employer_node = sirius_employer_get($uid);
+    if (!$employer_node) { return array(); }
+    $industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
+    if (!$industry_tids) { return array(); }
+    $industries = taxonomy_term_load_multiple($industry_tids);
+  }
+  if (!$industries) { return array(); }
+
+  // Get the open lists
+  global $user;
+  $user_full = user_load($user->uid);
+  $include_closed = user_access('sirius dispatch staff');
+
+  foreach ($industries as $industry_tid => $industry_term) {
+    $industry_is_empty = TRUE;
+    $industry_html = '<h2>' . $industry_term->name . '</h2>';
+
+    $open_statuses = sirius_worker_member_status_get_open_statuses($industry_tid, $include_closed);
+    $job_node = new stdClass();
+    $job_node->title = "Dummy";
+    $job_node->type = 'sirius_dispatch_job';
+    $job_node->language = LANGUAGE_NONE;
+    $job_node->uid = $user->uid;
+    $job_node->status = 1;
+    $job_node->promote = 0;
+    $job_node->comment = 0;
+    $job_node->field_grievance_shop['und'][0]['target_id'] = 0;
+    $job_node->field_sirius_dispatch_job_type['und'][0]['tid'] = sirius_get_special_tid('sirius_dispatch_job_type|OPEN');
+    $job_node->field_sirius_datetime['und'][0]['value'] = date('Y-m-d H:i:s');
+    $job_node->field_sirius_datetime_created['und'][0]['value'] = date('Y-m-d H:i:s');
+    $job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Pending';
+    $job_node->field_sirius_industry['und'][0]['tid'] = $industry_tid;
+    $industry_html .= '<ul>';
+    foreach ($open_statuses as $status_tid => $status_term) {
+      $job_node->field_sirius_member_status['und'] = array(array('tid' => $status_tid));
+      $count = sirius_dispatch_job_get_dispatchable_workers(
+        $job_node, 
+        $worker_node->nid,
+        0,
+        array(
+          'ignore_skill' => TRUE,
+          'ignore_department' => TRUE,
+          'ignore_cbn' => TRUE,
+          'count' => TRUE,
+        )
+      );
+      if (!$count) { continue; }
+      $industry_is_empty = FALSE;
+      $industry_html .= '<li>' . $status_term->name . ': ' . number_format($count) . ' available workers.' . '</li>';
+    }
+    $industry_html .= '</ul>';
+
+    if (!$industry_is_empty) {
+      $html .= $industry_html;
+    }
+
+  }
+
+  $block = array();
+  $block['subject'] = '';
+  $block['content'] = $html;
+  return $block;
+}
+
+/**
+ * Implements hook_form_alter
+ *
+ * @todo - Have you ever seen such crappy code?  Good god, it must be 11:00 PM on the night we're launching.
+ *         Somebody should really clean this up tout suite.
+ *         Look, let's just pretend this never happened, ok?  It'll be just between you and me?
+ */
+
+function sirius_dispatch_form_alter(&$form, &$form_state, $form_id) {
+
+  if ($form_id == 'sirius_worker_node_form') {
+    if (!$form['nid']['#value']) {
+      $sql = "select max(field_sirius_id_value) as m from field_data_field_sirius_id ";
+      $sql .= "where entity_type = 'node' "; 
+      $sql .= "and bundle = 'sirius_worker' ";
+      $sql .= "and field_sirius_id_value != '999099' ";
+      $sql .= "and field_sirius_id_value != '666666' ";
+      $sql .= "and field_sirius_id_value != '999001' ";
+      $sql .= "and length(field_sirius_id_value) = 6 ";
+      // $sql .= 'and field_sirius_id_value REGEXP \'^[0-9]{6}$\' ';
+      $stmt = db_query($sql, array());
+      $hr = $stmt->fetchAssoc();
+      $id = $hr['m'];
+      if ($id > 0) {
+        $id++;
+        if ($id == 999099) { $id++; }
+        if ($id == 666666) { $id++; }
+        if ($id == 999001) { $id++; }
+        $form['field_sirius_id']["und"][0]['value']['#default_value'] = $id;
+      }
+    }
+  }
+}
+

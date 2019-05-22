@@ -10,13 +10,33 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 // require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_broughtby.inc";
 // require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l226_clausemap.inc";
 
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1.inc";
 // require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l1_calllog.inc";
 
 // require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l23.inc";
 // require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l23_stewards.inc";
 
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_facilities.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_facilities.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_halls.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_halls.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_employers.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_jobs.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_jobs_skill.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_phone.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_skill.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_memberstatus.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_workstatus.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_dispatchstatus.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_nohire.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_cleanup.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_dispatch.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_specialrequest.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_image.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_owl.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_block.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_apprentice.inc";
 
 function grievance_uhmigrate_base_dir() {
   $dir = DRUPAL_ROOT;
@@ -35,13 +55,16 @@ function grievance_uhmigrate_log_summary() {
 
   print "\n\nSUMMARY\n";
 
-  foreach ($grievance_uhmigrate_log_data as $type => &$messages) {
-    if ($type == 'SUCCESS') { continue; }
-    print "*** $type ***\n";
-    
-    ksort($messages);
-    foreach ($messages as $msg => $entry) {
-      print "$msg (Count $entry[count], first row $entry[first_row])\n";
+  if ($grievance_uhmigrate_log_data) {
+    foreach ($grievance_uhmigrate_log_data as $type => &$messages) {
+      if ($type == 'SUCCESS') { continue; }
+      if ($type == 'DEBUG') { continue; }
+      print "*** $type ***\n";
+      
+      ksort($messages);
+      foreach ($messages as $msg => $entry) {
+        print "$msg (Count $entry[count], first row $entry[first_row])\n";
+      }
     }
   }
 
@@ -66,7 +89,9 @@ function grievance_uhmigrate_log($type, $row, $msg) {
   }
   $grievance_uhmigrate_log_data[$type][$msg]['count']++;
 
-  print "Row #" . $row['Row'] . ' / ' . $row['Griev#'] . ': ' . $type . ': ' . $msg . "\n";
+  print "Row #" . $row['Row'];
+  if ($row['Total']) { print '/' . $row['Total']; }
+  print ': ' . $type . ': ' . $msg . "\n";
 }
 
 function grievance_uhmigrate_find_by_title($content_type, $title) {
@@ -127,11 +152,11 @@ function grievance_uhmigrate_find_by_external_id($content_type, $external_id) {
   return $node;
 }
 
-function grievance_uhmigrate_find_by_sirius_id($content_type, $external_id) {
+function grievance_uhmigrate_find_by_sirius_id($content_type, $external_id, $field = 'field_sirius_id') {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', $content_type);
-  $query->fieldCondition('field_sirius_id', 'value', $external_id);
+  $query->fieldCondition($field, 'value', $external_id);
   $query->propertyOrderBy('nid');
   $stmt = $query->execute();
 
@@ -152,8 +177,53 @@ function grievance_uhmigrate_find_by_sirius_id($content_type, $external_id) {
   $node->status = 1;
   $node->promote = 0;
   $node->comment = 0;
-  $node->field_sirius_id['und'][0]['value'] = $external_id;
+  $node->{$field}['und'][0]['value'] = $external_id;
   return $node;
+}
+
+function grievance_uhmigrate_find_nid_by_sirius_id($content_type, $external_id, $field = 'field_sirius_id') {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', $content_type);
+  $query->fieldCondition($field, 'value', $external_id);
+  $query->propertyOrderBy('nid');
+  $stmt = $query->execute();
+
+  // Found one, return the first.
+  if ($stmt['node']) {
+    $tmp = array_keys($stmt['node']);
+    $nid = $tmp[0];
+    return $nid;
+    // return node_load($nid);
+  }
+
+  // Didn't find one, return an empty node
+  global $user;
+  $node = new stdClass();
+  $node->type = $content_type;
+  node_object_prepare($node); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+  $node->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+  $node->uid = $user->uid; 
+  $node->status = 1;
+  $node->promote = 0;
+  $node->comment = 0;
+  $node->{$field}['und'][0]['value'] = $external_id;
+  return $node;
+}
+function grievance_uhmigrate_find_term_by_sirius_id($vocabulary_name, $external_id, $field_name = 'field_sirius_id') {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'taxonomy_term');
+  $query->entityCondition('bundle', $vocabulary_name);
+  $query->fieldCondition($field_name, 'value', $external_id);
+  $query->propertyOrderBy('tid');
+  $stmt = $query->execute();
+
+  // Found one, return the first.
+  if ($stmt['taxonomy_term']) {
+    $tmp = array_keys($stmt['taxonomy_term']);
+    $tid = $tmp[0];
+    return taxonomy_term_load($tid);
+  }
 }
 
 function grievance_uhmigrate_node_save(&$node) {
@@ -177,3 +247,19 @@ function grievance_uhmigrate_requirements($phase) {
     );
   }
 }
+
+
+function grievance_uhmigrate_skiprow() {
+  static $this_row = -1;
+  ++$this_row;
+  $last_row = variable_get('grievance_uhmigrate_skiprow', 0);
+  if ($this_row < $last_row) { return TRUE; }
+  variable_set('grievance_uhmigrate_skiprow', $this_row); 
+  return FALSE;
+}
+
+
+function grievance_uhmigrate_skiprow_set($val = -1) {
+  variable_set('grievance_uhmigrate_skiprow', $val);
+}
+

@@ -24,6 +24,8 @@ function sirius_twilio_handler_get_sms($phone, $msg) {
  **********************************************************************************/
 
 function sirius_twilio_get_context($call_sid) {
+  if (!$call_sid) { return array(); }
+  
   // We look for the most recent outgoing log entry of type "twilio:conversation"
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');

@@ -1,5 +1,12 @@
 <?php
 
+function at_sirius_is_popup() {
+  if ($_REQUEST["popup"]) { return TRUE; }
+  $parts = explode('/', current_path());
+  if ($parts && array_pop($parts) == 'popup') { return TRUE; }
+  return FALSE;
+}
+
 /**
  * Override or insert variables into page templates.
  */
@@ -24,6 +31,10 @@ function at_sirius_preprocess_page(&$vars) {
   $vars['content_header_attributes_array']['class'][] = 'branding-elements';
   $vars['content_header_attributes_array']['role'][] = 'banner';
 
+
+  if (variable_get('sirius_banner_css', '')) {
+    drupal_add_css(variable_get('sirius_banner_css', ''), 'inline');
+  }
 
 	drupal_add_js('sites/all/themes/at_sirius/js/main.js');
 }

@@ -1,42 +1,39 @@
 img.banner-logo {
 	height: 70px;
-	width: 55px;
+	margin-top: -21px;
+	margin-right: 16px;
 }
-.banner-logo {
-	margin-top: 11px;
+.banner-logo-wrapper {
+	float: left;
 }
 .banner-name-wrapper {
 	font-family: roboto,arial, helvetica, san-serif;
 	font-weight: bold;
 	font-size:24px;
-	position: absolute;
-    top: 30px;
-    left: 100px;
     color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 2px;
+    margin-bottom: 32px;
+    float: left;
 }
 .banner-name-wrapper:hover {
 	color: #ffffcb;
 }
 #page-banner {
-    background: #1b4784;
-    background-image: url('/sites/default/files/adaptivetheme/at_sirius_files/blue-white-banner-bg.png');
-    background-repeat: repeat-x;
+	padding: 32px 0 0 0;
+	height: 60px;
 }
 #page-banner .container {
     position: relative;
     /* border-bottom: solid 4px #5984be; */
-    background: #ffffff;
+    background: transparent;
 }
 #page-banner .user-links {
-	position: absolute;
-	right: 36px;
-	top: 20px;
 	z-index: 9;
-	background: transparent;
 	color: #fff;
 	font-size: 14px;
+	float: right;
+	text-align: right;
 }
 #page-banner .user-links a {
 	color: #fff;
@@ -76,3 +73,59 @@ div.messages div {
 div.region-help {
 	margin: 0 36px 28px 36px;
 }
+.banner {
+	font-size: 1.5em;
+	font-weight: bold;
+	font-style: italic;
+	color: #ffffff;
+}
+
+#block-block-2,
+.banner-wrapper {
+}
+
+.banner-wrapper .inner {
+  margin-left: 36px;
+  margin-right: 36px;
+}
+
+.banner-menu-outer-wrapper {
+    background-color: #ffffff;
+}
+
+#block-grievance-grievance-quicksearch,
+#block-grievance-grievance-quicksearch-sub {
+	position: absolute;
+	right: 0;
+}
+#grievance-quicksearch-form,
+#grievance-quicksearch-sub-form {
+}
+#grievance-quicksearch-form label,
+#grievance-quicksearch-sub-form label {
+	display: none;
+}
+#grievance-quicksearch-form .form-submit,
+#grievance-quicksearch-sub-form .form-submit {
+	margin-right: 0;
+}
+#grievance-quicksearch-form div.form-item,
+#grievance-quicksearch-sub-form div.form-item {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+}
+
+/* client-specific settings */
+#page-banner {
+    /*
+    background-color: #1b4784; 
+    background-color: #000000;
+    border-bottom: 10px solid #fdb82f;
+    border-bottom: 10px solid #ff0000; 
+    */
+    background-color: #e89a00;
+    border-bottom: 0px solid #1b4784;
+}
+

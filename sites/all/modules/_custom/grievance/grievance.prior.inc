@@ -1,7 +1,6 @@
 <?php
 
 function grievance_node_tab_prior($grievance_node) {
-  drupal_set_title($grievance_node->title . ': ' . t('Prior grievances'));
   $entity_nid = $grievance_node->nid;
   $grievance_min = $grievance_node->field_grievance_min['und'][0]['value'];
   if (!$grievance_min) { $grievance_min = '[empty]'; }

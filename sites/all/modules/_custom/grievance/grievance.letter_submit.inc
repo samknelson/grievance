@@ -25,6 +25,24 @@ function grievance_letter_form_submit($form, &$form_state) {
 
 	$letter_nodes = node_load_multiple($letter_nids);
 
+	// Find out if we must log
+	$mustlog = FALSE;
+	foreach ($letter_nodes as $letter_nid => $letter_node) {
+		if ($letter_node->field_sirius_mustlog['und'][0]['value'] == 'Yes') {
+			$mustlog = TRUE;
+		}
+	}
+
+	if ($mustlog) {
+		if ($output == 'pdf' || $output == 'send-email' || $output == 'send-fax') {
+			if (!$form_state['values']['logging']) {
+				drupal_set_message(t('Letters of this type MUST be logged.'), 'error');
+				return;
+			}
+		}
+
+	}
+
 	$global_cc_recipients = array();
 	foreach ($letter_nodes as $letter_node) {
 		if ($letter_node->field_grievance_emails['und']) {

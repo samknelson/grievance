@@ -7,8 +7,8 @@ function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
 	if (!$job_node) { return; }
 	if ($job_node->field_sirius_notify['und'][0]['value'] != 'Yes') { return; }
-	$email = $job_node->field_sirius_email['und'][0]['value'];
-	if (!$email) { return; }
+	$emails = sirius_fieldvals($job_node, 'field_sirius_emails');
+	if (!$emails) { return; }
 	if (!$job_node->field_sirius_dispatch_job_nfcns['und'][0]) { return; }
 
 	$notifications = array();
@@ -24,11 +24,18 @@ function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
 	$found = FALSE; 
 	if ($status_new == 'accepted' && $notifications['dispatch_accept']) { $found = TRUE; }
 	if ($status_new == 'declined' && $notifications['dispatch_decline']) { $found = TRUE; }
-	if ($status_new == 'expired' && $notifications['dispatch_expired']) { $found = TRUE; }
+	if ($status_new == 'expired' && $notifications['dispatch_expire']) { $found = TRUE; }
+	if ($status_new == 'resigned' && $notifications['dispatch_resign']) { $found = TRUE; }
 	if (!$found) { return; }
 
 	global $base_url;
-	$subject = "Dispatch update - Call #" . $job_node->field_sirius_id['und'][0]['value'] . ' / Worker ' . $worker_node->title . ' / ' . $status_new;
+	$subject = "Dispatch update - Call #";
+	if ($job_node->field_sirius_id['und'][0]['value']) {
+		$subject .= $job_node->field_sirius_id['und'][0]['value'];
+	} else {
+		$subject .= $job_node->nid;
+	}
+	$subject .= ' / Worker ' . $worker_node->title . ' / ' . $status_new;
 	$body = "This is a status update notification.<br />";
 	$body .= "Job: <a href=\"$base_url/node/" . $job_node->nid . "\">" . $job_node->field_sirius_id['und'][0]['value'] . "</a><br />";
 	$body .= "Dispatch: <a href=\"$base_url/node/" . $dispatch_node->nid . "\">" . $dispatch_node->nid . "</a><br />";
@@ -36,21 +43,23 @@ function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
 	$body .= "Old status: <strong>$status_old</strong><br />";
 	$body .= "New status: <strong>$status_new</strong><br />";
 
-	sirius_email_send(
-		array(
-			'to' => $email,
-			'subject' => $subject,
-			'body' => $body,
-			'handler_nids' => array($dispatch_node->nid),
-		)
-	);
+	foreach ($emails as $email) {
+		sirius_email_send(
+			array(
+				'to' => $email,
+				'subject' => $subject,
+				'body' => $body,
+				'handler_nids' => array($dispatch_node->nid),
+			)
+		);
+	}
 }
 
 function sirius_dispatch_notify_employer_job($job_node) {
 	if (!$job_node) { return; }
 	if ($job_node->field_sirius_notify['und'][0]['value'] != 'Yes') { return; }
-	$email = $job_node->field_sirius_email['und'][0]['value'];
-	if (!$email) { return; }
+	$emails = sirius_fieldvals($job_node, 'field_sirius_emails');
+	if (!$emails) { return; }
 	if (!$job_node->field_sirius_dispatch_job_nfcns['und'][0]) { return; }
 
 	$notifications = array();
@@ -69,18 +78,26 @@ function sirius_dispatch_notify_employer_job($job_node) {
 	if (!$found) { return; }
 
 	global $base_url;
-	$subject = "Job update - Call #" . $job_node->field_sirius_id['und'][0]['value'] . ' / ' . $status_new;
+	$subject = "Job update - Call #";
+	if ($job_node->field_sirius_id['und'][0]['value']) {
+		$subject .= $job_node->field_sirius_id['und'][0]['value'];
+	} else {
+		$subject .= $job_node->nid;
+	}
+	$subject .= ' / ' . $status_new;
 	$body = "This is a status update notification.<br />";
 	$body .= "Job: <a href=\"$base_url/node/" . $job_node->nid . "\">" . $job_node->field_sirius_id['und'][0]['value'] . "</a><br />";
 	$body .= "Old status: <strong>$status_old</strong><br />";
 	$body .= "New status: <strong>$status_new</strong><br />";
 
-	sirius_email_send(
-		array(
-			'to' => $email,
-			'subject' => $subject,
-			'body' => $body,
-			'handler_nids' => array($job_node->nid),
-		)
-	);
+	foreach ($emails as $email) {
+		sirius_email_send(
+			array(
+				'to' => $email,
+				'subject' => $subject,
+				'body' => $body,
+				'handler_nids' => array($job_node->nid),
+			)
+		);
+	}
 }

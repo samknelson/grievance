@@ -11,17 +11,18 @@ function sirius_get_special_tid($which) {
 function sirius_specialtid_keys() {
 	return array(
 		'sirius_worker_dispatch_status' => array(
-			'employed_available' => 'Employed, Available',
-			'employed_not_available' => 'Employed, Not Available',
+			'employed' => 'Employed',
 			'not_employed_not_available' => 'Not Employed, Not Available',
 			'not_employed_available' => 'Not Employed, Available',
-			'not_employed_blocked' => 'Not Employed, Blocked',
 		),
 		'sirius_dispatch_job_type' => array(
 			'CBN' => 'Call by Name',
 			'FAN' => 'Call by Name, then Fill as Needed',
 			'OPEN' => 'Open',
 			'BULL' => 'Bullpen',
+		),
+		'sirius_dispatch_job_tags' => array(
+			'ASAP' => 'As Soon As Possible (ASAP)',
 		),
 	);
 }

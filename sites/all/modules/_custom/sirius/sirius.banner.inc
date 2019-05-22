@@ -17,6 +17,13 @@ function sirius_banner_config() {
     '#description' => t('Usually contact information. May contain HTML.'),
   );
 
+	$form['sirius_banner_css'] = array(
+		'#title' => t('CSS'),
+		'#type' => 'textarea',
+		'#default_value' => variable_get('sirius_banner_css', ''),
+		'#description' => t('Enter any additional CSS directives desired for styling the site.'),
+	);
+
 	$form['sirius_banner_logo'] = array(
 		'#title' => t('Logo'),
 		'#type' => 'managed_file',
@@ -37,6 +44,7 @@ function sirius_banner_config_submit($form, &$form_state) {
 			$file->status = FILE_STATUS_PERMANENT;
 			file_save($file);
 			variable_set('sirius_banner_logo', $file->fid);
+			file_usage_add($file, 'sirius_logo', 'sirius_logo', 1);
 		}
 	}
 	else {

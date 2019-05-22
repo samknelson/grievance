@@ -24,7 +24,8 @@
   regions[footer]         = Footer
   regions[page_top]       = Page top
   regions[page_bottom]    = Page bottom
-  regions[banner]       	= Banner
+  regions[banner]         = Banner
+  regions[banner_menu]    = Banner Menu
   regions[subtitle]       = Sub-Title
 
 

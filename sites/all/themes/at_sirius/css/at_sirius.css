@@ -1025,6 +1025,7 @@ select {
 }
 select {
   padding: 2px 2px 2px 3px;
+  max-width: 100%;
 }
 input.form-text,
 textarea {
@@ -1193,8 +1194,12 @@ fieldset#edit-body-und-0-format {
   border-radius: 0;
   background: #fff;
 }
+.vertical-tabs-panes {
+  overflow: hidden;
+}
 .vertical-tabs-panes > fieldset > .fieldset-wrapper {
   padding: 10px 15px;
+  max-width: 680px;
 }
 .vertical-tabs-panes fieldset fieldset .fieldset-wrapper {
   padding-top: 0 !important;
@@ -2149,7 +2154,6 @@ h2.field-label {
 	margin-right: 0;
 	margin-top: 5px;
 	margin-bottom: 5px;
-	font-weight: bold;
 }
 
 .field-widget-date-popup label {
@@ -2253,7 +2257,7 @@ h2.field-label {
 	float: none;
 }
 
-#page-banner .block-inner,
+.block-inner,
 .banner-wrapper {
 	background: none;
 }
@@ -2264,38 +2268,36 @@ h2.field-label {
   margin: 0 0 28px 0;
 }
 
-#page-banner .block-superfish {
-  padding: 10px 0; /*adjusting for padding in the first menu item */
+.block-superfish {
+  padding: 16px 0 13px 0; /*  */
 	text-align: center;
 }
-#page-banner ul.sf-menu.sf-style-white {
-	height: 32px;
+ul.sf-menu.sf-style-white {
 	padding-top: 2px;
   margin-left: -14px;
 }
-#page-banner .sf-menu.sf-style-white li, 
-#page-banner .sf-menu.sf-style-white.sf-navbar {
+.sf-menu.sf-style-white li, 
+.sf-menu.sf-style-white li li, 
+.sf-menu.sf-style-white li li li, 
+.sf-menu.sf-style-white.sf-navbar {
 	background: #ffffff; 
 	color: #1b4784;
 	font-size: 10px;
 	letter-spacing: 1px;
 }
-#page-banner .sf-menu.sf-style-white li .sf-depth-1 {
+.sf-menu.sf-style-white li .sf-depth-1 {
 	margin-right: 2px;
 }
-#page-banner .sf-menu.sf-style-white li a:hover,
-#page-banner .sf-menu.sf-style-white li:hover {
+.sf-menu.sf-style-white li a:hover,
+.sf-menu.sf-style-white li:hover {
 	background-color: #ffffff;
 	color: #e89a00;
 	text-decoration: none;
 }
-#page-banner .banner {
-	font-size: 1.5em;
-	font-weight: bold;
-	font-style: italic;
-	color: #ffffff;
+.sf-menu ul {
+    width: 20em;
 }
-#page-banner .sf-menu.sf-style-white a {
+.sf-menu.sf-style-white a {
 	border: none;
 	color: #1b4784;
 	text-transform: uppercase;
@@ -2303,18 +2305,19 @@ h2.field-label {
   padding-right: 14px;
   font-size: 13px;
 }
-#page-banner .sf-menu.sf-style-white ul.sf-menu.sf-style-white ul {
+.sf-menu.sf-style-white ul.sf-menu.sf-style-white ul {
   margin-top: 1em;
 }
-#page-banner .sf-menu.sf-style-white ul.sf-menu.sf-style-white ul a {
+.sf-menu.sf-style-white ul.sf-menu.sf-style-white ul a {
   text-transform: none;
   letter-spacing: normal;
   line-height: 130%;
 }
-
-
 .sf-menu.sf-style-white .sf-sub-indicator {
 	background-image: url('../images/sf-arrows.png');
+}
+.sf-menu.sf-style-white li li.sf-item-1 a {
+    padding-top: 24px;
 }
 
 .boolean-is-false {
@@ -2326,7 +2329,7 @@ h2.field-label {
 	float: right;
 }
 
-#page-banner .block-trustfund-flags-block-1 {
+.block-trustfund-flags-block-1 {
 	float: right;
 }
 	
@@ -2400,27 +2403,12 @@ table.trustfund-payperiod tr.error {
 	padding-bottom: 20px;
 }
 
-#page-banner .user-links {
-	background-color: #f7f5f5;
-	height: 22px;
-  padding-top: 6px;
-  padding-right: 6px;
-	text-align: right;
-	font-size: 13px;
-	color: #1b4784;
+.user-links {
 }
 
-#page-banner .user-links  a {
-	color: #4985d0;
+.user-links  a {
 }
 
-#page-banner #block-block-2,
-.banner-wrapper {
-	background-color: #1b4784;
-	height: 90px;
-	float: none;
-	border-bottom: 10px solid #fdb82f;
-}
 
 #header #main-content-header {
 	margin: 0;
@@ -2500,41 +2488,6 @@ table.trustfund-payperiod tr.error {
 	background-color: #f4fbfe;
 }
 
-#block-grievance-grievance-quicksearch,
-#block-grievance-grievance-quicksearch-sub {
-	position: relative;
-}
-
-#grievance-quicksearch-form,
-#grievance-quicksearch-sub-form {
-	width: auto;
-	float: right;
-	position: absolute;
-	right: 0;
-	top: 96px;
-	text-align: right;
-	margin: 0;
-	padding: 0;
-	z-index: 10;
-}
-
-
-#grievance-quicksearch-form label,
-#grievance-quicksearch-sub-form label {
-	display: none;
-}
-
-#grievance-quicksearch-form .form-submit,
-#grievance-quicksearch-sub-form .form-submit {
-	margin-right: 0;
-}
-#grievance-quicksearch-form div.form-item,
-#grievance-quicksearch-sub-form div.form-item {
-	display: inline-block;
-	margin: 0;
-	padding: 0;
-	text-align: left;
-}
 
 
 a.button, 
@@ -2849,41 +2802,45 @@ tr.view-subfooter-number{ display: none; }
 	background-color: #ffffff;
 }
 legend {
-	background-color: #5984be;
-	border-radius: 0;
+  background-color: #5984be;
+  border-radius: 0;
   padding: 14px 2%;
   max-width: 96%;
 }
-
 fieldset legend, 
 fieldset legend a,
 fieldset legend a:link,
 fieldset legend a:visited {
-	color: #ffffff;
-	font-weight: normal;
-	font-size: 11px;
-	text-transform: uppercase;
-	letter-spacing: 1px;
+  color: #ffffff;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
-
-
-
-
+.vertical-tabs-pane fieldset.form-wrapper legend {
+  background-color: #ffffff;
+  max-width: 96%;
+  border: 1px solid #1b4784;
+  border-bottom: 1px dotted #1b4784;
+  margin-left: -1px;
+}
+.vertical-tabs-pane fieldset.form-wrapper {
+  border: 1px solid #1b4784;
+}
+.vertical-tabs-pane fieldset.form-wrapper legend,
+.vertical-tabs-pane fieldset.form-wrapper legend a,
+.vertical-tabs-pane fieldset.form-wrapper legend a:link,
+.vertical-tabs-pane fieldset.form-wrapper legend a:visited {
+  color: #1b4784;
+}
 
 .field-widget-date-popup legend {
 	color: #1b4784;
 	text-transform: none;
-	font-size: 13px;
 	letter-spacing: normal;
 }
-
 .date-float .form-type-checkbox label {
 	display: inline;
 }
-
-
-
-
 
 .gform_header {
   font-size: 32px;
@@ -3211,7 +3168,6 @@ fieldset legend a:visited {
 
 
 .view-id-grievances table {
-  width: auto;
 }
 
 #block-views-grievance-news-block {
@@ -3741,7 +3697,8 @@ div.node-sirius-dispatch.node-teaser {
 }
 */
 
-.checkboxes-inline .form-checkboxes .form-item {.progress .filled
+.checkboxes-inline .form-checkboxes .form-item,
+.field-name-field-sirius-skill-form .form-item .form-type-checkbox {
   float: left;
   width: 250px;
 }
@@ -3757,6 +3714,108 @@ div.node-sirius-dispatch.node-teaser {
   display: none;
 }
 
+/* /node/add/grievance */
+.ui-state-default, 
+.ui-widget-content .ui-state-default, 
+.ui-widget-header .ui-state-default {
+    border-color: #5984be;
+    border-radius: 0px;
+    background-image: none;
+    background-color: transparent;
+}
+.ui-state-hover, 
+.ui-widget-content .ui-state-hover, 
+.ui-widget-header .ui-state-hover {
+    border-color: #5984be;
+    border-radius: 0px;
+    background-image: none;
+    background-color: #ffffff;
+}
+.ui-state-active, 
+.ui-widget-content .ui-state-active, 
+.ui-widget-header .ui-state-active {
+    border-color: #5984be;
+    border-radius: 0px;
+    background-image: none;
+    background-color: #ffffff;
+}
+.ui-state-default a:link,
+.ui-widget-content .ui-state-default a:link, 
+.ui-widget-header .ui-state-default a:link,
+.ui-state-default a, 
+.ui-widget-content .ui-state-default a, 
+.ui-widget-header .ui-state-default a {
+    color: #5984be;
+}
+.ui-state-active a:link, 
+.ui-widget-content .ui-state-active a:link, 
+.ui-widget-header .ui-state-active a:link,
+.ui-state-hover a:link, 
+.ui-widget-content .ui-state-hover a:link, 
+.ui-widget-header .ui-state-hover a:link,
+.ui-state-active a, 
+.ui-widget-content .ui-state-active a, 
+.ui-widget-header .ui-state-active a,
+.ui-state-hover a, 
+.ui-widget-content .ui-state-hover a, 
+.ui-widget-header .ui-state-hover a {
+    color: #1b4784;
+}
+label {
+    font-weight: normal !important;
+}
+.ui-widget-content {
+  color: #1b4784;
+}
+.field-multiple-table tr td {
+    padding-bottom: 0px;
+}
+.field-multiple-table tr th {
+    padding-bottom: 0px;
+}
+.field-multiple-table tr th label {
+    padding: 0px;
+}
+.field-multiple-table tr td .form-item {
+  max-width: 680px;
+}
+.field-multiple-table tr:last-child td {
+    padding-bottom: 22px;
+} 
+.ui-accordion .ui-accordion-header {
+    margin-top: 4px;
+}
+
+/* /sirius/dispatch/job/list */
+.views-exposed-form .views-exposed-widget {
+    float: left;
+    padding: .5em 1em 0 0;
+    max-width: 175px;
+}
+.views-exposed-form .views-exposed-widget ,
+.views-exposed-form .views-exposed-widget input,
+.views-exposed-form .views-exposed-widget input.form-autocomplete,
+.views-exposed-form .views-exposed-widget .description,
+.views-exposed-form .views-exposed-widget select {
+    max-width: 100%;
+}
+.views-exposed-widget.views-submit-button {
+    clear: left;
+}
+
+/* /node/add/sirius-worker */
+input.ajax-processed {
+  color: #5984be;
+  border: 1px solid #5984be;  
+  background-color: #ffffff;
+  font-weight: normal;
+  margin-left: 0px;
+}
+input.ajax-processed:hover {
+  background-color: #eaf1fb;
+} 
+
+/* /node/add/sirius-worker */
 .banner-wrapper .inner {
   margin-left: 36px;
   margin-right: 36px;
@@ -3766,6 +3825,10 @@ div.node-sirius-dispatch.node-teaser {
 .form-type-date-popup .form-item {
   float: left;
   padding-right: 5px;
+}
+
+.form-type-date-popup .description {
+  clear: left;
 }
 
 .form-type-date-popup:after {

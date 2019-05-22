@@ -13,3 +13,4 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twil
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.page_test.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.page_phone.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.page_calllog.inc';

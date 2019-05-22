@@ -84,18 +84,6 @@ function grievance_uhmigrate_l665_facilities($limit, $source_filename = 'facilit
       $node->field_sirius_name_tts['und'][0]['value'] = $row['TTSName'];
     }
 
-    // Clear the log for this node
-    if ($node->nid) {
-      $query = new EntityFieldQuery();
-      $query->entityCondition('entity_type', 'node');
-      $query->entityCondition('bundle', array('sirius_log'));
-      $query->fieldCondition('field_sirius_log_handler', 'target_id', $node->nid);
-      $stmt = $query->execute();
-      if ($stmt['node']) {
-        node_delete_multiple(array_keys($stmt['node']));
-      }
-    }
-
     // Save the grievance node
     $nid = $node->nid;
     if (!$nid) { $nid = "[new]"; }
@@ -103,22 +91,7 @@ function grievance_uhmigrate_l665_facilities($limit, $source_filename = 'facilit
     grievance_uhmigrate_node_save($node);
     grievance_uhmigrate_log('SUCCESS', $row, "External ID $external_id, Node ID $nid, intake $intake_date");
 
-    // Dump everything into "Comments"
-    sirius_log(
-      'import', 
-      'raw', 
-      'Raw record import', 
-      '', 
-      '<pre>' . print_r($row, 1) . '</pre>', 
-      array($node->nid)
-    );
-
-    // Set the creation date
-    $intake_ts = strtotime($row['DateAdd']);
-    if ($intake_ts) {
-      $sql = "update node set created = :intake_ts where nid = :nid";
-      $stmt = db_query($sql, array(':intake_ts' => $intake_ts, ':nid' => $node->nid));
-    }
+    grievance_uhmigrate_665cleanup($node, $row);
   }
 
   grievance_uhmigrate_log_summary();

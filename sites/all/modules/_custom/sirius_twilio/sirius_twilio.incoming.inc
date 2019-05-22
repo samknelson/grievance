@@ -14,6 +14,10 @@ function sirius_twilio_incoming_sms() {
 
 	$phone = sirius_phone_format_e164($phone);
 	$handler_nid = sirius_twilio_handler_get_sms($phone, $msg);
+	$handler_nids = array();
+	if (is_numeric($handler_nid)) {
+		$handler_nids[] = $handler_nid;
+	}
 
 	sirius_log(
 		'twilio:conversation', 
@@ -21,7 +25,7 @@ function sirius_twilio_incoming_sms() {
 		$msg, 
 		'<pre>' . print_r($_REQUEST, 1) . '</pre>', 
 		$phone, 
-		array($handler_nid)
+		$handler_nids
 	);
 
   $handler_node = node_load($handler_nid);
@@ -51,11 +55,15 @@ function sirius_twilio_incoming_voice() {
 	$context['digits'] = $_REQUEST['Digits'];
   $context['direction'] = $_REQUEST['Direction'];
   $context['msg'] = $_REQUEST['msg'];
+  $context['request'] = $_REQUEST;
+  $context['request_digits'] = $_REQUEST['Digits'];
   if (preg_match('/outbound/', $context['direction'])) {
   	$context['phone'] = sirius_phone_format_e164($context['to']);
   } else {
   	$context['phone'] = sirius_phone_format_e164($context['from']);
   }
+
+  // watchdog('debug', '<pre>' . print_r($_REQUEST, 1) . '</pre>');
 
 
 	if ($is_new) { 
@@ -66,8 +74,8 @@ function sirius_twilio_incoming_voice() {
 		$log_msg = "User entered: " . $context['digits'];
 	}
 
-	sirius_twilio_set_context($call_sid, $context, $log_type, $log_msg, '<pre>' . print_r($_REQUEST, 1) . '</pre>');
-  sirius_dispatch_handle_voice($call_sid, $context);
+	// sirius_twilio_set_context($call_sid, $context, $log_type, $log_msg, '<pre>' . print_r($_REQUEST, 1) . '</pre>');
+  sirius_phonetree($call_sid, $context);
 	sirius_become_superuser(FALSE);
 }
 
