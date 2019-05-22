@@ -55,6 +55,17 @@ function sirius_twilio_config() {
     '#default_value' => variable_get('sirius_twilio_twiml_close', '</prosody></Say>'),
   );
 
+  $form['sirius_twilio_sms_consolidate'] = array(
+    '#type' => 'select',
+    '#title' => t('Consolidate Outgoing Messages'),
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get('sirius_twilio_twiml_close', FALSE),
+    '#description' => t('Sometimes multiple SMS messages are sent within the same page load (i.e. "you have been laid off" and "you have been signed out". Select "Yes" to consolidate these into a single SMS messages.'),
+  );
+
   return system_settings_form($form);
 }
 
