@@ -153,7 +153,7 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
   if (!user_access('sirius dispatch admin')) {
     $form['field_sirius_worker']['#access'] = FALSE;
   }
-  if (!user_access('sirius dispatch admin') && !user_access('grievance admin')) {
+  if (!user_access('sirius dispatch admin') && !user_access('grievance admin') && !user_access('grievance user')) {
     $form['field_grievance_rep_lead']['#access'] = FALSE;
     $form['field_grievance_rep_organizer']['#access'] = FALSE;
     $form['field_grievance_shops']['#access'] = FALSE;
