@@ -21,6 +21,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.specialtid.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sns.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.qr.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.representatives.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.taxonomy.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
@@ -82,6 +84,10 @@ function sirius_field_formatter_info() {
       'label' => t('Sirius SSN Conditional'),  
       'field types' => array('text'), 
     ), 
+    'sirius_user_worker' => array(
+      'label' => t('Sirius User Worker'),
+      'field types' => array('entityreference')
+    ),
   ); 
 }
 
@@ -101,6 +107,28 @@ function sirius_field_formatter_view($entity_type, $entity, $field, $instance, $
         $markup = 'xxx-xx-' . substr($items[$delta]['value'], -4);
       }
       
+      $result[] = array('#markup' => $markup);
+    }
+  }
+
+  if ($display['type'] == 'sirius_user_worker') {
+    foreach ($items as $delta => $item) {
+      $hr = NULL;
+      $uid = $item['target_id'];
+      if ($uid) {
+        $sql = "select name, title, field_sirius_worker_target_id ";
+        $sql .= "from users ";
+        $sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'user' and field_data_field_sirius_worker.entity_id = users.uid ";
+        $sql .= "left join node on node.nid = field_sirius_worker_target_id ";
+        $sql .= "where users.uid = :uid";
+        $stmt = db_query($sql, array(':uid' => $uid));
+        $hr = $stmt->fetchAssoc();
+      }
+
+      if ($hr['title']) { $markup = $hr['title']; }
+      else if ($hr['name']) { $markup = $hr['name']; }
+      else if ($uid) { $markup = "[user not found: $uid]"; }
+      else { $markup = "User not found."; }
       $result[] = array('#markup' => $markup);
     }
   }
@@ -154,7 +182,9 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     $vocabulary = $form['#vocabulary'];
     if ($vocabulary && $vocabulary->machine_name && preg_match('/^(sirius|grievance)/', $vocabulary->machine_name)) {
       $form['path']['#access'] = FALSE;
-      $form['relations']['#access'] = FALSE;
+      if ($vocabulary->machine_name != 'sirius_skill') {
+        $form['relations']['#access'] = FALSE;
+      }
     }
   }
 }
@@ -174,8 +204,7 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
   if (!user_access('sirius dispatch admin')) {
     $form['field_sirius_worker']['#access'] = FALSE;
   }
-
-  if (!user_access('sirius dispatch admin') && !user_access('grievance user')) {
+  if (!user_access('sirius dispatch admin') && !user_access('grievance admin') && !user_access('grievance user')) {
     $form['field_grievance_rep_lead']['#access'] = FALSE;
     $form['field_grievance_rep_organizer']['#access'] = FALSE;
     $form['field_grievance_shops']['#access'] = FALSE;
@@ -222,46 +251,6 @@ function sirius_log_render($text) {
 }
 
 /**
- * A stupid utility function to create dropdowns and mappings from taxonomies.
- * Key can be:
- * - 'tid' to create a mapping by tid
- * - 'name' to create a mapping by name
- * Value can be:
- * - 'full' to return the fully loaded term
- * - 'name' to return the term name
- * - field_whatever to return the value of "field_whatever"
- */
-
-function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE) {
-  $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
-  $terms = taxonomy_get_tree($vocabulary->vid, 0, NULL, TRUE);
-
-  $map = array();
-  if ($include_null) {
-    $map[NULL] = t('-- Select --');
-  }
-  
-  foreach ($terms as &$term) {
-    if ($value_type == 'full') {
-      $value = $term;
-    } else if ($value_type == 'name') {
-      $value = $term->name;
-    } else {
-      $value = $term->{$value_type}['und'][0]['value'];
-    }
-
-    if ($key_type == 'tid') {
-      $key = $term->tid;
-    } else {
-      $key = $term->name;
-    }
-
-    $map[$key] = $value;
-  }
-  return $map;
-}
-
-/**
  * Implements hook_block_info().
  */
 
@@ -303,6 +292,16 @@ function sirius_user_edit_access($account) {
   return user_edit_access($account);
 }
 
+/**
+ * Implements hook_node_view
+ */
+
+/*
+function sirius_node_view($node, $view_mode, $langcode) {
+  // if ($node->content['field_sirius_representatives']) { sirius_representatives_node_view($node, $view_mode, $langcode); }
+}
+*/
+
 
 
 /**
@@ -330,4 +329,22 @@ function sirius_fieldval($node, $field, $col = 'value', $params = array()) {
   } else {
     return $node->{$field}['und'][0][$col];
   }
+}
+
+function sirius_fakerender_field($title, $values) {
+  if (!is_array($values)) { $values = array($values); }
+
+  $html = '<section class="field field-name-fake field-label-inline clearfix view-mode-full">';
+  $html .= '<h2 class="field-label">';
+  $html .= $title;
+  $html .= '</h2>';
+  $html .= '<div class="field-items">';
+  foreach ($values as $value) {
+    $html .= '<div class="field-item">';
+    $html .= $value;
+    $html .= '</div>';
+  }
+  $html .= '</div>';
+  $html .= '</section>';
+  return $html;
 }
