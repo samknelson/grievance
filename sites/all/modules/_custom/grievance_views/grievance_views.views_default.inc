@@ -5618,6 +5618,15 @@ Section',
   $handler->display->display_options['arguments']['field_grievance_shop_target_id']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['field_grievance_shop_target_id']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['arguments']['field_grievance_shop_target_id']['break_phrase'] = TRUE;
+  /* Contextual filter: Content: General Grievance? (field_grievance_classaction) */
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['id'] = 'field_grievance_classaction_value';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['table'] = 'field_data_field_grievance_classaction';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['field'] = 'field_grievance_classaction_value';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['field_grievance_classaction_value']['limit'] = '0';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -22043,11 +22052,10 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_name_short']['id'] = 'field_sirius_name_short';
   $handler->display->display_options['fields']['field_sirius_name_short']['table'] = 'field_data_field_sirius_name_short';
   $handler->display->display_options['fields']['field_sirius_name_short']['field'] = 'field_sirius_name_short';
-  /* Field: Broken/missing handler */
+  /* Field: Taxonomy term: Universal? */
   $handler->display->display_options['fields']['field_sirius_default']['id'] = 'field_sirius_default';
   $handler->display->display_options['fields']['field_sirius_default']['table'] = 'field_data_field_sirius_default';
   $handler->display->display_options['fields']['field_sirius_default']['field'] = 'field_sirius_default';
-  $handler->display->display_options['fields']['field_sirius_default']['label'] = 'Universal?';
   /* Field: Global: Custom text */
   $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
