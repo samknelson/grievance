@@ -96,6 +96,14 @@ function sirius_twilio_call_sid($call) {
 function sirius_twilio_outgoing_voice($phone, $context) {
 	global $base_url;
 	$phone = sirius_phone_format_e164($phone);
+
+  $disable = variable_get("sirius_sms_global_disable", '');
+  if ($disable == 'Yes') { 
+	  $whitelist = variable_get("sirius_sms_global_disable_whitelist", '');
+	  $probe = sirius_phone_format($phone);
+	  if (strpos($whitelist, $probe) === FALSE) { return array('success' => FALSE, 'msg' => "Global SMS disable is on and $probe is not whitelisted."); }
+	}
+
 	$context['phone'] = $phone;
 	$msg = "Outgoing call initiated to $phone";
 	try {
