@@ -143,8 +143,9 @@ function sirius_feeds_log($feed_node, $row, $type, $message, $other_handler_nids
 	if ($counts[$type] == 20) { $message = "--- subsequent error meesagees of the same type will be suppressed ---"; }
 	if ($counts[$type] > 20) { return; }
 
+	$feed_type_term = taxonomy_term_load($feed_node->field_sirius_feed_type['und'][0]['tid']);
 
-	$category = 'feeds:' . $feed_node->field_sirius_category['und'][0]['value'];
+	$category = 'feeds:' . $feed_type_term->name;
 	$type = $type;
 	$message = 'Row #' . $row['row'] . ': ' . $message;
 	$summary = $feed_node->title . ': Row #' . $row['row'];
