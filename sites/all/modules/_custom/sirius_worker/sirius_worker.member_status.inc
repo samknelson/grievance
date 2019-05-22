@@ -61,7 +61,6 @@ function sirius_worker_member_status_set($worker_node, $member_status_term, $tf,
   }
 
   // Fix industries
-  $orig_member_status_term = $member_status_term;
   if ($need_save) {
     $industry_tids = array();
     foreach ($worker_node->field_sirius_member_status[LANGUAGE_NONE] as $tmp) {
@@ -81,11 +80,11 @@ function sirius_worker_member_status_set($worker_node, $member_status_term, $tf,
   $category = 'worker:member_status';
   if ($tf) { 
     $type = 'set';
-    $message = $worker_node->title . ' has added the member status ' . $orig_member_status_term->name;
+    $message = $worker_node->title . ' has added the member status ' . $member_status_term->name;
   }
   else {
     $type = 'clear';
-    $message = $worker_node->title . ' has removed the member status ' . $orig_member_status_term->name;
+    $message = $worker_node->title . ' has removed the member status ' . $member_status_term->name;
   }
   $summary = $reason;
   $notes = $member_status_term->tid;
