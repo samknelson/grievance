@@ -22575,6 +22575,18 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_dispatch_status']['table'] = 'field_data_field_sirius_dispatch_status';
   $handler->display->display_options['fields']['field_sirius_dispatch_status']['field'] = 'field_sirius_dispatch_status';
   $handler->display->display_options['fields']['field_sirius_dispatch_status']['exclude'] = TRUE;
+  /* Field: Global: Regular Expression Re-Write */
+  $handler->display->display_options['fields']['regex_rewrite']['id'] = 'regex_rewrite';
+  $handler->display->display_options['fields']['regex_rewrite']['table'] = 'views';
+  $handler->display->display_options['fields']['regex_rewrite']['field'] = 'regex_rewrite';
+  $handler->display->display_options['fields']['regex_rewrite']['label'] = '';
+  $handler->display->display_options['fields']['regex_rewrite']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['regex_rewrite']['alter']['text'] = '[field_sirius_dispatch_status]';
+  $handler->display->display_options['fields']['regex_rewrite']['alter']['text_patterns'] = '/expired/
+/accepted_secondary/';
+  $handler->display->display_options['fields']['regex_rewrite']['alter']['text_replacements'] = 'Notified
+Accepted';
+  $handler->display->display_options['fields']['regex_rewrite']['element_label_colon'] = FALSE;
   /* Field: Content: Send Date */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
@@ -22584,7 +22596,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_datetime']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_sirius_datetime']['settings'] = array(
     'format_type' => 'custom',
-    'custom_date_format' => 'F j',
+    'custom_date_format' => 'F j, Y',
     'fromto' => 'both',
     'multiple_number' => '',
     'multiple_from' => '',
@@ -22608,7 +22620,7 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = '';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_dispatch_worker_view" class="tool-button">[field_grievance_shop] - [field_sirius_datetime]: [field_sirius_dispatch_status]</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_dispatch_worker_view" class="tool-button">[field_grievance_shop] - [field_sirius_datetime]: [regex_rewrite]</a>';
   $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
   /* Sort criterion: Content: Send Date (field_sirius_datetime) */
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
@@ -22640,8 +22652,96 @@ Grievance Form',
     'sirius_dispatch' => 'sirius_dispatch',
   );
 
-  /* Display: Block */
-  $handler = $view->new_display('block', 'Block', 'block');
+  /* Display: All */
+  $handler = $view->new_display('block', 'All', 'block');
+  $handler->display->display_options['display_description'] = '(Admin only)';
+
+  /* Display: Current */
+  $handler = $view->new_display('block', 'Current', 'block_1');
+  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
+  $handler->display->display_options['filter_groups']['groups'] = array(
+    1 => 'AND',
+    2 => 'OR',
+  );
+  $handler->display->display_options['defaults']['filters'] = FALSE;
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'sirius_dispatch' => 'sirius_dispatch',
+  );
+  $handler->display->display_options['filters']['type']['group'] = 1;
+  /* Filter criterion: Content: Status (field_sirius_dispatch_job_status) */
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value']['id'] = 'field_sirius_dispatch_job_status_value';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value']['table'] = 'field_data_field_sirius_dispatch_job_status';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value']['field'] = 'field_sirius_dispatch_job_status_value';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value']['relationship'] = 'field_sirius_dispatch_job_target_id';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value']['value'] = array(
+    'Pending' => 'Pending',
+    'Unfilled' => 'Unfilled',
+    'Running' => 'Running',
+  );
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value']['group'] = 2;
+  /* Filter criterion: Content: Status (field_sirius_dispatch_status) */
+  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['id'] = 'field_sirius_dispatch_status_value';
+  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['table'] = 'field_data_field_sirius_dispatch_status';
+  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['field'] = 'field_sirius_dispatch_status_value';
+  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['value'] = array(
+    'notified' => 'notified',
+    'notification failed' => 'notification failed',
+    'accepted' => 'accepted',
+    'accepted_secondary' => 'accepted_secondary',
+    'expired' => 'expired',
+  );
+  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['group'] = 2;
+  /* Filter criterion: Content: Type (field_sirius_dispatch_job_type) */
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['id'] = 'field_sirius_dispatch_job_type_tid';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['table'] = 'field_data_field_sirius_dispatch_job_type';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['field'] = 'field_sirius_dispatch_job_type_tid';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['relationship'] = 'field_sirius_dispatch_job_target_id';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['operator'] = 'not';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['value'] = array(
+    446 => '446',
+  );
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['group'] = 1;
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['vocabulary'] = 'sirius_dispatch_job_type';
+
+  /* Display: Prior */
+  $handler = $view->new_display('block', 'Prior', 'block_2');
+  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
+  $handler->display->display_options['defaults']['filters'] = FALSE;
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'sirius_dispatch' => 'sirius_dispatch',
+  );
+  /* Filter criterion: Content: Status (field_sirius_dispatch_status) */
+  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['id'] = 'field_sirius_dispatch_status_value';
+  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['table'] = 'field_data_field_sirius_dispatch_status';
+  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['field'] = 'field_sirius_dispatch_status_value';
+  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['value'] = array(
+    'declined' => 'declined',
+    'resigned' => 'resigned',
+    'terminated' => 'terminated',
+  );
   $translatables['sirius_worker_dispatches'] = array(
     t('Master'),
     t('My Dispatches'),
@@ -22661,10 +22761,15 @@ Grievance Form',
     t('Content entity referenced from field_sirius_dispatch_job'),
     t('Nid'),
     t('Status'),
+    t('[field_sirius_dispatch_status]'),
+    t('Notified
+Accepted'),
     t('Report Date'),
-    t('<a href="/node/[nid]/sirius_dispatch_worker_view" class="tool-button">[field_grievance_shop] - [field_sirius_datetime]: [field_sirius_dispatch_status]</a>'),
+    t('<a href="/node/[nid]/sirius_dispatch_worker_view" class="tool-button">[field_grievance_shop] - [field_sirius_datetime]: [regex_rewrite]</a>'),
     t('All'),
-    t('Block'),
+    t('(Admin only)'),
+    t('Current'),
+    t('Prior'),
   );
   $export['sirius_worker_dispatches'] = $view;
 
