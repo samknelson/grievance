@@ -23132,6 +23132,14 @@ Accepted'),
       'override_label' => 1,
       'label' => 'Layoff',
     ),
+    'action::sirius_worker_vbo_usersync' => array(
+      'selected' => 1,
+      'postpone_processing' => 0,
+      'skip_confirmation' => 0,
+      'skip_permission_check' => 1,
+      'override_label' => 1,
+      'label' => 'Re-Sync Worker\'s User',
+    ),
   );
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
@@ -24044,6 +24052,7 @@ Accepted'),
     t('Content'),
     t('- Choose an operation -'),
     t('Layoff'),
+    t('Re-Sync Worker\'s User'),
     t('ID'),
     t('Access Token'),
     t('Available Since'),
