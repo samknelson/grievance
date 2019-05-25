@@ -300,3 +300,13 @@ function grievance_update_7019() {
   module_enable(array('views_regex_rewrite'), FALSE);
 }
 
+/**
+ * Disable conditional fields
+ */
+
+function grievance_update_7020() {
+  // Enable some modules
+  module_disable(array('conditional_fields'), FALSE);
+  return t('Disabled conditional_fields');
+}
+
