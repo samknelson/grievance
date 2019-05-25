@@ -142,6 +142,17 @@ function sirius_worker_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+
+  $items['sirius/worker/config/user'] = array(
+    'title' => 'Worker / User Configuration',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_worker_user_admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+
   return $items;
 }
 
