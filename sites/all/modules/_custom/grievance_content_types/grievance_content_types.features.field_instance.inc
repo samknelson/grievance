@@ -8190,6 +8190,50 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_contract_clause-field_sirius_page'.
+  $field_instances['node-grievance_contract_clause-field_sirius_page'] = array(
+    'bundle' => 'grievance_contract_clause',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 22,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_page',
+    'label' => 'Page',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 3,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 31,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_contract_rule-field_grievance_alert_tid'.
   $field_instances['node-grievance_contract_rule-field_grievance_alert_tid'] = array(
     'bundle' => 'grievance_contract_rule',
@@ -8695,6 +8739,50 @@ function grievance_content_types_field_default_field_instances() {
       'settings' => array(),
       'type' => 'number',
       'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_contract_section-field_sirius_page'.
+  $field_instances['node-grievance_contract_section-field_sirius_page'] = array(
+    'bundle' => 'grievance_contract_section',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_page',
+    'label' => 'Page',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 3,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 32,
     ),
   );
 
@@ -12886,10 +12974,10 @@ function grievance_content_types_field_default_field_instances() {
     'bundle' => 'sirius_bulk',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'HTML formatting is permitted, but all links should be absolute. If this message is sent by SMS, the body will be converted to plain text.',
+    'description' => 'HTML formatting is permitted, but all links should be absolute.',
     'display' => array(
       'default' => array(
-        'label' => 'hidden',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
@@ -12911,7 +12999,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'body',
-    'label' => 'Body',
+    'label' => 'Email Body',
     'required' => 0,
     'settings' => array(
       'display_summary' => 1,
@@ -12926,7 +13014,7 @@ function grievance_content_types_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 31,
+      'weight' => 4,
     ),
   );
 
@@ -12968,7 +13056,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 33,
+      'weight' => 0,
     ),
   );
 
@@ -13010,7 +13098,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 32,
+      'weight' => 1,
     ),
   );
 
@@ -13068,7 +13156,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 35,
+      'weight' => 7,
     ),
   );
 
@@ -13127,7 +13215,93 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 37,
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_bulk-field_sirius_sms'.
+  $field_instances['node-sirius_bulk-field_sirius_sms'] = array(
+    'bundle' => 'sirius_bulk',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_sms',
+    'label' => 'SMS Body',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_bulk-field_sirius_voice'.
+  $field_instances['node-sirius_bulk-field_sirius_voice'] = array(
+    'bundle' => 'sirius_bulk',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_voice',
+    'label' => 'Voice Body',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 6,
     ),
   );
 
@@ -14385,7 +14559,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 18,
+      'weight' => 27,
     ),
   );
 
@@ -14439,7 +14613,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 19,
+      'weight' => 28,
     ),
   );
 
@@ -14494,7 +14668,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 20,
+      'weight' => 29,
     ),
   );
 
@@ -14609,7 +14783,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 13,
+      'weight' => 22,
     ),
   );
 
@@ -14664,7 +14838,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 11,
+      'weight' => 20,
     ),
   );
 
@@ -14718,7 +14892,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 12,
+      'weight' => 21,
     ),
   );
 
@@ -14877,7 +15051,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 7,
+      'weight' => 6,
     ),
   );
 
@@ -14902,7 +15076,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 9,
+        'weight' => 8,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -14942,7 +15116,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 6,
+      'weight' => 5,
     ),
   );
 
@@ -14991,7 +15165,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 15,
+      'weight' => 24,
     ),
   );
 
@@ -15064,7 +15238,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 16,
+      'weight' => 25,
     ),
   );
 
@@ -15301,7 +15475,7 @@ function grievance_content_types_field_default_field_instances() {
         'checkall' => FALSE,
       ),
       'type' => 'options_buttons',
-      'weight' => 38,
+      'weight' => 42,
     ),
   );
 
@@ -15320,7 +15494,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 10,
+        'weight' => 9,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -15407,7 +15581,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 13,
+      'weight' => 14,
     ),
   );
 
@@ -15469,7 +15643,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 4,
     ),
   );
 
@@ -15526,7 +15700,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 37,
+      'weight' => 41,
     ),
   );
 
@@ -15756,7 +15930,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 14,
+      'weight' => 23,
     ),
   );
 
@@ -15854,7 +16028,54 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 35,
+      'weight' => 40,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_dispatch_job-field_sirius_representatives'.
+  $field_instances['node-sirius_dispatch_job-field_sirius_representatives'] = array(
+    'bundle' => 'sirius_dispatch_job',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'sirius',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'sirius_user_worker',
+        'weight' => 10,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_representatives',
+    'label' => 'Representatives',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'multiple_selects',
+      'settings' => array(),
+      'type' => 'multiple_selects',
+      'weight' => 7,
     ),
   );
 
@@ -15970,7 +16191,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 21,
+      'weight' => 30,
     ),
   );
 
@@ -16024,7 +16245,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 17,
+      'weight' => 26,
     ),
   );
 
@@ -17743,7 +17964,11 @@ function grievance_content_types_field_default_field_instances() {
   // Exported field_instance: 'node-sirius_worker-field_sirius_dispatch_medium'.
   $field_instances['node-sirius_worker-field_sirius_dispatch_medium'] = array(
     'bundle' => 'sirius_worker',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => 'voice',
+      ),
+    ),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -18607,7 +18832,16 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'multiple_selects',
       'settings' => array(
+        'cascading_selection' => 0,
         'checkall' => FALSE,
+        'filter_view' => '',
+        'leaves_only' => 0,
+        'max_depth' => '',
+        'parent_term_id' => '',
+        'select_parents' => 0,
+        'start_minimized' => 0,
+        'token_display' => '',
+        'track_list' => 0,
       ),
       'type' => 'multiple_selects',
       'weight' => 16,
@@ -20499,6 +20733,48 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'taxonomy_term-sirius_skill-field_grievance_days'.
+  $field_instances['taxonomy_term-sirius_skill-field_grievance_days'] = array(
+    'bundle' => 'sirius_skill',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Enter the default number of days before this skill expires. The default is for a skill to never expire.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 5,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_days',
+    'label' => 'Default number of days',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 6,
+    ),
+  );
+
   // Exported field_instance: 'taxonomy_term-sirius_skill-field_sirius_badge'.
   $field_instances['taxonomy_term-sirius_skill-field_sirius_badge'] = array(
     'bundle' => 'sirius_skill',
@@ -20535,7 +20811,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 5,
     ),
   );
 
@@ -20610,6 +20886,56 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textfield',
       'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_skill-field_sirius_industry'.
+  $field_instances['taxonomy_term-sirius_skill-field_sirius_industry'] = array(
+    'bundle' => 'sirius_skill',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 6,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_industry',
+    'label' => 'Industry',
+    'required' => 0,
+    'settings' => array(
+      'field_lock_multi_values' => array(
+        'disable_reorder' => 0,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
+        'lock_previous' => 0,
+        'remove_header' => 0,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => '',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => '',
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'multiple_selects',
+      'settings' => array(),
+      'type' => 'multiple_selects',
+      'weight' => 7,
     ),
   );
 
@@ -20935,6 +21261,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Default Dispatch Notes');
   t('Default Information Request');
   t('Default Value');
+  t('Default number of days');
   t('Department');
   t('Departments');
   t('Description');
@@ -20950,6 +21277,7 @@ function grievance_content_types_field_default_field_instances() {
   t('EBA');
   t('EBA Dates');
   t('Email');
+  t('Email Body');
   t('Employed but Available');
   t('Employee ID #');
   t('Employer');
@@ -20961,6 +21289,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Enter an external identifier / code that can be used for importing, exporting, or synchronizing terms in this vocabulary.');
   t('Enter the article of the contract that was violated, for example: Article ....');
   t('Enter the company that this shop is associated with.');
+  t('Enter the default number of days before this skill expires. The default is for a skill to never expire.');
   t('Enter the employee ID # as assigned by the company.');
   t('Enter the help text as it should appear on the specified pages.  May contain HTML.');
   t('Enter the next deadline that the Union must meet -- i.e. "File Step 2" or "File for Arbitration".');
@@ -20991,7 +21320,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Grievance Document Type');
   t('Grievance Log Type');
   t('Group or Show');
-  t('HTML formatting is permitted, but all links should be absolute. If this message is sent by SMS, the body will be converted to plain text.');
+  t('HTML formatting is permitted, but all links should be absolute.');
   t('Hall');
   t('Handler');
   t('Headshot');
@@ -21058,6 +21387,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Office Phone');
   t('Organizer');
   t('Outcome');
+  t('Page');
   t('Parking Instructions');
   t('Passcode required for phone access?');
   t('Paths');
@@ -21074,10 +21404,12 @@ function grievance_content_types_field_default_field_instances() {
   t('Remedy');
   t('Report Date');
   t('Report Location');
+  t('Representatives');
   t('Resolution Procedure');
   t('Responded');
   t('Role');
   t('Roles');
+  t('SMS Body');
   t('SSN');
   t('Section Number');
   t('Section Tags');
@@ -21139,6 +21471,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Users with these roles have permission to create dispatches jobs with this member status. These should be administrative roles only.');
   t('Valid');
   t('Violation');
+  t('Voice Body');
   t('Watching');
   t('Weight');
   t('What roles should have access to this content');
