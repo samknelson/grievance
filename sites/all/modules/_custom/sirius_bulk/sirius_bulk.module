@@ -1,0 +1,51 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.permission.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.menu.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.admin.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.vbo.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.deliver.inc";
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_workers.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_queue.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_test.inc";
+
+/**
+ * Implements hook_cron()
+ */
+
+function sirius_bulk_cron() {
+	sirius_bulk_deliver();
+}
+
+function sirius_bulk_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'sirius_bulk_node_form') {
+
+  	$form['body']['#states'] = array(
+			'visible' => array(
+				array(':input[name="field_sirius_bulk_medium[und]"]' => array('value' => 'email')),
+				'or',
+				array(':input[name="field_sirius_bulk_medium[und]"]' => array('value' => 'choice')),
+			)
+  	);
+
+  	$form['field_sirius_sms']['#states'] = array(
+			'visible' => array(
+				array(':input[name="field_sirius_bulk_medium[und]"]' => array('value' => 'sms')),
+				'or',
+				array(':input[name="field_sirius_bulk_medium[und]"]' => array('value' => 'choice')),
+			)
+  	);
+
+  	$form['field_sirius_voice']['#states'] = array(
+			'visible' => array(
+				array(':input[name="field_sirius_bulk_medium[und]"]' => array('value' => 'voice')),
+				'or',
+				array(':input[name="field_sirius_bulk_medium[und]"]' => array('value' => 'choice')),
+			)
+  	);
+  }
+}
