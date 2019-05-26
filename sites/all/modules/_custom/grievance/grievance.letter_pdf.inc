@@ -89,6 +89,23 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 			array('node' => $node), 
 			array()
 		);
+	} else if ($values['letterhead'] > 0) {
+		$letterhead_node = node_load($values['letterhead']); 
+		$json = json_decode($letterhead_node->field_sirius_json['und'][0]['value'], TRUE);
+		$margin_args = '';
+		foreach (array('left', 'right', 'top', 'bottom') as $which) {
+			if ($json['page']["margin_$which"]) {
+				$arg = escapeshellarg($json['page']["margin_$which"]);
+			} else {
+				$arg = "'15mm'";
+			}
+			$margin_args .= "--margin-$which $arg ";
+		}
+
+		$letterhead_pdf_uri = 'temporary://pdfgen_letterhead_' . $letterhead_node->nid . '.pdf';
+		$letterhead_pdf_path = drupal_realpath($letterhead_pdf_uri);
+		$letterhead_source = (object) $letterhead_node->field_sirius_attachments['und'][0];
+		file_copy($letterhead_source, $letterhead_pdf_uri, FILE_EXISTS_REPLACE);
 	}
 
 	$cmd = '/usr/bin/xvfb-run -a ';
@@ -97,6 +114,7 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 	if ($wkhtmltopdfargs) {
 		$cmd .= $wkhtmltopdfargs . ' ';
 	}
+	$cmd .= $margin_args;
 	$cmd .= '--print-media-type ';
 	$cmd .= '-q ';
 	$cmd .= $html_path;
@@ -104,6 +122,13 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 	$cmd .= $pdf_path;
 
 	exec($cmd);
+
+	if ($letterhead_node) {
+		// Combine the letterhead with the source
+		$cmd = "/usr/bin/pdftk $pdf_path multibackground $letterhead_pdf_path output $pdf_path.combined";
+		exec($cmd);
+		rename("$pdf_path.combined", "$pdf_path");
+	}
 
 	return file_get_contents($pdf_path);
 }
