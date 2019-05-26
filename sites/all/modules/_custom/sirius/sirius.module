@@ -21,6 +21,9 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.specialtid.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sns.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.qr.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letterhead.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.loopback.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.pdf.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
