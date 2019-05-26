@@ -34,6 +34,14 @@ function sirius_permission() {
       'title' => t('Sirius Edit Own User'), 
       'description' => t('Permission to edit your own user account (i.e. set your password)'),
     ),
+    'sirius letterhead use' => array(
+      'title' => t('Sirius Letterhead Use'), 
+      'description' => t('Permission to print onto letterhead'),
+    ),
+    'sirius letterhead edit' => array(
+      'title' => t('Sirius Letterhead Edit'), 
+      'description' => t('Permission to create or edit letterhead'),
+    ),
   );
 }
 
@@ -45,5 +53,6 @@ function sirius_node_access($node, $op, $account) {
 	if ($node->type == 'sirius_log') { return sirius_node_access_log($node, $op, $account); }
   if ($node->type == 'sirius_news') { return sirius_node_access_news($node, $op, $account); }
   if ($node->type == 'sirius_feed') { return sirius_node_access_feed($node, $op, $account); }
+  if ($node->type == 'sirius_letterhead') { return sirius_node_access_letterhead($node, $op, $account); }
   return NODE_ACCESS_IGNORE;
 }
