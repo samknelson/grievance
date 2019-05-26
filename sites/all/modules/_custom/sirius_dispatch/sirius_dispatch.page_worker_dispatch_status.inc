@@ -183,7 +183,7 @@ function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state)
 	if ($form_state['values']['terminate'] == 'yes') {
 		$dispatch_node = sirius_dispatch_get_current($worker_node->nid);
 		if ($dispatch_node) {
-			$result = drupal_set_message(sirius_dispatch_terminate($dispatch_node, $reason));
+			$result = sirius_dispatch_terminate($dispatch_node, $reason);
 			if ($result['success']) {
 				drupal_set_message($result['msg']);
 			} else {

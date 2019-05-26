@@ -26,7 +26,7 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
   if (!sirius_phone_validate($phone)) { return array('success' => FALSE, 'msg' => "[$phone] is not a valid phone number."); }
 
   static $registered;
-  if (variable_get('sirius_twilio_sms_consolidate', TRUE)) {
+  if (variable_get('sirius_twilio_sms_consolidate', FALSE)) {
 		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg);
 		if (!$registered) {
 			$registered = TRUE;
@@ -96,6 +96,14 @@ function sirius_twilio_call_sid($call) {
 function sirius_twilio_outgoing_voice($phone, $context) {
 	global $base_url;
 	$phone = sirius_phone_format_e164($phone);
+
+  $disable = variable_get("sirius_sms_global_disable", '');
+  if ($disable == 'Yes') { 
+	  $whitelist = variable_get("sirius_sms_global_disable_whitelist", '');
+	  $probe = sirius_phone_format($phone);
+	  if (strpos($whitelist, $probe) === FALSE) { return array('success' => FALSE, 'msg' => "Global SMS disable is on and $probe is not whitelisted."); }
+	}
+
 	$context['phone'] = $phone;
 	$msg = "Outgoing call initiated to $phone";
 	try {
@@ -137,7 +145,7 @@ function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_dig
 	print "<Response>";
 	if ($gather_digits) { print "<Gather numDigits=\"$gather_digits\">"; }
 	print variable_get('sirius_twilio_twiml_open', '<Say><prosody>');
-	print $msg;
+	print substr($msg, 0, 3500);
 	print variable_get('sirius_twilio_twiml_close', '</prosody></Say>');
 	if ($gather_digits) { print "</Gather>"; }
 	print "</Response>";

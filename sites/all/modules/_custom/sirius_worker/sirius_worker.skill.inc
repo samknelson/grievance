@@ -76,72 +76,6 @@ function sirius_worker_skill_check($worker_node, $skill_term) {
 	return FALSE;
 }
 
-function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason, $files) {
-	if (is_numeric($worker_node)) { $worker_node = node_load($worker_node); }
-	if ($expires) {
-		$expires_display = date('m/d/Y', strtotime($expires));
-	} else {
-		$expires = date('Y-m-d', strtotime('+100 years'));
-		$expires_display = 'Never';
-	} 
-
-	// Adding an expired skill does nothing. But we still log the attempt
-	if ($action == 'add' && (strtotime($expires) < time())) {
-		$msg = 'Skipping add for skills, because they expired on ' . $expires . ': ';
-		foreach ($tids as $tid) {
-			$term = taxonomy_term_load($tid);
-			$msg .= $term->name;
-		}
-		sirius_log('worker:skill', 'add_expired', $msg, $reason, '', array($worker_node->nid), $files);
-		return;
-	}
-
-	$orig = array();
-	if ($worker_node->field_sirius_skill['und']) {
-		foreach ($worker_node->field_sirius_skill['und'] as $delta => $tmp) {
-			$tid = $tmp['tid'];
-			if (!isset($orig[$tid])) {
-				$orig[$tid] = $worker_node->field_sirius_skill_expire['und'][$delta]['value'];
-			}
-		}
-	}
-
-	$new = array();
-	foreach ($tids as $tid) {
-		if (!isset($new[$tid])) {
-			$new[$tid] = $expires;
-		}
-	}
-
-	$msg = '';
-	if ($action == 'add') {
-		foreach ($new as $tid => $expires) {
-			$orig[$tid] = $expires;
-			$term = taxonomy_term_load($tid);
-			$msg .= "Add or renew $term->name (expires $expires_display); ";
-		}
-	} else {
-		foreach ($new as $tid => $ignore) {
-			unset($orig[$tid]);
-			$term = taxonomy_term_load($tid);
-			$msg .= "Remove $term->name; ";
-		}
-	}
-
-	$worker_node->field_sirius_skill['und'] = array();
-	$worker_node->field_sirius_skill_expire['und'] = array();
-	foreach ($orig as $tid => $exp) {
-		$worker_node->field_sirius_skill['und'][] = array('tid' => $tid);
-		$worker_node->field_sirius_skill_expire['und'][] = array('value' => date('Y-m-d', strtotime($exp)));
-	}
-
-	node_save($worker_node);
-	sirius_log('worker:skill', $action, $msg, $reason, '', array($worker_node->nid), $files);
-
-	return array('success' => TRUE, 'msg' => $msg);
-}
-
-
 function sirius_worker_skills($worker_node) {
 	$skill_tids = array();
 
@@ -282,4 +216,127 @@ function sirius_worker_skills_cron($force = FALSE) {
 	}
 
 	watchdog('sirius_worker_skills', "Scanned for expired skills; removed $skill_count skills from $worker_count workers. Sent $notification_count notifications of upcoming skill expiration.");
+}
+
+
+
+
+
+/**
+ * @todo: There is some ugly code here. A bunch of functions called "sirius_worker_skill_set" as written, before I 
+ *        refactored the worker's skill page. So now there are two functions that are called with slightly
+ *        different parameters that do more or less the same thing.
+ *        "It Would Be A Good Thing" to consolidate.
+ */
+
+function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason, $files) {
+	if (is_numeric($worker_node)) { $worker_node = node_load($worker_node); }
+	if ($expires) {
+		$expires_display = date('m/d/Y', strtotime($expires));
+	} else {
+		$expires = date('Y-m-d', strtotime('+100 years'));
+		$expires_display = 'Never';
+	} 
+
+	// Adding an expired skill does nothing. But we still log the attempt
+	if ($action == 'add' && (strtotime($expires) < time())) {
+		$msg = 'Skipping add for skills, because they expired on ' . $expires . ': ';
+		foreach ($tids as $tid) {
+			$term = taxonomy_term_load($tid);
+			$msg .= $term->name;
+		}
+		sirius_log('worker:skill', 'add_expired', $msg, $reason, '', array($worker_node->nid), $files);
+		return;
+	}
+
+	$orig = array();
+	if ($worker_node->field_sirius_skill['und']) {
+		foreach ($worker_node->field_sirius_skill['und'] as $delta => $tmp) {
+			$tid = $tmp['tid'];
+			if (!isset($orig[$tid])) {
+				$orig[$tid] = $worker_node->field_sirius_skill_expire['und'][$delta]['value'];
+			}
+		}
+	}
+
+	$new = array();
+	foreach ($tids as $tid) {
+		if (!isset($new[$tid])) {
+			$new[$tid] = $expires;
+		}
+	}
+
+	$msg = '';
+	if ($action == 'add') {
+		foreach ($new as $tid => $expires) {
+			$orig[$tid] = $expires;
+			$term = taxonomy_term_load($tid);
+			$msg .= "Add or renew $term->name (expires $expires_display); ";
+		}
+	} else {
+		foreach ($new as $tid => $ignore) {
+			unset($orig[$tid]);
+			$term = taxonomy_term_load($tid);
+			$msg .= "Remove $term->name; ";
+		}
+	}
+
+	$worker_node->field_sirius_skill['und'] = array();
+	$worker_node->field_sirius_skill_expire['und'] = array();
+	foreach ($orig as $tid => $exp) {
+		$worker_node->field_sirius_skill['und'][] = array('tid' => $tid);
+		$worker_node->field_sirius_skill_expire['und'][] = array('value' => date('Y-m-d', strtotime($exp)));
+	}
+
+	node_save($worker_node);
+	sirius_log('worker:skill', $action, $msg, $reason, '', array($worker_node->nid), $files);
+
+	return array('success' => TRUE, 'msg' => $msg);
+}
+
+function sirius_worker_skill_set_all($worker_node, $new_vals, $reason, $files) {
+	if (is_numeric($worker_node)) { $worker_node = node_load($worker_node); }
+
+	// All of the work below is just to get a reasonable message into the log, showing the changes.
+  $old_vals = array();
+  foreach ($worker_node->field_sirius_skill['und'] as $delta => $tmp) {
+  	$tid = $tmp['tid'];
+  	$expires = $worker_node->field_sirius_skill_expire['und'][$delta]['value'];
+  	$old_vals[$tid] = $expires;
+  }
+
+  $names = sirius_taxonomy_load('sirius_skill', 'tid', 'name');
+
+  $msg = '';
+  foreach ($new_vals as $tid => $new_expires) {
+  	$old_expires = $old_vals[$tid];
+  	if (!$old_expires || (strtotime($old_expires) > strtotime('+75 years'))) { $old_expires = '2100-01-01'; } else { $old_expires = date('Y-m-d', strtotime($old_expires)); }
+  	if (!$new_expires || (strtotime($new_expires) > strtotime('+75 years'))) { $new_expires = '2100-01-01'; } else { $new_expires = date('Y-m-d', strtotime($new_expires)); }
+  	$new_vals[$tid] = $new_expires;
+  	if (!isset($old_vals[$tid])) {
+  		$msg .= '[Added ' . $names[$tid] . '] ';
+  	}
+  	else if ($old_expires != $new_expires) {
+  		$msg .= '[Renewed ' . $names[$tid] . ' until ' . $new_expires . '] ';
+  	}
+  }
+
+  foreach ($old_vals as $tid => $old_expires) {
+  	if (!isset($new_vals[$tid])) { 
+  		$msg .= '[Removed ' . $names[$tid] . '] ';
+  	}
+  }
+  if (!$msg) { $msg = "[Skills were unchanged]"; }
+
+	$worker_node->field_sirius_skill['und'] = array();
+	$worker_node->field_sirius_skill_expire['und'] = array();
+	foreach ($new_vals as $tid => $expires) {
+		$worker_node->field_sirius_skill['und'][] = array('tid' => $tid);
+		$worker_node->field_sirius_skill_expire['und'][] = array('value' => $expires);
+	}
+
+	node_save($worker_node);
+	sirius_log('worker:skill', 'set', $msg, $reason, '', array($worker_node->nid), $files);
+
+	return array('success' => TRUE, 'msg' => $msg);
 }

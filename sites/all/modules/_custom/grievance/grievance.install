@@ -290,7 +290,23 @@ function grievance_update_7017() {
 
 function grievance_update_7018() {
   // Enable some modules
-  print "Disabling field_permission\n";
+  print "Disabling field_permissions\n";
   module_disable(array('field_permissions'), FALSE);
+}
+
+function grievance_update_7019() {
+  // Enable some modules
+  print "Enabling views_regex_rewrite\n";
+  module_enable(array('views_regex_rewrite'), FALSE);
+}
+
+/**
+ * Disable conditional fields
+ */
+
+function grievance_update_7020() {
+  // Enable some modules
+  module_disable(array('conditional_fields'), FALSE);
+  return t('Disabled conditional_fields');
 }
 

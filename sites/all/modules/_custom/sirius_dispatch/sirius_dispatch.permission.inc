@@ -46,9 +46,21 @@ function sirius_dispatch_permission() {
       'title' => t('Sirius Dispatch Bullpen Signin View'), 
       'description' => t('Permission to view the signin list for a bullpen'),
     ),
+    'sirius dispatch bullpen assign representatives' => array(
+      'title' => t('Sirius Dispatch Bullpen Assign Representatives'), 
+      'description' => t('Permission to assign union representatives to a bullpen.'),
+    ),
     'sirius dispatch own preferences' => array(
       'title' => t('Sirius Dispatch Own Preferences'), 
-      'description' => t('Permission to set your own dispatch preferences'),
+      'description' => t('Permission to set your own dispatch preferences, except for the ones listed below'),
+    ),
+    'sirius dispatch own preferences skill' => array(
+      'title' => t('Sirius Dispatch Own Preferences Skill'), 
+      'description' => t('Permission to set your own dispatch skill preferences'),
+    ),
+    'sirius dispatch own preferences department' => array(
+      'title' => t('Sirius Dispatch Own Preferences department'), 
+      'description' => t('Permission to set your own dispatch skill preferences'),
     ),
   );
 }

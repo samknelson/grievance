@@ -43,7 +43,7 @@ function sirius_dispatch_node_tabs() {
   );
 
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_signin_self'] = array(
-    'title' => 'Sign In Yourself',
+    'title' => 'Bullpen EBA Signin',
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_bullpen_signin_self',
     'permissions' => array('sirius dispatch bullpen signin'),
@@ -51,11 +51,19 @@ function sirius_dispatch_node_tabs() {
   );
 
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_signin_others'] = array(
-    'title' => 'Sign-in List',
+    'title' => 'Bullpen Signin',
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_bullpen_signin_others',
     'permissions' => array('sirius dispatch bullpen signin view'),
     'weight' => 3,
+  );
+
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_signin_others'] = array(
+    'title' => 'Bullpen List',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_bullpen_signin_others',
+    'permissions' => array('sirius dispatch bullpen signin view'),
+    'weight' => 4,
   );
 
   /*
@@ -83,32 +91,59 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_dnc'] = array(
-    'title' => 'DNC',
-    'description' => '',
-    'callback' => 'sirius_node_tab_worker_dnc',
-    'permissions' => array('sirius dispatch worker'),
-  );
-
-  $node_tabs['sirius_worker']['sirius_worker_dispatch_preferences'] = array(
-    'title' => 'Dispatch Preferences',
-    'description' => '',
-    'callback' => 'sirius_node_tab_worker_dispatch_preferences',
-    'permissions' => array('sirius dispatch worker'),
-  );
-
   $node_tabs['sirius_worker']['sirius_worker_dispatches'] = array(
-    'title' => 'Dispatches',
+    'title' => 'Dispatch',
     'description' => '',
     'callback' => 'sirius_node_tab_worker_dispatches',
     'permissions' => array('sirius dispatch worker'),
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_dispatch_status'] = array(
+  $node_tabs['sirius_worker']['sirius_worker_dispatches/status'] = array(
     'title' => 'Dispatch Status',
     'description' => '',
     'callback' => 'sirius_node_tab_worker_dispatch_status',
     'permissions' => array('sirius dispatch worker'),
+    'weight' => 0,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_dispatches/current'] = array(
+    'title' => 'Current Dispatches',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_dispatches_current',
+    'permissions' => array('sirius dispatch worker'),
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_dispatches/archive'] = array(
+    'title' => 'Prior Dispatches',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_dispatches_archive',
+    'permissions' => array('sirius dispatch worker'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_dispatches/all'] = array(
+    'title' => 'All Dispatches',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_dispatches_all',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_dispatches/sirius_worker_dispatch_preferences'] = array(
+    'title' => 'Dispatch Preferences',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_dispatch_preferences',
+    'permissions' => array('sirius dispatch worker'),
+    'weight' => 4,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_dispatches/dnc'] = array(
+    'title' => 'DNC',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_dnc',
+    'permissions' => array('sirius dispatch worker'),
+    'weight' => 5,
   );
 
   $node_tabs['grievance_shop']['sirius_employer_dispatch_preferences'] = array(

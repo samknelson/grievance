@@ -590,7 +590,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	$total = count($workers);
 
 	if (!$found) {
-		return array('success' => FALSE, 'msg' => t('The worker passed all the tests, but does not appear on the dispatchable worker list for this job. Please contact the system adminitrator.'));
+		return array('success' => FALSE, 'msg' => t('The worker passed all the tests, but does not appear on the dispatchable worker list for this job. Please contact the system administrator.'));
 	}
 
 	return array(

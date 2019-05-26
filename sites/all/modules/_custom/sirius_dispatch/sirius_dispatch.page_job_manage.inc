@@ -112,6 +112,21 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 			),
 		);
 
+		$html = '<div style="width: 40%; float: right; padding-left: 10px;">';
+		$html .= '<h2>Examples</h2>';
+		$html .= '<table>';
+		$html .= '<tr><th>Expire Time</th><th>Max</th><th>Min</th><th>Ratio</th><th>Open Slots</th><th></th></tr>';
+		$html .= '<tr><td>5</td><td>50</td><td>10</td><td>2</td><td>10</td><td><strong>20 notifications every 5 minutes</strong></td></tr>';
+		$html .= '<tr><td>5</td><td>50</td><td>10</td><td>2</td><td>100</td><td><strong>50 notifications every 5 minutes</strong></td></tr>';
+		$html .= '<tr><td>5</td><td>50</td><td>10</td><td>2</td><td>1</td><td><strong>10 notifications every 5 minutes</strong></td></tr>';
+		$html .= '<tr><td>30</td><td>50</td><td>10</td><td>1.5</td><td>10</td><td><strong>15 notifications every 30 minutes</strong></td></tr>';
+		$html .= '<tr><td>30</td><td>50</td><td>1</td><td>1</td><td>5</td><td><strong>5 notifications every 30 minutes</strong></td></tr>';
+		$html .= '</table>';
+		$html .= '</div>';
+
+		$form['run_settings']['description'] = array('#markup' => $html);
+
+
 		$form['run_settings']['timelimit'] = array(
 			'#title' => 'Expire After',
 			'#type' => 'textfield',
@@ -120,43 +135,29 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 			'#description' => t('Enter the number of minutes before a dispatch notification should expire.'),
 		);
 
-		/*
-		$form['run_settings']['max'] = array(
+		$form['run_settings']['batch_max'] = array(
 			'#title' => 'Maximum Batch Size',
 			'#type' => 'textfield',
 			'#size' => 5,
-			'#default_value' => $job_node->field_sirius_timelimit['und'][0]['value'],
+			'#default_value' => $job_node->field_sirius_batch_max['und'][0]['value'],
 			'#description' => t('Enter the maxminum number ofnotifications that will be sent in any given batch'),
 		);
 
-		$form['run_settings']['min'] = array(
+		$form['run_settings']['batch_min'] = array(
 			'#title' => 'Minimum Batch Size',
 			'#type' => 'textfield',
 			'#size' => 5,
-			'#default_value' => $job_node->field_sirius_timelimit['und'][0]['value'],
+			'#default_value' => $job_node->field_sirius_batch_min['und'][0]['value'],
 			'#description' => t('Enter the minimum numer of notifications that will be sent in any given batch. If this is greater than 1, then it is possible that more notifications will be sent than the number of open slots, meaning that there is no guarantee that the job will be filled in seniority order.'),
 		);
 
-		$form['run_settings']['factor'] = array(
+		$form['run_settings']['batch_ratio'] = array(
 			'#title' => 'Ratio of Notifications to Slots',
 			'#type' => 'textfield',
 			'#size' => 5,
-			'#default_value' => $job_node->field_sirius_timelimit['und'][0]['value'],
+			'#default_value' => $job_node->field_sirius_batch_ratio['und'][0]['value'],
 			'#description' => t('Enter the number of notifications to be sent for each open slot. If this is greater than 1, then there will be more than one notification sent for each slot, meaning that there is no guarantee that the job will be filled in seniority order.'),
 		);
-
-		$html = '<h2>Examples</h2>';
-		$html .= '<table>';
-		$html .= '<tr><th>Expire Time</th><th>Max</th><th>Min</th><th>Ratio</th><th>Number of Open Slots</th><th></th></tr>';
-		$html .= '<tr><td>5</td><td>50</td><td>10</td><td>2</td><td>10</td><td><strong>20 notifications every 5 minutes</strong></td></tr>';
-		$html .= '<tr><td>5</td><td>50</td><td>10</td><td>2</td><td>100</td><td><strong>50 notifications every 5 minutes</strong></td></tr>';
-		$html .= '<tr><td>5</td><td>50</td><td>10</td><td>2</td><td>1</td><td><strong>10 notifications every 5 minutes</strong></td></tr>';
-		$html .= '<tr><td>30</td><td>50</td><td>10</td><td>1.5</td><td>10</td><td><strong>15 notifications every 30 minutes</strong></td></tr>';
-		$html .= '<tr><td>30</td><td>50</td><td>1</td><td>1</td><td>5</td><td><strong>5 notifications every 30 minutes</strong></td></tr>';
-		$html .= '</table>';
-
-		$form['run_settings']['description'] = array('#markup' => $html);
-		*/
 
 		$description = '';
 		if (!$options) {
@@ -308,14 +309,36 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 
 	if ($action == 'run') {
 		$timelimit = $form_state['values']['timelimit'];
-		if ($timelimit < 1) {
-			drupal_set_message(t('Time limit must be at least one minute.'), 'error');
+		if ($timelimit < 1) { drupal_set_message(t('Time limit must be at least one minute.'), 'error'); $is_error = TRUE; }
+
+		$system_max = variable_get('sirius_dispatch_run_create_count', 25);
+		$batch_min = $form_state['values']['batch_min'];
+		if (!$batch_min) { $batch_min = 1; }
+		if ($batch_min < 1) { drupal_set_message(t('Minimum batch size must be at least 1.'), 'error');  $is_error = TRUE; }
+		if ($batch_min > $system_max) { drupal_set_message(t('Minimum batch size cannot be greater than @max.', array('@max' => $system_max)), 'error'); $is_error = TRUE; }
+
+		$batch_max = $form_state['values']['batch_max'];
+		if (!$batch_max) { $batch_max = $system_max; }
+		if ($batch_max < 1) { drupal_set_message(t('Maximum batch size must be at least 1.'), 'error'); $is_error = TRUE; }
+		if ($batch_max > $system_max) { drupal_set_message(t('Maxium batch size cannot be greater than @max.', array('@max' => $system_max)), 'error'); $is_error = TRUE; }
+
+		$batch_ratio = $form_state['values']['batch_ratio'];
+		if (!$batch_ratio) { $batch_ratio = 1; }
+		if ($batch_ratio < 0.5) { drupal_set_message(t('Batch ratio must be at least 0.5'), 'error'); $is_error = TRUE; }
+		if ($batch_ratio > 5) { drupal_set_message(t('Batch ratio cannot be larger than 5.'), 'error'); $is_error = TRUE; }
+
+		if ($is_error) {
+			$form_state['rebuild'] = TRUE;
 			return;
 		}
+
 		$status = "Running";
 		$job_node->field_sirius_timelimit['und'][0]['value'] = $timelimit;
 		$job_node->field_sirius_dispatch_job_status['und'][0]['value'] = $status;
 		$job_node->field_sirius_summary['und'][0]['value'] = '';
+		$job_node->field_sirius_batch_min['und'][0]['value'] = $batch_min;
+		$job_node->field_sirius_batch_max['und'][0]['value'] = $batch_max;
+		$job_node->field_sirius_batch_ratio['und'][0]['value'] = $batch_ratio;
 		node_save($job_node);
 		drupal_set_message(t("Job status has been set to \"@status\" with time limit @timelimit minutes", array('@status' => $status, '@timelimit' => $timelimit)));
 		sirius_log('job:status', $status, "Status set to \"$status\" with time limit $timelimit minutes", $notes, $notes, array($job_node->nid));

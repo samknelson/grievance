@@ -48,7 +48,7 @@ function sirius_node_tab_feed_process_form_submit($form, &$form_state) {
 	$feed_node = $form_state['feed_node'];
 
 	$source = (object) $feed_node->field_sirius_attachments['und'][0];
-	$destination = 'temporary://sirius_feed/' . $feed_node->nid;
+	$destination = 'temporary://sirius_feed_' . $feed_node->nid;
 	file_copy($source, $destination, FILE_EXISTS_REPLACE);
 
 	$path = drupal_realpath($destination);
@@ -143,8 +143,9 @@ function sirius_feeds_log($feed_node, $row, $type, $message, $other_handler_nids
 	if ($counts[$type] == 20) { $message = "--- subsequent error meesagees of the same type will be suppressed ---"; }
 	if ($counts[$type] > 20) { return; }
 
+	$feed_type_term = taxonomy_term_load($feed_node->field_sirius_feed_type['und'][0]['tid']);
 
-	$category = 'feeds:' . $feed_node->field_sirius_category['und'][0]['value'];
+	$category = 'feeds:' . $feed_type_term->name;
 	$type = $type;
 	$message = 'Row #' . $row['row'] . ': ' . $message;
 	$summary = $feed_node->title . ': Row #' . $row['row'];

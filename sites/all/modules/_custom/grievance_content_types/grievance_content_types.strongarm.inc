@@ -943,6 +943,9 @@ function grievance_content_types_strongarm() {
         'title' => array(
           'weight' => '2',
         ),
+        'path' => array(
+          'weight' => '30',
+        ),
       ),
       'display' => array(),
     ),
@@ -1010,6 +1013,9 @@ function grievance_content_types_strongarm() {
       'form' => array(
         'title' => array(
           'weight' => '2',
+        ),
+        'path' => array(
+          'weight' => '30',
         ),
       ),
       'display' => array(),
@@ -1447,14 +1453,17 @@ function grievance_content_types_strongarm() {
       'revision' => array(
         'custom_settings' => FALSE,
       ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '-5',
+          'weight' => '2',
         ),
         'path' => array(
-          'weight' => '30',
+          'weight' => '3',
         ),
       ),
       'display' => array(),
