@@ -88,7 +88,6 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 		$options = array('no' => t('No Letterhead'));
 		if (variable_get('grievance_gform_wkhtmltopdfargs', '')) {
 			$options['yes'] = t('Standard Letterhead');
-			drupal_set_message("Here with: " . variable_get('grievance_gform_wkhtmltopdfargs', ''));
 		}
 		$letterheads = sirius_letterhead_list();
 		foreach ($letterheads as $nid => $title) {
