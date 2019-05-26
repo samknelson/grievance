@@ -2900,10 +2900,15 @@ fieldset legend a:visited {
 .loopback #admin-menu, 
 .loopback #page-banner, 
 .loopback #page-footer, 
-.loopback #header { 
+.loopback #header,
+.loopback .banner-menu-outer-wrapper { 
   display: none;
 }
 
+body.loopback {
+  background: none;
+  color: #000000;
+}
 
 
 .gform_body h3 {
@@ -3250,10 +3255,12 @@ table.grievance-timeline tr.pending {
     font-size: 12pt;
     font-family: "Times New Roman", Times, serif;
   }
+  /*
   #grievance-letter-body {
     padding-left: 5mm;
     padding-right: 5mm;
   }
+  */
   div.grievance-letter-page-break {
     page-break-after: always;
   }
