@@ -310,3 +310,26 @@ function grievance_update_7020() {
   return t('Disabled conditional_fields');
 }
 
+/**
+ * Letterhead permissions
+ */
+
+function grievance_update_7021() {
+  $permission = 'sirius letterhead use';
+  $old_permission = 'grievance view';
+  print "Granting new permission [$permission] to anybody with permission [$old_permission] ...\n";
+  $roles = user_roles(FALSE, $old_permission);
+  foreach ($roles as $rid => $name) {
+    print "... granting [$permission] to [$name]\n";
+    user_role_grant_permissions($rid, array($permission));
+  }
+
+  $permission = 'sirius letterhead edit';
+  $old_permission = 'grievance admin';
+  print "Granting new permission [$permission] to anybody with permission [$old_permission] ...\n";
+  $roles = user_roles(FALSE, $old_permission);
+  foreach ($roles as $rid => $name) {
+    print "... granting [$permission] to [$name]\n";
+    user_role_grant_permissions($rid, array($permission));
+  }
+}
