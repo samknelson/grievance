@@ -33,6 +33,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_send.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_member_status_ratios.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_notification_preferences.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_landing.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_manage.inc';
@@ -172,6 +173,19 @@ function sirius_dispatch_report_cache_info() {
     'batch_callback' => 'sirius_dispatch_report_member_status_ratios_batch',
     'render_callbacks' => array(
       'Ratio' => 'sirius_dispatch_report_member_status_ratios_view',
+    ),
+  );
+
+  $items['sirius-dispatch-notification_preferences'] = array(
+    'name' => t('Notification Preferences'),
+    'description' => '',
+    'access' => 'sirius report',
+    'fields' => sirius_dispatch_report_notification_preferences_fields(),
+    'form_callback' => 'sirius_dispatch_report_notification_preferences_form',
+    'pk_list_callback' => 'sirius_dispatch_report_notification_preferences_pks',
+    'batch_callback' => 'sirius_dispatch_report_notification_preferences_batch',
+    'render_callbacks' => array(
+      'Ratio' => 'sirius_dispatch_report_notification_preferences_view',
     ),
   );
 
