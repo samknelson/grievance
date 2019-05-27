@@ -399,14 +399,24 @@ function menu_get_ancestors($parts) {
  *   A path argument array, used to replace integer values in $data; an integer
  *   value N in $data will be replaced by value $map[N]. Typically, the $map
  *   array is generated from a call to the arg() function.
+ * @param $item
+ *   The menu item at hand. Optional to avoid regression problems with contrib.
  *
  * @return
  *   The unserialized $data array, with path arguments replaced.
  */
-function menu_unserialize($data, $map) {
+function menu_unserialize($data, $map, $item = NULL) {
   if ($data = unserialize($data)) {
     foreach ($data as $k => $v) {
       if (is_int($v)) {
+        // Load the object for the given id.
+        if (isset($item) && !empty($item['load_functions']) && !_menu_load_objects($item, $map)) {
+          // An error occurred loading an object.
+          // Do not set access to FALSE: results in unwanted 404-error
+          // on non-existing page, like content/123.
+          // $item['access'] = FALSE; is done in _menu_load_objects().
+          return FALSE;
+        }
         $data[$k] = isset($map[$v]) ? $map[$v] : '';
       }
     }
@@ -487,8 +497,10 @@ function menu_get_item($path = NULL, $router_item = NULL) {
       }
       if ($router_item['access']) {
         $router_item['map'] = $map;
-        $router_item['page_arguments'] = array_merge(menu_unserialize($router_item['page_arguments'], $map), array_slice($map, $router_item['number_parts']));
-        $router_item['theme_arguments'] = array_merge(menu_unserialize($router_item['theme_arguments'], $map), array_slice($map, $router_item['number_parts']));
+        $page_arguments = menu_unserialize($router_item['page_arguments'], $map, $router_item);
+        $theme_arguments = menu_unserialize($router_item['theme_arguments'], $map, $router_item);
+        $router_item['page_arguments'] = array_merge($page_arguments ? $page_arguments : array(), array_slice($map, $router_item['number_parts']));
+        $router_item['theme_arguments'] = array_merge($theme_arguments ? $theme_arguments : array(), array_slice($map, $router_item['number_parts']));
       }
     }
     $router_items[$path] = $router_item;
@@ -567,6 +579,21 @@ function _menu_load_objects(&$item, &$map) {
     if (!is_array($load_functions)) {
       $load_functions = unserialize($load_functions);
     }
+
+    // If the object is loaded before, don't load it again,
+    // but do update &$map with _cached_object_map.
+    if (isset($item['_cached_object_map'])) {
+      $map = $item['_cached_object_map'];
+      if ($item['_cached_object_map'] === FALSE) {
+          $item['access'] = FALSE;
+          return FALSE;
+      }
+      else {
+        return TRUE;
+      }
+    }
+    $item['_cached_object_map'] = array();
+
     $path_map = $map;
     foreach ($load_functions as $index => $function) {
       if ($function) {
@@ -607,12 +634,14 @@ function _menu_load_objects(&$item, &$map) {
         if ($return === FALSE) {
           $item['access'] = FALSE;
           $map = FALSE;
+          $item['_cached_object_map'] = $map;
           return FALSE;
         }
         $map[$index] = $return;
       }
     }
     $item['load_functions'] = $load_functions;
+    $item['_cached_object_map'] = $map;
   }
   return TRUE;
 }
@@ -626,9 +655,17 @@ function _menu_load_objects(&$item, &$map) {
  *   An array of path arguments; for example, array('node', '5').
  *
  * @return
+ *   TRUE if the object-at-hand could be loaded, FALSE otherwise.
  *   $item['access'] becomes TRUE if the item is accessible, FALSE otherwise.
  */
 function _menu_check_access(&$item, $map) {
+  // menu_tree_check_access() may set this ahead of time for links to nodes.
+  if (isset($item['access'])) {
+    if ($item['access'] === FALSE) {
+      return FALSE;
+    }
+    return TRUE;
+  }
   $item['access'] = FALSE;
   // Determine access callback, which will decide whether or not the current
   // user has access to this path.
@@ -638,7 +675,13 @@ function _menu_check_access(&$item, $map) {
     $item['access'] = (bool) $callback;
   }
   else {
-    $arguments = menu_unserialize($item['access_arguments'], $map);
+    $arguments = menu_unserialize($item['access_arguments'], $map, $item);
+    if ($arguments === FALSE) {
+      // An error happened when loading the object. $item['access'] is now set to FALSE.
+      $item['access'] = FALSE;
+      return FALSE;
+    }
+
     // As call_user_func_array is quite slow and user_access is a very common
     // callback, it is worth making a special case for it.
     if ($callback == 'user_access') {
@@ -648,6 +691,7 @@ function _menu_check_access(&$item, $map) {
       $item['access'] = call_user_func_array($callback, $arguments);
     }
   }
+  return TRUE;
 }
 
 /**
@@ -694,6 +738,11 @@ function _menu_item_localize(&$item, $map, $link_translate = FALSE) {
   // If we are translating a router item (tabs, page, breadcrumb), then we
   // can always use the information from the router item.
   if (!$link_translate || ($item['title'] == $item['link_title'])) {
+    $title_arguments = menu_unserialize($item['title_arguments'], $map, $item);
+    if ($title_arguments === FALSE) {
+      // An error happened when loading the object. $item['access'] is now set to FALSE.
+      return;
+    }
     // t() is a special case. Since it is used very close to all the time,
     // we handle it directly instead of using indirect, slower methods.
     if ($callback == 't') {
@@ -701,7 +750,7 @@ function _menu_item_localize(&$item, $map, $link_translate = FALSE) {
         $item['title'] = t($item['title']);
       }
       else {
-        $item['title'] = t($item['title'], menu_unserialize($item['title_arguments'], $map));
+        $item['title'] = t($item['title'], $title_arguments);
       }
     }
     elseif ($callback && function_exists($callback)) {
@@ -709,7 +758,7 @@ function _menu_item_localize(&$item, $map, $link_translate = FALSE) {
         $item['title'] = $callback($item['title']);
       }
       else {
-        $item['title'] = call_user_func_array($callback, menu_unserialize($item['title_arguments'], $map));
+        $item['title'] = call_user_func_array($callback, $title_arguments);
       }
       // Avoid calling check_plain again on l() function.
       if ($callback == 'check_plain') {
@@ -784,7 +833,7 @@ function _menu_translate(&$router_item, $map, $to_arg = FALSE) {
     $tab_parent_map = explode('/', $router_item['tab_parent']);
   }
   for ($i = 0; $i < $router_item['number_parts']; $i++) {
-    if ($link_map[$i] == '%') {
+    if (isset($link_map[$i]) && $link_map[$i] == '%' && isset($path_map[$i])) {
       $link_map[$i] = $path_map[$i];
     }
     if (isset($tab_root_map[$i]) && $tab_root_map[$i] == '%') {
@@ -798,7 +847,12 @@ function _menu_translate(&$router_item, $map, $to_arg = FALSE) {
   $router_item['tab_root_href'] = implode('/', $tab_root_map);
   $router_item['tab_parent_href'] = implode('/', $tab_parent_map);
   $router_item['options'] = array();
-  _menu_check_access($router_item, $map);
+
+  if (!_menu_check_access($router_item, $map)) {
+    // An error occurred loading an object.
+    $router_item['access'] = FALSE;
+    return FALSE;
+  }
 
   // For performance, don't localize an item the user can't access.
   if ($router_item['access']) {
@@ -928,14 +982,10 @@ function _menu_link_translate(&$item, $translate = FALSE) {
       $item['access'] = FALSE;
       return FALSE;
     }
-    // menu_tree_check_access() may set this ahead of time for links to nodes.
-    if (!isset($item['access'])) {
-      if (!empty($item['load_functions']) && !_menu_load_objects($item, $map)) {
-        // An error occurred loading an object.
-        $item['access'] = FALSE;
-        return FALSE;
-      }
-      _menu_check_access($item, $map);
+    if (!_menu_check_access($item, $map)) {
+      // An error occurred loading an object.
+      $item['access'] = FALSE;
+      return FALSE;
     }
     // For performance, don't localize a link the user can't access.
     if ($item['access']) {
@@ -981,8 +1031,15 @@ function _menu_link_translate(&$item, $translate = FALSE) {
  */
 function menu_get_object($type = 'node', $position = 1, $path = NULL) {
   $router_item = menu_get_item($path);
+
+  if (!is_array($router_item['load_functions'])) {
+    $router_item['load_functions'] = unserialize($router_item['load_functions']);
+  }
   if (isset($router_item['load_functions'][$position]) && !empty($router_item['map'][$position]) && $router_item['load_functions'][$position] == $type . '_load') {
-    return $router_item['map'][$position];
+    $map = $router_item['map'];
+    if (_menu_load_objects($router_item, $map)) {
+      return $map[$position];
+    }
   }
 }
 

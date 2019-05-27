@@ -6,8 +6,6 @@ Web {"url":"grievance\/admin\/web","lang":"und","weight":"-44"}
 --Add {"url":"admin\/structure\/custom_help_text\/add","lang":"und","weight":"-50"}
 -Basic Pages {"url":"grievance\/admin\/basic-pages","lang":"und","weight":"-49"}
 --Add {"url":"node\/add\/grievance-basic-page","lang":"und","weight":"0"}
--News {"url":"grievance\/news","lang":"und","weight":"-50"}
---Add {"url":"node\/add\/grievance-news","lang":"und","weight":"0"}
 Employers {"url":"grievance\/admin\/shops","lang":"und","weight":"-47"}
 -Add a Shop {"url":"node\/add\/grievance-shop","lang":"und","weight":"-48"}
 -Contacts {"url":"grievance\/admin\/shops\/contacts","lang":"und","weight":"-50"}
@@ -43,6 +41,7 @@ Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
 --Log Tags {"url":"admin\/structure\/taxonomy\/grievance_log_tags","lang":"und","weight":"-42"}
 --Assignee Notes {"url":"admin\/structure\/taxonomy\/grievance_assignee_notes","lang":"und","weight":"-49"}
 -Letter Templates {"url":"grievance\/admin\/letter-templates","lang":"und","weight":"-43"}
+--Letterhead {"url":"sirius\/admin\/letterhead","lang":"und","weight":"0"}
 -Phaxio {"url":"admin\/config\/grievance\/phaxio","lang":"und","weight":"-39"}
 -Intake Log {"url":"admin\/config\/grievance\/intake-log","lang":"und","weight":"-44"}
 -Special Log Types {"url":"admin\/config\/grievance\/log_types","lang":"und","weight":"-37"}

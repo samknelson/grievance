@@ -59,12 +59,18 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
-
   $node_tabs['sirius_feed']['sirius_feed_process'] = array(
     'title' => 'Process',
     'description' => '',
     'callback' => 'sirius_node_tab_feed_process',
     'permissions' => array('sirius admin'),
+  );
+
+  $node_tabs['sirius_letterhead']['sirius_letterhead_preview'] = array(
+    'title' => 'Preview',
+    'description' => '',
+    'callback' => 'sirius_node_tab_letterhead_preview',
+    'permissions' => array('sirius dispatch letterhead edit'),
   );
 
   return $node_tabs;
@@ -190,6 +196,31 @@ function sirius_menu() {
     'page arguments' => array('sirius_page_voice_forward_to_operator_settings'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
+  );
+
+  $items['sirius/loopback/remote-ip'] = array(
+    'title' => 'What is my IP?',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_loopback_remote_ip_print',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/loopback/sample-html'] = array(
+    'title' => 'Sample HTML Content',
+    'description' => '',
+    'access callback' => 'sirius_loopback_access',
+    'page callback' => 'sirius_loopback_sample_html',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/letterhead/sample-html/%node'] = array(
+    'title' => 'Sample HTML for Letterhead',
+    'description' => '',
+    'access callback' => 'sirius_loopback_access',
+    'page callback' => 'sirius_letterhead_preview_loopback',
+    'page arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
   );
 
 

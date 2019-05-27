@@ -23,13 +23,9 @@ function grievance_forward_loopback_access($node) {
 		return TRUE; 
 	}
 
-	return FALSE;
-}
+	if (user_access('sirius admin')) { return TRUE; }
 
-function grievance_custom_theme() {
-	if (preg_match('/^node\/\d+\/loopback$/', current_path())) {
-		return 'at_tf_admin';
-	}
+	return FALSE;
 }
 
 function grievance_node_tab_forward($node) {

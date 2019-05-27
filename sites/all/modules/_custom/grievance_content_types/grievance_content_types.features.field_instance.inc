@@ -13520,6 +13520,71 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'node-sirius_dispatch-field_sirius_datetime_created'.
+  $field_instances['node-sirius_dispatch-field_sirius_datetime_created'] = array(
+    'bundle' => 'sirius_dispatch',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'date',
+        'settings' => array(
+          'custom_date_format' => '',
+          'field_delimiter' => '',
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => FALSE,
+        ),
+        'type' => 'date_default',
+        'weight' => 4,
+      ),
+      'sirius_worker' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+      'teaser' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_datetime_created',
+    'label' => 'Created',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'now',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'no_fieldset' => 0,
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_popup',
+      'weight' => 7,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_dispatch-field_sirius_dispatch_cbn'.
   $field_instances['node-sirius_dispatch-field_sirius_dispatch_cbn'] = array(
     'bundle' => 'sirius_dispatch',
@@ -15647,6 +15712,55 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_email'.
+  $field_instances['node-sirius_dispatch_job-field_sirius_email'] = array(
+    'bundle' => 'sirius_dispatch_job',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 10,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_email',
+    'label' => 'Notification Email',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 25,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_emails'.
   $field_instances['node-sirius_dispatch_job-field_sirius_emails'] = array(
     'bundle' => 'sirius_dispatch_job',
@@ -16556,6 +16670,119 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-sirius_letterhead-field_sirius_attachments'.
+  $field_instances['node-sirius_letterhead-field_sirius_attachments'] = array(
+    'bundle' => 'sirius_letterhead',
+    'deleted' => 0,
+    'description' => 'Upload the letterhead in PDF format. 
+
+If the file has a single page, then that will be used as the background for all pages in the input document. 
+
+If the file has multiple pages, then each page in the input document will use the corresponding page in the letterhead as a background, with the last page in the letterhead repeated as many times as necessary if the input document is longer.  
+
+(For example, if a two-page letterhead is uploaded, then the first page of the letterhead will be used as the first page of the generated document, and the second page will be repeated as many times as necessary.)',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'file',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'file_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_attachments',
+    'label' => 'PDF',
+    'required' => 0,
+    'settings' => array(
+      'description_field' => 0,
+      'file_directory' => '',
+      'file_extensions' => 'pdf',
+      'filefield_paths' => array(
+        'active_updating' => 0,
+        'file_name' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => '[node:nid]_[file:fid].[file:ffp-extension-original]',
+        ),
+        'file_path' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => 'sirius_letterhead',
+        ),
+        'redirect' => FALSE,
+        'retroactive_update' => 0,
+      ),
+      'filefield_paths_enabled' => 1,
+      'max_filesize' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'file',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+      ),
+      'type' => 'file_generic',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_letterhead-field_sirius_json'.
+  $field_instances['node-sirius_letterhead-field_sirius_json'] = array(
+    'bundle' => 'sirius_letterhead',
+    'default_value' => array(),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'sirius_jsonfield',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'sirius_jsonfield_formatter_full',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_json',
+    'label' => 'JSON',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget',
+      'weight' => 1,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_log-field_sirius_attachments'.
   $field_instances['node-sirius_log-field_sirius_attachments'] = array(
     'bundle' => 'sirius_log',
@@ -16669,7 +16896,7 @@ function grievance_content_types_field_default_field_instances() {
   // Exported field_instance: 'node-sirius_log-field_sirius_json'.
   $field_instances['node-sirius_log-field_sirius_json'] = array(
     'bundle' => 'sirius_log',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -18775,6 +19002,47 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textfield',
       'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_worker-field_sirius_phone_mobile'.
+  $field_instances['node-sirius_worker-field_sirius_phone_mobile'] = array(
+    'bundle' => 'sirius_worker',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 34,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_phone_mobile',
+    'label' => 'Mobile Phone',
+    'required' => FALSE,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 25,
     ),
   );
 
@@ -21365,6 +21633,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Member Status');
   t('Member?');
   t('Message');
+  t('Mobile Phone');
   t('Must Log?');
   t('NOT Available for Departments');
   t('Name');
@@ -21376,6 +21645,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Next Step in the Grievance Procedure');
   t('Notes');
   t('Notification Body');
+  t('Notification Email');
   t('Notification Emails');
   t('Notification Medium');
   t('Notification Subject');
@@ -21387,6 +21657,7 @@ function grievance_content_types_field_default_field_instances() {
   t('Office Phone');
   t('Organizer');
   t('Outcome');
+  t('PDF');
   t('Page');
   t('Parking Instructions');
   t('Passcode required for phone access?');
@@ -21462,6 +21733,13 @@ function grievance_content_types_field_default_field_instances() {
   t('Update Company Representative');
   t('Upload images to include in letter templates, such as a scanned signature.');
   t('Upload the current contract document for this shop.  The contract will be used by stewards to identify violations.');
+  t('Upload the letterhead in PDF format. 
+
+If the file has a single page, then that will be used as the background for all pages in the input document. 
+
+If the file has multiple pages, then each page in the input document will use the corresponding page in the letterhead as a background, with the last page in the letterhead repeated as many times as necessary if the input document is longer.  
+
+(For example, if a two-page letterhead is uploaded, then the first page of the letterhead will be used as the first page of the generated document, and the second page will be repeated as many times as necessary.)');
   t('Use for Dispatch?');
   t('Use this field for a "letter" which has no customization, and which is simply meant to be downloaded.  No drop-in tokens are supported.');
   t('Use this field to enter the default body of the email; it should generally be something like "Please refer to the attached document re. a grievance filed against your company."');
