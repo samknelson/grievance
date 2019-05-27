@@ -37,6 +37,7 @@ function sirius_permission() {
     'sirius representative' => array(
       'title' => t('Sirius Representative'), 
       'description' => t('Permission to act as representative of the union, such as a shop steward or business agent'),
+    ),
     'sirius letterhead use' => array(
       'title' => t('Sirius Letterhead Use'), 
       'description' => t('Permission to print onto letterhead'),
