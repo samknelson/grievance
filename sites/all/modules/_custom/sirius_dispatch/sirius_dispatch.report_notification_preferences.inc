@@ -61,11 +61,10 @@ function sirius_dispatch_report_notification_preferences_batch($medium, $values,
     }
   }
 
-  dpm($data);
   foreach ($data as $medium => $ignore) {
     for ($delta = 0; $delta <= 2; ++$delta) {
       if (!$data[$medium]["count$delta"]) { $data[$medium]["count$delta"] = 0; }
-      if ($data['total']["count$delta"]) { drupal_set_message("Here with $medium"); $data[$medium]["pct$delta"] = round(100 * $data[$medium]["count$delta"] / $data['total']["count$delta"]) . '%'; }
+      if ($data['total']["count$delta"]) { $data[$medium]["pct$delta"] = round(100 * $data[$medium]["count$delta"] / $data['total']["count$delta"]) . '%'; }
     }
   }
 
