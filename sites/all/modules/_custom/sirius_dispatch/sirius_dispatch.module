@@ -184,9 +184,6 @@ function sirius_dispatch_report_cache_info() {
     'form_callback' => 'sirius_dispatch_report_notification_preferences_form',
     'pk_list_callback' => 'sirius_dispatch_report_notification_preferences_pks',
     'batch_callback' => 'sirius_dispatch_report_notification_preferences_batch',
-    'render_callbacks' => array(
-      'Ratio' => 'sirius_dispatch_report_notification_preferences_view',
-    ),
   );
 
   return $items;

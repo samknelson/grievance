@@ -16,12 +16,12 @@ function sirius_dispatch_report_notification_preferences_form_submit($form, &$fo
 function sirius_dispatch_report_notification_preferences_fields() {
 	$fields = array();
 	$fields['medium'] = 'Medium';
-  $fields['count0'] = 'Count Dispatch Primary';
-  $fields['pct0'] = 'Percent Dispatch Primary';
-  $fields['count1'] = 'Count Dispatch Secondary';
-  $fields['pct1'] = 'Percent Dispatch Secondary';
-  $fields['count2'] = 'Count Non-Dispatch';
-  $fields['pct2'] = 'Percent Non-Dispatch';
+  $fields['count0'] = '# Dispatch';
+  $fields['pct0'] = '% Dispatch';
+  $fields['count1'] = '# Secondary Dispatch';
+  $fields['pct1'] = '% Secondary Dispatch';
+  $fields['count2'] = '# Other Notifications';
+  $fields['pct2'] = '% Other Notification';
 	return $fields;
 }
 
@@ -51,31 +51,28 @@ function sirius_dispatch_report_notification_preferences_batch($medium, $values,
   $data['total'] = array('medium' => 'Total');
   $data['sms_total'] = array('medium' => 'SMS Total');
   $data['voice_total'] = array('medium' => 'Voice Total');
+
   foreach ($data as $medium => $ignore) {
     if (preg_match('/total/', $medium)) { continue; }
-
-    $data['total']['count0'] += $data[$medium]['count0'];
-    $data['total']['count1'] += $data[$medium]['count1'];
-    $data['total']['count2'] += $data[$medium]['count2'];
-
-    if (preg_match('/sms/', $medium)) {
-      $data['sms_total']['count0'] += $data[$medium]['count0'];
-      $data['sms_total']['count1'] += $data[$medium]['count1'];
-      $data['sms_total']['count2'] += $data[$medium]['count2'];
-    }
-
-    if (preg_match('/voice/', $medium)) {
-      $data['voice_total']['count0'] += $data[$medium]['count0'];
-      $data['voice_total']['count1'] += $data[$medium]['count1'];
-      $data['voice_total']['count2'] += $data[$medium]['count2'];
+    for ($delta = 0; $delta <= 2; ++$delta) {
+      $data['total']["count$delta"] += $data[$medium]["count$delta"];
+      if (preg_match('/sms/', $medium)) { $data['sms_total']["count$delta"] += $data[$medium]["count$delta"]; }
+      if (preg_match('/voice/', $medium)) { $data['voice_total']["count$delta"] += $data[$medium]["count$delta"]; }
     }
   }
 
+  dpm($data);
+  foreach ($data as $medium => $ignore) {
+    for ($delta = 0; $delta <= 2; ++$delta) {
+      if (!$data[$medium]["count$delta"]) { $data[$medium]["count$delta"] = 0; }
+      if ($data['total']["count$delta"]) { drupal_set_message("Here with $medium"); $data[$medium]["pct$delta"] = round(100 * $data[$medium]["count$delta"] / $data['total']["count$delta"]) . '%'; }
+    }
+  }
 
   foreach ($data as $medium => $ignore) {
-    if ($data['total']['count0']) { $data[$medium]['pct0'] = round(100 * $data[$medium]['count0'] / $data['total']['count0']); }
-    if ($data['total']['count1']) { $data[$medium]['pct1'] = round(100 * $data[$medium]['count1'] / $data['total']['count1']); }
-    if ($data['total']['count2']) { $data[$medium]['pct2'] = round(100 * $data[$medium]['count2'] / $data['total']['count2']); }
+    for ($delta = 0; $delta <= 2; ++$delta) {
+      $data[$medium]["count$delta"] = number_format($data[$medium]["count$delta"], 0);
+    }
   }
 
   $media_in_order = array(
@@ -100,86 +97,3 @@ function sirius_dispatch_report_notification_preferences_batch($medium, $values,
   return $rows;
 }
 
-function sirius_dispatch_report_notification_preferences_view($report_type, $report_id) {
-  // Load the parameters
-  $query = db_select('report_cache');
-  $query->fields('report_cache');
-  $query->condition('report_id', $report_id);
-  $query->condition('report_type', $report_type . ' :: PARAMETERS');
-  $stmt = $query->execute();
-  $hr = $stmt->fetchAssoc();
-  $parameters = unserialize($hr['report_data']);
-  $ratio_1_tid = $parameters['ratio_1'];
-  $ratio_2_tid = $parameters['ratio_2'];
-  $ratio_1_term = taxonomy_term_load($ratio_1_tid);
-  $ratio_2_term = taxonomy_term_load($ratio_2_tid);
-
-  $html = '';
-  $html .= '<h2>';
-  $html .= 'Ratio of employed workers with the member status <strong>' . $ratio_1_term->name . '</strong> to <strong>' . $ratio_2_term->name . '</strong>';
-  $html .= '</h2>';
-
-  $query = db_select('report_cache');
-  $query->fields('report_cache');
-  $query->condition('report_id', $report_id);
-  $query->condition('report_type', $report_type);
-  $stmt = $query->execute();
-  $data = array();
-  $grand_total_1 = 0;
-  $grand_total_2 = 0;
-  while ($hr = $stmt->fetchAssoc()) {
-    $hr = unserialize($hr['report_data']);
-
-    $count_1 = $hr['status_' . $ratio_1_tid];
-    $count_2 = $hr['status_' . $ratio_2_tid];
-
-    $grand_total_1 += $count_1;
-    $grand_total_2 += $count_2;
-
-    $total = $count_1 + $count_2; 
-    if (!$total) { continue; }
-
-    $key = $hr['shop_name'];
-
-    $row = array();
-    $row[] = $key;
-    $row[] = $total;
-    $row[] = $count_1;
-    $row[] = (100 *number_format($count_1 / $total, 2)) . ' %';
-    $row[] = $count_2;
-    $row[] = (100 *number_format($count_2 / $total, 2)) . ' %';
-
-
-
-    $data[$key] = $row;
-  }
-
-  ksort($data);
-  $rows = array_values($data);
-
-  $grand_total = $grand_total_1 + $grand_total_2;
-  if ($grand_total) {
-  	$row = array();
-  	$row[] = '<strong>' . 'Total' . '</strong>';
-    $row[] = '<strong>' . $grand_total . '</strong>';
-    $row[] = '<strong>' . $grand_total_1 . '</strong>';
-    $row[] = '<strong>' . (100 *number_format($grand_total_1 / $grand_total, 2)) . ' %' . '</strong>';
-    $row[] = '<strong>' . $grand_total_2;
-    $row[] = '<strong>' . (100 *number_format($grand_total_2 / $grand_total, 2)) . ' %' . '</strong>';
-    $rows[] = $row;
-  }
-
-  $header = array(
-  	'Shop Name',
-  	'Total Workers',
-  	'Count: ' . $ratio_1_term->name,
-  	'Fraction: ' . $ratio_1_term->name,
-  	'Count: ' . $ratio_2_term->name,
-  	'Fraction: ' . $ratio_2_term->name,
-  );
-
-  $attributes = array();
-  $html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => $attributes));
-
-  return $html;
-}
