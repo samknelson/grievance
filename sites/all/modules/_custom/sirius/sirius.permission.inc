@@ -34,6 +34,10 @@ function sirius_permission() {
       'title' => t('Sirius Edit Own User'), 
       'description' => t('Permission to edit your own user account (i.e. set your password)'),
     ),
+    'sirius representative' => array(
+      'title' => t('Sirius Representative'), 
+      'description' => t('Permission to act as representative of the union, such as a shop steward or business agent'),
+    ),
   );
 }
 
