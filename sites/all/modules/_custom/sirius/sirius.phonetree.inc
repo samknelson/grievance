@@ -187,6 +187,7 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 	  $query->entityCondition('bundle', 'sirius_dispatch_job');
 		$query->fieldCondition('field_sirius_dispatch_job_type', 'tid', sirius_get_special_tid('sirius_dispatch_job_type|BULL'));
 	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d H:i:s', strtotime('-1 days')), '>=');
+	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d H:i:s', strtotime('+1 days')), '>=');
 	  $query->fieldCondition('field_sirius_member_status', 'tid', $worker_member_status_tids, 'in');
 	  $query->fieldOrderBy('field_sirius_datetime', 'value');
 	  $stmt = $query->execute();
@@ -197,7 +198,7 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 
 	// Bullpen list
 	if (!$bullpen_nodes) {
-		$text = "There are no upcoming bullpens.";
+		$text = "There are no upcoming bullpens. ";
 	} else {
 		$i = 0;
 		$count = count($bullpen_nodes);
@@ -210,6 +211,7 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 			$ts = sirius_date_ts($bullpen_node, 'field_sirius_datetime');
 			$text .= "Bullpen number $i:\n";
 			$text .= sirius_tts_title($employer_node) . " on " . date('l, F d ', $ts) . ":\n\n";
+			/*
 			$member_status_tids = sirius_fieldvals($bullpen_node, 'field_sirius_member_status', 'tid');
 			if ($member_status_tids) {
 
@@ -219,6 +221,7 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 					$text .= $term->name . ":\n\n";
 				}
 			}
+			*/
 			$text .= "Report to " . $facility_node->title . " at " . date('h:i a', $ts) . " : \n";
 		}
 
