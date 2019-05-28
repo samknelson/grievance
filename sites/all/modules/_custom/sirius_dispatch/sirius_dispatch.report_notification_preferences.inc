@@ -30,13 +30,26 @@ function sirius_dispatch_report_notification_preferences_pks(&$form_state) {
 }
 
 function sirius_dispatch_report_notification_preferences_batch($medium, $values, $report_id, $report_action, &$context) {
-  $sql = "select field_sirius_dispatch_medium_value, delta, count(*) as c ";
+  // Get the "active" work statuses
+  $all_ws_terms = sirius_taxonomy_load('sirius_work_status', 'tid', 'full');
+  $active_ws_tids = array();
+  foreach ($all_ws_terms as $tid => $term) {
+    if ($term->field_sirius_dispatch_available['und'][0]['value'] == 'Yes') {
+      $active_ws_tids[] = $tid;
+    }
+  }
+
+  $sql = "select field_sirius_dispatch_medium_value, field_data_field_sirius_dispatch_medium.delta, count(*) as c ";
   $sql .= "from field_data_field_sirius_dispatch_medium ";
-  $sql .= "where entity_type = 'node' ";
-  $sql .= "and bundle = 'sirius_worker' ";
-  $sql .= "group by field_sirius_dispatch_medium_value, delta ";
-  $sql .= "order by field_sirius_dispatch_medium_value, delta ";
-  $stmt = db_query($sql, array());
+  $sql .= "join field_data_field_sirius_work_status ";
+  $sql .= "  on field_data_field_sirius_work_status.entity_type = 'node' ";
+  $sql .= "  and field_data_field_sirius_work_status.entity_id = field_data_field_sirius_dispatch_medium.entity_id ";
+  $sql .= "  and field_data_field_sirius_work_status.field_sirius_work_status_tid in (:active_ws_tids) ";
+  $sql .= "where field_data_field_sirius_dispatch_medium.entity_type = 'node' ";
+  $sql .= "and field_data_field_sirius_dispatch_medium.bundle = 'sirius_worker' ";
+  $sql .= "group by field_sirius_dispatch_medium_value, field_data_field_sirius_dispatch_medium.delta ";
+  $sql .= "order by field_sirius_dispatch_medium_value, field_data_field_sirius_dispatch_medium.delta ";
+  $stmt = db_query($sql, array(':active_ws_tids' => $active_ws_tids));
 
   $data = array();
   while ($hr = $stmt->fetchAssoc()) {
