@@ -186,8 +186,8 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 	  $query->entityCondition('entity_type', 'node');
 	  $query->entityCondition('bundle', 'sirius_dispatch_job');
 		$query->fieldCondition('field_sirius_dispatch_job_type', 'tid', sirius_get_special_tid('sirius_dispatch_job_type|BULL'));
-	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d H:i:s', strtotime('-1 days')), '>=');
-	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d H:i:s', strtotime('+1 days')), '<=');
+	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d 00:00:00'), '>=');
+	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d 00:00:00', strtotime('+2 days')), '<=');
 	  $query->fieldCondition('field_sirius_member_status', 'tid', $worker_member_status_tids, 'in');
 	  $query->fieldOrderBy('field_sirius_datetime', 'value');
 	  $stmt = $query->execute();
