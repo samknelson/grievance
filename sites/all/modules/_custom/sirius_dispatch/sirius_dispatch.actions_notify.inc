@@ -171,7 +171,7 @@ function sirius_dispatch_notify_schedule_ok() {
 		return array('success' => FALSE, 'msg' => 'Notifications cannot be sent today.');
 	}
 
-	if ($start_hour > $hour || ($start_hour == $hour && $start_minute < $minute)) {
+	if ($start_hour > $hour || ($start_hour == $hour && $start_minute > $minute)) {
 		return array('success' => FALSE, 'msg' => "Notifications cannot be sent until $start_hour:$start_minute_display.");
 	}
 
