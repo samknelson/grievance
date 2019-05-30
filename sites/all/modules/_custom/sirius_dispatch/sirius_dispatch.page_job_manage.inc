@@ -35,6 +35,8 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
   if (!$count_yes) { $count_yes = 0; }
   if ($count) {
   	$percent = 100 * $count_yes / $count;
+  	if ($percent > 100) { $percent = 100; }
+  	$percent = round($percent, 0);
 	  $html .= theme_progress_bar(array('percent' => $percent, 'message' => "$count_yes / $count workers have accepted."));
   }
   $html .= t('To contact the dispatch operator regarding this job request, reference job ID <strong>#@job_nid</strong>.', array('@job_nid' => $job_node->nid));

@@ -776,7 +776,6 @@ tbody {
 }
 td,th {
   margin: 0;
-  padding: 10px 7px;
 }
 th.active a {
   padding-right: 25px;
@@ -1205,13 +1204,13 @@ fieldset#edit-body-und-0-format {
   padding-top: 0 !important;
 }
 legend {
+  background-color: #5984be;
   font-size: 1em;
   border: 0;
-  background: #d4d4d4;
   display: block;
-  padding: 7px 1%;
+  padding: 14px 0 14px 2%;
   width: 98%;
-  border-radius: 2px;
+  border-radius: 0;
 }
 fieldset legend,
 fieldset legend a:link,
@@ -2385,6 +2384,8 @@ table.trustfund-payperiod tr.error {
 	font-size: 1em;
 	padding-top: 0;
 	padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .block .field-name-body ul,
@@ -2800,12 +2801,6 @@ tr.view-subfooter-number{ display: none; }
 }
 .tablesorter-blue tbody tr.odd td {
 	background-color: #ffffff;
-}
-legend {
-  background-color: #5984be;
-  border-radius: 0;
-  padding: 14px 2%;
-  max-width: 96%;
 }
 fieldset legend, 
 fieldset legend a,
@@ -3250,10 +3245,12 @@ table.grievance-timeline tr.pending {
 }
 
 
-@media print {
+@media only print {
   body {
     font-size: 12pt;
     font-family: "Times New Roman", Times, serif;
+    color: #000000;
+    background-color: #ffffff;
   }
   /*
   #grievance-letter-body {
@@ -3265,6 +3262,8 @@ table.grievance-timeline tr.pending {
     page-break-after: always;
   }
 
+  .primary-local-tasks-wrapper,
+  #block-grievance-grievance-quicksearch,
   .block-masquerade,
   #admin-menu-wrapper,
   .block-superfish,
@@ -3273,7 +3272,18 @@ table.grievance-timeline tr.pending {
     display: none;
   }
 
+  td {
+    padding: 11px 0 11px 22px !important;
+  }
 
+  #header {
+    background-color: #ffffff;
+    border-bottom: none;
+    margin: 28px 0 28px 0;
+  }
+  #page-banner {
+
+  }
 }
 
 
@@ -3717,7 +3727,9 @@ div.node-sirius-dispatch.node-teaser {
   background: #666666;
 }
 
-.views-row-edit-static {
+.views-row-edit-static, 
+.views-row-edit-edit .tabledrag-toggle-weight-wrapper,
+.views-row-edit-edit .field-add-more-submit { 
   display: none;
 }
 
@@ -3846,4 +3858,153 @@ input.ajax-processed:hover {
 
 .form-type-date-popup .form-item label {
   display: none;
+}
+
+/* /sirius-worker/... */
+.ds-below-left,
+.ds-above-left {
+    width: 49%;
+    margin-right: 1%;
+}
+
+/* /sirius_dispatch_worker_view/... */
+
+@media only screen {
+  .sirius_dispatch_view_print_header {display: none;}
+  .sirius_dispatch_view_print_footer {display: none;}
+  .sirius_dispatch_view_screen_header {margin: 24px 0;}
+  .sirius_dispatch_view_screen_footer {}
+}
+@media only print {
+  .sirius_dispatch_view_screen_header {display: none;}
+  .sirius_dispatch_view_screen_footer {display: none;}
+  .sirius_dispatch_view_print_header {
+    display: block;
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .sirius_dispatch_view_print_footer {
+    display: block;
+    padding-top: 24px;
+    margin-top: 24px;
+    border-top: 1px dotted #000000;    
+  }
+  .sirius_dispatch_view_worker_section,
+  .sirius_dispatch_view_dispatch_section {
+    border: 1px dotted #000;
+  }
+  #sirius-node-tab-dispatch-worker-view-form {}
+
+  .page-node-sirius-dispatch-worker-view #header {display: none;}
+  html body.admin-menu {
+      margin-top: 0 !important;
+  }
+}
+
+.sirius_dispatch_view_worker_section,
+.sirius_dispatch_view_dispatch_section {
+  float: left;
+  width: 44%;
+  padding: 24px 2%;
+  background-color: #fff;
+  margin-bottom: 24px;
+}
+.sirius_dispatch_view_worker_section {
+  float: right;
+}
+.sirius_dispatch_view_dispatch_section code {
+  float: left;
+  width: 105px;
+  margin-right: 25px;
+}
+.sirius_dispatch_view_dispatch_section section {
+  float: left;
+  width: 60%;
+}
+.sirius_dispatch_view_job_section {
+  margin-top: 48px;
+  clear: both;
+}
+.sirius_dispatch_view_worker_section .field-name-field-sirius-name h2,
+.sirius_dispatch_view_worker_section .field-name-field-sirius-phone h2,
+.sirius_dispatch_view_worker_section .field-name-field-sirius-email h2 {
+  display: none;
+}
+.sirius_dispatch_view_dispatch_section .field h2,
+.sirius_dispatch_view_worker_section .field h2 {
+  min-width: 0;
+  font-weight: normal;
+  margin-right: 4px;
+}
+.sirius_dispatch_view_worker_section img {
+  float: left;
+  width: 150px;
+  margin: 0 25px 25px 0;
+}
+.sirius_dispatch_view_worker_section section {
+  float: left;
+  width: 51%;
+}
+.sirius_dispatch_view_dispatch_section .field,
+.sirius_dispatch_view_worker_section .field {
+  margin-bottom: 3px;
+}
+.sirius_dispatch_view_dispatch_section,
+.sirius_dispatch_view_worker_section {
+  min-height: 140px; 
+}
+.sirius_dispatch_view_job_section .field {
+  margin-bottom: 12px;
+}
+.sirius_dispatch_view_job_section .field-name-field-sirius-notes h2,
+.sirius_dispatch_view_job_section .field-name-field-sirius-notes .field-items {
+  width: 100%;
+  padding-bottom: 12px !important;
+}
+
+/* Wrangle things in small views */
+@media only screen and (max-width:959px) {
+  /*   */
+  .ds-below-right,
+  .ds-below-left,
+  .ds-above-right,
+  .ds-above-left {
+      width: 100%;
+      margin-right: 0;
+  }
+}
+@media only screen and (max-width:880px) {
+  .sirius_dispatch_view_dispatch_section ,
+  .sirius_dispatch_view_worker_section {
+      width: 100%;
+      margin: 12px 0;
+      float: none;
+      padding: 24px 0 24px 18px;
+  }
+  .sirius_dispatch_view_dispatch_section code {
+    margin-bottom: 50px;
+  }
+  .sirius_dispatch_view_dispatch_section section {
+  }
+  .sirius_dispatch_view_worker_section img {
+    margin-bottom: 50px;
+  }
+  .sirius_dispatch_view_worker_section section {
+  }
+
+}
+
+@media only screen and (max-width:579px) {
+  .sirius_dispatch_view_worker_section section,
+  .sirius_dispatch_view_worker_section img,
+  .sirius_dispatch_view_dispatch_section section,
+  .sirius_dispatch_view_dispatch_section code {
+    margin-bottom: 12px;
+    float: none;
+    width: 100%;
+    display: block;
+  }
+  #page-banner .user-links {
+    display: none;
+  }
 }
