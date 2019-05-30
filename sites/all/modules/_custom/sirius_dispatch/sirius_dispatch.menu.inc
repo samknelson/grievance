@@ -142,7 +142,7 @@ function sirius_dispatch_node_tabs() {
     'title' => 'DNC',
     'description' => '',
     'callback' => 'sirius_node_tab_worker_dnc',
-    'permissions' => array('sirius dispatch worker'),
+    'permissions' => array('sirius dispatch staff'),
     'weight' => 5,
   );
 
