@@ -3,6 +3,22 @@
 function sirius_dispatch_report_notification_preferences_form($form, &$form_state, $report_type) {
   report_cache_form_prepare($report_type, $form, $form_state);
 
+  $form['dispatchable_only'] = array(
+    '#title' => t('Dispatchable Work Status Only?'),
+    '#type' => 'select',
+    '#options' => array(
+      'Yes' => t('Include only workers with a dispatchable work status'),
+      'No' => t('Include all workers, even with non-dispatchable work status')
+    ),
+  );
+
+  $member_status_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name', TRUE);
+  $form['member_status_tid'] = array(
+    '#title' => t('Restrict to Member Status'),
+    '#type' => 'select',
+    '#options' => $member_status_options,
+  );
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Generate',
@@ -30,26 +46,36 @@ function sirius_dispatch_report_notification_preferences_pks(&$form_state) {
 }
 
 function sirius_dispatch_report_notification_preferences_batch($medium, $values, $report_id, $report_action, &$context) {
-  // Get the "active" work statuses
-  $all_ws_terms = sirius_taxonomy_load('sirius_work_status', 'tid', 'full');
-  $active_ws_tids = array();
-  foreach ($all_ws_terms as $tid => $term) {
-    if ($term->field_sirius_dispatch_available['und'][0]['value'] == 'Yes') {
-      $active_ws_tids[] = $tid;
-    }
-  }
-
+  $params = array();
   $sql = "select field_sirius_dispatch_medium_value, field_data_field_sirius_dispatch_medium.delta, count(*) as c ";
   $sql .= "from field_data_field_sirius_dispatch_medium ";
-  $sql .= "join field_data_field_sirius_work_status ";
-  $sql .= "  on field_data_field_sirius_work_status.entity_type = 'node' ";
-  $sql .= "  and field_data_field_sirius_work_status.entity_id = field_data_field_sirius_dispatch_medium.entity_id ";
-  $sql .= "  and field_data_field_sirius_work_status.field_sirius_work_status_tid in (:active_ws_tids) ";
+  if ($values['dispatchable_only'] == 'Yes') {
+    // Get the "active" work statuses
+    $all_ws_terms = sirius_taxonomy_load('sirius_work_status', 'tid', 'full');
+    $active_ws_tids = array();
+    foreach ($all_ws_terms as $tid => $term) {
+      if ($term->field_sirius_dispatch_available['und'][0]['value'] == 'Yes') {
+        $active_ws_tids[] = $tid;
+      }
+    }
+    $sql .= "join field_data_field_sirius_work_status ";
+    $sql .= "  on field_data_field_sirius_work_status.entity_type = 'node' ";
+    $sql .= "  and field_data_field_sirius_work_status.entity_id = field_data_field_sirius_dispatch_medium.entity_id ";
+    $sql .= "  and field_data_field_sirius_work_status.field_sirius_work_status_tid in (:active_ws_tids) ";
+    $params[':active_ws_tids'] = $active_ws_tids;
+  }
+  if ($values['member_status_tid']) {
+    $sql .= "join field_data_field_sirius_member_status ";
+    $sql .= "  on field_data_field_sirius_member_status.entity_type = 'node' ";
+    $sql .= "  and field_data_field_sirius_member_status.entity_id = field_data_field_sirius_dispatch_medium.entity_id ";
+    $sql .= "  and field_data_field_sirius_member_status.field_sirius_member_status_tid = :member_status_tid ";
+    $params[':member_status_tid'] = $values['member_status_tid'];
+  }
   $sql .= "where field_data_field_sirius_dispatch_medium.entity_type = 'node' ";
   $sql .= "and field_data_field_sirius_dispatch_medium.bundle = 'sirius_worker' ";
   $sql .= "group by field_sirius_dispatch_medium_value, field_data_field_sirius_dispatch_medium.delta ";
   $sql .= "order by field_sirius_dispatch_medium_value, field_data_field_sirius_dispatch_medium.delta ";
-  $stmt = db_query($sql, array(':active_ws_tids' => $active_ws_tids));
+  $stmt = db_query($sql, $params);
 
   $data = array();
   while ($hr = $stmt->fetchAssoc()) {
