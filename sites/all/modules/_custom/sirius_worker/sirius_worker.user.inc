@@ -119,7 +119,9 @@ function sirius_worker_usersync($worker_nid) {
 		$new_rids[$rid] = TRUE;
 	}
 
+	$need_save = FALSE;
 	if (!$worker_user) {
+		$need_save = TRUE;
 		$is_new = TRUE;
 		$worker_user = new stdClass;
 		$worker_user->is_new = TRUE;
@@ -129,11 +131,31 @@ function sirius_worker_usersync($worker_nid) {
 		$worker_user->field_sirius_worker['und'][0]['target_id'] = $worker_nid;
 	} 
 
-	$worker_user->name = "$id";
-	$worker_user->pass = user_hash_password($aat);
-	$worker_user->mail = $email;
-	$worker_user->roles = $new_rids;
+	if ($worker_user->name != $id) {
+		$worker_user->name = "$id";
+		$need_save = TRUE;
+	}
 
+	if (!user_check_password($aat, $worker_user)) {
+		$aat_hashed = user_hash_password($aat);
+		$worker_user->pass = $aat_hashed;
+		$need_save = TRUE;
+	}
+
+	if ($worker_user->mail != $email) {
+		$worker_user->mail = $email;
+		$need_save = TRUE;
+	}
+
+	if (array_diff(array_keys($worker_user->roles), array_keys($new_rids)) || 
+			array_diff(array_keys($new_rids), array_keys($worker_user->roles))) {
+		$worker_user->roles = $new_rids;
+		$need_save = TRUE;
+	}
+
+	if (!$need_save) {
+		return array('success' => TRUE, 'msg' => "User is unchanged.");
+	}
 	drupal_save_session(FALSE);
 	user_save($worker_user);
 	drupal_save_session(TRUE);
