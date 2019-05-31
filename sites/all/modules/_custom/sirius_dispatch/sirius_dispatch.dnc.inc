@@ -78,16 +78,6 @@ function sirius_dispatch_dnc_set($worker_node, $employer_node, $tf, $reason, $at
 		}
 
 		/*
-		sirius_email_send(
-			array(
-				'to' => $worker_node->field_sirius_email['und'][0]['value'],
-				'subject' => $subject,
-				'body' => $body,
-				'handler_nids' => array($worker_node->nid)
-			)
-		);
-		*/
-
 		sirius_worker_notify(
 			$worker_node, 
 			array(
@@ -96,7 +86,7 @@ function sirius_dispatch_dnc_set($worker_node, $employer_node, $tf, $reason, $at
 				'sms' => $sms
 			)
 		);
-
+		*/
 
 		node_save($worker_node);
 	}
