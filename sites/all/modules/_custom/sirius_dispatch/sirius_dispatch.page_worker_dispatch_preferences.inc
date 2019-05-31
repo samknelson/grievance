@@ -41,7 +41,7 @@ function sirius_node_tab_worker_dispatch_preferences_form($form, &$form_state, $
 	unset($medium_options['voice']);
 	unset($medium_options['voice_alt']);
 	$form['medium_2'] = array(
-		'#title' => t('Send other notifications (skill expirations, termination notifications, do-not-call statuses) by:'),
+		'#title' => t('Send other notifications (skill expirations, termination notifications, etc.) by:'),
 		'#type' => 'select',
 		'#options' => $medium_options,
 		'#default_value' => $worker_node->field_sirius_dispatch_medium['und'][2]['value'],
