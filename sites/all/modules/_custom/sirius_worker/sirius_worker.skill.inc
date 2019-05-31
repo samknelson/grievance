@@ -218,10 +218,6 @@ function sirius_worker_skills_cron($force = FALSE) {
 	watchdog('sirius_worker_skills', "Scanned for expired skills; removed $skill_count skills from $worker_count workers. Sent $notification_count notifications of upcoming skill expiration.");
 }
 
-
-
-
-
 /**
  * @todo: There is some ugly code here. A bunch of functions called "sirius_worker_skill_set" as written, before I 
  *        refactored the worker's skill page. So now there are two functions that are called with slightly
