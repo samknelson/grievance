@@ -76,8 +76,26 @@ function sirius_dispatch_job_recompute_from_dispatch($dispatch_node, $is_delete 
 	}
 }
 
-function sirius_dispatch_job_get_dispatchable_workers_render_form($job_node, $states = NULL) {
-	drupal_add_js(drupal_get_path('module', 'sirius_dispatch') . '/js/sirius_dispatch.worker_filter.js', 'file');
+function sirius_dispatch_job_workerform_ajax($form, &$form_state) {
+	return $form['fieldset_workers']['ajax'];
+}
+
+function sirius_dispatch_job_workerform($form, &$form_state, $states = NULL) {
+	$job_node = $form_state['job_node'];
+
+	$member_status_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+	$member_status_abbrv = array();
+	foreach ($member_status_terms as $tid => $term) {
+  	if ($term->field_sirius_name_short['und'][0]['value']) {
+  		$term_name = $term->field_sirius_name_short['und'][0]['value'];
+  	} else {
+  		$term_name = $term->name;
+  	}
+  	$member_status_abbrv[$tid] = $term_name;
+	}
+
+
+	// drupal_add_js(drupal_get_path('module', 'sirius_dispatch') . '/js/sirius_dispatch.worker_filter.js', 'file');
 	$form['fieldset_workers']  = array(
 		'#type' => 'fieldset',
 		'#title' => 'Requested Workers',
@@ -87,45 +105,129 @@ function sirius_dispatch_job_get_dispatchable_workers_render_form($job_node, $st
 	// Filter ID
 	$form['fieldset_workers']['worker_id'] = array(
 		'#type' => 'textfield',
-		'#title' => 'Filter by member name or ID',
+		'#title' => 'Filter by member name or ID. Enter * to see all dispatchable workers.',
 		'#size' => 20,
 		'#states' => $states,
-		'#attributes' => array('class' => array('sirius-worker-filter')),
+		'#prefix' => '<div class="container-inline">',
 	);
 
-	$workers = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name');
-	$member_status_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+	$form['fieldset_workers']['go'] = array(
+		'#type' => 'button',
+		'#value' => 'Filter',
+    '#ajax' => array(
+      'callback' => 'sirius_dispatch_job_workerform_ajax',
+      'wrapper' => 'workers_filtered',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+    // '#limit_validation_errors' => array(),
+		'#suffix' => '</div>',
+	);
+
+	//
+	// Which workers should we show? It's complicated, because we want to show some that are not dispatchable
+	// 
+
+	// We're searching for this worker
+	$search_worker_id = $form_state['values']['worker_id'];
+
+	// We've selected these workers
+	$selected_workers = array();
+	if ($form_state['values']['workers']) {
+		foreach ($form_state['values']['workers'] as $nid => $value) { 
+			if ($value) { 
+				$selected_workers[$nid] = TRUE;
+			}
+		}
+	}
+
+	// Find any dispatchable workers
+	$dispatchable_workers = array();
+	if ($search_worker_id || $selected_workers) { 
+		$dispatchable_workers = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name');
+	}
+
+	// Start with any dispatchable workers who are already checked, and who match on name or ID
+	$workers = array();
+	$found_id = FALSE;
+	foreach ($dispatchable_workers as $nid => $worker) {
+		$is_good = FALSE; 
+		if ($selected_workers[$nid]) { $is_good = TRUE; }
+		if ($worker['id'] == $search_worker_id) { $is_good = TRUE; $found_id = TRUE; }
+		if ($search_worker_id == '*') { $is_good = TRUE; }
+		if (stripos($worker['family'], $search_worker_id) !== FALSE) { $is_good = TRUE; }
+		if (stripos($worker['given'], $search_worker_id) !== FALSE) { $is_good = TRUE; }
+		if ($is_good) { $workers[$nid] = $worker; }
+	}
+
+	// Next, if we're searching by ID, and if the worker is non-dispatchable, add them with an explanation.
+	$non_dispatchable_workers = array();
+	foreach ($selected_workers as $nid => $ignore) {
+		if (!$workers[$nid]) {
+			$non_dispatchable_workers[$nid] = TRUE;
+		}
+	}
+	if ($search_worker_id > 0 && !$found_id) {
+		$nid = sirius_find_nid_by_id($search_worker_id, 'sirius_worker');
+		if ($nid) { $non_dispatchable_workers[$nid] = TRUE; }
+	}
+	foreach ($non_dispatchable_workers as $nid => $ignore) {
+		$sql = "select * from field_data_field_sirius_id, field_data_field_sirius_name ";
+		$sql .= "where field_data_field_sirius_id.entity_id = :nid ";
+		$sql .= "and field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.bundle = 'sirius_worker' ";
+		$sql .= "and field_data_field_sirius_name.entity_type = 'node' and field_data_field_sirius_name.bundle = 'sirius_worker' ";
+		$sql .= "and field_data_field_sirius_id.entity_id = field_data_field_sirius_name.entity_id ";
+		$sql .= "order by field_data_field_sirius_id.entity_id desc limit 1 ";
+		$stmt = db_query($sql, array(':nid' => $nid));
+		$hr = $stmt->fetchAssoc();
+		if ($hr['entity_id']) {
+			$workers[$nid] = array();
+			$workers[$nid]['id'] = $hr['field_sirius_id_value'];
+			$workers[$nid]['family'] = $hr['field_sirius_name_family'];
+			$workers[$nid]['given'] = $hr['field_sirius_name_given'];
+			$result = sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $nid);
+			if (!$result['success']) {
+				$workers[$nid]['msg'] = $result['msg'];	
+			}
+			
+		}
+	}
+
   $worker_options = array();
   foreach ($workers as $worker_nid => $worker) {
   	$tid = $worker['member_status_tid'];
-  	$term = $member_status_terms[$tid];
-  	if ($term->field_sirius_name_short['und'][0]['value']) {
-  		$term_name = $term->field_sirius_name_short['und'][0]['value'];
-  	} else {
-  		$term_name = $term->name;
-  	}
-
-  	$worker_options[$worker_nid] = $worker['family'] . ', ' . $worker['given'] . ' [' . $term_name . ']';
-  	$worker_options[$worker_nid] .= ' <span class="sirius_invisible sirius_worker_id">' . $worker['id'] . '</span>';
+  	$worker_options[$worker_nid] = $worker['family'] . ', ' . $worker['given'];
+  	if ($tid) { $worker_options[$worker_nid] .= ' [' . $member_status_abbrv[$tid] . ']'; }
+  	if ($worker['msg']) { $worker_options[$worker_nid] .= '<br><span class="msg">' . $worker['msg'] . '</span>'; }
   }
 
-	$worker_ajax_id = 'sirius_dispatch_page_job_create_workers';
+  $form['fieldset_workers']['ajax'] = array(
+  	'#type' => 'fieldset',
+  	'#prefix' => '<div id="workers_filtered">',
+  	'#suffix' => '</div>',
+  );
+
+  /*
+	$form['fieldset_workers']['ajax']['debug'] = array(
+		'#type' => 'markup',
+		'#markup' => 'NONCE: ' . rand(0, 10000) . ' / JOB: ' . $job_node->title . ' / ' . ' count: ' . count($dispatchable_workers) . ' / DEBUG: ' . $debug,
+	);
+	*/
+
   if ($worker_options) {
-		$form['fieldset_workers']['workers'] = array(
+		$form['fieldset_workers']['ajax']['workers'] = array(
 			'#type' => 'checkboxes',
 			'#options' => $worker_options,
 			'#title' => 'Workers',
-			'#prefix' => "<div id=\"$worker_ajax_id\"><div class=\"checkboxes-inline sirius-worker-filter-target\">",
+			'#prefix' => "<div class=\"checkboxes-inline\">",
 			'#suffix' => '</div><div style="clear: left;">&nbsp;</div></div>',
 			'#states' => $states,
 		);
-	} else {
-		$form['fieldset_workers']['workers'] = array(
+	} else if ($search_worker_id || $selected_workers) {
+		$form['fieldset_workers']['ajax']['workers'] = array(
 			'#type' => 'markup',
-			'#markup' => t('No qualified workers match your criteria.'),
+			'#markup' => t('No workers match your criteria.'),
 			'#title' => 'Workers',
-			'#prefix' => "<div id=\"$worker_ajax_id\">",
-			'#suffix' => '</div>',
 		);
 	}
 
