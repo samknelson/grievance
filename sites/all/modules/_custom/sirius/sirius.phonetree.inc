@@ -308,7 +308,7 @@ function sirius_phonetree_dispatch_list($call_sid, $context) {
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_dispatch');
-  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('requested', 'notified', 'notification failed', 'expired'), 'in');
+  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('notified', 'notification failed', 'expired'), 'in');
   $query->fieldCondition('field_sirius_worker', 'target_id', $worker_node->nid);
   $query->propertyCondition('created', time()-(60*60*24*10), '>=');
   $query->propertyOrderBy('created');

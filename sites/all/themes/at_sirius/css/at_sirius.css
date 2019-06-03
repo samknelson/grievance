@@ -3720,6 +3720,11 @@ div.node-sirius-dispatch.node-teaser {
   width: 250px;
 }
 
+.checkboxes-inline .msg {
+   font-size: 85%;
+   color: #333333;
+}
+
 
 .sirius_invisible { display: none; }
 
