@@ -514,13 +514,12 @@ function sirius_dispatch_page_job_create_workers($form, $form_state) {
 function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	// Don't validate on ajax. This is kludgey, but limit_validation_errors() didn't work for me because it suppressed the values I needed.
 	if ($form_state['triggering_element']['#value'] == 'Filter') { return; }
+
 	// Report date must be in the future
-	if (is_string($form_state['values']['datetime'])) {
-		$report_ts = strtotime($form_state['values']['datetime']);
-		if ($report_ts < time() + 60*60*1) {
-	  	form_set_error('datetime', 'Report date must be at least one hour in the future.');
-	  }
-	}
+	$report_ts = strtotime($form_state['values']['datetime']);
+	if ($report_ts < time() + 60*60*1) {
+  	form_set_error('datetime', 'Report date must be at least one hour in the future.');
+  }
 
 	for ($i=0; $i<10; ++$i) {
 		if ($form_state['values']["email_$i"] && !sirius_email_validate($form_state['values']["email_$i"])) {
@@ -561,7 +560,7 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 
 	// These should be simple required fields, but required fields interfere with ajax callbacks, dammit.
 	if (!$form_state['values']['confirm']) { form_set_error('confirm', t('Please check the confirm box.')); }
-	if (! ($form_state['values']['count'] > 0)) { form_set_error('count', t('Please enter a nonzero number of workers.')); }
+	// if (! ($form_state['values']['count'] > 0)) { form_set_error('count', t('Please enter a nonzero number of workers.')); }
 	if (!$form_state['values']['facility']) { form_set_error('facility', t('Please select a facility.')); }
 }
 
