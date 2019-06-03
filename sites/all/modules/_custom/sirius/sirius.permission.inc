@@ -58,5 +58,6 @@ function sirius_node_access($node, $op, $account) {
   if ($node->type == 'sirius_news') { return sirius_node_access_news($node, $op, $account); }
   if ($node->type == 'sirius_feed') { return sirius_node_access_feed($node, $op, $account); }
   if ($node->type == 'sirius_letterhead') { return sirius_node_access_letterhead($node, $op, $account); }
+  if ($node->type == 'sirius_contact') { return sirius_node_access_contact($node, $op, $account); }
   return NODE_ACCESS_IGNORE;
 }
