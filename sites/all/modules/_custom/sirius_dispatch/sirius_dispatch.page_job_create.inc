@@ -138,7 +138,6 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	$form_state['job_type_tid'] = $job_type_tid;
 	$industry_tid = $employer_node->field_sirius_industry['und'][0]['tid'];
 	$industry_term = taxonomy_term_load($industry_tid);
-	$worker_ajax_id = 'sirius_dispatch_page_job_create_workers';
 
 	$job_type_term = taxonomy_term_load($job_type_tid);
 	$form['employer_markup'] = array('#markup' => '<div class="sirius_form_intro">Creating a job for <strong>' . 
@@ -156,8 +155,8 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		'#options' => $skill_options,
 		'#title' => 'Skill',
     '#ajax' => array(
-      'callback' => $worker_ajax_id,
-      'wrapper' => $worker_ajax_id,
+      'callback' => 'sirius_dispatch_job_workerform_ajax',
+      'wrapper' => 'workers_filtered',
       'method' => 'replace',
       'effect' => 'fade',
     ),
@@ -175,8 +174,8 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 			'#options' => $department_options,
 			'#title' => 'Department',
 	    '#ajax' => array(
-	      'callback' => $worker_ajax_id,
-	      'wrapper' => $worker_ajax_id,
+	      'callback' => 'sirius_dispatch_job_workerform_ajax',
+	      'wrapper' => 'workers_filtered',
 	      'method' => 'replace',
 	      'effect' => 'fade',
 	    ),
@@ -202,11 +201,10 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 			'#type' => 'checkboxes',
 			'#title' => 'Member Status',
 			'#options' => $open_member_status_options,
-			'#required' => TRUE, 
 			'#default_value' => array_keys($open_member_status_options),
 	    '#ajax' => array(
-	      'callback' => $worker_ajax_id,
-	      'wrapper' => $worker_ajax_id,
+	      'callback' => 'sirius_dispatch_job_workerform_ajax',
+	      'wrapper' => 'workers_filtered',
 	      'method' => 'replace',
 	      'effect' => 'fade',
 	    ),
@@ -232,8 +230,8 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 			'#default_value' => $worker_node->field_sirius_dispatch_eba['und'][0]['value'],
 			'#prefix' => '<div class="sirius_form_intro">' . t('If this is a job which will take place within the next seven days, you can also dispatch workers who are currently employed, but have indicated that they are available on specific days.') . '</div>',
 	    '#ajax' => array(
-	      'callback' => $worker_ajax_id,
-	      'wrapper' => $worker_ajax_id,
+	      'callback' => 'sirius_dispatch_job_workerform_ajax',
+	      'wrapper' => 'workers_filtered',
 	      'method' => 'replace',
 	      'effect' => 'fade',
 	    ),
@@ -249,10 +247,10 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 				)
 			),
 	    '#ajax' => array(
-		    'callback' => $worker_ajax_id,
-		    'wrapper' => $worker_ajax_id,
-		    'method' => 'replace',
-		    'effect' => 'fade',
+	      'callback' => 'sirius_dispatch_job_workerform_ajax',
+	      'wrapper' => 'workers_filtered',
+	      'method' => 'replace',
+	      'effect' => 'fade',
 	  	),
 		);
 	}
@@ -301,7 +299,6 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		'#type' => 'textfield',
 		'#title' => t('Call Number'),
 		'#size' => 5,
-		// '#required' => TRUE,
 	);
 
 	// Call Number
@@ -310,7 +307,6 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 			'#type' => 'textfield',
 			'#title' => t('Workers Required'),
 			'#size' => 5,
-			'#required' => TRUE,
 		);
 	}
 
@@ -322,7 +318,6 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 			'#type' => 'select',
 			'#title' => t('Group or Show'),
 			'#options' => $group_options,
-			'#required' => TRUE,
 		);
 	}
 
@@ -333,7 +328,6 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		'#type' => 'select',
 		'#options' => $facility_options,
 		'#title' => t('Location'),
-		'#required' => TRUE,
     '#ajax' => array(
       'callback' => $hall_ajax_id,
       'wrapper' => $hall_ajax_id,
@@ -429,42 +423,8 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		'#description' => t('Enter any parking instructions for workers.'),
 	);
 
-	$form['explain'] = array(
-		'#type' => 'fieldset',
-		'#title' => t('Check a Worker'),
-		'#collapsible' => TRUE,
-		'#collapsed' => TRUE,
-		'#description' => t('Use this utility to determine if a <em>specific</em> worker may be dispatched to this job. Enter the worker\'s dispatch ID in the field below.'),
-	);
-
-	$form['explain']['wtf'] = array(
-		'#title' => t('Dispatch ID'),
-		'#type' => 'textfield',
-		'#size' => 10,
-    '#ajax' => array(
-      'callback' => 'sirius_dispatch_page_job_create_ajax_explain',
-      'wrapper' => 'sirius_dispatch_page_job_create_ajax_explain',
-      'method' => 'replace',
-      'effect' => 'fade',
-    ),
-	);
-
 	$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
-	if ($form_state['values']['wtf']) {
-		$explain_result = sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_node, $form_state['values']['wtf']);
-		$explain_result_html = "Worker id #" . $form_state['values']['wtf'] . ': <strong>';
-		if (!$explain_result['success']) {
-			$explain_result_html .= 'The worker cannot be dispatched to this job: ';
-		}
-		$explain_result_html .= $explain_result['msg'] . '</strong>';
-	}
-
-	$form['explain']['explain_result'] = array(
-		'#type' => 'markup',
-		'#markup' => $explain_result_html,
-		'#prefix' => '<div id="sirius_dispatch_page_job_create_ajax_explain">',
-		'#suffix' => '</div>',
-	);
+	$form_state['job_node'] = $job_node;
 
 	$workers_visible = FALSE;
 	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|CBN') || 
@@ -473,7 +433,7 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	}
 
 	if ($workers_visible) {
-		$form += sirius_dispatch_job_get_dispatchable_workers_render_form($job_node, $workers_visible);
+		$form += sirius_dispatch_job_workerform($form, $form_state);
 	}
 
 	$default_job_node = $last_job_node;
@@ -532,7 +492,6 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 	$form['confirm'] = array(
 		'#type' => 'checkbox',
-		'#required' => TRUE,
 		'#title' => t('I have checked the form above, and all the information is correct. Please send worker notifications about this new job request.'),
 	);
 
@@ -544,10 +503,6 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	return $form;
 }
 
-function sirius_dispatch_page_job_create_ajax_explain($form, &$form_state) {
-	return $form['explain']['explain_result'];
-}
-
 function sirius_dispatch_page_job_create_ajax_halls($form, $form_state) {
   return $form['hall'];
 }
@@ -557,6 +512,8 @@ function sirius_dispatch_page_job_create_workers($form, $form_state) {
 }
 
 function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
+	// Don't validate on ajax. This is kludgey, but limit_validation_errors() didn't work for me because it suppressed the values I needed.
+	if ($form_state['triggering_element']['#value'] == 'Filter') { return; }
 	// Report date must be in the future
 	if (is_string($form_state['values']['datetime'])) {
 		$report_ts = strtotime($form_state['values']['datetime']);
@@ -566,7 +523,7 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	}
 
 	for ($i=0; $i<10; ++$i) {
-		if ($form_state['values']["email_$i"] && 	!sirius_email_validate($form_state['values']["email_$i"])) {
+		if ($form_state['values']["email_$i"] && !sirius_email_validate($form_state['values']["email_$i"])) {
 			form_set_error("email_$i", 'Please enter a valid email addresss.');
 		}
 	}
@@ -595,12 +552,17 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 			if ($worker_nid) { ++$selected; }
 		}
 	}
-	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|CBN') && $count && $count != $selected) {
-		form_set_error('worker_id', t('For a call by name, please select exactly @count workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
+	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|CBN') && $count && $selected < $count) {
+		form_set_error('worker_id', t('For a call by name, please select at least @count workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
 	}
-	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|FAN') && $count && ($selected < 1 || $selected > $count)) {
-		form_set_error('worker_id', t('Please select between 1 and @count workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
+	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|FAN') && $count && $selected < 1) {
+		form_set_error('worker_id', t('For a call by name / fill as needed, please select at least 1 workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
 	}
+
+	// These should be simple required fields, but required fields interfere with ajax callbacks, dammit.
+	if (!$form_state['values']['confirm']) { form_set_error('confirm', t('Please check the confirm box.')); }
+	if (! ($form_state['values']['count'] > 0)) { form_set_error('count', t('Please enter a nonzero number of workers.')); }
+	if (!$form_state['values']['facility']) { form_set_error('facility', t('Please select a facility.')); }
 }
 
 function sirius_dispatch_page_job_create_form_submit($form, &$form_state) {

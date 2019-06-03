@@ -126,13 +126,25 @@ function sirius_dispatch_run_notify($job_node) {
   }
 
   $nids = array_keys($stmt['node']);
+  $attempted = 0;
   $count = 0;
+  $failed = 0;
   foreach ($nids as $nid) {
   	$dispatch_node = node_load($nid);
-  	sirius_dispatch_notify($dispatch_node);
-  	++$count;
+  	$result = sirius_dispatch_notify($dispatch_node);
+
+    ++$attempted;
+    if ($result['success']) {
+      ++$count;
+    } else {
+      ++$failed;
+      if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+        sirius_log('job:run', 'notify', 'Notification failed: ' . $result['msg'], '', '', array($job_node->nid));
+      }
+    }
   }
-	$msg = "Sent $count notifications.";
+	$msg = "Attempted $attempted notifications. Sent $count, with $failed failures.";
+  if ($failed) 
   if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
   	sirius_log('job:run', 'notify', $msg, '', '', array($job_node->nid));
   }

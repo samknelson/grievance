@@ -91,6 +91,7 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 			'#title' => 'Action',
 			'#required' => TRUE,
 			'#options' => $options,
+			// '#default_value' => 'create_dispatches_manual',
 		);
 
 		$form['wtf'] = array(
@@ -182,7 +183,7 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 			'#states' => $workers_visible,
 		);
 
-		$form += sirius_dispatch_job_get_dispatchable_workers_render_form($job_node, $workers_visible);
+		$form += sirius_dispatch_job_workerform($form, $form_state, $workers_visible);
 
 		$form['count'] = array(
 			'#title' => t('Number of Workers'),
