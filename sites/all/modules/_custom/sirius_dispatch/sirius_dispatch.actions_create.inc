@@ -4,11 +4,24 @@ function sirius_dispatch_actions_create_possible($job_node, $worker_nid) {
 	// @todo verify that the job isn't full
 	
 	// This worker must be dispatchable for this job
+	/*
 	$check = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name', 1, array('worker_nid' => $worker_nid));
 	if (!$check[$worker_nid]) {
 		$worker_node = node_load($worker_nid);
 		return array('success' => FALSE, 'msg' => "The worker " . $worker_node->title . " cannot be dispatched on this job.");
 	}
+	*/
+
+	// Can't have multiple dispatches
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_dispatch');
+  $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_node->nid);
+  $query->fieldCondition('field_sirius_worker', 'target_id', $worker_nid);
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+  	return array('success' => FALSE, 'msg' => 'There is already a dispatch for this worker and this job.');
+  }
 
 	return array('success' => TRUE);
 }
