@@ -36,8 +36,8 @@ function sirius_node_tab_dispatch_worker_view_access_details($dispatch_node) {
 	$worker_nid = $user_full->field_sirius_worker['und'][0]['target_id'];
 	if (!$worker_nid) { return FALSE; }
 
-	// The worker must be associated with this dispatch.
-	if ($worker_nid == $dispatch_node->field_sirius_worker['und'][0]['target_id']) { return TRUE; }
+	// The worker must be associated with this dispatch, and it must have a status besides "requested"
+	if ($worker_nid == $dispatch_node->field_sirius_worker['und'][0]['target_id'] && $dispatch_node->field_sirius_dispatch_status['und'][0]['value'] != 'requested') { return TRUE; }
 
 	return FALSE;
 }
@@ -177,7 +177,14 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['job_employer_section_close'] = array('#markup' => '</div>');
 
 	$form['job_location_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_job_location_section">');
-	$form['job_location_section_a'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_datetime'));
+
+	$job_tags = sirius_fieldvals($job_node, 'field_sirius_dispatch_job_tags', 'tid');
+	if (in_array(sirius_get_special_tid('sirius_dispatch_job_tags|ASAP'), $job_tags)) {
+		$stupid_html = '<section class="field field-name-datetime field-label-inline clearfix view-mode-full"><h2 class="field-label">Report Date</h2><div class="field-items"><div class="field-item">As Soon As Possible</div></div></section>';
+		$form['job_location_section_a'] = array('#markup' => $stupid_html);
+	} else {
+		$form['job_location_section_a'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_datetime'));
+	}
 	if ($is_accepted) {
 		$form['job_location_section_b'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_dispatch_facility'));
 		$form['job_location_section_c'] = array('#markup' => sirius_dispatch_view_render_field($facility_node, 'field_sirius_address'));
