@@ -85,17 +85,21 @@ function sirius_dispatch_worker_recompute_from_dispatch($dispatch_node, $is_dele
 		} else {
 			unset($worker_node->field_grievance_shop['und']);
 
-			$asi = $worker_node->field_sirius_dispatch_asi['und'][0]['value'];
-			if ($asi == 'Yes') {
-				$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
-			} else {
-				$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+			if ($worker_node->field_sirius_worker_dispstatus['und'][0]['tid'] == sirius_get_special_tid('sirius_worker_dispatch_status|employed_not_available')) {
+				$asi = $worker_node->field_sirius_dispatch_asi['und'][0]['value'];
+				if ($asi == 'Yes') {
+					$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
+				} else {
+					$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+				}
 			}
 			sirius_log('worker:employer', 'clear', $worker_node->title . "'s employer has been cleared" . $new_employer_node->title, '', '', array($worker_node->nid));
 		}
 
 		node_save($worker_node);
-		sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid, 1);
+		if ($dispstatus_tid) {
+			sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid, 1);
+		}
 	}
 
 	// If 
