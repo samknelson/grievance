@@ -26,6 +26,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.loopback.in
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.pdf.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.representatives.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.taxonomy.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
@@ -37,6 +38,19 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_voice_
 
 function sirius_cron() {
   sirius_auditlog();
+}
+
+/**
+ * Implements hook_entity_presave()
+ */
+
+function sirius_entity_presave($entity, $type) {
+  if ($type == 'node') {
+    if ($entity->type == 'sirius_worker') { sirius_contact_sync_from_worker($entity); }
+  }
+  if ($type == 'user') {
+    sirius_contact_sync_from_user($entity);
+  }
 }
 
 /**
@@ -359,4 +373,49 @@ function sirius_fakerender_field($title, $values) {
   $html .= '</div>';
   $html .= '</section>';
   return $html;
+}
+
+function sirius_field_changed($node1, $node2, $field_name) {
+  if ($node1->{$field_name}) {
+    foreach (array_keys($node1->{$field_name}) as $lang) {
+      if ($node1->{$field_name}[$lang]) {
+        foreach (array_keys($node1->{$field_name}[$lang]) as $delta) {
+          if ($node1->{$field_name}[$lang][$delta]) {
+            foreach ($node1->{$field_name}[$lang][$delta] as $col => $val) {
+              if ($col == 'safe_value') { continue; }
+              if ($val != $node2->{$field_name}[$lang][$delta][$col]) { return TRUE; }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if ($node2->{$field_name}) {
+    foreach (array_keys($node2->{$field_name}) as $lang) {
+      if ($node2->{$field_name}[$lang]) {
+        foreach (array_keys($node2->{$field_name}[$lang]) as $delta) {
+          if ($node2->{$field_name}[$lang][$delta]) {
+            foreach ($node2->{$field_name}[$lang][$delta] as $col => $val) {
+              if ($col == 'safe_value') { continue; }
+              if ($val != $node1->{$field_name}[$lang][$delta][$col]) { return TRUE; }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+
+function sirius_find_nid_by_id($sirius_id, $bundle) {
+  $sql = "select entity_id from field_data_field_sirius_id ";
+  $sql .= "where entity_type = 'node' ";
+  $sql .= "and bundle = :bundle ";
+  $sql .= "and field_sirius_id_value = :sirius_id ";
+  $stmt = db_query($sql, array(':bundle' => $bundle, ':sirius_id' => $sirius_id));
+  $hr = $stmt->fetchAssoc();
+  return $hr['entity_id'];
 }
