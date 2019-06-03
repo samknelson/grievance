@@ -131,7 +131,7 @@ function sirius_email_send($params) {
     json_encode($message)
   );
 
-	return array('success' => TRUE, 'msg' => 'Email sent.');
+	return array('success' => TRUE, 'msg' => "Email sent to " . $params['to']);
 }
 
 /**
