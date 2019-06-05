@@ -3,6 +3,14 @@
 function sirius_worker_user_admin() {
   $form = array();
 
+  $form['sirius_worker_usersync_enable'] = array(
+    '#type' => 'select',
+    '#title' => t('Enable Worker / User Sync?'),
+    '#default_value' => variable_get('sirius_worker_usersync_enable', ''),
+    '#options' => array('No' => 'No', 'Yes' => 'Yes'),
+    '#description' => t('Should Sirius Workers by associated with Drupal Users?'),
+  );
+
   $form['sirius_worker_dummy_domain'] = array(
     '#type' => 'textfield',
     '#title' => t('Dummy Domain'),
@@ -20,6 +28,10 @@ function sirius_worker_user_admin() {
   );
 
   return system_settings_form($form);
+}
+
+function sirius_worker_usersync_enabled() {
+	return variable_get('sirius_worker_usersync_enable', '') == 'Yes';
 }
 
 function sirius_worker_get_uid($worker_nid) {
@@ -44,6 +56,9 @@ function sirius_worker_get($uid = NULL) {
 }
 
 function sirius_worker_usersync($worker_nid) {
+
+	if (!sirius_worker_usersync_enabled()) { return; }
+
 	$worker_node = node_load($worker_nid);
 	if (!$worker_node) {
 		return array('success' => FALSE, 'msg' => "Worker #$worker_nid not found.");
