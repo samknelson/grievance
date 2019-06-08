@@ -10,7 +10,7 @@ img.banner-logo {
 	font-family: roboto,arial, helvetica, san-serif;
 	font-weight: bold;
 	font-size:24px;
-    color: #000000;
+    color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 2px;
     margin-bottom: 32px;
@@ -48,6 +48,8 @@ img.banner-logo {
 #page-title .title-prefix {
 	font-weight: 400;
 }
+
+
 #page-footer {
 	background-color: #ffffff;
 	padding: 14px 0;
@@ -116,11 +118,6 @@ div.region-help {
 	text-align: left;
 }
 
-#block-grievance-grievance-quicksearch #autocomplete {
-	left: -210px !important;
-	width: 420px !important;
-}
-
 /* client-specific settings */
 #page-banner {
     /*
@@ -128,65 +125,8 @@ div.region-help {
     background-color: #000000;
     border-bottom: 10px solid #fdb82f;
     border-bottom: 10px solid #ff0000; 
+    */
     background-color: #e89a00;
     border-bottom: 0px solid #1b4784;
-    */
-    background-color: #ffffff;
-    border-bottom: 1px solid #000000;
-    color: #000000;
 }
 
-@media only print {
-	.banner-name-wrapper {
-		font-family: "Times New Roman", Times, serif;
-		font-weight: normal;
-		font-size:28px;
-		color: #000000;
-		letter-spacing: 1px;
-		margin-bottom: 10px;
-		float: none;
-		width: 100%;
-		text-align: center;
-		display: block;
-	}
-	.banner-logo-wrapper {
-		float: none;
-		width: 100%;
-		text-align: center;
-		display: block; 
-	}
-	#page-banner {
-		padding: 32px 0 0 0;
-		height: auto;
-		border-bottom: none;
-	}
-	#page-banner {
-		padding: 22px 0 0 0;
-	}
-	#header h1 {
-	    color: #000000;
-	    font-size: 28px;
-	    font-weight: 300;
-	    margin: 0px;
-	}
-	#header {
-	    border-bottom: 1px dotted #000000;
-	    margin: 24px 0 24px 0;
-	    padding: 0px 0 24px 0;
-	}
-}
-
-@media only screen and (max-width:767px) {
-	#block-grievance-grievance-quicksearch, #block-grievance-grievance-quicksearch-sub {
-	    position: static;
-	    margin-bottom: 24px;
-	}
-}@media only screen and (max-width:579px) {
-  .banner-name-wrapper {
-    font-weight: normal;
-    font-size: 20px;
-    color: #000000;
-    letter-spacing: 1px;
-    margin-bottom: 12px;
-  }
-}
