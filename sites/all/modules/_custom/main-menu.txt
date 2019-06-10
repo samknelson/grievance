@@ -51,6 +51,7 @@ Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
 --Configure {"url":"sirius\/document-retention\/configure","lang":"und","weight":"0"}
 --Log {"url":"sirius\/document-retention\/log","lang":"und","weight":"0"}
 -Document Types {"url":"grievance\/admin\/document_types","lang":"und","weight":"0"}
+--Information Request Sets {"url":"grievances\/irsets","lang":"und","weight":"-50"}
 File a Grievance {"url":"node\/add\/grievance","lang":"und","weight":"-50"}
 My Grievances {"url":"grievances","lang":"und","weight":"-49"}
 -All Grievances {"url":"grievances\/all","lang":"und","weight":"-50"}
