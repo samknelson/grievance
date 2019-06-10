@@ -7354,6 +7354,9 @@ Section',
   $handler->display->display_options['filters']['field_sirius_active_value']['id'] = 'field_sirius_active_value';
   $handler->display->display_options['filters']['field_sirius_active_value']['table'] = 'field_data_field_sirius_active';
   $handler->display->display_options['filters']['field_sirius_active_value']['field'] = 'field_sirius_active_value';
+  $handler->display->display_options['filters']['field_sirius_active_value']['value'] = array(
+    'Yes' => 'Yes',
+  );
   $handler->display->display_options['filters']['field_sirius_active_value']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_active_value']['expose']['operator_id'] = 'field_sirius_active_value_op';
   $handler->display->display_options['filters']['field_sirius_active_value']['expose']['label'] = 'Active?';
