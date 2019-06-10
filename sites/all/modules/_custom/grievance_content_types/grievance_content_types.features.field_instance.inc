@@ -9681,10 +9681,10 @@ function grievance_content_types_field_default_field_instances() {
     ),
     'view' => array(
       'args' => array(),
-      'display_name' => '',
+      'display_name' => 'term_reference_1',
       'match_operator' => 'CONTAINS',
       'size' => '',
-      'view_name' => '',
+      'view_name' => 'grievance_information_request_types',
     ),
     'widget' => array(
       'active' => 1,
