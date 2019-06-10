@@ -52,6 +52,18 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.shops
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.merge.inc";
 
 /**
+ * Implements hook_views_pre_view
+ */
+
+function grievance_views_pre_view(&$view, &$display_id, &$args) {
+  // For the grievance shops entity reference, show only active employers on insert; show all employers on update.
+  if ($view->name == 'grievance_shops' && $display_id == 'entityreference_1') {
+    if (preg_match('/NODE\d+/', $args[0])) { unset($args[0]); }
+    else if (preg_match('/NODE/', $args[0])) { $args[0] = 'Yes'; }
+  }
+}
+
+/**
  * Implement hook_cron() 
  */
 
