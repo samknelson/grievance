@@ -14,6 +14,7 @@ Employers {"url":"grievance\/admin\/shops","lang":"und","weight":"-47"}
 --Add a Company {"url":"node\/add\/grievance-company","lang":"und","weight":"0"}
 -Bulk-Reassign Organizers {"url":"grievance\/admin\/shops\/bulk-reassign","lang":"und","weight":"0"}
 -Chapters {"url":"grievance\/admin\/chapters","lang":"und","weight":"0"}
+-Grievance Reassign {"url":"admin\/grievance\/reassign","lang":"und","weight":"0"}
 Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
 -Grievance Form Settings {"url":"admin\/config\/grievance\/gform","lang":"und","weight":"-46"}
 --Arbitration Form Settings {"url":"admin\/config\/grievance\/arbitrationform","lang":"und","weight":"-50"}
