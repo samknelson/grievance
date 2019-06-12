@@ -334,7 +334,6 @@ function grievance_update_7021() {
   }
 }
 
-
 /**
  * Set all shops with active=NULL to active=Yes
  */
@@ -359,3 +358,26 @@ function grievance_update_7022() {
   return 'Set all shops with active=NULL to active=Yes.';
 }
 
+/**
+ * Set all contract templates with active=NULL to active=Yes
+ */
+
+function grievance_update_7023() {
+  $sql = "select * from node ";
+  $sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
+  $sql .= "where node.type = 'grievance_contract_template' ";
+  $sql .= "and field_sirius_active_value is null ";
+  $sql .= "order by nid ";
+  $stmt = db_query($sql, array());
+  $nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $nids[] = $hr['nid'];
+  }
+  foreach ($nids as $nid) {
+    $node = node_load($nid);
+    $node->field_sirius_active['und'][0]['value'] = 'Yes';
+    node_save($node);
+    print "Set node $nid to Active.\n";
+  }
+  return 'Set all contract templates with active=NULL to active=Yes.';
+}

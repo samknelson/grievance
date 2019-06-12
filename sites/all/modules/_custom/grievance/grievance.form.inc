@@ -603,5 +603,44 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       $form['#group_children']["grievance_intake_log_${i}"] = 'group_grievance_form';
     }
   }
+
+  //
+  // Add the information request sets
+  //
+
+  if ($form['field_grievance_document_types']['#access']) {
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance_irset');
+    $stmt = $query->execute();
+    if ($stmt['node']) {
+      $weight = $form['field_grievance_document_types']['#weight'] - 0.1;
+      $irset_nodes = node_load_multiple(array_keys($stmt['node']));
+      $irset_iroptions = array();
+      foreach ($irset_nodes as $irset_node) {
+        $irset_iroptions[$irset_node->nid] = $irset_node->title;
+      }
+      $form['irsets'] = array(
+        '#type' => 'checkboxes',
+        '#tree' => TRUE,
+        '#title' => "Sets",
+        '#options' => $irset_iroptions,
+        '#weight' => $weight
+      );
+      $form['#groups']['group_inforeq']->children[] = "irsets";
+      $form['#group_children']["irsets"] = 'group_inforeq';
+    }
+
+    $settings_for_js = array();
+
+    foreach ($irset_nodes as $irset_nid => $irset_node) {
+      if ($irset_node->field_grievance_document_types['und'][0]) {
+        foreach ($irset_node->field_grievance_document_types['und'] as $tmp) {
+          $settings_for_js[$irset_nid][] = $tmp['tid'];
+        }
+      }
+    }
+    drupal_add_js(array('grievance_form_irsets' => $settings_for_js), 'setting');
+  }
 }
 
