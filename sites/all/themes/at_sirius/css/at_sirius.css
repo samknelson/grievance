@@ -3239,7 +3239,8 @@ table.grievance-timeline tr.pending {
   display: inline;
 }
 
-.form-item-field-grievance-document-types-und .form-type-checkbox {
+.form-item-field-grievance-document-types-und .form-type-checkbox,
+.form-item-irsets .form-type-checkbox {
   display: inline-block;
   width: 290px;
 }
