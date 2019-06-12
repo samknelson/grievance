@@ -52,7 +52,7 @@ div.messages {
 
 pre, code {
   font-family: Consolas, Monaco, "Courier New", Courier, monospace;
-  background: #fff;
+  /* background: #fff; */
 }
 
 /* Layout */
@@ -3418,8 +3418,10 @@ table.grievance-timeline tr.pending {
 
 .view-grievance-log td,
 .view-grievance-log-all td {
+/*
   padding-top: 6px;
   padding-bottom: 0;
+*/
 }
 
 @media print {
