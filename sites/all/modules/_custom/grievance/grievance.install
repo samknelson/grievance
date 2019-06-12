@@ -371,7 +371,7 @@ function grievance_update_7023() {
   $stmt = db_query($sql, array());
   $nids = array();
   while ($hr = $stmt->fetchAssoc()) {
-    $nid[] = $hr['nid'];
+    $nids[] = $hr['nid'];
   }
   foreach ($nids as $nid) {
     $node = node_load($nid);
