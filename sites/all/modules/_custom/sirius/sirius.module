@@ -21,6 +21,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.specialtid.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sns.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.qr.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.wizard.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letterhead.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.loopback.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.pdf.inc';
@@ -418,4 +419,26 @@ function sirius_find_nid_by_id($sirius_id, $bundle) {
   $stmt = db_query($sql, array(':bundle' => $bundle, ':sirius_id' => $sirius_id));
   $hr = $stmt->fetchAssoc();
   return $hr['entity_id'];
+}
+
+
+
+/**
+ * Implements hook_module_implements_alter
+ * 
+ * WTF am I doing here? 
+ *
+ * There is a module, "admin_menu", which generates a handy menu for developers.
+ * But among other things, it loads every single field instance in every single content type, so as to add those links to the menu.
+ * Which, when the menu is rebuilt, sometimes crashes out the server, or takes several minutes for the page to deliver.
+ * I don't want to hack or patch the module directly. So I'm implementing "module_implements_alter" to remove its implementation of 
+ * the hook which takes forever (which it's implementing on behalf of the field_ui module, very improperly.)
+ *
+ * Better would be to modify the module to not show the damn fields.
+ */
+
+function sirius_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'admin_menu_map') {
+    unset($implementations['field_ui']);
+  }
 }
