@@ -62,6 +62,9 @@ function node_admin_menu_map() {
  * @todo Figure out how to fix the comment entity bundle mappings.
  */
 function field_ui_admin_menu_map() {
+  return array();
+  /*
+  drupal_set_message("In field_ui_admin_menu_map");
   $map = array();
 
   foreach (entity_get_info() as $entity_type => $entity_info) {
@@ -112,6 +115,7 @@ function field_ui_admin_menu_map() {
   }
 
   return $map;
+  */
 }
 
 /**
