@@ -52,7 +52,7 @@ div.messages {
 
 pre, code {
   font-family: Consolas, Monaco, "Courier New", Courier, monospace;
-  background: #fff;
+  /* background: #fff; */
 }
 
 /* Layout */
@@ -3239,15 +3239,14 @@ table.grievance-timeline tr.pending {
   display: inline;
 }
 
-.form-item-field-grievance-document-types-und .form-type-checkbox,
-.form-item-irsets .form-type-checkbox {
+.form-item-field-grievance-document-types-und .form-type-checkbox {
   display: inline-block;
   width: 290px;
 }
 
 
 @media only print {
-  body {
+  body, p, a {
     font-size: 12pt;
     font-family: "Times New Roman", Times, serif;
     color: #000000;
@@ -3274,7 +3273,7 @@ table.grievance-timeline tr.pending {
   }
 
   td {
-    padding: 11px 0 11px 22px !important;
+    padding: 11px 0 11px 22px;
   }
 
   #header {
@@ -3419,8 +3418,10 @@ table.grievance-timeline tr.pending {
 
 .view-grievance-log td,
 .view-grievance-log-all td {
+/*
   padding-top: 6px;
   padding-bottom: 0;
+*/
 }
 
 @media print {
