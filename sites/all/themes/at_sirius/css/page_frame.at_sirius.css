@@ -48,8 +48,6 @@ img.banner-logo {
 #page-title .title-prefix {
 	font-weight: 400;
 }
-
-
 #page-footer {
 	background-color: #ffffff;
 	padding: 14px 0;
@@ -117,6 +115,10 @@ div.region-help {
 	padding: 0;
 	text-align: left;
 }
+#block-grievance-grievance-quicksearch #autocomplete {
+	left: -210px !important;
+	width: 420px !important;
+}
 
 /* client-specific settings */
 #page-banner {
@@ -125,8 +127,114 @@ div.region-help {
     background-color: #000000;
     border-bottom: 10px solid #fdb82f;
     border-bottom: 10px solid #ff0000; 
-    */
     background-color: #e89a00;
     border-bottom: 0px solid #1b4784;
+    */
+    background-color: #ffffff;
+    border-bottom: 1px solid #000000;
+    color: #000000;
+}
+
+@media only print {
+	.banner-name-wrapper {
+		font-size:20px;
+		color: #000000;
+		letter-spacing: 0px;
+		text-transform: none;
+		float: none;
+		width: 100%;
+		text-align: center;
+		display: block;
+	}
+	img.banner-logo:visited,
+	img.banner-logo:active,
+	img.banner-logo {
+	    height: auto;
+	    width: 100px;
+	    margin: 0 auto;
+	    display: block;
+	    border: none;
+	}
+	.banner-wrapper a:visited,
+	.banner-wrapper a:active,
+	.banner-wrapper a {
+	    height: auto;
+	    margin: 0 auto;
+	    display: block;
+	    border: none;
+	}
+	.banner-logo-wrapper {
+		float: none;
+		width: 100%;
+		text-align: center;
+		display: block; 
+	}
+	#page-banner {
+		height: auto;
+		border-bottom: none;
+		padding: 22px 0 0 0;
+	    background-color: #ffffff !important;
+	    border-bottom: none !important;
+	    color: #000000 !important;
+	}
+	#header h1 {
+	    color: #000000;
+	    font-size: 28px;
+	    font-weight: 300;
+	    margin: 0px;
+	}
+	#header {
+	    margin: 24px 0 24px 0;
+	    padding: 0px 0 24px 0;
+	}
+	#toolbar {
+		display: none;
+	}
+	body.toolbar-drawer {
+    	padding-top: 0px !important;
+	}
+	fieldset legend, 
+	fieldset legend a, 
+	fieldset legend a:link, 
+	fieldset legend a:visited {
+	    color: #000000;
+	    font-weight: bold;
+	    text-transform: none;
+	    letter-spacing: 0;
+	    background-color: #ffffff;
+		border-bottom: 1px dotted #000000;
+		border-top: 1px dotted #000000;
+		padding-left: 0;
+	}
+	fieldset {
+		margin: 15px 0;
+		background-color: #ffffff;
+	}
+	.fieldset-wrapper {
+    	padding-left: 0;
+	}
+	.banner-menu-outer-wrapper {
+		display: none;
+	}
+	.view-grievance-log table {
+	    border: none !important;
+	}
+
+}
+
+@media only screen and (max-width:767px) {
+	#block-grievance-grievance-quicksearch, #block-grievance-grievance-quicksearch-sub {
+	    position: static;
+	    margin-bottom: 24px;
+	}
+}
+@media only screen and (max-width:579px) {
+  .banner-name-wrapper {
+		font-weight: normal;
+		font-size: 20px;
+		color: #000000;
+		letter-spacing: 1px;
+		margin-bottom: 12px;
+  }
 }
 
