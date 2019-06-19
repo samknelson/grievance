@@ -259,9 +259,7 @@ function grievance_contract_template_next_number($number) {
     return '';
   }
 
-  dpm($last);
   $last = array($last[0], $last[1]+1);
-  dpm($last);
   return $sequences[$last[0]][$last[1]];
 }
 
