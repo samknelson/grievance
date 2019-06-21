@@ -58,7 +58,7 @@ function sirius_worker_node_postsave($node, $op) {
     $need_save = FALSE;
 
     // Sync the user
-    sirius_worker_usersync($node->nid);
+    $result = sirius_worker_usersync($node->nid);
   }
 }
 
