@@ -629,18 +629,17 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       );
       $form['#groups']['group_inforeq']->children[] = "irsets";
       $form['#group_children']["irsets"] = 'group_inforeq';
-    }
 
-    $settings_for_js = array();
-
-    foreach ($irset_nodes as $irset_nid => $irset_node) {
-      if ($irset_node->field_grievance_document_types['und'][0]) {
-        foreach ($irset_node->field_grievance_document_types['und'] as $tmp) {
-          $settings_for_js[$irset_nid][] = $tmp['tid'];
+      $settings_for_js = array();
+      foreach ($irset_nodes as $irset_nid => $irset_node) {
+        if ($irset_node->field_grievance_document_types['und'][0]) {
+          foreach ($irset_node->field_grievance_document_types['und'] as $tmp) {
+            $settings_for_js[$irset_nid][] = $tmp['tid'];
+          }
         }
       }
+      drupal_add_js(array('grievance_form_irsets' => $settings_for_js), 'setting');
     }
-    drupal_add_js(array('grievance_form_irsets' => $settings_for_js), 'setting');
   }
 }
 
