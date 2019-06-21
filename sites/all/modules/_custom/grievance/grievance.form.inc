@@ -612,6 +612,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'grievance_irset');
+    $query->propertyOrderBy('title');
     $stmt = $query->execute();
     if ($stmt['node']) {
       $weight = $form['field_grievance_document_types']['#weight'] - 0.1;
