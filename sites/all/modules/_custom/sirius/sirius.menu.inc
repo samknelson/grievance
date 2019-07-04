@@ -182,6 +182,14 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/config/menu'] = array(
+    'title' => 'Menu Configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_menu_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/voice/forward-to-operator'] = array(
     'title' => 'Incoming Calls',
     'page callback' => 'sirius_page_voice_forward_to_operator',
@@ -344,3 +352,43 @@ function sirius_node_tab_access($node, $in_tab_name) {
   
   return false;
 }
+
+function sirius_menu_block_view() {
+  $block = array();
+  $block['subject'] = '';
+  $block['content'] = superfish_contents(3)['content'];
+  return $block;
+}
+
+function sirius_menu_admin() {
+  $role_options = array_map('check_plain', user_roles());
+  $menu_options = menu_parent_options(menu_get_menus(), array('mlid' => 0));
+
+  for ($delta = 1; $delta <=4; ++$delta) {
+    $form[$delta] = array(
+      '#type' => 'fieldset',
+      '#title' => 'Menu #' . $delta,
+    );
+
+    $form[$delta]['superfish_menu_' . $delta] = array(
+      '#type' => 'select',
+      '#title' => t('Menu'),
+      '#default_value' => variable_get('superfish_menu_' . $delta, 'main-menu:0'),
+      '#options' => $menu_options,
+    );
+
+     // Per-role visibility.
+    $default_role_options = db_query("SELECT rid FROM {block_role} WHERE module = 'superfish' AND delta = :delta", array(
+      ':delta' => $delta,
+    ))->fetchCol();
+    $form[$delta]['roles'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Roles'),
+      '#default_value' => $default_role_options,
+      '#options' => $role_options,
+    );
+  }
+
+  return system_settings_form($form);
+}
+
