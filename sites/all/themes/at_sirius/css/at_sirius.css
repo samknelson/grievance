@@ -3900,6 +3900,11 @@ input.ajax-processed:hover {
   display: none;
 }
 
+.node-grievance-form .form-type-date-popup .form-item label { 
+  display: block;
+}
+
+
 /* /sirius-worker/... */
 .ds-below-left,
 .ds-above-left {

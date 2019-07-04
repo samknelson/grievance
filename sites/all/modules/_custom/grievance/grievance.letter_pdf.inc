@@ -115,6 +115,7 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 		$cmd .= $wkhtmltopdfargs . ' ';
 	}
 	$cmd .= $margin_args;
+	$cmd .= '-s letter ';
 	$cmd .= '--print-media-type ';
 	$cmd .= '-q ';
 	$cmd .= $html_path;
