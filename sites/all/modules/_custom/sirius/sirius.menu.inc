@@ -242,6 +242,57 @@ function sirius_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $items['sirius/letterhead/sample-html/%node'] = array(
+    'title' => 'Sample HTML for Letterhead',
+    'description' => '',
+    'access callback' => 'sirius_loopback_access',
+    'page callback' => 'sirius_letterhead_preview_loopback',
+    'page arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/feeds/launch/%'] = array(
+    'title' => 'Start an Upload',
+    'description' => '',
+    'access callback' => 'sirius_feed_page_launch_access',
+    'access arguments' => array(3),
+    'page callback' => 'sirius_feed_page_launch',
+    'page arguments' => array(3),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/feeds/%'] = array(
+    'title' => 'Feed List',
+    'description' => '',
+    'access callback' => 'sirius_feed_page_list_access',
+    'access arguments' => array(2),
+    'page callback' => 'sirius_feed_page_list',
+    'page arguments' => array(2),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/feeds'] = array(
+    'title' => 'Feeds',
+    'description' => '',
+    'access callback' => 'sirius_feed_page_landing_access',
+    'access arguments' => array(),
+    'page callback' => 'sirius_feed_page_landing',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  /*
+  $items['taxonomy/term/%/sirius_dispatch_job_policy_exim'] = array(
+    'title' => 'Policy Export / Import',
+    'description' => '',
+    'access callback' => 'sirius_dispatch_job_policy_exim_access',
+    'access arguments' => array(2),
+    'page callback' => 'sirius_dispatch_job_policy_exim',
+    'page arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 60,
+  );
+  */
 
   return $items;
 }
