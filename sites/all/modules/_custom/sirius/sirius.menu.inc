@@ -66,6 +66,14 @@ function sirius_node_tabs() {
     'permissions' => array('sirius admin'),
   );
 
+  $node_tabs['sirius_feed']['sirius_feed_wizard'] = array(
+    'title' => 'Wizard',
+    'description' => '',
+    'callback' => 'sirius_node_tab_feed_wizard',
+    'callback arguments' => array(),
+    'permissions' => array('sirius admin'),
+  );
+
   $node_tabs['sirius_letterhead']['sirius_letterhead_preview'] = array(
     'title' => 'Preview',
     'description' => '',
@@ -101,6 +109,9 @@ function sirius_menu() {
       );
       if ($tab_record['weight']) {
         $items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
+      }
+      if ($tab_record['page arguments']) {
+        $items['node/%node/' . $tab_name]['page_arguments'] = array_merge($items['node/%node/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
       }
     }
   }
@@ -167,6 +178,14 @@ function sirius_menu() {
     'title' => 'SMS Configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_sms_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/config/menu'] = array(
+    'title' => 'Menu Configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_menu_admin'),
     'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -239,7 +258,11 @@ function sirius_node_tab_content($node, $in_tab_name) {
       foreach ($node_record as $tab_name => $tab_record) {
         if ($tab_name == $in_tab_name) {
           $callback = $tab_record['callback'];
-          return $callback($node);
+          $args = array($node);
+          if ($tab_record['callback arguments']) {
+            $args = array_merge($args, $tab_record['callback arguments']);
+          }
+          return call_user_func_array($callback, $args);
         }
       }
     }
@@ -278,3 +301,43 @@ function sirius_node_tab_access($node, $in_tab_name) {
   
   return false;
 }
+
+function sirius_menu_block_view() {
+  $block = array();
+  $block['subject'] = '';
+  $block['content'] = superfish_contents(3)['content'];
+  return $block;
+}
+
+function sirius_menu_admin() {
+  $role_options = array_map('check_plain', user_roles());
+  $menu_options = menu_parent_options(menu_get_menus(), array('mlid' => 0));
+
+  for ($delta = 1; $delta <=4; ++$delta) {
+    $form[$delta] = array(
+      '#type' => 'fieldset',
+      '#title' => 'Menu #' . $delta,
+    );
+
+    $form[$delta]['superfish_menu_' . $delta] = array(
+      '#type' => 'select',
+      '#title' => t('Menu'),
+      '#default_value' => variable_get('superfish_menu_' . $delta, 'main-menu:0'),
+      '#options' => $menu_options,
+    );
+
+     // Per-role visibility.
+    $default_role_options = db_query("SELECT rid FROM {block_role} WHERE module = 'superfish' AND delta = :delta", array(
+      ':delta' => $delta,
+    ))->fetchCol();
+    $form[$delta]['roles'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Roles'),
+      '#default_value' => $default_role_options,
+      '#options' => $role_options,
+    );
+  }
+
+  return system_settings_form($form);
+}
+
