@@ -333,7 +333,7 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 		$batch_ratio = $form_state['values']['batch_ratio'];
 		if (!$batch_ratio) { $batch_ratio = $policy['run']['batch_ratio']; }
 		if ($batch_ratio < 0.5) { drupal_set_message(t('Batch ratio must be at least 0.5'), 'error'); $is_error = TRUE; }
-		if ($batch_ratio > 5) { drupal_set_message(t('Batch ratio cannot be larger than 5.'), 'error'); $is_error = TRUE; }
+		if ($batch_ratio > 50) { drupal_set_message(t('Batch ratio cannot be larger than 50.'), 'error'); $is_error = TRUE; }
 
 		if ($is_error) {
 			$form_state['rebuild'] = TRUE;
