@@ -128,6 +128,39 @@ function sirius_dispatch_policy_sirius_jsonfield_form_definitions() {
 		'#description' => t('Enter the number of notifications to be sent for each open slot. If this is greater than 1, then there will be more than one notification sent for each slot, meaning that there is no guarantee that the job will be filled in seniority order.'),
 	);
 
+	$form['form'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Form Settings',
+	);
+
+	$form['form']['hide_skill'] = array(
+		'#type' => 'select', 
+		'#title' => 'Hide Skill?',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+		'#description' => t('If "Yes", then the "Skill" field will be hidden on the "create a job" form.')
+	);
+
+	$form['form']['hide_department'] = array(
+		'#type' => 'select', 
+		'#title' => 'Hide Department?',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+		'#description' => t('If "Yes", then the "Department" field will be hidden on the "create a job" form.')
+	);
+
+	$form['form']['hide_address_notes'] = array(
+		'#type' => 'select', 
+		'#title' => 'Hide Report Location?',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+		'#description' => t('If "Yes", then the "Report Location" field will be hidden on the "create a job" form.')
+	);
+
+	$form['form']['hide_address_parking'] = array(
+		'#type' => 'select', 
+		'#title' => 'Hide Parking Instructions?',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+		'#description' => t('If "Yes", then the "Parking Instructions" field will be hidden on the "create a job" form.')
+	);
+
 	$definition['taxonomy_term']['sirius_dispatch_job_type']['field_sirius_json'] = $form;
 	return $definition;
 }

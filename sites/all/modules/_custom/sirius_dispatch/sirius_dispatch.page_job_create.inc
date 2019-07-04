@@ -162,28 +162,32 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	);
 
 	// Skill
-	$skill_options = sirius_taxonomy_load('sirius_skill', 'tid', 'name', TRUE);
-	$skill_options[NULL] = t('-- No specific skill required --');
-	$form['skill'] = array(
-		'#type' => 'select',
-		'#options' => $skill_options,
-		'#title' => 'Skill',
-    '#ajax' => $workers_ajax,
-	);
-
-	// Department
-	$departments = sirius_worker_department_by_industry(array($industry_tid));
-	if ($departments) {
-		$department_options = array(NULL => t('-- No specific department --'));
-		foreach ($departments as $department_tid => $department_term) {
-			$department_options[$department_tid] = $department_term->name;
-		}
-		$form['department'] = array(
+	if ($job_policy['form']['hide_skill'] != 'Yes') {
+		$skill_options = sirius_taxonomy_load('sirius_skill', 'tid', 'name', TRUE);
+		$skill_options[NULL] = t('-- No specific skill required --');
+		$form['skill'] = array(
 			'#type' => 'select',
-			'#options' => $department_options,
-			'#title' => 'Department',
+			'#options' => $skill_options,
+			'#title' => 'Skill',
 	    '#ajax' => $workers_ajax,
 		);
+	}
+
+	// Department
+	if ($job_policy['form']['hide_department'] != 'Yes') {
+		$departments = sirius_worker_department_by_industry(array($industry_tid));
+		if ($departments) {
+			$department_options = array(NULL => t('-- No specific department --'));
+			foreach ($departments as $department_tid => $department_term) {
+				$department_options[$department_tid] = $department_term->name;
+			}
+			$form['department'] = array(
+				'#type' => 'select',
+				'#options' => $department_options,
+				'#title' => 'Department',
+		    '#ajax' => $workers_ajax,
+			);
+		}
 	}
 
 	// Member status
@@ -343,57 +347,59 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		);
 	}
 
-	$form['address_notes_type'] = array(
-		'#title' => t('Report Location'),
-		'#type' => 'select',
-		'#options' => array(
-			NULL => t('-- Select --'),
-			'door' => 'Door #',
-			'booth' => 'Booth #',
-			'other' => 'Other'
-		),
-		'#prefix' => '<div style="float: left;">',
-		'#suffix' => '</div>',
-	);
+	if ($job_policy['form']['hide_address_notes'] != 'Yes') {
+		$form['address_notes_type'] = array(
+			'#title' => t('Report Location'),
+			'#type' => 'select',
+			'#options' => array(
+				NULL => t('-- Select --'),
+				'door' => 'Door #',
+				'booth' => 'Booth #',
+				'other' => 'Other'
+			),
+			'#prefix' => '<div style="float: left;">',
+			'#suffix' => '</div>',
+		);
 
-	$form['address_notes_door'] = array(
-		'#type' => 'textfield',
-		'#size' => 4,
-		'#title' => 'Door #',
-		'#states' => array(
-	  	'visible' => array(
-	  		array(':input[name="address_notes_type"]' => array('value' => 'door')),
-	  	)
-		),
-		'#prefix' => '<div style="float: left; margin-left: 20px;">',
-		'#suffix' => '</div>',
-	);
+		$form['address_notes_door'] = array(
+			'#type' => 'textfield',
+			'#size' => 4,
+			'#title' => 'Door #',
+			'#states' => array(
+		  	'visible' => array(
+		  		array(':input[name="address_notes_type"]' => array('value' => 'door')),
+		  	)
+			),
+			'#prefix' => '<div style="float: left; margin-left: 20px;">',
+			'#suffix' => '</div>',
+		);
 
-	$form['address_notes_booth'] = array(
-		'#type' => 'textfield',
-		'#size' => 4,
-		'#title' => 'Booth #',
-		'#states' => array(
-	  	'visible' => array(
-	  		array(':input[name="address_notes_type"]' => array('value' => 'booth')),
-	  	)
-		),
-		'#prefix' => '<div style="float: left; margin-left: 20px;">',
-		'#suffix' => '</div>',
-	);
+		$form['address_notes_booth'] = array(
+			'#type' => 'textfield',
+			'#size' => 4,
+			'#title' => 'Booth #',
+			'#states' => array(
+		  	'visible' => array(
+		  		array(':input[name="address_notes_type"]' => array('value' => 'booth')),
+		  	)
+			),
+			'#prefix' => '<div style="float: left; margin-left: 20px;">',
+			'#suffix' => '</div>',
+		);
 
-	$form['address_notes_other'] = array(
-		'#type' => 'textfield',
-		'#size' => 30,
-		'#title' => 'Other (please specify)',
-		'#states' => array(
-	  	'visible' => array(
-	  		array(':input[name="address_notes_type"]' => array('value' => 'other')),
-	  	)
-		),
-		'#prefix' => '<div style="float: left; margin-left: 20px;">',
-		'#suffix' => '</div>',
-	);
+		$form['address_notes_other'] = array(
+			'#type' => 'textfield',
+			'#size' => 30,
+			'#title' => 'Other (please specify)',
+			'#states' => array(
+		  	'visible' => array(
+		  		array(':input[name="address_notes_type"]' => array('value' => 'other')),
+		  	)
+			),
+			'#prefix' => '<div style="float: left; margin-left: 20px;">',
+			'#suffix' => '</div>',
+		);
+	}
 
 	$notes_default = $employer_node->field_sirius_dispatch_notesdef['und'][0]['value'];
 	if (!$notes_default) {
@@ -408,11 +414,13 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		'#suffix' => '</div>',
 	);
 
-	$form['address_parking'] = array(
-		'#type' => 'textarea',
-		'#title' => t('Parking Instructions'),
-		'#description' => t('Enter any parking instructions for workers.'),
-	);
+	if ($job_policy['form']['hide_skill'] != 'Yes') {
+		$form['address_parking'] = array(
+			'#type' => 'textarea',
+			'#title' => t('Parking Instructions'),
+			'#description' => t('Enter any parking instructions for workers.'),
+		);
+	}
 
 	$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
 	$form_state['job_node'] = $job_node;
@@ -532,7 +540,7 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 
 	// CBN must select workers
 	$job_type_tid = $form_state['job_type_tid'];	
-	$policy = sirius_dispatch_job_policy_from_tid($job_type_tid);
+	$job_policy = sirius_dispatch_job_policy_from_tid($job_type_tid);
 	$count = $form_state['values']['count'];
 	$selected = 0;
 	if ($form_state['values']['workers']) {
@@ -540,7 +548,7 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 			if ($worker_nid) { ++$selected; }
 		}
 	}
-	if ($policy['workers']['cbn'] == 'Yes' && $policy['workers']['fan'] != 'Yes') {
+	if ($job_policy['workers']['cbn'] == 'Yes' && $job_policy['workers']['fan'] != 'Yes') {
 		if ($count && $selected < $count) {
 			form_set_error('worker_id', t('For a call by name, please select at least @count workers. You have selected @selected.', array('@count' => $count, '@selected' => $selected)));
 		}
