@@ -38,6 +38,14 @@ function sirius_permission() {
       'title' => t('Sirius Representative'), 
       'description' => t('Permission to act as representative of the union, such as a shop steward or business agent'),
     ),
+    'sirius domain switch' => array(
+      'title' => t('Sirius Domain Switch'),
+      'description' => t('Permission to change to a different domain'),
+    ),
+    'sirius domain switch all' => array(
+      'title' => t('Sirius Domain Switch All'),
+      'description' => t('Permission to change to ANY domain'),
+    ),
     'sirius letterhead use' => array(
       'title' => t('Sirius Letterhead Use'), 
       'description' => t('Permission to print onto letterhead'),
