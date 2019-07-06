@@ -421,6 +421,7 @@ function grievance_update_7025() {
  * Enabled views_tree
  */
 
+/*
 function grievance_update_7026() {
   // Enable some modules
   $modules = array('views_tree');
@@ -428,3 +429,4 @@ function grievance_update_7026() {
   module_enable($modules, FALSE);
   return "Enabled " . join(',', $modules);
 }
+*/
