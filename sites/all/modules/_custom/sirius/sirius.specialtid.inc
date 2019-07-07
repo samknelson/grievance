@@ -24,6 +24,10 @@ function sirius_specialtid_keys() {
 		'sirius_dispatch_job_tags' => array(
 			'ASAP' => 'As Soon As Possible (ASAP)',
 		),
+		'sirius_gender' => array(
+			'M' => 'Male',
+			'F' => 'Female',
+		),
 	);
 }
 
