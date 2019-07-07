@@ -81,6 +81,13 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch letterhead edit'),
   );
 
+  $node_tabs['sirius_domain']['sirius_domain_subdomains'] = array(
+    'title' => 'Subdomains',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_subdomains',
+    'permissions' => array('sirius domain admin'),
+  );
+
   return $node_tabs;
 }
 
