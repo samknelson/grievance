@@ -8,8 +8,8 @@ function sirius_worker_work_status_set($worker_node, $work_status_tid, $reason, 
 		$need_save = TRUE;
 	}
 
-	if ($need_save) {
-		node_save($worker_node);
+	if (!$need_save) {
+		return array('success' => TRUE, 'msg' => 'Work status unchanged.');
 	}
 
 	$category = 'worker:work_status';
@@ -18,4 +18,8 @@ function sirius_worker_work_status_set($worker_node, $work_status_tid, $reason, 
 	$summary = $reason;
 	$handler_nids = array($worker_node->nid);
 	sirius_log($category, $type, $message, $summary, $notes, $handler_nids, $attachments);
+
+	node_save($worker_node);
+
+	return array('success' => TRUE, 'msg' => 'Work status updated.');
 }
