@@ -606,7 +606,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	$sql .= "and field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
 	$sql .= "and field_data_field_sirius_dispatch_job.field_sirius_dispatch_job_target_id = :job_nid ";
 	$sql .= "and field_data_field_sirius_worker.field_sirius_worker_target_id = :worker_nid ";
-	$stmt = db_query($sql, array(':job_nid' => $job_nid, ':worker_nid' => $worker_nid));
+	$stmt = db_query($sql, array(':job_nid' => $job_node->nid, ':worker_nid' => $worker_nid));
 	$hr = $stmt->fetchAssoc();
 	if ($hr['c']) {
 		return array('success' => FALSE, 'msg' => t('There is already a dispatch for this worker and this job.'));
