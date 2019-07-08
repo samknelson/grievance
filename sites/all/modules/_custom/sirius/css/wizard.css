@@ -1,0 +1,34 @@
+ul.sirius_wizard {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+ul.sirius_wizard li { 
+	display: inline-block; 
+	color: #333333;
+	padding: 10px;
+	margin: 5px;
+}
+
+ul.sirius_wizard li a {
+	color: #000000;
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+ul.sirius_wizard li.sirius_wizard_step_incomplete {
+	background-color: #aa9999;
+	border: 1px solid #ff3333;
+}
+
+ul.sirius_wizard li.sirius_wizard_step_complete {
+	background-color: #99aa99;
+	border: 1px solid #33ff33;
+}
+
+ul.sirius_wizard li.sirius_wizard_step_current {
+	background-color: #9999aa;
+	border: 1px solid #3333ff;
+}
+
