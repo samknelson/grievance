@@ -141,13 +141,21 @@ function sirius_dispatch_worker_recompute_from_work_status($worker_node) {
 	// No change
 	if ($old_tid == $new_tid) { return; }
 
-	// We don't care unless we're currently available
-	if ($worker_node->field_sirius_worker_dispstatus['und'][0]['tid'] != sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) { return; }
-
 	// We only care if the new status is non-dispatchable.
 	$new_term = taxonomy_term_load($new_tid); 
 	if ($new_term->field_sirius_dispatch_available['und'][0]['value'] == 'Yes') { return; }
 
-	// Sign out.
-	sirius_dispatch_worker_dispstatus_set($worker_node, sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available'), NULL, "Work status was changed to " . $new_term->name);
+	// Terminate any current dispatch
+	$dispatch_node = sirius_dispatch_get_current($worker_node->nid);
+	if ($dispatch_node) {
+		$possible = sirius_dispatch_terminate_possible($dispatch_node);
+		if ($possible['success']) {
+			sirius_dispatch_terminate($dispatch_node, 'Your work status is now ' . $new_term->name . '.');
+		}
+	}
+
+	// Sign out
+	if ($worker_node->field_sirius_worker_dispstatus['und'][0]['tid'] != sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available')) { 
+		sirius_dispatch_worker_dispstatus_set($worker_node, sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available'), NULL, "Work status was changed to " . $new_term->name);
+	}
 }
