@@ -96,7 +96,12 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 			$prefix = '<div class="sirius_field_intro">';
 			$prefix .= t('The worker\'s <em>previous</em> seniority date was @date. ', array('@date' => $availdate));
 			if ($current_status_tid != sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
-				$prefix .= t(' By default, if they sign in now, their availability date will be reset to today\'s date and they will lose their seniority.');
+				$json = json_decode($worker_node->field_sirius_json['und'][0]['value'], TRUE);
+				if ($json['dispatch']['keep_seniority'] == 'Yes') {
+					$prefix .= t(' Because the "keep seniority" flag is set, if the sign in, they will keep their previous seniority.');
+				} else {
+					$prefix .= t(' By default, if they sign in now, their availability date will be reset to today\'s date and they will lose their seniority.');
+				}
 			}
 			$prefix .= '</div>';
 		}
