@@ -65,7 +65,7 @@ function grievance_quicksearch_form_submit($form, &$form_state) {
 	if (!$value) { return; }
 	
 	$matches = array();
-	if (preg_match('/\((\d+)\)/', $value, $matches) && $matches[1]) { 
+	if (preg_match('/\s+\((\d+)\)/', $value, $matches) && $matches[1]) { 
 		drupal_goto('node/' . $matches[1]);
 	}
 	
@@ -89,65 +89,201 @@ function grievance_quicksearch_results_html($grievance, $limit = 20) {
 	if ($results) {
 		$output = "<ul>";
 		$count = 0;
-		foreach ($results as $result) {
-			if (preg_match('/\((\d+)\)/', $result, $matches) && $matches[1]) { 
+		foreach ($results as $idx => $result) {
+			if (preg_match('/\s+\((\d+)\)/', $idx, $matches) && $matches[1]) { 
 				$count++;
 				$output .= "<li>";
-				$output .= l($result, 'node/' . $matches[1]);
+				$output .= l($idx, 'node/' . $matches[1]);
 				$output .= '</li>';
 			}
 		}
 		
+
 		$output = "<h2>" . t('Found @count results matching: @grievance', array('@count' => $count, '@grievance' => $grievance)) . '</h2>' . $output;
 		
 		return $output;
 	} else {
-		drupal_set_message(t("No grievances found."));
+		drupal_set_message(t("No records found."));
 		
-		return '<h2>' . t('No grievances found.') . '</h2>';
+		return '<h2>' . t('No records found.') . '</h2>';
 	}
 }
 
 function grievance_quicksearch_results($string, $limit = 20) {
+
+	$string = trim($string);
+
+	$types = grievance_quicksearch_types();
+	if (!$types) { return array();}
+
+
+	// Search the title
 	if (!preg_match('/\d/', $string)) {
 		$query = new EntityFieldQuery();
 		$query->entityCondition('entity_type', 'node');
-		$query->entityCondition('bundle', array('grievance'), 'in');
+		$query->entityCondition('bundle', array_keys($types), 'in');
 		$query->propertyCondition('status', 1);
 		$query->propertyCondition('title', '%' . $string . '%', 'like');
 		$query->propertyOrderBy('created', 'desc');
 		$query->range(0, $limit);
 		$result = $query->execute();
 		if (isset($result['node'])) {
-			$grievance_nids = array_keys($result['node']);
-			$grievance_nodes = entity_load('node', $grievance_nids);
-			foreach ($grievance_nodes as $grievance_node) {
-				$idx = $grievance_node->title . ' (' . $grievance_node->nid . ')';
-				$matches[$idx] = check_plain($idx);
+			foreach (array_keys($result['node']) as $nid) {
+				list ($idx, $label) = grievance_quicksearch_render_idx($nid);
+				$matches[$idx] = $label;
 			}
 		}	
 	}
 
 	if (preg_match('/\d/', $string)) {
-		$query = new EntityFieldQuery();
-		$query->entityCondition('entity_type', 'node');
-		$query->entityCondition('bundle', array('grievance'), 'in');
-		$query->propertyCondition('status', 1);
-		$query->propertyOrderBy('created', 'desc');
-		$query->fieldCondition('field_grievance_id', 'value', '%' . $string . '%', 'like');
-		$query->range(0, $limit);
-		$result = $query->execute();
-		if (isset($result['node'])) {
-			$grievance_nids = array_keys($result['node']);
-			$grievance_nodes = entity_load('node', $grievance_nids);
-			foreach ($grievance_nodes as $grievance_node) {
-				$idx = $grievance_node->title . ' (' . $grievance_node->nid . ')';
-				$matches[$idx] = check_plain($idx);
+		$tmp = $types;
+		unset($tmp['sirius_worker']);
+
+		// Search the grievance ID
+		if ($tmp) {
+			$query = new EntityFieldQuery();
+			$query->entityCondition('entity_type', 'node');
+			$query->entityCondition('bundle', array_keys($tmp), 'in');
+			$query->propertyCondition('status', 1);
+			$query->propertyOrderBy('created', 'desc');
+			$query->fieldCondition('field_grievance_id', 'value', '%' . $string . '%', 'like');
+			$query->range(0, $limit);
+			$result = $query->execute();
+			if (isset($result['node'])) {
+				foreach (array_keys($result['node']) as $nid) {
+					list ($idx, $label) = grievance_quicksearch_render_idx($nid);
+					$matches[$idx] = $label;
+				}
 			}
-		}	
+		}
+
+		// Search the sirius ID
+		$tmp = $types;
+		unset($tmp['grievance']);
+		if ($tmp) {
+			$query = new EntityFieldQuery();
+			$query->entityCondition('entity_type', 'node');
+			$query->entityCondition('bundle', array_keys($tmp), 'in');
+			$query->propertyCondition('status', 1);
+			$query->propertyOrderBy('created', 'desc');
+			$query->fieldCondition('field_sirius_id', 'value', '%' . $string . '%', 'like');
+			$query->range(0, $limit);
+			$result = $query->execute();
+			if (isset($result['node'])) {
+				foreach (array_keys($result['node']) as $nid) {
+					list ($idx, $label) = grievance_quicksearch_render_idx($nid);
+					$matches[$idx] = $label;
+				}
+			}
+		}
+
+		// Search the sirius ID 2
+		$tmp = $types;
+		unset($tmp['grievance']);
+		if ($tmp) {
+			$query = new EntityFieldQuery();
+			$query->entityCondition('entity_type', 'node');
+			$query->entityCondition('bundle', array_keys($tmp), 'in');
+			$query->propertyCondition('status', 1);
+			$query->propertyOrderBy('created', 'desc');
+			$query->fieldCondition('field_sirius_id2', 'value', $string);
+			$query->range(0, $limit);
+			$result = $query->execute();
+			if (isset($result['node'])) {
+				foreach (array_keys($result['node']) as $nid) {
+					list ($idx, $label) = grievance_quicksearch_render_idx($nid);
+					$matches[$idx] = $label;
+				}
+			}
+		}
 	}
-	
+
+	if ($types['sirius_worker']) {
+		// Search by worker's SSN
+		$ssn = sirius_ssn_format($string);
+		if ($ssn) {
+			$query = new EntityFieldQuery();
+			$query->entityCondition('entity_type', 'node');
+			$query->entityCondition('bundle', 'sirius_worker');
+			$query->propertyCondition('status', 1);
+			$query->propertyOrderBy('created', 'desc');
+			$query->fieldCondition('field_sirius_ssn', 'value', $ssn);
+			$query->range(0, $limit);
+			$result = $query->execute();
+			if (isset($result['node'])) {
+				foreach (array_keys($result['node']) as $nid) {
+					list ($idx, $label) = grievance_quicksearch_render_idx($nid);
+					$matches[$idx] = $label;
+				}
+			}
+		}
+
+		// Search by the worker's phone
+		$phone = sirius_phone_format($string);
+		if (sirius_phone_validate($phone)) {
+			$query = new EntityFieldQuery();
+			$query->entityCondition('entity_type', 'node');
+			$query->entityCondition('bundle', 'sirius_worker');
+			$query->propertyCondition('status', 1);
+			$query->propertyOrderBy('created', 'desc');
+			$query->fieldCondition('field_sirius_phone', 'value', $phone);
+			$query->range(0, $limit);
+			$result = $query->execute();
+			if (isset($result['node'])) {
+				foreach (array_keys($result['node']) as $nid) {
+					list ($idx, $label) = grievance_quicksearch_render_idx($nid);
+					$matches[$idx] = $label;
+				}
+			}
+		}
+	}
+
 	return $matches;
 }
 
+function grievance_quicksearch_types() {
+	$types = array();
+	if (variable_get('grievance_quicksearch_include_grievances', 'Yes') == 'Yes') { $types['grievance'] = 'GRV'; }
+	if (variable_get('grievance_quicksearch_include_workers', 'No') == 'Yes') { $types['sirius_worker'] = 'WRK'; }
+	return $types;
+}
+
+function grievance_quicksearch_render_idx($nid) {
+	$sql = "select title, type from node where nid = :nid";
+	$stmt = db_query($sql, array(':nid' => $nid));
+	$hr = $stmt->fetchAssoc();
+	$title = $hr['title'];
+	$type = $hr['type'];
+
+	$types = grievance_quicksearch_types();
+
+	$label = '<span data-nid="' . $nid . '">' .
+		check_plain($title);
+	if (count($types) > 1) {
+		$label .= ' (' . $types[$type] . ')';
+	}
+	$label .= '</span>';
+	$idx = check_plain($title) . ' (' . $nid . ')';
+	return array($idx, $label);
+}
+
+function grievance_quicksearch_admin() {
+  $form = array();
+
+  $form['grievance_quicksearch_include_grievances'] = array(
+  	'#type' => 'select',
+  	'#options' => array('Yes' => 'Yes', 'No' => 'No'),
+  	'#title' => t('Include grievances in quicksearch results?'),
+  	'#default_value' => variable_get('grievance_quicksearch_include_grievances', ''),
+	);
+
+  $form['grievance_quicksearch_include_workers'] = array(
+  	'#type' => 'select',
+  	'#options' => array('Yes' => 'Yes', 'No' => 'No'),
+  	'#title' => t('Include workers in quicksearch results?'),
+  	'#default_value' => variable_get('grievance_quicksearch_include_workers', ''),
+	);
+
+  return system_settings_form($form);
+}
 

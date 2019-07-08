@@ -371,6 +371,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 1,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 8,
@@ -417,6 +418,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 1,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 18,
@@ -438,11 +440,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -544,6 +549,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 9,
@@ -572,6 +578,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 2,
@@ -600,6 +607,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 19,
@@ -621,11 +629,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -2740,6 +2751,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 0,
@@ -2756,6 +2768,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 4,
@@ -2778,6 +2791,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 9,
@@ -2800,6 +2814,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 8,
@@ -2821,11 +2836,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 1,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -2864,6 +2882,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 5,
@@ -2898,6 +2917,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 12,
@@ -2919,11 +2939,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 1,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -3660,6 +3683,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 43,
@@ -3676,6 +3700,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 14,
@@ -3704,6 +3729,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 12,
@@ -3726,6 +3752,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 61,
@@ -3746,11 +3773,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '1900:+3',
       ),
@@ -4037,6 +4067,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 1,
@@ -4076,11 +4107,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -4961,7 +4995,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_rep_organizer',
-    'label' => 'Organizer',
+    'label' => 'Business Agent',
     'required' => 0,
     'settings' => array(
       'field_lock_multi_values' => array(
@@ -5177,6 +5211,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 60,
@@ -5234,11 +5269,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -5422,6 +5460,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 59,
@@ -5479,11 +5518,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -5820,7 +5862,7 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
-        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'content_taxonomy_autocomplete_new_terms' => 'deny',
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -6353,11 +6395,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 1,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -7738,6 +7783,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 2,
@@ -7765,11 +7811,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-10:+10',
       ),
@@ -8553,12 +8602,12 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'taxonomy',
         'settings' => array(
           'field_delimiter' => '',
         ),
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'taxonomy_term_reference_plain',
         'weight' => 4,
       ),
       'teaser' => array(
@@ -8702,7 +8751,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'number',
         'settings' => array(
           'decimal_separator' => '.',
@@ -8751,7 +8800,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
@@ -9227,6 +9276,53 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_contract_template-field_sirius_active'.
+  $field_instances['node-grievance_contract_template-field_sirius_active'] = array(
+    'bundle' => 'grievance_contract_template',
+    'default_value' => array(
+      0 => array(
+        'value' => 'Yes',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 9,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_active',
+    'label' => 'Active?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 32,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_field_overrides-field_grievance_bundle'.
   $field_instances['node-grievance_field_overrides-field_grievance_bundle'] = array(
     'bundle' => 'grievance_field_overrides',
@@ -9548,6 +9644,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 0,
@@ -9575,16 +9672,75 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
       'weight' => -4,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_irset-field_grievance_document_types'.
+  $field_instances['node-grievance_irset-field_grievance_document_types'] = array(
+    'bundle' => 'grievance_irset',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_document_types',
+    'label' => 'Information Request',
+    'required' => 0,
+    'settings' => array(
+      'checkall' => array(
+        'checkall' => 0,
+        'checkall-check-all' => 1,
+        'checkall-toggle' => 1,
+        'checkall-uncheck-all' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => 'term_reference_1',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => 'grievance_information_request_types',
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'checkall' => FALSE,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 32,
     ),
   );
 
@@ -10302,11 +10458,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -10667,6 +10826,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 1,
@@ -10694,11 +10854,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 1,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -11074,6 +11237,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 4,
@@ -11101,11 +11265,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -13120,6 +13287,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 2,
@@ -13147,11 +13315,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -13179,6 +13350,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 3,
@@ -13206,11 +13378,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -13369,6 +13544,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 5,
@@ -13385,6 +13561,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 3,
@@ -13401,6 +13578,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 1,
@@ -13422,11 +13600,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -13454,6 +13635,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 6,
@@ -13470,6 +13652,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 4,
@@ -13486,6 +13669,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 3,
@@ -13507,11 +13691,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -13539,6 +13726,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 4,
@@ -13572,11 +13760,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -14979,6 +15170,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 11,
@@ -14995,6 +15187,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 4,
@@ -15011,6 +15204,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 1,
@@ -15032,11 +15226,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - g:i:sa',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -15064,6 +15261,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 23,
@@ -15086,6 +15284,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 5,
@@ -15107,11 +15306,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -15139,6 +15341,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 8,
@@ -15172,11 +15375,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -15253,6 +15459,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 17,
@@ -15294,11 +15501,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -16382,6 +16592,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 2,
@@ -16409,11 +16620,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -16441,6 +16655,7 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 1,
@@ -16468,11 +16683,14 @@ function grievance_content_types_field_default_field_instances() {
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -16896,7 +17114,7 @@ If the file has multiple pages, then each page in the input document will use th
   // Exported field_instance: 'node-sirius_log-field_sirius_json'.
   $field_instances['node-sirius_log-field_sirius_json'] = array(
     'bundle' => 'sirius_log',
-    'default_value' => array(),
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -17265,6 +17483,7 @@ If the file has multiple pages, then each page in the input document will use th
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 18,
@@ -17292,11 +17511,14 @@ If the file has multiple pages, then each page in the input document will use th
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -17678,6 +17900,59 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'node-sirius_worker-field_sirius_contact'.
+  $field_instances['node-sirius_worker-field_sirius_contact'] = array(
+    'bundle' => 'sirius_worker',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 45,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_contact',
+    'label' => 'Contact',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 48,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_worker-field_sirius_dispatch_asi'.
   $field_instances['node-sirius_worker-field_sirius_dispatch_asi'] = array(
     'bundle' => 'sirius_worker',
@@ -17745,6 +18020,7 @@ If the file has multiple pages, then each page in the input document will use th
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 7,
@@ -17778,11 +18054,14 @@ If the file has multiple pages, then each page in the input document will use th
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -18024,6 +18303,7 @@ If the file has multiple pages, then each page in the input document will use th
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 44,
@@ -18057,11 +18337,14 @@ If the file has multiple pages, then each page in the input document will use th
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -18142,6 +18425,7 @@ If the file has multiple pages, then each page in the input document will use th
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 41,
@@ -18175,11 +18459,14 @@ If the file has multiple pages, then each page in the input document will use th
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -18652,6 +18939,52 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'node-sirius_worker-field_sirius_json'.
+  $field_instances['node-sirius_worker-field_sirius_json'] = array(
+    'bundle' => 'sirius_worker',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'sirius_jsonfield',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'sirius_jsonfield_formatter_full',
+        'weight' => 46,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_json',
+    'label' => 'JSON',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget',
+      'weight' => 50,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_worker-field_sirius_member_status'.
   $field_instances['node-sirius_worker-field_sirius_member_status'] = array(
     'bundle' => 'sirius_worker',
@@ -19005,47 +19338,6 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
-  // Exported field_instance: 'node-sirius_worker-field_sirius_phone_mobile'.
-  $field_instances['node-sirius_worker-field_sirius_phone_mobile'] = array(
-    'bundle' => 'sirius_worker',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
-        'weight' => 34,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_sirius_phone_mobile',
-    'label' => 'Mobile Phone',
-    'required' => FALSE,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 25,
-    ),
-  );
-
   // Exported field_instance: 'node-sirius_worker-field_sirius_skill'.
   $field_instances['node-sirius_worker-field_sirius_skill'] = array(
     'bundle' => 'sirius_worker',
@@ -19134,6 +19426,7 @@ If the file has multiple pages, then each page in the input document will use th
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 10,
@@ -19167,11 +19460,14 @@ If the file has multiple pages, then each page in the input document will use th
       'active' => 1,
       'module' => 'date',
       'settings' => array(
+        'date_single_day' => array(),
+        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -19457,13 +19753,13 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'list',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 0,
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -19481,7 +19777,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 0,
+      'weight' => 1,
     ),
   );
 
@@ -19494,7 +19790,7 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
           'bypass_access' => FALSE,
@@ -19502,7 +19798,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 1,
+        'weight' => 3,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -19521,6 +19817,45 @@ If the file has multiple pages, then each page in the input document will use th
       ),
       'type' => 'options_buttons',
       'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-grievance_alert_types-field_sirius_domain'.
+  $field_instances['taxonomy_term-grievance_alert_types-field_sirius_domain'] = array(
+    'bundle' => 'grievance_alert_types',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Domain',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 0,
     ),
   );
 
@@ -19635,6 +19970,44 @@ If the file has multiple pages, then each page in the input document will use th
       ),
       'type' => 'text_textfield',
       'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-grievance_contract_section_tags-field_sirius_css_class'.
+  $field_instances['taxonomy_term-grievance_contract_section_tags-field_sirius_css_class'] = array(
+    'bundle' => 'grievance_contract_section_tags',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_css_class',
+    'label' => 'CSS Class',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
     ),
   );
 
@@ -20332,6 +20705,41 @@ If the file has multiple pages, then each page in the input document will use th
       ),
       'type' => 'options_buttons',
       'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_dispatch_job_type-field_sirius_json'.
+  $field_instances['taxonomy_term-sirius_dispatch_job_type-field_sirius_json'] = array(
+    'bundle' => 'sirius_dispatch_job_type',
+    'default_value' => array(),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'sirius_jsonfield',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'sirius_jsonfield_formatter_full',
+        'weight' => 1,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Dispatch Policy',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget',
+      'weight' => 5,
     ),
   );
 
@@ -21484,9 +21892,11 @@ If the file has multiple pages, then each page in the input document will use th
   t('Building the Union with this case');
   t('Bundle');
   t('Bundle to overried, e.g. "grievance"');
+  t('Business Agent');
   t('CBA Provision(s) Violated');
   t('CC Emails');
   t('CSS');
+  t('CSS Class');
   t('Call Number');
   t('Call by Name Only?');
   t('Call by Name?');
@@ -21510,6 +21920,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Company Rep State or Province');
   t('Company Rep Title');
   t('Completed');
+  t('Contact');
   t('Contact Type');
   t('Contract');
   t('Contract Template');
@@ -21534,10 +21945,12 @@ If the file has multiple pages, then each page in the input document will use th
   t('Departments');
   t('Description');
   t('Discipline Date');
+  t('Dispatch Policy');
   t('Dispatch Roles');
   t('Dispatch Status');
   t('Display Name');
   t('Does this holiday repeat every year on the same date?');
+  t('Domain');
   t('Drupal paths on which to display the help text.  This can either be a path alias such as "my/page/here", or a native Drupal path such as "node/%/ac_questionnaire_questions".');
   t('Dummy?');
   t('E.g. "Step 1 Contact" or "Contact for Arbitration Only"');
@@ -21611,6 +22024,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Include EBA Workers');
   t('Indicates which job types this employer can create.');
   t('Industry');
+  t('Information Request');
   t('Information Request?');
   t('Intake Person');
   t('Is this a "dummy" or "placeholder" section?  This field should be left blank or set to "No" except for automatically-generated placeholder sections created when the article itself is meant to be selectable.');
@@ -21633,7 +22047,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('Member Status');
   t('Member?');
   t('Message');
-  t('Mobile Phone');
   t('Must Log?');
   t('NOT Available for Departments');
   t('Name');

@@ -58,7 +58,7 @@ function sirius_worker_node_postsave($node, $op) {
     $need_save = FALSE;
 
     // Sync the user
-    sirius_worker_usersync($node->nid);
+    $result = sirius_worker_usersync($node->nid);
   }
 }
 
@@ -92,3 +92,26 @@ function sirius_worker_views_pre_render(&$view) {
     break;
   }
 }
+
+/**
+ * Implements hook_sirius_jsonfield_form_definitions()
+ */
+
+function sirius_worker_sirius_jsonfield_form_definitions() {
+  $form = array();
+  $form['dispatch'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Dispatch',
+  );
+  $form['dispatch']['keep_seniority'] = array(
+    '#type' => 'select', 
+    '#title' => 'Keep Seniority',
+    '#options' => array('No' => 'No', 'Yes' => 'Yes'),
+    '#description' => t('If "Yes", then the next time this worker signs in, they will keep their previous seniority.')
+  );
+
+  $definition = array();
+  $definition['node']['sirius_worker']['field_sirius_json'] = $form;
+  return $definition;
+}
+

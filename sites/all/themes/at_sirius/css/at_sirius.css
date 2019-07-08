@@ -52,7 +52,7 @@ div.messages {
 
 pre, code {
   font-family: Consolas, Monaco, "Courier New", Courier, monospace;
-  background: #fff;
+  /* background: #fff; */
 }
 
 /* Layout */
@@ -3239,14 +3239,15 @@ table.grievance-timeline tr.pending {
   display: inline;
 }
 
-.form-item-field-grievance-document-types-und .form-type-checkbox {
+.form-item-field-grievance-document-types-und .form-type-checkbox,
+.form-item-irsets .form-type-checkbox {
   display: inline-block;
   width: 290px;
 }
 
 
 @media only print {
-  body {
+  body, p, a {
     font-size: 12pt;
     font-family: "Times New Roman", Times, serif;
     color: #000000;
@@ -3273,7 +3274,7 @@ table.grievance-timeline tr.pending {
   }
 
   td {
-    padding: 11px 0 11px 22px !important;
+    padding: 11px 0 11px 22px;
   }
 
   #header {
@@ -3418,8 +3419,10 @@ table.grievance-timeline tr.pending {
 
 .view-grievance-log td,
 .view-grievance-log-all td {
+/*
   padding-top: 6px;
   padding-bottom: 0;
+*/
 }
 
 @media print {
@@ -3827,6 +3830,38 @@ label {
     clear: left;
 }
 
+tr.sirius_bg_snow,          tr.sirius_bg_snow           td { background-color: snow; }
+tr.sirius_bg_mintcream,     tr.sirius_bg_mintcream      td { background-color: mintcream; }
+tr.sirius_bg_ivory,         tr.sirius_bg_ivory          td { background-color: ivory; }
+tr.sirius_bg_honeydew,      tr.sirius_bg_honeydew       td { background-color: honeydew; }
+tr.sirius_bg_aliceblue,     tr.sirius_bg_aliceblue      td { background-color: aliceblue; }
+tr.sirius_bg_seashell,      tr.sirius_bg_seashell       td { background-color: seashell; }
+tr.sirius_bg_beige,         tr.sirius_bg_beige          td { background-color: beige; }
+tr.sirius_bg_oldlace,       tr.sirius_bg_oldlace        td { background-color: oldlace; }
+tr.sirius_bg_floralwhite,   tr.sirius_bg_floralwhite    td { background-color: floralwhite; }
+tr.sirius_bg_antiquewhite,  tr.sirius_bg_antiquewhite   td { background-color: antiquewhite; }
+tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
+tr.sirius_bg_lavenderblush, tr.sirius_bg_lavenderblush  td { background-color: lavenderblush; }
+tr.sirius_bg_mistyrose,     tr.sirius_bg_mistyrose      td { background-color: mistyrose; }
+tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
+
+/*
+snow  #FFFAFA
+mintcream #F5FFFA
+ivory #FFFFF0
+honeydew  #F0FFF0
+azure #F0FFFF 
+aliceblue #F0F8FF
+seashell  #FFF5EE
+beige #F5F5DC
+oldlace #FDF5E6
+floralwhite #FFFAF0
+antiquewhite  #FAEBD7
+linen #FAF0E6
+lavenderblush #FFF0F5
+mistyrose #FFE4E1
+*/
+
 /* /node/add/sirius-worker */
 input.ajax-processed {
   color: #5984be;
@@ -3864,6 +3899,11 @@ input.ajax-processed:hover {
 .form-type-date-popup .form-item label {
   display: none;
 }
+
+.node-grievance-form .form-type-date-popup .form-item label { 
+  display: block;
+}
+
 
 /* /sirius-worker/... */
 .ds-below-left,

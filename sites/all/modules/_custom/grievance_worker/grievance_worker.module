@@ -5,6 +5,7 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_worker') . "/grievance_worker.menu.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_worker') . "/grievance_worker.admin.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_worker') . "/grievance_worker.permission.inc";
 
 function grievance_worker_search($str, $return_raw = FALSE) {
   // Execute as SQL for speed
@@ -83,6 +84,8 @@ function grievance_worker_form_grievance_node_callback_submit($form, &$form_stat
 }
 
 function grievance_worker_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
+  if (!user_access('grievance worker lookup')) { return; }
+
   // Add Worker Search elements to the form
   $form['grievance_worker_search'] = array(
     '#type' => 'textfield',
@@ -141,5 +144,97 @@ function grievance_worker_form_grievance_node_form_alter(&$form, &$form_state, $
   );
   $form['#groups']['group_grievance_employee']->children[] = 'grievance_worker_search_result';
   $form['#group_children']['grievance_worker_search_result'] = 'group_grievance_employee';
+
+  // Add "update a worker" side effect
+  if (user_access('grievance worker edit')) { 
+    $form['#groups']['group_grievance_employee']->children[] = 'grievance_worker_update';
+    $form['#group_children']['grievance_worker_update'] = 'group_grievance_employee';
+    $weight = $form['field_grievance_min']['#weight'] + 0.1;
+    $form['grievance_worker_update'] = array(
+      '#title' => 'Update Worker Database',
+      '#type' => 'select',
+      '#options' => array(
+        'No' => t('No'),
+        'Yes' => t('Yes'),
+      ),
+      '#default_value' => 'No',
+      '#required' => TRUE,
+      '#description' => t('Select "Yes" to save this information to the worker database. Choose this option if you are entering a new worker or wish to change the contact information for the worker.'),
+      '#weight' => $weight,
+    );
+  }
+}
+
+/**
+ * Implements hook_node_insert()
+ */
+
+function grievance_worker_node_insert($node) {
+  if ($node->type == 'grievance' && $node->grievance_worker_update == 'Yes' && user_access('grievance worker edit')) { grievance_worker_handle_update($node); }
+}
+
+/**
+ * Implements hook_node_update()
+ */
+
+function grievance_worker_node_update($node) {
+  if ($node->type == 'grievance' && $node->grievance_worker_update == 'Yes' && user_access('grievance worker edit')) { grievance_worker_handle_update($node); }
+}
+
+function grievance_worker_handle_update($grievance_node) {
+  $worker_id = trim($grievance_node->field_grievance_min['und'][0]['value']);
+  if (!$worker_id) {
+    drupal_set_message("Worker database update failed: no member id.", 'warning');
+    return;
+  }
+
+  $worker_node = sirius_worker_get_by_id($worker_id);
+  if (!$worker_node) {
+    if (!user_access('grievance worker create')) {
+      drupal_set_message("Worker database update failed: The worker was not found in the database, and you do not have permission to create a new worker. ", 'warning');
+      return;
+    }
+
+    global $user;
+    $worker_node = new stdClass();
+    $worker_node->type = 'sirius_worker';
+    $worker_node->language = LANGUAGE_NONE;
+    $worker_node->uid = $user->uid;
+    $worker_node->status = 1;
+    $worker_node->promote = 0;
+    $worker_node->comment = 0;
+    $worker_node->title = substr(date('c') . " - " . $category . " - " . $type . " - " . $message, 0, 254);
+    $worker_node->field_sirius_id['und'][0]['value'] = $worker_id;
+  }
+
+
+  if ($value = $grievance_node->field_grievance_first_name['und'][0]['value']) { $worker_node->field_sirius_name['und'][0]['given'] = $value; }
+  if ($value = $grievance_node->field_grievance_last_name['und'][0]['value'])  { $worker_node->field_sirius_name['und'][0]['family'] = $value; }
+  if ($value = $grievance_node->field_grievance_phone['und'][0]['value'])      { $worker_node->field_sirius_phone['und'][0]['value'] = $value; }
+  if ($value = $grievance_node->field_grievance_email['und'][0]['email'])      { $worker_node->field_sirius_email['und'][0]['value'] = $value; }
+
+  if ($value = $grievance_node->field_grievance_address['und'][0]['value'])    {
+    $worker_node->field_sirius_address['und'][0]['thoroughfare'] = $value; 
+    $worker_node->field_sirius_address['und'][0]['country'] = 'US';
+  }
+
+  if ($value = $grievance_node->field_grievance_address_2['und'][0]['value'])  { $worker_node->field_sirius_address['und'][0]['premise'] = $value; }
+  if ($value = $grievance_node->field_grievance_city['und'][0]['value'])       { $worker_node->field_sirius_address['und'][0]['locality'] = $value; }
+  if ($value = $grievance_node->field_grievance_state['und'][0]['value'])      { $worker_node->field_sirius_address['und'][0]['administrative_area'] = $value; }
+  if ($value = $grievance_node->field_grievance_zip['und'][0]['value'])        { $worker_node->field_sirius_address['und'][0]['postal_code'] = $value; }
+
+  if ($grievance_node->field_grievance_gender['und'][0]['value'] == 'M' && sirius_get_special_tid('sirius_gender|M')) { 
+    $worker_node->field_sirius_gender['und'][0]['tid'] = sirius_get_special_tid('sirius_gender|M');
+  }
+
+  if ($grievance_node->field_grievance_gender['und'][0]['value'] == 'F' && sirius_get_special_tid('sirius_gender|F')) { 
+    $worker_node->field_sirius_gender['und'][0]['tid'] = sirius_get_special_tid('sirius_gender|F');
+  }
+
+
+  $worker_node = node_submit($worker_node);
+  node_object_prepare($worker_node);
+  node_save($worker_node);
+  drupal_set_message("Worker database update: saved worker " . $worker_node->title . " ($worker_id)");
 
 }

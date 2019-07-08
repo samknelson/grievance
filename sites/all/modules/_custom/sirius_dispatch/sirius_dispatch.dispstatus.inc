@@ -86,13 +86,24 @@ function sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid = N
 
 	// If we're signing in, set the availability date
 	if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
-		$availdate = gmdate('Y-m-d H:i:s');
-		$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $availdate;
-		$category = 'worker:availdate';
-		$type = 'set';
-		$msg = $worker_node->title . "'s availability date has been set to " . $availdate;
-		$handler_nids = array($worker_node->nid);
-		sirius_log($category, $type, $msg, $reason, '', $handler_nids);
+
+		$json = json_decode($worker_node->field_sirius_json['und'][0]['value'], TRUE);
+		if ($json['dispatch']['keep_seniority'] == 'Yes') {
+			$json['dispatch']['keep_seniority'] = 'No';
+			$worker_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+			$availdate = sirius_date_date($worker_node, 'field_sirius_dispatch_availdate', $format = 'Y-m-d H:i:s');
+
+			$msg = $worker_node->title . "'s last dispatch was laid off under 24 hours, keeping previous availability date of $availdate.";
+			$handler_nids = array($worker_node->nid);
+			sirius_log('worker:availdate', 'keep', $msg, $reason, '', $handler_nids);
+		} else {
+			$availdate = gmdate('Y-m-d H:i:s');
+			$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $availdate;
+
+			$msg = $worker_node->title . "'s availability date has been set to " . $availdate;
+			$handler_nids = array($worker_node->nid);
+			sirius_log('worker:availdate', 'set', $msg, $reason, '', $handler_nids);
+		}
 	}
 
 	// Log the change

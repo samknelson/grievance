@@ -61,8 +61,6 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 
 	if (!$deliver_now) { return array('success' => TRUE, 'msg' => "Queued for delivery: $phone, $msg"); }
 
-	drupal_set_message("Here with $deliver_now.");
-
 	foreach ($queue as $phone => $msg) {
 		try {
 			$client = sirius_twilio_client_get();

@@ -598,7 +598,10 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
 
   $html = '';
 
-  $html .= '<table class="grievance_simple_table">';
+  $html .= '<style>';
+  $html .= '.uh226_report_weekly_summary th { border: 1px solid #333333; text-align: center; padding-left: 5px; margin-left: 0; padding-right: 5px; margin-right: 0; padding-top: 10px; padding-bottom: 10px;}';
+  $html .= '</style>';
+  $html .= '<table class="grievance_simple_table uh226_report_weekly_summary">';
 
   $html .= '<thead>';
   $html .= '<tr>';

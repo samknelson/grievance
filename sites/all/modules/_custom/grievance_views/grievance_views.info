@@ -32,6 +32,7 @@ features[views_view][] = grievance_document_types
 features[views_view][] = grievance_field_overrides
 features[views_view][] = grievance_holidays
 features[views_view][] = grievance_information_request_types
+features[views_view][] = grievance_irsets
 features[views_view][] = grievance_letter_templates
 features[views_view][] = grievance_log
 features[views_view][] = grievance_log_all

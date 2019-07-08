@@ -259,9 +259,7 @@ function grievance_contract_template_next_number($number) {
     return '';
   }
 
-  dpm($last);
   $last = array($last[0], $last[1]+1);
-  dpm($last);
   return $sequences[$last[0]][$last[1]];
 }
 
@@ -725,15 +723,6 @@ function grievance_contract_update_dummies($trigger_node) {
   }
 }
 
-//
-// Not using these functions at the moment, @todo probably safe to remove
-//
-
-function grievance_contract_clause_updateinsert($node) { }
-function grievance_contract_section_updateinsert($node) { }
-function grievance_contract_template_updateinsert($node) { }
-
-
 function grievance_contract_views_pre_build(&$view) {
   // When an admin is editing a grievance clause, they select the contract section from a view.  The view should be restricted
   // to just the contract template that they're working i.
@@ -772,6 +761,35 @@ function grievance_contract_views_pre_build(&$view) {
     $filename .= '.csv';
 
     $view->display_handler->options['style_options']['filename'] = $filename;
+  }
+
+  // drupal_set_message($view->name);
+  if ($view->name == 'grievance_contract_clauses') {
+    // dpm($view);
+    foreach ($view->result as $tmp) {
+      // drupal_set_message("Here.");
+    }
+  }
+}
+
+function grievance_contract_views_secondary_row_view_table(&$vars) {
+  // Add article tag CSS classes to each applicable row
+  if ($vars['view']->name == 'grievance_contract_clauses' && $vars['view']->result) {
+    $article_tag_lookup = array();
+    foreach ($vars['view']->result as $key => $row){
+      if (!$row->field_field_grievance_cont_sec_tags) { continue; }
+      foreach ($row->field_field_grievance_cont_sec_tags as $tmp) {
+        $tid = $tmp['raw']['tid'];
+        if (!$tid) { continue; }
+        if (!$article_tag_lookup[$tid]) {
+          $article_tag_lookup[$tid] = taxonomy_term_load($tid);
+        }
+        $class_name = $article_tag_lookup[$tid]->field_sirius_css_class['und'][0]['value'];
+        if (!$class_name) { continue; }
+        $vars['row_classes'][2*$key][] = $class_name;
+        $vars['row_classes'][2*$key+1][] = $class_name;
+      }
+    }
   }
 }
 
@@ -1070,3 +1088,4 @@ function grievance_contract_template_node_tab_clause_bulk_rename_operation($clau
     node_save($clause_node);
   }
 }
+

@@ -74,5 +74,20 @@
 			});
 		}
 
+		if (Drupal.settings && Drupal.settings.grievance_form_irsets) {
+			$('.form-item-irsets input').change(function() {
+				nid = $(this).val();
+				checked = $(this).prop('checked');
+				tids = Drupal.settings.grievance_form_irsets[nid];
+				if (tids.length) {
+					for (i=0; i<tids.length; ++i) {
+						tid = tids[i];
+						$('.field-name-field-grievance-document-types-form .form-item-field-grievance-document-types-und-' + tid + ' input:checkbox').prop('checked', checked); 
+					}
+				}
+			});
+			for (nid in Drupal.settings.grievance_form_irsets) {
+			}
+		}
 	});
 }(jQuery));
