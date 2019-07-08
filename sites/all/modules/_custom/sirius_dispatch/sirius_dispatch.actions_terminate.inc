@@ -17,13 +17,27 @@ function sirius_dispatch_terminate($dispatch_node, $notes = '') {
 		return $possible;
 	}
 
+	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+
+	// Terminations of "Accepted" dispatches after less than 24 hours keep their seniority.
+	if ($dispatch_node->field_sirius_dispatch_status['und'][0]['value'] == 'accepted') {
+		$report_ts = sirius_date_ts($job_node, 'field_sirius_datetime');
+		$duration = time() - $report_ts;
+		if ($duration < (24*60*60)) { 
+			$json = json_decode($worker_node->field_sirius_json['und'][0]['value'], TRUE);
+			$json['dispatch']['keep_seniority'] = 'Yes';
+			$worker_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+			node_save($worker_node);
+		}
+	}
+
 	// Set the dispatch status to "terminated", save and log
 	$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = 'terminated';
 	node_save($dispatch_node);
 	sirius_log('dispatch:terminate', 'complete', "Layoff complete", $notes, '', array($dispatch_node->nid));
 
 	// Notify the worker.
-	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
 	$unique_id = "UNIQUE/terminate/" . $dispatch_node->nid;
 	global $base_url;
 	$url = "$base_url/d/" . $dispatch_node->nid . "/" . $dispatch_node->field_sirius_aat['und'][0]['value'];
