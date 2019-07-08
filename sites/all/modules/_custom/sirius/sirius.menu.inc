@@ -59,13 +59,6 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
-  $node_tabs['sirius_feed']['sirius_feed_process'] = array(
-    'title' => 'Process',
-    'description' => '',
-    'callback' => 'sirius_node_tab_feed_process',
-    'permissions' => array('sirius admin'),
-  );
-
   $node_tabs['sirius_feed']['sirius_feed_wizard'] = array(
     'title' => 'Wizard',
     'description' => '',
