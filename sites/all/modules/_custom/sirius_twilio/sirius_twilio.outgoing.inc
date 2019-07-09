@@ -143,7 +143,7 @@ function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_dig
 	print "<Response>";
 	if ($gather_digits) { print "<Gather numDigits=\"$gather_digits\">"; }
 	print variable_get('sirius_twilio_twiml_open', '<Say><prosody>');
-	print substr($msg, 0, 3500);
+	print substr($msg, 0, 3000);
 	print variable_get('sirius_twilio_twiml_close', '</prosody></Say>');
 	if ($gather_digits) { print "</Gather>"; }
 	print "</Response>";

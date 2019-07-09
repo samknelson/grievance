@@ -112,6 +112,14 @@ function sirius_email_send($params) {
     }
   }
 
+  if (!$params['to']) {
+    return array('success' => FALSE, 'msg' => "No email address.");
+  }
+
+  if (!sirius_email_validate($params['to'])) {
+    return array('success' => FALSE, 'msg' => $params['to'] . " does not look like a valid email address.");
+  }
+
 	$message = drupal_mail(
 		'sirius', 
 		'default', 
