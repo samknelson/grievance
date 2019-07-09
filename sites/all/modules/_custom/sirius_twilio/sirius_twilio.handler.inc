@@ -7,7 +7,10 @@
 function sirius_twilio_handle_sms($msg, $phone) {
   $tokens = array();
   $tokens['sirius']['twilio']['input'] = $msg;
-  $text = "I'm sorry, I don't understand: $msg.";
+  global $base_url;
+  $text = "This system cannot respond to incoming messages.\n";
+  $text .= "Please sign in at the link below.\n";
+  $text .= $base_url;
   return sirius_twilio_outgoing_sms($phone, $text, $dispatch_node->nid);
 }
 

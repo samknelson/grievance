@@ -65,7 +65,8 @@ function sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid = N
 	}
 
 	// If we're already there, do nothing.
-	if ($dispstatus_tid == $worker_node->field_sirius_worker_dispstatus['und'][0]['tid']) { return array('success' => TRUE, 'msg' => 'The dispatch status is unchanged.'); }
+	$orig_dispstatus_tid = $worker_node->field_sirius_worker_dispstatus['und'][0]['tid'];
+	if ($dispstatus_tid == $orig_dispstatus_tid) { return array('success' => TRUE, 'msg' => 'The dispatch status is unchanged.'); }
 
 	// Find out if it's possible
 	$possible = sirius_dispatch_worker_dispstatus_set_possible($worker_node, $dispstatus_tid, $account);
@@ -114,27 +115,29 @@ function sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid = N
 	sirius_log($category, $type, $msg, $reason, '', $handler_nids, $attachments);
 
 	// Notify the worker
-	if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available') ||
-		$dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available')) {
+	if ($orig_dispstatus_tid != sirius_get_special_tid('sirius_worker_dispatch_status|employed')) {
+		if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available') ||
+			$dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available')) {
 
-		if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
-			$availdate = date('Y-m-d H:i:s', sirius_date_ts($worker_node, 'field_sirius_dispatch_availdate'));
-			$subject = "Dispatch system notification: Signed in";
-			$body = "You have been signed in to the out-of-work list, and are now eligible to receive dispatches. Your seniority date is $availdate.";
-			$sms = "Dispatch system notification: you have been signed in to the out-of-work list, and are now eligible to receive dispatches.  Your seniority date is $availdate.";
-		} else {
-			$subject = "Dispatch system notification: Signed out";
-			$body = "You have been signed out of the out-of-work list, and are not currently eligible to receive dispatches.";
-			$sms = "Dispatch system notification: you have been signed out of the out-of-work list, and are not currently eligible to receive dispatches.";
+			if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
+				$availdate = date('Y-m-d H:i:s', sirius_date_ts($worker_node, 'field_sirius_dispatch_availdate'));
+				$subject = "Dispatch system notification: Signed in";
+				$body = "You have been signed in to the out-of-work list, and are now eligible to receive dispatches. Your seniority date is $availdate.";
+				$sms = "Dispatch system notification: you have been signed in to the out-of-work list, and are now eligible to receive dispatches.  Your seniority date is $availdate.";
+			} else {
+				$subject = "Dispatch system notification: Signed out";
+				$body = "You have been signed out of the out-of-work list, and are not currently eligible to receive dispatches.";
+				$sms = "Dispatch system notification: you have been signed out of the out-of-work list, and are not currently eligible to receive dispatches.";
+			}
+			sirius_worker_notify(
+				$worker_node, 
+				array(
+					'subject' => $subject,
+					'body' => $body,
+					'sms' => $sms,
+				)
+			);
 		}
-		sirius_worker_notify(
-			$worker_node, 
-			array(
-				'subject' => $subject,
-				'body' => $body,
-				'sms' => $sms,
-			)
-		);
 	}
 
 	// Save the worker

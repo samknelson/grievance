@@ -224,7 +224,6 @@ function sirius_voice_send($params) {
 }
 
 function sirius_voice_already_sent($id) {
-  return FALSE;
   // SQL for speed
   $sql = "select * from node ";
   $sql .= "join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
