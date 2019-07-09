@@ -233,6 +233,10 @@ function sirius_sirius_wizard_info() {
     			'title' => 'Phone (Mobile)',
     			'required' => FALSE,
     		),
+    		'shop_name' => array(
+    			'title' => 'Current Employer Name',
+    			'required' => FALSE,
+    		),
     	),
     	'batch_size' => 50,
 	    'callback_row_verify' => 'sirius_feed_worker_row_verify',

@@ -642,9 +642,14 @@ function sirius_feed_wws_row_process($feed_node, $info, $data, $row) {
  ************************************************************************************************/
 
 function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precompute) {
-	static $work_status_map;
-	if (!$work_status_map) {
-		$work_status_map = sirius_taxonomy_load('sirius_work_status', 'field_sirius_id2', 'full');
+	static $employer_map;
+	if (!$employer_map) {
+		$sql = "select title, nid from node where type = 'grievance_shop'";
+		$stmt = db_query($sql, array());
+		while ($hr = $stmt->fetchAssoc()) {
+			$employer_map[$hr['title']] = $hr['nid'];
+		}
+		dpm($employer_map);
 	}
 
 	// Trim all
@@ -674,6 +679,13 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
   		return array('success' => FALSE, 'msg' => 'Multiple workers found with this ID.');
   	}
   	$row['worker_nid'] = $nid;
+  }
+
+  // Current Employer
+  if ($row['shop_name']) {
+  	$shop_nid = $employer_map[$row['shop_name']];
+  	if (!$shop_nid) { return array('success' => FALSE, 'msg' => 'Employer "' . $row['shop_name'] . '" not found.'); }
+  	if ($precompute) { $row['shop_nid'] = $shop_nid; }
   }
 
   return array('success' => TRUE, 'msg' => 'Looks good.');
@@ -711,6 +723,8 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
   if ($phone1) { $worker_node->field_sirius_phone['und'][0]['value'] = $phone1; }
   if ($phone2) { $worker_node->field_sirius_phone_alt['und'][0]['value'] = $phone2; }
   if ($row['email']) { $worker_node->field_sirius_email['und'][0]['value'] = $row['email']; }
+
+  if ($row['shop_nid']) { $worker_node->field_grievance_shop['und'][0]['target_id'] = $row['shop_nid']; }
 
 
   foreach (array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code') as $col) {
