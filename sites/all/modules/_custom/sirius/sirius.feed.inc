@@ -506,6 +506,13 @@ function sirius_feed_wizard_process_form($form, &$form_state, $info, $data, $fee
 	$form_state['feed_node'] = $feed_node;
 	$form_state['current_step'] = $current_step;
 
+	$form['limit'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Limit'),
+		'#size' => 5,
+		'#description' => t('Enter a number to process a limited number of batches, i.e. for testing. Leave blank to process the entire file.'),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Import Now',
@@ -519,14 +526,18 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 	$data = $form_state['data'];
 	$feed_node = $form_state['feed_node'];
 	$current_step = $form_state['current_step'];
+	$limit = $form_state['values']['limit'];
 
 	$batch_size = $info['feed']['batch_size'];
 	if (!$batch_size) { $batch_size = 10; }
 	$idx = 0;
 	$rows = $data['rows'];
+	$batch_count = 0;
 	while ($idx < $rows) {
 		$operations[] = array('sirius_feed_wizard_process_batch', array($feed_node, $info, $data, $idx));
 		$idx += $batch_size;
+		++$batch_count;
+		if ($limit && $batch_count >= $limit) { break; }
 	}
 	$operations[] = array('sirius_feed_wizard_process_finish', array($feed_node, $info, $data, $idx));
 	$batch = array('operations' => $operations);
@@ -624,4 +635,100 @@ function sirius_feed_wws_row_process($feed_node, $info, $data, $row) {
 	$result = sirius_feed_wws_row_verify($feed_node, $info, $data, $row, TRUE);
 	if (!$result['success']) { return $result; }
 	return sirius_worker_work_status_set(node_load($row['worker_nid']), $row['work_status_tid'], 'import', array());
+}
+
+/************************************************************************************************
+ * Worker Upload
+ ************************************************************************************************/
+
+function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precompute) {
+	static $work_status_map;
+	if (!$work_status_map) {
+		$work_status_map = sirius_taxonomy_load('sirius_work_status', 'field_sirius_id2', 'full');
+	}
+
+	// Trim all
+	foreach ($row as $key => $value) {
+		$row[$key] = trim($value);
+	}
+
+	if (!preg_match('/^\d+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
+
+	if ($row['phone'] && !sirius_phone_validate($row['phone'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone'); } else { $row['phone'] = sirius_phone_format($row['phone']); }
+	if ($row['phone_alt'] && !sirius_phone_validate($row['phone_alt'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Alt)'); } else { $row['phone_alt'] = sirius_phone_format($row['phone_alt']); }
+	if ($row['phone_mobile'] && !sirius_phone_validate($row['phone_mobile'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Mobile)'); } else { $row['phone_mobile'] = sirius_phone_format($row['phone_mobile']); }
+
+	if ($row['email'] && !sirius_email_validate($row['email'])) { return array('success' => FALSE, 'msg' => 'Invalid Email'); }
+
+  // Worker
+  if ($precompute) {
+  	$sql = "select max(entity_id) as a, min(entity_id) as b from field_data_field_sirius_id ";
+  	$sql .= "where entity_type = 'node' ";
+  	$sql .= "and bundle = 'sirius_worker' ";
+  	$sql .= "and field_sirius_id_value = :id ";
+  	$stmt = db_query($sql, array(':id' => $row['id']));
+  	$hr = $stmt->fetchAssoc();
+  	$nid = $hr['a'];
+  	$other_nid = $hr['b'];
+  	if ($nid != $other_nid) {
+  		return array('success' => FALSE, 'msg' => 'Multiple workers found with this ID.');
+  	}
+  	$row['worker_nid'] = $nid;
+  }
+
+  return array('success' => TRUE, 'msg' => 'Looks good.');
+}
+
+function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
+	$result = sirius_feed_worker_row_verify($feed_node, $info, $data, $row, TRUE);
+	if (!$result['success']) { return $result; }
+
+	if ($row['worker_nid']) {
+		$is_new = FALSE;
+		$worker_node = node_load($row['worker_nid']);
+	} else {
+		$is_new = TRUE;
+    global $user;
+    $worker_node = new stdClass();
+    $worker_node->type = 'sirius_worker';
+    $worker_node->language = LANGUAGE_NONE;
+    $worker_node->uid = $user->uid;
+    $worker_node->status = 1;
+    $worker_node->promote = 0;
+    $worker_node->comment = 0;
+    $worker_node->field_sirius_id['und'][0]['value'] = $row['id'];
+  }
+
+  $worker_node->field_sirius_name['und'][0]['given'] = $row['name_given'];
+  $worker_node->field_sirius_name['und'][0]['middle'] = $row['name_middle'];
+  $worker_node->field_sirius_name['und'][0]['family'] = $row['name_family'];
+
+  $phone1 = $row['phone'];
+  $phone2 = $row['phone_alt'];
+  if ($row['phone_mobile']) {
+  	if (!$phone1) { $phone1 = $row['phone_mobile']; } else { $phone2 = $row['phone_mobile']; }
+  }
+  if ($phone1) { $worker_node->field_sirius_phone['und'][0]['value'] = $phone1; }
+  if ($phone2) { $worker_node->field_sirius_phone_alt['und'][0]['value'] = $phone2; }
+  if ($row['email']) { $worker_node->field_sirius_email['und'][0]['value'] = $row['email']; }
+
+
+  foreach (array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code') as $col) {
+  	$has_address = FALSE;
+  	if ($row["address_$col"]) {
+  		$has_address = TRUE;
+  		$worker_node->field_sirius_address['und'][0][$col] = $row["address_$col"];
+  	}
+  	if ($has_address) {
+  		$worker_node->field_sirius_address['und'][0]['country'] = 'US';
+  	}
+  }
+
+  node_save($worker_node);
+
+  if ($is_new) {
+  	return array('success' => TRUE, 'msg' => 'Created a new worker.');
+  } else {
+  	return array('success' => TRUE, 'msg' => 'Updated an existing worker.');
+  }
 }

@@ -156,7 +156,7 @@ function sirius_sirius_wizard_info() {
     		),
     		'work_status_id' => array(
     			'title' => 'Work Status ID',
-    			'required' => FALSE,
+    			'required' => TRUE,
     		),
     	),
     	'batch_size' => 50,
@@ -165,6 +165,81 @@ function sirius_sirius_wizard_info() {
     ),
     'callback_launch' => 'sirius_feed_wizard_launch',
     'callback_launch_args' => array('feed_wws'),
+  );
+
+  $items['feed_worker'] = array(
+    'name' => 'feed_worker',
+    'title' => 'Workers',
+    'description' => 'Upload a new list of workers.',
+    'steps' => array(
+			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
+			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
+			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
+			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
+			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
+			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
+    ),
+    'feed' => array(
+    	'fields' => array(
+    		'id' => array(
+    			'title' => 'ID',
+    			'required' => TRUE,
+    		),
+    		'name_given' => array(
+    			'title' => 'First Name',
+    			'required' => FALSE,
+    		),
+    		'name_family' => array(
+    			'title' => 'Last Name',
+    			'required' => FALSE,
+    		),
+    		'name_middle' => array(
+    			'title' => 'Middle Name',
+    			'required' => FALSE,
+    		),
+    		'address_thoroughfare' => array(
+    			'title' => 'Address 1',
+    			'required' => FALSE,
+    		),
+    		'address_premise' => array(
+    			'title' => 'Address 2',
+    			'required' => FALSE,
+    		),
+    		'address_locality' => array(
+    			'title' => 'City',
+    			'required' => FALSE,
+    		),
+    		'address_administrative_area' => array(
+    			'title' => 'State',
+    			'required' => FALSE,
+    		),
+    		'address_postal_code' => array(
+    			'title' => 'Zip',
+    			'required' => FALSE,
+    		),
+    		'email' => array(
+    			'title' => 'Email',
+    			'required' => FALSE,
+    		),
+    		'phone' => array(
+    			'title' => 'Phone',
+    			'required' => FALSE,
+    		),
+    		'phone_alt' => array(
+    			'title' => 'Phone (Alt)',
+    			'required' => FALSE,
+    		),
+    		'phone_mobile' => array(
+    			'title' => 'Phone (Mobile)',
+    			'required' => FALSE,
+    		),
+    	),
+    	'batch_size' => 50,
+	    'callback_row_verify' => 'sirius_feed_worker_row_verify',
+	    'callback_row_process' =>'sirius_feed_worker_row_process',
+    ),
+    'callback_launch' => 'sirius_feed_wizard_launch',
+    'callback_launch_args' => array('feed_worker'),
   );
 
   return $items;
