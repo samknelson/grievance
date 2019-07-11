@@ -27,13 +27,13 @@ function sirius_phonetree($call_sid, $context) {
 		$msg = $context['outgoing_msg'];
 		unset($context['outgoing_msg']);
 		$msg = "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu.  Enter 9 to be connected with the operator. ";
+		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
 		$msg .= "Message repeates. ";
 		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu.  Enter 9 to be connected with the operator. ";
+		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
 		$msg .= "Message repeates. ";
 		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu.  Enter 9 to be connected with the operator. ";
+		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
 		sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, 1);
 	}
 
