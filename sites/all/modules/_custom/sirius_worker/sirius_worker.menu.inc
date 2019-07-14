@@ -97,6 +97,16 @@ function sirius_worker_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/employer/worker/list-ineligible'] = array(
+    'title' => 'Sirius: Employer: Worker: Ineligible List',
+    'description' => '',
+    'page callback' => 'sirius_worker_page_employer_worker_list_ineligible',
+    'page arguments' => array(),
+    'access callback' => array('sirius_worker_page_employer_worker_list_ineligible_access'),
+    'access arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/worker/me'] = array(
     'title' => 'Sirius: Worker: Me',
     'description' => '',
