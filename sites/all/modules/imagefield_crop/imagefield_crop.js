@@ -82,7 +82,7 @@ Drupal.behaviors.imagefield_crop = {
           ]
         });
       });
-    };
+    }
   }
 };
 
