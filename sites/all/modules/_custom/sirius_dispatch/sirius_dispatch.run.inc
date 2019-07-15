@@ -30,6 +30,10 @@ function sirius_dispatch_run_all() {
 }
 
 function sirius_dispatch_run($job_node) {
+  // Close jobs after the report date
+  $result = sirius_dispatch_run_check_report_date($job_node);
+  if (!$result['success']) { return $result; }
+
 	// Expire dispatches
 	$result = sirius_dispatch_run_expire($job_node);
 	if (!$result['success']) { return $result; }
@@ -52,6 +56,23 @@ function sirius_dispatch_run($job_node) {
 
 	return array('success' => TRUE);
 }
+
+function sirius_dispatch_run_check_report_date($job_node) {
+  $report_ts = sirius_date_ts($job_node, 'field_sirius_datetime');
+
+  if ($report_ts >= time()) { return array('success' => TRUE, 'msg' => 'Report date has not yet passed.'); }
+
+  $job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Filled';
+  $job_node->field_sirius_summary['und'][0]['value'] = 'Closing because report date passed on ' . date('c');
+  node_save($job_node);
+
+  if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+    sirius_log('job:run', 'complete', "The report date has passed. Closing the job.", '', '', array($job_node->nid));
+  }
+
+  return array('success' => FALSE, 'msg' => 'Report date has passed. Closing the job.');
+}
+
 
 function sirius_dispatch_run_error($job_node, $msg) {
 	sirius_log('job:run', 'error', $msg, '', '', array($job_node->nid));
@@ -144,7 +165,6 @@ function sirius_dispatch_run_notify($job_node) {
     }
   }
 	$msg = "Attempted $attempted notifications. Sent $count, with $failed failures.";
-  if ($failed) 
   if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
   	sirius_log('job:run', 'notify', $msg, '', '', array($job_node->nid));
   }
@@ -152,8 +172,13 @@ function sirius_dispatch_run_notify($job_node) {
 }
 
 function sirius_dispatch_run_create_dispatches($job_node) {
+  $policy = sirius_dispatch_job_policy($job_node);
+
   // Never create dispatches for CBNs.  Let's not even bother cluttering up the log.
-  if ($job_node->field_sirius_dispatch_job_type['und'][0]['tid'] == sirius_get_special_tid('sirius_dispatch_job_type|CBN')) {
+  if ($policy['run']['fan'] != 'Yes') {
+    if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+      sirius_log('job:run', 'create_dispatches', 'Dispatches are not created for call-by-names.', '', '', array($job_node->nid));
+    }
     return array('success' => TRUE, 'msg' => 'Dispatches are not created for call-by-names.');
   }
 

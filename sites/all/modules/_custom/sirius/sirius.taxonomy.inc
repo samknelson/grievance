@@ -66,6 +66,10 @@ function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include
 
     if ($key_type == 'tid') {
       $key = $term->tid;
+    } else if ($key_type == 'field_sirius_id') {
+      $key = $term->field_sirius_id['und'][0]['value'];
+    } else if ($key_type == 'field_sirius_id2') {
+      $key = $term->field_sirius_id2['und'][0]['value'];
     } else {
       $key = $term->name;
     }

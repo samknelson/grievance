@@ -10,6 +10,22 @@ use Twilio\TwiML;
 function sirius_twilio_incoming_sms() {
 	sirius_become_superuser(TRUE);
 	$phone = $_POST['From'];
+	$phone = sirius_phone_format_e164($phone);
+	sirius_log(
+		'twilio:conversation', 
+		'incoming_sms', 
+		$msg, 
+		'<pre>' . print_r($_REQUEST, 1) . '</pre>', 
+		$phone, 
+		array()
+	);
+	sirius_twilio_handle_sms($msg, $phone);
+	sirius_become_superuser(FALSE);
+}
+
+function sirius_twilio_incoming_sms_orig() {
+	sirius_become_superuser(TRUE);
+	$phone = $_POST['From'];
 	$msg = $_POST['Body'];
 
 	$phone = sirius_phone_format_e164($phone);

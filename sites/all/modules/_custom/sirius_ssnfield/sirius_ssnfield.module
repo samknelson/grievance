@@ -102,7 +102,7 @@ function sirius_ssnfield_field_widget_form(&$form, &$form_state, $field, $instan
       '#default_value' => $part2,
       '#size' => 2,
       '#maxlength' => 2,
-      '#prefix' => '<div class="sirius_ssnfield_part" style="float: leftt; display: inline-block; margin-left: 5px;">',
+      '#prefix' => '<div class="sirius_ssnfield_part" style="float: left; display: inline-block; margin-left: 5px;">',
       '#suffix' => '</div>',
     );
     $element['part3'] = array(
@@ -110,7 +110,7 @@ function sirius_ssnfield_field_widget_form(&$form, &$form_state, $field, $instan
       '#default_value' => $part3,
       '#size' => 4,
       '#maxlength' => 4,
-      '#prefix' => '<div class="sirius_ssnfield_part" style="float: leftt; display: inline-block; margin-left: 5px;">',
+      '#prefix' => '<div class="sirius_ssnfield_part" style="float: left; display: inline-block; margin-left: 5px;">',
       '#suffix' => '</div><div class="clearfix"></div>',
     );
 
@@ -125,8 +125,6 @@ function sirius_ssnfield_element_validate($element, &$form_state) {
   if (empty($element['#needs_validation'])) {
     return $element;
   }
-  dpm($element);
-  // dpm($form_state);
 }
 
 /**

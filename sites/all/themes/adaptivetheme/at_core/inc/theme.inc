@@ -612,7 +612,7 @@ function adaptivetheme_field__image($vars) {
     $output .= drupal_render($item);
 
     // Captions
-    if (isset($item['#item']['title']) && !empty($item['#item']['title']) && $image_settings_enabled == TRUE) {
+    if (isset($item['#children']) && isset($item['#item']['title']) && !empty($item['#item']['title']) && $image_settings_enabled == TRUE) {
 
       // Ouch this is ugly, please tell me how to get the actual width of the image.
       // image_style_load($item['#image_style']); will return the image style dimensions,

@@ -28,6 +28,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.pdf.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.representatives.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.taxonomy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.domain.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
@@ -188,6 +189,13 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
+  $defaultable_fields = array('sirius_domain');
+  foreach ($defaultable_fields as $field) {
+    if (isset($_GET[$field]) && isset($form['field_' . $field])) {
+      $form['field_' . $field]["und"]['#default_value'][0] = $_GET[$field];
+    }
+  }
+
   // Stupid patch for the "rolesfield" configuration form,
   if ($form_id == 'field_ui_field_edit_form') {
     if ($form['#field']['type'] == 'role') {
@@ -228,6 +236,10 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
     $form['field_grievance_shops']['#access'] = FALSE;
     $form['field_grievance_phone']['#access'] = FALSE;
     $form['field_grievance_phone_off']['#access'] = FALSE;
+  }
+
+  if (!user_access('sirius domain user admin')) {
+    $form['field_sirius_domain']['#accesss'] = FALSE;
   }
 }
 

@@ -61,8 +61,6 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 
 	if (!$deliver_now) { return array('success' => TRUE, 'msg' => "Queued for delivery: $phone, $msg"); }
 
-	drupal_set_message("Here with $deliver_now.");
-
 	foreach ($queue as $phone => $msg) {
 		try {
 			$client = sirius_twilio_client_get();
@@ -145,7 +143,7 @@ function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_dig
 	print "<Response>";
 	if ($gather_digits) { print "<Gather numDigits=\"$gather_digits\">"; }
 	print variable_get('sirius_twilio_twiml_open', '<Say><prosody>');
-	print substr($msg, 0, 3500);
+	print substr($msg, 0, 3000);
 	print variable_get('sirius_twilio_twiml_close', '</prosody></Say>');
 	if ($gather_digits) { print "</Gather>"; }
 	print "</Response>";

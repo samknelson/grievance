@@ -81,6 +81,7 @@ function sirius_pdf_generate($url, $params) {
 	$cmd .= '--server-args="-screen 0 1024x768x24" ';
 	$cmd .= '/usr/local/bin/wkhtmltopdf ';
 	$cmd .= $margin_args;
+	$cmd .= '-s letter ';
 	$cmd .= '--print-media-type ';
 	$cmd .= '-q ';
 	$cmd .= $input_html_path;

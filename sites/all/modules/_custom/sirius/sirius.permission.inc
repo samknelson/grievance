@@ -38,6 +38,22 @@ function sirius_permission() {
       'title' => t('Sirius Representative'), 
       'description' => t('Permission to act as representative of the union, such as a shop steward or business agent'),
     ),
+    'sirius domain switch' => array(
+      'title' => t('Sirius Domain Switch'),
+      'description' => t('Permission to change to a different domain'),
+    ),
+    'sirius domain switch all' => array(
+      'title' => t('Sirius Domain Switch All'),
+      'description' => t('Permission to change to ANY domain'),
+    ),
+    'sirius domain admin' => array(
+      'title' => t('Sirius Domain Admin'),
+      'description' => t('Permission to add, edit, or remove domains'),
+    ),
+    'sirius domain user admin' => array(
+      'title' => t('Sirius Domain User Admin'),
+      'description' => t('Permission to assign domains to users'),
+    ),
     'sirius letterhead use' => array(
       'title' => t('Sirius Letterhead Use'), 
       'description' => t('Permission to print onto letterhead'),
@@ -59,5 +75,6 @@ function sirius_node_access($node, $op, $account) {
   if ($node->type == 'sirius_feed') { return sirius_node_access_feed($node, $op, $account); }
   if ($node->type == 'sirius_letterhead') { return sirius_node_access_letterhead($node, $op, $account); }
   if ($node->type == 'sirius_contact') { return sirius_node_access_contact($node, $op, $account); }
+  if ($node->type == 'sirius_domain') { return sirius_node_access_domain($node, $op, $account); }
   return NODE_ACCESS_IGNORE;
 }
