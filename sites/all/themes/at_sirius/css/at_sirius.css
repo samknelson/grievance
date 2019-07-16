@@ -3285,6 +3285,10 @@ table.grievance-timeline tr.pending {
   #page-banner {
 
   }
+
+  div.sirius_noprint { 
+    display: none;
+  }
 }
 
 
