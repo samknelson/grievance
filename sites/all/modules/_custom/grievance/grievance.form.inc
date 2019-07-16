@@ -456,7 +456,13 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     );
     //$classification_tid = grievance_form_current_value('field_grievance_class_tid', 'tid', $form, $form_state); 
     //drupal_set_message("Here with $classification_tid");
-  }
+  } 
+
+  //
+  // Change the autocomplete path for classifications
+  //
+
+  $form['field_grievance_class_tid']['und']['#autocomplete_path'] = "grievance/autocomplete/grievance-job-class-tid/$contract_tplt_nid/";
 
   //
   // Add the "Assignee Notes" dropdown
