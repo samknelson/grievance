@@ -3248,10 +3248,12 @@ table.grievance-timeline tr.pending {
 
 @media only print {
   body, p, a {
-    font-size: 12pt;
+    font-size: 11pt;
     font-family: "Times New Roman", Times, serif;
     color: #000000;
-    background-color: #ffffff;
+  }
+  body, p, a, table, tr, td, th {
+    background-color: transparent !important;
   }
   /*
   #grievance-letter-body {
