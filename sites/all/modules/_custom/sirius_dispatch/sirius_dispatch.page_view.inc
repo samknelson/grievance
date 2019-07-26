@@ -215,6 +215,9 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['job_detail_section_b'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_grievance_departments'));
 	$form['job_detail_section_c'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_dispatch_job_type'));
 	$form['job_detail_section_d'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_notes'));
+	if ($is_accepted) {
+		$form['job_detail_section_e'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_attachments'));
+	}
 	$form['job_location_section_close'] = array('#markup' => '</div>');
 
 	$form['job_section_close'] = array('#markup' => '</div>');
