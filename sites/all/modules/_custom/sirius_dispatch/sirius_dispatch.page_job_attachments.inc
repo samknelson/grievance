@@ -136,18 +136,34 @@ function sirius_dispatch_job_attachment_file_download_access($file_item, $job_no
 
 	// Workers have access, but only if they have an active dispatch for this job.
 	$worker_node = sirius_worker_get();
-	if (!$worker_node) { return; }
-  $query = new EntityFieldQuery;
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'sirius_dispatch');
-  $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_node->nid);
-  $query->fieldCondition('field_sirius_worker', 'target_id', $worker_node->nid);
-  $stmt = $query->execute();
-  if (!$stmt['node']) { return; }
-  $dispatch_nid = array_keys($stmt['node'])[0];
-  $dispatch_node = node_load($dispatch_nid);
-  if (!$dispatch_node) { return; }
-  $dispatch_status = $dispatch_node->field_sirius_dispatch_status['und'][0]['value'];
-  drupal_set_message($dispatch_status);
-  if (in_array($dispatch_status, array('accepted', 'accepted_secondary', 'bullpen', 'resigned', 'terminated'))) { return TRUE; }
+	if ($worker_node) {
+	  $query = new EntityFieldQuery;
+	  $query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'sirius_dispatch');
+	  $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_node->nid);
+	  $query->fieldCondition('field_sirius_worker', 'target_id', $worker_node->nid);
+	  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('accepted', 'accepted_secondary', 'bullpen', 'resigned', 'terminated'), 'in');
+	  $stmt = $query->execute();
+	  if ($stmt['node']) { return TRUE; }
+	}
+
+	// If you're not signed in, but you have an AAT for an accepted dispatch, you have access. Using some slightly cumbersome code to ensure that 
+	// we don't get an empty string into the all_aats array. There's probably a tidier way to do this.
+	$all_aats = array();
+	if ($_REQUEST['aat']) { $all_aats[] = $_REQUEST['aat']; }
+	if ($_SESSION['aat']) { 
+		foreach ($_SESSION['aat'] as $key => $value) {
+			if ($key && $value) { $all_aats[] = $key; }
+		}
+	}
+	if ($all_aats) {
+	  $query = new EntityFieldQuery;
+	  $query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'sirius_dispatch');
+	  $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_node->nid);
+	  $query->fieldCondition('field_sirius_aat', 'value', $all_aats, 'in');
+	  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('accepted', 'accepted_secondary', 'bullpen', 'resigned', 'terminated'), 'in');
+	  $stmt = $query->execute();
+	  if ($stmt['node']) { return TRUE; }
+	}
 }

@@ -33,6 +33,14 @@ function sirius_dispatch_node_tabs() {
 
 
 
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_attachments'] = array(
+    'title' => 'Attachments',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_job_attachments',
+    'permissions' => array('sirius dispatch employer'),
+    'weight' => 1,
+  );
+
 
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen'] = array(
     'title' => 'Bullpen Details',
