@@ -19,7 +19,7 @@ class ReaderEntityFactory
      * @throws \Box\Spout\Common\Exception\UnsupportedTypeException
      * @return ReaderInterface
      */
-    public static function createReaderFromFile(string $path)
+    public static function createReaderFromFile($path)
     {
         return ReaderFactory::createFromFile($path);
     }
