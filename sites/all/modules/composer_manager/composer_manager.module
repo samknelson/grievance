@@ -287,7 +287,11 @@ function composer_manager_lock_file() {
  */
 function composer_manager_file_dir() {
   module_load_include('inc', 'composer_manager', 'composer_manager.writer');
-  $scheme = file_default_scheme();
+
+  // SKN Hack: Allow the composer manager scheme to be set in a setting.
+  // $scheme = file_default_scheme();
+  $scheme = variable_get('composer_manager_file_scheme', file_default_scheme());
+
   // Composer can only be run on a locally mounted file system. If the scheme is
   // set to something different like S3, we fall back to the public scheme.
   if (!in_array($scheme, array('public', 'private'))) {
