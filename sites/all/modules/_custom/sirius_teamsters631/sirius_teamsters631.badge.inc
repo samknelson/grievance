@@ -32,7 +32,8 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 		'red' => 'Red',
 		'green' => 'Green',
 		'orange' => 'Orange',
-		'saddlebrown' => 'Brown'
+		'saddlebrown' => 'Brown',
+		'#c203fc' => 'Purple',
 	);
 
 	$table = array();
@@ -46,6 +47,7 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 	$table[6] = array('bt' => 'saddlebrown', 'bb' => 'saddlebrown', 'msg' => 'Unskilled Extraboard');
 	$table[7] = array('bt' => 'green', 'bb' => '#272967', 'msg' => 'Specialty Craft / Active Member');
 	$table[8] = array('bt' => 'green', 'bb' => 'yellow', 'msg' => 'Specialty Craft / Non-Member');
+	$table[9] = array('bt' => '#c203fc', 'bb' => '#c203fc', 'msg' => 'Organizing Company');
 
 	$member_status_tids 		= sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
 	$is_ms_journeyman 			= in_array(271, $member_status_tids);
@@ -53,6 +55,7 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 	$is_ms_seb 							= in_array(270, $member_status_tids);
 	$is_ms_ueb 							= in_array(269, $member_status_tids);
 	$is_ms_specialty 				= in_array(673, $member_status_tids); 
+	$is_ms_organizing_company = in_array(628, $member_status_tids); 
 
 	$work_status_tid = sirius_fieldval($worker_node, 'field_sirius_work_status', 'tid');
 	$work_status_term = taxonomy_term_load($work_status_tid);
@@ -68,6 +71,7 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 	else if ($is_ms_ueb) 															{ $which = 6; }
 	else if ($is_ms_specialty && $is_ws_active) 			{ $which = 7; }
 	else if ($is_ms_specialty) 												{ $which = 8; }
+	else if ($is_ms_organizing_company) 								{ $which = 9; }
 
 	$rows = array();
 	foreach ($table as $rownum => $hr) {

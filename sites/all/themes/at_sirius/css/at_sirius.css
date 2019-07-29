@@ -3867,6 +3867,10 @@ lavenderblush #FFF0F5
 mistyrose #FFE4E1
 */
 
+div.sirius-view-multitable table {
+  table-layout: fixed;
+}
+
 /* /node/add/sirius-worker */
 input.ajax-processed {
   color: #5984be;
