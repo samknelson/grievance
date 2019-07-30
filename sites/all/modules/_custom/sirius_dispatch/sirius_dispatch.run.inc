@@ -207,6 +207,7 @@ function sirius_dispatch_run_create_dispatches($job_node) {
   }
 
   // We have too many -- error
+  /*
 	if ($count_we_need < $count_we_have) {
 		$msg = "We need $count_we_need dispatches, but there are already $count_we_have dispatches with status requested, notified, or pending. This job is oversubscribed.";
 		sirius_dispatch_run_error($job_node, $msg);
@@ -221,38 +222,41 @@ function sirius_dispatch_run_create_dispatches($job_node) {
     }
 		return array('success' => TRUE, 'msg' => $msg);
 	}
+  */
 
 	// We don't have enough
 	$count_to_create = $count_we_need - $count_we_have;
   $count_to_create = $count_to_create * $batch_ratio;
   if ($count_to_create > $batch_max) { $count_to_create = $batch_max; }
   if ($count_to_create < $batch_min) { $count_to_create = $batch_min; }
-	$workers = sirius_dispatch_job_get_dispatchable_workers(
-    $job_node, 
-    'dispatch', 
-    $count_to_create,
-    array('cbn' => 'No')
-  );
+  if ($count_to_create >= 1) {
+  	$workers = sirius_dispatch_job_get_dispatchable_workers(
+      $job_node, 
+      'dispatch', 
+      $count_to_create,
+      array('cbn' => 'No')
+    );
 
-	// Create all
-	$created = 0;
-	foreach ($workers as $worker) {
-		$worker_nid = $worker['nid'];
-		sirius_dispatch_actions_create($job_node, $worker_nid, 'No');
-		++$created;
-	}
+  	// Create all
+  	$created = 0;
+  	foreach ($workers as $worker) {
+  		$worker_nid = $worker['nid'];
+  		sirius_dispatch_actions_create($job_node, $worker_nid, 'No');
+  		++$created;
+  	}
 
-  // There are not enough dispatchable workers -- error
-  if (count($workers) < $count_to_create) {
-    $msg = "There are not enough dispatchable workers.";
-    sirius_dispatch_run_error($job_node, $msg);
-    return array('success' => FALSE, 'msg' => $msg);
-  }
+    // There are not enough dispatchable workers -- error
+    if (count($workers) < $count_to_create) {
+      $msg = "There are not enough dispatchable workers.";
+      sirius_dispatch_run_error($job_node, $msg);
+      return array('success' => FALSE, 'msg' => $msg);
+    }
 
-	// All done
-	$msg = "Created $created dispatches.";
-  if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
-  	sirius_log('job:run', 'create_dispatches', $msg, '', '', array($job_node->nid));
+  	// All done
+  	$msg = "Created $created dispatches.";
+    if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+    	sirius_log('job:run', 'create_dispatches', $msg, '', '', array($job_node->nid));
+    }
   }
 	return array('success' => TRUE, 'msg' => $msg);
 }
