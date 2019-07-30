@@ -87,6 +87,10 @@ if (at_sirius_is_popup()) {
               print l(t('account'),'user/'.$user->uid.'/edit');
               print " / ";
             }
+            if (user_access('sirius domain switch')) {
+              print l(t('domain'),'sirius/domain/switch');
+              print " / ";
+            }
             print l(t("logout"),"user/logout");
             print t('</div>');
           ?>

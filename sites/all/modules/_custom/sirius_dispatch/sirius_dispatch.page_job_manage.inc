@@ -22,7 +22,7 @@ function sirius_node_tab_dispatch_job_manage($job_node) {
 
 function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node) {
 	$form_state['job_node'] = $job_node;
-
+	$policy = sirius_dispatch_job_policy($job_node);
 	// drupal_add_js(drupal_get_path('module', 'sirius_dispatch') . '/js/sirius_dispatch.employer_job_view.js', 'file');
 	// drupal_add_css(drupal_get_path('module', 'sirius_dispatch') . '/css/sirius_dispatch.css');
   // drupal_add_library('system', 'ui.tabs');
@@ -47,64 +47,85 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 	$form['intro'] = array('#markup' => $html);
 
 	$status = $job_node->field_sirius_dispatch_job_status['und'][0]['value'];
+	global $user;
+	$user_roles = array_keys($user->roles);
+	$can_run = FALSE;
+	foreach ($user_roles as $rid) {
+		if (!$rid) { continue; }
+		if (!$policy['run']['role'][$rid]) { continue; }
+		$can_run = TRUE;
+	}
 
-	if (user_access('sirius dispatch staff')) {
-		// Staff form
-		$options = array();
-		$options[NULL] = t('-- Select --');
-		$options['refresh'] = t('Refresh this page');
+	// Staff form
+	$options = array();
+	$options[NULL] = t('-- Select --');
+	$options['refresh'] = t('Refresh this page');
+	$options['explain'] = t('Determine whether a specific worker is dispatchable to this job.');
+
+	if ($can_run) {
 
 		if ($status == 'Pending') {
-			$options['approve'] = t('Approve (move to "Unfilled")');
-			$options['member_status'] = t('Change Member Statuses (which "lists" are available)');
-			$options['archive'] = t('Archive (move to "Archived")');
+			$options['run'] = t('Run (dispatches will be created automatically until the job is filled.)');
+			if (user_access('sirius dispatch staff')) {
+				$options['approve'] = t('Approve (move to "Unfilled")');
+				$options['member_status'] = t('Change Member Statuses (which "lists" are available)');
+				$options['archive'] = t('Archive (move to "Archived")');
+			}
 		}
 
 		if ($status == 'Unfilled') {
-			$options['member_status'] = t('Change Member Statuses (which "lists" are available)');
 			$options['run'] = t('Run (dispatches will be created automatically until the job is filled.)');
-			$options['create_dispatches_auto'] = t('Create Dispatches - Automatic');
-			$options['create_dispatches_manual'] = t('Create Dispatches - Manual');
-			$options['notify'] = t('Send notifications');
 			$options['close'] = t('Close (mark as "Filled")');
-			$options['archive'] = t('Archive (move to "Archived")');
+			if (user_access('sirius dispatch staff')) {
+				$options['member_status'] = t('Change Member Statuses (which "lists" are available)');
+				$options['archive'] = t('Archive (move to "Archived")');
+				$options['create_dispatches_auto'] = t('Create Dispatches - Automatic');
+				$options['create_dispatches_manual'] = t('Create Dispatches - Manual');
+				$options['notify'] = t('Send notifications');
+			}
 		}
 
 		if ($status == 'Filled') {
-			$options['reopen'] = t('Re-open (mark as "Unfilled")');
-			$options['archive'] = t('Archive (move to "Archived")');
+			if (user_access('sirius dispatch staff')) {
+				$options['reopen'] = t('Re-open (mark as "Unfilled")');
+				$options['archive'] = t('Archive (move to "Archived")');
+			}
 		}
 
 		if ($status == 'Running') {
-			$options['poll'] = t('Poll Manually (will run automatically)');
 			$options['pause'] = t('Pause');
+			if (user_access('sirius dispatch staff')) {
+				$options['poll'] = t('Poll Manually (will run automatically)');
+			}
 		}
 
 		if ($status == 'Archived') {
-			$options['reopen'] = t('Re-open (mark as "Unfilled")');
+			if (user_access('sirius dispatch staff')) {
+				$options['reopen'] = t('Re-open (mark as "Unfilled")');
+			}
 		}
+	}
 
-		$options['explain'] = t('Determine whether a specific worker is dispatchable to this job.');
+	$form['action'] = array(
+		'#type' => 'select',
+		'#title' => 'Action',
+		'#required' => TRUE,
+		'#options' => $options,
+		// '#default_value' => 'create_dispatches_manual',
+	);
 
-		$form['action'] = array(
-			'#type' => 'select',
-			'#title' => 'Action',
-			'#required' => TRUE,
-			'#options' => $options,
-			// '#default_value' => 'create_dispatches_manual',
-		);
+	$form['wtf'] = array(
+		'#title' => t('Dispatch ID'),
+		'#type' => 'textfield',
+		'#size' => 5,
+		'#states' => array(
+	  	'visible' => array(
+	  		array(':input[name="action"]' => array('value' => 'explain')),
+	  	)
+		),
+	);
 
-		$form['wtf'] = array(
-			'#title' => t('Dispatch ID'),
-			'#type' => 'textfield',
-			'#size' => 5,
-			'#states' => array(
-		  	'visible' => array(
-		  		array(':input[name="action"]' => array('value' => 'explain')),
-		  	)
-			),
-		);
-
+	if (user_access('sirius dispatch staff')) {
 		$form['run_settings'] = array(
 			'#type' => 'fieldset',
 			'#title' => t('Running Job Settings'),
@@ -129,59 +150,65 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 
 		$form['run_settings']['description'] = array('#markup' => $html);
 
-
+		$default = $job_node->field_sirius_timelimit['und'][0]['value'];
+		if (!$default) { $default = $policy['run']['timelimit']; }
 		$form['run_settings']['timelimit'] = array(
 			'#title' => 'Expire After',
 			'#type' => 'textfield',
 			'#size' => 5,
-			'#default_value' => $job_node->field_sirius_timelimit['und'][0]['value'],
+			'#default_value' => $default,
 			'#description' => t('Enter the number of minutes before a dispatch notification should expire.'),
 		);
 
+		$default = $job_node->field_sirius_batch_max['und'][0]['value'];
+		if (!$default) { $default = $policy['run']['batch_max']; }
 		$form['run_settings']['batch_max'] = array(
 			'#title' => 'Maximum Batch Size',
 			'#type' => 'textfield',
 			'#size' => 5,
-			'#default_value' => $job_node->field_sirius_batch_max['und'][0]['value'],
+			'#default_value' => $default,
 			'#description' => t('Enter the maxminum number ofnotifications that will be sent in any given batch'),
 		);
 
+		$default = $job_node->field_sirius_batch_min['und'][0]['value'];
+		if (!$default) { $default = $policy['run']['batch_min']; }
 		$form['run_settings']['batch_min'] = array(
 			'#title' => 'Minimum Batch Size',
 			'#type' => 'textfield',
 			'#size' => 5,
-			'#default_value' => $job_node->field_sirius_batch_min['und'][0]['value'],
+			'#default_value' => $default,
 			'#description' => t('Enter the minimum numer of notifications that will be sent in any given batch. If this is greater than 1, then it is possible that more notifications will be sent than the number of open slots, meaning that there is no guarantee that the job will be filled in seniority order.'),
 		);
 
+		$default = $job_node->field_sirius_batch_ratio['und'][0]['value'];
+		if (!$default) { $default = $policy['run']['batch_ratio']; }
 		$form['run_settings']['batch_ratio'] = array(
 			'#title' => 'Ratio of Notifications to Slots',
 			'#type' => 'textfield',
 			'#size' => 5,
-			'#default_value' => $job_node->field_sirius_batch_ratio['und'][0]['value'],
+			'#default_value' => $default,
 			'#description' => t('Enter the number of notifications to be sent for each open slot. If this is greater than 1, then there will be more than one notification sent for each slot, meaning that there is no guarantee that the job will be filled in seniority order.'),
 		);
+	}
 
-		$description = '';
-		if (!$options) {
-			$description = t('There are no dispatchable workers. You might want to open some additional members statuses for this job.');
-		}
-
+	if ($can_run) {
 		$workers_visible = array(
 	  	'visible' => array(
 	  		array(':input[name="action"]' => array('value' => 'create_dispatches_manual')),
 	  	)
 		);
 
-		$form['sirius_dispatch_cbn'] = array(
-			'#title' => 'Call by Name?',
-			'#type' => 'select',
-			'#options' => array(
-				'No' => 'No',
-				'Yes' => 'Yes',
-			),
-			'#states' => $workers_visible,
-		);
+		if (user_access('sirius dispatch staff')) {
+			$form['sirius_dispatch_cbn'] = array(
+				'#title' => 'Call by Name?',
+				'#type' => 'select',
+				'#options' => array(
+					'No' => 'No',
+					'Yes' => 'Yes',
+				),
+				'#states' => $workers_visible,
+			);
+		}
 
 		$form += sirius_dispatch_job_workerform($form, $form_state, $workers_visible);
 
@@ -196,69 +223,45 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 			),
 		);
 
-		$member_status_terms = sirius_worker_member_status_get_open_statuses($job_node->field_sirius_industry['und'][0]['tid']);
-		$options = array();
-		foreach ($member_status_terms as $member_status_term) {
-			$options[$member_status_term->tid] = $member_status_term->name;
-		}
-		$defaults = array();
-		if ($job_node->field_sirius_member_status['und'][0]['tid']) {
-			foreach ($job_node->field_sirius_member_status['und'] as $tmp) {
-				$defaults[$tmp['tid']] = $tmp['tid'];
+		if (user_access('sirius dispatch staff')) {
+			$member_status_terms = sirius_worker_member_status_get_open_statuses($job_node->field_sirius_industry['und'][0]['tid']);
+			$options = array();
+			foreach ($member_status_terms as $member_status_term) {
+				$options[$member_status_term->tid] = $member_status_term->name;
 			}
+			$defaults = array();
+			if ($job_node->field_sirius_member_status['und'][0]['tid']) {
+				foreach ($job_node->field_sirius_member_status['und'] as $tmp) {
+					$defaults[$tmp['tid']] = $tmp['tid'];
+				}
+			}
+			$form['member_status'] = array(
+				'#title' => t('Member Statuses'),
+				'#type' => 'checkboxes',
+				'#options' => $options,
+				'#default_value' => $defaults,
+				'#description' => t('Specify which member statuses (or "lists") may be dispatched for this job.'),
+				'#states' => array(
+			  	'visible' => array(
+			  		array(':input[name="action"]' => array('value' => 'member_status')),
+			  	)
+				),
+			);
+
+			$form['notes'] = array(
+				'#type' => 'textarea',
+				'#title' => t('Notes'),
+			);
 		}
-		$form['member_status'] = array(
-			'#title' => t('Member Statuses'),
-			'#type' => 'checkboxes',
-			'#options' => $options,
-			'#default_value' => $defaults,
-			'#description' => t('Specify which member statuses (or "lists") may be dispatched for this job.'),
-			'#states' => array(
-		  	'visible' => array(
-		  		array(':input[name="action"]' => array('value' => 'member_status')),
-		  	)
-			),
-		);
+	}
 
-		$form['notes'] = array(
-			'#type' => 'textarea',
-			'#title' => t('Notes'),
-		);
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'Submit',
+	);
 
-		$form['submit'] = array(
-			'#type' => 'submit',
-			'#value' => 'Submit',
-		);
-
+	if (user_access('sirius dispatch staff')) {
 		$form += sirius_log_render_form($job_node->nid);
-	} else {
-		// Employer form
-		$options = array();
-		$options[NULL] = t('-- Select --');
-		$options['refresh'] = t('Refresh this page');
-		$options['explain'] = t('Determine whether a specific worker is dispatchable to this job.');
-		$form['action'] = array(
-			'#type' => 'select',
-			'#title' => 'Action',
-			'#required' => TRUE,
-			'#options' => $options,
-		);
-
-		$form['wtf'] = array(
-			'#title' => t('Dispatch ID'),
-			'#type' => 'textfield',
-			'#size' => 5,
-			'#states' => array(
-		  	'visible' => array(
-		  		array(':input[name="action"]' => array('value' => 'explain')),
-		  	)
-			),
-		);
-
-		$form['submit'] = array(
-			'#type' => 'submit',
-			'#value' => 'Submit',
-		);
 	}
 
 	$html = '';
@@ -274,6 +277,7 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 
 function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 	$job_node = $form_state['job_node'];
+	$policy = sirius_dispatch_job_policy($job_node);
 	$action = $form_state['values']['action'];
 	$notes = $form_state['values']['notes'];
 
@@ -312,23 +316,24 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 
 	if ($action == 'run') {
 		$timelimit = $form_state['values']['timelimit'];
+		if (!$timelimit) { $timelimit = $policy['run']['timelimit']; }
 		if ($timelimit < 1) { drupal_set_message(t('Time limit must be at least one minute.'), 'error'); $is_error = TRUE; }
 
 		$system_max = variable_get('sirius_dispatch_run_create_count', 25);
 		$batch_min = $form_state['values']['batch_min'];
-		if (!$batch_min) { $batch_min = 1; }
+		if (!$batch_min) { $batch_min = $policy['run']['batch_min']; }
 		if ($batch_min < 1) { drupal_set_message(t('Minimum batch size must be at least 1.'), 'error');  $is_error = TRUE; }
 		if ($batch_min > $system_max) { drupal_set_message(t('Minimum batch size cannot be greater than @max.', array('@max' => $system_max)), 'error'); $is_error = TRUE; }
 
 		$batch_max = $form_state['values']['batch_max'];
-		if (!$batch_max) { $batch_max = $system_max; }
+		if (!$batch_max) { $batch_max = $policy['run']['batch_max']; }
 		if ($batch_max < 1) { drupal_set_message(t('Maximum batch size must be at least 1.'), 'error'); $is_error = TRUE; }
 		if ($batch_max > $system_max) { drupal_set_message(t('Maxium batch size cannot be greater than @max.', array('@max' => $system_max)), 'error'); $is_error = TRUE; }
 
 		$batch_ratio = $form_state['values']['batch_ratio'];
-		if (!$batch_ratio) { $batch_ratio = 1; }
+		if (!$batch_ratio) { $batch_ratio = $policy['run']['batch_ratio']; }
 		if ($batch_ratio < 0.5) { drupal_set_message(t('Batch ratio must be at least 0.5'), 'error'); $is_error = TRUE; }
-		if ($batch_ratio > 5) { drupal_set_message(t('Batch ratio cannot be larger than 5.'), 'error'); $is_error = TRUE; }
+		if ($batch_ratio > 50) { drupal_set_message(t('Batch ratio cannot be larger than 50.'), 'error'); $is_error = TRUE; }
 
 		if ($is_error) {
 			$form_state['rebuild'] = TRUE;
@@ -449,6 +454,6 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 				drupal_set_message(t("Notification to @name failed: @msg", array('@name' => $worker_node->title, '@msg' => $result['msg'])), 'warning');
 			}
 	  }
-		sirius_log('job:notify', 'notify', "Sent $count notifications", $notes, $notes, array($job_node->nid));
+		// sirius_log('job:notify', 'notify', "Sent $count notifications", $notes, $notes, array($job_node->nid));
 	}
 }

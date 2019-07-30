@@ -64,6 +64,7 @@ features[views_view][] = sirius_dispatches
 features[views_view][] = sirius_employer_users
 features[views_view][] = sirius_employer_workers
 features[views_view][] = sirius_employers
+features[views_view][] = sirius_feeds
 features[views_view][] = sirius_grievance_quick_export
 features[views_view][] = sirius_help
 features[views_view][] = sirius_industries

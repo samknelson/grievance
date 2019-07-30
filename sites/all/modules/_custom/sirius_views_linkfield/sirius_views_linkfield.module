@@ -33,6 +33,8 @@ class sirius_views_linkfield_field extends views_handler_field {
     $options = parent::option_definition();
     $options['sirius_linkfield_text']['default'] = '';
     $options['sirius_linkfield_path']['default'] = '';
+    $options['sirius_linkfield_check_permission']['default'] = 'No';
+    $options['sirius_linkfield_classes']['default'] = '';
 
 
     // Override the alter text option to always alter the text.
@@ -63,6 +65,24 @@ class sirius_views_linkfield_field extends views_handler_field {
       '#default_value' => $this->options['sirius_linkfield_path'],
     );
 
+    $form['sirius_linkfield_classes'] = array(
+      '#title' => t('Extra Classes'),
+      '#description' => t("Extra classes to be added to the href."),
+      '#type' => 'textfield',
+      '#default_value' => $this->options['sirius_linkfield_classes'],
+    );
+
+    $form['sirius_linkfield_check_permission'] = array(
+      '#title' => t('Check Permission?'),
+      '#description' => t("Should the link check the permission of the visitor? This triggers a call to Drupal's \"valid_path()\"."),
+      '#type' => 'select',
+      '#options' => array(
+        'No' => t('No'),
+        'Yes' => t('Yes'),
+      ),
+      '#default_value' => $this->options['sirius_linkfield_check_permission'],
+    );
+
     parent::options_form($form, $form_state);
   }
 
@@ -70,6 +90,8 @@ class sirius_views_linkfield_field extends views_handler_field {
     // Return the text, so the code never thinks the value is empty.
     $text = $this->options['sirius_linkfield_text'];
     $path = $this->options['sirius_linkfield_path'];
+    $check_permission = $this->options['sirius_linkfield_check_permission'];
+    $classes = explode(' ', $this->options['sirius_linkfield_classes']);
 
     // It ought to be this simple.  But it's not, because tokenize_value only exists if one of the preceding fields on this row
     // has "rewrite" implemented.  And I can't figure out how to force it.
@@ -104,10 +126,14 @@ class sirius_views_linkfield_field extends views_handler_field {
     );
     $text = strip_tags($this->render_altered($fake_item, $tokens));
 
-    //if (!drupal_valid_path($path)) {
-    //  return NULL;
-    //}
+    if ($check_permission == 'Yes') {
+      if (!drupal_valid_path($path)) {
+        return NULL;
+      }
+    }
 
-    return l($text, $path);
+    $attributes = array();
+    if ($classes) { $attributes['class'] = $classes; }
+    return l($text, $path, array('attributes' => $attributes));
   }
 }

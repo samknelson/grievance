@@ -59,10 +59,11 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
-  $node_tabs['sirius_feed']['sirius_feed_process'] = array(
-    'title' => 'Process',
+  $node_tabs['sirius_feed']['sirius_feed_wizard'] = array(
+    'title' => 'Wizard',
     'description' => '',
-    'callback' => 'sirius_node_tab_feed_process',
+    'callback' => 'sirius_node_tab_feed_wizard',
+    'callback arguments' => array(),
     'permissions' => array('sirius admin'),
   );
 
@@ -71,6 +72,13 @@ function sirius_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_letterhead_preview',
     'permissions' => array('sirius dispatch letterhead edit'),
+  );
+
+  $node_tabs['sirius_domain']['sirius_domain_subdomains'] = array(
+    'title' => 'Subdomains',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_subdomains',
+    'permissions' => array('sirius domain admin'),
   );
 
   return $node_tabs;
@@ -101,6 +109,9 @@ function sirius_menu() {
       );
       if ($tab_record['weight']) {
         $items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
+      }
+      if ($tab_record['page arguments']) {
+        $items['node/%node/' . $tab_name]['page_arguments'] = array_merge($items['node/%node/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
       }
     }
   }
@@ -171,6 +182,14 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/config/menu'] = array(
+    'title' => 'Menu Configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_menu_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/voice/forward-to-operator'] = array(
     'title' => 'Incoming Calls',
     'page callback' => 'sirius_page_voice_forward_to_operator',
@@ -223,6 +242,57 @@ function sirius_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $items['sirius/letterhead/sample-html/%node'] = array(
+    'title' => 'Sample HTML for Letterhead',
+    'description' => '',
+    'access callback' => 'sirius_loopback_access',
+    'page callback' => 'sirius_letterhead_preview_loopback',
+    'page arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/feeds/launch/%'] = array(
+    'title' => 'Start an Upload',
+    'description' => '',
+    'access callback' => 'sirius_feed_page_launch_access',
+    'access arguments' => array(3),
+    'page callback' => 'sirius_feed_page_launch',
+    'page arguments' => array(3),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/feeds/%'] = array(
+    'title' => 'Feed List',
+    'description' => '',
+    'access callback' => 'sirius_feed_page_list_access',
+    'access arguments' => array(2),
+    'page callback' => 'sirius_feed_page_list',
+    'page arguments' => array(2),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/feeds'] = array(
+    'title' => 'Feeds',
+    'description' => '',
+    'access callback' => 'sirius_feed_page_landing_access',
+    'access arguments' => array(),
+    'page callback' => 'sirius_feed_page_landing',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  /*
+  $items['taxonomy/term/%/sirius_dispatch_job_policy_exim'] = array(
+    'title' => 'Policy Export / Import',
+    'description' => '',
+    'access callback' => 'sirius_dispatch_job_policy_exim_access',
+    'access arguments' => array(2),
+    'page callback' => 'sirius_dispatch_job_policy_exim',
+    'page arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 60,
+  );
+  */
 
   return $items;
 }
@@ -239,7 +309,11 @@ function sirius_node_tab_content($node, $in_tab_name) {
       foreach ($node_record as $tab_name => $tab_record) {
         if ($tab_name == $in_tab_name) {
           $callback = $tab_record['callback'];
-          return $callback($node);
+          $args = array($node);
+          if ($tab_record['callback arguments']) {
+            $args = array_merge($args, $tab_record['callback arguments']);
+          }
+          return call_user_func_array($callback, $args);
         }
       }
     }
@@ -278,3 +352,43 @@ function sirius_node_tab_access($node, $in_tab_name) {
   
   return false;
 }
+
+function sirius_menu_block_view() {
+  $block = array();
+  $block['subject'] = '';
+  $block['content'] = superfish_contents(3)['content'];
+  return $block;
+}
+
+function sirius_menu_admin() {
+  $role_options = array_map('check_plain', user_roles());
+  $menu_options = menu_parent_options(menu_get_menus(), array('mlid' => 0));
+
+  for ($delta = 1; $delta <=4; ++$delta) {
+    $form[$delta] = array(
+      '#type' => 'fieldset',
+      '#title' => 'Menu #' . $delta,
+    );
+
+    $form[$delta]['superfish_menu_' . $delta] = array(
+      '#type' => 'select',
+      '#title' => t('Menu'),
+      '#default_value' => variable_get('superfish_menu_' . $delta, 'main-menu:0'),
+      '#options' => $menu_options,
+    );
+
+     // Per-role visibility.
+    $default_role_options = db_query("SELECT rid FROM {block_role} WHERE module = 'superfish' AND delta = :delta", array(
+      ':delta' => $delta,
+    ))->fetchCol();
+    $form[$delta]['roles'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Roles'),
+      '#default_value' => $default_role_options,
+      '#options' => $role_options,
+    );
+  }
+
+  return system_settings_form($form);
+}
+

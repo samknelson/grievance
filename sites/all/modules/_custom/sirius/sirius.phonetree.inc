@@ -27,13 +27,13 @@ function sirius_phonetree($call_sid, $context) {
 		$msg = $context['outgoing_msg'];
 		unset($context['outgoing_msg']);
 		$msg = "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu.  Enter 9 to be connected with the operator. ";
+		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
 		$msg .= "Message repeates. ";
 		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu.  Enter 9 to be connected with the operator. ";
+		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
 		$msg .= "Message repeates. ";
 		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu.  Enter 9 to be connected with the operator. ";
+		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
 		sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, 1);
 	}
 
@@ -314,7 +314,14 @@ function sirius_phonetree_dispatch_list($call_sid, $context) {
   $query->propertyOrderBy('created');
   $stmt = $query->execute();
   if ($stmt['node']) {
-		$dispatch_nodes = array_values(node_load_multiple(array_keys($stmt['node'])));
+		$candidate_dispatch_nodes = array_values(node_load_multiple(array_keys($stmt['node'])));
+		$dispatch_nodes = array();
+		foreach ($candidate_dispatch_nodes as $candidate_dispatch_node) {
+			$check = sirius_dispatch_accept_possible($candidate_dispatch_node);
+			if ($check['success']) {
+				$dispatch_nodes[] = $candidate_dispatch_node;
+			}
+		}
   }
 
 	if ($digits == 8) {

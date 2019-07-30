@@ -85,17 +85,10 @@ function grievance_node_update($node) {
       $node->grievance_status_changed = TRUE;
     }
   }
-
-  if ($node->type == 'grievance_contract_clause')     { grievance_contract_clause_updateinsert($node); }
-  if ($node->type == 'grievance_contract_section')    { grievance_contract_section_updateinsert($node); }
-  if ($node->type == 'grievance_contract_template')   { grievance_contract_template_updateinsert($node); }
 }
 
 function grievance_node_insert($node) {
   if ($node->type == 'grievance') { $node->grievance_assignment_changed = TRUE; }
-  if ($node->type == 'grievance_contract_clause')     { grievance_contract_clause_updateinsert($node); }
-  if ($node->type == 'grievance_contract_section')    { grievance_contract_section_updateinsert($node); }
-  if ($node->type == 'grievance_contract_template')   { grievance_contract_template_updateinsert($node); }
 }
 
 /*
@@ -463,6 +456,56 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     require_once DRUPAL_ROOT . "/sites/all/modules/better_exposed_filters/better_exposed_filters.theme";
   }
 
+  // On the clause search, restrict the list of avaiable tags based on the contract.
+  if ($form_id == 'views_exposed_form' && 
+    isset($form_state['view']) && 
+    $form_state['view']->name == 'grievance_contract_clauses' &&
+    isset($form_state['view']->args)) {
+
+    $contract_nid = $form_state['view']->args[0];
+    if ($contract_nid) {
+      if ($form['field_grievanct_cont_clse_tags_tid']['#options']) {
+        $sql = "select distinct field_grievanct_cont_clse_tags_tid as tid ";
+        $sql .= "from field_data_field_grievanct_cont_clse_tags, field_data_field_grievance_contract_tplt ";
+        $sql .= "where field_data_field_grievanct_cont_clse_tags.entity_type = 'node' ";
+        $sql .= "and field_data_field_grievance_contract_tplt.entity_type = 'node' ";
+        $sql .= "and field_data_field_grievance_contract_tplt.entity_id = field_data_field_grievanct_cont_clse_tags.entity_id ";
+        $sql .= "and field_grievance_contract_tplt_target_id = :contract_nid ";
+        $stmt = db_query($sql, array(':contract_nid' => $contract_nid));
+        $tids = array();
+        while ($hr = $stmt->fetchAssoc()) { $tids[$hr['tid']] = TRUE; }
+        $to_remove = array();
+        foreach ($form['field_grievanct_cont_clse_tags_tid']['#options'] as $tid => $ignore) { 
+          if ($tid && $tid != 'All' && !$tids[$tid]) { $to_remove[] = $tid; }
+        }
+        foreach ($to_remove as $tid) {
+          unset($form['field_grievanct_cont_clse_tags_tid']['#options'][$tid]);
+        }
+      }
+
+      if ($form['field_grievance_cont_sec_tags_tid']['#options']) {
+        $sql = "select distinct field_grievance_cont_sec_tags_tid as tid ";
+        $sql .= "from field_data_field_grievance_cont_sec_tags, field_data_field_grievance_contract_tplt ";
+        $sql .= "where field_data_field_grievance_cont_sec_tags.entity_type = 'node' ";
+        $sql .= "and field_data_field_grievance_contract_tplt.entity_type = 'node' ";
+        $sql .= "and field_data_field_grievance_contract_tplt.entity_id = field_data_field_grievance_cont_sec_tags.entity_id ";
+        $sql .= "and field_grievance_contract_tplt_target_id = :contract_nid ";
+        $stmt = db_query($sql, array(':contract_nid' => $contract_nid));
+        $tids = array();
+        while ($hr = $stmt->fetchAssoc()) { $tids[$hr['tid']] = TRUE; }
+        $to_remove = array();
+        foreach ($form['field_grievance_cont_sec_tags_tid']['#options'] as $tid => $ignore) { 
+          if ($tid && $tid != 'All' && !$tids[$tid]) { $to_remove[] = $tid; }
+        }
+        foreach ($to_remove as $tid) {
+          unset($form['field_grievance_cont_sec_tags_tid']['#options'][$tid]);
+        }
+      }
+    }
+
+
+  }
+
   // Add some information to deletion confirmations
   if ($form_id == 'node_delete_confirm') {
     grievance_delete_form_alter_node_delete_confirm($form, $form_state);
@@ -511,6 +554,10 @@ function grievance_classes_array($new_classes = null) {
   }
 
   return $classes;
+}
+
+function grievance_preprocess_views_secondary_row_view_table(&$vars) {
+  grievance_contract_views_secondary_row_view_table($vars);
 }
 
 function grievance_preprocess_html(&$variables) {

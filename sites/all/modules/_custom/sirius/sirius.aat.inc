@@ -44,5 +44,6 @@ function sirius_aat_check($node) {
 	$aat = $node->field_sirius_aat['und'][0]['value'];
 	if (!$aat) { return FALSE; }
 	if ($_REQUEST['aat'] == $aat) { return TRUE; }
-	return $_SESSION['aat'][$aat];
+	if ($_SESSION['aat'][$aat]) { return TRUE; }
+	return FALSE;
 }

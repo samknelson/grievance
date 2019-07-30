@@ -553,6 +553,13 @@ function sirius_node_tab_worker_dispatch_preferences_form_submit($form, &$form_s
 			$worker_node->field_sirius_dispatch_eba['und']['0']['value'] = $new_eba;
 			$need_save = TRUE;
 			sirius_log('worker:eba', 'set', 'EBA status set to ' . $new_eba, '', '', array($worker_node->nid), array());
+
+			if ($new_eba == 'Yes') {
+				$newdate = gmdate('Y-m-d H:i:s');
+				$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $newdate;
+				sirius_log('worker:availdate', 'set', "Set worker's availability date to $newdate", 'Signed in to EBA', '', array($worker_node->nid));
+			}
+
 			drupal_set_message('Employed-but-available status set to ' . $new_eba . '.');
 		}
 

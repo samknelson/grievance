@@ -30,3 +30,21 @@ function sirius_worker_page_employer_worker_list($member_status_tid = NULL) {
 
 	return $result;
 }
+
+function sirius_worker_page_employer_worker_list_ineligible_access() {
+	if (!user_access('sirius dispatch employer')) { return FALSE; }
+	return TRUE;
+}
+
+function sirius_worker_page_employer_worker_list_ineligible() {
+
+	$title = t('Employed but Ineligible');
+	drupal_set_title($title);
+
+	global $user;
+	$user_full = user_load($user->uid);
+	$shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
+	$result .= views_embed_view('sirius_employer_workers_ineligible', 'block_1', $shop_nid);
+
+	return $result;
+}

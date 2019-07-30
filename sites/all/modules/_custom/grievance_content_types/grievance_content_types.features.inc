@@ -225,6 +225,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'sirius_feed' => array(
+      'name' => t('Sirius Feed'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'sirius_help' => array(
       'name' => t('Sirius Help'),
       'base' => 'node_content',
