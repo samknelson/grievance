@@ -47,11 +47,11 @@ function sirius_page_voice_forward_to_operator() {
       $html .= '<strong>' . $worker_node->title . '</strong><br />';
       $html .= l('View', "node/$worker_nid", array('attributes' => array('class' => array('tool-button'))));
   		$html .= ' ';
-  		$html .= l('Dispatch Status', "node/$worker_nid/sirius_worker_dispatch_status", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+  		$html .= l('Dispatch Status', "node/$worker_nid/sirius_worker_dispatches/status", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
   		$html .= ' ';
-  		$html .= l('Dispatches', "node/$worker_nid/sirius_worker_dispatches", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+  		$html .= l('Dispatches', "node/$worker_nid/sirius_worker_dispatches/current", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
   		$html .= ' ';
-  		$html .= l('Preferences', "node/$worker_nid/sirius_worker_dispatch_preferences", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+  		$html .= l('Preferences', "node/$worker_nid/sirius_worker_dispatches/sirius_worker_dispatch_preferences", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
       $html .= '<br />Authenticated by: Signed in to the phone system';
   		$html .= '<br style="clear: left;" />';
   	} else if ($from) {
