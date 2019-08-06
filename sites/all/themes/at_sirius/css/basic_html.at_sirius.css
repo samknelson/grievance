@@ -36,6 +36,9 @@ a.tool-button:hover {
 	border-color: #1b4784;
 }
 
+.block a.action-button,
+a.action-button:visited,
+a.action-button:link,
 a.action-button {
 	background-color: #1b4784;
 	color: #ffffff;
@@ -55,13 +58,28 @@ hr {
 }
 
 #grievance-letter-body table tr td {
-	padding: 22px 0 22px 0px;
+	padding: 7px 0px;
 }
 #grievance-letter-body table {
 	border: 0;
 }
-#grievance-letter-body {
-	background-color: #fff; 
+#grievance-letter-body tbody tr {
+	border-color: #000;	
+	background-color: transparent;
+}
+
+@media only screen {
+	#grievance-letter-body {
+		background-color: #fff; 
+	}
+	.view-grievance-log thead tr {
+		background-color: #fff;
+	}
+}
+@media only print {
+	#grievance-letter-body table {
+		border-color: #000;
+	}
 }
 
 .view-grievance-log table hr {
@@ -84,9 +102,6 @@ hr {
 }
 .view-grievance-log td.views-field-nothing pre {
 	margin: 0;
-}
-.view-grievance-log thead tr {
-	background-color: #fff;
 }
 .view-grievance-log table {
 	border: 1px solid #5984be;
