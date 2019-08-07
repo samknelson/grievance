@@ -62,6 +62,14 @@ function sirius_permission() {
       'title' => t('Sirius Letterhead Edit'), 
       'description' => t('Permission to create or edit letterhead'),
     ),
+    'sirius signature edit' => array(
+      'title' => t('Sirius Signature Edit'),
+      'description' => t('Permission to edit an uploaded signature on a user record that you have access to. Most users will have access only to their own signature, but admin users will have access to everybody\'s.')
+    ),
+    'sirius contact admin' => array(
+      'title' => t('Sirius Contact Admin'),
+      'description' => t('Permission to add, edit, or delete any contact or any contact relationship.')
+    ),
   );
 }
 
