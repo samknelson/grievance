@@ -130,7 +130,7 @@ function grievance_node_tabs() {
 		'title' => 'Contacts',
 		'description' => '',
 		'callback' => 'grievance_shop_node_tab_contacts',
-		'permissions' => array('grievance contact'),
+		'permissions' => array(),
 	);
 
 	$node_tabs['grievance_company']['contacts'] = array(
@@ -730,6 +730,14 @@ function grievance_node_tab_access($node, $in_tab_name) {
 					foreach ($tab_record['permissions'] as $permission) {
 						if (!user_access($permission)) { return false; }
 					}
+
+          // Check for a custom access permission
+          $access_function_name = $tab_record['callback'] . '_access';
+          if (function_exists($access_function_name)) {
+            if (!$access_function_name($node)) {
+              return false;
+            }
+          }
 					
 					return true;
 				}
@@ -758,15 +766,11 @@ function grievance_node_tab_get_addlink($content_type, $query, $prompt = NULL) {
 	$item = menu_get_item($path);
 	if (!$item['access']) { return ''; }
 	
-	$result = "<div class=\"unite-addlink\">";
-	$result .= '[';
 	$result .= l(
 		$prompt, 
 		$path,
-		array('query' => $query)
+		array('query' => $query, 'attributes' => array('class' => array('tool-button')))
 	);
-	$result .= ']';
-	$result .= "</div>";
 	
 	return $result;
 }
