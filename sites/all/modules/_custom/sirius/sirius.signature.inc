@@ -1,5 +1,10 @@
 <?php
 
+function sirius_signature_render($account) {
+  $name = $account->name;
+  return '<div style="text-align: left; font-size: 30pt; width: 1000px; height: 250px; font-style: italic;">' . $name . '</div>';
+}
+
 /**
  * It turns out that when you combine filefield_paths, imagefield_crop, and private directories bad things happen.
  * In particular, imagefield_crop copies the original uploaded image before filefield_paths has a chance to rename it over to the private
