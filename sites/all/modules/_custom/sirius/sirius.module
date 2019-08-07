@@ -241,6 +241,18 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
   if (!user_access('sirius domain user admin')) {
     $form['field_sirius_domain']['#accesss'] = FALSE;
   }
+
+  if (!user_access('sirius signature edit')) {
+    $form['field_sirius_signature']['#access'] = FALSE;
+  }
+
+  if (!user_access('sirius domain user admin')) {
+    $form['field_sirius_domain']['#access'] = FALSE;
+  }
+
+  if (!user_access('sirius contact admin')) {
+    $form['field_sirius_contact']['#access'] = FALSE;
+  }
 }
 
 function sirius_become_superuser($tf) {
