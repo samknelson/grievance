@@ -23,7 +23,7 @@ function sirius_node_tab_letterhead_preview($letterhead_node) {
  * Implements hook_sirius_jsonfield_form_definitions()
  */
 
-function sirius_sirius_jsonfield_form_definitions() {
+function sirius_letterhead_sirius_jsonfield_form_definitions() {
 	$form['page'] = array(
 		'#type' => 'fieldset',
 		'#title' => 'Page',
