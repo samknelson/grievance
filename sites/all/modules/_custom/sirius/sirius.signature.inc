@@ -1,8 +1,21 @@
 <?php
 
 function sirius_signature_render($account) {
+	$html = '<div class="sirius_signature_wrapper">';
+
   $name = $account->name;
-  return '<div style="text-align: left; font-size: 30pt; width: 1000px; height: 250px; font-style: italic;">' . $name . '</div>';
+  $fid = $account->field_sirius_signature['und'][0]['fid'];
+  if ($fid) { $file = file_load($fid); }
+  if ($file) {
+  	$url = file_create_url($file->uri);
+  	$html .= '<img src="' . $url . '?loopback=1" alt="' . htmlspecialchars($name) . '" />';
+  	$html .= '</div>';
+  } else {
+	  $html = htmlspecialchars($name);
+	}
+	$html .= '</div>';
+
+	return $html;
 }
 
 /**
