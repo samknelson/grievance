@@ -35,6 +35,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_voice_forward_to_operator.inc';
 
+require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
+
 /**
  * Implements hook_cron
  */

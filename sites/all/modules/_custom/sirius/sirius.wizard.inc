@@ -12,7 +12,8 @@ function sirius_node_tab_wizard($node, $wizard_name) {
 	$current_step = sirius_wizard_current_step($steps);
 
 	$html = sirius_wizard_render_steps($steps, $current_step);
-	$html .= drupal_render(sirius_wizard_content($info, $data, $node, $current_step));
+	$renderable = sirius_wizard_content($info, $data, $node, $current_step);
+	$html .= drupal_render($renderable);
 
 	return $html;
 }

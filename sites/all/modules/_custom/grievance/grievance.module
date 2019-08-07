@@ -307,9 +307,6 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     // Alert data is a system-only field
     $form['field_grievance_data_alert']['#access'] = FALSE;
 
-    // External ID is a system-only field (for now)
-    $form['field_grievance_external_id']['#access'] = FALSE;
-
     // Arbitration fields are restricted by admin
     if (!user_access('grievance arbitrationform')) {
       $fields = array(
@@ -413,6 +410,11 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     if (!user_access('grievance form id')) {
       $form['field_grievance_id']['#access'] = FALSE;
     }
+    if (!user_access('grievance form external id')) {
+      $form['field_grievance_external_id']['#access'] = FALSE;
+    }
+
+
     if (!user_access('grievance form company contacts')) {
       $form['field_grievance_contact_selector']['#access'] = FALSE;
       $form['field_grievance_co_name']['#access'] = FALSE;

@@ -35,7 +35,7 @@ class ReaderFactory
      * @throws \Box\Spout\Common\Exception\UnsupportedTypeException
      * @return ReaderInterface
      */
-    public static function createFromFile(string $path)
+    public static function createFromFile($path)
     {
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
 

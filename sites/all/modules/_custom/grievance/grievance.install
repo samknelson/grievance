@@ -387,13 +387,15 @@ function grievance_update_7023() {
  */
 
 function grievance_update_7024() {
-  $permission = 'grievance worker lookup';
-  $old_permission = 'grievance view';
-  print "Granting new permission [$permission] to anybody with permission [$old_permission] ...\n";
-  $roles = user_roles(FALSE, $old_permission);
-  foreach ($roles as $rid => $name) {
-    print "... granting [$permission] to [$name]\n";
-    user_role_grant_permissions($rid, array($permission));
+  if (module_exists('grievance_worker')) {
+    $permission = 'grievance worker lookup';
+    $old_permission = 'grievance view';
+    print "Granting new permission [$permission] to anybody with permission [$old_permission] ...\n";
+    $roles = user_roles(FALSE, $old_permission);
+    foreach ($roles as $rid => $name) {
+      print "... granting [$permission] to [$name]\n";
+      user_role_grant_permissions($rid, array($permission));
+    }
   }
 }
 
