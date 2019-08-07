@@ -474,3 +474,12 @@ function sirius_sirius_jsonfield_form_definitions() {
   $definition += sirius_letterhead_sirius_jsonfield_form_definitions();
   return $definition;
 }
+
+/**
+ * Implements hook_file_download_access
+ */
+
+function sirius_file_download_access($file_item, $entity_type, $entity) {
+  if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
+}
+
