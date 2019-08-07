@@ -440,6 +440,9 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'grievance_attachments') {
     grievance_attachment_views_exposed_form_alter($form, $form_state);
   }
+  if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'grievance_shop_contacts') {
+    grievance_contact_views_exposed_form_alter($form, $form_state);
+  }
 
   // Clean up the taxonomy term form
   if ($form_id == 'taxonomy_form_term') {
@@ -703,6 +706,10 @@ function grievance_views_pre_render(&$view) {
       }
     }
   }
+
+  if ($view->name == 'grievance_shop_contacts') {
+    grievance_contacts_views_pre_render($view);
+  }
 }
 
 function grievance_views_post_execute(&$view) {
@@ -784,3 +791,14 @@ function grievance_node_set_title(&$node) {
 
   $node->title = "$shop - $name";
 }
+
+/**
+ * Implements hook_sirius_jsonfield_form_definitions()
+ */
+
+function grievance_sirius_jsonfield_form_definitions() {
+  $definition = array();
+  $definition += grievance_contact_sirius_jsonfield_form_definitions();
+  return $definition;
+}
+
