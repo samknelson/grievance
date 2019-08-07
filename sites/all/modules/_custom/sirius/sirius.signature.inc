@@ -9,7 +9,6 @@ function sirius_signature_render($account) {
   if ($file) {
   	$url = file_create_url($file->uri);
   	$html .= '<img src="' . $url . '?loopback=1" alt="' . htmlspecialchars($name) . '" />';
-  	$html .= '</div>';
   } else {
 	  $html = htmlspecialchars($name);
 	}
