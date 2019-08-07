@@ -29,6 +29,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.representat
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.taxonomy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.domain.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.signature.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
@@ -40,6 +41,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_voice_
 
 function sirius_cron() {
   sirius_auditlog();
+  sirius_signature_cleanup();
 }
 
 /**
@@ -50,9 +52,7 @@ function sirius_entity_presave($entity, $type) {
   if ($type == 'node') {
     if ($entity->type == 'sirius_worker') { sirius_contact_sync_from_worker($entity); }
   }
-  if ($type == 'user') {
-    sirius_contact_sync_from_user($entity);
-  }
+  if ($type == 'user') { sirius_contact_sync_from_user($entity); }
 }
 
 /**
@@ -433,8 +433,6 @@ function sirius_find_nid_by_id($sirius_id, $bundle) {
   return $hr['entity_id'];
 }
 
-
-
 /**
  * Implements hook_module_implements_alter
  * 
@@ -453,4 +451,14 @@ function sirius_module_implements_alter(&$implementations, $hook) {
   if ($hook == 'admin_menu_map') {
     unset($implementations['field_ui']);
   }
+}
+
+/**
+ * Implements hook_sirius_jsonfield_form_definitions()
+ */
+
+function sirius_sirius_jsonfield_form_definitions() {
+  $definition = array();
+  $definition += sirius_letterhead_sirius_jsonfield_form_definitions();
+  return $definition;
 }
