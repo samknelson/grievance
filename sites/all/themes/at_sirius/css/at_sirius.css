@@ -4066,3 +4066,18 @@ input.ajax-processed:hover {
     display: none;
   }
 }
+
+
+.sirius_signature_wrapper {
+  width: 100%;
+  overflow: hidden;
+  font-size: 1.5em;
+  color: #1b4784;
+  font-style: italic;
+  font-family: roboto, arial, helvetica, san-serif;  
+}
+.sirius_signature_wrapper img {
+  height: 90px;
+}
+
+
