@@ -649,7 +649,6 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
 		while ($hr = $stmt->fetchAssoc()) {
 			$employer_map[$hr['title']] = $hr['nid'];
 		}
-		dpm($employer_map);
 	}
 
 	// Trim all
