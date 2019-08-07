@@ -72,7 +72,7 @@ function sirius_node_access_log($log_node, $op, $account) {
       return NODE_ACCESS_ALLOW;
     }
   }
-  
+
   // Nobody else can see any log entries
   return NODE_ACCESS_DENY;
 }
