@@ -15993,7 +15993,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 14,
+      'weight' => 13,
     ),
   );
 
@@ -16159,6 +16159,59 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textfield',
       'weight' => 42,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_event'.
+  $field_instances['node-sirius_dispatch_job-field_sirius_event'] = array(
+    'bundle' => 'sirius_dispatch_job',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 1,
+          'field_delimiter' => '',
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 11,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_event',
+    'label' => 'Event',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 14,
     ),
   );
 
@@ -22247,6 +22300,79 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'user-user-field_sirius_signature'.
+  $field_instances['user-user-field_sirius_signature'] = array(
+    'bundle' => 'user',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'image',
+        'settings' => array(
+          'field_delimiter' => '',
+          'image_link' => '',
+          'image_style' => 'sirius_signature_preview',
+        ),
+        'type' => 'image',
+        'weight' => 7,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'user',
+    'field_name' => 'field_sirius_signature',
+    'label' => 'Signature',
+    'required' => 0,
+    'settings' => array(
+      'alt_field' => 0,
+      'default_image' => 0,
+      'file_directory' => 'sirius_signatures',
+      'file_extensions' => 'png gif jpg jpeg',
+      'filefield_paths' => array(
+        'active_updating' => 1,
+        'file_name' => array(
+          'options' => array(
+            'pathauto' => 0,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => '[user:uid]_[file:fid].[file:ffp-extension-original]',
+        ),
+        'file_path' => array(
+          'options' => array(
+            'pathauto' => 0,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => 'sirius_signature',
+        ),
+        'redirect' => FALSE,
+        'retroactive_update' => 0,
+      ),
+      'filefield_paths_enabled' => 1,
+      'max_filesize' => '',
+      'max_resolution' => '',
+      'min_resolution' => '',
+      'title_field' => 0,
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'imagefield_crop',
+      'settings' => array(
+        'collapsible' => 1,
+        'croparea' => '1000x1000',
+        'enforce_minimum' => 0,
+        'enforce_ratio' => 0,
+        'preview_image_style' => 'thumbnail',
+        'progress_indicator' => 'throbber',
+        'resolution' => '',
+      ),
+      'type' => 'imagefield_crop_widget',
+      'weight' => 13,
+    ),
+  );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('"Access token" field, used to permit viewing of this node for unauthenticated users.');
@@ -22385,6 +22511,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Enter the union\'s ID # for this member.');
   t('Entity Type');
   t('Entity type to override, almost always "node".');
+  t('Event');
   t('Expire After');
   t('External ID');
   t('Facility');
@@ -22527,6 +22654,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Should contain only letters and numbers and underscore, used to generate filenames.');
   t('Show on Timeline?');
   t('Sign-In Blocked?');
+  t('Signature');
   t('Skill Expires');
   t('Skilled Payrate');
   t('Skills');

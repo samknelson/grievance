@@ -2315,6 +2315,7 @@ function grievance_content_types_field_group_info() {
       6 => 'field_sirius_dispatch_job_group',
       7 => 'field_grievance_departments',
       8 => 'field_sirius_dispatch_job_tags',
+      9 => 'field_sirius_event',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2347,6 +2348,7 @@ function grievance_content_types_field_group_info() {
       1 => 'field_sirius_dispatch_job_type',
       2 => 'field_sirius_dispatch_job_status',
       3 => 'field_sirius_representatives',
+      4 => 'field_sirius_event',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
