@@ -430,3 +430,18 @@ function grievance_update_7026() {
   return "Enabled " . join(',', $modules);
 }
 */
+
+/**
+ * Edit Signature permission
+ */
+
+function grievance_update_7026() {
+  $permission = 'sirius signature edit';
+  $old_permission = 'grievance admin';
+  print "Granting new permission [$permission] to anybody with permission [$old_permission] ...\n";
+  $roles = user_roles(FALSE, $old_permission);
+  foreach ($roles as $rid => $name) {
+    print "... granting [$permission] to [$name]\n";
+    user_role_grant_permissions($rid, array($permission));
+  }
+}
