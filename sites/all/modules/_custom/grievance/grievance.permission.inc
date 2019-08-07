@@ -169,6 +169,8 @@ function grievance_node_access($node, $op, $account) {
     // Some additional restrictions based on log type.
     if ($node->type == 'grievance_log') { return grievance_node_access_grievance_log($node, $op, $account); }
     if ($node->type == 'grievance_irset') { return grievance_node_access_grievance_irset($node, $op, $account); }
+
+    if ($node->type == 'grievance_shop_contact') { return grievance_node_access_shop_contact($node, $op, $account); }
 	
 	return NODE_ACCESS_IGNORE;
 }
