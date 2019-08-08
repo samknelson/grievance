@@ -4995,7 +4995,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_grievance_rep_organizer',
-    'label' => 'Business Agent',
+    'label' => 'Organizer',
     'required' => 0,
     'settings' => array(
       'field_lock_multi_values' => array(
@@ -9789,7 +9789,7 @@ function grievance_content_types_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -9857,7 +9857,7 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 4,
+      'weight' => 8,
     ),
   );
 
@@ -9953,7 +9953,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 8,
+      'weight' => 4,
     ),
   );
 
@@ -10026,6 +10026,56 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-grievance_letter_template-field_grievance_log_type'.
+  $field_instances['node-grievance_letter_template-field_grievance_log_type'] = array(
+    'bundle' => 'grievance_letter_template',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_log_type',
+    'label' => 'Default Log Type',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => '',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => '',
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-grievance_letter_template-field_grievance_notify_body'.
   $field_instances['node-grievance_letter_template-field_grievance_notify_body'] = array(
     'bundle' => 'grievance_letter_template',
@@ -10065,7 +10115,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 10,
+      'weight' => 5,
     ),
   );
 
@@ -10109,7 +10159,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 9,
+      'weight' => 3,
     ),
   );
 
@@ -10152,7 +10202,7 @@ function grievance_content_types_field_default_field_instances() {
         'checkall' => FALSE,
       ),
       'type' => 'options_buttons',
-      'weight' => 2,
+      'weight' => 5,
     ),
   );
 
@@ -10196,7 +10246,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 3,
+      'weight' => 5,
     ),
   );
 
@@ -10243,7 +10293,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 11,
+      'weight' => 3,
     ),
   );
 
@@ -19762,6 +19812,47 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'node-sirius_worker-field_sirius_phone_mobile'.
+  $field_instances['node-sirius_worker-field_sirius_phone_mobile'] = array(
+    'bundle' => 'sirius_worker',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 34,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_phone_mobile',
+    'label' => 'Mobile Phone',
+    'required' => FALSE,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 25,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_worker-field_sirius_skill'.
   $field_instances['node-sirius_worker-field_sirius_skill'] = array(
     'bundle' => 'sirius_worker',
@@ -21090,6 +21181,56 @@ If the file has multiple pages, then each page in the input document will use th
       ),
       'type' => 'options_buttons',
       'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-grievance_status-field_grievance_statuses'.
+  $field_instances['taxonomy_term-grievance_status-field_grievance_statuses'] = array(
+    'bundle' => 'grievance_status',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'When a grievance has this status, list the subsequent statuses that the grievance can be moved to. Make sure to include ALL POSSIBLE subsequent statuses.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 9,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_grievance_statuses',
+    'label' => 'Subsequent Statuses',
+    'required' => 0,
+    'settings' => array(
+      'checkall' => array(
+        'checkall' => 0,
+        'checkall-check-all' => 1,
+        'checkall-toggle' => 1,
+        'checkall-uncheck-all' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => '',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => '',
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'checkall' => FALSE,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 7,
     ),
   );
 
@@ -22424,7 +22565,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('Building the Union with this case');
   t('Bundle');
   t('Bundle to overried, e.g. "grievance"');
-  t('Business Agent');
   t('CBA Provision(s) Violated');
   t('CC Emails');
   t('CSS');
@@ -22471,6 +22611,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Declined Count');
   t('Default Dispatch Notes');
   t('Default Information Request');
+  t('Default Log Type');
   t('Default Value');
   t('Default number of days');
   t('Department');
@@ -22582,6 +22723,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Member Status');
   t('Member?');
   t('Message');
+  t('Mobile Phone');
   t('Must Log?');
   t('NOT Available for Departments');
   t('Name');
@@ -22664,6 +22806,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Status Change Date');
   t('Status Notes');
   t('Subject');
+  t('Subsequent Statuses');
   t('Summary');
   t('Supervisor Name');
   t('Supervisor Title');
@@ -22704,6 +22847,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Watching');
   t('Weight');
   t('What roles should have access to this content');
+  t('When a grievance has this status, list the subsequent statuses that the grievance can be moved to. Make sure to include ALL POSSIBLE subsequent statuses.');
   t('When a notification for this status is sent to the company, what subject should be used?');
   t('When a notification is sent to the company, what should the body of the email be? ');
   t('When the grievance admin selects this clause, which "statement of grievance" should be selected?');

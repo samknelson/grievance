@@ -14,6 +14,150 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_access|node|grievance_letter_template|form';
+  $field_group->group_name = 'group_access';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_letter_template';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_details';
+  $field_group->data = array(
+    'label' => 'Access',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_grievance_roles',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-access field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_access|node|grievance_letter_template|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_attachments|node|grievance_letter_template|form';
+  $field_group->group_name = 'group_attachments';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_letter_template';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_details';
+  $field_group->data = array(
+    'label' => 'Attachments',
+    'weight' => '6',
+    'children' => array(
+      0 => 'field_grievance_attachments',
+      1 => 'field_grievance_css',
+      2 => 'field_grievance_images',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-attachments field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_attachments|node|grievance_letter_template|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_body|node|grievance_letter_template|form';
+  $field_group->group_name = 'group_body';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_letter_template';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_details';
+  $field_group->data = array(
+    'label' => 'Body',
+    'weight' => '2',
+    'children' => array(
+      0 => 'body',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-body field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_body|node|grievance_letter_template|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_details|node|grievance_letter_template|form';
+  $field_group->group_name = 'group_details';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_letter_template';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Detail',
+    'weight' => '0',
+    'children' => array(
+      0 => 'group_identity',
+      1 => 'group_body',
+      2 => 'group_email',
+      3 => 'group_attachments',
+      4 => 'group_log',
+      5 => 'group_access',
+    ),
+    'format_type' => 'accordion',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'effect' => 'none',
+        'classes' => 'group-details field-group-accordion',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_details|node|grievance_letter_template|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_email|node|grievance_letter_template|form';
+  $field_group->group_name = 'group_email';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_letter_template';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_details';
+  $field_group->data = array(
+    'label' => 'Email',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_grievance_emails',
+      1 => 'field_grievance_notify_body',
+      2 => 'field_grievance_notify_subject',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-email field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_email|node|grievance_letter_template|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_grieance_company|node|grievance|grievance_gform';
   $field_group->group_name = 'group_grieance_company';
   $field_group->entity_type = 'node';
@@ -1221,7 +1365,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_inforeq|node|grievance|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_notifications|node|grievance_shop|default';
   $field_group->group_name = 'group_grievance_notifications';
@@ -1706,6 +1850,35 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_identity|node|grievance_letter_template|form';
+  $field_group->group_name = 'group_identity';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_letter_template';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_details';
+  $field_group->data = array(
+    'label' => 'Identity',
+    'weight' => '1',
+    'children' => array(
+      0 => 'field_grievance_shortname',
+      1 => 'title',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'label' => 'Identity',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-identity field-group-accordion-item',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_identity|node|grievance_letter_template|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_inforeq|node|grievance|form';
   $field_group->group_name = 'group_inforeq';
   $field_group->entity_type = 'node';
@@ -1730,6 +1903,35 @@ function grievance_content_types_field_group_info() {
     ),
   );
   $field_groups['group_inforeq|node|grievance|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_log|node|grievance_letter_template|form';
+  $field_group->group_name = 'group_log';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'grievance_letter_template';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_details';
+  $field_group->data = array(
+    'label' => 'Log and Update',
+    'weight' => '4',
+    'children' => array(
+      0 => 'field_grievance_update_rep',
+      1 => 'field_sirius_mustlog',
+      2 => 'field_grievance_log_type',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-log field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_log|node|grievance_letter_template|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
@@ -2948,11 +3150,13 @@ function grievance_content_types_field_group_info() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Access');
   t('Address');
   t('Arbitration');
   t('Arbitration Comments');
   t('Assignment');
   t('Attachments');
+  t('Body');
   t('Comments');
   t('Company Contact');
   t('Company Rep');
@@ -2960,10 +3164,12 @@ function grievance_content_types_field_group_info() {
   t('Company Representatives');
   t('Contact');
   t('Contract');
+  t('Detail');
   t('Details');
   t('Dispatch');
   t('Dispatch Details');
   t('Dispatch Preferences');
+  t('Email');
   t('Email and Phone');
   t('Employee');
   t('Employee Contact');
@@ -2977,6 +3183,7 @@ function grievance_content_types_field_group_info() {
   t('Information Request');
   t('Job Details');
   t('Job Info');
+  t('Log and Update');
   t('Name and Role');
   t('Notification Settings');
   t('Notifications');
