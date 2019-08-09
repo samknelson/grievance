@@ -447,3 +447,12 @@ function grievance_update_7026() {
     user_role_grant_permissions($rid, array($permission));
   }
 }
+
+/**
+ * Enables views_current_path
+ */
+function grievance_update_7027() {
+  // Enable some modules
+  print "Enabling views_current_path\n";
+  module_enable(array('views_current_path'), FALSE);
+}
