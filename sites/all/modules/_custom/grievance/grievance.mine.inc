@@ -1,7 +1,8 @@
 <?php
 
 function grievance_home() {
-	drupal_goto('grievances/mine/');
+	$path = variable_get('grievance_home_path', 'grievances/mine');
+	drupal_goto($path);
 }
 
 function grievance_all() {
