@@ -3724,9 +3724,14 @@ div.node-sirius-dispatch.node-teaser {
 */
 
 .checkboxes-inline .form-checkboxes .form-item,
-.field-name-field-sirius-skill-form .form-item .form-type-checkbox {
+.field-name-field-sirius-skill-form .form-item .form-type-checkbox,
+.field-name-field-grievance-statuses .form-item .form-type-checkbox {
   float: left;
   width: 250px;
+}
+
+.field-name-field-grievance-statuses .form-item .description {
+  clear: left;
 }
 
 .checkboxes-inline .msg {
