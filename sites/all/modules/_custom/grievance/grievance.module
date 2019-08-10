@@ -50,6 +50,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.phaxi
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.classification.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.shops.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.merge.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.vbo.inc";
 
 /**
  * Implements hook_views_pre_view
@@ -73,6 +74,10 @@ function grievance_cron() {
   grievance_bundle_cleanup();
 }
 
+/**
+ * Implements hook_node_update
+ */
+
 function grievance_node_update($node) {
   if ($node->type == 'grievance') {
     if ($node->field_grievance_rep_assignee['und'][0]['target_id'] != $node->original->field_grievance_rep_assignee['und'][0]['target_id']) {
@@ -86,6 +91,10 @@ function grievance_node_update($node) {
     }
   }
 }
+
+/**
+ * Implements hook_node_insert
+ */
 
 function grievance_node_insert($node) {
   if ($node->type == 'grievance') { $node->grievance_assignment_changed = TRUE; }
