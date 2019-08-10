@@ -140,6 +140,9 @@ function grievance_permission() {
     'grievance form id' => array(
         'title' => t('Grievance Form - Change Grievance ID'),
     ),
+    'grievance form external id' => array(
+        'title' => t('Grievance Form - Change Grievance External ID'),
+    ),
     'grievance letter variable delivery' => array(
         'title' => t('Grievance Letter - Change the Delivery drop-in variable'),
     ),
@@ -168,8 +171,24 @@ function grievance_node_access($node, $op, $account) {
 
     // Some additional restrictions based on log type.
     if ($node->type == 'grievance_log') { return grievance_node_access_grievance_log($node, $op, $account); }
+    if ($node->type == 'grievance_irset') { return grievance_node_access_grievance_irset($node, $op, $account); }
+
+    if ($node->type == 'grievance_shop_contact') { return grievance_node_access_shop_contact($node, $op, $account); }
 	
 	return NODE_ACCESS_IGNORE;
+}
+
+function grievance_node_access_grievance_irset($node, $op, $account) {
+    // Admins can do anything
+    if (user_access('grievance admin', $account)) { return NODE_ACCESS_IGNORE; }
+
+    // Editors can do anything.  @todo probably should treate delete specially.
+    if (user_access('grievance edit')) { return NODE_ACCESS_IGNORE; }
+
+    // Viewers can view
+    if ($op == 'view' && user_access('grievance view', $account)) { return NODE_ACCESS_IGNORE; }
+
+    return NODE_ACCESS_DENY;
 }
 
 function grievance_node_access_grievance($node, $op, $account) {

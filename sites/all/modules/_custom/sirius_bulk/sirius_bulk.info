@@ -1,0 +1,4 @@
+name = Sirius Bulk
+description = Implements the Sirius bulk message functionality
+package = sirius
+core = 7.x

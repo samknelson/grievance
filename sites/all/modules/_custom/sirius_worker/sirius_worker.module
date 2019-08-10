@@ -9,14 +9,18 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.member_status.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.work_status.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.skill.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.admin.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.department.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.notify.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.vbo.inc";
 
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.pages_worker_user.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_user.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_employer_worker_list.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_worker_work_status.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_worker_skill.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_worker_industry.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_work_status.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_contact.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_industry.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_me.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_expiring.inc";
 
 function sirius_worker_get_by_id($id) {
 	if (!$id) { return NULL; }
@@ -54,7 +58,60 @@ function sirius_worker_node_postsave($node, $op) {
     $need_save = FALSE;
 
     // Sync the user
-    sirius_worker_usersync($node->nid);
+    $result = sirius_worker_usersync($node->nid);
   }
 }
-	
+
+/**
+ * Implements hook_cron
+ */
+
+function sirius_worker_cron() {
+  sirius_worker_skills_cron();
+}
+
+
+
+/**
+ * Implements hook_views_pre_render
+ */
+
+function sirius_worker_views_pre_render(&$view) {
+  return; 
+  if ($view->name != 'sirius_skill_expiration_list') { return; }
+  if (!$view->result) { return; }
+  // drupal_set_message('<pre>' . print_r($view, 1) . '</pre>');
+  foreach ($view->result as &$row) {
+    if ($row->field_field_sirius_skill_expire) {
+      foreach ($row->field_field_sirius_skill_expire as $delta => $hr) {
+        $date = $hr['raw']['value'];
+        drupal_set_message($date);
+      }
+    }
+    dpm($row);
+    break;
+  }
+}
+
+/**
+ * Implements hook_sirius_jsonfield_form_definitions()
+ */
+
+function sirius_worker_sirius_jsonfield_form_definitions() {
+  $form = array();
+  $form['dispatch'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Dispatch',
+  );
+  $form['dispatch']['keep_seniority'] = array(
+    '#type' => 'select', 
+    '#title' => 'Keep Seniority',
+    '#options' => array('No' => 'No', 'Yes' => 'Yes'),
+    '#description' => t('If "Yes", then the next time this worker signs in, they will keep their previous seniority.')
+  );
+
+  $definition = array();
+  $definition['node']['sirius_worker']['field_sirius_json'] = $form;
+  return $definition;
+}
+

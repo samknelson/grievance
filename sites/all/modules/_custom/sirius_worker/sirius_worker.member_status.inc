@@ -1,6 +1,6 @@
 <?php
 
-function sirius_worker_member_status_get_open_statuses($industry_tid = NULL, $include_closed = FALSE) {
+function sirius_worker_member_status_get_open_statuses($industry_tid = NULL, $include_closed = FALSE, $job_type_tid = NULL) {
   global $user;
   $rids = array(-1);
   if ($user && $user->roles) {
@@ -16,11 +16,15 @@ function sirius_worker_member_status_get_open_statuses($industry_tid = NULL, $in
   if ($industry_tid) {
     $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid);
   }
+  if ($job_type_tid) {
+    $query->fieldCondition('field_sirius_dispatch_job_types', 'tid', $job_type_tid);
+  }
   $query->propertyOrderBy('weight');
   $stmt = $query->execute();
   if (!$stmt['taxonomy_term']) { return array(); }
   $tids = array_keys($stmt['taxonomy_term']);
   $terms = taxonomy_term_load_multiple($tids);
+
   return $terms;
 }
 

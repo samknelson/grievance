@@ -15,6 +15,8 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 
 	$status = $dispatch_node->field_sirius_dispatch_status['und'][0]['value'];
 	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+	$employer_node = node_load($job_node->field_grievance_shop['und'][0]['target_id']);
 
 	$actions = array(NULL => t('-- Select --'));
 
@@ -69,6 +71,15 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 	} else {
 		if ($_REQUEST['debug']) {
 			$form['impossible']['terminate_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Layoff not possible: ' . $possible['msg'] . '</div>');
+		}
+	}
+
+	$possible = sirius_dispatch_rollover_possible($dispatch_node);
+	if ($possible['success']) {
+		$actions['rollover'] 		= t('Rollover this dispatch');
+	} else {
+		if ($_REQUEST['debug']) {
+			$form['impossible']['rollover_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'Rollover not possible: ' . $possible['msg'] . '</div>');
 		}
 	}
 
@@ -129,6 +140,56 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 		),
 	);
 
+	$rollover_options = array(NULL => t('-- Select --'));
+	$rollover_options += sirius_employer_list(TRUE, $employer_node->field_sirius_industry['und'][0]['tid']);
+	$form['rollover_employer_nid'] = array(
+		'#title' => t('Rollover To:'),
+		'#type' => 'select',
+		'#options' => $rollover_options,
+		'#states' => array(
+			'visible' => array(
+				array(':input[name="action"]' => array('value' => 'rollover')),
+			)
+		),
+	);
+
+  $form['rollover_type'] = array(
+    '#type' => 'select',
+    '#title' => 'Rollover Type:',
+    '#options' => array('permanent' => 'Permanent', 'temporary' => 'Temporary'),
+    '#description' => t('Permanent rollovers will result in a layoff, whether or not the worker accepts the rollover. Temporary rollovers will not affect the worker\' current dispatch.'),
+		'#states' => array(
+			'visible' => array(
+				array(':input[name="action"]' => array('value' => 'rollover')),
+			)
+		),
+  );
+
+  $form['rollover_end_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => 'End Date:',
+    '#states' => array(
+      'visible' => array(
+				array(
+					':input[name="action"]' => array('value' => 'rollover'),
+					':input[name="rollover_type"]' => array('value' => 'temporary')
+				),
+      )
+    ),
+    '#timepicker' => 'timepicker',
+    '#timepicker_options' => array(
+      'rows' => 6,
+      'minutes' => array(
+        'starts' => 0,
+        'ends' => 56,
+        'interval' => 5,
+      ),
+    ),
+    '#attributes' => array(
+      'autocomplete' => 'off',
+    ),
+  );
+
 
 	$form['notes'] = array(
 		'#type' => 'textarea',
@@ -157,6 +218,7 @@ function sirius_node_tab_dispatch_manage_form_submit($form, &$form_state) {
 	if ($action == 'decline')				{ $result = sirius_dispatch_decline($dispatch_node, $notes); }
 	if ($action == 'undecline')			{ $result = sirius_dispatch_undecline($dispatch_node, $notes); }
 	if ($action == 'terminate')			{ $result = sirius_dispatch_terminate($dispatch_node, $notes); }
+	if ($action == 'rollover')			{ $result = sirius_dispatch_rollover($dispatch_node, $form_state['values']['rollover_employer_nid'], $form_state['values']['rollover_type'], $form_state['values']['rollover_end_date'], $notes); }
 	if ($action == 'resign')				{ $result = sirius_dispatch_resign($dispatch_node, $notes); }
 
 	if ($result['success']) {

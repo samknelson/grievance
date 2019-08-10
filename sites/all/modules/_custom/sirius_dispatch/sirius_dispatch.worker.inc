@@ -85,17 +85,21 @@ function sirius_dispatch_worker_recompute_from_dispatch($dispatch_node, $is_dele
 		} else {
 			unset($worker_node->field_grievance_shop['und']);
 
-			$asi = $worker_node->field_sirius_dispatch_asi['und'][0]['value'];
-			if ($asi == 'Yes') {
-				$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
-			} else {
-				$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+			if ($worker_node->field_sirius_worker_dispstatus['und'][0]['tid'] == sirius_get_special_tid('sirius_worker_dispatch_status|employed_not_available')) {
+				$asi = $worker_node->field_sirius_dispatch_asi['und'][0]['value'];
+				if ($asi == 'Yes') {
+					$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
+				} else {
+					$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+				}
 			}
 			sirius_log('worker:employer', 'clear', $worker_node->title . "'s employer has been cleared" . $new_employer_node->title, '', '', array($worker_node->nid));
 		}
 
 		node_save($worker_node);
-		sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid, NULL, NULL);
+		if ($dispstatus_tid) {
+			sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid, 1);
+		}
 	}
 
 	// If 
@@ -130,73 +134,30 @@ function sirius_dispatch_worker_recompute_from_dispatch($dispatch_node, $is_dele
 	}
 }
 
-function sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid, $reason = NULL, $attachments = NULL) {
-	if ($dispstatus_tid == $worker_node->field_sirius_worker_dispstatus['und'][0]['tid']) { return; }
+function sirius_dispatch_worker_recompute_from_work_status($worker_node) {
+	$old_tid = $worker_node->original->field_sirius_work_status['und'][0]['tid'];
+	$new_tid = $worker_node->field_sirius_work_status['und'][0]['tid'];
 
-	$worker_node->field_sirius_worker_dispstatus['und'][0]['tid'] = $dispstatus_tid;
-	$dispstatus_term = taxonomy_term_load($dispstatus_tid);
-	global $sirius_suppress_notifications;
+	// No change
+	if ($old_tid == $new_tid) { return; }
 
-	if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
-		$availdate = gmdate('Y-m-d H:i:s');
-		$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $availdate;
-		$category = 'worker:availdate';
-		$type = 'set';
-		$message = $worker_node->title . "'s availability date has been set to " . $availdate;
-		$handler_nids = array($worker_node->nid);
-		if (!$sirius_suppress_notifications) {
-			sirius_log($category, $type, $message, $message, '', $handler_nids);
+	// We only care if the new status is non-dispatchable.
+	$new_term = taxonomy_term_load($new_tid); 
+	if ($new_term->field_sirius_dispatch_available['und'][0]['value'] == 'Yes') { return; }
+
+	// Terminate any current dispatch
+	/*
+	$dispatch_node = sirius_dispatch_get_current($worker_node->nid);
+	if ($dispatch_node) {
+		$possible = sirius_dispatch_terminate_possible($dispatch_node);
+		if ($possible['success']) {
+			sirius_dispatch_terminate($dispatch_node, 'Your work status is now ' . $new_term->name . '.');
 		}
 	}
+	*/
 
-	$category = 'worker:dispstatus';
-	$type = 'set';
-	$message = $worker_node->title . "'s dispatch status has been set to " . $dispstatus_term->name;
-	$handler_nids = array($worker_node->nid);
-	if (!$sirius_suppress_notifications) {
-		sirius_log($category, $type, $message, $reason, '', $handler_nids, $attachments);
+	// Sign out
+	if ($worker_node->field_sirius_worker_dispstatus['und'][0]['tid'] == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) { 
+		sirius_dispatch_worker_dispstatus_set($worker_node, sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available'), NULL, "Work status was changed to " . $new_term->name);
 	}
-
-	if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available') ||
-		$dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available')) {
-
-		if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
-			$availdate = date('Y-m-d H:i:s', sirius_date_ts($worker_node, 'field_sirius_dispatch_availdate'));
-			$subject = "Dispatch system notification: Signed in";
-			$body = "You have been signed in to the out-of-work list, and are now eligible to receive dispatches. Your seniority date is $availdate.";
-			$sms = "Dispatch system notification: you have been signed in to the out-of-work list, and are now eligible to receive dispatches.  Your seniority date is $availdate.";
-		} else {
-			$subject = "Dispatch system notification: Signed out";
-			$body = "You have been signed out of the out-of-work list, and are not currently eligible to receive dispatches.";
-			$sms = "Dispatch system notification: you have been signed out of the out-of-work list, and are not currently eligible to receive dispatches.";
-		}
-		if (!$sirius_suppress_notifications) {
-			sirius_worker_notify(
-				$worker_node, 
-				array(
-					'subject' => $subject,
-					'body' => $body,
-					'sms' => $sms,
-				)
-			);
-		}
-	}
-
-	node_save($worker_node);
-	return $message;
 }
-
-function sirius_dispatch_worker_dispstatus_block_set($worker_node, $block, $reason = NULL, $attachments = NULL) {
-	if ($block == $worker_node->field_sirius_dispatch_sib['und'][0]['value'] ) { return; }
-	$worker_node->field_sirius_dispatch_sib['und'][0]['value'] = $block;
-	$worker_node->field_sirius_dispatch_asi['und'][0]['value'] = 'No';
-	$category = 'worker:dispstatus_block';
-	$type = 'set';
-	$message = $worker_node->title . "'s dispatch status block has been set to " . $block;
-	$handler_nids = array($worker_node->nid);
-	sirius_log($category, $type, $message, $reason, '', $handler_nids, $attachments);
-	node_save($worker_node);
-	return $message;
-
-}
-

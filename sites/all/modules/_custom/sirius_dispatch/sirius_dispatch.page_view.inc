@@ -36,8 +36,8 @@ function sirius_node_tab_dispatch_worker_view_access_details($dispatch_node) {
 	$worker_nid = $user_full->field_sirius_worker['und'][0]['target_id'];
 	if (!$worker_nid) { return FALSE; }
 
-	// The worker must be associated with this dispatch.
-	if ($worker_nid == $dispatch_node->field_sirius_worker['und'][0]['target_id']) { return TRUE; }
+	// The worker must be associated with this dispatch, and it must have a status besides "requested"
+	if ($worker_nid == $dispatch_node->field_sirius_worker['und'][0]['target_id'] && $dispatch_node->field_sirius_dispatch_status['und'][0]['value'] != 'requested') { return TRUE; }
 
 	return FALSE;
 }
@@ -86,6 +86,7 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	drupal_set_title("Dispatch #" . $dispatch_node->nid);
 	$form_state['dispatch_node'] = $dispatch_node;
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+	$job_policy = sirius_dispatch_job_policy($job_node);
 	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
 	$facility_node = node_load($job_node->field_sirius_dispatch_facility['und'][0]['target_id']);
 	$employer_node = node_load($job_node->field_grievance_shop['und'][0]['target_id']);
@@ -177,7 +178,29 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['job_employer_section_close'] = array('#markup' => '</div>');
 
 	$form['job_location_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_job_location_section">');
-	$form['job_location_section_a'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_datetime'));
+
+	$job_tags = sirius_fieldvals($job_node, 'field_sirius_dispatch_job_tags', 'tid');
+	if (in_array(sirius_get_special_tid('sirius_dispatch_job_tags|ASAP'), $job_tags)) {
+		$stupid_html = '<section class="field field-name-datetime field-label-inline clearfix view-mode-full"><h2 class="field-label">Report Date</h2><div class="field-items"><div class="field-item">As Soon As Possible</div></div></section>';
+		$form['job_location_section_a'] = array('#markup' => $stupid_html);
+	} else {
+		$form['job_location_section_a'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_datetime'));
+	}
+
+	if ($dispatch_node->field_sirius_dispatch_status['und'][0]['value'] == 'accepted_secondary' && $job_policy['workers']['must_be_rollover'] == 'Yes') {
+		$rollover_log_nid = sirius_dispatch_rollover_nid($employer_node->nid, $worker_node->nid, sirius_date_ts($dispatch_node, 'field_sirius_datetime'));
+		$rollover_log_node = node_load($rollover_log_nid);
+		if ($rollover_log_node) {
+			$json = json_decode($rollover_log_node->field_sirius_json['und'][0]['value'], TRUE);
+			$rollover_end_ts = strtotime($json['end_date']);
+			if ($rollover_end_ts > 1) {
+				$rollover_end_date = gmdate('l, F j, Y', $rollover_end_ts);
+				$stupid_html = '<section class="field field-name-datetime field-label-inline clearfix view-mode-full"><h2 class="field-label">Rollover End Date</h2><div class="field-items"><div class="field-item">' . $rollover_end_date . '</div></div></section>';
+				$form['job_location_section_aa'] = array('#markup' => $stupid_html);
+			}
+		}
+	}
+
 	if ($is_accepted) {
 		$form['job_location_section_b'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_dispatch_facility'));
 		$form['job_location_section_c'] = array('#markup' => sirius_dispatch_view_render_field($facility_node, 'field_sirius_address'));
@@ -192,6 +215,9 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['job_detail_section_b'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_grievance_departments'));
 	$form['job_detail_section_c'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_dispatch_job_type'));
 	$form['job_detail_section_d'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_notes'));
+	if ($is_accepted) {
+		$form['job_detail_section_e'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_attachments'));
+	}
 	$form['job_location_section_close'] = array('#markup' => '</div>');
 
 	$form['job_section_close'] = array('#markup' => '</div>');

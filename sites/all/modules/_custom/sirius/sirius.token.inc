@@ -58,6 +58,15 @@ function sirius_tokens($type, $tokens, array $data = array(), array $options = a
     }
   }
 
+  if ($type == 'user') {
+    foreach ($tokens as $name => $original) {
+      list ($sirius, $type) = explode(':', $name);
+      if ($sirius == 'sirius' && $type == 'signature') {
+        $replacements[$original] = sirius_signature_render($data['user']);
+      }
+    }
+  }
+
   return $replacements;
 }
 
@@ -71,3 +80,4 @@ function sirius_tokens_alter(array &$replacements, array $context) {
     $replacements += token_generate($context['options']['aliases'][$context['type']], $context['tokens'], $new_data, $context['options']);
   }
 }
+

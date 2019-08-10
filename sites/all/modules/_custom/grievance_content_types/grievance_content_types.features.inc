@@ -21,6 +21,30 @@ function grievance_content_types_ctools_plugin_api($module = NULL, $api = NULL) 
 }
 
 /**
+ * Implements hook_image_default_styles().
+ */
+function grievance_content_types_image_default_styles() {
+  $styles = array();
+
+  // Exported image style: sirius_signature_preview.
+  $styles['sirius_signature_preview'] = array(
+    'label' => 'Sirius Signature Preview',
+    'effects' => array(
+      2 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 400,
+          'height' => 100,
+        ),
+        'weight' => 1,
+      ),
+    ),
+  );
+
+  return $styles;
+}
+
+/**
  * Implements hook_node_info().
  */
 function grievance_content_types_node_info() {
@@ -115,6 +139,14 @@ function grievance_content_types_node_info() {
     ),
     'grievance_holiday' => array(
       'name' => t('Grievance Holiday'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'grievance_irset' => array(
+      'name' => t('Grievance Information Request Set'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',
@@ -217,8 +249,24 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'sirius_feed' => array(
+      'name' => t('Sirius Feed'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'sirius_help' => array(
       'name' => t('Sirius Help'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_letterhead' => array(
+      'name' => t('Sirius Letterhead'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',

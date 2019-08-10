@@ -88,7 +88,11 @@ function report_cache_page_report($report_type) {
 		$result .= $preview;
 	}
 
-	$result .= l(t('Generate a new report'), $report_type_info['path']);
+	$path = $report_type_info['path'];
+	if (!$path) { 
+		$path = 'sirius/report-cache/' . $report_type . '/form';
+	}
+	$result .= l(t('Generate a new report'), $path);
 	
 	return $result;
 }

@@ -277,3 +277,182 @@ function grievance_update_7016() {
   print "Disabling search\n";
   module_disable(array('search'), TRUE);
 }
+
+function grievance_update_7017() {
+  $table = 'field_data_field_sirius_id';
+  $column = 'field_sirius_id_value';
+  try { db_add_index($table, "${table}_${column}", array($column)); } catch (exception $ignore) { }
+
+  $table = 'field_data_field_sirius_id2';
+  $column = 'field_sirius_id2_value';
+  try { db_add_index($table, "${table}_${column}", array($column)); } catch (exception $ignore) { }
+}
+
+function grievance_update_7018() {
+  // Enable some modules
+  print "Disabling field_permissions\n";
+  module_disable(array('field_permissions'), FALSE);
+}
+
+function grievance_update_7019() {
+  // Enable some modules
+  print "Enabling views_regex_rewrite\n";
+  module_enable(array('views_regex_rewrite'), FALSE);
+}
+
+/**
+ * Disable conditional fields
+ */
+
+function grievance_update_7020() {
+  // Enable some modules
+  module_disable(array('conditional_fields'), FALSE);
+  return t('Disabled conditional_fields');
+}
+
+/**
+ * Letterhead permissions
+ */
+
+function grievance_update_7021() {
+  $permission = 'sirius letterhead use';
+  $old_permission = 'grievance view';
+  print "Granting new permission [$permission] to anybody with permission [$old_permission] ...\n";
+  $roles = user_roles(FALSE, $old_permission);
+  foreach ($roles as $rid => $name) {
+    print "... granting [$permission] to [$name]\n";
+    user_role_grant_permissions($rid, array($permission));
+  }
+
+  $permission = 'sirius letterhead edit';
+  $old_permission = 'grievance admin';
+  print "Granting new permission [$permission] to anybody with permission [$old_permission] ...\n";
+  $roles = user_roles(FALSE, $old_permission);
+  foreach ($roles as $rid => $name) {
+    print "... granting [$permission] to [$name]\n";
+    user_role_grant_permissions($rid, array($permission));
+  }
+}
+
+/**
+ * Set all shops with active=NULL to active=Yes
+ */
+
+function grievance_update_7022() {
+  $sql = "select * from node ";
+  $sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
+  $sql .= "where node.type = 'grievance_shop' ";
+  $sql .= "and field_sirius_active_value is null ";
+  $sql .= "order by nid ";
+  $stmt = db_query($sql, array());
+  $shop_nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $shop_nids[] = $hr['nid'];
+  }
+  foreach ($shop_nids as $shop_nid) {
+    $node = node_load($shop_nid);
+    $node->field_sirius_active['und'][0]['value'] = 'Yes';
+    node_save($node);
+    print "Set node $shop_nid to Active.\n";
+  }
+  return 'Set all shops with active=NULL to active=Yes.';
+}
+
+/**
+ * Set all contract templates with active=NULL to active=Yes
+ */
+
+function grievance_update_7023() {
+  $sql = "select * from node ";
+  $sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
+  $sql .= "where node.type = 'grievance_contract_template' ";
+  $sql .= "and field_sirius_active_value is null ";
+  $sql .= "order by nid ";
+  $stmt = db_query($sql, array());
+  $nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $nids[] = $hr['nid'];
+  }
+  foreach ($nids as $nid) {
+    $node = node_load($nid);
+    $node->field_sirius_active['und'][0]['value'] = 'Yes';
+    node_save($node);
+    print "Set node $nid to Active.\n";
+  }
+  return 'Set all contract templates with active=NULL to active=Yes.';
+}
+
+/**
+ * Grievance worker permission
+ */
+
+function grievance_update_7024() {
+  if (module_exists('grievance_worker')) {
+    $permission = 'grievance worker lookup';
+    $old_permission = 'grievance view';
+    print "Granting new permission [$permission] to anybody with permission [$old_permission] ...\n";
+    $roles = user_roles(FALSE, $old_permission);
+    foreach ($roles as $rid => $name) {
+      print "... granting [$permission] to [$name]\n";
+      user_role_grant_permissions($rid, array($permission));
+    }
+  }
+}
+
+/**
+ * Index on SSN; delete the "feed type" taxonomy and field
+ */
+
+function grievance_update_7025() {
+  $table = 'field_data_field_sirius_ssn';
+  $column = 'field_sirius_ssn_value';
+  try { db_add_index($table, "${table}_${column}", array($column)); } catch (exception $ignore) { }
+  print "Added index on $table ($column)\n";
+
+  $field = 'field_sirius_feed_type';
+  try { field_delete_field($field); } catch (exception $e) { print_r($e); }
+  print "Deleted field: $field\n";
+
+  $name = 'sirius_feed_types';
+  $vocabulary = taxonomy_vocabulary_machine_name_load($name);
+  if ($vocabulary) { taxonomy_vocabulary_delete($vocabulary->vid); }
+  print "Deleted taxonomy: $name\n";
+}
+
+/**
+ * Enabled views_tree
+ */
+
+/*
+function grievance_update_7026() {
+  // Enable some modules
+  $modules = array('views_tree');
+  print "Enabling: " . join(',', $modules) . "\n";
+  module_enable($modules, FALSE);
+  return "Enabled " . join(',', $modules);
+}
+*/
+
+/**
+ * Edit Signature permission
+ */
+
+function grievance_update_7026() {
+  $permission = 'sirius signature edit';
+  $old_permission = 'grievance admin';
+  print "Granting new permission [$permission] to anybody with permission [$old_permission] ...\n";
+  $roles = user_roles(FALSE, $old_permission);
+  foreach ($roles as $rid => $name) {
+    print "... granting [$permission] to [$name]\n";
+    user_role_grant_permissions($rid, array($permission));
+  }
+}
+
+/**
+ * Enables views_current_path
+ */
+function grievance_update_7027() {
+  // Enable some modules
+  print "Enabling views_current_path\n";
+  module_enable(array('views_current_path'), FALSE);
+}

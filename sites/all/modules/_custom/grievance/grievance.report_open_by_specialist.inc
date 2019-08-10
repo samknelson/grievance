@@ -24,12 +24,18 @@ function grievance_report_open_by_specialist_form($form, &$form_state) {
   $form['shop_match'] = array(
     '#type' => 'select',
     '#title' => t('Exact match on shop name?'),
-    '#options' => array('No' => 'No', 'Yes' => 'Yes'),
+    '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
+  );
+
+  $form['classaction'] = array(
+    '#type' => 'select',
+    '#title' => t('General Grievances Only?'),
+    '#options' => array(NULL => t('Both Individual and General'), 'No' => t('Individual Grievnaces Only'), 'Yes' => t('General / Class Action Grievances Only')),
   );
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Generate Report',
+    '#value' => t('Generate Report'),
     '#suffix' => '</div>',
   );
 
@@ -85,9 +91,15 @@ function grievance_report_open_by_specialist_form_submit($form, &$form_state) {
 		$shop_str = join('+', $shops);
 	}
 
+	$classaction = $form_state['values']['classaction'];
+
 	$results = '';
 	foreach ($organizers as $organizer_uid) {
-		$tmp = views_embed_view('grievance_open_report', 'page', $organizer_uid, $shop_str);
+		if ($classaction) {
+			$tmp = views_embed_view('grievance_open_report', 'page', $organizer_uid, $shop_str, $classaction);
+		} else {
+			$tmp = views_embed_view('grievance_open_report', 'page', $organizer_uid, $shop_str);
+		}
 		if (preg_match('/table/', $tmp)) {
 			$organizer = user_load($organizer_uid);
 			$results .= '<h2>' . $organizer->name . '</h2>' . $tmp;

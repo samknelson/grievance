@@ -130,7 +130,7 @@ function grievance_node_tabs() {
 		'title' => 'Contacts',
 		'description' => '',
 		'callback' => 'grievance_shop_node_tab_contacts',
-		'permissions' => array('grievance contact'),
+		'permissions' => array(),
 	);
 
 	$node_tabs['grievance_company']['contacts'] = array(
@@ -216,6 +216,14 @@ function grievance_node_tabs() {
 		'callback' => 'grievance_contract_template_node_tab_picker',
 		'permissions' => array('grievance contract view'),
 		'weight' => 4,
+	);
+
+	$node_tabs['grievance_contract_template']['clauses/bulk-rename'] = array(
+		'title' => 'Bulk Rename',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_clause_bulk_rename',
+		'permissions' => array('grievance contract edit'),
+		'weight' => 5,
 	);
 
 
@@ -509,6 +517,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['admin/config/grievance/quicksearch'] = array(
+		'title' => 'Grievance Module - QuickSearch',
+		'description' => t('Settings for the quicksearch'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_quicksearch_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['admin/config/grievance/contacts'] = array(
 		'title' => 'Grievance Module - Contacts',
 		'description' => t('Contact-related settings'),
@@ -713,6 +730,14 @@ function grievance_node_tab_access($node, $in_tab_name) {
 					foreach ($tab_record['permissions'] as $permission) {
 						if (!user_access($permission)) { return false; }
 					}
+
+          // Check for a custom access permission
+          $access_function_name = $tab_record['callback'] . '_access';
+          if (function_exists($access_function_name)) {
+            if (!$access_function_name($node)) {
+              return false;
+            }
+          }
 					
 					return true;
 				}
@@ -741,15 +766,11 @@ function grievance_node_tab_get_addlink($content_type, $query, $prompt = NULL) {
 	$item = menu_get_item($path);
 	if (!$item['access']) { return ''; }
 	
-	$result = "<div class=\"unite-addlink\">";
-	$result .= '[';
 	$result .= l(
 		$prompt, 
 		$path,
-		array('query' => $query)
+		array('query' => $query, 'attributes' => array('class' => array('tool-button')))
 	);
-	$result .= ']';
-	$result .= "</div>";
 	
 	return $result;
 }

@@ -41,7 +41,7 @@ function sirius_node_tab_worker_dispatch_preferences_form($form, &$form_state, $
 	unset($medium_options['voice']);
 	unset($medium_options['voice_alt']);
 	$form['medium_2'] = array(
-		'#title' => t('Send other notifications (skill expirations, termination notifications, do-not-call statuses) by:'),
+		'#title' => t('Send other notifications (skill expirations, termination notifications, etc.) by:'),
 		'#type' => 'select',
 		'#options' => $medium_options,
 		'#default_value' => $worker_node->field_sirius_dispatch_medium['und'][2]['value'],
@@ -76,70 +76,76 @@ function sirius_node_tab_worker_dispatch_preferences_form($form, &$form_state, $
 	}
 
 
-	if (user_access('sirius dispatch staff') || user_access('sirius dispatch own preferences')) {
-		//
-		// Skils
-		//
+	if (user_access('sirius dispatch staff') || user_access('sirius dispatch own preferences skill') || user_access('sirius dispatch own preferences department')) {
 
-		if ($worker_node->field_sirius_skill['und']) {
-			$skills = sirius_worker_skills($worker_node);
-			$skill_options = array();
-			foreach ($skills as $skill_tid => $skill_term) {
-				$skill_options[$skill_tid] = $skill_term->name;
-			}
+	  $form['accordion_open_skills'] = array('#markup' => '<div class="sirius_accordion_label">' . t('Skill Preferences') . '</div><div class="sirius_accordion_body">' . t('If you would prefer to only receive dispatches for certain skills, select them below. Remember that if you select specific skills, you will not receive certain open-call dispatches.'));
 
-			$skill_defaults = array();
-			$default_restricted = 'all';
-			if ($worker_node->field_sirius_skills_avail['und']) {
-				foreach ($worker_node->field_sirius_skills_avail['und'] as $tmp) {
-					$skill_tid = $tmp['tid'];
-					$skill_defaults[$skill_tid] = $skill_tid;
+		if (user_access('sirius dispatch staff') || user_access('sirius dispatch own preferences skill')) {
+
+			//
+			// Skils
+			//
+
+			if ($worker_node->field_sirius_skill['und']) {
+				$skills = sirius_worker_skills($worker_node);
+				$skill_options = array();
+				foreach ($skills as $skill_tid => $skill_term) {
+					$skill_options[$skill_tid] = $skill_term->name;
+				}
+
+				$skill_defaults = array();
+				$default_restricted = 'all';
+				if ($worker_node->field_sirius_skills_avail['und']) {
+					foreach ($worker_node->field_sirius_skills_avail['und'] as $tmp) {
+						$skill_tid = $tmp['tid'];
+						$skill_defaults[$skill_tid] = $skill_tid;
+						$default_restricted = 'restrict';
+					}
+				}
+				if ($worker_node->field_sirius_skills_availx['und'][0]['value']) {
 					$default_restricted = 'restrict';
 				}
+
+				$form['skills_restricted'] = array(
+					'#title' => '',
+					'#type' => 'select',
+					'#options' => array(
+						'all' => t('Send me dispatches for all skills'),
+						'restrict' => t('Send me dispatches for specified skills'),
+					),
+					'#default_value' => $default_restricted,
+				);
+
+				$form['skills_avail'] = array(
+					'#title' => t('I only want to receive dispatches for the skills checked below.'),
+					'#type' => 'checkboxes',
+					'#options' => $skill_options,
+					'#default_value' => $skill_defaults,
+					'#states' => array(
+						'visible' => array(
+							array(':input[name="skills_restricted"]' => array('value' => 'restrict')),
+						)
+					),
+				);
+
+				$form['skills_availx'] = array(
+					'#title' => t('In addition to the skills selected above, I want to receive dispatches with no skill specified.'),
+					'#type' => 'select',
+					'#options' => array(
+						'No' => t('No'),
+						'Yes' => t('Yes'),
+					),
+					'#default_value' => $worker_node->field_sirius_skills_availx['und'][0]['value'],
+					'#states' => array(
+						'visible' => array(
+							array(':input[name="skills_restricted"]' => array('value' => 'restrict')),
+						)
+					),
+				);
 			}
-			if ($worker_node->field_sirius_skills_availx['und'][0]['value']) {
-				$default_restricted = 'restrict';
-			}
+		}
 
-		  $form['accordion_open_skills'] = array('#markup' => '<div class="sirius_accordion_label">' . t('Skill Preferences') . '</div><div class="sirius_accordion_body">' . t('If you would prefer to only receive dispatches for certain skills, select them below. Remember that if you select specific skills, you will not receive certain open-call dispatches.'));
-
-			$form['skills_restricted'] = array(
-				'#title' => '',
-				'#type' => 'select',
-				'#options' => array(
-					'all' => t('Send me dispatches for all skills'),
-					'restrict' => t('Send me dispatches for specified skills'),
-				),
-				'#default_value' => $default_restricted,
-			);
-
-			$form['skills_avail'] = array(
-				'#title' => t('I only want to receive dispatches for the skills checked below.'),
-				'#type' => 'checkboxes',
-				'#options' => $skill_options,
-				'#default_value' => $skill_defaults,
-				'#states' => array(
-					'visible' => array(
-						array(':input[name="skills_restricted"]' => array('value' => 'restrict')),
-					)
-				),
-			);
-
-			$form['skills_availx'] = array(
-				'#title' => t('In addition to the skills selected above, I want to receive dispatches with no skill specified.'),
-				'#type' => 'select',
-				'#options' => array(
-					'No' => t('No'),
-					'Yes' => t('Yes'),
-				),
-				'#default_value' => $worker_node->field_sirius_skills_availx['und'][0]['value'],
-				'#states' => array(
-					'visible' => array(
-						array(':input[name="skills_restricted"]' => array('value' => 'restrict')),
-					)
-				),
-			);
-
+		if (user_access('sirius dispatch staff') || user_access('sirius dispatch own preferences department')) {
 
 			//
 			// Departments
@@ -156,10 +162,12 @@ function sirius_node_tab_worker_dispatch_preferences_form($form, &$form_state, $
 				'#options' => $department_options,
 				'#default_value' => sirius_fieldvals($worker_node, 'field_grievance_departments', 'tid'),
 			);
-
-		  $form['accordion_close_skills'] = array('#markup' => '</div>');
-
 		}
+
+		$form['accordion_close_skills'] = array('#markup' => '</div>');
+	}
+
+	if (user_access('sirius dispatch staff') || user_access('sirius dispatch own preferences')) {
 
 		//
 		// DNCs
@@ -393,31 +401,7 @@ function sirius_node_tab_worker_dispatch_preferences_form_submit($form, &$form_s
 		drupal_set_message($msg);
 	}
 
-	if (user_access('sirius dispatch staff') || user_access('sirius dispatch own preferences')) {
-		// CBN
-		$val = $form_state['values']['cbn'];
-		if ($val != $worker_node->field_sirius_dispatch_cbn['und'][0]['value']) {
-			$worker_node->field_sirius_dispatch_cbn['und'][0]['value'] = $val;
-			$need_save = TRUE;
-			drupal_set_message(t('"Call by Name Only?" set  to @val', array('@val' => ($val?$val:"[NULL]"))));
-		}
-
-		// HFE
-		$hfe_action = $form_state['values']['hfe_action'];
-		if ($hfe_action == 'Clear') {
-			sirius_dispatch_hfe_clear($worker_node);
-			drupal_set_message(t('"Hold for employer" has been cleared'));
-		}
-		if ($hfe_action == 'Set') {
-			$employer_nid = $form_state['values']['hfe'];
-			$employer_node = node_load($employer_nid);
-			$hfe_hrs = $form_state['values']['hfe_hrs'];
-			$hfe_ts = time() + (60*60*$hfe_hrs);
-			sirius_dispatch_hfe_set($worker_node, $employer_node, $hfe_ts);
-			$need_save = TRUE;
-			drupal_set_message(t('You will not receive any new dispatches except for those from @val until @date at @time.', array('@val' => $employer_node->title, '@date' => date('l, F d ', $hfe_ts), '@time' => date('h:i a', $hfe_ts))));
-		}
-
+	if (user_access('sirius dispatch staff') || user_access('sirius dispatch own preferences skill')) {
 		// Clear skill preferences
 		if ($form_state['values']['skills_restricted'] == 'all') {
 			if ($worker_node->field_sirius_skills_avail['und']) {
@@ -475,9 +459,9 @@ function sirius_node_tab_worker_dispatch_preferences_form_submit($form, &$form_s
 				drupal_set_message('Availability for unskilled work has been set to ' . $form_state['values']['skills_availx']);
 			}
 		}
+	}
 
-
-
+	if (user_access('sirius dispatch staff') || user_access('sirius dispatch own preferences department')) {
 		// Department Preferences
 		$new_departments = array();
 		if ($form_state['values']['department_not_avail']) {
@@ -496,57 +480,32 @@ function sirius_node_tab_worker_dispatch_preferences_form_submit($form, &$form_s
 			}
 			drupal_set_message("Department preferences have been updated.");
 		}
+	}
 
-		/*
-			if ($worker_node->field_grievance_departments['und'] || $worker_node->field_grievance_departmentsx['und']) {
-				$worker_node->field_grievance_departments['und'] = array();
-				$worker_node->field_grievance_departmentsx['und'] = array();
-				$need_save = TRUE;
-				sirius_log('worker:department_avail', 'clear', 'Department preferences have been cleared', '', '', array($worker_node->nid), array());
-				drupal_set_message('Department preferences have been removed.');
-			}
+	if (user_access('sirius dispatch staff') || user_access('sirius dispatch own preferences')) {
+		// CBN
+		$val = $form_state['values']['cbn'];
+		if ($val != $worker_node->field_sirius_dispatch_cbn['und'][0]['value']) {
+			$worker_node->field_sirius_dispatch_cbn['und'][0]['value'] = $val;
+			$need_save = TRUE;
+			drupal_set_message(t('"Call by Name Only?" set  to @val', array('@val' => ($val?$val:"[NULL]"))));
 		}
 
-		if ($form_state['values']['department_restricted'] == 'restrict') {
-			$old_departments = array();
-			if ($worker_node->field_grievance_departments['und']) {
-				foreach ($worker_node->field_grievance_departments['und'] as $tmp) {
-					$old_departments[$tmp['tid']] = TRUE;
-				}
-			}
-			$old_departments = array_keys($old_departments);
-
-			$new_departments = array();
-			foreach (array_values($form_state['values']['department_avail']) as $tid) {
-				if ($tid) {
-					$new_departments[$tid] = TRUE;
-				}
-			}
-			$new_departments = array_keys($new_departments);
-
-			if (array_diff($old_departments, $new_departments) || array_diff($new_departments, $old_departments)) {
-				$worker_node->field_grievance_departments['und'] = array();
-				foreach ($new_departments as $tid) {
-					$worker_node->field_grievance_departments['und'][] = array('tid' => $tid);
-				}
-				$need_save = TRUE;
-				sirius_log('worker:department_avail', 'set', 'Department preferences have been set', '', '', array($worker_node->nid), array());
-				drupal_set_message('Department preferences have been set.');
-			}
-
-			if ($form_state['values']['department_availx'] && 
-				($form_state['values']['department_availx'] != $worker_node->field_grievance_departmentsx['und'][0]['value'])) {
-				$worker_node->field_grievance_departmentsx['und'][0]['value'] = $form_state['values']['department_availx'];
-				$need_save = TRUE;
-				sirius_log('worker:department_availx', 'set', 'Available for unskilled work has been set to ' . $form_state['values']['department_availx'], '', '', array($worker_node->nid), array());
-				drupal_set_message('Availability for work with no specific department set to ' . $form_state['values']['department_availx']);
-			}
+		// HFE
+		$hfe_action = $form_state['values']['hfe_action'];
+		if ($hfe_action == 'Clear') {
+			sirius_dispatch_hfe_clear($worker_node);
+			drupal_set_message(t('"Hold for employer" has been cleared'));
 		}
-		*/
-
-
-
-
+		if ($hfe_action == 'Set') {
+			$employer_nid = $form_state['values']['hfe'];
+			$employer_node = node_load($employer_nid);
+			$hfe_hrs = $form_state['values']['hfe_hrs'];
+			$hfe_ts = time() + (60*60*$hfe_hrs);
+			sirius_dispatch_hfe_set($worker_node, $employer_node, $hfe_ts);
+			$need_save = TRUE;
+			drupal_set_message(t('You will not receive any new dispatches except for those from @val until @date at @time.', array('@val' => $employer_node->title, '@date' => date('l, F d ', $hfe_ts), '@time' => date('h:i a', $hfe_ts))));
+		}
 
 		for ($delta = 0; $delta < 1000; ++$delta) {
 			$new_employer_nid = $form_state['values']['dncs2_nid_' . $delta];
@@ -594,6 +553,13 @@ function sirius_node_tab_worker_dispatch_preferences_form_submit($form, &$form_s
 			$worker_node->field_sirius_dispatch_eba['und']['0']['value'] = $new_eba;
 			$need_save = TRUE;
 			sirius_log('worker:eba', 'set', 'EBA status set to ' . $new_eba, '', '', array($worker_node->nid), array());
+
+			if ($new_eba == 'Yes') {
+				$newdate = gmdate('Y-m-d H:i:s');
+				$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $newdate;
+				sirius_log('worker:availdate', 'set', "Set worker's availability date to $newdate", 'Signed in to EBA', '', array($worker_node->nid));
+			}
+
 			drupal_set_message('Employed-but-available status set to ' . $new_eba . '.');
 		}
 

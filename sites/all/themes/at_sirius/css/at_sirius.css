@@ -52,7 +52,7 @@ div.messages {
 
 pre, code {
   font-family: Consolas, Monaco, "Courier New", Courier, monospace;
-  background: #fff;
+  /* background: #fff; */
 }
 
 /* Layout */
@@ -776,7 +776,6 @@ tbody {
 }
 td,th {
   margin: 0;
-  padding: 10px 7px;
 }
 th.active a {
   padding-right: 25px;
@@ -1205,13 +1204,13 @@ fieldset#edit-body-und-0-format {
   padding-top: 0 !important;
 }
 legend {
+  background-color: #5984be;
   font-size: 1em;
   border: 0;
-  background: #d4d4d4;
   display: block;
-  padding: 7px 1%;
+  padding: 14px 0 14px 2%;
   width: 98%;
-  border-radius: 2px;
+  border-radius: 0;
 }
 fieldset legend,
 fieldset legend a:link,
@@ -2385,6 +2384,8 @@ table.trustfund-payperiod tr.error {
 	font-size: 1em;
 	padding-top: 0;
 	padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .block .field-name-body ul,
@@ -2801,12 +2802,6 @@ tr.view-subfooter-number{ display: none; }
 .tablesorter-blue tbody tr.odd td {
 	background-color: #ffffff;
 }
-legend {
-  background-color: #5984be;
-  border-radius: 0;
-  padding: 14px 2%;
-  max-width: 96%;
-}
 fieldset legend, 
 fieldset legend a,
 fieldset legend a:link,
@@ -2900,10 +2895,15 @@ fieldset legend a:visited {
 .loopback #admin-menu, 
 .loopback #page-banner, 
 .loopback #page-footer, 
-.loopback #header { 
+.loopback #header,
+.loopback .banner-menu-outer-wrapper { 
   display: none;
 }
 
+body.loopback {
+  background: none;
+  color: #000000;
+}
 
 
 .gform_body h3 {
@@ -3239,25 +3239,34 @@ table.grievance-timeline tr.pending {
   display: inline;
 }
 
-.form-item-field-grievance-document-types-und .form-type-checkbox {
+.form-item-field-grievance-document-types-und .form-type-checkbox,
+.form-item-irsets .form-type-checkbox {
   display: inline-block;
   width: 290px;
 }
 
 
-@media print {
-  body {
-    font-size: 12pt;
+@media only print {
+  body, p, a {
+    font-size: 11pt;
     font-family: "Times New Roman", Times, serif;
+    color: #000000;
   }
+  body, p, a, table, tr, td, th {
+    background-color: transparent !important;
+  }
+  /*
   #grievance-letter-body {
     padding-left: 5mm;
     padding-right: 5mm;
   }
+  */
   div.grievance-letter-page-break {
     page-break-after: always;
   }
 
+  .primary-local-tasks-wrapper,
+  #block-grievance-grievance-quicksearch,
   .block-masquerade,
   #admin-menu-wrapper,
   .block-superfish,
@@ -3266,7 +3275,22 @@ table.grievance-timeline tr.pending {
     display: none;
   }
 
+  td {
+    padding: 11px 0 11px 22px;
+  }
 
+  #header {
+    background-color: #ffffff;
+    border-bottom: none;
+    margin: 28px 0 28px 0;
+  }
+  #page-banner {
+
+  }
+
+  div.sirius_noprint { 
+    display: none;
+  }
 }
 
 
@@ -3366,8 +3390,8 @@ table.grievance-timeline tr.pending {
 
 
 #grievance-letter-body table,
-#grievance-letter-body tbody {
-  border: none;
+#grievance-letter-body table {
+  border-collapse: separate;
 }
 
 .page-node-statuslog .unite-addlink {
@@ -3401,8 +3425,10 @@ table.grievance-timeline tr.pending {
 
 .view-grievance-log td,
 .view-grievance-log-all td {
+/*
   padding-top: 6px;
   padding-bottom: 0;
+*/
 }
 
 @media print {
@@ -3698,9 +3724,19 @@ div.node-sirius-dispatch.node-teaser {
 */
 
 .checkboxes-inline .form-checkboxes .form-item,
-.field-name-field-sirius-skill-form .form-item .form-type-checkbox {
+.field-name-field-sirius-skill-form .form-item .form-type-checkbox,
+.field-name-field-grievance-statuses .form-item .form-type-checkbox {
   float: left;
   width: 250px;
+}
+
+.field-name-field-grievance-statuses .form-item .description {
+  clear: left;
+}
+
+.checkboxes-inline .msg {
+   font-size: 85%;
+   color: #333333;
 }
 
 
@@ -3710,7 +3746,9 @@ div.node-sirius-dispatch.node-teaser {
   background: #666666;
 }
 
-.views-row-edit-static {
+.views-row-edit-static, 
+.views-row-edit-edit .tabledrag-toggle-weight-wrapper,
+.views-row-edit-edit .field-add-more-submit { 
   display: none;
 }
 
@@ -3803,6 +3841,45 @@ label {
     clear: left;
 }
 
+tr.sirius_bg_snow,          tr.sirius_bg_snow           td { background-color: snow; }
+tr.sirius_bg_mintcream,     tr.sirius_bg_mintcream      td { background-color: mintcream; }
+tr.sirius_bg_ivory,         tr.sirius_bg_ivory          td { background-color: ivory; }
+tr.sirius_bg_honeydew,      tr.sirius_bg_honeydew       td { background-color: honeydew; }
+tr.sirius_bg_aliceblue,     tr.sirius_bg_aliceblue      td { background-color: aliceblue; }
+tr.sirius_bg_seashell,      tr.sirius_bg_seashell       td { background-color: seashell; }
+tr.sirius_bg_beige,         tr.sirius_bg_beige          td { background-color: beige; }
+tr.sirius_bg_oldlace,       tr.sirius_bg_oldlace        td { background-color: oldlace; }
+tr.sirius_bg_floralwhite,   tr.sirius_bg_floralwhite    td { background-color: floralwhite; }
+tr.sirius_bg_antiquewhite,  tr.sirius_bg_antiquewhite   td { background-color: antiquewhite; }
+tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
+tr.sirius_bg_lavenderblush, tr.sirius_bg_lavenderblush  td { background-color: lavenderblush; }
+tr.sirius_bg_mistyrose,     tr.sirius_bg_mistyrose      td { background-color: mistyrose; }
+tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
+tr.sirius_bg_azure,         tr.sirius_bg_azure          td { background-color: azure; }
+tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
+tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
+
+/*
+snow  #FFFAFA
+mintcream #F5FFFA
+ivory #FFFFF0
+honeydew  #F0FFF0
+azure #F0FFFF 
+aliceblue #F0F8FF
+seashell  #FFF5EE
+beige #F5F5DC
+oldlace #FDF5E6
+floralwhite #FFFAF0
+antiquewhite  #FAEBD7
+linen #FAF0E6
+lavenderblush #FFF0F5
+mistyrose #FFE4E1
+*/
+
+div.sirius-view-multitable table {
+  table-layout: fixed;
+}
+
 /* /node/add/sirius-worker */
 input.ajax-processed {
   color: #5984be;
@@ -3840,3 +3917,172 @@ input.ajax-processed:hover {
 .form-type-date-popup .form-item label {
   display: none;
 }
+
+.node-grievance-form .form-type-date-popup .form-item label { 
+  display: block;
+}
+
+
+/* /sirius-worker/... */
+.ds-below-left,
+.ds-above-left {
+    width: 49%;
+    margin-right: 1%;
+}
+
+/* /sirius_dispatch_worker_view/... */
+
+@media only screen {
+  .sirius_dispatch_view_print_header {display: none;}
+  .sirius_dispatch_view_print_footer {display: none;}
+  .sirius_dispatch_view_screen_header {margin: 24px 0;}
+  .sirius_dispatch_view_screen_footer {}
+}
+@media only print {
+  .sirius_dispatch_view_screen_header {display: none;}
+  .sirius_dispatch_view_screen_footer {display: none;}
+  .sirius_dispatch_view_print_header {
+    display: block;
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .sirius_dispatch_view_print_footer {
+    display: block;
+    padding-top: 24px;
+    margin-top: 24px;
+    border-top: 1px dotted #000000;    
+  }
+  .sirius_dispatch_view_worker_section,
+  .sirius_dispatch_view_dispatch_section {
+    border: 1px dotted #000;
+  }
+  #sirius-node-tab-dispatch-worker-view-form {}
+
+  .page-node-sirius-dispatch-worker-view #header {display: none;}
+  html body.admin-menu {
+      margin-top: 0 !important;
+  }
+}
+
+.sirius_dispatch_view_worker_section,
+.sirius_dispatch_view_dispatch_section {
+  float: left;
+  width: 44%;
+  padding: 24px 2%;
+  background-color: #fff;
+  margin-bottom: 24px;
+}
+.sirius_dispatch_view_worker_section {
+  float: right;
+}
+.sirius_dispatch_view_dispatch_section code {
+  float: left;
+  width: 105px;
+  margin-right: 25px;
+}
+.sirius_dispatch_view_dispatch_section section {
+  float: left;
+  width: 60%;
+}
+.sirius_dispatch_view_job_section {
+  margin-top: 48px;
+  clear: both;
+}
+.sirius_dispatch_view_worker_section .field-name-field-sirius-name h2,
+.sirius_dispatch_view_worker_section .field-name-field-sirius-phone h2,
+.sirius_dispatch_view_worker_section .field-name-field-sirius-email h2 {
+  display: none;
+}
+.sirius_dispatch_view_dispatch_section .field h2,
+.sirius_dispatch_view_worker_section .field h2 {
+  min-width: 0;
+  font-weight: normal;
+  margin-right: 4px;
+}
+.sirius_dispatch_view_worker_section img {
+  float: left;
+  width: 150px;
+  margin: 0 25px 25px 0;
+}
+.sirius_dispatch_view_worker_section section {
+  float: left;
+  width: 51%;
+}
+.sirius_dispatch_view_dispatch_section .field,
+.sirius_dispatch_view_worker_section .field {
+  margin-bottom: 3px;
+}
+.sirius_dispatch_view_dispatch_section,
+.sirius_dispatch_view_worker_section {
+  min-height: 140px; 
+}
+.sirius_dispatch_view_job_section .field {
+  margin-bottom: 12px;
+}
+.sirius_dispatch_view_job_section .field-name-field-sirius-notes h2,
+.sirius_dispatch_view_job_section .field-name-field-sirius-notes .field-items {
+  width: 100%;
+  padding-bottom: 12px !important;
+}
+
+/* Wrangle things in small views */
+@media only screen and (max-width:959px) {
+  /*   */
+  .ds-below-right,
+  .ds-below-left,
+  .ds-above-right,
+  .ds-above-left {
+      width: 100%;
+      margin-right: 0;
+  }
+}
+@media only screen and (max-width:880px) {
+  .sirius_dispatch_view_dispatch_section ,
+  .sirius_dispatch_view_worker_section {
+      width: 100%;
+      margin: 12px 0;
+      float: none;
+      padding: 24px 0 24px 18px;
+  }
+  .sirius_dispatch_view_dispatch_section code {
+    margin-bottom: 50px;
+  }
+  .sirius_dispatch_view_dispatch_section section {
+  }
+  .sirius_dispatch_view_worker_section img {
+    margin-bottom: 50px;
+  }
+  .sirius_dispatch_view_worker_section section {
+  }
+
+}
+
+@media only screen and (max-width:579px) {
+  .sirius_dispatch_view_worker_section section,
+  .sirius_dispatch_view_worker_section img,
+  .sirius_dispatch_view_dispatch_section section,
+  .sirius_dispatch_view_dispatch_section code {
+    margin-bottom: 12px;
+    float: none;
+    width: 100%;
+    display: block;
+  }
+  #page-banner .user-links {
+    display: none;
+  }
+}
+
+
+.sirius_signature_wrapper {
+  width: 100%;
+  overflow: hidden;
+  font-size: 1.5em;
+  color: #1b4784;
+  font-style: italic;
+  font-family: roboto, arial, helvetica, san-serif;  
+}
+.sirius_signature_wrapper img {
+  height: 90px;
+}
+
+

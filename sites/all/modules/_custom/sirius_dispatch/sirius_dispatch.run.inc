@@ -30,6 +30,10 @@ function sirius_dispatch_run_all() {
 }
 
 function sirius_dispatch_run($job_node) {
+  // Close jobs after the report date
+  $result = sirius_dispatch_run_check_report_date($job_node);
+  if (!$result['success']) { return $result; }
+
 	// Expire dispatches
 	$result = sirius_dispatch_run_expire($job_node);
 	if (!$result['success']) { return $result; }
@@ -52,6 +56,23 @@ function sirius_dispatch_run($job_node) {
 
 	return array('success' => TRUE);
 }
+
+function sirius_dispatch_run_check_report_date($job_node) {
+  $report_ts = sirius_date_ts($job_node, 'field_sirius_datetime');
+
+  if ($report_ts >= time()) { return array('success' => TRUE, 'msg' => 'Report date has not yet passed.'); }
+
+  $job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Filled';
+  $job_node->field_sirius_summary['und'][0]['value'] = 'Closing because report date passed on ' . date('c');
+  node_save($job_node);
+
+  if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+    sirius_log('job:run', 'complete', "The report date has passed. Closing the job.", '', '', array($job_node->nid));
+  }
+
+  return array('success' => FALSE, 'msg' => 'Report date has passed. Closing the job.');
+}
+
 
 function sirius_dispatch_run_error($job_node, $msg) {
 	sirius_log('job:run', 'error', $msg, '', '', array($job_node->nid));
@@ -126,13 +147,24 @@ function sirius_dispatch_run_notify($job_node) {
   }
 
   $nids = array_keys($stmt['node']);
+  $attempted = 0;
   $count = 0;
+  $failed = 0;
   foreach ($nids as $nid) {
   	$dispatch_node = node_load($nid);
-  	sirius_dispatch_notify($dispatch_node);
-  	++$count;
+  	$result = sirius_dispatch_notify($dispatch_node);
+
+    ++$attempted;
+    if ($result['success']) {
+      ++$count;
+    } else {
+      ++$failed;
+      if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+        sirius_log('job:run', 'notify', 'Notification failed: ' . $result['msg'], '', '', array($job_node->nid));
+      }
+    }
   }
-	$msg = "Sent $count notifications.";
+	$msg = "Attempted $attempted notifications. Sent $count, with $failed failures.";
   if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
   	sirius_log('job:run', 'notify', $msg, '', '', array($job_node->nid));
   }
@@ -140,13 +172,26 @@ function sirius_dispatch_run_notify($job_node) {
 }
 
 function sirius_dispatch_run_create_dispatches($job_node) {
+  $policy = sirius_dispatch_job_policy($job_node);
+
   // Never create dispatches for CBNs.  Let's not even bother cluttering up the log.
-  if ($job_node->field_sirius_dispatch_job_type['und'][0]['tid'] == sirius_get_special_tid('sirius_dispatch_job_type|CBN')) {
+  if ($policy['run']['fan'] != 'Yes') {
+    if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+      sirius_log('job:run', 'create_dispatches', 'Dispatches are not created for call-by-names.', '', '', array($job_node->nid));
+    }
     return array('success' => TRUE, 'msg' => 'Dispatches are not created for call-by-names.');
   }
 
 	// How many do we need?
 	$count_we_need = $job_node->field_sirius_count['und'][0]['value'];
+
+  // Job settings
+  $batch_max = $job_node->field_sirius_batch_max['und'][0]['value'];
+  if (!$batch_max) { $batch_max = variable_get('sirius_dispatch_run_create_count', 25); }
+  $batch_min = $job_node->field_sirius_batch_min['und'][0]['value'];
+  if (!$batch_min) { $batch_min = 1; }
+  $batch_ratio = $job_node->field_sirius_batch_ratio['und'][0]['value'];
+  if (!$batch_ratio) { $batch_ratio = 1; }
 
 	// How many are requested, notified, or accepted?
 	$query = new EntityFieldQuery;
@@ -162,6 +207,7 @@ function sirius_dispatch_run_create_dispatches($job_node) {
   }
 
   // We have too many -- error
+  /*
 	if ($count_we_need < $count_we_have) {
 		$msg = "We need $count_we_need dispatches, but there are already $count_we_have dispatches with status requested, notified, or pending. This job is oversubscribed.";
 		sirius_dispatch_run_error($job_node, $msg);
@@ -176,35 +222,41 @@ function sirius_dispatch_run_create_dispatches($job_node) {
     }
 		return array('success' => TRUE, 'msg' => $msg);
 	}
+  */
 
 	// We don't have enough
 	$count_to_create = $count_we_need - $count_we_have;
-	$workers = sirius_dispatch_job_get_dispatchable_workers(
-    $job_node, 
-    'dispatch', 
-    $count_to_create,
-    array('cbn' => 'No')
-  );
+  $count_to_create = $count_to_create * $batch_ratio;
+  if ($count_to_create > $batch_max) { $count_to_create = $batch_max; }
+  if ($count_to_create < $batch_min) { $count_to_create = $batch_min; }
+  if ($count_to_create >= 1) {
+  	$workers = sirius_dispatch_job_get_dispatchable_workers(
+      $job_node, 
+      'dispatch', 
+      $count_to_create,
+      array('cbn' => 'No')
+    );
 
-	// Create all
-	$created = 0;
-	foreach ($workers as $worker) {
-		$worker_nid = $worker['nid'];
-		sirius_dispatch_actions_create($job_node, $worker_nid, 'No');
-		++$created;
-	}
+  	// Create all
+  	$created = 0;
+  	foreach ($workers as $worker) {
+  		$worker_nid = $worker['nid'];
+  		sirius_dispatch_actions_create($job_node, $worker_nid, 'No');
+  		++$created;
+  	}
 
-  // There are not enough dispatchable workers -- error
-  if (count($workers) < $count_to_create) {
-    $msg = "There are not enough dispatchable workers.";
-    sirius_dispatch_run_error($job_node, $msg);
-    return array('success' => FALSE, 'msg' => $msg);
-  }
+    // There are not enough dispatchable workers -- error
+    if (count($workers) < $count_to_create) {
+      $msg = "There are not enough dispatchable workers.";
+      sirius_dispatch_run_error($job_node, $msg);
+      return array('success' => FALSE, 'msg' => $msg);
+    }
 
-	// All done
-	$msg = "Created $created dispatches.";
-  if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
-  	sirius_log('job:run', 'create_dispatches', $msg, '', '', array($job_node->nid));
+  	// All done
+  	$msg = "Created $created dispatches.";
+    if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
+    	sirius_log('job:run', 'create_dispatches', $msg, '', '', array($job_node->nid));
+    }
   }
 	return array('success' => TRUE, 'msg' => $msg);
 }
@@ -261,17 +313,8 @@ function sirius_dispatch_run_admin() {
     '#type' => 'textfield',
     '#title' => t('Maximum Dispatches Created Per Poll'),
     '#size' => 6,
-    '#default_value' => variable_get('sirius_dispatch_run_create_count', 25),
-    '#description' => t("Maximum number of dispatches that will be created each time a running job is polled"),
-  );
-
-  $var = 'sirius_dispatch_run_notify_count';
-  $form[$var] = array(
-    '#type' => 'textfield',
-    '#title' => t('Maximum Notifications Per Poll'),
-    '#size' => 6,
     '#default_value' => variable_get($var, 25),
-    '#description' => t("Maximum number of notifications that will be sent each time a running job is polled"),
+    '#description' => t("Maximum number of dispatches that will be created each time a running job is polled"),
   );
 
   $days = array(

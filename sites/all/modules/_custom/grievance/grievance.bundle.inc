@@ -64,8 +64,6 @@ function grievance_node_tab_bundle_download($grievance_node) {
 }
 
 function grievance_node_tab_bundle($grievance_node) {
-  drupal_set_title($grievance_node->title . ': ' . t('Bundle'));
-
 	return drupal_get_form('grievance_bundle_form', $grievance_node);
 }
 

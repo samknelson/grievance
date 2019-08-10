@@ -49,6 +49,15 @@ function sirius_dispatch_dnc_set($worker_node, $employer_node, $tf, $reason, $at
 			$body .= "<a href=\"$base_url\">$base_url</a>";
 			$body .= "<hr><strong>Reason: </strong>";
 			$body .= $reason;
+
+			$sms = "At the request of " . $employer_node->title . ", you have been placed on the Do Not Call list for this employer. The reason is provided below. ";
+			$sms .= "If you have any questions, please contact the office.";
+			$sms .= "\n\n";
+			$sms .= "To see the DNC record and any supporting information, please sign into your account at\n";
+			$sms .= "$base_url\n\n";
+			$sms .= "Reason: ";
+			$sms .= $reason;
+
 		} else {
 			$subject = "You have been removed from the Do Not Call list for " . $employer_node->title;
 			$body = "At the request of " . $employer_node->title . ", you have been removed from the Do Not Call list for this employer. The reason is provided below. ";
@@ -58,16 +67,26 @@ function sirius_dispatch_dnc_set($worker_node, $employer_node, $tf, $reason, $at
 			$body .= "<a href=\"$base_url\">$base_url</a>";
 			$body .= "<hr><strong>Reason: </strong>";
 			$body .= $reason;
+
+			$sms = "At the request of " . $employer_node->title . ", you have been removed from the Do Not Call list for this employer. The reason is provided below. ";
+			$sms .= "If you have any questions, please contact the office. ";
+			$sms .= "\n\n";
+			$sms .= "To see the DNC record and any supporting information, please sign into your account at\n";
+			$sms .= "$base_url\n\n";
+			$sms .= "Reason: ";
+			$sms .= $reason;
 		}
 
-		sirius_email_send(
+		/*
+		sirius_worker_notify(
+			$worker_node, 
 			array(
-				'to' => $worker_node->field_sirius_email['und'][0]['value'],
 				'subject' => $subject,
 				'body' => $body,
-				'handler_nids' => array($worker_node->nid)
+				'sms' => $sms
 			)
 		);
+		*/
 
 		node_save($worker_node);
 	}

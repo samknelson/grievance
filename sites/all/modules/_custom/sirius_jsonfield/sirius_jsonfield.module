@@ -17,7 +17,15 @@ function sirius_jsonfield_menu() {
 
 function sirius_jsonfield_form_definition($entity_type, $bundle, $field_name) {
   $all_definitions = module_invoke_all('sirius_jsonfield_form_definitions');
-  return $all_definitions[$entity_type][$bundle][$field_name];
+  $form = $all_definitions[$entity_type][$bundle][$field_name];
+  if (!$form) {
+    $form = array(
+      '#type' => 'markup',
+      '#markup' => t('Please supply a form defintiion by implementing hook_sirius_jsonfield_form_definitions and returning a value for $all_defintions[@entity_type][@bundle][@field_name]', array('@entity_type' => $entity_type, '@bundle' => $bundle, '@field_name' => $field_name)),
+    );
+  }
+
+  return $form;
 }
 
 /**
@@ -115,13 +123,15 @@ function sirius_jsonfield_field_widget_form(&$form, &$form_state, $field, $insta
   } else {
     $element['sirius_jsonfield'] = sirius_jsonfield_form_definition($entity_type, $bundle, $field['field_name']);
     $default_value = json_decode($items[$delta]['value'], TRUE);
-    foreach ($default_value as $sub_name => $sub_value) {
-      if (is_array($sub_value)) {
-        foreach ($sub_value as $sub_sub_name => $sub_sub_value) {
-          $element['sirius_jsonfield'][$sub_name][$sub_sub_name]['#default_value'] = $sub_sub_value;
+    if ($default_value) {
+      foreach ($default_value as $sub_name => $sub_value) {
+        if (is_array($sub_value)) {
+          foreach ($sub_value as $sub_sub_name => $sub_sub_value) {
+            $element['sirius_jsonfield'][$sub_name][$sub_sub_name]['#default_value'] = $sub_sub_value;
+          }
+        } else {
+          $element['sirius_jsonfield'][$sub_name]['#default_value'] = $sub_value;
         }
-      } else {
-        $element['sirius_jsonfield'][$sub_name]['#default_value'] = $sub_value;
       }
     }
   }

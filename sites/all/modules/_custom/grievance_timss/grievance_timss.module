@@ -520,6 +520,9 @@ function grievance_timss_form_grievance_node_form_alter(&$form, &$form_state, $f
     if (!$candidates) {
       $result_body .= t('No members match your search criteria: ') . '<strong>' . $form_state['values']['grievance_timss_search'] . '</strong>';
     } else {
+
+      usort($candidates, function($a, $b) { return strcasecmp($a->name, $b->name); });
+
       $header = array(
         t('TIMSS ID'),
         t('Name'),

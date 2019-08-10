@@ -26,8 +26,14 @@ function sirius_phonetree($call_sid, $context) {
 	if ($context['outgoing_msg']) {
 		$msg = $context['outgoing_msg'];
 		unset($context['outgoing_msg']);
-		$msg = "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ".\n\n" . $msg;
-		$msg .= "Enter star to hear this message again. Enter 9 to be connected with the operator. Enter 0 to return to the main menu.";
+		$msg = "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
+		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
+		$msg .= "Message repeates. ";
+		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
+		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
+		$msg .= "Message repeates. ";
+		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
+		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
 		sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, 1);
 	}
 
@@ -180,7 +186,8 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 	  $query->entityCondition('entity_type', 'node');
 	  $query->entityCondition('bundle', 'sirius_dispatch_job');
 		$query->fieldCondition('field_sirius_dispatch_job_type', 'tid', sirius_get_special_tid('sirius_dispatch_job_type|BULL'));
-	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d H:i:s', strtotime('-1 days')), '>=');
+	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d 00:00:00'), '>=');
+	  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d 00:00:00', strtotime('+2 days')), '<=');
 	  $query->fieldCondition('field_sirius_member_status', 'tid', $worker_member_status_tids, 'in');
 	  $query->fieldOrderBy('field_sirius_datetime', 'value');
 	  $stmt = $query->execute();
@@ -191,7 +198,7 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 
 	// Bullpen list
 	if (!$bullpen_nodes) {
-		$text = "There are no upcoming bullpens.";
+		$text = "There are no upcoming bullpens. ";
 	} else {
 		$i = 0;
 		$count = count($bullpen_nodes);
@@ -204,6 +211,7 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 			$ts = sirius_date_ts($bullpen_node, 'field_sirius_datetime');
 			$text .= "Bullpen number $i:\n";
 			$text .= sirius_tts_title($employer_node) . " on " . date('l, F d ', $ts) . ":\n\n";
+			/*
 			$member_status_tids = sirius_fieldvals($bullpen_node, 'field_sirius_member_status', 'tid');
 			if ($member_status_tids) {
 
@@ -213,6 +221,7 @@ function sirius_phonetree_bullpen($call_sid, $context) {
 					$text .= $term->name . ":\n\n";
 				}
 			}
+			*/
 			$text .= "Report to " . $facility_node->title . " at " . date('h:i a', $ts) . " : \n";
 		}
 
@@ -230,27 +239,32 @@ function sirius_phonetree_dispatch_status($call_sid, $context) {
 	$digits = $context['digits'];
 	$worker_nid = $context['worker_nid'];
 	$worker_node = node_load($worker_nid);
-	$status_tid = $worker_node->field_sirius_worker_dispstatus['und'][0]['tid'];
+	$current_status_tid = $worker_node->field_sirius_worker_dispstatus['und'][0]['tid'];
+	$current_status_term = taxonomy_term_load($current_status_tid);
 
-	$can_signin = FALSE;
-	if ($status_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available')) {
-		$user = sirius_worker_get_user($worker_node->nid);
-		if (user_access('sirius dispatch signin', $user)) {
-			$can_signin = TRUE;
-		}
-		if ($worker_node->field_sirius_dispatch_sib['und'][0]['value'] == 'Yes') {
-			$can_signin = FALSE;
-		}
+	if ($current_status_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
+		$new_status_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+	} else {
+		$new_status_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
 	}
+
+	$possible = sirius_dispatch_worker_dispstatus_set_possible($worker_node, $new_status_tid, sirius_worker_get_user($worker_node->nid));
 
 	if ($digits == '8') {
 
 		$context['digits'] = $context['handler'] = NULL;
 		sirius_phonetree($call_sid, $context);
 
-	} else if ($digits == 1 && $can_signin) {
+	} else if ($digits == 1) {
 
-		$result = sirius_dispatch_worker_dispstatus_set($worker_node, sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available'), 'Request via automated phone tree');
+		$result = sirius_dispatch_worker_dispstatus_set(
+			$worker_node, 
+			$new_status_tid, 
+			sirius_worker_get_user($worker_node->nid), 
+			'Request via automated phone tree'
+		);
+		$current_status_tid = $new_status_tid;
+		$current_status_term = taxonomy_term_load($current_status_tid);
 
 		if ($result['success'] == FALSE) {
 
@@ -258,10 +272,11 @@ function sirius_phonetree_dispatch_status($call_sid, $context) {
 
 		} else {
 
-			$status_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
-			$text = "You have been placed on the \"available\" list, and you will receive notifications about new dispatches. ";
-			$can_signin = FALSE;
-
+			if ($new_status_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
+				$text = "You have been placed on the \"available\" list, and you will receive notifications about new dispatches. ";
+			} else {
+				$text = "You have been removed from the \"available\" list, and you will not receive notifications about new dispatches. ";
+			}
 		}
 	} else if ($digits) {
 
@@ -269,20 +284,17 @@ function sirius_phonetree_dispatch_status($call_sid, $context) {
 
 	}
 
-	$status_term = taxonomy_term_load($status_tid);
-	$status_name = $status_term->field_sirius_name_tts['und'][0]['value'];
-	if (!$status_name) { $status_name = $status_term->name; }
-	if (!$status_name) { $status_name = 'Undefined.'; }
-
-	$text .= "Your current dispatch status is: $status_name. ";
-	if ($status_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available')) {
-		if ($can_signin) {
+	$text .= "Your current dispatch status is: " . $current_status_term->name . ". ";
+	if ($possible['success']) {
+		if ($new_status_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
 			$text .= "Enter 1 to be placed on the \"available\" list for upcoming dispatches. ";
 		} else {
-			$text .= "If you wish to be placed on the \"available\" list for upcoming dispatches, please contact the office. ";
+			$text .= "Enter 1 to be removed from the \"available\" list for upcoming dispatches. ";
 		}
+	} else {
+		$text .= "If you wish to change your dispatch status, please contact the office. ";
 	}
-	$text .= "Enter 8 to return to the previous menu. Enter 9 to be connected with an operator. Enter star to hear this message again.";
+	$text .= "Enter 8 to return to the previous menu. Enter 9 to be connected with an operator. Enter star to hear this message again. ";
 	sirius_twilio_outgoing_voice_say($call_sid, $context, $text, 1);
 }
 
@@ -296,13 +308,20 @@ function sirius_phonetree_dispatch_list($call_sid, $context) {
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_dispatch');
-  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('requested', 'notified', 'notification failed', 'expired'), 'in');
+  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('notified', 'notification failed', 'expired'), 'in');
   $query->fieldCondition('field_sirius_worker', 'target_id', $worker_node->nid);
   $query->propertyCondition('created', time()-(60*60*24*10), '>=');
   $query->propertyOrderBy('created');
   $stmt = $query->execute();
   if ($stmt['node']) {
-		$dispatch_nodes = array_values(node_load_multiple(array_keys($stmt['node'])));
+		$candidate_dispatch_nodes = array_values(node_load_multiple(array_keys($stmt['node'])));
+		$dispatch_nodes = array();
+		foreach ($candidate_dispatch_nodes as $candidate_dispatch_node) {
+			$check = sirius_dispatch_accept_possible($candidate_dispatch_node);
+			if ($check['success']) {
+				$dispatch_nodes[] = $candidate_dispatch_node;
+			}
+		}
   }
 
 	if ($digits == 8) {

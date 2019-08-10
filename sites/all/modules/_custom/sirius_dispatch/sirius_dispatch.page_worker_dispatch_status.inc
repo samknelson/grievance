@@ -68,15 +68,18 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 	// If we don't have a dispatch ...
 	if (!$dispatch_node) {
 
-		$status_default = $worker_node->field_sirius_worker_dispstatus['und'][0]['tid'];
+		$status_options = array();
 
-		if (user_access('sirius dispatch staff')) {
-			// ... Staff can set the status to anything not-employed
-			$status_options = array(
-				sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available') => t('Not Employed / Not Available (SIGNED OUT)'),
-				sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available') => t('Not Employed / Available (SIGNED IN)'),
-			);
-			
+		$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+		$possible = sirius_dispatch_worker_dispstatus_set_possible($worker_node, $tid);
+		if ($possible['success']) { $status_options[$tid] = 'Not Available (SIGNED OUT)'; } 
+
+		$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
+		$possible = sirius_dispatch_worker_dispstatus_set_possible($worker_node, $tid);
+		if ($possible['success']) { $status_options[$tid] = 'Available (SIGNED IN)'; }
+
+		if ($status_options) {
+			$status_default = $worker_node->field_sirius_worker_dispstatus['und'][0]['tid'];
 			$need_submit = TRUE;
 			$form['status'] = array(
 				'#type' => 'select',
@@ -84,36 +87,6 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 				'#options' => $status_options,
 				'#default_value' => $status_default,
 			);
-		} else if (
-			user_access('sirius dispatch signin') && 
-				(
-					$status_default == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available') || 
-					$status_default == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')
-				)
-			) {
-
-
-			if ($worker_node->field_sirius_dispatch_sib['und'][0]['value'] == 'Yes') {
-
-				$form['status'] = array('#markup' => '<div class="sirius_form_msg"><br /><br /><strong>' . t('An administrator has set a sign-in block. You cannot change your dispatch status until the administrator clears the block.') . '</strong></div>');
-
-			} else {
-
-				$status_options = array(
-					sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available') => t('Not Employed / Not Available (SIGNED OUT)'),
-					sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available') => t('Not Employed / Available (SIGNED IN)'),
-				);
-				
-				$need_submit = TRUE;
-				$form['status'] = array(
-					'#type' => 'select',
-					'#title' => t('Sign in?'),
-					'#options' => $status_options,
-					'#default_value' => $status_default,
-				);
-
-			}
-
 		}
 	}
 
@@ -123,7 +96,12 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 			$prefix = '<div class="sirius_field_intro">';
 			$prefix .= t('The worker\'s <em>previous</em> seniority date was @date. ', array('@date' => $availdate));
 			if ($current_status_tid != sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
-				$prefix .= t(' By default, if they sign in now, their availability date will be reset to today\'s date and they will lose their seniority.');
+				$json = json_decode($worker_node->field_sirius_json['und'][0]['value'], TRUE);
+				if ($json['dispatch']['keep_seniority'] == 'Yes') {
+					$prefix .= t(' Because the "keep seniority" flag is set, if the sign in, they will keep their previous seniority.');
+				} else {
+					$prefix .= t(' By default, if they sign in now, their availability date will be reset to today\'s date and they will lose their seniority.');
+				}
 			}
 			$prefix .= '</div>';
 		}
@@ -155,7 +133,7 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 				'autocomplete' => 'off',
 			),
 		);
-	}
+	} 
 
 	if (user_access('sirius dispatch staff')) {
 		$form['sib'] = array(
@@ -172,22 +150,19 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 			'#type' => 'textarea',
 			'#title' => t('Notes'),
 		);
+	} else {
+		if ($worker_node->field_sirius_dispatch_sib['und'][0]['value'] == 'Yes') {
+			$form['sib'] = array('#markup' => '<div class="sirius_form_intro"><strong>Sign-in is not permitted - the administrator has placed a sign-in block. Please contact the office for more information.</strong></div>');
+		}
 	}
 
 	if ($need_submit) {
-		// Must confirm
-		$form['confirm'] = array(
-			'#type' => 'checkbox',
-			'#required' => TRUE,
-			'#title' => t('Yes, please perform the action selected above.'),
-		);
-
 		// Submit button
 		$form['submit'] = array(
 			'#type' => 'submit',
 			'#value' => 'Submit'
 		);
-	}
+	} 
 
 	$form += sirius_log_render_form($worker_node->nid, join('+', array('worker:employer', 'dispatch:status', 'worker:dispstatus', 'worker:availdate', 'worker:dispstatus_block')));
 
@@ -213,7 +188,7 @@ function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state)
 	if ($form_state['values']['terminate'] == 'yes') {
 		$dispatch_node = sirius_dispatch_get_current($worker_node->nid);
 		if ($dispatch_node) {
-			$result = drupal_set_message(sirius_dispatch_terminate($dispatch_node, $reason));
+			$result = sirius_dispatch_terminate($dispatch_node, $reason);
 			if ($result['success']) {
 				drupal_set_message($result['msg']);
 			} else {
@@ -223,14 +198,14 @@ function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state)
 	}
 
 	if ($form_state['values']['status']) {
-		$result = drupal_set_message(sirius_dispatch_worker_dispstatus_set($worker_node, $form_state['values']['status'], $reason));
+		$result = sirius_dispatch_worker_dispstatus_set($worker_node, $form_state['values']['status'], NULL, $reason);
 		if ($result['success']) {
 			drupal_set_message($result['msg']);
 		} else {
 			drupal_set_message($result['msg'], 'warning');
 		}
 	}
-	
+
 	if ($form_state['values']['set_availdate'] && $form_state['values']['availdate']) {
 		$newdate = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['availdate']));
 		$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $newdate;

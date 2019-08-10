@@ -1,14 +1,50 @@
 <?php
 
-function sirius_worker_get_user($worker_nid) {
+function sirius_worker_user_admin() {
+  $form = array();
+
+  $form['sirius_worker_usersync_enable'] = array(
+    '#type' => 'select',
+    '#title' => t('Enable Worker / User Sync?'),
+    '#default_value' => variable_get('sirius_worker_usersync_enable', ''),
+    '#options' => array('No' => 'No', 'Yes' => 'Yes'),
+    '#description' => t('Should Sirius Workers by associated with Drupal Users?'),
+  );
+
+  $form['sirius_worker_dummy_domain'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Dummy Domain'),
+    '#default_value' => variable_get('sirius_worker_dummy_domain', ''),
+    '#description' => t('Workers without an email address will be assigned an address at this domain.'),
+  );
+
+	$role_options = user_roles(TRUE);
+  $form['sirius_worker_roles'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Worker Roles'),
+    '#options' => $role_options,
+    '#default_value' => variable_get('sirius_worker_roles', array()),
+    '#description' => t('The checked roles are used for workers. Workers are assigned to, or removed from, roles within this list, based on the settings in their member status.'),
+  );
+
+  return system_settings_form($form);
+}
+
+function sirius_worker_usersync_enabled() {
+	return variable_get('sirius_worker_usersync_enable', '') == 'Yes';
+}
+
+function sirius_worker_get_uid($worker_nid) {
 	$sql = "select entity_id from field_data_field_sirius_worker ";
 	$sql .= "where entity_type = 'user' ";
 	$sql .= "and field_sirius_worker_target_id = :worker_nid ";
 	$stmt = db_query($sql, array(':worker_nid' => $worker_nid));
 	$hr = $stmt->fetchAssoc();
-	$worker_uid = $hr['entity_id'];
-	if (!$worker_uid) { return NULL; }
-	return user_load($worker_uid);
+	return $hr['entity_id'];
+}
+
+function sirius_worker_get_user($worker_nid) {
+	return user_load(sirius_worker_get_uid($worker_nid));
 }
 
 function sirius_worker_get($uid = NULL) {
@@ -20,6 +56,9 @@ function sirius_worker_get($uid = NULL) {
 }
 
 function sirius_worker_usersync($worker_nid) {
+
+	if (!sirius_worker_usersync_enabled()) { return; }
+
 	$worker_node = node_load($worker_nid);
 	if (!$worker_node) {
 		return array('success' => FALSE, 'msg' => "Worker #$worker_nid not found.");
@@ -95,7 +134,9 @@ function sirius_worker_usersync($worker_nid) {
 		$new_rids[$rid] = TRUE;
 	}
 
+	$need_save = FALSE;
 	if (!$worker_user) {
+		$need_save = TRUE;
 		$is_new = TRUE;
 		$worker_user = new stdClass;
 		$worker_user->is_new = TRUE;
@@ -105,11 +146,31 @@ function sirius_worker_usersync($worker_nid) {
 		$worker_user->field_sirius_worker['und'][0]['target_id'] = $worker_nid;
 	} 
 
-	$worker_user->name = "$id";
-	$worker_user->pass = user_hash_password($aat);
-	$worker_user->mail = $email;
-	$worker_user->roles = $new_rids;
+	if ($worker_user->name != $id) {
+		$worker_user->name = "$id";
+		$need_save = TRUE;
+	}
 
+	if (!user_check_password($aat, $worker_user)) {
+		$aat_hashed = user_hash_password($aat);
+		$worker_user->pass = $aat_hashed;
+		$need_save = TRUE;
+	}
+
+	if ($worker_user->mail != $email) {
+		$worker_user->mail = $email;
+		$need_save = TRUE;
+	}
+
+	if (array_diff(array_keys($worker_user->roles), array_keys($new_rids)) || 
+			array_diff(array_keys($new_rids), array_keys($worker_user->roles))) {
+		$worker_user->roles = $new_rids;
+		$need_save = TRUE;
+	}
+
+	if (!$need_save) {
+		return array('success' => TRUE, 'msg' => "User is unchanged.");
+	}
 	drupal_save_session(FALSE);
 	user_save($worker_user);
 	drupal_save_session(TRUE);

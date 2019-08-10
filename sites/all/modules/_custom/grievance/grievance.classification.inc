@@ -2,6 +2,7 @@
 
 // @TODO: This is an incredible kludge and involved hacking the term_reference_filter_by_views_autocomplete module.
 function grievance_term_reference_filter_by_views_autocomplete_alter(&$entity, &$context) {
+  return;
   if (!isset($entity['#field_name'])) { return; }
   if ($entity['#field_name'] != 'field_grievance_class_tid') { return; }
 

@@ -1,5 +1,6 @@
 <?php
 
+
 function sirius_dispatch_job_count($dispatch_nid) {
 	
 }
@@ -63,8 +64,31 @@ function sirius_dispatch_job_recompute_from_dispatch($dispatch_node, $is_delete 
 	}
 }
 
-function sirius_dispatch_job_get_dispatchable_workers_render_form($job_node, $states = NULL) {
-	drupal_add_js(drupal_get_path('module', 'sirius_dispatch') . '/js/sirius_dispatch.worker_filter.js', 'file');
+function sirius_dispatch_job_workerform_ajax($form, &$form_state) {
+	return $form['fieldset_workers']['ajax'];
+}
+
+function sirius_dispatch_job_workerform($form, &$form_state, $states = NULL) {
+	// Job node
+	$job_node = $form_state['job_node'];
+	$job_policy = sirius_dispatch_job_policy($job_node);
+
+	// Can we create dispatches for ineligible workers? Usually we can, but some job types prohibit this.  In particular, you
+	// can't create a dispatch on a rollover job for anybody who's not rollover.
+	$must_be_eligible = ($job_policy['workers']['must_be_eligible'] == 'Yes');
+
+	$member_status_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+	$member_status_abbrv = array();
+	foreach ($member_status_terms as $tid => $term) {
+  	if ($term->field_sirius_name_short['und'][0]['value']) {
+  		$term_name = $term->field_sirius_name_short['und'][0]['value'];
+  	} else {
+  		$term_name = $term->name;
+  	}
+  	$member_status_abbrv[$tid] = $term_name;
+	}
+
+	// drupal_add_js(drupal_get_path('module', 'sirius_dispatch') . '/js/sirius_dispatch.worker_filter.js', 'file');
 	$form['fieldset_workers']  = array(
 		'#type' => 'fieldset',
 		'#title' => 'Requested Workers',
@@ -74,45 +98,136 @@ function sirius_dispatch_job_get_dispatchable_workers_render_form($job_node, $st
 	// Filter ID
 	$form['fieldset_workers']['worker_id'] = array(
 		'#type' => 'textfield',
-		'#title' => 'Filter by member name or ID',
+		'#title' => 'Filter by member name or ID. Enter * to see all dispatchable workers.',
 		'#size' => 20,
 		'#states' => $states,
-		'#attributes' => array('class' => array('sirius-worker-filter')),
+		'#prefix' => '<div class="container-inline">',
 	);
 
-	$workers = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name');
-	$member_status_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+	$form['fieldset_workers']['go'] = array(
+		'#type' => 'button',
+		'#value' => 'Filter',
+    '#ajax' => array(
+      'callback' => 'sirius_dispatch_job_workerform_ajax',
+      'wrapper' => 'workers_filtered',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+    // '#limit_validation_errors' => array(),
+		'#suffix' => '</div>',
+	);
+
+	//
+	// Which workers should we show? It's complicated, because we want to show some that are not dispatchable
+	// 
+
+	// We're searching for this worker
+	$search_worker_id = $form_state['values']['worker_id'];
+
+	// We've selected these workers
+	$selected_workers = array();
+	if ($form_state['values']['workers']) {
+		foreach ($form_state['values']['workers'] as $nid => $value) { 
+			if ($value) { 
+				$selected_workers[$nid] = TRUE;
+			}
+		}
+	}
+
+	// Find any dispatchable workers
+	$dispatchable_workers = array();
+	if ($search_worker_id || $selected_workers) { 
+		$dispatchable_workers = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name');
+	}
+
+	// Start with any dispatchable workers who are already checked, and who match on name or ID
+	$workers = array();
+	$found_id = FALSE;
+	foreach ($dispatchable_workers as $nid => $worker) {
+		$is_good = FALSE; 
+		if ($selected_workers[$nid]) { $is_good = TRUE; }
+		if ($worker['id'] == $search_worker_id) { $is_good = TRUE; $found_id = TRUE; }
+		if ($search_worker_id == '*') { $is_good = TRUE; }
+		if (stripos($worker['family'], $search_worker_id) !== FALSE) { $is_good = TRUE; }
+		if (stripos($worker['given'], $search_worker_id) !== FALSE) { $is_good = TRUE; }
+		if ($is_good) { $workers[$nid] = $worker; }
+	}
+
+	// Next, if we're searching by ID, and if the worker is non-dispatchable, add them with an explanation.
+	$non_dispatchable_workers = array();
+	foreach ($selected_workers as $nid => $ignore) {
+		if (!$workers[$nid]) {
+			$non_dispatchable_workers[$nid] = TRUE;
+		}
+	}
+	if ($search_worker_id > 0 && !$found_id) {
+		$nid = sirius_find_nid_by_id($search_worker_id, 'sirius_worker');
+		if ($nid) { $non_dispatchable_workers[$nid] = TRUE; }
+	}
+	foreach ($non_dispatchable_workers as $nid => $ignore) {
+		$sql = "select * from field_data_field_sirius_id, field_data_field_sirius_name ";
+		$sql .= "where field_data_field_sirius_id.entity_id = :nid ";
+		$sql .= "and field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.bundle = 'sirius_worker' ";
+		$sql .= "and field_data_field_sirius_name.entity_type = 'node' and field_data_field_sirius_name.bundle = 'sirius_worker' ";
+		$sql .= "and field_data_field_sirius_id.entity_id = field_data_field_sirius_name.entity_id ";
+		$sql .= "order by field_data_field_sirius_id.entity_id desc limit 1 ";
+		$stmt = db_query($sql, array(':nid' => $nid));
+		$hr = $stmt->fetchAssoc();
+		if ($hr['entity_id']) {
+			$workers[$nid] = array();
+			$workers[$nid]['id'] = $hr['field_sirius_id_value'];
+			$workers[$nid]['family'] = $hr['field_sirius_name_family'];
+			$workers[$nid]['given'] = $hr['field_sirius_name_given'];
+			$result = sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $nid);
+			if (!$result['success']) {
+				$workers[$nid]['msg'] = $result['msg'];	
+			}
+			
+		}
+	}
+
   $worker_options = array();
   foreach ($workers as $worker_nid => $worker) {
   	$tid = $worker['member_status_tid'];
-  	$term = $member_status_terms[$tid];
-  	if ($term->field_sirius_name_short['und'][0]['value']) {
-  		$term_name = $term->field_sirius_name_short['und'][0]['value'];
-  	} else {
-  		$term_name = $term->name;
-  	}
-
-  	$worker_options[$worker_nid] = $worker['family'] . ', ' . $worker['given'] . ' [' . $term_name . ']';
-  	$worker_options[$worker_nid] .= ' <span class="sirius_invisible sirius_worker_id">' . $worker['id'] . '</span>';
+  	$worker_options[$worker_nid] = $worker['family'] . ', ' . $worker['given'];
+  	if ($tid) { $worker_options[$worker_nid] .= ' [' . $member_status_abbrv[$tid] . ']'; }
+  	if ($worker['msg']) { $worker_options[$worker_nid] .= '<br><span class="msg">' . $worker['msg'] . '</span>'; }
   }
 
-	$worker_ajax_id = 'sirius_dispatch_page_job_create_workers';
+  $form['fieldset_workers']['ajax'] = array(
+  	'#type' => 'fieldset',
+  	'#prefix' => '<div id="workers_filtered">',
+  	'#suffix' => '</div>',
+  );
+
+  /*
+	$form['fieldset_workers']['ajax']['debug'] = array(
+		'#type' => 'markup',
+		'#markup' => 'NONCE: ' . rand(0, 10000) . ' / JOB: ' . $job_node->title . ' / ' . ' count: ' . count($dispatchable_workers) . ' / DEBUG: ' . $debug,
+	);
+	*/
+
   if ($worker_options) {
-		$form['fieldset_workers']['workers'] = array(
+		$form['fieldset_workers']['ajax']['workers'] = array(
 			'#type' => 'checkboxes',
 			'#options' => $worker_options,
 			'#title' => 'Workers',
-			'#prefix' => "<div id=\"$worker_ajax_id\"><div class=\"checkboxes-inline sirius-worker-filter-target\">",
+			'#prefix' => "<div class=\"checkboxes-inline\">",
 			'#suffix' => '</div><div style="clear: left;">&nbsp;</div></div>',
 			'#states' => $states,
 		);
-	} else {
-		$form['fieldset_workers']['workers'] = array(
+		if ($must_be_eligible) {
+			foreach ($non_dispatchable_workers as $nid => $ignore) {
+				if ($worker_options[$nid]) {
+					$form['fieldset_workers']['ajax']['workers'][$nid]['#disabled'] = TRUE;
+				}
+			}
+		}
+	} else if ($search_worker_id || $selected_workers) {
+		$form['fieldset_workers']['ajax']['workers'] = array(
 			'#type' => 'markup',
-			'#markup' => t('No qualified workers match your criteria.'),
+			'#markup' => t('No workers match your criteria.'),
 			'#title' => 'Workers',
-			'#prefix' => "<div id=\"$worker_ajax_id\">",
-			'#suffix' => '</div>',
 		);
 	}
 
@@ -120,6 +235,8 @@ function sirius_dispatch_job_get_dispatchable_workers_render_form($job_node, $st
 }
 
 function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name', $limit = 0, $filters = array()) {
+	$job_policy = sirius_dispatch_job_policy($job_node);
+
 	// Get dispatchable work statuses
 	$all_work_statuses = sirius_taxonomy_load('sirius_work_status', 'tid', 'full');
 	$work_status_tids = array();
@@ -281,35 +398,45 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		} 
 	}
 
+	// Dispatch statuses: not employed / available
+	$dispatch_statuses = array();
+	$dispatch_statuses[] = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
+	if ($job_policy['workers']['may_be_unavailable'] == 'Yes') {
+		$dispatch_statuses[] = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+	}
+	if ($job_policy['workers']['may_be_employed'] == 'Yes') {
+		$dispatch_statuses[] = sirius_get_special_tid('sirius_worker_dispatch_status|employed');
+	}
 
-	if ($job_node->field_sirius_dispatch_eba['und'][0]['value'] != 'Yes') {
-		// Must be "not employed available"
-		$sql .= "and field_sirius_worker_dispstatus_tid = :dispstatus_available ";
-		$args[':dispstatus_available'] = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
-	} else {
-		// Must be "not employed available" or "employed" with a suitable EBA
-		$sql .= "and ( ";
-		$sql .= "  (field_sirius_worker_dispstatus_tid = :dispstatus_available)  ";
-		$sql .= "  or ";
-		$sql .= "  ( ";
-		$sql .= "    field_sirius_worker_dispstatus_tid = :dispstatus_employed ";
-		$sql .= "    and field_sirius_dispatch_eba_value = 'Yes' ";
-		if ($job_node->field_sirius_dispatch_eba_dates['und']) {
-			foreach ($job_node->field_sirius_dispatch_eba_dates['und'] as $delta => $tmp) {
-				$sql .= "    and exists ( ";
-				$sql .= "      select 1 from field_data_field_sirius_dispatch_eba_dates eba_dates_$delta ";
-				$sql .= "      where eba_dates_$delta.entity_type = 'node' ";
-				$sql .= "      and eba_dates_$delta.entity_id = node.nid ";
-				$sql .= "      and eba_dates_$delta.field_sirius_dispatch_eba_dates_value = :eba_dates_$delta ";
-				$sql .= "      ) ";
-				$args[":eba_dates_$delta"] = $tmp['value'];
+	if (!$filters['ignore_dispatch_status']) {
+		if ($job_node->field_sirius_dispatch_eba['und'][0]['value'] != 'Yes') {
+			// Must be "not employed available"
+			$sql .= "and field_sirius_worker_dispstatus_tid in (:dispatch_statuses) ";
+		} else {
+			// Must be "not employed available" or "employed" with a suitable EBA
+			$sql .= "and ( ";
+			$sql .= "  (field_sirius_worker_dispstatus_tid in (:dispatch_statuses) )  ";
+			$sql .= "  or ";
+			$sql .= "  ( ";
+			$sql .= "    field_sirius_worker_dispstatus_tid = :dispstatus_employed ";
+			$sql .= "    and field_sirius_dispatch_eba_value = 'Yes' ";
+			if ($job_node->field_sirius_dispatch_eba_dates['und']) {
+				foreach ($job_node->field_sirius_dispatch_eba_dates['und'] as $delta => $tmp) {
+					$sql .= "    and exists ( ";
+					$sql .= "      select 1 from field_data_field_sirius_dispatch_eba_dates eba_dates_$delta ";
+					$sql .= "      where eba_dates_$delta.entity_type = 'node' ";
+					$sql .= "      and eba_dates_$delta.entity_id = node.nid ";
+					$sql .= "      and eba_dates_$delta.field_sirius_dispatch_eba_dates_value = :eba_dates_$delta ";
+					$sql .= "      ) ";
+					$args[":eba_dates_$delta"] = $tmp['value'];
+				}
 			}
-		}
-		$sql .= "  ) ";
-		$sql .= ") ";
+			$sql .= "  ) ";
+			$sql .= ") ";
 
-		$args[':dispstatus_available'] = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
-		$args[':dispstatus_employed'] = sirius_get_special_tid('sirius_worker_dispatch_status|employed');
+			$args[':dispstatus_employed'] = sirius_get_special_tid('sirius_worker_dispatch_status|employed');
+		}
+		$args[':dispatch_statuses'] = $dispatch_statuses;
 	}
 
 	// Exclude employer-initiated DNCs
@@ -347,15 +474,38 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	}
 
 	// HFE
-	if ($employer_nid) {
-		$sql .= "and ( ";
-		$sql .= "  field_sirius_dispatch_hfe_target_id = :hfe ";
-		$sql .= "  or field_sirius_dispatch_hfe_target_id IS NULL ";
-		$sql .= "  or field_sirius_dispatch_hfe_until_value IS NULL ";
-		$sql .= "  or field_sirius_dispatch_hfe_until_value < NOW()";
-		$args[':hfe'] = $employer_nid;
-		$sql .= ") ";
+	if (!$filters['ignore_hfe']) {
+		if ($employer_nid) {
+			$sql .= "and ( ";
+			$sql .= "  field_sirius_dispatch_hfe_target_id = :hfe ";
+			$sql .= "  or field_sirius_dispatch_hfe_target_id IS NULL ";
+			$sql .= "  or field_sirius_dispatch_hfe_until_value IS NULL ";
+			$sql .= "  or field_sirius_dispatch_hfe_until_value < NOW()";
+			$args[':hfe'] = $employer_nid;
+			$sql .= ") ";
+		}
 	}
+
+	// Rollover
+	if ($job_policy['workers']['must_be_rollover'] == 'Yes') {
+		$roll_cutoff = strtotime('-7 days');
+		$sql .= "and exists (";
+		$sql .= "  select nid "; 
+		$sql .= "  from node roll_n, ";
+		$sql .= "  field_data_field_sirius_log_handler roll_h1, ";
+		$sql .= "  field_data_field_sirius_log_handler roll_h2, ";
+		$sql .= "  field_data_field_sirius_category roll_c ";
+		$sql .= "  where roll_n.type = 'sirius_log' ";
+		$sql .= "  and roll_n.created >= :roll_cutoff ";
+		$sql .= "  and roll_h1.entity_type = 'node' and roll_h1.entity_id = roll_n.nid and roll_h1.field_sirius_log_handler_target_id = node.nid ";
+		$sql .= "  and roll_h2.entity_type = 'node' and roll_h2.entity_id = roll_n.nid and roll_h2.field_sirius_log_handler_target_id = :roll_employer_nid ";
+		$sql .= "  and roll_c.entity_type = 'node' and roll_c.entity_id = roll_n.nid and roll_c.field_sirius_category_value = 'dispatch:rollover' ";
+		$sql .= ") ";
+		$args[':roll_employer_nid'] = $employer_nid;
+		$args[':roll_cutoff'] = $roll_cutoff;
+	}
+	// drupal_set_message($sql);
+	// dpm($args);
 
 	// Order
 	if (!$filters['count']) {
@@ -385,6 +535,11 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		$workers[$hr['nid']] = $hr;
 	}
 
+	// Add the rollover date to each worker. 
+	if ($job_policy['workers']['must_be_rollover'] == 'Yes') {
+		sirius_dispatch_rollover_dates($employer_nid, $workers, $roll_cutoff);
+	}
+
 	return $workers;
 }
 
@@ -395,10 +550,25 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 
 
 
+function sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_node, $worker_id, $filters = array()) {
+	if (!$worker_id) {
+		return array('success' => FALSE, 'msg' => 'Please enter a worker ID.');
+	}
+	$sql = "select entity_id from field_data_field_sirius_id where entity_type = 'node' and bundle = 'sirius_worker' and field_sirius_id_value = :id";
+	$stmt = db_query($sql, array(':id' => $worker_id));
+	$hr = $stmt->fetchAssoc();
+	$worker_nid = $hr['entity_id'];
+	if (!$worker_nid) {
+		return array('success' => FALSE, 'msg' => "The worker with dispatch ID #$worker_id was not found.");
+	}
 
+	return sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, $filters = array());
+}
 
 
 function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, $filters = array()) {
+	$job_policy = sirius_dispatch_job_policy($job_node);
+
 	// Get dispatchable work statuses
 	$all_work_statuses = sirius_taxonomy_load('sirius_work_status', 'tid', 'full');
 	$work_status_tids = array();
@@ -436,10 +606,34 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	$sql .= "and field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
 	$sql .= "and field_data_field_sirius_dispatch_job.field_sirius_dispatch_job_target_id = :job_nid ";
 	$sql .= "and field_data_field_sirius_worker.field_sirius_worker_target_id = :worker_nid ";
-	$stmt = db_query($sql, array(':job_nid' => $job_nid, ':worker_nid' => $worker_nid));
+	$stmt = db_query($sql, array(':job_nid' => $job_node->nid, ':worker_nid' => $worker_nid));
 	$hr = $stmt->fetchAssoc();
 	if ($hr['c']) {
 		return array('success' => FALSE, 'msg' => t('There is already a dispatch for this worker and this job.'));
+	}
+
+	// Rollover
+	if ($job_policy['workers']['must_be_rollover'] == 'Yes') {
+		$roll_cutoff = strtotime('-7 days');
+		$sql = "  select nid "; 
+		$sql .= "  from node roll_n, ";
+		$sql .= "  field_data_field_sirius_log_handler roll_h1, ";
+		$sql .= "  field_data_field_sirius_log_handler roll_h2, ";
+		$sql .= "  field_data_field_sirius_category roll_c ";
+		$sql .= "  where roll_n.type = 'sirius_log' ";
+		$sql .= "  and roll_n.created >= :roll_cutoff ";
+		$sql .= "  and roll_h1.entity_type = 'node' and roll_h1.entity_id = roll_n.nid and roll_h1.field_sirius_log_handler_target_id = :worker_nid ";
+		$sql .= "  and roll_h2.entity_type = 'node' and roll_h2.entity_id = roll_n.nid and roll_h2.field_sirius_log_handler_target_id = :roll_employer_nid ";
+		$sql .= "  and roll_c.entity_type = 'node' and roll_c.entity_id = roll_n.nid and roll_c.field_sirius_category_value = 'dispatch:rollover' ";
+		$args = array();
+		$args[':roll_employer_nid'] = $employer_nid;
+		$args[':roll_cutoff'] = $roll_cutoff;
+		$args[':worker_nid'] = $worker_nid;
+		$stmt = db_query($sql, $args);
+		$hr = $stmt->fetchAssoc();
+		if (!$hr['nid']) {
+			return array('success' => FALSE, 'msg' => t('There is no rollover entry to this employer in the last 7 days.'));
+		}
 	}
 
 	// Limit by member status
@@ -451,7 +645,6 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	if (!array_intersect(sirius_fieldvals($worker_node, 'field_sirius_work_status', 'tid'), $work_status_tids)) {
 		return array('success' => FALSE, 'msg' => t('The worker does not have a work status that is eligible for dispatch.'));
 	}
-
 
 	// Limit by industry.  All jobs need an industry
 	$sql .= "and exists (";
@@ -496,30 +689,40 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 		} 
 	}
 
+	// Dispatch statuses: not employed / available
+	$dispatch_statuses = array();
+	$dispatch_statuses[] = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
+	if ($job_policy['workers']['may_be_unavailable'] == 'Yes') {
+		$dispatch_statuses[] = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+	}
+	if ($job_policy['workers']['may_be_employed'] == 'Yes') {
+		$dispatch_statuses[] = sirius_get_special_tid('sirius_worker_dispatch_status|employed');
+	}
 
-	$dispstatus_tid = sirius_fieldval($worker_node, 'field_sirius_worker_dispstatus', 'tid');
-	if ($dispstatus_tid != sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
-		if ($job_node->field_sirius_dispatch_eba['und'][0]['value'] != 'Yes') {
-			return array('success' => FALSE, 'msg' => t('The worker is not signed in to the out of work list.'));
-		}
+	if (!$filters['ignore_dispatch_status']) {
+		$dispstatus_tid = sirius_fieldval($worker_node, 'field_sirius_worker_dispstatus', 'tid');
+		if (!in_array($dispstatus_tid, $dispatch_statuses)) {
+			if ($job_node->field_sirius_dispatch_eba['und'][0]['value'] != 'Yes') {
+				return array('success' => FALSE, 'msg' => t('The worker is not signed in to the out of work list.'));
+			}
 
-		if ($dispstatus_tid != sirius_get_special_tid('sirius_worker_dispatch_status|employed')) {
-			return array('success' => FALSE, 'msg' => t('The worker is not signed in to the out of work list, and is not currently employed.'));
-		}
+			if ($dispstatus_tid != sirius_get_special_tid('sirius_worker_dispatch_status|employed')) {
+				return array('success' => FALSE, 'msg' => t('The worker is not signed in to the out of work list, and is not currently employed.'));
+			}
 
-		if (sirius_fieldval($worker_node, 'field_sirius_dispatch_eba') != 'Yes') {
-			return array('success' => FALSE, 'msg' => t('The worker is employed, and is not employed-but-available.'));
-		}
+			if (sirius_fieldval($worker_node, 'field_sirius_dispatch_eba') != 'Yes') {
+				return array('success' => FALSE, 'msg' => t('The worker is employed, and is not employed-but-available.'));
+			}
 
-		$worker_eba_dates = sirius_fieldvals($worker_node, 'field_sirius_dispatch_eba_dates');
-		$job_eba_dates = sirius_fieldvals($job_node, 'field_sirius_dispatch_eba_dates');
-		foreach ($job_eba_dates as $date) {
-			if (!in_array($date, $worker_eba_dates)) {
-				return array('success' => FALSE, 'msg' => t('The worker is currently employed and accepting EBA calls, but is not available to work on @date.', array('@date' => date('Y-m-d', strtotime($date)))));
+			$worker_eba_dates = sirius_fieldvals($worker_node, 'field_sirius_dispatch_eba_dates');
+			$job_eba_dates = sirius_fieldvals($job_node, 'field_sirius_dispatch_eba_dates');
+			foreach ($job_eba_dates as $date) {
+				if (!in_array($date, $worker_eba_dates)) {
+					return array('success' => FALSE, 'msg' => t('The worker is currently employed and accepting EBA calls, but is not available to work on @date.', array('@date' => date('Y-m-d', strtotime($date)))));
+				}
 			}
 		}
 	}
-
 
 	// Exclude employer-initiated DNCs
 	if ($employer_nid && in_array($employer_nid, sirius_fieldvals($worker_node, 'field_sirius_dispatch_dncs', 'target_id'))) {
@@ -542,10 +745,12 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	}
 
 	// HFE
-	$hfe = sirius_fieldval($worker_node, 'field_sirius_dispatch_hfe', 'target_id');
-	$hfe_ts = sirius_fieldval($worker_node, 'field_sirius_dispatch_hfe_until', 'ts');
-	if ($employer_nid && $hfe && $hfe != $employer_nid && $hfe_ts > time()) {
-		return array('success' => FALSE, 'msg' => t('The worker is holding for a call from a different employer. The hold expires on @date', array('@date' => date('Y-m-d H:i:s', $hfe_ts))));
+	if (!$filters['ignore_hfe']) {
+		$hfe = sirius_fieldval($worker_node, 'field_sirius_dispatch_hfe', 'target_id');
+		$hfe_ts = sirius_fieldval($worker_node, 'field_sirius_dispatch_hfe_until', 'ts');
+		if ($employer_nid && $hfe && $hfe != $employer_nid && $hfe_ts > time()) {
+			return array('success' => FALSE, 'msg' => t('The worker is holding for a call from a different employer. The hold expires on @date', array('@date' => date('Y-m-d H:i:s', $hfe_ts))));
+		}
 	}
 
 	// Workers
@@ -558,7 +763,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	$total = count($workers);
 
 	if (!$found) {
-		return array('success' => FALSE, 'msg' => t('The worker passed all the tests, but does not appear on the dispatchable worker list for this job. Please contact the system adminitrator.'));
+		return array('success' => FALSE, 'msg' => t('The worker passed all the tests, but does not appear on the dispatchable worker list for this job. Please contact the system administrator.'));
 	}
 
 	return array(

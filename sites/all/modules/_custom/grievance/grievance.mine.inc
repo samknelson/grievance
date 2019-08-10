@@ -56,10 +56,6 @@ function grievance_mine_reminder_no_first_call() {
   return views_embed_view($view_name, $display_name, 'reminder_no_first_call');
 }
 
-function grievance_mine_views_exposed_form_alter($form, &$form_state) {
-	
-}
-
 function grievance_views_query_alter_grievances_mine(&$view, &$query) {
 	if (isset($view->args) && ($view->args[0] == 'upcoming')) {
 		$query->where[1]['conditions'][] = array(
@@ -246,7 +242,7 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 
 			if ($entry['count']) {
 				$msgs[] = t(
-					'Warning: there are <strong>@count</strong> messages with <a href="@url">@title</a>.', 
+					'Warning: there are <strong>@count</strong> grievances with <a href="@url">@title</a>.', 
 					array(
 						'@count' => $entry['count'], 
 						'@title' => $entry['title'], 

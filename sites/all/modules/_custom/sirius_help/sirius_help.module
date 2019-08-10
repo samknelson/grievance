@@ -122,6 +122,16 @@ function sirius_help_block_view($delta = '') {
   }
 }
 
+function sirius_help_get($path) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_help');
+  $query->fieldCondition('field_sirius_paths', 'value', $path);
+  $stmt = $query->execute(); 
+  if (!$stmt['node']) { return NULL; }
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
 function sirius_help_render($help_node) {
   $html = '<div class="sirius_help"><div class="inner">';
 
