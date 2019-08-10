@@ -5,6 +5,16 @@ function grievance_report_open_by_specialist() {
 }
 
 function grievance_report_open_by_specialist_form($form, &$form_state) {
+	$broughtby_options = sirius_taxonomy_load('grievance_broughtby', 'tid', 'name');
+	if (count($broughtby_options) > 1) {
+		$broughtby_options = array(NULL => 'All Entities') + $broughtby_options;
+	  $form['broughtby'] = array(
+	    '#type' => 'select',
+	    '#title' => t('Brought By'),
+	    '#options' => $broughtby_options,
+	  );
+	}
+
   $form['organizer'] = array(
     '#type' => 'entityreference',
     '#title' => t('Organizer'),
@@ -91,14 +101,19 @@ function grievance_report_open_by_specialist_form_submit($form, &$form_state) {
 		$shop_str = join('+', $shops);
 	}
 
+	// Broughtby
+	$broughtby = 'all';
+	if ($form_state['values']['broughtby']) { $broughtby = $form_state['values']['broughtby']; }
+
 	$classaction = $form_state['values']['classaction'];
 
 	$results = '';
 	foreach ($organizers as $organizer_uid) {
 		if ($classaction) {
-			$tmp = views_embed_view('grievance_open_report', 'page', $organizer_uid, $shop_str, $classaction);
+			drupal_set_message("Here with all/$organizer_uid/$shop_str/$classaction");
+			$tmp = views_embed_view('grievance_open_report', 'page', $broughtby, $organizer_uid, $shop_str, $classaction);
 		} else {
-			$tmp = views_embed_view('grievance_open_report', 'page', $organizer_uid, $shop_str);
+			$tmp = views_embed_view('grievance_open_report', 'page', $broughtby, $organizer_uid, $shop_str);
 		}
 		if (preg_match('/table/', $tmp)) {
 			$organizer = user_load($organizer_uid);
