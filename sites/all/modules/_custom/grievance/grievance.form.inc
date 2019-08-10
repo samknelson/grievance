@@ -122,33 +122,40 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   }
 
   //
-  // Restrict the list of available statuses based on the user's role.
+  // Restrict the list of available statuses
   //
 
+  $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
+  $status_term = taxonomy_term_load($status_tid);
   if (!user_access('grievance admin')) {
-    $status_vid = taxonomy_vocabulary_machine_name_load('grievance_status')->vid;
-    $status_terms = taxonomy_get_tree($status_vid);
+    // 
+    // Restrict the statuses based on the user roles
+    //
 
+    $status_terms = sirius_taxonomy_load('grievance_status', 'tid', 'full');
+    $status_tids = array_keys($status_terms);
     $user_roles = array_keys($user_full->roles);
-
     $status_tids_to_disable = array();
-    foreach ($status_terms as $status_term) {
-      $status_tid = $status_term->tid;
-      $status_term_full = taxonomy_term_load($status_tid);
-      $status_term_roles = array();
-      if ($status_term_full->field_grievance_roles['und']) {
-        foreach ($status_term_full->field_grievance_roles['und'] as $delta => $tmp) {
-          $status_term_roles[] = $tmp['value'];
-        }
-      }
-
-      if (!array_intersect($status_term_roles, $user_roles)) {
-        $status_tids_to_disable[] = $status_tid;
-      }
+    foreach ($status_terms as $check_status_tid => $check_status_term) {
+      $status_term_roles = sirius_fieldvals($check_status_term, 'field_grievance_roles');
+      if (!array_intersect($status_term_roles, $user_roles)) { $status_tids_to_disable[] = $check_status_tid; }
     }
 
-    foreach ($status_tids_to_disable as $status_tid) {
-      unset($form['field_grievance_status']['und']['#options'][$status_tid]);
+    //
+    // Restrict the statuses based on what can follow the current status
+    //
+
+    $next_status_tids = sirius_fieldvals($status_term, 'field_grievance_statuses', 'tid');
+    if ($next_status_tids) { 
+      $status_tids_to_disable = array_merge($status_tids_to_disable, array_diff($status_tids, $next_status_tids));
+    }
+
+    //
+    // Remove the unavailable options
+    //
+
+    foreach ($status_tids_to_disable as $check_status_tid) {
+      unset($form['field_grievance_status']['und']['#options'][$check_status_tid]);
     }
   }
 
@@ -165,19 +172,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
         $form[$hidefield]['#access'] = FALSE;
       }
     }
-
-    /*
-    if ($category_term){
-      if ($category_term->name == 'Contract') {
-        $form['field_grievance_remedy']['#access'] = FALSE;
-        $form['field_grievance_type']['#access'] = FALSE;
-      } else if ($category_term->name == 'Discipline') {
-        $form['field_grievance_classaction']['#access'] = FALSE;
-        // $form['field_grievance_remedy_other']['#access'] = FALSE;
-        // $form['field_grievance_type_other']['#access'] = FALSE;
-      }
-    }
-    */
   }
 
   //
@@ -269,9 +263,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   // 
   // Recipients
   //
-
-  $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
-  $status_term = taxonomy_term_load($status_tid);
 
   if ($form['field_grievance_contact_selector']['#access']) {
     $form['field_grievance_contact_selector']['und'][0]['markup']['#markup'] = grievance_contacts_create_selector($shop_nid, $status_tid, 'contact', FALSE);
