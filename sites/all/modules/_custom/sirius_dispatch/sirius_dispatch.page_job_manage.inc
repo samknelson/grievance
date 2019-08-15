@@ -56,54 +56,55 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 		$can_run = TRUE;
 	}
 
+	$is_staff = user_access('sirius dispatch staff');
+
 	// Staff form
 	$options = array();
 	$options[NULL] = t('-- Select --');
 	$options['refresh'] = t('Refresh this page');
 	$options['explain'] = t('Determine whether a specific worker is dispatchable to this job.');
 
-	if ($can_run) {
+	if ($status == 'Pending' && $can_run) {
+		$options['run'] = t('Run (dispatches will be created automatically until the job is filled.)');
+	}
 
-		if ($status == 'Pending') {
-			$options['run'] = t('Run (dispatches will be created automatically until the job is filled.)');
-			if (user_access('sirius dispatch staff')) {
-				$options['approve'] = t('Approve (move to "Unfilled")');
-				$options['member_status'] = t('Change Member Statuses (which "lists" are available)');
-				$options['archive'] = t('Archive (move to "Archived")');
-			}
-		}
+	if ($status == 'Pending' && $can_run && $is_staff) {
+		$options['approve'] = t('Approve (move to "Unfilled")');
+		$options['member_status'] = t('Change Member Statuses (which "lists" are available)');
+	}
 
-		if ($status == 'Unfilled') {
-			$options['run'] = t('Run (dispatches will be created automatically until the job is filled.)');
-			$options['close'] = t('Close (mark as "Filled")');
-			if (user_access('sirius dispatch staff')) {
-				$options['member_status'] = t('Change Member Statuses (which "lists" are available)');
-				$options['archive'] = t('Archive (move to "Archived")');
-				$options['create_dispatches_auto'] = t('Create Dispatches - Automatic');
-				$options['create_dispatches_manual'] = t('Create Dispatches - Manual');
-				$options['notify'] = t('Send notifications');
-			}
-		}
+	if ($status == 'Pending') {
+		$options['archive'] = t('Cancel (move to "Archived")');
+	}
 
-		if ($status == 'Filled') {
-			if (user_access('sirius dispatch staff')) {
-				$options['reopen'] = t('Re-open (mark as "Unfilled")');
-				$options['archive'] = t('Archive (move to "Archived")');
-			}
-		}
+	if ($status == 'Unfilled' && $can_run) {
+		$options['run'] = t('Run (dispatches will be created automatically until the job is filled.)');
+		$options['close'] = t('Close (mark as "Filled")');
+	}
 
-		if ($status == 'Running') {
-			$options['pause'] = t('Pause');
-			if (user_access('sirius dispatch staff')) {
-				$options['poll'] = t('Poll Manually (will run automatically)');
-			}
-		}
+	if ($status == 'Unfilled' && $can_run && $is_staff) {
+		$options['member_status'] = t('Change Member Statuses (which "lists" are available)');
+		$options['archive'] = t('Archive (move to "Archived")');
+		$options['create_dispatches_auto'] = t('Create Dispatches - Automatic');
+		$options['create_dispatches_manual'] = t('Create Dispatches - Manual');
+		$options['notify'] = t('Send notifications');
+	}
 
-		if ($status == 'Archived') {
-			if (user_access('sirius dispatch staff')) {
-				$options['reopen'] = t('Re-open (mark as "Unfilled")');
-			}
-		}
+	if ($status == 'Filled' && $can_run && $is_staff) {
+		$options['reopen'] = t('Re-open (mark as "Unfilled")');
+		$options['archive'] = t('Archive (move to "Archived")');
+	}
+
+	if ($status == 'Running' && $can_run) {
+		$options['pause'] = t('Pause');
+	}
+
+	if ($status == 'Running' && $can_run && $is_staff) {
+		$options['poll'] = t('Poll Manually (will run automatically)');
+	}
+
+	if ($status == 'Archived' && $can_run && $is_staff) {
+		$options['reopen'] = t('Re-open (mark as "Unfilled")');
 	}
 
 	$form['action'] = array(
