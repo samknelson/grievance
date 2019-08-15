@@ -91,7 +91,7 @@ function sirius_dispatch_run_finalize($job_node) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_dispatch');
   $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_node->nid);
-  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('accepted'), 'in');
+  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('accepted', 'accepted_secondary'), 'in');
   $query->propertyOrderBy('created');
   $stmt = $query->execute();
   $count_we_have = 0;
@@ -198,7 +198,7 @@ function sirius_dispatch_run_create_dispatches($job_node) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_dispatch');
   $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_node->nid);
-  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('notified', 'requested', 'accepted'), 'in');
+  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('requested', 'notified', 'accepted', 'accepted_secondary'), 'in');
   $query->propertyOrderBy('created');
   $stmt = $query->execute();
   $count_we_have = 0;
