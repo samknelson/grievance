@@ -134,6 +134,15 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/auditlog/config'] = array(
+    'title' => 'Auditlog Configuration ',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_auditlog_config_form'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/dispatch/threestrikes'] = array(
     'title' => 'Three Strikes Tester',
     'description' => '',
