@@ -30,6 +30,8 @@ function sirius_auditlog($force = FALSE) {
 
 	$all_info = sirius_auditlog_info();
 	foreach ($all_info as $type => $info) {
+		if (variable_get("sirius_auditlog_enable_$type", '') != 'Yes') { continue; }
+
 		// @todo: Implement a more versatile schedule process.
 		$today = date('Y-m-d');
 		$last_run = variable_get('sirius_auditlog_lastrun_' . $type, '');
@@ -66,4 +68,22 @@ function sirius_auditlog($force = FALSE) {
 
 function sirius_dispatch_auditlog_viewfetch($view_name, $display_id) {
 	return views_embed_view($view_name, $display_id);
+}
+
+function sirius_auditlog_config_form($form, &$form_state) {
+	$all_info = sirius_auditlog_info();
+	foreach ($all_info as $type => $info) {
+		$form["sirius_auditlog_enable_$type"] = array(
+			'#type' => 'select',
+			'#options' => array(
+				NULL => '-- Select --',
+				'No' => 'No',
+				'Yes' => 'Yes',
+			),
+			'#default_value' => variable_get("sirius_auditlog_enable_$type", ''),
+			'#title' => "Enable auditlog for $info[title] ($type)?",
+		);
+	}
+
+	return system_settings_form($form);
 }
