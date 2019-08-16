@@ -61,6 +61,13 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance statuslog'),
 	);
 
+	$node_tabs['grievance']['status_correct'] = array(
+		'title' => 'Status Correct',
+		'description' => '',
+		'callback' => 'grievance_node_tab_status_correct',
+		'permissions' => array('grievance admin'),
+	);
+
 	$node_tabs['grievance']['attachments'] = array(
 		'title' => 'Attachments',
 		'description' => '',
