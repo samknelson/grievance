@@ -34,6 +34,23 @@ function sirius_node_tab_dispatch_bullpen($job_node) {
 	return drupal_get_form('sirius_node_tab_dispatch_bullpen_form', $job_node);
 }
 
+function sirius_node_tab_bullpen_info($job_node) {
+	$ts = sirius_dispatch_bullpen_signin_ts($job_node);
+	$datestr = 'g:i A, l, F j';
+	$style = "display: inline-block; width: 170px; font-weight: bold;";
+
+
+  $html = '<div class="sirius_help"><div class="inner">';
+  $html .= sirius_fakerender_field('EBA Sign-in Opens', date($datestr, $ts['signin_opens_self']));
+  $html .= sirius_fakerender_field('General Sign-in Opens:', date($datestr, $ts['signin_opens_others']));
+  $html .= sirius_fakerender_field('Sign-in Closes:', date($datestr, $ts['signin_closes']));
+  $html .= sirius_fakerender_field('Time Now:', date($datestr));
+  $html .= render(field_view_field('node', $job_node, 'field_sirius_representatives', 'full'));
+  $html .= '</div></div>';
+
+	return $html;
+}
+
 ///////////////////////////////////////////////////////////////////
 // Signin Self 
 ///////////////////////////////////////////////////////////////////
@@ -53,6 +70,8 @@ function sirius_node_tab_dispatch_bullpen_signin_self_form($form, &$form_state, 
 
 	$dispatch_node = sirius_dispatch_bullpen_signin_get_dispatch($job_node, $worker_node);
 	$status = $dispatch_node->field_sirius_dispatch_status['und'][0]['value'];
+
+	$form['info'] = array('#markup' => sirius_node_tab_bullpen_info($job_node));
 
 	if ($status) {
 		$form['msg'] = array('#markup' => '<div>Your current status is: <strong>' . $status . '</strong></div>');
@@ -138,15 +157,19 @@ function sirius_node_tab_dispatch_bullpen_signin_others_access($job_node) {
 
 function sirius_node_tab_dispatch_bullpen_signin_others($job_node) {
 	drupal_set_title($job_node->title); 
-	return drupal_get_form('sirius_node_tab_dispatch_bullpen_signin_others_form', $job_node);
+	$html .= sirius_node_tab_bullpen_info($job_node);
+	$html .= drupal_render(drupal_get_form('sirius_node_tab_dispatch_bullpen_signin_others_form', $job_node));
+	$html .= views_embed_view('sirius_dispatches', 'block_2', $job_node->nid);
+	return $html;
 }
 
 function sirius_node_tab_dispatch_bullpen_signin_others_form($form, &$form_state, $job_node) {
 	$form_state['job_node'] = $job_node;
 
-	if (user_access('sirius dispatch bullpen signin others')) {
+	$open = sirius_dispatch_bullpen_signin_open($job_node, FALSE);
+	if ($open['success'] && user_access('sirius dispatch bullpen signin others')) {
 	  $form['worker'] = array(
-	    '#title' => t('Worker'),
+	    '#title' => t('Sign-in a Worker'),
 	    '#type' => 'textfield',
 	    '#autocomplete_path' => 'sirius/ajax/bullpen-quicksearch',
 			'#size' => 25,
@@ -158,9 +181,6 @@ function sirius_node_tab_dispatch_bullpen_signin_others_form($form, &$form_state
 	    '#value' => 'Sign In',
 	  );
 	}
-
-	$html .= views_embed_view('sirius_dispatches', 'block_2', $job_node->nid);
-	$form['current_signins'] = array('#markup' => $html);
 
 	return $form;
 }
@@ -184,11 +204,11 @@ function sirius_node_tab_dispatch_bullpen_signin_others_form_submit($form, &$for
 
 	$worker_node = node_load($worker_nid);	
 
-	$result = sirius_dispatch_bullpen_signin($job_node, $worker_node);
+	$result = sirius_dispatch_bullpen_signin($job_node, $worker_node, TRUE);
 	if (!$result['success']) {
 		drupal_set_message("Sign-in failed: " . $result['msg'], 'warning');
 	} else {
-		drupal_set_message(t('@worker has been signed in.', array('@worker' => $worker_node->title)));
+		drupal_set_message(t('@worker [@nid] has been signed in.', array('@worker' => $worker_node->title, '@nid' => $worker_node->nid)));
 	}
 }
 

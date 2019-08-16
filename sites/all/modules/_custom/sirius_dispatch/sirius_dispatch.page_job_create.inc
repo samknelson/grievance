@@ -161,6 +161,18 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		'</strong></div>'
 	);
 
+	// Event
+	$show_event = ($job_policy['event']['has_event'] == 'Yes' && $job_policy['event']['on_job_create'] == 'select');
+	if ($show_event) {
+		$event_options = array(NULL => t('-- Select --'));
+		$form['event_nid'] = array(
+			'#type' => 'select',
+			'#title' => t('Event'),
+			'#options' => $event_options,
+			'#required' => TRUE,
+		);
+	}
+
 	// Skill
 	if ($job_policy['form']['hide_skill'] != 'Yes') {
 		$skill_options = sirius_taxonomy_load('sirius_skill', 'tid', 'name', TRUE);
@@ -269,23 +281,26 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		$datetime_state = array();
 	}
 	*/
-	$form['datetime'] = array(
-		'#type' => 'date_popup',
-		'#title' => t('Report At Time'),
-		'#timepicker' => 'timepicker',
-		'#timepicker_options' => array(
-			'rows' => 6,
-			'minutes' => array(
-			  'starts' => 0,
-			  'ends' => 56,
-			  'interval' => 5,
+
+	if (!$show_event) {
+		$form['datetime'] = array(
+			'#type' => 'date_popup',
+			'#title' => t('Report At Time'),
+			'#timepicker' => 'timepicker',
+			'#timepicker_options' => array(
+				'rows' => 6,
+				'minutes' => array(
+				  'starts' => 0,
+				  'ends' => 56,
+				  'interval' => 5,
+				),
 			),
-		),
-		'#attributes' => array(
-			'autocomplete' => 'off',
-		),
-		// '#states' => $datetime_states,
-	);
+			'#attributes' => array(
+				'autocomplete' => 'off',
+			),
+			// '#states' => $datetime_states,
+		);
+	}
 
 	// Call Number
 	$form['id'] = array(
@@ -305,100 +320,102 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		if ($count_policy == 'required') { $form['count']['#required'] = TRUE; }
 	}
 
-	// Group
-	$group_options = sirius_dispatch_group_list_active($industry_tid);
-	if ($group_options) { 
-		// $group_options = array(NULL => t('-- Select --')) + $group_options;
-		$form['job_group'] = array(
+	if (!$show_event) {
+		// Group
+		$group_options = sirius_dispatch_group_list_active($industry_tid);
+		if ($group_options) { 
+			// $group_options = array(NULL => t('-- Select --')) + $group_options;
+			$form['job_group'] = array(
+				'#type' => 'select',
+				'#title' => t('Group or Show'),
+				'#options' => $group_options,
+			);
+		}
+
+		// Facility
+		$hall_ajax_id = 'sirius_dispatch_page_job_create_ajax_halls';
+		$facility_options = sirius_dispatch_facility_dropdown();
+		$form['facility'] = array(
 			'#type' => 'select',
-			'#title' => t('Group or Show'),
-			'#options' => $group_options,
+			'#options' => $facility_options,
+			'#title' => t('Location'),
+	    '#ajax' => array(
+	      'callback' => $hall_ajax_id,
+	      'wrapper' => $hall_ajax_id,
+	      'method' => 'replace',
+	      'effect' => 'fade',
+	    ),
 		);
-	}
+		$facility_nid = $form_state['values']['facility'];
+		$hall_options = sirius_dispatch_facility_hall_dropdown($facility_nid);
+		if (count($hall_options) > 1) {
+			$form['hall'] = array(
+				'#type' => 'select',
+				'#options' => $hall_options,
+				'#title' => t('Hall'),
+				'#prefix' => "<div id=\"$hall_ajax_id\">",
+				'#suffix' => '</div>',
+			);
+		} else {
+			$form['hall'] = array(
+				'#prefix' => "<div id=\"$hall_ajax_id\">",
+				'#suffix' => '</div>',
+			);
+		}
 
-	// Facility
-	$hall_ajax_id = 'sirius_dispatch_page_job_create_ajax_halls';
-	$facility_options = sirius_dispatch_facility_dropdown();
-	$form['facility'] = array(
-		'#type' => 'select',
-		'#options' => $facility_options,
-		'#title' => t('Location'),
-    '#ajax' => array(
-      'callback' => $hall_ajax_id,
-      'wrapper' => $hall_ajax_id,
-      'method' => 'replace',
-      'effect' => 'fade',
-    ),
-	);
-	$facility_nid = $form_state['values']['facility'];
-	$hall_options = sirius_dispatch_facility_hall_dropdown($facility_nid);
-	if (count($hall_options) > 1) {
-		$form['hall'] = array(
-			'#type' => 'select',
-			'#options' => $hall_options,
-			'#title' => t('Hall'),
-			'#prefix' => "<div id=\"$hall_ajax_id\">",
-			'#suffix' => '</div>',
-		);
-	} else {
-		$form['hall'] = array(
-			'#prefix' => "<div id=\"$hall_ajax_id\">",
-			'#suffix' => '</div>',
-		);
-	}
+		if ($job_policy['form']['hide_address_notes'] != 'Yes') {
+			$form['address_notes_type'] = array(
+				'#title' => t('Report Location'),
+				'#type' => 'select',
+				'#options' => array(
+					NULL => t('-- Select --'),
+					'door' => 'Door #',
+					'booth' => 'Booth #',
+					'other' => 'Other'
+				),
+				'#prefix' => '<div style="float: left;">',
+				'#suffix' => '</div>',
+			);
 
-	if ($job_policy['form']['hide_address_notes'] != 'Yes') {
-		$form['address_notes_type'] = array(
-			'#title' => t('Report Location'),
-			'#type' => 'select',
-			'#options' => array(
-				NULL => t('-- Select --'),
-				'door' => 'Door #',
-				'booth' => 'Booth #',
-				'other' => 'Other'
-			),
-			'#prefix' => '<div style="float: left;">',
-			'#suffix' => '</div>',
-		);
+			$form['address_notes_door'] = array(
+				'#type' => 'textfield',
+				'#size' => 4,
+				'#title' => 'Door #',
+				'#states' => array(
+			  	'visible' => array(
+			  		array(':input[name="address_notes_type"]' => array('value' => 'door')),
+			  	)
+				),
+				'#prefix' => '<div style="float: left; margin-left: 20px;">',
+				'#suffix' => '</div>',
+			);
 
-		$form['address_notes_door'] = array(
-			'#type' => 'textfield',
-			'#size' => 4,
-			'#title' => 'Door #',
-			'#states' => array(
-		  	'visible' => array(
-		  		array(':input[name="address_notes_type"]' => array('value' => 'door')),
-		  	)
-			),
-			'#prefix' => '<div style="float: left; margin-left: 20px;">',
-			'#suffix' => '</div>',
-		);
+			$form['address_notes_booth'] = array(
+				'#type' => 'textfield',
+				'#size' => 4,
+				'#title' => 'Booth #',
+				'#states' => array(
+			  	'visible' => array(
+			  		array(':input[name="address_notes_type"]' => array('value' => 'booth')),
+			  	)
+				),
+				'#prefix' => '<div style="float: left; margin-left: 20px;">',
+				'#suffix' => '</div>',
+			);
 
-		$form['address_notes_booth'] = array(
-			'#type' => 'textfield',
-			'#size' => 4,
-			'#title' => 'Booth #',
-			'#states' => array(
-		  	'visible' => array(
-		  		array(':input[name="address_notes_type"]' => array('value' => 'booth')),
-		  	)
-			),
-			'#prefix' => '<div style="float: left; margin-left: 20px;">',
-			'#suffix' => '</div>',
-		);
-
-		$form['address_notes_other'] = array(
-			'#type' => 'textfield',
-			'#size' => 30,
-			'#title' => 'Other (please specify)',
-			'#states' => array(
-		  	'visible' => array(
-		  		array(':input[name="address_notes_type"]' => array('value' => 'other')),
-		  	)
-			),
-			'#prefix' => '<div style="float: left; margin-left: 20px;">',
-			'#suffix' => '</div>',
-		);
+			$form['address_notes_other'] = array(
+				'#type' => 'textfield',
+				'#size' => 30,
+				'#title' => 'Other (please specify)',
+				'#states' => array(
+			  	'visible' => array(
+			  		array(':input[name="address_notes_type"]' => array('value' => 'other')),
+			  	)
+				),
+				'#prefix' => '<div style="float: left; margin-left: 20px;">',
+				'#suffix' => '</div>',
+			);
+		}
 	}
 
 	$notes_default = $employer_node->field_sirius_dispatch_notesdef['und'][0]['value'];
@@ -414,12 +431,14 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		'#suffix' => '</div>',
 	);
 
-	if ($job_policy['form']['hide_skill'] != 'Yes') {
-		$form['address_parking'] = array(
-			'#type' => 'textarea',
-			'#title' => t('Parking Instructions'),
-			'#description' => t('Enter any parking instructions for workers.'),
-		);
+	if (!$show_event) {
+		if ($job_policy['form']['hide_address_parking'] != 'Yes') {
+			$form['address_parking'] = array(
+				'#type' => 'textarea',
+				'#title' => t('Parking Instructions'),
+				'#description' => t('Enter any parking instructions for workers.'),
+			);
+		}
 	}
 
 	$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
@@ -566,16 +585,23 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 
 function sirius_dispatch_page_job_create_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
-	$employer_node = $form_state['employer_node'];
 
-	$job_type_term = taxonomy_term_load($form_state['values']['job_type_tid']);
+	// Build and save the event (if any)
+	$event_node = sirius_dispatch_page_job_create_get_event_node($form_state);
+	if ($event_node) {
+		$event_node = node_submit($event_node);
+		node_save($event_node);
+		$event_nid = $event_node->nid;
+	}
 
-	global $user;
+	// Build and save the job
 	$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
 	$job_node = node_submit($job_node);
+	if ($event_nid) { $job_node->field_sirius_event['und'][0]['target_id'] = $event_nid; }
 	node_save($job_node);
 	$job_nid = $job_node->nid;
 
+	// Build and save any CBN workers
 	if ($form_state['values']['workers']) {
 		foreach ($form_state['values']['workers'] as $worker_nid => $checked) {
 			if (!$checked) { continue; }
@@ -730,5 +756,42 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 		}
 	}
 	return $job_node;
+}
+
+function sirius_dispatch_page_job_create_get_event_node($form_state) {
+	$job_type_tid = $form_state['job_type_tid'];
+	$job_policy = sirius_dispatch_job_policy_from_tid($job_type_tid);
+	if ($job_policy['event']['has_event'] != 'Yes') { return NULL; }
+	if ($job_policy['event']['on_job_create'] != 'create') { return NULL; }
+
+	$event_type_tid = $job_policy['event']['event_type'];
+	if (!$event_type_tid) { return NULL; }
+	$event_type_term = taxonomy_term_load($event_type_tid);
+
+	$employer_node = $form_state['employer_node'];
+
+	global $user;
+	$event_node = new stdClass();
+	if ($form_state['values']['asap'] == 'Yes') {
+		$event_node->title = $employer_node->title . ' - ' . $event_type_term->name . ' - ASAP';
+	} else {
+		$event_node->title = $employer_node->title . ' - ' . $event_type_term->name . ' - ' . gmdate('Y-m-d', strtotime($form_state['values']['datetime']));
+	}
+	$event_node->type = 'sirius_event';
+	node_object_prepare($event_node);
+	$event_node->language = LANGUAGE_NONE;
+	$event_node->uid = $user->uid;
+	$event_node->status = 1;
+	$event_node->promote = 0;
+	$event_node->comment = 0;
+
+	if ($form_state['values']['asap'] == 'Yes') {
+  	$event_node->field_sirius_daterepeat['und'][0]['value'] = gmdate('Y-m-d H:i:s');
+  } else {
+  	$event_node->field_sirius_daterepeat['und'][0]['value'] = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['datetime']));
+  }
+  $event_node->field_sirius_event_type['und'][0]['tid'] = $event_type_tid;
+
+	return $event_node;
 }
 

@@ -161,6 +161,35 @@ function sirius_dispatch_policy_sirius_jsonfield_form_definitions() {
 		'#description' => t('If "Yes", then the "Parking Instructions" field will be hidden on the "create a job" form.')
 	);
 
+	$form['event'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Event Settings',
+	);
+
+	$form['event']['has_event'] = array(
+		'#type' => 'select', 
+		'#title' => 'Has Event?',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+		'#description' => t('If "Yes", then each job of this type should be associated with an event. The worker list will be drawn from event registrants.'),
+	);
+
+	$event_type_options = sirius_taxonomy_load('sirius_event_type', 'tid', 'name', TRUE);
+	$form['event']['event_type'] = array(
+		'#type' => 'select',
+		'#title' => 'Event Type',
+		'#options' => $event_type_options,
+	);
+
+	$form['event']['on_job_create'] = array(
+		'#type' => 'select',
+		'#title' => 'On Job Creation',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'create' => t('Create a new event'),
+			'select' => t('Select an existing event'),
+		),
+	);
+
 	$definition['taxonomy_term']['sirius_dispatch_job_type']['field_sirius_json'] = $form;
 	return $definition;
 }

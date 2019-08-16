@@ -329,7 +329,9 @@ function sirius_teamsters631_badge_contents($worker_node) {
 	print '</div>';
 
 	print '<div style="margin-bottom: 5px;">';
-	print "Dispatch: " . sirius_phone_format(variable_get('sirius_twilio_operator', ''));
+	// print "Dispatch: " . sirius_phone_format(variable_get('sirius_twilio_operator', ''));
+	print "Dispatch: (702) 430-5048";
+	
 	print "<br />";
 	print "www.TeamstersLocal631.org";
 	print '</div>';

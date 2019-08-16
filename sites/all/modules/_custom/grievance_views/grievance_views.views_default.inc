@@ -5804,6 +5804,15 @@ Section',
   $handler->display->display_options['sorts']['field_grievance_id_value']['id'] = 'field_grievance_id_value';
   $handler->display->display_options['sorts']['field_grievance_id_value']['table'] = 'field_data_field_grievance_id';
   $handler->display->display_options['sorts']['field_grievance_id_value']['field'] = 'field_grievance_id_value';
+  /* Contextual filter: Content: Brought By (field_grievance_broughtby) */
+  $handler->display->display_options['arguments']['field_grievance_broughtby_tid']['id'] = 'field_grievance_broughtby_tid';
+  $handler->display->display_options['arguments']['field_grievance_broughtby_tid']['table'] = 'field_data_field_grievance_broughtby';
+  $handler->display->display_options['arguments']['field_grievance_broughtby_tid']['field'] = 'field_grievance_broughtby_tid';
+  $handler->display->display_options['arguments']['field_grievance_broughtby_tid']['default_action'] = 'empty';
+  $handler->display->display_options['arguments']['field_grievance_broughtby_tid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['field_grievance_broughtby_tid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_grievance_broughtby_tid']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_grievance_broughtby_tid']['summary_options']['items_per_page'] = '25';
   /* Contextual filter: Field: Organizer (field_grievance_rep_organizer) */
   $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['id'] = 'field_grievance_rep_organizer_target_id';
   $handler->display->display_options['arguments']['field_grievance_rep_organizer_target_id']['table'] = 'field_data_field_grievance_rep_organizer';
@@ -7921,6 +7930,16 @@ Section',
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '10';
   $handler->display->display_options['style_plugin'] = 'table';
+  /* Header: Global: Text area */
+  $handler->display->display_options['header']['area']['id'] = 'area';
+  $handler->display->display_options['header']['area']['table'] = 'views';
+  $handler->display->display_options['header']['area']['field'] = 'area';
+  $handler->display->display_options['header']['area']['content'] = '<p>
+This tool will bulk-update existing grievances, changing their statuses <strong>AND</strong> changing the status of their log entries.
+<br><br>
+<strong>Warning: This is a powerful tool that can update many grievances. The changes that are made using this tool cannot be undone. Please use this tool with caution; when in doubt, edit the grievances individually.
+</p>';
+  $handler->display->display_options['header']['area']['format'] = 'full_html';
   /* Relationship: Entity Reference: Referenced Entity */
   $handler->display->display_options['relationships']['field_grievance_rep_organizer_target_id']['id'] = 'field_grievance_rep_organizer_target_id';
   $handler->display->display_options['relationships']['field_grievance_rep_organizer_target_id']['table'] = 'field_data_field_grievance_rep_organizer';
@@ -8089,6 +8108,11 @@ Section',
     t('‹ previous'),
     t('next ›'),
     t('last »'),
+    t('<p>
+This tool will bulk-update existing grievances, changing their statuses <strong>AND</strong> changing the status of their log entries.
+<br><br>
+<strong>Warning: This is a powerful tool that can update many grievances. The changes that are made using this tool cannot be undone. Please use this tool with caution; when in doubt, edit the grievances individually.
+</p>'),
     t('User entity referenced from field_grievance_rep_organizer'),
     t('Content entity referenced from field_grievance_shop'),
     t('Content'),
@@ -17612,6 +17636,15 @@ Grievance Form',
   $handler->display->display_options['filters']['field_sirius_datetime_value']['operator'] = '>=';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['form_type'] = 'date_popup';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['default_date'] = 'now';
+  /* Filter criterion: Content: Status (field_sirius_dispatch_job_status) */
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value_1']['id'] = 'field_sirius_dispatch_job_status_value_1';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value_1']['table'] = 'field_data_field_sirius_dispatch_job_status';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value_1']['field'] = 'field_sirius_dispatch_job_status_value';
+  $handler->display->display_options['filters']['field_sirius_dispatch_job_status_value_1']['value'] = array(
+    'Pending' => 'Pending',
+    'Unfilled' => 'Unfilled',
+    'Running' => 'Running',
+  );
 
   /* Display: Upcoming Bullpens */
   $handler = $view->new_display('page', 'Upcoming Bullpens', 'page');
