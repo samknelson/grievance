@@ -126,6 +126,7 @@ function grievance_uhmigrate_find_by_external_id($content_type, $external_id) {
 
 function grievance_uhmigrate_node_save(&$node) {
   // return NULL;
+  node_object_prepare($node);
   return node_save($node); 
 }
 
