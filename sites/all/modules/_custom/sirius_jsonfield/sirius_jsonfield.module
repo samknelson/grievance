@@ -1,0 +1,200 @@
+<?php
+
+function sirius_jsonfield_menu() {
+  $items = array();
+
+  /*
+  $items['sirius/cloudflare/test/%'] = array(
+    'title'            => 'CloudFlare Test',
+    'page callback'    => 'sirius_cloudflare_test',
+    'page arguments'   => array(3),
+    'access arguments' => array('access content'),
+  );
+  */
+
+  return $items;
+}
+
+function sirius_jsonfield_form_definition($entity_type, $bundle, $field_name) {
+  $all_definitions = module_invoke_all('sirius_jsonfield_form_definitions');
+  $form = $all_definitions[$entity_type][$bundle][$field_name];
+  if (!$form) {
+    $form = array(
+      '#type' => 'markup',
+      '#markup' => t('Please supply a form defintiion by implementing hook_sirius_jsonfield_form_definitions and returning a value for $all_defintions[@entity_type][@bundle][@field_name]', array('@entity_type' => $entity_type, '@bundle' => $bundle, '@field_name' => $field_name)),
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_field_info().
+ */
+
+function sirius_jsonfield_field_info() {  
+  return array(  
+    'sirius_jsonfield' => array(  
+      'label' => t('sirius JSON Field'),  
+      'description' => t('A field storing JSON-encoded data'),
+      'default_widget' => 'sirius_jsonfield_widget',
+      'default_formatter' => 'sirius_jsonfield_formatter_full',  
+    ), 
+  ); 
+} 
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function sirius_jsonfield_field_formatter_info() {
+  return array(   
+    'sirius_jsonfield_formatter_full' => array(  
+      'label' => t('sirius JSON Full'),  
+      'field types' => array('sirius_jsonfield'),  
+    ), 
+    'sirius_jsonfield_formatter_raw' => array(  
+      'label' => t('sirius JSON Raw'),  
+      'field types' => array('sirius_jsonfield'),  
+    ), 
+    'sirius_jsonfield_formatter_single' => array(  
+      'label' => t('sirius JSON Single'),  
+      'field types' => array('sirius_jsonfield'),  
+    ), 
+  ); 
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+
+function sirius_jsonfield_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $element = array();
+  if ($display['type'] == 'sirius_jsonfield_formatter_single') {
+    $element['sub_name'] = array(
+      '#title' => t('Field to Display'),
+      '#type' => 'textfield',
+      '#size' => 20,
+      '#default_value' => $settings['sub_name'],
+      '#required' => TRUE,
+    );
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+
+function sirius_jsonfield_field_widget_info() {
+  return array(
+    'sirius_jsonfield_widget' => array(
+      'label' => t('sirius JSON Field Widget'),
+      'field types' => array('sirius_jsonfield'),
+    ),
+    'sirius_jsonfield_widget_raw' => array(
+      'label' => t('sirius JSON Field Widget Raw'),
+      'field types' => array('sirius_jsonfield'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function sirius_jsonfield_field_is_empty($item, $field) { 
+  return empty($item['sirius_jsonfield']) && empty($item['value']);
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+
+function sirius_jsonfield_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $entity_type = $instance['entity_type'];
+  $bundle = $instance['bundle'];
+
+  if ($instance['widget']['type'] == 'sirius_jsonfield_widget_raw') {
+    $element['value'] = array(
+      '#type' => 'textarea',
+      '#default_value' => $items[$delta]['value'],
+    );
+  } else {
+    $element['sirius_jsonfield'] = sirius_jsonfield_form_definition($entity_type, $bundle, $field['field_name']);
+    $default_value = json_decode($items[$delta]['value'], TRUE);
+    if ($default_value) {
+      foreach ($default_value as $sub_name => $sub_value) {
+        if (is_array($sub_value)) {
+          foreach ($sub_value as $sub_sub_name => $sub_sub_value) {
+            $element['sirius_jsonfield'][$sub_name][$sub_sub_name]['#default_value'] = $sub_sub_value;
+          }
+        } else {
+          $element['sirius_jsonfield'][$sub_name]['#default_value'] = $sub_value;
+        }
+      }
+    }
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_presave().
+ */
+
+function sirius_jsonfield_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if ($field['type'] == 'sirius_jsonfield') {
+    foreach ($items as $delta => $item) {
+      if ($item['sirius_jsonfield']) {
+        $items[$delta]['value'] = json_encode($item['sirius_jsonfield']);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+
+function sirius_jsonfield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $result = array();
+
+  foreach ($items as $delta => $item) {
+    $value = json_decode($items[$delta]['value'], TRUE);
+
+    $markup = '';
+    if ($display['type'] == 'sirius_jsonfield_formatter_full') {
+      if ($value) {
+        $markup = _sirius_jsonfield_recursive_render($value);
+      }
+    } else if ($display['type'] == 'sirius_jsonfield_formatter_raw') {
+      $markup = $items[$delta]['value'];
+    } else if ($display['type'] == 'sirius_jsonfield_formatter_single') {
+      list ($part1, $part2) = explode(':', $display['settings']['sub_name']);
+      if ($part2) {
+        $markup = $value[$part1][$part2];
+      } else {
+        $markup = $value[$part1];
+      }
+    }
+    $result[] = array('#markup' => $markup);
+  }
+  return $result;
+}
+
+
+function _sirius_jsonfield_recursive_render($obj) {
+  if (!is_array($obj)) { return $obj; }
+
+  $html .= '<ul>';
+  foreach ($obj as $key => $value) {
+    $html .= '<li>';
+    $html .= '<strong>' . $key . ': ' . '</strong>';
+    $html .= _sirius_jsonfield_recursive_render($value);
+    $html .= '</li>';
+  }
+  $html .= '</ul>';
+
+  return $html;
+}

@@ -1,0 +1,4 @@
+name = Sirius Worker
+description = Implements the Sirius Worker functionality
+package = sirius
+core = 7.x

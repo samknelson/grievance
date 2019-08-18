@@ -14,50 +14,35 @@ function grievance_content_types_user_default_permissions() {
   // Exported permission: 'create field_grievance_shops'.
   $permissions['create field_grievance_shops'] = array(
     'name' => 'create field_grievance_shops',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'grievance admin' => 'grievance admin',
-    ),
+    'roles' => array(),
     'module' => 'field_permissions',
   );
 
   // Exported permission: 'edit field_grievance_shops'.
   $permissions['edit field_grievance_shops'] = array(
     'name' => 'edit field_grievance_shops',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'grievance admin' => 'grievance admin',
-    ),
+    'roles' => array(),
     'module' => 'field_permissions',
   );
 
   // Exported permission: 'edit own field_grievance_shops'.
   $permissions['edit own field_grievance_shops'] = array(
     'name' => 'edit own field_grievance_shops',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'grievance admin' => 'grievance admin',
-    ),
+    'roles' => array(),
     'module' => 'field_permissions',
   );
 
   // Exported permission: 'view field_grievance_shops'.
   $permissions['view field_grievance_shops'] = array(
     'name' => 'view field_grievance_shops',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'grievance admin' => 'grievance admin',
-    ),
+    'roles' => array(),
     'module' => 'field_permissions',
   );
 
   // Exported permission: 'view own field_grievance_shops'.
   $permissions['view own field_grievance_shops'] = array(
     'name' => 'view own field_grievance_shops',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'grievance admin' => 'grievance admin',
-    ),
+    'roles' => array(),
     'module' => 'field_permissions',
   );
 

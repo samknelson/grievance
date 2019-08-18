@@ -1,0 +1,113 @@
+table {
+	background-color: transparent;
+	border-bottom: 1px solid #5984be;	
+}
+thead tr, thead th {
+	background-color: transparent;
+	color: #1b4784;
+	font-weight: 400;
+}
+th {
+	padding: 22px 0 22px 22px;
+}
+td {
+	padding: 22px 0 22px 22px;
+}
+
+thead tr {
+	border-bottom: 1px solid #5984be;
+}
+tbody tr {
+	border-left: 1px solid #5984be;
+	border-right: 1px solid #5984be;
+	border-bottom: 1px solid #5984be;	
+	background-color: #ffffff;
+}
+tbody td {
+	background-color: #ffffff;
+}
+a.tool-button {
+	padding: 4px 11px;
+	border: 1px solid #a0bbf5;
+	display: inline-block;
+}
+a.tool-button:hover {
+	color: #1b4784;
+	border-color: #1b4784;
+}
+
+.block a.action-button,
+a.action-button:visited,
+a.action-button:link,
+a.action-button {
+	background-color: #1b4784;
+	color: #ffffff;
+	display: inline-block;
+	padding: 14px 42px;
+	font-size: 16px;
+	margin: 14px 0;
+}
+a.action-button:hover {
+	background-color: #0f3871;
+	color: #ffffff;
+}
+hr {
+	border: 0;
+	height: 0;
+	border-top: 1px dashed #5984be;
+}
+
+#grievance-letter-body table tr td {
+	padding: 7px 0px;
+}
+#grievance-letter-body table {
+	border: 0;
+}
+#grievance-letter-body tbody tr {
+	border-color: #000;	
+	background-color: transparent;
+}
+
+@media only screen {
+	#grievance-letter-body {
+		background-color: #fff; 
+	}
+	.view-grievance-log thead tr {
+		background-color: #fff;
+	}
+}
+@media only print {
+	#grievance-letter-body table {
+		border-color: #000;
+	}
+}
+
+.view-grievance-log table hr {
+	display: none;
+}
+.view-grievance-log tr {
+	border: none;
+}
+.view-grievance-log th{
+	padding: 12px 0 12px 12px;
+	font-weight: bold;
+	border-bottom: 1px dotted #5984be;
+}
+.view-grievance-log td {
+	padding: 12px 0 6px 12px;
+}
+.view-grievance-log td.views-field-nothing {
+	padding: 0px 0px 12px 12px;
+	border-bottom: 1px dotted #5984be;
+}
+.view-grievance-log td.views-field-nothing pre {
+	margin: 0;
+}
+.view-grievance-log table {
+	border: 1px solid #5984be;
+	border-collapse: separate;
+}
+
+
+@media only print {
+}

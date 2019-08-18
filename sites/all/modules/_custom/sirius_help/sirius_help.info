@@ -1,0 +1,5 @@
+name = Sirius Help
+description = Implements the Sirius help text functionality
+package = sirius
+core = 7.x
+; stylesheets[all][] = css/unite.css

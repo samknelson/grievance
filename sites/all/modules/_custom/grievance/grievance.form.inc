@@ -122,33 +122,40 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   }
 
   //
-  // Restrict the list of available statuses based on the user's role.
+  // Restrict the list of available statuses
   //
 
+  $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
+  $status_term = taxonomy_term_load($status_tid);
   if (!user_access('grievance admin')) {
-    $status_vid = taxonomy_vocabulary_machine_name_load('grievance_status')->vid;
-    $status_terms = taxonomy_get_tree($status_vid);
+    // 
+    // Restrict the statuses based on the user roles
+    //
 
+    $status_terms = sirius_taxonomy_load('grievance_status', 'tid', 'full');
+    $status_tids = array_keys($status_terms);
     $user_roles = array_keys($user_full->roles);
-
     $status_tids_to_disable = array();
-    foreach ($status_terms as $status_term) {
-      $status_tid = $status_term->tid;
-      $status_term_full = taxonomy_term_load($status_tid);
-      $status_term_roles = array();
-      if ($status_term_full->field_grievance_roles['und']) {
-        foreach ($status_term_full->field_grievance_roles['und'] as $delta => $tmp) {
-          $status_term_roles[] = $tmp['value'];
-        }
-      }
-
-      if (!array_intersect($status_term_roles, $user_roles)) {
-        $status_tids_to_disable[] = $status_tid;
-      }
+    foreach ($status_terms as $check_status_tid => $check_status_term) {
+      $status_term_roles = sirius_fieldvals($check_status_term, 'field_grievance_roles');
+      if (!array_intersect($status_term_roles, $user_roles)) { $status_tids_to_disable[] = $check_status_tid; }
     }
 
-    foreach ($status_tids_to_disable as $status_tid) {
-      unset($form['field_grievance_status']['und']['#options'][$status_tid]);
+    //
+    // Restrict the statuses based on what can follow the current status
+    //
+
+    $next_status_tids = sirius_fieldvals($status_term, 'field_grievance_statuses', 'tid');
+    if ($next_status_tids) { 
+      $status_tids_to_disable = array_merge($status_tids_to_disable, array_diff($status_tids, $next_status_tids));
+    }
+
+    //
+    // Remove the unavailable options
+    //
+
+    foreach ($status_tids_to_disable as $check_status_tid) {
+      unset($form['field_grievance_status']['und']['#options'][$check_status_tid]);
     }
   }
 
@@ -165,19 +172,6 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
         $form[$hidefield]['#access'] = FALSE;
       }
     }
-
-    /*
-    if ($category_term){
-      if ($category_term->name == 'Contract') {
-        $form['field_grievance_remedy']['#access'] = FALSE;
-        $form['field_grievance_type']['#access'] = FALSE;
-      } else if ($category_term->name == 'Discipline') {
-        $form['field_grievance_classaction']['#access'] = FALSE;
-        // $form['field_grievance_remedy_other']['#access'] = FALSE;
-        // $form['field_grievance_type_other']['#access'] = FALSE;
-      }
-    }
-    */
   }
 
   //
@@ -257,15 +251,18 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
         '</strong>.';
     }
   }
+
   $form['#groups']['group_grievance_form']->format_settings['instance_settings']['description'] = 
     '<div id="grievance-form-contract-link">' . $contract_link_text . '</div>';
+
+  // Add the clause picker as a new field
+  if ($contract_tplt_node && $contract_tplt_node->nid) {
+    $form['field_grievance_clauseref']['#prefix'] = '<a href="#" onClick="javascript:sirius_popup(\'/node/' . $contract_tplt_node->nid . '/clauses/picker/popup\', \'clause_picker\', 1025, 600); return false;">Clause Picker</a>';
+  }
 
   // 
   // Recipients
   //
-
-  $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
-  $status_term = taxonomy_term_load($status_tid);
 
   if ($form['field_grievance_contact_selector']['#access']) {
     $form['field_grievance_contact_selector']['und'][0]['markup']['#markup'] = grievance_contacts_create_selector($shop_nid, $status_tid, 'contact', FALSE);
@@ -450,7 +447,13 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     );
     //$classification_tid = grievance_form_current_value('field_grievance_class_tid', 'tid', $form, $form_state); 
     //drupal_set_message("Here with $classification_tid");
-  }
+  } 
+
+  //
+  // Change the autocomplete path for classifications
+  //
+
+  $form['field_grievance_class_tid']['und']['#autocomplete_path'] = "grievance/autocomplete/grievance-job-class-tid/$contract_tplt_nid/";
 
   //
   // Add the "Assignee Notes" dropdown
@@ -595,6 +598,45 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       );
       $form['#groups']['group_grievance_form']->children[] = "grievance_intake_log_${i}";
       $form['#group_children']["grievance_intake_log_${i}"] = 'group_grievance_form';
+    }
+  }
+
+  //
+  // Add the information request sets
+  //
+
+  if ($form['field_grievance_document_types']['#access']) {
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'grievance_irset');
+    $query->propertyOrderBy('title');
+    $stmt = $query->execute();
+    if ($stmt['node']) {
+      $weight = $form['field_grievance_document_types']['#weight'] - 0.1;
+      $irset_nodes = node_load_multiple(array_keys($stmt['node']));
+      $irset_iroptions = array();
+      foreach ($irset_nodes as $irset_node) {
+        $irset_iroptions[$irset_node->nid] = $irset_node->title;
+      }
+      $form['irsets'] = array(
+        '#type' => 'checkboxes',
+        '#tree' => TRUE,
+        '#title' => "Sets",
+        '#options' => $irset_iroptions,
+        '#weight' => $weight
+      );
+      $form['#groups']['group_inforeq']->children[] = "irsets";
+      $form['#group_children']["irsets"] = 'group_inforeq';
+
+      $settings_for_js = array();
+      foreach ($irset_nodes as $irset_nid => $irset_node) {
+        if ($irset_node->field_grievance_document_types['und'][0]) {
+          foreach ($irset_node->field_grievance_document_types['und'] as $tmp) {
+            $settings_for_js[$irset_nid][] = $tmp['tid'];
+          }
+        }
+      }
+      drupal_add_js(array('grievance_form_irsets' => $settings_for_js), 'setting');
     }
   }
 }

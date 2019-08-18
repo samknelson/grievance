@@ -17,6 +17,9 @@ function grievance_uh226_report_summary_form($form, &$form_state) {
   }
 
   $from_ts = strtotime('-7 days');
+
+  $form['open'] = array('#markup' => '<div class="sirius_noprint">');
+
   $form['from_date'] = array(
     '#type' => 'date',
     '#title' => t('From Date'),
@@ -38,6 +41,8 @@ function grievance_uh226_report_summary_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => 'Generate Report',
   );
+
+  $form['close'] = array('#markup' => '</div>');
 
   if ($form_state['results']) {
     $form['results'] = array(
@@ -391,6 +396,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     }
 
     // Fetch the total calls this week
+    /*
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'grievance_log');
@@ -403,8 +409,39 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if ($stmt['node']) {
       $report_row['calls'] = count(array_keys($stmt['node']));
     }
+    */
+
+    $sql = "select count(*) as c ";
+    $sql .= "from node grievance_node ";
+    $sql .= "join field_data_field_grievance_rep_organizer ";
+    $sql .= "  on field_data_field_grievance_rep_organizer.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_rep_organizer.entity_id = grievance_node.nid ";
+    $sql .= "  and field_grievance_rep_organizer_target_id = :uid ";
+    $sql .= "join field_data_field_grievance ";
+    $sql .= "  on field_data_field_grievance.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance.bundle = 'grievance_log' ";
+    $sql .= "  and field_grievance_target_id = grievance_node.nid ";
+    $sql .= "join field_data_field_grievance_log_type ";
+    $sql .= "  on field_data_field_grievance_log_type.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_log_type.entity_id = field_data_field_grievance.entity_id ";
+    $sql .= "  and field_grievance_log_type_tid in (:log_type_call_tids) ";
+    $sql .= "join field_data_field_grievance_status_date ";
+    $sql .= "  on field_data_field_grievance_status_date.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_status_date.entity_id = field_data_field_grievance.entity_id ";
+    $sql .= "  and field_grievance_status_date_value >= :from_date ";
+    $sql .= "  and field_grievance_status_date_value <= :to_date ";
+    $args = array(
+      ':uid' => $user['uid'],
+      ':log_type_call_tids' => $log_type_call_tids,
+      ':from_date' => $from_date,
+      ':to_date' => $to_date,
+    );
+    $stmt = db_query($sql, $args);
+    $hr = $stmt->fetchAssoc();
+    $report_row['calls'] = $hr['c'];
 
     // Fetch the first calls this week
+    /*
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'grievance_log');
@@ -417,8 +454,38 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if ($stmt['node']) {
       $report_row['first_calls'] = count(array_keys($stmt['node']));
     }
+    */
+    $sql = "select count(*) as c ";
+    $sql .= "from node grievance_node ";
+    $sql .= "join field_data_field_grievance_rep_organizer ";
+    $sql .= "  on field_data_field_grievance_rep_organizer.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_rep_organizer.entity_id = grievance_node.nid ";
+    $sql .= "  and field_grievance_rep_organizer_target_id = :uid ";
+    $sql .= "join field_data_field_grievance ";
+    $sql .= "  on field_data_field_grievance.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance.bundle = 'grievance_log' ";
+    $sql .= "  and field_grievance_target_id = grievance_node.nid ";
+    $sql .= "join field_data_field_grievance_log_type ";
+    $sql .= "  on field_data_field_grievance_log_type.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_log_type.entity_id = field_data_field_grievance.entity_id ";
+    $sql .= "  and field_grievance_log_type_tid in (:log_type_call_tids) ";
+    $sql .= "join field_data_field_grievance_status_date ";
+    $sql .= "  on field_data_field_grievance_status_date.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_status_date.entity_id = field_data_field_grievance.entity_id ";
+    $sql .= "  and field_grievance_status_date_value >= :from_date ";
+    $sql .= "  and field_grievance_status_date_value <= :to_date ";
+    $args = array(
+      ':uid' => $user['uid'],
+      ':log_type_call_tids' => $log_type_first_call_tid,
+      ':from_date' => $from_date,
+      ':to_date' => $to_date,
+    );
+    $stmt = db_query($sql, $args);
+    $hr = $stmt->fetchAssoc();
+    $report_row['first_calls'] = $hr['c'];
 
     // Fetch the "Left Message" calls
+    /*
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'grievance_log');
@@ -432,6 +499,40 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     if ($stmt['node']) {
       $report_row['left_message'] = count(array_keys($stmt['node']));
     }
+    */
+    $sql = "select count(*) as c ";
+    $sql .= "from node grievance_node ";
+    $sql .= "join field_data_field_grievance_rep_organizer ";
+    $sql .= "  on field_data_field_grievance_rep_organizer.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_rep_organizer.entity_id = grievance_node.nid ";
+    $sql .= "  and field_grievance_rep_organizer_target_id = :uid ";
+    $sql .= "join field_data_field_grievance ";
+    $sql .= "  on field_data_field_grievance.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance.bundle = 'grievance_log' ";
+    $sql .= "  and field_grievance_target_id = grievance_node.nid ";
+    $sql .= "join field_data_field_grievance_log_type ";
+    $sql .= "  on field_data_field_grievance_log_type.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_log_type.entity_id = field_data_field_grievance.entity_id ";
+    $sql .= "  and field_grievance_log_type_tid in (:log_type_call_tids) ";
+    $sql .= "join field_data_field_grievance_status_date ";
+    $sql .= "  on field_data_field_grievance_status_date.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_status_date.entity_id = field_data_field_grievance.entity_id ";
+    $sql .= "  and field_grievance_status_date_value >= :from_date ";
+    $sql .= "  and field_grievance_status_date_value <= :to_date ";
+    $sql .= "join field_data_field_grievance_log_tags ";
+    $sql .= "  on field_data_field_grievance_log_tags.entity_type = 'node' ";
+    $sql .= "  and field_data_field_grievance_log_tags.entity_id = field_data_field_grievance.entity_id ";
+    $sql .= "  and field_grievance_log_tags_tid = :log_tag_left_message_tid ";
+    $args = array(
+      ':uid' => $user['uid'],
+      ':log_type_call_tids' => $log_type_call_tids,
+      ':from_date' => $from_date,
+      ':to_date' => $to_date,
+      ':log_tag_left_message_tid' => $log_tag_left_message_tid,
+    );
+    $stmt = db_query($sql, $args);
+    $hr = $stmt->fetchAssoc();
+    $report_row['left_message'] = $hr['c'];
 
     // Fetch "New This Week" 
     $query = new EntityFieldQuery;
@@ -598,7 +699,11 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
 
   $html = '';
 
-  $html .= '<table class="grievance_simple_table">';
+  $html .= '<style>';
+  $html .= '.uh226_report_weekly_summary th { border: 1px solid #333333; text-align: center; padding-left: 5px; margin-left: 0; padding-right: 5px; margin-right: 0; padding-top: 10px; padding-bottom: 10px;}';
+  $html .= '.uh226_report_weekly_summary td { border: 1px solid #333333; padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; text-align: center; }';
+  $html .= '</style>';
+  $html .= '<table class="grievance_simple_table uh226_report_weekly_summary">';
 
   $html .= '<thead>';
   $html .= '<tr>';
@@ -646,6 +751,4 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $html .= '</table>';
 
   $form_state['results'] = $html;
-
-  drupal_set_message("Report generated.");
 }

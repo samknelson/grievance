@@ -1,0 +1,487 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.auditlog.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.aat.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.ssn.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.date.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.news.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.banner.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phone.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phonetree.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.email.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.specialtid.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sns.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.qr.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.wizard.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letterhead.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.loopback.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.pdf.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.representatives.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.taxonomy.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.domain.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.signature.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_voice_forward_to_operator.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
+
+/**
+ * Implements hook_cron
+ */
+
+function sirius_cron() {
+  sirius_auditlog();
+  sirius_signature_cleanup();
+}
+
+/**
+ * Implements hook_entity_presave()
+ */
+
+function sirius_entity_presave($entity, $type) {
+  if ($type == 'node') {
+    if ($entity->type == 'sirius_worker') { sirius_contact_sync_from_worker($entity); }
+  }
+  if ($type == 'user') { sirius_contact_sync_from_user($entity); }
+}
+
+/**
+ * Implements hook_node_presave()
+ */
+
+function sirius_node_presave($node) {
+  if ($node->type == 'sirius_worker') {
+    $fields = array(
+      'field_sirius_phone', 
+      'field_sirius_phone_alt', 
+      'field_grievance_phone', 
+      'field_grievance_co_phone', 
+      'field_grievance_co_fax',
+      'field_grievance_co_phone_2',
+      'field_grievance_phone_off',
+    );
+    foreach ($fields as $field) {
+      if (isset($node->{$field}['und'][0]['value'])) {
+        $node->{$field}['und'][0]['value'] = sirius_phone_format($node->{$field}['und'][0]['value']);
+      }
+    }
+  }
+
+  if ($node->type == 'sirius_worker') {
+    $fields = array(
+      'field_sirius_email', 
+    );
+    foreach ($fields as $field) {
+      if (isset($node->{$field}['und'][0]['value'])) {
+        $node->{$field}['und'][0]['value'] = sirius_email_format($node->{$field}['und'][0]['value']);
+      }
+    }
+  }
+}
+
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function sirius_field_formatter_info() {
+  return array(   
+    'sirius_ssn_formatter_masked' => array(  
+      'label' => t('Sirius SSN Masked'),  
+      'field types' => array('text'), 
+    ), 
+    'sirius_ssn_formatter_conditional' => array(  
+      'label' => t('Sirius SSN Conditional'),  
+      'field types' => array('text'), 
+    ), 
+    'sirius_user_worker' => array(
+      'label' => t('Sirius User Worker'),
+      'field types' => array('entityreference')
+    ),
+  ); 
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+
+function sirius_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $result = array();
+
+  if ($display['type'] == 'sirius_ssn_formatter_masked' || $display['type'] == 'sirius_ssn_formatter_conditional') {
+    foreach ($items as $delta => $item) {
+
+      if ($display['type'] == 'sirius_ssn_formatter_conditional' && user_access('sirius ssn')) {
+        $markup = $items[$delta]['value'];
+      } else {
+        $markup = 'xxx-xx-' . substr($items[$delta]['value'], -4);
+      }
+      
+      $result[] = array('#markup' => $markup);
+    }
+  }
+
+  if ($display['type'] == 'sirius_user_worker') {
+    foreach ($items as $delta => $item) {
+      $hr = NULL;
+      $uid = $item['target_id'];
+      if ($uid) {
+        $sql = "select name, title, field_sirius_worker_target_id ";
+        $sql .= "from users ";
+        $sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'user' and field_data_field_sirius_worker.entity_id = users.uid ";
+        $sql .= "left join node on node.nid = field_sirius_worker_target_id ";
+        $sql .= "where users.uid = :uid";
+        $stmt = db_query($sql, array(':uid' => $uid));
+        $hr = $stmt->fetchAssoc();
+      }
+
+      if ($hr['title']) { $markup = $hr['title']; }
+      else if ($hr['name']) { $markup = $hr['name']; }
+      else if ($uid) { $markup = "[user not found: $uid]"; }
+      else { $markup = "User not found."; }
+      $result[] = array('#markup' => $markup);
+    }
+  }
+
+  return $result;
+}
+
+/** 
+ * Implements hook_field_formatter_settings_summary
+ */
+
+function sirius_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = '';
+
+  if ($display['type'] == 'sirius_ssn_formatter_masked') {
+    $summary = 'xxx-xx-1234';
+  }
+  if ($display['type'] == 'sirius_ssn_formatter_conditional') {
+    $summary = '???-??-1234';
+  }
+  return $summary;
+}
+/**
+ * Implements hook_form_alter
+ */
+
+function sirius_form_alter(&$form, &$form_state, $form_id) {
+  // Set default values for entity fields with autocomplete widgets
+  $defaultable_fields = array('sirius_dispatch_facility', 'sirius_dispatch_job');
+  foreach ($defaultable_fields as $field) {
+    if (isset($_GET[$field]) && isset($form['field_' . $field])) {
+      $nid = $_GET[$field];
+      $entity_node = node_load($nid);
+      if ($entity_node) {
+        $form['field_' . $field]["und"][0]['target_id']['#default_value'] = "$entity_node->title ($nid)";
+      }
+    }
+  }
+
+  $defaultable_fields = array('sirius_domain');
+  foreach ($defaultable_fields as $field) {
+    if (isset($_GET[$field]) && isset($form['field_' . $field])) {
+      $form['field_' . $field]["und"]['#default_value'][0] = $_GET[$field];
+    }
+  }
+
+  // Stupid patch for the "rolesfield" configuration form,
+  if ($form_id == 'field_ui_field_edit_form') {
+    if ($form['#field']['type'] == 'role') {
+      $form['field']['settings']['roles']['#required'] = FALSE;
+    }
+  }
+
+  // Clean up taxonomy term forms
+  if ($form_id == 'taxonomy_form_term') {
+    $vocabulary = $form['#vocabulary'];
+    if ($vocabulary && $vocabulary->machine_name && preg_match('/^(sirius|grievance)/', $vocabulary->machine_name)) {
+      $form['path']['#access'] = FALSE;
+      if ($vocabulary->machine_name != 'sirius_skill') {
+        $form['relations']['#access'] = FALSE;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Clear account fields that users shouldn't have access to.
+ */
+
+function sirius_form_user_profile_form_alter(&$form, &$form_state) {
+  if ($form['#user_category'] != 'account') { return; }
+
+  $account = $form['#user'];
+  unset($form['mimemail']);
+
+  if (!user_access('sirius dispatch admin')) {
+    $form['field_sirius_worker']['#access'] = FALSE;
+  }
+  if (!user_access('sirius dispatch admin') && !user_access('grievance admin') && !user_access('grievance user')) {
+    $form['field_grievance_rep_lead']['#access'] = FALSE;
+    $form['field_grievance_rep_organizer']['#access'] = FALSE;
+    $form['field_grievance_shops']['#access'] = FALSE;
+    $form['field_grievance_phone']['#access'] = FALSE;
+    $form['field_grievance_phone_off']['#access'] = FALSE;
+  }
+
+  if (!user_access('sirius domain user admin')) {
+    $form['field_sirius_domain']['#accesss'] = FALSE;
+  }
+
+  if (!user_access('sirius signature edit')) {
+    $form['field_sirius_signature']['#access'] = FALSE;
+  }
+
+  if (!user_access('sirius domain user admin')) {
+    $form['field_sirius_domain']['#access'] = FALSE;
+  }
+
+  if (!user_access('sirius contact admin')) {
+    $form['field_sirius_contact']['#access'] = FALSE;
+  }
+}
+
+function sirius_become_superuser($tf) {
+  global $user;
+  static $original_user;
+  static $old_state;
+
+  // Signing in as a new user sometimes takes astonishingly long, because we're regenerating the admin menu.
+  // But we only call this function in the context where we're not actually rendering pages. So we don't need the admin menu.
+  if (function_exists('admin_menu_suppress')) { admin_menu_suppress(TRUE); }
+  global $admin_menu_suppress;
+  $admin_menu_suppress = TRUE;
+  
+  if ($tf) {
+    $original_user = $user; 
+    $old_state = drupal_save_session(); 
+    drupal_save_session(FALSE); 
+    $user = user_load(1); 
+  } else {
+    $user = $original_user; 
+    drupal_save_session($old_state); 
+  }
+}
+
+function sirius_page_alter(&$page) {
+  global $admin_menu_suppress;
+  if ($admin_menu_suppress) {
+    unset($page['page_top']['toolbar']);
+  }
+}
+
+function sirius_log_render($text) {
+  // 2018-11-08T05:57:55-08:00:  
+  $entries = preg_split('/(\d\d\d\d\-\d\d\-\d\dT\d\d:\d\d:\d\d-\d\d:\d\d):/', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+
+  $html = '';
+  foreach ($entries as $entry) {
+    if (preg_match('/\d\d\d\d\-\d\d\-\d\dT\d\d:\d\d:\d\d-\d\d:\d\d/', $entry)) {
+      if ($html) { $html .= '<br />'; }
+      $html .= '<strong>' . date('Y-m-d H:i', strtotime($entry)) . '</strong> :: ';
+    } else {
+      $html .= $entry; 
+    }
+  }
+
+  return $html;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+
+function sirius_block_info() {
+  $blocks = array();
+  $blocks['sirius_news_popup'] = array(
+    'info' => t('Sirius News Popup'),
+    'cache' => DRUPAL_NO_CACHE,
+  );      
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+
+function sirius_block_view($delta = '') {
+  if ($delta == 'sirius_news_popup') {
+    return sirius_news_popup_block_view();
+  }
+}
+
+/**
+ * Implements hook_menu_alter()
+ */
+
+function sirius_menu_alter(&$items) {
+  $items['user/%user']['access callback'] = 'sirius_user_view_access';
+  $items['user/%user/edit']['access callback'] = 'sirius_user_edit_access';
+}
+
+function sirius_user_view_access($account) {
+  if (!user_access('sirius edit own user')) { return FALSE; }
+  return user_view_access($account);
+}
+
+function sirius_user_edit_access($account) {
+  if (!user_access('sirius edit own user')) { return FALSE; }
+  return user_edit_access($account);
+}
+
+/**
+ * Implements hook_node_view
+ */
+
+/*
+function sirius_node_view($node, $view_mode, $langcode) {
+  // if ($node->content['field_sirius_representatives']) { sirius_representatives_node_view($node, $view_mode, $langcode); }
+}
+*/
+
+
+
+/**
+ * Stupid utility function to get multiple values from a field
+ */
+
+function sirius_fieldvals($node, $field, $col = 'value') {
+  $result = array();
+  if (!$node->{$field}['und']) { return array(); }
+
+  foreach ($node->{$field}['und'] as $tmp) {
+    if ($col == 'ts') {
+      $result[] = strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']);
+    } else {
+      $result[] = $tmp[$col];
+    }
+  }
+
+  return $result;
+}
+
+function sirius_fieldval($node, $field, $col = 'value', $params = array()) {
+  if ($col == 'ts') { 
+    return strtotime($node->{$field}['und'][0]['value'] . ' ' . $node->{$field}['und'][0]['timezone_db']);
+  } else {
+    return $node->{$field}['und'][0][$col];
+  }
+}
+
+function sirius_fakerender_field($title, $values) {
+  if (!is_array($values)) { $values = array($values); }
+
+  $html = '<section class="field field-name-fake field-label-inline clearfix view-mode-full">';
+  $html .= '<h2 class="field-label">';
+  $html .= $title;
+  $html .= '</h2>';
+  $html .= '<div class="field-items">';
+  foreach ($values as $value) {
+    $html .= '<div class="field-item">';
+    $html .= $value;
+    $html .= '</div>';
+  }
+  $html .= '</div>';
+  $html .= '</section>';
+  return $html;
+}
+
+function sirius_field_changed($node1, $node2, $field_name) {
+  if ($node1->{$field_name}) {
+    foreach (array_keys($node1->{$field_name}) as $lang) {
+      if ($node1->{$field_name}[$lang]) {
+        foreach (array_keys($node1->{$field_name}[$lang]) as $delta) {
+          if ($node1->{$field_name}[$lang][$delta]) {
+            foreach ($node1->{$field_name}[$lang][$delta] as $col => $val) {
+              if ($col == 'safe_value') { continue; }
+              if ($val != $node2->{$field_name}[$lang][$delta][$col]) { return TRUE; }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if ($node2->{$field_name}) {
+    foreach (array_keys($node2->{$field_name}) as $lang) {
+      if ($node2->{$field_name}[$lang]) {
+        foreach (array_keys($node2->{$field_name}[$lang]) as $delta) {
+          if ($node2->{$field_name}[$lang][$delta]) {
+            foreach ($node2->{$field_name}[$lang][$delta] as $col => $val) {
+              if ($col == 'safe_value') { continue; }
+              if ($val != $node1->{$field_name}[$lang][$delta][$col]) { return TRUE; }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+
+function sirius_find_nid_by_id($sirius_id, $bundle) {
+  $sql = "select entity_id from field_data_field_sirius_id ";
+  $sql .= "where entity_type = 'node' ";
+  $sql .= "and bundle = :bundle ";
+  $sql .= "and field_sirius_id_value = :sirius_id ";
+  $stmt = db_query($sql, array(':bundle' => $bundle, ':sirius_id' => $sirius_id));
+  $hr = $stmt->fetchAssoc();
+  return $hr['entity_id'];
+}
+
+/**
+ * Implements hook_module_implements_alter
+ * 
+ * WTF am I doing here? 
+ *
+ * There is a module, "admin_menu", which generates a handy menu for developers.
+ * But among other things, it loads every single field instance in every single content type, so as to add those links to the menu.
+ * Which, when the menu is rebuilt, sometimes crashes out the server, or takes several minutes for the page to deliver.
+ * I don't want to hack or patch the module directly. So I'm implementing "module_implements_alter" to remove its implementation of 
+ * the hook which takes forever (which it's implementing on behalf of the field_ui module, very improperly.)
+ *
+ * Better would be to modify the module to not show the damn fields.
+ */
+
+function sirius_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'admin_menu_map') {
+    unset($implementations['field_ui']);
+  }
+}
+
+/**
+ * Implements hook_sirius_jsonfield_form_definitions()
+ */
+
+function sirius_sirius_jsonfield_form_definitions() {
+  $definition = array();
+  $definition += sirius_letterhead_sirius_jsonfield_form_definitions();
+  return $definition;
+}
+
+/**
+ * Implements hook_file_download_access
+ */
+
+function sirius_file_download_access($file_item, $entity_type, $entity) {
+  if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
+}
+

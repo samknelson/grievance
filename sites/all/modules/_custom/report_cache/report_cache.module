@@ -11,7 +11,6 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/r
 function report_cache_menu() {
   $items = array();
 
-	// Report Cache
 	$items['admin/reports/report-cache'] = array(
 		'title' => 'Report Cache',
 		'description' => '',
@@ -40,6 +39,22 @@ function report_cache_menu() {
 		'access arguments' => array('access site reports'),
 		'type' => MENU_NORMAL_ITEM,
 	);
+
+	// Create menu items for the form for each report type
+	$report_type_infos = module_invoke_all('report_cache_info');
+	foreach ($report_type_infos as $report_type => $info) {
+		if ($info['path']) { continue; }
+		if (!$info['form_callback']) { continue; }
+
+		$path = 'sirius/report-cache/' . $report_type . '/form';
+		$item = array();
+		$item['title'] = 'Report - ' . $info['name'];
+		$item['description'] = $info['description'];
+		$item['page callback'] = 'drupal_get_form';
+		$item['page arguments'] = array($info['form_callback'], $report_type);
+		$item['access arguments'] = array($info['access']);
+		$items[$path] = $item;
+	}
 
   return $items;
 }

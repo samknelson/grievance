@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * Implements hook_init
+ * 
+ * This is an alternative to the "TFA Required Roles" functionality in tfa_basic.
+ * The "Required Roles" disallows login altogether, which makes it hard for users to self-provision TFA.
+ *
+ * With this module, users with the "sirius tfa required" role are permitted to sign in, but
+ * they are always redirected to their TFA provisioning page if they're not provisioned.
+ * 
+ */
+
+/*
+function sirius_tfa_init() {
+	// Only relevant if there's an authenticated user
+	global $user;
+	if (!$user) { return; }
+
+	// Only relevant if the user has one of the required roles.
+	if (!in_array('sirius tfa required', $user->roles)) { return; }
+
+  $tfa = tfa_get_process($user);
+  if ($tfa->ready()) { return; }
+  drupal_set_message("Ready: " . $tfa->ready());
+
+  $item = menu_get_item();
+  dpm($item);
+}
+*/

@@ -7,6 +7,7 @@ function grievance_letter_form_change_letter_callback($form, $form_state) {
   $commands[] = ajax_command_replace("#grievance-letter-form-replace-subject", render($form['recipients']['extra']['subject']));
   $commands[] = ajax_command_replace("#grievance-letter-form-replace-body", render($form['recipients']['extra']['body']));
   $commands[] = ajax_command_replace("#grievance-letter-form-replace-update-rep", render($form['recipients']['extra']['update_company_representative']));
+  $commands[] = ajax_command_replace("#grievance-letter-form-replace-logging", render($form['dest']['logging']));
 
   return array(
     '#type' => 'ajax',
@@ -84,13 +85,19 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	}
 
 	if (user_access('grievance letter variable letterhead')) {
+		// @todo: I'm supporting some crappy legacy code here.
+		$options = array('no' => t('No Letterhead'));
+		if (variable_get('grievance_gform_wkhtmltopdfargs', '')) {
+			$options['yes'] = t('Standard Letterhead');
+		}
+		$letterheads = sirius_letterhead_list();
+		foreach ($letterheads as $nid => $title) {
+			$options[$nid] = $title;
+		}
 	  // Letterhead
 	  $form['letter']['letterhead'] = array(
 	    '#type' => 'select',
-	    '#options' => array(
-	    	'no' => t('No Letterhead'),
-	    	'yes' => t('Standard Letterhead'),
-	    ),
+	    '#options' => $options,
 	    '#title' => t('Letterhead'),
 	  );
 	}
@@ -375,23 +382,6 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 		'#prefix' => '</div>'
 	);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Fax Recipients
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -468,7 +458,12 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     '#type' => 'select',
     '#options' => $log_type_options,
     '#title' => t('Save letter to the log as'),
+		'#prefix' => '<div id="grievance-letter-form-replace-logging">',
+		'#suffix' => '</div>',
   );
+	$letter_nid = $form_state['values']['letter_nid_0'];
+	$letter_node = node_load($letter_nid);
+	$form_state['input']['logging'] = $letter_node->field_grievance_log_type['und'][0]['tid'];
 
   $form['dest']['submit'] = array(
     '#type' => 'submit',

@@ -1,0 +1,19 @@
+#primary-tasks, 
+#block-trustfund-trustfund-quicksearch,
+#block-trustfund-trustfund-quicksearch-sub,
+.user-links,
+.region-banner,
+#breadcrumb,
+#topbar,
+.add-or-remove-shortcuts {
+	display: none;
+}
+
+.page-node-payperiod-invoice td {
+	padding: 5px;
+}
+
+
+#main-content .views-table {
+	width: 100%;
+}

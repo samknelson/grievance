@@ -5,6 +5,16 @@ function grievance_report_open_by_specialist() {
 }
 
 function grievance_report_open_by_specialist_form($form, &$form_state) {
+	$broughtby_options = sirius_taxonomy_load('grievance_broughtby', 'tid', 'name');
+	if (count($broughtby_options) > 1) {
+		$broughtby_options = array(NULL => 'All Entities') + $broughtby_options;
+	  $form['broughtby'] = array(
+	    '#type' => 'select',
+	    '#title' => t('Brought By'),
+	    '#options' => $broughtby_options,
+	  );
+	}
+
   $form['organizer'] = array(
     '#type' => 'entityreference',
     '#title' => t('Organizer'),
@@ -24,12 +34,18 @@ function grievance_report_open_by_specialist_form($form, &$form_state) {
   $form['shop_match'] = array(
     '#type' => 'select',
     '#title' => t('Exact match on shop name?'),
-    '#options' => array('No' => 'No', 'Yes' => 'Yes'),
+    '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
+  );
+
+  $form['classaction'] = array(
+    '#type' => 'select',
+    '#title' => t('General Grievances Only?'),
+    '#options' => array(NULL => t('Both Individual and General'), 'No' => t('Individual Grievnaces Only'), 'Yes' => t('General / Class Action Grievances Only')),
   );
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Generate Report',
+    '#value' => t('Generate Report'),
     '#suffix' => '</div>',
   );
 
@@ -85,9 +101,20 @@ function grievance_report_open_by_specialist_form_submit($form, &$form_state) {
 		$shop_str = join('+', $shops);
 	}
 
+	// Broughtby
+	$broughtby = 'all';
+	if ($form_state['values']['broughtby']) { $broughtby = $form_state['values']['broughtby']; }
+
+	$classaction = $form_state['values']['classaction'];
+
 	$results = '';
 	foreach ($organizers as $organizer_uid) {
-		$tmp = views_embed_view('grievance_open_report', 'page', $organizer_uid, $shop_str);
+		if ($classaction) {
+			drupal_set_message("Here with all/$organizer_uid/$shop_str/$classaction");
+			$tmp = views_embed_view('grievance_open_report', 'page', $broughtby, $organizer_uid, $shop_str, $classaction);
+		} else {
+			$tmp = views_embed_view('grievance_open_report', 'page', $broughtby, $organizer_uid, $shop_str);
+		}
 		if (preg_match('/table/', $tmp)) {
 			$organizer = user_load($organizer_uid);
 			$results .= '<h2>' . $organizer->name . '</h2>' . $tmp;

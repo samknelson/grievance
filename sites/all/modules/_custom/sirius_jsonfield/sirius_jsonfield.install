@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Implements hook_field_schema().
+ */
+function sirius_jsonfield_field_schema($field) {  
+  return array(                  
+    'columns' => array(           
+      'value' => array(          
+        'type' => 'text',
+        'size' => 'big',
+	      'not null' => FALSE,
+      ), 
+    ), 
+  );
+}

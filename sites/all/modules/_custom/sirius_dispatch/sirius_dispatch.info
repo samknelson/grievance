@@ -1,0 +1,4 @@
+name = Sirius Dispatch
+description = Implements functionality for the dispatch application
+package = sirius
+core = 7.x

@@ -1,0 +1,16 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.client.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.incoming.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.outgoing.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.handler.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.admin.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.page_test.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.page_phone.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.page_calllog.inc';

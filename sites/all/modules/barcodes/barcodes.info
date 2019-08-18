@@ -1,0 +1,10 @@
+name = Barcodes
+description = Generate barcodes
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2017-07-12
+version = "7.x-1.3"
+core = "7.x"
+project = "barcodes"
+datestamp = "1499844249"
+

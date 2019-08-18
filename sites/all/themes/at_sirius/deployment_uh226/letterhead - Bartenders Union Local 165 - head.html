@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+	<title></title>
+
+		<script>  
+    function first_page_only() {
+	    var page_params = {};
+	    var x = document.location.search.substring(1).split('&');
+	    for (var i in x) { var z = x[i].split('=',2); page_params[z[0]] = unescape(z[1]); }
+        var page = page_params.page || 1;
+
+        if(page != 1) {
+					document.getElementById('first-page-only').style.display = 'none';
+        }
+    }
+		</script>  
+	</head>  
+	<body style="margin-left: auto; margin-right: auto;" onLoad="first_page_only();">
+		<div style="padding: 0; margin: 0;" id="first-page-only"><img src="/sites/all/themes/at_tf_admin/deployment_uh226/letterhead - Bartenders Union Local 165 - head.png" style="width: 100%;"></div>
+	</body>
+</html>

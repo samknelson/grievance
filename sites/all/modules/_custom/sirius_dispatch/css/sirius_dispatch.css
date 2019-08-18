@@ -1,0 +1,92 @@
+#sirius_dispatch_operator_devices { 
+	display: none;
+}
+
+
+#sirius_dispatch_operator_volume {
+	padding: 10px;
+	margin-top: 20px;
+	width: 500px;
+	height: 15px;
+}
+
+#sirius_dispatch_operator_volume_input_wrapper,
+#sirius_dispatch_operator_volume_output_wrapper {
+	height: 10px;
+	width: 100px;
+	display: inline-block;
+	padding-right: 10px;
+}
+
+#sirius_dispatch_operator_volume_input,
+#sirius_dispatch_operator_volume_output {
+	height: 10px;
+	width: 100px;
+	display: inline-block;
+}
+
+#sirius_dispatch_operator_callback_requested_list {
+	min-height: 200px;
+}
+
+#sirius_dispatch_operator_call_controls {
+	padding-bottom: 10px;
+}
+
+#content #sirius_dispatch_operator_dispatch_tabs .ui-widget,
+#content #sirius_dispatch_operator_dispatch_tabs h2.field-label
+{
+	font-size: 12px;
+}
+
+
+#sirius_dispatch_operator_dispatch_tabs div.node-sirius-dispatch.node-teaser {
+	padding: 0;
+	margin: 0;
+}
+
+#sirius_dispatch_operator_queue tr.active {
+	background-color: #aaf7ae;
+}
+
+#sirius_dispatch_operator_queue tr:hover {
+	background-color: #f7e1aa;
+}
+
+#sirius_dispatch_operator_statusbar {
+	border: 1px solid #333333;
+	color: #ffffff;
+	background-color: #333333;
+	padding: 10px;
+	margin: 0;
+}
+
+.page-sirius-dispatch-operator #breadcrumb {
+	display: none;
+}
+
+.page-sirius-dispatch-operator #columns,
+.page-sirius-dispatch-operator #main-content {
+	padding-top: 0;
+}
+
+.page-sirius-dispatch-operator #main-content-header {
+	min-height: 0;
+}
+
+#sirius_dispatch_operator_dispatch_tabs .contextual-links {
+	display: none;
+}
+
+#sirius_dispatch_operator_dispatch_tabs h2.field-label {
+	min-width: 90px;
+}
+
+
+.page-sirius-dispatch-operator #admin-menu-wrapper {
+	display: none;
+}
+
+html body.page-sirius-dispatch-operator {
+	margin-top: 0 !important;
+}

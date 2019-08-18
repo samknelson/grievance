@@ -1,7 +1,6 @@
 <?php
 
 function grievance_contract_template_node_tab_rules($contract_template_node) {
-  drupal_set_title($contract_template_node->title . ': ' . t('Rules'));
   $entity_nid = $contract_template_node->nid;
 
   $result .= grievance_node_tab_get_addlink(
@@ -26,7 +25,6 @@ function grievance_contract_template_node_tab_rules($contract_template_node) {
 }
 
 function grievance_contract_template_node_tab_notifications($contract_template_node) {
-  drupal_set_title($contract_template_node->title . ': ' . t('Notifications'));
   $entity_nid = $contract_template_node->nid;
 
   $result .= grievance_node_tab_get_addlink("grievance-contract-rule", array("grievance_contract_tplt" => $entity_nid));
@@ -39,7 +37,10 @@ function grievance_contract_template_node_tab_notifications($contract_template_n
 }
 
 function grievance_contract_template_node_tab_clauses($contract_template_node) {
-  drupal_set_title($contract_template_node->title . ': ' . t('Sections'));
+  drupal_goto('/node/' . $contract_template_node->nid . '/clauses/list');
+}
+
+function grievance_contract_template_node_tab_clauses_list($contract_template_node) {
   $entity_nid = $contract_template_node->nid;
 
   $result = '';
@@ -54,7 +55,10 @@ function grievance_contract_template_node_tab_clauses($contract_template_node) {
 }
 
 function grievance_contract_section_node_tab_clauses($contract_section_node) {
-  drupal_set_title($contract_section_node->title . ': ' . t('Sections'));
+  drupal_goto('node/' . $contract_section_node->nid . '/clauses/list');
+}
+
+function grievance_contract_section_node_tab_clauses_list($contract_section_node) {
   $contract_section_nid = $contract_section_node->nid;
 
   $contract_template_nid = $contract_section_node->field_grievance_contract_tplt['und'][0]['target_id'];
@@ -84,8 +88,244 @@ function grievance_contract_section_node_tab_clauses($contract_section_node) {
   return $result;
 }
 
+function grievance_contract_section_node_tab_clauses_bulk($contract_section_node) {
+  return drupal_get_form('grievance_contract_section_node_tab_clauses_bulk_form', $contract_section_node);
+}
+         
+function grievance_contract_section_node_tab_clauses_bulk_form($form, &$form_state, $contract_section_node) {
+  $form_state['contract_section_node'] = $contract_section_node;
+  $contract_template_nid = $contract_section_node->field_grievance_contract_tplt['und'][0]['target_id'];
+  $contract_template_node = node_load($contract_template_nid);
+  $form['intro'] = array('#markup' => '<div class="sirius_form_intro">' . '[' . l(t('Back to @title', array('@title' => $contract_template_node->title)), 'node/' . $contract_template_nid . '/sections') . '] ' . '</div>');
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_contract_clause');
+  $query->fieldCondition('field_grievance_contract_section', 'target_id', $contract_section_node->nid);
+  $query->fieldOrderBy('field_grievance_weight', 'value');
+  $query->fieldOrderBy('field_grievance_label', 'value');
+  $stmt = $query->execute();
+  $section_nids = array();
+  if ($stmt['node']) {
+    $section_nids = array_keys($stmt['node']);
+  }
+  $section_nodes = node_load_multiple($section_nids);
+
+  $form['#tree'] = TRUE;
+
+  $max_weight = 0;
+  foreach ($section_nodes as $section_nid => $section_node) {
+    if ($section_node->field_grievance_weight['und'][0]['value'] > $max_weight) {
+      $max_weight = $section_node->field_grievance_weight['und'][0]['value'];
+    }
+    $form["section_${section_nid}"] = array(
+      '#type' => 'fieldset',
+      '#attributes' => array('class' => array('container-inline')), 
+    );
+    $form["section_${section_nid}"]["nid"] = array(
+      '#type' => 'value',
+      '#value' => $section_nid,
+    );
+    $form["section_${section_nid}"]["weight"] = array(
+      '#title' => t('Weight'),
+      '#type' => 'textfield',
+      '#default_value' => $section_node->field_grievance_weight['und'][0]['value'],
+      '#size' => 5,
+    );
+    $form["section_${section_nid}"]["number"] = array(
+      '#title' => t('Section #'),
+      '#type' => 'textfield',
+      '#default_value' => $section_node->field_grievance_label['und'][0]['value'],
+      '#size' => 10,
+    );
+    $form["section_${section_nid}"]["title"] = array(
+      '#title' => t('Title'),
+      '#type' => 'textfield',
+      '#default_value' => $section_node->title,
+    );
+    $form["section_${section_nid}"]["body"] = array(
+      '#type' => 'textarea',
+      '#default_value' => $section_node->field_grievance_clause['und'][0]['value'],
+      '#prefix' => '<div style="display: block;">',
+      '#suffix' => '</div>',
+    );
+  }
+
+  $blanks = $form_state['blanks'];
+  if (!$blanks) { $blanks = 3; }
+  if ($form_state['clicked_button']['#value'] == 'Add one') { $blanks++; }
+  if ($form_state['clicked_button']['#value'] == 'Add ten') { $blanks += 10; }
+  $form_state['blanks'] = $blanks;
+
+  $form['newsections'] = array(
+    '#type' => 'fieldset',
+    '#prefix' => '<div id="newsections">',
+    '#suffix' => '</div>',
+  );
+  for ($i=0; $i<$blanks; ++$i) {
+    $form['newsections']["newsection_${i}"] = array(
+      '#type' => 'fieldset',
+      '#attributes' => array('class' => array('container-inline')), 
+    );
+    $form['newsections']["newsection_${i}"]["weight"] = array(
+      '#title' => t('Weight'),
+      '#type' => 'textfield',
+      '#size' => 5,
+    );
+
+    if ($max_weight) {
+      $form['newsections']["newsection_${i}"]["weight"]['#default_value'] = $max_weight + $i + 1;
+    }
+
+    $form['newsections']["newsection_${i}"]["number"] = array(
+      '#title' => t('Clause #'),
+      '#type' => 'textfield',
+      '#size' => 10,
+    );
+    $form['newsections']["newsection_${i}"]["title"] = array(
+      '#title' => t('Title'),
+      '#type' => 'textfield',
+    );
+    $form['newsections']["newsection_${i}"]["body"] = array(
+      '#type' => 'textarea',
+      '#prefix' => '<div style="display: block;">',
+      '#suffix' => '</div>',
+    );
+  }
+
+  $form['newsections']['add_one'] = array(
+    '#type' => 'button',
+    '#value' => t('Add one'),
+    '#ajax' => array(
+      'callback' => 'grievance_contract_template_node_tab_sections_bulk_form_addone',
+      'wrapper' => 'newsections',
+    ),
+  );
+
+  $form['newsections']['add_ten'] = array(
+    '#type' => 'button',
+    '#value' => t('Add ten'),
+    '#ajax' => array(
+      'callback' => 'grievance_contract_template_node_tab_sections_bulk_form_addone',
+      'wrapper' => 'newsections',
+    ),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
+  return $form;
+}
+
+function grievance_contract_template_next_number($number) {
+  static $last = NULL;
+
+  $number = grievance_contract_template_clean_text($number);
+
+  $sequences = array(
+    array('i','ii','iii','iv','v','vi','vii','viii','ix','x','xi','xii','xiii','xiv','xv','xvi','xvii','xviii','xix','xx','xxi','xxii','xxiii','xxiv','xxv','xxvi'),
+    array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'),
+    array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'),
+    array(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,21,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50),
+  );
+
+  if ($number) {
+    if (!$last) {
+      // If we've never found a sequence, check them all.
+      foreach ($sequences as $idx => $sequence) {
+        $flip = array_flip($sequence);
+        if (isset($flip[$number])) {
+          $last = array($idx, $flip[$number]);
+          // drupal_set_message("Found INITIAL $number in " . print_r($flip, 1) . " and set last to " . print_r($last, 1));
+          break;
+        }
+      }
+    } else {
+      // Just check the seuqence we're in. 
+      $sequence = $sequences[$last[0]];
+      $flip = array_flip($sequence);
+      if (isset($flip[$number])) {
+        $last = array($last[0], $flip[$number]);
+        // drupal_set_message("Found $number in " . print_r($flip, 1) . " and set " . print_r($last, 1));
+      }
+    }
+
+    return $number;
+  }
+
+  if (!$last) {
+    return '';
+  }
+
+  $last = array($last[0], $last[1]+1);
+  return $sequences[$last[0]][$last[1]];
+}
+
+function grievance_contract_section_node_tab_clauses_bulk_form_submit($form, &$form_state) {
+  $contract_section_node = $form_state['contract_section_node'];
+  $contract_template_nid = $contract_section_node->field_grievance_contract_tplt['und'][0]['target_id'];
+  $contract_template_node = node_load($contract_template_nid);
+
+  // Update existing clauses
+  foreach ($form_state['values'] as $name => $value) {
+    if (!preg_match('/^section_\d+$/', $name)) { continue; }
+    $nid = $value['nid'];
+    $title = grievance_contract_template_clean_text($value['title']);
+    $weight = grievance_contract_template_clean_text($value['weight']);
+    $body = grievance_contract_template_clean_text($value['body']);
+    if (!$weight) { $weight = 0; }
+
+    if (!$title && !$body) {
+      node_delete($nid);
+    } else {
+      $number = grievance_contract_template_next_number($value['number']);
+      $clause_node = node_load($nid);
+      $clause_node->title = $title;
+      $clause_node->field_grievance_weight['und'][0]['value'] = $weight;
+      $clause_node->field_grievance_label['und'][0]['value'] = $number;
+      $clause_node->field_grievance_clause['und'][0]['value'] = $body;
+      node_save($clause_node);
+    }
+  }
+
+  // Create new clauses
+  global $user;
+  foreach ($form_state['values']['newsections'] as $name => $value) {
+    if (!preg_match('/^newsection_\d+$/', $name)) { continue; }
+    $nid = $value['nid'];
+    $title = grievance_contract_template_clean_text($value['title']);
+    $weight = grievance_contract_template_clean_text($value['weight']);
+    $body = grievance_contract_template_clean_text($value['body']);
+    if (!$weight) { $weight = 0; }
+    if (!$title && !$body) { continue; }
+
+    $number = grievance_contract_template_next_number($value['number']);
+    $clause_node = new stdClass();
+    $clause_node->title = $title;
+    $clause_node->type = 'grievance_contract_clause';
+    node_object_prepare($clause_node);
+    $clause_node->language = LANGUAGE_NONE;
+    $clause_node->uid = $user->uid; 
+    $clause_node->status = 1;
+    $clause_node->promote = 0;
+    $clause_node->comment = 0;
+    $clause_node->field_grievance_contract_tplt = array('und' => array(array('target_id' => $contract_template_node->nid)));
+    $clause_node->field_grievance_contract_section = array('und' => array(array('target_id' => $contract_section_node->nid)));
+    $clause_node->field_grievance_weight['und'][0]['value'] = $weight;
+    $clause_node->field_grievance_label['und'][0]['value'] = $number;
+    $clause_node->field_grievance_clause['und'][0]['value'] = $body;
+    node_save($clause_node);
+
+  }
+}
+
 function grievance_contract_template_node_tab_sections($contract_template_node) {
-  drupal_set_title($contract_template_node->title . ': ' . t('Articles'));
+  drupal_goto('node/' . $contract_template_node->nid . '/sections/list');
+}
+
+function grievance_contract_template_node_tab_sections_list($contract_template_node) {
   $entity_nid = $contract_template_node->nid;
 
   $result = '';
@@ -98,7 +338,6 @@ function grievance_contract_template_node_tab_sections($contract_template_node) 
 }
 
 function grievance_contract_template_node_tab_full($contract_template_node) {
-  drupal_set_title($contract_template_node->title . ': ' . t('Full Text'));
   $entity_nid = $contract_template_node->nid;
 
   $result = views_embed_view('grievance_contract_clauses', 'block_1', $entity_nid);
@@ -107,8 +346,16 @@ function grievance_contract_template_node_tab_full($contract_template_node) {
   return $result;
 }
 
+function grievance_contract_template_node_tab_picker($contract_template_node) {
+  $entity_nid = $contract_template_node->nid;
+
+  drupal_add_js(drupal_get_path('module', 'grievance') . '/js/grievance.clause-picker.js');
+  $result = views_embed_view('grievance_contract_clauses', 'block_3', $entity_nid);
+
+  return $result;
+}
+
 function grievance_contract_template_node_tab_pdf($contract_template_node) {
-  drupal_set_title($contract_template_node->title . ': ' . t('PDF'));
   $entity_nid = $contract_template_node->nid;
 
   $result = '';
@@ -476,15 +723,6 @@ function grievance_contract_update_dummies($trigger_node) {
   }
 }
 
-//
-// Not using these functions at the moment, @todo probably safe to remove
-//
-
-function grievance_contract_clause_updateinsert($node) { }
-function grievance_contract_section_updateinsert($node) { }
-function grievance_contract_template_updateinsert($node) { }
-
-
 function grievance_contract_views_pre_build(&$view) {
   // When an admin is editing a grievance clause, they select the contract section from a view.  The view should be restricted
   // to just the contract template that they're working i.
@@ -502,8 +740,6 @@ function grievance_contract_views_pre_build(&$view) {
     }
   }
 
-  //dpm($view->display_handler);
-  //dpm($view);
   if ( ($view->name == 'grievance_contract_clauses' && $view->current_display == 'views_data_export_1') ||
        ($view->name == 'grievance_contract_clauses' && $view->current_display == 'views_data_export_2') ||
        ($view->name == 'grievance_contract_sections' && $view->current_display == 'views_data_export_1') ) {
@@ -526,4 +762,330 @@ function grievance_contract_views_pre_build(&$view) {
 
     $view->display_handler->options['style_options']['filename'] = $filename;
   }
+
+  // drupal_set_message($view->name);
+  if ($view->name == 'grievance_contract_clauses') {
+    // dpm($view);
+    foreach ($view->result as $tmp) {
+      // drupal_set_message("Here.");
+    }
+  }
 }
+
+function grievance_contract_views_secondary_row_view_table(&$vars) {
+  // Add article tag CSS classes to each applicable row
+  if ($vars['view']->name == 'grievance_contract_clauses' && $vars['view']->result) {
+    $article_tag_lookup = array();
+    foreach ($vars['view']->result as $key => $row){
+      if (!$row->field_field_grievance_cont_sec_tags) { continue; }
+      foreach ($row->field_field_grievance_cont_sec_tags as $tmp) {
+        $tid = $tmp['raw']['tid'];
+        if (!$tid) { continue; }
+        if (!$article_tag_lookup[$tid]) {
+          $article_tag_lookup[$tid] = taxonomy_term_load($tid);
+        }
+        $class_name = $article_tag_lookup[$tid]->field_sirius_css_class['und'][0]['value'];
+        if (!$class_name) { continue; }
+        $vars['row_classes'][2*$key][] = $class_name;
+        $vars['row_classes'][2*$key+1][] = $class_name;
+      }
+    }
+  }
+}
+
+function grievance_contract_template_node_tab_sections_bulk($contract_template_node) { 
+  return drupal_get_form('grievance_contract_template_node_tab_sections_bulk_form', $contract_template_node); 
+}
+
+function grievance_contract_template_node_tab_sections_bulk_form($form, &$form_state, $contract_template_node) {
+  $form_state['contract_template_node'] = $contract_template_node;
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_contract_section');
+  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_template_node->nid);
+  $query->fieldOrderBy('field_grievance_weight', 'value');
+  $query->fieldOrderBy('field_grievance_section_number', 'value');
+  $stmt = $query->execute();
+  $section_nids = array();
+  if ($stmt['node']) {
+    $section_nids = array_keys($stmt['node']);
+  }
+  $section_nodes = node_load_multiple($section_nids);
+
+  $form['#tree'] = TRUE;
+
+  $max_weight = 0;
+  foreach ($section_nodes as $section_nid => $section_node) {
+    if ($section_node->field_grievance_weight['und'][0]['value'] > $max_weight) {
+      $max_weight = $section_node->field_grievance_weight['und'][0]['value'];
+    }
+    $form["section_${section_nid}"] = array(
+      '#type' => 'fieldset',
+      '#attributes' => array('class' => array('container-inline')), 
+    );
+    $form["section_${section_nid}"]["nid"] = array(
+      '#type' => 'value',
+      '#value' => $section_nid,
+    );
+    $form["section_${section_nid}"]["weight"] = array(
+      '#title' => t('Weight'),
+      '#type' => 'textfield',
+      '#default_value' => $section_node->field_grievance_weight['und'][0]['value'],
+      '#size' => 5,
+    );
+    $form["section_${section_nid}"]["number"] = array(
+      '#title' => t('Article #'),
+      '#type' => 'textfield',
+      '#default_value' => $section_node->field_grievance_section_number['und'][0]['value'],
+      '#size' => 10,
+    );
+    $form["section_${section_nid}"]["title"] = array(
+      '#title' => t('Title'),
+      '#type' => 'textfield',
+      '#default_value' => $section_node->title,
+    );
+  }
+
+  $blanks = $form_state['blanks'];
+  if (!$blanks) { $blanks = 3; }
+  if ($form_state['clicked_button']['#value'] == 'Add one') { $blanks++; }
+  if ($form_state['clicked_button']['#value'] == 'Add ten') { $blanks += 10; }
+  $form_state['blanks'] = $blanks;
+
+  $form['newsections'] = array(
+    '#type' => 'fieldset',
+    '#prefix' => '<div id="newsections">',
+    '#suffix' => '</div>',
+  );
+  for ($i=0; $i<$blanks; ++$i) {
+    $form['newsections']["newsection_${i}"] = array(
+      '#type' => 'fieldset',
+      '#attributes' => array('class' => array('container-inline')), 
+    );
+    $form['newsections']["newsection_${i}"]["weight"] = array(
+      '#title' => t('Weight'),
+      '#type' => 'textfield',
+      '#size' => 5,
+    );
+
+    if ($max_weight) {
+      $form['newsections']["newsection_${i}"]["weight"]['#default_value'] = $max_weight + $i + 1;
+    }
+
+    $form['newsections']["newsection_${i}"]["number"] = array(
+      '#title' => t('Article #'),
+      '#type' => 'textfield',
+      '#size' => 10,
+    );
+    $form['newsections']["newsection_${i}"]["title"] = array(
+      '#title' => t('Title'),
+      '#type' => 'textfield',
+    );
+  }
+
+  $form['newsections']['add_one'] = array(
+    '#type' => 'button',
+    '#value' => t('Add one'),
+    '#ajax' => array(
+      'callback' => 'grievance_contract_template_node_tab_sections_bulk_form_addone',
+      'wrapper' => 'newsections',
+    ),
+  );
+
+  $form['newsections']['add_ten'] = array(
+    '#type' => 'button',
+    '#value' => t('Add ten'),
+    '#ajax' => array(
+      'callback' => 'grievance_contract_template_node_tab_sections_bulk_form_addone',
+      'wrapper' => 'newsections',
+    ),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+
+  return $form;
+}
+
+function grievance_contract_template_node_tab_sections_bulk_form_submit($form, &$form_state) {
+  $contract_template_node = $form_state['contract_template_node'];
+
+  // Update existing articles
+  foreach ($form_state['values'] as $name => $value) {
+    if (!preg_match('/^section_\d+$/', $name)) { continue; }
+    $nid = $value['nid'];
+    $title = grievance_contract_template_clean_text($value['title']);
+    $weight = grievance_contract_template_clean_text($value['weight']);
+    $number = grievance_contract_template_clean_text($value['number']);
+
+    if (!$title) {
+      node_delete($nid);
+    } else {
+      $section_node = node_load($nid);
+      $section_node->title = $title;
+      $section_node->field_grievance_weight['und'][0]['value'] = $weight;
+      $section_node->field_grievance_section_number['und'][0]['value'] = $number;
+      node_save($section_node);
+    }
+  }
+
+  // Create new articles
+  global $user;
+  foreach ($form_state['values']['newsections'] as $name => $value) {
+    if (!preg_match('/^newsection_\d+$/', $name)) { continue; }
+    $nid = $value['nid'];
+    $title = grievance_contract_template_clean_text($value['title']);
+    $weight = grievance_contract_template_clean_text($value['weight']);
+    $number = grievance_contract_template_clean_text($value['number']);
+    if (!$title) { continue; }
+
+    $section_node = new stdClass();
+    $section_node->title = $title;
+    $section_node->type = 'grievance_contract_section';
+    node_object_prepare($section_node);
+    $section_node->language = LANGUAGE_NONE;
+    $section_node->uid = $user->uid; 
+    $section_node->status = 1;
+    $section_node->promote = 0;
+    $section_node->comment = 0;
+    $section_node->field_grievance_contract_tplt = array('und' => array(array('target_id' => $contract_template_node->nid)));
+    if ($weight) {
+      $section_node->field_grievance_weight['und'][0]['value'] = $weight;
+    }
+    $section_node->field_grievance_section_number['und'][0]['value'] = $number;
+    node_save($section_node);
+
+  }
+}
+
+function grievance_contract_template_node_tab_sections_bulk_form_addone($form, $form_state) {
+  $commands = array();
+  $commands[] = ajax_command_replace("#newsections", render($form['newsections']));
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands
+  );
+}
+
+function grievance_contract_template_clean_text($text) {
+  // Get rid of leading and trailing.
+  $text = trim($text);
+  $text = preg_replace('/\r/', '', $text);
+
+  // 1. Whatever
+  $text = preg_replace('/\n(\d+)([\.\):])/', '{lf}$1$2', $text);
+
+  // ii. Whatever
+  $text = preg_replace('/\n([iv]+)([\.\):])/', '{lf}$1$2', $text);
+
+  // a. Whatever
+  $text = preg_replace('/\n([a-zA-Z])([\.\):])/', '{lf}$1$2', $text);
+
+  // (1) Whatever
+  $text = preg_replace('/\n\((\d+)\)/', '{lf}($1)', $text);
+
+  // Whatever:
+  $text = preg_replace('/:\n/', ':{lf}', $text);
+
+  // (a) Whatever
+  $text = preg_replace('/\n\(([a-z])\)\s+/', '{lf}($1) ', $text);
+
+  // (iv) Whatever
+  $text = preg_replace('/\n\(([iv]+)\)\s+/', '{lf}($1) ', $text);
+
+  $text = preg_replace('/\s*\n\n\s*/', "{lf}", $text);
+  $text = preg_replace('/\s+/', ' ', $text);
+  $text = preg_replace('/({lf})+/', "\n\n", $text);
+
+  // Convert 
+  return $text;
+}
+
+function grievance_contract_template_node_tab_clause_bulk_rename($contract_template_node) { 
+  return drupal_get_form('grievance_contract_template_node_tab_clause_bulk_rename_form', $contract_template_node); 
+}
+
+function grievance_contract_template_node_tab_clause_bulk_rename_form($form, &$form_state, $contract_template_node) {
+  $form_state['contract_template_node'] = $contract_template_node;
+
+  $form['#markup'] = array('<div class="sirius_form_intro">' . t('Each section number should begin with the article number. This utility will rename all sections to include the article name, if it is not already there.'));
+
+  $form['mode'] = array(
+    '#type' => 'select', 
+    '#required' => TRUE, 
+    '#title' => t('Mode'),
+    '#options' => array(
+      'test' => t('Test Mode'),
+      'live' => t('Live Mode'),
+    ),
+  );
+
+  $form['separator'] = array(
+    '#type' => 'textfield', 
+    '#required' => TRUE, 
+    '#title' => t('Separator between the article number and the section number'),
+    '#default_value' => ': ',
+  );
+
+  $form['confirm'] = array('#type' => 'checkbox', '#required' => TRUE, '#title' => t('Yes, rename all sections in this contract now.'));
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+  return $form;
+}
+
+function grievance_contract_template_node_tab_clause_bulk_rename_form_submit($form, &$form_state) {
+  $contract_template_node = $form_state['contract_template_node'];
+
+  $separator = $form_state['values']['separator'];
+  $mode = $form_state['values']['mode'];
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_contract_clause');
+  $query->fieldCondition('field_grievance_contract_tplt', 'target_id', $contract_template_node->nid);
+  $query->propertyOrderBy('nid');
+  $stmt = $query->execute();
+  $clause_nids = array();
+  if ($stmt['node']) {
+    $clause_nids = array_keys($stmt['node']);
+  }
+
+  $operations = array();
+  foreach ($clause_nids as $clause_nid) {
+    $operations[] = array(
+      'grievance_contract_template_node_tab_clause_bulk_rename_operation', 
+      array($clause_nid, $mode, $separator),
+    );
+  }
+  $batch = array('operations' => $operations);
+  batch_set($batch);
+}
+
+function grievance_contract_template_node_tab_clause_bulk_rename_operation($clause_nid, $mode, $separator) {
+  $clause_node = node_load($clause_nid);
+  $section_node = node_load($clause_node->field_grievance_contract_section['und'][0]['target_id']);
+
+  if (!$clause_node || !$section_node) { return; }
+  
+  $clause_label = $clause_node->field_grievance_label['und'][0]['value'];
+  $section_label = $section_node->field_grievance_section_number['und'][0]['value'];
+  if (!$clause_label || !$section_label) { return; }
+
+  if (strpos($clause_label, "$section_label$separator") !== FALSE) { return; }
+  $old_clause_label = $clause_label;
+  $clause_label = "$section_label$separator$clause_label";
+
+  drupal_set_message("Renaming $old_clause_label to $clause_label");
+
+  if ($mode == 'live') {
+    $clause_node->field_grievance_label['und'][0]['value'] = $clause_label;
+    node_save($clause_node);
+  }
+}
+

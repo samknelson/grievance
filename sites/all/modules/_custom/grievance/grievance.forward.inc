@@ -16,16 +16,16 @@ function grievance_forward_loopback($node) {
 function grievance_forward_loopback_access($node) {
 	if ($_SERVER['SERVER_ADDR'] == $_SERVER['REMOTE_ADDR'] ||
 		  $_SERVER['SERVER_ADDR'] == $_SERVER['HTTP_X_FORWARDED_FOR'] ||
-		  $_SERVER['SERVER_ADDR'] == variable_get('grievance_loopback_ip', '')) { 
+		  variable_get('grievance_loopback_ip', '') == $_SERVER['REMOTE_ADDR'] || 
+		  variable_get('grievance_loopback_ip', '') == $_SERVER['HTTP_X_FORWARDED_FOR'] ||
+		  '35.161.76.142' == $_SERVER['REMOTE_ADDR'] ||
+		  '35.161.76.142' == $_SERVER['HTTP_X_FORWARDED_FOR']) {
 		return TRUE; 
 	}
-	return FALSE;
-}
 
-function grievance_custom_theme() {
-	if (preg_match('/^node\/\d+\/loopback$/', current_path())) {
-		return 'at_tf_admin';
-	}
+	if (user_access('sirius admin')) { return TRUE; }
+
+	return FALSE;
 }
 
 function grievance_node_tab_forward($node) {

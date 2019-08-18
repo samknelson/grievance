@@ -1,7 +1,8 @@
 <?php
 
 function grievance_home() {
-	drupal_goto('grievances/mine/');
+	$path = variable_get('grievance_home_path', 'grievances/mine');
+	drupal_goto($path);
 }
 
 function grievance_all() {
@@ -53,10 +54,6 @@ function grievance_mine_reminder_no_first_call() {
 	$view_name = variable_get('grievance_mine_view_name', 'grievances_mine');
 	$display_name = variable_get('grievance_mine_view_display', 'page_1');
   return views_embed_view($view_name, $display_name, 'reminder_no_first_call');
-}
-
-function grievance_mine_views_exposed_form_alter($form, &$form_state) {
-	
 }
 
 function grievance_views_query_alter_grievances_mine(&$view, &$query) {
@@ -245,7 +242,7 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 
 			if ($entry['count']) {
 				$msgs[] = t(
-					'Warning: there are <strong>@count</strong> messages with <a href="@url">@title</a>.', 
+					'Warning: there are <strong>@count</strong> grievances with <a href="@url">@title</a>.', 
 					array(
 						'@count' => $entry['count'], 
 						'@title' => $entry['title'], 

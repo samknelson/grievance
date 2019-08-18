@@ -1,0 +1,4 @@
+name = Sirius
+description = Shared functionality for the Sirius Suite
+core = 7.x
+package = sirius

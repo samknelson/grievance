@@ -61,6 +61,13 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance statuslog'),
 	);
 
+	$node_tabs['grievance']['status_correct'] = array(
+		'title' => 'Status Correct',
+		'description' => '',
+		'callback' => 'grievance_node_tab_status_correct',
+		'permissions' => array('grievance admin'),
+	);
+
 	$node_tabs['grievance']['attachments'] = array(
 		'title' => 'Attachments',
 		'description' => '',
@@ -130,7 +137,7 @@ function grievance_node_tabs() {
 		'title' => 'Contacts',
 		'description' => '',
 		'callback' => 'grievance_shop_node_tab_contacts',
-		'permissions' => array('grievance contact'),
+		'permissions' => array(),
 	);
 
 	$node_tabs['grievance_company']['contacts'] = array(
@@ -161,12 +168,73 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance contract view'),
 	);
 
+	$node_tabs['grievance_contract_template']['sections/list'] = array(
+		'title' => 'List',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_sections_list',
+		'permissions' => array('grievance contract view'),
+		'weight' => 1,
+	);
+
+	$node_tabs['grievance_contract_template']['sections/bulk'] = array(
+		'title' => 'Bulk Edit',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_sections_bulk',
+		'permissions' => array('grievance contract'),
+		'weight' => 2,
+	);
+
+
+
 	$node_tabs['grievance_contract_template']['clauses'] = array(
 		'title' => 'Sections',
 		'description' => '',
 		'callback' => 'grievance_contract_template_node_tab_clauses',
 		'permissions' => array('grievance contract view'),
 	);
+
+	$node_tabs['grievance_contract_template']['clauses/list'] = array(
+		'title' => 'Sections',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_clauses_list',
+		'permissions' => array('grievance contract view'),
+		'weight' => 1,
+	);
+
+	$node_tabs['grievance_contract_template']['clauses/full'] = array(
+		'title' => 'Full Text',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_full',
+		'permissions' => array('grievance contract view'),
+		'weight' => 2,
+	);
+
+	$node_tabs['grievance_contract_template']['clauses/pdf'] = array(
+		'title' => 'PDF',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_pdf',
+		'permissions' => array('grievance contract view'),
+		'weight' => 3,
+	);
+
+	$node_tabs['grievance_contract_template']['clauses/picker'] = array(
+		'title' => 'Clause Picker',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_picker',
+		'permissions' => array('grievance contract view'),
+		'weight' => 4,
+	);
+
+	$node_tabs['grievance_contract_template']['clauses/bulk-rename'] = array(
+		'title' => 'Bulk Rename',
+		'description' => '',
+		'callback' => 'grievance_contract_template_node_tab_clause_bulk_rename',
+		'permissions' => array('grievance contract edit'),
+		'weight' => 5,
+	);
+
+
+
 
 	$node_tabs['grievance_contract_section']['clauses'] = array(
 		'title' => 'Sections',
@@ -175,18 +243,20 @@ function grievance_node_tabs() {
 		'permissions' => array('grievance contract view'),
 	);
 
-	$node_tabs['grievance_contract_template']['full'] = array(
-		'title' => 'Full Text',
+	$node_tabs['grievance_contract_section']['clauses/list'] = array(
+		'title' => 'List',
 		'description' => '',
-		'callback' => 'grievance_contract_template_node_tab_full',
-		'permissions' => array('grievance user view'),
+		'callback' => 'grievance_contract_section_node_tab_clauses_list',
+		'permissions' => array('grievance contract view'),
+		'weight' => 1,
 	);
 
-	$node_tabs['grievance_contract_template']['pdf'] = array(
-		'title' => 'PDF',
+	$node_tabs['grievance_contract_section']['clauses/bulk'] = array(
+		'title' => 'Bulk Edit',
 		'description' => '',
-		'callback' => 'grievance_contract_template_node_tab_pdf',
-		'permissions' => array('grievance user'),
+		'callback' => 'grievance_contract_section_node_tab_clauses_bulk',
+		'permissions' => array('grievance contract'),
+		'weight' => 2,
 	);
 
 	$node_tabs['grievance_contract_template']['holidays'] = array(
@@ -454,6 +524,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['admin/config/grievance/quicksearch'] = array(
+		'title' => 'Grievance Module - QuickSearch',
+		'description' => t('Settings for the quicksearch'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_quicksearch_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['admin/config/grievance/contacts'] = array(
 		'title' => 'Grievance Module - Contacts',
 		'description' => t('Contact-related settings'),
@@ -469,6 +548,15 @@ function grievance_menu() {
 		'page callback' => 'grievance_report_bytype',
 		'page arguments' => array(),
 		'access arguments' => array('grievance report bytype'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['grievance/report/shop-monthly'] = array(
+		'title' => 'Report: Count by Type',
+		'description' => '',
+		'page callback' => 'grievance_report_shop_monthly',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 
@@ -649,6 +737,14 @@ function grievance_node_tab_access($node, $in_tab_name) {
 					foreach ($tab_record['permissions'] as $permission) {
 						if (!user_access($permission)) { return false; }
 					}
+
+          // Check for a custom access permission
+          $access_function_name = $tab_record['callback'] . '_access';
+          if (function_exists($access_function_name)) {
+            if (!$access_function_name($node)) {
+              return false;
+            }
+          }
 					
 					return true;
 				}
@@ -677,15 +773,11 @@ function grievance_node_tab_get_addlink($content_type, $query, $prompt = NULL) {
 	$item = menu_get_item($path);
 	if (!$item['access']) { return ''; }
 	
-	$result = "<div class=\"unite-addlink\">";
-	$result .= '[';
 	$result .= l(
 		$prompt, 
 		$path,
-		array('query' => $query)
+		array('query' => $query, 'attributes' => array('class' => array('tool-button')))
 	);
-	$result .= ']';
-	$result .= "</div>";
 	
 	return $result;
 }
