@@ -38,6 +38,9 @@ function sirius_log(
     $log_node->field_sirius_attachments['und'] = $files;
   }
   if ($json) {
+    if (is_array($json) || is_object($json)) {
+      $json = json_encode($json);
+    }
     $log_node->field_sirius_json['und'][0]['value'] = $json;
   }
 
