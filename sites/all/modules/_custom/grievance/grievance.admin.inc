@@ -196,8 +196,8 @@ function grievance_admin() {
     '#type' => 'textarea',
   );
 
-  $form['grievance_from_email'] = array(
-    '#default_value' => variable_get('grievance_from_email', ''),
+  $form['sirius_email_default_from_address'] = array(
+    '#default_value' => variable_get('sirius_email_default_from_address', ''),
     '#title' => t('From Email'),
     '#description' => t('The "From" email for the system; must be configured so that the server is a legitimate sender from this email.'),
     '#type' => 'textfield',
