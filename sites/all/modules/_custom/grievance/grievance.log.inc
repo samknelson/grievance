@@ -694,8 +694,10 @@ function grievance_log_views_pre_render($view) {
     // Fetch the sirius log entries associated with each grievance log entry. Do it in one query
     // to avoid running too much sql.
     $grievance_log_nids = array();
-    foreach ($view->result as $row) { $grievance_log_nids[] = $row->nid; }
-    if (count($grievance_log_nids) > 5000) { break; }
+    foreach ($view->result as $row) { 
+      $grievance_log_nids[] = $row->nid;
+      if (count($grievance_log_nids) > 5000) { break; }
+    }
 
     // SQL for speed and to fetch just the fields we need
     $sql = "select node.nid, node.created, field_sirius_category_value, field_sirius_type_value, field_sirius_log_handler_target_id, field_sirius_summary_value ";
