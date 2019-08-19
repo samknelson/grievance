@@ -722,6 +722,10 @@ function grievance_views_pre_render(&$view) {
   if ($view->name == 'grievance_shop_contacts') {
     grievance_contacts_views_pre_render($view);
   }
+
+  if ($view->name == 'grievance_log') {
+    grievance_log_views_pre_render($view);
+  }
 }
 
 function grievance_views_post_execute(&$view) {
