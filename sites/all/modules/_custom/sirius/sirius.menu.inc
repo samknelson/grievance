@@ -183,6 +183,14 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/config/email/test'] = array(
+    'title' => 'Email Configuration Tester',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_email_test_form'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/config/sms'] = array(
     'title' => 'SMS Configuration',
     'page callback' => 'drupal_get_form',
@@ -287,6 +295,24 @@ function sirius_menu() {
     'access arguments' => array(),
     'page callback' => 'sirius_feed_page_landing',
     'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/sns/incoming'] = array(
+    'title' => 'SNS Incoming',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_sns_incoming',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/sns/config'] = array(
+    'title' => 'SNS Configuration',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_sns_config'),
     'type' => MENU_NORMAL_ITEM,
   );
 
