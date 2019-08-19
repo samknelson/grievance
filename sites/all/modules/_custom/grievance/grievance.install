@@ -456,3 +456,14 @@ function grievance_update_7027() {
   print "Enabling views_current_path\n";
   module_enable(array('views_current_path'), FALSE);
 }
+
+/**
+ * Set sirius_email_default_from_address from grievance_from_email
+ */
+
+function grievance_update_7028() {
+  if (!variable_get('sirius_email_default_from_address', '') && variable_get('grievance_from_email', '')) {
+    variable_set('sirius_email_default_from_address', variable_get('grievance_from_email', ''));
+    print "Set sirius_email_default_from_address = grievance_from_email = " . variable_get('sirius_email_default_from_address', '') . "\n";
+  }
+}
