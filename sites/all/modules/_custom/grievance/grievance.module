@@ -723,7 +723,7 @@ function grievance_views_pre_render(&$view) {
     grievance_contacts_views_pre_render($view);
   }
 
-  if ($view->name == 'grievance_log') {
+  if ($view->name == 'grievance_log' || $view->name == 'grievance_log_all') {
     grievance_log_views_pre_render($view);
   }
 }
