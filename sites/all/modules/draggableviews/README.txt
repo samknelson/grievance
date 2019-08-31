@@ -9,6 +9,8 @@ Quick install:
  3) Click Add button at the "Fields" section and choose field "Content:title", add and apply.
  4) Click Add button at the "Fields" section and choose field "Draggableviews: Content", add apply.
  5) Click Add button at the "Sort criteria" section and choose field "Draggableviews: Weight", add and choose sort asc, then apply.
+    (if using a drag handler that works on another field, then the field that
+    holds this must be added, eg taxonomy term weight).
  6) Save the view and you're done.
 
 In the case of table standard drupal tabledrag.js JavaScript is used.
