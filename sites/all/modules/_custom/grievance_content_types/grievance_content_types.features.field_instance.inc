@@ -18999,54 +18999,6 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
-  // Exported field_instance: 'node-sirius_worker-field_sirius_dispatch_sib'.
-  $field_instances['node-sirius_worker-field_sirius_dispatch_sib'] = array(
-    'bundle' => 'sirius_worker',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'If set to "Yes", the worker will not be permitted to sign themselves in (set their dispatch status).',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'list',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'list_default',
-        'weight' => 33,
-      ),
-      'sirius_worker' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_sirius_dispatch_sib',
-    'label' => 'Sign-In Blocked?',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'content_taxonomy_opt_groups' => FALSE,
-      ),
-      'type' => 'options_select',
-      'weight' => 37,
-    ),
-  );
-
   // Exported field_instance:
   // 'node-sirius_worker-field_sirius_dispatch_sib_status'.
   $field_instances['node-sirius_worker-field_sirius_dispatch_sib_status'] = array(
@@ -22816,7 +22768,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('If "Yes", this is a department that can be selected when creating a dispatch job.');
   t('If only certain roles have access to edit log entries of this type, select the roles that should have access.  If no roles are checked, all roles will have access.');
   t('If selected, this contact will appear for all shops associated with this company.');
-  t('If set to "Yes", the worker will not be permitted to sign themselves in (set their dispatch status).');
   t('If the company should see a longer or more descriptive name, enter it here.  (I.e. the name might be "Guest Complaints" and the employer name might be " Guest complaints (with complete mailing and/or email address and phone number)").  This longer name will be used on information requests and grievance forms sent to the company.');
   t('Images');
   t('Incident Date');
@@ -22918,7 +22869,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('Short Name');
   t('Should contain only letters and numbers and underscore, used to generate filenames.');
   t('Show on Timeline?');
-  t('Sign-In Blocked?');
   t('Sign-in Blocked?');
   t('Signature');
   t('Skill Expires');
