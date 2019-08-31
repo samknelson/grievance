@@ -1365,7 +1365,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_grievance_inforeq|node|grievance|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_grievance_notifications|node|grievance_shop|default';
   $field_group->group_name = 'group_grievance_notifications';
@@ -2826,7 +2826,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_sirius_worker_preferences';
   $field_group->data = array(
     'label' => 'Holds',
-    'weight' => '45',
+    'weight' => '46',
     'children' => array(
       0 => 'field_sirius_dispatch_hfe',
       1 => 'field_sirius_dispatch_hfe_until',
@@ -2967,6 +2967,7 @@ function grievance_content_types_field_group_info() {
       10 => 'field_sirius_dispatch_eba',
       11 => 'field_sirius_dispatch_eba_dates',
       12 => 'field_sirius_dispatch_sib',
+      13 => 'field_sirius_dispatch_sib_status',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -3005,7 +3006,8 @@ function grievance_content_types_field_group_info() {
       8 => 'field_sirius_dispatch_eba',
       9 => 'field_sirius_dispatch_eba_dates',
       10 => 'field_sirius_dispatch_sib',
-      11 => 'group_sirius_worker_holds',
+      11 => 'field_sirius_dispatch_sib_status',
+      12 => 'group_sirius_worker_holds',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

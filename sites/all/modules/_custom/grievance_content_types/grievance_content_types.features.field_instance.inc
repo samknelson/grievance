@@ -18099,7 +18099,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 37,
+        'weight' => 38,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -18142,7 +18142,7 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 41,
+      'weight' => 42,
     ),
   );
 
@@ -18296,7 +18296,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 44,
+      'weight' => 45,
     ),
   );
 
@@ -18383,13 +18383,8 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 45,
       ),
       'sirius_worker' => array(
@@ -18494,7 +18489,6 @@ If the file has multiple pages, then each page in the input document will use th
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 7,
@@ -18558,7 +18552,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 34,
+        'weight' => 35,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -18588,7 +18582,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 42,
+      'weight' => 43,
     ),
   );
 
@@ -18702,7 +18696,7 @@ If the file has multiple pages, then each page in the input document will use th
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 43,
+      'weight' => 44,
     ),
   );
 
@@ -18754,7 +18748,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 46,
+      'weight' => 47,
     ),
   );
 
@@ -18777,7 +18771,6 @@ If the file has multiple pages, then each page in the input document will use th
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 44,
@@ -18823,7 +18816,7 @@ If the file has multiple pages, then each page in the input document will use th
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 47,
+      'weight' => 48,
     ),
   );
 
@@ -18876,7 +18869,7 @@ If the file has multiple pages, then each page in the input document will use th
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 33,
+      'weight' => 52,
     ),
   );
 
@@ -18899,7 +18892,6 @@ If the file has multiple pages, then each page in the input document will use th
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 41,
@@ -18945,7 +18937,7 @@ If the file has multiple pages, then each page in the input document will use th
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 34,
+      'weight' => 53,
     ),
   );
 
@@ -19003,7 +18995,7 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 38,
+      'weight' => 39,
     ),
   );
 
@@ -19052,6 +19044,62 @@ If the file has multiple pages, then each page in the input document will use th
       ),
       'type' => 'options_select',
       'weight' => 37,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_worker-field_sirius_dispatch_sib_status'.
+  $field_instances['node-sirius_worker-field_sirius_dispatch_sib_status'] = array(
+    'bundle' => 'sirius_worker',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 34,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_dispatch_sib_status',
+    'label' => 'Sign-in Blocked?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => '',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => '',
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 38,
     ),
   );
 
@@ -19422,11 +19470,8 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 46,
       ),
       'sirius_worker' => array(
@@ -19821,12 +19866,15 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 34,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19941,7 +19989,6 @@ If the file has multiple pages, then each page in the input document will use th
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 10,
@@ -20005,7 +20052,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 35,
+        'weight' => 36,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -20040,7 +20087,7 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 39,
+      'weight' => 40,
     ),
   );
 
@@ -20062,7 +20109,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 36,
+        'weight' => 37,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -20092,7 +20139,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 40,
+      'weight' => 41,
     ),
   );
 
@@ -21382,6 +21429,81 @@ If the file has multiple pages, then each page in the input document will use th
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-sirius_dispatch_sib-field_sirius_dispatch_available'.
+  $field_instances['taxonomy_term-sirius_dispatch_sib-field_sirius_dispatch_available'] = array(
+    'bundle' => 'sirius_dispatch_sib',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 1,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_dispatch_available',
+    'label' => 'Can Sign In?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_dispatch_sib-field_sirius_name_display'.
+  $field_instances['taxonomy_term-sirius_dispatch_sib-field_sirius_name_display'] = array(
+    'bundle' => 'sirius_dispatch_sib',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_name_display',
+    'label' => 'Display Name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-sirius_industry-field_sirius_dispatch_3sen'.
   $field_instances['taxonomy_term-sirius_industry-field_sirius_dispatch_3sen'] = array(
     'bundle' => 'sirius_industry',
@@ -22572,6 +22694,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Call Number');
   t('Call by Name Only?');
   t('Call by Name?');
+  t('Can Sign In?');
   t('Can and should this case be settled?');
   t('Can the articles in this contract be selected?  If "Yes", then a "dummy" section will be created for each article.');
   t('Cancel By');
@@ -22796,6 +22919,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Should contain only letters and numbers and underscore, used to generate filenames.');
   t('Show on Timeline?');
   t('Sign-In Blocked?');
+  t('Sign-in Blocked?');
   t('Signature');
   t('Skill Expires');
   t('Skilled Payrate');
