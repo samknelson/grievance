@@ -79,7 +79,7 @@ function sirius_sns_handle($json) {
 	}
 
   // Handle subscription callback
-  if ($json->Message->Type == "SubscriptionConfirmation") {
+  if ($json->Type == "SubscriptionConfirmation") {
     sirius_sns_handle_subscription($json);
     return TRUE;
   }
@@ -88,7 +88,7 @@ function sirius_sns_handle($json) {
 }
 
 function sirius_sns_handle_subscription($json) {
-  $url = $json->Message->SubscribeURL;
+  $url = $json->SubscribeURL;
   $curl_handle = curl_init();
   curl_setopt($curl_handle, CURLOPT_URL, $url);
   curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 2);
