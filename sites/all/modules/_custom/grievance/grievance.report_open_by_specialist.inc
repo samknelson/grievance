@@ -110,7 +110,6 @@ function grievance_report_open_by_specialist_form_submit($form, &$form_state) {
 	$results = '';
 	foreach ($organizers as $organizer_uid) {
 		if ($classaction) {
-			drupal_set_message("Here with all/$organizer_uid/$shop_str/$classaction");
 			$tmp = views_embed_view('grievance_open_report', 'page', $broughtby, $organizer_uid, $shop_str, $classaction);
 		} else {
 			$tmp = views_embed_view('grievance_open_report', 'page', $broughtby, $organizer_uid, $shop_str);
