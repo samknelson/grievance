@@ -24,6 +24,7 @@ function sirius_specialtid_keys() {
 		'sirius_dispatch_sib' => array(
 			'not_blocked' => 'Not Blocked',
 			'blocked' => 'Blocked',
+			'threestrikes' => 'Three-Strikes',
 		),
 		'sirius_dispatch_job_tags' => array(
 			'ASAP' => 'As Soon As Possible (ASAP)',
