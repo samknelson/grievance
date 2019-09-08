@@ -139,3 +139,54 @@ function grievance_uh226_report_cache_info() {
 
 
 
+/**
+ * Implements hook_node_validate
+ *
+ * Provide some custom validations on insert only
+ */
+
+function grievance_uh226_node_validate($node, $form, &$form_state) {
+  // Don't run on ajax callbacks
+  if (!$form_state['submitted']) { return; }
+
+  // For grievance nodes only
+  if ($node->type == 'grievance') {
+
+    // For insert only
+    if (!$node->nid) {
+
+      // Require a category
+      $category_tid = $node->field_grievance_category['und'][0]['tid'];
+      if (!$category_tid) {
+        form_set_error('field_grievance_category', 'Please select a grievance category.');
+      }
+      $category_term = taxonomy_term_load($category_tid);
+
+      // For discipline only
+      if ($category_term && $category_term->name == 'Discipline') {
+        // Require one of the fields "grievance_date_1" and "grievance_date_1"
+        $ts1 = sirius_date_ts($node, 'field_grievance_date_1');
+        $ts2 = sirius_date_ts($node, 'field_grievance_date_2');
+        if (!$ts1 && !$ts2) {
+          form_set_error('field_grievance_date_1', t('For discipline grievances, please enter an incident date or a discipline date.'));
+          form_set_error('field_grievance_date_2', '');
+        }
+
+        // Require at least one of the grievance_intake_log_ fields (not native node fields)
+        $found = FALSE;
+        for ($i=1; $i<10; ++$i) {
+          if ($node->{"grievance_intake_log_$i"}) {
+            $found = TRUE;
+            break;
+          }
+        }
+        if (!$found) {
+          form_set_error("grievance_intake_log_1", t('For discipline grievances, please enter at least one of the discipline dates.'));
+          for ($i=2; $i<10; ++$i) {
+            form_set_error("grievance_intake_log_$i", '');
+          }
+        }
+      }
+    }
+  }
+}
