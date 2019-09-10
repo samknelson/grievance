@@ -467,3 +467,54 @@ function grievance_update_7028() {
     print "Set sirius_email_default_from_address = grievance_from_email = " . variable_get('sirius_email_default_from_address', '') . "\n";
   }
 }
+
+/**
+ * Update the sign-in blocked data from a simple field into a taxonomy reference
+ */
+
+function grievance_update_7029() {
+  // Move all blocked workers 
+  $blocked_tid = sirius_get_special_tid('sirius_dispatch_sib|blocked');
+  if ($blocked_tid) {
+    print "Setting all blocked workers to have the tid $blocked_tid\n";
+    try {
+      $sql = "select entity_id from field_data_field_sirius_dispatch_sib where entity_type = 'node' and bundle = 'sirius_worker' and field_sirius_dispatch_sib_value = 'Yes'";
+      $stmt = db_query($sql, array());
+      $worker_nids = array();
+      while ($hr = $stmt->fetchAssoc()) {
+        $worker_nids[] = $hr['entity_id'];
+      }
+      $total = count($worker_nids);
+      $count = 0;
+      foreach ($worker_nids as $worker_nid) {
+        ++$count;
+        $worker_node = node_load($worker_nid);
+        $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid'] = $blocked_tid;
+        node_save($worker_node);
+        print "Set worker #$count/$total - $worker_nid ($worker_node->title)\n";
+      }
+    } catch (exception $ignore) {}
+  }
+}
+
+/**
+ * Change "info" to a longblob.
+ */
+
+function grievance_update_7030() {
+  $sql = "ALTER TABLE system CHANGE info info LONGBLOB NULL DEFAULT NULL";
+  $stmt = db_query($sql, array());
+  print "$sql\n";
+}
+
+/**
+ * Remove the old sign-in blocked field
+ */
+
+/*
+function grievance_update_7030() {
+  $field = 'field_sirius_dispatch_sib';
+  try { field_delete_field($field); } catch (exception $e) { print_r($e); }
+  print "Deleted field: $field\n";
+}
+*/
