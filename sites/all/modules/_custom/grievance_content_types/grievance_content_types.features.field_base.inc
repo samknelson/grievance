@@ -5409,6 +5409,7 @@ function grievance_content_types_field_default_field_bases() {
         'declined' => 'declined',
         'expired' => 'expired',
         'resigned' => 'voluntary layoff',
+        'vlri' => 'voluntary layoff request involuntary',
         'terminated' => 'layoff',
         'bullpen signin' => 'bullpen signin',
         'bullpen' => 'bullpen',

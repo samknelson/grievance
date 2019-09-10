@@ -209,6 +209,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Subject'),
       'help' => '',
     ),
+    'sirius_contact' => array(
+      'name' => t('Sirius Contact'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'sirius_dispatch' => array(
       'name' => t('Sirius Dispatch'),
       'base' => 'node_content',
@@ -259,6 +267,14 @@ function grievance_content_types_node_info() {
     ),
     'sirius_help' => array(
       'name' => t('Sirius Help'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_json_definition' => array(
+      'name' => t('Sirius JSON Definition'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',
