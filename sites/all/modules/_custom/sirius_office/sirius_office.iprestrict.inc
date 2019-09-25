@@ -83,4 +83,13 @@ function sirius_office_iprestrict_user_login($edit, $account) {
   session_destroy();
   $user = drupal_anonymous_user();
   drupal_set_message("Login prohibited; you can only sign in from a whitelisted IP address.", 'warning');
+  sirius_log(
+    'office', 
+    'iprestrict', 
+    $account->uid . ' / ' . $account->name . ' / ' . $account->mail, 
+    "Administrative login attempt blocked because the incoming IP address, $ip_address, was not whitelisted.",
+    NULL, 
+    array($account->uid)
+  );
+
 }
