@@ -777,6 +777,13 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_enable_revisions_page_node_sirius_news';
+  $strongarm->value = 0;
+  $export['diff_enable_revisions_page_node_sirius_news'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'diff_show_preview_changes_node_grievance';
   $strongarm->value = 0;
   $export['diff_show_preview_changes_node_grievance'] = $strongarm;
@@ -840,6 +847,13 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_show_preview_changes_node_sirius_news';
+  $strongarm->value = 0;
+  $export['diff_show_preview_changes_node_sirius_news'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'diff_view_mode_preview_node_grievance';
   $strongarm->value = 'full';
   $export['diff_view_mode_preview_node_grievance'] = $strongarm;
@@ -899,6 +913,13 @@ function grievance_content_types_strongarm() {
   $strongarm->name = 'diff_view_mode_preview_node_sirius_letterhead';
   $strongarm->value = 'full';
   $export['diff_view_mode_preview_node_sirius_letterhead'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_view_mode_preview_node_sirius_news';
+  $strongarm->value = 'full';
+  $export['diff_view_mode_preview_node_sirius_news'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -3056,9 +3077,7 @@ function grievance_content_types_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'menu_options_sirius_news';
-  $strongarm->value = array(
-    0 => 'main-menu',
-  );
+  $strongarm->value = array();
   $export['menu_options_sirius_news'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -3818,7 +3837,7 @@ function grievance_content_types_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_sirius_news';
-  $strongarm->value = '1';
+  $strongarm->value = '0';
   $export['node_preview_sirius_news'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -4049,7 +4068,7 @@ function grievance_content_types_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'node_submitted_sirius_news';
-  $strongarm->value = 1;
+  $strongarm->value = 0;
   $export['node_submitted_sirius_news'] = $strongarm;
 
   $strongarm = new stdClass();
