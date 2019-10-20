@@ -37,7 +37,7 @@ function sirius_dispatch_job_recompute_from_dispatch($dispatch_node, $is_delete 
 	$count_no = 0;
 	foreach ($dispatches as $ignore => $status) {
 		if ($status == 'notified') { ++$count_notified; }
-		if ($status == 'accepted') { ++$count_yes; }
+		if ($status == 'accepted' || $status == 'accepted_secondary' || $status == 'resigned' || $status == 'vlri' || $status == 'terminated') { ++$count_yes; }
 		if ($status == 'accepted_secondary') { ++$count_yes; }
 		if ($status == 'declined' || $status == 'notification failed' || $status == 'expired') { ++$count_no; }
 	}
@@ -465,7 +465,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 
 	// CBN
 	if (!$filters['ignore_cbn']) {
-		if ($job_node->field_sirius_dispatch_job_type['und'][0]['tid'] == sirius_get_special_tid('sirius_dispatch_job_type|OPEN')) {
+		if ($filters['cbn'] == 'No') {
 			$sql .= "and ( ";
 			$sql .= "  field_sirius_dispatch_cbn_value IS NULL ";
 			$sql .= "  or field_sirius_dispatch_cbn_value = 'No' ";
@@ -737,7 +737,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 
 	// CBN
 	if (!$filters['ignore_cbn']) {
-		if ($job_node->field_sirius_dispatch_job_type['und'][0]['tid'] == sirius_get_special_tid('sirius_dispatch_job_type|OPEN')) {
+		if ($filters['cbn'] == 'No') {
 			if (sirius_fieldval($worker_node, 'field_sirius_dispatch_cbn', 'value') == 'Yes') {
 				return array('success' => FALSE, 'msg' => t('The worker has requested to only receive call-by-names.'));
 			}
