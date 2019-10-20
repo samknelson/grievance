@@ -34,6 +34,35 @@ function sirius_dispatch_action_info() {
       'vbo_configurable' => FALSE,
       'triggers' => array(),
     ),
+    'sirius_dispatch_vbo_vlri_resolve' => array(
+      'type' => 'node',
+      'label' => t('Sirius Dispatch VLRI'),
+      'configurable' => TRUE,
+      'vbo_configurable' => FALSE,
+      'triggers' => array(),
+    ),
+  );
+}
+
+function sirius_dispatch_vbo_vlri_resolve(&$node, $context) {
+  drupal_set_message("About to resolve: " . $node->title . " with action " . $context['vlri_resolve']);
+  $result = sirius_dispatch_vlri_resolve($node, '', $context['vlri_resolve']);
+}
+
+function sirius_dispatch_vbo_vlri_resolve_form(&$context, &$form_state) {
+  $form['vlri_resolve'] = array(
+    '#title' => t('Resolve:'),
+    '#type' => 'select',
+    '#options' => array(NULL => t('-- Select --'), 'accept' => t('Accept'), 'reject' => t('Reject')),
+    '#required' => TRUE,
+  );
+
+  return $form;
+}
+
+function sirius_dispatch_vbo_vlri_resolve_submit(&$form, &$form_state) {
+  return array(
+    'vlri_resolve' => $form_state['values']['vlri_resolve'],
   );
 }
 
