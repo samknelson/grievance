@@ -142,7 +142,7 @@ function sirius_dispatch_job_attachment_file_download_access($file_item, $job_no
 	  $query->entityCondition('bundle', 'sirius_dispatch');
 	  $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_node->nid);
 	  $query->fieldCondition('field_sirius_worker', 'target_id', $worker_node->nid);
-	  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('accepted', 'accepted_secondary', 'bullpen', 'resigned', 'terminated'), 'in');
+	  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('accepted', 'accepted_secondary', 'bullpen', 'resigned', 'vlri', 'terminated'), 'in');
 	  $stmt = $query->execute();
 	  if ($stmt['node']) { return TRUE; }
 	}
@@ -162,7 +162,7 @@ function sirius_dispatch_job_attachment_file_download_access($file_item, $job_no
 	  $query->entityCondition('bundle', 'sirius_dispatch');
 	  $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_node->nid);
 	  $query->fieldCondition('field_sirius_aat', 'value', $all_aats, 'in');
-	  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('accepted', 'accepted_secondary', 'bullpen', 'resigned', 'terminated'), 'in');
+	  $query->fieldCondition('field_sirius_dispatch_status', 'value', array('accepted', 'accepted_secondary', 'bullpen', 'resigned', 'vlri', 'terminated'), 'in');
 	  $stmt = $query->execute();
 	  if ($stmt['node']) { return TRUE; }
 	}
