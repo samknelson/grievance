@@ -156,7 +156,7 @@ function sirius_dispatch_vlri_block_check($employer_nid) {
 function sirius_dispatch_vlri_admin() {
 	$form['sirius_dispatch_vlri_enable'] = array(
 		'#type' => 'select',
-		'#title' => 'Enable VLRA?',
+		'#title' => 'Enable VLRI?',
 		'#options' => array('no' => 'No', 'yes' => 'Yes'),
 		'#default_value' => variable_get('sirius_dispatch_vlri_enable', 'no'),
 	);
