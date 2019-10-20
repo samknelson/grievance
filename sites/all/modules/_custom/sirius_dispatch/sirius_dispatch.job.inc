@@ -562,7 +562,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_
 		return array('success' => FALSE, 'msg' => "The worker with dispatch ID #$worker_id was not found.");
 	}
 
-	return sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, $filters = array());
+	return sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, $filters);
 }
 
 
