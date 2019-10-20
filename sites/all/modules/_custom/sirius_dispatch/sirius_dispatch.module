@@ -34,6 +34,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_expire.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_bullpen_signin.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_send.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_vlri.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_member_status_ratios.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_notification_preferences.inc';
@@ -378,6 +379,19 @@ function sirius_dispatch_node_view($node, $view_mode, $langcode) {
     if (!user_access('sirius dispatch staff')) {
       unset($node->content['field_sirius_count_no']);
       unset($node->content['field_sirius_count_notified']);
+    }
+  }
+
+  // Render the SIB status 
+  if ($node->type == 'sirius_worker') {
+    if (!user_access('sirius dispatch staff')) {
+      $block_tid = $node->field_sirius_dispatch_sib_status['und'][0]['tid'];
+      if ($block_tid) {
+        $block_term = taxonomy_term_load($block_tid);
+        $name_display = $block_term->field_sirius_name_display['und'][0]['value'];
+        if (!$name_display) { $name_display = $block_term->name; }
+        $node->content['field_sirius_dispatch_sib_status'][0]['#markup'] = $name_display;
+      }
     }
   }
 }
