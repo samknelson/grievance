@@ -27,13 +27,13 @@ function sirius_phonetree($call_sid, $context) {
 		$msg = $context['outgoing_msg'];
 		unset($context['outgoing_msg']);
 		$msg = "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
+		$msg .= " Enter star to hear this message again. Enter 0 to hear your dispatches. ";
 		$msg .= "Message repeates. ";
 		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
+		$msg .= " Enter star to hear this message again. Enter 0 to hear your dispatches. ";
 		$msg .= "Message repeates. ";
 		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to return to the main menu. ";
+		$msg .= " Enter star to hear this message again. Enter 0 to hear your dispatches. ";
 		sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, 1);
 	}
 
@@ -102,7 +102,7 @@ function sirius_phonetree_worker_login($call_sid, $context) {
 		// Ask AAT
 		$context['candidate_worker_nid'] = $worker_node->nid;
 		$context['expect'] = 'aat';
-		sirius_twilio_outgoing_voice_say($call_sid, $context, "Please enter your passcode.", 7);
+		sirius_twilio_outgoing_voice_say($call_sid, $context, "Please enter your access code.", 7);
 
 	} else if ($expect == 'aat') {
 
