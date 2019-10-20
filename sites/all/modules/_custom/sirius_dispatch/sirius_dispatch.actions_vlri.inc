@@ -69,10 +69,10 @@ function sirius_dispatch_vlri_resolve($dispatch_node, $notes, $resolution) {
 	// Set the dispatch status, save and log
 	if ($resolution == 'accept') {
 		$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = 'terminated';
-		$msg = "Layoff request was accepted, dispatch status changed to \"Layoff\".";
+		$msg = "The layoff you reported for " . $employer_node->title . " has been accepted, and your layoff is now considered involuntary.";
 	} else {
 		$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = 'resigned';
-		$msg = "Layoff request was rejected, dispatch status changed to \"Voluntary Layoff\".";
+		$msg = "The layoff you reported for " . $employer_node->title . " has been denied, and your layoff is now considered voluntary. You may dispute this by providing the Dispatch Office a copy of your layoff slip from the employer.";
 	}
 	node_save($dispatch_node);
 	sirius_log('dispatch:vlri', $resolution, $msg, $notes, '', array($dispatch_node->nid, $worker_nid, $employer_nid));
