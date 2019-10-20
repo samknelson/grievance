@@ -126,6 +126,20 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 		),
 	);
 
+	$form['wtf_cbn'] = array(
+		'#title' => 'Call by Name?',
+		'#type' => 'select',
+		'#options' => array(
+			'No' => 'No',
+			'Yes' => 'Yes',
+		),
+		'#states' => array(
+	  	'visible' => array(
+	  		array(':input[name="action"]' => array('value' => 'explain')),
+	  	)
+		),
+	);
+
 	if (user_access('sirius dispatch staff')) {
 		$form['run_settings'] = array(
 			'#type' => 'fieldset',
@@ -288,7 +302,8 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 	}
 
 	if ($action == 'explain') {
-		$result = sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_node, $form_state['values']['wtf']);
+		$form_state['rebuild'] = TRUE;
+		$result = sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_node, $form_state['values']['wtf'], array('cbn' => $form_state['values']['wtf_cbn']));
 		if ($result['success']) {
 			drupal_set_message($result['msg']);
 		} else {
