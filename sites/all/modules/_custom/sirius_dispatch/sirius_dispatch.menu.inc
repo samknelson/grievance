@@ -31,8 +31,6 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch employer'),
   );
 
-
-
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_attachments'] = array(
     'title' => 'Attachments',
     'description' => '',
@@ -114,6 +112,7 @@ function sirius_dispatch_node_tabs() {
     'weight' => 0,
   );
 
+  /*
   $node_tabs['sirius_worker']['sirius_worker_dispatches/current'] = array(
     'title' => 'Current Dispatches',
     'description' => '',
@@ -121,6 +120,7 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch worker'),
     'weight' => 1,
   );
+  */
 
   $node_tabs['sirius_worker']['sirius_worker_dispatches/archive'] = array(
     'title' => 'Prior Dispatches',
@@ -245,6 +245,23 @@ function sirius_dispatch_menu() {
     'page callback' => 'sirius_dispatch_page_employer_job_list',
     'page arguments' => array(4),
     'access arguments' => array('sirius dispatch employer'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/employer/dispatch/vlri'] = array(
+    'title' => 'Sirius: Employer: Layoff Requests',
+    'description' => '',
+    'page callback' => 'sirius_dispatch_page_employer_vlri',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch employer'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/dispatch/config/vlri'] = array(
+    'title' => 'Layoff Request Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_dispatch_vlri_admin'),
+    'access arguments' => array('sirius dispatch admin'),
     'type' => MENU_NORMAL_ITEM,
   );
 
