@@ -128,7 +128,7 @@ function sirius_dispatch_page_employer_vlri() {
 
 function sirius_dispatch_vlri_block_check($employer_nid) {
 	if (!sirius_dispatch_vlri_enabled()) {
-		return array('success' => TRIE, 'msg' => "VLRI is not enabled.");
+		return array('success' => TRUE, 'msg' => "VLRI is not enabled.");
 	}
 
 	$window = variable_get('sirius_dispatch_vlri_block_window', 24*60*60);
