@@ -1,0 +1,4 @@
+name = Sirius Hour
+description = Sirius hour tracking
+core = 7.x
+package = sirius

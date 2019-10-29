@@ -1,0 +1,46 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.payperiod.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.cache.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.page_payperiod_entries.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.page_worker_hours.inc';
+
+
+/**
+ * Implements hook_sirius_jsonfield_form_definitions 
+ */
+
+function sirius_hour_sirius_jsonfield_form_definitions() {
+  $definitions['node']['sirius_payperiod']['field_sirius_json'] = sirius_hour_payperiod_definition();
+  return $definitions;
+}
+
+/**
+ * Implements hook_node_insert()
+ */
+
+function sirius_hour_node_insert($node) {
+	if ($node->type == 'sirius_payperiod') { sirius_hour_cache_set($node); }
+}
+
+/**
+ * Implements hook_node_update()
+ */
+
+function sirius_hour_node_update($node) {
+	if ($node->type == 'sirius_payperiod') { sirius_hour_cache_set($node); }
+}
+
+/**
+ * Implements hook_node_delete()
+ */
+
+function sirius_hour_node_delete($node) {
+	if ($node->type == 'sirius_payperiod') { sirius_hour_cache_clear($node); }
+}
