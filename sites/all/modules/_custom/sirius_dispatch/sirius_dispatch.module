@@ -52,6 +52,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_bullpen.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_dispatch_preferences.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_attachments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_jwa_prefs.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_jwa_assign.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_landing.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_create.inc';
@@ -90,6 +92,21 @@ function sirius_dispatch_get_current($worker_nid) {
   $stmt = $query->execute();
   if (!$stmt['node']) {
   	return NULL;
+  }
+
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
+function sirius_dispatch_get($worker_nid, $job_nid) {
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_dispatch');
+  $query->fieldCondition('field_sirius_worker', 'target_id', $worker_nid);
+  $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_nid);
+  $query->propertyOrderBy('created', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) {
+    return NULL;
   }
 
   return node_load(array_keys($stmt['node'])[0]);
