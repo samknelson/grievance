@@ -323,6 +323,30 @@ function sirius_dispatch_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/dispatch/jwa'] = array(
+    'title' => 'Job / Worker Assign',
+    'page callback' => 'sirius_dispatch_page_jwa_assign',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/dispatch/jwa/assign'] = array(
+    'title' => 'Assign',
+    'page callback' => 'sirius_dispatch_page_jwa_assign',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['sirius/dispatch/jwa/prefs'] = array(
+    'title' => 'Preferences',
+    'page callback' => 'sirius_dispatch_page_jwa_prefs',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 
