@@ -302,7 +302,7 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 	}
 
 	if ($action == 'explain') {
-		$result = sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_node, $form_state['values']['wtf'], array('cbn' => $form_state['values']['wtf_cbn']));
+		$result = sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_node, $form_state['values']['wtf'], array('cbn' => $form_state['values']['wtf_cbn'], 'ignore_redispatch' => TRUE));
 		if ($result['success']) {
 			drupal_set_message($result['msg']);
 		} else {
