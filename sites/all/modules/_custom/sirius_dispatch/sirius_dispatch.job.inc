@@ -38,7 +38,6 @@ function sirius_dispatch_job_recompute_from_dispatch($dispatch_node, $is_delete 
 	foreach ($dispatches as $ignore => $status) {
 		if ($status == 'notified') { ++$count_notified; }
 		if ($status == 'accepted' || $status == 'accepted_secondary' || $status == 'resigned' || $status == 'vlri' || $status == 'terminated') { ++$count_yes; }
-		if ($status == 'accepted_secondary') { ++$count_yes; }
 		if ($status == 'declined' || $status == 'notification failed' || $status == 'expired') { ++$count_no; }
 	}
 
