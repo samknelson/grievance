@@ -327,7 +327,7 @@ function sirius_dispatch_menu() {
     'title' => 'Job / Worker Assign',
     'page callback' => 'sirius_dispatch_page_jwa_assign',
     'page arguments' => array(),
-    'access arguments' => array('sirius dispatch admin'),
+    'access arguments' => array('sirius dispatch staff'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -335,7 +335,7 @@ function sirius_dispatch_menu() {
     'title' => 'Assign',
     'page callback' => 'sirius_dispatch_page_jwa_assign',
     'page arguments' => array(),
-    'access arguments' => array('sirius dispatch admin'),
+    'access arguments' => array('sirius dispatch staff'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
@@ -343,7 +343,7 @@ function sirius_dispatch_menu() {
     'title' => 'Preferences',
     'page callback' => 'sirius_dispatch_page_jwa_prefs',
     'page arguments' => array(),
-    'access arguments' => array('sirius dispatch admin'),
+    'access arguments' => array('sirius dispatch staff'),
     'type' => MENU_LOCAL_TASK,
   );
 
