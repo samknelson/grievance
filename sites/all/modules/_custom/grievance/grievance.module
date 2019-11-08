@@ -19,6 +19,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.repor
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_average_time.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_spi_term.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_summary.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_specialist_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_by_specialist.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_aged_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_summary_with_log.inc";
