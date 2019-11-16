@@ -705,19 +705,6 @@ function grievance_views_pre_render(&$view) {
     }
   }
 
-  // Render clauseref fields with their label in front.
-  if ($view->name == 'grievance_open_report' && isset($view->result)) {
-    foreach ($view->result as &$result) {
-      if (isset($result->field_field_grievance_clauseref)) {
-        foreach ($result->field_field_grievance_clauseref as &$item) {
-          if (isset($item['rendered']) && isset($item['raw']) && isset($item['raw']['entity'])) {
-            $item['rendered']['#markup'] = $item['raw']['entity']->field_grievance_label['und'][0]['value'] . ': ' . $item['rendered']['#markup'];
-          }
-        }
-      }
-    }
-  }
-
   if ($view->name == 'grievance_shop_contacts') {
     grievance_contacts_views_pre_render($view);
   }
