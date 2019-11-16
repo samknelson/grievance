@@ -20,6 +20,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.repor
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_spi_term.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_specialist_summary.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_by_specialist.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_aged_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_summary_with_log.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_settlement_summary.inc";
@@ -701,6 +702,19 @@ function grievance_views_pre_render(&$view) {
     foreach ($view->result as &$row) {
       if ($row->field_field_grievance_rep_assignee[0]['raw']['target_id'] == $user->uid) {
         $row->field_field_grievance_rep_assignee[0]['rendered']['#markup'] = '<strong>' . $row->field_field_grievance_rep_assignee[0]['rendered']['#markup'] . '</strong>';
+      }
+    }
+  }
+
+  // Render clauseref fields with their label in front.
+  if ($view->name == 'grievance_open_report' && isset($view->result)) {
+    foreach ($view->result as &$result) {
+      if (isset($result->field_field_grievance_clauseref)) {
+        foreach ($result->field_field_grievance_clauseref as &$item) {
+          if (isset($item['rendered']) && isset($item['raw']) && isset($item['raw']['entity'])) {
+            $item['rendered']['#markup'] = $item['raw']['entity']->field_grievance_label['und'][0]['value'] . ': ' . $item['rendered']['#markup'];
+          }
+        }
       }
     }
   }
