@@ -2,6 +2,7 @@
 
 /**
  * @file
+ * Hooks and related function for Views Current Path.
  */
 
 /**
@@ -11,4 +12,18 @@ function views_current_path_views_api() {
   return array(
     'api' => 3,
   );
+}
+
+/**
+ * Implements hook_views_data().
+ */
+function views_current_path_views_data() {
+  $data['views']['current_path'] = array(
+    'title' => t('Current Path'),
+    'help' => t('The path of the page currently being viewed.'),
+    'field' => array(
+      'handler' => 'views_current_path_views_handler_field_current_path',
+    ),
+  );
+  return $data;
 }
