@@ -2,22 +2,8 @@
 
 /**
  * @file
- * Views related hooks and handlers for Views Current Path.
+ * Definition of views_handler_field_current_path.
  */
-
-/**
- * Implements hook_views_data().
- */
-function views_current_path_views_data() {
-  $data['views']['current_path'] = array(
-    'title' => t('Current Path'),
-    'help' => t('The path of the page currently being viewed.'),
-    'field' => array(
-      'handler' => 'views_current_path_views_handler_field_current_path',
-    ),
-  );
-  return $data;
-}
 
 /**
  * Views field handler for current path.
@@ -51,7 +37,7 @@ class views_current_path_views_handler_field_current_path extends views_handler_
   function options_form(&$form, &$form_state) {
     $alias_required_message = module_exists('path') ? '' : '<em>'
       . t('Note: the Path module must be enabled for the "Alias" options to work.') . '</em>';
-    
+
     // Determine the URL prefix.
     global $base_url;
     $url_options = array();
@@ -67,7 +53,7 @@ class views_current_path_views_handler_field_current_path extends views_handler_
     $query_string_example = '?nid=357&tid=271';
     $query_string_valid_path_example = '[current_path]tid=[tid]';
     $query_string_invalid_path_example = '[current_path]?tid=[tid]';
-    
+
     $form['path_format'] = array(
       '#type' => 'radios',
       '#title' => t('Output style'),
