@@ -653,8 +653,10 @@ function grievance_report_cache_info() {
     'pk_list_callback' => 'grievance_report_open_summary_with_log_pks',
     'batch_callback' => 'grievance_report_open_summary_with_log_batch',
     'render_callbacks' => array(
-      'By Specialist' => 'grievance_report_open_summary_with_log_render_specialist',
-      'By Employer' => 'grievance_report_open_summary_with_log_render_employer',
+      'Summary by Specialist' => 'grievance_report_open_summary_with_log_render_specialist',
+      'Summary by Employer' => 'grievance_report_open_summary_with_log_render_employer',
+      'Detail by Specialist' => 'grievance_report_open_summary_with_log_render_specialist_detail',
+      'Detail by Employer' => 'grievance_report_open_summary_with_log_render_employer_detail',
     ),
   );
 
