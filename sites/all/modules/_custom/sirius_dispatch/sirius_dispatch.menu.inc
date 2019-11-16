@@ -31,8 +31,6 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch employer'),
   );
 
-
-
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_attachments'] = array(
     'title' => 'Attachments',
     'description' => '',
@@ -114,6 +112,7 @@ function sirius_dispatch_node_tabs() {
     'weight' => 0,
   );
 
+  /*
   $node_tabs['sirius_worker']['sirius_worker_dispatches/current'] = array(
     'title' => 'Current Dispatches',
     'description' => '',
@@ -121,6 +120,7 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch worker'),
     'weight' => 1,
   );
+  */
 
   $node_tabs['sirius_worker']['sirius_worker_dispatches/archive'] = array(
     'title' => 'Prior Dispatches',
@@ -248,6 +248,23 @@ function sirius_dispatch_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/employer/dispatch/vlri'] = array(
+    'title' => 'Sirius: Employer: Layoff Requests',
+    'description' => '',
+    'page callback' => 'sirius_dispatch_page_employer_vlri',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch employer'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/dispatch/config/vlri'] = array(
+    'title' => 'Layoff Request Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_dispatch_vlri_admin'),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/staff/dispatch'] = array(
     'title' => 'Sirius: Staff: Dispatch',
     'description' => '',
@@ -304,6 +321,30 @@ function sirius_dispatch_menu() {
     'page arguments' => array('sirius_dispatch_threestrikes_admin'),
     'access arguments' => array('sirius dispatch admin'),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/dispatch/jwa'] = array(
+    'title' => 'Job / Worker Assign',
+    'page callback' => 'sirius_dispatch_page_jwa_assign',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/dispatch/jwa/assign'] = array(
+    'title' => 'Assign',
+    'page callback' => 'sirius_dispatch_page_jwa_assign',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['sirius/dispatch/jwa/prefs'] = array(
+    'title' => 'Preferences',
+    'page callback' => 'sirius_dispatch_page_jwa_prefs',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;

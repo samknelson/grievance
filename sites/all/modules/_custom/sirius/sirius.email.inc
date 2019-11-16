@@ -161,9 +161,12 @@ function sirius_email_send($params) {
     return array('success' => FALSE, 'msg' => "No email address.");
   }
 
-  $to = mailparse_rfc822_parse_addresses($params['to']);
-  if (!$to) {
-    return array('success' => FALSE, 'msg' => $params['to'] . " does not look like a valid email address.");
+  $to = $params['to'];
+  if (function_exists('mailparse_rfc822_parse_addresses')) {
+    $to = mailparse_rfc822_parse_addresses($params['to']);
+    if (!$to) {
+      return array('success' => FALSE, 'msg' => $params['to'] . " does not look like a valid email address.");
+    }
   }
 
 	$message = drupal_mail(
@@ -174,6 +177,9 @@ function sirius_email_send($params) {
 		$params 
 	);
 
+  // Don't log attachments
+  unset($message['params']['attachments']);
+  
   sirius_log(
     'email', 
     'sending', 

@@ -4385,6 +4385,34 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
+  // Exported field_base: 'field_sirius_contact_tags'.
+  $field_bases['field_sirius_contact_tags'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_contact_tags',
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'sirius_contact_tags',
+          'parent' => 0,
+          'depth' => '',
+        ),
+      ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
+  );
+
   // Exported field_base: 'field_sirius_count'.
   $field_bases['field_sirius_count'] = array(
     'active' => 1,
@@ -5409,6 +5437,7 @@ function grievance_content_types_field_default_field_bases() {
         'declined' => 'declined',
         'expired' => 'expired',
         'resigned' => 'voluntary layoff',
+        'vlri' => 'voluntary layoff request involuntary',
         'terminated' => 'layoff',
         'bullpen signin' => 'bullpen signin',
         'bullpen' => 'bullpen',
@@ -6153,6 +6182,31 @@ Prof.',
     'type' => 'text',
   );
 
+  // Exported field_base: 'field_sirius_payperiod_type'.
+  $field_bases['field_sirius_payperiod_type'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_payperiod_type',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'timestamp' => 'Timestamp data - individual entries',
+        'totals' => 'Totals only',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_sirius_payrate'.
   $field_bases['field_sirius_payrate'] = array(
     'active' => 1,
@@ -6516,6 +6570,27 @@ Prof.',
     'type' => 'text_long',
   );
 
+  // Exported field_base: 'field_sirius_source'.
+  $field_bases['field_sirius_source'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_source',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
   // Exported field_base: 'field_sirius_ssn'.
   $field_bases['field_sirius_ssn'] = array(
     'active' => 1,
@@ -6560,6 +6635,27 @@ Prof.',
     'settings' => array(),
     'translatable' => 0,
     'type' => 'text_long',
+  );
+
+  // Exported field_base: 'field_sirius_term_source'.
+  $field_bases['field_sirius_term_source'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_term_source',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
   );
 
   // Exported field_base: 'field_sirius_timelimit'.

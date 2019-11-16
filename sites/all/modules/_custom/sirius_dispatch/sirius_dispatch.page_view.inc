@@ -103,20 +103,24 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$actions = array(NULL => t('-- Select --'));
 	if ($is_staff || $is_worker) {
 		// @todo: Can only accept or decline if you are not UEB!
-		if (sirius_dispatch_accept_possible($dispatch_node)['success']) { $actions['accept'] = t('Accept this dispatch'); }
-		if (sirius_dispatch_decline_possible($dispatch_node)['success']) { $actions['decline'] = t('Decline this dispatch'); }
+		if (sirius_dispatch_accept_possible($dispatch_node)['success']) { $actions['accept'] = t('Accept'); }
+		if (sirius_dispatch_decline_possible($dispatch_node)['success']) { $actions['decline'] = t('Decline'); }
 	}
 
 	if ($is_staff || $is_employer) {
-		if (sirius_dispatch_terminate_possible($dispatch_node)['success']) { $actions['terminate'] = t('Layoff this dispatch'); }
+		if (sirius_dispatch_terminate_possible($dispatch_node)['success']) { $actions['terminate'] = t('Layoff'); }
 	}
 
 	if ($is_staff || $is_worker) {
-		if (sirius_dispatch_resign_possible($dispatch_node)['success']) { $actions['resign'] = t('Voluntary layoff this dispatch'); }
+		if (sirius_dispatch_resign_possible($dispatch_node)['success']) { $actions['resign'] = t('Voluntary layoff'); }
+	}
+
+	if ($is_staff || $is_worker) {
+		if (sirius_dispatch_vlri_possible($dispatch_node)['success']) { $actions['vlri'] = t('Employer Initiated Layoff'); }
 	}
 
 	$is_accepted = FALSE;
-	$is_accepted = in_array($dispatch_node->field_sirius_dispatch_status['und'][0]['value'], array('accepted', 'accepted_secondary', 'bullpen', 'resigned', 'terminated'));
+	$is_accepted = in_array($dispatch_node->field_sirius_dispatch_status['und'][0]['value'], array('accepted', 'accepted_secondary', 'bullpen', 'resigned', 'vlri', 'terminated'));
 
 	if (count($actions) > 1) {
 		$form['action'] = array(
@@ -235,6 +239,7 @@ function sirius_node_tab_dispatch_worker_view_form_submit($form, &$form_state) {
 	if ($action == 'decline') { $result = sirius_dispatch_decline($dispatch_node); }
 	if ($action == 'terminate') { $result = sirius_dispatch_terminate($dispatch_node); }
 	if ($action == 'resign') { $result = sirius_dispatch_resign($dispatch_node); }
+	if ($action == 'vlri') { $result = sirius_dispatch_vlri($dispatch_node); }
 
 	if ($result['success']) {
 		drupal_set_message($result['msg']);

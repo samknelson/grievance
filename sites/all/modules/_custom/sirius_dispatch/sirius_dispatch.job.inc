@@ -37,7 +37,7 @@ function sirius_dispatch_job_recompute_from_dispatch($dispatch_node, $is_delete 
 	$count_no = 0;
 	foreach ($dispatches as $ignore => $status) {
 		if ($status == 'notified') { ++$count_notified; }
-		if ($status == 'accepted') { ++$count_yes; }
+		if ($status == 'accepted' || $status == 'accepted_secondary' || $status == 'resigned' || $status == 'vlri' || $status == 'terminated') { ++$count_yes; }
 		if ($status == 'accepted_secondary') { ++$count_yes; }
 		if ($status == 'declined' || $status == 'notification failed' || $status == 'expired') { ++$count_no; }
 	}
@@ -465,7 +465,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 
 	// CBN
 	if (!$filters['ignore_cbn']) {
-		if ($job_node->field_sirius_dispatch_job_type['und'][0]['tid'] == sirius_get_special_tid('sirius_dispatch_job_type|OPEN')) {
+		if ($filters['cbn'] == 'No') {
 			$sql .= "and ( ";
 			$sql .= "  field_sirius_dispatch_cbn_value IS NULL ";
 			$sql .= "  or field_sirius_dispatch_cbn_value = 'No' ";
@@ -562,7 +562,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_
 		return array('success' => FALSE, 'msg' => "The worker with dispatch ID #$worker_id was not found.");
 	}
 
-	return sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, $filters = array());
+	return sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, $filters);
 }
 
 
@@ -597,19 +597,21 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	$employer_node = node_load($employer_nid);
 
 	// Exclude current dispatches
-	$sql = "select count(*) as c from ";
-	$sql .= "node, ";
-	$sql .= "field_data_field_sirius_worker, ";
-	$sql .= "field_data_field_sirius_dispatch_job ";
-	$sql .= "where node.type = 'sirius_dispatch' ";
-	$sql .= "and field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
-	$sql .= "and field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
-	$sql .= "and field_data_field_sirius_dispatch_job.field_sirius_dispatch_job_target_id = :job_nid ";
-	$sql .= "and field_data_field_sirius_worker.field_sirius_worker_target_id = :worker_nid ";
-	$stmt = db_query($sql, array(':job_nid' => $job_node->nid, ':worker_nid' => $worker_nid));
-	$hr = $stmt->fetchAssoc();
-	if ($hr['c']) {
-		return array('success' => FALSE, 'msg' => t('There is already a dispatch for this worker and this job.'));
+	if (!$filters['ignore_redispatch']) {
+		$sql = "select count(*) as c from ";
+		$sql .= "node, ";
+		$sql .= "field_data_field_sirius_worker, ";
+		$sql .= "field_data_field_sirius_dispatch_job ";
+		$sql .= "where node.type = 'sirius_dispatch' ";
+		$sql .= "and field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+		$sql .= "and field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
+		$sql .= "and field_data_field_sirius_dispatch_job.field_sirius_dispatch_job_target_id = :job_nid ";
+		$sql .= "and field_data_field_sirius_worker.field_sirius_worker_target_id = :worker_nid ";
+		$stmt = db_query($sql, array(':job_nid' => $job_node->nid, ':worker_nid' => $worker_nid));
+		$hr = $stmt->fetchAssoc();
+		if ($hr['c']) {
+			return array('success' => FALSE, 'msg' => t('There is already a dispatch for this worker and this job.'));
+		}
 	}
 
 	// Rollover
@@ -737,7 +739,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 
 	// CBN
 	if (!$filters['ignore_cbn']) {
-		if ($job_node->field_sirius_dispatch_job_type['und'][0]['tid'] == sirius_get_special_tid('sirius_dispatch_job_type|OPEN')) {
+		if ($filters['cbn'] == 'No') {
 			if (sirius_fieldval($worker_node, 'field_sirius_dispatch_cbn', 'value') == 'Yes') {
 				return array('success' => FALSE, 'msg' => t('The worker has requested to only receive call-by-names.'));
 			}

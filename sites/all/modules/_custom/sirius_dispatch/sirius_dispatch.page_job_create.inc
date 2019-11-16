@@ -112,6 +112,20 @@ function sirius_dispatch_page_job_create_access($employer_node, $job_type_tid) {
 }
 
 function sirius_dispatch_page_job_create($employer_node, $job_type_tid) {
+	// Check for pending VLRIs
+	if (!user_access('sirius dispatch staff')) {
+		// Must not have any pending VLRIs
+		$vlri_check = sirius_dispatch_vlri_block_check($employer_node->nid);
+		if (!$vlri_check['success']) {
+			$html = $vlri_check['msg'];
+			$html .= " ";
+			$html .= "No new jobs may be created until these layoff requests are resolved. ";
+			$html .= '<br /><br />';
+			$html .= l('Resolve layoff requests.', 'sirius/employer/dispatch/vlri');
+			return $html;
+		}
+	}
+
 	return drupal_get_form('sirius_dispatch_page_job_create_form', $employer_node, $job_type_tid);
 }
 

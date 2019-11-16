@@ -92,6 +92,24 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 		}
 	}
 
+	$possible = sirius_dispatch_vlri_possible($dispatch_node);
+	if ($possible['success']) {
+		$actions['vlri'] 			= t('Voluntary layoff this dispatch with a request to convert to involuntary');
+	} else {
+		if ($_REQUEST['debug']) {
+			$form['impossible']['vlri_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'VLRI not possible: ' . $possible['msg'] . '</div>');
+		}
+	}
+
+	$possible = sirius_dispatch_vlri_resolve_possible($dispatch_node);
+	if ($possible['success']) {
+		$actions['vlri_resolve'] 			= t('Resolve layoff request');
+	} else {
+		if ($_REQUEST['debug']) {
+			$form['impossible']['vlri_resolve_impossible'] = array('#markup' => '<div class="sirius_form_intro">' . 'VLRI Resolve not possible: ' . $possible['msg'] . '</div>');
+		}
+	}
+
 	$actions['send'] 				  = t('Send a copy');
 
 	$form['action'] = array(
@@ -190,6 +208,17 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
     ),
   );
 
+	$form['vlri_resolve'] = array(
+		'#title' => t('Resolve:'),
+		'#type' => 'select',
+		'#options' => array(NULL => t('-- Select --'), 'accept' => t('Accept'), 'reject' => t('Reject')),
+		'#states' => array(
+			'visible' => array(
+				array(':input[name="action"]' => array('value' => 'vlri_resolve')),
+			)
+		),
+	);
+
 
 	$form['notes'] = array(
 		'#type' => 'textarea',
@@ -220,6 +249,8 @@ function sirius_node_tab_dispatch_manage_form_submit($form, &$form_state) {
 	if ($action == 'terminate')			{ $result = sirius_dispatch_terminate($dispatch_node, $notes); }
 	if ($action == 'rollover')			{ $result = sirius_dispatch_rollover($dispatch_node, $form_state['values']['rollover_employer_nid'], $form_state['values']['rollover_type'], $form_state['values']['rollover_end_date'], $notes); }
 	if ($action == 'resign')				{ $result = sirius_dispatch_resign($dispatch_node, $notes); }
+	if ($action == 'vlri')					{ $result = sirius_dispatch_vlri($dispatch_node, $notes); }
+	if ($action == 'vlri_resolve')	{ $result = sirius_dispatch_vlri_resolve($dispatch_node, $notes, $form_state['values']['vlri_resolve']); }
 
 	if ($result['success']) {
 		drupal_set_message("Success - " . $result['msg']);

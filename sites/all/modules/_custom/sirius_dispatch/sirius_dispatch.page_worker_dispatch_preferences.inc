@@ -49,7 +49,8 @@ function sirius_node_tab_worker_dispatch_preferences_form($form, &$form_state, $
 
   $form['accordion_close_notifications'] = array('#markup' => '</div>');
 
-	if (user_access('sirius dispatch staff') || (user_access('sirius dispatch own preferences') && $worker_node->field_sirius_dispatch_sib['und'][0]['value'] != 'Yes')) {
+  $sib_term = taxonomy_term_load($worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']);
+	if (user_access('sirius dispatch staff') || (user_access('sirius dispatch own preferences') && $sib_term->field_sirius_dispatch_available['und'][0]['value'] != 'No')) {
 
 		// 
 		// Auto Sign-In?
@@ -539,7 +540,7 @@ function sirius_node_tab_worker_dispatch_preferences_form_submit($form, &$form_s
 
 		$old_asi = $worker_node->field_sirius_dispatch_asi['und']['0']['value'];
 		$new_asi = $form_state['values']['asi'];
-		if ($old_asi != $new_asi) {
+		if ($new_asi && $old_asi != $new_asi) {
 			$worker_node->field_sirius_dispatch_asi['und']['0']['value'] = $new_asi;
 			$need_save = TRUE;
 			sirius_log('worker:asi', 'set', 'Auto-sign-in preferences have been set to ' . $new_asi, '', '', array($worker_node->nid), array());
