@@ -560,6 +560,15 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['grievance/report/status-summary'] = array(
+		'title' => 'Report: Status Summary',
+		'description' => '',
+		'page callback' => 'grievance_report_status_summary',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
 	$items['grievance/report/average-time'] = array(
 		'title' => 'Report: Average Time Between Statuses',
 		'description' => '',
