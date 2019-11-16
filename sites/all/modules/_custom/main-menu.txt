@@ -67,7 +67,6 @@ Reports {"url":"<front>","lang":"und","weight":"-48"}
 -Type and Status {"url":"grievance\/report\/bytype","lang":"und","weight":"-41"}
 -Settlement Detail {"url":"grievance\/report\/settlement","lang":"und","weight":"-43"}
 -Average Time Between Statuses {"url":"grievance\/report\/average-time","lang":"und","weight":"-47"}
--Open Grievances: By Specialist {"url":"grievance\/report\/open","lang":"und","weight":"-46"}
 -Yearly Summary {"url":"grievance\/report\/year-summary","lang":"und","weight":"-40"}
 -Log Search {"url":"grievances\/log","lang":"und","weight":"-50"}
 -Settlement Summary {"url":"grievance\/report\/settlement\/summary","lang":"und","weight":"-42"}
@@ -88,6 +87,8 @@ Reports {"url":"<front>","lang":"und","weight":"-48"}
 -UH226 Violation {"url":"grievance\/report\/custom\/uh226-violation","lang":"und","weight":"0"}
 -UH23 Summary {"url":"grievance\/report\/custom\/uh23-report-summary","lang":"und","weight":"0"}
 -Quick Export {"url":"grievance\/report\/grievance-quick-export","lang":"und","weight":"0"}
+-Status Summary {"url":"grievance\/report\/status-summary","lang":"und","weight":"0"}
+-Monthly Grievances by Shop {"url":"admin\/reports\/report-cache\/grievance-report-shop-monthly","lang":"und","weight":"0"}
 Help {"url":"grievances\/uh\/help","lang":"und","weight":"50"}
 -Emailing Attachments {"url":"grievances\/uh\/help\/emailing_attachments","lang":"und","weight":"-48"}
 -Logging In and Out {"url":"grievances\/uh\/help\/logging_in_and_out","lang":"und","weight":"-50"}
