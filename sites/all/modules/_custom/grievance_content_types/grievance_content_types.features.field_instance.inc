@@ -13302,6 +13302,50 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-sirius_bulk-field_field_sirius_callerid'.
+  $field_instances['node-sirius_bulk-field_field_sirius_callerid'] = array(
+    'bundle' => 'sirius_bulk',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_field_sirius_callerid',
+    'label' => 'Caller ID',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 9,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_bulk-field_sirius_bulk_medium'.
   $field_instances['node-sirius_bulk-field_sirius_bulk_medium'] = array(
     'bundle' => 'sirius_bulk',
@@ -13404,7 +13448,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 2,
@@ -13467,7 +13510,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 3,
@@ -14171,6 +14213,7 @@ function grievance_content_types_field_default_field_instances() {
         'title' => 0,
       ),
       'override_format' => 'default',
+      'preferred_field_reference' => '',
       'show_component_required_marker' => 0,
       'size' => array(
         'credentials' => 35,
@@ -21351,6 +21394,7 @@ If the file has multiple pages, then each page in the input document will use th
         'title' => 0,
       ),
       'override_format' => 'default',
+      'preferred_field_reference' => '',
       'show_component_required_marker' => 0,
       'size' => array(
         'credentials' => 35,
@@ -24604,6 +24648,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Call Number');
   t('Call by Name Only?');
   t('Call by Name?');
+  t('Caller ID');
   t('Caller ID text (what is shown to the recipient)');
   t('Caller IDs');
   t('Can Sign In?');
