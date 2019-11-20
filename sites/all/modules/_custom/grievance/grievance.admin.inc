@@ -55,6 +55,15 @@ function grievance_admin() {
     );
   }
 
+  $form['grievance_status']['grievance_incident_default_days_ago'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default Incident Days Ago'),
+    '#size' => 4,
+    '#default_value' => variable_get('grievance_incident_default_days_ago', 15),
+    '#description' => t('When a new grievance is created, a "timeline starts" log entry is created. If the date of this incident is not entered, the log entry should be this many days before the current date.'),
+  );
+
+
   $form['member_forward'] = array(
     '#type' => 'fieldset',
     '#title' => t('Member Notification'),

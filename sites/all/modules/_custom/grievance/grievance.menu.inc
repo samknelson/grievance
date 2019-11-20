@@ -560,6 +560,25 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['grievance/report/status-summary'] = array(
+		'title' => 'Report: Status Summary',
+		'description' => '',
+		'page callback' => 'grievance_report_status_summary',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['grievance/report/open'] = array(
+		'title' => 'Report: Open Grievances by Specialist',
+		'description' => '',
+		'page callback' => 'grievance_report_open_by_specialist',
+		'page arguments' => array(),
+		'access arguments' => array('grievance view'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+
 	$items['grievance/report/average-time'] = array(
 		'title' => 'Report: Average Time Between Statuses',
 		'description' => '',
@@ -611,15 +630,6 @@ function grievance_menu() {
 		'page callback' => 'grievance_report_open_summary_with_log',
 		'page arguments' => array(),
 		'access arguments' => array('grievance report'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-
-	$items['grievance/report/open'] = array(
-		'title' => 'Report: Open Grievances: By Specialist',
-		'description' => '',
-		'page callback' => 'grievance_report_open_by_specialist',
-		'page arguments' => array(),
-		'access arguments' => array('grievance view'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 

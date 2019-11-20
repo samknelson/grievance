@@ -177,6 +177,9 @@ function sirius_email_send($params) {
 		$params 
 	);
 
+  // Don't log attachments
+  unset($message['params']['attachments']);
+  
   sirius_log(
     'email', 
     'sending', 

@@ -13,7 +13,7 @@ function grievance_report_open_summary_with_log_form($form, &$form_state) {
   $log_type_vid = taxonomy_vocabulary_machine_name_load('grievance_log_types')->vid;
   $log_type_terms = taxonomy_get_tree($log_type_vid);
 
-  $options = array(NULL => '-- Select --');
+  $options = array();
   foreach ($status_terms as $ignore => $term) {
     $options["status|" . $term->tid] = "Status: " . $term->name;
   }
@@ -28,19 +28,52 @@ function grievance_report_open_summary_with_log_form($form, &$form_state) {
       'Use the form below to generate a report of <strong>open</strong> grievances which have one or two specific log types. ' .
       'For example, you might select the log type "first call" to count grievances that have or haven\'t had a first call. ' .
       'You might select "BOA Held" to count grievances that have or haven\'t had a board of adjustment.' .
+      'Make sure to select only log types OR statuses, not both. ' .
       '</div>',
+  );
+
+  $form['organizer'] = array(
+    '#type' => 'entityreference',
+    '#title' => t('Organizer'),
+    '#era_entity_type' => 'user',
+    '#era_bundles' => array(),
+    '#era_query_settings' => array(),
+    '#description' => t('Leave blank to select all organizers.'),
+    '#prefix' => '<div class="form-start">',
+  );
+
+  $form['shop'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Shop'),
+    '#description' => t('Enter all or part of the shop name.  Leave blank to select all shops.'),
+  );
+
+  $form['shop_match'] = array(
+    '#type' => 'select',
+    '#title' => t('Exact match on shop name?'),
+    '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
+  );
+
+  $form['classaction'] = array(
+    '#type' => 'select',
+    '#title' => t('General Grievances Only?'),
+    '#options' => array(NULL => t('Both Individual and General'), 'No' => t('Individual Grievnaces Only'), 'Yes' => t('General / Class Action Grievances Only')),
   );
 
   $form['col_1'] = array(
     '#type' => 'select',
     '#title' => 'First Column',
     '#options' => $options,
+    '#multiple' => TRUE,
+    '#size' => 10,
   );
 
   $form['col_2'] = array(
     '#type' => 'select',
     '#title' => 'Second Column',
     '#options' => $options,
+    '#multiple' => TRUE,
+    '#size' => 10,
   );
 
   $form['submit'] = array(
@@ -60,15 +93,22 @@ function grievance_report_open_summary_with_log_form_submit($form, &$form_state)
 
 function grievance_report_open_summary_with_log_fields() {
   return array(
-    t('NID'),
-    t('Name'), 
-    t('Shop'), 
-    t('Col 1'),
-    t('Col 2'),
+    'nid' => t('NID'),
+    'specialist' => t('Specialist'), 
+    'shop' => t('Shop'), 
+    'grievance_id' => t('Grievance ID'), 
+    'first_name' => t('First Name'), 
+    'last_name' => t('Last Name'), 
+    'classification' => t('Classification'), 
+    'cba' => t('CBA Provision(s) Violated'), 
+    'col_1_count' => t('Col 1 Count'),
+    'col_1_date' => t('Col 1 First Date'),
+    'col_2_count' => t('Col 2 Count'),
+    'col_2_date' => t('Col 2 First Date'),
   );
 }
 
-function grievance_report_open_summary_with_log_pks() {
+function grievance_report_open_summary_with_log_pks($form_state, $report_type, $report_id) {
   // Get the list of open and closed statuses
   $status_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_status');
   $status_terms = array();
@@ -87,14 +127,43 @@ function grievance_report_open_summary_with_log_pks() {
     }
   }
 
-  $sql = "select nid ";
+  $shop = $form_state['values']['shop'];
+  $shop_match = $form_state['values']['shop_match'];
+  $organizer_nid = $form_state['values']['organizer']['entity_id'];
+  $classaction = $form_state['values']['classaction'];
+
+  $args = array();
+  $args[':open_status_tids'] = $open_status_tids;
+
+  $sql = "select distinct node.nid ";
   $sql .= "from node ";
+  $sql .= "left join field_data_field_grievance_rep_organizer on (field_data_field_grievance_rep_organizer.entity_type = 'node' and field_data_field_grievance_rep_organizer.entity_id = node.nid) ";
+  $sql .= "left join field_data_field_grievance_shop on (field_data_field_grievance_shop.entity_type = 'node' and node.nid = field_data_field_grievance_shop.entity_id) ";
   $sql .= "left join field_data_field_grievance_status on (field_data_field_grievance_status.entity_type = 'node' and node.nid = field_data_field_grievance_status.entity_id) ";
+  $sql .= "left join field_data_field_grievance_classaction on (field_data_field_grievance_classaction.entity_type = 'node' and node.nid = field_data_field_grievance_classaction.entity_id) ";
+  $sql .= "left join node shop_node on shop_node.nid = field_grievance_shop_target_id ";
   $sql .= "where node.type = 'grievance' ";
   $sql .= "and field_data_field_grievance_status.field_grievance_status_tid in (:open_status_tids) ";
+  if ($shop) {
+    if ($shop_match == 'Yes') {
+      $sql .= "and shop_node.title = :shop ";
+      $args[':shop'] = $shop;
+    } else {
+      $sql .= "and shop_node.title like :shop ";
+      $args[':shop'] = '%' . $shop . '%';
+    }
+  }
+  if ($organizer_nid) {
+    $sql .= "and field_grievance_rep_organizer_target_id = :organizer_nid ";
+    $args[':organizer_nid'] = $organizer_nid;
+  }
+  if ($classaction) {
+    $sql .= "and field_grievance_classaction_value = :classaction ";
+    $args[':classaction'] = $classaction;
+  }
   $sql .= "order by node.nid ";
 
-  $stmt = db_query($sql, array(':open_status_tids' => $open_status_tids));
+  $stmt = db_query($sql, $args);
   $nids = array();
   while ($hr = $stmt->fetchAssoc()) {
     $nids[] = $hr['nid'];
@@ -123,44 +192,72 @@ function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $value
   $row = array();
   $row[] = $grievance_nid;
 
-  $sql = "select name from users, field_data_field_grievance_rep_organizer ";
-  $sql .= "where users.uid = field_data_field_grievance_rep_organizer.field_grievance_rep_organizer_target_id ";
-  $sql .= "and field_data_field_grievance_rep_organizer.entity_type = 'node' ";
-  $sql .= "and field_data_field_grievance_rep_organizer.entity_id = :nid ";
+  // Basic grievancce information 
+  $sql = "select users.name as user_name, ";
+  $sql .= "shop_node.title as shop_title, ";
+  $sql .= "field_grievance_id_value as id, ";
+  $sql .= "field_grievance_first_name_value as first_name, "; 
+  $sql .= "field_grievance_last_name_value as last_name, "; 
+  $sql .= "class_term.name as classification ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_grievance_rep_organizer on (field_data_field_grievance_rep_organizer.entity_type = 'node' and field_data_field_grievance_rep_organizer.entity_id = node.nid) ";
+  $sql .= "left join field_data_field_grievance_shop on (field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid) ";
+  $sql .= "left join field_data_field_grievance_first_name on (field_data_field_grievance_first_name.entity_type = 'node' and field_data_field_grievance_first_name.entity_id = node.nid) ";
+  $sql .= "left join field_data_field_grievance_last_name on (field_data_field_grievance_last_name.entity_type = 'node' and field_data_field_grievance_last_name.entity_id = node.nid) ";
+  $sql .= "left join field_data_field_grievance_id on (field_data_field_grievance_id.entity_type = 'node' and field_data_field_grievance_id.entity_id = node.nid) ";
+  $sql .= "left join field_data_field_grievance_class_tid on (field_data_field_grievance_class_tid.entity_type = 'node' and field_data_field_grievance_class_tid.entity_id = node.nid) ";
+  $sql .= "left join users on field_grievance_rep_organizer_target_id = users.uid ";
+  $sql .= "left join node shop_node on field_grievance_shop_target_id = shop_node.nid ";
+  $sql .= "left join taxonomy_term_data class_term on field_grievance_class_tid_tid = class_term.tid ";
+  $sql .= "where node.nid = :nid ";
   $stmt = db_query($sql, array(':nid' => $grievance_nid));
   $hr = $stmt->fetchAssoc();
-  $row[] = $hr['name'];
+  $row[] = $hr['user_name'];
+  $row[] = $hr['shop_title'];
+  $row[] = $hr['id'];
+  $row[] = $hr['first_name'];
+  $row[] = $hr['last_name'];
+  $row[] = $hr['classification'];
 
-  $sql = "select title from node, field_data_field_grievance_shop ";
-  $sql .= "where node.nid = field_data_field_grievance_shop.field_grievance_shop_target_id ";
-  $sql .= "and field_data_field_grievance_shop.entity_type = 'node' ";
-  $sql .= "and field_data_field_grievance_shop.entity_id = :nid ";
+  // Violations
+  $sql = "select clause_node.title as clause_title ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_grievance_clauseref on (field_data_field_grievance_clauseref.entity_type = 'node' and field_data_field_grievance_clauseref.entity_id = node.nid) ";
+  $sql .= "left join node clause_node on clause_node.nid = field_grievance_clauseref_target_id ";
+  $sql .= "where node.nid = :nid ";
+  $sql .= "order by field_data_field_grievance_clauseref.delta ";
   $stmt = db_query($sql, array(':nid' => $grievance_nid));
-  $hr = $stmt->fetchAssoc();
-  $row[] = $hr['title'];
+  while ($hr = $stmt->fetchAssoc()) {
+    if ($clause_title) { $clause_title .= '<br />'; }
+    $clause_title .= $hr['clause_title'];
+  }
+  $row[] = $clause_title;
 
   for ($i=1; $i<=2; ++$i) {
     if ($values['col_' . $i]) {
-      list ($which, $tid) = explode('|', $values['col_' . $i]);
-      if ($which == 'type') {
-        $sql = "select count(*) as c from field_data_field_grievance, field_data_field_grievance_log_type ";
-        $sql .= "where field_data_field_grievance.entity_type = 'node' ";
-        $sql .= "and field_data_field_grievance_log_type.entity_type = 'node' ";
-        $sql .= "and field_data_field_grievance_log_type.entity_id = field_data_field_grievance.entity_id ";
-        $sql .= "and field_data_field_grievance.field_grievance_target_id = :nid ";
-        $sql .= "and field_data_field_grievance_log_type.field_grievance_log_type_tid = :tid ";
-      } else {
-        $sql = "select count(*) as c from field_data_field_grievance, field_data_field_grievance_status ";
-        $sql .= "where field_data_field_grievance.entity_type = 'node' ";
-        $sql .= "and field_data_field_grievance_status.entity_type = 'node' ";
-        $sql .= "and field_data_field_grievance_status.entity_id = field_data_field_grievance.entity_id ";
-        $sql .= "and field_data_field_grievance.field_grievance_target_id = :nid ";
-        $sql .= "and field_data_field_grievance_status.field_grievance_status_tid = :tid ";
+      $tids = array();
+      $which = '';
+      foreach ($values['col_' . $i] as $key) {
+        list ($which, $tid) = explode('|', $key);
+        $tids[] = $tid;        
       }
-      $stmt = db_query($sql, array(':nid' => $grievance_nid, ':tid' => $tid));
+
+      $sql = "select count(*) as c, min(field_grievance_status_date_value) as first_date ";
+      $sql .= "from node ";
+      $sql .= "left join field_data_field_grievance on (field_data_field_grievance.entity_type = 'node' and field_data_field_grievance.entity_id = node.nid) ";
+      $sql .= "left join field_data_field_grievance_status on (field_data_field_grievance_status.entity_type = 'node' and field_data_field_grievance_status.entity_id = node.nid) ";
+      $sql .= "left join field_data_field_grievance_status_date on (field_data_field_grievance_status_date.entity_type = 'node' and field_data_field_grievance_status_date.entity_id = node.nid) ";
+      $sql .= "left join field_data_field_grievance_log_type on (field_data_field_grievance_log_type.entity_type = 'node' and field_data_field_grievance_log_type.entity_id = node.nid) ";
+      $sql .= "where node.type = 'grievance_log' ";
+      $sql .= "and field_grievance_target_id = :nid ";
+      if ($which == 'type') { $sql .= "and field_grievance_log_type_tid in (:tids) "; } 
+      else { $sql .= "and field_grievance_status_tid in (:tids) "; }
+      $stmt = db_query($sql, array(':nid' => $grievance_nid, ':tids' => $tids));
       $hr = $stmt->fetchAssoc();
       $row[] = $hr['c'];
+      $row[] = $hr['first_date'];
     } else {
+      $row[] = 'N/A';
       $row[] = 'N/A';
     }
   }
@@ -173,6 +270,14 @@ function grievance_report_open_summary_with_log_lookups() {
   $status_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_status');
   $status_terms = taxonomy_get_tree($status_vocabulary->vid);
   return array('status_terms' => $status_terms);
+}
+
+function grievance_report_open_summary_with_log_render_specialist_detail($report_type, $report_id) {
+  return grievance_report_open_summary_with_log_render_detail($report_type, $report_id, 'specialist');
+}
+
+function grievance_report_open_summary_with_log_render_employer_detail($report_type, $report_id) {
+  return grievance_report_open_summary_with_log_render_detail($report_type, $report_id, 'employer');
 }
 
 function grievance_report_open_summary_with_log_render_specialist($report_type, $report_id) {
@@ -196,13 +301,35 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
   $html = '';
   $html .= '<div class="grievance-report-summary-with-log-render">';
   $html .= '<h2>';
-  $html .= t('Open Grievances Summary Report With Log ');
+  $html .= t('Open Grievances Summary Report');
   if ($which == 'specialist') { 
     $html .= ' -- By Specialist'; 
   } else {
     $html .= ' -- By Employer'; 
   }
   $html .= '</h2>';
+
+  if ($parameters['classaction']) {
+    $html .= '<strong>' . t('General / Class Action: ') . '</strong>' . $parameters['classaction'] . '<br />';
+  }
+  if ($parameters['shop']) {
+    $html .= '<strong>' . t('Shop: ') . '</strong>' . $parameters['shop'] . '<br />';
+  }
+
+  for ($i=1; $i<=2; ++$i) {
+    if ($parameters["col_$i"]) {
+      $col_str = '';
+      foreach ($parameters["col_$i"] as $key) {
+        list ($ignore, $tid) = explode('|', $key);
+        $term = taxonomy_term_load($tid);
+        if ($col_str) { $col_str .= ', '; }
+        $col_str .= $term->name;
+      }
+      $html .= '<strong>' . "Milestone #$i: " . '</strong>' . $col_str . '<br />';
+    }
+  }
+
+  $fields = grievance_report_open_summary_with_log_fields();
 
   $query = db_select('report_cache');
   $query->fields('report_cache');
@@ -211,13 +338,18 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
   $stmt = $query->execute();
   $data = array();
   while ($hr = $stmt->fetchAssoc()) {
-    $hr = unserialize($hr['report_data']);
-    $total += $hr['amt'];
+    $raw_hr = unserialize($hr['report_data']);
+    $hr = array();
+    $delta = 0;
+    foreach ($fields as $name => $prompt) {
+      $hr[$name] = $raw_hr[$delta];
+      ++$delta;
+    }
 
     if ($which == 'specialist') {
-      $key = $hr[1];
+      $key = $hr['specialist'];
     } else {
-      $key = $hr[2];
+      $key = $hr['shop'];
     }
 
     if (!$key) { $key = '[unknown]'; }
@@ -225,7 +357,7 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
     $data[$key]['total']++;
     $totals['total']++;
 
-    if ($hr[3]) {
+    if ($hr['col_1_count']) {
       $data[$key]['col_1_yes']++;
       $totals['col_1_yes']++;
     } else {
@@ -233,7 +365,7 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
       $totals['col_1_no']++;
     }
 
-    if ($hr[4]) {
+    if ($hr['col_2_count']) {
       $data[$key]['col_2_yes']++;
       $totals['col_2_yes']++;
     } else {
@@ -244,16 +376,6 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
 
   ksort($data);
 
-  if ($parameters['col_1']) {
-    list ($ignore, $tid) = explode('|', $parameters['col_1']);
-    $col_1_term = taxonomy_term_load($tid);
-  }
-
-  if ($parameters['col_2']) {
-    list ($ignore, $tid) = explode('|', $parameters['col_2']);
-    $col_2_term = taxonomy_term_load($tid);
-  }
-
   $header = array();
   if ($which == 'specialist') {
     $header[] = 'Specialist';
@@ -261,10 +383,10 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
     $header[] = 'Employer';
   }
   $header[] = 'Total';
-  if ($parameters['col_1']) { $header[] = 'With: ' . $col_1_term->name; }
-  if ($parameters['col_2']) { $header[] = 'With: ' . $col_2_term->name; }
-  if ($parameters['col_1']) { $header[] = 'Without: ' . $col_1_term->name; }
-  if ($parameters['col_2']) { $header[] = 'Without: ' . $col_2_term->name; }
+  if ($parameters['col_1']) { $header[] = 'With Milestone #1'; }
+  if ($parameters['col_2']) { $header[] = 'With Milestone #2'; }
+  if ($parameters['col_1']) { $header[] = 'Without Milestone #1'; }
+  if ($parameters['col_2']) { $header[] = 'Without Milestone #2'; }
 
   $rows = array();
   foreach ($data as $key => $sub_data) {
@@ -288,7 +410,6 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
   if ($parameters['col_2']) { $row[] = '<strong>' . number_format($totals['col_2_no']) . '</strong>'; }
   $rows[] = $row;
 
-
   $attributes = array();
 
   $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
@@ -297,229 +418,123 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
   return $html;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function grievance_report_open_summary_with_log_formxyz_submit($form, &$form_state) {
-	$form_state['rebuild'] = TRUE;
-
-	// Get the list of open and closed statuses
-  $status_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_status');
-  $status_terms = array();
-  $tmp = taxonomy_get_tree($status_vocabulary->vid);
-  foreach ($tmp as $status_term) {
-    $status_terms[$status_term->tid] = taxonomy_term_load($status_term->tid);
-  }
-  $open_status_tids = array(-999);
-  $closed_status_tids = array(-999);
-
-  foreach ($status_terms as $tid => $term) {
-    if ($term->field_grievance_open['und'][0]['value'] == 1) {
-      $open_status_tids[] = $tid;
-    }
-    if ($term->field_grievance_open['und'][0]['value'] == 0) {
-      $closed_status_tids[] = $tid;
-    }
-  }
-  $params[':open_status_tids'] = $open_status_tids;
-
-
-  // Get the column 1 and 2
-  $col_1 = $form_state['values']['col_1'];
-  $col_2 = $form_state['values']['col_2'];
-  list($col_1_which, $col_1_tid) = explode('|', $col_1);
-  list($col_2_which, $col_2_tid) = explode('|', $col_2);
-
-  // Do this as one SQL query, because it's so much quicker
-  /*
-  $sql = "select nid, ";
-  $sql .= "field_grievance_rep_organizer_target_id, ";
-  $sql .= "field_grievance_shop_target_id ";
-  if ($col_1) {
-    if ($col_1_which == 'type') {
-      $sql .= ', count(log1_type.field_grievance_log_type_tid) as col_1 ';
-    } else {
-      $sql .= ', count(log1_status.field_grievance_status_tid) as col_1 ';
-    }
-  } 
-  $sql .= "from node ";
-  $sql .= "left join field_data_field_grievance_status on (field_data_field_grievance_status.entity_type = 'node' and node.nid = field_data_field_grievance_status.entity_id) ";
-  $sql .= "left join field_data_field_grievance_rep_organizer on (field_data_field_grievance_rep_organizer.entity_type = 'node' and node.nid = field_data_field_grievance_rep_organizer.entity_id) ";
-  $sql .= "left join field_data_field_grievance_shop on (field_data_field_grievance_shop.entity_type = 'node' and node.nid = field_data_field_grievance_shop.entity_id) ";
-
-  if ($col_1) {
-    $sql .= "left join field_data_field_grievance field_data_field_grievance_col_1 on (field_data_field_grievance_col_1.entity_type = 'node' and field_data_field_grievance_col_1.bundle = 'grievance_log' and field_data_field_grievance_col_1.field_grievance_target_id = node.nid) ";
-    $params[':col_1_tid'] = $col_1_tid;
-    $sql .= "left join field_data_field_grievance log1 on (log1.entity_type = 'node' and log1.bundle = 'grievance_log' and log1.field_grievance_target_id = node.nid) ";
-    if ($col_1_which == 'type') {
-      $sql .= "left join field_data_field_grievance_log_type log1_type on (log1_type.entity_type = 'node' and log1_type.entity_id = log1.entity_id and log1_type.field_grievance_log_type_tid = :col_1_tid) ";
-    } else {
-      $sql .= "left join field_data_field_grievance_status log1_status on (log1_status.entity_type = 'node' and log1_status.entity_id = log1.entity_id and log1_status.field_grievance_status_tid = :col_1_tid) ";
-    }
-  }
-
-  if ($col_2) {
-    $sql .= "left join field_data_field_grievance field_data_field_grievance_col_2 on (field_data_field_grievance_col_2.entity_type = 'node' and field_data_field_grievance_col_2.bundle = 'grievance_log' and field_data_field_grievance_col_2.field_grievance_target_id = node.nid) ";
-    $params[':col_2_tid'] = $col_2_tid;
-    $sql .= "left join field_data_field_grievance log2 on (log2.entity_type = 'node' and log2.bundle = 'grievance_log' and log2.field_grievance_target_id = node.nid) ";
-    if ($col_2_which == 'type') {
-      $sql .= "left join field_data_field_grievance_log_type log2_type on (log2_type.entity_type = 'node' and log2_type.entity_id = log2.entity_id and log2_type.field_grievance_log_type_tid = :col_2_tid) ";
-    } else {
-      $sql .= "left join field_data_field_grievance_status log2_status on (log2_status.entity_type = 'node' and log2_status.entity_id = log2.entity_id and log2_status.field_grievance_status_tid = :col_2_tid) ";
-    }
-  }
-
-  $sql .= "where node.type = 'grievance' ";
-  $sql .= "and field_data_field_grievance_status.field_grievance_status_tid in (:open_status_tids) ";
-  $sql .= "group by node.nid ";
-  */
-
-  $header = array(
-  	'Name',
-  	'Open',
-    'Col 1 Yes',
-    'Col 2 Yes',
-    'Col 1 No',
-  	'Col 2 No',
-  );
-  $attributes = array();
-
-  $stmt = db_query($sql, $params);
-  $counts = array();
-
-  $count_total = 0;
-  $count_by_specialist = array();
-  $count_by_shop = array();
-
-  while ($hr = $stmt->fetchAssoc()) {
-  	++$count;
-
-    ++$count_by_specialist[$hr['field_grievance_rep_organizer_target_id']]['total'];
-    ++$count_by_shop[$hr['field_grievance_shop_target_id']]['total'];
-
-    if ($hr['col_1']) {
-      ++$count_by_specialist[$hr['field_grievance_rep_organizer_target_id']]['col_1_yes'];
-      ++$count_by_shop[$hr['field_grievance_shop_target_id']]['col_1_yes'];
-    } else {
-      ++$count_by_specialist[$hr['field_grievance_rep_organizer_target_id']]['col_1_no'];
-      ++$count_by_shop[$hr['field_grievance_shop_target_id']]['col_1_no'];
-    }
-
-    if ($hr['col_2']) {
-      ++$count_by_specialist[$hr['field_grievance_rep_organizer_target_id']]['col_2_yes'];
-      ++$count_by_shop[$hr['field_grievance_shop_target_id']]['col_2_yes'];
-    } else {
-      ++$count_by_specialist[$hr['field_grievance_rep_organizer_target_id']]['col_2_no'];
-      ++$count_by_shop[$hr['field_grievance_shop_target_id']]['col_2_no'];
-    }
-  }
-
-  $which = $form_state['values']['which'];
-
-  if ($which == 'specialist') {
-  	$lookups = user_load_multiple(array_keys($count_by_specialist));
-  	$count_by_which = $count_by_specialist;
+function grievance_report_open_summary_with_log_render_detail($report_type, $report_id, $which) {
+  // Load the parameters
+  $query = db_select('report_cache');
+  $query->fields('report_cache');
+  $query->condition('report_id', $report_id);
+  $query->condition('report_type', $report_type . ' :: PARAMETERS');
+  $stmt = $query->execute();
+  $hr = $stmt->fetchAssoc();
+  $parameters = unserialize($hr['report_data']);
+
+  $html = '';
+  $html .= '<div class="grievance-report-summary-with-log-render">';
+  $html .= '<h2>';
+  $html .= t('Open Grievances Detail Report');
+  if ($which == 'specialist') { 
+    $html .= ' -- By Specialist'; 
   } else {
-  	$lookups = node_load_multiple(array_keys($count_by_shop));
-  	$count_by_which = $count_by_shop;
+    $html .= ' -- By Employer'; 
+  }
+  $html .= '</h2>';
+
+  if ($parameters['classaction']) {
+    $html .= '<strong>' . t('General / Class Action: ') . '</strong>' . $parameters['classaction'] . '<br />';
+  }
+  if ($parameters['shop']) {
+    $html .= '<strong>' . t('Shop: ') . '</strong>' . $parameters['shop'] . '<br />';
   }
 
-  foreach ($count_by_which as $id => &$counts) {
-  	if (!$id) {
-  		$counts['name'] = '(Not assigned)';
-  		$counts['id'] = 0;
-  	} else {
-  		if ($which == 'specialist') {
-  			$counts['name'] = $lookups[$id]->name;
-  		} else {
-  			$counts['name'] = $lookups[$id]->title;
-  		}
-  		$counts['id'] = $id;
-  	}
+  for ($i=1; $i<=2; ++$i) {
+    if ($parameters["col_$i"]) {
+      $col_str = '';
+      foreach ($parameters["col_$i"] as $key) {
+        list ($ignore, $tid) = explode('|', $key);
+        $term = taxonomy_term_load($tid);
+        if ($col_str) { $col_str .= ', '; }
+        $col_str .= $term->name;
+      }
+      $html .= '<strong>' . "Milestone #$i: " . '</strong>' . $col_str . '<br />';
+    }
   }
 
-  usort($count_by_which, function($a, $b) { 
-  	if (!$a['id']) { return 1; }
-  	if (!$b['id']) { return -1; }
-  	return strcmp($a['name'], $b['name']);
-	});
+  $fields = grievance_report_open_summary_with_log_fields();
+
+  $query = db_select('report_cache');
+  $query->fields('report_cache');
+  $query->condition('report_id', $report_id);
+  $query->condition('report_type', $report_type);
+  $stmt = $query->execute();
+  $data = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $raw_hr = unserialize($hr['report_data']);
+    $hr = array();
+    $delta = 0;
+    foreach ($fields as $name => $prompt) {
+      $hr[$name] = $raw_hr[$delta];
+      ++$delta;
+    }
+
+    if ($which == 'specialist') {
+      $key = $hr['specialist'];
+    } else {
+      $key = $hr['shop'];
+    }
+
+    if (!$key) { $key = '[unknown]'; }
+
+    $data[$key][] = $hr;
+  }
+
+  ksort($data);
+
+  $header = array();
+  if ($which == 'specialist') {
+    $header[] = 'Employer';
+  } else {
+    $header[] = 'Specialist';
+  }
+  $header[] = 'Grievance ID';
+  $header[] = 'First Name';
+  $header[] = 'Last Name';
+  $header[] = 'Classification';
+  $header[] = 'CBA Provision(s) Violated';
+  for ($i=1; $i<=2; ++$i) {
+    if ($parameters["col_$i"]) {
+      $header[] = "Milestone #i Date";
+    }
+  }
 
   $rows = array();
-  foreach ($count_by_which as $id => &$counts) {
-  	$row = array();
-  	$row[] = $counts['name'];
-    $row[] = $counts['total'];
-    $row[] = $counts['col_1_yes'];
-    $row[] = $counts['col_1_no'];
-  	$rows[] = $row;
+  foreach ($data as $key => $sub_data) {
+    $row = array();
+    $row[] = array('data' => "<strong>$key</strong>", 'colspan' => count($header));
+    $rows[] = $row;
+
+    foreach ($sub_data as $hr) {
+      $row = array();
+      if ($which == 'specialist') { $row[] = $hr['shop']; } 
+      else { $row[] = $hr['specialist']; }
+      $row[] = $hr['grievance_id'];
+      $row[] = $hr['first_name'];
+      $row[] = $hr['last_name'];
+      $row[] = $hr['classification'];
+      $row[] = $hr['cba'];
+      for ($i=1; $i<=2; ++$i) {
+        if ($parameters["col_$i"]) {
+          if ($hr["col_${i}_date"]) { $row[] = date('Y-m-d', strtotime($hr["col_${i}_date"])); } 
+          else { $row[] = 'N/A'; }
+        }
+      }
+      $rows[] = $row;
+    }
   }
 
-  /*
-  $row = array();
-  $row[] = '<strong>Total</strong>';
-	foreach ($breakpoints as $breakpoint) {
-		$row[] = '<strong>' . number_format($count_total[$breakpoint], 0) . '</strong>';
-	}
-	$rows[] = $row;
-  */
+  $attributes = array();
 
+  $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
+  $html .= '</div>';
 
-	$form_state['results'] = theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => $attributes));
+  return $html;
 }
-
