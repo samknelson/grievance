@@ -1,5 +1,6 @@
 <?php
 
+
 function sirius_node_tab_wizard($node, $wizard_name) {
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/wizard.css');
 
@@ -247,6 +248,28 @@ function sirius_sirius_wizard_info() {
     'callback_launch_args' => array('feed_worker'),
   );
 
+  $items['feed_contact'] = array(
+    'name' => 'feed_contact',
+    'title' => 'Contacts',
+    'description' => 'Upload a new list of contacts.',
+    'steps' => array(
+			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
+			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
+			// 'tag' 			=> array('label' => 'Tag', 				'callback' => 'sirius_feed_wizard_tag'),
+			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
+			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
+			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
+			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
+    ),
+    'feed' => array(
+    	'batch_size' => 50,
+	    'callback_row_verify' => 'sirius_feed_contact_row_verify',
+	    'callback_row_process' =>'sirius_feed_contact_row_process',
+			'callback_fields' => 'sirius_feed_contact_fields',
+    ),
+    'callback_launch' => 'sirius_feed_wizard_launch',
+    'callback_launch_args' => array('feed_contact'),
+  );
   return $items;
 }
 
