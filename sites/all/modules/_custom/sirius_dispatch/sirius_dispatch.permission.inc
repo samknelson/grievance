@@ -26,6 +26,14 @@ function sirius_dispatch_permission() {
       'title' => t('Sirius Dispatch Resign'), 
       'description' => t('Permission to resign from your own dispatch'),
     ),
+    'sirius dispatch payrate override' => array(
+      'title' => t('Sirius Dispatch Payrate Override'), 
+      'description' => t('Permission to override the pay rate for a job'),
+    ),
+    'sirius dispatch vlri' => array(
+      'title' => t('Sirius Dispatch VLRI'), 
+      'description' => t('Permission to VLRI (voluntary layoff with a request for an involuntary layoff) from your own dispatch'),
+    ),
     'sirius dispatch signin' => array(
       'title' => t('Sirius Dispatch Signin'), 
       'description' => t('Permission to sign yourself in to the out-of-work list'),
