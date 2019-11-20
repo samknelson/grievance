@@ -76,13 +76,34 @@ function sirius_twilio_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/twilio/phone'] = array(
-    'title' => 'Sirius: Twilio: Phone',
+  $items['sirius/twilio/browserphone/twiml'] = array(
+    'title' => 'TwiML BrowserPhone Server',
     'description' => '',
-    'page callback' => 'sirius_twilio_page_phone',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_twilio_browserphone_twiml_dial',
     'page arguments' => array(),
-    'access arguments' => array('sirius twilio admin'),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/twilio/browserphone/twiml/omg'] = array(
+    'page callback' => 'sirius_twilio_browserphone_twiml_omg',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['sirius/twilio/browserphone/twiml/omg/play'] = array(
+    'page callback' => 'sirius_twilio_browserphone_twiml_omg_play',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['sirius/twilio/browserphone/twiml/omg/stream'] = array(
+    'page callback' => 'sirius_twilio_browserphone_twiml_omg_stream',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/twilio/phone'] = array(
