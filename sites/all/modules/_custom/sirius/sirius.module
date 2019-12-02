@@ -20,7 +20,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.email.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.specialtid.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sns.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.qr.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.wizard.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letterhead.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.loopback.inc';
@@ -28,12 +27,30 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.pdf.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.representatives.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.taxonomy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact_definition.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.domain.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.signature.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.callerid.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.volunteer.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_worker.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_contact.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contacts.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_voice_forward_to_operator.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_users.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_switch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_subdomains.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_delete.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_clone.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_sort.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_vocabulary_list.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_list.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_vocabulary_admin.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
 
@@ -191,10 +208,17 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
-  $defaultable_fields = array('sirius_domain');
+  $defaultable_fields = array('sirius_domain', 'sirius_event_type');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $form['field_' . $field]["und"]['#default_value'][0] = $_GET[$field];
+    }
+  }
+
+  $defaultable_fields = array('sirius_type');
+  foreach ($defaultable_fields as $field) {
+    if (isset($_GET[$field]) && isset($form['field_' . $field])) {
+      $form['field_' . $field]["und"][0]['value']['#default_value'] = $_GET[$field];
     }
   }
 
@@ -214,6 +238,38 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
         $form['relations']['#access'] = FALSE;
       }
     }
+  }
+
+  // Remove the domain
+  if ($form['field_sirius_domain']) {
+    if (!user_access('sirius admin')) {
+      // Check our domain. Might come from the query.
+      $domain_nid = $_GET['sirius_domain'];
+
+      // If not, might come from the default value (current field value)
+      if (!$domain_nid) {
+        $domain_nid = $form['field_sirius_domain']['und']['#default_value'][0];
+      }
+
+      // If not, default to our very own domain.
+      if (!$domain_nid) {
+        $domain_node = sirius_domain();
+        $domain_nid = $domain_node->nid;
+      }
+
+      if ($domain_nid) {
+        if (!sirius_domain_access($domain_nid)) { 
+          drupal_set_message("Attempting to create a record in a domain without access.", 'error');
+          $form['#access'] = FALSE;
+        }
+        $form['field_sirius_domain']['und']['#value']['target_id'] = $domain_nid;
+        $form['field_sirius_domain']['#access'] = FALSE;
+      }
+    }
+  }
+
+  // Filter the taxonomy by domain
+  if ($form_id == 'taxonomy_form_term' || preg_match('/_node_form/', $form_id)) {
   }
 }
 
@@ -238,6 +294,7 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
     $form['field_grievance_shops']['#access'] = FALSE;
     $form['field_grievance_phone']['#access'] = FALSE;
     $form['field_grievance_phone_off']['#access'] = FALSE;
+    $form['field_sirius_json']['#access'] = FALSE;
   }
 
   if (!user_access('sirius domain user admin')) {
@@ -333,6 +390,9 @@ function sirius_block_view($delta = '') {
 function sirius_menu_alter(&$items) {
   $items['user/%user']['access callback'] = 'sirius_user_view_access';
   $items['user/%user/edit']['access callback'] = 'sirius_user_edit_access';
+  unset($items['taxonomy/term/%taxonomy_term']);
+  unset($items['taxonomy/term/%taxonomy_term/view']);
+  unset($items['taxonomy/term/%taxonomy_term/feed']);
 }
 
 function sirius_user_view_access($account) {
@@ -473,7 +533,8 @@ function sirius_module_implements_alter(&$implementations, $hook) {
 
 function sirius_sirius_jsonfield_form_definitions() {
   $definition = array();
-  $definition += sirius_letterhead_sirius_jsonfield_form_definitions();
+  $definition = sirius_letterhead_sirius_jsonfield_form_definitions();
+  $definition = array_merge_recursive($definition, sirius_contact_sirius_jsonfield_form_definitions());
   return $definition;
 }
 
@@ -485,3 +546,103 @@ function sirius_file_download_access($file_item, $entity_type, $entity) {
   if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
 }
 
+/**
+ * Implements hook_user_login
+ *
+ * Prevent login for users with disabled domains
+ */
+
+function sirius_user_login(&$edit, $account) {
+  sirius_domain_user_login($edit, $account); 
+}
+
+
+/**
+ * Implements hook_node_insert
+ */
+
+function sirius_node_insert($node) {
+}
+
+
+/**
+ * Implements hook_node_update
+ */
+
+function sirius_node_update($node) {
+  if ($node->type == 'sirius_domain') { sirius_domain_node_update($node); }
+}
+
+/**
+ * Implements hook_views_query_alter
+ */
+
+function sirius_views_query_alter(&$view, &$query) {
+  // Irritatingly, within Views contextual filters, there's no way to have a default value of NULL. 
+  // So, for example, you can't say "give me all the results for value X, and if X is missing, give me all the results where X is null."
+  // This hideous snippet of code allows you to put a default value of the (string) "NULL". When it detects it, it converts it into a "IS NULL" condition.
+
+  if ($query->where) {
+    foreach ($query->where as $delta => &$clause) {
+      if ($clause['conditions']) {
+        foreach ($clause['conditions'] as $delta2 => &$condition) {
+          $matches = array();
+          if ($condition['operator'] == 'formula' && preg_match('/\s*([a-zA-Z0-9_\.]+)\s+=\s+(:[a-zA-Z0-9_\.]+)\s*/', $condition['field'], $matches)) {
+            $var = $matches[2];
+
+            // If the value is "CURRENT_DOMAIN", try to use the current domain (default to NULL)
+            if (is_array($condition['value']) && $condition['value'][$var] == 'CURRENT_DOMAIN') {
+              $current_domain_nid = sirius_domain_nid();
+              if ($current_domain_nid) { 
+                $condition['value'][$var] = $current_domain_nid;
+              } else {
+                $condition['value'][$var] = 'NULL';
+              }
+            }
+
+            // If the value is NULL, rewrite the query to support NULL.
+            if (is_array($condition['value']) && $condition['value'][$var] == 'NULL') {
+              $condition['field'] = 'field_data_field_sirius_domain.field_sirius_domain_target_id';
+              $condition['operator'] = 'IS NULL';
+              unset($condition['value']);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ *  Needed this to dynamically generate links. 
+ *  @todo It either needs to be refactored, removed, or pushed into its own file. Very rudimentary at the moment.
+ */
+
+function sirius_quicknav($links) {
+  $current_path = current_path();
+
+  $html = '<div class="sirius_quicknav">';
+  foreach ($links as $link) {
+    $path = $link['path'];
+    $query = $link['query'];
+    if (!$query) { $query = array(); }
+    $is_current = TRUE;
+    if ($path != $current_path) { $is_current = FALSE; }
+    foreach ($query as $key => $value) {
+      if ($_GET[$key] != $value) { $is_current = FALSE; }
+    }
+    foreach ($_GET as $key => $value) {
+      if ($key == 'q') { continue; }
+      if ($query[$key] != $value) { $is_current = FALSE; }
+    }
+
+    if ($is_current) {
+      $html .= '<span>' . $link['title'] . '</span>';
+    } else {
+      $html .= l($link['title'], $link['path'], array('query' => $query));
+    }
+  }
+  $html .= '</div>';
+
+  return $html;
+}

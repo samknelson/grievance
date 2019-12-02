@@ -83,7 +83,8 @@ function grievance_log_update($grievance_node, $op) {
       $event_date = $grievance_node->field_grievance_date_1['und'][0]['value'];
     }
     if (!$event_date) {
-      $event_date = date('Y-m-d 00:00:00', strtotime('-15 days'));
+      $days_ago = variable_get('grievance_incident_default_days_ago', 15);
+      $event_date = date('Y-m-d 00:00:00', strtotime("-$days_ago days"));
     }
 
     if ($event_date) {

@@ -7,7 +7,7 @@ function sirius_node_tab_feed_wizard($feed_node) {
 }
 
 function sirius_node_access_feed($feed_node, $op, $account) {
-	return user_access('sirius admin');
+	return user_access('sirius');
 }
 
 function sirius_feed_default_column_title($col) {
@@ -38,16 +38,21 @@ function sirius_feed_lastdata($info, $feed_node) {
  ************************************************************************************************/
 
 function sirius_feed_page_list_access($wizard_name) {
-	return user_access('sirius admin');
+	$info = sirius_wizard_info($wizard_name);
+	// drupal_set_message('<pre>' . print_r($info, 1) . '</pre>)');
+	// return user_access('sirius admin');
+	// @todo!
+	return user_access('sirius');
 }
 
 function sirius_feed_page_list($wizard_name) {
+	$domain = sirius_domain();
 	$info = sirius_wizard_info($wizard_name);
 	if (!$info) { return "No such wizard."; }
 
 	drupal_set_title("Feed list: " . $info['title']);
 
-	$html .=  views_embed_view('sirius_feeds', 'block_1', $wizard_name);
+	$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain->nid);
 
 	return $html;
 }
@@ -139,9 +144,9 @@ function sirius_feed_spout_get_cell($row, $col) {
 	return $cell->getValue();
 }
 
-function sirius_feed_spout_get_import_row($row, $info, $data, $count) {
+function sirius_feed_spout_get_import_row($fields, $row, $data, $count) {
 	$import_data_row = array('xxxrowcountxxx' => $count);
-	foreach ($info['feed']['fields'] as $field_name => $field_info) {
+	foreach ($fields as $field_name => $field_info) {
 		$col = $data["map_$field_name"];
 		if ($col === NULL || $col === '') { continue; }
 		$import_data_row[$field_name] = sirius_feed_spout_get_cell($row, $col);
@@ -157,7 +162,9 @@ function sirius_feed_page_launch_access($wizard_name) {
 	$info = sirius_wizard_info($wizard_name);
 	if (!$info) { return FALSE; }
 
-	return user_access('sirius admin');
+	// @todo
+	return user_access('sirius');
+	// return user_access('sirius admin');
 }
 
 function sirius_feed_page_launch($wizard_name) {
@@ -188,6 +195,7 @@ function sirius_feed_page_launch_form_submit($form, &$form_state) {
 }
 
 function sirius_feed_wizard_launch($wizard_name) {
+	$domain = sirius_domain();
   $feed_node = new stdClass();
   $feed_node->type = 'sirius_feed';
   $feed_node->no_recurse = TRUE;
@@ -196,6 +204,7 @@ function sirius_feed_wizard_launch($wizard_name) {
   $feed_node->status = 1;
   $feed_node->promote = 0;
   $feed_node->comment = 0;
+  if ($domain) { $feed_node->field_sirius_domain['und'][0]['target_id'] = $domain->nid; }
   $feed_node->field_sirius_type['und'][0]['value'] = $wizard_name;
   $feed_node->field_sirius_feed_status['und'][0]['value'] = 'draft';
   $feed_node = node_submit($feed_node);
@@ -233,6 +242,24 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 		'#title' => $title,
 		'#default_value' => $data['steps'][$current_step]['data']['a_random_variable'],
 	);
+
+	$default = $data['source'];
+	if (!$default) { $default = 'Import ' . date('Y-m-d H:i:s'); }
+	$form['source'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Source',
+		'#default_value' => $default,
+	);
+
+	$pks = $info['feed']['pks'];
+	if ($pks) {
+		$form['pk'] = array(
+			'#type' => 'select',
+			'#title' => 'Primary Key',
+			'#options' => $pks,
+			'#default_value' => $data['pk'],
+		);
+	}
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -280,6 +307,8 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
 		unset($file['uri']);
 		$feed_node->field_sirius_attachments['und'][0] = $file;
   }
+  $data['source'] = $form_state['values']['source'];
+  $data['pk'] = $form_state['values']['pk'];
 
 	sirius_wizard_submit($info, $data, $feed_node, $current_step, "File uploaded.");
 }
@@ -355,6 +384,14 @@ function sirius_feed_wizard_sheet_form_submit($form, &$form_state) {
  * Step 3: Mapping
  ************************************************************************************************/
 
+function sirius_feed_wizard_fields($info, $data = NULL, $feed_node = NULL, $current_step = NULL) {
+	if ($info['feed']['fields']) { return $info['feed']['fields']; }
+	$callback = $info['feed']['callback_fields'];
+	if ($callback) {
+		return $callback($info, $data, $feed_node, $current_step);
+	}
+}
+
 function sirius_feed_wizard_map($info, $data, $feed_node, $current_step) { return drupal_get_form('sirius_feed_wizard_map_form', $info, $data, $feed_node, $current_step); }
 
 function sirius_feed_wizard_map_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
@@ -381,9 +418,13 @@ function sirius_feed_wizard_map_form($form, &$form_state, $info, $data, $feed_no
 		if ($count >= 10) { break; }
 	}
 
-	foreach ($info['feed']['fields'] as $field_name => $field_info) {
-		$default = $data["map_$field_name"];
-		if (!$default) { $default = $last_data["map_$field_name"]; }
+	$fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step);
+	foreach ($fields as $field_name => $field_info) {
+		if ($data) {
+			$default = $data["map_$field_name"];
+		} else {
+			$default = $last_data["map_$field_name"];
+		}
 
 		if ($field_info['required']) {
 			$options = $header;
@@ -405,8 +446,10 @@ function sirius_feed_wizard_map_form($form, &$form_state, $info, $data, $feed_no
 		'#value' => 'Submit',
 	);
 
-	$html = "<h2>Preview - First $count Rows</h2>";
+	$html = '<div style="width: 100%; height: 600px; overflow: scroll; border: 1px solid #333333; padding: 20px; margin-top: 20px;">';
+	$html .= "<h2>Preview - First $count Rows</h2>";
 	$html .= theme_table(array('rows' => $html_rows, 'header' => $header, 'attributes' => array()));
+	$html .= '</div>';
 	$form["preview"] = array('#markup' => $html);
 
 	return $form;
@@ -417,12 +460,52 @@ function sirius_feed_wizard_map_form_submit($form, &$form_state) {
 	$data = $form_state['data'];
 	$feed_node = $form_state['feed_node'];
 	$current_step = $form_state['current_step'];
-	foreach ($info['feed']['fields'] as $field_name => $field_info) {
+	$fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step);
+	foreach ($fields as $field_name => $field_info) {
 		$data["map_$field_name"] = $form_state['values']["map_$field_name"];
 	}
 
 	sirius_wizard_submit($info, $data, $feed_node, $current_step, "Worksheet selection saved.");
 }
+
+/************************************************************************************************
+ * Step 3A: Tagging
+ ************************************************************************************************/
+
+/*
+function sirius_feed_wizard_tag($info, $data, $feed_node, $current_step) { return drupal_get_form('sirius_feed_wizard_tag_form', $info, $data, $feed_node, $current_step); }
+
+function sirius_feed_wizard_tag_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
+	$form_state['info'] = $info;
+	$form_state['data'] = $data;
+	$form_state['feed_node'] = $feed_node;
+	$form_state['current_step'] = $current_step;
+	$steps = sirius_wizard_steps($info, $data, $feed_node);
+	$last_data = sirius_feed_lastdata($info, $feed_node);
+
+	sirius_taxonomy_checkboxes($form, $form_state, 'whatever', 'sirius_contact_tags');
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'Submit',
+	);
+
+	return $form;
+}
+
+function sirius_feed_wizard_tag_form_submit($form, &$form_state) {
+	$info = $form_state['info'];
+	$data = $form_state['data'];
+	$feed_node = $form_state['feed_node'];
+	$current_step = $form_state['current_step'];
+	$fields = array();
+	foreach ($fields as $field_name => $field_info) {
+		$data["map_$field_name"] = $form_state['values']["map_$field_name"];
+	}
+
+	sirius_wizard_submit($info, $data, $feed_node, $current_step, "Worksheet selection saved.");
+}
+*/
 
 /************************************************************************************************
  * Step 4: Verify
@@ -441,7 +524,8 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$header = sirius_feed_spout_get_header($sheet, $data['header_row']);
 
 	$import_header = array('xxxrowcountxxx' => 'Row');
-	foreach ($info['feed']['fields'] as $field_name => $field_info) {
+	$fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step);
+	foreach ($fields as $field_name => $field_info) {
 		$col = $data["map_$field_name"];
 		if ($col === NULL || $col === '') { continue; }
 		$import_header[$field_name] = $field_info['title'] . '<br>(' . $header[$col] . ')';
@@ -456,7 +540,7 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$callback = $info['feed']['callback_row_verify'];
 	foreach ($sheet->getRowIterator() as $row) {
 		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
-		$import_data_row = sirius_feed_spout_get_import_row($row, $info, $data, $count);
+		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count);
 		$result = $callback($feed_node, $info, $data, $import_data_row, FALSE);
 		if ($result['success']) { $import_data_row['xxxsuccsssxxx'] = 'Yes'; } else { $import_data_row['xxxsuccsssxxx'] = 'No'; }
 		$import_data_row['xxxmsgxxx'] = $result['msg'];
@@ -551,6 +635,18 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 	$reader = sirius_feed_spout_get_reader($feed_node);
 	$sheet = sirius_feed_spout_get_sheet($reader, $data['worksheet']);
 	$header = sirius_feed_spout_get_header($sheet, $data['header_row']);
+	$fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step);
+
+	if (!$context['results']['results_path']) {
+		$context['results']['results_path'] = 'temporary://sirius_feed_results_' . rand();
+		$results_fp = fopen(drupal_realpath($context['results']['results_path']), 'w');
+		$cols = array_keys($fields);
+		$cols[] = 'Message';
+		$cols[] = 'Result';
+		fputcsv($results_fp, $cols);
+	} else {
+		$results_fp = fopen(drupal_realpath($context['results']['results_path']), 'a');
+	}
 
 	// Get our data
 	$count = 0;
@@ -562,9 +658,17 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 		++$count;
 		if ($count < $idx) { continue; }
 		if ($count > $idx+$batch_size) { break; }
-		$import_data_row = sirius_feed_spout_get_import_row($row, $info, $data, $count);
+		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count);
 		$result = $callback($feed_node, $info, $data, $import_data_row);
 		++$counts[$result['msg']];
+
+		$results_row = array();
+		foreach (array_keys($fields) as $field_name) {
+			$results_row[] = $import_data_row[$field_name];
+		}
+		if ($result['success']) { $results_row[] = 'Success'; } else { $results_row[] = 'Error'; }
+		$results_row[] = $result['msg'];
+		fputcsv($results_fp, $results_row);
 	}
 	$context['results']['counts'] = $counts;
 
@@ -575,6 +679,17 @@ function sirius_feed_wizard_process_finish($feed_node, $info, $data, $idx, &$con
 	$context['message'] = "Cleaning up.";
 	$data['feed']['counts'] = $context['results']['counts'];
   $feed_node->field_sirius_feed_status['und'][0]['value'] = 'complete';
+
+	$file = new stdClass;
+	$file->uid = $user->uid;
+	$file->uri = $context['results']['results_path'];
+	$file->filemime = 'text/csv';
+	$file->status = 1;
+	$file->display = 1;
+	file_save($file);
+  $file = file_move($file, 'private://attach_' . rand() . '.csv');
+  $feed_node->field_sirius_attachments['und'][1] = (array) $file;
+
 	sirius_wizard_submit($info, $data, $feed_node, 'process', "Import complete");
 }
 
@@ -595,153 +710,10 @@ function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed
 	$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => array()));
 	$form['review'] = array('#markup' => $html);
 
+	$renderable = field_view_field('node', $feed_node, 'field_sirius_attachments', 'full');
+	$form['attachments_intro'] = array('#markup' => '<div>' . t('The first file below contains the original upload data. The second contains the full set of results.') . '</div>');
+	$form['attachments'] = array('#markup' => drupal_render($renderable));
+
+
 	return $form;
-}
-
-
-/************************************************************************************************
- * WWS Upload
- ************************************************************************************************/
-
-function sirius_feed_wws_row_verify($feed_node, $info, $data, &$row, $precompute) {
-	static $work_status_map;
-	if (!$work_status_map) {
-		$work_status_map = sirius_taxonomy_load('sirius_work_status', 'field_sirius_id2', 'full');
-	}
-
-	$ssn = $row['ssn'];
-	if (!sirius_ssn_validate($ssn)) { return array('success' => FALSE, 'msg' => 'Invalid SSN'); }
-
-  // Worker
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'sirius_worker');
-  $query->fieldCondition('field_sirius_ssn', 'value', $ssn);
-  $stmt = $query->execute();
-  if (!$stmt['node']) { return array('success' => FALSE, 'msg' => 'No worker found.'); }
-  if (count($stmt['node']) > 1) { return array('success' => FALSE, 'msg' => 'Multiple workers found.'); }
-  if ($precompute) { $row['worker_nid'] = array_keys($stmt['node'])[0]; }
-
-	// Find the work status
-	$work_status_id = $row['work_status_id'];
-	if ($work_status_id === NULL || $work_status_id === '') { return array('success' => FALSE, 'msg' => 'No work status ID'); }
-	if (!$work_status_map[$work_status_id]) { return array('success' => FALSE, 'msg' => "Work status $work_status_id not found."); }
-	if ($precompute) { $row['work_status_tid'] = $work_status_map[$work_status_id]->tid; }
-
-  return array('success' => TRUE, 'msg' => 'Looks good.');
-}
-
-function sirius_feed_wws_row_process($feed_node, $info, $data, $row) {
-	$result = sirius_feed_wws_row_verify($feed_node, $info, $data, $row, TRUE);
-	if (!$result['success']) { return $result; }
-	return sirius_worker_work_status_set(node_load($row['worker_nid']), $row['work_status_tid'], 'import', array());
-}
-
-/************************************************************************************************
- * Worker Upload
- ************************************************************************************************/
-
-function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precompute) {
-	static $employer_map;
-	if (!$employer_map) {
-		$sql = "select title, nid from node where type = 'grievance_shop'";
-		$stmt = db_query($sql, array());
-		while ($hr = $stmt->fetchAssoc()) {
-			$employer_map[$hr['title']] = $hr['nid'];
-		}
-	}
-
-	// Trim all
-	foreach ($row as $key => $value) {
-		$row[$key] = trim($value);
-	}
-
-	if (!preg_match('/^\d+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
-
-	if ($row['phone'] && !sirius_phone_validate($row['phone'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone'); } else { $row['phone'] = sirius_phone_format($row['phone']); }
-	if ($row['phone_alt'] && !sirius_phone_validate($row['phone_alt'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Alt)'); } else { $row['phone_alt'] = sirius_phone_format($row['phone_alt']); }
-	if ($row['phone_mobile'] && !sirius_phone_validate($row['phone_mobile'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Mobile)'); } else { $row['phone_mobile'] = sirius_phone_format($row['phone_mobile']); }
-
-	if ($row['email'] && !sirius_email_validate($row['email'])) { return array('success' => FALSE, 'msg' => 'Invalid Email'); }
-
-  // Worker
-  if ($precompute) {
-  	$sql = "select max(entity_id) as a, min(entity_id) as b from field_data_field_sirius_id ";
-  	$sql .= "where entity_type = 'node' ";
-  	$sql .= "and bundle = 'sirius_worker' ";
-  	$sql .= "and field_sirius_id_value = :id ";
-  	$stmt = db_query($sql, array(':id' => $row['id']));
-  	$hr = $stmt->fetchAssoc();
-  	$nid = $hr['a'];
-  	$other_nid = $hr['b'];
-  	if ($nid != $other_nid) {
-  		return array('success' => FALSE, 'msg' => 'Multiple workers found with this ID.');
-  	}
-  	$row['worker_nid'] = $nid;
-  }
-
-  // Current Employer
-  if ($row['shop_name']) {
-  	$shop_nid = $employer_map[$row['shop_name']];
-  	if (!$shop_nid) { return array('success' => FALSE, 'msg' => 'Employer "' . $row['shop_name'] . '" not found.'); }
-  	if ($precompute) { $row['shop_nid'] = $shop_nid; }
-  }
-
-  return array('success' => TRUE, 'msg' => 'Looks good.');
-}
-
-function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
-	$result = sirius_feed_worker_row_verify($feed_node, $info, $data, $row, TRUE);
-	if (!$result['success']) { return $result; }
-
-	if ($row['worker_nid']) {
-		$is_new = FALSE;
-		$worker_node = node_load($row['worker_nid']);
-	} else {
-		$is_new = TRUE;
-    global $user;
-    $worker_node = new stdClass();
-    $worker_node->type = 'sirius_worker';
-    $worker_node->language = LANGUAGE_NONE;
-    $worker_node->uid = $user->uid;
-    $worker_node->status = 1;
-    $worker_node->promote = 0;
-    $worker_node->comment = 0;
-    $worker_node->field_sirius_id['und'][0]['value'] = $row['id'];
-  }
-
-  $worker_node->field_sirius_name['und'][0]['given'] = $row['name_given'];
-  $worker_node->field_sirius_name['und'][0]['middle'] = $row['name_middle'];
-  $worker_node->field_sirius_name['und'][0]['family'] = $row['name_family'];
-
-  $phone1 = $row['phone'];
-  $phone2 = $row['phone_alt'];
-  if ($row['phone_mobile']) {
-  	if (!$phone1) { $phone1 = $row['phone_mobile']; } else { $phone2 = $row['phone_mobile']; }
-  }
-  if ($phone1) { $worker_node->field_sirius_phone['und'][0]['value'] = $phone1; }
-  if ($phone2) { $worker_node->field_sirius_phone_alt['und'][0]['value'] = $phone2; }
-  if ($row['email']) { $worker_node->field_sirius_email['und'][0]['value'] = $row['email']; }
-
-  if ($row['shop_nid']) { $worker_node->field_grievance_shop['und'][0]['target_id'] = $row['shop_nid']; }
-
-
-  foreach (array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code') as $col) {
-  	$has_address = FALSE;
-  	if ($row["address_$col"]) {
-  		$has_address = TRUE;
-  		$worker_node->field_sirius_address['und'][0][$col] = $row["address_$col"];
-  	}
-  	if ($has_address) {
-  		$worker_node->field_sirius_address['und'][0]['country'] = 'US';
-  	}
-  }
-
-  node_save($worker_node);
-
-  if ($is_new) {
-  	return array('success' => TRUE, 'msg' => 'Created a new worker.');
-  } else {
-  	return array('success' => TRUE, 'msg' => 'Updated an existing worker.');
-  }
 }

@@ -1,11 +1,11 @@
 <?php
+
 /**
  * @file
  * Themeable functions for imagefield_crop module.
  */
 
- function theme_imagefield_crop_widget($variables) {
-
+function theme_imagefield_crop_widget($variables) {
   $element = $variables['element'];
 
   $wrapper_attributes = array(
@@ -17,7 +17,6 @@
   );
 
   $output = '';
-  $output .= '<div ' . drupal_attributes($wrapper_attributes) . '>';
 
   if (isset($element['preview'])) {
     $element['preview']['#attributes']['class'][] = 'form-item';
@@ -38,20 +37,17 @@
     $output .= '</div>';
   }
   $output .= drupal_render_children($element);
-  $output .= '</div>';
 
-  return $output;
+  return '<div ' . drupal_attributes($wrapper_attributes) . '>' . $output . '</div>';
 }
 
 function theme_imagefield_crop_preview($variables) {
   $info = $variables['element']['#imagefield_crop'];
-  $output = '<div class="jcrop-preview-wrapper" style="width:' . $info['#width'] . 'px;height:' . $info['#height'] . 'px;overflow:hidden;">';
-  $output .= $variables['element']['#markup'];
+  $output = $variables['element']['#markup'];
   $output .= theme('image', array(
     'path' => $info['#path'],
     'alt' => 'jcrop-preview',
     'attributes' => array('class' => 'jcrop-preview', 'style' => 'display:none'),
   ));
-  $output .= '</div>';
-  return $output;
+  return '<div class="jcrop-preview-wrapper" style="width:' . $info['#width'] . 'px;height:' . $info['#height'] . 'px;overflow:hidden;">' . $output . '</div>';
 }

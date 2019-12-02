@@ -13302,6 +13302,50 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-sirius_bulk-field_field_sirius_callerid'.
+  $field_instances['node-sirius_bulk-field_field_sirius_callerid'] = array(
+    'bundle' => 'sirius_bulk',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_field_sirius_callerid',
+    'label' => 'Caller ID',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 9,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_bulk-field_sirius_bulk_medium'.
   $field_instances['node-sirius_bulk-field_sirius_bulk_medium'] = array(
     'bundle' => 'sirius_bulk',
@@ -13404,7 +13448,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 2,
@@ -13467,7 +13510,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 3,
@@ -13594,6 +13636,221 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textarea',
       'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_callerid-field_sirius_active'.
+  $field_instances['node-sirius_callerid-field_sirius_active'] = array(
+    'bundle' => 'sirius_callerid',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_active',
+    'label' => 'Active?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_callerid-field_sirius_domain'.
+  $field_instances['node-sirius_callerid-field_sirius_domain'] = array(
+    'bundle' => 'sirius_callerid',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Domain',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_callerid-field_sirius_id'.
+  $field_instances['node-sirius_callerid-field_sirius_id'] = array(
+    'bundle' => 'sirius_callerid',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_id',
+    'label' => 'ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_callerid-field_sirius_name_display'.
+  $field_instances['node-sirius_callerid-field_sirius_name_display'] = array(
+    'bundle' => 'sirius_callerid',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Caller ID text (what is shown to the recipient)',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_name_display',
+    'label' => 'Display Name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_callerid-field_sirius_phone'.
+  $field_instances['node-sirius_callerid-field_sirius_phone'] = array(
+    'bundle' => 'sirius_callerid',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_phone',
+    'label' => 'Phone',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
     ),
   );
 
@@ -13956,6 +14213,7 @@ function grievance_content_types_field_default_field_instances() {
         'title' => 0,
       ),
       'override_format' => 'default',
+      'preferred_field_reference' => '',
       'show_component_required_marker' => 0,
       'size' => array(
         'credentials' => 35,
@@ -15512,7 +15770,7 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 15,
+      'weight' => 16,
     ),
   );
 
@@ -15790,7 +16048,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 23,
+      'weight' => 22,
     ),
   );
 
@@ -15899,7 +16157,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 22,
+      'weight' => 21,
     ),
   );
 
@@ -17153,6 +17411,60 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_payrate'.
+  $field_instances['node-sirius_dispatch_job-field_sirius_payrate'] = array(
+    'bundle' => 'sirius_dispatch_job',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 2,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_decimal',
+        'weight' => 24,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_payrate',
+    'label' => 'Pay Rate Override',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 15,
+    ),
+  );
+
   // Exported field_instance:
   // 'node-sirius_dispatch_job-field_sirius_representatives'.
   $field_instances['node-sirius_dispatch_job-field_sirius_representatives'] = array(
@@ -17549,6 +17861,96 @@ function grievance_content_types_field_default_field_instances() {
       'settings' => array(),
       'type' => 'multiple_selects',
       'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_domain-field_sirius_active'.
+  $field_instances['node-sirius_domain-field_sirius_active'] = array(
+    'bundle' => 'sirius_domain',
+    'default_value' => array(
+      0 => array(
+        'value' => 'Yes',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_active',
+    'label' => 'Active?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 33,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_domain-field_sirius_domain'.
+  $field_instances['node-sirius_domain-field_sirius_domain'] = array(
+    'bundle' => 'sirius_domain',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'field_delimiter' => '',
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Parent',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 35,
     ),
   );
 
@@ -17963,6 +18365,137 @@ function grievance_content_types_field_default_field_instances() {
       ),
       'type' => 'text_textarea',
       'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_json_definition-field_sirius_audio'.
+  $field_instances['node-sirius_json_definition-field_sirius_audio'] = array(
+    'bundle' => 'sirius_json_definition',
+    'deleted' => 0,
+    'description' => 'Upload audio files in WAV or MP3 format. You may want to use a service such as <a href="https://online-voice-recorder.com/" target="_blank">online-voice-recorder.com</a>.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'audiofield',
+        'settings' => array(
+          'audiofield_audioplayer_flac' => 'html5',
+          'audiofield_audioplayer_mp3' => 'html5',
+          'audiofield_audioplayer_mp4' => 'html5',
+          'audiofield_audioplayer_oga' => 'html5',
+          'audiofield_audioplayer_ogg' => 'html5',
+          'audiofield_audioplayer_opus' => 'html5',
+          'audiofield_audioplayer_wav' => 'html5',
+          'audiofield_audioplayer_webm' => 'html5',
+          'audiofield_detail' => array(
+            'bitrate' => 0,
+            'channelmode' => 0,
+            'codec' => 0,
+            'filename' => 0,
+            'filesize' => 0,
+            'length' => 0,
+            'samplerate' => 0,
+            'tags_id3' => 0,
+            'tags_id3_picture' => 0,
+          ),
+          'display_file_details' => 0,
+          'download_link' => 0,
+          'field_delimiter' => '',
+        ),
+        'type' => 'audiofield_player',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_audio',
+    'label' => 'Audio',
+    'required' => 0,
+    'settings' => array(
+      'description_field' => 1,
+      'file_directory' => '',
+      'file_extensions' => 'wav mp3',
+      'filefield_paths' => array(
+        'active_updating' => 0,
+        'file_name' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => '[node:nid]_[file:fid].[file:ffp-extension-original]',
+        ),
+        'file_path' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => 'sirius_audio',
+        ),
+        'redirect' => FALSE,
+        'retroactive_update' => 0,
+      ),
+      'filefield_paths_enabled' => 1,
+      'max_filesize' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'file',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+      ),
+      'type' => 'file_generic',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_json_definition-field_sirius_callerids'.
+  $field_instances['node-sirius_json_definition-field_sirius_callerids'] = array(
+    'bundle' => 'sirius_json_definition',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_callerids',
+    'label' => 'Caller IDs',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'multiple_selects',
+      'settings' => array(),
+      'type' => 'multiple_selects',
+      'weight' => 6,
     ),
   );
 
@@ -20861,6 +21394,7 @@ If the file has multiple pages, then each page in the input document will use th
         'title' => 0,
       ),
       'override_format' => 'default',
+      'preferred_field_reference' => '',
       'show_component_required_marker' => 0,
       'size' => array(
         'credentials' => 35,
@@ -24091,6 +24625,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Attachment?');
   t('Attachments');
   t('Attachments will be listed at the bottom of the page.');
+  t('Audio');
   t('Auto Sign In?');
   t('Available For Skills');
   t('Available Since');
@@ -24113,6 +24648,9 @@ If the file has multiple pages, then each page in the input document will use th
   t('Call Number');
   t('Call by Name Only?');
   t('Call by Name?');
+  t('Caller ID');
+  t('Caller ID text (what is shown to the recipient)');
+  t('Caller IDs');
   t('Can Sign In?');
   t('Can and should this case be settled?');
   t('Can the articles in this contract be selected?  If "Yes", then a "dummy" section will be created for each article.');
@@ -24295,9 +24833,11 @@ If the file has multiple pages, then each page in the input document will use th
   t('PDF');
   t('Page');
   t('Paid at Skilled Rate');
+  t('Parent');
   t('Parking Instructions');
   t('Passcode required for phone access?');
   t('Paths');
+  t('Pay Rate Override');
   t('Payrate');
   t('Personal Phone');
   t('Phone');
@@ -24373,6 +24913,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Unresolved?');
   t('Unskilled Pay Rate');
   t('Update Company Representative');
+  t('Upload audio files in WAV or MP3 format. You may want to use a service such as <a href="https://online-voice-recorder.com/" target="_blank">online-voice-recorder.com</a>.');
   t('Upload images to include in letter templates, such as a scanned signature.');
   t('Upload the current contract document for this shop.  The contract will be used by stewards to identify violations.');
   t('Upload the letterhead in PDF format. 
