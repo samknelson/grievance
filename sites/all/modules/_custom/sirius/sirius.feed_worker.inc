@@ -1,6 +1,9 @@
 <?php
 
 function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precompute) {
+  $pk = $data['pk'];
+  if (!$pk) { $pk = 'id'; }
+
 	static $employer_map;
 	if (!$employer_map) {
 		$sql = "select title, nid from node where type = 'grievance_shop'";
@@ -15,7 +18,12 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
 		$row[$key] = trim($value);
 	}
 
-	if (!preg_match('/^\d+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
+  $row['ssn'] = sirius_ssn_format($row['ssn']);
+  if ($pk == 'id') {
+	 if (!preg_match('/^\d+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
+  } else if ($pk == 'ssn') {
+    if (!sirius_ssn_validate($row['ssn'])) { return array('success' => FALSE, 'msg' => 'Invalid SSN'); }
+  }
 
 	if ($row['phone'] && !sirius_phone_validate($row['phone'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone'); } else { $row['phone'] = sirius_phone_format($row['phone']); }
 	if ($row['phone_alt'] && !sirius_phone_validate($row['phone_alt'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Alt)'); } else { $row['phone_alt'] = sirius_phone_format($row['phone_alt']); }
@@ -25,19 +33,34 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
 
   // Worker
   if ($precompute) {
-  	$sql = "select max(entity_id) as a, min(entity_id) as b from field_data_field_sirius_id ";
-  	$sql .= "where entity_type = 'node' ";
-  	$sql .= "and bundle = 'sirius_worker' ";
-  	$sql .= "and field_sirius_id_value = :id ";
-  	$stmt = db_query($sql, array(':id' => $row['id']));
-  	$hr = $stmt->fetchAssoc();
-  	$nid = $hr['a'];
-  	$other_nid = $hr['b'];
-  	if ($nid != $other_nid) {
-  		return array('success' => FALSE, 'msg' => 'Multiple workers found with this ID.');
-  	}
-  	$row['worker_nid'] = $nid;
-  }
+    if ($pk == 'id') {
+    	$sql = "select max(entity_id) as a, min(entity_id) as b from field_data_field_sirius_id ";
+    	$sql .= "where entity_type = 'node' ";
+    	$sql .= "and bundle = 'sirius_worker' ";
+    	$sql .= "and field_sirius_id_value = :id ";
+    	$stmt = db_query($sql, array(':id' => $row['id']));
+    	$hr = $stmt->fetchAssoc();
+    	$nid = $hr['a'];
+    	$other_nid = $hr['b'];
+    	if ($nid != $other_nid) {
+    		return array('success' => FALSE, 'msg' => 'Multiple workers found with this ID.');
+    	}
+    	$row['worker_nid'] = $nid;
+    } else if ($pk == 'ssn') {
+      $sql = "select max(entity_id) as a, min(entity_id) as b from field_data_field_sirius_ssn ";
+      $sql .= "where entity_type = 'node' ";
+      $sql .= "and bundle = 'sirius_worker' ";
+      $sql .= "and field_sirius_ssn_value = :ssn ";
+      $stmt = db_query($sql, array(':ssn' => $row['ssn']));
+      $hr = $stmt->fetchAssoc();
+      $nid = $hr['a'];
+      $other_nid = $hr['b'];
+      if ($nid != $other_nid) {
+        return array('success' => FALSE, 'msg' => 'Multiple workers found with this SSN.');
+      }
+      $row['worker_nid'] = $nid;
+    }
+  } 
 
   // Current Employer
   if ($row['shop_name']) {
@@ -68,6 +91,9 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
     $worker_node->comment = 0;
     $worker_node->field_sirius_id['und'][0]['value'] = $row['id'];
   }
+
+  $worker_node->field_sirius_id3['und'][0]['value'] = $row['id3'];
+  $worker_node->field_sirius_ssn['und'][0]['value'] = $row['ssn'];
 
   $worker_node->field_sirius_name['und'][0]['given'] = $row['name_given'];
   $worker_node->field_sirius_name['und'][0]['middle'] = $row['name_middle'];

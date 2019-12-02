@@ -251,6 +251,16 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 		'#default_value' => $default,
 	);
 
+	$pks = $info['feed']['pks'];
+	if ($pks) {
+		$form['pk'] = array(
+			'#type' => 'select',
+			'#title' => 'Primary Key',
+			'#options' => $pks,
+			'#default_value' => $data['pk'],
+		);
+	}
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Submit',
@@ -298,6 +308,7 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
 		$feed_node->field_sirius_attachments['und'][0] = $file;
   }
   $data['source'] = $form_state['values']['source'];
+  $data['pk'] = $form_state['values']['pk'];
 
 	sirius_wizard_submit($info, $data, $feed_node, $current_step, "File uploaded.");
 }
@@ -409,8 +420,11 @@ function sirius_feed_wizard_map_form($form, &$form_state, $info, $data, $feed_no
 
 	$fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step);
 	foreach ($fields as $field_name => $field_info) {
-		$default = $data["map_$field_name"];
-		if (!$default) { $default = $last_data["map_$field_name"]; }
+		if ($data) {
+			$default = $data["map_$field_name"];
+		} else {
+			$default = $last_data["map_$field_name"];
+		}
 
 		if ($field_info['required']) {
 			$options = $header;
@@ -623,6 +637,17 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 	$header = sirius_feed_spout_get_header($sheet, $data['header_row']);
 	$fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step);
 
+	if (!$context['results']['results_path']) {
+		$context['results']['results_path'] = 'temporary://sirius_feed_results_' . rand();
+		$results_fp = fopen(drupal_realpath($context['results']['results_path']), 'w');
+		$cols = array_keys($fields);
+		$cols[] = 'Message';
+		$cols[] = 'Result';
+		fputcsv($results_fp, $cols);
+	} else {
+		$results_fp = fopen(drupal_realpath($context['results']['results_path']), 'a');
+	}
+
 	// Get our data
 	$count = 0;
 	$import_data = array();
@@ -636,6 +661,14 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count);
 		$result = $callback($feed_node, $info, $data, $import_data_row);
 		++$counts[$result['msg']];
+
+		$results_row = array();
+		foreach (array_keys($fields) as $field_name) {
+			$results_row[] = $import_data_row[$field_name];
+		}
+		if ($result['success']) { $results_row[] = 'Success'; } else { $results_row[] = 'Error'; }
+		$results_row[] = $result['msg'];
+		fputcsv($results_fp, $results_row);
 	}
 	$context['results']['counts'] = $counts;
 
@@ -646,6 +679,17 @@ function sirius_feed_wizard_process_finish($feed_node, $info, $data, $idx, &$con
 	$context['message'] = "Cleaning up.";
 	$data['feed']['counts'] = $context['results']['counts'];
   $feed_node->field_sirius_feed_status['und'][0]['value'] = 'complete';
+
+	$file = new stdClass;
+	$file->uid = $user->uid;
+	$file->uri = $context['results']['results_path'];
+	$file->filemime = 'text/csv';
+	$file->status = 1;
+	$file->display = 1;
+	file_save($file);
+  $file = file_move($file, 'private://attach_' . rand() . '.csv');
+  $feed_node->field_sirius_attachments['und'][1] = (array) $file;
+
 	sirius_wizard_submit($info, $data, $feed_node, 'process', "Import complete");
 }
 
@@ -665,6 +709,11 @@ function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed
 	foreach ($data['feed']['counts'] as $key => $value) { $summary_rows[] = array($key, $value); }
 	$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => array()));
 	$form['review'] = array('#markup' => $html);
+
+	$renderable = field_view_field('node', $feed_node, 'field_sirius_attachments', 'full');
+	$form['attachments_intro'] = array('#markup' => '<div>' . t('The first file below contains the original upload data. The second contains the full set of results.') . '</div>');
+	$form['attachments'] = array('#markup' => drupal_render($renderable));
+
 
 	return $form;
 }
