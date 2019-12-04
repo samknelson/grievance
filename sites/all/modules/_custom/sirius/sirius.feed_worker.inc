@@ -89,15 +89,15 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
     $worker_node->status = 1;
     $worker_node->promote = 0;
     $worker_node->comment = 0;
-    $worker_node->field_sirius_id['und'][0]['value'] = $row['id'];
   }
 
-  $worker_node->field_sirius_id3['und'][0]['value'] = $row['id3'];
-  $worker_node->field_sirius_ssn['und'][0]['value'] = $row['ssn'];
+  if ($row['id'])  { $worker_node->field_sirius_id['und'][0]['value'] = $row['id']; }
+  if ($row['id3']) { $worker_node->field_sirius_id3['und'][0]['value'] = $row['id3']; }
+  if ($row['ssn']) { $worker_node->field_sirius_ssn['und'][0]['value'] = $row['ssn']; }
 
-  $worker_node->field_sirius_name['und'][0]['given'] = $row['name_given'];
-  $worker_node->field_sirius_name['und'][0]['middle'] = $row['name_middle'];
-  $worker_node->field_sirius_name['und'][0]['family'] = $row['name_family'];
+  if ($row['name_given'])  { $worker_node->field_sirius_name['und'][0]['given'] = $row['name_given']; }
+  if ($row['name_middle']) { $worker_node->field_sirius_name['und'][0]['middle'] = $row['name_middle']; }
+  if ($row['name_family']) { $worker_node->field_sirius_name['und'][0]['family'] = $row['name_family']; }
 
   $phone1 = $row['phone'];
   $phone2 = $row['phone_alt'];
