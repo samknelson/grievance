@@ -2865,6 +2865,7 @@ function grievance_content_types_field_group_info() {
       3 => 'field_sirius_aat',
       4 => 'field_sirius_id2',
       5 => 'field_sirius_gender',
+      6 => 'field_sirius_id3',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2898,6 +2899,7 @@ function grievance_content_types_field_group_info() {
       3 => 'field_sirius_aat',
       4 => 'field_sirius_id2',
       5 => 'field_sirius_gender',
+      6 => 'field_sirius_id3',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2967,8 +2969,7 @@ function grievance_content_types_field_group_info() {
       9 => 'field_sirius_skills_availx',
       10 => 'field_sirius_dispatch_eba',
       11 => 'field_sirius_dispatch_eba_dates',
-      12 => 'field_sirius_dispatch_sib',
-      13 => 'field_sirius_dispatch_sib_status',
+      12 => 'field_sirius_dispatch_sib_status',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -3006,9 +3007,8 @@ function grievance_content_types_field_group_info() {
       7 => 'field_sirius_skills_availx',
       8 => 'field_sirius_dispatch_eba',
       9 => 'field_sirius_dispatch_eba_dates',
-      10 => 'field_sirius_dispatch_sib',
-      11 => 'field_sirius_dispatch_sib_status',
-      12 => 'group_sirius_worker_holds',
+      10 => 'field_sirius_dispatch_sib_status',
+      11 => 'group_sirius_worker_holds',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
