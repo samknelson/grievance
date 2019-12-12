@@ -27,28 +27,6 @@ function sirius_twilio_node_tabs() {
 function sirius_twilio_menu() {
   $items = array();
 
-  //
-  // Node Tabs
-  // 
-
-  $node_tabs = sirius_twilio_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    foreach ($node_record as $tab_name => $tab_record) {
-      $items['node/%node/' . $tab_name] = array(
-        'title' => $tab_record['title'],
-        'description' => $tab_record['description'],
-        'page callback' => 'sirius_twilio_node_tab_content',
-        'page arguments' => array(1, $tab_name),
-        'access callback' => 'sirius_twilio_node_tab_access',
-        'access arguments' => array(1, $tab_name),
-        'type' => MENU_LOCAL_TASK,
-      );
-      if ($tab_record['weight']) {
-        $items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
-      }
-    }
-  }
-
   $items['sirius/twilio/test'] = array(
     'title' => 'Sirius: Twilio: Test',
     'description' => '',
@@ -128,51 +106,3 @@ function sirius_twilio_menu() {
 
   return $items;
 }
-
-function sirius_twilio_node_tab_content($node, $in_tab_name) {
-  $node_tabs = sirius_twilio_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          $callback = $tab_record['callback'];
-          return $callback($node);
-        }
-      }
-    }
-  }
-  
-  drupal_set_message("Bad tab: $node->type, $in_tab_name");
-  
-  return "";
-}
-
-function sirius_twilio_node_tab_access($node, $in_tab_name) {
-  // Check generic permissions
-  $node_tabs = sirius_twilio_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          foreach ($tab_record['permissions'] as $permission) {
-            if (!user_access($permission)) { return false; }
-          }
-          
-          // Check for a custom access permission
-          $access_function_name = $tab_record['callback'] . '_access';
-          if (function_exists($access_function_name)) {
-            if (!$access_function_name($node)) {
-              return false;
-            }
-          }
-          
-          return true;
-        }
-      }
-    }
-  }
-  
-  return false;
-}
-
-
