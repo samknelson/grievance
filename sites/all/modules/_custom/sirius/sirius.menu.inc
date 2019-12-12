@@ -108,11 +108,7 @@ function sirius_node_tabs() {
 function sirius_menu() {
   $items = array();
 
-  //
-  // Node Tabs
-  // 
-
-  $node_tabs = sirius_node_tabs();
+  $node_tabs = sirius_node_tab_all('node_tabs');
   foreach ($node_tabs as $node_type => $node_record) {
     foreach ($node_record as $tab_name => $tab_record) {
       $items['node/%node/' . $tab_name] = array(
@@ -129,6 +125,27 @@ function sirius_menu() {
       }
       if ($tab_record['page arguments']) {
         $items['node/%node/' . $tab_name]['page_arguments'] = array_merge($items['node/%node/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
+      }
+    }
+  }
+
+  $term_tabs = sirius_term_tab_all('term_tabs');
+  foreach ($term_tabs as $term_type => $term_record) {
+    foreach ($term_record as $tab_name => $tab_record) {
+      $items['taxonomy/term/%taxonomy_term/' . $tab_name] = array(
+        'title' => $tab_record['title'],
+        'description' => $tab_record['description'],
+        'page callback' => 'sirius_term_tab_content',
+        'page arguments' => array(2, $tab_name),
+        'access callback' => 'sirius_term_tab_access',
+        'access arguments' => array(2, $tab_name),
+        'type' => MENU_LOCAL_TASK,
+      );
+      if ($tab_record['weight']) {
+        $items['term/%term/' . $tab_name]['weight'] = $tab_record['weight'];
+      }
+      if ($tab_record['page arguments']) {
+        $items['term/%term/' . $tab_name]['page_arguments'] = array_merge($items['term/%term/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
       }
     }
   }
@@ -518,58 +535,6 @@ function sirius_menu() {
 
 function sirius_aatlink($nid, $aat) {
   drupal_goto('node/' . $nid . '/sirius_dispatch_worker_view', array('query' => array('aat' => $aat)));
-}
-
-
-function sirius_node_tab_content($node, $in_tab_name) {
-  $node_tabs = sirius_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          $callback = $tab_record['callback'];
-          $args = array($node);
-          if ($tab_record['callback arguments']) {
-            $args = array_merge($args, $tab_record['callback arguments']);
-          }
-          return call_user_func_array($callback, $args);
-        }
-      }
-    }
-  }
-  
-  drupal_set_message("Bad tab: $node->type, $in_tab_name");
-  
-  return "";
-}
-
-function sirius_node_tab_access($node, $in_tab_name) {
-  // Check generic permissions
-  $node_tabs = sirius_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          // Check basic permission
-          foreach ($tab_record['permissions'] as $permission) {
-            if (!user_access($permission)) { return false; }
-          }
-
-          // Check for a custom access permission
-          $access_function_name = $tab_record['callback'] . '_access';
-          if (function_exists($access_function_name)) {
-            if (!$access_function_name($node)) {
-              return false;
-            }
-          }
-          
-          return true;
-        }
-      }
-    }
-  }
-  
-  return false;
 }
 
 function sirius_menu_block_view() {

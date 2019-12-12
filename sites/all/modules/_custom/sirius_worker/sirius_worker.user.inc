@@ -44,7 +44,9 @@ function sirius_worker_get_uid($worker_nid) {
 }
 
 function sirius_worker_get_user($worker_nid) {
-	return user_load(sirius_worker_get_uid($worker_nid));
+	$uid = sirius_worker_get_uid($worker_nid);
+	if (!$uid) { return NULL; }
+	return user_load($uid);
 }
 
 function sirius_worker_get($uid = NULL) {
@@ -97,7 +99,6 @@ function sirius_worker_usersync($worker_nid) {
 	foreach (array_values(variable_get('sirius_worker_roles', array())) as $rid) {
 		$all_rids[$rid] = TRUE;
 	}
-	
 
 	// Next, get all the user's member statuses.
 	$member_status_tids = array();
@@ -134,6 +135,14 @@ function sirius_worker_usersync($worker_nid) {
 		$new_rids[$rid] = TRUE;
 	}
 
+	$sql = "select * from users where name = :name or mail = :mail";
+	$stmt = db_query($sql, array(':name' => $id, 'mail' => $email));
+	$hr = $stmt->fetchAssoc();
+	if ($hr) {
+		return array('success' => FALSE, 'msg' => "There is already an existing user " . $hr['uid'] . " with name $id or mail $mail.");
+	}
+
+
 	$need_save = FALSE;
 	if (!$worker_user) {
 		$need_save = TRUE;
@@ -167,6 +176,7 @@ function sirius_worker_usersync($worker_nid) {
 		$worker_user->roles = $new_rids;
 		$need_save = TRUE;
 	}
+
 
 	if (!$need_save) {
 		return array('success' => TRUE, 'msg' => "User is unchanged.");

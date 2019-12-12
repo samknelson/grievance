@@ -32,16 +32,18 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.domain.inc'
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.signature.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.callerid.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.volunteer.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lock.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.node_tabs.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_worker.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_contact.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_hours.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contacts.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_voice_forward_to_operator.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_users.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_switch.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_subdomains.inc';
@@ -610,6 +612,13 @@ function sirius_views_query_alter(&$view, &$query) {
         }
       }
     }
+  }
+}
+
+function sirius_views_pre_view(&$view, &$display_id, &$args) {
+  // The admin view "taxonomy_term" is bizarrely persistent and a bizarrely grotesque security hole.
+  if ($view->name == 'taxonomy_term') {
+    $args = array(-999);
   }
 }
 
