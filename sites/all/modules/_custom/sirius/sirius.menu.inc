@@ -517,6 +517,15 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/contact/resync/all'] = array(
+    'title' => 'Resync All Contacts',
+    'description' => '',
+    'page callback' => 'sirius_page_contact_resync_all',
+    'page arguments' => array(),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   /*
   $items['taxonomy/term/%/sirius_dispatch_job_policy_exim'] = array(
     'title' => 'Policy Export / Import',
