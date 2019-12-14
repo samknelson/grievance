@@ -53,6 +53,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxono
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_vocabulary_list.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_list.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_vocabulary_admin.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_resync_all.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
 
