@@ -29,6 +29,23 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_manage',
     'permissions' => array('sirius dispatch employer'),
+    'weight' => 4,
+  );
+
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_dispatches'] = array(
+    'title' => 'Dispatches',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_job_dispatches',
+    'permissions' => array('sirius'),
+    'weight' => 5,
+  );
+
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_bullpen'] = array(
+    'title' => 'Bullpen',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_job_bullpen',
+    'permissions' => array('sirius dispatch employer'),
+    'weight' => 6,
   );
 
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_attachments'] = array(
@@ -36,59 +53,16 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_attachments',
     'permissions' => array('sirius dispatch employer'),
-    'weight' => 1,
+    'weight' => 7,
   );
 
-
-  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen'] = array(
-    'title' => 'Bullpen Details',
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_payrate'] = array(
+    'title' => 'Pay Rate',
     'description' => '',
-    'callback' => 'sirius_node_tab_dispatch_bullpen',
-    'permissions' => array('sirius dispatch bullpen view'),
-    'weight' => 1,
+    'callback' => 'sirius_node_tab_dispatch_job_payrate',
+    'permissions' => array('sirius dispatch payrate override'),
+    'weight' => 8,
   );
-
-  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_signin_self'] = array(
-    'title' => 'Bullpen EBA Signin',
-    'description' => '',
-    'callback' => 'sirius_node_tab_dispatch_bullpen_signin_self',
-    'permissions' => array('sirius dispatch bullpen signin'),
-    'weight' => 2,
-  );
-
-  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_signin_others'] = array(
-    'title' => 'Bullpen Signin',
-    'description' => '',
-    'callback' => 'sirius_node_tab_dispatch_bullpen_signin_others',
-    'permissions' => array('sirius dispatch bullpen signin view'),
-    'weight' => 3,
-  );
-
-  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_signin_others'] = array(
-    'title' => 'Bullpen List',
-    'description' => '',
-    'callback' => 'sirius_node_tab_dispatch_bullpen_signin_others',
-    'permissions' => array('sirius dispatch bullpen signin view'),
-    'weight' => 4,
-  );
-
-  /*
-  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_open'] = array(
-    'title' => 'Dispatch',
-    'description' => '',
-    'callback' => 'sirius_node_tab_dispatch_bullpen',
-    'permissions' => array('sirius dispatch bullpen view'),
-    'weight' => 4,
-  );
-
-  $node_tabs['sirius_dispatch_job']['sirius_dispatch_bullpen_cbn'] = array(
-    'title' => 'Dispatch by Name',
-    'description' => '',
-    'callback' => 'sirius_node_tab_dispatch_bullpen',
-    'permissions' => array('sirius dispatch bullpen view'),
-    'weight' => 5,
-  );
-  */
 
   $node_tabs['sirius_dispatch_facility']['sirius_dispatch_facility_halls'] = array(
     'title' => 'Halls',
@@ -170,28 +144,6 @@ function sirius_dispatch_node_tabs() {
 
 function sirius_dispatch_menu() {
   $items = array();
-
-  //
-  // Node Tabs
-  // 
-
-  $node_tabs = sirius_dispatch_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    foreach ($node_record as $tab_name => $tab_record) {
-      $items['node/%node/' . $tab_name] = array(
-        'title' => $tab_record['title'],
-        'description' => $tab_record['description'],
-        'page callback' => 'sirius_dispatch_node_tab_content',
-        'page arguments' => array(1, $tab_name),
-        'access callback' => 'sirius_dispatch_node_tab_access',
-        'access arguments' => array(1, $tab_name),
-        'type' => MENU_LOCAL_TASK,
-      );
-      if ($tab_record['weight']) {
-        $items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
-      }
-    }
-  }
 
   $items['sirius/staff/dispatch/operator'] = array(
     'title' => 'Sirius: Dispatch: Operator',
@@ -292,27 +244,12 @@ function sirius_dispatch_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/dispatch/config/bullpen'] = array(
-    'title' => 'Bullpen Settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_dispatch_bullpen_admin'),
-    'access arguments' => array('sirius dispatch admin'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
   $items['sirius/dispatch/config/view'] = array(
     'title' => 'Dispatch View Settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_dispatch_view_admin'),
     'access arguments' => array('sirius dispatch admin'),
     'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['sirius/ajax/bullpen-quicksearch'] = array(
-    'page callback' => 'grievance_quicksearch_autocomplete',
-    'page arguments' => array(),
-    'access arguments' => array('sirius dispatch bullpen signin others'),
-    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/dispatch/config/threestrikes'] = array(
@@ -347,52 +284,13 @@ function sirius_dispatch_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $items['sirius/dispatch/eba/cleanup'] = array(
+    'title' => 'EBA Cleanup',
+    'page callback' => 'sirius_dispatch_page_eba_cleanup',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
-}
-
-function sirius_dispatch_node_tab_content($node, $in_tab_name) {
-  $node_tabs = sirius_dispatch_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          $callback = $tab_record['callback'];
-          return $callback($node);
-        }
-      }
-    }
-  }
-  
-  drupal_set_message("Bad tab: $node->type, $in_tab_name");
-  
-  return "";
-}
-
-function sirius_dispatch_node_tab_access($node, $in_tab_name) {
-  // Check generic permissions
-  $node_tabs = sirius_dispatch_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          // Check basic permission
-          foreach ($tab_record['permissions'] as $permission) {
-            if (!user_access($permission)) { return false; }
-          }
-
-          // Check for a custom access permission
-          $access_function_name = $tab_record['callback'] . '_access';
-          if (function_exists($access_function_name)) {
-            if (!$access_function_name($node)) {
-              return false;
-            }
-          }
-          
-          return true;
-        }
-      }
-    }
-  }
-  
-  return false;
 }
