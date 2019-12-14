@@ -279,14 +279,6 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 		$form += sirius_log_render_form($job_node->nid);
 	}
 
-	$html = '';
-	if (user_access('sirius dispatch staff')) {
-		$html .= views_embed_view('sirius_dispatches', 'block', $job_node->nid);
-	} else {
-		$html .= views_embed_view('sirius_dispatches', 'block_1', $job_node->nid);
-	}
-	$form['conclusion'] = array('#markup' => $html);
-
 	return $form;
 }
 
