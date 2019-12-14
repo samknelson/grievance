@@ -1,14 +1,85 @@
 <?php
 
+function sirius_dispatch_jwa_prefs() {
+	global $user;
+	$user_full = user_load($user->uid);
+	$json = json_decode($user_full->field_sirius_json['und'][0]['value'], TRUE);
+	return $json['sirius']['dispatch']['jwa']['prefs'];
+}
+
+function sirius_dispatch_jwa_hours_clause($prefs) {
+  $sql = "";
+  $delta = 0;
+  $date_range = $prefs['date_range'];
+  $date_range_days = $prefs['date_range_days'];
+  $date_range_months = $prefs['date_range_months'];
+  $month = date('m');
+  $year = date('Y');
+  $day = date('d');
+  if ($date_range == 'all') {
+    // No date range
+  } else if ($date_range == 'this_month') {
+    $target_year = $year;
+    $target_month = $month;
+    $date_range_sql = "(year = $target_year and month = target_month) ";
+  } else if ($date_range == 'last_month') {
+    $target_year = $year;
+    $target_month = $month--;
+    if ($target_month < 1) { $target_month = 12; --$target_year; }
+    $date_range_sql = "(year = $target_year and month = target_month) ";
+  } else if ($date_range == 'this_year') {
+    $target_year = $year;
+    $date_range_sql = "(year = $target_year) ";
+  } else if ($date_range == 'last_year') {
+    $target_year = $year-1;
+    $date_range_sql = "(year = $target_year) ";
+  } else if ($date_range == 'days') {
+    $target_date = date('Y-m-d', strtotime("-$date_range_days days"));
+    list ($target_year, $target_month, $target_day) = explode('-', $target_date);
+    $target_thingy = ($target_year * 1000000) + $target_month * 1000 + $target_day;
+    $date_range_sql = "( (year * 1000000 + month * 1000 + day) >= $target_thingy ) ";
+  } else if ($date_range == 'months') {
+    $target_date = date('Y-m', strtotime("-$date_range_months months"));
+    list ($target_year, $target_month) = explode('-', $target_date);
+    $target_thingy = ($target_year * 1000000) + $target_month * 1000;
+    $date_range_sql = "( (year * 1000000 + month * 1000) >= $target_thingy ) ";
+  }
+
+  $delta = 0;
+  foreach ($prefs['hour_type'] as $type) {
+    $clauses = array();
+    list ($hours_type_tid, $department_tid) = explode('|', $type);
+    if ($hours_type_tid > 0) { $clauses[] = "hours_type_tid = $hours_type_tid "; }
+    if ($department_tid > 0) { $clauses[] = "department_tid = $department_tid "; }
+    if ($date_range_sql) { $clauses[] = $date_range_sql; }
+    if (!$clauses) { $clauses[] = 'TRUE'; }
+    $sql .= "\nSUM(CASE WHEN ( ";
+    $sql .= join(' AND ', $clauses);
+    $sql .= ") THEN hours ELSE 0 END) AS hours_$delta,\n ";
+    ++$delta;
+  }
+
+  return $sql;
+}
+
+function sirius_dispatch_jwa_hours_render($prefs, $hr) {
+	$hours = '';
+	$is_first = TRUE;
+	$delta = 0;
+	foreach ($prefs['hour_type'] as $type) { 
+		if ($is_first) { $is_first = FALSE; } else { $hours .= '&nbsp;/&nbsp;'; }
+		$hours .= round($hr["hours_$delta"], 2); 
+		++$delta;
+	}
+	return $hours;
+}
+
 function sirius_dispatch_page_jwa_assign() {
 	return drupal_get_form('sirius_dispatch_page_jwa_assign_form');
 }
 
 function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
-	global $user;
-	$user_full = user_load($user->uid);
-	$json = json_decode($user_full->field_sirius_json['und'][0]['value'], TRUE);
-	$prefs = $json['sirius']['dispatch']['jwa']['prefs'];
+	$prefs = sirius_dispatch_jwa_prefs();
 	if (!$prefs) {
 		drupal_set_message(t('Please set your Job / Worker Assign Preferences.'), 'warning');
 		return array();
@@ -61,55 +132,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	// Fetch the workers. SQL for speed
 	$args = array();
 	$sql = "select node.nid as worker_nid, ";
-	$delta = 0;
-	$date_range = $prefs['date_range'];
-	$date_range_days = $prefs['date_range_days'];
-	$date_range_months = $prefs['date_range_months'];
-	$month = date('m');
-	$year = date('Y');
-	$day = date('d');
-	if ($date_range == 'all') {
-		// No date range
-	} else if ($date_range == 'this_month') {
-		$target_year = $year;
-		$target_month = $month;
-		$date_range_sql = "(year = $target_year and month = target_month) ";
-	} else if ($date_range == 'last_month') {
-		$target_year = $year;
-		$target_month = $month--;
-		if ($target_month < 1) { $target_month = 12; --$target_year; }
-		$date_range_sql = "(year = $target_year and month = target_month) ";
-	} else if ($date_range == 'this_year') {
-		$target_year = $year;
-		$date_range_sql = "(year = $target_year) ";
-	} else if ($date_range == 'last_year') {
-		$target_year = $year-1;
-		$date_range_sql = "(year = $target_year) ";
-	} else if ($date_range == 'days') {
-		$target_date = date('Y-m-d', strtotime("-$date_range_days days"));
-		list ($target_year, $target_month, $target_day) = explode('-', $target_date);
-		$target_thingy = ($target_year * 1000000) + $target_month * 1000 + $target_day;
-		$date_range_sql = "( (year * 1000000 + month * 1000 + day) >= $target_thingy ) ";
-	} else if ($date_range == 'months') {
-		$target_date = date('Y-m', strtotime("-$date_range_months months"));
-		list ($target_year, $target_month) = explode('-', $target_date);
-		$target_thingy = ($target_year * 1000000) + $target_month * 1000;
-		$date_range_sql = "( (year * 1000000 + month * 1000) >= $target_thingy ) ";
-	}
-
-	$delta = 0;
-	foreach ($prefs['hour_type'] as $type) {
-		$clauses = array();
-		list ($hours_type_tid, $department_tid) = explode('|', $type);
-		if ($hours_type_tid > 0) { $clauses[] = "hours_type_tid = $hours_type_tid "; }
-		if ($department_tid > 0) { $clauses[] = "department_tid = $department_tid "; }
-		if ($date_range_sql) { $clauses[] = $date_range_sql; }
-		if (!$clauses) { $clauses[] = 'TRUE'; }
-		$sql .= "\nSUM(CASE WHEN ( ";
-		$sql .= join(' AND ', $clauses);
-		$sql .= ") THEN hours ELSE 0 END) AS hours_$delta,\n ";
-		++$delta;
-	}
+	$sql .= sirius_dispatch_jwa_hours_clause($prefs);
 
 	$worker_max = variable_get('sirius_dispatch_jwa_worker_max', 500);
 	$sql .= "field_sirius_dispatch_availdate_value as availdate, ";
@@ -208,14 +231,8 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 		 		$tools .= l($dispatch['dispatch_status'], "node/$dispatch[dispatch_nid]/sirius_dispatch_manage", array('attributes' => array('target' => '_blank', 'class' => array('tool-button')))) . ' ';
  			}
  		}
- 		$hours = '';
- 		$is_first = TRUE;
- 		$delta = 0;
-		foreach ($prefs['hour_type'] as $type) { 
-			if ($is_first) { $is_first = FALSE; } else { $hours .= '&nbsp;/&nbsp;'; }
-			$hours .= round($hr["hours_$delta"], 2); 
-			++$delta;
-		}
+
+ 		$hours = sirius_dispatch_jwa_hours_render($prefs, $hr);
 
 		if ($hr['eba_name'] == 'Yes') { $eba = $hr['eba_dates']; } else { $eba = ''; }
 
