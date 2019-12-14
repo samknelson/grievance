@@ -179,6 +179,26 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	$show_event = ($job_policy['event']['has_event'] == 'Yes' && $job_policy['event']['on_job_create'] == 'select');
 	if ($show_event) {
 		$event_options = array(NULL => t('-- Select --'));
+		$query = new EntityFieldQuery;
+	  $query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'sirius_event');
+	  $query->fieldCondition('field_sirius_event_type', 'tid', $job_policy['event']['event_type']);
+	  $query->fieldCondition('field_sirius_daterepeat', 'value', gmdate('Y-m-d'), '>=');
+	  $query->fieldCondition('field_sirius_active', 'value', 'Yes');
+	  $query->fieldOrderBy('field_sirius_daterepeat', 'value');
+	  $stmt = $query->execute();
+	  if (!$stmt['node']) {
+	  	drupal_set_message(t('There are no upcoming events.'), 'error');
+	  	return array();
+	  }
+	  $event_nodes = node_load_multiple(array_keys($stmt['node']));
+	  foreach ($event_nodes as $event_nid => $event_node) {
+	  	$bullen_job_node = sirius_event_bullpen_job($event_nid);
+	  	if (!$bullen_job_node) { continue; }
+	  	$employer_node = node_load($bullen_job_node->field_grievance_shop['und'][0]['target_id']);
+	  	$facility_node = node_load($bullen_job_node->field_sirius_dispatch_facility['und'][0]['target_id']);
+	  	$event_options[$event_nid] = $employer_node->title . ': ' . sirius_date_date($event_node, 'field_sirius_daterepeat', 'Y-m-d h:i a') . ': ' . $facility_node->title;
+	  }
 		$form['event_nid'] = array(
 			'#type' => 'select',
 			'#title' => t('Event'),
@@ -545,10 +565,12 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	if ($form_state['triggering_element']['#value'] == 'Filter') { return; }
 
 	// Report date must be in the future
-	$report_ts = strtotime($form_state['values']['datetime']);
-	if ($report_ts < time() + 60*60*1) {
-  	form_set_error('datetime', 'Report date must be at least one hour in the future.');
-  }
+	if (!$form_state['values']['event_nid']) {
+		$report_ts = strtotime($form_state['values']['datetime']);
+		if ($report_ts < time() + 60*60*1) {
+	  	form_set_error('datetime', 'Report date must be at least one hour in the future.');
+	  }
+	}
 
 	for ($i=0; $i<10; ++$i) {
 		if ($form_state['values']["email_$i"] && !sirius_email_validate($form_state['values']["email_$i"])) {
@@ -594,24 +616,41 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	if ($count_policy == 'required') {
 		if (! ($form_state['values']['count'] > 0)) { form_set_error('count', t('Please enter a nonzero number of workers.')); }
 	}
-	if (!$form_state['values']['facility']) { form_set_error('facility', t('Please select a facility.')); }
+	if (!$form_state['values']['event_nid']) {
+		if (!$form_state['values']['facility']) { form_set_error('facility', t('Please select a facility.')); }
+	}
+
 }
 
 function sirius_dispatch_page_job_create_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 
+	// Build the job
+	$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
+	$job_node = node_submit($job_node);
+
 	// Build and save the event (if any)
-	$event_node = sirius_dispatch_page_job_create_get_event_node($form_state);
+	$event_node = sirius_dispatch_page_job_create_get_event_node($form_state, $job_node);
 	if ($event_node) {
 		$event_node = node_submit($event_node);
 		node_save($event_node);
 		$event_nid = $event_node->nid;
+
+		if (!user_access('sirius dispatch staff')) {
+			global $user;
+			$event_type_tid = $event_node->field_sirius_event_type['und'][0]['tid'];
+			$event_type_term = taxonomy_term_load($event_type_tid);
+			$event_type_json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+			$key = $event_type_json['bullpen']['register_as'];
+			list ($prole, $pstatus) = explode('|', $key);
+			if ($prole && $pstatus) {
+				sirius_event_participant_register_user($event_nid, $user->uid, $prole, $pstatus);
+			}
+		}
+		$job_node->field_sirius_event['und'][0]['target_id'] = $event_nid;
 	}
 
-	// Build and save the job
-	$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
-	$job_node = node_submit($job_node);
-	if ($event_nid) { $job_node->field_sirius_event['und'][0]['target_id'] = $event_nid; }
+	// Save the job
 	node_save($job_node);
 	$job_nid = $job_node->nid;
 
@@ -725,6 +764,15 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 		$job_node->field_sirius_dispatch_job_group['und'][0]['target_id'] = $form_state['values']['job_group'];
 	}
 
+	$event_nid = $form_state['values']['event_nid'];
+	if ($event_nid) {
+		$job_node->field_sirius_event['und'][0]['target_id'] = $event_nid;
+		$event_node = node_load($event_nid);
+		$sponsor_job_node = sirius_event_bullpen_job($event_nid);
+		$job_node->field_sirius_datetime = $sponsor_job_node->field_sirius_datetime;
+		$job_node->field_sirius_dispatch_facility = $sponsor_job_node->field_sirius_dispatch_facility;
+	}
+
 	if ($form_state['values']['notify']) {
 		$job_node->field_sirius_notify['und'][0]['value'] = $form_state['values']['notify'];
 
@@ -772,7 +820,7 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 	return $job_node;
 }
 
-function sirius_dispatch_page_job_create_get_event_node($form_state) {
+function sirius_dispatch_page_job_create_get_event_node($form_state, $job_node) {
 	$job_type_tid = $form_state['job_type_tid'];
 	$job_policy = sirius_dispatch_job_policy_from_tid($job_type_tid);
 	if ($job_policy['event']['has_event'] != 'Yes') { return NULL; }
@@ -791,6 +839,7 @@ function sirius_dispatch_page_job_create_get_event_node($form_state) {
 	} else {
 		$event_node->title = $employer_node->title . ' - ' . $event_type_term->name . ' - ' . gmdate('Y-m-d', strtotime($form_state['values']['datetime']));
 	}
+	$event_node->field_sirius_active['und'][0]['value'] = 'Yes';
 	$event_node->type = 'sirius_event';
 	node_object_prepare($event_node);
 	$event_node->language = LANGUAGE_NONE;
@@ -805,6 +854,7 @@ function sirius_dispatch_page_job_create_get_event_node($form_state) {
   	$event_node->field_sirius_daterepeat['und'][0]['value'] = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['datetime']));
   }
   $event_node->field_sirius_event_type['und'][0]['tid'] = $event_type_tid;
+  $event_node->field_sirius_active['und'][0]['value'] = 'Yes';
 
 	return $event_node;
 }

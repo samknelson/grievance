@@ -72,7 +72,14 @@ function grievance_quicksearch_form_submit($form, &$form_state) {
 	drupal_goto("grievance/admin/quicksearch/" . urlencode($value));
 }
 
-function grievance_quicksearch_autocomplete($string) {
+function grievance_quicksearch_autocomplete($string, $s2 = NULL, $s3 = NULL, $s4 = NULL) {
+	// If the string has a slash, it's not passed by the autocomplete function.
+	// See https://www.drupal.org/project/drupal/issues/93854
+	// So we use this monstrosity.
+	if (isset($s2)) { $string .= "/$s2"; }
+	if (isset($s3)) { $string .= "/$s3"; }
+	if (isset($s4)) { $string .= "/$s4"; }
+
   $matches = array();
 	if (strlen($string) < 3) { 
 		drupal_json_output($matches);
@@ -110,7 +117,6 @@ function grievance_quicksearch_results_html($grievance, $limit = 20) {
 }
 
 function grievance_quicksearch_results($string, $limit = 20) {
-
 	$string = trim($string);
 
 	$types = grievance_quicksearch_types();
@@ -118,7 +124,7 @@ function grievance_quicksearch_results($string, $limit = 20) {
 
 
 	// Search the title
-	if (!preg_match('/\d/', $string)) {
+	if (!preg_match('!\d!', $string)) {
 		$query = new EntityFieldQuery();
 		$query->entityCondition('entity_type', 'node');
 		$query->entityCondition('bundle', array_keys($types), 'in');
@@ -135,7 +141,13 @@ function grievance_quicksearch_results($string, $limit = 20) {
 		}	
 	}
 
-	if (preg_match('/\d/', $string)) {
+	if (preg_match('!\d!', $string)) {
+		$id = $string;
+
+		if (preg_match('/\//', $id)) {
+			$id = preg_replace('/.*\//', '', $id);
+			$id = trim($id);
+		}
 		$tmp = $types;
 		unset($tmp['sirius_worker']);
 
@@ -146,7 +158,7 @@ function grievance_quicksearch_results($string, $limit = 20) {
 			$query->entityCondition('bundle', array_keys($tmp), 'in');
 			$query->propertyCondition('status', 1);
 			$query->propertyOrderBy('created', 'desc');
-			$query->fieldCondition('field_grievance_id', 'value', '%' . $string . '%', 'like');
+			$query->fieldCondition('field_grievance_id', 'value', '%' . $id . '%', 'like');
 			$query->range(0, $limit);
 			$result = $query->execute();
 			if (isset($result['node'])) {
@@ -166,7 +178,7 @@ function grievance_quicksearch_results($string, $limit = 20) {
 			$query->entityCondition('bundle', array_keys($tmp), 'in');
 			$query->propertyCondition('status', 1);
 			$query->propertyOrderBy('created', 'desc');
-			$query->fieldCondition('field_sirius_id', 'value', '%' . $string . '%', 'like');
+			$query->fieldCondition('field_sirius_id', 'value', '%' . $id . '%', 'like');
 			$query->range(0, $limit);
 			$result = $query->execute();
 			if (isset($result['node'])) {
@@ -186,7 +198,7 @@ function grievance_quicksearch_results($string, $limit = 20) {
 			$query->entityCondition('bundle', array_keys($tmp), 'in');
 			$query->propertyCondition('status', 1);
 			$query->propertyOrderBy('created', 'desc');
-			$query->fieldCondition('field_sirius_id2', 'value', $string);
+			$query->fieldCondition('field_sirius_id2', 'value', $id);
 			$query->range(0, $limit);
 			$result = $query->execute();
 			if (isset($result['node'])) {

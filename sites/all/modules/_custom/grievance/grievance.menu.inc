@@ -6,7 +6,7 @@
  * shows housing-related functions. 
  */
  
-function grievance_node_tabs() {
+function grievance_xnode_tabs() {
 	$node_tabs = array();
 
 	$node_tabs['grievance']['letter'] = array(
@@ -300,7 +300,7 @@ function grievance_menu() {
 	// Node Tabs
   // 
 
-	$node_tabs = grievance_node_tabs();
+	$node_tabs = grievance_xnode_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		foreach ($node_record as $tab_name => $tab_record) {
 			$items['node/%node/' . $tab_name] = array(
@@ -712,7 +712,7 @@ function grievance_menu_deny() { return 'Access denied.'; }
 function grievance_menu_deny_access() { return FALSE; }
 
 function grievance_node_tab_content($node, $in_tab_name) {
-	$node_tabs = grievance_node_tabs();
+	$node_tabs = grievance_xnode_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		if ($node->type == $node_type) {
 			foreach ($node_record as $tab_name => $tab_record) {
@@ -739,7 +739,7 @@ function grievance_node_tab_access($node, $in_tab_name) {
 	}
 
 	// Check generic permissions
-	$node_tabs = grievance_node_tabs();
+	$node_tabs = grievance_xnode_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		if ($node->type == $node_type) {
 			foreach ($node_record as $tab_name => $tab_record) {

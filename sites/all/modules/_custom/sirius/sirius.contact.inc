@@ -97,6 +97,21 @@ function sirius_contact_sync_from_user($account) {
 	return $contact_node;
 }
 
+function sirius_contact_nid_get_from_user($uid = NULL) {
+	if (!$uid) { 
+		global $user;
+		$uid = $user->uid;
+	}
+	if (!$uid) { return NULL; }
+
+	$sql = "select field_sirius_contact_target_id from field_data_field_sirius_contact ";
+	$sql .= "where entity_type = 'user' ";
+	$sql .= "and entity_id = :uid";
+	$stmt = db_query($sql, array(':uid' => $uid));
+	$hr = $stmt->fetchAssoc();
+	return $hr['field_sirius_contact_target_id'];
+}
+
 function sirius_contact_sirius_jsonfield_form_definitions() {
 	$definitions['node']['sirius_contact']['field_sirius_json'] = array('#callback' => 'sirius_contact_sirius_jsonfield_form_definitions_callback');
 	return $definitions;
@@ -106,4 +121,14 @@ function sirius_contact_sirius_jsonfield_form_definitions_callback($element) {
 	$contact_node = $element['#entity'];
 	$domain_nid = $contact_node->field_sirius_domain['und'][0]['target_id'];
 	return sirius_contact_definition($domain_nid);
+}
+
+function sirius_contact_get_nid_from_worker($worker_nid) {
+	$sql = "select field_sirius_contact_target_id from field_data_field_sirius_contact ";
+	$sql .= "where entity_type = 'node' ";
+	$sql .= "and bundle = 'sirius_worker' ";
+	$sql .= "and entity_id = :worker_nid";
+	$stmt = db_query($sql, array(':worker_nid' => $worker_nid));
+	$hr = $stmt->fetchAssoc();
+	return $hr['field_sirius_contact_target_id'];
 }

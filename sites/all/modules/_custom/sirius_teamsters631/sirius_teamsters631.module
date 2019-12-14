@@ -18,3 +18,56 @@ function sirius_teamsters631_taxonomy_term_update($term) {
   if ($vocabulary->machine_name == 'sirius_member_status') { sirius_teamsters631_taxonomy_term_update_ebnotify($term); }
 }
  
+
+function sirius_teamsters631_oneoff_notification_update() {
+	// Get the last job created by this job at this employer with this type.
+	$sql = "select entity_id from field_data_field_sirius_dispatch_medium ";
+	$sql .= "where entity_type = 'node' ";
+	$sql .= "and bundle = 'sirius_worker' ";
+	$sql .= "and delta = 2 "; 
+	$sql .= "and field_sirius_dispatch_medium_value = 'email' ";
+	$sql .= "order by entity_id ";
+
+	$worker_nids = array();
+	$stmt = db_query($sql, array());
+	while ($hr = $stmt->fetchAssoc()) {
+		$worker_nids[] = $hr['entity_id'];
+	}
+
+	foreach ($worker_nids as $worker_nid) {
+		print "Scanning: $worker_nid\n";
+		$sql = "select * from field_data_field_sirius_type, field_data_field_sirius_category, field_data_field_sirius_log_handler ";
+		$sql .= "where field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.bundle = 'sirius_log' ";
+		$sql .= "and field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.bundle = 'sirius_log' ";
+		$sql .= "and field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.bundle = 'sirius_log' ";
+		$sql .= "and field_data_field_sirius_type.entity_id = field_data_field_sirius_category.entity_id ";
+		$sql .= "and field_data_field_sirius_category.entity_id = field_data_field_sirius_log_handler.entity_id ";
+		$sql .= "and field_sirius_log_handler_target_id = :worker_nid ";
+		$sql .= "and field_sirius_category_value = 'worker:dispatch' ";
+		$sql .= "and field_sirius_type_value = 'update_preferences' ";
+		$sql .= "limit 1 ";
+		$stmt = db_query($sql, array(':worker_nid' => $worker_nid));
+		$hr = $stmt->fetchAssoc();
+		if ($hr) {
+			print "... Already set preferences; skipping\n";
+			continue; 
+		}
+
+		$sql = "select * from field_data_field_sirius_phone ";
+		$sql .= "where entity_type = 'node' ";
+		$sql .= "and entity_id = :worker_nid ";
+		$stmt = db_query($sql, array(':worker_nid' => $worker_nid));
+		$hr = $stmt->fetchAssoc();
+		if (!$hr) {
+			print "... No phone; skipping.\n";
+			continue; 
+		}
+
+		$tables = array('field_data_field_sirius_dispatch_medium', 'field_revision_field_sirius_dispatch_medium');
+		foreach ($tables as $table) {
+			$sql = "update $table set field_sirius_dispatch_medium_value = 'sms' where entity_type = 'node' and entity_id = :worker_nid and delta = 2 ";
+			$stmt = db_query($sql, array(':worker_nid' => $worker_nid));
+		}
+		print "... Updated.\n";
+	}
+}
