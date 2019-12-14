@@ -135,10 +135,12 @@ function sirius_worker_usersync($worker_nid) {
 		$new_rids[$rid] = TRUE;
 	}
 
-	$sql = "select * from users where name = :name or mail = :mail";
+	$sql = "select * from users ";
+	$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'user' and field_data_field_sirius_worker.entity_id = users.uid ";;
+	$sql .= "where name = :name or mail = :mail";
 	$stmt = db_query($sql, array(':name' => $id, 'mail' => $email));
-	$hr = $stmt->fetchAssoc();
-	if ($hr) {
+	while ($hr = $stmt->fetchAssoc()) {
+		if ($hr['field_sirius_worker_target_id'] == $worker_nid) { continue; }
 		return array('success' => FALSE, 'msg' => "There is already an existing user " . $hr['uid'] . " with name $id or mail $mail.");
 	}
 
