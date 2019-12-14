@@ -16,8 +16,10 @@ function sirius_dispatch_accept_possible($dispatch_node) {
 
 	// Verify that the job isn't full
 	$worker_nid = $dispatch_node->field_sirius_worker['und'][0]['target_id'];
-	if ($job_node->field_sirius_count_yes['und'][0]['value'] >= $job_node->field_sirius_count['und'][0]['value']) {
-		return array('success' => FALSE, 'msg' => 'The job is full.');
+	if ($job_node->field_sirius_count['und'][0]['value'] > 0) {
+		if ($job_node->field_sirius_count_yes['und'][0]['value'] >= $job_node->field_sirius_count['und'][0]['value']) {
+			return array('success' => FALSE, 'msg' => 'The job is full.');
+		}
 	}
 
 	// Verify that the worker is still dispatchable for this job
@@ -35,6 +37,23 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 	if (!$possible['success']) {
 		sirius_log('dispatch:accept', 'fail', "Accept failed - " . $possible['msg'], '', '', array($dispatch_node->nid));
 		return $possible;
+	}
+
+	// Remove from the event
+	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+	$event_nid = $job_node->field_sirius_event['und'][0]['target_id'];
+	if ($event_nid) {
+		$contact_nid = sirius_contact_get_nid_from_worker($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+		$event_node = node_load($event_nid);
+		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+		$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+		list ($prole_tid, $pstatus_tid) = explode('|', $json['bullpen']['post_dispatch']);
+		$participant_node = sirius_event_participant_get($event_nid, $contact_nid);
+		if ($participant_node && $prole_tid && $pstatus_tid) {
+			$participant_node->field_sirius_event_prole['und'][0]['tid'] = $prole_tid;
+			$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $pstatus_tid;
+			node_save($participant_node);
+		}
 	}
 
 	// Set the status
