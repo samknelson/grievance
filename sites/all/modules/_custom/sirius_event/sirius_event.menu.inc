@@ -107,24 +107,7 @@ function sirius_event_node_tabs() {
     'weight' => 4,
   );
 
-  $node_tabs['sirius_event']['sirius_event_bullpen'] = array(
-    'title' => 'Bullpen',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_bullpen',
-    'permissions' => array('sirius'),
-    'weight' => 3,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_bullpen/view'] = array(
-    'title' => 'View',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_bullpen_view',
-    'permissions' => array(),
-    'weight' => 1,
-  );
-
-
-  $node_tabs['sirius_event']['sirius_event_bullpen/self'] = array(
+  $node_tabs['sirius_event']['sirius_event_bullpen_self'] = array(
     'title' => 'Self Sign-in',
     'description' => '',
     'callback' => 'sirius_node_tab_event_bullpen_self',

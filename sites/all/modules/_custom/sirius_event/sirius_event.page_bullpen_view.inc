@@ -1,7 +1,7 @@
 <?php
 
 function sirius_node_tab_event_bullpen_view_access($event_node) {
-	return sirius_node_tab_event_bullpen_access($event_node);
+  return sirius_event_bullpen_enabled($event_node);
 }
 
 function sirius_node_tab_event_bullpen_view($event_node) {
