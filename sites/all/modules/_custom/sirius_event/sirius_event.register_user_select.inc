@@ -47,9 +47,34 @@ function sirius_event_register_user_select_form($form, &$form_state, $event_node
 	}
 
 	$form['register_as'] = array(
-		'#title' => 'Register As',
+		'#title' => 'Register as',
 		'#type' => 'select',
 		'#options' => $register_as_options,
+	);
+
+	$form['notify'] = array(
+		'#title' => 'Notify by',
+		'#type' => 'select',
+		'#options' => array(
+			'NULL' => t('No notification'),
+			'sms' => t('Text message'),
+			'email' => t('Email message'),
+			'both' => t('Both text and email messages'),
+		),
+	);
+
+	$form['notify_body'] = array(
+		'#type' => 'textarea',
+		'#title' => t('Add a message'),
+		'#states' => array(
+			'visible' => array(
+				':input[name="notify"]' => array(
+					array('value' => 'sms'),
+					array('value' => 'email'),
+					array('value' => 'both')
+				),
+			),
+		),
 	);
 
 	$form['submit'] = array(
@@ -62,9 +87,67 @@ function sirius_event_register_user_select_form($form, &$form_state, $event_node
 
 function sirius_event_register_user_select_form_submit($form, &$form_state) {
 	$event_nid = $form_state['event_nid'];
+	$event_node = node_load($event_nid);
+
 	$contact_nid = $form_state['values']['contact_nid'];
+	$contact_node = node_load($contact_nid);
+
 	$register_as = $form_state['values']['register_as'];
 	list ($prole_tid, $pstatus_tid) = explode('|', $register_as);
+	$prole_term = taxonomy_term_load($prole_tid);
+	$pstatus_term = taxonomy_term_load($pstatus_tid);
+
+  $event_type_tid = $event_node->field_sirius_event_type['und'][0]['tid'];
+  $event_type_term = taxonomy_term_load($event_type_tid);
+  $json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+  global $base_url;
+  $url = $base_url . '/node/' . $event_nid;
+  if (sirius_event_bullpen_enabled_type($event_type_term)) { $url .= "/sirius_event_bullpen/view"; }
+
 	$result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
-	if ($result['success']) { drupal_set_message($result['msg']); } else { drupal_set_message($result['msg'], 'error'); }
+	if ($result['success']) { 
+		drupal_set_message($result['msg']);
+	} else { 
+		drupal_set_message($result['msg'], 'error'); 
+		return;
+	}
+
+  if ($form_state['values']['notify'] == 'sms' || $form_state['values']['notify'] == 'both') {
+		$phone = $contact_node->field_sirius_phone['und'][0]['value'];
+		if (!$phone) { 
+			drupal_set_message("Unable to notify by SMS: the contact has no phone number listed.");
+		} else {
+	    $params = array();
+	    $params['sms'] = "You have been registered for " . $event_node->title . " as a " . $prole_term->name . " with a status of " . $pstatus_term->name;
+	    $params['sms'] .= "\n";
+	    $params['sms'] .= $url;
+	    if ($form_state['values']['notify_body']) {
+	    	$params['sms'] .= "\n" . $form_state['values']['notify_body'];
+	    }
+
+      $params['to'] = $phone;
+      $result = sirius_sms_send($params);
+			if ($result['success']) { drupal_set_message("Notified by SMS: $phone"); } else { drupal_set_message($result['msg'], 'warning'); }
+    }
+  }
+
+  if ($form_state['values']['notify'] == 'email' || $form_state['values']['notify'] == 'both') {
+		$email = $contact_node->field_sirius_email['und'][0]['value'];
+		if (!$email) { 
+			drupal_set_message("Unable to notify by Email: the contact has no email address listed.");
+		} else {
+	    $params = array();
+	    $params['subject'] = "You have been registered for " . $event_node->title;
+	    $params['body'] = "You have been registered for " . $event_node->title . " as a " . $prole_term->name . " with a status of " . $pstatus_term->name;
+	    $params['body'] .= "<br /><br />";
+	    $params['body'] .= "<a href=\"$url\">$url</a>";
+	    if ($form_state['values']['notify_body']) {
+	    	$params['body'] .= "<br /><br />" . $form_state['values']['notify_body'];
+	    }
+
+      $params['to'] = $email;
+      $result = sirius_email_send($params);
+			if ($result['success']) { drupal_set_message("Notified by email: $email"); } else { drupal_set_message($result['msg'], 'warning'); }
+    }
+  }
 }

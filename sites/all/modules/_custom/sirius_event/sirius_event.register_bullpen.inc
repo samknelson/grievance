@@ -1,13 +1,11 @@
 <?php
 
 function sirius_event_register_bullpen_signin_form($form, &$form_state, $event_node, $rule) {
-
   $form_state['event_nid'] = $event_node->nid;
   $form_state['rule'] = $rule;
   $form_state['participant_role_tid'] = $participant_role_tid;
 
   $ts = sirius_event_bullpen_ts($event_node);
-  /*
   if ($ts['signin_opens_others'] > time()) {
     drupal_set_message("Sign-in opens at " . date('g:i A, l, F j', $ts['signin_opens_others']), 'warning');
     return array();
@@ -16,7 +14,6 @@ function sirius_event_register_bullpen_signin_form($form, &$form_state, $event_n
     drupal_set_message("Sign-in closed at " . date('g:i A, l, F j', $ts['signin_closes']), 'warning');
     return array();
   }
-  */
 
 	// $open = sirius_dispatch_bullpen_signin_open($job_node, FALSE);
   $form['worker'] = array(
@@ -50,7 +47,7 @@ function sirius_event_register_bullpen_signin_form_submit($form, &$form_state) {
     $worker_nid = $matches[1];
   }
   if (!$worker_nid) {
-    drupal_set_message("Please make sure that you have selected a a matching worker.", 'warning');
+    drupal_set_message("Please make sure that you have selected a matching worker.", 'warning');
     return;
   }
 
@@ -83,6 +80,3 @@ function sirius_event_register_bullpen_signin_form_submit($form, &$form_state) {
 }
 
 
-function sirius_event_register_bullpen_ajax() {
-  
-}

@@ -19,12 +19,10 @@ function sirius_node_tab_dispatch_job_bullpen_form($form, &$form_state, $job_nod
 	$event_node = node_load($job_node->field_sirius_event['und'][0]['target_id']);
 
   $ts = sirius_event_bullpen_ts($event_node);
-  /*
   if ($ts['job_ts'] > time()) {
     drupal_set_message("The event opens at " . date('g:i A, l, F j', $ts['job_ts']), 'warning');
     return array();
   }
-  */
 
 	// Get the list of dispatchable workers
 	$workers = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name', 0);
@@ -113,7 +111,7 @@ function sirius_node_tab_dispatch_job_bullpen_form_submit($form, &$form_state) {
 				if ($result['success']) {
 					drupal_set_message(t("Dispatched: @name", array('@name' => $worker_node->title)));
 				} else { 
-					drupal_set_message(t("Dispatch failed for @name: @msg", array('@name' => $worker_node->title, '@msg' => $result['msg'])), 'warning');
+					drupal_set_message(t("Notification failed for @name: @msg", array('@name' => $worker_node->title, '@msg' => $result['msg'])), 'warning');
 				}
 			} else {
 				drupal_set_message(t("Dispatch failed for @name: @msg", array('@name' => $worker_node->title, '@msg' => $result['msg'])), 'warning');

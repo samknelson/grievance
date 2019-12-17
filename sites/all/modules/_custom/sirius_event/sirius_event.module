@@ -33,6 +33,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_settings.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_bullpen.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_bullpen_view.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_bullpen_self.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_create.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_register.inc";
@@ -263,3 +264,55 @@ function sirius_event_duration_format($seconds) {
   }
   return $duration;
 }
+
+/**
+ * Implements hook_node_insert
+ */
+
+function sirius_event_node_insert($node)  {
+  if ($node->type == 'sirius_event') {
+    $event_type_tid = $node->field_sirius_event_type['und'][0]['tid'];
+    $event_type_term = taxonomy_term_load($event_type_tid);
+    $json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+
+    $nid = $node->nid;
+    global $base_url;
+    $url = $base_url . '/node/' . $nid;
+    if (sirius_event_bullpen_enabled_type($event_type_term)) {
+      $url .= "/sirius_event_bullpen/view";
+    }
+
+    if ($json['create']['notify']['sms']) {
+      $params = array();
+      $params['sms'] = "A new event of type " . $event_type_term->name . " has been created.\n";
+      $params['sms'] .= $url;
+
+      foreach ($json['create']['notify']['sms'] as $phone) {
+        // $params['X-Sirius-Id'] = 'sirius_event/create/' . $nid . '/' . $phone;
+        $params['to'] = $phone;
+        sirius_sms_send($params);
+      }
+    }
+
+    if ($json['create']['notify']['email']) {
+      $params = array();
+      $params['body'] = "A new event of type " . $event_type_term->name . " has been created.<br /><br />";
+      $params['body'] .= "<a href=\"$url\">" . $url . "</a>";
+      $params['subject'] = "A new event of type " . $event_type_term->name . " has been created.";
+
+      foreach ($json['create']['notify']['email'] as $email) {
+        // $params['X-Sirius-Id'] = 'sirius_event/create/' . $nid . '/' . $email;
+        $params['to'] = $email;
+        sirius_email_send($params);
+      }
+    }
+  }  
+}
+
+/**
+ * Implements hook_node_update
+ */
+
+function sirius_event_node_update($node)  {
+}
+
