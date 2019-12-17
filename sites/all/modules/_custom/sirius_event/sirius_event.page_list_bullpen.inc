@@ -48,7 +48,7 @@ function sirius_event_page_list_bullpens() {
 	  if ($facility_node) { $html .= sirius_fakerender_field('Facility:', $facility_node->title); }
 	  if ($hall_node) { $html .= sirius_fakerender_field('Hall:', $hall_node->title); }
 	  if ($host_job_node->field_sirius_address_notes['und'][0]['value']) { $html .= sirius_fakerender_field('Report Location:', $host_job_node->field_sirius_address_notes['und'][0]['value']); }
-	  $html .= l('View', 'node/' . $event_node->nid . '/sirius_event_bullpen/view', array('attributes' => array('class' => array('tool-button'))));
+	  $html .= l('View', 'node/' . $event_node->nid . '/sirius_event_info', array('attributes' => array('class' => array('tool-button'))));
 	  $html .= '<br /><br />';
 	}
 

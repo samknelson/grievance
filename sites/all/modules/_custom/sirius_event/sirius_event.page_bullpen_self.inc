@@ -1,7 +1,7 @@
 <?php
 
 function sirius_node_tab_event_bullpen_self_access($event_node) {
-	if (!sirius_node_tab_event_bullpen_access($event_node)) { return FALSE; }
+	if (!sirius_node_tab_event_bullpen_view_access($event_node)) { return FALSE; }
 
   // Must have a worker
   $worker_node = sirius_worker_get();

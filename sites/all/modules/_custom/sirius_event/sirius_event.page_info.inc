@@ -16,7 +16,10 @@ function sirius_node_tab_event_info_access($event_node) {
 }
 
 function sirius_node_tab_event_info($event_node) {
-	$renderable = node_view($event_node, 'full');
-
-	return drupal_render($renderable);
+  if (sirius_node_tab_event_bullpen_view_access($event_node)) {
+    return sirius_node_tab_event_bullpen_view($event_node);
+  } else {
+    $renderable = node_view($event_node, 'full');
+    return drupal_render($renderable);
+  }
 }
