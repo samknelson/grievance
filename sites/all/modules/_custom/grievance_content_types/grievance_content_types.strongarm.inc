@@ -777,6 +777,20 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_enable_revisions_page_node_sirius_event';
+  $strongarm->value = 0;
+  $export['diff_enable_revisions_page_node_sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_enable_revisions_page_node_sirius_event_participant';
+  $strongarm->value = 0;
+  $export['diff_enable_revisions_page_node_sirius_event_participant'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'diff_enable_revisions_page_node_sirius_feed';
   $strongarm->value = 1;
   $export['diff_enable_revisions_page_node_sirius_feed'] = $strongarm;
@@ -875,6 +889,20 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_show_preview_changes_node_sirius_event';
+  $strongarm->value = 0;
+  $export['diff_show_preview_changes_node_sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_show_preview_changes_node_sirius_event_participant';
+  $strongarm->value = 0;
+  $export['diff_show_preview_changes_node_sirius_event_participant'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'diff_show_preview_changes_node_sirius_feed';
   $strongarm->value = 1;
   $export['diff_show_preview_changes_node_sirius_feed'] = $strongarm;
@@ -969,6 +997,20 @@ function grievance_content_types_strongarm() {
   $strongarm->name = 'diff_view_mode_preview_node_sirius_domain';
   $strongarm->value = 'full';
   $export['diff_view_mode_preview_node_sirius_domain'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_view_mode_preview_node_sirius_event';
+  $strongarm->value = 'full';
+  $export['diff_view_mode_preview_node_sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_view_mode_preview_node_sirius_event_participant';
+  $strongarm->value = 'full';
+  $export['diff_view_mode_preview_node_sirius_event_participant'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -2290,6 +2332,114 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'field_bundle_settings_node__sirius_event';
+  $strongarm->value = array(
+    'view_modes' => array(
+      'teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'full' => array(
+        'custom_settings' => FALSE,
+      ),
+      'rss' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
+      'sirius_worker' => array(
+        'custom_settings' => FALSE,
+      ),
+      'grievance_arbitrationform' => array(
+        'custom_settings' => FALSE,
+      ),
+      'grievance_form_226' => array(
+        'custom_settings' => FALSE,
+      ),
+      'grievance_gform' => array(
+        'custom_settings' => FALSE,
+      ),
+      'grievance_gform_a' => array(
+        'custom_settings' => FALSE,
+      ),
+      'revision' => array(
+        'custom_settings' => FALSE,
+      ),
+    ),
+    'extra_fields' => array(
+      'form' => array(
+        'title' => array(
+          'weight' => '1',
+        ),
+        'path' => array(
+          'weight' => '2',
+        ),
+      ),
+      'display' => array(),
+    ),
+  );
+  $export['field_bundle_settings_node__sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'field_bundle_settings_node__sirius_event_participant';
+  $strongarm->value = array(
+    'view_modes' => array(
+      'teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'full' => array(
+        'custom_settings' => FALSE,
+      ),
+      'rss' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
+      'sirius_worker' => array(
+        'custom_settings' => FALSE,
+      ),
+      'grievance_arbitrationform' => array(
+        'custom_settings' => FALSE,
+      ),
+      'grievance_form_226' => array(
+        'custom_settings' => FALSE,
+      ),
+      'grievance_gform' => array(
+        'custom_settings' => FALSE,
+      ),
+      'grievance_gform_a' => array(
+        'custom_settings' => FALSE,
+      ),
+      'revision' => array(
+        'custom_settings' => FALSE,
+      ),
+    ),
+    'extra_fields' => array(
+      'form' => array(
+        'title' => array(
+          'weight' => '0',
+        ),
+        'path' => array(
+          'weight' => '6',
+        ),
+      ),
+      'display' => array(),
+    ),
+  );
+  $export['field_bundle_settings_node__sirius_event_participant'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_node__sirius_feed';
   $strongarm->value = array(
     'view_modes' => array(
@@ -3062,6 +3212,20 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'language_content_type_sirius_event';
+  $strongarm->value = '0';
+  $export['language_content_type_sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'language_content_type_sirius_event_participant';
+  $strongarm->value = '0';
+  $export['language_content_type_sirius_event_participant'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'language_content_type_sirius_feed';
   $strongarm->value = '0';
   $export['language_content_type_sirius_feed'] = $strongarm;
@@ -3316,6 +3480,20 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'menu_options_sirius_event';
+  $strongarm->value = array();
+  $export['menu_options_sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'menu_options_sirius_event_participant';
+  $strongarm->value = array();
+  $export['menu_options_sirius_event_participant'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'menu_options_sirius_feed';
   $strongarm->value = array();
   $export['menu_options_sirius_feed'] = $strongarm;
@@ -3564,6 +3742,20 @@ function grievance_content_types_strongarm() {
   $strongarm->name = 'menu_parent_sirius_domain';
   $strongarm->value = 'main-menu:0';
   $export['menu_parent_sirius_domain'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'menu_parent_sirius_event';
+  $strongarm->value = 'main-menu:0';
+  $export['menu_parent_sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'menu_parent_sirius_event_participant';
+  $strongarm->value = 'main-menu:0';
+  $export['menu_parent_sirius_event_participant'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -3877,6 +4069,24 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'node_options_sirius_event';
+  $strongarm->value = array(
+    0 => 'status',
+  );
+  $export['node_options_sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_options_sirius_event_participant';
+  $strongarm->value = array(
+    0 => 'status',
+  );
+  $export['node_options_sirius_event_participant'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'node_options_sirius_feed';
   $strongarm->value = array(
     0 => 'status',
@@ -4145,6 +4355,20 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'node_preview_sirius_event';
+  $strongarm->value = '0';
+  $export['node_preview_sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_preview_sirius_event_participant';
+  $strongarm->value = '0';
+  $export['node_preview_sirius_event_participant'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_sirius_feed';
   $strongarm->value = '0';
   $export['node_preview_sirius_feed'] = $strongarm;
@@ -4393,6 +4617,20 @@ function grievance_content_types_strongarm() {
   $strongarm->name = 'node_submitted_sirius_domain';
   $strongarm->value = 0;
   $export['node_submitted_sirius_domain'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_submitted_sirius_event';
+  $strongarm->value = 0;
+  $export['node_submitted_sirius_event'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_submitted_sirius_event_participant';
+  $strongarm->value = 0;
+  $export['node_submitted_sirius_event_participant'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
