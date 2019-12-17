@@ -203,8 +203,12 @@ function sirius_mail($key, &$message, $params) {
 
   // Pass params through to the message
   if (isset($params['attachments'])) { $message['params']['attachments'] = $params['attachments']; }
-  if ($params['headers']['Cc']) { $message['headers']['Cc'] = $params['headers']['cc']; } 
-  if ($params['headers']['Bcc']) { $message['headers']['Bcc'] = $params['headers']['bcc']; } 
+  
+  if ($params['headers']['Cc']) { $message['headers']['Cc'] = $params['headers']['Cc']; } 
+  if ($params['headers']['cc']) { $message['headers']['Cc'] = $params['headers']['cc']; } 
+  if ($params['headers']['Bcc']) { $message['headers']['Bcc'] = $params['headers']['Bcc']; } 
+  if ($params['headers']['bcc']) { $message['headers']['Bcc'] = $params['headers']['bcc']; } 
+
   $message['subject'] = $params['subject'];
   $message['body'][] = $params['body'];
 
