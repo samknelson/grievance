@@ -50,6 +50,13 @@ function sirius_event_term_tab_bullpen_form($form, &$form_state, $event_type_ter
 		'#default_value' => $json['bullpen']['post_dispatch'],
 	);
 
+	$form["checkout"] = array(
+		'#title' => t('Checkout'),
+		'#type' => 'select',
+		'#options' => $register_as_options,
+		'#default_value' => $json['bullpen']['checkout'],
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),

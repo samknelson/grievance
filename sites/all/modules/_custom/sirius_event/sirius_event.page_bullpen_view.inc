@@ -24,43 +24,8 @@ function sirius_node_tab_event_bullpen_view($event_node) {
   $html .= sirius_fakerender_field('Time Now:', date($datestr));
   $html .= render(field_view_field('node', $event_node, 'body', 'full'));
 
-  global $user;
-  $user_full = user_load($user->uid);
-  $contact_node = node_load($user_full->field_sirius_contact['und'][0]['target_id']);
-  if ($contact_node) {
-    $possible = sirius_event_bullpen_selfsignin_possible($event_node);
-    if ($possible['success'] && $_REQUEST['selfsignin']) {
-      drupal_set_message("Self sign-in.");
-    }
-
-
-    $html .= '<h2>' . t('Sign-in Status') . '</h2>';
-    $query = new EntityFieldQuery;
-    $query->entityCondition('entity_type', 'node');
-    $query->entityCondition('bundle', 'sirius_event_participant');
-    $query->fieldCondition('field_sirius_contact', 'target_id', $contact_node->nid);
-    $query->fieldCondition('field_sirius_event', 'target_id', $event_node->nid);
-    $stmt = $query->execute();
-    if ($stmt['node']) {
-      $participant_node = node_load(array_keys($stmt['node']));
-      $pstatus_term = taxonomy_term_load($participant_node->field_sirius_event_pstatus['und'][0]['tid']);
-      $prole_term = taxonomy_term_load($participant_node->field_sirius_event_prole['und'][0]['tid']);
-      $html .= sirius_fakerender_field('Participant Role:', $prole_term->name);
-      $html .= sirius_fakerender_field('Participant Status:', $prole_term->name);
-    } else {
-      if (!$possible['success']) {
-        $html .= sirius_fakerender_field('Self sign-in:', "Not available - " . $possible['msg']);
-      } else {
-        $html .= sirius_fakerender_field('Self sign-in:', l(t('Sign-in Now'), current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => array('selfsignin' => TRUE))));
-      }
-
-    }
-    // Self sign-in possible?
-  }
-
   $job_nodes = sirius_event_bullpen_job($event_node->nid, TRUE);
   if ($job_nodes) {
-    $html .= '<h2>' . t('Employers') . '</h2>';
     $is_first = TRUE;
     foreach ($job_nodes as $job_nid => $job_node) {
       $html .= '<br />';
@@ -102,62 +67,4 @@ function sirius_node_tab_event_bullpen_view($event_node) {
 
 
 	return $html;
-}
-
-
-function sirius_event_bullpen_selfsignin_possible($event_node) {
-  // Self sign-in must be open
-  $ts = sirius_event_bullpen_ts($event_node);
-  $datestr = 'g:i A, l, F j';
-  if ($ts['signin_opens_self'] > time()) {
-    // return array('success' => FALSE, 'msg' => 'Self sign-in opens on ' . date($datestr, $ts['signin_opens_self']));
-  }
-
-  // Must have a worker
-  $worker_node = sirius_worker_get();
-  if (!$worker_node) {
-    return array('success' => FALSE, 'msg' => 'There is no worker associated with your user.');
-  }
-
-  // Must have a contact
-  $contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
-  if (!$contact_node) {
-    return array('success' => FALSE, 'msg' => 'There is no contact associated with your user.');
-  }
-
-  // Must be eligible for the host job
-  $job_node = sirius_event_bullpen_job($event_node->nid);
-  $result = sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_node->nid, array('ignore_skill' => TRUE, 'ignore_department' => TRUE, 'ignore_dispatch_status' => TRUE, 'ignore_event' => TRUE));
-  if (!$result['success']) {
-    return array('success' => FALSE, 'msg' => $result['msg']);
-  }
-
-  // Must be employed by the current employer
-  $current_employer_nid = $worker_node->field_grievance_shop['und'][0]['target_id'];
-  if ($current_employer_nid != $job_node->field_grievance_shop['und'][0]['target_id']) {
-    return array('success' => FALSE, 'msg' => "You can only sign yourself into bullpens offered by your current employer.");
-  }
-
-  // Must be EBA on the correct date
-  /*
-  if ($worker_node->field_sirius_dispatch_eba['und'][0]['value'] != 'Yes') {
-    return array('success' => FALSE, 'msg' => "You can only sign yourself into this bullpen if you have indicated that you are employed-but-available for this date. Please check your " . l('dispatch preferences.', 'sirius/worker/me/sirius_worker_dispatch_preferences'));
-  }
-  $found = FALSE;
-  $eba_dates = sirius_fieldvals($worker_node, 'field_sirius_dispatch_eba_dates');
-  $job_date = date('Y-m-d', strtotime(sirius_fieldval($job_node, 'field_sirius_datetime')));
-  foreach ($eba_dates as $eba_date) {
-    $eba_date = date('Y-m-d', strtotime($eba_date));
-    if ($eba_date == $job_date) {
-      $found = TRUE;
-      break;
-    }
-  }
-  if (!$found) {
-    // return array('success' => FALSE, 'msg' => "You can only sign yourself into this bullpen if you have indicated that you are employed-but-available for this date. Please check your " . l('dispatch preferences.', 'sirius/worker/me/sirius_worker_dispatch_preferences'));
-  }
-  */
-
-  return array('success' => TRUE, 'msg' => 'Self sign-in here.');
-
 }

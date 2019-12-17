@@ -123,6 +123,15 @@ function sirius_event_node_tabs() {
     'weight' => 1,
   );
 
+
+  $node_tabs['sirius_event']['sirius_event_bullpen/self'] = array(
+    'title' => 'Self Sign-in',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_bullpen_self',
+    'permissions' => array(),
+    'weight' => 2,
+  );
+
   /*
   $node_tabs['sirius_json_definition']['sirius_event_participant_definition_settings'] = array(
     'title' => 'Settings',

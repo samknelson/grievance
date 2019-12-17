@@ -8,14 +8,9 @@ function sirius_event_participant_register_user($event_nid, $uid, $participant_r
 }
 
 function sirius_event_participant_register($event_nid, $contact_nid, $participant_role_tid, $participant_status_tid) {
-  $query = new EntityFieldQuery;
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'sirius_event_participant');
-	$query->fieldCondition('field_sirius_event', 'target_id', $event_nid);
-	$query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
-  $stmt = $query->execute();
-  if ($stmt['node']) {
-		return array('success' => FALSE, 'msg' => 'That contact is already registered for the event.', 'code' => 1);
+	$participant_node = sirius_event_participant_get($event_nid, $contact_nid);
+	if ($participant_node) {
+		return array('success' => FALSE, 'msg' => 'That contact is already registered for the event.', 'code' => 1, 'participant_node' => $participant_node);
   }
 
 	$domain_nid = sirius_domain_nid();
@@ -34,6 +29,7 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
 	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $participant_status_tid;
 	$participant_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s');
 	node_save($participant_node);
+
 	return array('success' => TRUE, 'msg' => 'Participant created.', 'nid' => $participant_node->nid);
 }
 
