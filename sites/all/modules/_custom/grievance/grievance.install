@@ -641,7 +641,7 @@ function grievance_update_7035() {
 
   if ($instance = field_info_instance('node', 'field_sirius_dispatch_notesdef', 'grievance_shop')) {
     print "Deleting: grievance_shop / field_sirius_dispatch_notesdef\n";
-    // field_delete_instance($instance);
+    field_delete_instance($instance);
   }
 
   if ($instance = field_info_instance('taxonomy_term', 'field_sirius_dispatch_notesdef', 'sirius_industry')) {

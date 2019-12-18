@@ -12205,50 +12205,6 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance:
-  // 'node-grievance_shop-field_sirius_dispatch_notesdef'.
-  $field_instances['node-grievance_shop-field_sirius_dispatch_notesdef'] = array(
-    'bundle' => 'grievance_shop',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
-        'weight' => 8,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_sirius_dispatch_notesdef',
-    'label' => 'Default Dispatch Notes',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 5,
-      ),
-      'type' => 'text_textarea',
-      'weight' => 28,
-    ),
-  );
-
   // Exported field_instance: 'node-grievance_shop-field_sirius_id'.
   $field_instances['node-grievance_shop-field_sirius_id'] = array(
     'bundle' => 'grievance_shop',
@@ -24782,44 +24738,6 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
-  // Exported field_instance:
-  // 'taxonomy_term-sirius_industry-field_sirius_dispatch_notesdef'.
-  $field_instances['taxonomy_term-sirius_industry-field_sirius_dispatch_notesdef'] = array(
-    'bundle' => 'sirius_industry',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
-        'weight' => 4,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'taxonomy_term',
-    'field_name' => 'field_sirius_dispatch_notesdef',
-    'label' => 'Default Dispatch Notes',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 5,
-      ),
-      'type' => 'text_textarea',
-      'weight' => 8,
-    ),
-  );
-
   // Exported field_instance: 'taxonomy_term-sirius_industry-field_sirius_id'.
   $field_instances['taxonomy_term-sirius_industry-field_sirius_id'] = array(
     'bundle' => 'sirius_industry',
@@ -25994,7 +25912,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('Deadlines Waived');
   t('Deadlines have been waived as of this date.');
   t('Declined Count');
-  t('Default Dispatch Notes');
   t('Default Information Request');
   t('Default Log Type');
   t('Default Value');
