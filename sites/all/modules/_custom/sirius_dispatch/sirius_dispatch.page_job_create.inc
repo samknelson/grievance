@@ -469,10 +469,13 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 	if (!$show_event) {
 		if ($job_policy['form']['hide_address_parking'] != 'Yes') {
+			$address_parking_default = $employer_json['dispatch']['default']['address_parking'];
+			if (!$address_parking_default) { $address_parking_default = $industry_json['dispatch']['default']['address_parking']; }
 			$form['address_parking'] = array(
 				'#type' => 'textarea',
 				'#title' => t('Parking Instructions'),
 				'#description' => t('Enter any parking instructions for workers.'),
+				'#default_value' => $address_parking_default,
 			);
 		}
 	}
