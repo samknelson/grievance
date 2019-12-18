@@ -607,3 +607,45 @@ function grievance_update_7034() {
 }
 
 
+
+/**
+ * Move the "field_sirius_dispatch_notesdef" into json
+ */
+
+function grievance_update_7035() {
+  try {
+    $sql = "select * from field_data_field_sirius_dispatch_notesdef order by entity_id";
+    $stmt = db_query($sql, array());
+    while ($hr = $stmt->fetchAssoc()) {
+      $entity_type = $hr['entity_type'];
+      $entity_id = $hr['entity_id'];
+      $notes = $hr['field_sirius_dispatch_notesdef_value'];
+
+      if ($entity_type == 'node') {
+        $entity = node_load($entity_id);
+      } else if ($entity_type == 'taxonomy_term') {
+        $entity = taxonomy_term_load($entity_id);
+      }
+      $json = json_decode($entity->field_sirius_json['und'][0]['value'], TRUE);
+      $json['dispatch']['default']['notes'] = $notes;
+      $entity->field_sirius_json['und'][0]['value'] = json_encode($json);
+      if ($entity_type == 'node') { 
+        node_save($entity);
+      } else if ($entity_type == 'taxonomy_term') {
+        taxonomy_term_save($entity);
+      }
+
+      print "Moved notes to json: $entity_type, $entity_id\n\n";
+    }
+  } catch (exception $ignore) { }
+
+  if ($instance = field_info_instance('node', 'field_sirius_dispatch_notesdef', 'grievance_shop')) {
+    print "Deleting: grievance_shop / field_sirius_dispatch_notesdef\n";
+    // field_delete_instance($instance);
+  }
+
+  if ($instance = field_info_instance('taxonomy_term', 'field_sirius_dispatch_notesdef', 'sirius_industry')) {
+    print "Deleting: sirius_industry / field_sirius_dispatch_notesdef\n";
+    field_delete_instance($instance);
+  }
+}
