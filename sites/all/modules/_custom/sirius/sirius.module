@@ -274,6 +274,11 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   // Filter the taxonomy by domain
   if ($form_id == 'taxonomy_form_term' || preg_match('/_node_form/', $form_id)) {
   }
+
+  // Remove access to some JSON fields
+  if ($form_id == 'grievance_shop_node_form') {
+    $form['field_sirius_json']['#access'] = FALSE;
+  }
 }
 
 /**
