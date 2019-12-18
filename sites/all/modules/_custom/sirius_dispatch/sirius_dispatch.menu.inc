@@ -138,6 +138,19 @@ function sirius_dispatch_node_tabs() {
   return $node_tabs;
 }
 
+function sirius_dispatch_term_tabs() {
+  $term_tabs = array();
+
+  $term_tabs['sirius_industry']['sirius_dispatch_industry'] = array(
+    'title' => 'Dispatch',
+    'description' => '',
+    'callback' => 'sirius_dispatch_term_tab_industry',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 4,
+  );
+
+  return $term_tabs;
+}
 /**
  * Implements hook_menu
  */
