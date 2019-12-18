@@ -167,6 +167,9 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	$industry_tid = $employer_node->field_sirius_industry['und'][0]['tid'];
 	$industry_term = taxonomy_term_load($industry_tid);
 
+	$employer_json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
+	$industry_json = json_decode($industry_term->field_sirius_json['und'][0]['value'], TRUE);
+
 	$job_type_term = taxonomy_term_load($job_type_tid);
 	$form['employer_markup'] = array('#markup' => '<div class="sirius_form_intro">Creating a job for <strong>' . 
 		$employer_node->title . 
@@ -450,10 +453,11 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		}
 	}
 
-	$notes_default = $employer_node->field_sirius_dispatch_notesdef['und'][0]['value'];
-	if (!$notes_default) {
-		$notes_default = $industry_term->field_sirius_dispatch_notesdef['und'][0]['value'];
-	}
+	$employer_json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
+	$industry_json = json_decode($industry_term->field_sirius_json['und'][0]['value'], TRUE);
+
+	$notes_default = $employer_json['dispatch']['default']['notes'];
+	if (!$notes_default) { $notes_default = $industry_json['dispatch']['default']['notes']; }
 	$form['notes'] = array(
 		'#type' => 'textarea',
 		'#title' => t('Notes'),
@@ -633,18 +637,6 @@ function sirius_dispatch_page_job_create_form_submit($form, &$form_state) {
 		$event_node = node_submit($event_node);
 		node_save($event_node);
 		$event_nid = $event_node->nid;
-
-		if (!user_access('sirius dispatch staff')) {
-			global $user;
-			$event_type_tid = $event_node->field_sirius_event_type['und'][0]['tid'];
-			$event_type_term = taxonomy_term_load($event_type_tid);
-			$event_type_json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
-			$key = $event_type_json['bullpen']['register_as'];
-			list ($prole, $pstatus) = explode('|', $key);
-			if ($prole && $pstatus) {
-				sirius_event_participant_register_user($event_nid, $user->uid, $prole, $pstatus);
-			}
-		}
 		$job_node->field_sirius_event['und'][0]['target_id'] = $event_nid;
 	}
 
