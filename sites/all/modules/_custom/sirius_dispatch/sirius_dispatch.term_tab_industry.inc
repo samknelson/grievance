@@ -14,6 +14,13 @@ function sirius_dispatch_term_tab_industry_form($form, &$form_state, $industry_t
 		'#default_value' => $json['dispatch']['default']['notes'],
 	);
 
+	$form['address_parking'] = array(
+		'#title' => t('Default Parking Instructions'),
+		'#type' => 'textarea',
+		'#default_value' => $json['dispatch']['default']['address_parking'],
+	);
+
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -30,6 +37,7 @@ function sirius_dispatch_term_tab_industry_form_submit($form, &$form_state) {
 	$json = json_decode($industry_term->field_sirius_json['und'][0]['value'], TRUE);
 	$json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
 	$json['dispatch']['default']['notes'] = $form_state['values']['notes'];
+	$json['dispatch']['default']['address_parking'] = $form_state['values']['address_parking'];
 	$industry_term->field_sirius_json['und'][0]['value'] = json_encode($json);
 	taxonomy_term_save($industry_term);
 	drupal_set_message(t('Settings saved.'));
