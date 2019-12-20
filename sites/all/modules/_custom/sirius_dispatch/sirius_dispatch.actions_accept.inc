@@ -41,7 +41,7 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 
 	// Remove from the event
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
-	$event_nid = $job_node->field_sirius_event['und'][0]['target_id'];
+	$event_nid = $job_node->field_sirius_events['und'][0]['target_id'];
 	if ($event_nid) {
 		$contact_nid = sirius_contact_get_nid_from_worker($dispatch_node->field_sirius_worker['und'][0]['target_id']);
 		$event_node = node_load($event_nid);
