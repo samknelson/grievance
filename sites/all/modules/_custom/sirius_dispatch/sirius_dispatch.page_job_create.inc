@@ -640,7 +640,7 @@ function sirius_dispatch_page_job_create_form_submit($form, &$form_state) {
 		$event_node = node_submit($event_node);
 		node_save($event_node);
 		$event_nid = $event_node->nid;
-		$job_node->field_sirius_event['und'][0]['target_id'] = $event_nid;
+		$job_node->field_sirius_events['und'][0]['target_id'] = $event_nid;
 	}
 
 	// Save the job
@@ -759,7 +759,7 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 
 	$event_nid = $form_state['values']['event_nid'];
 	if ($event_nid) {
-		$job_node->field_sirius_event['und'][0]['target_id'] = $event_nid;
+		$job_node->field_sirius_events['und'][0]['target_id'] = $event_nid;
 		$event_node = node_load($event_nid);
 		$sponsor_job_node = sirius_event_bullpen_job($event_nid);
 		$job_node->field_sirius_datetime = $sponsor_job_node->field_sirius_datetime;

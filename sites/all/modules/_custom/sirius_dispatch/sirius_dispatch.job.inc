@@ -508,7 +508,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	}
 
 	// Event
-	$event_nid = $job_node->field_sirius_event['und'][0]['target_id'];
+	$event_nid = $job_node->field_sirius_events['und'][0]['target_id'];
 	if ($event_nid && !$filters['ignore_event']) {
 		$event_node = node_load($event_nid);
 		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
@@ -765,7 +765,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 		}
 	}
 
-	$event_nid = $job_node->field_sirius_event['und'][0]['target_id'];
+	$event_nid = $job_node->field_sirius_events['und'][0]['target_id'];
 	if ($event_nid && !$filters['ignore_event']) {
 		$event_node = node_load($event_nid);
 		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);

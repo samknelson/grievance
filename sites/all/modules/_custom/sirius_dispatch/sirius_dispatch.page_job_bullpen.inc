@@ -3,7 +3,7 @@
 function sirius_node_tab_dispatch_job_bullpen_access($job_node) {
 	if (!sirius_node_tab_dispatch_job_manage_access($job_node)) { return FALSE; }
 
-	$event_node = node_load($job_node->field_sirius_event['und'][0]['target_id']);
+	$event_node = node_load($job_node->field_sirius_events['und'][0]['target_id']);
 	if (!$event_node) { return FALSE; }
 
 	return TRUE;
@@ -16,7 +16,7 @@ function sirius_node_tab_dispatch_job_bullpen($job_node) {
 function sirius_node_tab_dispatch_job_bullpen_form($form, &$form_state, $job_node) {
 	$form_state['job_nid'] = $job_node->nid;
 	$policy = sirius_dispatch_job_policy($job_node);
-	$event_node = node_load($job_node->field_sirius_event['und'][0]['target_id']);
+	$event_node = node_load($job_node->field_sirius_events['und'][0]['target_id']);
 
   $ts = sirius_event_bullpen_ts($event_node);
   if ($ts['job_ts'] > time()) {

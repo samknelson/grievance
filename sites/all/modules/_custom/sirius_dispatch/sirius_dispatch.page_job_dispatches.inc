@@ -32,7 +32,7 @@ function sirius_node_tab_dispatch_job_dispatches($job_node) {
 }
 
 function sirius_rename_this_is_steward($job_node) {
-	$event_nid = $job_node->field_sirius_event['und'][0]['target_id'];
+	$event_nid = $job_node->field_sirius_events['und'][0]['target_id'];
 	if ($event_nid) {
 		$event_node = node_load($event_nid);
 		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
