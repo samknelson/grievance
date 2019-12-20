@@ -11461,7 +11461,7 @@ function grievance_content_types_field_default_field_instances() {
     'settings' => array(
       'description_field' => 1,
       'file_directory' => '',
-      'file_extensions' => 'txt pdf doc docx xls xlsx rtf ppt zip',
+      'file_extensions' => 'txt pdf doc docx xls xlsx rtf ppt zip png gif jpg jpeg',
       'filefield_paths' => array(
         'active_updating' => 0,
         'file_name' => array(
@@ -12149,6 +12149,73 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-grievance_shop-field_sirius_attachments'.
+  $field_instances['node-grievance_shop-field_sirius_attachments'] = array(
+    'bundle' => 'grievance_shop',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'file',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'file_default',
+        'weight' => 9,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_attachments',
+    'label' => 'Attachments',
+    'required' => 0,
+    'settings' => array(
+      'description_field' => 1,
+      'file_directory' => '',
+      'file_extensions' => 'txt pdf doc docx xls xlsx rtf ppt zip png gif jpg jpeg',
+      'filefield_paths' => array(
+        'active_updating' => 1,
+        'file_name' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => '[node:nid]_[file:fid].[file:ffp-extension-original]',
+        ),
+        'file_path' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => 'sirius_attachments',
+        ),
+        'redirect' => FALSE,
+        'retroactive_update' => 0,
+      ),
+      'filefield_paths_enabled' => 1,
+      'max_filesize' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'file',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+      ),
+      'type' => 'file_generic',
+      'weight' => 29,
+    ),
+  );
+
   // Exported field_instance:
   // 'node-grievance_shop-field_sirius_dispatch_job_types'.
   $field_instances['node-grievance_shop-field_sirius_dispatch_job_types'] = array(
@@ -12312,11 +12379,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 15,
       ),
       'teaser' => array(
@@ -12400,7 +12464,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 9,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -12437,7 +12501,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 29,
+      'weight' => 28,
     ),
   );
 
@@ -16965,7 +17029,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 25,
+      'weight' => 8,
     ),
   );
 
@@ -17026,23 +17090,23 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_event'.
-  $field_instances['node-sirius_dispatch_job-field_sirius_event'] = array(
+  // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_events'.
+  $field_instances['node-sirius_dispatch_job-field_sirius_events'] = array(
     'bundle' => 'sirius_dispatch_job',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => 1,
+          'bypass_access' => FALSE,
           'field_delimiter' => '',
-          'link' => 1,
+          'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 11,
+        'weight' => 25,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -17059,8 +17123,8 @@ function grievance_content_types_field_default_field_instances() {
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'field_sirius_event',
-    'label' => 'Event',
+    'field_name' => 'field_sirius_events',
+    'label' => 'Events',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -17075,7 +17139,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 14,
+      'weight' => 15,
     ),
   );
 
@@ -17457,7 +17521,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 15,
+      'weight' => 16,
     ),
   );
 
@@ -25958,6 +26022,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Entity Type');
   t('Entity type to override, almost always "node".');
   t('Event');
+  t('Events');
   t('Expire After');
   t('External ID');
   t('Facility');
