@@ -26,10 +26,10 @@ function sirius_event_bullpen_ts($event_node) {
 }
 
 function sirius_event_bullpen_job($event_nid, $include_nonsponsor = FALSE) {
-	$sql = "select entity_id from field_data_field_sirius_event ";
+	$sql = "select entity_id from field_data_field_sirius_events ";
 	$sql .= "where entity_type = 'node' ";
 	$sql .= "and bundle = 'sirius_dispatch_job' ";
-	$sql .= "and field_sirius_event_target_id = :event_nid ";
+	$sql .= "and field_sirius_events_target_id = :event_nid ";
 	$sql .= "order by entity_id ";
 	if (!$include_nonsponsor) {
 		$sql .= "limit 1 ";
