@@ -20,8 +20,8 @@ function sirius_node_tab_dispatch_job_bullpen_form($form, &$form_state, $job_nod
 
   $ts = sirius_event_bullpen_ts($event_node);
   if ($ts['job_ts'] > time()) {
-    drupal_set_message("The event opens at " . date('g:i A, l, F j', $ts['job_ts']), 'warning');
-    return array();
+    //drupal_set_message("The event opens at " . date('g:i A, l, F j', $ts['job_ts']), 'warning');
+    //return array();
   }
 
 	// Get the list of dispatchable workers
