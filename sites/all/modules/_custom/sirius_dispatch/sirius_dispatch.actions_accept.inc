@@ -10,7 +10,7 @@ function sirius_dispatch_accept_possible($dispatch_node) {
 	// Verify the job status
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
 	$job_status = $job_node->field_sirius_dispatch_job_status['und'][0]['value'];
-	if ($job_status != 'Unfilled' && $job_status != 'Running') {
+	if ($job_status != 'Unfilled' && $job_status != 'Running' && $job_status != 'Pending') {
 		return array('success' => FALSE, 'msg' => "The job status is $job_status");
 	}
 
