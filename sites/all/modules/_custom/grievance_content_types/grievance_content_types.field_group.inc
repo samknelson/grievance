@@ -2113,7 +2113,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Dispatch Details',
-    'weight' => '5',
+    'weight' => '6',
     'children' => array(
       0 => 'field_sirius_count_yes',
       1 => 'field_sirius_count_no',
@@ -2154,9 +2154,9 @@ function grievance_content_types_field_group_info() {
     'label' => 'Dispatch',
     'weight' => '3',
     'children' => array(
-      0 => 'field_sirius_dispatch_notesdef',
-      1 => 'field_sirius_dispatch_job_types',
-      2 => 'field_sirius_skill',
+      0 => 'field_sirius_dispatch_job_types',
+      1 => 'field_sirius_skill',
+      2 => 'field_sirius_attachments',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2184,9 +2184,9 @@ function grievance_content_types_field_group_info() {
     'label' => 'Dispatch',
     'weight' => '4',
     'children' => array(
-      0 => 'field_sirius_dispatch_notesdef',
-      1 => 'field_sirius_dispatch_job_types',
-      2 => 'field_sirius_skill',
+      0 => 'field_sirius_dispatch_job_types',
+      1 => 'field_sirius_skill',
+      2 => 'field_sirius_attachments',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -2335,7 +2335,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Employer Notes',
-    'weight' => '4',
+    'weight' => '5',
     'children' => array(
       0 => 'field_sirius_address_parking',
       1 => 'field_sirius_notes',
@@ -2519,6 +2519,7 @@ function grievance_content_types_field_group_info() {
       8 => 'field_sirius_dispatch_job_tags',
       9 => 'field_sirius_event',
       10 => 'field_sirius_payrate',
+      11 => 'field_sirius_events',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2640,7 +2641,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Notifications',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(
       0 => 'field_sirius_dispatch_job_nfcns',
       1 => 'field_sirius_notify',
