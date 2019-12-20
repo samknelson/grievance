@@ -135,6 +135,13 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch employer'),
   );
 
+  $node_tabs['grievance_shop']['sirius_employer_dispatch_attachments'] = array(
+    'title' => 'Dispatch Attachments',
+    'description' => '',
+    'callback' => 'sirius_node_tab_employer_dispatch_attachments',
+    'permissions' => array('sirius dispatch employer'),
+  );
+
   return $node_tabs;
 }
 
