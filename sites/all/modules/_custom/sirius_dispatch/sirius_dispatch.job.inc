@@ -508,9 +508,9 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	}
 
 	// Event
-	$event_nid = $job_node->field_sirius_events['und'][0]['target_id'];
-	if ($event_nid && !$filters['ignore_event']) {
-		$event_node = node_load($event_nid);
+	$event_nids = sirius_fieldvals($job_node, 'field_sirius_events', 'target_id');
+	if ($event_nids && !$filters['ignore_event']) {
+		$event_node = node_load($event_nids[0]);
 		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 		$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
 		list ($prole_tid, $pstatus_tid) = explode('|', $json['bullpen']['pre_dispatch']);
@@ -531,7 +531,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 
 		$sql .= "and field_data_field_sirius_event.entity_type = 'node' ";
 		$sql .= "and field_data_field_sirius_event.entity_id = participant_contact.entity_id ";
-		$sql .= "and field_data_field_sirius_event.field_sirius_event_target_id = :event_nid ";
+		$sql .= "and field_data_field_sirius_event.field_sirius_event_target_id in (:event_nids) ";
 
 		$sql .= "and field_data_field_sirius_event_prole.entity_type = 'node' ";
 		$sql .= "and field_data_field_sirius_event_prole.entity_id = participant_contact.entity_id ";
@@ -541,7 +541,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		$sql .= "and field_data_field_sirius_event_pstatus.entity_id = participant_contact.entity_id ";
 		$sql .= "and field_data_field_sirius_event_pstatus.field_sirius_event_pstatus_tid = :pstatus_tid ";
 		$sql .= ") ";
-		$args[':event_nid'] = $event_nid;
+		$args[':event_nids'] = $event_nids;
 		$args[':prole_tid'] = $prole_tid;
 		$args[':pstatus_tid'] = $pstatus_tid;
 	}
@@ -765,9 +765,9 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 		}
 	}
 
-	$event_nid = $job_node->field_sirius_events['und'][0]['target_id'];
-	if ($event_nid && !$filters['ignore_event']) {
-		$event_node = node_load($event_nid);
+	$event_nids = sirius_fieldvals($job_node, 'field_sirius_events', 'target_id');
+	if ($event_nids && !$filters['ignore_event']) {
+		$event_node = node_load($event_nids[0]);
 		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 		$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
 		list ($prole_tid, $pstatus_tid) = explode('|', $json['bullpen']['pre_dispatch']);
@@ -787,7 +787,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 
 		$sql .= "and field_data_field_sirius_event.entity_type = 'node' ";
 		$sql .= "and field_data_field_sirius_event.entity_id = participant_contact.entity_id ";
-		$sql .= "and field_data_field_sirius_event.field_sirius_event_target_id = :event_nid ";
+		$sql .= "and field_data_field_sirius_event.field_sirius_event_target_id in (:event_nids) ";
 
 		$sql .= "and field_data_field_sirius_event_prole.entity_type = 'node' ";
 		$sql .= "and field_data_field_sirius_event_prole.entity_id = participant_contact.entity_id ";
@@ -798,7 +798,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 		$sql .= "and field_data_field_sirius_event_pstatus.field_sirius_event_pstatus_tid = :pstatus_tid ";
 		$args = array();
 		$args[':worker_nid'] = $worker_nid;
-		$args[':event_nid'] = $event_nid;
+		$args[':event_nids'] = $event_nids;
 		$args[':prole_tid'] = $prole_tid;
 		$args[':pstatus_tid'] = $pstatus_tid;
 		$stmt = db_query($sql, $args);

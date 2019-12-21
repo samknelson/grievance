@@ -90,6 +90,7 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
 	$facility_node = node_load($job_node->field_sirius_dispatch_facility['und'][0]['target_id']);
 	$employer_node = node_load($job_node->field_grievance_shop['und'][0]['target_id']);
+	$employer_json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
 
 	// Get our permission type. We might have multiple. We're a worker if we either are logged in, or if we have an access token.
 	if (user_access('sirius dispatch employer')) { $is_employer = TRUE; }
@@ -220,7 +221,21 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['job_detail_section_c'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_dispatch_job_type'));
 	$form['job_detail_section_d'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_notes'));
 	if ($is_accepted) {
-		$form['job_detail_section_e'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_attachments'));
+		$form['job_detail_section_e'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_attachments', 'Job Attachments'));
+		if ($employer_json['dispatch']['job_files']) {
+			$fids = array();
+			foreach ($employer_json['dispatch']['job_files'] as $entry) { $fids[] = $entry['fid']; }
+			if ($fids && $employer_node->field_sirius_attachments['und']) {
+				$new_attachments = array();
+				foreach ($employer_node->field_sirius_attachments['und'] as $tmp) {
+					if (in_array($tmp['fid'], $fids)) {
+						$new_attachments[] = $tmp;
+					}
+				}
+				$employer_node->field_sirius_attachments['und'] = $new_attachments;
+				$form['job_detail_section_f'] = array('#markup' => sirius_dispatch_view_render_field($employer_node, 'field_sirius_attachments', 'Employer Attachments'));
+			}
+		}
 	}
 	$form['job_location_section_close'] = array('#markup' => '</div>');
 

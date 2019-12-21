@@ -20,7 +20,6 @@ function sirius_dispatch_term_tab_industry_form($form, &$form_state, $industry_t
 		'#default_value' => $json['dispatch']['default']['address_parking'],
 	);
 
-
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
