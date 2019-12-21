@@ -23,7 +23,7 @@ function sirius_event_page_list_bullpens() {
 	$query->entityCondition('bundle', 'sirius_event');
 	$query->fieldCondition('field_sirius_event_type', 'tid', $event_type_tids, 'in');;
 	$query->fieldCondition('field_sirius_active', 'value', 'Yes');
-	$query->fieldCondition('field_sirius_daterepeat', 'value', date('Y-m-d H:i', strtotime('-2 days')), '>=');;
+	$query->fieldCondition('field_sirius_daterepeat', 'value', gmdate('Y-m-d 00:00:00'), '>=');
 	$query->fieldOrderBy('field_sirius_daterepeat', 'value', 'desc');
 	$stmt = $query->execute();
 	if (!$stmt['node']) { 
