@@ -183,7 +183,7 @@ function sirius_worker_report_cache_info() {
   $items['sirius-worker-duplicate-id'] = array(
     'name' => t('Workers with Duplicate IDs'),
     'description' => '',
-    'access' => 'sirius report',
+    'access' => 'sirius worker view',
     'fields' => sirius_worker_report_duplicate_id_fields(),
     'form_callback' => 'sirius_worker_report_duplicate_id_form',
     'pk_list_callback' => 'sirius_worker_report_duplicate_id_pks',
