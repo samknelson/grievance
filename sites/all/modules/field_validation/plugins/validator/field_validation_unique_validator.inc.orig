@@ -29,11 +29,7 @@ class field_validation_unique_validator extends field_validation_validator {
         }
       }
     }
-    $ignore = FALSE;
-    if (isset($this->rule->settings['ignore_empty']) && $this->rule->settings['ignore_empty'] && $this->value === '') {
-      $ignore = TRUE;
-    }
-    if (!$ignore && $flag) {
+    if ($flag) {
       $query = new EntityFieldQuery();
       if ($scope == 'global') {
       }
@@ -152,11 +148,6 @@ class field_validation_unique_validator extends field_validation_validator {
       '#states' => array(
         'invisible' => array(':input[name="settings[data]"]' => array('value' => 'global')),
       ),
-    );
-    $form['settings']['ignore_empty'] = array(
-      '#title' => t('Ignore empty'),
-      '#type' => 'checkbox',
-      '#default_value' => isset($default_settings['ignore_empty']) ? $default_settings['ignore_empty'] : FALSE,
     );
     parent::settings_form($form, $form_state);
   }
