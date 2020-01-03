@@ -236,6 +236,7 @@ function sirius_node_tab_worker_industry_form_submit($form, &$form_state) {
 				return;
 			}
 
+			/*
 			sirius_worker_member_status_set(
 				$worker_node, 
 				$clear_member_status_term, 
@@ -245,6 +246,7 @@ function sirius_node_tab_worker_industry_form_submit($form, &$form_state) {
 			);
 
 			drupal_set_message(t('Removed member status @status.', array('@status' => $clear_member_status_term->name)), 'error');
+			*/
 		}
 	}
 

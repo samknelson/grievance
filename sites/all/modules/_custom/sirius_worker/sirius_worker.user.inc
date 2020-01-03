@@ -190,7 +190,87 @@ function sirius_worker_usersync($worker_nid) {
 	if ($is_new) {
 		$msg = "Created a new user with name $id, email $email, and password $aat.";
 	} else {
-		$msg = "Updated existing user; set name = $id, $email = $email, and password = $aat.";
+		$msg = "Updated existing user; set name = $id, email = $email, and password = $aat.";
 	}
 	return array('success' => TRUE, 'msg' => $msg);
+}
+
+
+/**
+ * Implements hook_form_user_pass_alter
+ */
+
+function sirius_worker_form_user_pass_alter(&$form, &$form_state, $form_id) {
+	$form['#validate'] = array('sirius_worker_form_user_pass_validate');
+	$form['#submit'] = array('sirius_worker_form_user_pass_submit');
+	$form['delivery'] = array(
+		'#type' => 'select',
+		'#title' => t('Send by'),
+		'#options' => array(
+			'email' => t('E-mail'),
+			'sms' => t('Text message'),
+		),
+		'#default_value' => 'email',
+	);
+	$form['actions']['submit']['#value'] = t('Send new password');
+}
+
+function sirius_worker_form_user_pass_validate($form, &$form_state) {
+	// Default validation function
+	user_pass_validate($form, $form_state);
+
+  $account = $form_state['values']['account'];
+	if (!$account) { return; }
+
+	if ($form_state['values']['delivery'] == 'sms') {
+		// Validate that the user has a phone number
+	  $contact_node = node_load($account->field_sirius_contact['und'][0]['target_id']);
+	  if (!$contact_node) {
+	  	form_set_error('delivery', t('There is no contact associated with that user.'));
+	  	return;
+	  }
+
+	  $phone = $contact_node->field_sirius_phone['und'][0]['value'];
+	  if (!$phone) {
+	  	form_set_error('delivery', t('There is no phone number associated with that user.'));
+	  	return;
+	  }
+	  if (!sirius_phone_validate($phone)) {
+	  	form_set_error('delivery', t('The phone number for that user is not valid.'));
+	  	return;
+	  }
+	  $form_state['phone'] = sirius_phone_format($phone);
+	}	else {
+		// Validate that the email address isn't a "dummy".
+		$dummy_domain = variable_get('sirius_worker_dummy_domain', '');
+		if ($dummy_domain) {
+			$mail = $account->mail;
+			if (strpos($mail, $dummy_domain) !== false) {
+				form_set_error('name', t('That user does not have a valid e-mail address.'));
+			}
+		}
+	}
+}
+
+function sirius_worker_form_user_pass_submit($form, &$form_state) {
+	// Default submit function
+	if ($form_state['values']['delivery'] == 'sms') {
+		$params = array();
+		$params['to'] = $form_state['phone'];
+		$params['sms'] = 'A request to reset the password for your account has been made. You may now log in by clicking this link or copying and pasting it to your browser:';
+		$params['sms'] .= "\n\n";
+		$params['sms'] .= user_pass_reset_url($form_state['values']['account']);
+		$result = sirius_sms_send($params);
+  	$form_state['redirect'] = 'user';
+	} else {
+		user_pass_submit($form, $form_state);
+	}
+}
+
+/**
+ * Implements hook_form_user_pass_reset_alter
+ */
+
+function sirius_worker_form_user_pass_reset_alter(&$form, &$form_state, $form_id) {
+	// Not needed...
 }
