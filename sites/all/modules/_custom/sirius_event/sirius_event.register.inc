@@ -28,6 +28,7 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
 	$participant_node->field_sirius_event_prole['und'][0]['tid'] = $participant_role_tid;
 	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $participant_status_tid;
 	$participant_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s');
+	sirius_jsonfield_log($participant_node, 'registered', 'Participant registered.');
 	node_save($participant_node);
 
 	return array('success' => TRUE, 'msg' => 'Participant created.', 'nid' => $participant_node->nid);

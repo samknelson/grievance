@@ -186,13 +186,8 @@ function sirius_node_tab_event_phonebank_call_form_submit_ajax($form, $form_stat
 	$participant_node = node_load($participant_nid);
 	$json = json_decode($participant_node->field_sirius_json['und'][0]['value'], TRUE);
 	$json['survey'] = $form_state['values']['survey'];
-	
-	if ($json['survey_log']['last_change']['uid'] != $user->uid) {
-		$json['survey_log']['changes'][] = array('uid' => $user->uid, 'ts' => time());
-	}
-	$json['survey_log']['last_change'] = array('uid' => $user->uid, 'ts' => time());
-
 	$participant_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+	sirius_jsonfield_log($participant_node, 'survey', 'Survey submitted.');	
 	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $form_state['values']['survey']['pstatus'];
 	node_save($participant_node);
 

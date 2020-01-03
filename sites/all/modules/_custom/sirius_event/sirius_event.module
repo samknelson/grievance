@@ -6,11 +6,14 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.permission.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.menu.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.participant.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_user_select.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_bullpen.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_worker_byname.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.vbo.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.phonebank.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.bullpen.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.class.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_landing.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.participant_definition.inc";
@@ -22,7 +25,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_schedule.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_body.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_register.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_register_byname.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_register_bulk.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_audio.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_callerid.inc";
@@ -42,6 +44,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_schedule.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_phonebank.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_bullpen.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_class.inc";
 
 function sirius_event_type_json($event_node) {
   $event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
@@ -64,142 +67,6 @@ function sirius_event_participant_nid_from_user($event_nid, $uid = NULL) {
   $stmt = $query->execute();
   if (!$stmt['node']) { return NULL; }
   return array_keys($stmt['node'])[0];
-}
-
-/***
- * Implements hook_sirius_jsonfield_form_definitions()
- */
-
-function sirius_event_sirius_jsonfield_form_definitions() {
-  $definitions['taxonomy_term']['sirius_event_type']['field_sirius_json'] = array('#callback' => 'sirius_event_type_form_definition_callback');
-
-  // The form within the taxonomy term -- hardcoded fields defining attributes of this event type.
-  $form = array();
-  $form['registration'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Registration Options'),
-    '#collapsible' => FALSE,
-    // '#collapsed' => TRUE,
-  );
-
-  $form['registration']['byname'] = array(
-    '#type' => 'select',
-    '#title' => t('Register By Name?'),
-    '#options' => array('Yes' => t('Yes'), 'No' => t('No')),
-  );
-
-  $form['registration']['bulk'] = array(
-    '#type' => 'select',
-    '#title' => t('Contact Search?'),
-    '#options' => array('Yes' => t('Yes'), 'No' => t('No')),
-  );
-
-  $definitions['taxonomy_term']['sirius_event_participant_role']['field_sirius_json'] = $form;
-
-  // The form within the taxonomy term -- hardcoded fields defining attributes of this event type.
-  /*
-  drupal_add_library('system', 'ui.accordion');
-  drupal_add_js('jQuery(document).ready(function () { jQuery("#sirius_accordion").accordion({active: false, collapsible: true, autoehight: true, heightStyle: "content"}); });', 'inline');
-  $form = array();
-  $form['participant'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Participant Roles and Statuses'),
-    '#description' => t('Use the form below to select the statuses available to each participant role. For excample, in a class, you might select that the role of "Student" could have the statuses "interested", "enrolled", "graduated", or "dropped out".'),
-    '#collapsible' => TRUE,
-    // '#collapsed' => TRUE,
-  );
-
-  $roles = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'name');
-  $statuses = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
-  $form['participant']['accordion_open'] = array('#markup' => '<div id="sirius_accordion">');
-  foreach ($roles as $role_tid => $role_name) {
-    $form['participant']["role_$role_tid"]['accordion_open'] = array('#markup' => '<div class="sirius_accordion_label">' . $role_name . '</div><div class="sirius_accordion_body">');
-
-    $form['participant']["role_$role_tid"]['statuses'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Statuses'),
-      '#options' => $statuses,
-    );
-
-    $form['participant']["role_$role_tid"]['accordion_close'] = array('#markup' => '</div>');
-  }
-  $form['participant']['accordion_close'] = array('#markup' => '</div>');
-
-  $form['participant']["roles"] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('roles'),
-    '#options' => $roles,
-  );
-  */
-
-  $form = array('#markup' => '');
-
-  /*
-  $form['registration'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Self Registration'),
-    '#description' => t('List which users can register for which event roles.'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-
-  $proles = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'name');
-  $uroles =  user_roles();
-  $statuses = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
-
-  for ($i=1; $i<=10; ++$i) {
-    $form['registration'][$i] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Self-registration #@i', array('@i' => $i)),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-
-    $form['registration'][$i]['urole'] = array(
-      '#type' => 'select',
-      '#title' => t('Users with this role'),
-      '#options' => $uroles,
-    );
-
-    $form['registration'][$i]['prole'] = array(
-      '#type' => 'select',
-      '#title' => t('Can register for this participant role'),
-      '#options' => $proles,
-    );
-
-    $form['registration'][$i]['status'] = array(
-      '#type' => 'select',
-      '#title' => t('With this status'),
-      '#options' => $statuses,
-    );
-  }
-  */
-  /*
-  foreach ($proles as $prid => $prole_name) {
-    $form['registration']["workers_${prid}_uroles"] = array(
-      '#type' => 'checkboxes',
-      '#title' => t('Users who can register for: ') . $prole_name,
-      '#options' => $uroles,
-      '#prefix' => '<div class="checkboxes-inline">',
-      '#suffix' => '</div><div style="clear: left;">&nbsp;</div>',
-    );
-  }
-
-  $definitions['node']['sirius_event']['field_sirius_json'] = $form;
-  */
-
-  return $definitions;
-}
-
-function sirius_event_type_form_definition_callback($event_type) {
-  return array();
-}
-
-/**
- * Implements hook_view_alter
- */
-function sirius_event_form_alter($form, &$form_state) {
-
 }
 
 function sirius_event_duration_options($event_type_term = NULL) {
@@ -276,10 +143,7 @@ function sirius_event_node_insert($node)  {
 
     $nid = $node->nid;
     global $base_url;
-    $url = $base_url . '/node/' . $nid;
-    if (sirius_event_bullpen_enabled_type($event_type_term)) {
-      $url .= "/sirius_event_bullpen/view";
-    }
+    $url = $base_url . '/node/' . $nid . '/sirius_event_info';
 
     if ($json['create']['notify']['sms']) {
       $params = array();

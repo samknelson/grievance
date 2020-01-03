@@ -22,6 +22,7 @@ function sirius_node_tab_event_bullpen_view($event_node) {
   $html .= sirius_fakerender_field('General Sign-in Opens:', date($datestr, $ts['signin_opens_others']));
   $html .= sirius_fakerender_field('Sign-in Closes:', date($datestr, $ts['signin_closes']));
   $html .= sirius_fakerender_field('Time Now:', date($datestr));
+  $html .= sirius_dispatch_view_render_field($host_job_node, 'field_sirius_member_status', t('Member Statuses'));
   $html .= render(field_view_field('node', $event_node, 'body', 'full'));
 
   $job_nodes = sirius_event_bullpen_job($event_node->nid, TRUE);
@@ -43,13 +44,14 @@ function sirius_node_tab_event_bullpen_view($event_node) {
 
       $paths = array(
         'node/' . $job_node->nid . '/sirius_dispatch_job_manage' => 'Manage',
-        'node/' . $job_node->nid . '/sirius_dispatch_job_dispatches' => 'Dispatches',
+        'node/' . $job_node->nid . '/sirius_dispatch_job_bullpen' => 'Create Dispatches',
+        'node/' . $job_node->nid . '/sirius_dispatch_job_dispatches' => 'Accept or Decline Dispatches',
       );
       $found = FALSE;
       foreach ($paths as $path => $title) {
         if (drupal_valid_path($path)) {
           $found = TRUE;
-          $html .= l($title, $path, array('attributes' => array('class' => array('tool-button'))));
+          $html .= l($title, $path, array('attributes' => array('class' => array('tool-button')))) . ' ';
         }
       }
       if ($found) {

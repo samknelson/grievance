@@ -125,9 +125,7 @@ function sirius_node_tab_event_bullpen_self_edit_form($form, &$form_state, $even
 function sirius_node_tab_event_bullpen_self_edit_form_submit($form, &$form_state) {
 	$participant_node = node_load($form_state['participant_nid']);
 	list ($prole_tid, $pstatus_tid) = explode('|', $form_state['values']['paccess']);
-	$participant_node->field_sirius_event_prole['und'][0]['tid'] = $prole_tid;
-	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $pstatus_tid;
-	node_save($participant_node);
+  sirius_event_participant_pstatus_set($participant_node, $prole_tid, $pstatus_tid);
 	drupal_set_message(t('Status updated.'));
 }
 

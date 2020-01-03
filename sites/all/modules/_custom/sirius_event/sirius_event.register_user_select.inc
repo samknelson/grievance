@@ -101,8 +101,7 @@ function sirius_event_register_user_select_form_submit($form, &$form_state) {
   $event_type_term = taxonomy_term_load($event_type_tid);
   $json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
   global $base_url;
-  $url = $base_url . '/node/' . $event_nid;
-  if (sirius_event_bullpen_enabled_type($event_type_term)) { $url .= "/sirius_event_bullpen/view"; }
+  $url = $base_url . '/node/' . $event_nid . '/sirius_event_info';
 
 	$result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
 	if ($result['success']) { 

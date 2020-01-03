@@ -28,6 +28,7 @@ function sirius_event_page_create_form($form, &$form_state, $event_type_tid) {
 		'#title' => t('Event Title'),
 		'#type' => 'textfield',
 		'#required' => TRUE,
+		'#default_value' => $event_type_term->name,
 	);
 
   $form["start_date"] = array(
@@ -58,6 +59,7 @@ function sirius_event_page_create_form($form, &$form_state, $event_type_tid) {
     '#title' => t('Description'),
 		'#type' => 'text_format',
 		'#required' => TRUE,
+		'#default_value' => $event_type_term->description,
   );
 
 	$form['submit'] = array(
