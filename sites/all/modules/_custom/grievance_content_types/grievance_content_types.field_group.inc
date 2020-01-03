@@ -2518,9 +2518,8 @@ function grievance_content_types_field_group_info() {
       6 => 'field_sirius_dispatch_job_group',
       7 => 'field_grievance_departments',
       8 => 'field_sirius_dispatch_job_tags',
-      9 => 'field_sirius_event',
-      10 => 'field_sirius_payrate',
-      11 => 'field_sirius_events',
+      9 => 'field_sirius_payrate',
+      10 => 'field_sirius_events',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
