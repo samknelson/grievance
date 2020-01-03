@@ -3,6 +3,7 @@
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.util.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.menu.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.link.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.log.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.page_definition_edit.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.page_definition_preview.inc';
