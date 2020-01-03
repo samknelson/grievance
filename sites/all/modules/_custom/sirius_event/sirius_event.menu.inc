@@ -345,7 +345,7 @@ function sirius_event_menu() {
   $items['sirius/ajax/bullpen-quicksearch'] = array(
     'page callback' => 'grievance_quicksearch_autocomplete',
     'page arguments' => array(),
-    'access arguments' => array('sirius dispatch bullpen signin others'),
+    'access arguments' => array('sirius'),
     'type' => MENU_CALLBACK,
   );
 
