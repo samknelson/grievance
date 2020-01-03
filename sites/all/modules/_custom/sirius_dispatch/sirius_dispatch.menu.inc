@@ -44,7 +44,7 @@ function sirius_dispatch_node_tabs() {
     'title' => 'Bullpen',
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_bullpen',
-    'permissions' => array('sirius dispatch employer'),
+    'permissions' => array('sirius'),
     'weight' => 6,
   );
 
@@ -69,6 +69,14 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_payrate',
     'permissions' => array('sirius dispatch payrate override'),
+    'weight' => 8,
+  );
+
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_fore'] = array(
+    'title' => 'Foreperson',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_job_fore',
+    'permissions' => array('sirius dispatch employer'),
     'weight' => 8,
   );
 
@@ -318,6 +326,13 @@ function sirius_dispatch_menu() {
     'page arguments' => array(),
     'access arguments' => array('sirius dispatch admin'),
     'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/ajax/fore-quicksearch'] = array(
+    'page callback' => 'grievance_quicksearch_autocomplete',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch employer'),
+    'type' => MENU_CALLBACK,
   );
 
   return $items;

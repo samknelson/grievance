@@ -67,7 +67,7 @@ function sirius_term_tab_content($term, $in_tab_name) {
 
   $callback = $tab_record['callback'];
   $args = array($term);
-  drupal_set_title($term->title);
+  drupal_set_title($term->name);
   if ($tab_record['callback arguments']) {
     $args = array_merge($args, $tab_record['callback arguments']);
   }

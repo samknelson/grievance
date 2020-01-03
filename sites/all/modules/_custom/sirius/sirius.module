@@ -276,7 +276,8 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   }
 
   // Remove access to some JSON fields
-  if ($form_id == 'grievance_shop_node_form') {
+  if ($form_id == 'grievance_shop_node_form' ||
+      $form_id == 'sirius_dispatch_job_node_form') {
     $form['field_sirius_json']['#access'] = FALSE;
   }
 }
@@ -404,12 +405,35 @@ function sirius_menu_alter(&$items) {
 }
 
 function sirius_user_view_access($account) {
-  if (!user_access('sirius edit own user')) { return FALSE; }
+  if (!user_access('sirius edit own user')) { 
+    // If we can't edit our own user, and we're a worker, we get redirected to the "edit the worker" page.
+    $worker = sirius_worker_get();
+    global $user;
+    $uid = $user->uid;
+    $path = current_path();
+    if ($uid && $path && $worker && $path = 'user') {
+      drupal_goto('node/' . $worker->nid . '/sirius_worker_contact');
+    } else {
+      return FALSE;
+    }
+  }
   return user_view_access($account);
 }
 
 function sirius_user_edit_access($account) {
-  if (!user_access('sirius edit own user')) { return FALSE; }
+  if (!user_access('sirius edit own user')) { 
+    // If we can't edit our own user, and we're a worker, we get redirected to the "edit the worker" page.
+    $worker = sirius_worker_get();
+    global $user;
+    $uid = $user->uid;
+    $path = current_path();
+    if ($uid && $path && $worker && $path = 'user/' . $uid . '/edit') {
+      drupal_goto('node/' . $worker->nid . '/sirius_worker_contact');
+    } else {
+      return FALSE;
+    }
+  }
+  
   return user_edit_access($account);
 }
 

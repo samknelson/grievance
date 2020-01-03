@@ -38,8 +38,8 @@ function sirius_phonetree($call_sid, $context) {
 	}
 
 	// Enter 9 to be connected with an operator.
-	if ($digits == 9) {
-		sirius_phonetree_forward_to_operator($call_sid, $context); 
+	if ($digits == 9 || $handler == 'operator') {
+		sirius_phonetree_operator($call_sid, $context); 
 	} 
 
 	// Enter * to hear this message again.
@@ -121,7 +121,6 @@ function sirius_phonetree_worker_login($call_sid, $context) {
 			$context['expect'] = $context['digits'] = $context['handler'] = NULL;
 			$context['worker_nid'] = $worker_node->nid;
 			sirius_phonetree($call_sid, $context);
-
 		}
 	} 
 }
@@ -551,16 +550,86 @@ function sirius_phonetree_dispatch_current($call_sid, $context) {
  * Forwward to Operator
  */
 
-function sirius_phonetree_forward_to_operator($call_sid, $context) {
-	$status = variable_get('sirius_voice_forward_to_operator_status', 'open');
-	if ($status == 'closed') {
-		$which = variable_get('sirius_voice_forward_to_operator_disabled_which', 1);
-		$text = variable_get("sirius_voice_forward_to_operator_disabled_$which", "We're sorry, the office is closed right now.");
-		$text .= ": ";
+function sirius_phonetree_operator($call_sid, $context) {
+	$operators = array_values(sirius_office_operator_list());
+	if (count($operators < 8)) { $digit_count = 1; } else { $digit_count = 3; }
+	$context['handler'] = 'operator';
+	$digits = $context['digits'];
+
+	// Return to main menu
+	if ($digits == 8) {
+		$context['expect'] = $context['digits'] = $context['handler'] = $context['operator_nid'] = NULL;
+		return sirius_phonetree($call_sid, $context);
+	}
+
+	// No operators, just terminate
+	if (!$operators) {
+		$text .= 'There are no available operators. ';
 		$text .= "Enter 8 to return to the previous menu.\n";
 		$text .= "Enter star to hear this message again.\n";
 		$context['expect'] = $context['handler'] = $context['digits'] = NULL;
 	  sirius_twilio_outgoing_voice_say($call_sid, $context, $text, 1);
+	  return;
 	}
-	sirius_twilio_outgoing_voice_dial($call_sid, $context, "Please wait while we connect you with an operator.", variable_get('sirius_twilio_operator', ''));
+
+	// Which operator do we want?
+	if (count($operators) == 1) {
+		$context['operator_nid'] = $operators[0]->nid;
+	} else if ($digits == 9) {
+		// Do nothing
+	} else {
+		if ($digit_count == 3) { $digits = preg_replace('/^1/', '', $digits); }
+		$operator_nid = $operators[$digits]->nid;
+		if ($operator_nid) { $context['operator_nid'] = $operator_nid; } else { $text .= "That is not a valid operator. "; }
+	}
+
+	if ($context['operator_nid']) {
+		$operator_node = node_load($context['operator_nid']);
+		$json = json_decode($operator_node->field_sirius_json['und'][0]['value'], TRUE);
+		$status = $json['status']['status'];
+		if ($status == 'closed') {
+			$context['operator_nid'] = NULL;
+			$which = $json['status']['which'];
+			$text .= $json['status']["msg_$which"] . ' ';
+		} else {
+			$phone = $operator_node->field_sirius_phone['und'][0]['value'];
+			sirius_twilio_outgoing_voice_dial($call_sid, $context, "Please wait while we connect you with " . sirius_tts_title($operator_node), $phone);
+		}
+	}
+
+	// Only support up to 99 operators. If we have more than that, we'll crash Twilio anyway.
+	// If we have <8 operators, menu is 
+	// 0 ==> operator #0
+	// 1 ==> operator #1
+	// ... 
+	// 8 ==> Previous menu
+	//
+	// If we have >8 operators, menu is
+	// 100 ==> operator #0
+	// 101 ==> operator #1
+	// ...
+	// 008 ==> Previous menu
+
+	foreach ($operators as $delta => $operator_node) {
+		if ($digit_count == 1) {
+			$delta_tts = $delta;
+		} else {
+			$delta_tts = '1 ' . sirius_phonetree_pad($delta, $digit_count-1);
+		}
+
+		$text .= "Enter " . $delta_tts . " to be connected with " . sirius_tts_title($operator_node) . ". "; 
+	}
+	$text .= "Enter " . sirius_phonetree_pad(8, $digit_count) . " to return to the previous menu.\n";
+	$text .= "Enter star to hear this message again.\n";
+	sirius_twilio_outgoing_voice_say($call_sid, $context, $text, $digit_count);
+	return;
+}
+
+function sirius_phonetree_pad($number, $len) {
+	// Prepend with 0s
+	$result = $number;
+	while (strlen($result) < $len) { $result = "0$result"; }
+	$arr = str_split($result);
+	$result = join(' ', $arr);
+	return $result;
 }

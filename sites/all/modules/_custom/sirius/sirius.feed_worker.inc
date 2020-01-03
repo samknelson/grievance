@@ -69,6 +69,28 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
   	if ($precompute) { $row['shop_nid'] = $shop_nid; }
   }
 
+  // Member Status
+  if ($row['member_status']) {
+    $member_status_tid = sirius_taxonomy_lookup_by_anything('sirius_member_status', $row['member_status']);
+    if (!$member_status_tid) { return array('success' => FALSE, 'msg' => 'Member status [' . $row['member_status'] . '] does not match the TID, name, short name, or ID of any member status taxonomy term.'); }
+    if ($precompute) {
+      $row['member_status_tid'] = $member_status_tid;
+    }
+  }
+
+  // Job NID
+  if ($row['dispatch_job_nid']) {
+    $sql = "select type from node where nid = :dispatch_job_nid";
+    $stmt = db_query($sql, array(':dispatch_job_nid' => $row['dispatch_job_nid']));
+    $hr = $stmt->fetchAssoc();
+    if ($hr['type'] != 'sirius_dispatch_job') {
+      return array('success' => FALSE, 'msg' => 'Dispatch to Job [' . $row['dispatch_job_nid'] . '] does not correspond to a node of type "sirius_dispatch_job".');
+    }
+    if ($precompute) {
+      $row['job_node'] = node_load($row['dispatch_job_nid']);
+    }
+  }
+
   return array('success' => TRUE, 'msg' => 'Looks good.');
 }
 
@@ -123,6 +145,15 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
   }
 
   node_save($worker_node);
+
+  if ($row['member_status_tid']) {
+    $member_status_term = taxonomy_term_load($row['member_status_tid']);
+    sirius_worker_member_status_set($worker_node, $member_status_term, TRUE, 'Feed upload');
+  }
+
+  if ($row['dispatch_job_nid']) {
+    $result = sirius_dispatch_actions_create($row['job_node'], $worker_node->nid, 'No', 'accepted');
+  }
 
   if ($is_new) {
   	return array('success' => TRUE, 'msg' => 'Created a new worker.');

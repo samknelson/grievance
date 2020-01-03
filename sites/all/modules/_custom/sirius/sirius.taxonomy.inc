@@ -79,3 +79,27 @@ function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include
   }
   return $map;
 }
+
+function sirius_taxonomy_lookup_by_anything($vocabulary_name, $value) {
+  static $preload;
+
+  if (!$preload[$vocabulary_name]) {
+    $tmp = sirius_taxonomy_load($vocabulary_name, 'tid', 'full');
+    foreach ($tmp as $tid => $term) {
+      $keys = array();
+      $keys[] = trim(strtolower($term->name));
+      $keys[] = trim(strtolower($term->field_sirius_name_short['und'][0]['value']));
+      $keys[] = trim(strtolower($term->field_sirius_id['und'][0]['value']));
+      $keys[] = trim(strtolower($term->field_sirius_id2['und'][0]['value']));
+      $keys[] = trim(strtolower($term->field_sirius_id3['und'][0]['value']));
+      $keys[] = $term->tid;
+      foreach ($keys as $key) {
+        if ($key) {
+          $preload[$vocabulary_name][$key] = $tid;
+        }
+      }
+    }
+  }
+
+  return $preload[$vocabulary_name][trim(strtolower($value))];
+}

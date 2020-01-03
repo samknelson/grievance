@@ -85,6 +85,7 @@ function sirius_event_term_tab_policy_create_form_submit($form, &$form_state) {
 	$notify_sms = preg_split('/[\n\r]+/', $form_state['values']['create']['notify']['sms']);
 	$json['create']['notify']['sms'] = array();
 	foreach ($notify_sms as $phone) {
+		if (!$phone) { continue; }
 		$phone = sirius_phone_format($phone);
 		if (!sirius_phone_validate($phone)) {
 			drupal_set_message("Doesn't look like a valid phone number: $phone", 'warning');
@@ -96,6 +97,7 @@ function sirius_event_term_tab_policy_create_form_submit($form, &$form_state) {
 	$notify_email = preg_split('/[\n\r]+/', $form_state['values']['create']['notify']['email']);
 	$json['create']['notify']['email'] = array();
 	foreach ($notify_email as $email) {
+		if (!$email) { continue; }
 		$email = sirius_email_format($email);
 		if (!sirius_email_validate($email)) {
 			drupal_set_message("Doesn't look like a valid email address: $email", 'warning');

@@ -115,6 +115,13 @@ function sirius_event_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_event_participant']['sirius_event_participant_json_log'] = array(
+    'title' => 'Change Log',
+    'description' => '',
+    'callback' => 'sirius_jsonfield_log_render',
+    'permissions' => array('sirius event admin'),
+    'weight' => 2,
+  );
   /*
   $node_tabs['sirius_json_definition']['sirius_event_participant_definition_settings'] = array(
     'title' => 'Settings',
@@ -177,7 +184,7 @@ function sirius_event_term_tabs() {
     'description' => '',
     'callback' => 'sirius_event_term_tab_policy',
     'permissions' => array('sirius event admin'),
-    'weight' => 4,
+    'weight' => 1,
   );
 
   $term_tabs['sirius_event_type']['sirius_event_type_policy/create'] = array(
@@ -242,6 +249,14 @@ function sirius_event_term_tabs() {
     'callback' => 'sirius_event_term_tab_bullpen',
     'permissions' => array('sirius event admin'),
     'weight' => 4,
+  );
+
+  $term_tabs['sirius_event_type']['sirius_event_type_class'] = array(
+    'title' => 'Class',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_class',
+    'permissions' => array('sirius event admin'),
+    'weight' => 5,
   );
 
   return $term_tabs;

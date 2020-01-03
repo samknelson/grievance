@@ -17,11 +17,10 @@ function sirius_event_action_info() {
 }
 
 function sirius_event_participant_status(&$participant_node, $context) {
-  $participant_status_tid = $context['participant_status_tid'];
-  if ($participant_node->field_sirius_event_pstatus['und'][0]['tid'] != $participant_status_tid) {
-    $participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $participant_status_tid;
-    node_save($participant_node);
-  } 
+  $result = sirius_event_participant_pstatus_set($participant_node, NULL, $context['participant_status_tid']);
+  if (!$result['success']) {
+    drupal_set_message($result['msg'], 'warning');
+  }
 }
 
 function sirius_event_participant_status_form(&$context, &$form_state) {

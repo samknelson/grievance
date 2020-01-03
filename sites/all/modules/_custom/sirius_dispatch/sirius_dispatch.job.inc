@@ -284,6 +284,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		'field_data_field_sirius_dispatch_hfe',
 		'field_data_field_sirius_dispatch_hfe_until',
 		'field_data_field_sirius_dispatch_eba',
+		'field_data_field_sirius_contact',
 	);
 
 	// Writing this in SQL for speed
@@ -299,6 +300,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		$sql .= "field_sirius_name_family as family, ";
 		$sql .= "taxonomy_term_data_member_status.tid as member_status_tid, ";
 		$sql .= "taxonomy_term_data_member_status.name as member_status_name, ";
+		$sql .= "field_sirius_contact_target_id as contact_nid, ";
 		$sql .= "case ";
 		foreach ($member_status_weights as $tid => $weight) {
 			$sql .= "when taxonomy_term_data_member_status.tid = $tid then $weight ";

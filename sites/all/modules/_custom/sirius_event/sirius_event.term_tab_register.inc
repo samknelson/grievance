@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
 [user with user role X] [worker with work status X] [worker with member status X] [existing contact] [new contact]
 CAN BE REGISTERED FOR 
 [role x]
@@ -24,7 +24,7 @@ function sirius_event_register_widgets() {
 	return array(
 		'user_select' => t('User Select'),
 		'user_byname' => t('User by Name'),
-		'contact_byname' => t('Contact by Name'),
+		'worker_byname' => t('Worker by Name'),
 		'contact_bulk' => t('Contact Bulk'),
 		'bullpen_signin' => t('Bullpen Signin'),
 	);

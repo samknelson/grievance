@@ -25,6 +25,9 @@ function sirius_node_tab_event_participants_current($event_node) {
 	if (!isset($delta)) {
 		$widgets = sirius_event_participants_widgets();
 
+		if (!$rules) {
+			return t('You do not have access to any participant rules for this event type.');
+		}
 		$html = '';
 		foreach ($rules as $delta => $rule) {
 			$html .= '<strong>' . $rule['name'] . '</strong><br />';
@@ -63,10 +66,10 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 	$prole_term = taxonomy_term_load($prole);
 	drupal_set_title(drupal_get_title() . ': ' . $prole_term->name);
 	if ($widget == 'view') {
-		return views_embed_view('sirius_event_participants', 'block', $event_node->nid, $prole);
+		return views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
 	} else if ($widget == 'status') {
 		// return 'View here.';
-		return views_embed_view('sirius_event_participants', 'block', $event_node->nid, $prole);
+		return views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
 	} else {
 		return t('Widget not found.');
 	}
