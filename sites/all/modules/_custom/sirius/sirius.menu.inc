@@ -142,10 +142,10 @@ function sirius_menu() {
         'type' => MENU_LOCAL_TASK,
       );
       if ($tab_record['weight']) {
-        $items['term/%term/' . $tab_name]['weight'] = $tab_record['weight'];
+        $items['taxonomy/term/%taxonomy_term/' . $tab_name]['weight'] = $tab_record['weight'];
       }
       if ($tab_record['page arguments']) {
-        $items['term/%term/' . $tab_name]['page_arguments'] = array_merge($items['term/%term/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
+        $items['taxonomy/term/%taxonomy_term/' . $tab_name]['page_arguments'] = array_merge($items['term/%term/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
       }
     }
   }

@@ -544,6 +544,12 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 		$result = $callback($feed_node, $info, $data, $import_data_row, FALSE);
 		if ($result['success']) { $import_data_row['xxxsuccsssxxx'] = 'Yes'; } else { $import_data_row['xxxsuccsssxxx'] = 'No'; }
 		$import_data_row['xxxmsgxxx'] = $result['msg'];
+		foreach ($fields as $field_name => $field_info) {
+			$col = $data["map_$field_name"];
+			if ($col === NULL || $col === '') { 
+				unset($import_data_row[$field_name]);
+			}
+		}
 
 		++$counts[$result['msg']];
 		if ($counts[$result['msg']] == 6) { $import_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
@@ -561,6 +567,8 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$html .= "<h2>Preview</h2>";
 	$html .= theme_table(array('rows' => $import_data, 'header' => $import_header, 'attributes' => array()));
 	$form["preview"] = array('#markup' => $html);
+	dpm($import_header);
+	dpm($import_data);
 
 	$form['submit'] = array(
 		'#type' => 'submit',

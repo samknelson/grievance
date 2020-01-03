@@ -203,6 +203,8 @@ function sirius_sirius_wizard_info() {
     		'phone_alt' => array('title' => 'Phone (Alt)'),
     		'phone_mobile' => array('title' => 'Phone (Mobile)'),
     		'shop_name' => array('title' => 'Current Employer Name'),
+    		'member_status' => array('title' => 'Member Status'),
+    		'dispatch_job_nid' => array('title' => 'Dispatch to Job (NID)'),
     	),
     	'batch_size' => 50,
 	    'callback_row_verify' => 'sirius_feed_worker_row_verify',
