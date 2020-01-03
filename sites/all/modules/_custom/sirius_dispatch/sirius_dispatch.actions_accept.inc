@@ -50,9 +50,7 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 		list ($prole_tid, $pstatus_tid) = explode('|', $json['bullpen']['post_dispatch']);
 		$participant_node = sirius_event_participant_get($event_nid, $contact_nid);
 		if ($participant_node && $prole_tid && $pstatus_tid) {
-			$participant_node->field_sirius_event_prole['und'][0]['tid'] = $prole_tid;
-			$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $pstatus_tid;
-			node_save($participant_node);
+			sirius_event_participant_pstatus_set($participant_node, $prole_tid, $pstatus_tid);
 		}
 	}
 
