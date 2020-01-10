@@ -11,7 +11,7 @@ function tfa_trusted_ip_menu() {
     'description' => t('Set trusted IP addresses for two-factor authentication') ,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('tfa_trusted_ip_admin'),
-    'access arguments' => array('grievance admin'),
+    'access arguments' => array('administer users'),
   );
 
   $items['admin/config/people/tfa-trusted-ip'] = array(
@@ -19,7 +19,7 @@ function tfa_trusted_ip_menu() {
     'description' => t('Set trusted IP addresses for two-factor authentication') ,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('tfa_trusted_ip_admin'),
-    'access arguments' => array('grievance admin'),
+    'access arguments' => array('administer users'),
   );
 
   return $items;

@@ -8,10 +8,12 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.m
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.admin.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.vbo.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.deliver.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.oneclick.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_workers.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_queue.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_test.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_oneclick.inc";
 
 /**
  * Implements hook_cron()

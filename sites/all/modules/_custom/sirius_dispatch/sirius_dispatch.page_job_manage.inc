@@ -4,12 +4,14 @@ function sirius_node_tab_dispatch_job_manage_access($job_node) {
 	// Staff can view any job
 	if (user_access('sirius dispatch staff')) { return TRUE; }
 
-	// Employer can view only their own shop's jobs.
-	global $user;
-	$user_full = user_load($user->uid);
-	if ($job_node->field_grievance_shop['und'][0]['target_id'] && 
-		($user_full->field_grievance_shops['und'][0]['target_id'] == $job_node->field_grievance_shop['und'][0]['target_id'])) {
-		return TRUE;
+	if (user_access('sirius dispatch employer')) {
+		// Employer can view only their own shop's jobs.
+		global $user;
+		$user_full = user_load($user->uid);
+		if ($job_node->field_grievance_shop['und'][0]['target_id'] && 
+			($user_full->field_grievance_shops['und'][0]['target_id'] == $job_node->field_grievance_shop['und'][0]['target_id'])) {
+			return TRUE;
+		}
 	}
 
 	// Oh well.
@@ -278,14 +280,6 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 	if (user_access('sirius dispatch staff')) {
 		$form += sirius_log_render_form($job_node->nid);
 	}
-
-	$html = '';
-	if (user_access('sirius dispatch staff')) {
-		$html .= views_embed_view('sirius_dispatches', 'block', $job_node->nid);
-	} else {
-		$html .= views_embed_view('sirius_dispatches', 'block_1', $job_node->nid);
-	}
-	$form['conclusion'] = array('#markup' => $html);
 
 	return $form;
 }

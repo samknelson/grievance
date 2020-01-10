@@ -12,6 +12,9 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.department.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.notify.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.vbo.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.merge.inc";
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_duplicate_id.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_user.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_employer_worker_list.inc";
@@ -21,6 +24,9 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_industry.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_me.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_expiring.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_merge.inc";
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_optin.inc";
 
 function sirius_worker_get_by_id($id) {
 	if (!$id) { return NULL; }
@@ -113,5 +119,80 @@ function sirius_worker_sirius_jsonfield_form_definitions() {
   $definition = array();
   $definition['node']['sirius_worker']['field_sirius_json'] = $form;
   return $definition;
+}
+
+/**
+ * Implements hook_form_alter
+ *
+ * @todo - Have you ever seen such crappy code?  Good god, it must be 11:00 PM on the night we're launching.
+ *         Somebody should really clean this up tout suite.
+ *         Look, let's just pretend this never happened, ok?  It'll be just between you and me?
+ */
+
+function sirius_worker_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'sirius_worker_node_form') {
+    if (!$form['nid']['#value']) {
+      $form['field_sirius_id']["und"][0]['value']['#default_value'] = sirius_worker_nextid();
+    }
+  }
+}
+
+function sirius_worker_node_presave($worker_node) {
+  // Only for workers
+  if ($worker_node->type != 'sirius_worker') { return; }
+
+  // Only on insert
+  if ($worker->nid) { return; }
+
+  // Only if the ID is blank
+  if ($worker_node->field_sirius_id['und'][0]['value']) { return; }
+
+  $worker_node->field_sirius_id['und'][0]['value'] = sirius_worker_nextid();
+}
+
+function sirius_worker_nextid() {
+  $sql = "select max(field_sirius_id_value) as m from field_data_field_sirius_id ";
+  $sql .= "where entity_type = 'node' "; 
+  $sql .= "and bundle = 'sirius_worker' ";
+  $sql .= "and field_sirius_id_value != '999099' ";
+  $sql .= "and field_sirius_id_value != '666666' ";
+  $sql .= "and field_sirius_id_value != '999001' ";
+  $sql .= "and field_sirius_id_value < '999000' ";
+  $sql .= "and length(field_sirius_id_value) = 6 ";
+  // $sql .= 'and field_sirius_id_value REGEXP \'^[0-9]{6}$\' ';
+  $stmt = db_query($sql, array());
+  $hr = $stmt->fetchAssoc();
+  $id = $hr['m'];
+  if ($id > 0) {
+    $id++;
+    if ($id == 999099) { $id++; }
+    if ($id == 666666) { $id++; }
+    if ($id == 999001) { $id++; }
+    return $id;
+    
+  }
+}
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function sirius_worker_report_cache_info() {
+  $items = array();
+
+  $items['sirius-worker-duplicate-id'] = array(
+    'name' => t('Workers with Duplicate IDs'),
+    'description' => '',
+    'access' => 'sirius worker view',
+    'fields' => sirius_worker_report_duplicate_id_fields(),
+    'form_callback' => 'sirius_worker_report_duplicate_id_form',
+    'pk_list_callback' => 'sirius_worker_report_duplicate_id_pks',
+    'batch_callback' => 'sirius_worker_report_duplicate_id_batch',
+    'render_callbacks' => array(
+      'View' => 'sirius_worker_report_duplicate_id_view',
+    ),
+  );
+
+  return $items;
 }
 

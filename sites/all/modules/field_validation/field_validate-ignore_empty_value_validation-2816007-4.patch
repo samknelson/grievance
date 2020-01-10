@@ -1,0 +1,29 @@
+diff --git a/plugins/validator/field_validation_unique_validator.inc b/plugins/validator/field_validation_unique_validator.inc
+index 23de6a8..6b958ce 100644
+--- a/plugins/validator/field_validation_unique_validator.inc
++++ b/plugins/validator/field_validation_unique_validator.inc
+@@ -30,7 +30,11 @@ class field_validation_unique_validator extends field_validation_validator {
+         }
+       }
+     }
+-    if ($flag) {
++    $ignore = FALSE;
++    if (isset($this->rule->settings['ignore_empty']) && $this->rule->settings['ignore_empty'] && $this->value === '') {
++      $ignore = TRUE;
++    }
++    if (!$ignore && $flag) {
+       $query = new EntityFieldQuery();
+       if ($scope == 'global') {
+       }
+@@ -150,6 +154,11 @@ class field_validation_unique_validator extends field_validation_validator {
+         'invisible' => array(':input[name="settings[data]"]' => array('value' => 'global')),
+       ),
+     );
++    $form['settings']['ignore_empty'] = array(
++      '#title' => t('Ignore empty'),
++      '#type' => 'checkbox',
++      '#default_value' => isset($default_settings['ignore_empty']) ? $default_settings['ignore_empty'] : FALSE,
++    );
+     parent::settings_form($form, $form_state);
+   }
+ 

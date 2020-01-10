@@ -129,21 +129,11 @@ function sirius_twilio_outgoing_voice_repeat($call_sid, $context, $msg = NULL) {
 }
 
 function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_digits) {
-	$client = sirius_twilio_client_get();
-	$response = new TwiML();
-
-	if ($gather_digits) {
-		$gather = $response->gather(array('numDigits' => $gather_digits));
-		$gather->say($msg);
-	} else {
-		$response->say($msg);
-	}
-
 	header('Content-Type: text/xml');
 	print "<Response>";
 	if ($gather_digits) { print "<Gather numDigits=\"$gather_digits\">"; }
 	print variable_get('sirius_twilio_twiml_open', '<Say><prosody>');
-	print substr($msg, 0, 3000);
+	print sirius_twilio_outgoing_voice_clean($msg);
 	print variable_get('sirius_twilio_twiml_close', '</prosody></Say>');
 	if ($gather_digits) { print "</Gather>"; }
 	print "</Response>";
@@ -161,7 +151,7 @@ function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone) {
 	$phone = sirius_phone_format_e164($phone);
 	$client = sirius_twilio_client_get();
 	$response = new TwiML();
-	$response->say($msg);
+	$response->say(sirius_twilio_outgoing_voice_clean($msg));
 	$response->dial($phone);
 
 	header('Content-Type: text/xml');
@@ -173,4 +163,8 @@ function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone) {
 	}
 	sirius_twilio_set_context($call_sid, $context, 'dial', $msg);
 	exit();
+}
+
+function sirius_twilio_outgoing_voice_clean($msg) {
+	return substr(htmlspecialchars($msg), 0, 3000);
 }

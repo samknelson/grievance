@@ -1,27 +1,26 @@
 <?php
 
-function sirius_jsonfield_menu() {
-  $items = array();
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.util.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.link.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.log.inc';
 
-  /*
-  $items['sirius/cloudflare/test/%'] = array(
-    'title'            => 'CloudFlare Test',
-    'page callback'    => 'sirius_cloudflare_test',
-    'page arguments'   => array(3),
-    'access arguments' => array('access content'),
-  );
-  */
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.page_definition_edit.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.page_definition_preview.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.page_definition_exim.inc';
 
-  return $items;
-}
-
-function sirius_jsonfield_form_definition($entity_type, $bundle, $field_name) {
+function sirius_jsonfield_form_definition($entity_type, $bundle, $field_name, $element) {
   $all_definitions = module_invoke_all('sirius_jsonfield_form_definitions');
   $form = $all_definitions[$entity_type][$bundle][$field_name];
+
+  if ($form['#callback']) {
+    $callback = $form['#callback'];
+    $form = $callback($element);
+  }
   if (!$form) {
     $form = array(
       '#type' => 'markup',
-      '#markup' => t('Please supply a form defintiion by implementing hook_sirius_jsonfield_form_definitions and returning a value for $all_defintions[@entity_type][@bundle][@field_name]', array('@entity_type' => $entity_type, '@bundle' => $bundle, '@field_name' => $field_name)),
+      '#markup' => t('Please supply a form definition by implementing hook_sirius_jsonfield_form_definitions and returning a value for $all_defintions[@entity_type][@bundle][@field_name]', array('@entity_type' => $entity_type, '@bundle' => $bundle, '@field_name' => $field_name)),
     );
   }
 
@@ -121,22 +120,32 @@ function sirius_jsonfield_field_widget_form(&$form, &$form_state, $field, $insta
       '#default_value' => $items[$delta]['value'],
     );
   } else {
-    $element['sirius_jsonfield'] = sirius_jsonfield_form_definition($entity_type, $bundle, $field['field_name']);
-    $default_value = json_decode($items[$delta]['value'], TRUE);
-    if ($default_value) {
-      foreach ($default_value as $sub_name => $sub_value) {
-        if (is_array($sub_value)) {
-          foreach ($sub_value as $sub_sub_name => $sub_sub_value) {
-            $element['sirius_jsonfield'][$sub_name][$sub_sub_name]['#default_value'] = $sub_sub_value;
-          }
-        } else {
-          $element['sirius_jsonfield'][$sub_name]['#default_value'] = $sub_value;
-        }
-      }
+    $element['sirius_jsonfield'] = sirius_jsonfield_form_definition($entity_type, $bundle, $field['field_name'], $element);
+    if ($element['#type'] == 'markup') {
+
     }
+    $default_value = json_decode($items[$delta]['value'], TRUE);
+    _sirius_jsonfield_field_widget_for_set_defaults($element['sirius_jsonfield'], $default_value);
   }
 
+
   return $element;
+}
+
+function _sirius_jsonfield_field_widget_for_set_defaults(&$element, $default_value, $depth = 0) {
+  if ($depth > 100)                   { return; }
+  if (!$default_value)                { return; }
+  if (!$element)                      { return; }
+  if ($element['#type'] == 'markup')  { return; }
+  
+  foreach ($default_value as $sub_name => $sub_value) {
+    $type = $element[$sub_name]['#type'];
+    if (!$type || $type == 'fieldset') {
+      _sirius_jsonfield_field_widget_for_set_defaults($element[$sub_name], $default_value[$sub_name], $depth+1);
+    } else {
+      $element[$sub_name]['#default_value'] = $sub_value;
+    }
+  }
 }
 
 /**
@@ -185,7 +194,7 @@ function sirius_jsonfield_field_formatter_view($entity_type, $entity, $field, $i
 
 
 function _sirius_jsonfield_recursive_render($obj) {
-  if (!is_array($obj)) { return $obj; }
+  if (!is_array($obj)) { return htmlspecialchars($obj); }
 
   $html .= '<ul>';
   foreach ($obj as $key => $value) {

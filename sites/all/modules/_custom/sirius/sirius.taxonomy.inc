@@ -2,7 +2,7 @@
 
 function sirius_taxonomy_checkboxes(&$form, &$form_state, $field_name, $vocabulary_name) {
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
-  $terms = taxonomy_get_tree($vocabulary->vid, 0, NULL, TRUE);
+  $terms = sirius_domain_taxonomy_get_tree($vocabulary->vid, 0, NULL, TRUE, sirius_domain_nid());
 
   foreach ($terms as $term) {
     $tid = $term->tid;
@@ -46,9 +46,10 @@ function sirius_taxonomy_checkboxes(&$form, &$form_state, $field_name, $vocabula
  */
 
 function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE) {
+  $domain_nid = sirius_domain_nid();
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
   if ($value_type == 'name') { $load_entities = FALSE; } else { $load_entities = TRUE; }
-  $terms = taxonomy_get_tree($vocabulary->vid, 0, NULL, $load_entities);
+  $terms = sirius_domain_taxonomy_get_tree($vocabulary->vid, 0, NULL, $load_entities, sirius_domain_nid());
 
   $map = array();
   if ($include_null) {
@@ -77,4 +78,28 @@ function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include
     $map[$key] = $value;
   }
   return $map;
+}
+
+function sirius_taxonomy_lookup_by_anything($vocabulary_name, $value) {
+  static $preload;
+
+  if (!$preload[$vocabulary_name]) {
+    $tmp = sirius_taxonomy_load($vocabulary_name, 'tid', 'full');
+    foreach ($tmp as $tid => $term) {
+      $keys = array();
+      $keys[] = trim(strtolower($term->name));
+      $keys[] = trim(strtolower($term->field_sirius_name_short['und'][0]['value']));
+      $keys[] = trim(strtolower($term->field_sirius_id['und'][0]['value']));
+      $keys[] = trim(strtolower($term->field_sirius_id2['und'][0]['value']));
+      $keys[] = trim(strtolower($term->field_sirius_id3['und'][0]['value']));
+      $keys[] = $term->tid;
+      foreach ($keys as $key) {
+        if ($key) {
+          $preload[$vocabulary_name][$key] = $tid;
+        }
+      }
+    }
+  }
+
+  return $preload[$vocabulary_name][trim(strtolower($value))];
 }
