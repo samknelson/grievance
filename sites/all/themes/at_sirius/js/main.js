@@ -223,12 +223,10 @@
 						$('.form-item-field-grievance-gender-und select').val(json.gender);
 					}
 
-					/*
-					$('.form-item-field-grievance-phone-und-0-value input').val(json[0].phone_Number);
-					$('.form-item-field-grievance-email-und-0-email input').val(json[0].email_Address);
-					$('.form-item-field-grievance-department-und-0-value input').val(json[0].department);
-					$('.form-item-field-grievance-classification-und-0-value input').val(json[0].classification);
-					*/
+					$('.form-item-field-grievance-phone-und-0-value input').val(json.Phones[0].Phone);
+					$('.form-item-field-grievance-email-und-0-email input').val(json.Emails[0].Email);
+					// $('.form-item-field-grievance-department-und-0-value input').val(json[0].department);
+					// $('.form-item-field-grievance-classification-und-0-value input').val(json[0].classification);
 					$('.form-item-field-grievance-min-und-0-value input').val(json.ImisId);
 				});
 
