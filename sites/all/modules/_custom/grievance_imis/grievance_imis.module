@@ -366,8 +366,6 @@ function grievance_imis_lookup_raw($imis_id, $broughtby_tid) {
     return NULL;
   }
 
-  dpm(json_decode($response->data));
-
   return $response->data;
 }
 
