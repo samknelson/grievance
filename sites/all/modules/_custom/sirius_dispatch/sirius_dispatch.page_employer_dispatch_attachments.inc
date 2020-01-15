@@ -1,5 +1,9 @@
 <?php
 
+function sirius_node_tab_employer_dispatch_attachments_access($employer_node) {
+	return sirius_employer_node_tab_employer_users_access($employer_node);
+}
+
 function sirius_node_tab_employer_dispatch_attachments($employer_node) {
 	return drupal_get_form('sirius_node_tab_employer_dispatch_attachments_form', $employer_node);
 }
