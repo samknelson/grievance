@@ -606,8 +606,6 @@ function grievance_update_7034() {
   }
 }
 
-
-
 /**
  * Move the "field_sirius_dispatch_notesdef" into json
  */
@@ -647,5 +645,36 @@ function grievance_update_7035() {
   if ($instance = field_info_instance('taxonomy_term', 'field_sirius_dispatch_notesdef', 'sirius_industry')) {
     print "Deleting: sirius_industry / field_sirius_dispatch_notesdef\n";
     field_delete_instance($instance);
+  }
+}
+
+/**
+ * Move the employer's "field_sirius_skill" into json
+ */
+
+function grievance_update_7036() {
+  try {
+    print "Moving skill settings for employers into JSON...\n";
+    $sql = "select * from field_data_field_sirius_skill where entity_type = 'node' and bundle = 'grievance_shop' order by entity_id ";
+    $stmt = db_query($sql, array());
+    while ($hr = $stmt->fetchAssoc()) {
+      $nid = $hr['entity_id'];
+      $node = node_load($nid);
+
+      $json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+      $json['dispatch']['pay_at_skilled_rate']['skill'][] = $hr['field_sirius_skill_tid'];
+      $node->field_sirius_json['und'][0]['value'] = json_encode($json);
+      node_save($node);
+
+      print "Updated: $node->title ($nid)\n";
+    }
+
+  } catch (exception $ignore) { }
+
+  $bundle = 'grievance_shop';
+  $field = 'field_sirius_skill';
+  if ($instance = field_info_instance('node', $field, $bundle)) {
+    print "Deleting: $bundle / $field\n";
+    // field_delete_instance($instance);
   }
 }
