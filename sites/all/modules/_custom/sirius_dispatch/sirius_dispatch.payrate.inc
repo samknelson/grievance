@@ -104,7 +104,6 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
   if (!$force_recompute) {
   	if (isset($dispatch_node->field_sirius_payrate['und'][0]['value'])) { return; }
   }
- 
   $job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
   if (!$job_node) { return; }
 
@@ -144,11 +143,20 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
 
   // Some employers always pay the skilled rate for workers with specific skills.
   if (!$is_skilled) {
-    $employer_skills = sirius_fieldvals($employer_node, 'field_sirius_skill', 'tid');
+  	$json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
+    $employer_skills = $json['dispatch']['pay_at_skilled_rate']['skill'];
     $worker_skills = sirius_fieldvals($worker_node, 'field_sirius_skill', 'tid');
-    if (array_intersect($employer_skills, $worker_skills)) { $is_skilled = TRUE; }
-  }
+    $employer_member_statuses = $json['dispatch']['pay_at_skilled_rate']['member_status'];
+    $worker_member_statuses = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
 
+  	// Is skilled if we have one of the required skills...
+    if (array_intersect($employer_skills, $worker_skills)) { $is_skilled = TRUE; }
+
+    // ... But NOT if we don't have one of the reuired member statuses
+    if ($employer_member_statuses) {
+    	if (!array_intersect($employer_member_statuses, $worker_member_statuses)) { $is_skilled = FALSE; }
+    }
+  }
 
   if ($is_skilled) {
     $dispatch_node->field_sirius_payrate = $member_status_term->field_sirius_payrate_skilled; 

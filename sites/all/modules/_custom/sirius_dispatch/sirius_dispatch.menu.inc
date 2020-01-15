@@ -158,6 +158,13 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch employer'),
   );
 
+  $node_tabs['grievance_shop']['sirius_employer_dispatch_payrate'] = array(
+    'title' => 'Dispatch Payrate',
+    'description' => '',
+    'callback' => 'sirius_node_tab_employer_dispatch_payrate',
+    'permissions' => array('sirius dispatch staff'),
+  );
+
   return $node_tabs;
 }
 

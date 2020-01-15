@@ -567,8 +567,6 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$html .= "<h2>Preview</h2>";
 	$html .= theme_table(array('rows' => $import_data, 'header' => $import_header, 'attributes' => array()));
 	$form["preview"] = array('#markup' => $html);
-	dpm($import_header);
-	dpm($import_data);
 
 	$form['submit'] = array(
 		'#type' => 'submit',

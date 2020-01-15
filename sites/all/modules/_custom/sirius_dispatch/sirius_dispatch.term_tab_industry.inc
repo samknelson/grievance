@@ -34,7 +34,6 @@ function sirius_dispatch_term_tab_industry_form_submit($form, &$form_state) {
 	$industry_tid = $form_state['industry_tid'];
 	$industry_term = taxonomy_term_load($industry_tid);
 	$json = json_decode($industry_term->field_sirius_json['und'][0]['value'], TRUE);
-	$json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
 	$json['dispatch']['default']['notes'] = $form_state['values']['notes'];
 	$json['dispatch']['default']['address_parking'] = $form_state['values']['address_parking'];
 	$industry_term->field_sirius_json['und'][0]['value'] = json_encode($json);

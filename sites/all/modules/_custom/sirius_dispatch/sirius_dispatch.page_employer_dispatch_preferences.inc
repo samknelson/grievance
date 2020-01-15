@@ -1,7 +1,7 @@
 <?php
 
 function sirius_node_tab_employer_dispatch_preferences_access($employer_node) {
-	return node_access('view', $employer_node);
+	return sirius_employer_node_tab_employer_users_access($employer_node);
 }
 
 function sirius_node_tab_employer_dispatch_preferences($employer_node) {

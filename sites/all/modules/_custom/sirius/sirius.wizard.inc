@@ -187,8 +187,9 @@ function sirius_sirius_wizard_info() {
 	    	'ssn' => 'SSN',
 	    ),
     	'fields' => array(
-    		'id' => array('title' => 'ID'),
     		'ssn' => array('title' => 'SSN'),
+    		'id' => array('title' => 'ID'),
+    		'id2' => array('title' => 'ID2'),
     		'id3' => array('title' => 'ID3'),
     		'name_given' => array('title' => 'First Name'),
     		'name_family' => array('title' => 'Last Name'),
