@@ -46,6 +46,20 @@ function sirius_term_tab_ms_form($form, &$form_state, $ms_term) {
 			'#description' => t('The level title as it will be displayed to users')
 		);
 
+		$form['levels'][$level_code]['payrate_skilled'] = array(
+			'#title' => t('Pay Rate (Skilled)'),
+			'#type' => 'textfield',
+			'#default_value' => $level['payrate_skilled'],
+			'#size' => 4,
+		);
+
+		$form['levels'][$level_code]['payrate_unskilled'] = array(
+			'#title' => t('Pay Rate (Unskilled)'),
+			'#type' => 'textfield',
+			'#default_value' => $level['payrate_unskilled'],
+			'#size' => 4,
+		);
+
 		$form['levels'][$level_code]['weight'] = array(
 			'#title' => t('Weight'),
 			'#type' => 'textfield',
