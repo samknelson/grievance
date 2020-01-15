@@ -20,8 +20,8 @@ function sirius_term_tab_ms_form($form, &$form_state, $ms_term) {
 		'#default_value' => $json['training']['levels_enabled'],
 	);
 
-	$hours_types = sirius_taxonomy_load('sirius_hour_type', 'tid', 'name', TRUE);
-	$hours_types['TOTAL'] = t('TOTAL HOURS');
+	$departments = sirius_taxonomy_load('grievance_department', 'tid', 'name', TRUE);
+	$departments['TOTAL'] = t('TOTAL HOURS');
 
 	$levels = sirius_training_levels_fetch($ms_term);
 	$levels['new'] = array('title' => t('New Level'));
@@ -64,11 +64,11 @@ function sirius_term_tab_ms_form($form, &$form_state, $ms_term) {
 		$hour_requirements = $level['hour_requirements'];
 		if (!$hour_requirements) { $hour_requirements = array(); }
 		for ($i=0; $i<3; ++$i) {
-			$form['levels'][$level_code]['hour_requirements'][$i]['type'] = array(
+			$form['levels'][$level_code]['hour_requirements'][$i]['dept'] = array(
 				'#type' => 'select',
 				'#title' => t('Hour Type #@i', array('@i' => $i+1)),
-				'#options' => $hours_types,
-				'#default_value' => $hour_requirements[$i]['type'],
+				'#options' => $departments,
+				'#default_value' => $hour_requirements[$i]['dept'],
 			);
 
 			$form['levels'][$level_code]['hour_requirements'][$i]['qty'] = array(
