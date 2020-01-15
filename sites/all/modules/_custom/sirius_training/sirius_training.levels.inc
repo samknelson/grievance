@@ -105,7 +105,7 @@ function sirius_training_level_graduate($worker_node, $ms_term, $level, $params)
 	// Possible?
 	$possible = sirius_training_level_graduate_possible($worker_node, $ms_term, $level, $params);
 	if (!$possible['success']) {
-		// /return $possible;
+		return $possible;
 	}
 
 	// Set the level
