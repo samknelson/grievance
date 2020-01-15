@@ -675,6 +675,6 @@ function grievance_update_7036() {
   $field = 'field_sirius_skill';
   if ($instance = field_info_instance('node', $field, $bundle)) {
     print "Deleting: $bundle / $field\n";
-    // field_delete_instance($instance);
+    field_delete_instance($instance);
   }
 }
