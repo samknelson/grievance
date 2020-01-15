@@ -1,0 +1,13 @@
+<?php
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.levels.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_employer.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_overview.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_graduate.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.term_tab_ms.inc';
