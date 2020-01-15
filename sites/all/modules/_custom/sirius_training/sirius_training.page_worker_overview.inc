@@ -24,8 +24,8 @@ function sirius_training_node_tab_worker_overview($worker_node) {
 		if ($worker_level) {
 			$html .= sirius_fakerender_field('Level:', $level['title']);
 			$html .= sirius_fakerender_field('Date:', date('Y-m-d H:i:s', $worker_level['ts'])); 
-			$html .= sirius_fakerender_field('Payrate (Skilled):', '$' . number_format($level['payrate_skilled'], 2));
-			$html .= sirius_fakerender_field('Payrate (Unskilled):', '$' . number_format($level['payrate_unskilled'], 2)); 
+			if ($payrate_skilled) { $html .= sirius_fakerender_field('Payrate (Skilled):', '$' . number_format($level['payrate_skilled'], 2)); }
+			if ($payrate_unskilled) { $html .= sirius_fakerender_field('Payrate (Unskilled):', '$' . number_format($level['payrate_unskilled'], 2)); }
 		} else {
 			$html .= sirius_fakerender_field('Level:', t('(no level)'));
 		}
