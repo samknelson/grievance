@@ -209,6 +209,10 @@ function sirius_mail($key, &$message, $params) {
   if ($params['headers']['Bcc']) { $message['headers']['Bcc'] = $params['headers']['Bcc']; } 
   if ($params['headers']['bcc']) { $message['headers']['Bcc'] = $params['headers']['bcc']; } 
 
+  // See comment from Takirimi https://api.drupal.org/api/drupal/includes%21mail.inc/function/drupal_mail/7.x
+  $message['headers']['Cc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Cc']);
+  $message['headers']['Bcc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Bcc']);
+
   $message['subject'] = $params['subject'];
   $message['body'][] = $params['body'];
 
