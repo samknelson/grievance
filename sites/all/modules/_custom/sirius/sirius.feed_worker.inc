@@ -114,6 +114,7 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
   }
 
   if ($row['id'])  { $worker_node->field_sirius_id['und'][0]['value'] = $row['id']; }
+  if ($row['id2']) { $worker_node->field_sirius_id2['und'][0]['value'] = $row['id2']; }
   if ($row['id3']) { $worker_node->field_sirius_id3['und'][0]['value'] = $row['id3']; }
   if ($row['ssn']) { $worker_node->field_sirius_ssn['und'][0]['value'] = $row['ssn']; }
 
