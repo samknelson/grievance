@@ -71,29 +71,29 @@ function sirius_training_level_graduate_possible($worker_node, $ms_term, $level,
 	$hour_requirements = $json['training']['levels'][$level['code']]['hour_requirements'];
 	if ($hour_requirements) {
 
-		$sql = "select hours_type_tid, sum(hours) as s ";
+		$sql = "select department_tid, sum(hours) as s ";
 		$sql .= "from sirius_hours_cache ";
 		$sql .= "where worker_nid = :worker_nid ";
-		$sql .= "group by hours_type_tid ";
+		$sql .= "group by department_tid ";
 		$stmt = db_query($sql, array(':worker_nid' => $worker_node->nid));
 		$grand_total = 0;
 		$worker_hours = array();
 		while ($hr = $stmt->fetchAssoc()) {
-			$worker_hours[$hr['hours_type_tid']] = $hr['s'];
+			$worker_hours[$hr['department_tid']] = $hr['s'];
 			$worker_hours['TOTAL'] += $hr['s'];
 		}
 
 		foreach ($hour_requirements as $hour_requirements) {
 			$qty = $hour_requirements['qty'];
-			$type = $hour_requirements['type'];
-			if (!$qty || !$type) { continue; }
-			if ($worker_hours[$type] >= $qty) { continue; }
+			$dept_tid = $hour_requirements['dept'];
+			if (!$qty || !$dept_tid) { continue; }
+			if ($worker_hours[$dept_tid] >= $qty) { continue; }
 
-			if ($type == 'TOTAL') {
+			if ($dept_tid == 'TOTAL') {
 				return array('success' => FALSE, 'msg' => t('The worker must have at least @qty total hours.', array('@qty' => $qty)));
 			} else {
-				$hour_type_term = taxonomy_term_load($type);
-				return array('success' => FALSE, 'msg' => t('The worker must have at least @qty hours of type @type.', array('@qty' => $qty, '@type' => $hour_type_term->name)));
+				$dept_term = taxonomy_term_load($dept_tid);
+				return array('success' => FALSE, 'msg' => t('The worker must have at least @qty hours of type @type.', array('@qty' => $qty, '@type' => $dept_term->name)));
 			}
 		}
 	}
