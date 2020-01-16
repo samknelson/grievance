@@ -141,10 +141,13 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 
 function sirius_node_tab_worker_dispatch_status_form_validate($form, &$form_state) {
 	$worker_node = $form_state['worker_node'];
-	$reason = $form_state['values']['reason'];
-	$block_tid = $form_state['values']['sib'];
-	if (!$reason && ($block_tid != $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid'])) {
-		form_set_error('reason', 'If you are changing the sign-in block status, please enter a reason.');
+
+	if (user_access('sirius dispatch staff')) {
+		$reason = $form_state['values']['reason'];
+		$block_tid = $form_state['values']['sib'];
+		if (!$reason && ($block_tid != $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid'])) {
+			form_set_error('reason', 'If you are changing the sign-in block status, please enter a reason.');
+		}
 	}
 }
 

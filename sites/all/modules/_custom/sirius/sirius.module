@@ -34,6 +34,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.callerid.in
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.volunteer.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lock.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.node_tabs.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.masquerade.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
