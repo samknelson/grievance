@@ -51,7 +51,7 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	$days = $form_state['values']['days'];
 
 	$args = array();
-	$args[':start'] = gmdate('Y-m-d');
+	// $args[':start'] = gmdate('Y-m-d');
 	$args[':end'] = gmdate('Y-m-d', strtotime("+$days days"));
 
 	$sql = "select title, name, nid, field_sirius_skill_expire_value, field_sirius_id_value ";
@@ -62,7 +62,7 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	$sql .= "join taxonomy_term_data on taxonomy_term_data.tid = field_sirius_skill_tid ";
 	$sql .= "where node.type = 'sirius_worker' ";
 	$sql .= "and field_data_field_sirius_skill.delta = field_data_field_sirius_skill_expire.delta ";
-	$sql .= "and field_sirius_skill_expire_value >= :start ";
+	// $sql .= "and field_sirius_skill_expire_value >= :start ";
 	$sql .= "and field_sirius_skill_expire_value <= :end ";
 	if ($form_state['values']['name']) {
 		$sql .= "and node.title like :name ";
