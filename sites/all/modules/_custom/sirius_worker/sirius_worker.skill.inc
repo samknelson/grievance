@@ -224,6 +224,7 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 	return array('success' => TRUE, 'msg' => $msg);
 }
 
+/*
 function sirius_worker_skill_set_all($worker_node, $new_vals, $reason, $files) {
 	if (is_numeric($worker_node)) { $worker_node = node_load($worker_node); }
 
@@ -270,3 +271,4 @@ function sirius_worker_skill_set_all($worker_node, $new_vals, $reason, $files) {
 
 	return array('success' => TRUE, 'msg' => $msg);
 }
+*/
