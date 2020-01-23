@@ -24,12 +24,72 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
   );
 
+
+
+
+
+
+
   $node_tabs['sirius_worker']['sirius_worker_skill'] = array(
     'title' => 'Skills',
     'description' => '',
     'callback' => 'sirius_node_tab_worker_skill',
     'permissions' => array('sirius'),
   );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_view',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/add'] = array(
+    'title' => 'Add',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_add',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/add2'] = array(
+    'title' => 'Add Multiple',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_add2',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/renew'] = array(
+    'title' => 'Renew',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_renew',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 4,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/remove'] = array(
+    'title' => 'Remove',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_remove',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 5,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/log'] = array(
+    'title' => 'Log',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_log',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 7,
+  );
+
+
+
+
+
+
 
   $node_tabs['sirius_worker']['sirius_worker_contact'] = array(
     'title' => 'Contact',
@@ -152,6 +212,16 @@ function sirius_worker_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  /*
+  $items['sirius/worker/skill-renew'] = array(
+    'title' => 'Renew a Skill',
+    'description' => '',
+    'page callback' => 'sirius_worker_skill_term_renew',
+    'page arguments' => array(3),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  */
 
   $items['sirius/worker/config/user'] = array(
     'title' => 'Worker / User Configuration',
