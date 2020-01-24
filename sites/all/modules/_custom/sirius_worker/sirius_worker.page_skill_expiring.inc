@@ -40,6 +40,15 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 		'#size' => 6,
 	);
 
+	$form['output'] = array(
+		'#type' => 'select',
+		'#title' => t('Output'),
+		'#options' => array(
+			'screen' => t('Screen'),
+			'csv' => t('CSV'),
+		),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Submit',
@@ -64,6 +73,8 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	if (is_numeric($days2)) {
 		$args[':start'] = gmdate('Y-m-d', strtotime("+$days2 days"));
 	}
+
+	$output = $form_state['values']['output'];
 
 	$sql = "select title, name, nid, field_sirius_skill_expire_value, field_sirius_id_value ";
 	$sql .= "from node ";
@@ -102,10 +113,27 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 		$row[] = $hr['field_sirius_id_value'];
 		$row[] = $hr['name'];
 		$row[] = date('Y-m-d', strtotime($hr['field_sirius_skill_expire_value']));
-		$row[] = l(t('Manage Skills'), 'node/' . $hr['nid'] . '/sirius_worker_skill', array('attributes' => array('class' => 'tool-button')));
+		if ($output == 'csv') {
+			$row[] = $hr['nid'];
+		} else {
+			$row[] = l(t('Manage Skills'), 'node/' . $hr['nid'] . '/sirius_worker_skill', array('attributes' => array('class' => 'tool-button')));
+		}
 		$rows[] = $row;
 	}
 
 	$header = array('Worker', 'Badge #', 'Skill', 'Expiration', 'NID');
+
+	if ($output == 'csv') {
+		$filename = "skill_expiration_report_" . date('YmdHis') . '_' . $days . '_' . $days2 . '.csv';
+		drupal_add_http_header('Content-Type', 'text/csv');
+		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		$fp = fopen('php://output', 'w');
+		fputcsv($fp, $header);
+		foreach ($rows as $row) {
+			fputcsv($fp, $row);
+		}
+		drupal_exit();
+	}
+
 	$form_state['result'] = theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
 }
