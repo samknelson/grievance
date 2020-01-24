@@ -125,7 +125,7 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 		$rows[] = $row;
 	}
 
-	if ($count >= $limit-1) { drupal_set_message("Only showing the first $limit records. Select a CSV export to download the full list.";); }
+	if ($count >= $limit-1) { drupal_set_message("Only showing the first $limit records. Select a CSV export to download the full list."); }
 
 	$header = array('Worker', 'Badge #', 'Skill', 'Expiration', 'NID');
 
