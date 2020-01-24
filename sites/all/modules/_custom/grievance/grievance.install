@@ -523,10 +523,10 @@ function grievance_update_7031() {
   $tables = array('field_data_field_sirius_json', 'field_revision_field_sirius_json');
   foreach ($tables as $table) {
     $sql = "delete from $table where not json_valid(field_sirius_json_value);";
-    $stmt = db_query($sql, array());
+    try { $stmt = db_query($sql, array()); } catch (exception $ignore) { print "Unable to execute: $sql. Please run manually after the database has been upgraded.\n"; }
 
     $sql = "alter table $table change field_sirius_json_value field_sirius_json_value json";
-    $stmt = db_query($sql, array());
+    try { $stmt = db_query($sql, array()); } catch (exception $ignore) { print "Unable to execute: $sql. Please run manually after the database has been upgraded.\n"; }
   }
 }
 

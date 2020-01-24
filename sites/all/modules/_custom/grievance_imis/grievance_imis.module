@@ -429,7 +429,7 @@ function grievance_imis_form_grievance_node_form_alter(&$form, &$form_state, $fo
       $result_body .= t('No members match your search criteria: ') . '<strong>' . $form_state['values']['grievance_imis_search'] . '</strong>';
     } else {
 
-      usort($candidates, function($a, $b) { return strcasecmp($a->name, $b->name); });
+      usort($candidates, function($a, $b) { return strcasecmp($a->FullName, $b->FullName); });
 
       $header = array(
         t('imis ID'),
