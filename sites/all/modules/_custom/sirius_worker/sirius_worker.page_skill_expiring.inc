@@ -103,11 +103,15 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 		$args['id'] = $form_state['values']['id'];
 	}
 	$sql .= "order by field_sirius_skill_expire_value, node.nid ";
-	$sql .= "limit 5000 ";
+
+	$limit = 1000;
+	if ($output == 'csv') { $limit = 100000; }
 
 	$stmt = db_query($sql, $args);
 	$rows = array();
+	$count = 0;
 	while ($hr = $stmt->fetchAssoc()) {
+		++$count;
 		$row = array();
 		$row[] = $hr['title'];
 		$row[] = $hr['field_sirius_id_value'];
@@ -120,6 +124,8 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 		}
 		$rows[] = $row;
 	}
+
+	if ($count >= $limit-1) { drupal_set_message("Only showing the first $limit records. Select a CSV export to download the full list.";); }
 
 	$header = array('Worker', 'Badge #', 'Skill', 'Expiration', 'NID');
 
