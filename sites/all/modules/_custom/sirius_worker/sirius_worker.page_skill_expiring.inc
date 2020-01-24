@@ -8,10 +8,16 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 	$form['days'] = array(
 		'#type' => 'textfield',
 		'#default_value' => $days,
-		'#title' => t('Days'),
-		'#description' => t('Search for skills expiring within this many days.'),
+		'#title' => t('Expires Before'),
+		'#description' => t('Search for skills expiring AT MOST this many days out.'),
 		'#size' => 4,
-		'#required' => TRUE,
+	);
+
+	$form['days2'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Expires After'),
+		'#description' => t('Search for skills expiring AT LEAST this many days out.'),
+		'#size' => 4,
 	);
 
 	$skills = sirius_taxonomy_load('sirius_skill', 'tid', 'name', TRUE);
@@ -49,10 +55,15 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 	$days = $form_state['values']['days'];
+	$days2 = $form_state['values']['days2'];
 
 	$args = array();
-	// $args[':start'] = gmdate('Y-m-d');
-	$args[':end'] = gmdate('Y-m-d', strtotime("+$days days"));
+	if (is_numeric($days)) {
+		$args[':end'] = gmdate('Y-m-d', strtotime("+$days days"));
+	}
+	if (is_numeric($days2)) {
+		$args[':start'] = gmdate('Y-m-d', strtotime("+$days2 days"));
+	}
 
 	$sql = "select title, name, nid, field_sirius_skill_expire_value, field_sirius_id_value ";
 	$sql .= "from node ";
@@ -62,8 +73,12 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	$sql .= "join taxonomy_term_data on taxonomy_term_data.tid = field_sirius_skill_tid ";
 	$sql .= "where node.type = 'sirius_worker' ";
 	$sql .= "and field_data_field_sirius_skill.delta = field_data_field_sirius_skill_expire.delta ";
-	// $sql .= "and field_sirius_skill_expire_value >= :start ";
-	$sql .= "and field_sirius_skill_expire_value <= :end ";
+	if ($args[':start']) {
+		$sql .= "and field_sirius_skill_expire_value >= :start ";
+	}
+	if ($args[':end']) {
+		$sql .= "and field_sirius_skill_expire_value <= :end ";
+	}
 	if ($form_state['values']['name']) {
 		$sql .= "and node.title like :name ";
 		$args['name'] = '%' . $form_state['values']['name'] . '%';
