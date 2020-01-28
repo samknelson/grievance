@@ -103,3 +103,60 @@ function sirius_taxonomy_lookup_by_anything($vocabulary_name, $value) {
 
   return $preload[$vocabulary_name][trim(strtolower($value))];
 }
+
+/**
+ * Implements hook_taxonomy_term_update
+ *
+ * Log taxonomy term changes.
+ */
+
+function sirius_taxonomy_term_update($term) {
+  sirius_log(
+    'taxonomy_term', 
+    'update', 
+    'The taxonomy term ' . $term->name . ' has been updated.', 
+    '', 
+    '',  
+    NULL, 
+    NULL,
+    $term
+  );
+}
+
+/**
+ * Implements hook_taxonomy_term_insert
+ *
+ * Log taxonomy term changes.
+ */
+
+function sirius_taxonomy_term_insert($term) {
+  sirius_log(
+    'taxonomy_term', 
+    'insert', 
+    'The taxonomy term ' . $term->name . ' has been inserted.', 
+    '', 
+    '',  
+    NULL, 
+    NULL,
+    $term
+  );
+}
+
+/**
+ * Implements hook_taxonomy_term_delete
+ *
+ * Log taxonomy term changes.
+ */
+
+function sirius_taxonomy_term_delete($term) {
+  sirius_log(
+    'taxonomy_term', 
+    'delete', 
+    'The taxonomy term ' . $term->name . ' has been deleted.', 
+    '', 
+    '',  
+    NULL, 
+    NULL,
+    $term
+  );
+}
