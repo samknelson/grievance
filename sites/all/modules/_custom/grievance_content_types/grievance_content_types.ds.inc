@@ -355,6 +355,122 @@ function grievance_content_types_ds_field_settings_info() {
   );
   $export['node|grievance|grievance_gform_a'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|sirius_dispatch_facility|sirius_worker';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'sirius_dispatch_facility';
+  $ds_fieldsetting->view_mode = 'sirius_worker';
+  $ds_fieldsetting->settings = array(
+    'field_sirius_address_geo' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|sirius_dispatch_facility|sirius_worker'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|sirius_dispatch_job|default';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'sirius_dispatch_job';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'field_sirius_events' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|sirius_dispatch_job|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|sirius_log|default';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'sirius_log';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'author' => array(
+      'weight' => '7',
+      'label' => 'inline',
+      'format' => 'author',
+    ),
+    'post_date' => array(
+      'weight' => '6',
+      'label' => 'inline',
+      'format' => 'ds_post_date_long',
+    ),
+  );
+  $export['node|sirius_log|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|sirius_news|default';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'sirius_news';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'author' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'author',
+    ),
+    'post_date' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'ds_post_date_long',
+    ),
+  );
+  $export['node|sirius_news|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|sirius_worker|default';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'sirius_worker';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'grievance_timeline' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'field_sirius_skill' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_ds_field_expert',
+          'fis' => TRUE,
+          'fis-el' => 'div',
+          'fis-cl' => '',
+          'fis-at' => '',
+          'fis-def-at' => FALSE,
+          'fi' => TRUE,
+          'fi-el' => 'div',
+          'fi-cl' => '',
+          'fi-at' => '',
+          'fi-def-at' => FALSE,
+          'fi-odd-even' => FALSE,
+          'fi-first-last' => FALSE,
+        ),
+      ),
+    ),
+    'field_sirius_aat' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'Access Token',
+        ),
+      ),
+    ),
+  );
+  $export['node|sirius_worker|default'] = $ds_fieldsetting;
+
   return $export;
 }
 
