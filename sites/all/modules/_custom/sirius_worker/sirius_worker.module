@@ -15,6 +15,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.merge.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_duplicate_id.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_multiple_member_status.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_user.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_employer_worker_list.inc";
@@ -131,14 +132,17 @@ function sirius_worker_sirius_jsonfield_form_definitions() {
 
 /**
  * Implements hook_form_alter
- *
- * @todo - Have you ever seen such crappy code?  Good god, it must be 11:00 PM on the night we're launching.
- *         Somebody should really clean this up tout suite.
- *         Look, let's just pretend this never happened, ok?  It'll be just between you and me?
  */
 
 function sirius_worker_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'sirius_worker_node_form') {
+    // Some fields must be edited within tabs, can't be modified here.
+    $form['field_sirius_skill']['#access'] = FALSE;
+    $form['field_sirius_skill_expire']['#access'] = FALSE;
+
+    // @todo - Have you ever seen such crappy code?  Good god, it must be 11:00 PM on the night we're launching.
+    //        Somebody should really clean this up tout suite.
+    //        Look, let's just pretend this never happened, ok?  It'll be just between you and me?
     if (!$form['nid']['#value']) {
       $form['field_sirius_id']["und"][0]['value']['#default_value'] = sirius_worker_nextid();
     }
@@ -198,6 +202,19 @@ function sirius_worker_report_cache_info() {
     'batch_callback' => 'sirius_worker_report_duplicate_id_batch',
     'render_callbacks' => array(
       'View' => 'sirius_worker_report_duplicate_id_view',
+    ),
+  );
+
+  $items['sirius-worker-multiple-member-status'] = array(
+    'name' => t('Workers with Multiple Member Statuses'),
+    'description' => '',
+    'access' => 'sirius worker view',
+    'fields' => sirius_worker_report_multiple_member_status_fields(),
+    'form_callback' => 'sirius_worker_report_multiple_member_status_form',
+    'pk_list_callback' => 'sirius_worker_report_multiple_member_status_pks',
+    'batch_callback' => 'sirius_worker_report_multiple_member_status_batch',
+    'render_callbacks' => array(
+      'View' => 'sirius_worker_report_multiple_member_status_view',
     ),
   );
 
