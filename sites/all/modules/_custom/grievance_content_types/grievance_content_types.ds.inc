@@ -842,6 +842,85 @@ function grievance_content_types_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|grievance_shop|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'grievance_shop';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'group_sirius_identity',
+        1 => 'group_sirius_contract',
+        2 => 'field_sirius_active',
+        3 => 'group_sirius_grievance',
+        4 => 'field_sirius_name_tts',
+        5 => 'group_sirius_dispatch',
+        6 => 'field_grievance_contract_tplt',
+        7 => 'field_grievance_contract',
+        8 => 'field_sirius_id',
+        9 => 'field_grievance_attachments',
+        10 => 'field_grievance_external_id',
+        11 => 'field_grievance_company',
+        12 => 'field_grievance_rep_assignee',
+        13 => 'field_sirius_dispatch_job_types',
+        14 => 'field_sirius_industry',
+        15 => 'field_sirius_skill',
+        16 => 'field_grievance_chapter',
+        17 => 'field_grievance_assignee_notes',
+        18 => 'field_grievance_tags',
+        19 => 'field_sirius_attachments',
+        20 => 'field_grievance_rep_filed',
+        21 => 'field_grievance_rep_organizer',
+        22 => 'field_grievance_rep_lead',
+        23 => 'field_grievance_rep_manager',
+        24 => 'field_grievance_rep_watching',
+      ),
+    ),
+    'fields' => array(
+      'group_sirius_identity' => 'ds_content',
+      'group_sirius_contract' => 'ds_content',
+      'field_sirius_active' => 'ds_content',
+      'group_sirius_grievance' => 'ds_content',
+      'field_sirius_name_tts' => 'ds_content',
+      'group_sirius_dispatch' => 'ds_content',
+      'field_grievance_contract_tplt' => 'ds_content',
+      'field_grievance_contract' => 'ds_content',
+      'field_sirius_id' => 'ds_content',
+      'field_grievance_attachments' => 'ds_content',
+      'field_grievance_external_id' => 'ds_content',
+      'field_grievance_company' => 'ds_content',
+      'field_grievance_rep_assignee' => 'ds_content',
+      'field_sirius_dispatch_job_types' => 'ds_content',
+      'field_sirius_industry' => 'ds_content',
+      'field_sirius_skill' => 'ds_content',
+      'field_grievance_chapter' => 'ds_content',
+      'field_grievance_assignee_notes' => 'ds_content',
+      'field_grievance_tags' => 'ds_content',
+      'field_sirius_attachments' => 'ds_content',
+      'field_grievance_rep_filed' => 'ds_content',
+      'field_grievance_rep_organizer' => 'ds_content',
+      'field_grievance_rep_lead' => 'ds_content',
+      'field_grievance_rep_manager' => 'ds_content',
+      'field_grievance_rep_watching' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|grievance_shop|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|grievance|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'grievance';
@@ -1452,6 +1531,657 @@ function grievance_content_types_ds_layout_settings_info() {
     'page_option_title' => '',
   );
   $export['node|grievance|grievance_gform_a'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_dispatch_facility|sirius_worker';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_dispatch_facility';
+  $ds_layout->view_mode = 'sirius_worker';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_sirius_address',
+        1 => 'field_sirius_address_geo',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_address' => 'ds_content',
+      'field_sirius_address_geo' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_dispatch_facility|sirius_worker'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_dispatch_job|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_dispatch_job';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'two_column_bricks';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'above_left' => array(
+        0 => 'group_sirius_employer_info',
+        2 => 'field_grievance_shop',
+        3 => 'field_sirius_industry',
+        4 => 'group_sirius_job_details',
+        5 => 'field_sirius_id',
+        7 => 'field_sirius_id2',
+        17 => 'field_sirius_skill',
+        22 => 'field_grievance_departments',
+        25 => 'field_sirius_datetime',
+        28 => 'field_sirius_dispatch_job_group',
+        29 => 'field_sirius_dispatch_facility',
+        30 => 'field_sirius_dispatch_hall',
+        32 => 'field_sirius_address_notes',
+        33 => 'field_sirius_dispatch_job_tags',
+        35 => 'field_sirius_events',
+      ),
+      'above_right' => array(
+        1 => 'group_sirius_job_info',
+        9 => 'group_sirius_notify',
+        11 => 'field_sirius_dispatch_job_type',
+        13 => 'field_sirius_notify',
+        14 => 'field_sirius_datetime_created',
+        18 => 'field_sirius_dispatch_job_nfcns',
+        21 => 'field_sirius_dispatch_job_status',
+        24 => 'field_sirius_representatives',
+        27 => 'field_sirius_emails',
+      ),
+      'middle' => array(
+        6 => 'group_sirius_employer_notes',
+        10 => 'field_sirius_notes',
+        12 => 'field_sirius_address_parking',
+        15 => 'field_sirius_attachments',
+      ),
+      'below_left' => array(
+        8 => 'group_sirius_dispatch_details',
+        31 => 'field_sirius_member_status',
+        34 => 'field_sirius_dispatch_eba',
+        36 => 'field_sirius_dispatch_eba_dates',
+        37 => 'field_sirius_summary',
+        38 => 'field_sirius_timelimit',
+        39 => 'field_sirius_batch_max',
+        40 => 'field_sirius_batch_min',
+        41 => 'field_sirius_batch_ratio',
+        42 => 'field_sirius_datetime_completed',
+      ),
+      'below_right' => array(
+        16 => 'field_sirius_count',
+        19 => 'field_sirius_count_notified',
+        20 => 'group_sirius_worker_counts',
+        23 => 'field_sirius_count_yes',
+        26 => 'field_sirius_count_no',
+      ),
+    ),
+    'fields' => array(
+      'group_sirius_employer_info' => 'above_left',
+      'group_sirius_job_info' => 'above_right',
+      'field_grievance_shop' => 'above_left',
+      'field_sirius_industry' => 'above_left',
+      'group_sirius_job_details' => 'above_left',
+      'field_sirius_id' => 'above_left',
+      'group_sirius_employer_notes' => 'middle',
+      'field_sirius_id2' => 'above_left',
+      'group_sirius_dispatch_details' => 'below_left',
+      'group_sirius_notify' => 'above_right',
+      'field_sirius_notes' => 'middle',
+      'field_sirius_dispatch_job_type' => 'above_right',
+      'field_sirius_address_parking' => 'middle',
+      'field_sirius_notify' => 'above_right',
+      'field_sirius_datetime_created' => 'above_right',
+      'field_sirius_attachments' => 'middle',
+      'field_sirius_count' => 'below_right',
+      'field_sirius_skill' => 'above_left',
+      'field_sirius_dispatch_job_nfcns' => 'above_right',
+      'field_sirius_count_notified' => 'below_right',
+      'group_sirius_worker_counts' => 'below_right',
+      'field_sirius_dispatch_job_status' => 'above_right',
+      'field_grievance_departments' => 'above_left',
+      'field_sirius_count_yes' => 'below_right',
+      'field_sirius_representatives' => 'above_right',
+      'field_sirius_datetime' => 'above_left',
+      'field_sirius_count_no' => 'below_right',
+      'field_sirius_emails' => 'above_right',
+      'field_sirius_dispatch_job_group' => 'above_left',
+      'field_sirius_dispatch_facility' => 'above_left',
+      'field_sirius_dispatch_hall' => 'above_left',
+      'field_sirius_member_status' => 'below_left',
+      'field_sirius_address_notes' => 'above_left',
+      'field_sirius_dispatch_job_tags' => 'above_left',
+      'field_sirius_dispatch_eba' => 'below_left',
+      'field_sirius_events' => 'above_left',
+      'field_sirius_dispatch_eba_dates' => 'below_left',
+      'field_sirius_summary' => 'below_left',
+      'field_sirius_timelimit' => 'below_left',
+      'field_sirius_batch_max' => 'below_left',
+      'field_sirius_batch_min' => 'below_left',
+      'field_sirius_batch_ratio' => 'below_left',
+      'field_sirius_datetime_completed' => 'below_left',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'header' => 'div',
+      'above_left' => 'div',
+      'above_right' => 'div',
+      'middle' => 'div',
+      'below_left' => 'div',
+      'below_right' => 'div',
+      'footer' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_dispatch_job|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_dispatch_job|sirius_worker';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_dispatch_job';
+  $ds_layout->view_mode = 'sirius_worker';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_sirius_industry',
+        1 => 'field_grievance_shop',
+        2 => 'field_sirius_dispatch_job_type',
+        3 => 'field_sirius_skill',
+        4 => 'field_sirius_id',
+        5 => 'field_sirius_datetime',
+        6 => 'field_sirius_dispatch_facility',
+        7 => 'field_sirius_dispatch_hall',
+        8 => 'field_sirius_address_notes',
+        9 => 'field_sirius_address_parking',
+        10 => 'field_sirius_notes',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_industry' => 'ds_content',
+      'field_grievance_shop' => 'ds_content',
+      'field_sirius_dispatch_job_type' => 'ds_content',
+      'field_sirius_skill' => 'ds_content',
+      'field_sirius_id' => 'ds_content',
+      'field_sirius_datetime' => 'ds_content',
+      'field_sirius_dispatch_facility' => 'ds_content',
+      'field_sirius_dispatch_hall' => 'ds_content',
+      'field_sirius_address_notes' => 'ds_content',
+      'field_sirius_address_parking' => 'ds_content',
+      'field_sirius_notes' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_dispatch_job|sirius_worker'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_dispatch_job|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_dispatch_job';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_sirius_industry',
+        1 => 'field_sirius_skill',
+        2 => 'field_grievance_shop',
+        3 => 'field_sirius_datetime',
+        4 => 'field_sirius_dispatch_job_type',
+        5 => 'field_sirius_dispatch_job_status',
+        6 => 'field_sirius_count',
+        7 => 'field_sirius_datetime_completed',
+        8 => 'field_sirius_dispatch_facility',
+        9 => 'field_sirius_dispatch_hall',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_industry' => 'ds_content',
+      'field_sirius_skill' => 'ds_content',
+      'field_grievance_shop' => 'ds_content',
+      'field_sirius_datetime' => 'ds_content',
+      'field_sirius_dispatch_job_type' => 'ds_content',
+      'field_sirius_dispatch_job_status' => 'ds_content',
+      'field_sirius_count' => 'ds_content',
+      'field_sirius_datetime_completed' => 'ds_content',
+      'field_sirius_dispatch_facility' => 'ds_content',
+      'field_sirius_dispatch_hall' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_dispatch_job|teaser'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_dispatch|sirius_worker';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_dispatch';
+  $ds_layout->view_mode = 'sirius_worker';
+  $ds_layout->layout = 'two_column_bricks';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'above_left' => array(
+        0 => 'field_sirius_payrate',
+        1 => 'field_sirius_dispatch_status',
+        2 => 'field_sirius_dispatch_cbn',
+        3 => 'field_sirius_datetime',
+        4 => 'field_sirius_datetime_completed',
+      ),
+      'above_right' => array(
+        5 => 'field_sirius_worker',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_payrate' => 'above_left',
+      'field_sirius_dispatch_status' => 'above_left',
+      'field_sirius_dispatch_cbn' => 'above_left',
+      'field_sirius_datetime' => 'above_left',
+      'field_sirius_datetime_completed' => 'above_left',
+      'field_sirius_worker' => 'above_right',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'header' => 'div',
+      'above_left' => 'div',
+      'above_right' => 'div',
+      'middle' => 'div',
+      'below_left' => 'div',
+      'below_right' => 'div',
+      'footer' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_dispatch|sirius_worker'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_dispatch|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_dispatch';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_sirius_datetime',
+        1 => 'field_sirius_dispatch_status',
+        2 => 'field_sirius_datetime_completed',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_datetime' => 'ds_content',
+      'field_sirius_dispatch_status' => 'ds_content',
+      'field_sirius_datetime_completed' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_dispatch|teaser'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_log|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_log';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_sirius_log_handler',
+        1 => 'field_sirius_category',
+        2 => 'field_sirius_type',
+        3 => 'field_sirius_message',
+        4 => 'field_sirius_notes',
+        5 => 'field_sirius_summary',
+        6 => 'post_date',
+        7 => 'field_sirius_attachments',
+        8 => 'author',
+        9 => 'field_sirius_json',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_log_handler' => 'ds_content',
+      'field_sirius_category' => 'ds_content',
+      'field_sirius_type' => 'ds_content',
+      'field_sirius_message' => 'ds_content',
+      'field_sirius_notes' => 'ds_content',
+      'field_sirius_summary' => 'ds_content',
+      'post_date' => 'ds_content',
+      'field_sirius_attachments' => 'ds_content',
+      'author' => 'ds_content',
+      'field_sirius_json' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_log|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_news|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_news';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'post_date',
+        2 => 'author',
+        3 => 'body',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'ds_content',
+      'post_date' => 'ds_content',
+      'author' => 'ds_content',
+      'body' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_news|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_worker|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_worker';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'two_column_bricks';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'above_left' => array(
+        0 => 'grievance_timeline',
+        1 => 'group_sirius_worker_identity',
+        3 => 'field_sirius_name',
+        4 => 'group_sirius_worker_contact',
+        5 => 'field_sirius_id',
+        7 => 'field_sirius_ssn',
+        9 => 'field_sirius_id2',
+        12 => 'field_sirius_id3',
+        14 => 'field_sirius_aat',
+        15 => 'field_sirius_gender',
+        21 => 'field_sirius_phone',
+        22 => 'field_sirius_phone_alt',
+        23 => 'field_sirius_phone_fax',
+        24 => 'field_sirius_email',
+        25 => 'field_sirius_address',
+      ),
+      'above_right' => array(
+        2 => 'group_sirius_worker_status',
+        6 => 'field_sirius_member_status',
+        8 => 'group_sirius_worker_preferences',
+        10 => 'field_sirius_work_status',
+        11 => 'field_sirius_worker_dispstatus',
+        13 => 'field_sirius_dispatch_availdate',
+        16 => 'field_grievance_shop',
+        19 => 'field_sirius_dispatch_dncs',
+        20 => 'field_sirius_industry',
+        26 => 'field_sirius_dispatch_medium',
+        27 => 'field_sirius_dispatch_asi',
+        29 => 'field_sirius_dispatch_sib_status',
+        30 => 'field_sirius_dispatch_cbn',
+        31 => 'field_sirius_skills_avail',
+        32 => 'field_sirius_skills_availx',
+        33 => 'field_grievance_departments',
+        34 => 'field_sirius_dispatch_dncs2',
+        35 => 'field_sirius_dispatch_hfe',
+        36 => 'field_sirius_dispatch_hfe_until',
+        37 => 'field_sirius_aat_required',
+        38 => 'field_sirius_dispatch_eba',
+        39 => 'field_sirius_dispatch_eba_dates',
+      ),
+      'below_left' => array(
+        17 => 'field_sirius_skill',
+        41 => 'group_sirius_worker_skills',
+      ),
+      'below_right' => array(
+        18 => 'field_sirius_skill_expire',
+        40 => 'group_sirius_worker_skill_exp',
+      ),
+      'header' => array(
+        28 => 'field_sirius_headshot',
+      ),
+    ),
+    'fields' => array(
+      'grievance_timeline' => 'above_left',
+      'group_sirius_worker_identity' => 'above_left',
+      'group_sirius_worker_status' => 'above_right',
+      'field_sirius_name' => 'above_left',
+      'group_sirius_worker_contact' => 'above_left',
+      'field_sirius_id' => 'above_left',
+      'field_sirius_member_status' => 'above_right',
+      'field_sirius_ssn' => 'above_left',
+      'group_sirius_worker_preferences' => 'above_right',
+      'field_sirius_id2' => 'above_left',
+      'field_sirius_work_status' => 'above_right',
+      'field_sirius_worker_dispstatus' => 'above_right',
+      'field_sirius_id3' => 'above_left',
+      'field_sirius_dispatch_availdate' => 'above_right',
+      'field_sirius_aat' => 'above_left',
+      'field_sirius_gender' => 'above_left',
+      'field_grievance_shop' => 'above_right',
+      'field_sirius_skill' => 'below_left',
+      'field_sirius_skill_expire' => 'below_right',
+      'field_sirius_dispatch_dncs' => 'above_right',
+      'field_sirius_industry' => 'above_right',
+      'field_sirius_phone' => 'above_left',
+      'field_sirius_phone_alt' => 'above_left',
+      'field_sirius_phone_fax' => 'above_left',
+      'field_sirius_email' => 'above_left',
+      'field_sirius_address' => 'above_left',
+      'field_sirius_dispatch_medium' => 'above_right',
+      'field_sirius_dispatch_asi' => 'above_right',
+      'field_sirius_headshot' => 'header',
+      'field_sirius_dispatch_sib_status' => 'above_right',
+      'field_sirius_dispatch_cbn' => 'above_right',
+      'field_sirius_skills_avail' => 'above_right',
+      'field_sirius_skills_availx' => 'above_right',
+      'field_grievance_departments' => 'above_right',
+      'field_sirius_dispatch_dncs2' => 'above_right',
+      'field_sirius_dispatch_hfe' => 'above_right',
+      'field_sirius_dispatch_hfe_until' => 'above_right',
+      'field_sirius_aat_required' => 'above_right',
+      'field_sirius_dispatch_eba' => 'above_right',
+      'field_sirius_dispatch_eba_dates' => 'above_right',
+      'group_sirius_worker_skill_exp' => 'below_right',
+      'group_sirius_worker_skills' => 'below_left',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'header' => 'div',
+      'above_left' => 'div',
+      'above_right' => 'div',
+      'middle' => 'div',
+      'below_left' => 'div',
+      'below_right' => 'div',
+      'footer' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_worker|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_worker|sirius_worker';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_worker';
+  $ds_layout->view_mode = 'sirius_worker';
+  $ds_layout->layout = 'two_column_bricks';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'above_left' => array(
+        0 => 'group_sirius_worker_identity',
+        1 => 'field_sirius_name',
+        2 => 'field_sirius_id',
+        3 => 'field_sirius_ssn',
+      ),
+      'above_right' => array(
+        4 => 'group_sirius_worker_contact',
+        5 => 'field_sirius_phone',
+        6 => 'field_sirius_phone_alt',
+        7 => 'field_sirius_email',
+        8 => 'field_sirius_address',
+      ),
+    ),
+    'fields' => array(
+      'group_sirius_worker_identity' => 'above_left',
+      'field_sirius_name' => 'above_left',
+      'field_sirius_id' => 'above_left',
+      'field_sirius_ssn' => 'above_left',
+      'group_sirius_worker_contact' => 'above_right',
+      'field_sirius_phone' => 'above_right',
+      'field_sirius_phone_alt' => 'above_right',
+      'field_sirius_email' => 'above_right',
+      'field_sirius_address' => 'above_right',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'header' => 'div',
+      'above_left' => 'div',
+      'above_right' => 'div',
+      'middle' => 'div',
+      'below_left' => 'div',
+      'below_right' => 'div',
+      'footer' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_worker|sirius_worker'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_worker|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_worker';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_sirius_name',
+        1 => 'field_sirius_phone',
+        2 => 'field_sirius_id',
+        3 => 'field_sirius_ssn',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_name' => 'ds_content',
+      'field_sirius_phone' => 'ds_content',
+      'field_sirius_id' => 'ds_content',
+      'field_sirius_ssn' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_worker|teaser'] = $ds_layout;
 
   return $export;
 }
