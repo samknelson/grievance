@@ -10,22 +10,37 @@
 function sirius_bulk_node_tabs() {
 	$node_tabs = array();
 
-	$node_tabs['sirius_bulk']['sirius_bulk_workers'] = array(
+  $node_tabs['sirius_bulk']['sirius_bulk_test'] = array(
+    'title' => 'Test',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_test',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 1,
+  );
+
+	$node_tabs['sirius_bulk']['sirius_bulk_recipients'] = array(
 		'title' => 'Recipients',
 		'description' => '',
-		'callback' => 'sirius_bulk_node_tab_workers',
-		'permissions' => array('sirius bulk send'),
-		'weight' => 1,
-	);
-
-	$node_tabs['sirius_bulk']['sirius_bulk_test'] = array(
-		'title' => 'Test',
-		'description' => '',
-		'callback' => 'sirius_bulk_node_tab_test',
+		'callback' => 'sirius_bulk_node_tab_recipients',
 		'permissions' => array('sirius bulk send'),
 		'weight' => 2,
 	);
 
+  $node_tabs['sirius_bulk']['sirius_bulk_recipients/workers'] = array(
+    'title' => 'Workers',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_recipients_workers',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_bulk']['sirius_bulk_recipients/contacts'] = array(
+    'title' => 'Contacts',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_recipients_contacts',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 2,
+  );
 
 	$node_tabs['sirius_bulk']['sirius_bulk_queue'] = array(
 		'title' => 'Queue',

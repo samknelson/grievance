@@ -10,7 +10,9 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.v
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.deliver.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.oneclick.inc";
 
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_workers.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_recipients.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_recipients_workers.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_recipients_contacts.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_queue.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_test.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_oneclick.inc";
@@ -50,4 +52,21 @@ function sirius_bulk_form_alter(&$form, &$form_state, $form_id) {
 			)
   	);
   }
+}
+
+/**
+ * Implement hook_views_pre_render
+ */
+
+function sirius_bulk_views_pre_render(&$view) {
+	if ($view->name == 'sirius_bulkmsg') {
+		$bulk_node = menu_get_object();
+		if ($bulk_node && $bulk_node->type == 'sirius_bulk') {
+			if ($view->result) {
+				foreach ($view->result as &$row) {
+					$row->sirius_bulk_nid = $bulk_node->nid;
+				}
+			}
+		}
+	}
 }
