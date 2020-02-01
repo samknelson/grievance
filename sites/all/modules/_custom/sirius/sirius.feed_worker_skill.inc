@@ -44,6 +44,14 @@ function sirius_feed_worker_skill_row_verify($feed_node, $info, $data, &$row, $p
       $row['worker_nid'] = $nid;
     }
     if (!$row['worker_nid']) { return array('success' => FALSE, 'msg' => 'Worker not found'); }
+
+    $reason = $data['source'];
+    if ($row['skill_comment']) {
+      if ($reason) { $reason .= ': '; }
+      $reason .= $row['skill_comment'];
+    }
+    if (!$reason) { $reason = 'Feed import'; }
+    $row['reason'] = $reason;
   } 
 
   $skill_tid = sirius_taxonomy_lookup_by_anything('sirius_skill', $row['skill']);
@@ -66,8 +74,6 @@ function sirius_feed_worker_skill_row_process($feed_node, $info, $data, $row) {
   $expiration = $row['skill_expiration'];
   $action = $row['skill_action'];
   if (!$action) { $action = 'add'; }
-  $reason = $data['source'];
-  if (!$reason) { $reason = 'Feed import'; }
-
+  $reason = $row['reason'];
   return sirius_worker_skill_set($worker_node, array($skill_tid), $expiration, $action, $reason, array());
 }
