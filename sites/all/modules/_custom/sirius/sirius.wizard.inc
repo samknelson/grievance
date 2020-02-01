@@ -46,7 +46,9 @@ function sirius_wizard_info($wizard_name) {
 }
 
 function sirius_wizard_info_all() {
-	return module_invoke_all('sirius_wizard_info');
+	$all = module_invoke_all('sirius_wizard_info');
+	ksort($all);
+	return $all;
 }
 
 function sirius_wizard_steps($info, $data = NULL, $node = NULL) {
@@ -276,9 +278,73 @@ function sirius_sirius_wizard_info() {
     'callback_launch' => 'sirius_feed_wizard_launch',
     'callback_launch_args' => array('feed_contact'),
   );
+
+  $items['feed_worker_skill'] = array(
+    'name' => 'feed_worker_skill',
+    'title' => 'Worker Skills',
+    'description' => 'Upload worker skills and expiration dates.',
+    'steps' => array(
+			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
+			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
+			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
+			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
+			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
+			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
+    ),
+    'feed' => array(
+	    'pks' => array(
+	    	'id' => 'ID',
+	    	'ssn' => 'SSN',
+	    ),
+    	'fields' => array(
+    		'id' => array('title' => 'ID'),
+    		'ssn' => array('title' => 'SSN'),
+    		'skill' => array('title' => 'Skill', 'description' => 'Enter the skill name exactly as it appears, or the short name, ID, External ID, or NID.'),
+    		'skill_expiration' => array('title' => 'Expiration Date'),
+    		'skill_action' => array('title' => 'Action', 'description' => 'Enter "add" or "remove"'),
+    		'skill_comment' => array('title' => 'Comment'),
+    	),
+    	'batch_size' => 50,
+	    'callback_row_verify' => 'sirius_feed_worker_skill_row_verify',
+	    'callback_row_process' =>'sirius_feed_worker_skill_row_process',
+    ),
+    'callback_launch' => 'sirius_feed_wizard_launch',
+    'callback_launch_args' => array('feed_worker_skill'),
+  );
+
+  $items['feed_grievance'] = array(
+    'name' => 'feed_grievance',
+    'title' => 'Grievances',
+    'description' => 'Upload grievance records.',
+    'steps' => array(
+			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
+			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
+			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
+			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
+			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
+			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
+    ),
+    'feed' => array(
+	    'pks' => array(
+	    	'nid' => 'NID',
+	    	'id' => 'ID',
+	    ),
+    	'fields' => array(
+    		'nid' => array('title' => 'NID'),
+    		'id' => array('title' => 'ID'),
+    		'ssn' => array('title' => 'SSN'),
+    		'employer' => array('title' => 'Employer', 'description' => 'Enter the employer name exactly as it appears, or enter the id or external ID or the node ID (nid).'),
+    	),
+    	'batch_size' => 50,
+	    'callback_row_verify' => 'sirius_feed_grievance_row_verify',
+	    'callback_row_process' =>'sirius_feed_grievance_row_process',
+    ),
+    'callback_launch' => 'sirius_feed_wizard_launch',
+    'callback_launch_args' => array('feed_grievance'),
+  );
+
   return $items;
 }
-
 
 function sirius_wizard_submit($info, $data, $node, $current_step, $msg = NULL) {
 	// Mark this step as complete

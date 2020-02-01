@@ -33,6 +33,30 @@ function sirius_feed_lastdata($info, $feed_node) {
   return sirius_wizard_data($info, $last_feed_node);
 }
 
+function sirius_feed_node_search($id, $bundle, $fields) {
+	foreach ($fields as $field) {
+		$sql_args = array(':bundle' => $bundle, ':id' => $id);
+		if ($field == 'nid') { 
+			$sql = "select max(nid) as a, min(nid) as b from node where type = :bundle and nid = :id";
+		} else if ($field == 'title') { 
+			$sql = "select max(nid) as a, min(nid) as b from node where type = :bundle and title = :id";
+		} else {
+			$sql = "select max(entity_id) as a, min(entity_id) as b ";
+			$sql .= "from field_data_field_$field ";
+			$sql .= "where entity_type = 'node' ";
+			$sql .= "and bundle = :bundle ";
+			$sql .= "and field_{$field}_value = :id ";
+		}
+		$stmt = db_query($sql, $sql_args);
+		$hr = $stmt->fetchAssoc();
+		if (!$hr['a']) { continue; }
+		if ($hr['a'] != $hr['b']) { return array('success' => FALSE, 'msg' => "Multiple records of type $bundle found in $field with id $id.", 'multiple' => TRUE); }
+		return array('success' => TRUE, 'nid' => $hr['a']);
+	}
+
+	return array('success' => FALSE, 'msg' => "No record of type $bundle found with id $id.");
+}
+
 /************************************************************************************************
  * List page
  ************************************************************************************************/
@@ -549,7 +573,7 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 			if ($col === NULL || $col === '') { 
 				unset($import_data_row[$field_name]);
 			}
-		}
+			}
 
 		++$counts[$result['msg']];
 		if ($counts[$result['msg']] == 6) { $import_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }

@@ -28,12 +28,11 @@ ul.sirius_wizard li a {
 	font-weight: normal;
 }
 
-
 ul.sirius_wizard li a {
 	border: 1px solid #5984be;
 	background-color: #5984be;
-	color: #fff;
 }
+
 ul.sirius_wizard li a:hover {
 	/* lightest blue: #e8edf3;  background */
 	/* light blue: #a0bbf5; table button border */
@@ -52,4 +51,9 @@ ul.sirius_wizard li.sirius_wizard_step_current a {
 }
 
 ul.sirius_wizard li.sirius_wizard_step_incomplete span {
+}
+
+ul.sirius_wizard a,
+ul.sirius_wizard a:visited {
+	color: #ffffff;
 }
