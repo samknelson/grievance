@@ -462,12 +462,14 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
 
   // On the "All Grievances" exposed filter, change status to checkboxes.
   if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'grievances') {
-    foreach ($form['filters'] as $delta => &$set) {
-      if (is_integer($delta) && is_array($set) && $set['field_grievance_status_tid']) {
-        $set['field_grievance_status_tid']['#theme'] = 'select_as_checkboxes';
+    if ($form['filters']) {
+      foreach ($form['filters'] as $delta => &$set) {
+        if (is_integer($delta) && is_array($set) && $set['field_grievance_status_tid']) {
+          $set['field_grievance_status_tid']['#theme'] = 'select_as_checkboxes';
+        }
       }
+      require_once DRUPAL_ROOT . "/sites/all/modules/better_exposed_filters/better_exposed_filters.theme";
     }
-    require_once DRUPAL_ROOT . "/sites/all/modules/better_exposed_filters/better_exposed_filters.theme";
   }
 
   // On the clause search, restrict the list of avaiable tags based on the contract.
