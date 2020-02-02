@@ -16,14 +16,11 @@ Employers {"url":"grievance\/admin\/shops","lang":"und","weight":"-47"}
 -Chapters {"url":"grievance\/admin\/chapters","lang":"und","weight":"0"}
 -Grievance Reassign {"url":"admin\/grievance\/reassign","lang":"und","weight":"0"}
 Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
--Grievance Form Settings {"url":"admin\/config\/grievance\/gform","lang":"und","weight":"-46"}
+-Grievance Form Settings {"url":"admin\/config\/grievance\/gform","lang":"und","weight":"-47"}
 --Arbitration Form Settings {"url":"admin\/config\/grievance\/arbitrationform","lang":"und","weight":"-50"}
--Field Overrides {"url":"admin\/config\/grievances\/fieldoverrides","lang":"und","weight":"-47"}
--Holidays {"url":"grievance\/admin\/holidays","lang":"und","weight":"-45"}
--TIMSS Configuration {"url":"admin\/config\/grievance\/timss","lang":"und","weight":"-41"}
---Test TIMSS Connection {"url":"admin\/config\/grievance\/timss\/test","lang":"und","weight":"0"}
--Two-Factor Trusted IPs {"url":"admin\/config\/people\/tfa-trusted-ip","lang":"und","weight":"-40"}
--Drop-down Lists {"url":"admin\/structure\/taxonomy","lang":"und","weight":"-48"}
+-Field Overrides {"url":"admin\/config\/grievances\/fieldoverrides","lang":"und","weight":"-48"}
+-Holidays {"url":"grievance\/admin\/holidays","lang":"und","weight":"-46"}
+-Drop-down Lists {"url":"admin\/structure\/taxonomy","lang":"und","weight":"-49"}
 --Tags {"url":"admin\/structure\/taxonomy\/grievance_tags","lang":"und","weight":"-34"}
 --Grievance Types {"url":"admin\/structure\/taxonomy\/grievance_types","lang":"und","weight":"-43"}
 --Statuses {"url":"admin\/structure\/taxonomy\/grievance_status","lang":"und","weight":"-36"}
@@ -41,19 +38,26 @@ Config {"url":"admin\/config\/grievance\/core","lang":"und","weight":"-43"}
 --Delivery Options {"url":"admin\/structure\/taxonomy\/grievance_delivery","lang":"und","weight":"-45"}
 --Log Tags {"url":"admin\/structure\/taxonomy\/grievance_log_tags","lang":"und","weight":"-42"}
 --Assignee Notes {"url":"admin\/structure\/taxonomy\/grievance_assignee_notes","lang":"und","weight":"-49"}
--Letter Templates {"url":"grievance\/admin\/letter-templates","lang":"und","weight":"-43"}
+-Letter Templates {"url":"grievance\/admin\/letter-templates","lang":"und","weight":"-44"}
 --Letterhead {"url":"sirius\/admin\/letterhead","lang":"und","weight":"0"}
--Phaxio {"url":"admin\/config\/grievance\/phaxio","lang":"und","weight":"-39"}
--Intake Log {"url":"admin\/config\/grievance\/intake-log","lang":"und","weight":"-44"}
--Special Log Types {"url":"admin\/config\/grievance\/log_types","lang":"und","weight":"-37"}
--Special Contact Types {"url":"admin\/config\/grievance\/contacts","lang":"und","weight":"-38"}
--Statuses {"url":"grievance\/admin\/statuses","lang":"und","weight":"-49"}
+-Intake Log {"url":"admin\/config\/grievance\/intake-log","lang":"und","weight":"-45"}
+-Special Log Types {"url":"admin\/config\/grievance\/log_types","lang":"und","weight":"-39"}
+-Special Contact Types {"url":"admin\/config\/grievance\/contacts","lang":"und","weight":"-40"}
+-Statuses {"url":"grievance\/admin\/statuses","lang":"und","weight":"-50"}
 --Status Sequences {"url":"grievance\/admin\/statuses\/sequences","lang":"und","weight":"0"}
--Document Retention {"url":"sirius\/document-retention","lang":"und","weight":"0"}
+-Document Retention {"url":"sirius\/document-retention","lang":"und","weight":"-37"}
 --Configure {"url":"sirius\/document-retention\/configure","lang":"und","weight":"0"}
 --Log {"url":"sirius\/document-retention\/log","lang":"und","weight":"0"}
--Document Types {"url":"grievance\/admin\/document_types","lang":"und","weight":"0"}
+-Document Types {"url":"grievance\/admin\/document_types","lang":"und","weight":"-36"}
 --Information Request Sets {"url":"grievances\/irsets","lang":"und","weight":"-50"}
+-System Configuration {"url":"<front>","lang":"und","weight":"-38"}
+--TIMSS Configuration {"url":"admin\/config\/grievance\/timss","lang":"und","weight":"-50"}
+---Test TIMSS Connection {"url":"admin\/config\/grievance\/timss\/test","lang":"und","weight":"0"}
+--Two-Factor Trusted IPs {"url":"admin\/config\/people\/tfa-trusted-ip","lang":"und","weight":"-49"}
+--Phaxio {"url":"admin\/config\/grievance\/phaxio","lang":"und","weight":"-48"}
+--Email Configuration {"url":"sirius\/config\/email","lang":"und","weight":"-47"}
+--SNS Configuration {"url":"sirius\/sns\/config","lang":"und","weight":"-45"}
+--IMIS Configuration {"url":"admin\/config\/grievance\/imis","lang":"und","weight":"-46"}
 File a Grievance {"url":"node\/add\/grievance","lang":"und","weight":"-50"}
 My Grievances {"url":"grievances","lang":"und","weight":"-49"}
 -All Grievances {"url":"grievances\/all","lang":"und","weight":"-50"}
@@ -65,7 +69,6 @@ Reports {"url":"<front>","lang":"und","weight":"-48"}
 -Type and Status {"url":"grievance\/report\/bytype","lang":"und","weight":"-41"}
 -Settlement Detail {"url":"grievance\/report\/settlement","lang":"und","weight":"-43"}
 -Average Time Between Statuses {"url":"grievance\/report\/average-time","lang":"und","weight":"-47"}
--Open Grievances: By Specialist {"url":"grievance\/report\/open","lang":"und","weight":"-46"}
 -Yearly Summary {"url":"grievance\/report\/year-summary","lang":"und","weight":"-40"}
 -Log Search {"url":"grievances\/log","lang":"und","weight":"-50"}
 -Settlement Summary {"url":"grievance\/report\/settlement\/summary","lang":"und","weight":"-42"}
@@ -86,6 +89,9 @@ Reports {"url":"<front>","lang":"und","weight":"-48"}
 -UH226 Violation {"url":"grievance\/report\/custom\/uh226-violation","lang":"und","weight":"0"}
 -UH23 Summary {"url":"grievance\/report\/custom\/uh23-report-summary","lang":"und","weight":"0"}
 -Quick Export {"url":"grievance\/report\/grievance-quick-export","lang":"und","weight":"0"}
+-Status Summary {"url":"grievance\/report\/status-summary","lang":"und","weight":"0"}
+-Monthly Grievances by Shop {"url":"admin\/reports\/report-cache\/grievance-report-shop-monthly","lang":"und","weight":"0"}
+-Open Grievances by Specialist {"url":"grievance\/report\/open","lang":"und","weight":"0"}
 Help {"url":"grievances\/uh\/help","lang":"und","weight":"50"}
 -Emailing Attachments {"url":"grievances\/uh\/help\/emailing_attachments","lang":"und","weight":"-48"}
 -Logging In and Out {"url":"grievances\/uh\/help\/logging_in_and_out","lang":"und","weight":"-50"}

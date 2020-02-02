@@ -1,0 +1,4 @@
+name = Sirius Event
+description = Implements the Sirius Event functionality
+package = sirius
+core = 7.x

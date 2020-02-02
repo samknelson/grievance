@@ -8,10 +8,16 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 	$form['days'] = array(
 		'#type' => 'textfield',
 		'#default_value' => $days,
-		'#title' => t('Days'),
-		'#description' => t('Search for skills expiring within this many days.'),
+		'#title' => t('Expires Before'),
+		'#description' => t('Search for skills expiring AT MOST this many days out.'),
 		'#size' => 4,
-		'#required' => TRUE,
+	);
+
+	$form['days2'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Expires After'),
+		'#description' => t('Search for skills expiring AT LEAST this many days out.'),
+		'#size' => 4,
 	);
 
 	$skills = sirius_taxonomy_load('sirius_skill', 'tid', 'name', TRUE);
@@ -34,6 +40,15 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 		'#size' => 6,
 	);
 
+	$form['output'] = array(
+		'#type' => 'select',
+		'#title' => t('Output'),
+		'#options' => array(
+			'screen' => t('Screen'),
+			'csv' => t('CSV'),
+		),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Submit',
@@ -49,10 +64,17 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 	$days = $form_state['values']['days'];
+	$days2 = $form_state['values']['days2'];
 
 	$args = array();
-	$args[':start'] = gmdate('Y-m-d');
-	$args[':end'] = gmdate('Y-m-d', strtotime("+$days days"));
+	if (is_numeric($days)) {
+		$args[':end'] = gmdate('Y-m-d', strtotime("+$days days"));
+	}
+	if (is_numeric($days2)) {
+		$args[':start'] = gmdate('Y-m-d', strtotime("+$days2 days"));
+	}
+
+	$output = $form_state['values']['output'];
 
 	$sql = "select title, name, nid, field_sirius_skill_expire_value, field_sirius_id_value ";
 	$sql .= "from node ";
@@ -62,8 +84,12 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	$sql .= "join taxonomy_term_data on taxonomy_term_data.tid = field_sirius_skill_tid ";
 	$sql .= "where node.type = 'sirius_worker' ";
 	$sql .= "and field_data_field_sirius_skill.delta = field_data_field_sirius_skill_expire.delta ";
-	$sql .= "and field_sirius_skill_expire_value >= :start ";
-	$sql .= "and field_sirius_skill_expire_value <= :end ";
+	if ($args[':start']) {
+		$sql .= "and field_sirius_skill_expire_value >= :start ";
+	}
+	if ($args[':end']) {
+		$sql .= "and field_sirius_skill_expire_value <= :end ";
+	}
 	if ($form_state['values']['name']) {
 		$sql .= "and node.title like :name ";
 		$args['name'] = '%' . $form_state['values']['name'] . '%';
@@ -77,20 +103,43 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 		$args['id'] = $form_state['values']['id'];
 	}
 	$sql .= "order by field_sirius_skill_expire_value, node.nid ";
-	$sql .= "limit 5000 ";
+
+	$limit = 1000;
+	if ($output == 'csv') { $limit = 100000; }
 
 	$stmt = db_query($sql, $args);
 	$rows = array();
+	$count = 0;
 	while ($hr = $stmt->fetchAssoc()) {
+		++$count;
 		$row = array();
 		$row[] = $hr['title'];
 		$row[] = $hr['field_sirius_id_value'];
 		$row[] = $hr['name'];
 		$row[] = date('Y-m-d', strtotime($hr['field_sirius_skill_expire_value']));
-		$row[] = l(t('Manage Skills'), 'node/' . $hr['nid'] . '/sirius_worker_skill', array('attributes' => array('class' => 'tool-button')));
+		if ($output == 'csv') {
+			$row[] = $hr['nid'];
+		} else {
+			$row[] = l(t('Manage Skills'), 'node/' . $hr['nid'] . '/sirius_worker_skill', array('attributes' => array('class' => 'tool-button')));
+		}
 		$rows[] = $row;
 	}
 
+	if ($count >= $limit-1) { drupal_set_message("Only showing the first $limit records. Select a CSV export to download the full list."); }
+
 	$header = array('Worker', 'Badge #', 'Skill', 'Expiration', 'NID');
+
+	if ($output == 'csv') {
+		$filename = "skill_expiration_report_" . date('YmdHis') . '_' . $days . '_' . $days2 . '.csv';
+		drupal_add_http_header('Content-Type', 'text/csv');
+		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		$fp = fopen('php://output', 'w');
+		fputcsv($fp, $header);
+		foreach ($rows as $row) {
+			fputcsv($fp, $row);
+		}
+		drupal_exit();
+	}
+
 	$form_state['result'] = theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
 }

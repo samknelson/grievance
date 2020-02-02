@@ -194,6 +194,46 @@
 		},
 	}
 
+
+	Drupal.behaviors.grievance_imis = {
+	    attach: function(context, settings) {
+			$('.grievance-imis-id-for-insert').once().click(function(event) {
+				event.preventDefault(); 
+				grievance_imis_handle_recipient_click($(this));
+			});
+
+			function grievance_imis_handle_recipient_click(elt) {
+				val = elt.html();
+
+				broughtby_tid = $('#grievance-timss-broughtby-tid-for-insert').html();
+				if (!broughtby_tid) { broughtby_tid = 'DEFAULT'; }
+				var jqxhr = $.getJSON('/grievance/imis/lookup/' + val + '?broughtby_tid=' + broughtby_tid);
+				jqxhr.complete(function(data) {
+					var json = jQuery.parseJSON(data.responseJSON);
+					console.log(json);
+					$('.form-item-field-grievance-first-name-und-0-value input').val(json.FirstName);
+					$('.form-item-field-grievance-last-name-und-0-value input').val(json.LastName);
+
+					if (json.WorkerAddress) {
+						$('.form-item-field-grievance-city-und-0-value input').val(json.WorkerAddress.City);
+						$('.form-item-field-grievance-state-und-0-value input').val(json.WorkerAddress.State);
+						$('.form-item-field-grievance-zip-und-0-value input').val(json.WorkerAddress.Zip);
+						$('.form-item-field-grievance-address-und-0-value input').val(json.WorkerAddress.Address1);
+						$('.form-item-field-grievance-address-2-und-0-value input').val(json.WorkerAddress.Address2);
+						$('.form-item-field-grievance-gender-und select').val(json.gender);
+					}
+
+					$('.form-item-field-grievance-phone-und-0-value input').val(json.Phones[0].Phone);
+					$('.form-item-field-grievance-email-und-0-email input').val(json.Emails[0].Email);
+					// $('.form-item-field-grievance-department-und-0-value input').val(json[0].department);
+					// $('.form-item-field-grievance-classification-und-0-value input').val(json[0].classification);
+					$('.form-item-field-grievance-min-und-0-value input').val(json.ImisId);
+				});
+
+			}
+		},
+	}
+
 	jQuery(document).ready(function() {
 
 		$('.showhide_toggle a').click(function(event) {

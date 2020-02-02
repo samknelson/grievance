@@ -1,0 +1,4 @@
+name = Grievance IMIS
+description = Functionality to connect the Grievance application to the IMIS CRM
+package = grievance
+core = 7.x

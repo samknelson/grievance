@@ -24,12 +24,72 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
   );
 
+
+
+
+
+
+
   $node_tabs['sirius_worker']['sirius_worker_skill'] = array(
     'title' => 'Skills',
     'description' => '',
     'callback' => 'sirius_node_tab_worker_skill',
     'permissions' => array('sirius'),
   );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_view',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/add'] = array(
+    'title' => 'Add',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_add',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/add2'] = array(
+    'title' => 'Add Multiple',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_add2',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/renew'] = array(
+    'title' => 'Renew',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_renew',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 4,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/remove'] = array(
+    'title' => 'Remove',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_remove',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 5,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_skill/log'] = array(
+    'title' => 'Log',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_skill_log',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 7,
+  );
+
+
+
+
+
+
 
   $node_tabs['sirius_worker']['sirius_worker_contact'] = array(
     'title' => 'Contact',
@@ -45,7 +105,29 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_merge'] = array(
+    'title' => 'Merge',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_merge',
+    'permissions' => array('sirius worker admin'),
+  );
+
 	return $node_tabs;
+}
+
+
+function sirius_worker_term_tabs() {
+  $term_tabs = array();
+
+  $term_tabs['sirius_member_status']['sirius_member_status_optin'] = array(
+    'title' => 'Opt-In',
+    'description' => '',
+    'callback' => 'sirius_worker_term_tab_member_status_optin',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 4,
+  );
+
+  return $term_tabs;
 }
 
 /***
@@ -54,28 +136,6 @@ function sirius_worker_node_tabs() {
 
 function sirius_worker_menu() {
   $items = array();
-
-  //
-	// Node Tabs
-  // 
-
-	$node_tabs = sirius_worker_node_tabs();
-	foreach ($node_tabs as $node_type => $node_record) {
-		foreach ($node_record as $tab_name => $tab_record) {
-			$items['node/%node/' . $tab_name] = array(
-				'title' => $tab_record['title'],
-				'description' => $tab_record['description'],
-				'page callback' => 'sirius_worker_node_tab_content',
-				'page arguments' => array(1, $tab_name),
-				'access callback' => 'sirius_worker_node_tab_access',
-				'access arguments' => array(1, $tab_name),
-				'type' => MENU_LOCAL_TASK,
-			);
-			if ($tab_record['weight']) {
-				$items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
-			}
-		}
-	}
 
   $items['sirius/employer/worker/list'] = array(
     'title' => 'Sirius: Employer: Worker: List',
@@ -152,6 +212,16 @@ function sirius_worker_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  /*
+  $items['sirius/worker/skill-renew'] = array(
+    'title' => 'Renew a Skill',
+    'description' => '',
+    'page callback' => 'sirius_worker_skill_term_renew',
+    'page arguments' => array(3),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  */
 
   $items['sirius/worker/config/user'] = array(
     'title' => 'Worker / User Configuration',
@@ -164,44 +234,6 @@ function sirius_worker_menu() {
 
 
   return $items;
-}
-
-function sirius_worker_node_tab_content($node, $in_tab_name) {
-	$node_tabs = sirius_worker_node_tabs();
-	foreach ($node_tabs as $node_type => $node_record) {
-		if ($node->type == $node_type) {
-			foreach ($node_record as $tab_name => $tab_record) {
-				if ($tab_name == $in_tab_name) {
-					$callback = $tab_record['callback'];
-					return $callback($node);
-				}
-			}
-		}
-	}
-	
-	drupal_set_message("Bad tab: $node->type, $in_tab_name");
-	
-	return "";
-}
-
-function sirius_worker_node_tab_access($node, $in_tab_name) {
-	// Check generic permissions
-	$node_tabs = sirius_worker_node_tabs();
-	foreach ($node_tabs as $node_type => $node_record) {
-		if ($node->type == $node_type) {
-			foreach ($node_record as $tab_name => $tab_record) {
-				if ($tab_name == $in_tab_name) {
-					foreach ($tab_record['permissions'] as $permission) {
-						if (!user_access($permission)) { return false; }
-					}
-					
-					return true;
-				}
-			}
-		}
-	}
-	
-	return false;
 }
 
 /**

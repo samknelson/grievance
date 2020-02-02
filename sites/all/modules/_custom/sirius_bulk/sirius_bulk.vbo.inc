@@ -8,17 +8,20 @@ function sirius_bulk_action_info() {
       'configurable' => FALSE,
       'vbo_configurable' => FALSE,
       'triggers' => array(),
+      'pass rows' => TRUE,
     ),
   );
 }
 
 function sirius_bulk_queue(&$node, $context) {
-	// @todo: this is a little sketchy. I assume that the bulk nid is the first argument passed into the view (even if the view has no contextual filters defined.)
-	$bulk_nid = $context['view_info']['arguments'][0];
-	if (!$bulk_nid) { 
-		drupal_set_message("Bulk message not found.");
-		return; 
-	}
+	// We need to set the bulk message in each row, in a views hook. It's a little ornate, but I couldn't figure out any other way to get the data into the VBO.
+  if ($context['rows']) {
+    $bulk_nid = array_values($context['rows'])[0]->sirius_bulk_nid;
+  }
+  if (!$bulk_nid) { 
+    drupal_set_message("Don't know which bulk message!", 'error');
+    return;
+  }
 
 	// Don't add to the queue twice.
 	$query = new EntityFieldQuery();

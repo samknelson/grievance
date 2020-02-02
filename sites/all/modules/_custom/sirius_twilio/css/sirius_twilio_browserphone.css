@@ -1,0 +1,26 @@
+#sirius_browserphone {
+  width: 100%;
+}
+
+#sirius_browserphone_volume {
+  display: none;
+  width: 200px;
+  text-align: left;
+}
+
+#sirius_browserphone_volume > div {
+  display: block;
+  height: 20px;
+  width: 0;
+}
+
+div#controls div#log {
+  border: 1px solid #686865;
+  height: 250px;
+  text-align: left;
+  padding: 5px;
+  margin-top: 5px;
+  overflow-y: scroll;
+  display: none;
+}
+

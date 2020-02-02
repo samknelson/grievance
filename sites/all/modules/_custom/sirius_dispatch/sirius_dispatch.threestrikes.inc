@@ -265,7 +265,7 @@ function sirius_dispatch_threestrikes_scan_worker($worker_nid, $is_test = FALSE,
 	$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
 	if (!$is_test) {
 		sirius_dispatch_worker_dispstatus_set($worker_node, $tid, 1, $msg);
-		sirius_dispatch_worker_dispstatus_block_set($worker_node, 'Yes', $msg);
+		sirius_dispatch_worker_dispstatus_block_set($worker_node, sirius_get_special_tid('sirius_dispatch_sib|threestrikes'), $msg);
 		sirius_worker_notify(
 			$worker_node, 
 			array(

@@ -19,7 +19,9 @@ function sirius_dispatch_worker_dispstatus_set_possible($worker_node, $dispstatu
 	}
 
 	// Can't sign in if we have a sign-in block
-	if ($worker_node->field_sirius_dispatch_sib['und'][0]['value'] == 'Yes' && 
+	$sib_term = taxonomy_term_load($worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']);
+	if ($sib_term && 
+		$sib_term->field_sirius_dispatch_available['und'][0]['value'] == 'No' && 
 		$dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available') && 
 		!user_access('sirius dispatch staff', $account)) {
 		return array('success' => FALSE, 'msg' => 'The administrator has placed a sign-in block on this worker.');
@@ -146,16 +148,37 @@ function sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid = N
 	return array('success' => TRUE, 'msg' => $msg);
 }
 
-function sirius_dispatch_worker_dispstatus_block_set($worker_node, $block, $reason = NULL, $attachments = NULL) {
-	if ($block == $worker_node->field_sirius_dispatch_sib['und'][0]['value'] ) { return array('success' => TRUE, 'msg' => 'There is already a sign-in block for ' . $worker_node->title); }
-	$worker_node->field_sirius_dispatch_sib['und'][0]['value'] = $block;
-	$worker_node->field_sirius_dispatch_asi['und'][0]['value'] = 'No';
-	$category = 'worker:dispstatus_block';
-	$type = 'set';
-	$msg = $worker_node->title . "'s dispatch status block has been set to " . $block;
-	$handler_nids = array($worker_node->nid);
-	sirius_log($category, $type, $msg, $reason, '', $handler_nids, $attachments);
+function sirius_dispatch_worker_dispstatus_block_set($worker_node, $block_tid, $reason = NULL, $attachments = NULL) {
+	if ($block_tid == $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']) { 
+		return array('success' => TRUE, 'msg' => 'Block status unchanged.');
+	}
+
+	$json = array();
+	if ($block_tid) {
+		$worker_node->field_sirius_dispatch_sib_status['und'][0]['tid'] = $block_tid;
+		$block_term = taxonomy_term_load($block_tid);
+		if ($block_term->field_sirius_dispatch_available['und'][0]['value'] == 'No') {
+			$worker_node->field_sirius_dispatch_asi['und'][0]['value'] = 'No';
+		}
+		$category = 'worker:dispstatus_block';
+		$type = 'set';
+		$name = $block_term->name;
+		$display_name = $block_term->field_sirius_name_display['und'][0]['value'];
+		if (!$display_name) { $display_name = $name; }
+		$msg = $worker_node->title . "'s dispatch status block has been set to " . $display_name;
+		$json['block_display_name'] = $display_name;
+		$json['block_real_name'] = $name;
+		$json['block_tid'] = $block_tid;
+		$handler_nids = array($worker_node->nid);
+	} else {
+		unset($worker_node->field_sirius_dispatch_sib_status['und']);
+		$category = 'worker:dispstatus_block';
+		$type = 'clear';
+		$msg = $worker_node->title . "'s dispatch status block has been cleared.";
+		$handler_nids = array($worker_node->nid);
+	}
 	node_save($worker_node);
-	return array('success' => TRUE, 'msg' => 'A sign-in block has been set for ' . $worker_node->title);
+	sirius_log($category, $type, $msg, $reason, '', $handler_nids, $attachments, $json);
+	return array('success' => TRUE, 'msg' => $msg);
 }
 

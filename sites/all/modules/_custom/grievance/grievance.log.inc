@@ -83,7 +83,8 @@ function grievance_log_update($grievance_node, $op) {
       $event_date = $grievance_node->field_grievance_date_1['und'][0]['value'];
     }
     if (!$event_date) {
-      $event_date = date('Y-m-d 00:00:00', strtotime('-15 days'));
+      $days_ago = variable_get('grievance_incident_default_days_ago', 15);
+      $event_date = date('Y-m-d 00:00:00', strtotime("-$days_ago days"));
     }
 
     if ($event_date) {
@@ -689,3 +690,47 @@ function grievance_log_types_i_can_edit($account = NULL) {
   return $result[$uid];
 }
 
+function grievance_log_views_pre_render($view) {
+  if ($view->result) {
+    // Fetch the sirius log entries associated with each grievance log entry. Do it in one query
+    // to avoid running too much sql.
+    $grievance_log_nids = array();
+    foreach ($view->result as $row) { 
+      $grievance_log_nids[] = $row->nid;
+      if (count($grievance_log_nids) > 5000) { break; }
+    }
+
+    // SQL for speed and to fetch just the fields we need
+    $sql = "select node.nid, node.created, field_sirius_category_value, field_sirius_type_value, field_sirius_log_handler_target_id, field_sirius_summary_value ";
+    $sql .= "from node ";
+    $sql .= "join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
+    $sql .= "join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+    $sql .= "join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+    $sql .= "join field_data_field_sirius_summary on field_data_field_sirius_summary.entity_type = 'node' and field_data_field_sirius_summary.entity_id = node.nid ";
+    $sql .= "where node.type = 'sirius_log' ";
+    $sql .= "and field_sirius_log_handler_target_id in (:grievance_log_nids) ";
+    $sql .= "order by node.created ";
+    $sql .= "limit 5000 ";
+    $stmt = db_query($sql, array(':grievance_log_nids' => $grievance_log_nids));
+    while ($hr = $stmt->fetchAssoc()) {
+      $results[$hr['field_sirius_log_handler_target_id']][] = $hr;
+    }
+    foreach ($view->result as $row) {
+      if (!$results[$row->nid]) { continue; }
+      $html = '<br /><strong>' . t('Events') . '</strong>';
+      foreach ($results[$row->nid] as $result) {
+        $html .= '<br />';
+        $html .= date('Y-m-d H:i:s', $result['created']);
+        $html .= ' / ';
+        $html .= $result['field_sirius_category_value'];
+        $html .= ' / ';
+        $html .= l($result['field_sirius_type_value'], 'node/' . $result['nid'], array('attributes' => array('target' => '_blank')));
+        if (($result['field_sirius_type_value'] == 'Bounce' || $result['field_sirius_type_value'] == 'Delivery') && $result['field_sirius_summary_value']) {
+          $html .= ' / ';
+          $html .= $result['field_sirius_summary_value'];
+        }
+      }
+      $row->field_body[0]['rendered']['#markup'] .= $html;
+    }
+  }
+}

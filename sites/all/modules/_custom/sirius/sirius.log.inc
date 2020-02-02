@@ -18,6 +18,27 @@ function sirius_log(
   $handler_nids, 
   $files = NULL,
   $json = NULL) {
+
+  $real_uid = $_SESSION['masquerading'];
+  if ($real_uid) {
+    $real_user = user_load($real_uid);
+    $message .= ' [MASQ FROM ' . $real_user->name . ']';
+    $json_to_add = array(
+      'real_user_name' => $real_user->name,
+      'real_user_uid' => $real_user->uid,
+      'real_user_mail' => $real_user->mail,
+    );
+
+    if (is_object($json)) {
+      $json->masquerade = $json_to_add;
+    } else if (is_array($json)) {
+      $json['masquerade'] = $json_to_add;
+    } else {
+      $json = json_decode($json, TRUE);
+      $json['masquerade'] = $json_to_add;
+    }
+  }
+
   global $user;
   $log_node = new stdClass();
   $log_node->type = 'sirius_log';
@@ -38,6 +59,9 @@ function sirius_log(
     $log_node->field_sirius_attachments['und'] = $files;
   }
   if ($json) {
+    if (is_array($json) || is_object($json)) {
+      $json = json_encode($json);
+    }
     $log_node->field_sirius_json['und'][0]['value'] = $json;
   }
 

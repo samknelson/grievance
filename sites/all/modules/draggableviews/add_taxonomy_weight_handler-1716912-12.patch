@@ -1,0 +1,66 @@
+diff --git a/README.txt b/README.txt
+index ecbec8b..e28d4d2 100644
+--- a/README.txt
++++ b/README.txt
+@@ -9,6 +9,8 @@ Quick install:
+  3) Click Add button at the "Fields" section and choose field "Content:title", add and apply.
+  4) Click Add button at the "Fields" section and choose field "Draggableviews: Content", add apply.
+  5) Click Add button at the "Sort criteria" section and choose field "Draggableviews: Weight", add and choose sort asc, then apply.
++    (if using a drag handler that works on another field, then the field that
++    holds this must be added, eg taxonomy term weight).
+  6) Save the view and you're done.
+ 
+ In the case of table standard drupal tabledrag.js JavaScript is used.
+diff --git a/draggableviews.info b/draggableviews.info
+index 632702c..8af9a68 100644
+--- a/draggableviews.info
++++ b/draggableviews.info
+@@ -12,6 +12,7 @@ files[] = handlers/draggableviews_handler_native.inc
+ files[] = handlers/draggableviews_handler_fieldapi.inc
+ files[] = handlers/draggableviews_hierarchy_handler.inc
+ files[] = handlers/draggableviews_hierarchy_handler_native.inc
++files[] = handlers/draggableviews_handler_taxonomy_term.inc
+ 
+ files[] = test/draggableviews.test
+ 
+diff --git a/handlers/draggableviews_handler_taxonomy_term.inc b/handlers/draggableviews_handler_taxonomy_term.inc
+index e69de29..f6c0b52 100644
+--- a/handlers/draggableviews_handler_taxonomy_term.inc
++++ b/handlers/draggableviews_handler_taxonomy_term.inc
+@@ -0,0 +1,36 @@
++<?php
++
++/**
++ * @file
++ * The taxonomy term weight handler plugin.
++ */
++
++$plugin = array(
++  'label' => 'Taxonomy term',
++  'handler' => array(
++    'class' => 'draggableviews_handler_taxonomy_term',
++  ),
++);
++
++class draggableviews_handler_taxonomy_term extends draggableviews_handler {
++
++  public function get($field, $index) {
++    $row = $field->view->result[$index];
++    return $row->taxonomy_term_data_weight;
++  }
++
++  function set($form_state) {
++    foreach ($form_state['values']['draggableviews'] as $item) {
++      // Make sure id is available.
++      if (!isset($item['id'])) {
++        continue;
++      }
++
++      $term = taxonomy_term_load($item['id']);
++      if ($term->weight != $item['weight']) {
++        $term->weight = $item['weight'];
++        taxonomy_term_save($term);
++      }
++    }
++  }
++}

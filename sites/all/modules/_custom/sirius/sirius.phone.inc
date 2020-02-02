@@ -58,7 +58,7 @@ function sirius_phone_validate($phonenumber) {
 function sirius_phone_format_e164($phonenumber) {
 	$phonenumber = preg_replace('/[^\d]/', '', $phonenumber);
   if (strlen($phonenumber) < 11) { $phonenumber = '1' . $phonenumber; }
-  $phonenunmber = '+' . $phonenumber;
+  // $phonenumber = '+' . $phonenumber;
 	return $phonenumber;
 }
 

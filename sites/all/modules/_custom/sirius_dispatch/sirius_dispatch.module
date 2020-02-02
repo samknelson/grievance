@@ -22,6 +22,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.vbo.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.dispstatus.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.rollover.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.payrate.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.fore.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_accept.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_decline.inc';
@@ -32,8 +34,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_rollover.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_create.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_expire.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_bullpen_signin.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_send.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_vlri.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_member_status_ratios.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_notification_preferences.inc';
@@ -41,6 +43,9 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_landing.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_manage.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_manage.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_bullpen.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_events.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_dispatches.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_dispatch_facility_halls.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_operator.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_view.inc';
@@ -48,13 +53,18 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatches.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatch_preferences.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatch_status.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_bullpen.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_dispatch_preferences.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_dispatch_attachments.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_attachments.inc';
-
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_jwa_prefs.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_jwa_assign.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_landing.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_create.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_fore.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_job_list.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_payrate.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.term_tab_industry.inc';
 
 /**
  * Implements hook_cron
@@ -63,6 +73,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 function sirius_dispatch_cron() {
   sirius_dispatch_run_all();
   sirius_dispatch_threestrikes_cron();
+  sirius_dispatch_eba_cron();
 }
 
 /**
@@ -89,6 +100,21 @@ function sirius_dispatch_get_current($worker_nid) {
   $stmt = $query->execute();
   if (!$stmt['node']) {
   	return NULL;
+  }
+
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
+function sirius_dispatch_get($worker_nid, $job_nid) {
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_dispatch');
+  $query->fieldCondition('field_sirius_worker', 'target_id', $worker_nid);
+  $query->fieldCondition('field_sirius_dispatch_job', 'target_id', $job_nid);
+  $query->propertyOrderBy('created', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) {
+    return NULL;
   }
 
   return node_load(array_keys($stmt['node'])[0]);
@@ -135,55 +161,6 @@ function sirius_dispatch_node_delete($node) {
   if ($node->type == 'sirius_dispatch') {
     sirius_dispatch_job_recompute_from_dispatch($node, TRUE);
     sirius_dispatch_worker_recompute_from_dispatch($node, TRUE);
-  }
-}
-
-function sirius_dispatch_compute_payrate($dispatch_node) {
-  // The pay rate should only be computed once.
-  // if ($dispatch_node->field_sirius_payrate['und'][0]['value']) { return; }
- 
-  $job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
-  if (!$job_node) { return; }
-  $industry_tid = $job_node->field_sirius_industry['und'][0]['tid'];
-  if (!$industry_tid) { return; }
-
-  $employer_node = node_load($job_node->field_grievance_shop['und'][0]['target_id']);
-  if (!$employer_node) { return; }
-
-  $worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
-  if (!$worker_node) { return; }
-
-  // Find the member status for the industry of the employer.
-  $member_status_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
-  if (!$member_status_tids) { return; }
-  $member_status_terms = taxonomy_term_load_multiple($member_status_tids);
-  $found_industry = FALSE; 
-  foreach ($member_status_terms as $member_status_tid => $member_status_term) {
-    if ($member_status_term->field_sirius_industry['und'][0]['tid'] == $industry_tid) { 
-      $found_industry = TRUE;
-      break;
-    }
-  }
-  if (!$found_industry) { return; }
-
-  // Need to determine if we should pay at the skilled rate.
-  $is_skilled = FALSE;
-
-  // If the job explicitly mentions a skill, then it's a skilled job and we pay at the skilled rate.
-  if ($job_node->field_sirius_skill['und'][0]['tid']) { $is_skilled = TRUE; }
-
-  // Some employers always pay the skilled rate for workers with specific skills.
-  if (!$is_skilled) {
-    $employer_skills = sirius_fieldvals($employer_node, 'field_sirius_skill', 'tid');
-    $worker_skills = sirius_fieldvals($worker_node, 'field_sirius_skill', 'tid');
-    if (array_intersect($employer_skills, $worker_skills)) { $is_skilled = TRUE; }
-  }
-
-
-  if ($is_skilled) {
-    $dispatch_node->field_sirius_payrate = $member_status_term->field_sirius_payrate_skilled; 
-  } else {
-    $dispatch_node->field_sirius_payrate = $member_status_term->field_sirius_payrate; 
   }
 }
 
@@ -315,40 +292,6 @@ function sirius_dispatch_listcounts_block_view() {
 }
 
 /**
- * Implements hook_form_alter
- *
- * @todo - Have you ever seen such crappy code?  Good god, it must be 11:00 PM on the night we're launching.
- *         Somebody should really clean this up tout suite.
- *         Look, let's just pretend this never happened, ok?  It'll be just between you and me?
- */
-
-function sirius_dispatch_form_alter(&$form, &$form_state, $form_id) {
-
-  if ($form_id == 'sirius_worker_node_form') {
-    if (!$form['nid']['#value']) {
-      $sql = "select max(field_sirius_id_value) as m from field_data_field_sirius_id ";
-      $sql .= "where entity_type = 'node' "; 
-      $sql .= "and bundle = 'sirius_worker' ";
-      $sql .= "and field_sirius_id_value != '999099' ";
-      $sql .= "and field_sirius_id_value != '666666' ";
-      $sql .= "and field_sirius_id_value != '999001' ";
-      $sql .= "and length(field_sirius_id_value) = 6 ";
-      // $sql .= 'and field_sirius_id_value REGEXP \'^[0-9]{6}$\' ';
-      $stmt = db_query($sql, array());
-      $hr = $stmt->fetchAssoc();
-      $id = $hr['m'];
-      if ($id > 0) {
-        $id++;
-        if ($id == 999099) { $id++; }
-        if ($id == 666666) { $id++; }
-        if ($id == 999001) { $id++; }
-        $form['field_sirius_id']["und"][0]['value']['#default_value'] = $id;
-      }
-    }
-  }
-}
-
-/**
  * Implements hook_sirius_jsonfield_form_definitions()
  */
 
@@ -378,6 +321,19 @@ function sirius_dispatch_node_view($node, $view_mode, $langcode) {
     if (!user_access('sirius dispatch staff')) {
       unset($node->content['field_sirius_count_no']);
       unset($node->content['field_sirius_count_notified']);
+    }
+  }
+
+  // Render the SIB status 
+  if ($node->type == 'sirius_worker') {
+    if (!user_access('sirius dispatch staff')) {
+      $block_tid = $node->field_sirius_dispatch_sib_status['und'][0]['tid'];
+      if ($block_tid) {
+        $block_term = taxonomy_term_load($block_tid);
+        $name_display = $block_term->field_sirius_name_display['und'][0]['value'];
+        if (!$name_display) { $name_display = $block_term->name; }
+        $node->content['field_sirius_dispatch_sib_status'][0]['#markup'] = $name_display;
+      }
     }
   }
 }

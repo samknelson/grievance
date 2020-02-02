@@ -456,3 +456,225 @@ function grievance_update_7027() {
   print "Enabling views_current_path\n";
   module_enable(array('views_current_path'), FALSE);
 }
+
+/**
+ * Set sirius_email_default_from_address from grievance_from_email
+ */
+
+function grievance_update_7028() {
+  if (!variable_get('sirius_email_default_from_address', '') && variable_get('grievance_from_email', '')) {
+    variable_set('sirius_email_default_from_address', variable_get('grievance_from_email', ''));
+    print "Set sirius_email_default_from_address = grievance_from_email = " . variable_get('sirius_email_default_from_address', '') . "\n";
+  }
+}
+
+/**
+ * Update the sign-in blocked data from a simple field into a taxonomy reference
+ */
+
+function grievance_update_7029() {
+  // Move all blocked workers 
+  $blocked_tid = sirius_get_special_tid('sirius_dispatch_sib|blocked');
+  if ($blocked_tid) {
+    print "Setting all blocked workers to have the tid $blocked_tid\n";
+    try {
+      $sql = "select entity_id from field_data_field_sirius_dispatch_sib where entity_type = 'node' and bundle = 'sirius_worker' and field_sirius_dispatch_sib_value = 'Yes'";
+      $stmt = db_query($sql, array());
+      $worker_nids = array();
+      while ($hr = $stmt->fetchAssoc()) {
+        $worker_nids[] = $hr['entity_id'];
+      }
+      $total = count($worker_nids);
+      $count = 0;
+      foreach ($worker_nids as $worker_nid) {
+        ++$count;
+        $worker_node = node_load($worker_nid);
+        $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid'] = $blocked_tid;
+        node_save($worker_node);
+        print "Set worker #$count/$total - $worker_nid ($worker_node->title)\n";
+      }
+    } catch (exception $ignore) {}
+  }
+}
+
+/**
+ * Change "info" to a longblob.
+ */
+
+function grievance_update_7030() {
+  $sql = "ALTER TABLE system CHANGE info info LONGBLOB NULL DEFAULT NULL";
+  $stmt = db_query($sql, array());
+  print "$sql\n";
+}
+
+/**
+ * Remove the old sign-in blocked field
+ */
+
+/*
+function grievance_update_7030() {
+  $field = 'field_sirius_dispatch_sib';
+  try { field_delete_field($field); } catch (exception $e) { print_r($e); }
+  print "Deleted field: $field\n";
+}
+*/
+
+function grievance_update_7031() {
+  $tables = array('field_data_field_sirius_json', 'field_revision_field_sirius_json');
+  foreach ($tables as $table) {
+    $sql = "delete from $table where not json_valid(field_sirius_json_value);";
+    try { $stmt = db_query($sql, array()); } catch (exception $ignore) { print "Unable to execute: $sql. Please run manually after the database has been upgraded.\n"; }
+
+    $sql = "alter table $table change field_sirius_json_value field_sirius_json_value json";
+    try { $stmt = db_query($sql, array()); } catch (exception $ignore) { print "Unable to execute: $sql. Please run manually after the database has been upgraded.\n"; }
+  }
+}
+
+/**
+ * Disable pathauto; get rid of unnecessary aliases
+ */
+
+function grievance_update_7032() {
+  // Disable pathauto
+  print "Disabling pathauto\n";
+  module_disable(array('pathauto'), TRUE);
+
+  // Get rid of unnecessary aliases
+  $sql = "delete from url_alias where alias like 'sirius-dispatch/%' or alias like 'sirius-help/%' or alias like 'sirius-worker/%' or alias like 'grievance/%' or alias like 'sirius-dispatch-job/%' or alias like 'sirius-dispatch-facility-hall/%' or alias like 'sirius-dispatch-facility/%' or alias like 'sirius-twilio-conversation/%'";
+  print "$sql\n";
+  $stmt = db_query($sql, array());
+}
+
+
+/**
+ * Add index on id3
+ */
+
+function grievance_update_7033() {
+  $table = 'field_data_field_sirius_id3';
+  $column = 'field_sirius_id3_value';
+  try { db_add_index($table, "${table}_${column}", array($column)); } catch (exception $ignore) { }
+}
+
+/**
+ * Create the hours table. Raw sql.
+ */
+
+function grievance_update_7034() {
+
+  $sqls = array();
+
+  $sqls[] = "create table sirius_hours_cache (
+    payperiod_nid integer,
+    year integer,
+    month integer,
+    day integer,
+    worker_nid integer,
+    employer_nid integer,
+    hours_type_tid integer,
+    department_tid integer,
+    hours numeric(10,6),
+    total numeric(10,2),
+    worker_name varchar(255),
+    employer_name varchar(255),
+    hours_type_name varchar(255),
+    department_name varchar(255)
+  );";
+
+  $sqls[] = 'create index sirius_hours_cache_idx01 on sirius_hours_cache (payperiod_nid);';
+  $sqls[] = 'create index sirius_hours_cache_idx02 on sirius_hours_cache (year, month, day);';
+  $sqls[] = 'create index sirius_hours_cache_idx03 on sirius_hours_cache (worker_nid);';
+  $sqls[] = 'create index sirius_hours_cache_idx04 on sirius_hours_cache (employer_nid);';
+  $sqls[] = 'create index sirius_hours_cache_idx05 on sirius_hours_cache (worker_nid, year, month, day);';
+
+  $sqls[] = 'create table sirius_lock (
+    id varchar(255),
+    type varchar(255),
+    uid integer,
+    ts integer,
+    primary key (id, type),
+    index (id),
+    index (uid)
+  );';
+
+  foreach ($sqls as $sql)
+  try { 
+    print "Executing: $sql\n";
+    db_query($sql, array());
+  } catch (exception $ignore) {
+    // Do nothing.
+  }
+}
+
+/**
+ * Move the "field_sirius_dispatch_notesdef" into json
+ */
+
+function grievance_update_7035() {
+  try {
+    $sql = "select * from field_data_field_sirius_dispatch_notesdef order by entity_id";
+    $stmt = db_query($sql, array());
+    while ($hr = $stmt->fetchAssoc()) {
+      $entity_type = $hr['entity_type'];
+      $entity_id = $hr['entity_id'];
+      $notes = $hr['field_sirius_dispatch_notesdef_value'];
+
+      if ($entity_type == 'node') {
+        $entity = node_load($entity_id);
+      } else if ($entity_type == 'taxonomy_term') {
+        $entity = taxonomy_term_load($entity_id);
+      }
+      $json = json_decode($entity->field_sirius_json['und'][0]['value'], TRUE);
+      $json['dispatch']['default']['notes'] = $notes;
+      $entity->field_sirius_json['und'][0]['value'] = json_encode($json);
+      if ($entity_type == 'node') { 
+        node_save($entity);
+      } else if ($entity_type == 'taxonomy_term') {
+        taxonomy_term_save($entity);
+      }
+
+      print "Moved notes to json: $entity_type, $entity_id\n\n";
+    }
+  } catch (exception $ignore) { }
+
+  if ($instance = field_info_instance('node', 'field_sirius_dispatch_notesdef', 'grievance_shop')) {
+    print "Deleting: grievance_shop / field_sirius_dispatch_notesdef\n";
+    field_delete_instance($instance);
+  }
+
+  if ($instance = field_info_instance('taxonomy_term', 'field_sirius_dispatch_notesdef', 'sirius_industry')) {
+    print "Deleting: sirius_industry / field_sirius_dispatch_notesdef\n";
+    field_delete_instance($instance);
+  }
+}
+
+/**
+ * Move the employer's "field_sirius_skill" into json
+ */
+
+function grievance_update_7036() {
+  try {
+    print "Moving skill settings for employers into JSON...\n";
+    $sql = "select * from field_data_field_sirius_skill where entity_type = 'node' and bundle = 'grievance_shop' order by entity_id ";
+    $stmt = db_query($sql, array());
+    while ($hr = $stmt->fetchAssoc()) {
+      $nid = $hr['entity_id'];
+      $node = node_load($nid);
+
+      $json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+      $json['dispatch']['pay_at_skilled_rate']['skill'][] = $hr['field_sirius_skill_tid'];
+      $node->field_sirius_json['und'][0]['value'] = json_encode($json);
+      node_save($node);
+
+      print "Updated: $node->title ($nid)\n";
+    }
+
+  } catch (exception $ignore) { }
+
+  $bundle = 'grievance_shop';
+  $field = 'field_sirius_skill';
+  if ($instance = field_info_instance('node', $field, $bundle)) {
+    print "Deleting: $bundle / $field\n";
+    field_delete_instance($instance);
+  }
+}

@@ -5,7 +5,18 @@
 //////////////////////////
 
 function sirius_get_special_tid($which) {
-	return variable_get('sirius_specialtid_' . $which, NULL);
+	list ($vocabulary_machine_name, $key) = explode('|', $which);
+	$is_multidomain = sirius_domain_taxonomy_is_multidomain($vocabulary_machine_name);
+
+	$variable_name = $which;
+	if ($is_multidomain) {
+		$domain_nid = sirius_domain_nid();
+		if ($domain_nid) {
+			$variable_name = "$domain_nid/$which";
+		}
+	}
+	$variable_name = "sirius_specialtid_$variable_name";
+	return variable_get($variable_name, NULL);
 }
 
 function sirius_specialtid_keys() {
@@ -21,6 +32,11 @@ function sirius_specialtid_keys() {
 			'OPEN' => 'Open',
 			'BULL' => 'Bullpen',
 		),
+		'sirius_dispatch_sib' => array(
+			'not_blocked' => 'Not Blocked',
+			'blocked' => 'Blocked',
+			'threestrikes' => 'Three-Strikes',
+		),
 		'sirius_dispatch_job_tags' => array(
 			'ASAP' => 'As Soon As Possible (ASAP)',
 		),
@@ -33,9 +49,15 @@ function sirius_specialtid_keys() {
 
 function sirius_specialtid_admin() {
 	$keys = sirius_specialtid_keys();
+	$domain_node = sirius_domain();
+	if ($domain_node) {
+		drupal_set_title(drupal_get_title() . ': ' . $domain_node->title);
+		$domain_nid = $domain_node->nid;
+	}
 
 	foreach ($keys as $key => $subkeys) {
 		$vocabulary = taxonomy_vocabulary_machine_name_load($key);
+		$is_multidomain = sirius_domain_taxonomy_is_multidomain($key);
 
 		$form["sirius_specialtid_$key"] = array(
 			'#type' => 'fieldset',
@@ -43,11 +65,16 @@ function sirius_specialtid_admin() {
 		);
 
 		foreach ($subkeys as $subkey => $title) {
-			$form["sirius_specialtid_$key"]["sirius_specialtid_$key|$subkey"] = array(
+			$idx = "$key|$subkey";
+			if ($is_multidomain && $domain_nid) {
+				$idx = "$domain_nid/$idx";
+			}
+			$idx = "sirius_specialtid_$idx";
+			$form["sirius_specialtid_$key"][$idx] = array(
 				'#type' => 'select',
 				'#title' => $title,
 				'#options' => sirius_taxonomy_load($key, 'tid', 'name', TRUE),
-				'#default_value' => variable_get("sirius_specialtid_$key|$subkey", NULL),
+				'#default_value' => variable_get($idx, NULL),
 			);
 
 		}

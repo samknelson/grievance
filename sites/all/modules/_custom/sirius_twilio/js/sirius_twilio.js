@@ -7,8 +7,10 @@ var inputVolumeBar = document.getElementById('input-volume');
 var volumeIndicators = document.getElementById('volume-indicators');
 
 var device;
+var CallSid
 
 token = Drupal.settings.sirius_twilio.token;
+event_nid = Drupal.settings.sirius_twilio.event_nid;
 
 // Setup Twilio.Device
 device = new Twilio.Device(token);
@@ -23,6 +25,10 @@ device.on('error', function (error) {
 });
 
 device.on('connect', function (conn) {
+	CallSid = conn.parameters.CallSid;
+	console.log(CallSid);
+	console.log(conn.parameters);
+	console.log(conn);
 	log('Call established.');
 	document.getElementById('button-call').style.display = 'none';
 	document.getElementById('button-hangup').style.display = 'inline';
@@ -43,7 +49,6 @@ device.on('incoming', function (conn) {
 	conn.accept();
 });
 
-console.log(device);
 device.audio.on('deviceChange', updateAllDevices);
 
 // Show audio selection UI if it is supported by the browser.
@@ -53,23 +58,35 @@ if (device.audio.isSelectionSupported) {
 
 
 // Bind button to make call
-document.getElementById('button-call').onclick = function () {
+document.getElementById('button-call').onclick = function (event) {
 	// get the phone number to connect the call to
 	var params = {
-  		To: document.getElementById('phone-number').value
+  	To: document.getElementById('phone-number').value
 	};
 	console.log('Calling ' + params.To + '...');
 	if (device) {
-	  	device.connect(params);
+		device.connect(params);
 	}
+	return false;
 };
 
 // Bind button to hangup call
 document.getElementById('button-hangup').onclick = function () {
 	log('Hanging up...');
 	if (device) {
-  		device.disconnectAll();
+		device.disconnectAll();
 	}
+	return false;
+};
+
+document.getElementById('button-omg').onclick = function () {
+	log('Transferring...');
+	url = '/sirius/event/phonebank/omg/transfer/' + event_nid + '/' + CallSid;
+	$.ajax({url: url}).done(function(data) { 
+		// device.disconnectAll(); 
+		console.log(data);
+	});
+	return false;
 };
 
 document.getElementById('get-devices').onclick = function() {

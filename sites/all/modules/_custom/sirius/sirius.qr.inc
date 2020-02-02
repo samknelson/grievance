@@ -16,7 +16,7 @@ function sirius_qr_url($url = '') {
 	return sirius_qr_string($url);
 }
 
-function sirius_qr_string($string) {
+function sirius_qr_string($string, $format = 'svg') {
 	$generator = new BarcodeGenerator();
   $barcode = $generator->getBarcodeObj(
     variable_get('barcodes_type', 'QRCODE'),
@@ -32,5 +32,11 @@ function sirius_qr_string($string) {
     )
   );
 
-  return '<code>' . $barcode->getSvgCode() . '</code>';
+  if ($format == 'svg') {
+    return '<code>' . $barcode->getSvgCode() . '</code>';
+  }
+
+  if ($format == 'png') {
+    return $barcode->getPngData();
+  }
 }

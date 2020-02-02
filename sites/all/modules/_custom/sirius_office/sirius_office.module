@@ -1,0 +1,13 @@
+<?php
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.iprestrict.inc';
+
+/**
+ * Implements hook_user_login
+ */
+
+function sirius_office_user_login(&$edit, $account) {
+  sirius_office_iprestrict_user_login($edit, $account); 
+}

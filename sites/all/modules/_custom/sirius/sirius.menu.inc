@@ -64,7 +64,7 @@ function sirius_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_feed_wizard',
     'callback arguments' => array(),
-    'permissions' => array('sirius admin'),
+    'permissions' => array('sirius'),
   );
 
   $node_tabs['sirius_letterhead']['sirius_letterhead_preview'] = array(
@@ -79,6 +79,23 @@ function sirius_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_sirius_domain_subdomains',
     'permissions' => array('sirius domain admin'),
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_domain']['sirius_domain_users'] = array(
+    'title' => 'Users',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_users',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 4,
+  );
+
+  $node_tabs['sirius_domain']['sirius_domain_delete'] = array(
+    'title' => 'Delete',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_delete',
+    'permissions' => array('sirius domain delete'),
+    'weight' => 5,
   );
 
   return $node_tabs;
@@ -91,11 +108,7 @@ function sirius_node_tabs() {
 function sirius_menu() {
   $items = array();
 
-  //
-  // Node Tabs
-  // 
-
-  $node_tabs = sirius_node_tabs();
+  $node_tabs = sirius_node_tab_all('node_tabs');
   foreach ($node_tabs as $node_type => $node_record) {
     foreach ($node_record as $tab_name => $tab_record) {
       $items['node/%node/' . $tab_name] = array(
@@ -116,6 +129,27 @@ function sirius_menu() {
     }
   }
 
+  $term_tabs = sirius_term_tab_all('term_tabs');
+  foreach ($term_tabs as $term_type => $term_record) {
+    foreach ($term_record as $tab_name => $tab_record) {
+      $items['taxonomy/term/%taxonomy_term/' . $tab_name] = array(
+        'title' => $tab_record['title'],
+        'description' => $tab_record['description'],
+        'page callback' => 'sirius_term_tab_content',
+        'page arguments' => array(2, $tab_name),
+        'access callback' => 'sirius_term_tab_access',
+        'access arguments' => array(2, $tab_name),
+        'type' => MENU_LOCAL_TASK,
+      );
+      if ($tab_record['weight']) {
+        $items['taxonomy/term/%taxonomy_term/' . $tab_name]['weight'] = $tab_record['weight'];
+      }
+      if ($tab_record['page arguments']) {
+        $items['taxonomy/term/%taxonomy_term/' . $tab_name]['page_arguments'] = array_merge($items['term/%term/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
+      }
+    }
+  }
+
   $items['sirius/news'] = array(
     'title' => 'News',
     'description' => '',
@@ -125,12 +159,30 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/news/admin'] = array(
+    'title' => 'News',
+    'description' => '',
+    'page callback' => 'sirius_page_news_admin',
+    'page arguments' => array(),
+    'access arguments' => array('sirius news admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/admin/banner'] = array(
     'title' => 'Banner Configuration ',
     'description' => '',
     'access arguments' => array('sirius admin'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_banner_config'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/auditlog/config'] = array(
+    'title' => 'Auditlog Configuration ',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_auditlog_config_form'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -170,6 +222,14 @@ function sirius_menu() {
     'title' => 'Email Configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_email_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/config/email/test'] = array(
+    'title' => 'Email Configuration Tester',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_email_test_form'),
     'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -281,6 +341,191 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/sns/incoming'] = array(
+    'title' => 'SNS Incoming',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_sns_incoming',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/sns/config'] = array(
+    'title' => 'SNS Configuration',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_sns_config'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+
+  $items['sirius/domain/config/usermanage'] = array(
+    'title' => 'Domain User Manager Configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_domain_usermanage_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/domain/switch'] = array(
+    'title' => 'Domain Switch',
+    'page callback' => 'sirius_domain_page_switch',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain switch'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/domains'] = array(
+    'title' => 'Domains',
+    'page callback' => 'sirius_page_domains',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/domain/users'] = array(
+    'title' => 'Users',
+    'page callback' => 'sirius_page_domain_users',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/contacts'] = array(
+    'title' => 'Contacts',
+    'page callback' => 'sirius_page_contacts',
+    'page arguments' => array(),
+    'access arguments' => array('sirius contact admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/contact/definition'] = array(
+    'title' => 'Contact Fields',
+    'page callback' => 'sirius_page_contact_definition_edit',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/contact/definition/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'sirius_page_contact_definition_edit',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/contact/definition/preview'] = array(
+    'title' => 'Preview',
+    'page callback' => 'sirius_page_contact_definition_preview',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/contact/definition/clone'] = array(
+    'title' => 'Clone',
+    'page callback' => 'sirius_page_contact_definition_clone',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
+
+  $items['sirius/taxonomy/%'] = array(
+    'title' => 'Taxonomy',
+    'page callback' => 'sirius_page_taxonomy',
+    'page arguments' => array(2),
+    'access callback' => 'sirius_page_taxonomy_access',
+    'access arguments' => array(2),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/taxonomy/%/list'] = array(
+    'title' => 'List',
+    'page callback' => 'sirius_page_taxonomy_list',
+    'page arguments' => array(2),
+    'access callback' => 'sirius_page_taxonomy_access',
+    'access arguments' => array(2),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/taxonomy/%/sort'] = array(
+    'title' => 'Sort',
+    'page callback' => 'sirius_page_taxonomy_sort_wrapper',
+    'page arguments' => array(2),
+    'access callback' => 'sirius_page_taxonomy_access',
+    'access arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/taxonomy/%/clone'] = array(
+    'title' => 'Clone',
+    'page callback' => 'sirius_page_taxonomy_clone',
+    'page arguments' => array(2),
+    'access callback' => 'sirius_page_taxonomy_clone_access',
+    'access arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
+  $items['sirius/taxonomy'] = array(
+    'title' => 'Drop-Down List Management',
+    'page callback' => 'sirius_page_taxonomy_vocabulary_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/admin/taxonomy'] = array(
+    'title' => 'Taxonomy Admin',
+    'page callback' => 'sirius_page_taxonomy_vocabulary_admin',
+    'page arguments' => array(),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/callerid'] = array(
+    'title' => 'Caller ID Admin',
+    'page callback' => 'sirius_page_callerid',
+    'page arguments' => array(),
+    'access arguments' => array('sirius callerid admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/volunteer/admin'] = array(
+    'title' => 'Volunteer Admin',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_page_volunteer_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/volunteer/%'] = array(
+    'title' => 'Volunteer Login',
+    'description' => '',
+    'page callback' => 'sirius_page_volunteer_selfregister',
+    'page arguments' => array(2),
+    'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/contact/resync/all'] = array(
+    'title' => 'Resync All Contacts',
+    'description' => '',
+    'page callback' => 'sirius_page_contact_resync_all',
+    'page arguments' => array(),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   /*
   $items['taxonomy/term/%/sirius_dispatch_job_policy_exim'] = array(
     'title' => 'Policy Export / Import',
@@ -299,58 +544,6 @@ function sirius_menu() {
 
 function sirius_aatlink($nid, $aat) {
   drupal_goto('node/' . $nid . '/sirius_dispatch_worker_view', array('query' => array('aat' => $aat)));
-}
-
-
-function sirius_node_tab_content($node, $in_tab_name) {
-  $node_tabs = sirius_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          $callback = $tab_record['callback'];
-          $args = array($node);
-          if ($tab_record['callback arguments']) {
-            $args = array_merge($args, $tab_record['callback arguments']);
-          }
-          return call_user_func_array($callback, $args);
-        }
-      }
-    }
-  }
-  
-  drupal_set_message("Bad tab: $node->type, $in_tab_name");
-  
-  return "";
-}
-
-function sirius_node_tab_access($node, $in_tab_name) {
-  // Check generic permissions
-  $node_tabs = sirius_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          // Check basic permission
-          foreach ($tab_record['permissions'] as $permission) {
-            if (!user_access($permission)) { return false; }
-          }
-
-          // Check for a custom access permission
-          $access_function_name = $tab_record['callback'] . '_access';
-          if (function_exists($access_function_name)) {
-            if (!$access_function_name($node)) {
-              return false;
-            }
-          }
-          
-          return true;
-        }
-      }
-    }
-  }
-  
-  return false;
 }
 
 function sirius_menu_block_view() {

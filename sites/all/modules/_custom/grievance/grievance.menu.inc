@@ -6,7 +6,7 @@
  * shows housing-related functions. 
  */
  
-function grievance_node_tabs() {
+function grievance_xnode_tabs() {
 	$node_tabs = array();
 
 	$node_tabs['grievance']['letter'] = array(
@@ -59,6 +59,13 @@ function grievance_node_tabs() {
 		'description' => '',
 		'callback' => 'grievance_node_tab_timeline',
 		'permissions' => array('grievance statuslog'),
+	);
+
+	$node_tabs['grievance']['status_correct'] = array(
+		'title' => 'Status Correct',
+		'description' => '',
+		'callback' => 'grievance_node_tab_status_correct',
+		'permissions' => array('grievance admin'),
 	);
 
 	$node_tabs['grievance']['attachments'] = array(
@@ -293,7 +300,7 @@ function grievance_menu() {
 	// Node Tabs
   // 
 
-	$node_tabs = grievance_node_tabs();
+	$node_tabs = grievance_xnode_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		foreach ($node_record as $tab_name => $tab_record) {
 			$items['node/%node/' . $tab_name] = array(
@@ -553,6 +560,25 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['grievance/report/status-summary'] = array(
+		'title' => 'Report: Status Summary',
+		'description' => '',
+		'page callback' => 'grievance_report_status_summary',
+		'page arguments' => array(),
+		'access arguments' => array('grievance report'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['grievance/report/open'] = array(
+		'title' => 'Report: Open Grievances by Specialist',
+		'description' => '',
+		'page callback' => 'grievance_report_open_by_specialist',
+		'page arguments' => array(),
+		'access arguments' => array('grievance view'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+
 	$items['grievance/report/average-time'] = array(
 		'title' => 'Report: Average Time Between Statuses',
 		'description' => '',
@@ -604,15 +630,6 @@ function grievance_menu() {
 		'page callback' => 'grievance_report_open_summary_with_log',
 		'page arguments' => array(),
 		'access arguments' => array('grievance report'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-
-	$items['grievance/report/open'] = array(
-		'title' => 'Report: Open Grievances: By Specialist',
-		'description' => '',
-		'page callback' => 'grievance_report_open_by_specialist',
-		'page arguments' => array(),
-		'access arguments' => array('grievance view'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 
@@ -695,7 +712,7 @@ function grievance_menu_deny() { return 'Access denied.'; }
 function grievance_menu_deny_access() { return FALSE; }
 
 function grievance_node_tab_content($node, $in_tab_name) {
-	$node_tabs = grievance_node_tabs();
+	$node_tabs = grievance_xnode_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		if ($node->type == $node_type) {
 			foreach ($node_record as $tab_name => $tab_record) {
@@ -722,7 +739,7 @@ function grievance_node_tab_access($node, $in_tab_name) {
 	}
 
 	// Check generic permissions
-	$node_tabs = grievance_node_tabs();
+	$node_tabs = grievance_xnode_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		if ($node->type == $node_type) {
 			foreach ($node_record as $tab_name => $tab_record) {
