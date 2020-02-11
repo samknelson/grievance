@@ -11,6 +11,17 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_timss') . 
  */
 
 function grievance_timss_cron() {
+  // Run once a day
+  $today = date('Y-m-d');
+  $last_run = variable_get('grievance_timss_last_date', 0);
+  if ($last_run == $today && !$force) { return; }
+  variable_set('grievance_timss_last_date', $today);
+
+  // Don't run before a specific time
+  $hour = variable_get('grievance_timss_start_hr', 1);
+  $min = variable_get('grievance_timss_start_min', 30);
+  if (time() < strtotime("$today $hour:$min") && !$force) { return; }
+
   grievance_timss_resync();
   grievance_timss_resync_shop_stewards();
 }
@@ -124,12 +135,13 @@ function grievance_timss_resync_shop_stewards() {
 
 
 // @todo: not currently resyncing if there's no "broughtby" term
-function grievance_timss_resync() {
+function grievance_timss_resync($force = NULL) {
   watchdog('grievance_timss', 'TIMSS resync: Starting');
 
   $broughtby_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_broughtby');
   if (!$broughtby_vocabulary) { return; }
   $broughtby_terms = taxonomy_get_tree($broughtby_vocabulary->vid);
+  if (!$broughtby_terms) { $broughtby_terms['DEFAULT'] = (object) array('name' => 'DEFAULT'); }
  
   // Load all "open" TIDs
   $status_vocab = taxonomy_vocabulary_machine_name_load('grievance_status ');
@@ -145,14 +157,14 @@ function grievance_timss_resync() {
   $examined_count = 0;
   $updated_count = 0;
 
-  foreach ($broughtby_terms as $broughtby_term) {
+  foreach ($broughtby_terms as $broughtby_tid => $broughtby_term) {
     watchdog('grievance_timss', 'TIMSS resync: Starting ' . $broughtby_term->name);
 
     // Find all open grievances where the data hasn't been changed manually.
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'grievance');
-    $query->fieldCondition('field_grievance_broughtby', 'tid',  $broughtby_term->tid);
+    if ($broughtby_tid != 'DEFAULT') { $query->fieldCondition('field_grievance_broughtby', 'tid',  $broughtby_tid); }
     $query->fieldCondition('field_grievance_status', 'tid', $status_tids, 'in');
     // The following would be nice, but doesn't handle nulls.  So we check manually later.
     // $query->fieldCondition('field_grievance_corrected', 'value', 'Pending', '!=');
@@ -181,7 +193,7 @@ function grievance_timss_resync() {
       }
 
       // Load the candidate from TIMSS
-      $candidate = grievance_timss_lookup($member_id, $broughtby_term->tid);
+      $candidate = grievance_timss_lookup($member_id, $broughtby_tid);
       if (!$candidate || !is_array($candidate)) {
         watchdog('grievance_timss', "TIMSS resync: $grievance_nid: TIMSS record not found. Skipping.");
         continue;
@@ -246,9 +258,11 @@ function grievance_timss_resync() {
 
         if (!$new_value) { continue; }
         if ($new_value == $old_value) { continue; }
+        if (preg_replace('/[\s\-\(\)]/', '', $new_value) == preg_replace('/[\s\-\(\)]/', '', $old_value)) { continue; }
 
         $grievance_node->{$drupal_field}['und'][0][$column] = $new_value;
         $is_changed = TRUE;
+        // print "Changed: $drupal_field / $column / $new_value\n";
       }
 
       if (!$is_changed) {
