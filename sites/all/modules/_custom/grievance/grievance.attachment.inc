@@ -50,8 +50,10 @@ function grievance_attachment_views_exposed_form_alter(&$form, &$form_state) {
       }
     }
 
-    foreach ($to_erase as $tid) {
-      unset($form['field_grievance_document_type_tid']['#options'][$tid]);
-    }
+    if ($to_erase) {
+	    foreach ($to_erase as $tid) {
+	      unset($form['field_grievance_document_type_tid']['#options'][$tid]);
+	    }
+	  }
   }
 }
