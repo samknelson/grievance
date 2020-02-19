@@ -44,10 +44,24 @@ function sirius_event_term_tab_bullpen_form($form, &$form_state, $event_type_ter
 	);
 
 	$form["checkout"] = array(
-		'#title' => t('Checkout'),
+		'#title' => t('A worker who checks out of a bullpen should be set to this participant role and status'),
 		'#type' => 'select',
 		'#options' => $register_as_options,
 		'#default_value' => $json['bullpen']['checkout'],
+	);
+
+	$form["signin_opens_self"] = array(
+		'#title' => t('Self Sign-in Period'),
+		'#type' => 'textfield',
+		'#default_value' => $json['bullpen']['signin_opens_self'],
+		'#description' => t('Enter the period before the event start date when a worker can begin signing themselves in. This should be set as a nubmer of seconds; for example, if a worker can self sign-in five days before the event, enter 60*60*24*5 = <strong>432000</strong>.'),
+	);
+
+	$form["signin_opens_others"] = array(
+		'#title' => t('Steward Sign-in Period'),
+		'#type' => 'textfield',
+		'#default_value' => $json['bullpen']['signin_opens_others'],
+		'#description' => t('Enter the period before the event start date when a steward can begin signing in workers. This should be set as a nubmer of seconds; for example, if a steward can sign-in a worker one hour before the event, enter 60*60 = <strong>3600</strong>.'),
 	);
 
 	$form['submit'] = array(
