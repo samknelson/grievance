@@ -199,7 +199,7 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 			$json = json_decode($rollover_log_node->field_sirius_json['und'][0]['value'], TRUE);
 			$rollover_end_ts = strtotime($json['end_date']);
 			if ($rollover_end_ts > 1) {
-				$rollover_end_date = gmdate('l, F j, Y', $rollover_end_ts);
+				$rollover_end_date = date('l, F j, Y h:i A', $rollover_end_ts);
 				$stupid_html = '<section class="field field-name-datetime field-label-inline clearfix view-mode-full"><h2 class="field-label">Rollover End Date</h2><div class="field-items"><div class="field-item">' . $rollover_end_date . '</div></div></section>';
 				$form['job_location_section_aa'] = array('#markup' => $stupid_html);
 			}
