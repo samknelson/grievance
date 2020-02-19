@@ -53,6 +53,12 @@ function sirius_dispatch_policy_sirius_jsonfield_form_definitions() {
 		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
 		'#description' => t('If Yes, then call-by-name is supported for this job type.')
 	);
+	$form['workers']['always_secondary'] = array(
+		'#type' => 'select', 
+		'#title' => 'Always Secondary',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+		'#description' => t('If "Yes", then dispatches to this type of job are ALWAYS secondary. They do not set the employer and they do not affect the worker\'s out-of-work status.'),
+	);
 	$form['workers']['count_policy'] = array(
 		'#type' => 'select', 
 		'#title' => 'Worker Count',
