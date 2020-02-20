@@ -26,12 +26,6 @@ function sirius_node_tab_dispatch_job_bullpen_form($form, &$form_state, $job_nod
 	$policy = sirius_dispatch_job_policy($job_node);
 	$event_node = node_load($job_node->field_sirius_events['und'][0]['target_id']);
 
-  $ts = sirius_event_bullpen_ts($event_node);
-  if ($ts['job_ts'] > time()) {
-    //drupal_set_message("The event opens at " . date('g:i A, l, F j', $ts['job_ts']), 'warning');
-    //return array();
-  }
-
 	// Get the list of dispatchable workers
 	$workers = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name', 0);
 	$tmp = array('ignore_redispatch' => TRUE);
