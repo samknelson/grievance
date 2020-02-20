@@ -98,6 +98,9 @@ function sirius_phone_keypad($string) {
   return $string;
 }
 
+// @todo
+function sirius_sms_enabled() { return TRUE; }
+
 function sirius_sms_send($params) {
   // Allow callers to set the X-Sirius-Id, and don't resent with the same ID. This allows callers to set unique keys.
   $id = $params['X-Sirius-Id'];
