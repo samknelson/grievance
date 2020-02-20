@@ -64,6 +64,17 @@ function sirius_event_term_tab_bullpen_form($form, &$form_state, $event_type_ter
 		'#description' => t('Enter the period before the event start date when a steward can begin signing in workers. This should be set as a nubmer of seconds; for example, if a steward can sign-in a worker one hour before the event, enter 60*60 = <strong>3600</strong>.'),
 	);
 
+	$form["self_signin_must_be_employed"] = array(
+		'#title' => t('Self Sign-in Employed Only'),
+		'#type' => 'select',
+		'#default_value' => $json['bullpen']['self_signin_must_be_employed'],
+		'#options' => array(
+			'yes' => t('Yes'),
+			'no' => t('No'),
+		),
+		'#description' => t('For workers who are signing in themselves, select "Yes" if they must be employed by the bullpen host. Select "No" if unemployed workers, or workers with another employer, can sign in.'),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),

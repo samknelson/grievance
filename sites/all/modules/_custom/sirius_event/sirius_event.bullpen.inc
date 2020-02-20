@@ -12,9 +12,12 @@ function sirius_event_bullpen_enabled_type($event_type_term) {
 }
 
 function sirius_event_bullpen_ts($event_node) {
+	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+
 	$ts = sirius_date_ts($event_node, 'field_sirius_daterepeat');
-	$signin_opens_self = $ts - variable_get('sirius_dispatch_bullpen_signin_opens', 60*60*24*5);
-	$signin_opens_others = $ts - variable_get('sirius_dispatch_bullpen_signin_opens_others', 60*60);
+	$signin_opens_self = $ts - $json['bullpen']['signin_opens_self'];
+	$signin_opens_others = $ts - $json['bullpen']['signin_opens_others'];
 	$signin_closes = $ts + variable_get('sirius_dispatch_bullpen_signin_grace', 60*15);
 
 	return array(
