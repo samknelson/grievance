@@ -3,7 +3,6 @@
 function sirius_training_levels_fetch_all() {
 	$ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
 
-	$all_levels = array();
 	foreach ($ms_terms as $ms_tid => $ms_term) {
 		$levels = sirius_training_levels_fetch($ms_term);
 		if ($levels) { $all_levels[$ms_tid] = $levels; }
@@ -13,14 +12,13 @@ function sirius_training_levels_fetch_all() {
 }
 
 function sirius_training_levels_fetch($ms_term_or_tid) {
-	if (is_object($ms_term_or_tid)) { $ms_term = $ms_term_or_tid; } else { $ms_term = sirius_taxonomy_load($ms_term); }
+	if (is_object($ms_term_or_tid)) { $ms_term = $ms_term_or_tid; } else { $ms_term = taxonomy_term_load($ms_term_or_tid); }
 	$json = json_decode($ms_term->field_sirius_json['und'][0]['value'], TRUE);
 	if ($json['training']['levels_enabled'] != 'Yes') { return array(); }
 
 	$levels = $json['training']['levels'];
 
 	uasort($levels, function($a,$b) { return $a['weight'] <=> $b['weight']; });
-
 	return $levels;
 }
 
@@ -29,18 +27,21 @@ function sirius_training_levels_fetch_worker($worker_node) {
 	return $json['training']['levels'];
 }
 
-function sirius_training_level_notification_emails($worker_node, $ms_term, $level) {
-	// The worker's email
-	$emails = $worker_node->field_sirius_email['und'][0]['value'];
-
+function sirius_training_level_notification_recipients($worker_node, $ms_term, $level) {
 	// The staff emails
-	if ($level['notification_emails']) {
-		if ($emails) { $emails .= "\n"; }
-		$emails .= $level['notification_emails'];
+	$recipients = array();
+	if (is_array($level['notification_emails'])) {
+		foreach ($level['notification_emails'] as $candidate) {
+			if ($candidate['email'] || $candidate['name']) {
+				$candidate['disposition'] = 'to';
+				$candidate['description'] = 'Staff contact';
+				$recipients[] = $candidate;
+			}
+		}
 	}
 
 	// Employer emails. SQL for speed
-	$sql = "select nid, field_sirius_json_value from node ";
+	$sql = "select nid, node.title as shop_name, field_sirius_json_value from node ";
 	$sql .= "join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
 	$sql .= "join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
 	$sql .= "where node.type = 'grievance_shop' ";
@@ -49,14 +50,18 @@ function sirius_training_level_notification_emails($worker_node, $ms_term, $leve
 	$stmt = db_query($sql, array());
 	while ($hr = $stmt->fetchAssoc()) {
 		$employer_json = json_decode($hr['field_sirius_json_value'], TRUE);
-		$employer_emails = $employer_json['training']['ms_' . $ms_term->tid][$level['code']]['notification_emails'];
-		if ($employer_emails) {
-			if ($emails) { $emails .= "\n"; }
-			$emails .= $employer_emails;
+		if (is_array($employer_json['training']['ms_' . $ms_term->tid][$level['code']]['notification_emails'])) {
+			foreach ($employer_json['training']['ms_' . $ms_term->tid][$level['code']]['notification_emails'] as $candidate) {
+				if ($candidate['email'] || $candidate['name']) { 
+					$candidate['disposition'] = 'to';
+					$candidate['description'] = "Shop contact for " . $hr['shop_name'];
+					$recipients[] = $candidate;
+				}
+			}
 		}
 	}
 
-	return $emails;
+	return $recipients;
 }
 
 function sirius_training_level_graduate_possible($worker_node, $ms_term, $level, $params) {
