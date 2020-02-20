@@ -150,7 +150,9 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
     $worker_member_statuses = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
 
   	// Is skilled if we have one of the required skills...
-    if (array_intersect($employer_skills, $worker_skills)) { $is_skilled = TRUE; }
+  	if (is_array($employer_skills) && is_array($worker_skills)) {
+    	if (array_intersect($employer_skills, $worker_skills)) { $is_skilled = TRUE; }
+    }
 
     // ... But NOT if we don't have one of the reuired member statuses
     if ($employer_member_statuses) {

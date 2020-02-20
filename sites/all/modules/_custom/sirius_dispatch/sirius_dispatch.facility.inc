@@ -2,8 +2,16 @@
 
 function sirius_dispatch_facility_dropdown() {
 	// Run as raw $sql for efficiecy
-	$sql = "select nid, title from node where type = 'sirius_dispatch_facility' order by title ";
-	$stmt = db_query($sql, array());
+	$domain_nid = sirius_domain_nid();
+
+	$sql_args = array();
+	$sql = "select nid, title from node ";
+	if ($domain_nid) {
+		$sql .= "join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	}
+	$sql .= "where type = 'sirius_dispatch_facility' order by title ";
+	$stmt = db_query($sql, $sql_args);
 	$map = array();
 	$map[NULL] = t('-- Select --');
 	while ($hr = $stmt->fetchAssoc()) {

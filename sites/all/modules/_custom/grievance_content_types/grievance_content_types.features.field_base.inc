@@ -4940,6 +4940,7 @@ function grievance_content_types_field_default_field_bases() {
         ),
         'target_bundles' => array(
           'grievance_shop' => 'grievance_shop',
+          'sirius_dispatch_facility' => 'sirius_dispatch_facility',
         ),
       ),
       'target_type' => 'node',
@@ -6060,6 +6061,31 @@ function grievance_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'entityreference',
+  );
+
+  // Exported field_base: 'field_sirius_letter_content_type'.
+  $field_bases['field_sirius_letter_content_type'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_letter_content_type',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'grievance' => 'Grievance',
+        'sirius_worker' => 'Worker',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
   );
 
   // Exported field_base: 'field_sirius_log_handler'.
