@@ -31,7 +31,7 @@ function sirius_event_page_list_bullpens() {
 		$query->fieldOrderBy('field_sirius_daterepeat', 'value', 'desc');
 		$stmt = $query->execute();
 		if (!$stmt['node']) { 
-			$html .= t('There are no upcoming bullpens.');
+			$html .= t('There are no upcoming @titles.', array('@title' => $event_types[$event_type_tid]->name));
 		} else {
 			$event_nodes = node_load_multiple(array_keys($stmt['node']));
 
