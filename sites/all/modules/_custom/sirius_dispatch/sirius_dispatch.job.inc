@@ -268,6 +268,9 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		$member_status_weights[$member_status_tid] = $member_status_term->field_grievance_weight['und'][0]['value'];
 	}
 
+	// Get the facility NID
+	$facility_nid = $job_node->field_sirius_dispatch_facility['und'][0]['target_id'];
+
 	// Get the employer nid
 	$employer_nid = $job_node->field_grievance_shop['und'][0]['target_id'];
 
@@ -448,9 +451,10 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	$sql .= "  select 1 from field_revision_field_sirius_dispatch_dncs ";
 	$sql .= "  where field_revision_field_sirius_dispatch_dncs.entity_type = 'node' ";
 	$sql .= "  and field_revision_field_sirius_dispatch_dncs.entity_id = node.nid ";
-	$sql .= "  and field_sirius_dispatch_dncs_target_id = :employer_nid1 ";
+	$sql .= "  and field_sirius_dispatch_dncs_target_id in (:employer_nid1) ";
+	$args[':employer_nid1'] = array($employer_nid);
+	if ($facility_nid) { $args[':employer_nid1'][] = $facility_nid; }
 	$sql .= ") ";
-	$args[':employer_nid1'] = $employer_nid;
 
 	// Exclude employee-initiated DNCs
 	$sql .= "and not exists (";
@@ -637,6 +641,9 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	$employer_nid = $job_node->field_grievance_shop['und'][0]['target_id'];
 	$employer_node = node_load($employer_nid);
 
+	// Get the facility NID
+	$facility_nid = $job_node->field_sirius_dispatch_facility['und'][0]['target_id'];
+
 	// Exclude current dispatches
 	if (!$filters['ignore_redispatch']) {
 		$sql = "select count(*) as c from ";
@@ -810,10 +817,14 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 		}
 	}
 
-
 	// Exclude employer-initiated DNCs
 	if ($employer_nid && in_array($employer_nid, sirius_fieldvals($worker_node, 'field_sirius_dispatch_dncs', 'target_id'))) {
 		return array('success' => FALSE, 'msg' => t('The worker has been placed on the do-not-call list for this employer.'));
+	}
+
+	// Exclude employer-initiated DNCs
+	if ($facility_nid && in_array($facility_nid, sirius_fieldvals($worker_node, 'field_sirius_dispatch_dncs', 'target_id'))) {
+		return array('success' => FALSE, 'msg' => t('The worker has been placed on the do-not-call list for this facility.'));
 	}
 
 	// Exclude employee-initiated DNCs
