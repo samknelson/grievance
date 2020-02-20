@@ -168,13 +168,24 @@ function sirius_feed_spout_get_cell($row, $col) {
 	return $cell->getValue();
 }
 
-function sirius_feed_spout_get_import_row($fields, $row, $data, $count) {
+function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header) {
 	$import_data_row = array('xxxrowcountxxx' => $count);
 	foreach ($fields as $field_name => $field_info) {
 		$col = $data["map_$field_name"];
 		if ($col === NULL || $col === '') { continue; }
 		$import_data_row[$field_name] = sirius_feed_spout_get_cell($row, $col);
 	}
+
+	$raw_row = array();
+	$delta = 0;
+	foreach ($row->getCells() as $cell) {
+		$title = $header[$delta];
+		if (!$title) { $title = $delta; }
+		$raw_row[$title] = $cell->getValue();
+		++$delta;
+	}
+	$import_data_row['xxxrawxxx'] = $raw_row;
+
 	return $import_data_row;
 }
 
@@ -564,8 +575,10 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$callback = $info['feed']['callback_row_verify'];
 	foreach ($sheet->getRowIterator() as $row) {
 		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
-		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count);
+		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
+
 		$result = $callback($feed_node, $info, $data, $import_data_row, FALSE);
+
 		if ($result['success']) { $import_data_row['xxxsuccsssxxx'] = 'Yes'; } else { $import_data_row['xxxsuccsssxxx'] = 'No'; }
 		$import_data_row['xxxmsgxxx'] = $result['msg'];
 		foreach ($fields as $field_name => $field_info) {
@@ -573,7 +586,8 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 			if ($col === NULL || $col === '') { 
 				unset($import_data_row[$field_name]);
 			}
-			}
+		}
+		unset($import_data_row['xxxrawxxx']);
 
 		++$counts[$result['msg']];
 		if ($counts[$result['msg']] == 6) { $import_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
@@ -688,7 +702,7 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 		++$count;
 		if ($count < $idx) { continue; }
 		if ($count > $idx+$batch_size) { break; }
-		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count);
+		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 		$result = $callback($feed_node, $info, $data, $import_data_row);
 		++$counts[$result['msg']];
 
