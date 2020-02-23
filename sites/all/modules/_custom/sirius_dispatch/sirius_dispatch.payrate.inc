@@ -194,7 +194,7 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
 
   // If the job explicitly mentions a skill, then it's a skilled job and we pay at the skilled rate.
   if ($job_node->field_sirius_skill['und'][0]['tid']) {
-  	$msg = 'Using skilled rate because the job reuires a skill. ';
+  	$msg .= 'Using skilled rate because the job reuires a skill. ';
   	$is_skilled = TRUE;
   }
 
@@ -223,6 +223,7 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
     	}
     }
   }
+  if (!$is_skilled) { $msg .= "Using unskilled payrate. "; }
 
   $ms_json = json_decode($member_status_term->field_sirius_json['und'][0]['value'], TRUE);
 
