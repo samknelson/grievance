@@ -72,6 +72,14 @@ function sirius_dispatch_node_tabs() {
     'weight' => 8,
   );
 
+  $node_tabs['sirius_dispatch']['sirius_dispatch_payrate'] = array(
+    'title' => 'Pay Rate',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_payrate',
+    'permissions' => array('sirius dispatch payrate override'),
+    'weight' => 8,
+  );
+
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_fore'] = array(
     'title' => 'Foreperson',
     'description' => '',
