@@ -18,8 +18,9 @@ function sirius_event_page_list_bullpens() {
 		return t('There are no event types configured as bullpens.');
 	}
 
+	$html = '';
 	foreach ($event_type_tids as $event_type_tid) {
-		$html = '<h2>' . t('Upcoming: ') . $event_types[$event_type_tid]->name . '</h2>';
+		$html .= '<h2>' . t('Upcoming: ') . $event_types[$event_type_tid]->name . '</h2>';
 		
 		$query = new EntityFieldQuery;
 		$query->entityCondition('entity_type', 'node');
@@ -30,7 +31,7 @@ function sirius_event_page_list_bullpens() {
 		$query->fieldOrderBy('field_sirius_daterepeat', 'value', 'desc');
 		$stmt = $query->execute();
 		if (!$stmt['node']) { 
-			$html .= t('There are no upcoming bullpens.');
+			$html .= t('There are no upcoming @titles.', array('@title' => $event_types[$event_type_tid]->name));
 		} else {
 			$event_nodes = node_load_multiple(array_keys($stmt['node']));
 
