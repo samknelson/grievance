@@ -30,25 +30,11 @@ function sirius_node_tab_dispatch_payrate_form_submit($form, &$form_state) {
 	if ($old_payrate != $dispatch_node->field_sirius_payrate['und'][0]['value']) { 
 		node_save($dispatch_node);
 		drupal_set_message("Recomputed and saved new payrate.");
+		sirius_log('dispatch:payrate', 'Recompute', "Payrate recomputed from dispatch tab.", '', '', array($dispatch_node->nid));
 	} else {
 		drupal_set_message("Payrate unchanged.");
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function sirius_node_tab_dispatch_job_payrate($job_node) {
 	return drupal_get_form('sirius_node_tab_dispatch_job_payrate_form', $job_node);
