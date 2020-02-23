@@ -7,9 +7,19 @@ function sirius_node_tab_dispatch_payrate($dispatch_node) {
 function sirius_node_tab_dispatch_payrate_form($form, &$form_state, $dispatch_node) {
 	$form_state['dispatch_nid'] = $dispatch_node->nid;
 
+	$form['action'] = array(
+		'#type' => 'select', 
+		'#title' => t('Action'),
+		'#options' => array(
+			'explain' => t('Explain what the payrate should be.'),
+			'recompute' => t('Explain and recompute the payrate.'),
+		),
+		'#required' => TRUE, 
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit', 
-		'#value' => t('Recompute and Explain Payrate'),
+		'#value' => t('Submit'),
 	);
 
 	$log = sirius_minilog_render_html();
@@ -28,9 +38,12 @@ function sirius_node_tab_dispatch_payrate_form_submit($form, &$form_state) {
 
 	++$count;
 	if ($old_payrate != $dispatch_node->field_sirius_payrate['und'][0]['value']) { 
-		node_save($dispatch_node);
-		drupal_set_message("Recomputed and saved new payrate.");
-		sirius_log('dispatch:payrate', 'Recompute', "Payrate recomputed from dispatch tab.", '', '', array($dispatch_node->nid));
+		drupal_set_message("The recomputed payrate does not match what appears in the dispatch.");
+		if ($form_state['values']['action'] == 'recompute') {
+			node_save($dispatch_node);
+			sirius_log('dispatch:payrate', 'Recompute', "Payrate recomputed from dispatch tab.", '', '', array($dispatch_node->nid));
+			drupal_set_message("New payrate saved.");
+		}
 	} else {
 		drupal_set_message("Payrate unchanged.");
 	}
