@@ -16,6 +16,7 @@ function sirius_page_config() {
 
 	$links['grievance'] = array('title' => 'Grievance');
 	$links['grievance']['links']['admin/config/grievance/core'] 	= array('title' => 'Grievance Settings', 'description' => 'Configure the grievance module.');
+	$links['grievance']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
 
 	$links['dispatch'] = array('title' => 'Dispatch');
 	$links['dispatch']['links']['sirius/dispatch/config/run'] 	= array('title' => 'Running Job Settings', 'description' => 'Global settings for running jobs.');
@@ -34,6 +35,7 @@ function sirius_page_config() {
 
 	$links['systems'] = array('title' => 'Systems');
 	$links['systems']['links']['sirius/domains'] 								= array('title' => 'Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
+	$links['systems']['links']['sirius/callerid'] 							= array('title' => 'Caller ID', 'description' => 'Create or manage Caller ID entries.');
 	$links['systems']['links']['sirius/config/specialrid'] 			= array('title' => 'Special Roles', 'description' => 'Certain roles have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/email'] 					= array('title' => 'Email', 'description' => 'Oubound email settings');
