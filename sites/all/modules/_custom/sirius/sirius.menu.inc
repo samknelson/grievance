@@ -17,6 +17,10 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
+  // 
+  // Entity Log
+  //
+
   $node_tabs['sirius_dispatch']['sirius_dispatch_log'] = array(
     'title' => 'Log',
     'description' => '',
@@ -58,6 +62,28 @@ function sirius_node_tabs() {
     'callback' => 'sirius_node_tab_entity_log',
     'permissions' => array('sirius dispatch staff'),
   );
+
+  $node_tabs['sirius_worker']['sirius_worker_letter'] = array(
+    'title' => 'Letters',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_letter',
+    'permissions' => array('sirius worker admin'),
+  );
+
+  $node_tabs['grievance']['grievance_letter'] = array(
+    'title' => 'Letters (New)',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_letter',
+    'permissions' => array('grievance user'),
+  );
+
+  $node_tabs['grievance_letter_template']['sirius_letter_template_recipients'] = array(
+    'title' => 'Recipients',
+    'description' => '',
+    'callback' => 'sirius_node_tab_letter_template_recipients',
+    'permissions' => array('grievance admin'),
+  );
+
 
   $node_tabs['sirius_feed']['sirius_feed_wizard'] = array(
     'title' => 'Wizard',
@@ -186,14 +212,6 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/dispatch/threestrikes'] = array(
-    'title' => 'Three Strikes Tester',
-    'description' => '',
-    'access arguments' => array('sirius dispatch staff'),
-    'page callback' => 'sirius_dispatch_threestrikes_page',
-    'type' => MENU_NORMAL_ITEM,
-  );
-
   $items['d/%/%'] = array(
     'title' => 'Dispatch shortlink',
     'page callback' => 'sirius_aatlink',
@@ -309,6 +327,15 @@ function sirius_menu() {
     'page callback' => 'sirius_letterhead_preview_loopback',
     'page arguments' => array(3),
     'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/letter/htmltemplate'] = array(
+    'title' => 'Letter Template',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_letter_htmltemplate',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
   );
 
   $items['sirius/feeds/launch/%'] = array(
@@ -435,7 +462,6 @@ function sirius_menu() {
     'weight' => 3,
   );
 
-
   $items['sirius/taxonomy/%'] = array(
     'title' => 'Taxonomy',
     'page callback' => 'sirius_page_taxonomy',
@@ -525,6 +551,50 @@ function sirius_menu() {
     'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
   );
+
+  $items['sirius/field_overrides'] = array(
+    'title' => 'Field Overrides',
+    'page callback' => 'sirius_page_field_overrides',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/phonenumber'] = array(
+    'title' => 'Manage Phone Numbers',
+    'page callback' => 'sirius_page_phonenumber_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/phonenumber/list'] = array(
+    'title' => 'Phone Number List',
+    'page callback' => 'sirius_page_phonenumber_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/phonenumber/check'] = array(
+    'title' => 'Phone Number Lookup',
+    'page callback' => 'sirius_page_phonenumber_check',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+
+  $items['sirius/config'] = array(
+    'title' => 'Sirius Configuration',
+    'page callback' => 'sirius_page_config',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
 
   /*
   $items['taxonomy/term/%/sirius_dispatch_job_policy_exim'] = array(
