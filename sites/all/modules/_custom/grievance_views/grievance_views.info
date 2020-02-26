@@ -86,6 +86,7 @@ features[views_view][] = sirius_member_status
 features[views_view][] = sirius_news
 features[views_view][] = sirius_news_admin
 features[views_view][] = sirius_payperiods
+features[views_view][] = sirius_phonenumbers
 features[views_view][] = sirius_skills
 features[views_view][] = sirius_taxonomy
 features[views_view][] = sirius_twilio_sms_conversations

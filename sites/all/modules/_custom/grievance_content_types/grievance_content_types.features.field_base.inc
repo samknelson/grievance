@@ -6906,6 +6906,31 @@ Prof.',
     'type' => 'text_long',
   );
 
+  // Exported field_base: 'field_sirius_sms_possible'.
+  $field_bases['field_sirius_sms_possible'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_sms_possible',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Yes' => 'Yes',
+        'No' => 'No',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_sirius_source'.
   $field_bases['field_sirius_source'] = array(
     'active' => 1,

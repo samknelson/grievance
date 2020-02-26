@@ -3150,6 +3150,34 @@ function grievance_content_types_field_group_info() {
   );
   $field_groups['group_sirius_worker_status|node|sirius_worker|form'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_skills|node|sirius_worker|default';
+  $field_group->group_name = 'group_skills';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Skills',
+    'weight' => '50',
+    'children' => array(
+      0 => 'field_sirius_skill',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Skills',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-skills field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_skills|node|sirius_worker|default'] = $field_group;
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Access');
