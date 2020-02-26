@@ -9,10 +9,13 @@ function sirius_page_config() {
 
 	$links['core'] = array('title' => 'Core');
 	$links['core']['links']['sirius/taxonomy'] 									= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');
+	$links['core']['links']['grievance/admin/letter-templates'] = array('title' => 'Letters', 'description' => 'Set up letter templates, such as a grievance notification or a graduation announcement for a worker..');
 	$links['core']['links']['sirius/admin/banner'] 							= array('title' => 'Site Banner', 'description' => 'Configure the banner to be shown at the top of all web pages.');
-	$links['core']['links']['sirius/phonenumber'] 							= array('title' => 'Phone Number Cache', 'description' => 'Search and review the cache of phone numbers and deliverability metrics (i.e. SMS-enabled).');
 	$links['core']['links']['sirius/field_overrides']						= array('title' => 'Field Overrides', 'description' => 'Change the names of fields.');
 	$links['core']['links']['admin/config/grievance/quicksearch'] = array('title' => 'Quickseach', 'description' => 'Settings for the banner "quicksearch" tool.');
+
+	$links['grievance'] = array('title' => 'Grievance');
+	$links['dispatch']['links']['admin/config/grievance/core'] 	= array('title' => 'Grievance Settings', 'description' => 'Configure the grievance module.');
 
 	$links['dispatch'] = array('title' => 'Dispatch');
 	$links['dispatch']['links']['sirius/dispatch/config/run'] 	= array('title' => 'Running Job Settings', 'description' => 'Global settings for running jobs.');
@@ -30,16 +33,14 @@ function sirius_page_config() {
 
 
 	$links['systems'] = array('title' => 'Systems');
+	$links['systems']['links']['sirius/domains'] 								= array('title' => 'Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
 	$links['systems']['links']['sirius/config/specialrid'] 			= array('title' => 'Special Roles', 'description' => 'Certain roles have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/email'] 					= array('title' => 'Email', 'description' => 'Oubound email settings');
+	$links['systems']['links']['sirius/phonenumber'] 						= array('title' => 'Phone Number Cache', 'description' => 'Search and review the cache of phone numbers and deliverability metrics (i.e. SMS-enabled).');
 	$links['systems']['links']['sirius/config/sms'] 						= array('title' => 'SMS', 'description' => 'SMS (text message) settings');
 	$links['systems']['links']['sirius/admin/twilio'] 					= array('title' => 'Twilio', 'description' => 'Settings for the Twilio phone service');
 	$links['systems']['links']['admin/config'] 									= array('title' => 'Drupal Configuration', 'description' => 'Enter the system-wide Drupal configuration screens.');
-
-
-
-
 
 	$html .= '<table>';
 
