@@ -30,15 +30,11 @@ function sirius_employer_node_tab_employer_users($employer_node) {
 	}
 
 	$rids = array();
-	if (user_access('sirius employer admin')) {
-		$rids = array_keys(user_roles());
-	} else {
-		$roles = user_roles();
-		$roles_avail = array();
-		foreach ($roles as $rid => $role) {
-			$avail = variable_get("sirius_employer_userrmanage_$rid", 'omit');
-			if ($avail != 'omit') { $rids[] = $rid; }
-		}
+	$roles = user_roles();
+	$roles_avail = array();
+	foreach ($roles as $rid => $role) {
+		$avail = variable_get("sirius_employer_userrmanage_$rid", 'omit');
+		if ($avail != 'omit') { $rids[] = $rid; }
 	}
 
 	$html = views_embed_view('sirius_employer_users', 'block', $employer_node->nid, join('+', $rids));
