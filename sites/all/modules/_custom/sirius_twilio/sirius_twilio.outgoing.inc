@@ -25,6 +25,9 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
   if (!$phone)                        { return array('success' => FALSE, 'msg' => "No phone number"); }
   if (!sirius_phone_validate($phone)) { return array('success' => FALSE, 'msg' => "[$phone] is not a valid phone number."); }
 
+  $possible = sirius_phonenumber_sms_possible($phone);
+  if (!$possible) 										{ return array('success' => FALSE, 'msg' => "[$phone] does not appear to be a mobile-enabled number."); }
+
   static $registered;
   if (variable_get('sirius_twilio_sms_consolidate', FALSE)) {
 		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg);
