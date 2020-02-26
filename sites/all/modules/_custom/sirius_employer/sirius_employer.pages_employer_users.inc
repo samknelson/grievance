@@ -29,15 +29,8 @@ function sirius_employer_node_tab_employer_users($employer_node) {
 		return drupal_get_form('sirius_employer_node_tab_employer_users_add_form', $employer_node);
 	}
 
-	$rids = array();
-	$roles = user_roles();
-	$roles_avail = array();
-	foreach ($roles as $rid => $role) {
-		$avail = variable_get("sirius_employer_userrmanage_$rid", 'omit');
-		if ($avail != 'omit') { $rids[] = $rid; }
-	}
-
-	$html = views_embed_view('sirius_employer_users', 'block', $employer_node->nid, join('+', $rids));
+	$roles = sirius_employer_usermanage_roles();
+	$html = views_embed_view('sirius_employer_users', 'block', $employer_node->nid, join('+', array_keys($roles)));
 	return $html;
 }
 
@@ -58,6 +51,12 @@ function sirius_employer_node_tab_employer_users_add_form($form, &$form_state, $
 
 		if ($new_user->field_grievance_shops['und'][0]['target_id'] != $employer_node->nid) {
 			drupal_set_message("The user is not associated with this shop.", 'error');
+			return array();
+		}
+
+		$roles = sirius_employer_usermanage_roles();
+		if (!$roles || !array_intersect(array_keys($roles), array_keys($new_user->roles))) {
+			drupal_set_message("The user does not have one of the required roles, and cannot be edited in this form.");
 			return array();
 		}
 
@@ -113,25 +112,13 @@ function sirius_employer_node_tab_employer_users_add_form($form, &$form_state, $
 		'#default_value' => $new_user->status,
 	);
 
-	$roles = user_roles();
-	$roles_avail = array();
-	$roles_default = array();
-	foreach ($roles as $rid => $role) {
-		$avail = variable_get("sirius_employer_userrmanage_$rid", 'omit');
-		if ($avail == 'optional') {
-			$roles_avail[$rid] = $role;
-			if ($new_user->roles[$rid]) {
-				$roles_default[] = $rid;
-			}
-		}
-	}
-
-	if ($roles_avail) {
+	$roles = sirius_employer_usermanage_roles('optional');
+	if ($roles) {
 		$form['roles'] = array(
 			'#type' => 'checkboxes',
 			'#title' => 'Roles',
-			'#options' => $roles_avail,
-			'#default_value' => $roles_default,
+			'#options' => $roles,
+			'#default_value' => array_intersect(array_keys($roles), array_keys($new_user->roles)),
 		);
 	}
 
@@ -207,27 +194,28 @@ function sirius_employer_node_tab_employer_users_add_form_submit($form, &$form_s
 	$new_user->name = $name;
 	$new_user->field_grievance_shops['und'][0]['target_id'] = $employer_node->nid;
 	$new_user->field_grievance_phone['und'][0]['value'] = $phone;
-	$roles = user_roles();
-	foreach ($roles as $rid => $role) {
-		$avail = variable_get("sirius_employer_userrmanage_$rid", 'omit');
-		if ($avail == 'required') { 
-			$new_user->roles[$rid] = $role;
-		}
 
-		if ($avail == 'optional') {
-			if ($form_state['values']['roles'][$rid]) { 
-				$new_user->roles[$rid] = $role;
+	$all_roles = user_roles();
+	$required_roles = sirius_employer_usermanage_roles('required');
+	foreach ($required_roles as $rid => $role) {
+		$new_user->roles[$rid] = $role;
+	}
+	if ($form_state['values']['roles']) {
+		foreach ($form_state['values']['roles'] as $rid => $checked) {
+			if ($checked) { 
+				$new_user->roles[$rid] = $all_roles[$rid];
 			} else {
 				unset($new_user->roles[$rid]);
 			}
 		}
 	}
+
 	$new_user->status = $form_state['values']['status'];
 
 	$new_user = user_save($new_user, $edit);
 	//dpm($new_user);
-	//$form_state['rebuild'] = TRUE;
-	//return;
+	// $form_state['rebuild'] = TRUE;
+	// return;
 
 	if ($new_uid) {
 		drupal_set_message(t('User @name has been updated.', array('@name' => $new_user->name)));
@@ -255,4 +243,17 @@ function sirius_employer_usermanage_admin() {
   }
 
   return system_settings_form($form);
+}
+
+function sirius_employer_usermanage_roles($which = NULL) {
+	$all_roles = user_roles();
+	$roles = array();
+	foreach ($all_roles as $rid => $role) {
+		$avail = variable_get("sirius_employer_userrmanage_$rid", 'omit');
+		if ($which && ($avail != $which))  { continue; }
+		if (!$which && ($avail == 'omit')) { continue; }
+		$roles[$rid] = $role;
+	}
+
+	return $roles;
 }
