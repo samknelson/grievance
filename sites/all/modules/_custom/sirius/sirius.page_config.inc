@@ -22,6 +22,13 @@ function sirius_page_config() {
 	$links['dispatch'] = array('title' => 'Bulk Messenger');
 	$links['dispatch']['links']['sirius/config/bulk'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
 
+	$links['users'] = array('title' => 'Users');
+	$links['users']['links']['admin/people/permissions'] = array('title' => 'Permissions', 'description' => 'Define which roles have which permissions.');
+	$links['users']['links']['admin/people/permissions/roles'] = array('title' => 'Roles', 'description' => 'Define the system-wide user roles.');
+	$links['users']['links']['admin/config/system/flood-control'] = array('title' => 'Flood Control', 'description' => 'Settings for blocking multiple failed login attempts from the same IP address.');
+	$links['users']['links']['admin/config/system/flood-unblock'] = array('title' => 'Flood Unblock', 'description' => 'Clear the flood block for a legitimate user who is trying to sign in.');
+
+
 	$links['systems'] = array('title' => 'Systems');
 	$links['systems']['links']['sirius/config/specialrid'] 			= array('title' => 'Special Roles', 'description' => 'Certain roles have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');
