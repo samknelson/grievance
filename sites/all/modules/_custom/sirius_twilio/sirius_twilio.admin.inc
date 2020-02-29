@@ -3,66 +3,75 @@
 function sirius_twilio_config() {
   $form = array();
 
-  $form['sirius_twilio_phone'] = array(
+  $name = sirius_domain_variable_name('sirius_twilio_phone');
+  $form[$name] = array(
     '#type' => 'textfield',
     '#title' => t('Phone Number'),
-    '#default_value' => variable_get('sirius_twilio_phone', ''),
+    '#default_value' => variable_get($name, ''),
     '#description' => t('Phone number in E164 format (i.e. "+15551234567".'),
   );
 
-  $form['sirius_twilio_account_sid'] = array(
+  $name = sirius_domain_variable_name('sirius_twilio_account_sid');
+  $form[$name] = array(
     '#type' => 'textfield',
     '#title' => t('Account SID'),
-    '#default_value' => variable_get('sirius_twilio_account_sid', ''),
+    '#default_value' => variable_get($name, ''),
   );
 
-  $form['sirius_twilio_account_token'] = array(
+  $name = sirius_domain_variable_name('sirius_twilio_account_token');
+  $form[$name] = array(
     '#type' => 'textfield',
     '#title' => t('Account Token'),
-    '#default_value' => variable_get('sirius_twilio_account_token', ''),
+    '#default_value' => variable_get($name, ''),
   );
 
-  $form['sirius_twilio_app_sid'] = array(
+  $name = sirius_domain_variable_name('sirius_twilio_app_sid');
+  $form[$name] = array(
     '#type' => 'textfield',
     '#title' => t('App SID'),
-    '#default_value' => variable_get('sirius_twilio_app_sid', ''),
+    '#default_value' => variable_get($name, ''),
   );
 
-  $form['sirius_twilio_operator'] = array(
+  $name = sirius_domain_variable_name('sirius_twilio_operator');
+  $form[$name] = array(
     '#type' => 'textfield',
     '#title' => t('Operator Phone Number'),
-    '#default_value' => variable_get('sirius_twilio_operator', ''),
+    '#default_value' => variable_get($name, ''),
     '#description' => t('Phone number in E164 format (i.e. "+15551234567".'),
   );
 
-  $form['sirius_twilio_site_name_tts'] = array(
+  $name = sirius_domain_variable_name('sirius_twilio_site_name_tts');
+  $form[$name] = array(
     '#type' => 'textfield',
     '#title' => t('Site Name (TTS)'),
-    '#default_value' => variable_get('sirius_twilio_site_name_tts', ''),
+    '#default_value' => variable_get($name, ''),
     '#description' => t('Site name as it should be spoken (TTS format)'),
   );
 
-  $form['sirius_twilio_twiml_open'] = array(
+  $name = sirius_domain_variable_name('sirius_twilio_twiml_open');
+  $form[$name] = array(
     '#type' => 'textfield',
     '#title' => t('TWIML Open'),
-    '#default_value' => variable_get('sirius_twilio_twiml_open', '<Say><prosody>'),
+    '#default_value' => variable_get($name, '<Say><prosody>'),
     '#description' => t('Enter the default TWIML wrapper. This allows you to specify a voice and a prosody call.'),
   );
 
-  $form['sirius_twilio_twiml_close'] = array(
+  $name = sirius_domain_variable_name('sirius_twilio_twiml_close');
+  $form[$name] = array(
     '#type' => 'textfield',
     '#title' => t('TWIML Close'),
-    '#default_value' => variable_get('sirius_twilio_twiml_close', '</prosody></Say>'),
+    '#default_value' => variable_get($name, '</prosody></Say>'),
   );
 
-  $form['sirius_twilio_sms_consolidate'] = array(
+  $name = sirius_domain_variable_name('sirius_twilio_sms_consolidate');
+  $form[$name] = array(
     '#type' => 'select',
     '#title' => t('Consolidate Outgoing Messages'),
     '#options' => array(
       FALSE => t('No'),
       TRUE => t('Yes'),
     ),
-    '#default_value' => variable_get('sirius_twilio_sms_consolidate', FALSE),
+    '#default_value' => variable_get($name, FALSE),
     '#description' => t('Sometimes multiple SMS messages are sent within the same page load (i.e. "you have been laid off" and "you have been signed out". Select "Yes" to consolidate these into a single SMS messages.'),
   );
 

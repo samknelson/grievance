@@ -10,8 +10,8 @@ function sirius_twilio_client_get() {
 		// Autoload error with respect to TwiML, I think it has to do with capitalization
 		require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/twilio-php/Twilio/Twiml.php';
 		
-		$account_sid = variable_get('sirius_twilio_account_sid', '');
-		$account_token = variable_get('sirius_twilio_account_token', '');
+		$account_sid = sirius_domain_variable_get('sirius_twilio_account_sid', '');
+		$account_token = sirius_domain_variable_get('sirius_twilio_account_token', '');
 		$client = new Client($account_sid, $account_token);
 	}
 
@@ -22,9 +22,9 @@ function sirius_twilio_capability_token_get() {
 	global $user;
 
 	// put your Twilio API credentials here
-	$account_sid = variable_get('sirius_twilio_account_sid', '');
-	$account_token = variable_get('sirius_twilio_account_token', '');
-	$app_sid = variable_get('sirius_twilio_app_sid', '');
+	$account_sid = sirius_domain_variable_get('sirius_twilio_account_sid', '');
+	$account_token = sirius_domain_variable_get('sirius_twilio_account_token', '');
+	$app_sid = sirius_domain_variable_get('sirius_twilio_app_sid', '');
 
 	$capability = new ClientToken($account_sid, $account_token);
 	$capability->allowClientOutgoing($app_sid);
