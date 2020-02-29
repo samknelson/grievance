@@ -3,8 +3,6 @@
 function sirius_page_config() {
 
 
-//
-
 	$links = array();
 
 	$links['core'] = array('title' => 'Core');
@@ -41,7 +39,7 @@ function sirius_page_config() {
 	$links['systems']['links']['sirius/config/email'] 					= array('title' => 'Email', 'description' => 'Oubound email settings');
 	$links['systems']['links']['sirius/phonenumber'] 						= array('title' => 'Phone Number Cache', 'description' => 'Search and review the cache of phone numbers and deliverability metrics (i.e. SMS-enabled).');
 	$links['systems']['links']['sirius/config/sms'] 						= array('title' => 'SMS', 'description' => 'SMS (text message) settings');
-	$links['systems']['links']['sirius/admin/twilio'] 					= array('title' => 'Twilio', 'description' => 'Settings for the Twilio phone service');
+	$links['systems']['links']['sirius/config/twilio'] 					= array('title' => 'Twilio', 'description' => 'Settings for the Twilio phone service');
 	$links['systems']['links']['admin/config'] 									= array('title' => 'Drupal Configuration', 'description' => 'Enter the system-wide Drupal configuration screens.');
 
 	$html .= '<table>';
@@ -58,11 +56,13 @@ function sirius_page_config() {
 		$html .= '</tr>';
 
 		foreach ($category['links'] as $path => $link) {
-			$html .= '<tr>';
-			$html .= '<td>' . $link['title'] . '</td>';
-			$html .= '<td>' . $link['description'] . '</td>';
-			$html .= '<td>' . l('Manage', $path, array('attributes' => array('class' => array('tool-button')))) . '</td>';
-			$html .= '</tr>';
+			if (drupal_valid_path($path)) {
+				$html .= '<tr>';
+				$html .= '<td>' . $link['title'] . '</td>';
+				$html .= '<td>' . $link['description'] . '</td>';
+				$html .= '<td>' . l('Manage', $path, array('attributes' => array('class' => array('tool-button')))) . '</td>';
+				$html .= '</tr>';
+			}
 		}
 	}
 
