@@ -164,7 +164,9 @@ function sirius_sms_already_sent($id) {
 }
 
 function sirius_sms_admin() {
-  $form["sirius_sms_global_disable"] = array(
+
+  $name = sirius_domain_variable_name('sirius_sms_global_disable');
+  $form[$name] = array(
     '#type' => 'select',
     '#title' => t('Global Disable'),
     '#options' => array(
@@ -172,14 +174,15 @@ function sirius_sms_admin() {
       'Yes' => t('Yes'),
     ),
     '#description' => t('Select "Yes" to globally disable SMS on this server.'),
-    '#default_value' => variable_get("sirius_sms_global_disable", ''),
+    '#default_value' => variable_get($name, ''),
   );
 
-  $form["sirius_sms_global_disable_whitelist"] = array(
+  $name = sirius_domain_variable_name('sirius_sms_global_disable_whitelist');
+  $form[$name] = array(
     '#type' => 'textarea',
     '#title' => t('Whitelist'),
     '#description' => t('When global disable is on, use the whitelist to indicate which phone numbers <strong>can</strong> receive SMS. Phone numbers must be in the format (xxx) xxx-xxxx.'),
-    '#default_value' => variable_get("sirius_sms_global_disable_whitelist", ''),
+    '#default_value' => variable_get($name, ''),
     '#states' => array(
       'visible' => array(
         array(':input[name="sirius_sms_global_disable"]' => array('value' => 'Yes')),
