@@ -5470,121 +5470,6 @@ Section',
   $export['grievance_log_status'] = $view;
 
   $view = new view();
-  $view->name = 'grievance_news';
-  $view->description = '';
-  $view->tag = 'default';
-  $view->base_table = 'node';
-  $view->human_name = 'Grievance News';
-  $view->core = 7;
-  $view->api_version = '3.0';
-  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
-
-  /* Display: Master */
-  $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'News and Announcements';
-  $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'grievance user';
-  $handler->display->display_options['cache']['type'] = 'none';
-  $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['exposed_form']['type'] = 'basic';
-  $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
-  $handler->display->display_options['style_plugin'] = 'default';
-  $handler->display->display_options['row_plugin'] = 'node';
-  /* Header: Global: Text area */
-  $handler->display->display_options['header']['area']['id'] = 'area';
-  $handler->display->display_options['header']['area']['table'] = 'views';
-  $handler->display->display_options['header']['area']['field'] = 'area';
-  /* Field: Content: Title */
-  $handler->display->display_options['fields']['title']['id'] = 'title';
-  $handler->display->display_options['fields']['title']['table'] = 'node';
-  $handler->display->display_options['fields']['title']['field'] = 'title';
-  $handler->display->display_options['fields']['title']['label'] = '';
-  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
-  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
-  /* Field: Content: Body */
-  $handler->display->display_options['fields']['body']['id'] = 'body';
-  $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
-  $handler->display->display_options['fields']['body']['field'] = 'body';
-  /* Field: Content: Nid */
-  $handler->display->display_options['fields']['nid']['id'] = 'nid';
-  $handler->display->display_options['fields']['nid']['table'] = 'node';
-  $handler->display->display_options['fields']['nid']['field'] = 'nid';
-  /* Sort criterion: Content: Post date */
-  $handler->display->display_options['sorts']['created']['id'] = 'created';
-  $handler->display->display_options['sorts']['created']['table'] = 'node';
-  $handler->display->display_options['sorts']['created']['field'] = 'created';
-  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
-  /* Contextual filter: Field: Roles (field_sirius_roles) */
-  $handler->display->display_options['arguments']['field_sirius_roles_value']['id'] = 'field_sirius_roles_value';
-  $handler->display->display_options['arguments']['field_sirius_roles_value']['table'] = 'field_data_field_sirius_roles';
-  $handler->display->display_options['arguments']['field_sirius_roles_value']['field'] = 'field_sirius_roles_value';
-  $handler->display->display_options['arguments']['field_sirius_roles_value']['default_action'] = 'access denied';
-  $handler->display->display_options['arguments']['field_sirius_roles_value']['default_argument_type'] = 'fixed';
-  $handler->display->display_options['arguments']['field_sirius_roles_value']['summary']['number_of_records'] = '0';
-  $handler->display->display_options['arguments']['field_sirius_roles_value']['summary']['format'] = 'default_summary';
-  $handler->display->display_options['arguments']['field_sirius_roles_value']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published status */
-  $handler->display->display_options['filters']['status']['id'] = 'status';
-  $handler->display->display_options['filters']['status']['table'] = 'node';
-  $handler->display->display_options['filters']['status']['field'] = 'status';
-  $handler->display->display_options['filters']['status']['value'] = 1;
-  $handler->display->display_options['filters']['status']['group'] = 1;
-  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Filter criterion: Content: Type */
-  $handler->display->display_options['filters']['type']['id'] = 'type';
-  $handler->display->display_options['filters']['type']['table'] = 'node';
-  $handler->display->display_options['filters']['type']['field'] = 'type';
-  $handler->display->display_options['filters']['type']['value'] = array(
-    'grievance_news' => 'grievance_news',
-  );
-
-  /* Display: Block */
-  $handler = $view->new_display('block', 'Block', 'block');
-  $handler->display->display_options['defaults']['title'] = FALSE;
-  $handler->display->display_options['defaults']['pager'] = FALSE;
-  $handler->display->display_options['pager']['type'] = 'some';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '5';
-  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
-  $handler->display->display_options['style_plugin'] = 'default';
-  $handler->display->display_options['defaults']['style_options'] = FALSE;
-  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
-  $handler->display->display_options['row_plugin'] = 'node';
-  $handler->display->display_options['defaults']['row_options'] = FALSE;
-  $handler->display->display_options['defaults']['header'] = FALSE;
-  $handler->display->display_options['defaults']['footer'] = FALSE;
-  /* Footer: Global: Text area */
-  $handler->display->display_options['footer']['area']['id'] = 'area';
-  $handler->display->display_options['footer']['area']['table'] = 'views';
-  $handler->display->display_options['footer']['area']['field'] = 'area';
-  $handler->display->display_options['footer']['area']['content'] = '[<a href="/grievance/news">All news</a>]';
-  $handler->display->display_options['footer']['area']['format'] = 'full_html';
-  $translatables['grievance_news'] = array(
-    t('Master'),
-    t('News and Announcements'),
-    t('more'),
-    t('Apply'),
-    t('Reset'),
-    t('Sort by'),
-    t('Asc'),
-    t('Desc'),
-    t('Items per page'),
-    t('- All -'),
-    t('Offset'),
-    t('« first'),
-    t('‹ previous'),
-    t('next ›'),
-    t('last »'),
-    t('Body'),
-    t('Nid'),
-    t('All'),
-    t('Block'),
-    t('[<a href="/grievance/news">All news</a>]'),
-  );
-  $export['grievance_news'] = $view;
-
-  $view = new view();
   $view->name = 'grievance_open_report';
   $view->description = '';
   $view->tag = 'default';
@@ -18676,10 +18561,12 @@ Grievance Form',
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Departments';
   $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['group_by'] = TRUE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'sirius dispatch admin';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['query']['options']['distinct'] = TRUE;
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '500';
@@ -18758,6 +18645,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_industry']['settings'] = array(
     'field_delimiter' => '',
   );
+  $handler->display->display_options['fields']['field_sirius_industry']['group_column'] = 'entity_id';
   $handler->display->display_options['fields']['field_sirius_industry']['delta_offset'] = '0';
   /* Field: Taxonomy term: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
@@ -18774,7 +18662,6 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_dispatch_available']['id'] = 'field_sirius_dispatch_available';
   $handler->display->display_options['fields']['field_sirius_dispatch_available']['table'] = 'field_data_field_sirius_dispatch_available';
   $handler->display->display_options['fields']['field_sirius_dispatch_available']['field'] = 'field_sirius_dispatch_available';
-  $handler->display->display_options['fields']['field_sirius_dispatch_available']['label'] = 'Use for Dispatch?';
   /* Field: Global: Custom text */
   $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
@@ -18823,7 +18710,7 @@ Grievance Form',
     t('Industry'),
     t('Name'),
     t('External ID'),
-    t('Use for Dispatch?'),
+    t('Available for Dispatch?'),
     t('Tools'),
     t('<a href="/taxonomy/term/[tid]/edit?destination=[current_path]" class="tool-button">Edit</a>'),
     t('Page'),
@@ -26571,6 +26458,27 @@ Grievance Form',
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['path'] = 'sirius/admin/skills';
+
+  /* Display: Data export */
+  $handler = $view->new_display('views_data_export', 'Data export', 'views_data_export_1');
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
+  $handler->display->display_options['style_options']['provide_file'] = 1;
+  $handler->display->display_options['style_options']['parent_sort'] = 0;
+  $handler->display->display_options['style_options']['quote'] = 1;
+  $handler->display->display_options['style_options']['trim'] = 0;
+  $handler->display->display_options['style_options']['replace_newlines'] = 0;
+  $handler->display->display_options['style_options']['newline_token'] = '1';
+  $handler->display->display_options['style_options']['header'] = 1;
+  $handler->display->display_options['style_options']['keep_html'] = 0;
+  $handler->display->display_options['path'] = 'sirius/admin/skills/csv';
+  $handler->display->display_options['displays'] = array(
+    'page' => 'page',
+    'default' => 0,
+  );
+  $handler->display->display_options['use_batch'] = 'batch';
+  $handler->display->display_options['segment_size'] = '100';
   $translatables['sirius_skills'] = array(
     t('Master'),
     t('Skills'),
@@ -26602,6 +26510,7 @@ Grievance Form',
     t('contain all words'),
     t('contains all words'),
     t('Page'),
+    t('Data export'),
   );
   $export['sirius_skills'] = $view;
 
@@ -28329,6 +28238,7 @@ Accepted'),
   $handler->display->display_options['filters']['field_sirius_dispatch_sib_status_tid']['id'] = 'field_sirius_dispatch_sib_status_tid';
   $handler->display->display_options['filters']['field_sirius_dispatch_sib_status_tid']['table'] = 'field_data_field_sirius_dispatch_sib_status';
   $handler->display->display_options['filters']['field_sirius_dispatch_sib_status_tid']['field'] = 'field_sirius_dispatch_sib_status_tid';
+  $handler->display->display_options['filters']['field_sirius_dispatch_sib_status_tid']['group'] = 1;
   $handler->display->display_options['filters']['field_sirius_dispatch_sib_status_tid']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_dispatch_sib_status_tid']['expose']['operator_id'] = 'field_sirius_dispatch_sib_status_tid_op';
   $handler->display->display_options['filters']['field_sirius_dispatch_sib_status_tid']['expose']['label'] = 'Sign-in Block?';
@@ -28344,6 +28254,7 @@ Accepted'),
   $handler->display->display_options['filters']['field_sirius_dispatch_available_value']['table'] = 'field_data_field_sirius_dispatch_available';
   $handler->display->display_options['filters']['field_sirius_dispatch_available_value']['field'] = 'field_sirius_dispatch_available_value';
   $handler->display->display_options['filters']['field_sirius_dispatch_available_value']['relationship'] = 'field_sirius_work_status_tid';
+  $handler->display->display_options['filters']['field_sirius_dispatch_available_value']['group'] = 1;
   $handler->display->display_options['filters']['field_sirius_dispatch_available_value']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_dispatch_available_value']['expose']['operator_id'] = 'field_sirius_dispatch_available_value_op';
   $handler->display->display_options['filters']['field_sirius_dispatch_available_value']['expose']['label'] = 'Available for Dispatch?';
@@ -28358,6 +28269,7 @@ Accepted'),
   $handler->display->display_options['filters']['field_sirius_name']['table'] = 'field_data_field_sirius_name';
   $handler->display->display_options['filters']['field_sirius_name']['field'] = 'field_sirius_name';
   $handler->display->display_options['filters']['field_sirius_name']['operator'] = 'allwords';
+  $handler->display->display_options['filters']['field_sirius_name']['group'] = 1;
   $handler->display->display_options['filters']['field_sirius_name']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_name']['expose']['operator_id'] = 'field_sirius_name_op';
   $handler->display->display_options['filters']['field_sirius_name']['expose']['label'] = 'Name';
@@ -28370,6 +28282,7 @@ Accepted'),
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['filters']['field_grievance_shop_target_id']['group'] = 1;
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['operator_id'] = 'field_grievance_shop_target_id_op';
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['label'] = 'Employer';
@@ -28382,6 +28295,7 @@ Accepted'),
   $handler->display->display_options['filters']['field_sirius_worker_dispstatus_tid']['id'] = 'field_sirius_worker_dispstatus_tid';
   $handler->display->display_options['filters']['field_sirius_worker_dispstatus_tid']['table'] = 'field_data_field_sirius_worker_dispstatus';
   $handler->display->display_options['filters']['field_sirius_worker_dispstatus_tid']['field'] = 'field_sirius_worker_dispstatus_tid';
+  $handler->display->display_options['filters']['field_sirius_worker_dispstatus_tid']['group'] = 1;
   $handler->display->display_options['filters']['field_sirius_worker_dispstatus_tid']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_worker_dispstatus_tid']['expose']['operator_id'] = 'field_sirius_worker_dispstatus_tid_op';
   $handler->display->display_options['filters']['field_sirius_worker_dispstatus_tid']['expose']['label'] = 'Dispatch Status';
@@ -28392,6 +28306,48 @@ Accepted'),
   );
   $handler->display->display_options['filters']['field_sirius_worker_dispstatus_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_sirius_worker_dispstatus_tid']['vocabulary'] = 'sirius_worker_dispatch_status';
+  /* Filter criterion: Field: ID (field_sirius_id) */
+  $handler->display->display_options['filters']['field_sirius_id_value']['id'] = 'field_sirius_id_value';
+  $handler->display->display_options['filters']['field_sirius_id_value']['table'] = 'field_data_field_sirius_id';
+  $handler->display->display_options['filters']['field_sirius_id_value']['field'] = 'field_sirius_id_value';
+  $handler->display->display_options['filters']['field_sirius_id_value']['operator'] = 'contains';
+  $handler->display->display_options['filters']['field_sirius_id_value']['group'] = 1;
+  $handler->display->display_options['filters']['field_sirius_id_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['operator_id'] = 'field_sirius_id_value_op';
+  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['label'] = 'ID/Badge #';
+  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['operator'] = 'field_sirius_id_value_op';
+  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['identifier'] = 'field_sirius_id_value';
+  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  /* Filter criterion: Field: Titan ID (field_sirius_id2) */
+  $handler->display->display_options['filters']['field_sirius_id2_value']['id'] = 'field_sirius_id2_value';
+  $handler->display->display_options['filters']['field_sirius_id2_value']['table'] = 'field_data_field_sirius_id2';
+  $handler->display->display_options['filters']['field_sirius_id2_value']['field'] = 'field_sirius_id2_value';
+  $handler->display->display_options['filters']['field_sirius_id2_value']['operator'] = 'contains';
+  $handler->display->display_options['filters']['field_sirius_id2_value']['group'] = 1;
+  $handler->display->display_options['filters']['field_sirius_id2_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['operator_id'] = 'field_sirius_id2_value_op';
+  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['label'] = 'Titan ID';
+  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['operator'] = 'field_sirius_id2_value_op';
+  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['identifier'] = 'field_sirius_id2_value';
+  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  /* Filter criterion: Content: ID3 (field_sirius_id3) */
+  $handler->display->display_options['filters']['field_sirius_id3_value']['id'] = 'field_sirius_id3_value';
+  $handler->display->display_options['filters']['field_sirius_id3_value']['table'] = 'field_data_field_sirius_id3';
+  $handler->display->display_options['filters']['field_sirius_id3_value']['field'] = 'field_sirius_id3_value';
+  $handler->display->display_options['filters']['field_sirius_id3_value']['operator'] = 'contains';
+  $handler->display->display_options['filters']['field_sirius_id3_value']['group'] = 1;
+  $handler->display->display_options['filters']['field_sirius_id3_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_id3_value']['expose']['operator_id'] = 'field_sirius_id3_value_op';
+  $handler->display->display_options['filters']['field_sirius_id3_value']['expose']['label'] = 'Apprentice ID';
+  $handler->display->display_options['filters']['field_sirius_id3_value']['expose']['operator'] = 'field_sirius_id3_value_op';
+  $handler->display->display_options['filters']['field_sirius_id3_value']['expose']['identifier'] = 'field_sirius_id3_value';
+  $handler->display->display_options['filters']['field_sirius_id3_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -28488,6 +28444,7 @@ Accepted'),
   $handler->display->display_options['fields']['field_sirius_dispatch_availdate']['id'] = 'field_sirius_dispatch_availdate';
   $handler->display->display_options['fields']['field_sirius_dispatch_availdate']['table'] = 'field_data_field_sirius_dispatch_availdate';
   $handler->display->display_options['fields']['field_sirius_dispatch_availdate']['field'] = 'field_sirius_dispatch_availdate';
+  $handler->display->display_options['fields']['field_sirius_dispatch_availdate']['label'] = 'Last Sign in';
   $handler->display->display_options['fields']['field_sirius_dispatch_availdate']['settings'] = array(
     'format_type' => 'date_and_time_sortable',
     'custom_date_format' => '',
@@ -28672,21 +28629,21 @@ Accepted'),
     t('Available for Dispatch?'),
     t('based on current work status'),
     t('Dispatch Status'),
+    t('ID/Badge #'),
+    t('Titan ID'),
+    t('Apprentice ID'),
     t('Page'),
     t('<div /><a href="/node/add/sirius-worker?destination=[current_path]" class="action-button">Add a new worker</a></div>'),
     t('Content'),
     t('- Choose an operation -'),
     t('Re-Sync Worker\'s User'),
     t('ID'),
-    t('Available Since'),
+    t('Last Sign in'),
     t('Work Status'),
     t('Work Status / Dispatch Status'),
     t('[field_sirius_work_status]<br><a href="/node/[nid]/sirius_worker_dispatches/status" target="_blank">[field_sirius_worker_dispstatus]</a>'),
     t('<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a> <a href="/node/[nid]/sirius_worker_dispatches" target="_blank" class="tool-button">Dispatches</a>'),
     t('Data export'),
-    t('ID/Badge #'),
-    t('Titan ID'),
-    t('Apprentice ID'),
     t('Address'),
     t('Apt/Suite #'),
     t('City'),

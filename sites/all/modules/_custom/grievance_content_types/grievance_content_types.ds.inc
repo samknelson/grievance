@@ -87,36 +87,6 @@ function grievance_content_types_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
-  $ds_fieldsetting->id = 'node|grievance_news|teaser';
-  $ds_fieldsetting->entity_type = 'node';
-  $ds_fieldsetting->bundle = 'grievance_news';
-  $ds_fieldsetting->view_mode = 'teaser';
-  $ds_fieldsetting->settings = array(
-    'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'node_link' => array(
-      'weight' => '4',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'author' => array(
-      'weight' => '2',
-      'label' => 'hidden',
-      'format' => 'author',
-    ),
-    'post_date' => array(
-      'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'ds_post_date_long',
-    ),
-  );
-  $export['node|grievance_news|teaser'] = $ds_fieldsetting;
-
-  $ds_fieldsetting = new stdClass();
-  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|grievance|default';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'grievance';
@@ -732,45 +702,6 @@ function grievance_content_types_ds_layout_settings_info() {
     'page_option_title' => '',
   );
   $export['node|grievance_log|default'] = $ds_layout;
-
-  $ds_layout = new stdClass();
-  $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|grievance_news|teaser';
-  $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'grievance_news';
-  $ds_layout->view_mode = 'teaser';
-  $ds_layout->layout = 'ds_1col';
-  $ds_layout->settings = array(
-    'regions' => array(
-      'ds_content' => array(
-        0 => 'title',
-        1 => 'post_date',
-        2 => 'author',
-        3 => 'body',
-        4 => 'node_link',
-      ),
-    ),
-    'fields' => array(
-      'title' => 'ds_content',
-      'post_date' => 'ds_content',
-      'author' => 'ds_content',
-      'body' => 'ds_content',
-      'node_link' => 'ds_content',
-    ),
-    'classes' => array(),
-    'wrappers' => array(
-      'ds_content' => 'div',
-    ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
-    'hide_page_title' => '0',
-    'page_option_title' => '',
-  );
-  $export['node|grievance_news|teaser'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
