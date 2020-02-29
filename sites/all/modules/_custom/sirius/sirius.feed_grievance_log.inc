@@ -35,11 +35,7 @@ function sirius_feed_grievance_log_info() {
 
 function sirius_feed_grievance_log_row_verify($feed_node, $info, $data, &$row, $precompute) {
 	// Trim all
-	foreach ($row as $key => $value) { 
-    if (is_string($row[$key])) { 
-      $row[$key] = trim($value);
-    }
-  }
+  foreach ($row as $key => $value) { if (is_string($value)) { $row[$key] = trim($value); } }
 
   $log_id = $row['log_id'];
   if (!$log_id) { return array('success' => FALSE, 'msg' => 'Missing log ID.'); } 
