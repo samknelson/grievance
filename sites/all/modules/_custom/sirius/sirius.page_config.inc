@@ -19,7 +19,6 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/admin/letterhead'] 					= array('title' => 'Letterhead', 'description' => 'Manage letterheads and watermarks for the site.');
 
 	$links['worker'] = array('title' => 'Worker');
-	$links['worker']['links']['admin/config/grievance/core'] 	= array('title' => 'Grievance Settings', 'description' => 'Configure the grievance module.');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
 
 	$links['employer'] = array('title' => 'Employer');
