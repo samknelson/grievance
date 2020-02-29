@@ -390,7 +390,6 @@ function grievance_letter_render_html($grievance_node, $letter_nids, $other_toke
 	if ($workersync_plugin['id'] == 'local') {
 		$worker_id = $grievance_node->field_grievance_min['und'][0]['value'];
 		$worker_node = sirius_worker_get_by_id($worker_id);
-		drupal_set_message("Here with " . $worker_id . " => " . $worker_node->title);
 		if ($worker_node) {
 			$tokens['worker_node'] = $worker_node;
 			$token_aliases['worker_node'] = 'node';
