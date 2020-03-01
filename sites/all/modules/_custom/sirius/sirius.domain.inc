@@ -214,8 +214,8 @@ function sirius_domain_taxonomy_is_multidomain($vid_or_machine_name) {
   } else {
     $vocabulary_machine_name = $vid_or_machine_name;
   }
-  $multidomain = variable_get("sirius_taxonomy_multidomain_$vocabulary_machine_name", '');
-  return ($multidomain == 'Yes');
+  $settings = sirius_taxonomy_settings($vocabulary_machine_name);
+  return ($settings['multidomain'] == 'Yes');
 }
 
 /**
