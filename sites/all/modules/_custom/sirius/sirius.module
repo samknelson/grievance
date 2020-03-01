@@ -257,29 +257,27 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
 
   // Remove the domain
   if ($form['field_sirius_domain']) {
-    if (!user_access('sirius admin')) {
-      // Check our domain. Might come from the query.
-      $domain_nid = $_GET['sirius_domain'];
+    // Check our domain. Might come from the query.
+    $domain_nid = $_GET['sirius_domain'];
 
-      // If not, might come from the default value (current field value)
-      if (!$domain_nid) {
-        $domain_nid = $form['field_sirius_domain']['und']['#default_value'][0];
-      }
+    // If not, might come from the default value (current field value)
+    if (!$domain_nid) {
+      $domain_nid = $form['field_sirius_domain']['und']['#default_value'][0];
+    }
+    if ($domain_nid == 'CURRENT_DOMAIN') { $domain_nid = NULL; }
 
-      // If not, default to our very own domain.
-      if (!$domain_nid) {
-        $domain_node = sirius_domain();
-        $domain_nid = $domain_node->nid;
-      }
+    // If not, default to our very own domain.
+    if (!$domain_nid) {
+      $domain_nid = sirius_domain_nid();
+    }
 
-      if ($domain_nid) {
-        if (!sirius_domain_access($domain_nid)) { 
-          drupal_set_message("Attempting to create a record in a domain without access.", 'error');
-          $form['#access'] = FALSE;
-        }
-        $form['field_sirius_domain']['und']['#value']['target_id'] = $domain_nid;
-        $form['field_sirius_domain']['#access'] = FALSE;
+    if ($domain_nid) {
+      if (!sirius_domain_access($domain_nid)) { 
+        drupal_set_message("Attempting to create a record in a domain without access.", 'error');
+        $form['#access'] = FALSE;
       }
+      $form['field_sirius_domain']['und']['#value']['target_id'] = $domain_nid;
+      if (!user_access('sirius admin')) { $form['field_sirius_domain']['#access'] = FALSE; }
     }
   }
 
