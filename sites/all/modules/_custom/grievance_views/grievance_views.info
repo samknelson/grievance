@@ -77,6 +77,7 @@ features[views_view][] = sirius_feeds
 features[views_view][] = sirius_grievance_quick_export
 features[views_view][] = sirius_help
 features[views_view][] = sirius_industries
+features[views_view][] = sirius_json_definitions
 features[views_view][] = sirius_letterhead_admin
 features[views_view][] = sirius_log
 features[views_view][] = sirius_log_admin
