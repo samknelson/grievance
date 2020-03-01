@@ -8,6 +8,8 @@ function sirius_page_taxonomy_vocabulary_admin_form($form, &$form_state) {
   drupal_add_library('system', 'ui.accordion');
   drupal_add_js('jQuery(document).ready(function () { jQuery("#sirius_accordion").accordion({active: false, collapsible: true, autoehight: true, heightStyle: "content"}); });', 'inline');
 
+  $settings = sirius_taxonomy_settings('all');
+
 	$sql = "select name, machine_name, vid ";
 	$sql .= "from taxonomy_vocabulary ";
 	$sql .= "order by machine_name ";

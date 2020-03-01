@@ -15,12 +15,12 @@ function sirius_page_taxonomy_vocabulary_list() {
 		$html .= t('Use the links below to manage the drop-down lists (taxonomies) for this site.');
 	}
 
+  $all_settings = sirius_taxonomy_settings('all');
+
 	$html .= '<ul>';
 	while ($hr = $stmt->fetchAssoc()) {
 		// This taxonomy must be configured for Sirius access
-		$view = variable_get("sirius_taxonomy_view_$hr[machine_name]", '');
-		$display = variable_get("sirius_taxonomy_view_display_$hr[machine_name]", '');
-		if (!$view || !$display) { continue; }
+		if (!$all_settings[$hr['machine_name']]) { continue; }
 
 		// The user must have access to these terms
 		if (!user_access('edit terms in ' . $hr['vid'])) { continue; }
