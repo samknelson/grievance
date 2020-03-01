@@ -179,20 +179,27 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 
 	// Fetch the current dispatches for each worker
 	if ($workers) { 
+		$sql_args = array();
+		$sql_args[':worker_nids'] = array_keys($workers);
+		$sql_args[':now'] = gmdate('Y-m-d 00:00:00', strtotime("-2 days"));
+
 		$sql = "select nid as dispatch_nid, ";
 		$sql .= "field_sirius_worker_target_id as worker_nid, ";
 		$sql .= "field_sirius_dispatch_status_value as dispatch_status, ";
-		$sql .= "field_grievance_shop_target_id as employer_nid ";
+		$sql .= "field_grievance_shop_target_id as employer_nid, ";
+		$sql .= "field_sirius_datetime_value as report_date ";
 		$sql .= "from node ";
 		$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
 		$sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
 		$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";
 		$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = field_sirius_dispatch_job_target_id ";
+		$sql .= "left join field_data_field_sirius_datetime on field_data_field_sirius_datetime.entity_type = 'node' and field_data_field_sirius_datetime.entity_id = field_sirius_dispatch_job_target_id ";
 		$sql .= "where type = 'sirius_dispatch' ";
 		$sql .= "and field_sirius_worker_target_id in (:worker_nids) ";
 		$sql .= "and field_sirius_dispatch_status_value in ('notified', 'notification failed', 'accepted', 'accepted_secondary') ";
+		$sql .= "and not (field_sirius_dispatch_status_value in ('notified', 'notification failed') and field_sirius_datetime_value < :now) ";
 		$sql .= "limit " . 10 * $worker_max;
-		$stmt = db_query($sql, array(':worker_nids' => array_keys($workers)));
+		$stmt = db_query($sql, $sql_args);
 		while ($hr = $stmt->fetchAssoc()) {
 			$workers[$hr['worker_nid']]['dispatches'][] = $hr;
 		}
