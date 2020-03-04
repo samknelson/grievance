@@ -14,7 +14,7 @@ function sirius_node_tab_event_participant_definition_callerid_form($form, &$for
 	$callerid_options = array(NULL => t('-- Select --'));
 	foreach ($callerid_nodes as $callerid_nid => $callerid_node) {
 		if ($callerid_node->field_sirius_active['und'][0]['value'] == 'Yes') {
-			$callerid_options[$callerid_nid] = $callerid_node->title;
+			$callerid_options[$callerid_nid] = $callerid_node->title . ' (' . $callerid_node->field_sirius_phone['und'][0]['value'] . ')';
 		}
 	}
 
