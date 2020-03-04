@@ -38,14 +38,14 @@ function grievance_log_update($grievance_node, $op) {
   $log_node = new stdClass();
   if ($op == 'insert') {
     $log_node->title = t('Grievance Record Created');
-    $log_type_tid = variable_get('grievance_log_insert_type', '');
+    $log_type_tid = sirius_get_special_tid('grievance_log_types|insert');
   } else {
     if ($grievance_node->grievance_status_changed) {
       $log_node->title = t('Grievance Record Updated with status change');
-      $log_type_tid = variable_get('grievance_log_update_type_with_status_change', '');
+      $log_type_tid = sirius_get_special_tid('grievance_log_types|update_with_status_change');
     } else {
       $log_node->title = t('Grievance Record Updated');
-      $log_type_tid = variable_get('grievance_log_update_type_without_status_change', '');
+      $log_type_tid = sirius_get_special_tid('grievance_log_types|update_without_status_change');
     }
   }
   $log_node->type = 'grievance_log';
@@ -70,12 +70,13 @@ function grievance_log_update($grievance_node, $op) {
 
   $log_node = node_submit($log_node); // Prepare node for saving
   node_save($log_node);
+  dpm($log_node);
 
   //
   // Log the event date, which starts the timeline.  But only if we don't already have one.
   //
 
-  $incident_type_tid = variable_get('grievance_log_incident_type', '');
+  $incident_type_tid = sirius_get_special_tid('grievance_log_types|incident');
   $probe = grievance_log_list($grievance_node, array($incident_type_tid));
   if (!$probe) {
     $event_date = $grievance_node->field_grievance_date_2['und'][0]['value'];
@@ -101,7 +102,7 @@ function grievance_log_update($grievance_node, $op) {
 
       $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
       $log_node->field_grievance_status['und'][0]['tid'] =  variable_get('grievance_log_incident_status', '');
-      $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_incident_type', '');
+      $log_node->field_grievance_log_type['und'][0]['tid'] = sirius_get_special_tid('grievance_log_types|incident');
 
       $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:00', strtotime($event_date));
 
@@ -133,7 +134,7 @@ function grievance_log_update($grievance_node, $op) {
     $log_node->promote = 0;
     $log_node->comment = 0;
     $log_node->body['und'][0]['value'] = $grievance_node->field_grievance_assignee_notes['und'][0]['value'];
-    $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_assignment_type', '');
+    $log_node->field_grievance_log_type['und'][0]['tid'] = sirius_get_special_tid('grievance_log_types|assignment');
     $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s');
 
     $log_node = node_submit($log_node); // Prepare node for saving
@@ -146,7 +147,7 @@ function grievance_log_update($grievance_node, $op) {
 
   if ($op == 'insert') {
     for ($i=1; $i<=5; ++$i) {
-      $log_type_tid = variable_get("grievance_log_intake_${i}_type", '');
+      $log_type_tid = sirius_get_special_tid("grievance_log_types|intake_$i");
       if (!$log_type_tid) { continue; }
       $log_type_term = taxonomy_term_load($log_type_tid);
       $date = $grievance_node->{"grievance_intake_log_${i}"};
@@ -174,7 +175,7 @@ function grievance_log_notify_check($grievance_node) {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'grievance_log');
-  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_notify_type', ''));
+  $query->fieldCondition('field_grievance_log_type', 'tid', sirius_get_special_tid('grievance_log_types|notify'));
   $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
   $stmt = $query->execute();
 
@@ -217,7 +218,7 @@ function grievance_log_notify(
   $log_node->field_grievance_status = $grievance_node->field_grievance_status;
   $log_node->field_grievance_alert = $grievance_node->field_grievance_alert;
   $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
-  $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_notify_type', '');
+  $log_node->field_grievance_log_type['und'][0]['tid'] = sirius_get_special_tid('grievance_log_types|notify');
   $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d'); 
 
   $comments = t("COMPANY NOTIFICATION SENT\n");
@@ -271,7 +272,7 @@ function grievance_log_member_forward(
   $log_node->field_grievance_status = $grievance_node->field_grievance_status;
   $log_node->field_grievance_alert = $grievance_node->field_grievance_alert;
   $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
-  $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get('grievance_log_member_forward_type', '');
+  $log_node->field_grievance_log_type['und'][0]['tid'] = sirius_get_special_tid('grievance_log_types|member_forward');
   $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d'); 
 
   $comments = t("MEMBER NOTIFICATION SENT\n");
@@ -321,10 +322,10 @@ function grievance_log_list($grievance_nid, $type_tids) {
 
 function grievance_log_status_date($grievance_nid, $status_tid, $direction = 'asc') {
   $log_update_tids = array(
-    variable_get('grievance_log_insert_type', ''), 
-    variable_get('grievance_log_update_type_with_status_change', ''), 
-    variable_get('grievance_log_update_type_without_status_change', ''), 
-    variable_get('grievance_log_incident_type', '')
+    sirius_get_special_tid('grievance_log_types|insert'), 
+    sirius_get_special_tid('grievance_log_types|update_with_status_change'), 
+    sirius_get_special_tid('grievance_log_types|update_without_status_change'), 
+    sirius_get_special_tid('grievance_log_types|incident'),
   );
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
@@ -350,10 +351,10 @@ function grievance_log_status_date($grievance_nid, $status_tid, $direction = 'as
 
 function grievance_log_status_entry($grievance_nid, $status_tid, $direction = 'asc') {
   $log_update_tids = array(
-    variable_get('grievance_log_insert_type', ''), 
-    variable_get('grievance_log_update_type_with_status_change', ''), 
-    variable_get('grievance_log_update_type_without_status_change', ''), 
-    variable_get('grievance_log_incident_type', '')
+    sirius_get_special_tid('grievance_log_types|insert'), 
+    sirius_get_special_tid('grievance_log_types|update_with_status_change'), 
+    sirius_get_special_tid('grievance_log_types|update_without_status_change'), 
+    sirius_get_special_tid('grievance_log_types|incident'),
   );
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
@@ -551,9 +552,8 @@ function grievance_log_views_exposed_form_alter($form, &$form_state) {
   if (isset($form['field_grievance_log_type_tid']['#options'])) {
 
     $skip_tids = array();
-    foreach (array('grievance_log_update_type_without_status_change', 'grievance_log_phaxio_callback_type') as $skip_variable_name) {
-      $skip_tids[] = variable_get($skip_variable_name, '');
-    }
+    $skip_tids[] = sirius_get_special_tid('grievance_log_types|update_without_status_change');
+    $skip_tids[] = sirius_get_special_tid('grievance_log_types|phaxio_callback');
 
     $default = array();
     foreach (array_keys($form['field_grievance_log_type_tid']['#options']) as $tid) {
@@ -587,8 +587,8 @@ function grievance_log_node_form_alter(&$form, &$form_state, $form_id) {
   $form['field_grievance_status']['#access'] = FALSE;
   if (isset($form['#node']) && isset($form['#node']->field_grievance_log_type['und'][0]['tid'])) {
     if (
-      $form['#node']->field_grievance_log_type['und'][0]['tid'] == variable_get('grievance_log_update_type_with_status_change', '') ||
-      $form['#node']->field_grievance_log_type['und'][0]['tid'] == variable_get('grievance_log_update_type_without_status_change', '')
+      $form['#node']->field_grievance_log_type['und'][0]['tid'] == sirius_get_special_tid('grievance_log_types|update_with_status_change') ||
+      $form['#node']->field_grievance_log_type['und'][0]['tid'] == sirius_get_special_tid('grievance_log_types|update_without_status_change')
     ) {
       $form['field_grievance_status']['#access'] = TRUE;
     }
@@ -598,7 +598,7 @@ function grievance_log_node_form_alter(&$form, &$form_state, $form_id) {
   $form['field_grievance_log_type']['und']['#options'] = grievance_log_types_i_can_edit();
 
   // Make the "days" field conditional
-  $timelines_extended_tid = variable_get('grievance_log_timelines_extended_type', '');
+  $timelines_extended_tid = sirius_get_special_tid('grievance_log_types|timelines_extended');
   if (!$timelines_extended_tid) {
     $form['field_grievance_days']['#access'] = FALSE;
   } else {
@@ -608,23 +608,6 @@ function grievance_log_node_form_alter(&$form, &$form_state, $form_id) {
       ),
     );
   }
-}
-
-function grievance_log_intake_admin() {
-  $form = array();
-
-  $options = grievance_log_types_i_can_edit();
-
-  for ($i=1; $i<=5; ++$i) {
-    $form["grievance_log_intake_${i}_type"] = array(
-      '#type' => 'select',
-      '#options' => $options,
-      '#title' => t("Intake Log Type $i"),
-      '#default_value' => variable_get("grievance_log_intake_${i}_type", ''),
-    );
-  }
-
-  return system_settings_form($form);
 }
 
 function grievance_node_access_grievance_log($node, $op, $account) {
