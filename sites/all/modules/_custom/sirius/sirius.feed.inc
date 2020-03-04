@@ -86,7 +86,7 @@ function sirius_feed_page_list($wizard_name) {
  ************************************************************************************************/
 
 function sirius_feed_page_landing_access() {
-	return user_access('sirius admin');
+	return user_access('sirius domain admin');
 }
 
 function sirius_feed_page_landing() {
@@ -198,8 +198,7 @@ function sirius_feed_page_launch_access($wizard_name) {
 	if (!$info) { return FALSE; }
 
 	// @todo
-	return user_access('sirius');
-	// return user_access('sirius admin');
+	return user_access('sirius domain admin');
 }
 
 function sirius_feed_page_launch($wizard_name) {

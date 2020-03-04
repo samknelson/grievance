@@ -79,14 +79,14 @@ function sirius_permission() {
 
 function sirius_node_access($node, $op, $account) {
   // Check domain
-  /*
   $domain_nid = $node->field_sirius_domain['und'][0]['target_id'];
-  if ($domain_nid) {
-    if (!user_access('sirius admin', $account) && !sirius_domain_access($domain_nid)) {
+  if ($domain_nid && !user_access('sirius admin', $account)) {
+    static $my_domain_nid;
+    if (!$my_domain_nid) { $my_domain_nid = sirius_domain_nid(); }
+    if ($my_domain_nid != $domain_nid) {
       return NODE_ACCESS_DENY;
     }
   }
-  */
 
   // Specific checks by node type
 	if ($node->type == 'sirius_log') { return sirius_node_access_log($node, $op, $account); }
