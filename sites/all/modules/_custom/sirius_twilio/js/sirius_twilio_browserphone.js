@@ -98,7 +98,7 @@
 
 		$('#sirius_browserphone_button_call').click(function() {
 			var params = {
-		  	to: $('#sirius_browserphone_number').val(),
+		  	To: $('#sirius_browserphone_number').val(),
 		  	token: token,
 		  	callerid_nid: $('#sirius_browserphone_callerid').val()
 			};

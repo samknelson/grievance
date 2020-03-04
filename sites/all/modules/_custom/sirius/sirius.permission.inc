@@ -81,11 +81,14 @@ function sirius_node_access($node, $op, $account) {
   // Get the node type
   if (is_object($node)) { $type = $node->type; } else { $type = $node; }
 
-  // Deny access to all nodes that are not in your domain
-  if (is_object($node) && !user_access('sirius admin')) {
-    $node_domain_nid = $node->field_sirius_domain['und'][0]['target_id'];
-    $my_domain_nid = sirius_domain_nid();
-    if ($node_domain_nid != $my_domain_nid) { return NODE_ACCESS_DENY; }
+  // Check domain
+  $domain_nid = $node->field_sirius_domain['und'][0]['target_id'];
+  if ($domain_nid && !user_access('sirius admin', $account)) {
+    static $my_domain_nid;
+    if (!$my_domain_nid) { $my_domain_nid = sirius_domain_nid(); }
+    if ($my_domain_nid != $domain_nid) {
+      return NODE_ACCESS_DENY;
+    }
   }
 
   // Specific checks by node type

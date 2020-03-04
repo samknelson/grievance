@@ -348,3 +348,27 @@ function sirius_domain_variable_name($name) {
   $domain_nid = sirius_domain_nid();
   if ($domain_nid) { return $domain_nid . '/' . $name; } else { return $name; }
 }
+
+
+function sirius_domain_restrict_taxonomy_fields(&$form, $form_id) {
+  if ($form['#entity'] && $form['entity']->field_sirius_domain['und'][0]['target_id']) {
+    $domain_nid = $form['entity']->field_sirius_domain['und'][0]['target_id'];
+  } else {
+    $domain_nid = sirius_domain_nid();
+  }
+  if (!$domain_nid) { 
+    return;
+  }
+
+  foreach ($form as $field_name => &$form_field) {
+    if (!preg_match('/^field_/', $field_name)) { continue; }
+    $info = field_info_field($field_name);
+    if ($info['type'] != 'taxonomy_term_reference') { continue; }
+    $vocabulary_machine_name = $info['settings']['allowed_values'][0]['vocabulary'];
+    if (!$vocabulary_machine_name) { continue; }
+    $options = sirius_taxonomy_load($vocabulary_machine_name, 'tid', 'name');
+    if ($form_field['und']['#options']) {
+      $form_field['und']['#options'] = array_intersect($form_field['und']['#options'], $options);
+    }
+  }
+}
