@@ -173,7 +173,7 @@ function sirius_node_tab_worker_skill_add2_form_submit($form, &$form_state) {
   	$tid = $matches[1];
     if (in_array($tid, $current_vals)) { continue; }
   	$expires = $form_state['values']["skill_expires_$tid"];
-    if (strtotime($expires) < 1) { $expires = NULL; }
+    if (sirius_strtotime($expires) < 1) { $expires = NULL; }
     $result = sirius_worker_skill_set($worker_node, array($tid), $expires, 'add', $reason, $files);
     if ($result['success']) {
       drupal_set_message($result['msg']);

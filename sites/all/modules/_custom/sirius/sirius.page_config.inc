@@ -1,10 +1,12 @@
 <?php
 
 function sirius_page_config() {
-
-
 	$links = array();
 
+	$links['domain'] = array('title' => 'Domains');
+	$links['domain']['links']['sirius/domains'] 									= array('title' => 'Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
+	$links['domain']['links']['sirius/domain/config/usermanage'] 	= array('title' => 'Domain User Manager', 'description' => 'Settings for the domain-specific user manager.');
+	
 	$links['core'] = array('title' => 'Core');
 	$links['core']['links']['sirius/taxonomy'] 									= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');
 	$links['core']['links']['grievance/admin/letter-templates'] = array('title' => 'Letters', 'description' => 'Set up letter templates, such as a grievance notification or a graduation announcement for a worker..');
@@ -17,6 +19,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/admin/help'] 								= array('title' => 'Help Text', 'description' => 'Put explanatory text on any page on the site.');
 	$links['core']['links']['grievance/admin/basic-pages'] 			= array('title' => 'Basic Pages', 'description' => 'Manage basic pages.');
 	$links['core']['links']['sirius/admin/letterhead'] 					= array('title' => 'Letterhead', 'description' => 'Manage letterheads and watermarks for the site.');
+	$links['core']['links']['sirius/contact/definition'] 				= array('title' => 'Contact Definition', 'description' => 'Set additional domain-specific fields for contacts.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
@@ -48,7 +51,6 @@ function sirius_page_config() {
 	$links['users']['links']['admin/config/people/tfa-trusted-ip'] = array('title' => 'TFA Trusted IPs', 'description' => 'Set the list of trusted IP addresses for two-factor authentication.');
 
 	$links['systems'] = array('title' => 'Systems');
-	$links['systems']['links']['sirius/domains'] 								= array('title' => 'Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
 	$links['systems']['links']['sirius/callerid'] 							= array('title' => 'Caller ID', 'description' => 'Create or manage Caller ID entries.');
 	$links['systems']['links']['sirius/config/specialrid'] 			= array('title' => 'Special Roles', 'description' => 'Certain roles have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');

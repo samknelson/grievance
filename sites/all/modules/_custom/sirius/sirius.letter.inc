@@ -363,7 +363,12 @@ function sirius_letter_wizard_recipients_email_form($form, &$form_state, $info, 
 	$steps = sirius_wizard_steps($info, $data, $entity_node);
 
 	$recipients = $data['recipients'];
-	if ($recipients) { usort($recipients, function($a, $b) { return $a['delta'] <=> $b['delta']; }); }
+	if ($recipients) { usort($recipients, function($a, $b) { 
+			if ($a['delta'] < $b['delta']) { return -1; }
+			if ($a['delta'] > $b['delta']) { return 1; }
+			return 0;
+		});
+	}
 	for ($i=0; $i<5; ++$i) {
 		$recipients[] = array('description' => t('Additional Recipient #@i', array('@i' => ($i+1))));
 	}
@@ -592,21 +597,39 @@ function sirius_letter_list($entity_node) {
 
 
 function sirius_letter_render_html($entity_node, $letter_nids, $other_tokens) {
+	$tokens = array();
+	$token_aliases = array();
+
+	if ($entity_node->type == 'grievance') {
+		$workersync_plugin = grievance_workersync_plugin_fetch();
+		if ($workersync_plugin['id'] == 'local') {
+			$worker_id = $entity_node->field_grievance_min['und'][0]['value'];
+			$worker_node = sirius_worker_get_by_id($worker_id);
+			if ($worker_node) {
+				$tokens['worker_node'] = $worker_node;
+				$token_aliases['worker_node'] = 'node';
+			}
+		}
+	}
+
+
 	if ($other_tokens['letter_body']) {
 		return '<div id="grievance-letter-body">' . $other_tokens['letter_body'] . '</div>';
 	}
+
 	$letter_nodes = node_load_multiple($letter_nids);
 	$body = '';
+	$tokens['node'] = $grievance_node;
+	$tokens['other_tokens'] = $other_tokens;
+
 	foreach ($letter_nodes as $letter_nid => $letter_node) {
 		$letter_part = $letter_node->body['und'][0]['value'];
 		$letter_part = token_replace(
 			$letter_part, 
-			array(
-				'node' => $entity_node,
-				'grievance-letter' => $other_tokens,
-			),
+			$tokens,
 			array(
 				'clear' => TRUE,
+				'aliases' => $token_aliases,
 			)
 		);
 

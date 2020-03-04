@@ -122,6 +122,7 @@ function sirius_event_node_tabs() {
     'permissions' => array('sirius event admin'),
     'weight' => 2,
   );
+
   /*
   $node_tabs['sirius_json_definition']['sirius_event_participant_definition_settings'] = array(
     'title' => 'Settings',

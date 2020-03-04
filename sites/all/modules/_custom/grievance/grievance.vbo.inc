@@ -68,10 +68,10 @@ function grievance_vbo_log_form(&$context, &$form_state) {
     '#title'          => 'Type',
     '#options'        => grievance_log_types_i_can_edit(),
     '#required'       => TRUE,
-    '#default_value'  => variable_get('grievance_log_modal_default_type', NULL),
+    '#default_value'  => sirius_get_special_tid('grievance_log_types|modal_default'),
   );
 
-  $timelines_extended_tid = variable_get('grievance_log_timelines_extended_type', '');
+  $timelines_extended_tid = sirius_get_special_tid('grievance_log_types|timelines_extended');
   if ($timelines_extended_tid) {
 	  $form['grievance_days'] = array(
 	    '#type'           => 'textfield',

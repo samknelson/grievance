@@ -85,7 +85,7 @@ function sirius_twilio_menu() {
   );
 
   $items['sirius/config/twilio'] = array(
-    'title' => 'Twilio Configuration ',
+    'title' => 'Twilio Configuration',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
     'page callback' => 'drupal_get_form',
@@ -94,7 +94,7 @@ function sirius_twilio_menu() {
   );
 
   $items['sirius/config/twilio/settings'] = array(
-    'title' => 'Twilio Configuration ',
+    'title' => 'Twilio Configuration: Settings',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
     'page callback' => 'drupal_get_form',
@@ -104,7 +104,7 @@ function sirius_twilio_menu() {
   );
 
   $items['sirius/config/twilio/test'] = array(
-    'title' => 'Sirius: Twilio: Test',
+    'title' => 'Twilio Configuration: Test',
     'description' => '',
     'page callback' => 'sirius_twilio_page_test',
     'page arguments' => array(),
