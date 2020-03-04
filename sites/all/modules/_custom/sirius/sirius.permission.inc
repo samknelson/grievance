@@ -78,23 +78,26 @@ function sirius_permission() {
  */
 
 function sirius_node_access($node, $op, $account) {
+  // Get the node type
+  if (is_object($node)) { $type = $node->type; } else { $type = $node; }
+
   // Check domain
-  /*
   $domain_nid = $node->field_sirius_domain['und'][0]['target_id'];
-  if ($domain_nid) {
-    if (!user_access('sirius admin', $account) && !sirius_domain_access($domain_nid)) {
+  if ($domain_nid && !user_access('sirius admin', $account)) {
+    static $my_domain_nid;
+    if (!$my_domain_nid) { $my_domain_nid = sirius_domain_nid(); }
+    if ($my_domain_nid != $domain_nid) {
       return NODE_ACCESS_DENY;
     }
   }
-  */
 
   // Specific checks by node type
-	if ($node->type == 'sirius_log') { return sirius_node_access_log($node, $op, $account); }
-  if ($node->type == 'sirius_news') { return sirius_node_access_news($node, $op, $account); }
-  if ($node->type == 'sirius_feed') { return sirius_node_access_feed($node, $op, $account); }
-  if ($node->type == 'sirius_letterhead') { return sirius_node_access_letterhead($node, $op, $account); }
-  if ($node->type == 'sirius_contact') { return sirius_node_access_contact($node, $op, $account); }
-  if ($node->type == 'sirius_domain') { return sirius_node_access_domain($node, $op, $account); }
+	if ($type == 'sirius_log') { return sirius_node_access_log($node, $op, $account); }
+  if ($type == 'sirius_news') { return sirius_node_access_news($node, $op, $account); }
+  if ($type == 'sirius_feed') { return sirius_node_access_feed($node, $op, $account); }
+  if ($type == 'sirius_letterhead') { return sirius_node_access_letterhead($node, $op, $account); }
+  if ($type == 'sirius_contact') { return sirius_node_access_contact($node, $op, $account); }
+  if ($type == 'sirius_domain') { return sirius_node_access_domain($node, $op, $account); }
 
   // We know nothing.
   return NODE_ACCESS_IGNORE;

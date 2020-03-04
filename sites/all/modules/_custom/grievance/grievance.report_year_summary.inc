@@ -79,8 +79,8 @@ function grievance_report_year_summary_form_submit($form, &$form_state) {
   	}
   }
 
-  $insert_log_tid = variable_get('grievance_log_insert_type', '');
-  $update_log_tid = variable_get('grievance_log_update_type_with_status_change', '');
+  $insert_log_tid = sirius_get_special_tid('grievance_log_types|insert');
+  $update_log_tid = sirius_get_special_tid('grievance_log_types|update_with_status_change');
 
   // A grievance might be opened and closed multiple times, so we need to pull them all and sort in memory; simply doing a "group by ... distinct" in the SQL doesn't work.
 

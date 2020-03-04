@@ -118,12 +118,20 @@ function sirius_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['sirius_domain']['sirius_domain_clone'] = array(
+    'title' => 'Clone',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_clone',
+    'permissions' => array('sirius admin'),
+    'weight' => 5,
+  );
+
   $node_tabs['sirius_domain']['sirius_domain_delete'] = array(
     'title' => 'Delete',
     'description' => '',
     'callback' => 'sirius_node_tab_sirius_domain_delete',
-    'permissions' => array('sirius domain delete'),
-    'weight' => 5,
+    'permissions' => array('sirius admin'),
+    'weight' => 6,
   );
 
   return $node_tabs;
