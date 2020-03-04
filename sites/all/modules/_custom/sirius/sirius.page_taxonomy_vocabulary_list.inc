@@ -23,7 +23,7 @@ function sirius_page_taxonomy_vocabulary_list() {
 		if (!$view || !$display) { continue; }
 
 		// The user must have access to these terms
-		if (!user_access('edit terms in ' . $hr['vid'])) { continue; }
+		if (!user_access('edit terms in ' . $hr['vid']) && !user_access('sirius admin')) { continue; }
 
 		$html .= '<dl>';
 
