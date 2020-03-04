@@ -63,6 +63,7 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
+  /*
   $node_tabs['sirius_worker']['sirius_worker_letter'] = array(
     'title' => 'Letters',
     'description' => '',
@@ -76,6 +77,7 @@ function sirius_node_tabs() {
     'callback' => 'sirius_node_tab_entity_letter',
     'permissions' => array('grievance user'),
   );
+  */
 
   $node_tabs['grievance_letter_template']['sirius_letter_template_recipients'] = array(
     'title' => 'Recipients',
