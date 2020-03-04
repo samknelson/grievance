@@ -597,21 +597,39 @@ function sirius_letter_list($entity_node) {
 
 
 function sirius_letter_render_html($entity_node, $letter_nids, $other_tokens) {
+	$tokens = array();
+	$token_aliases = array();
+
+	if ($entity_node->type == 'grievance') {
+		$workersync_plugin = grievance_workersync_plugin_fetch();
+		if ($workersync_plugin['id'] == 'local') {
+			$worker_id = $entity_node->field_grievance_min['und'][0]['value'];
+			$worker_node = sirius_worker_get_by_id($worker_id);
+			if ($worker_node) {
+				$tokens['worker_node'] = $worker_node;
+				$token_aliases['worker_node'] = 'node';
+			}
+		}
+	}
+
+
 	if ($other_tokens['letter_body']) {
 		return '<div id="grievance-letter-body">' . $other_tokens['letter_body'] . '</div>';
 	}
+
 	$letter_nodes = node_load_multiple($letter_nids);
 	$body = '';
+	$tokens['node'] = $grievance_node;
+	$tokens['other_tokens'] = $other_tokens;
+
 	foreach ($letter_nodes as $letter_nid => $letter_node) {
 		$letter_part = $letter_node->body['und'][0]['value'];
 		$letter_part = token_replace(
 			$letter_part, 
-			array(
-				'node' => $entity_node,
-				'grievance-letter' => $other_tokens,
-			),
+			$tokens,
 			array(
 				'clear' => TRUE,
+				'aliases' => $token_aliases,
 			)
 		);
 
