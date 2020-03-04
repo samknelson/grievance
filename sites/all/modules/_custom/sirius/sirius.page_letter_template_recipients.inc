@@ -23,7 +23,13 @@ function sirius_node_tab_letter_template_recipients_form($form, &$form_state, $t
 	$form['intro'] = array('#markup' => '<table><tr><th>Description</th><th>Name</th><th>Email</th><th>Disposition</th><th>Locked?</th></tr>');
 
 	$recipients = $json['recipients'];
-	if (!$recipients) { $recipients = array(); } else { usort($recipients, function($a, $b) { return $a['delta'] <=> $b['delta']; }); }
+	if (!$recipients) { $recipients = array(); } else { 
+		usort($recipients, function($a, $b) { 
+			if ($a['delta'] < $b['delta']) { return -1; }
+			if ($a['delta'] > $b['delta']) { return 1; }
+			return 0;
+		});
+	}
 	for ($i=0; $i<5; ++$i) {
 		$recipients[] = array();
 	}
