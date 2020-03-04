@@ -363,7 +363,12 @@ function sirius_letter_wizard_recipients_email_form($form, &$form_state, $info, 
 	$steps = sirius_wizard_steps($info, $data, $entity_node);
 
 	$recipients = $data['recipients'];
-	if ($recipients) { usort($recipients, function($a, $b) { return $a['delta'] <=> $b['delta']; }); }
+	if ($recipients) { usort($recipients, function($a, $b) { 
+			if ($a['delta'] < $b['delta']) { return -1; }
+			if ($a['delta'] > $b['delta']) { return 1; }
+			return 0;
+		});
+	}
 	for ($i=0; $i<5; ++$i) {
 		$recipients[] = array('description' => t('Additional Recipient #@i', array('@i' => ($i+1))));
 	}
