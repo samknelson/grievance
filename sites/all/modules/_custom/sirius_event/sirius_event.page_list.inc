@@ -9,21 +9,14 @@ function sirius_event_page_list() {
 	$tree = sirius_taxonomy_load('sirius_event_type', 'tid', 'full');
 	if (!$tree) { return t('No event types have been configured.'); }
 
-	$html .= '<h2>' . t('Event Types') . '</h2>';
-	$html .= '<dl>';
 	foreach ($tree as $tid => $term) {
-		$html .= '<dt>';
-		$html .= '<strong>';
-		$html .= $term->name;
-		$html .= '</strong>';
-		$html .= '</dt>';
-		$html .= '<dd>';
+		$html .= '<h2>' . $term->name . '</h2>';
 		if (strlen($term->description) > 5) {
 			$html .= $term->description;
 			$html .= '<br />';
 		}
 
-		$html .= l(t('List'), 'sirius/event/list/' . $term->tid, array('attributes' => array('class' => array('tool-button'))));
+		$html .= l(t('Full List'), 'sirius/event/list/' . $term->tid . '/all', array('attributes' => array('class' => array('tool-button'))));
 		if (drupal_valid_path("sirius/event/create/$event_type_tid")) {
 			$html .= ' ' . l(
 				t('Create'),
@@ -31,11 +24,12 @@ function sirius_event_page_list() {
 				array('attributes' => array('class' => 'tool-button'))
 			);
 		}
+		if (sirius_event_page_list_type_access($tid)) {
+			$html .= sirius_event_page_list_type_upcoming($tid);
+		}
 
 		$html .= '<br /><br />';
-		$html .= '</dd>';
 	}
-	$html .= '</dl>';
 
 	return $html;
 }
