@@ -23883,7 +23883,7 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_event_schedule" class="tool-button" target="_blank">Schedule</a>
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_event_info/schedule" class="tool-button" target="_blank">Schedule</a>
 <a href="/node/[nid]/sirius_event_participants_current" class="tool-button" target="_blank">Participants</a>
 <a href="/node/[nid]/sirius_event_participants_register" class="tool-button" target="_blank">Register</a>
 ';
@@ -23992,7 +23992,7 @@ Grievance Form',
     t('Title'),
     t('Date'),
     t('Tools'),
-    t('<a href="/node/[nid]/sirius_event_schedule" class="tool-button" target="_blank">Schedule</a>
+    t('<a href="/node/[nid]/sirius_event_info/schedule" class="tool-button" target="_blank">Schedule</a>
 <a href="/node/[nid]/sirius_event_participants_current" class="tool-button" target="_blank">Participants</a>
 <a href="/node/[nid]/sirius_event_participants_register" class="tool-button" target="_blank">Register</a>
 '),
