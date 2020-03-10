@@ -63,7 +63,7 @@ function sirius_permission() {
       'description' => t('Permission to perform any action within user\'s domain, including adding, modifying, or switching to subdomains'),
     ),
     'sirius domain delete' => array(
-      'title' => t('Sirius Domain Admin'),
+      'title' => t('Sirius Domain Delete'),
       'description' => t('Permission to delete a domain and all content associated with it. Requires permission on the domain (i.e. a domain admin with this permission can delete their own subdomains, but not other user\'s subdomains.)'),
     ),
     'sirius callerid admin' => array(
@@ -81,13 +81,20 @@ function sirius_node_access($node, $op, $account) {
   // Get the node type
   if (is_object($node)) { $type = $node->type; } else { $type = $node; }
 
-  // Check domain
+  // Check domain. 
   $domain_nid = $node->field_sirius_domain['und'][0]['target_id'];
   if ($domain_nid && !user_access('sirius admin', $account)) {
-    static $my_domain_nid;
-    if (!$my_domain_nid) { $my_domain_nid = sirius_domain_nid(); }
-    if ($my_domain_nid != $domain_nid) {
-      return NODE_ACCESS_DENY;
+    if ($type == 'sirius_domain') {
+      // For domain-type nodes, need access to both the domain and its parent
+      if (!sirius_domain_access($domain_nid)) { return NODE_ACCESS_DENY; }
+      if ($node->nid && !sirius_domain_access($node->nid)) { return NODE_ACCESS_DENY; }
+    } else {
+      // For all other nodes, it must be our current domain.
+      static $my_domain_nid;
+      if (!$my_domain_nid) { $my_domain_nid = sirius_domain_nid(); }
+      if ($my_domain_nid != $domain_nid) {
+        return NODE_ACCESS_DENY;
+      }
     }
   }
 
