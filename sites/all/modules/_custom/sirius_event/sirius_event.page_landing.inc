@@ -21,6 +21,7 @@ function sirius_event_page_landing() {
   	$participant_nids = array_keys($stmt['node']);
   }
 
+  /*
 	$event_types = sirius_taxonomy_load('sirius_event_type', 'tid', 'full');
 	$create_html = '';
 	foreach ($event_types as $event_type_tid => $event_type_term) {
@@ -37,7 +38,7 @@ function sirius_event_page_landing() {
 		$html .= '<h2>' . t('Create a New Event') . '</h2>';
 		$html .= $create_html;
 	}
-
+	*/
 
 	$html .= '<h2>' . t('Your Events') . '</h2>';
 
@@ -83,6 +84,10 @@ function sirius_event_page_landing() {
 		$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
   } else {
   	$html .= "You are not currently registered for any events.";
+  }
+
+  if (sirius_event_page_list_access()) {
+  	$html .= sirius_event_page_list();
   }
 
 	return $html;

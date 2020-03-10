@@ -9,6 +9,15 @@ function sirius_jsonfield_util_set_from_path(&$json, $path, $value) {
 	else { $json[$current] = $value; }
 }
 
+function sirius_jsonfield_util_unset_from_path(&$json, $path) {
+	$path = preg_replace('/^:/', '', $path);
+	$parts = explode(':', $path);
+	$current = array_shift($parts);
+	$path = join(':', $parts);
+	if ($path) { sirius_jsonfield_util_unset_from_path($json[$current], $path); }
+	else { unset($json[$current]); }
+}
+
 function sirius_jsonfield_util_get_from_path($json, $path) {
 	$path = preg_replace('/^:/', '', $path);
 	$parts = explode(':', $path);
@@ -57,4 +66,22 @@ function sirius_jsonfield_util_quote($str) {
 	$safe = preg_replace('/^\'/', '\'"', $safe);
 	$safe = preg_replace('/\'$/', '"\'', $safe);
 	return $safe;
+}
+
+function sirius_jsonfield_util_value_list_paths($json) {
+	$result = array();
+	sirius_jsonfield_util_value_list_paths_recursive($result, $json);
+	return $result;
+}
+
+function sirius_jsonfield_util_value_list_paths_recursive(&$result, $json, $path = '') {
+  if (!is_array($json)) { return; }
+
+  foreach ($json as $key => $value) {
+  	if (is_array($value)) {
+  		sirius_jsonfield_util_value_list_paths_recursive($result, $value, $path . ':' . $key);
+  	} else {
+  		$result[] = "$path:$key";
+  	}
+  }
 }
