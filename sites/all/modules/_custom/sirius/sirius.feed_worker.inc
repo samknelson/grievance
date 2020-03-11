@@ -240,7 +240,11 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
     }
   }
 
-  node_save($worker_node);
+  try {
+    node_save($worker_node);
+  } catch (exception $e) {
+    return array('success' => FALSE, 'msg' => 'node_save() failed.');
+  }
 
   if ($row['member_status_tid']) {
     $member_status_term = taxonomy_term_load($row['member_status_tid']);
