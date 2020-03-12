@@ -70,7 +70,6 @@ function grievance_log_update($grievance_node, $op) {
 
   $log_node = node_submit($log_node); // Prepare node for saving
   node_save($log_node);
-  dpm($log_node);
 
   //
   // Log the event date, which starts the timeline.  But only if we don't already have one.
