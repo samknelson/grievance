@@ -155,7 +155,7 @@ function sirius_feed_spout_get_header($sheet, $header_row) {
 	foreach ($sheet->getRowIterator() as $row) {
 		$cells = array();
 		foreach ($row->getCells() as $cell) {
-			$cells[] = $cell->getValue();
+			$cells[] = trim(mb_convert_encoding($cell->getValue(), 'UTF-8'));
 		}
 		if ($header_row == 'Yes') {
 			$header = $cells;
@@ -172,7 +172,7 @@ function sirius_feed_spout_get_header($sheet, $header_row) {
 function sirius_feed_spout_get_cell($row, $col) {
 	$cell = $row->getCellAtIndex($col);
 	if (!$cell) { return NULL; }
-	return $cell->getValue();
+	return trim(mb_convert_encoding($cell->getValue(), 'UTF-8'));
 }
 
 function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header) {
@@ -188,7 +188,7 @@ function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header)
 	foreach ($row->getCells() as $cell) {
 		$title = $header[$delta];
 		if (!$title) { $title = $delta; }
-		$raw_row[$title] = $cell->getValue();
+		$raw_row[$title] = trim(mb_convert_encoding($cell->getValue(), 'UTF-8'));
 		++$delta;
 	}
 	$import_data_row['xxxrawxxx'] = $raw_row;
