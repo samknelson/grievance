@@ -43,9 +43,11 @@ function sirius_twilio_browserphone_twiml_omg() {
 			exit();
 		}
 
-		$phone = $parameters['phone'];
+		// $phone = $parameters['phone'];
+		$phone = $_REQUEST['phone'];
 		if (!$phone) {
-			print "Phone number not found in the parameters.";
+			print "Phone number not found in the request.";
+			print_r($parameters);
 			exit();
 		}
 		$phone = sirius_phone_format_e164($phone);
@@ -139,7 +141,12 @@ function sirius_twilio_browserphone_twiml_dial_error($msg) {
 	exit();
 }
 
+/*
+ * @todo This function doesn't ever get called, as far as I can tell.
+ */
+
 function sirius_twilio_browserphone_twiml_dial() {
+	return 'Broken.';
 	// Get our input
 	$token = $_REQUEST['token'];
 	$phone = $_REQUEST['to'];
