@@ -186,7 +186,9 @@ function sirius_domain_tree($root = NULL) {
 }
 
 function sirius_domain_tree_render_as_select($root = NULL, $depth = 0) {
-  $tree = sirius_domain_tree($root);
+  $root_nid = NULL; 
+  if (is_object($root)) { $root_nid = $root->nid; } else { $root_nid = $root; }
+  $tree = sirius_domain_tree($root_nid);
   $options = array();
   _sirius_domain_tree_render_as_select($tree, $options, $depth);
   return $options;
