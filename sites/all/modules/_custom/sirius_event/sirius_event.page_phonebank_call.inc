@@ -95,25 +95,17 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$form['prefix'] = array('#markup' => '<div class="sirius-form" id="sirius_event_phonebank_survey"><table><tr>');
 	$form['prefix_col_1'] = array('#markup' => '<td valign="top" style="vertical-align: top;">');
 	$form['survey'] = $survey_form;
+
 	$form['survey']['survey_wrap_open'] = array('#markup' => '<div id="survey_wrap">', '#weight' => -9999);
-	$form['survey']['survey_intro'] = array('#markup' => 'You are now speaking with: <strong>' . l($contact_node->title, 'node/' . $participant_nid, array('attributes' => array('target' => '_blank'))) . '</strong>', '#weight' => -999);
-	if ($participant_nid) {
-		$form['survey']['pstatus'] = array(
-			'#type' => 'select',
-			'#options' => $pstatuses,
-			'#title' => 'Status',
-			'#weight' => -998,
-			'#default_value' => $participant_node->field_sirius_event_pstatus['und'][0]['tid'],
-			'#prefix' => '<div class="container-inline">',
-			'#suffix' => '</div>',
-			'#ajax' => array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax'),
-		);
-	}
 	$form['survey']['survey_wrap_close'] = array('#markup' => '</div>', '#weight' => 9999);
 	$form['suffix_col_1'] = array('#markup' => '</td>');
 
 	$form['prefix_col_2'] = array('#markup' => '<td width="35%" valign="top" style="vertical-align: top; border-left: 1px solid #333333; padding-left: 10px;">');
 	$intro_html = '<div class="sirius_form_intro">';
+	if ($contact_node) {
+		$intro_html .= 'You are now speaking with: <strong>' . l($contact_node->title, 'node/' . $participant_nid, array('attributes' => array('target' => '_blank')));
+		$intro_html .= '<br />';
+	}
 	$intro_html .= t('Phone: <strong>@phone</strong><br />', array('@phone' => $phone));
 	$intro_html .= '</div>';
 	$form['intro'] = array('#markup' => $intro_html);
@@ -148,20 +140,19 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$browserphone_params['omg_nid'] = $survey_node->nid;
 	$form['phone_interface_html'] = array('#markup' => sirius_twilio_browserphone_render($browserphone_params));
 
+	if ($participant_nid) {
+		$form['pstatus'] = array(
+			'#type' => 'radios',
+			'#options' => $pstatuses,
+			'#title' => 'Status',
+			'#default_value' => $participant_node->field_sirius_event_pstatus['und'][0]['tid'],
+			'#ajax' => array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax'),
+		);
+	}
+
 	$form['submit_next'] = array(
 		'#type' => 'submit',
 		'#value' => t('Save and Next'),
-		'#suffix' => '<br />',
-	);
-	$form['submit_close'] = array(
-		'#type' => 'submit',
-		'#value' => t('Save and Close'),
-		'#suffix' => '<br />',
-	);
-	$form['submit_skip'] = array(
-		'#type' => 'submit',
-		'#value' => t('Skip'),
-		'#suffix' => '<br />',
 	);
 
 	$form['suffix_col_2'] = array('#markup' => '</td');
@@ -188,7 +179,7 @@ function sirius_node_tab_event_phonebank_call_form_submit_ajax($form, $form_stat
 	$json['survey'] = $form_state['values']['survey'];
 	$participant_node->field_sirius_json['und'][0]['value'] = json_encode($json);
 	sirius_jsonfield_log($participant_node, 'survey', 'Survey submitted.');	
-	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $form_state['values']['survey']['pstatus'];
+	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $form_state['values']['pstatus'];
 	node_save($participant_node);
 
 	// Set linked fields, formerly known as "candidate-issue"
