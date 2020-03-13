@@ -18,6 +18,9 @@ function sirius_bulk_queue(&$node, $context) {
   if ($context['rows']) {
     $bulk_nid = array_values($context['rows'])[0]->sirius_bulk_nid;
   }
+  if (!$bulk_nid) {
+    $bulk_nid = $_SESSION['my_bulk_nid'];
+  }
   if (!$bulk_nid) { 
     drupal_set_message("Don't know which bulk message!", 'error');
     return;

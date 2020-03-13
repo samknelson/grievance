@@ -27,14 +27,13 @@ function grievance_mailattach_fetch() {
 
 	// For each message
 	foreach ($messages as $message) {
-
 		watchdog('grievance_mailattach', 'Processing message <pre>' . print_r($message, 1) . '</pre>');
 
 		// 
 		// Get the user
 		//
 
-		$from = $message->from;
+		$from = imap_utf8($message->from);
 		if (!$from) {
 			watchdog('grievance_mailattach', "No FROM address in message; skipping: <pre>" . print_r($message, 1) . "</pre>");
 			continue;
@@ -60,7 +59,7 @@ function grievance_mailattach_fetch() {
 		// Get the grievance
 		//
 
-		$subject = $message->subject;
+		$subject = imap_utf8($message->subject);
 		if (!$subject) {
 			watchdog('grievance_mailattach', "Mail subject not found; rejecting: <pre>" . print_r($message, 1) . "</pre>");
 			grievance_mailattach_fetch_reject($from_mail, "The subject of the email was not found.");

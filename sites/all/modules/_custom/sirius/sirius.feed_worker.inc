@@ -1,5 +1,56 @@
 <?php
 
+function sirius_feed_worker_info() {
+  $items = array();
+  $items['feed_worker'] = array(
+    'name' => 'feed_worker',
+    'title' => 'Workers',
+    'description' => 'Upload a new list of workers.',
+    'steps' => array(
+      'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
+      'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),
+      'map'       => array('label' => 'Mapping',    'callback' => 'sirius_feed_wizard_map'),
+      'verify'    => array('label' => 'Verify',     'callback' => 'sirius_feed_wizard_verify'),
+      'process'   => array('label' => 'Process',    'callback' => 'sirius_feed_wizard_process'),
+      'review'    => array('label' => 'Review',     'callback' => 'sirius_feed_wizard_review'),
+    ),
+    'feed' => array(
+      'pks' => array(
+        'id' => 'ID',
+        'ssn' => 'SSN',
+      ),
+      'fields' => array(
+        'ssn' => array('title' => 'SSN'),
+        'id' => array('title' => 'ID'),
+        'id2' => array('title' => 'ID2'),
+        'id3' => array('title' => 'ID3'),
+        'name_given' => array('title' => 'First Name'),
+        'name_family' => array('title' => 'Last Name'),
+        'name_middle' => array('title' => 'Middle Name'),
+        'address_thoroughfare' => array('title' => 'Address 1'),
+        'address_premise' => array('title' => 'Address 2'),
+        'address_locality' => array('title' => 'City'),
+        'address_administrative_area' => array('title' => 'State'),
+        'address_postal_code' => array('title' => 'Zip'),
+        'email' => array('title' => 'Email'),
+        'phone' => array('title' => 'Phone'),
+        'phone_alt' => array('title' => 'Phone (Alt)'),
+        'phone_mobile' => array('title' => 'Phone (Mobile)'),
+        'shop_name' => array('title' => 'Current Employer Name'),
+        'member_status' => array('title' => 'Member Status'),
+        'dispatch_job_nid' => array('title' => 'Dispatch to Job (NID)'),
+        'level' => array('title' => 'Training Center Level Code'),
+      ),
+      'batch_size' => 50,
+      'callback_row_verify' => 'sirius_feed_worker_row_verify',
+      'callback_row_process' =>'sirius_feed_worker_row_process',
+    ),
+    'callback_launch' => 'sirius_feed_wizard_launch',
+    'callback_launch_args' => array('feed_worker'),
+  );
+  return $items;
+}  
+
 function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precompute) {
   $pk = $data['pk'];
   if (!$pk) { $pk = 'id'; }
@@ -89,6 +140,24 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
     }
   }
 
+  // Level
+  if ($row['level']) {
+    static $all_levels_by_code;
+    if (!$all_levels_by_code && function_exists('sirius_training_levels_fetch_all')) {
+      $all_levels = sirius_training_levels_fetch_all();
+      foreach ($all_levels as $ms_tid => $levels) {
+        foreach ($levels as $level_code => $level) {
+          $all_levels_by_code[$level_code] = $ms_tid;
+        }
+      }
+    }
+
+    $level_ms_tid = $all_levels_by_code[$row['level']];
+    if (!$level_ms_tid) { return array('success' => FALSE, 'msg' => "Unable to find level: $row[level]"); }
+    if ($precompute) { $row['level_ms_tid'] = $level_ms_tid; }
+  }
+
+
   return array('success' => TRUE, 'msg' => 'Looks good.');
 }
 
@@ -143,7 +212,39 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
   	}
   }
 
-  node_save($worker_node);
+  if ($row['level'] && $row['level_ms_tid']) {
+    $level = $row['level'];
+    $ms_tid = $row['level_ms_tid'];
+    $json = json_decode($worker_node->field_sirius_json['und'][0]['value'], TRUE);
+
+    if ($json['training']['levels'][$ms_tid]['code'] != $level) {
+      $json['training']['levels'][$ms_tid] = array(
+        'code' => $level,
+        'ts' => time(),
+      );
+      $worker_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+
+      // Log
+      if ($worker_node->nid) {
+        sirius_log(
+          'worker:level', 
+          'set', 
+          $worker_node->title . "'s level has been imported as " . $level, 
+          '', 
+          '', 
+          array($worker_node->nid),
+          array(),
+          array('ms_tid' => $ms_tid, 'level' => $level)
+        );
+      }
+    }
+  }
+
+  try {
+    node_save($worker_node);
+  } catch (exception $e) {
+    return array('success' => FALSE, 'msg' => 'node_save() failed.');
+  }
 
   if ($row['member_status_tid']) {
     $member_status_term = taxonomy_term_load($row['member_status_tid']);

@@ -282,7 +282,7 @@ function grievance_mail($key, &$message, $params) {
   }
 
   // @TODO Put this into a configuration variable!!!!
-  $from_email = variable_get('grievance_from_email', '');
+  $from_email = variable_get('sirius_email_default_from_address', '');
   if (!$from_email) {
     drupal_set_message(t('The from_email for this server has not been configured.  Mails will not be delivered correctly!'), 'error');
   }

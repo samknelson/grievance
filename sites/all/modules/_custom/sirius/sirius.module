@@ -257,29 +257,8 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   }
 
   // Remove the domain
-  if ($form['field_sirius_domain']) {
-    // Check our domain. Might come from the query.
-    $domain_nid = $_GET['sirius_domain'];
-
-    // If not, might come from the default value (current field value)
-    if (!$domain_nid) {
-      $domain_nid = $form['field_sirius_domain']['und']['#default_value'][0];
-    }
-    if ($domain_nid == 'CURRENT_DOMAIN') { $domain_nid = NULL; }
-
-    // If not, default to our very own domain.
-    if (!$domain_nid) {
-      $domain_nid = sirius_domain_nid();
-    }
-
-    if ($domain_nid) {
-      if (!sirius_domain_access($domain_nid)) { 
-        drupal_set_message("Attempting to create a record in a domain without access.", 'error');
-        $form['#access'] = FALSE;
-      }
-      $form['field_sirius_domain']['und']['#value']['target_id'] = $domain_nid;
-      if (!user_access('sirius admin')) { $form['field_sirius_domain']['#access'] = FALSE; }
-    }
+  if (preg_match('/_node_form/', $form_id)) {
+    sirius_domain_form_alter_node($form, $form_state, $form_id);
   }
 
   // Filter the taxonomy by domain
@@ -291,8 +270,17 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'sirius_worker' ||
       $form_id == 'grievance_shop_node_form' ||
       $form_id == 'sirius_dispatch_job_node_form' ||
-      $form_id == 'grievance_node_form') {
+      $form_id == 'grievance_node_form' ||
+      $form_id == 'sirius_contact_node_form' || 
+      $form_id == 'sirius_json_definition_node_form') {
     $form['field_sirius_json']['#access'] = FALSE;
+  }
+
+  // Remove access to caller ID fields which are set in a node tab
+  if ($form_id == 'sirius_json_definition_node_form') {
+    $form['field_sirius_callerids']['#access'] = FALSE;
+    $form['field_sirius_audio']['#access'] = FALSE;
+    if ($_GET['sirius_type']) { $form['field_sirius_type']['#access'] = FALSE; }
   }
 
   // Field overrides
@@ -314,6 +302,7 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
   if (!user_access('sirius dispatch admin')) {
     $form['field_sirius_worker']['#access'] = FALSE;
   }
+
   if (!user_access('sirius dispatch admin') && !user_access('grievance admin') && !user_access('grievance user')) {
     $form['field_grievance_rep_lead']['#access'] = FALSE;
     $form['field_grievance_rep_organizer']['#access'] = FALSE;
@@ -323,20 +312,13 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
     $form['field_sirius_json']['#access'] = FALSE;
   }
 
-  if (!user_access('sirius domain user admin')) {
-    $form['field_sirius_domain']['#accesss'] = FALSE;
+  if (!user_access('sirius admin')) {
+    $form['field_sirius_domain']['#access'] = FALSE;
+    $form['field_sirius_contact']['#access'] = FALSE;
   }
 
   if (!user_access('sirius signature edit')) {
     $form['field_sirius_signature']['#access'] = FALSE;
-  }
-
-  if (!user_access('sirius domain user admin')) {
-    $form['field_sirius_domain']['#access'] = FALSE;
-  }
-
-  if (!user_access('sirius contact admin')) {
-    $form['field_sirius_contact']['#access'] = FALSE;
   }
 }
 
