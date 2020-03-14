@@ -19,7 +19,6 @@ function sirius_node_tab_event_phonebank_call_access($event_node) {
 }
 
 function sirius_node_tab_event_phonebank_call($event_node) {
-	// @TODO!!!
 	$json = json_decode($event_node->field_sirius_json['und'][0]['value'], TRUE);
 	$type_json = sirius_event_type_json($event_node);
 	$prole_tid = $type_json['phonebank']['prole_tid'];
@@ -74,7 +73,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$survey_nid = $event_node->field_sirius_json_definition['und'][0]['target_id'];
 	$survey_node = node_load($survey_nid);
 	if (!$survey_node) { drupal_set_message("No survey!"); return array(); }
-	$survey_form = json_decode($survey_node->field_sirius_json['und'][0]['value'], TRUE);
+	$survey_form = json_decode($survey_node->field_sirius_json['und'][0]['value'], TRUE)['form']['default'];
 
 	$participant_nid = $form_state['values']['participant_nid'];
 	if (!$participant_nid) { 
