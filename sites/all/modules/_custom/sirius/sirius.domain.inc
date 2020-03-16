@@ -7,6 +7,7 @@ function sirius_node_access_domain($node, $op, $account) {
 
   // Domain admins can access
   if (user_access('sirius domain admin') && sirius_domain_access($node->nid)) { return NODE_ACCESS_ALLOW; }
+  if (user_access('sirius domain admin') && $op == 'create') { return NODE_ACCESS_ALLOW; }
 
   // Nobody else can see do anyhing.
   return NODE_ACCESS_DENY;
