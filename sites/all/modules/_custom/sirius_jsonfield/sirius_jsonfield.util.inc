@@ -45,7 +45,7 @@ function sirius_jsonfield_util_form_list_paths_recursive(&$result, $json, $path 
   foreach ($json as $key => $value) {
   	if (!is_array($value)) { continue; }
   	if (preg_match('/^#/', $key)) { continue; }
-    sirius_jsonfield_util_form_list_paths_recursive($result, $value, $path . ':' . $key);
+    sirius_jsonfield_util_form_list_paths_recursive($result, $value, $path . ':' . $key, $value_only);
   }
 }
 
@@ -84,4 +84,27 @@ function sirius_jsonfield_util_value_list_paths_recursive(&$result, $json, $path
   		$result[] = "$path:$key";
   	}
   }
+}
+
+function sirius_jsonfield_util_form_flatten($json) {
+	$result = array();
+	$paths = sirius_jsonfield_util_form_list_paths($json);
+	foreach ($paths as $id => $path) {
+		// We don't trust the paths. Sigh.
+		$new_id = preg_replace('/:/', '__', 'sirius_json_id' . $path);
+		$result[$new_id] = sirius_jsonfield_util_get_from_path($json, $path);
+		foreach ($result[$new_id] as $key => $value) {
+			if (!preg_match('/^#/', $key)) { unset($result[$new_id][$key]); }
+		}
+		$result[$new_id]['#path'] = $path;
+	}
+	return $result;
+}
+
+function sirius_jsonfield_util_render_value($form_element, $value) {
+	if (is_array($value)) {
+		if ($form_element['#type'] == 'date_popup') { return $value['date'] . ' ' . $value['time']; }
+		return print_r($value, 1);
+	}
+	return $value;
 }
