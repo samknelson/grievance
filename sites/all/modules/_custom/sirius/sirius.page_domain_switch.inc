@@ -18,7 +18,11 @@ function sirius_domain_page_switch() {
 
 		// Switch 
 		$domain = sirius_domain($new_domain_nid);
-		drupal_set_message("Switched to: " . $domain->title);
+		if ($domain) {
+			drupal_set_message("Switched to: " . $domain->title);
+		} else {
+			drupal_set_message("Switched to: [no domain]");
+		}
 
 		// Redirect
 		if ($_REQUEST['destination']) { drupal_goto($_REQUEST['destination']); }
