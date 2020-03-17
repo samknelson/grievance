@@ -505,11 +505,11 @@ function grievance_contract_compute_timeline($grievance_node) {
 
   // Load the log dates that the grievance status changed
   $log_update_tids = array(
-    variable_get('grievance_log_insert_type', ''), 
-    variable_get('grievance_log_update_type_with_status_change', ''), 
-    variable_get('grievance_log_update_type_without_status_change', ''), 
-    variable_get('grievance_log_incident_type', ''),
-    variable_get('grievance_log_timelines_extended_type', ''),
+    sirius_get_special_tid('grievance_log_types|insert'), 
+    sirius_get_special_tid('grievance_log_types|update_with_status_change'), 
+    sirius_get_special_tid('grievance_log_types|update_without_status_change'), 
+    sirius_get_special_tid('grievance_log_types|incident'),
+    sirius_get_special_tid('grievance_log_types|timelines_extended'),
   );
   $log_nodes = grievance_log_list($grievance_node, $log_update_tids);
 
@@ -588,7 +588,7 @@ function grievance_contract_compute_timeline($grievance_node) {
 
   // Walk the log again and extend any timelines
   foreach ($log_nodes as $log_node) {
-    if ($log_node->field_grievance_log_type['und'][0]['tid'] != variable_get('grievance_log_timelines_extended_type', '')) { continue; }
+    if ($log_node->field_grievance_log_type['und'][0]['tid'] != sirius_get_special_tid('grievance_log_types|timelines_extended')) { continue; }
     $days = $log_node->field_grievance_days['und'][0]['value'];
     $status_ts = strtotime($log_node->field_grievance_status_date['und'][0]['value']);
     foreach ($rule_nodes as $rule_node) {

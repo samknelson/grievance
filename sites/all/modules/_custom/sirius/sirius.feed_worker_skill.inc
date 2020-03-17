@@ -5,7 +5,7 @@ function sirius_feed_worker_skill_row_verify($feed_node, $info, $data, &$row, $p
   if (!$pk) { $pk = 'id'; }
 
 	// Trim all
-	foreach ($row as $key => $value) { $row[$key] = trim($value); }
+	foreach ($row as $key => $value) { if (is_string($value)) { $row[$key] = trim($value); } }
 
   $row['ssn'] = sirius_ssn_format($row['ssn']);
   if ($pk == 'id') {

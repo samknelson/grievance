@@ -31,6 +31,12 @@ function grievance_form_current_value($field, $column, $form, $form_state) {
 
 function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
   //
+  // Add the worker sync functions
+  //
+
+  grievance_workersync_search_form($form, $form_state);
+
+  //
   // Load our custom javascript
   //
 
@@ -581,7 +587,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
   if (!$grievance_node->nid) {
     for ($i=1; $i<=5; ++$i) {
-      $log_type_tid = variable_get("grievance_log_intake_${i}_type", '');
+      $log_type_tid = sirius_get_special_tid("grievance_log_types|intake_$i"); 
       if (!$log_type_tid) { continue; }
       $log_type_term = taxonomy_term_load($log_type_tid);
 

@@ -1,11 +1,15 @@
 <?php
 
 function sirius_training_levels_fetch_all() {
-	$ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+	$all_levels = &drupal_static(__FUNCTION__);
+	if (!$all_levels) {
+		$all_levels = array();
+		$ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
 
-	foreach ($ms_terms as $ms_tid => $ms_term) {
-		$levels = sirius_training_levels_fetch($ms_term);
-		if ($levels) { $all_levels[$ms_tid] = $levels; }
+		foreach ($ms_terms as $ms_tid => $ms_term) {
+			$levels = sirius_training_levels_fetch($ms_term);
+			if ($levels) { $all_levels[$ms_tid] = $levels; }
+		}
 	}
 
 	return $all_levels;

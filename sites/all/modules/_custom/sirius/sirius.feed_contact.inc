@@ -102,9 +102,7 @@ function _sirius_feed_contact_fields_recursive($obj, $prefix, $prefix_label, &$r
 
 function sirius_feed_contact_row_verify($feed_node, $info, $data, &$row, $precompute) {
 	// Trim all
-	foreach ($row as $key => $value) {
-		$row[$key] = trim($value);
-	}
+  foreach ($row as $key => $value) { if (is_string($value)) { $row[$key] = trim($value); } }
 
 	if (!preg_match('/^\d+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
 

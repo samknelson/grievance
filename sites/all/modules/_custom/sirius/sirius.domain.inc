@@ -7,6 +7,7 @@ function sirius_node_access_domain($node, $op, $account) {
 
   // Domain admins can access
   if (user_access('sirius domain admin') && sirius_domain_access($node->nid)) { return NODE_ACCESS_ALLOW; }
+  if (user_access('sirius domain admin') && $op == 'create') { return NODE_ACCESS_ALLOW; }
 
   // Nobody else can see do anyhing.
   return NODE_ACCESS_DENY;
@@ -155,7 +156,7 @@ function sirius_domain_access($domain_nid, $root = NULL, $depth = 0) {
 }
 
 /**
- * Fetch all the parrents of a domain
+ * Fetch all the children of a domain
  */
 
 
@@ -185,10 +186,12 @@ function sirius_domain_tree($root = NULL) {
 	return $tree;
 }
 
-function sirius_domain_tree_render_as_select($root = NULL) {
-  $tree = sirius_domain_tree($root);
+function sirius_domain_tree_render_as_select($root = NULL, $depth = 0) {
+  $root_nid = NULL; 
+  if (is_object($root)) { $root_nid = $root->nid; } else { $root_nid = $root; }
+  $tree = sirius_domain_tree($root_nid);
   $options = array();
-  _sirius_domain_tree_render_as_select($tree, $options);
+  _sirius_domain_tree_render_as_select($tree, $options, $depth);
   return $options;
 }
 
@@ -214,8 +217,8 @@ function sirius_domain_taxonomy_is_multidomain($vid_or_machine_name) {
   } else {
     $vocabulary_machine_name = $vid_or_machine_name;
   }
-  $multidomain = variable_get("sirius_taxonomy_multidomain_$vocabulary_machine_name", '');
-  return ($multidomain == 'Yes');
+  $settings = sirius_taxonomy_settings($vocabulary_machine_name);
+  return ($settings['multidomain'] == 'Yes');
 }
 
 /**
@@ -347,4 +350,72 @@ function sirius_domain_variable_set($name, $value) {
 function sirius_domain_variable_name($name) {
   $domain_nid = sirius_domain_nid();
   if ($domain_nid) { return $domain_nid . '/' . $name; } else { return $name; }
+}
+
+
+function sirius_domain_restrict_taxonomy_fields(&$form, $form_id) {
+  if ($form['#entity'] && $form['entity']->field_sirius_domain['und'][0]['target_id']) {
+    $domain_nid = $form['entity']->field_sirius_domain['und'][0]['target_id'];
+  } else {
+    $domain_nid = sirius_domain_nid();
+  }
+  if (!$domain_nid) { 
+    return;
+  }
+
+  foreach ($form as $field_name => &$form_field) {
+    if (!preg_match('/^field_/', $field_name)) { continue; }
+    $info = field_info_field($field_name);
+    if ($info['type'] != 'taxonomy_term_reference') { continue; }
+    $vocabulary_machine_name = $info['settings']['allowed_values'][0]['vocabulary'];
+    if (!$vocabulary_machine_name) { continue; }
+    $options = sirius_taxonomy_load($vocabulary_machine_name, 'tid', 'name');
+    if ($form_field['und']['#options']) {
+      $form_field['und']['#options'] = array_intersect($form_field['und']['#options'], $options);
+    }
+  }
+}
+function sirius_domain_form_alter_node(&$form, &$form_state, $form_id) {
+  // We only care about nodes with a domain field.
+  if (!$form['field_sirius_domain']) { return; }
+
+  // If this is a new node, set the default value for the domain.
+  $node = $form['#node'];
+  if (!$node->nid) {
+    // Accept a default domain from the query. But only if we have access to it.
+    $default_domain_nid = $_GET['sirius_domain'];
+    if ($default_domain_nid) {
+      if (!sirius_domain_access($default_domain_nid)) {
+        $form['#access'] = FALSE;
+        drupal_set_message("You do not have access to that domain.", 'error');
+        return;
+      }
+    }
+
+    // Otherwise, the default value is our current domain.
+    if (!$default_domain_nid) { 
+      $default_domain_nid = sirius_domain_nid();
+    }
+
+    // Set the default value in the form.
+    if ($default_domain_nid) { 
+      $form['field_sirius_domain']['und']['#default_value'][0] = $default_domain_nid; 
+    }
+  }
+
+  // Restrict the list of available domains to those that we have access to.
+  $tree = array();
+  $my_root_node = sirius_domain_root();
+  if ($my_root_node) { 
+    $my_root_nid = $my_root_node->nid;
+    $tree = array($my_root_nid => $my_root_node->title);
+  } else {
+    $my_root_nid = NULL;
+    $tree = array('_none' => '(root)');
+  }
+  $tree += sirius_domain_tree_render_as_select($my_root_nid, 1);
+  $form['field_sirius_domain']['und']['#options'] = $tree;
+
+  // And, finally ... hide this field from anybody without domain admin permission
+  if (!user_access('sirius domain admin')) { $form['field_sirius_domain']['#access'] = FALSE; }
 }

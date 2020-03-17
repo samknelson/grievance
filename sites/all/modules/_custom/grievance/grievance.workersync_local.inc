@@ -53,7 +53,7 @@ function grievance_workersync_local_search($str, $verbose = FALSE) {
   $sql .= "field_sirius_id2_value, ";
   $sql .= "node_employer.title as employer, ";
   $sql .= "field_sirius_name_family as last_name, ";
-  $sql .= "field_sirius_name_given as first_name, ";
+  $sql .= "field_sirius_name_given as first_name ";
   $sql .= "from node ";
   foreach ($tables as $table) {
     $sql .= "left join $table on $table.entity_type = 'node' and $table.entity_id = node.nid ";

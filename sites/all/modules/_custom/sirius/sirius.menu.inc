@@ -63,6 +63,7 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
+  /*
   $node_tabs['sirius_worker']['sirius_worker_letter'] = array(
     'title' => 'Letters',
     'description' => '',
@@ -76,6 +77,7 @@ function sirius_node_tabs() {
     'callback' => 'sirius_node_tab_entity_letter',
     'permissions' => array('grievance user'),
   );
+  */
 
   $node_tabs['grievance_letter_template']['sirius_letter_template_recipients'] = array(
     'title' => 'Recipients',
@@ -116,12 +118,20 @@ function sirius_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['sirius_domain']['sirius_domain_clone'] = array(
+    'title' => 'Clone',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_clone',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 5,
+  );
+
   $node_tabs['sirius_domain']['sirius_domain_delete'] = array(
     'title' => 'Delete',
     'description' => '',
     'callback' => 'sirius_node_tab_sirius_domain_delete',
-    'permissions' => array('sirius domain delete'),
-    'weight' => 5,
+    'permissions' => array('sirius domain admin'),
+    'weight' => 6,
   );
 
   return $node_tabs;

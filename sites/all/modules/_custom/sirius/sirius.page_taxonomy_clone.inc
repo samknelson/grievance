@@ -60,6 +60,9 @@ function sirius_page_taxonomy_clone_form($form, &$form_state, $vocabulary_machin
 		'#value' => 'Submit',
 	);
 
+  $log = sirius_minilog_render_html();
+  if ($log) { $form['results'] = array('#markup' => '<hr>' . $log); }
+
 	return $form;
 }
 
@@ -117,6 +120,29 @@ function sirius_page_taxonomy_clone_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
+function sirius_domain_get_target_tid($domain_nid, $source_tid, $reset = FALSE) {
+	$data = &drupal_static(__FUNCTION__);
+  if (!isset($data)) { $data = array(); }
+  if ($reset) { $data = array(); }
+
+  // drupal_set_message("Looking up: $domain_nid, $source_tid");
+  if (!isset($data[$domain_nid][$source_tid])) {
+  	// drupal_set_message("... Querying.");
+		$sql = "select tid from taxonomy_term_data ";
+		$sql .= "join field_data_field_sirius_term_source on field_data_field_sirius_term_source.entity_type = 'taxonomy_term' and field_data_field_sirius_term_source.entity_id = taxonomy_term_data.tid ";
+		$sql .= "join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'taxonomy_term' and field_data_field_sirius_domain.entity_id = taxonomy_term_data.tid ";
+		$sql .= "where field_sirius_domain_target_id = :domain_nid ";
+		$sql .= "and field_sirius_term_source_value = :source_tid ";
+		$sql_args = array();
+		$sql_args[':domain_nid'] = $domain_nid;
+		$sql_args[':source_tid'] = $source_tid;
+		$stmt = db_query($sql, $sql_args);
+		$hr = $stmt->fetchAssoc();
+		$data[$domain_nid][$source_tid] = $hr['tid'];
+	}
+	return $data[$domain_nid][$source_tid];
+}
+
 function sirius_domain_clone_taxonomy($vocabulary_machine_name, $source_domain_nid, $target_domain_nid) {
 	// Get the vocabulary
 	$vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_machine_name);
@@ -145,7 +171,6 @@ function sirius_domain_clone_taxonomy($vocabulary_machine_name, $source_domain_n
 	  $target_terms = taxonomy_term_load_multiple(array_keys($stmt['taxonomy_term']));
   }
 
-
   // Set up the target mapping
   $target_map = array();
   foreach ($target_terms as $target_tid => $target_term) {
@@ -167,7 +192,8 @@ function sirius_domain_clone_taxonomy($vocabulary_machine_name, $source_domain_n
 		$hr = $stmt->fetchAssoc();
 		$source_term->parent = $hr['parent'];
 
-  	drupal_set_message("Cloning: " . $source_term->name);
+		sirius_minilog("Cloning: " . $source_term->name);
+		$vars = get_object_vars($source_term);
   	++$count;
   	if ($target_map[$source_tid]) {
   		++$count_update;
@@ -178,13 +204,11 @@ function sirius_domain_clone_taxonomy($vocabulary_machine_name, $source_domain_n
   		$new_term->format = $source_term->format;
   		$new_term->hweight = $source_term->hweight;
   		$new_term->hdepth = $source_term->hdepth;
-  		$vars = get_object_vars($source_term);
-  		foreach ($vars as $var) {
-  			if (is_array($var)) { continue; }
-  			if (!preg_match('/^field_/', $var)) { continue; }
-  			if ($var == 'field_sirius_domain') { continue; }
-  			if ($var == 'field_sirius_term_source') { continue; }
-  			$new_term->{$var} = $source_term->{$var};
+  		foreach ($vars as $field_name => $var) {
+  			if (!preg_match('/^field_/', $field_name)) { continue; }
+  			if ($field_name == 'field_sirius_domain') { continue; }
+  			if ($field_name == 'field_sirius_term_source') { continue; }
+  			$new_term->{$field_name} = $source_term->{$field_name};
   		}
   	} else {
   		++$count_create;
@@ -194,6 +218,64 @@ function sirius_domain_clone_taxonomy($vocabulary_machine_name, $source_domain_n
   		$new_term->field_sirius_term_source['und'][0]['value'] = $source_tid;
   		$new_term->field_sirius_domain['und'][0]['target_id'] = $target_domain_nid;
   	}
+
+  	// Update term reference fields
+  	foreach ($vars as $field_name => $var) {
+			if (!preg_match('/^field_/', $field_name)) { continue; }
+			if ($field_name == 'field_sirius_domain') { continue; }
+			if ($field_name == 'field_sirius_term_source') { continue; }
+
+	    $info = field_info_field($field_name);
+	    if ($info['type'] != 'taxonomy_term_reference') { continue; }
+	    $vocabulary_machine_name = $info['settings']['allowed_values'][0]['vocabulary'];
+	    if (!$vocabulary_machine_name) { continue; }
+	    $values = sirius_fieldvals($source_term, $field_name, 'tid');
+	    foreach ($values as $delta => $source_reference_tid) {
+	    	if (!$source_reference_tid) { continue; }
+				$new_tid = sirius_domain_get_target_tid($target_domain_nid, $source_reference_tid);
+				if ($new_tid) { $new_term->{$field_name}['und'][$delta]['tid'] = $new_tid; }
+	    }
+  	}
+
+  	// Update that pesky JSON
+  	$json = json_decode($new_term->field_sirius_json['und'][0]['value'], TRUE);
+  	$paths = sirius_jsonfield_util_value_list_paths($json);
+  	$patterns = array(
+  		':prole_tid',
+			':caller_prole_tids:(\d+)',
+			':admin_prole_tids:(\d+)',
+			':paccess:([A-Z\d]+)\|([A-Z\d]+)',
+			':participants:([A-Z\d]+)\|([A-Z\d]+)',
+  	);
+  	foreach ($paths as $path) {
+  		$matches = array();
+  		foreach ($patterns as $pattern) {
+	  		if (preg_match("/$pattern/", $path, $matches)) {
+	  			$key_part_1 = $matches[1];
+	  			$key_part_2 = $matches[2];
+	  			$val = sirius_jsonfield_util_get_from_path($json, $path);
+  				list ($val_1, $val_2) = explode('|', $val);
+
+  				$key_part_1_new = sirius_domain_get_target_tid($target_domain_nid, $key_part_1);
+  				$key_part_2_new = sirius_domain_get_target_tid($target_domain_nid, $key_part_2);
+  				$val_1_new 			= sirius_domain_get_target_tid($target_domain_nid, $val_1);
+  				$val_2_new 			= sirius_domain_get_target_tid($target_domain_nid, $val_2);
+
+  				$new_path = $path;
+  				if ($key_part_1 && $key_part_1_new && $key_part_1 != $key_part_1_new) { $new_path = preg_replace("/:$key_part_1\|/", ":$key_part_1_new|", $new_path); $new_path = preg_replace("/:$key_part_1\$/", ":$key_part_1_new", $new_path); }
+  				if ($key_part_2 && $key_part_2_new && $key_part_2 != $key_part_2_new) { $new_path = preg_replace("/\|$key_part_2\$/", "|$key_part_2_new", $new_path); }
+
+  				$new_val = $val;
+  				if ($val_1 && $val_1_new && $val_1 != $val_1_new) { $new_val = preg_replace("/^$val_1/", "$val_1_new", $new_val); }
+  				if ($val_2 && $val_2_new && $val_2 != $val_2_new) { $new_val = preg_replace("/$val_2\$/", "$val_2_new", $new_val); }
+
+  				if ($path != $new_path) { sirius_jsonfield_util_unset_from_path($json, $path); }
+  				if ($val != $new_val)   { sirius_jsonfield_util_set_from_path($json, $new_path, $new_val); }
+	  		}
+	  	}
+  	}
+  	$new_term->field_sirius_json['und'][0]['value'] = json_encode($json);
+
 		taxonomy_term_save($new_term);
 		if (!$target_map[$source_tid]) { $target_map[$source_tid] = $new_term; }
   }
@@ -216,16 +298,18 @@ function sirius_domain_clone_taxonomy($vocabulary_machine_name, $source_domain_n
   // Set the "special" TIDs
   $all_keys = sirius_specialtid_keys();
   $keys = $all_keys[$vocabulary_machine_name];
-  foreach ($keys as $key => $ignore) {
-  	$source_variable_name = 'sirius_specialtid_' . $source_domain_nid . '/' . $vocabulary_machine_name . '|' . $key;
-  	$target_variable_name = 'sirius_specialtid_' . $target_domain_nid . '/' . $vocabulary_machine_name . '|' . $key;
-  	$source_value = variable_get($source_variable_name);
-  	if ($source_value && $target_map[$source_value]) {
-	  	$target_value = $target_map[$source_value]->tid;
-	  	variable_set($target_variable_name, $target_value);
-			drupal_set_message("Copying setting: $source_variable_name = $source_value to $target_variable_name = $target_value");;
-		}
-  }
+  if ($keys) {
+	  foreach ($keys as $key => $ignore) {
+	  	$source_variable_name = 'sirius_specialtid_' . $source_domain_nid . '/' . $vocabulary_machine_name . '|' . $key;
+	  	$target_variable_name = 'sirius_specialtid_' . $target_domain_nid . '/' . $vocabulary_machine_name . '|' . $key;
+	  	$source_value = variable_get($source_variable_name);
+	  	if ($source_value && $target_map[$source_value]) {
+		  	$target_value = $target_map[$source_value]->tid;
+		  	variable_set($target_variable_name, $target_value);
+		  	sirius_minilog("Copying setting: $source_variable_name = $source_value to $target_variable_name = $target_value");
+			}
+	  }
+	}
 
   return array('success' => TRUE, 'msg' => t('Taxonomy clone complete. Copied @count terms; created @count_create and updated @count_update.', array('@count' => $count, '@count_create' => $count_create, '@count_update' => $count_update)));
 }

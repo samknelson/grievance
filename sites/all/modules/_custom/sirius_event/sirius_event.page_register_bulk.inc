@@ -3,7 +3,6 @@
 function sirius_node_tab_event_participants_register_bulk($event_node) {
 	$participant_role_tid = $_REQUEST["participant_role_tid"];
 	if (!$participant_role_tid) {
-		$html = sirius_node_tab_event_participants_quicknav($event_node, 'register/bulk');
 		$html .= "To register new participants for this event, please select a role from the list above.";
 		return $html;
 	} 
@@ -32,7 +31,6 @@ function sirius_contact_search_addone($form, $form_state) {
 function sirius_node_tab_event_participants_register_bulk_form($form, &$form_state, $event_node, $participant_role_tid) {
 	$form_state['event_nid'] = $event_node->nid;
 	$form_state['participant_role_tid'] = $participant_role_tid;
-	$form['nav'] = array('#markup' => sirius_node_tab_event_participants_quicknav($event_node, 'register/bulk'));
 	$participant_role_term = taxonomy_term_load($participant_role_tid);
 	$statuses = sirius_event_participant_role_status_tids($participant_role_tid);
 
@@ -47,12 +45,14 @@ function sirius_node_tab_event_participants_register_bulk_form($form, &$form_sta
   // I am a super search! Hear me roar.
   //
 
+	/*
   $form['contact_search'] = array(
     '#type' => 'fieldset',
     '#title' => t('Contact Search'),
     '#prefix' => '<div id="contact_search">',
     '#suffix' => '</div>',
   );
+  */
 
 	$criteria_count = $form_state['contact_search']['criteria_count'];
 	if (!$criteria_count) { $criteria_count = 1; }
@@ -83,6 +83,19 @@ function sirius_node_tab_event_participants_register_bulk_form($form, &$form_sta
 
 	$contact_form_definition = sirius_contact_definition();
 	$contact_form_paths = array(NULL => t('-- Select --')) + sirius_jsonfield_util_form_list_paths($contact_form_definition);
+
+	$form['source'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Source',
+	);
+
+	/*
+	$form['contact_search']['add_criterion'] = array(
+		'#type' => 'select',
+		'#title' => 'Add a Contact Criterion: ',
+		'#options' => $contact_form_paths,
+	);
+
 	$form['contact_search']['add_criterion'] = array(
 		'#type' => 'select',
 		'#title' => 'Add a Contact Criterion: ',
@@ -97,7 +110,7 @@ function sirius_node_tab_event_participants_register_bulk_form($form, &$form_sta
     ),
     '#limit_validation_errors' => array(),
   );
-
+	*/
 	$form['action'] = array(
 		'#title' => 'Action',
 		'#type' => 'select',
@@ -137,13 +150,14 @@ function sirius_node_tab_event_participants_register_bulk_form_submit($form, &$f
 	$domain_nid = sirius_domain_nid();
 	$args = array();
 
-	$sql_detail_start = "select nid, title, field_sirius_json_value ";
+	$sql_detail_start = "select nid, title, field_sirius_json_value, field_sirius_source_value ";
 	$sql_count_start = "select count(nid) as c "; 
 	$sql = '';
 	$sql .= "from node ";
 	if ($domain_nid) {
 		$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 	}
+	$sql .= "left join field_data_field_sirius_source on field_data_field_sirius_source.entity_type = 'node' and field_data_field_sirius_source.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
 	$sql .= "where type = 'sirius_contact' ";
 	if ($domain_nid) {
@@ -171,8 +185,13 @@ function sirius_node_tab_event_participants_register_bulk_form_submit($form, &$f
 	if (!$first_clause) {
 		$sql .= "and ($clauses) ";
 	}
+	if ($form_state['values']['source']) {
+		$args[':source'] = $form_state['values']['source'];
+		$sql .= "and field_sirius_source_value = :source ";
+	}
 
-	$sql_detail_end = "limit 100 ";
+
+	$sql_detail_end = "limit 10000 ";
 
 	$sql_count = $sql_count_start . $sql . $sql_count_end; 
 	$sql_detail = $sql_detail_start . $sql . $sql_detail_end; 
@@ -186,6 +205,7 @@ function sirius_node_tab_event_participants_register_bulk_form_submit($form, &$f
 		$json = json_decode($hr['field_sirius_json_value'], TRUE);
 		$row = array();
 		$row[] = $hr['title'];
+		$row[] = $hr['field_sirius_source_value'];
 		foreach (array_keys($headers) as $json_path) {
 			$row[] = sirius_jsonfield_util_get_from_path($json, $json_path);
 		}
@@ -197,6 +217,7 @@ function sirius_node_tab_event_participants_register_bulk_form_submit($form, &$f
 
 	$header = array(
 		'Name',
+		'Source',
 	);
 	foreach (array_keys($headers) as $json_path) {
 		$header[] = $json_path;
@@ -205,12 +226,12 @@ function sirius_node_tab_event_participants_register_bulk_form_submit($form, &$f
 
 	$html = '<hr>';
 	$html .= '<h2>' . t('Results') . '</h2>';
-	if ($count >= 100) {
+	if ($count >= 10000) {
 		$stmt = db_query($sql_count, $args);
 		$hr = $stmt->fetchAssoc();
 		$count_total = $hr['c'];
 
-		$html .= t('@count_total matching contacts found, showing the first 100', array('@count_total' => $count_total));
+		$html .= t('@count_total matching contacts found, showing the first 10000', array('@count_total' => $count_total));
 	} else if ($count < 1) {
 		$html .= t('No contacts match your criteria.');
 	} else {
@@ -243,23 +264,25 @@ function sirius_node_tab_event_participants_register_bulk_form_submit($form, &$f
 
 function rename_this_function_get_clause($values, &$headers, $json_path_for_query = '$', $json_path_for_header = '') {
 	$clause = '';
-	foreach ($values as $key => $value) {
-		$subclause = '';
-		$sub_json_path_for_query = $json_path_for_query . ".$key";
-		$sub_json_path_for_header = $json_path_for_header . ":$key";
-		$sub_json_path_for_header = preg_replace('/^:/', '', $sub_json_path_for_header);
+	if ($values) {
+		foreach ($values as $key => $value) {
+			$subclause = '';
+			$sub_json_path_for_query = $json_path_for_query . ".$key";
+			$sub_json_path_for_header = $json_path_for_header . ":$key";
+			$sub_json_path_for_header = preg_replace('/^:/', '', $sub_json_path_for_header);
 
-		if (is_array($value)) {
-			$subclause .= rename_this_function_get_clause($value, $headers, $sub_json_path_for_query, $sub_json_path_for_header);
-		} else {
-			if ($value) {
-				$subclause = "json_contains(field_sirius_json_value, '\"$value\"', '$sub_json_path_for_query') ";
-				$headers[$sub_json_path_for_header] = TRUE;
+			if (is_array($value)) {
+				$subclause .= rename_this_function_get_clause($value, $headers, $sub_json_path_for_query, $sub_json_path_for_header);
+			} else {
+				if ($value) {
+					$subclause = "json_contains(field_sirius_json_value, '\"$value\"', '$sub_json_path_for_query') ";
+					$headers[$sub_json_path_for_header] = TRUE;
+				}
 			}
-		}
-		if ($subclause) {
-			if ($clause) { $clause .= 'and '; }
-			$clause .= $subclause;
+			if ($subclause) {
+				if ($clause) { $clause .= 'and '; }
+				$clause .= $subclause;
+			}
 		}
 	}
 	return $clause;

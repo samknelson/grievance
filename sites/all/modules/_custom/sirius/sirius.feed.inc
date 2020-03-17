@@ -86,7 +86,7 @@ function sirius_feed_page_list($wizard_name) {
  ************************************************************************************************/
 
 function sirius_feed_page_landing_access() {
-	return user_access('sirius admin');
+	return user_access('sirius domain admin');
 }
 
 function sirius_feed_page_landing() {
@@ -129,12 +129,18 @@ function sirius_feed_spout_get_reader($feed_node) {
 	$path = drupal_realpath($dest);
 
 	sirius_feed_spout_init();
-	$reader = ReaderEntityFactory::createReaderFromFile($path);
-	$reader->open($path);
-	return $reader;
+	try {
+		$reader = ReaderEntityFactory::createReaderFromFile($path);
+		$reader->open($path);
+		return $reader;
+	} catch (exception $e) {
+		drupal_set_message($e->getMessage(), 'error');
+		return NULL;
+	}
 }
 
 function sirius_feed_spout_get_sheet($reader, $sheet_name) {
+	if (!$reader) { return NULL; }
 	foreach ($reader->getSheetIterator() as $sheet) {
 		if (!$sheet_name) { break; }
   	if ($sheet->getName() == $sheet_name) { break; }
@@ -144,11 +150,12 @@ function sirius_feed_spout_get_sheet($reader, $sheet_name) {
 
 
 function sirius_feed_spout_get_header($sheet, $header_row) {
+	if (!$sheet) { return NULL; }
 	$header = array();
 	foreach ($sheet->getRowIterator() as $row) {
 		$cells = array();
 		foreach ($row->getCells() as $cell) {
-			$cells[] = $cell->getValue();
+			$cells[] = trim(mb_convert_encoding($cell->getValue(), 'UTF-8'));
 		}
 		if ($header_row == 'Yes') {
 			$header = $cells;
@@ -165,7 +172,7 @@ function sirius_feed_spout_get_header($sheet, $header_row) {
 function sirius_feed_spout_get_cell($row, $col) {
 	$cell = $row->getCellAtIndex($col);
 	if (!$cell) { return NULL; }
-	return $cell->getValue();
+	return trim(mb_convert_encoding($cell->getValue(), 'UTF-8'));
 }
 
 function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header) {
@@ -181,7 +188,7 @@ function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header)
 	foreach ($row->getCells() as $cell) {
 		$title = $header[$delta];
 		if (!$title) { $title = $delta; }
-		$raw_row[$title] = $cell->getValue();
+		$raw_row[$title] = trim(mb_convert_encoding($cell->getValue(), 'UTF-8'));
 		++$delta;
 	}
 	$import_data_row['xxxrawxxx'] = $raw_row;
@@ -198,8 +205,7 @@ function sirius_feed_page_launch_access($wizard_name) {
 	if (!$info) { return FALSE; }
 
 	// @todo
-	return user_access('sirius');
-	// return user_access('sirius admin');
+	return user_access('sirius domain admin');
 }
 
 function sirius_feed_page_launch($wizard_name) {
@@ -363,6 +369,10 @@ function sirius_feed_wizard_sheet_form($form, &$form_state, $info, $data, $feed_
 	$last_data = sirius_feed_lastdata($info, $feed_node);
 
 	$reader = sirius_feed_spout_get_reader($feed_node);
+	if (!$reader) {
+		drupal_set_message("Unable to load the spreadsheet.", 'error');
+		return array();
+	}
 	$names = array();
 	$i = 0;
 	foreach ($reader->getSheetIterator() as $sheet) {
@@ -444,6 +454,12 @@ function sirius_feed_wizard_map_form($form, &$form_state, $info, $data, $feed_no
 
 	$count = 0;
 	$html_rows = array();
+
+	if (!$sheet) { 
+		drupal_set_message("Unable to load spreadsheet.", 'error');
+		return array();
+	}
+
 	foreach ($sheet->getRowIterator() as $row) {
 		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
 		$html_row = array();
@@ -556,6 +572,10 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	// Preview
 	$reader = sirius_feed_spout_get_reader($feed_node);
 	$sheet = sirius_feed_spout_get_sheet($reader, $data['worksheet']);
+	if (!$sheet) { 
+		drupal_set_message("Unable to load the spreadsheet", 'error');
+		return array();
+	}
 	$header = sirius_feed_spout_get_header($sheet, $data['header_row']);
 
 	$import_header = array('xxxrowcountxxx' => 'Row');
