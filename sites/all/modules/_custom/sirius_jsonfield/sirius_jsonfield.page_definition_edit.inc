@@ -5,25 +5,26 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 	$node = node_load($nid);
 
 	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
-	$tree = _sirius_json_definition_edit_render_recursive($json);
+	$json_form = $json['form']['default'];
+	$tree = _sirius_json_definition_edit_render_recursive($json_form);
 
 	$field_name = $_REQUEST['field_name'];
 	$json_path = $_REQUEST['json_path'];
 	$parts = explode(':', $json_path);
-	$ref = &$json;
+	$ref = &$json_form;
 	foreach ($parts as $part) {
 		if ($part) { $ref = &$ref[$part]; }
 	}
 	if ($field_name) { $leaf = $ref[$field_name]; }
 
 	$field_list = array();
-	_sirius_json_definition_edit_field_list_recursive($field_list, $json);
+	_sirius_json_definition_edit_field_list_recursive($field_list, $json_form);
 
 	$link_field_list = array();
 	_sirius_json_definition_edit_field_list_recursive($link_field_list, $link_json);
 
 	$fieldset_list = array();
-	_sirius_json_definition_edit_fieldset_list_recursive($fieldset_list, $json);
+	_sirius_json_definition_edit_fieldset_list_recursive($fieldset_list, $json_form);
 
 	// Can't move fieldset to child
 	if ($leaf['#type'] === 'fieldset') {
@@ -305,9 +306,6 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 
 	$form['suffix'] = array('#markup' => '</tr></table></div>');
 
-
-
-
 	return $form;
 }
 
@@ -315,7 +313,7 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 	$nid = $form_state['nid'];
 	$node = node_load($nid);
 	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
-	// $json['random_' . rand(0, 10000)] = $form_state['values'];
+	$json_form = $json['form']['default'];
 
 	$old_field_name =  sirius_json_definition_canonical_field_name($_REQUEST['field_name']);
 	$field_name = sirius_json_definition_canonical_field_name($form_state['values']['name']);
@@ -324,7 +322,7 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 
 	// Find the ref for our current fieldset
 	$parts = explode(':', $json_path);
-	$ref = &$json;
+	$ref = &$json_form;
 	foreach ($parts as $part) {
 		if ($part) {
 			$ref = &$ref[$part];
@@ -378,7 +376,7 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 
 		// Find the ref for our current fieldset
 		$parts = explode(':', $new_path);
-		$new_ref = &$json;
+		$new_ref = &$json_form;
 		foreach ($parts as $part) {
 			if ($part) {
 				$new_ref = &$new_ref[$part];
@@ -459,6 +457,7 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		foreach ($leaf as $key => $value) { $ref[$field_name][$key] = $value; }
 	}
 
+	$json['form']['default'] = $json_form;
 	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
 	node_save($node);
 }

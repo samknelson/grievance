@@ -122,7 +122,7 @@ function sirius_node_tabs() {
     'title' => 'Clone',
     'description' => '',
     'callback' => 'sirius_node_tab_sirius_domain_clone',
-    'permissions' => array('sirius admin'),
+    'permissions' => array('sirius domain admin'),
     'weight' => 5,
   );
 
@@ -130,7 +130,7 @@ function sirius_node_tabs() {
     'title' => 'Delete',
     'description' => '',
     'callback' => 'sirius_node_tab_sirius_domain_delete',
-    'permissions' => array('sirius admin'),
+    'permissions' => array('sirius domain admin'),
     'weight' => 6,
   );
 

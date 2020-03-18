@@ -3,7 +3,6 @@
 function sirius_node_tab_event_participants_register_bulk($event_node) {
 	$participant_role_tid = $_REQUEST["participant_role_tid"];
 	if (!$participant_role_tid) {
-		$html = sirius_node_tab_event_participants_quicknav($event_node, 'register/bulk');
 		$html .= "To register new participants for this event, please select a role from the list above.";
 		return $html;
 	} 
@@ -32,7 +31,6 @@ function sirius_contact_search_addone($form, $form_state) {
 function sirius_node_tab_event_participants_register_bulk_form($form, &$form_state, $event_node, $participant_role_tid) {
 	$form_state['event_nid'] = $event_node->nid;
 	$form_state['participant_role_tid'] = $participant_role_tid;
-	$form['nav'] = array('#markup' => sirius_node_tab_event_participants_quicknav($event_node, 'register/bulk'));
 	$participant_role_term = taxonomy_term_load($participant_role_tid);
 	$statuses = sirius_event_participant_role_status_tids($participant_role_tid);
 

@@ -4,8 +4,9 @@ function sirius_json_definition_preview_form($form, &$form_state, $nid) {
 	$form_state['nid'] = $nid;
 	$node = node_load($nid);
 	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+	$json_form = $json['form']['default'];
 
-	$json['!intro'] = array(
+	$json_form['!intro'] = array(
 		'#markup' => '<div class="sirius_form_intro">' . 
 		'<h2>' .
 		t('Form Preview') .
@@ -16,10 +17,10 @@ function sirius_json_definition_preview_form($form, &$form_state, $nid) {
 		'#weight' => -9999,
 	);
 
-	$json['!outro'] = array(
+	$json_form['!outro'] = array(
 		'#markup' => '</div>',
 		'#weight' => 9999,
 	);
 
-	return $json;
+	return $json_form;
 }

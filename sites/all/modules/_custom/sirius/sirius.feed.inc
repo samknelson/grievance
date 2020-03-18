@@ -155,7 +155,7 @@ function sirius_feed_spout_get_header($sheet, $header_row) {
 	foreach ($sheet->getRowIterator() as $row) {
 		$cells = array();
 		foreach ($row->getCells() as $cell) {
-			$cells[] = trim(mb_convert_encoding($cell->getValue(), 'UTF-8'));
+			$cells[] = sirius_feed_spout_get_cell_value($cell);
 		}
 		if ($header_row == 'Yes') {
 			$header = $cells;
@@ -172,7 +172,31 @@ function sirius_feed_spout_get_header($sheet, $header_row) {
 function sirius_feed_spout_get_cell($row, $col) {
 	$cell = $row->getCellAtIndex($col);
 	if (!$cell) { return NULL; }
-	return trim(mb_convert_encoding($cell->getValue(), 'UTF-8'));
+
+	return sirius_feed_spout_get_cell_value($cell);
+}
+
+function sirius_feed_spout_get_cell_value($cell) {
+	try {
+		// Start with the reaw cell value
+		$value = $cell->getValue();
+
+		// If it's an object, try to render it. But don't try too hard.
+		if (is_object($value)) {
+			$class = get_class($value);
+			if ($class = 'DateTime') { $value = $value->format('Y-m-d H:i:s e'); }
+			else { $value = '(object)'; }
+		}
+
+		// Convert to UTF8 and trim
+		$value = mb_convert_encoding($value, 'UTF-8');
+		$value = trim($value);
+
+		return $value;
+	} catch (exception $e) {
+		drupal_set_message($e->getMessage(), 'error');
+		return NULL;
+	}
 }
 
 function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header) {
@@ -188,7 +212,7 @@ function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header)
 	foreach ($row->getCells() as $cell) {
 		$title = $header[$delta];
 		if (!$title) { $title = $delta; }
-		$raw_row[$title] = trim(mb_convert_encoding($cell->getValue(), 'UTF-8'));
+		$raw_row[$title] = sirius_feed_spout_get_cell_value($cell);
 		++$delta;
 	}
 	$import_data_row['xxxrawxxx'] = $raw_row;
