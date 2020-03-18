@@ -124,8 +124,10 @@ function sirius_dispatch_report_prior_employed_list_batch($dispatch_nids, $value
     $sql .= "join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
     $sql .= "where node.type = 'sirius_log' ";
     $sql .= "and field_sirius_log_handler_target_id = :dispatch_nid ";
-    $sql .= "and (field_sirius_category_value like 'dispatch:%' and field_sirius_type_value = 'complete') ";
-    $sql .= "or (field_sirius_category_value like 'dispatch:vlri') ";
+    $sql .= "and (";
+    $sql .= "  (field_sirius_category_value like 'dispatch:%' and field_sirius_type_value = 'complete') or ";
+    $sql .= "  (field_sirius_category_value = 'dispatch:vlri') ";
+    $sql .= ") ";;
     $sql .= "and created <= :ts ";
     $sql .= "order by created ";
     $stmt = db_query($sql, $sql_args);
