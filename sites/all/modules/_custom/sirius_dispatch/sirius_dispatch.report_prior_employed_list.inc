@@ -32,13 +32,12 @@ function sirius_dispatch_report_prior_employed_list_fields() {
 	$fields = array();
   $fields['worker_nid'] = 'Worker: NID';
   $fields['worker_id'] = 'Worker: ID';
+  $fields['worker_name_full'] = 'Worker: Full Name';
   $fields['worker_name_first'] = 'Worker: First Name';
   $fields['worker_name_last'] = 'Worker: Last Name';
   $fields['worker_phone'] = 'Worker: Phone';
   $fields['worker_email'] = 'Worker: Email';
   $fields['dispatch_nid'] = 'Dispatch: NID';
-  $fields['dispatch_start'] = 'Dispatch: Start Date';
-  $fields['dispatch_end'] = 'Dispatch: End Date';
 
 	return $fields;
 }
@@ -61,7 +60,7 @@ function sirius_dispatch_report_prior_employed_list_pks(&$form_state) {
   while ($hr = $stmt->fetchAssoc()) {
     $nids[] = $hr['nid'];
   }
-  return array_chunk($nids, 10, TRUE);
+  return array_chunk($nids, 100, TRUE);
 }
 
 function sirius_dispatch_report_prior_employed_list_batch($dispatch_nids, $values, $report_id, $report_action, &$context) {
@@ -70,16 +69,28 @@ function sirius_dispatch_report_prior_employed_list_batch($dispatch_nids, $value
 
   // Get the worker info for each dispatch. 
   $sql_args = array();
-  $sql = "select field_data_field_sirius_worker.entity_id as nid, ";
-  $sql .= "field_sirius_worker_target_id ";
-  $sql .= "from field_data_field_sirius_worker ";
-  $sql .= "where entity_type = 'node' ";
-  $sql .= "and entity_id in (:dispatch_nids) ";
+  $sql = "select node.nid as worker_nid, ";
+  $sql .= "node.title, "; 
+  $sql .= "field_data_field_sirius_worker.entity_id as dispatch_nid, ";
+  $sql .= "field_sirius_name_family as worker_name_last, ";
+  $sql .= "field_sirius_name_given as worker_name_first, ";
+  $sql .= "node.title as worker_name_full, ";
+  $sql .= "field_sirius_phone_value as worker_phone, ";
+  $sql .= "field_sirius_email_value as worker_email, ";
+  $sql .= "field_sirius_id_value as worker_id ";
+  $sql .= "from node ";
+  $sql .= "join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_sirius_worker_target_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_name on field_data_field_sirius_name.entity_type = 'node' and field_data_field_sirius_name.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_phone on field_data_field_sirius_phone.entity_type = 'node' and field_data_field_sirius_phone.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_email on field_data_field_sirius_email.entity_type = 'node' and field_data_field_sirius_email.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
+  $sql .= "where node.type = 'sirius_worker' ";
+  $sql .= "and field_data_field_sirius_worker.entity_id in (:dispatch_nids) ";
   $sql_args[':dispatch_nids'] = array_values($dispatch_nids);
   $stmt = db_query($sql, $sql_args);
   $workers = array();
   while ($hr = $stmt->fetchAssoc()) {
-    $workers[$hr['nid']] = $hr;
+    $workers[$hr['dispatch_nid']] = $hr;
   }
 
   // Get the current status for each dispatch
@@ -91,7 +102,7 @@ function sirius_dispatch_report_prior_employed_list_batch($dispatch_nids, $value
   $sql .= "and entity_id in (:dispatch_nids) ";
   $sql_args[':dispatch_nids'] = array_values($dispatch_nids);
   $stmt = db_query($sql, $sql_args);
-  $workers = array();
+  $status_now = array();
   while ($hr = $stmt->fetchAssoc()) {
     $status_raw = $hr['field_sirius_dispatch_status_value'];
     if ($status_raw == 'accepted' || $status_raw == 'accepted_secondary') { $status_now[$hr['nid']] = 'employed'; } else { $status_now[$hr['nid']] = 'layoff'; }
@@ -100,6 +111,7 @@ function sirius_dispatch_report_prior_employed_list_batch($dispatch_nids, $value
   $rows = array('is_multiple' => TRUE, 'rows' => array());
 
   foreach ($dispatch_nids as $dispatch_nid) {
+    // Walk the log to find our status back then
     $sql_args = array();
     $sql_args[':dispatch_nid'] = $dispatch_nid;
     $sql_args[':ts'] = $ts;
@@ -117,7 +129,6 @@ function sirius_dispatch_report_prior_employed_list_batch($dispatch_nids, $value
     $sql .= "and created <= :ts ";
     $sql .= "order by created ";
     $stmt = db_query($sql, $sql_args);
-
     $status_then = 'unknown';
     while ($hr = $stmt->fetchAssoc()) {
       $category = $hr['field_sirius_category_value'];
@@ -127,16 +138,14 @@ function sirius_dispatch_report_prior_employed_list_batch($dispatch_nids, $value
     }
     if ($status_then == 'unknown') { $status_then = $status_now[$dispatch_nid]; }
     if (!$status_then) { $status_then = 'layoff'; }
-    drupal_set_message("Dispatch $dispatch_nid: $status_then");
+    if ($status_then != 'employed') { continue; }
 
-    $context['sandbox']['worker_nids'][$dispatch_nid] = TRUE;
-    $row = array();
-    $row['worker_nid'] = $hr['nid'];
-    $row['worker_title'] = $hr['title'];
-    if (!$row['worker_title']) { $row['worker_title'] = '(no name)'; }
-
-    // $context['results']['worker_nids'][$dispatch_nid] = TRUE;
-    // $rows['rows'][$worker_nid] = $row;
+    // Ok, this worker was employed on that date. 
+    $worker = $workers[$dispatch_nid];
+    $worker_nid = $worker['worker_nid'];
+    if ($context['sandbox']['dedupe'][$worker_nid]) { continue; }
+    $context['sandbox']['dedupe'][$worker_nid] = $dispatch_nid;
+    $rows['rows'][$worker_nid] = $worker;
   }
 
   return $rows;

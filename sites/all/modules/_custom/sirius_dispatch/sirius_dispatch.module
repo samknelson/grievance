@@ -203,9 +203,6 @@ function sirius_dispatch_report_cache_info() {
     'form_callback' => 'sirius_dispatch_report_prior_employed_list_form',
     'pk_list_callback' => 'sirius_dispatch_report_prior_employed_list_pks',
     'batch_callback' => 'sirius_dispatch_report_prior_employed_list_batch',
-    'render_callbacks' => array(
-      'Ratio' => 'sirius_dispatch_report_prior_employed_list_view',
-    ),
   );
 
   return $items;
