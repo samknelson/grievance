@@ -138,6 +138,7 @@ function sirius_dispatch_report_prior_employed_list_batch($dispatch_nids, $value
       if ($category == 'dispatch:resign') { $status_then = 'layoff'; }
       if ($category == 'dispatch:terminate') { $status_then = 'layoff'; }
       if ($category == 'dispatch:vlri') { $status_then = 'layoff'; }
+      if ($category == 'dispatch:rollover') { $status_then = 'layoff'; }
     }
     if ($status_then == 'unknown') { $status_then = $status_now[$dispatch_nid]; }
     if (!$status_then) { $status_then = 'layoff'; }
