@@ -53,7 +53,7 @@ function sirius_dispatch_report_prior_employed_list_pks(&$form_state) {
   $sql .= "and field_grievance_shop_target_id = :shop_nid ";
   $sql .= "and created <= :ts ";
   $sql .= "order by nid desc ";
-  $sql .= "limit 300 ";
+  // $sql .= "limit 300 ";
   $stmt = db_query($sql, $sql_args);
 
   $nids = array();
@@ -143,8 +143,8 @@ function sirius_dispatch_report_prior_employed_list_batch($dispatch_nids, $value
     // Ok, this worker was employed on that date. 
     $worker = $workers[$dispatch_nid];
     $worker_nid = $worker['worker_nid'];
-    if ($context['sandbox']['dedupe'][$worker_nid]) { continue; }
-    $context['sandbox']['dedupe'][$worker_nid] = $dispatch_nid;
+    if ($context['results']['dedupe'][$worker_nid]) { continue; }
+    $context['results']['dedupe'][$worker_nid] = $dispatch_nid;
     $rows['rows'][$worker_nid] = $worker;
   }
 
