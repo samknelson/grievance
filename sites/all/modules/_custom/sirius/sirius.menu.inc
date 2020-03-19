@@ -134,6 +134,14 @@ function sirius_node_tabs() {
     'weight' => 6,
   );
 
+  $node_tabs['sirius_contact']['sirius_contact_json'] = array(
+    'title' => 'Custom Fields',
+    'description' => '',
+    'callback' => 'sirius_node_tab_contact_json',
+    'permissions' => array('sirius'),
+    'weight' => 6,
+  );
+
   return $node_tabs;
 }
 
