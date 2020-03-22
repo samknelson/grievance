@@ -259,7 +259,7 @@ function sirius_phonenumber_node_presave($node) {
   $node->title = $node->field_sirius_id['und'][0]['value'];
 }
 
-function sirius_phonenumber_check($phonenumber, $force_refresh = FALSE) {
+function sirius_phonenumber_lookup($phonenumber) {
   // Look up the node
   $domain_nid = sirius_domain_nid();
   $phonenumber = sirius_phone_format($phonenumber);
@@ -295,6 +295,11 @@ function sirius_phonenumber_check($phonenumber, $force_refresh = FALSE) {
     sirius_minilog("Existing record not found, creating a new one.");
   }
 
+  return $node;
+}
+
+function sirius_phonenumber_check($phonenumber, $force_refresh = FALSE) {
+  $node = sirius_phonenumber_lookup($phonenumber);
   $json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
 
   if (!$force_refresh && (strtotime($node->field_sirius_datetime['und'][0]['value']) > time() - 60*60*24*30) ) {
