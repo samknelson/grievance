@@ -10,7 +10,27 @@ use Twilio\TwiML;
 function sirius_twilio_incoming_sms() {
 	sirius_become_superuser(TRUE);
 	$phone = $_POST['From'];
+	$msg = $_POST['Body'];
 	$phone = sirius_phone_format_e164($phone);
+
+	// Guess the domain from the log. It should be the domain of the last log entry that we sent to.
+  // We look for the most recent outgoing log entry of type "twilio:conversation"
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_log');
+  $query->fieldCondition('field_sirius_category', 'value', 'twilio:conversation');
+  $query->fieldCondition('field_sirius_type', 'value', 'outgoing_sms');
+  $query->fieldCondition('field_sirius_notes', 'value', $phone);
+  $query->propertyOrderBy('nid', 'desc');
+  $query->range(0, 1);
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+  $log_node = node_load(array_keys($stmt['node'])[0]);
+  if ($log_node) {
+	  $domain_nid = $log_node->field_sirius_domain['und'][0]['target_id'];
+  	if ($domain_nid) { sirius_domain($domain_nid); }
+  }
+
 	sirius_log(
 		'twilio:conversation', 
 		'incoming_sms', 
