@@ -5,13 +5,40 @@
  **********************************************************************************/
 
 function sirius_twilio_handle_sms($msg, $phone) {
-  $tokens = array();
-  $tokens['sirius']['twilio']['input'] = $msg;
+  $domain_nid = sirius_domain_nid();
+  $msg = trim($msg);
+  $msg = strtolower($msg);
+
+  // I got this mostly implemented, then realized that Twilio does this natively beyond our control.
+  /*
+  if ($msg == 'stop' || $msg == 'resume') {
+    $phonenumber_node = sirius_phonenumber_lookup($phone);
+    $json = json_decode($phonenumber_node->field_sirius_json['und'][0]['value']);
+    if ($msg == 'stop') {
+      $text = "Text messaging from this site has been suspedned. Text RESUME to resume messaging.";
+      $json['unsubscribe'] = TRUE;
+      $json['msg'] = $text;
+      $phonenumber_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+      $phonenumber_node->field_sirius_sms_possible['und'][0]['value'] = 'No';
+      sirius_jsonfield_log($phonenumber_node, 'stop', $text);
+    } else {
+      $text = "Text messaging has resumed. Text STOP to stop receiving messages from this site.";
+      $json['unsubscribe'] = FALSE;
+      $json['msg'] = $text;
+      $phonenumber_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+      $phonenumber_node->field_sirius_sms_possible['und'][0]['value'] = 'Yes';
+      sirius_jsonfield_log($phonenumber_node, 'stop', $text);
+    }
+    node_save($phonenumber_node);
+  } else {
+  }
+  */
+  
   global $base_url;
-  $text = "This system cannot respond to incoming messages.\n";
-  $text .= "Please sign in at the link below.\n";
+  $text = "This system cannot respond to incoming messages. Please sign in at the link below.\n";
   $text .= $base_url;
-  return sirius_twilio_outgoing_sms($phone, $text, $dispatch_node->nid);
+
+  return sirius_twilio_outgoing_sms($phone, $text);
 }
 
 function sirius_twilio_handler_get_sms($phone, $msg) {
