@@ -601,7 +601,7 @@ function sirius_menu() {
     'title' => 'Sirius Configuration',
     'page callback' => 'sirius_page_config',
     'page arguments' => array(),
-    'access arguments' => array('sirius'),
+    'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
   );
 
