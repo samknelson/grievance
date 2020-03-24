@@ -108,3 +108,19 @@ function sirius_jsonfield_util_render_value($form_element, $value) {
 	}
 	return $value;
 }
+
+
+function sirius_jsonfield_util_set_defaults(&$form, $defaults) {
+	if (!is_array($form)) { return; }
+	foreach ($form as $key => $value) {
+		if (!is_array($form[$key])) { continue; }
+		$type = $form[$key]['#type'];
+		if ($type && $type != 'fieldset') {
+			if ($type == 'select' || $type == 'textfield' || $type == 'textarea' || $type == 'date_popup' || $type == 'radios' || $type == 'checkboxes')  {
+				if (isset($defaults[$key])) { $form[$key]['#default_value'] = $defaults[$key]; }
+			}
+		} else {
+			sirius_jsonfield_util_set_defaults($form[$key], $defaults[$key]);
+		}
+	}
+}

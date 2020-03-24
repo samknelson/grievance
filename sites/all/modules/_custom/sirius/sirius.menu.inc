@@ -134,6 +134,14 @@ function sirius_node_tabs() {
     'weight' => 6,
   );
 
+  $node_tabs['sirius_contact']['sirius_contact_json'] = array(
+    'title' => 'Custom Fields',
+    'description' => '',
+    'callback' => 'sirius_node_tab_contact_json',
+    'permissions' => array('sirius'),
+    'weight' => 6,
+  );
+
   return $node_tabs;
 }
 
@@ -262,12 +270,29 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/config/sms'] = array(
-    'title' => 'SMS Configuration',
+  $items['sirius/config/phone'] = array(
+    'title' => 'Phone Configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_sms_admin'),
     'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/config/phone/sms'] = array(
+    'title' => 'SMS',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_sms_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -100,
+  );
+
+  $items['sirius/config/phone/callerid'] = array(
+    'title' => 'Caller IDs',
+    'page callback' => 'sirius_page_callerid',
+    'page arguments' => array(),
+    'access arguments' => array('sirius callerid admin'),
+    'type' => MENU_LOCAL_TASK,
   );
 
   $items['sirius/config/menu'] = array(
@@ -472,6 +497,15 @@ function sirius_menu() {
     'weight' => 3,
   );
 
+  $items['sirius/contact/definition/display'] = array(
+    'title' => 'Display',
+    'page callback' => 'sirius_page_contact_definition_display',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+  );
+
   $items['sirius/taxonomy/%'] = array(
     'title' => 'Taxonomy',
     'page callback' => 'sirius_page_taxonomy',
@@ -524,14 +558,6 @@ function sirius_menu() {
     'page callback' => 'sirius_page_taxonomy_vocabulary_admin',
     'page arguments' => array(),
     'access arguments' => array('sirius admin'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['sirius/callerid'] = array(
-    'title' => 'Caller ID Admin',
-    'page callback' => 'sirius_page_callerid',
-    'page arguments' => array(),
-    'access arguments' => array('sirius callerid admin'),
     'type' => MENU_NORMAL_ITEM,
   );
 
