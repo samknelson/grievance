@@ -110,8 +110,8 @@ function sirius_log_render_form($param1, $param2 = NULL) {
 
   $form['log_wrapper'] = array(
     '#type' => 'fieldset',
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    // '#collapsible' => TRUE,
+    // '#collapsed' => TRUE,
     '#title' => 'Change Log',
   );
 
