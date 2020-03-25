@@ -146,10 +146,10 @@ function sirius_twilio_browserphone_twiml_dial_error($msg) {
  */
 
 function sirius_twilio_browserphone_twiml_dial() {
-	return 'Broken.';
 	// Get our input
 	$token = $_REQUEST['token'];
 	$phone = $_REQUEST['to'];
+	if (!$phone) { $phone = $_REQUEST['To']; }
 	$callerid_nid = $_REQUEST['callerid_nid'];
 
 	// Get our parameters
