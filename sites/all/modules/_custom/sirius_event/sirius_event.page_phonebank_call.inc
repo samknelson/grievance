@@ -30,6 +30,11 @@ function sirius_node_tab_event_phonebank_call($event_node) {
 
 	$mode = $_REQUEST['mode'];
 	if (!$mode) {
+		// Release locks on this page, because we're not in the caller interface
+		global $user;
+		$lock_type = sirius_event_phonebank_lock_type($event_node);
+		sirius_lock_release_by_uid($lock_type, $user->uid);
+
 		$json = json_decode($event_node->field_sirius_json['und'][0]['value'], TRUE);
 		$html .= $json['phonebank']['caller_intro'];
 		$html .= '<br /><br />';
@@ -102,10 +107,15 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$form['prefix_col_2'] = array('#markup' => '<td width="35%" valign="top" style="vertical-align: top; border-left: 1px solid #333333; padding-left: 10px;">');
 	$intro_html = '<div class="sirius_form_intro">';
 	if ($contact_node) {
-		$intro_html .= 'You are now speaking with: <strong>' . l($contact_node->title, 'node/' . $participant_nid, array('attributes' => array('target' => '_blank')));
-		$intro_html .= '<br />';
+		$intro_html .= sirius_fakerender_field('Speaking with:', l($contact_node->title, 'node/' . $participant_nid, array('attributes' => array('target' => '_blank'))));
+		$contact_json = json_decode($contact_node->field_sirius_json['und'][0]['value'], TRUE);
+		$contact_definition = sirius_contact_definition();
+
+		$display_fields = sirius_contact_definition_display_get($contact_definition, 'phonebank-default');
+		sirius_jsonfield_util_add_node_fields($contact_node, $contact_definition['form']['default'], $contact_json['survey']);
+		$intro_html .= sirius_jsonfield_util_render_values($contact_definition['form']['default'], $contact_json['survey'], $display_fields, array('show_title' => TRUE));
 	}
-	$intro_html .= t('Phone: <strong>@phone</strong><br />', array('@phone' => $phone));
+	$intro_html .= sirius_fakerender_field('Phone:', $phone);
 	$intro_html .= '</div>';
 	$form['intro'] = array('#markup' => $intro_html);
 
@@ -217,6 +227,8 @@ function sirius_event_phonebank_prep_survey(&$form, $defaults) {
 				$form[$key]['#ajax'] = array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax');
 				if (isset($defaults[$key])) {
 					$form[$key]['#default_value'] = $defaults[$key];
+					if ($type == 'date_popup') { $form[$key]['#default_value'] = date('Y-m-d H:i:s', strtotime($defaults[$key]['date'] . ' ' . $defaults[$key]['time'])); }
+					else { $form[$key]['#default_value'] = $defaults[$key]; }
 				}
 			}
 		} else {
