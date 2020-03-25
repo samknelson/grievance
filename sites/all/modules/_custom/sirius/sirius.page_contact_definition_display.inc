@@ -49,6 +49,7 @@ function sirius_page_contact_definition_display_form_submit($form, &$form_state)
 function sirius_contact_definition_display_get($contact_definition, $which) {
 	$unsorted_display_fields = $contact_definition['display']['phonebank-default'];
 	if (!$unsorted_display_fields) { $unsorted_display_fields = array(); }
+	$display_fields = array();
 	foreach ($unsorted_display_fields as $path_with_weight) {
 		$parts = explode(':', $path_with_weight);
 		$weight = array_shift($parts);
