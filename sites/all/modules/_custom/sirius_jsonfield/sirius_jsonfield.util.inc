@@ -101,12 +101,16 @@ function sirius_jsonfield_util_form_flatten($json) {
 	return $result;
 }
 
-function sirius_jsonfield_util_render_value($form_element, $value) {
+function sirius_jsonfield_util_render_value($form_element, $value, $options = array()) {
+	$id = $form_element['#id'];
+	$title = $form_element['#title'] . ':';
+
 	if (is_array($value)) {
-		if ($form_element['#type'] == 'date_popup') { return $value['date'] . ' ' . $value['time']; }
-		return print_r($value, 1);
-	}
-	return $value;
+		if ($form_element['#type'] == 'date_popup') { $value_rendered = $value['date'] . ' ' . $value['time']; }
+		else { $value_rendered = '<pre>' . print_r($value, 1) . '</pre>'; }
+	} else { $value_rendered = $value; }
+
+	return sirius_fakerender_field($title, $value_rendered, $options);
 }
 
 
@@ -117,10 +121,56 @@ function sirius_jsonfield_util_set_defaults(&$form, $defaults) {
 		$type = $form[$key]['#type'];
 		if ($type && $type != 'fieldset') {
 			if ($type == 'select' || $type == 'textfield' || $type == 'textarea' || $type == 'date_popup' || $type == 'radios' || $type == 'checkboxes')  {
-				if (isset($defaults[$key])) { $form[$key]['#default_value'] = $defaults[$key]; }
+				if (isset($defaults[$key])) {
+					if ($type == 'date_popup') { $form[$key]['#default_value'] =  date('Y-m-d H:i:s', strtotime($defaults[$key]['date'] . ' ' . $defaults[$key]['time'])); } 
+					else { $form[$key]['#default_value'] = $defaults[$key]; }
+				}
 			}
 		} else {
 			sirius_jsonfield_util_set_defaults($form[$key], $defaults[$key]);
 		}
 	}
+}
+
+function sirius_jsonfield_util_render_values($form, $values, $field_list, $options = array()) {
+	$html = '';
+	if ($field_list) {
+		foreach ($field_list as $path) {
+			$form_element = sirius_jsonfield_util_get_from_path($form, $path);
+			$value = sirius_jsonfield_util_get_from_path($values, $path);
+			$html .= sirius_jsonfield_util_render_value($form_element, $value, $options);
+		}
+	}
+
+	return $html;
+}
+
+function sirius_jsonfield_util_add_node_fields($node, &$form, &$values) {
+	$node_fields = sirius_jsonfield_util_list_node_fields($node->type);
+	foreach ($node_fields as $path => $title) {
+		list ($empty, $node_type, $field_name, $col) = explode(':', $path);
+		$form[$node_type][$field_name][$col] = array('#type' => 'textfield', '#title' => $title);
+		$value = '';
+		if ($field_name == 'title') { $value = $node->title; }
+		else { $value = sirius_fieldval($node, $field_name, $col); }
+		$values[$node_type][$field_name][$col] = $value;
+	}
+}
+
+function sirius_jsonfield_util_list_node_fields($node_type) {
+	$fields = array();
+	if ($node_type == 'sirius_contact') {
+		$fields = array(
+			":$node_type:title:value" => 'Name',
+			":$node_type:field_sirius_phone:value" => 'Phone',
+			":$node_type:field_sirius_email:value" => 'Email',
+			":$node_type:field_sirius_address:country" => 'Country',
+			":$node_type:field_sirius_address:administrative_area" => 'State',
+			":$node_type:field_sirius_address:locality" => 'City',
+			":$node_type:field_sirius_address:thoroughfare" => 'Address',
+			":$node_type:field_sirius_address:postal_code" => 'Zip',
+		);
+	}
+
+	return $fields;
 }
