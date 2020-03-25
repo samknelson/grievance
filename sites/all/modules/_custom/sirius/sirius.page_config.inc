@@ -44,6 +44,9 @@ function sirius_page_config() {
 	$links['dispatch'] = array('title' => 'Bulk Messenger');
 	$links['dispatch']['links']['sirius/config/bulk'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
 
+	$links['training'] = array('title' => 'Training Center');
+	$links['training']['links']['sirius/config/training'] 					= array('title' => 'Training Center Settings', 'description' => 'Settings for the training center (evaluations, etc.).');
+
 	$links['users'] = array('title' => 'Users');
 	$links['users']['links']['admin/people/permissions'] = array('title' => 'Permissions', 'description' => 'Define which roles have which permissions.');
 	$links['users']['links']['admin/people/permissions/roles'] = array('title' => 'Roles', 'description' => 'Define the system-wide user roles.');
