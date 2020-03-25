@@ -54,6 +54,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.i
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contacts.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_resync_all.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_json.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_definition_display.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_users.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_switch.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_subdomains.inc';
@@ -94,7 +95,7 @@ function sirius_entity_presave($entity, $type) {
  */
 
 function sirius_node_presave($node) {
-  if ($node->type == 'sirius_worker') {
+  if ($node->type == 'sirius_worker' || $node->type == 'sirius_contact') {
     $fields = array(
       'field_sirius_phone', 
       'field_sirius_phone_alt', 
@@ -111,7 +112,7 @@ function sirius_node_presave($node) {
     }
   }
 
-  if ($node->type == 'sirius_worker') {
+  if ($node->type == 'sirius_worker' || $node->type == 'sirius_contact') {
     $fields = array(
       'field_sirius_email', 
     );
@@ -496,13 +497,15 @@ function sirius_fieldval($node, $field, $col = 'value', $params = array()) {
   }
 }
 
-function sirius_fakerender_field($title, $values) {
+function sirius_fakerender_field($title, $values, $options = array()) {
   if (!is_array($values)) { $values = array($values); }
 
   $html = '<section class="field field-name-fake field-label-inline clearfix view-mode-full">';
-  $html .= '<h2 class="field-label">';
-  $html .= $title;
-  $html .= '</h2>';
+  if (!$options['hide_title']) {
+    $html .= '<h2 class="field-label">';
+    $html .= $title;
+    $html .= '</h2>';
+  }
   $html .= '<div class="field-items">';
   foreach ($values as $value) {
     $html .= '<div class="field-item">';
