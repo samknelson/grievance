@@ -113,14 +113,7 @@ function sirius_contact_nid_get_from_user($uid = NULL) {
 }
 
 function sirius_contact_sirius_jsonfield_form_definitions() {
-	$definitions['node']['sirius_contact']['field_sirius_json'] = array('#callback' => 'sirius_contact_sirius_jsonfield_form_definitions_callback');
-	return $definitions;
-}
-
-function sirius_contact_sirius_jsonfield_form_definitions_callback($element) {
-	$contact_node = $element['#entity'];
-	$domain_nid = $contact_node->field_sirius_domain['und'][0]['target_id'];
-	return sirius_contact_definition($domain_nid);
+	return array();
 }
 
 function sirius_contact_get_nid_from_worker($worker_nid) {
