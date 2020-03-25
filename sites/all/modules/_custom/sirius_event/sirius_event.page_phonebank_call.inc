@@ -107,7 +107,13 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$form['prefix_col_2'] = array('#markup' => '<td width="35%" valign="top" style="vertical-align: top; border-left: 1px solid #333333; padding-left: 10px;">');
 	$intro_html = '<div class="sirius_form_intro">';
 	if ($contact_node) {
-		$intro_html .= sirius_fakerender_field('Speaking with:', l($contact_node->title, 'node/' . $participant_nid, array('attributes' => array('target' => '_blank'))));
+		$contact_link = '';
+		if (drupal_valid_path('node/' . $contact_node->nid)) { 
+			$contact_link = l($contact_node->title, 'node/' . $contact_node->nid, array('attributes' => array('target' => '_blank')));
+		} else {
+			$contact_link = $contact_node->title;
+		}
+		$intro_html .= sirius_fakerender_field('Speaking with:', $contact_link);
 		$contact_json = json_decode($contact_node->field_sirius_json['und'][0]['value'], TRUE);
 		$contact_definition = sirius_contact_definition();
 
