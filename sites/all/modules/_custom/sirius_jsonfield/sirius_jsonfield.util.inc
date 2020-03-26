@@ -107,6 +107,14 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 
 	if (is_array($value)) {
 		if ($form_element['#type'] == 'date_popup') { $value_rendered = $value['date'] . ' ' . $value['time']; }
+		else if ($form_element['#type'] == 'checkboxes') { 
+			foreach ($value as $a => $b) {
+				if ($b) {
+					if ($value_rendered) { $value_rendered .= ' / '; }
+					$value_rendered .= $b;
+				}
+			}
+		}
 		else { $value_rendered = '<pre>' . print_r($value, 1) . '</pre>'; }
 	} else { $value_rendered = $value; }
 
@@ -173,4 +181,10 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 	}
 
 	return $fields;
+}
+
+
+function sirius_jsonfield_util_render_all_values($form, $values, $options = array()) {
+	$paths = drupal_map_assoc(sirius_jsonfield_util_form_list_paths($form));
+	return sirius_jsonfield_util_render_values($form, $values, $paths, $options);
 }

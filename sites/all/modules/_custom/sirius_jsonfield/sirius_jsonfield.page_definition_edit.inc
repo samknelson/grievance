@@ -1,11 +1,16 @@
 <?php
 
-function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json = NULL) {
+function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json = NULL, $which_form = 'default') {
 	$form_state['nid'] = $nid;
+	$form_state['which_form'] = $which_form;
 	$node = node_load($nid);
 
 	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
-	$json_form = $json['form']['default'];
+
+	// @todo: We need to make $json['form'] go away, and use exclusively $json['form_encoded']. But there is some legacy data.
+	//        (we re-encode because, ick, MySQL doesn't preserve ordering so e.g. all option dropdowns are unsorted.)
+	$json_form = $json['form'][$which_form];
+	if ($json['form_encoded'][$which_form]) { $json_form = json_decode($json['form_encoded'][$which_form], TRUE); }
 	$tree = _sirius_json_definition_edit_render_recursive($json_form);
 
 	$field_name = $_REQUEST['field_name'];
@@ -182,6 +187,23 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 		'#suffix' => '</div>',
 	);
 
+	$form['size'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Size',
+		'#size' => 5,
+		'#states' => array(
+			'visible' => array(
+				array(
+					':input[name="action"]' => array('value' => 'edit'),
+					':input[name="type"]' => array(array('value' => 'textfield')),
+				),
+			),
+		),
+		'#default_value' => $leaf['#size'],
+		'#prefix' => '<div class="container-inline">',
+		'#suffix' => '</div>',
+	);
+
 	$form['markup'] = array(
 		'#type' => 'textarea',
 		'#title' => 'Markup',
@@ -311,9 +333,14 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 
 function sirius_json_definition_edit_form_submit($form, &$form_state) {
 	$nid = $form_state['nid'];
+	$which_form = $form_state['which_form'];
 	$node = node_load($nid);
 	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
-	$json_form = $json['form']['default'];
+
+	// @todo: We need to make $json['form'] go away, and use exclusively $json['form_encoded']. But there is some legacy data.
+	//        (we re-encode because, ick, MySQL doesn't preserve ordering so e.g. all option dropdowns are unsorted.)
+	$json_form = $json['form'][$which_form];
+	if ($json['form_encoded'][$which_form]) { $json_form = json_decode($json['form_encoded'][$which_form], TRUE); }
 
 	$old_field_name =  sirius_json_definition_canonical_field_name($_REQUEST['field_name']);
 	$field_name = sirius_json_definition_canonical_field_name($form_state['values']['name']);
@@ -392,14 +419,19 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		$leaf = array();
 
 		// Set basic attributes
-		foreach (array('title', 'type', 'description') as $key) {
+		foreach (array('title', 'type', 'description', 'size') as $key) {
 			$leaf['#' . $key] = $form_state['values'][$key];
 		}
 		if ($form_state['values']['type'] == 'markup') {
 			$leaf['#markup'] = $form_state['values']['markup'];
 		} 
-		$leaf['#prefix'] = '<div class="container-inline">';
-		$leaf['#suffix'] = '</div>';
+		if ($form_state['values']['type'] == 'checkboxes') {
+			$leaf['#prefix'] = '<div class="checkboxes-inline">';
+			$leaf['#suffix'] = '</div>';
+		} else {
+			$leaf['#prefix'] = '<div class="container-inline">';
+			$leaf['#suffix'] = '</div>';
+		}
 
 		// Set conditional targets.
 		if ($form_state['values']['conditional'] == 'Yes') {
@@ -447,7 +479,7 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 				$options[$key] = $value;
 			}
 			$leaf['#options'] = $options;
-		}
+		} 
 
 		// Generating the HTML ID is surprisingly ugly. Needs to include the full path, and IDs don't like colons or periods.
 		$leaf['#id'] = preg_replace('/:/', '__', 'sirius_json_id' . $json_path . ':' . $field_name);
@@ -457,7 +489,8 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		foreach ($leaf as $key => $value) { $ref[$field_name][$key] = $value; }
 	}
 
-	$json['form']['default'] = $json_form;
+	$json['form'][$which_form] = $json_form;
+	$json['form_encoded'][$which_form] = json_encode($json_form);
 	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
 	node_save($node);
 }
