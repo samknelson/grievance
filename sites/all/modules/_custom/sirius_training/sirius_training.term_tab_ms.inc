@@ -10,6 +10,16 @@ function sirius_term_tab_ms_form($form, &$form_state, $ms_term) {
 
 	$form['#tree'] = TRUE;
 
+	$form['evaluations_enabled'] = array(
+		'#title' => t('Evaluations Enabled?'),
+		'#type' => 'select',
+		'#options' => array(
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $json['training']['evaluations_enabled'],
+	);
+
 	$form['levels_enabled'] = array(
 		'#title' => t('Levels Enabled?'),
 		'#type' => 'select',

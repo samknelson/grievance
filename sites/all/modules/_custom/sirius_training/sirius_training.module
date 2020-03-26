@@ -3,11 +3,42 @@
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.menu.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.permission.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.levels.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.evaluations.inc';
 
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_config.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_config_evaluations.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_employer.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_overview.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_level.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_graduate.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_evaluations.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_evaluations_request.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_evaluation_evaluate.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_evaluation_evaluate_launch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_evaluation_edit.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_evaluations_queue.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.term_tab_ms.inc';
+
+/*
+function sirius_training_file_download_access($file_item, $entity_type, $entity) {
+	// Workers can access their own evaluations.
+  if ($entity_type == 'node' && $entity->type == 'sirius_log') {
+  	$category = $entity->field_sirius_category['und'][0]['value'];
+  	if ($category != 'worker:training') { return; }
+
+		$type = $entity->field_sirius_type['und'][0]['value'];
+  	if ($type != 'evaluation') { return; }
+  	
+  	$worker_node = sirius_worker_get();
+  	if (!$worker_node) { return; }
+
+  	$handlers = sirius_fieldvals($entity, 'field_sirius_log_handler', 'target_id');
+  	if (!in_array($worker_node->nid, $handlers)) { return; }
+
+  	return TRUE; 
+  }
+}
+*/
