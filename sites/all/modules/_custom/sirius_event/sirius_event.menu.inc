@@ -3,6 +3,14 @@
 function sirius_event_node_tabs() {
 	$node_tabs = array();
 
+  $node_tabs['sirius_event_participant']['sirius_event_participant_json'] = array(
+    'title' => 'Survey',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json',
+    'permissions' => array('sirius event admin'),
+    'weight' => 1,
+  );
+
   $node_tabs['sirius_event']['sirius_event_info'] = array(
     'title' => 'Info',
     'description' => '',
