@@ -209,7 +209,7 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 		$json = array('contact' => $contact_json, 'survey' => $participant_json['survey']);
 		foreach ($form_flat as $id => $element) {
 			if (in_array($element['#type'], array('fieldset', 'markup'))) { continue; }
-			$row[] = sirius_jsonfield_util_render_value($element, sirius_jsonfield_util_get_from_path($json, $element['#path']), array('hide_title' => TRUE));
+			$row[] = sirius_jsonfield_util_render_value($element, sirius_jsonfield_util_get_from_path($json, $element['#path']), array('raw' => TRUE));
 		}
 		fputcsv($fp, $row);
 	}
