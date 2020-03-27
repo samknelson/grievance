@@ -21,7 +21,7 @@ function sirius_training_config_evaluations($form, &$form_state) {
     '#title' => t('Roles'),
     '#options' => $roles,
     '#description' => t('List the roles which have permission to submit an evaluation.'),
-    '#default_value' => variable_get($name, ''),
+    '#default_value' => variable_get($name, array()),
   );
 
   /*
