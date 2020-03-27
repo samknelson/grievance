@@ -45,6 +45,7 @@ function sirius_training_config_evaluations($form, &$form_state) {
   $form['#submit'][] = 'sirius_training_config_evaluations_form_submit';
   */
 
+  /*
   $name = sirius_domain_variable_name('sirius_training_evaluations_email');
   $form[$name] = array(
     '#type' => 'textfield',
@@ -52,6 +53,7 @@ function sirius_training_config_evaluations($form, &$form_state) {
     '#description' => t('Evaluations should be sent to this address.'),
     '#default_value' => variable_get($name, ''),
   );
+  */
 
   $name = sirius_domain_variable_name('sirius_training_evaluations_form_intro');
   $default = variable_get($name, array());
