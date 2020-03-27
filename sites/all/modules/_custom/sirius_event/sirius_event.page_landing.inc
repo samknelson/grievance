@@ -39,7 +39,7 @@ function sirius_event_page_landing() {
   $query->entityCondition('bundle', 'sirius_event');
 	$query->fieldCondition('field_sirius_daterepeat', 'value', $now, '>=');
 	if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
-	$query->propertyCondition('nid', $my_event_nids, 'not in');
+	if ($my_event_nids) { $query->propertyCondition('nid', $my_event_nids, 'not in'); }
 	$query->propertyOrderBy('nid', 'desc');
   $stmt = $query->execute();
   if ($stmt['node']) {
