@@ -20,6 +20,7 @@ function sirius_training_node_tab_worker_graduate_form($form, &$form_state, $wor
 
 	//$notification_emails = sirius_training_level_notification_emails($worker_node, $ms_term, $level);
 
+	/*
 	$form['notification_emails'] = array(
 		'#title' => t('Notification Emails'),
 		'#type' => 'textarea',
@@ -38,6 +39,7 @@ function sirius_training_node_tab_worker_graduate_form($form, &$form_state, $wor
 		'#type' => 'textarea',
 		'#default_value' => '',
 	);
+	*/
 
 	$form['submit'] = array(
 		'#type' => 'submit',
