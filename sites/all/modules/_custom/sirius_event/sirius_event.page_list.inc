@@ -16,6 +16,9 @@ function sirius_event_page_list() {
 			$html .= '<br />';
 		}
 
+		if (sirius_event_page_list_type_access($tid)) {
+			$html .= sirius_event_page_list_type_upcoming($tid);
+		}
 		$html .= l(t('Full List'), 'sirius/event/list/' . $term->tid . '/all', array('attributes' => array('class' => array('tool-button'))));
 		if (drupal_valid_path("sirius/event/create/$event_type_tid")) {
 			$html .= ' ' . l(
@@ -24,11 +27,6 @@ function sirius_event_page_list() {
 				array('attributes' => array('class' => 'tool-button'))
 			);
 		}
-		if (sirius_event_page_list_type_access($tid)) {
-			$html .= sirius_event_page_list_type_upcoming($tid);
-		}
-
-		$html .= '<br /><br />';
 	}
 
 	return $html;
@@ -36,7 +34,7 @@ function sirius_event_page_list() {
 
 function sirius_event_page_list_type_access($event_type_tid) {
 	// @todo
-	return user_access('sirius domain admin');
+	return user_access('sirius');
 }
 
 function sirius_event_page_list_type($event_type_tid) {
