@@ -117,6 +117,12 @@ function sirius_training_config_evaluations_preview() {
   return drupal_get_form('sirius_json_definition_preview_form', $definition_nid, 'default_evaluation_form');
 }
 
+function sirius_training_config_evaluations_exim() {
+  $domain_nid = sirius_domain_nid();
+  $definition_nid = sirius_contact_definition_get_nid($domain_nid, TRUE);
+  return drupal_get_form('sirius_json_definition_exim_form', $definition_nid, 'default_evaluation_form');
+}
+
 
 /*
 function sirius_training_config_evaluations_form_validate($form, &$form_state) {

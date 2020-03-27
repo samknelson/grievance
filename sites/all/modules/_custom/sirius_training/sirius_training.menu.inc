@@ -139,6 +139,14 @@ function sirius_training_menu() {
     'weight' => 3,
   );
 
+  $items['sirius/config/training/evaluations/exim'] = array(
+    'title' => 'Form Export / Import',
+    'page callback' => 'sirius_training_config_evaluations_exim',
+    'access arguments' => array('sirius training admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+  );
+
   $items['sirius/training/evaluation'] = array(
     'title' => 'Submit an Evaluation',
     'page callback' => 'sirius_training_evaluation_evaluate_launch',
