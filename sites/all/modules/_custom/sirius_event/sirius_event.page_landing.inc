@@ -55,27 +55,32 @@ function sirius_event_page_landing() {
   	// $html .= sirius_event_page_list();
   }
 
-
-
-  /*
 	$event_types = sirius_taxonomy_load('sirius_event_type', 'tid', 'full');
 	$create_html = '';
 	foreach ($event_types as $event_type_tid => $event_type_term) {
-		if (drupal_valid_path("sirius/event/create/$event_type_tid")) {
+		if (drupal_valid_path("sirius/event/list/$event_type_tid")) {
+			$create_html .= $event_type_term->name . ': ';
 			$create_html .= l(
-				t('Create a new @type', array('@type' => $event_type_term->name)),
-				"sirius/event/create/$event_type_tid",
+				t('Full List', array('@type' => $event_type_term->name)),
+				"sirius/event/list/$event_type_tid/all",
 				array('attributes' => array('class' => 'tool-button'))
 			);
 			$create_html .= ' ';
 		}
+		if (drupal_valid_path("sirius/event/create/$event_type_tid")) {
+			$create_html .= l(
+				t('Create', array('@type' => $event_type_term->name)),
+				"sirius/event/create/$event_type_tid",
+				array('attributes' => array('class' => 'tool-button'))
+			);
+			$create_html .= '<br />';
+		}
 	}
+
 	if ($create_html) {
-		$html .= '<h2>' . t('Create a New Event') . '</h2>';
+		$html .= '<h2>' . t('All Events') . '</h2>';
 		$html .= $create_html;
 	}
-	*/
-
 
 	return $html;
 }
