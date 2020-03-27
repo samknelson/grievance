@@ -6,6 +6,7 @@ function sirius_event_page_landing_access() {
 
 function sirius_event_page_landing() {
 	global $user;
+	$domain_nid = sirius_domain_nid();
 	if (!$user || !$user->uid) { return 'No user.'; }
 	$user_full = user_load($user->uid);
 	$contact_nid = $user_full->field_sirius_contact['und'][0]['target_id'];
@@ -20,6 +21,41 @@ function sirius_event_page_landing() {
   if ($stmt['node']) {
   	$participant_nids = array_keys($stmt['node']);
   }
+
+	$my_event_nids = array();
+  if ($participant_nids) {
+  	$participant_nodes = node_load_multiple($participant_nids);
+  	foreach ($participant_nodes as $participant_nid => $participant_node) {
+  		$my_event_nids[] = $participant_node->field_sirius_event['und'][0]['target_id'];
+  	}
+  	$my_event_nodes = node_load_multiple($my_event_nids);
+		$html .= '<h2>' . t('Your Events') . '</h2>';
+  	$html .= sirius_event_page_landing_render($my_event_nodes, $participant_nodes);
+  } 
+
+  $now = gmdate('Y-m-d 00:00:00', strtotime('-1 days'));
+	$query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_event');
+	$query->fieldCondition('field_sirius_daterepeat', 'value', $now, '>=');
+	if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+	$query->propertyCondition('nid', $my_event_nids, 'not in');
+	$query->propertyOrderBy('nid', 'desc');
+  $stmt = $query->execute();
+  if ($stmt['node']) {
+  	$other_event_nids = array_keys($stmt['node']);
+  }
+  if ($other_event_nids) {
+  	$other_event_nodes = node_load_multiple($other_event_nids);
+		$html .= '<h2>' . t('Upcoming Events') . '</h2>';
+  	$html .= sirius_event_page_landing_render($other_event_nodes, array());
+  } 
+
+  if (sirius_event_page_list_access()) {
+  	// $html .= sirius_event_page_list();
+  }
+
+
 
   /*
 	$event_types = sirius_taxonomy_load('sirius_event_type', 'tid', 'full');
@@ -40,55 +76,78 @@ function sirius_event_page_landing() {
 	}
 	*/
 
-	$html .= '<h2>' . t('Your Events') . '</h2>';
 
-  if ($participant_nids) {
-  	$participant_nodes = node_load_multiple($participant_nids);
-  	$event_nids = array();
-  	foreach ($participant_nodes as $participant_nid => $participant_node) {
-  		$event_nids[] = $participant_node->field_sirius_event['und'][0]['target_id'];
-  	}
-  	$event_nodes = node_load_multiple($event_nids);
-  	$rows = array();
-		foreach ($event_nodes as $event_nid => $event_node) {
-			$tools = '';
-			$paths = array();
-			$paths['node/' . $event_nid] = 'View';
-			if (sirius_event_phonebank_enabled($event_node)) {
-				$paths['node/' . $event_nid . '/sirius_event_phonebank/call'] = t('Make Calls');
-			}
-			if (sirius_event_bullpen_enabled($event_node)) {
-				$paths['node/' . $event_nid . '/sirius_event_bullpen'] = t('Manage Bullpen');
-			}
+	return $html;
+}
 
-			foreach ($paths as $path => $name) {
-				if (!drupal_valid_path($path)) { continue; }
-				if ($tools) { $tools .= ' '; }
-				$tools .= l($name, $path, array('attributes' => array('class' => array('tool-button'))));
-			}
+function sirius_event_page_landing_render($event_nodes, $participant_nodes = array()) {
+	if (!$event_nodes) { return ''; }
 
-			$dates = sirius_fieldvals($event_node, 'field_sirius_daterepeat');
-			$datestr = '';
-			foreach ($dates as $date) {
-				if ($datestr) { $datestr .= '<br />'; }
-				$datestr .= $date;
-			}
+	$participant_map = array();
+	foreach ($participant_nodes as $participant_nid => $participant_node) {
+		$participant_map[$participant_node->field_sirius_event['und'][0]['target_id']] = $participant_nid;
+	}
 
-			$row = array();
-			$row[] = $event_node->title;
-			$row[] = $datestr;
-			$row[] = $tools;
-			$rows[] = $row;
+	$rows = array();
+	foreach ($event_nodes as $event_nid => $event_node) {
+		$event_type_tid = $event_node->field_sirius_event_type['und'][0]['tid'];
+		$event_type_term = taxonomy_term_load($event_type_tid);
+		$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+
+		$tools = '';
+		$paths = array();
+
+		$paths['node/' . $event_nid . '/sirius_event_info'] = 'Info';
+		$paths['node/' . $event_nid . '/sirius_event_participants_current'] = t('Participants');
+		$paths['node/' . $event_nid . '/sirius_event_phonebank/call'] = t('Phone Bank');
+		$paths['node/' . $event_nid . '/sirius_event_instance_participant_definition'] = t('Survey');
+
+
+		foreach ($paths as $path => $name) {
+			if (!drupal_valid_path($path)) { continue; }
+			if ($tools) { $tools .= ' '; }
+			$tools .= l($name, $path, array('attributes' => array('class' => array('tool-button'))));
 		}
-		$header = array('Event', 'Date(s)', 'Tools');
-		$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
-  } else {
-  	$html .= "You are not currently registered for any events.";
-  }
 
-  if (sirius_event_page_list_access()) {
-  	$html .= sirius_event_page_list();
-  }
+		// Register
+		$widgets = sirius_event_register_widgets();
+		$all_rules = $json['register']['rules'];
+		if (user_access('sirius event admin')) { $rules = $all_rules; } 
+		else { $rules = sirius_event_paccess_rule_match($event_node->nid, $all_rules, TRUE); }
+		if ($rules) {
+			foreach ($rules as $delta => $rule) {
+				foreach ($rule['widget'] as $widget) {
+					if ($widget == 'user_self' && $participant_map[$event_nid]) { continue; }
+					if ($tools) { $tools .= ' '; }
+					$tools .= l($widgets[$widget], 'node/' . $event_nid . '/sirius_event_participants_register', array('attributes' => array('class' => array('tool-button')), 'query' => array('delta' => $delta, 'widget' => $widget))); 
+				}
+			}
+		}
+
+		$dates = sirius_fieldvals($event_node, 'field_sirius_daterepeat');
+		$datestr = '';
+		foreach ($dates as $date) {
+			if ($datestr) { $datestr .= '<br />'; }
+			$datestr .= $date;
+		}
+
+		$row = array();
+		$row[] = $event_type_term->name;
+		$row[] = $event_node->title;
+		$row[] = $datestr;
+		$row[] = $tools;
+		$rows[] = $row;
+	}
+	$header = array(
+		array('data' => 'Event Type', 	'width' => '15%'),
+		array('data' => 'Event', 				'width' => '25%'),
+		array('data' => 'Date(s)', 			'width' => '20%'),
+		array('data' => 'Tools', 				'width' => '40%'),
+	);
+
+	$html .= '<div class="sirius_event_list">';
+	$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
+	$html .= '</div>';
 
 	return $html;
 }
