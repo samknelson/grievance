@@ -118,6 +118,8 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 		else { $value_rendered = '<pre>' . print_r($value, 1) . '</pre>'; }
 	} else { $value_rendered = $value; }
 
+	if ($options['raw']) { return $value_rendered; }
+
 	return sirius_fakerender_field($title, $value_rendered, $options);
 }
 
