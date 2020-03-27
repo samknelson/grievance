@@ -33,6 +33,7 @@ function sirius_node_tab_event_participants_register_bulk_form($form, &$form_sta
 	$form_state['participant_role_tid'] = $participant_role_tid;
 	$participant_role_term = taxonomy_term_load($participant_role_tid);
 	$statuses = sirius_event_participant_role_status_tids($participant_role_tid);
+	$domain_nid = sirius_domain_nid();
 
   drupal_add_library('system', 'ui.accordion');
   drupal_add_js('jQuery(document).ready(function () { jQuery("#sirius_accordion").accordion({active: false, collapsible: true, autoehight: true, heightStyle: "content"}); });', 'inline');
@@ -84,9 +85,23 @@ function sirius_node_tab_event_participants_register_bulk_form($form, &$form_sta
 	$contact_form_definition = sirius_contact_definition();
 	$contact_form_paths = array(NULL => t('-- Select --')) + sirius_jsonfield_util_form_list_paths($contact_form_definition);
 
+	$sql = "select distinct field_sirius_source_value as source from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_source on field_data_field_sirius_source.entity_type = 'node' and field_data_field_sirius_source.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_contact' ";
+	$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+	$sql_args[':domain_nid'] = $domain_nid;
+	$sql .= "order by field_sirius_source_value ";
+
+	$stmt = db_query($sql, $sql_args);
+	$source_options = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		if ($hr['source']) { $source_options[$hr['source']] = $hr['source']; }
+	}
 	$form['source'] = array(
-		'#type' => 'textfield',
+		'#type' => 'select',
 		'#title' => 'Source',
+		'#options' => $source_options,
 	);
 
 	/*
