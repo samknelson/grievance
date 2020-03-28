@@ -69,11 +69,11 @@ function sirius_training_evaluation_evaluate_form($form, &$form_state, $worker_i
 function sirius_training_evaluation_evaluate_form_submit($form, &$form_state) {
 	$worker_id = $form_state['worker_id'];
 	$worker_node = sirius_worker_get_by_id($worker_id);
-
 	$domain_nid = sirius_domain_nid();
   $definition_nid = sirius_contact_definition_get_nid($domain_nid, TRUE);
 	$contact_definition_json = sirius_contact_definition();
 
+	// Save the evaluation.
 	$log_json = array();
 	$form = $contact_definition_json['form']['default_evaluation_form'];
 	$values = $form_state['values']['survey'];
@@ -88,6 +88,28 @@ function sirius_training_evaluation_evaluate_form_submit($form, &$form_state) {
 		array($worker_node->nid), 
 		NULL,
 		$log_json
+	);
+
+	// Notify the worker
+	global $user;
+	$user_full = user_load($user->uid);
+	if ($user_full->field_sirius_worker['und'][0]['target_id']) {
+		$author_worker_node = node_load($user_full->field_sirius_worker['und'][0]['target_id']);
+		$author_name = $author_worker_node->title;
+	} else {
+		$author_name = $user->name;
+	}
+
+	$subject = "An evaulation has been submitted on your behalf";
+	$body = "An evaluation on your behalf has been submitted to the training center by $author_name.";
+	$sms = "An evaluation on your behalf has been submitted to the training center by $author_name.";
+	sirius_worker_notify(
+		$worker_node, 
+		array(
+			'subject' => $subject,
+			'body' => $body,
+			'sms' => $sms,
+		)
 	);
 
 	drupal_set_message(t('Evaluation submitted: ') . $worker_id . ' - ' . $worker_node->title);
