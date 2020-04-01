@@ -20,11 +20,15 @@ function sirius_node_tab_event_participant_json_form($form, &$form_state, $parti
 	$event_node = node_load($event_nid);
 	$survey_nid = $event_node->field_sirius_json_definition['und'][0]['target_id'];
 	$survey_node = node_load($survey_nid);
-	$form['survey'] = json_decode($survey_node->field_sirius_json['und'][0]['value'], TRUE)['form']['default'];
-	$form['#tree'] = TRUE;
+	$survey_json = sirius_jsonfield_util_node_json_get($survey_node);
+	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
 
-	$json_defaults = json_decode($participant_node->field_sirius_json['und'][0]['value'], TRUE);
-	sirius_jsonfield_util_set_defaults($form['survey'], $json_defaults['survey']);
+	$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
+	$participant_results = sirius_jsonfield_util_results_get($participant_json, 'survey');
+	sirius_jsonfield_util_set_defaults($survey_form, $participant_results);
+
+	$form['#tree'] = TRUE;
+	$form['survey'] = $survey_form;
 
 	$form['!intro'] = array(
 		'#markup' => '<div class="sirius_form_intro">' . 
@@ -48,9 +52,9 @@ function sirius_node_tab_event_participant_json_form($form, &$form_state, $parti
 
 function sirius_node_tab_event_participant_json_form_submit($form, &$form_state) {
 	$participant_node = node_load($form_state['participant_nid']);
-	$json = json_decode($participant_node->field_sirius_json['und'][0]['value'], TRUE);
-	$json['survey'] = $form_state['values']['survey'];
+	$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
+	sirius_jsonfield_util_results_set($participant_json, 'survey', $form_state['values']['survey']);
+	sirius_jsonfield_util_node_json_set($participant_node, $participant_json);
 	sirius_jsonfield_log($participant_node, 'survey', 'Survey updated.');
-	$participant_node->field_sirius_json['und'][0]['value'] = json_encode($json);
 	node_save($participant_node);
 }
