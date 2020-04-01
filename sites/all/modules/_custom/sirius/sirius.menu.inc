@@ -488,13 +488,12 @@ function sirius_menu() {
     'weight' => 2,
   );
 
-  $items['sirius/contact/definition/clone'] = array(
-    'title' => 'Clone',
-    'page callback' => 'sirius_page_contact_definition_clone',
-    'page arguments' => array(),
+  $items['sirius/contact/definition/exim'] = array(
+    'title' => 'Export / Import',
+    'page callback' => 'sirius_page_contact_definition_exim',
     'access arguments' => array('sirius domain admin'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
+    'weight' => 4,
   );
 
   $items['sirius/contact/definition/display'] = array(
@@ -631,6 +630,29 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/esignature/test'] = array(
+    'title' => 'Sirius eSignature Test',
+    'page callback' => 'sirius_page_esignature_test',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/esignature/test/%'] = array(
+    'title' => 'Sirius eSignature Test',
+    'page callback' => 'sirius_page_esignature_test',
+    'page arguments' => array(3),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/esignature/stream/%/%'] = array(
+    'title' => 'Sirius eSignature Stream',
+    'page callback' => 'sirius_esignature_stream',
+    'page arguments' => array(3,4),
+    'access arguments' => array('sirius'),
+    'type' => MENU_NORMAL_ITEM,
+  ); 
 
   /*
   $items['taxonomy/term/%/sirius_dispatch_job_policy_exim'] = array(
