@@ -38,6 +38,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.masquerade.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.fax.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overrides.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -67,6 +68,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxono
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_field_overrides.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_letter_template_recipients.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_config.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_esignature_test.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
 
