@@ -12,9 +12,9 @@ function sirius_training_node_tab_evaluation_edit($evaluation_node) {
 function sirius_training_node_tab_evaluation_edit_form($form, &$form_state, $evaluation_node) {
 	$form_state['evaluation_nid'] = $evaluation_node->nid;
 
-	$json = json_decode($evaluation_node->field_sirius_json['und'][0]['value'], TRUE);
-	$survey_form = json_decode($json['evaluation']['form_encoded'], TRUE);
-	$results = json_decode($json['evaluation']['results_encoded'], TRUE);
+	$json = sirius_jsonfield_util_node_json_get($evaluation_node);
+	$survey_form = sirius_jsonfield_util_form_get($json, 'evaluation');
+	$results = sirius_jsonfield_util_results_get($json, 'evaluation');
 	sirius_jsonfield_util_set_defaults($survey_form, $results);
 
 	$form['survey'] = $survey_form;
@@ -68,10 +68,11 @@ function sirius_training_node_tab_evaluation_edit_form($form, &$form_state, $eva
 function sirius_training_node_tab_evaluation_edit_form_submit($form, &$form_state) {
 	$evaluation_nid = $form_state['evaluation_nid'];
 	$evaluation_node = node_load($evaluation_nid);
-	$json = json_decode($evaluation_node->field_sirius_json['und'][0]['value'], TRUE);
-	$original_results = $json['evaluation']['results_encoded'];
-	$json['evaluation']['results_encoded'] = json_encode($form_state['values']['survey']);
-	$evaluation_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+
+	$json = sirius_jsonfield_util_node_json_get($evaluation_node);
+	$original_results = sirius_jsonfield_util_results_get($json, 'evaluation');
+	sirius_jsonfield_util_results_set($json, 'evaluation', $form_state['values']['survey']);
+	sirius_jsonfield_util_node_json_set($evaluation_node, $json);
 	sirius_jsonfield_log($evaluation_node, 'edit', 'Edited', array('original' => $original_results));
 	$evaluation_node->field_sirius_type['und'][0]['value'] = $form_state['values']['status'];
 	node_save($evaluation_node);
