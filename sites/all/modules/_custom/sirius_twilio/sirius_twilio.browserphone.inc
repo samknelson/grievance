@@ -242,7 +242,7 @@ function sirius_twilio_browserphone_render($parameters = array()) {
   $html .= '</ul>';
 
   $html .= '<div id="sirius_browserphone_tab_phone">';
-	$html .= '  Phone Number:<br />';
+	$html .= '  Phone:';
 	$html .= '  <input id="sirius_browserphone_number" type="text" placeholder="Enter a phone #" value="" />';
 	$html .= '  <br />';
 	$html .= '  <button id="sirius_browserphone_button_call">Call</button>';
