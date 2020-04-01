@@ -5,9 +5,9 @@ function sirius_page_contact_definition_display() {
 }
 
 function sirius_page_contact_definition_display_form($form, &$form_state) {
-	$contact_definition = sirius_contact_definition();
-	$contact_definition_form = $contact_definition['form']['default'];
-	$paths = array_values(sirius_jsonfield_util_form_list_paths($contact_definition_form));
+	$contact_definition_json = sirius_contact_definition();
+	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
+	$paths = array_values(sirius_jsonfield_util_form_list_paths($contact_definition_form, TRUE));
 
 	$core_paths = array_reverse(array_keys(sirius_jsonfield_util_list_node_fields('sirius_contact')));
 	foreach ($core_paths as $core_path) { array_unshift($paths, $core_path); }
@@ -25,7 +25,7 @@ function sirius_page_contact_definition_display_form($form, &$form_state) {
 		'#multiple' => TRUE,
 		'#title' => 'Display: Phone Bank: Default',
 		'#options' => $options,
-		'#default_value' => $contact_definition['display']['phonebank-default'],
+		'#default_value' => $contact_definition_json['display']['phonebank-default'],
 		'#size' => 10,
 	);
 

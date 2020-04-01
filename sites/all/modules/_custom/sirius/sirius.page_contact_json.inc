@@ -11,13 +11,20 @@ function sirius_node_tab_contact_json($cotnact_node) {
 }
 
 function sirius_node_tab_contact_json_form($form, &$form_state, $contact_node) {
-	$form_state['contact_nid'] = $contact_node->nid;
-	$contact_definition_json = sirius_contact_definition();
-	$form['survey'] = $contact_definition_json['form']['default'];
-	$form['#tree'] = TRUE;
+	$which = 'default';
 
-	$json_defaults = json_decode($contact_node->field_sirius_json['und'][0]['value'], TRUE);
-	sirius_jsonfield_util_set_defaults($form['survey'], $json_defaults['survey']);
+	$form_state['contact_nid'] = $contact_node->nid;
+	$form_state['which'] = $which;
+
+	$contact_definition_json = sirius_contact_definition();
+	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, $which);
+
+	$contact_json = sirius_jsonfield_util_node_json_get($contact_node);
+	$contact_results = sirius_jsonfield_util_results_get($contact_json, $which);
+	sirius_jsonfield_util_set_defaults($contact_definition_form, $contact_results);
+
+	$form[$which] = $contact_definition_form;
+	$form['#tree'] = TRUE;
 
 	$form['!intro'] = array(
 		'#markup' => '<div class="sirius_form_intro">' . 
@@ -40,10 +47,12 @@ function sirius_node_tab_contact_json_form($form, &$form_state, $contact_node) {
 }
 
 function sirius_node_tab_contact_json_form_submit($form, &$form_state) {
+	$which = $form_state['which'];
+
 	$contact_node = node_load($form_state['contact_nid']);
-	$json = json_decode($contact_node->field_sirius_json['und'][0]['value'], TRUE);
-	$json['survey'] = $form_state['values']['survey'];
+	$contact_json = sirius_jsonfield_util_node_json_get($contact_node);
+	sirius_jsonfield_util_results_set($contact_json, $which, $form_state['values'][$which]);
+	sirius_jsonfield_util_node_json_set($contact_node, $contact_json);
 	sirius_jsonfield_log($contact_node, 'survey', 'Survey updated.');
-	$contact_node->field_sirius_json['und'][0]['value'] = json_encode($json);
 	node_save($contact_node);
 }

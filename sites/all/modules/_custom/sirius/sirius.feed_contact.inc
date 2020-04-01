@@ -62,42 +62,14 @@ function sirius_feed_contact_fields($info, $data, $feed_node, $current_step) {
   );
 
   // Json fields
-  $domain_nid = $feed_node->field_sirius_domain['und'][0]['target_id'];
-  if ($domain_nid) {
-    $definition = sirius_contact_definition($domain_nid);
-    $result = array();
-    _sirius_feed_contact_fields_recursive($definition, 'JSON', '', $result);
-    $fields += $result;
+  $contact_definition_json = sirius_contact_definition();
+  $contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
+  $paths = array_values(sirius_jsonfield_util_form_list_paths($contact_definition_form, TRUE));
+  foreach ($paths as $path) {
+    $fields["JSON:$path"] = array('title' => $path);
   }
 
   return $fields;
-}
-
-function _sirius_feed_contact_fields_recursive($obj, $prefix, $prefix_label, &$result) {
-  if (!$obj) { return; }
-  if (!is_array($obj)) { return; }
-
-  $type = $obj['#type'];
-  if (!$type || $type == 'fieldset') {
-    foreach ($obj as $key => $value) {
-      if (!is_array($value)) { continue; }
-      if ($key == '#options') { continue; }
-      $title = $prefix_label;
-      if ($title) { $title .= ': '; }
-      $title .= $obj['#title'];
-      _sirius_feed_contact_fields_recursive($value, "$prefix:$key", $title, $result);
-    }
-  } else {
-    $title = $prefix_label;
-    if ($title) { $title .= ': '; }
-    $title .= $obj['#title'];
-    $result["$prefix"] = array(
-      'title' => $title,
-      'required' => FALSE,
-    );
-  }
-
-  return $result;
 }
 
 function sirius_feed_contact_row_verify($feed_node, $info, $data, &$row, $precompute) {
@@ -188,15 +160,16 @@ function sirius_feed_contact_row_process($feed_node, $info, $data, $row) {
   	}
   }
 
-  $json = array();
+  $json = sirius_jsonfield_util_node_json_get($contact_node);
+  $results_json = array();
   foreach ($row as $key => $value) {
     if (preg_match('/JSON:/', $key)) {
-      sirius_jsonfield_util_set_from_path($json, preg_replace('/JSON:/', '', $key), $value);
+      sirius_jsonfield_util_set_from_path($results_json, preg_replace('/JSON:/', '', $key), $value);
     }
   }
-  $contact_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+  sirius_jsonfield_util_results_set($json, 'default', $results_json);
+  sirius_jsonfield_util_node_json_set($contact_node, $json);
   $contact_node->field_sirius_domain = $feed_node->field_sirius_domain;
-
   node_save($contact_node);
 
   if ($is_new) {
