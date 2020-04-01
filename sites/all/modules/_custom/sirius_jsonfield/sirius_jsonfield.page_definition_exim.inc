@@ -5,11 +5,12 @@ function sirius_json_definition_exim_form($form, &$form_state, $nid, $which_form
 	$form_state['which_form'] = $which_form;
 
 	$node = node_load($nid);
-	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_jsonfield_util_node_json_get($node);
+	$json_form = sirius_jsonfield_util_form_get($json, $which_form);
 
 	$form['json'] = array(
 		'#type' => 'textarea',
-		'#default_value' => $json['form_encoded'][$which_form],
+		'#default_value' => json_encode($json_form, TRUE),
 		'#title' => 'Raw Field Definition',
 	);
 
@@ -31,17 +32,15 @@ function sirius_json_definition_exim_form_submit($form, &$form_state) {
 	$nid = $form_state['nid'];
 	$which_form = $form_state['which_form'];
 	$node = node_load($nid);
+	$json = sirius_jsonfield_util_node_json_get($node);
 	$txt = $form_state['values']['json'];
-	$parsed = json_decode($txt, TRUE);
-	if (!$parsed) {
+	$json_form = json_decode($txt, TRUE);
+	if (!$json_form) {
 		drupal_set_message("Please enter a valid JSON-encoded string.", 'error');
 		return;
 	}
-	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
-	$json['form_encoded'][$which_form] = $txt;
-	$json['form'][$which_form] = $parsed;
-
-	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
+	sirius_jsonfield_util_form_set($json, $which_form, $json_form);
+	sirius_jsonfield_util_node_json_set($node, $json);
 	node_save($node);
 	drupal_set_message("Form definition updated.");
 }

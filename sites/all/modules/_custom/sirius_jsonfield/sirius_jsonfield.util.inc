@@ -27,25 +27,31 @@ function sirius_jsonfield_util_get_from_path($json, $path) {
 	else { return $json[$current]; }
 }
 
-function sirius_jsonfield_util_form_list_paths($json) {
+function sirius_jsonfield_util_type_has_data($type) {
+	return in_array($type, array('select', 'textfield', 'textarea', 'date_popup', 'radios', 'checkboxes'));
+}
+
+function sirius_jsonfield_util_form_list_paths($json, $data_fields_only = FALSE) {
 	$result = array();
-	sirius_jsonfield_util_form_list_paths_recursive($result, $json);
+	sirius_jsonfield_util_form_list_paths_recursive($result, $json, NULL, $data_fields_only);
 	return $result;
 }
 
-function sirius_jsonfield_util_form_list_paths_recursive(&$result, $json, $path = '') {
+function sirius_jsonfield_util_form_list_paths_recursive(&$result, $json, $path = '', $data_fields_only = NULL) {
 	if (!$json) { return; }
   if (!is_array($json)) { return; }
 	sirius_jsonfield_util_form_sort_by_weight($json);
 	$type = $json['#type'];
 	$id = $json['#id'];
-	if ($id) { $result[$id] = $path; }
+	if ($id) { 
+		if (!$data_fields_only || sirius_jsonfield_util_type_has_data($type)) { $result[$id] = $path; }
+	}
 	if ($type && ($type != 'fieldset')) { return; }
 
   foreach ($json as $key => $value) {
   	if (!is_array($value)) { continue; }
   	if (preg_match('/^#/', $key)) { continue; }
-    sirius_jsonfield_util_form_list_paths_recursive($result, $value, $path . ':' . $key, $value_only);
+    sirius_jsonfield_util_form_list_paths_recursive($result, $value, $path . ':' . $key, $data_fields_only);
   }
 }
 
@@ -189,4 +195,48 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 function sirius_jsonfield_util_render_all_values($form, $values, $options = array()) {
 	$paths = drupal_map_assoc(sirius_jsonfield_util_form_list_paths($form));
 	return sirius_jsonfield_util_render_values($form, $values, $paths, $options);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+function sirius_jsonfield_util_form_get($json, $which) {
+	return json_decode($json[$which]['form_encoded'], TRUE);
+}
+
+function sirius_jsonfield_util_form_set(&$json, $which, $form) {
+	$json[$which]['form_encoded'] = json_encode($form);
+}
+
+function sirius_jsonfield_util_results_get($json, $which) {
+	return json_decode($json[$which]['results_encoded'], TRUE);
+}
+
+function sirius_jsonfield_util_results_set(&$json, $which, $results) {
+	$json[$which]['results'] = $results;
+	$json[$which]['results_encoded'] = json_encode($results);
+}
+
+function sirius_jsonfield_util_display_get($json, $which) {
+	return json_decode($json[$which]['display_encoded'], TRUE);
+}
+
+function sirius_jsonfield_util_display_set(&$json, $which, $display) {
+	$json[$which]['display_encoded'] = json_encode($display);
+}
+
+function sirius_jsonfield_util_node_json_get($node) {
+	return json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+}
+
+function sirius_jsonfield_util_node_json_set(&$node, $json) {
+	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
+}
+
+function sirius_jsonfield_util_esignature_get($json, $which) {
+	return json_decode($json[$which]['esignature_encoded'], TRUE);
+}
+
+function sirius_jsonfield_util_esignature_set(&$json, $which, $esignature) {
+	$json[$which]['esignature_encoded'] = json_encode($esignature);
 }
