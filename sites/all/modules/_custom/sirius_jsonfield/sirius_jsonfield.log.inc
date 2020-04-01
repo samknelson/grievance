@@ -7,7 +7,7 @@
 function sirius_jsonfield_log($node, $type, $msg, $extra = array()) {
 	global $user;
 	$ts = time();
-	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_jsonfield_util_node_json_get($node);
 
 	if ($json['log']) {
 		$count = count($json['log']);
@@ -25,11 +25,11 @@ function sirius_jsonfield_log($node, $type, $msg, $extra = array()) {
 			'extra' => $extra
 		);
 	}
-	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
+	sirius_jsonfield_util_node_json_set($node, $json);
 }
 
 function sirius_jsonfield_log_render($node) {
-	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_jsonfield_util_node_json_get($node);
 	$log = $json['log'];
 	if (!$log) { return array('no log entries.'); }
 

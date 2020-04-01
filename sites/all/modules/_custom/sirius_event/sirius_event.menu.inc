@@ -141,20 +141,36 @@ function sirius_event_node_tabs() {
   );
   */
 
-  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_edit'] = array(
-    'title' => 'Fields',
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form'] = array(
+    'title' => 'Form',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_definition_edit',
     'permissions' => array('sirius domain admin'),
     'weight' => 2,
   );
 
-  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_preview'] = array(
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_edit',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form/preview'] = array(
     'title' => 'Preview',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_definition_preview',
     'permissions' => array('sirius domain admin'),
-    'weight' => 4,
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form/exim'] = array(
+    'title' => 'Export / Import',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_exim',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 3,
   );
 
   $node_tabs['sirius_json_definition']['sirius_event_participant_definition_audio'] = array(
@@ -172,15 +188,6 @@ function sirius_event_node_tabs() {
     'permissions' => array('sirius domain admin'),
     'weight' => 3,
   );
-
-  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_clone'] = array(
-    'title' => 'Clone',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_participant_definition_clone',
-    'permissions' => array('sirius domain admin'),
-    'weight' => 4,
-  );
-
 
 	return $node_tabs;
 }

@@ -24,3 +24,31 @@ div#controls div#log {
   display: none;
 }
 
+#sirius_browserphone_number {
+  width: 135px;
+}
+
+#sirius_browserphone button {
+  background-image: none;
+  margin: 14px 0;
+  background-image: none;
+  border: 0;
+  outline: none;
+  border-radius: initial;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: #1b4784;
+  color: #ffffff;
+  padding: 9px 20px;
+  font-size: 14px;
+  margin: 9px;
+}
+
+#sirius_browserphone_devices {
+  width: 135px;
+}
+
+#sirius_browserphone .ui-tabs .ui-tabs-panel {
+  padding: 10px;
+}

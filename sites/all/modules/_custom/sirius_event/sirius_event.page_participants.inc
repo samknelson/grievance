@@ -137,35 +137,50 @@ function sirius_node_tab_event_participants_reports_form($form, &$form_state, $e
 
 	$form['intro'] = array('#markup' => '<div class="sirius_form_intro">' . t('Click below to download the list of all participants, including all custom fields and all survey responses.') . '</div>');
 
+	$form['output'] = array(
+		'#type' => 'select',
+		'#options' => array(
+			'screen' => t('Screen'),
+			'csv' => t('Download'),
+		),
+		'#description' => t('Screen output will be limited to 1000 records.'),
+		'#required' => TRUE,
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
-		'#value' => t('Download Now'),
+		'#value' => t('Submit'),
 	);
+
+	if ($form_state['results']) {
+		$form['results'] = $form_state['results'];
+	}
 
 	return $form;
 }
 
 function sirius_node_tab_event_participants_reports_form_submit($form, &$form_state) {
+	$output = $form_state['values']['output'];
+
 	$prole_names = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'name');
 	$pstatus_names = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
 
 	$event_node = node_load($form_state['event_nid']);
 
-	$survey_nid = $event_node->field_sirius_json_definition['und'][0]['target_id'];
-	$survey_node = node_load($survey_nid);
-	if (!$survey_node) { drupal_set_message("No survey!"); return array(); }
-	$survey_form_definition = json_decode($survey_node->field_sirius_json['und'][0]['value'], TRUE)['form']['default'];
+	$participant_definition_node = node_load($event_node->field_sirius_json_definition['und'][0]['target_id']);
+	if (!$participant_definition_node) { drupal_set_message("No survey!"); return array(); }
+	$participant_definition_json = sirius_jsonfield_util_node_json_get($participant_definition_node);
+	$participant_definition_form = sirius_jsonfield_util_form_get($participant_definition_json, 'default');
+  $participant_paths = array_values(sirius_jsonfield_util_form_list_paths($participant_definition_form, TRUE));
 
-	$contact_form_definition = sirius_contact_definition();
+	$contact_definition_json = sirius_contact_definition();
+	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
+  $contact_paths = array_values(sirius_jsonfield_util_form_list_paths($contact_definition_form, TRUE));
 
-	$form = array('contact' => $contact_form_definition, 'survey' => $survey_form_definition);
-	$form_flat = sirius_jsonfield_util_form_flatten($form);
 
 	$header = array('Participant ID', 'Contact ID', 'Contact Name', 'Role', 'Status');
-	foreach ($form_flat as $id => $element) {
-		if (in_array($element['#type'], array('fieldset', 'markup'))) { continue; }
-		$header[] = $element['#path'];
-	}
+	foreach ($contact_paths as $path) { $header[] = $path; }
+	foreach ($participant_paths as $path) { $header[] = $path; }
 
 	$sql_args = array();
 	$sql_args[':event_nid'] = $event_node->nid;
@@ -188,14 +203,17 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$sql .= "where node.type = 'sirius_event_participant' ";
 	$sql .= "and field_sirius_event_target_id = :event_nid ";
 
-	$fp = fopen('php://output', 'w');
-	$filename = 'reports.csv';
-	drupal_add_http_header('Content-Type', 'text/csv');
-	drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
-	fputcsv($fp, $header);
+	$rows = array();
+	if ($output == 'csv') {
+		$fp = fopen('php://output', 'w');
+		$filename = 'reports.csv';
+		drupal_add_http_header('Content-Type', 'text/csv');
+		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		fputcsv($fp, $header);
+	}
 
 	$stmt = db_query($sql, $sql_args);
-	$rows = array();
+	$count = 0;
 	while ($hr = $stmt->fetchAssoc()) {
 		$row = array();
 		$row[] = $hr['participant_nid'];
@@ -205,16 +223,41 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 		$row[] = $pstatus_names[$hr['pstatus_tid']];
 
 		$contact_json = json_decode($hr['contact_json'], TRUE);
+		$contact_results_json = sirius_jsonfield_util_results_get($contact_json, 'default');
+
 		$participant_json = json_decode($hr['participant_json'], TRUE);
-		$json = array('contact' => $contact_json, 'survey' => $participant_json['survey']);
-		foreach ($form_flat as $id => $element) {
-			if (in_array($element['#type'], array('fieldset', 'markup'))) { continue; }
-			$row[] = sirius_jsonfield_util_render_value($element, sirius_jsonfield_util_get_from_path($json, $element['#path']), array('raw' => TRUE));
+		$participant_results_json = sirius_jsonfield_util_results_get($participant_json, 'survey');
+
+		foreach ($contact_paths as $path) { 
+			$row[] = sirius_jsonfield_util_render_value(
+				sirius_jsonfield_util_get_from_path($contact_definition_form, $path),
+				sirius_jsonfield_util_get_from_path($contact_results_json, $path), 
+				array('raw' => TRUE)
+			);
 		}
-		fputcsv($fp, $row);
+		foreach ($participant_paths as $path) { 
+			$row[] = sirius_jsonfield_util_render_value(
+				sirius_jsonfield_util_get_from_path($participant_definition_form, $path),
+				sirius_jsonfield_util_get_from_path($participant_results_json, $path), 
+				array('raw' => TRUE)
+			);
+		}
+		if ($output == 'csv') { 
+			fputcsv($fp, $row);
+		} else {
+			$rows[] = $row;
+		}
+		++$count;
+		if ($count > 1000 && $output == 'screen') { break; }
 	}
-	fclose($fp);
-	exit();
+
+	if ($output == 'csv') {
+		fclose($fp);
+		exit();
+	} else {
+		$form_state['results'] = array('#markup' => '<hr>' . '<h2>' . t('Results') . '</h2>' . theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array())));
+		$form_state['rebuild'] = TRUE;
+	}
 }
 
 function sirius_node_tab_event_participants_summary($event_nid, $prole_tid = NULL) {

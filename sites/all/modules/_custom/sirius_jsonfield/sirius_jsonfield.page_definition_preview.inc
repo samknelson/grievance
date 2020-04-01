@@ -3,9 +3,8 @@
 function sirius_json_definition_preview_form($form, &$form_state, $nid, $which_form = 'default') {
 	$form_state['nid'] = $nid;
 	$node = node_load($nid);
-	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
-	$json_form = $json['form'][$which_form];
-	if ($json['form_encoded'][$which_form]) { $json_form = json_decode($json['form_encoded'][$which_form], TRUE); }
+	$json = sirius_jsonfield_util_node_json_get($node);
+	$json_form = sirius_jsonfield_util_form_get($json, $which_form);
 
 	$json_form['!intro'] = array(
 		'#markup' => '<div class="sirius_form_intro">' . 

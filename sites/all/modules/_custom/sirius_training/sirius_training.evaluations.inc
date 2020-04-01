@@ -58,10 +58,9 @@ function sirius_training_evaluations_render($evaluation_node, $options = array()
 	}
 	$html .= sirius_fakerender_field('Submitted:', date('l, F d g:i A', $evaluation_node->created));
 
-
-	$json = json_decode($evaluation_node->field_sirius_json['und'][0]['value'], TRUE);
-	$form = json_decode($json['evaluation']['form_encoded'], TRUE);
-	$results = json_decode($json['evaluation']['results_encoded'], TRUE);
+	$json = sirius_jsonfield_util_node_json_get($evaluation_node);
+	$form = sirius_jsonfield_util_form_get($json, 'evaluation');
+	$results = sirius_jsonfield_util_results_get($json, 'evaluation');
 	$html .= sirius_jsonfield_util_render_all_values($form, $results);
 
 	if (!$options['hide_edit_link']) {
