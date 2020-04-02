@@ -7,6 +7,7 @@ function sirius_event_participants_widgets() {
 		'contact' => t('Manage Contact Participant List'),
 		'reports' => t('Download reports'),
 		'summary' => t('View a Summary'),
+		'attendance' => t('Attendance Sheets'),
 	);
 }
 

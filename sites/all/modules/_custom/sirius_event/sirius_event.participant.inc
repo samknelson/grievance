@@ -26,3 +26,41 @@ function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $ps
 	sirius_jsonfield_log($participant_node, 'status', "Set prole = " . $term_cache[$prole_tid]->name . ", pstatus = " . $term_cache[$pstatus_tid]->name);
 	node_save($participant_node);
 }
+
+/**
+ * Return the full list of participant and events for a contact
+ *
+ * $result[participant_type_tid][0]['participant_node']
+ * $result[participant_type_tid][0]['event_node']
+ * $result[participant_type_tid][1]['participant_node']
+ * $result[participant_type_tid][1]['event_node']
+ *
+ * @todo: This function loads too many things, especially when filtering by an event type and a contact has many participant records.
+ */
+
+function sirius_event_participants_by_contact($contact_nid, $event_type_tids = NULL) {
+	// Get the full participant list for this contact
+	$query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_event_participant');
+  $query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
+  $query->propertyOrderBy('created');
+  $stmt = $query->execute();
+  $participant_nids = array();
+  if ($stmt['node']) { $participant_nids = array_keys($stmt['node']); }
+  $participant_nodes = node_load_multiple($participant_nids);
+
+  // By type
+  $by_type = array();
+  foreach ($participant_nodes as $participant_nid => $participant_node) {
+  	$event_node = node_load($participant_node->field_sirius_event['und'][0]['target_id']);
+  	$event_type_tid = $event_node->field_sirius_event_type['und'][0]['tid'];
+  	if ($event_type_tids && !in_array($event_type_tid, $event_type_tids)) { continue; }
+		$by_type[$event_type_tid][] = array(
+			'participant_node' => $participant_node,
+			'event_node' => $event_node,
+		);
+  }
+
+  return $by_type;
+}

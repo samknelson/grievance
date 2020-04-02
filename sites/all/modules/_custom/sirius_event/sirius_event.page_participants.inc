@@ -77,6 +77,8 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 		return sirius_node_tab_event_participants_reports($event_node->nid);
 	} else if ($widget == 'summary') { 
 		return sirius_node_tab_event_participants_summary($event_node->nid, $prole);
+	} else if ($widget == 'attendance') {
+		return sirius_event_page_participant_attendance($event_node, $rule);
 	} else {
 		return t('Widget not found: @widget.', array('@widget' => $widget));;
 	}
@@ -125,7 +127,6 @@ function sirius_event_contact_search($event_nid, $participant_role_tid, $string)
 
   drupal_json_output($matches);
 }
-
 
 function sirius_node_tab_event_participants_reports($event_nid) {
 	return drupal_get_form('sirius_node_tab_event_participants_reports_form', $event_nid);

@@ -7,7 +7,7 @@ function sirius_event_class_enabled($event_node) { return sirius_event_class_ena
 function sirius_event_class_enabled_tid($event_type_tid) { return sirius_event_class_enabled_type(taxonomy_term_load($event_type_tid)); }
 
 function sirius_event_class_enabled_type($event_type_term) {
-  $json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+  $json = sirius_jsonfield_util_term_json_get($event_type_term);
   return $json['class']['enabled'] == 'Yes';
 }
 
@@ -23,4 +23,14 @@ function sirius_event_class_ts($event_node) {
 		'signin_opens_others' => $signin_opens_others,
 		'signin_closes' => $signin_closes,
 	);
+}
+
+function sirius_event_get_class_types() {
+	$event_type_terms = sirius_taxonomy_load('sirius_event_type', 'tid', 'full');
+	$class_type_terms = array();
+	foreach ($event_type_terms as $event_type_tid => $event_type_term) {
+		if (sirius_event_class_enabled_type($event_type_term)) { $class_type_terms[$event_type_tid] = $event_type_term; }
+	}
+
+	return $class_type_terms;
 }
