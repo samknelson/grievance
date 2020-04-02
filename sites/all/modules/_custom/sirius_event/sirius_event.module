@@ -17,6 +17,8 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_bullpen.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_worker_byname.inc";
 
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_attendance.inc';
+
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_landing.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.participant_definition.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_list.inc";
@@ -182,3 +184,15 @@ function sirius_event_node_insert($node)  {
 function sirius_event_node_update($node)  {
 }
 
+/**
+ * Implements hook_form_alter
+ */
+
+function sirius_event_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'views_exposed_form' && $form_state['view']->name == 'sirius_event_participants') {
+    $event_nid = $form_state['view']->args[0];
+    $prole_tid = $form_state['view']->args[1];
+    $pstatus_options = sirius_event_participant_role_status_tids(array($prole_tid));
+    $form['field_sirius_event_pstatus_tid']['#options'] = array('All' => t('-- Select --')) + $pstatus_options;
+  }
+}
