@@ -41,8 +41,8 @@ function sirius_page_config() {
 	$links['dispatch']['links']['sirius/dispatch/config/view'] 	= array('title' => 'Dispatch Display', 'description' => 'Configure the header, footer, and style for the dispatch page.');
 	$links['dispatch']['links']['sirius/dispatch/config/vlri'] 	= array('title' => 'VLRI', 'description' => 'VLRI - Voluntary layoff with a request to convert to an involuntary configuration.');
 
-	$links['dispatch'] = array('title' => 'Bulk Messenger');
-	$links['dispatch']['links']['sirius/config/bulk'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
+	$links['bulk'] = array('title' => 'Bulk Messenger');
+	$links['bulk']['links']['sirius/config/bulk'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
 
 	$links['training'] = array('title' => 'Training Center');
 	$links['training']['links']['sirius/config/training'] 					= array('title' => 'Training Center Settings', 'description' => 'Settings for the training center (evaluations, etc.).');
