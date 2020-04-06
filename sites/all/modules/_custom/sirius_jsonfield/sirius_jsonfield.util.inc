@@ -111,6 +111,11 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 	$id = $form_element['#id'];
 	$title = $form_element['#title'] . ':';
 
+	if ($form_element['#type'] == 'fieldset') {
+		if ($options['raw']) { return NULL; }
+		else { return '<hr><h2>' . $form_element['#title'] . '</h2>'; }
+	}
+
 	if (is_array($value)) {
 		if ($form_element['#type'] == 'date_popup') { $value_rendered = $value['date'] . ' ' . $value['time']; }
 		else if ($form_element['#type'] == 'checkboxes') { 
@@ -201,6 +206,7 @@ function sirius_jsonfield_util_render_all_values($form, $values, $options = arra
 ///////////////////////////////////////////////////////////////////////////////
 
 function sirius_jsonfield_util_form_get($json, $which) {
+	if (!is_array($json) || !is_array($json[$which])) { return NULL; }
 	return json_decode($json[$which]['form_encoded'], TRUE);
 }
 
@@ -209,6 +215,7 @@ function sirius_jsonfield_util_form_set(&$json, $which, $form) {
 }
 
 function sirius_jsonfield_util_results_get($json, $which) {
+	if (!is_array($json) || !is_array($json[$which])) { return NULL; }
 	return json_decode($json[$which]['results_encoded'], TRUE);
 }
 
@@ -218,11 +225,21 @@ function sirius_jsonfield_util_results_set(&$json, $which, $results) {
 }
 
 function sirius_jsonfield_util_display_get($json, $which) {
+	if (!is_array($json) || !is_array($json[$which])) { return NULL; }
 	return json_decode($json[$which]['display_encoded'], TRUE);
 }
 
 function sirius_jsonfield_util_display_set(&$json, $which, $display) {
 	$json[$which]['display_encoded'] = json_encode($display);
+}
+
+function sirius_jsonfield_util_esignature_get($json, $which) {
+	if (!is_array($json) || !is_array($json[$which])) { return NULL; }
+	return json_decode($json[$which]['esignature_encoded'], TRUE);
+}
+
+function sirius_jsonfield_util_esignature_set(&$json, $which, $esignature) {
+	$json[$which]['esignature_encoded'] = json_encode($esignature);
 }
 
 function sirius_jsonfield_util_node_json_get($node) {
@@ -233,10 +250,11 @@ function sirius_jsonfield_util_node_json_set(&$node, $json) {
 	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
 }
 
-function sirius_jsonfield_util_esignature_get($json, $which) {
-	return json_decode($json[$which]['esignature_encoded'], TRUE);
+function sirius_jsonfield_util_term_json_get($term) {
+	return json_decode($term->field_sirius_json['und'][0]['value'], TRUE);
 }
 
-function sirius_jsonfield_util_esignature_set(&$json, $which, $esignature) {
-	$json[$which]['esignature_encoded'] = json_encode($esignature);
+function sirius_jsonfield_util_term_json_set(&$node, $json) {
+	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
 }
+
