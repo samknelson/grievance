@@ -276,7 +276,8 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
       $form_id == 'sirius_dispatch_job_node_form' ||
       $form_id == 'grievance_node_form' ||
       $form_id == 'sirius_contact_node_form' || 
-      $form_id == 'sirius_json_definition_node_form') {
+      $form_id == 'sirius_json_definition_node_form' ||
+      $form_id == 'sirius_event_participant_node_form') {
     $form['field_sirius_json']['#access'] = FALSE;
   }
 
@@ -476,13 +477,15 @@ function sirius_node_validate($node, $form, &$form_state) {
  * Stupid utility function to get multiple values from a field
  */
 
-function sirius_fieldvals($node, $field, $col = 'value') {
+function sirius_fieldvals($node, $field, $col = 'value', $format = 'Y-m-d H:i') {
   $result = array();
   if (!$node->{$field}['und']) { return array(); }
 
-  foreach ($node->{$field}['und'] as $tmp) {
+  foreach ($node->{$field}['und'] as $delta => $tmp) {
     if ($col == 'ts') {
       $result[] = strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']);
+    } else if ($col == 'date') {
+      $result[] = date($format, strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']));
     } else {
       $result[] = $tmp[$col];
     }
