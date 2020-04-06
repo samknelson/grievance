@@ -34,6 +34,7 @@ function sirius_node_tab_sirius_domain_clone_form($form, &$form_state, $source_d
 		'#type' => 'checkboxes',
 		'#title' => 'Clone these taxonomy terms',
 		'#options' => $taxonomy_bundles,
+		'#checkall' => TRUE,
 	);
 
 	$form['confirm'] = array(
@@ -90,4 +91,6 @@ function sirius_node_tab_sirius_domain_clone_form_submit($form, &$form_state) {
 		sirius_minilog("Setting $name to " . substr($value, 0, 100));
 		variable_set($name, $value);
 	}
+
+	drupal_set_message("Domain cloned.");
 }
