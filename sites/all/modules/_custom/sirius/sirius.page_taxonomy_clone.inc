@@ -238,7 +238,7 @@ function sirius_domain_clone_taxonomy($vocabulary_machine_name, $source_domain_n
   	}
 
   	// Update that pesky JSON
-  	$json = json_decode($new_term->field_sirius_json['und'][0]['value'], TRUE);
+  	$json = sirius_jsonfield_util_term_json_get($new_term);
   	$paths = sirius_jsonfield_util_value_list_paths($json);
   	$patterns = array(
   		':prole_tid',
@@ -246,6 +246,7 @@ function sirius_domain_clone_taxonomy($vocabulary_machine_name, $source_domain_n
 			':admin_prole_tids:(\d+)',
 			':paccess:([A-Z\d]+)\|([A-Z\d]+)',
 			':participants:([A-Z\d]+)\|([A-Z\d]+)',
+			':register_as',
   	);
   	foreach ($paths as $path) {
   		$matches = array();
@@ -274,7 +275,7 @@ function sirius_domain_clone_taxonomy($vocabulary_machine_name, $source_domain_n
 	  		}
 	  	}
   	}
-  	$new_term->field_sirius_json['und'][0]['value'] = json_encode($json);
+  	sirius_jsonfield_util_term_json_set($new_term, $json);
 
 		taxonomy_term_save($new_term);
 		if (!$target_map[$source_tid]) { $target_map[$source_tid] = $new_term; }
