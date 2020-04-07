@@ -654,6 +654,22 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   ); 
 
+  $items['sirius/license'] = array(
+    'title' => 'Sirius License',
+    'page callback' => 'sirius_page_license',
+    'page arguments' => array(3,4),
+    'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  ); 
+
+  $items['grievance/license'] = array(
+    'title' => 'Sirius License',
+    'page callback' => 'sirius_page_license',
+    'page arguments' => array(3,4),
+    'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  ); 
+
   /*
   $items['taxonomy/term/%/sirius_dispatch_job_policy_exim'] = array(
     'title' => 'Policy Export / Import',
