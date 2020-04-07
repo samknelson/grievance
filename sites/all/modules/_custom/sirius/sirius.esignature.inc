@@ -31,21 +31,25 @@ function sirius_esignature_stream($nid, $which) {
 }
 
 function sirius_esignature_render($esignature, $format, $nid, $which) {
-	$html .= '<div class="sirius_esignature_render">';
-	if ($format == 'full') {
-		$html .= $esignature['statement'];
-		$html .= "<img src=\"/sirius/esignature/stream/$nid/$which\" class=\"sirius_esignature_render_img_full\" />";
-		$html .= '<br />';
-		$html .= 'IP: ' . $esignature['ip'] . '<br />';
-		$html .= 'Date: ' . $esignature['date_str'] . '<br />';
-		$html .= 'User: ' . $esignature['user_uid'] . ' / ' . $esignature['user_name'] . ' / ' . $esignature['user_mail'] . '<br />';
-	} else {
-		$html .= "<img src=\"/sirius/esignature/stream/$nid/$which\" class=\"sirius_esignature_render_img\" />";
-		$html .= '<div class="sirius_esignature_render_date">';
-		$html .= $esignature['date_str'];
+	if ($esignature) { 
+		$html .= '<div class="sirius_esignature_render">';
+		if ($format == 'full') {
+			$html .= $esignature['statement'];
+			$html .= "<img src=\"/sirius/esignature/stream/$nid/$which\" class=\"sirius_esignature_render_img_full\" />";
+			$html .= '<br />';
+			$html .= 'IP: ' . $esignature['ip'] . '<br />';
+			$html .= 'Date: ' . $esignature['date_str'] . '<br />';
+			$html .= 'User: ' . $esignature['user_uid'] . ' / ' . $esignature['user_name'] . ' / ' . $esignature['user_mail'] . '<br />';
+		} else {
+			$html .= "<img src=\"/sirius/esignature/stream/$nid/$which\" class=\"sirius_esignature_render_img\" />";
+			$html .= '<div class="sirius_esignature_render_date">';
+			$html .= $esignature['date_str'];
+			$html .= '</div>';
+		}
 		$html .= '</div>';
+	} else {
+		$html = '<div class="sirius_esignature_render sirius_esignature_render_missing"></div>';
 	}
-	$html .= '</div>';
 	return $html;
 }
 
@@ -93,4 +97,17 @@ function sirius_esignature_form_get_json($form, &$form_state, $field_name) {
 		$json['user_mail'] = $user->mail;
 	}
 	return $json;
+}
+
+function sirius_esignature_fully_signed($json, $which) {
+	$json_form = sirius_jsonfield_util_form_get($json, $which);
+	$signature_definitions = $json_form['#sirius']['signature_definitions'];
+	if (!$signature_definitions) { return TRUE; }
+	foreach ($signature_definitions as $signature_definition) {
+		$name = $signature_definition['name'];
+		$esignature = sirius_jsonfield_util_esignature_get($json, $name);
+		if (!$esignature) { return FALSE; }
+	}
+
+	return TRUE;
 }
