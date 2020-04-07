@@ -40,6 +40,12 @@
 	border: 1px dashed #000000;
 }
 
+.sirius_esignature_render_missing {
+	width: 200px;
+	height: 40px;
+	border: 1px dashed #666666;
+}
+
 .sirius_esignature_render_img_full {
 	width: 400px;
 	border: 2px dashed #000000;
