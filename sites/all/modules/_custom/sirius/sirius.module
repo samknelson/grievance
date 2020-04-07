@@ -69,6 +69,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_field_
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_letter_template_recipients.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_config.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_esignature_test.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_license.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
 
