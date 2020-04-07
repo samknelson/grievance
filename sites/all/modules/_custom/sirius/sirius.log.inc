@@ -81,6 +81,8 @@ function sirius_log(
   $log_node = node_submit($log_node);
   node_object_prepare($log_node);
   node_save($log_node);
+
+  return $log_node;
 }
 
 function sirius_node_access_log($log_node, $op, $account) {
