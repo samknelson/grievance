@@ -334,6 +334,79 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 		);
 	}
 
+	$form['style'] = array(
+		'#type' => 'select',
+		'#title' => 'Style',
+		'#states' => array(
+			'visible' => array(
+				array(
+					':input[name="action"]' => array('value' => 'edit'),
+					':input[name="type"]' => array(
+						array('value' => 'textfield'), 
+						array('value' => 'textarea'), 
+						array('value' => 'date_popup'), 
+						array('value' => 'select'), 
+						array('value' => 'radios'), 
+						array('value' => 'checkboxes')
+					),
+				),
+			),
+		),
+		'#options' => array(
+			'standard' => t('Standard'),
+			'inline_label' => t('Inline Label'),
+		),
+		'#default_value' => $leaf['#sirius']['style'],
+		'#prefix' => '<div class="container-inline">',
+		'#suffix' => '</div>',
+	);
+
+	$form['xprefix'] = array(
+		'#type' => 'textarea',
+		'#title' => 'Prefix',
+		'#states' => array(
+			'visible' => array(
+				array(
+					':input[name="action"]' => array('value' => 'edit'),
+					':input[name="type"]' => array(
+						array('value' => 'textfield'), 
+						array('value' => 'textarea'), 
+						array('value' => 'date_popup'), 
+						array('value' => 'select'), 
+						array('value' => 'radios'), 
+						array('value' => 'checkboxes')
+					),
+				),
+			),
+		),
+		'#default_value' => $leaf['#sirius']['prefix'],
+		'#prefix' => '<div class="container-inline">',
+		'#suffix' => '</div>',
+	);
+
+	$form['xsuffix'] = array(
+		'#type' => 'textarea',
+		'#title' => 'Suffix',
+		'#states' => array(
+			'visible' => array(
+				array(
+					':input[name="action"]' => array('value' => 'edit'),
+					':input[name="type"]' => array(
+						array('value' => 'textfield'), 
+						array('value' => 'textarea'), 
+						array('value' => 'date_popup'), 
+						array('value' => 'select'), 
+						array('value' => 'radios'), 
+						array('value' => 'checkboxes')
+					),
+				),
+			),
+		),
+		'#default_value' => $leaf['#sirius']['suffix'],
+		'#prefix' => '<div class="container-inline">',
+		'#suffix' => '</div>',
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Save',
@@ -439,6 +512,10 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		// Action = Edit. Create our new "leaf"
 		$leaf = array();
 
+		if ($form_state['values']['style']) { $leaf['#sirius']['style'] = $form_state['values']['style']; }
+		if ($form_state['values']['xprefix']) { $leaf['#sirius']['prefix'] = $form_state['values']['xprefix']; }
+		if ($form_state['values']['xsuffix']) { $leaf['#sirius']['suffix'] = $form_state['values']['xsuffix']; }
+
 		// Set basic attributes
 		foreach (array('title', 'type', 'description', 'size', 'required') as $key) {
 			$leaf['#' . $key] = $form_state['values'][$key];
@@ -446,13 +523,21 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		if ($form_state['values']['type'] == 'markup') {
 			$leaf['#markup'] = $form_state['values']['markup'];
 		} 
-		if ($form_state['values']['type'] == 'checkboxes') {
-			$leaf['#prefix'] = '<div class="checkboxes-inline">';
-			$leaf['#suffix'] = '</div>';
+		if ($leaf['#sirius']['style'] == 'inline_label') {
+			if ($form_state['values']['type'] == 'checkboxes') {
+				$leaf['#prefix'] = '<div class="checkboxes-inline">';
+				$leaf['#suffix'] = '</div>';
+			} else {
+				$leaf['#prefix'] = '<div class="container-inline">';
+				$leaf['#suffix'] = '</div>';
+			}
 		} else {
-			$leaf['#prefix'] = '<div class="container-inline">';
-			$leaf['#suffix'] = '</div>';
+			$leaf['#prefix'] = '';
+			$leaf['#suffix'] = '';
 		}
+
+		if ($leaf['#sirius']['prefix']) { $leaf['#prefix'] .= $leaf['#sirius']['prefix']; }
+		if ($leaf['#sirius']['suffix']) { $leaf['#suffix'] = $leaf['#sirius']['suffix'] . $leaf['#suffix']; }
 
 		// Set conditional targets.
 		if ($form_state['values']['conditional'] == 'Yes') {
@@ -505,6 +590,17 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		// Generating the HTML ID is surprisingly ugly. Needs to include the full path, and IDs don't like colons or periods.
 		$leaf['#id'] = preg_replace('/:/', '__', 'sirius_json_id' . $json_path . ':' . $field_name);
 
+		// For new leafs, put at the bottom
+		if (!$leaf['#weight'] && !$_REQUEST['field_name']) {
+			$max_weight = 0;
+			foreach ($ref as $other_field_name => $other_leaf) {
+				if (isset($other_leaf['#weight']) && $other_leaf['#weight'] > $max_weight) { $max_weight = $other_leaf['#weight']; }
+			}
+			if ($max_weight) {
+				$leaf['#weight'] = $max_weight + 10;
+			}
+		}
+
 		if (!$ref[$field_name]) { $ref[$field_name] = array(); }
 		unset($ref[$field_name]['#markup']);
 		foreach ($leaf as $key => $value) { $ref[$field_name][$key] = $value; }
@@ -538,7 +634,7 @@ function _sirius_json_definition_edit_render_recursive($obj, $path = '') {
 
 	$type = $obj['#type'];
 	if (!$type || $type == 'fieldset') {
-	  $html .= '<ul>';
+	  $html .= '<ol>';
 	  foreach ($obj as $key => $value) {
 	  	if (!is_array($value)) { continue; }
 	  	if (preg_match('/^#/', $key)) { continue; }
@@ -554,7 +650,7 @@ function _sirius_json_definition_edit_render_recursive($obj, $path = '') {
 	    if ($path == $_REQUEST['json_path'] && !$_REQUEST['field_name']) { $html .= '&nbsp;&larr;'; }
     $html .= '</li>';
 
-	  $html .= '</ul>';
+	  $html .= '</ol>';
 	} else {
 		// $html = l($obj['title'], current_path(), array('query' => array('json_path' => $path)));
 	}
