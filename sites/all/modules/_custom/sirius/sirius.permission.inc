@@ -105,6 +105,7 @@ function sirius_node_access($node, $op, $account) {
   if ($type == 'sirius_letterhead') { return sirius_node_access_letterhead($node, $op, $account); }
   if ($type == 'sirius_contact') { return sirius_node_access_contact($node, $op, $account); }
   if ($type == 'sirius_domain') { return sirius_node_access_domain($node, $op, $account); }
+  if ($type == 'sirius_term_proxy') { return sirius_node_access_term_proxy($node, $op, $account); }
 
   // We know nothing.
   return NODE_ACCESS_IGNORE;
