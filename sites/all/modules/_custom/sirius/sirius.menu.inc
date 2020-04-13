@@ -17,6 +17,14 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
+  $node_tabs['sirius_event']['sirius_event_materials'] = array(
+    'title' => 'Materials',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_materials',
+    'permissions' => array('sirius'),
+    'weight' => 20,
+  );
+
   // 
   // Entity Log
   //
@@ -145,6 +153,19 @@ function sirius_node_tabs() {
   return $node_tabs;
 }
 
+function sirius_term_tabs() {
+  $term_tabs = array();
+
+  $term_tabs['sirius_event_type']['sirius_event_materials'] = array(
+    'title' => 'Materials',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_materials',
+    'permissions' => array('sirius'),
+  );
+
+  return $term_tabs;
+
+}
 /**
  * Implements hook_menu
  */
@@ -549,14 +570,6 @@ function sirius_menu() {
     'page callback' => 'sirius_page_taxonomy_vocabulary_list',
     'page arguments' => array(),
     'access arguments' => array('sirius domain admin'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['sirius/admin/taxonomy'] = array(
-    'title' => 'Taxonomy Admin',
-    'page callback' => 'sirius_page_taxonomy_vocabulary_admin',
-    'page arguments' => array(),
-    'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
   );
 
