@@ -115,6 +115,7 @@ function sirius_node_tab_entity_materials_list($entity, $options = array()) {
 	if ($entity->tid) { $node = sirius_taxonomy_proxy($entity->tid); } else { $node = $entity; } 
 
 	$materials = sirius_materials_list($entity);
+	if (!$materials && $options['hide_empty']) { return ''; }
 
 	$rows = array();
 	foreach ($materials as $material_nid => $material_node) {
@@ -150,9 +151,12 @@ function sirius_node_tab_entity_materials_list($entity, $options = array()) {
 		$rows[] = $row;
 	}
 
-	$header = array('Title', 'Description', 'Attachment', 'Tools');
-
-	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => array('sirius_materials'))));
+	if ($materials) {
+		$header = array('Title', 'Description', 'Attachment', 'Tools');
+		$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => array('sirius_materials'))));
+	} else {
+		$html .= '<p>No materials found.</p>';
+	}
 
 	if (!$options['hide_add']) {
 		if (sirius_materials_access('add', $entity)) {
@@ -168,8 +172,11 @@ function sirius_node_tab_entity_materials_list($entity, $options = array()) {
 	if ($node->type == 'sirius_event') {
 		$event_type_term = taxonomy_term_load($node->field_sirius_event_type['und'][0]['tid']);
 		if (sirius_materials_access('list', $event_type_term)) {
-			$html .= '<h2>' . t('General materials for: ') . $event_type_term->name . '</h2>';
-			$html .= sirius_node_tab_entity_materials_list($event_type_term, array('hide_add' => TRUE));
+			$parent_html = sirius_node_tab_entity_materials_list($event_type_term, array('hide_add' => TRUE, 'hide_empty' => TRUE));
+			if ($parent_html) {
+				$html .= '<h2>' . t('General materials for: ') . $event_type_term->name . '</h2>';
+				$html .= $parent_html;
+			}
 		}
 	}
 
