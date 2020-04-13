@@ -27,16 +27,47 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$prole_tids = sirius_fieldvals($event_type_term, 'field_sirius_event_proles', 'tid');
 
-	$form['active'] = array(
+	$form['#tree'] = TRUE;
+	$form['phonebank']['active'] = array(
 		'#type' => 'select',
 		'#title' => t('Active?'),
-		'#options' => array('No' => t('No'), 'Yes' => t('Yes')),
+		'#options' => array(
+			'No' => t('No'), 
+			'Yes' => t('Yes'),
+			'Auto' => t('Auto'),
+		),
 		'#default_value' => $json['phonebank']['active'],
-		'#description' => t('Is the phonebank active -- i.e. is it possible to make calls?'),
+		'#description' => t('Is the phonebank active -- i.e. is it possible to make calls? Select "Auto" to have the phonebank automatically open and close at the scheduled time.'),
+	);
+
+	$form['phonebank']['active_grace_open'] = array(
+		'#type' => 'textfield',
+		'#size' => 5,
+		'#title' => t('Grace Period - Open'),
+		'#description' => t('Enter the grace period for opening the phone bank. Calls can be made this many minutes before the scheduled open time.'),
+    '#states' => array(
+      'visible' => array(
+        array(':input[name="phonebank[active]"]' => array('value' => 'Auto')),
+      )
+    ),
+		'#default_value' => $json['phonebank']['active_grace_open'],
+	);
+
+	$form['phonebank']['active_grace_close'] = array(
+		'#type' => 'textfield',
+		'#size' => 5,
+		'#title' => t('Grace Period - Close'),
+		'#description' => t('Enter the grace period for closing the phone bank. Calls can be made this many minutes after the scheduled close time.'),
+    '#states' => array(
+      'visible' => array(
+        array(':input[name="phonebank[active]"]' => array('value' => 'Auto')),
+      )
+    ),
+		'#default_value' => $json['phonebank']['active_grace_close'],
 	);
 
 	$pstatus_options = sirius_event_participant_role_status_tids($prole_tids);
-	$form['pstatus_tid'] = array(
+	$form['phonebank']['pstatus_tid'] = array(
 		'#type' => 'select',
 		'#title' => t('Status to Call'),
 		'#options' => $pstatus_options,
@@ -44,7 +75,7 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 		'#description' => t('Phone calls will be made to participants with this status.'),
 	);
 
-	$form['caller_intro'] = array(
+	$form['phonebank']['caller_intro'] = array(
 		'#type' => 'textarea',
 		'#title' => 'Introduction for callers',
 		'#default_value' => $json['phonebank']['caller_intro'],
@@ -62,10 +93,9 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 function sirius_node_tab_event_phonebank_settings_form_submit($form, &$form_state) {
 	$event_nid = $form_state['event_nid'];
 	$event_node = node_load($event_nid);
-	$json = json_decode($event_node->field_sirius_json['und'][0]['value'], TRUE);
-	$json['phonebank'] = $form_state['values'];
-	$event_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+	$json = sirius_jsonfield_util_node_json_get($event_node);
+	$json['phonebank'] = $form_state['values']['phonebank'];
+	sirius_jsonfield_util_node_json_set($event_node, $json);
 	node_save($event_node);
 	drupal_set_message(t('Settings saved.'));
-
 }

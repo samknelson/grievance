@@ -19,6 +19,7 @@ function sirius_node_tab_event_phonebank_call_access($event_node) {
 }
 
 function sirius_node_tab_event_phonebank_call($event_node) {
+	$active = sirius_phonebank_active($event_node);
 	$json = sirius_jsonfield_util_node_json_get($event_node);
 	$type_json = sirius_event_type_json($event_node);
 	$prole_tid = $type_json['phonebank']['prole_tid'];
@@ -34,19 +35,43 @@ function sirius_node_tab_event_phonebank_call($event_node) {
 		$lock_type = sirius_event_phonebank_lock_type($event_node);
 		sirius_lock_release_by_uid($lock_type, $user->uid);
 
+		if (!$active) {
+		  if ($event_node->field_sirius_daterepeat['und']) {
+		    $ts_now = time();
+				$opens_in = 999999999;
+		    foreach ($event_node->field_sirius_daterepeat['und'] as $tmp) {
+		      $start_ts = strtotime($tmp['value'] . ' ' . $tmp['timezone_db']);
+		      $end_ts = strtotime($tmp['value2'] . ' ' . $tmp['timezone_db']);
+		      if ($start_ts <= 1 || $end_ts <= 1) { continue; }
+		      if ($start_ts >= $ts_now) {
+		      	$range = $start_ts - $ts_now;
+		      	if ($range && $range < $opens_in) { $opens_in = $range; }
+		      }
+		    }
+		    if ($opens_in > 1 && $opens_in < 999999999) {
+		    	drupal_set_message(t('Opening in: @interval', array('@interval' => format_interval($opens_in))));
+		    }
+		  }
+		}
+
+
 		$json = sirius_jsonfield_util_node_json_get($event_node);
 		$html .= $json['phonebank']['caller_intro'];
-		$html .= '<br /><br />';
+		$html .= '<br />';
+		$html .= sirius_fakerender_field('Current Time:', date('l, F d Y - g:ia'));
+		$html .= '<br />';
+		$html .= sirius_dispatch_view_render_field($event_node, 'field_sirius_daterepeat', 'Phone Bank Open');
+		$html .= '<br />';
+
 		$html .= l(t('Dry Run'), current_path(),  array('query' => array('mode' => 'test'), 'attributes' => array('class' => array('tool-button'))));
-		if ($json['phonebank']['active'] == 'Yes') { 
-			$html .= ' / ';
+		if ($active) { 
 			$html .= l(t('Start Making Calls'), current_path(),  array('query' => array('mode' => 'live'), 'attributes' => array('class' => array('tool-button'))));
 		}
 		return $html;
 	}
 
 	// Get the participant
-	if ($mode == 'live' && $json['phonebank']['active'] == 'Yes') {
+	if ($mode == 'live' && $active == 'Yes') {
 		$phone = sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_tid);
 		if (!$phone) { return 'There are no more calls to make!'; }
 	} 
@@ -96,6 +121,9 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 
 		unset($form_state['values']['pstatus']);
 		unset($form_state['input']['pstatus']);
+
+		unset($form_state['values']['caller']);
+		unset($form_state['input']['caller']);
 	}
 	if ($form_state['triggering_element']['#ajax']['callback'] == 'sirius_node_tab_event_phonebank_call_form_submit_ajax') {
 		// A bit of a kludge. sirius_node_tab_event_phonebank_call_form_submit_ajax() saves the participant with a new pstatus. 
@@ -185,6 +213,31 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 			'#prefix' => '<div id="pstatus_wrap">',
 			'#suffix' => '</div>',
 		);
+
+		$caller_uid = $participant_json['phonebank']['caller']['uid'];
+		global $user;
+		$my_uid = $user->uid;
+		if (!$caller_uid || ($caller_uid == $my_uid)) {
+			$form['caller'] = array(
+				'#type' => 'hidden',
+				'#name' => 'caller',
+				'#value' => $caller_uid,
+			);
+		} else {
+			$caller_user = user_load($caller_uid);
+			$form['caller'] = array(
+				'#type' => 'select',
+				'#options' => array(
+					$user->uid => $user->name,
+					$caller_uid => $caller_user->name,
+				),
+				'#title' => 'Called by',
+				'#prefix' => '<div id="caller_wrap">',
+				'#suffix' => '</div>',
+				'#ajax' => array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax'),
+				'#default_value' => $caller_uid,
+			);
+		}
 	}
 
 	$form['submit'] = array(
@@ -220,9 +273,34 @@ function sirius_node_tab_event_phonebank_call_form_submit_ajax($form, $form_stat
 	$participant_node = node_load($participant_nid);
 	$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
 	sirius_jsonfield_util_results_set($participant_json, 'survey', $form_state['values']['survey']);
-	sirius_jsonfield_util_node_json_set($participant_node, $participant_json);	
-	sirius_jsonfield_log($participant_node, 'survey', 'Survey submitted.');	
+
+	// Set the caller;
+	$old_caller = $participant_json['phonebank']['caller'];
+	$new_caller_uid = $form_state['values']['caller'];
+	if ($new_caller_uid && ($new_caller_uid != $old_caller['uid'])) {
+		$new_caller_user = user_load($new_caller_uid);
+		$new_caller = array(
+			'uid' => $new_caller_uid,
+			'name' => $new_caller_user->name,
+			'mail' => $new_caller_user->mail,
+			'phone' => $new_caller_user->field_sirius_phone['und'][0]['value'],
+		);
+		$participant_json['phonebank']['caller'] = $new_caller;
+	}
+	if (!$participant_json['phonebank']['first_call']) {
+		$participant_json['phonebank']['first_call'] = array(
+			'ts' => time(),
+			'date' => date('l, F d Y - g:ia'),
+		);
+	}
+	$participant_json['phonebank']['last_call'] = array(
+		'ts' => time(),
+		'date' => date('l, F d Y - g:ia'),
+	);
 	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $form_state['values']['pstatus'];
+
+	sirius_jsonfield_util_node_json_set($participant_node, $participant_json);
+	// sirius_jsonfield_log($participant_node, 'survey', 'Survey submitted.');
 	node_save($participant_node);
 
 	// Set linked fields, formerly known as "candidate-issue"

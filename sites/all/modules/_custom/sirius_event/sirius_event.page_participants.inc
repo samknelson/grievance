@@ -40,6 +40,7 @@ function sirius_node_tab_event_participants_current($event_node) {
 
 			foreach (array_keys($proles) as $prole) {
 				$prole_term = taxonomy_term_load($prole);
+				$is_first = TRUE;
 				foreach ($rule['widget'] as $widget) {
 					$html .= l($widgets[$widget] . ': ' . $prole_term->name, current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => array('delta' => $delta, 'widget' => $widget, 'prole' => $prole))); 
 				}
@@ -66,7 +67,7 @@ function sirius_node_tab_event_participants_current($event_node) {
 
 function sirius_node_tab_event_participants_current_rule($event_node, $rule, $widget, $prole) {
 	$prole_term = taxonomy_term_load($prole);
-	drupal_set_title(drupal_get_title() . ': ' . $prole_term->name);
+	drupal_set_title(drupal_get_title() . ': ' . $rule['name'] . ' - ' . $widget);
 	if ($widget == 'view') {
 		return views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
 	} else if ($widget == 'status') {
@@ -79,6 +80,8 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 		return sirius_node_tab_event_participants_summary($event_node->nid, $prole);
 	} else if ($widget == 'attendance') {
 		return sirius_event_page_participant_attendance($event_node, $rule);
+	} else if ($widget == 'certifications') {
+		return sirius_event_page_participant_certifications($event_node, $rule);
 	} else {
 		return t('Widget not found: @widget.', array('@widget' => $widget));;
 	}
@@ -167,6 +170,8 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$pstatus_names = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
 
 	$event_node = node_load($form_state['event_nid']);
+	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+	$is_phonebank = sirius_event_phonebank_enabled_type($event_type_term);
 
 	$participant_definition_node = node_load($event_node->field_sirius_json_definition['und'][0]['target_id']);
 	if (!$participant_definition_node) { drupal_set_message("No survey!"); return array(); }
@@ -178,10 +183,17 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
   $contact_paths = array_values(sirius_jsonfield_util_form_list_paths($contact_definition_form, TRUE));
 
-
 	$header = array('Participant ID', 'Contact ID', 'Contact Name', 'Role', 'Status');
 	foreach ($contact_paths as $path) { $header[] = $path; }
 	foreach ($participant_paths as $path) { $header[] = $path; }
+	if ($is_phonebank) {
+		$header[] = "Caller UID";
+		$header[] = "Caller Name";
+		$header[] = "Caller Mail";
+		$header[] = "First Call";
+		$header[] = "Last Call";
+	}
+
 
 	$sql_args = array();
 	$sql_args[':event_nid'] = $event_node->nid;
@@ -243,6 +255,13 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 				array('raw' => TRUE)
 			);
 		}
+
+		$row[] = $participant_json['phonebank']['caller']['uid'];
+		$row[] = $participant_json['phonebank']['caller']['name'];
+		$row[] = $participant_json['phonebank']['caller']['mail'];
+		$row[] = $participant_json['phonebank']['first_call']['date'];
+		$row[] = $participant_json['phonebank']['last_call']['date'];
+
 		if ($output == 'csv') { 
 			fputcsv($fp, $row);
 		} else {

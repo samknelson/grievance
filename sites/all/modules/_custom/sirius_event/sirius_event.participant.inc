@@ -64,3 +64,36 @@ function sirius_event_participants_by_contact($contact_nid, $event_type_tids = N
 
   return $by_type;
 }
+
+function sirius_event_participant_list_by_rule($event_nid, $rule) {
+	$sql_args = array();
+	$sql_args[':event_nid'] = $event_nid;
+	$sql = "select node.nid as participant_nid ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_event_participant' ";
+	$sql .= "and field_sirius_event_target_id = :event_nid ";
+	if ($rule['participants']) {
+		$sql .= "and ( ";
+		$delta = 0;
+		foreach ($rule['participants'] as $tmp) {
+			list ($prole_tid, $pstatus_tid) = explode('|', $tmp);
+			if ($delta > 0) { $sql .= ' or '; }
+			$sql .= " (field_sirius_event_prole_tid = :prole_tid_$delta and field_sirius_event_pstatus_tid = :pstatus_tid_$delta ) ";
+			$sql_args[":prole_tid_$delta"] = $prole_tid;
+			$sql_args[":pstatus_tid_$delta"] = $pstatus_tid;
+			++$delta;
+		}
+		$sql .= ') ';
+	}
+
+	$stmt = db_query($sql, $sql_args);
+	$participant_nids = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$participant_nids[] = $hr['participant_nid'];
+	}
+	return $participant_nids;
+}
+

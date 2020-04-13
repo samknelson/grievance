@@ -2,11 +2,11 @@
 
 function sirius_node_tab_event_participant_json_access($participant_node) {
 	$event_nid = $participant_node->field_sirius_event['und'][0]['target_id'];
-	if (!$event_nid) { drupal_set_message("No event."); return FALSE; }
+	if (!$event_nid) { return FALSE; }
 	$event_node = node_load($event_nid);
 	$survey_nid = $event_node->field_sirius_json_definition['und'][0]['target_id'];
 	$survey_node = node_load($survey_nid);
-	if (!$survey_node) { drupal_set_message("No survey."); return FALSE; }
+	if (!$survey_node) { return FALSE; }
 	return TRUE;
 }
 

@@ -23,6 +23,29 @@ function sirius_event_term_tab_class_form($form, &$form_state, $event_type_term)
 		'#default_value' => $class_json['enabled'],
 	);
 
+
+
+	if (function_exists('sirius_training_certifications_enabled') && sirius_training_certifications_enabled()) {
+		$certification_definitions = sirius_training_certification_definitions();
+		if ($certification_definitions) {
+			$form['certifications'] = array(
+				'#type' => 'fieldset',
+				'#title' => t('Certifications'),
+			);
+
+			$options = array();
+			foreach ($certification_definitions as $certification_definition_nid => $certification_definition_node) {
+				$options[$certification_definition_nid] = $certification_definition_node->title;
+			}
+			$form['certifications']['available'] = array(
+				'#type' => 'select',
+				'#multiple' => TRUE,
+				'#options' => $options,
+			);
+		}
+		if ($class_json['certifications']['available']) { $form['certifications']['available']['#default_value'] = $class_json['certifications']['available']; }
+	}
+
 	$form['skills'] = array(
 		'#type' => 'fieldset',
 		'#title' => t('Skills'),

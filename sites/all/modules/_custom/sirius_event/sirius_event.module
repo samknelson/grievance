@@ -18,6 +18,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_worker_byname.inc";
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_attendance.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_certifications.inc';
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_landing.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.participant_definition.inc";
@@ -27,6 +28,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_info.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participants.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_json.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_comments.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_schedule.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_body.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_register.inc";
@@ -50,6 +52,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_phonebank.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_bullpen.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_class.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_materials.inc";
 
 function sirius_event_type_json($event_node) {
   $event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
@@ -60,18 +63,23 @@ function sirius_event_participant_nid_from_user($event_nid, $uid = NULL) {
   global $user;
   if (!$uid) { $uid = $user->uid; }
   if (!$uid) { return NULL; }
-  $user_full = user_load($uid);
-  $contact_nid = $user_full->field_sirius_contact['und'][0]['target_id'];
-  if (!$contact_nid) { return NULL; }
 
-  $query = new EntityFieldQuery;
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'sirius_event_participant');
-  $query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
-  $query->fieldCondition('field_sirius_event', 'target_id', $event_nid);
-  $stmt = $query->execute();
-  if (!$stmt['node']) { return NULL; }
-  return array_keys($stmt['node'])[0];
+  $cache = &drupal_static(__FUNCTION__);
+  if (!isset($cache[$event_nid][$uid])) {
+    $user_full = user_load($uid);
+    $contact_nid = $user_full->field_sirius_contact['und'][0]['target_id'];
+    if (!$contact_nid) { return NULL; }
+
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'sirius_event_participant');
+    $query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
+    $query->fieldCondition('field_sirius_event', 'target_id', $event_nid);
+    $stmt = $query->execute();
+    if ($stmt['node']) { $cache[$event_nid][$uid] = array_keys($stmt['node'])[0]; } else { $cache[$event_nid][$uid] = NULL; }
+  }
+
+  return $cache[$event_nid][$uid];
 }
 
 function sirius_event_duration_options($event_type_term = NULL) {
@@ -87,7 +95,8 @@ function sirius_event_duration_options($event_type_term = NULL) {
       }
     } else {
       for ($min = 0; $min < 60; $min += 5) {
-        $results[60*$min] = sirius_event_duration_format($key);
+        $key = 60*$min;
+        $results[$event_type_tid][$key] = sirius_event_duration_format($key);
       }
 
       for ($hour = 1; $hour <= 12; ++$hour) {
@@ -113,6 +122,7 @@ function sirius_event_duration_round($seconds) {
 }
 
 function sirius_event_duration_format($seconds) {
+  if (!$seconds) { return '0 minutes'; }
   $duration = '';
   $days = floor($seconds / 86400);
   $seconds -= $days * 86400;
@@ -135,6 +145,19 @@ function sirius_event_duration_format($seconds) {
   }
   return $duration;
 }
+
+function sirius_event_duration_format_hours($seconds) {
+  $hours = floor($seconds / 3600);
+  $seconds -= $hours * 3600;
+  $minutes = floor($seconds / 60);
+
+  $duration = $hours . ' hours';
+  if($minutes > 0) {
+    $duration .= ' ' . $minutes . ' minutes';
+  }
+  return $duration;
+}
+
 
 /**
  * Implements hook_node_insert

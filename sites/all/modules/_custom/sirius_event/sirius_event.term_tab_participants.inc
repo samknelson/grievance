@@ -8,6 +8,7 @@ function sirius_event_participants_widgets() {
 		'reports' => t('Download reports'),
 		'summary' => t('View a Summary'),
 		'attendance' => t('Attendance Sheets'),
+		'certifications' => t('Certifications'),
 	);
 }
 

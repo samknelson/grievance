@@ -1,5 +1,10 @@
 <?php
 
+function sirius_node_tab_event_participant_definition_callerid_access($definition_node) {
+	if ($definition_node->field_sirius_type['und'][0]['value'] != 'node:sirius_event_participant:field_sirius_json') { return FALSE; }
+	return TRUE;
+}
+
 function sirius_node_tab_event_participant_definition_callerid($definition_node) {
 	return drupal_get_form('sirius_node_tab_event_participant_definition_callerid_form', $definition_node->nid);
 }

@@ -20,6 +20,10 @@ function sirius_node_tab_event_participant_definition_exim($definition_node) {
 	return drupal_get_form('sirius_json_definition_exim_form', $definition_node->nid);
 }
 
+function sirius_node_tab_event_participant_definition_signatures($definition_node) {
+	return drupal_get_form('sirius_json_definition_signatures_form', $definition_node->nid);
+}
+
 function sirius_event_instance_participant_definition($event_node) {
 	drupal_goto(current_path() . '/select');
 }

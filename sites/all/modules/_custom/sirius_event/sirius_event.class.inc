@@ -34,3 +34,4 @@ function sirius_event_get_class_types() {
 
 	return $class_type_terms;
 }
+

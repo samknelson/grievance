@@ -5,11 +5,17 @@ function sirius_event_register_worker_byname_form($form, &$form_state, $event_no
   $form_state['rule'] = $rule;
 
   // $open = sirius_dispatch_bullpen_signin_open($job_node, FALSE);
+  $form['#tree'] = TRUE; 
   $form['worker'] = array(
     '#title' => t('Register a Worker'),
     '#type' => 'textfield',
     '#autocomplete_path' => 'sirius/ajax/bullpen-quicksearch',
     '#description' => t('Enter or scan the worker\'s dispatch ID, SSN, or name.'),
+   );
+
+  $form['participant']['comments'] = array(
+    '#title' => t('Comments'),
+    '#type' => 'textarea',
    );
  
   $form['submit'] = array(
@@ -55,7 +61,7 @@ function sirius_event_register_worker_byname_form_submit($form, &$form_state) {
     drupal_set_messge(t('The event is misconfigured; no prole or pstatus set.'), 'warning');
   }
 
-  $result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
+  $result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid, $form_state['values']['participant']);
   if ($result['success']) { drupal_set_message(t('The worker has been registered.')); } else { drupal_set_message($result['msg'], 'error'); }
 }
 
