@@ -9,9 +9,13 @@ function sirius_esignature_init() {
 	drupal_add_css('sites/all/libraries/jquery_signature/css/jquery.signature.css');
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.esignature.css');
 
-	$settings_for_js = array();
+	$settings_for_js = array(
+		'popup_width' => 600,
+		'popup_height' => 200,
+	);
+
 	// $settings_for_js['fields'] = $fields;
-	drupal_add_js(array('esignature' => $settings_for_js), 'setting');
+	drupal_add_js(array('sirius_esignature' => $settings_for_js), 'setting');
 }
 
 /**
@@ -35,16 +39,28 @@ function sirius_esignature_render($esignature, $format, $nid, $which) {
 		$html .= '<div class="sirius_esignature_render">';
 		if ($format == 'full') {
 			$html .= $esignature['statement'];
+			$html .= '<br />';
 			$html .= "<img src=\"/sirius/esignature/stream/$nid/$which\" class=\"sirius_esignature_render_img_full\" />";
 			$html .= '<br />';
 			$html .= 'IP: ' . $esignature['ip'] . '<br />';
 			$html .= 'Date: ' . $esignature['date_str'] . '<br />';
 			$html .= 'User: ' . $esignature['user_uid'] . ' / ' . $esignature['user_name'] . ' / ' . $esignature['user_mail'] . '<br />';
 		} else {
+			$html .= "<a href=\"#\" class=\"sirius_esignature_popup_trigger\">";
 			$html .= "<img src=\"/sirius/esignature/stream/$nid/$which\" class=\"sirius_esignature_render_img\" />";
+			$html .= "</a>";
 			$html .= '<div class="sirius_esignature_render_date">';
 			$html .= $esignature['date_str'];
 			$html .= '</div>';
+
+			$html .= '<div style="display:none" class="sirius_esignature_popup_overlay"></div>';
+			$html .= '<div style="display:none" class="sirius_esignature_popup_wrap">';
+			$html .= '<div class="sirius_esignature_popup_contents">';
+			$html .= sirius_esignature_render($esignature, 'full', $nid, $which);
+			$html .= '</div>';
+			$html .= '<div class="sirius_esignature_popup_close"></div>';
+			$html .= '</div>';
+
 		}
 		$html .= '</div>';
 	} else {
