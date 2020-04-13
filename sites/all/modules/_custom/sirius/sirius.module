@@ -50,6 +50,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grieva
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance_log.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_materials.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_letter.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contacts.inc';
@@ -611,6 +612,11 @@ function sirius_file_download_access($file_item, $entity_type, $entity) {
   if ($entity_type == 'node' && $entity->type == 'sirius_worker' && preg_match('/private:\/\/sirius_headshot/', $file_item['uri'])) {
     if (user_access('sirius dispatch employer')) { return TRUE; }
   }
+
+  // Materials get treated specially
+  if ($entity_type == 'node' && $entity->type == 'sirius_log' && $entity->field_sirius_category['und'][0]['value'] == 'material') {
+    return sirius_materials_download_access($file_item, $entity_type, $entity);
+  }
 }
 
 /**
@@ -719,4 +725,14 @@ function sirius_quicknav($links) {
   $html .= '</div>';
 
   return $html;
+}
+
+/**
+ * Copied from drupal_html_to_text. 
+ */
+
+function sirius_text_to_html($string) {
+  $string = htmlentities($string);
+  $string = nl2br($string);
+  return $string;
 }
