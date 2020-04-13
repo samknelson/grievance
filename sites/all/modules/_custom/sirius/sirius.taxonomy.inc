@@ -275,8 +275,46 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_work_status']['view'] = 'sirius_taxonomy';
     $settings['sirius_work_status']['display'] = 'block_8';
     $settings['sirius_work_status']['multidomain'] = 'No';
+    $settings['sirius_ledger_type']['view'] = 'sirius_taxonomy';
+    $settings['sirius_ledger_type']['display'] = 'block';
+    $settings['sirius_ledger_type']['multidomain'] = 'Yes';
   }
 
   if ($vocabulary_machine_name == 'all') { return $settings; }
   return $settings[$vocabulary_machine_name];
 }
+
+/**
+ * Sometimes we want to attach things (like a log entry) to a taxonomy term. 
+ * But this is hard, because things like log entries can only reference one type of entity, i.e. a node.
+ * So we maintain an as-needed proxy for each taxonomy term. This is just an inaccessible system-level node which references the term in question.
+ */
+
+function sirius_taxonomy_proxy($tid) {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_term_proxy');
+  $query->fieldCondition('field_sirius_term_proxy', 'target_id', $tid);
+  $query->propertyOrderBy('created', 'desc');
+  $query->range(0,1);
+  $stmt = $query->execute();
+  if ($stmt['node']) { return node_load(array_keys($stmt['node'])[0]); }
+
+  global $user;
+  $node = new stdClass();
+  $node->type = 'sirius_term_proxy';
+  $node->title = 'Proxy: ' . $tid;
+  $node->no_recurse = TRUE;
+  $node->language = LANGUAGE_NONE;
+  $node->uid = $user->uid;
+  $node->status = 1;
+  $node->promote = 0;
+  $node->comment = 0;
+  $node->field_sirius_term_proxy['und'][0]['target_id'] = $tid;
+  $node = node_submit($node);
+  node_object_prepare($node);
+  node_save($node);
+  return $node;
+}
+
+function sirius_node_access_term_proxy($node, $op, $account) { return FALSE; }
