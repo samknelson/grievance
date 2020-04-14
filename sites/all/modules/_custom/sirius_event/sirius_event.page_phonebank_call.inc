@@ -300,7 +300,6 @@ function sirius_node_tab_event_phonebank_call_form_submit_ajax($form, $form_stat
 	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $form_state['values']['pstatus'];
 
 	sirius_jsonfield_util_node_json_set($participant_node, $participant_json);
-	// sirius_jsonfield_log($participant_node, 'survey', 'Survey submitted.');
 	node_save($participant_node);
 
 	// Set linked fields, formerly known as "candidate-issue"

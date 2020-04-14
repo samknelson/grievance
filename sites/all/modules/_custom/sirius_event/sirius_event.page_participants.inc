@@ -236,6 +236,12 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$stmt = db_query($sql, $sql_args);
 	$count = 0;
 	while ($hr = $stmt->fetchAssoc()) {
+		$contact_json = json_decode($hr['contact_json'], TRUE);
+		$contact_results_json = sirius_jsonfield_util_results_get($contact_json, 'default');
+
+		$participant_json = json_decode($hr['participant_json'], TRUE);
+		$participant_results_json = sirius_jsonfield_util_results_get($participant_json, 'survey');
+
 		$row = array();
 		$row[] = $hr['participant_nid'];
 		$row[] = $hr['contact_nid'];
@@ -251,12 +257,6 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 			$row[] = $participant_json['phonebank']['first_call']['date'];
 			$row[] = $participant_json['phonebank']['last_call']['date'];
 		}
-
-		$contact_json = json_decode($hr['contact_json'], TRUE);
-		$contact_results_json = sirius_jsonfield_util_results_get($contact_json, 'default');
-
-		$participant_json = json_decode($hr['participant_json'], TRUE);
-		$participant_results_json = sirius_jsonfield_util_results_get($participant_json, 'survey');
 
 		foreach ($contact_paths as $path) { 
 			$row[] = sirius_jsonfield_util_render_value(
