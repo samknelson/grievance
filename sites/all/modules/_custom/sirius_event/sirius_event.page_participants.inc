@@ -75,7 +75,7 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 	} else if ($widget == 'contact') {
 		return views_embed_view('sirius_event_participants', 'block', $event_node->nid, $prole);
 	} else if ($widget == 'reports') {
-		return sirius_node_tab_event_participants_reports($event_node->nid);
+		return sirius_node_tab_event_participants_reports($event_node->nid, $prole);
 	} else if ($widget == 'summary') { 
 		return sirius_node_tab_event_participants_summary($event_node->nid, $prole);
 	} else if ($widget == 'attendance') {
@@ -131,12 +131,13 @@ function sirius_event_contact_search($event_nid, $participant_role_tid, $string)
   drupal_json_output($matches);
 }
 
-function sirius_node_tab_event_participants_reports($event_nid) {
-	return drupal_get_form('sirius_node_tab_event_participants_reports_form', $event_nid);
+function sirius_node_tab_event_participants_reports($event_nid, $prole_tid) {
+	return drupal_get_form('sirius_node_tab_event_participants_reports_form', $event_nid, $prole_tid);
 }
 
-function sirius_node_tab_event_participants_reports_form($form, &$form_state, $event_nid) {
+function sirius_node_tab_event_participants_reports_form($form, &$form_state, $event_nid, $prole_tid = NULL) {
 	$form_state['event_nid'] = $event_nid;
+	if ($prole_tid) { $form_state['prole_tid'] = $prole_tid; }
 	$event_node = node_load($event_nid);
 
 	$form['intro'] = array('#markup' => '<div class="sirius_form_intro">' . t('Click below to download the list of all participants, including all custom fields and all survey responses.') . '</div>');
@@ -165,6 +166,7 @@ function sirius_node_tab_event_participants_reports_form($form, &$form_state, $e
 
 function sirius_node_tab_event_participants_reports_form_submit($form, &$form_state) {
 	$output = $form_state['values']['output'];
+	$prole_tid = $form_state['prole_tid'];
 
 	$prole_names = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'name');
 	$pstatus_names = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
@@ -215,6 +217,10 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$sql .= "left join field_data_field_sirius_json contact_json on contact_json.entity_type = 'node' and contact_json.entity_id = contact_node.nid ";
 	$sql .= "where node.type = 'sirius_event_participant' ";
 	$sql .= "and field_sirius_event_target_id = :event_nid ";
+	if ($prole_tid) {
+		$sql .= "and field_sirius_event_prole_tid = :prole_tid ";
+		$sql_args[':prole_tid'] = $prole_tid;
+	}
 
 	$rows = array();
 	if ($output == 'csv') {
