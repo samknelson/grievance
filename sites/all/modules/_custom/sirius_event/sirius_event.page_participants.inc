@@ -185,7 +185,7 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
   $contact_paths = array_values(sirius_jsonfield_util_form_list_paths($contact_definition_form, TRUE));
 
-	$header = array('Participant ID', 'Contact ID', 'Contact Name', 'Role', 'Status');
+	$header = array('Participant ID', 'Contact ID', 'Contact Name', 'Role', 'Status', 'Phone');
 	if ($is_phonebank) {
 		$header[] = "Caller UID";
 		$header[] = "Caller Name";
@@ -206,7 +206,8 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$sql .= "contact_node.title as contact_title, ";
 	$sql .= "contact_json.field_sirius_json_value as contact_json, ";
 	$sql .= "field_sirius_event_prole_tid as prole_tid, ";
-	$sql .= "field_sirius_event_pstatus_tid as pstatus_tid ";
+	$sql .= "field_sirius_event_pstatus_tid as pstatus_tid, ";
+	$sql .= "field_sirius_phone_value as phone ";
 	$sql .= "from node ";
 	$sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
@@ -215,6 +216,7 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
 	$sql .= "left join node contact_node on field_sirius_contact_target_id = contact_node.nid ";
 	$sql .= "left join field_data_field_sirius_json contact_json on contact_json.entity_type = 'node' and contact_json.entity_id = contact_node.nid ";
+	$sql .= "left join field_data_field_sirius_phone contact_phone on contact_phone.entity_type = 'node' and contact_phone.entity_id = contact_node.nid ";
 	$sql .= "where node.type = 'sirius_event_participant' ";
 	$sql .= "and field_sirius_event_target_id = :event_nid ";
 	if ($prole_tid) {
@@ -240,6 +242,7 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 		$row[] = $hr['contact_title'];
 		$row[] = $prole_names[$hr['prole_tid']];
 		$row[] = $pstatus_names[$hr['pstatus_tid']];
+		$row[] = $hr['phone'];
 
 		if ($is_phonebank) {
 			$row[] = $participant_json['phonebank']['caller']['uid'];
