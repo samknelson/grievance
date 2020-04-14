@@ -1,7 +1,12 @@
 <?php
 
 function sirius_event_page_participant_certifications($event_node, $rule) {
-	sirius_esignature_init();
+	return drupal_get_form('sirius_event_page_participant_certifications_form', $event_node, $rule);
+}
+
+function sirius_event_page_participant_certifications_form($form, &$form_state, $event_node, $rule) {
+	$form_state['event_nid'] = $event_node->nid;
+	$form_state['rule'] = $rule;
 
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
@@ -10,36 +15,11 @@ function sirius_event_page_participant_certifications($event_node, $rule) {
 	if (!$certification_definition_nodes) { return 'No certifications found for this event type.'; }
 
 	// Get the participants
-	$sql_args = array();
-	$sql_args[':event_nid'] = $event_node->nid;
-	$sql = "select node.nid as participant_nid ";
-	$sql .= "from node ";
-	$sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
-	$sql .= "where node.type = 'sirius_event_participant' ";
-	$sql .= "and field_sirius_event_target_id = :event_nid ";
-	$sql .= "and ( ";
-	$delta = 0;
-	foreach ($rule['participants'] as $tmp) {
-		list ($prole_tid, $pstatus_tid) = explode('|', $tmp);
-		if ($delta > 0) { $sql .= ' or '; }
-		$sql .= " (field_sirius_event_prole_tid = :prole_tid_$delta and field_sirius_event_pstatus_tid = :pstatus_tid_$delta ) ";
-		$sql_args[":prole_tid_$delta"] = $prole_tid;
-		$sql_args[":pstatus_tid_$delta"] = $pstatus_tid;
-		++$delta;
-	}
-	$sql .= ') ';
-
-	$stmt = db_query($sql, $sql_args);
-	$participant_nids = array();
-	while ($hr = $stmt->fetchAssoc()) {
-		$participant_nids[] = $hr['participant_nid'];
-	}
-
-
+	$participant_nids = sirius_event_participant_list_by_rule($event_node->nid, $rule);
 	$participant_nodes = node_load_multiple($participant_nids);
+
 	$header = array('Name', 'Badge',);
+
 	foreach ($certification_definition_nodes as $certification_definition_nid => $certification_definition_node) {
 		$header[] = $certification_definition_node->title;
 		$header[] = t('Tools');
@@ -56,17 +36,7 @@ function sirius_event_page_participant_certifications($event_node, $rule) {
 		$row[] = $worker_node->field_sirius_id['und'][0]['value'];
 
 		// Load all the certifications for this participant
-		$query = new EntityFieldQuery();
-	  $query->entityCondition('entity_type', 'node');
-	  $query->entityCondition('bundle', 'sirius_log');
-	  $query->fieldCondition('field_sirius_category', 'value', 'worker:certification');
-	  $query->fieldCondition('field_sirius_log_handler', 'target_id', $participant_nid);
-	  $query->propertyOrderBy('created');
-	  $stmt = $query->execute();
-	  $certification_nids = array();
-	  if ($stmt['node']) { $certification_nids = array_keys($stmt['node']); }
-	  $certification_nodes = node_load_multiple($certification_nids);
-
+		$certification_nodes = sirius_training_certifications_fetch_by_participant($participant_nid);
 	  $certification_nodes_by_definition = array();
 	  foreach ($certification_nodes as $certification_nid => $certification_node) {
 	  	$handler_nodes = node_load_multiple(sirius_fieldvals($certification_node, 'field_sirius_log_handler', 'target_id'));
@@ -85,12 +55,10 @@ function sirius_event_page_participant_certifications($event_node, $rule) {
 				$paths['node/' . $certification_node->nid . '/sirius_log_tc/certification_edit'] = 'Edit';
 				$paths['node/' . $certification_node->nid . '/sirius_log_tc/certification_signatures'] = 'Signatures';
 				$paths['node/' . $certification_node->nid . '/sirius_log_tc/certification_grant'] = 'Grant';
-				$title = 'Complete';
-				$title .= ' - ';
-				$title .= $certification_node->field_sirius_type['und'][0]['value'];
+				$title = $certification_node->field_sirius_type['und'][0]['value'];
 			} else {
 				$certification_node = '';
-				$title = 'Incomplete';
+				$title = '[incomplete]';
 				$paths['sirius/training/certification/' . $worker_node->nid . '/' . $certification_definition_nid . '/' . $participant_node->nid] = 'Add';
 			}
 
@@ -105,9 +73,57 @@ function sirius_event_page_participant_certifications($event_node, $rule) {
 			$row[] = $tools;
 		}
 
-		$rows[] = $row;
+		$options[$participant_nid] = $row;
 	}
-	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
 
-	return $html;
+	$form['participant_nids'] = array(
+		'#type' => 'tableselect',
+		'#title' => 'Particicipants',
+		'#header' => $header,
+		'#options' => $options,
+		'#required' => TRUE,
+	);
+
+
+	$confirm_html = '<p>';
+	$confirm_html .= t('When the button below is clicked, the following actions will be taken on all the selected participants:');
+	$confirm_html .= '<ul>';
+	$confirm_html .= '<li>' . t('All participants will be set to the status: ') . '<strong>' . 'Passed' . '</strong>' . '</li>';
+	$confirm_html .= '<li>' . t('All certifications for each selected participant will be granted') . '</li>';
+	$confirm_html .= '<li>' . t('All the skill associated with the granted certifications will be added or renewed') . '</li>';
+	$confirm_html .= '</ul>';
+
+	$form['#tree'] = TRUE;
+	$form['confirm'] = array(
+		'#type' => 'checkbox', 
+		'#required' => TRUE,
+		'#prefix' => $confirm_html,
+		'#title' => t('Yes, perform all these actions on the selected participants.'),
+	);
+
+	$form['submit'] = array(
+		'#type' => 'submit', 
+		'#value' => t('Submit'),
+	);
+
+	return $form;
+}
+
+function sirius_event_page_participant_certifications_form_submit($form, &$form_state) {
+	$participant_nids = array_values($form_state['values']['participant_nids']);
+
+	foreach ($participant_nids as $participant_nid) {
+		if (!$participant_nid) { continue; }
+		$certification_nodes = sirius_training_certifications_fetch_by_participant($participant_nid);
+		foreach ($certification_nodes as $certification_nid => $certification_node) {
+			$result = sirius_training_certification_grant($certification_node);
+			if ($result['success']) { 
+				// drupal_set_message($result['msg']);
+			} else { 
+				drupal_set_message($result['msg'], 'warning');
+			}
+		}
+	}
+
+	drupal_set_message(sirius_minilog_render_html());
 }

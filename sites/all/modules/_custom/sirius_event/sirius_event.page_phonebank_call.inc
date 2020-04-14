@@ -221,7 +221,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 			$form['caller'] = array(
 				'#type' => 'hidden',
 				'#name' => 'caller',
-				'#value' => $caller_uid,
+				'#value' => $my_uid,
 			);
 		} else {
 			$caller_user = user_load($caller_uid);

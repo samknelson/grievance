@@ -184,8 +184,6 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
   $contact_paths = array_values(sirius_jsonfield_util_form_list_paths($contact_definition_form, TRUE));
 
 	$header = array('Participant ID', 'Contact ID', 'Contact Name', 'Role', 'Status');
-	foreach ($contact_paths as $path) { $header[] = $path; }
-	foreach ($participant_paths as $path) { $header[] = $path; }
 	if ($is_phonebank) {
 		$header[] = "Caller UID";
 		$header[] = "Caller Name";
@@ -194,6 +192,8 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 		$header[] = "Last Call";
 	}
 
+	foreach ($contact_paths as $path) { $header[] = $path; }
+	foreach ($participant_paths as $path) { $header[] = $path; }
 
 	$sql_args = array();
 	$sql_args[':event_nid'] = $event_node->nid;
@@ -235,6 +235,14 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 		$row[] = $prole_names[$hr['prole_tid']];
 		$row[] = $pstatus_names[$hr['pstatus_tid']];
 
+		if ($is_phonebank) {
+			$row[] = $participant_json['phonebank']['caller']['uid'];
+			$row[] = $participant_json['phonebank']['caller']['name'];
+			$row[] = $participant_json['phonebank']['caller']['mail'];
+			$row[] = $participant_json['phonebank']['first_call']['date'];
+			$row[] = $participant_json['phonebank']['last_call']['date'];
+		}
+
 		$contact_json = json_decode($hr['contact_json'], TRUE);
 		$contact_results_json = sirius_jsonfield_util_results_get($contact_json, 'default');
 
@@ -255,12 +263,6 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 				array('raw' => TRUE)
 			);
 		}
-
-		$row[] = $participant_json['phonebank']['caller']['uid'];
-		$row[] = $participant_json['phonebank']['caller']['name'];
-		$row[] = $participant_json['phonebank']['caller']['mail'];
-		$row[] = $participant_json['phonebank']['first_call']['date'];
-		$row[] = $participant_json['phonebank']['last_call']['date'];
 
 		if ($output == 'csv') { 
 			fputcsv($fp, $row);

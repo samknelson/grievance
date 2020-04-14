@@ -13,6 +13,9 @@ function sirius_event_term_tab_class_form($form, &$form_state, $event_type_term)
 	$class_json = $json['class'];
 	$skill_options = sirius_taxonomy_load('sirius_skill', 'tid', 'name'); 
 
+	$prole_tids = sirius_fieldvals($event_type_term, 'field_sirius_event_proles', 'tid');
+	$pstatus_options = sirius_event_participant_role_status_tids($prole_tids);
+
 	$form['#tree'] = TRUE;
 
 	$form['enabled'] = array(
@@ -41,9 +44,17 @@ function sirius_event_term_tab_class_form($form, &$form_state, $event_type_term)
 				'#type' => 'select',
 				'#multiple' => TRUE,
 				'#options' => $options,
+				'#title' => t('Certifications available for this class'),
 			);
+			if ($class_json['certifications']['available']) { $form['certifications']['available']['#default_value'] = $class_json['certifications']['available']; }
+
+			$form['certifications']['pstatus_passed'] = array(
+				'#type' => 'select',
+				'#options' => $pstatus_options,
+				'#title' => t('When granting a certification, set the participant status to'),
+			);
+			if ($class_json['certifications']['pstatus_passed']) { $form['certifications']['pstatus_passed']['#default_value'] = $class_json['certifications']['pstatus_passed']; }
 		}
-		if ($class_json['certifications']['available']) { $form['certifications']['available']['#default_value'] = $class_json['certifications']['available']; }
 	}
 
 	$form['skills'] = array(
