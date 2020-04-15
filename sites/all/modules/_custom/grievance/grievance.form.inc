@@ -38,6 +38,33 @@ function grievance_form_no_more_required_recursive(&$form) {
   }
 }
 
+
+
+function grievance_node_validate($node, $form, &$form_state) {
+  // Don't run on ajax callbacks
+  if (!$form_state['submitted']) { return; }
+
+  // For grievance nodes only
+  if ($node->type == 'grievance') {
+
+    // For insert only
+    if (!$node->nid) {
+
+      // Require a category
+      $status_tid = $node->field_grievance_status['und'][0]['tid'];
+      if (!$status_tid) {
+        form_set_error('field_grievance_status', 'Please select a status.');
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
 function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
   //
   // Damn limit validation problme
