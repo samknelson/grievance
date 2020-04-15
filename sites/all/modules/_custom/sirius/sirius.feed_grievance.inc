@@ -174,6 +174,7 @@ function sirius_feed_grievance_row_process($feed_node, $info, $data, $row) {
   $comments = $row['raw'];
   $grievance_node->field_grievance_comments['und'][0]['value'] = $comments;
 
+  $grievance_node = node_submit($grievance_node);
   node_save($grievance_node);
 
   if ($row['created']) { 

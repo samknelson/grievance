@@ -116,6 +116,8 @@ function sirius_feed_grievance_log_row_process($feed_node, $info, $data, $row) {
   $grievance_log_node->title = $term->name;
 
   $ts = strtotime($row['created']);
+  if (!$ts || ($ts < 10)) { $ts = time(); }
+
   $grievance_log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s', $ts);
 
   $grievance_log_node->body['und'][0]['value'] = $row['body'];
