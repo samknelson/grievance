@@ -783,7 +783,7 @@ function grievance_update_7037() {
   }
 
   //
-  // Remoeve the grievance_news content type
+  // Remove the grievance_news content type
   //
 
   print "Removing the Grievance News content type\n";
@@ -805,7 +805,7 @@ function grievance_update_7037() {
   // Enable some required modules
   //
 
-  $modules = array('date_popup_timepicker');
+  $modules = array('date_popup_timepicker', 'checkall');
   foreach ($modules as $module) {
     print "Enabling module: $module.\n";
     try { module_enable(array($module), TRUE); } catch (exception $ignore) { }
