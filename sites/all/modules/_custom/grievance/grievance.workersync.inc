@@ -54,7 +54,7 @@ function grievance_workersync_search_form_callback_replace($form, $form_state) {
 }
 
 function grievance_workersync_search_form_callback_submit($form, &$form_state) {
-  $form_state['rebuild'] = TRUE;
+  // $form_state['rebuild'] = TRUE;
 }
 
 function grievance_workersync_search_form(&$form, &$form_state) {
@@ -71,15 +71,15 @@ function grievance_workersync_search_form(&$form, &$form_state) {
   $form['#groups']['group_grievance_employee']->children[] = 'grievance_workersync_search';
   $form['#group_children']['grievance_workersync_search'] = 'group_grievance_employee';
 
+  if ($form['#form_id'] == 'grievance_node_form') { $ajax_callback = 'grievance_form_grievance_node_callback_replace'; } else { $ajax_callback = 'grievance_workersync_search_form_callback_replace'; }
   $form['grievance_workersync_search_submit'] = array(
-    '#type' => 'submit',
+    '#type' => 'button',
     '#value' => t('Search'),
-    '#submit' => array('grievance_workersync_search_form_callback_submit'),
     '#ajax' => array(
-      'callback' => 'grievance_workersync_search_form_callback_replace',
+      'callback' => $ajax_callback,
       'method' => 'replace',
     ),
-    '#limit_validation_errors' => array(array('grievance_workersync_search')),
+    // '#limit_validation_errors' => array(array('grievance_workersync_search')),
   );
   $form['#groups']['group_grievance_employee']->children[] = 'grievance_workersync_search_submit';
   $form['#group_children']['grievance_workersync_search_submit'] = 'group_grievance_employee';

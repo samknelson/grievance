@@ -29,7 +29,24 @@ function grievance_form_current_value($field, $column, $form, $form_state) {
   }
 }
 
+function grievance_form_no_more_required_recursive(&$form) {
+  if (!is_array($form)) { return; }
+  foreach ($form as $key => $value) {
+    if (!is_array($value)) { continue; }
+    unset($form[$key]['#required']);
+    grievance_form_no_more_required_recursive($form[$key]);
+  }
+}
+
 function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
+  //
+  // Damn limit validation problme
+  //
+
+  // @todo: we need to think about what's required and add a node_validate which only runs when
+  // if ($form_state['triggering_element']['#value'] == 'Search') looks right
+  grievance_form_no_more_required_recursive($form);
+
   //
   // Add the worker sync functions
   //
@@ -105,8 +122,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';
   } else if ($form_state['triggering_element']['#field_name']) {
     $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'open';
+  } else if ($form_state['triggering_element']['#value'] == 'Search') {
+    $form['#groups']['group_grievance_employee']->format_settings['formatter'] = 'open';
   }
-  
+
   //////////////////////////////////////////////////////
   // These things happen on rebuild
   //////////////////////////////////////////////////////
@@ -200,6 +219,11 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   if ($contract_tplt_nid) {
     $contract_tplt_node = node_load($contract_tplt_nid);
   }
+  /*
+  if ($form_state['triggering_element']['#value'] == 'Search') { 
+    drupal_set_message("Here with:"); 
+  }
+  */
 
   // 
   // Set the list of clauses
