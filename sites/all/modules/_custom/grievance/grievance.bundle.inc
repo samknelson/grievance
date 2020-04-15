@@ -100,6 +100,7 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
 	    '#type' => 'checkboxes',
 	    '#title' => t('Attachments to Include'),
 	    '#options' => $options,
+	    '#checkall' => TRUE,
 	  );
 	}
 
@@ -127,6 +128,7 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
 	    '#type' => 'checkboxes',
 	    '#title' => t('Logged Attachments to Include'),
 	    '#options' => $options,
+	    '#checkall' => TRUE,
 	  );
 	}
 
@@ -139,6 +141,7 @@ function grievance_bundle_form($form, &$form_state, $grievance_node) {
     	'attachments' => t('Attachment List'),
     	'statuslog' => t('Log'),
     	'settlements' => t('Settlements'),
+	    '#checkall' => TRUE,
     ),
   );
 
