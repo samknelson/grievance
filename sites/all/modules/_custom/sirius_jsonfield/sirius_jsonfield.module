@@ -8,6 +8,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_j
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.page_definition_edit.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.page_definition_preview.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.page_definition_exim.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_jsonfield/sirius_jsonfield.page_definition_signatures.inc';
 
 function sirius_jsonfield_form_definition($entity_type, $bundle, $field_name, $element) {
   $all_definitions = module_invoke_all('sirius_jsonfield_form_definitions');
