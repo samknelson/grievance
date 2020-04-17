@@ -1,0 +1,52 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.permission.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.menu.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.user.inc";
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.pages_employer_users.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.pages_me.inc";
+
+/**
+ * @todo: Migrate grievance_shop functionality to this module
+ *
+ * We're taking a shortcut here.  There was legacy functionality built around the content type "grievance_shop": 
+ * stuff like content types and views, "Contacts", and even "Contracts" and "Rules".  All of that functionality
+ * is built into the "grievance" module.
+ *
+ * We're not ready for a massive refactoring to pull all of that stuff into a new module.  But we want to start building
+ * some new employer-specific functionality, like tools to manage the users associated with an employer. 
+ * 
+ * So there's a new module "sirius_employer" which reference content types called things like "grievance_shop", which are defined elsewhere.
+ */
+
+
+function sirius_employer_list($active_only = TRUE, $industry_tid = NULL) {
+	$args = array();
+
+	$sql = "select nid, title, field_sirius_active_value from node ";
+	if ($industry_tid) {
+		$sql .= "join field_data_field_sirius_industry on field_data_field_sirius_industry.entity_type = 'node' and field_data_field_sirius_industry.entity_id = node.nid and field_sirius_industry_tid = :industry_tid ";
+		$args[':industry_tid'] = $industry_tid;
+	}
+	$sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
+	$sql .= "where type = 'grievance_shop' ";
+	if ($active_only) {
+		// For some reason this inhibits indexing and results in a painfully slow query.
+		// $sql .= "and field_sirius_active_value is null or field_sirius_active_value = 'Yes' ";
+	}
+	$sql .= "order by title";
+
+	$stmt = db_query($sql, $args);
+	$options = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		if ($active_only && $hr['field_sirius_active_value'] != 'Yes') { continue; }
+		$options[$hr['nid']] = $hr['title'];
+	}
+
+	return $options;
+}
+
