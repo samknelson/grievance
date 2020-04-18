@@ -683,18 +683,15 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   ); 
 
-  /*
-  $items['taxonomy/term/%/sirius_dispatch_job_policy_exim'] = array(
-    'title' => 'Policy Export / Import',
+  $items['taxonomy/term/%/json_exim'] = array(
+    'title' => 'Export / Import',
     'description' => '',
-    'access callback' => 'sirius_dispatch_job_policy_exim_access',
-    'access arguments' => array(2),
-    'page callback' => 'sirius_dispatch_job_policy_exim',
+    'access arguments' => array('sirius domain admin'),
+    'page callback' => 'sirius_page_term_exim',
     'page arguments' => array(2),
     'type' => MENU_LOCAL_TASK,
     'weight' => 60,
   );
-  */
 
   return $items;
 }
