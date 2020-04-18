@@ -1,34 +1,421 @@
 <?php
 
-function sirius_domain_get_nid() {
-	$domain_nid = $_SESSION['sirius_domain'];
-	if (!$domain_nid) {
-		global $user;
-		$user_full = user_load($user->uid);
-		$domain_nid = $user_full->field_sirius_domain['und'][0]['target_id'];
-	}
-
-	return $domain_nid;
-}
 
 function sirius_node_access_domain($node, $op, $account) {
   // Admins can do anything
-  if (user_access('sirius domain admin', $account)) { return NODE_ACCESS_ALLOW; }
+  if (user_access('sirius admin', $account)) { return NODE_ACCESS_ALLOW; }
+
+  // Domain admins can access
+  if (user_access('sirius domain admin') && sirius_domain_access($node->nid)) { return NODE_ACCESS_ALLOW; }
+  if (user_access('sirius domain admin') && $op == 'create') { return NODE_ACCESS_ALLOW; }
 
   // Nobody else can see do anyhing.
   return NODE_ACCESS_DENY;
 }
 
-function sirius_node_tab_sirius_domain_subdomains($domain_node) {
-	if ($domain_node->field_sirius_domain['und'][0]['target_id']) {
-		$domain_node_parent = node_load($domain_node->field_sirius_domain['und'][0]['target_id']);
-		$backlink = l('[Back to ' . $domain_node_parent->title . ']', 'node/' . $domain_node_parent->nid . '/sirius_domain_subdomains');
-	} else {
-		$backlink = l('[Back to root domains]', '/sirius/domains');
-	}
+/**
+ * Fetch the root domain for the current user
+ */
 
-	$html = '';
-	$html .= '<div class="sirius_form_intro">' . $backlink . '</div>';
-	$html .= views_embed_view('sirius_domains', 'block_1', $domain_node->nid);
-	return $html;
+function sirius_domain_root() {
+	global $user;
+	if (!$user) { return NULL; }
+	if (!$user->uid) { return NULL; }
+	$user_full = user_load($user->uid);
+	return node_load($user_full->field_sirius_domain['und'][0]['target_id']);
+}
+
+/**
+ * Fetch or set the current domain for the current user.
+ */
+
+function sirius_domain($new_domain_nid = NULL) {
+	// Set if necessary
+	if ($new_domain_nid) { $_SESSION['domain_nid'] = $new_domain_nid; }
+
+	// Look up from the session
+	if ($_SESSION['domain_nid']) { return node_load($_SESSION['domain_nid']); }
+
+	// Fetch the root domain for the current user.
+	return sirius_domain_root();
+}
+
+function sirius_domain_nid() {
+  $domain_node = sirius_domain();
+  if (!$domain_node) { return NULL; }
+  return $domain_node->nid;
+}
+
+function sirius_domain_active($domain_nid) {
+  $sql = "select field_sirius_active_value, field_sirius_domain_target_id ";
+  $sql .= " from field_data_field_sirius_active ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = field_data_field_sirius_active.entity_id ";
+  $sql .= "where field_data_field_sirius_active.entity_type = 'node' ";
+  $sql .= "and field_data_field_sirius_active.entity_id = :domain_nid ";
+  $stmt = db_query($sql, array(':domain_nid' => $domain_nid));
+  $hr = $stmt->fetchAssoc();
+
+  // If this domain is inactive, return FALSE
+  if ($hr['field_sirius_active_value'] == 'No') { return FALSE; }
+
+  // If we have a parent, return the value for the parent
+  if ($hr['field_sirius_domain_target_id']) { return sirius_domain_active($hr['field_sirius_domain_target_id']); }
+
+  // Neither this domain nor its parents are inactive, so it must be active.
+  return TRUE;
+}
+
+function sirius_domain_user_login(&$edit, $account) {
+  $domain_nid = $account->field_sirius_domain['und'][0]['target_id'];
+  if ($domain_nid) {
+    if (!sirius_domain_active($domain_nid)) {
+      global $user;
+      module_invoke_all('user_logout', $user);
+      session_destroy();
+      $user = drupal_anonymous_user();
+      drupal_set_message("Login prohibited; your domain or one of its parents is disabled.", 'warning');
+    }
+  }
+}
+
+function sirius_domain_uids($domain_nid, $depth = 0) {
+  if ($depth > 100) { return; }
+  // Users in this domain.
+  $sql = "select entity_id from field_data_field_sirius_domain ";
+  $sql .= "where entity_type = 'user' ";
+  $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+  $stmt = db_query($sql, array(':domain_nid' => $domain_nid));
+  $uids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $uids[] = $hr['entity_id'];
+  }
+
+  // Users in all children
+  $sql = "select entity_id from field_data_field_sirius_domain ";
+  $sql .= "where entity_type = 'node' ";
+  $sql .= "and bundle = 'sirius_domain' ";
+  $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+  $stmt = db_query($sql, array(':domain_nid' => $domain_nid));
+  $child_domain_nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $child_domain_nids[] = $hr['entity_id'];
+  }
+  foreach ($child_domain_nids as $child_domain_nid) {
+    $uids = array_merge($uids, sirius_domain_uids($child_domain_nid, $depth+1));
+  }
+
+  return $uids;
+}
+
+/**
+ * If a domain is set to "inactive", force logout all users in the domain (including child domains).
+ */
+
+function sirius_domain_node_update($domain_node) {
+  if ($domain_node->field_sirius_active['und'][0]['value'] == 'No') {
+    $uids = sirius_domain_uids($domain_node->nid);
+    foreach ($uids as $uid) {
+      drupal_session_destroy_uid($uid);
+    }
+  }
+}
+
+
+/**
+ * Determine if the current user has access to a specific domain
+ */
+
+function sirius_domain_access($domain_nid, $root = NULL, $depth = 0) {
+	// Avoid infinite loops
+	if ($depth > 100) { return FALSE; }
+
+	// Admin can do anything
+	if (user_access('sirius admin')) { return TRUE; }
+
+	// Must be a domain!
+	$sql = "select type from node where nid = :domain_nid";
+	$stmt = db_query($sql, array(':domain_nid' => $domain_nid));
+	$hr = $stmt->fetchAssoc();
+	if ($hr['type'] != 'sirius_domain') { return FALSE; }
+
+	// Fetch our root
+	if (!$root) { $root = sirius_domain_root(); }
+	if (!$root) { return FALSE; }
+	if ($root->nid == $domain_nid) { return TRUE; }
+
+	// Fetch the parent
+	$sql = "select field_sirius_domain_target_id from field_data_field_sirius_domain where entity_type = 'node' and entity_id = :domain_nid ";
+	$stmt = db_query($sql, array(':domain_nid' => $domain_nid));
+	$hr = $stmt->fetchAssoc();
+	$parent_domain_nid = $hr['field_sirius_domain_target_id'];
+	if (!$parent_domain_nid) { return FALSE; }
+	if ($parent_domain_nid == $root->nid) { return TRUE; }
+
+	// Do I have access to mommy?
+	return sirius_domain_access($parent_domain_nid, $root, $depth+1);
+}
+
+/**
+ * Fetch all the children of a domain
+ */
+
+
+function sirius_domain_tree($root = NULL) {
+	$args = array();
+	$sql = "select nid, title from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_domain' ";
+	if ($root) {
+		$sql .= "and field_sirius_domain_target_id = :root ";
+		$args[':root'] = $root;
+	} else {
+		$sql .= "and field_sirius_domain_target_id IS NULL ";
+	}
+	$sql .= "order by node.title ";
+
+	$stmt = db_query($sql, $args);
+
+	$tree = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$nid = $hr['nid'];
+		$title = $hr['title'];
+
+		$tree[$nid]['title'] = $title;
+		$tree[$nid]['children'] = sirius_domain_tree($nid);
+	}
+	return $tree;
+}
+
+function sirius_domain_tree_render_as_select($root = NULL, $depth = 0) {
+  $root_nid = NULL; 
+  if (is_object($root)) { $root_nid = $root->nid; } else { $root_nid = $root; }
+  $tree = sirius_domain_tree($root_nid);
+  $options = array();
+  _sirius_domain_tree_render_as_select($tree, $options, $depth);
+  return $options;
+}
+
+function _sirius_domain_tree_render_as_select($tree, &$options, $depth = 0) {
+  if ($depth > 100) { return; }
+  foreach ($tree as $nid => $obj) {
+    $title = '';
+    for ($i=0; $i<$depth; ++$i) { $title .= '- '; }
+    $title .= $obj['title'];
+    $options[$nid] = $title;
+    if ($obj['children']) {
+      _sirius_domain_tree_render_as_select($obj['children'], $options, $depth+1);
+    }
+  }
+}
+
+function sirius_domain_taxonomy_is_multidomain($vid_or_machine_name) {
+  if ($vid_or_machine_name > 0) {
+    $sql = "select machine_name from taxonomy_vocabulary where vid = :vid";
+    $stmt = db_query($sql, array(':vid' => $vid_or_machine_name));
+    $hr = $stmt->fetchAssoc();
+    $vocabulary_machine_name = $hr['machine_name'];
+  } else {
+    $vocabulary_machine_name = $vid_or_machine_name;
+  }
+  $settings = sirius_taxonomy_settings($vocabulary_machine_name);
+  return ($settings['multidomain'] == 'Yes');
+}
+
+/**
+ * Rewrite taxonomy_get_tree with support for domain restriction
+ */
+
+function sirius_domain_taxonomy_get_tree($vid, $parent = 0, $max_depth = NULL, $load_entities = FALSE, $domain_nid = NULL) {
+  $children =& drupal_static(__FUNCTION__, array());
+  $parents =& drupal_static(__FUNCTION__ . ':parents', array());
+  $terms =& drupal_static(__FUNCTION__ . ':terms', array());
+
+  $is_multidomain = sirius_domain_taxonomy_is_multidomain($vid);
+
+
+  // We cache trees, so it's not CPU-intensive to call taxonomy_get_tree() on a
+  // term and its children, too.
+  if (!isset($children[$vid])) {
+    $children[$vid] = array();
+    $parents[$vid] = array();
+    $terms[$vid] = array();
+    $query = db_select('taxonomy_term_data', 't');
+    $query->join('taxonomy_term_hierarchy', 'h', 'h.tid = t.tid');
+    if ($is_multidomain == 'Yes') {
+      if ($domain_nid) {
+        $query->join('field_data_field_sirius_domain', 'd', "d.entity_type = 'taxonomy_term' and d.entity_id = t.tid and d.field_sirius_domain_target_id = $domain_nid" );
+      } else {
+        $query->leftjoin('field_data_field_sirius_domain', 'd', "d.entity_type = 'taxonomy_term' and d.entity_id = t.tid");
+        $query->condition('d.entity_id', NULL, 'IS NULL');
+        // @todo
+      }
+    }
+    $result = $query
+      ->addTag('translatable')
+      ->addTag('taxonomy_term_access')
+      ->fields('t')
+      ->fields('h', array(
+      'parent',
+    ))
+      ->condition('t.vid', $vid)
+      ->orderBy('t.weight')
+      ->orderBy('t.name')
+      ->execute();
+    foreach ($result as $term) {
+      $children[$vid][$term->parent][] = $term->tid;
+      $parents[$vid][$term->tid][] = $term->parent;
+      $terms[$vid][$term->tid] = $term;
+    }
+  }
+
+  // Load full entities, if necessary. The entity controller statically
+  // caches the results.
+  if ($load_entities) {
+    $term_entities = taxonomy_term_load_multiple(array_keys($terms[$vid]));
+  }
+  $max_depth = !isset($max_depth) ? count($children[$vid]) : $max_depth;
+  $tree = array();
+
+  // Keeps track of the parents we have to process, the last entry is used
+  // for the next processing step.
+  $process_parents = array();
+  $process_parents[] = $parent;
+
+  // Loops over the parent terms and adds its children to the tree array.
+  // Uses a loop instead of a recursion, because it's more efficient.
+  while (count($process_parents)) {
+    $parent = array_pop($process_parents);
+
+    // The number of parents determines the current depth.
+    $depth = count($process_parents);
+    if ($max_depth > $depth && !empty($children[$vid][$parent])) {
+      $has_children = FALSE;
+      $child = current($children[$vid][$parent]);
+      do {
+        if (empty($child)) {
+          break;
+        }
+        $term = $load_entities ? $term_entities[$child] : $terms[$vid][$child];
+        if (isset($parents[$vid][$term->tid])) {
+
+          // Clone the term so that the depth attribute remains correct
+          // in the event of multiple parents.
+          $term = clone $term;
+        }
+        $term->depth = $depth;
+        unset($term->parent);
+        $term->parents = $parents[$vid][$term->tid];
+        $tree[] = $term;
+        if (!empty($children[$vid][$term->tid])) {
+          $has_children = TRUE;
+
+          // We have to continue with this parent later.
+          $process_parents[] = $parent;
+
+          // Use the current term as parent for the next iteration.
+          $process_parents[] = $term->tid;
+
+          // Reset pointers for child lists because we step in there more often
+          // with multi parents.
+          reset($children[$vid][$term->tid]);
+
+          // Move pointer so that we get the correct term the next time.
+          next($children[$vid][$parent]);
+          break;
+        }
+      } while ($child = next($children[$vid][$parent]));
+      if (!$has_children) {
+
+        // We processed all terms in this hierarchy-level, reset pointer
+        // so that this function works the next time it gets called.
+        reset($children[$vid][$parent]);
+      }
+    }
+  }
+  return $tree;
+}
+
+/**
+ * Wrapper functions for variable_get() and variable_set() that make them multi-domain-aware.
+ */
+
+function sirius_domain_variable_get($name, $default = NULL) {
+  return variable_get(sirius_domain_variable_name($name), $default);
+}
+
+function sirius_domain_variable_set($name, $value) {
+  return variable_set(sirius_domain_variable_name($name), $value);
+}
+
+function sirius_domain_variable_name($name) {
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { return $domain_nid . '/' . $name; } else { return $name; }
+}
+
+
+function sirius_domain_restrict_taxonomy_fields(&$form, $form_id) {
+  if ($form['#entity'] && $form['entity']->field_sirius_domain['und'][0]['target_id']) {
+    $domain_nid = $form['entity']->field_sirius_domain['und'][0]['target_id'];
+  } else {
+    $domain_nid = sirius_domain_nid();
+  }
+  if (!$domain_nid) { 
+    return;
+  }
+
+  foreach ($form as $field_name => &$form_field) {
+    if (!preg_match('/^field_/', $field_name)) { continue; }
+    $info = field_info_field($field_name);
+    if ($info['type'] != 'taxonomy_term_reference') { continue; }
+    $vocabulary_machine_name = $info['settings']['allowed_values'][0]['vocabulary'];
+    if (!$vocabulary_machine_name) { continue; }
+    $options = sirius_taxonomy_load($vocabulary_machine_name, 'tid', 'name');
+    if ($form_field['und']['#options']) {
+      $form_field['und']['#options'] = array_intersect($form_field['und']['#options'], $options);
+    }
+  }
+}
+function sirius_domain_form_alter_node(&$form, &$form_state, $form_id) {
+  // We only care about nodes with a domain field.
+  if (!$form['field_sirius_domain']) { return; }
+
+  // If this is a new node, set the default value for the domain.
+  $node = $form['#node'];
+  if (!$node->nid) {
+    // Accept a default domain from the query. But only if we have access to it.
+    $default_domain_nid = $_GET['sirius_domain'];
+    if ($default_domain_nid) {
+      if (!sirius_domain_access($default_domain_nid)) {
+        $form['#access'] = FALSE;
+        drupal_set_message("You do not have access to that domain.", 'error');
+        return;
+      }
+    }
+
+    // Otherwise, the default value is our current domain.
+    if (!$default_domain_nid) { 
+      $default_domain_nid = sirius_domain_nid();
+    }
+
+    // Set the default value in the form.
+    if ($default_domain_nid) { 
+      $form['field_sirius_domain']['und']['#default_value'][0] = $default_domain_nid; 
+    }
+  }
+
+  // Restrict the list of available domains to those that we have access to.
+  $tree = array();
+  $my_root_node = sirius_domain_root();
+  if ($my_root_node) { 
+    $my_root_nid = $my_root_node->nid;
+    $tree = array($my_root_nid => $my_root_node->title);
+  } else {
+    $my_root_nid = NULL;
+    $tree = array('_none' => '(root)');
+  }
+  $tree += sirius_domain_tree_render_as_select($my_root_nid, 1);
+  $form['field_sirius_domain']['und']['#options'] = $tree;
+
+  // And, finally ... hide this field from anybody without domain admin permission
+  if (!user_access('sirius domain admin')) { $form['field_sirius_domain']['#access'] = FALSE; }
 }

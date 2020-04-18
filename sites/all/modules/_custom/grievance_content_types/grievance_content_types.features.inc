@@ -15,6 +15,9 @@ function grievance_content_types_ctools_plugin_api($module = NULL, $api = NULL) 
   if ($module == "field_group" && $api == "field_group") {
     return array("version" => "1");
   }
+  if ($module == "field_validation" && $api == "default_field_validation_rules") {
+    return array("version" => "2");
+  }
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => "1");
   }
@@ -169,14 +172,6 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
-    'grievance_news' => array(
-      'name' => t('Grievance News'),
-      'base' => 'node_content',
-      'description' => '',
-      'has_title' => '1',
-      'title_label' => t('Title'),
-      'help' => '',
-    ),
     'grievance_settlement' => array(
       'name' => t('Grievance Settlement'),
       'base' => 'node_content',
@@ -207,6 +202,22 @@ function grievance_content_types_node_info() {
       'description' => '',
       'has_title' => '1',
       'title_label' => t('Subject'),
+      'help' => '',
+    ),
+    'sirius_callerid' => array(
+      'name' => t('Sirius Caller ID'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_contact' => array(
+      'name' => t('Sirius Contact'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
       'help' => '',
     ),
     'sirius_dispatch' => array(
@@ -249,6 +260,30 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'sirius_domain' => array(
+      'name' => t('Sirius Domain'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_event' => array(
+      'name' => t('Sirius Event'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_event_participant' => array(
+      'name' => t('Sirius Event Participant'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'sirius_feed' => array(
       'name' => t('Sirius Feed'),
       'base' => 'node_content',
@@ -259,6 +294,14 @@ function grievance_content_types_node_info() {
     ),
     'sirius_help' => array(
       'name' => t('Sirius Help'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_json_definition' => array(
+      'name' => t('Sirius JSON Definition'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',
@@ -283,6 +326,30 @@ function grievance_content_types_node_info() {
     ),
     'sirius_news' => array(
       'name' => t('Sirius News'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_payperiod' => array(
+      'name' => t('Sirius Payperiod'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_phonenumber' => array(
+      'name' => t('Sirius Phonenumber'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_term_proxy' => array(
+      'name' => t('Sirius Term Proxy'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',

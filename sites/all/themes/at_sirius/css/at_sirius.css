@@ -2509,6 +2509,10 @@ input.teaser-button {
 
 }
 
+input.form-button-disabled {
+  background-color: #666666;
+}
+
 a.button:hover, 
 input.form-submit:hover, 
 input.teaser-button:hover {
@@ -2516,6 +2520,7 @@ input.teaser-button:hover {
 	background-color: #0f3871;
 }
 
+input[value~=Skip],
 input[value~=Save], 
 input[value~=Update], 
 #system-theme-settings input#edit-submit, 
@@ -2525,6 +2530,7 @@ input#edit-save.form-submit {
   margin: 14px 0;
 }
 
+input[value~=Skip],
 input[value~=Save]:hover, 
 input[value~=Update]:hover, 
 #system-theme-settings input#edit-submit:hover, 
@@ -2938,6 +2944,10 @@ body.loopback {
     width: 100%;
   }
 
+}
+
+.container-inline .form-type-checkbox {
+  white-space: nowrap;
 }
 
 
@@ -3687,12 +3697,33 @@ fieldset.date-combo .container-inline-date .date-padding {
 
 
 .view-grievance-log-status .container-inline-date input,
-.view-grievance-log-status .views-widget-filter-created .views-widget input {
+.view-grievance-log-status .views-widget-filter-created .views-widget input,
+.sirius-form .container-inline label {
   width: 150px;
+  display: inline-block;
 }
 
+.sirius-form div.container-inline {
+  clear: left;
+  display: block;
+}
+.sirius-form .container-inline .description { 
+  clear: left;
+  display: block;
+}
 
+.sirius-form .container-inline .form-type-date-popup .date-padding .description {
+  display: none;
+}
 
+.sirius-form table legend {
+  background-color: #5984be;
+  width: max-content;
+}
+
+.sirius-form table fieldset {
+  background: #fafafa;
+}
 
 div.sirius_help {
   background: url(images/help.png) no-repeat 8px 5px #f0f8ff;
@@ -3918,6 +3949,16 @@ input.ajax-processed:hover {
   display: none;
 }
 
+.container-inline .form-type-date-popup label {
+  float: left;
+  padding-right: 10px;
+}
+
+.container-inline .form-type-date-popup .form-item {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 .node-grievance-form .form-type-date-popup .form-item label { 
   display: block;
 }
@@ -4086,3 +4127,31 @@ input.ajax-processed:hover {
 }
 
 
+div.sirius_quicknav {
+  padding-bottom: 10px;
+}
+
+.sirius_quicknav a {
+  padding: 4px 11px;
+  border: 1px solid #a0bbf5;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.sirius_quicknav span {
+  padding: 4px 11px;
+  border: 1px solid #000000;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.sirius_quicknav a:hover {
+  color: #1b4784;
+  border-color: #1b4784;
+}
+
+
+
+.accordion_highlighted {
+  background-color: #ffc;
+}

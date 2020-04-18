@@ -18,6 +18,27 @@ function sirius_log(
   $handler_nids, 
   $files = NULL,
   $json = NULL) {
+
+  $real_uid = $_SESSION['masquerading'];
+  if ($real_uid) {
+    $real_user = user_load($real_uid);
+    $message .= ' [MASQ FROM ' . $real_user->name . ']';
+    $json_to_add = array(
+      'real_user_name' => $real_user->name,
+      'real_user_uid' => $real_user->uid,
+      'real_user_mail' => $real_user->mail,
+    );
+
+    if (is_object($json)) {
+      $json->masquerade = $json_to_add;
+    } else if (is_array($json)) {
+      $json['masquerade'] = $json_to_add;
+    } else {
+      $json = json_decode($json, TRUE);
+      $json['masquerade'] = $json_to_add;
+    }
+  }
+
   global $user;
   $log_node = new stdClass();
   $log_node->type = 'sirius_log';
@@ -34,10 +55,17 @@ function sirius_log(
   $log_node->field_sirius_message['und'][0]['value'] = substr($message, 0, 254);
   $log_node->field_sirius_summary['und'][0]['value'] = $summary;
   $log_node->field_sirius_notes['und'][0]['value'] = $notes;
+
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $log_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; } 
+
   if ($files) {
     $log_node->field_sirius_attachments['und'] = $files;
   }
   if ($json) {
+    if (is_array($json) || is_object($json)) {
+      $json = json_encode($json);
+    }
     $log_node->field_sirius_json['und'][0]['value'] = $json;
   }
 
@@ -53,6 +81,8 @@ function sirius_log(
   $log_node = node_submit($log_node);
   node_object_prepare($log_node);
   node_save($log_node);
+
+  return $log_node;
 }
 
 function sirius_node_access_log($log_node, $op, $account) {
@@ -82,8 +112,8 @@ function sirius_log_render_form($param1, $param2 = NULL) {
 
   $form['log_wrapper'] = array(
     '#type' => 'fieldset',
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    // '#collapsible' => TRUE,
+    // '#collapsed' => TRUE,
     '#title' => 'Change Log',
   );
 

@@ -13,6 +13,20 @@ function sirius_dispatch_action_info() {
       'vbo_configurable' => FALSE,
       'triggers' => array(),
     ),
+    'sirius_dispatch_vbo_accept' => array(
+      'type' => 'node',
+      'label' => t('Sirius Dispatch Accept'),
+      'configurable' => FALSE,
+      'vbo_configurable' => FALSE,
+      'triggers' => array(),
+    ),
+    'sirius_dispatch_vbo_decline' => array(
+      'type' => 'node',
+      'label' => t('Sirius Dispatch Decline'),
+      'configurable' => FALSE,
+      'vbo_configurable' => FALSE,
+      'triggers' => array(),
+    ),
     'sirius_dispatch_vbo_rollover' => array(
       'type' => 'node',
       'label' => t('Sirius Dispatch Rollover'),
@@ -20,25 +34,50 @@ function sirius_dispatch_action_info() {
       'vbo_configurable' => FALSE,
       'triggers' => array(),
     ),
-    'sirius_dispatch_vbo_bullpen_signin' => array(
+    'sirius_dispatch_vbo_vlri_resolve' => array(
       'type' => 'node',
-      'label' => t('Sirius Dispatch Bullpen Sign In'),
-      'configurable' => FALSE,
-      'vbo_configurable' => FALSE,
-      'triggers' => array(),
-    ),
-    'sirius_dispatch_vbo_bullpen_signout' => array(
-      'type' => 'node',
-      'label' => t('Sirius Dispatch Bullpen Sign Out'),
-      'configurable' => FALSE,
+      'label' => t('Sirius Dispatch VLRI'),
+      'configurable' => TRUE,
       'vbo_configurable' => FALSE,
       'triggers' => array(),
     ),
   );
 }
 
+function sirius_dispatch_vbo_vlri_resolve(&$node, $context) {
+  drupal_set_message("About to resolve: " . $node->title . " with action " . $context['vlri_resolve']);
+  $result = sirius_dispatch_vlri_resolve($node, '', $context['vlri_resolve']);
+}
+
+function sirius_dispatch_vbo_vlri_resolve_form(&$context, &$form_state) {
+  $form['vlri_resolve'] = array(
+    '#title' => t('Resolve:'),
+    '#type' => 'select',
+    '#options' => array(NULL => t('-- Select --'), 'accept' => t('Accept'), 'reject' => t('Reject')),
+    '#required' => TRUE,
+  );
+
+  return $form;
+}
+
+function sirius_dispatch_vbo_vlri_resolve_submit(&$form, &$form_state) {
+  return array(
+    'vlri_resolve' => $form_state['values']['vlri_resolve'],
+  );
+}
+
 function sirius_dispatch_vbo_terminate(&$node, $context) {
   sirius_dispatch_terminate($node);
+}
+
+function sirius_dispatch_vbo_accept(&$node, $context) {
+  $result = sirius_dispatch_accept($node);
+  if (!$result['success']) { drupal_set_message($result['msg'], 'warning'); }
+}
+
+function sirius_dispatch_vbo_decline(&$node, $context) {
+  $result = sirius_dispatch_decline($node);
+  if (!$result['success']) { drupal_set_message($result['msg'], 'warning'); }
 }
 
 function sirius_dispatch_vbo_rollover(&$node, $context) {
@@ -107,23 +146,4 @@ function sirius_dispatch_vbo_rollover_submit(&$form, &$form_state) {
     'rollover_type' => $form_state['values']['rollover_type'],
     'rollover_end_date' => $form_state['values']['rollover_end_date']
   );
-}
-
-
-function sirius_dispatch_vbo_bullpen_signin(&$dispatch_node, $context) {
-  $job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
-  $worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
-  $result = sirius_dispatch_bullpen_signin($job_node, $worker_node, TRUE);
-  if (!$result) {
-    drupal_set_message("Sign in failed: " . $result['msg'], 'warning');
-  }
-}
-
-function sirius_dispatch_vbo_bullpen_signout(&$dispatch_node, $context) {
-  $job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
-  $worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
-  $result = sirius_dispatch_bullpen_signin($job_node, $worker_node, FALSE);
-  if (!$result) {
-    drupal_set_message("Sign out failed: " . $result['msg'], 'warning');
-  }
 }

@@ -1,0 +1,5 @@
+table.sirius_event_attendance td:nth-child(1) { width: 15%; }
+table.sirius_event_attendance td:nth-child(2) { width: 15%; }
+table.sirius_event_attendance td:nth-child(3) { width: 40%; }
+table.sirius_event_attendance td:nth-child(4) { width: 15%; }
+table.sirius_event_attendance td:nth-child(5) { width: 15%; }

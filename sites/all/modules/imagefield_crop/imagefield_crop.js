@@ -19,9 +19,6 @@ Drupal.behaviors.imagefield_crop = {
       // add Jcrop exactly once to each cropbox
       $('.cropbox', context).once(function() {
         var self = $(this);
-
-        //alert("found a cropbox" + self.attr('id'));
-
         // get the id attribute for multiple image support
         var self_id = self.attr('id');
         var id = self_id.substring(0, self_id.indexOf('-cropbox'));

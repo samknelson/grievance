@@ -155,7 +155,21 @@ function grievance_permission() {
     'grievance mine expanded' => array(
         'title' => t('My Grievances - Tickler'),
     ),
- );
+
+    'grievance worker lookup' => array(
+      'title' => t('Grievance Workersync Lookup'), 
+      'description' => t('Permission to look up workers from the worker database'),
+    ),
+    'grievance worker edit' => array(
+      'title' => t('Grievance Workersync Edit'), 
+      'description' => t('Permission to update existing workers via the grievance form'),
+    ),
+    'grievance worker create' => array(
+      'title' => t('Grievance Workersync Create'), 
+      'description' => t('Permission to create new workers via the grievance form'),
+    ),
+
+    );
 }
 
 function grievance_node_access($node, $op, $account) {
@@ -172,11 +186,25 @@ function grievance_node_access($node, $op, $account) {
     // Some additional restrictions based on log type.
     if ($node->type == 'grievance_log') { return grievance_node_access_grievance_log($node, $op, $account); }
     if ($node->type == 'grievance_irset') { return grievance_node_access_grievance_irset($node, $op, $account); }
-
     if ($node->type == 'grievance_shop_contact') { return grievance_node_access_shop_contact($node, $op, $account); }
+    // if ($node->type == 'grievance_shop') { return grievance_node_access_shop($node, $op, $account); }
 	
 	return NODE_ACCESS_IGNORE;
 }
+
+function grievance_node_access_shop($node, $op, $account) {
+    // Admins can do anything
+    if (user_access('grievance admin', $account)) { return NODE_ACCESS_IGNORE; }
+
+    // Editors can do anything.  @todo probably should treate delete specially.
+    if (user_access('grievance edit')) { return NODE_ACCESS_IGNORE; }
+
+    // All with grievance permission can view
+    if ($op == 'view' && user_access('grievance', $account)) { return NODE_ACCESS_IGNORE; }
+
+    return NODE_ACCESS_DENY;
+    }
+
 
 function grievance_node_access_grievance_irset($node, $op, $account) {
     // Admins can do anything

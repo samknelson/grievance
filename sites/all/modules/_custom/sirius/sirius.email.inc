@@ -1,5 +1,40 @@
 <?php
 
+function sirius_email_test_form($form, &$form_state) {
+  $form['to'] = array(
+    '#type' => 'textfield',
+    '#title' => 'To',
+  );
+  $form['subject'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Subject',
+  );
+
+  $form['body'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Body',
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+
+  return $form;
+}
+
+function sirius_email_test_form_submit($form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
+  $params = $form_state['values'];
+  $result = sirius_email_send($params);
+  $msg = $result['msg'];
+  if ($result['success']) {
+    drupal_set_message($msg);
+  } else {
+    drupal_setMessage($msg, 'error');
+  }
+}
+
 function sirius_email_admin() {
 	$form["sirius_email_default_from_address"] = array(
 		'#type' => 'textfield',
@@ -31,7 +66,6 @@ function sirius_email_admin() {
     ),
   );
 
-
 	$form["sirius_email_replyto_address"] = array(
 		'#type' => 'textfield',
 		'#title' => 'Global Reply-To Email',
@@ -44,6 +78,12 @@ function sirius_email_admin() {
 		'#title' => 'Global Reply-To Name',
 		'#default_value' => variable_get("sirius_email_replyto_name", ''),
 	);
+
+  $form["sirius_ses_configuration_set"] = array(
+    '#type' => 'textfield',
+    '#title' => 'Amazon SES Configuration Set Name',
+    '#default_value' => variable_get("sirius_ses_configuration_set", ''),
+  );
 
   return system_settings_form($form);
 }
@@ -65,6 +105,11 @@ function sirius_email_validate($email) {
  */
 
 function sirius_mail_alter(&$message) {
+  // Set the "AWS SES Configuration Set"
+  if (variable_get("sirius_ses_configuration_set", '')) {
+    $message['headers']['X-SES-CONFIGURATION-SET'] = variable_get("sirius_ses_configuration_set", '');
+  }
+
   // Are we in a global disable mode?
   $disable = variable_get("sirius_email_global_disable", '');
   if ($disable != 'Yes') { return; }
@@ -116,8 +161,12 @@ function sirius_email_send($params) {
     return array('success' => FALSE, 'msg' => "No email address.");
   }
 
-  if (!sirius_email_validate($params['to'])) {
-    return array('success' => FALSE, 'msg' => $params['to'] . " does not look like a valid email address.");
+  $to = $params['to'];
+  if (function_exists('mailparse_rfc822_parse_addresses')) {
+    $to = mailparse_rfc822_parse_addresses($params['to']);
+    if (!$to) {
+      return array('success' => FALSE, 'msg' => $params['to'] . " does not look like a valid email address.");
+    }
   }
 
 	$message = drupal_mail(
@@ -128,6 +177,9 @@ function sirius_email_send($params) {
 		$params 
 	);
 
+  // Don't log attachments
+  unset($message['params']['attachments']);
+  
   sirius_log(
     'email', 
     'sending', 
@@ -151,8 +203,16 @@ function sirius_mail($key, &$message, $params) {
 
   // Pass params through to the message
   if (isset($params['attachments'])) { $message['params']['attachments'] = $params['attachments']; }
-  if ($params['headers']['Cc']) { $message['headers']['Cc'] = $params['headers']['cc']; } 
-  if ($params['headers']['Bcc']) { $message['headers']['Bcc'] = $params['headers']['bcc']; } 
+  
+  if ($params['headers']['Cc']) { $message['headers']['Cc'] = $params['headers']['Cc']; } 
+  if ($params['headers']['cc']) { $message['headers']['Cc'] = $params['headers']['cc']; } 
+  if ($params['headers']['Bcc']) { $message['headers']['Bcc'] = $params['headers']['Bcc']; } 
+  if ($params['headers']['bcc']) { $message['headers']['Bcc'] = $params['headers']['bcc']; } 
+
+  // See comment from Takirimi https://api.drupal.org/api/drupal/includes%21mail.inc/function/drupal_mail/7.x
+  $message['headers']['Cc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Cc']);
+  $message['headers']['Bcc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Bcc']);
+
   $message['subject'] = $params['subject'];
   $message['body'][] = $params['body'];
 
@@ -178,10 +238,7 @@ function sirius_mail($key, &$message, $params) {
 
   // "From" 
   $from_email = $params['from'];
-  if (!$from_email) {
-	  // @TODO Put this into a configuration variable!!!!
-	  $from_email = variable_get("sirius_email_default_from_address", '');
-  }
+  if (!$from_email) { $from_email = variable_get("sirius_email_default_from_address", ''); }
 
   // Custom header: 
   $message['from'] = 
@@ -206,4 +263,49 @@ function sirius_email_already_sent($id) {
   $hr = $stmt->fetchAssoc();
   if ($hr) { return TRUE; }
   return FALSE;
+}
+
+function sirius_email_callback($id, $type, $json) {
+  if ($id) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'sirius_log');
+    $query->fieldCondition('field_sirius_notes', 'value', $id);
+    $query->fieldCondition('field_sirius_log_handler', 'target_id', 0, '>');
+    $query->fieldCondition('field_sirius_category', 'value', 'email');
+    $query->fieldCondition('field_sirius_type', 'value', 'sending');
+    $query->propertyOrderBy('nid', 'desc');
+    $stmt = $query->execute();
+    if ($stmt['node']) {
+      $previous_log_node = node_load(array_keys($stmt['node'])[0]);
+      $handler_nids = sirius_fieldvals($previous_log_node, 'field_sirius_log_handler', 'target_id');
+    }
+  }
+
+  $summary = '';
+  if ($json->Message->delivery->recipients) {
+    foreach ($json->Message->delivery->recipients as $email) {
+      if ($summary) { $summary .= ' / '; }
+      $summary .= $email;
+    }
+  }
+  if ($json->Message->bounce->bouncedRecipients) {
+    foreach ($json->Message->bounce->bouncedRecipients as $tmp) {
+      if ($summary) { $summary .= ' / '; }
+      $summary .= $tmp->emailAddress;
+      $summary .= ': ';
+      $summary .= $tmp->diagnosticCode;
+    }
+  }
+
+  sirius_log(
+    'email', 
+    $type, 
+    "Callback of type $type", 
+    $summary,
+    $id, 
+    $handler_nids,
+    NULL,
+    $json
+  );
 }

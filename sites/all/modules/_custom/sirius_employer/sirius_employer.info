@@ -1,0 +1,4 @@
+name = Sirius Employer
+description = Implements the Sirius Employer functionality
+package = sirius
+core = 7.x

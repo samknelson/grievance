@@ -1,0 +1,221 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.permission.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.menu.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.participant.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.phonebank.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.bullpen.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.class.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.vbo.inc";
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_user_select.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_user_self.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_bullpen.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_worker_byname.inc";
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_attendance.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_certifications.inc';
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_landing.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.participant_definition.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_list.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_list_bullpen.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_create.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_info.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participants.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_json.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_comments.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_schedule.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_body.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_register.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_register_bulk.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_audio.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_callerid.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_call.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_lock.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_status.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_settings.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_bullpen_view.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_bullpen_self.inc";
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_create.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_register.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_participants.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_edit.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_view.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_schedule.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_phonebank.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_bullpen.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_class.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.term_tab_materials.inc";
+
+function sirius_event_type_json($event_node) {
+  $event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+  return json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+}
+
+function sirius_event_participant_nid_from_user($event_nid, $uid = NULL) {
+  global $user;
+  if (!$uid) { $uid = $user->uid; }
+  if (!$uid) { return NULL; }
+
+  $cache = &drupal_static(__FUNCTION__);
+  if (!isset($cache[$event_nid][$uid])) {
+    $user_full = user_load($uid);
+    $contact_nid = $user_full->field_sirius_contact['und'][0]['target_id'];
+    if (!$contact_nid) { return NULL; }
+
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'sirius_event_participant');
+    $query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
+    $query->fieldCondition('field_sirius_event', 'target_id', $event_nid);
+    $stmt = $query->execute();
+    if ($stmt['node']) { $cache[$event_nid][$uid] = array_keys($stmt['node'])[0]; } else { $cache[$event_nid][$uid] = NULL; }
+  }
+
+  return $cache[$event_nid][$uid];
+}
+
+function sirius_event_duration_options($event_type_term = NULL) {
+  $results = &drupal_static(__FUNCTION__);
+
+  $event_type_tid = $event_type_term->tid;
+
+  if (!$results[$event_type_tid]) {
+    $json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+    if ($json['schedule']['duration']) {
+      foreach ($json['schedule']['duration'] as $key) {
+        $results[$event_type_tid][$key] = sirius_event_duration_format($key);
+      }
+    } else {
+      for ($min = 0; $min < 60; $min += 5) {
+        $key = 60*$min;
+        $results[$event_type_tid][$key] = sirius_event_duration_format($key);
+      }
+
+      for ($hour = 1; $hour <= 12; ++$hour) {
+        for ($min = 0; $min < 60; $min += 15) {
+          $key = 60*$min + 3600*$hour;
+          if ($hour == 1) { $val = t('1 Hour'); } else { $val = t('@hour hours', array('@hour' => $hour)); }
+          if ($min) { $val .= t(', @min Minutes', array('@min' => $min)); }
+          $results[$event_type_tid][$key] = sirius_event_duration_format($key);
+        }
+      }
+    }
+  }
+
+  return $results[$event_type_tid];
+}
+
+function sirius_event_duration_round($seconds) {
+  $options = sirius_event_duration_options();
+  foreach ($options as $val => $name) {
+    if ($seconds < $val) { return $last; }
+    $last = $val;
+  }
+}
+
+function sirius_event_duration_format($seconds) {
+  if (!$seconds) { return '0 minutes'; }
+  $duration = '';
+  $days = floor($seconds / 86400);
+  $seconds -= $days * 86400;
+  $hours = floor($seconds / 3600);
+  $seconds -= $hours * 3600;
+  $minutes = floor($seconds / 60);
+  $seconds = $seconds - $minutes * 60;
+
+  if($days > 0) {
+    $duration .= $days . ' days';
+  }
+  if($hours > 0) {
+    $duration .= ' ' . $hours . ' hours';
+  }
+  if($minutes > 0) {
+    $duration .= ' ' . $minutes . ' minutes';
+  }
+  if($seconds > 0) {
+    $duration .= ' ' . $seconds . ' seconds';
+  }
+  return $duration;
+}
+
+function sirius_event_duration_format_hours($seconds) {
+  $hours = floor($seconds / 3600);
+  $seconds -= $hours * 3600;
+  $minutes = floor($seconds / 60);
+
+  $duration = $hours . ' hours';
+  if($minutes > 0) {
+    $duration .= ' ' . $minutes . ' minutes';
+  }
+  return $duration;
+}
+
+
+/**
+ * Implements hook_node_insert
+ */
+
+function sirius_event_node_insert($node)  {
+  if ($node->type == 'sirius_event') {
+    $event_type_tid = $node->field_sirius_event_type['und'][0]['tid'];
+    $event_type_term = taxonomy_term_load($event_type_tid);
+    $json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+
+    $nid = $node->nid;
+    global $base_url;
+    $url = $base_url . '/node/' . $nid . '/sirius_event_info';
+
+    if ($json['create']['notify']['sms']) {
+      $params = array();
+      $params['sms'] = "A new event of type " . $event_type_term->name . " has been created.\n";
+      $params['sms'] .= $url;
+
+      foreach ($json['create']['notify']['sms'] as $phone) {
+        // $params['X-Sirius-Id'] = 'sirius_event/create/' . $nid . '/' . $phone;
+        $params['to'] = $phone;
+        sirius_sms_send($params);
+      }
+    }
+
+    if ($json['create']['notify']['email']) {
+      $params = array();
+      $params['body'] = "A new event of type " . $event_type_term->name . " has been created.<br /><br />";
+      $params['body'] .= "<a href=\"$url\">" . $url . "</a>";
+      $params['subject'] = "A new event of type " . $event_type_term->name . " has been created.";
+
+      foreach ($json['create']['notify']['email'] as $email) {
+        // $params['X-Sirius-Id'] = 'sirius_event/create/' . $nid . '/' . $email;
+        $params['to'] = $email;
+        sirius_email_send($params);
+      }
+    }
+  }  
+}
+
+/**
+ * Implements hook_node_update
+ */
+
+function sirius_event_node_update($node)  {
+}
+
+/**
+ * Implements hook_form_alter
+ */
+
+function sirius_event_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'views_exposed_form' && $form_state['view']->name == 'sirius_event_participants') {
+    $event_nid = $form_state['view']->args[0];
+    $prole_tid = $form_state['view']->args[1];
+    $pstatus_options = sirius_event_participant_role_status_tids(array($prole_tid));
+    $form['field_sirius_event_pstatus_tid']['#options'] = array('All' => t('-- Select --')) + $pstatus_options;
+  }
+}

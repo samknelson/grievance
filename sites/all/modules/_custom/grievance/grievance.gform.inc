@@ -325,9 +325,9 @@ function grievance_timeline_short($grievance_node) {
 
 	// Add any "log status changed" entries of the right type.
   $log_update_tids = array(
-    variable_get('grievance_log_insert_type', ''), 
-    variable_get('grievance_log_update_type_with_status_change', ''), 
-    variable_get('grievance_log_incident_type', '')
+    sirius_get_special_tid('grievance_log_types|insert'), 
+    sirius_get_special_tid('grievance_log_types|update_with_status_change'), 
+    sirius_get_special_tid('grievance_log_types|incident')
   );
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');

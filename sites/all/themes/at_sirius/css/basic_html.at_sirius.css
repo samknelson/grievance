@@ -30,6 +30,7 @@ a.tool-button {
 	padding: 4px 11px;
 	border: 1px solid #a0bbf5;
 	display: inline-block;
+	margin-right: 10px;
 }
 a.tool-button:hover {
 	color: #1b4784;
@@ -96,10 +97,11 @@ hr {
 .view-grievance-log td {
 	padding: 12px 0 6px 12px;
 }
-.view-grievance-log td.views-field-nothing {
+.view-grievance-log td.views-field-body {
 	padding: 0px 0px 12px 12px;
 	border-bottom: 1px dotted #5984be;
 }
+
 .view-grievance-log td.views-field-nothing pre {
 	margin: 0;
 }

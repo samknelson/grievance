@@ -12,13 +12,13 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.attac
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.settlement.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.permission.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.admin.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.admin_log_types.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.gform.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.arbitrationform.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_bytype.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_average_time.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_spi_term.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_summary.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_specialist_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_by_specialist.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_aged_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_summary_with_log.inc";
@@ -52,6 +52,8 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.shops
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.merge.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.vbo.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.status_correct.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.workersync.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.workersync_local.inc";
 
 /**
  * Implements hook_views_pre_view
@@ -73,6 +75,7 @@ function grievance_cron() {
   grievance_alert_all();
   grievance_mailattach_fetch();
   grievance_bundle_cleanup();
+  grievance_workersync_cron();
 }
 
 /**
@@ -90,6 +93,8 @@ function grievance_node_update($node) {
     if ($node->field_grievance_status['und'][0]['tid'] != $node->original->field_grievance_status['und'][0]['tid']) {
       $node->grievance_status_changed = TRUE;
     }
+
+    grievance_workersync_backsync($node);
   }
 }
 
@@ -98,7 +103,10 @@ function grievance_node_update($node) {
  */
 
 function grievance_node_insert($node) {
-  if ($node->type == 'grievance') { $node->grievance_assignment_changed = TRUE; }
+  if ($node->type == 'grievance') { 
+    $node->grievance_assignment_changed = TRUE;
+    grievance_workersync_backsync($node);
+  }
 }
 
 /*
@@ -274,7 +282,7 @@ function grievance_mail($key, &$message, $params) {
   }
 
   // @TODO Put this into a configuration variable!!!!
-  $from_email = variable_get('grievance_from_email', '');
+  $from_email = variable_get('sirius_email_default_from_address', '');
   if (!$from_email) {
     drupal_set_message(t('The from_email for this server has not been configured.  Mails will not be delivered correctly!'), 'error');
   }
@@ -463,9 +471,11 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
 
   // On the "All Grievances" exposed filter, change status to checkboxes.
   if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'grievances') {
-    foreach ($form['filters'] as $delta => &$set) {
-      if (is_integer($delta) && is_array($set) && $set['field_grievance_status_tid']) {
-        $set['field_grievance_status_tid']['#theme'] = 'select_as_checkboxes';
+    if ($form['filters']) {
+      foreach ($form['filters'] as $delta => &$set) {
+        if (is_integer($delta) && is_array($set) && $set['field_grievance_status_tid']) {
+          $set['field_grievance_status_tid']['#theme'] = 'select_as_checkboxes';
+        }
       }
     }
     require_once DRUPAL_ROOT . "/sites/all/modules/better_exposed_filters/better_exposed_filters.theme";
@@ -652,8 +662,10 @@ function grievance_report_cache_info() {
     'pk_list_callback' => 'grievance_report_open_summary_with_log_pks',
     'batch_callback' => 'grievance_report_open_summary_with_log_batch',
     'render_callbacks' => array(
-      'By Specialist' => 'grievance_report_open_summary_with_log_render_specialist',
-      'By Employer' => 'grievance_report_open_summary_with_log_render_employer',
+      'Summary by Specialist' => 'grievance_report_open_summary_with_log_render_specialist',
+      'Summary by Employer' => 'grievance_report_open_summary_with_log_render_employer',
+      'Detail by Specialist' => 'grievance_report_open_summary_with_log_render_specialist_detail',
+      'Detail by Employer' => 'grievance_report_open_summary_with_log_render_employer_detail',
     ),
   );
 
@@ -670,7 +682,6 @@ function grievance_report_cache_info() {
     ),
   );
 
-  /*
   $items['grievance-report-status-summary'] = array(
     'name' => t('Status Summary Report'),
     'description' => '',
@@ -680,11 +691,9 @@ function grievance_report_cache_info() {
     'pk_list_callback' => 'grievance_report_status_summary_pks',
     'batch_callback' => 'grievance_report_status_summary_batch',
     'render_callbacks' => array(
-      'Summary By Specialist' => 'grievance_report_status_summary_render_specialist',
-      'Summary By Chapter' => 'grievance_report_status_summary_render_chapter',
+      'Breakout by Company' => 'grievance_report_status_summary_render_company',
     ),
   );
-  */
 
   return $items;
 }
@@ -721,6 +730,10 @@ function grievance_views_pre_render(&$view) {
 
   if ($view->name == 'grievance_shop_contacts') {
     grievance_contacts_views_pre_render($view);
+  }
+
+  if ($view->name == 'grievance_log' || $view->name == 'grievance_log_all') {
+    grievance_log_views_pre_render($view);
   }
 }
 

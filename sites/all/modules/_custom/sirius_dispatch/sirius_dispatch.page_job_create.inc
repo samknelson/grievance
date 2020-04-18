@@ -112,6 +112,20 @@ function sirius_dispatch_page_job_create_access($employer_node, $job_type_tid) {
 }
 
 function sirius_dispatch_page_job_create($employer_node, $job_type_tid) {
+	// Check for pending VLRIs
+	if (!user_access('sirius dispatch staff')) {
+		// Must not have any pending VLRIs
+		$vlri_check = sirius_dispatch_vlri_block_check($employer_node->nid);
+		if (!$vlri_check['success']) {
+			$html = $vlri_check['msg'];
+			$html .= " ";
+			$html .= "No new jobs may be created until these layoff requests are resolved. ";
+			$html .= '<br /><br />';
+			$html .= l('Resolve layoff requests.', 'sirius/employer/dispatch/vlri');
+			return $html;
+		}
+	}
+
 	return drupal_get_form('sirius_dispatch_page_job_create_form', $employer_node, $job_type_tid);
 }
 
@@ -153,6 +167,9 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	$industry_tid = $employer_node->field_sirius_industry['und'][0]['tid'];
 	$industry_term = taxonomy_term_load($industry_tid);
 
+	$employer_json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
+	$industry_json = json_decode($industry_term->field_sirius_json['und'][0]['value'], TRUE);
+
 	$job_type_term = taxonomy_term_load($job_type_tid);
 	$form['employer_markup'] = array('#markup' => '<div class="sirius_form_intro">Creating a job for <strong>' . 
 		$employer_node->title . 
@@ -165,6 +182,26 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	$show_event = ($job_policy['event']['has_event'] == 'Yes' && $job_policy['event']['on_job_create'] == 'select');
 	if ($show_event) {
 		$event_options = array(NULL => t('-- Select --'));
+		$query = new EntityFieldQuery;
+	  $query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'sirius_event');
+	  $query->fieldCondition('field_sirius_event_type', 'tid', $job_policy['event']['event_type']);
+	  $query->fieldCondition('field_sirius_daterepeat', 'value', gmdate('Y-m-d'), '>=');
+	  $query->fieldCondition('field_sirius_active', 'value', 'Yes');
+	  $query->fieldOrderBy('field_sirius_daterepeat', 'value');
+	  $stmt = $query->execute();
+	  if (!$stmt['node']) {
+	  	drupal_set_message(t('There are no upcoming events.'), 'error');
+	  	return array();
+	  }
+	  $event_nodes = node_load_multiple(array_keys($stmt['node']));
+	  foreach ($event_nodes as $event_nid => $event_node) {
+	  	$bullen_job_node = sirius_event_bullpen_job($event_nid);
+	  	if (!$bullen_job_node) { continue; }
+	  	$employer_node = node_load($bullen_job_node->field_grievance_shop['und'][0]['target_id']);
+	  	$facility_node = node_load($bullen_job_node->field_sirius_dispatch_facility['und'][0]['target_id']);
+	  	$event_options[$event_nid] = $employer_node->title . ': ' . sirius_date_date($event_node, 'field_sirius_daterepeat', 'Y-m-d h:i a') . ': ' . $facility_node->title;
+	  }
 		$form['event_nid'] = array(
 			'#type' => 'select',
 			'#title' => t('Event'),
@@ -204,9 +241,7 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 	// Member status
 	$show_closed_statuses = FALSE;
-	if ($job_type_tid == sirius_get_special_tid('sirius_dispatch_job_type|BULL')) {
-		$show_closed_statuses = TRUE; 
-	}
+	if ($job_policy['event']['has_event'] == 'Yes') { $show_closed_statuses = TRUE; }
 	$open_member_statuses = sirius_worker_member_status_get_open_statuses($industry_tid, $show_closed_statuses, $job_type_tid);
 	$open_member_status_tids = array_keys($open_member_statuses);
 	$open_member_status_options = array();
@@ -418,10 +453,11 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 		}
 	}
 
-	$notes_default = $employer_node->field_sirius_dispatch_notesdef['und'][0]['value'];
-	if (!$notes_default) {
-		$notes_default = $industry_term->field_sirius_dispatch_notesdef['und'][0]['value'];
-	}
+	$employer_json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
+	$industry_json = json_decode($industry_term->field_sirius_json['und'][0]['value'], TRUE);
+
+	$notes_default = $employer_json['dispatch']['default']['notes'];
+	if (!$notes_default) { $notes_default = $industry_json['dispatch']['default']['notes']; }
 	$form['notes'] = array(
 		'#type' => 'textarea',
 		'#title' => t('Notes'),
@@ -433,10 +469,13 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 	if (!$show_event) {
 		if ($job_policy['form']['hide_address_parking'] != 'Yes') {
+			$address_parking_default = $employer_json['dispatch']['default']['address_parking'];
+			if (!$address_parking_default) { $address_parking_default = $industry_json['dispatch']['default']['address_parking']; }
 			$form['address_parking'] = array(
 				'#type' => 'textarea',
 				'#title' => t('Parking Instructions'),
 				'#description' => t('Enter any parking instructions for workers.'),
+				'#default_value' => $address_parking_default,
 			);
 		}
 	}
@@ -531,10 +570,12 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	if ($form_state['triggering_element']['#value'] == 'Filter') { return; }
 
 	// Report date must be in the future
-	$report_ts = strtotime($form_state['values']['datetime']);
-	if ($report_ts < time() + 60*60*1) {
-  	form_set_error('datetime', 'Report date must be at least one hour in the future.');
-  }
+	if (!$form_state['values']['event_nid']) {
+		$report_ts = strtotime($form_state['values']['datetime']);
+		if ($report_ts < time() + 60*60*1) {
+	  	form_set_error('datetime', 'Report date must be at least one hour in the future.');
+	  }
+	}
 
 	for ($i=0; $i<10; ++$i) {
 		if ($form_state['values']["email_$i"] && !sirius_email_validate($form_state['values']["email_$i"])) {
@@ -580,24 +621,29 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	if ($count_policy == 'required') {
 		if (! ($form_state['values']['count'] > 0)) { form_set_error('count', t('Please enter a nonzero number of workers.')); }
 	}
-	if (!$form_state['values']['facility']) { form_set_error('facility', t('Please select a facility.')); }
+	if (!$form_state['values']['event_nid']) {
+		if (!$form_state['values']['facility']) { form_set_error('facility', t('Please select a facility.')); }
+	}
+
 }
 
 function sirius_dispatch_page_job_create_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 
+	// Build the job
+	$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
+	$job_node = node_submit($job_node);
+
 	// Build and save the event (if any)
-	$event_node = sirius_dispatch_page_job_create_get_event_node($form_state);
+	$event_node = sirius_dispatch_page_job_create_get_event_node($form_state, $job_node);
 	if ($event_node) {
 		$event_node = node_submit($event_node);
 		node_save($event_node);
 		$event_nid = $event_node->nid;
+		$job_node->field_sirius_events['und'][0]['target_id'] = $event_nid;
 	}
 
-	// Build and save the job
-	$job_node = sirius_dispatch_page_job_create_get_job_node($form_state);
-	$job_node = node_submit($job_node);
-	if ($event_nid) { $job_node->field_sirius_event['und'][0]['target_id'] = $event_nid; }
+	// Save the job
 	node_save($job_node);
 	$job_nid = $job_node->nid;
 
@@ -711,6 +757,15 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 		$job_node->field_sirius_dispatch_job_group['und'][0]['target_id'] = $form_state['values']['job_group'];
 	}
 
+	$event_nid = $form_state['values']['event_nid'];
+	if ($event_nid) {
+		$job_node->field_sirius_events['und'][0]['target_id'] = $event_nid;
+		$event_node = node_load($event_nid);
+		$sponsor_job_node = sirius_event_bullpen_job($event_nid);
+		$job_node->field_sirius_datetime = $sponsor_job_node->field_sirius_datetime;
+		$job_node->field_sirius_dispatch_facility = $sponsor_job_node->field_sirius_dispatch_facility;
+	}
+
 	if ($form_state['values']['notify']) {
 		$job_node->field_sirius_notify['und'][0]['value'] = $form_state['values']['notify'];
 
@@ -758,7 +813,7 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 	return $job_node;
 }
 
-function sirius_dispatch_page_job_create_get_event_node($form_state) {
+function sirius_dispatch_page_job_create_get_event_node($form_state, $job_node) {
 	$job_type_tid = $form_state['job_type_tid'];
 	$job_policy = sirius_dispatch_job_policy_from_tid($job_type_tid);
 	if ($job_policy['event']['has_event'] != 'Yes') { return NULL; }
@@ -777,6 +832,7 @@ function sirius_dispatch_page_job_create_get_event_node($form_state) {
 	} else {
 		$event_node->title = $employer_node->title . ' - ' . $event_type_term->name . ' - ' . gmdate('Y-m-d', strtotime($form_state['values']['datetime']));
 	}
+	$event_node->field_sirius_active['und'][0]['value'] = 'Yes';
 	$event_node->type = 'sirius_event';
 	node_object_prepare($event_node);
 	$event_node->language = LANGUAGE_NONE;
@@ -791,6 +847,7 @@ function sirius_dispatch_page_job_create_get_event_node($form_state) {
   	$event_node->field_sirius_daterepeat['und'][0]['value'] = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['datetime']));
   }
   $event_node->field_sirius_event_type['und'][0]['tid'] = $event_type_tid;
+  $event_node->field_sirius_active['und'][0]['value'] = 'Yes';
 
 	return $event_node;
 }

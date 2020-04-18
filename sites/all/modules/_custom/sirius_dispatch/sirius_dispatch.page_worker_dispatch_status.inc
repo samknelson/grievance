@@ -11,8 +11,14 @@ function sirius_node_tab_worker_dispatch_status($worker_node) {
 function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worker_node) {
 	$form_state['worker_node'] = $worker_node;
 
-	// Show the current dispatch status, current employer, current dispatch
 	$html = '';
+
+	// List current dispatches
+	$html .= '<h2>' . t('Current Dispatches') . '</h2>';
+	$html .= views_embed_view('sirius_worker_dispatches', 'block_1', $worker_node->nid);
+
+
+	$html .= '<h2>Dispatch Status</h2>';
 	$current_status_tid = $worker_node->field_sirius_worker_dispstatus['und'][0]['tid'];
 	$current_status_term = taxonomy_term_load($current_status_tid);
 	$html .= t('Current dispatch status: ') . '<strong>' . $current_status_term->name . '</strong>';
@@ -27,70 +33,35 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 		$html .= '<br />' . t('Current Employer: ') . '<strong>' . $employer_node->title . '</strong>';
 	}
 
-	$dispatch_node = sirius_dispatch_get_current($worker_node->nid);
-	if ($dispatch_node) {
-		$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
-		$html .= '<br />' . t('Current dispatch: ') . '<strong>' . $job_node->title . '</strong> (' . l('View', 'node/' . $dispatch_node->nid . '/sirius_dispatch_worker_view') . ')';
-	}
-
 	$form['intro'] = array(
 		'#type' => 'markup',
 		'#markup' => '<div class="sirius_form_intro">' . $html . '</div>',
 	);
 
-	// If we have permission to resign a dispatch, show a resign option
 	$need_submit = FALSE;
-	if ($dispatch_node && (user_access('sirius dispatch staff') || user_access('sirius dispatch resign'))) {
+	$status_options = array();
+
+	$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+	$possible = sirius_dispatch_worker_dispstatus_set_possible($worker_node, $tid);
+	if ($possible['success']) { $status_options[$tid] = 'Not Available (SIGNED OUT)'; } 
+
+	$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
+	$possible = sirius_dispatch_worker_dispstatus_set_possible($worker_node, $tid);
+	if ($possible['success']) { $status_options[$tid] = 'Available (SIGNED IN)'; }
+
+	if ($status_options) {
+		$status_default = $worker_node->field_sirius_worker_dispstatus['und'][0]['tid'];
 		$need_submit = TRUE;
-		$form['resign'] = array(
+		$form['status'] = array(
 			'#type' => 'select',
-			'#title' => t('Voluntary layoff this dispatch?'),
-			'#options' => array(
-				'no' => t('No, I do not wish to go on voluntary layoff.'),
-				'yes' => t('Yes, I wish to go on voluntary layoff for this dispatch.'),
-			),
+			'#title' => t('Sign in?'),
+			'#options' => $status_options,
+			'#default_value' => $status_default,
 		);
-	}
-
-	// If we have permission to terminate a dispatch, show a termiante option
-	if ($dispatch_node && (user_access('sirius dispatch staff'))) {
-		$need_submit = TRUE;
-		$form['terminate'] = array(
-			'#type' => 'select',
-			'#title' => t('Layoff this dispatch?'),
-			'#options' => array(
-				'no' => t('No, the employer does not wish to layoff this dispatch.'),
-				'yes' => t('Yes, the employer wishes to layoff this dispatch.'),
-			),
-		);
-	}
-
-	// If we don't have a dispatch ...
-	if (!$dispatch_node) {
-
-		$status_options = array();
-
-		$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
-		$possible = sirius_dispatch_worker_dispstatus_set_possible($worker_node, $tid);
-		if ($possible['success']) { $status_options[$tid] = 'Not Available (SIGNED OUT)'; } 
-
-		$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
-		$possible = sirius_dispatch_worker_dispstatus_set_possible($worker_node, $tid);
-		if ($possible['success']) { $status_options[$tid] = 'Available (SIGNED IN)'; }
-
-		if ($status_options) {
-			$status_default = $worker_node->field_sirius_worker_dispstatus['und'][0]['tid'];
-			$need_submit = TRUE;
-			$form['status'] = array(
-				'#type' => 'select',
-				'#title' => t('Sign in?'),
-				'#options' => $status_options,
-				'#default_value' => $status_default,
-			);
-		}
 	}
 
 	if (user_access('sirius dispatch staff')) {
+		$need_submit = TRUE;
 		$prefix = '';
 		if ($worker_node->field_sirius_dispatch_availdate['und'][0]['value']) {
 			$prefix = '<div class="sirius_field_intro">';
@@ -136,14 +107,12 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 	} 
 
 	if (user_access('sirius dispatch staff')) {
+		$options = sirius_taxonomy_load('sirius_dispatch_sib', 'tid', 'name', TRUE);
 		$form['sib'] = array(
 			'#type' => 'select',
 			'#title' => t('Sign-In Blocked?'),
-			'#options' => array(
-				'No' => t('No'),
-				'Yes' => t('Yes'),
-			),
-			'#default_value' => $worker_node->field_sirius_dispatch_sib['und'][0]['value'],
+			'#options' => $options,
+			'#default_value' => $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid'],
 		);
 
 		$form['reason'] = array(
@@ -151,7 +120,8 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 			'#title' => t('Notes'),
 		);
 	} else {
-		if ($worker_node->field_sirius_dispatch_sib['und'][0]['value'] == 'Yes') {
+		$sib_term = taxonomy_term_load($worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']);
+		if ($sib_term && $sib_term->field_sirius_dispatch_available['und'][0]['value'] == 'No') {
 			$form['sib'] = array('#markup' => '<div class="sirius_form_intro"><strong>Sign-in is not permitted - the administrator has placed a sign-in block. Please contact the office for more information.</strong></div>');
 		}
 	}
@@ -169,33 +139,21 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 	return $form;
 }
 
+function sirius_node_tab_worker_dispatch_status_form_validate($form, &$form_state) {
+	$worker_node = $form_state['worker_node'];
+
+	if (user_access('sirius dispatch staff')) {
+		$reason = $form_state['values']['reason'];
+		$block_tid = $form_state['values']['sib'];
+		if (!$reason && ($block_tid != $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid'])) {
+			form_set_error('reason', 'If you are changing the sign-in block status, please enter a reason.');
+		}
+	}
+}
+
 function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state) {
 	$worker_node = $form_state['worker_node'];
 	$reason = $form_state['values']['reason'];
-
-	if ($form_state['values']['resign'] == 'yes') {
-		$dispatch_node = sirius_dispatch_get_current($worker_node->nid);
-		if ($dispatch_node) {
-			$result = sirius_dispatch_resign($dispatch_node, $reason);
-			if ($result['success']) {
-				drupal_set_message($result['msg']);
-			} else {
-				drupal_set_message($result['msg'], 'warning');
-			}
-		}
-	}
-
-	if ($form_state['values']['terminate'] == 'yes') {
-		$dispatch_node = sirius_dispatch_get_current($worker_node->nid);
-		if ($dispatch_node) {
-			$result = sirius_dispatch_terminate($dispatch_node, $reason);
-			if ($result['success']) {
-				drupal_set_message($result['msg']);
-			} else {
-				drupal_set_message($result['msg'], 'warning');
-			}
-		}
-	}
 
 	if ($form_state['values']['status']) {
 		$result = sirius_dispatch_worker_dispstatus_set($worker_node, $form_state['values']['status'], NULL, $reason);
@@ -213,10 +171,15 @@ function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state)
 		sirius_log('worker:availdate', 'set', "Set worker's availability date to $newdate", $reason, '', array($worker_node->nid));
 	}
 
-	if ($form_state['values']['sib']) {
-		if ($form_state['values']['sib'] != $worker_node->field_sirius_dispatch_sib['und'][0]['value']) {
-			sirius_dispatch_worker_dispstatus_block_set($worker_node, $form_state['values']['sib'], $reason);
-			drupal_set_message("Sign-in block has been set to " . $form_state['values']['sib']);
+	$block_tid = $form_state['values']['sib'];
+	if ($block_tid != $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']) {
+		if ($block_tid) {
+			$block_term = taxonomy_term_load($block_tid);
+			sirius_dispatch_worker_dispstatus_block_set($worker_node, $block_tid, $reason);
+			drupal_set_message("Sign-in block has been set to " . $block_term->name);
+		} else {
+			sirius_dispatch_worker_dispstatus_block_set($worker_node, NULL, $reason);
+			drupal_set_message("Sign-in block has been cleared.");
 		}
 	}
 }

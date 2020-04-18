@@ -1,0 +1,177 @@
+<?php
+
+/**
+ * Implements hook_grievance_workersync_plugin_info
+ */
+
+function grievance_imis_grievance_workersync_plugin_info() {
+  $info = array();
+  $info['imis'] = array(
+    'title' => 'iMIS',
+    'description' => 'Fetch workers from an iMIS data source',
+    'settings_callback' => 'grievance_imis_callback_settings',
+    'search_callback' => 'grievance_imis_callback_search',
+    'search_description' => 'Enter the last name or SSN of the employee.',
+    'lookup_callback' => 'grievance_imis_callback_lookup',
+  );
+
+  return $info;
+}
+
+/**
+ * Plugin callback: settings
+ */
+
+function grievance_imis_callback_settings(&$form, &$form_state) {
+  $variable_name = sirius_domain_variable_name('grievance_workersync_imis_url');
+  $form['plugin_settings'][$variable_name] = array(
+    '#type' => 'textfield',
+    '#default_value' => variable_get($variable_name, ''),
+    '#title' => t('iMIS URL'),
+    '#description' => t('This will be something like: https://unite-test3.burstingsilver.com/BSi.iMIS.WebServices/api/member/grievance'),
+  );
+
+   $variable_name = sirius_domain_variable_name('grievance_workersync_imis_apikey');
+   $form['plugin_settings'][$variable_name] = array(
+    '#type' => 'textarea',
+    '#title' => t('IMIS API Key'),
+    '#description'   => t('IMIS API Key.'),
+    '#default_value' => variable_get($variable_name, ''),
+  );
+}
+
+function grievance_imis_callback_search($str, $verbose = FALSE) {
+  $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url');
+  $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey');
+
+  if (!$imis_url || !$imis_apikey) {
+    sirius_minilog('imis access is not configured.', 'error');
+    return NULL;
+  }
+
+  $imis_url .= '/find';
+  if ($verbose) { sirius_minilog("Connecting to: $imis_url"); }
+
+  if (preg_match('/^\d+$/', $str) && (strlen($str) != 9)) {
+    $str = strtoupper($str);
+    $imis_url .= '?imisId=' . urlencode($str);
+    if ($verbose) { sirius_minilog("Assume search is on iMIS ID: $imis_url"); }
+  } else if (strlen(preg_replace('/\-/', '', $str)) == 9) {
+    $str = preg_replace('/[\-]/', '', $str);
+    $imis_url .= '?ssn=' . urlencode($str);
+    if ($verbose) { sirius_minilog("Assume search is on SSN: $imis_url"); }
+  } else {
+    $imis_url .= '?lastname=' . urlencode($str);
+    if ($verbose) { sirius_minilog("Assume search is on Last Name: $imis_url"); }
+  }
+
+  $options = array(
+    'headers' => array('ApiKey' => $imis_apikey),
+    'method' => 'GET',
+    'context' => stream_context_create(array('ssl' => ['verify_peer' => FALSE, 'verify_peer_name' => FALSE])),
+  );
+  $response = drupal_http_request($imis_url, $options);
+  if ($verbose) { sirius_minilog("Raw response data follows."); }
+  if ($verbose) { sirius_minilog('<pre>' . print_r($response, 1) . '</pre>'); }
+
+  // HTTP Request execute
+  if ($response->code != 200) {
+    drupal_set_message(
+      t(
+        'Unable to connect to server at @url: @error (@code)', 
+        array(
+          '@url' => $imis_url,
+          '@error' => $response->error,
+          '@code' => $response->code
+        )
+      ),
+      'error'
+    );
+    return NULL;
+  }
+
+  $matches = array();
+  $candidates = json_decode($response->data);
+  if ($candidates) {
+    foreach ($candidates as $candidate) {
+      $match = array();
+      $match['id'] = $candidate->ImisId;
+      $match['title'] = $candidate->FullName;
+      $extra = '';
+      if ($candidate->TimssId) {
+        if ($extra) { $extra .= ' / '; }
+        $extra .= $candidate->TimssId;
+      }
+      $match['extra'] = $extra;
+      $employers = array();
+      if ($candidate->Employments) {
+        foreach ($candidate->Employments as $employment) {
+          $employers[$employment->EmployerName]++;
+        }
+      }
+      $match['employer'] = join(', ', array_keys($employers));
+      $match['sort'] = $candidate->LastName . ' ' . $candidate->FirstName;
+
+      $matches[] = $match;
+    }
+  }
+  return $matches;
+}
+
+function grievance_imis_callback_lookup($imis_id, $verbose = FALSE) {
+  $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url');
+  $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey');
+
+  if (!$imis_url || !$imis_apikey) {
+    sirius_minilog('imis access is not configured.', 'error');
+    return NULL;
+  }
+
+  $imis_url .= '/detail';
+  $imis_url .= '?imisId=' . urlencode($imis_id);
+  if ($verbose) { sirius_minilog("Connecting to: $imis_url"); }
+
+  $options = array(
+    'headers' => array('ApiKey' => $imis_apikey),
+    'method' => 'GET',
+    'context' => stream_context_create(array('ssl' => ['verify_peer' => FALSE, 'verify_peer_name' => FALSE])),
+  );
+
+  $response = drupal_http_request($imis_url, $options);
+  if ($verbose) { sirius_minilog("Raw response data follows."); }
+  if ($verbose) { sirius_minilog('<pre>' . print_r($response, 1) . '</pre>'); }
+
+  // HTTP Request execute
+  if ($response->code != 200) {
+    drupal_set_message(
+      t(
+        'Unable to connect to server at @url: @error (@code)', 
+        array(
+          '@url' => $imis_url,
+          '@error' => $response->error,
+          '@code' => $response->code
+        )
+      ),
+      'error'
+    );
+    return NULL;
+  }
+
+  if (!$response->data) { return NULL; }
+  $json = json_decode($response->data, TRUE);
+  $result = array();
+  $result['first_name']   = $json['FirstName'];
+  $result['last_name']    = $json['LastName'];
+  if ($json['WorkerAddress']) {
+    $result['city']         = $json['WorkerAddress']['City'];
+    $result['state']        = $json['WorkerAddress']['State'];
+    $result['zip']          = $json['WorkerAddress']['Zip'];
+    $result['street']       = $json['WorkerAddress']['Address1'];
+    $result['street2']       = $json['WorkerAddress']['Address2'];
+  }
+  $result['gender']       = $json['Gender'];
+  $result['phone']        = $json['Phones'][0]['Phone'];
+  $result['email']        = $json['Emails'][0]['Email'];;
+  $result['id']           = $json['ImisId'];
+  return $result;
+}

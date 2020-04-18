@@ -104,7 +104,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
         !preg_match('/unresolved/i', $term->name)) {
       $victory_status_tids[] = $tid;
     }
-    if (preg_match('/BOA Held/i', $term->name)) {
+    if (preg_match('/BOA Held/i', $term->name) || preg_match('/BOA Follow-Up Held/i', $term->name)) {
       $boa_held_status_tids[] = $tid;
     }
   }
@@ -134,7 +134,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
 
   // Get the list of log types corresponding to "call to grievant".
   // @todo this should be configurable, but what the heck.
-  $log_type_call_tids = array(441, 503, 85);
+  $log_type_call_tids = array(441, 503);
   $log_type_first_call_tid = 503;
   $log_tag_left_message_tid = 874;
   $status_boa_held_tid = 112;
@@ -670,7 +670,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
     'name' => t('Specialist'),
     'open' => t('Total Open'),
     'new' => t('New'),
-    'calls' => t('Total Calls'),
+    'calls' => t('Total Calls Placed'),
     'first_calls' => t('First Calls'),
     'left_message' => t('Left Message'),
     'terms_total' => t('Total Terms'),

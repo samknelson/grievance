@@ -15,6 +15,7 @@ files[] = test/draggableviews.test
 files[] = handlers/draggableviews_handler_native.inc
 files[] = handlers/draggableviews_handler_fieldapi.inc
 files[] = handlers/draggableviews_hierarchy_handler_native.inc
+files[] = handlers/draggableviews_handler_taxonomy_term.inc
 
 dependencies[] = entity
 

@@ -86,7 +86,7 @@ function grievance_letter_form_submit($form, &$form_state) {
 			}
 
 			$log_body = '';
-			grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents, $basename);
+			$log_node = grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents, $basename);
 		}
 
 		// Dump to browser and exit
@@ -271,44 +271,38 @@ function grievance_letter_form_submit($form, &$form_state) {
 			$log_body .= "Subject: $subject\n";
 			$log_body .= "\n$body";
 
-			grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents, $basename);
+			$log_node = grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents, $basename);
 		}
 
 		$params = array();
 		$params['body'] = $body;
 		$params['subject'] =  $subject;
-		if ($cc) {
-			$params['headers']['Cc'] = $cc;
-		}
-		if ($bcc) {
-			$params['headers']['Bcc'] = $bcc;
-		}
-		$params['from'] = $from;
-		$params['attachments'] = array();
+		$params['to'] = $to;
+		if ($cc) { $params['headers']['Cc'] = $cc; }
+		if ($bcc) { $params['headers']['Bcc'] = $bcc; }
+		$params['handler_nids'] = array($grievance_node->nid);
+		if ($log_node) { $params['handler_nids'][] = $log_node->nid; }
+
+		$params['reply-to'] = $from;
 
 		// Attach the grievance as a PDF
+		$params['attachments'] = array();
 		$params['attachments'][] = array(
 			'filecontent' => $pdf_contents,
 			'filename' => 'grievance_' . $grievance_node->nid . '_' . time() . '.pdf',
 			'filemime' => 'grievance/pdf',
 		);
 
-		drupal_mail(
-			'grievance', 
-			'notify', 
-			$to, 
-			LANGUAGE_NONE, 
-			$params
-		);
+		$result = sirius_email_send($params);
 
-		drupal_set_message(t('Sent Notification: ') . htmlspecialchars($subject));
-		drupal_set_message(t('Notification FROM: ') . htmlspecialchars($from));
-		drupal_set_message(t('Notification TO: ') . htmlspecialchars($to));
-		if ($cc) {
-			drupal_set_message(t('Notification CC: ') . htmlspecialchars($cc));
-		}
-		if ($bcc) {
-			drupal_set_message(t('Notification BCC: ') . htmlspecialchars($bcc));
+		if (!$result['success']) {
+			drupal_set_message(t('Message failed: ') . $result['msg'], 'error');
+		} else {
+			drupal_set_message(t('Sent Notification: ') . htmlspecialchars($subject));
+			drupal_set_message(t('Notification FROM: ') . htmlspecialchars($params['reply-to']));
+			drupal_set_message(t('Notification TO: ') . htmlspecialchars($to));
+			if ($cc) { drupal_set_message(t('Notification CC: ') . htmlspecialchars($cc)); }
+			if ($bcc) { drupal_set_message(t('Notification BCC: ') . htmlspecialchars($bcc)); }
 		}
 
 		return;
@@ -388,21 +382,37 @@ function grievance_letter_form_submit($form, &$form_state) {
 }
 
 function grievance_letter_render_html($grievance_node, $letter_nids, $other_tokens) {
+	// Add the worker node as a tokenized object
+	$tokens = array();
+	$token_aliases = array();
+
+	$workersync_plugin = grievance_workersync_plugin_fetch();
+	if ($workersync_plugin['id'] == 'local') {
+		$worker_id = $grievance_node->field_grievance_min['und'][0]['value'];
+		$worker_node = sirius_worker_get_by_id($worker_id);
+		if ($worker_node) {
+			$tokens['worker_node'] = $worker_node;
+			$token_aliases['worker_node'] = 'node';
+		}
+	}
+
 	if ($other_tokens['letter_body']) {
 		return '<div id="grievance-letter-body">' . $other_tokens['letter_body'] . '</div>';
 	}
 	$letter_nodes = node_load_multiple($letter_nids);
+
+	$tokens['node'] = $grievance_node;
+	$tokens['other_tokens'] = $other_tokens;
+
 	$body = '';
 	foreach ($letter_nodes as $letter_nid => $letter_node) {
 		$letter_part = $letter_node->body['und'][0]['value'];
 		$letter_part = token_replace(
 			$letter_part, 
-			array(
-				'node' => $grievance_node,
-				'grievance-letter' => $other_tokens,
-			),
+			$tokens,
 			array(
 				'clear' => TRUE,
+				'aliases' => $token_aliases,
 			)
 		);
 
@@ -457,4 +467,5 @@ function grievance_letter_log($form_state, $log_title, $log_body, $pdf_contents,
 
   $log_node = node_submit($log_node); // Prepare node for saving
   node_save($log_node);
+  return $log_node;
 }

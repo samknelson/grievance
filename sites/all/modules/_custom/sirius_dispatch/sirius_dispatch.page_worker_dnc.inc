@@ -21,9 +21,9 @@ function sirius_node_tab_worker_dnc_form($form, &$form_state, $worker_node) {
 		}
 	}
 	if ($html) {
-		$html = $worker_node->title . ' is currently on the Do Not Call list for the following employers:<ul>' . $html . '</ul>';
+		$html = t('@title is currently on the Do Not Call list for the following employers and/or facilities:', array('@title' => $worker_node->title)) . '<ul>' . $html . '</ul>';
 	} else {
-		$html = $worker_node->title . ' is not currently on the Do Not Call list for any employers.';
+		$html = t('@title is not currently on the Do Not Call list for any employers or facilities.', array('@title' => $worker_node->title));
 	}
 	$form['intro'] = array(
 		'#type' => 'markup',
@@ -32,12 +32,22 @@ function sirius_node_tab_worker_dnc_form($form, &$form_state, $worker_node) {
 
 
 	if (user_access('sirius dispatch staff')) {
-		$employer_options = array(NULL => t('-- Select --'));
-		$employer_options += sirius_employer_list();
+		$options = array(NULL => t('-- Select --'));
+		$employer_options = sirius_employer_list();
+		foreach ($employer_options as $nid => $title) {
+			if (!$nid) { continue; }
+			$options[$nid] = t('Employer: ') . $title;
+		}
+		$facility_options = sirius_dispatch_facility_dropdown();
+		foreach ($facility_options as $nid => $title) {
+			if (!$nid) { continue; }
+			$options[$nid] = t('Facility: ') . $title;
+		}
+
 		$form['employer_nid'] = array(
 			'#type' => 'select',
-			'#title' => 'Employer',
-			'#options' => $employer_options,
+			'#title' => 'Employer or Facility',
+			'#options' => $options,
 			'#required' => TRUE,
 		);
 

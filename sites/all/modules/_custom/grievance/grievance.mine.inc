@@ -122,10 +122,10 @@ function grievance_views_post_execute_grievances_mine(&$view) {
 	// Look up various TID's
 	//
 
-  $first_call_tid = variable_get('grievance_log_first_call_type', '');
+  $first_call_tid = sirius_get_special_tid('grievance_log_types|first_call');
+  $log_assignment_type = sirius_get_special_tid('grievance_log_types|assignment');
   $filed_status_tid = variable_get('grievance_log_filed_status', '');
   $filed_status_tid_2 = variable_get('grievance_log_filed_status_2', '');
-  $log_assignment_type = variable_get('grievance_log_assignment_type', '');
 
 	foreach ($view->result as $delta => &$result) {
 		++$total;
