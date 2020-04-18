@@ -16,6 +16,14 @@ function grievance_admin() {
     '#description' => t("Grievance log status to be used for incidents -- i.e. an entry with this status is created the date that the incident occurred."),
   );
 
+  $form['grievance_status']['grievance_incident_required'] = array(
+    '#type' => 'select',
+    '#options' => array('No' => 'No', 'Yes' => 'Yes'),
+    '#title' => t('Incident Date Required?'),
+    '#default_value' => variable_get('grievance_incident_required', ''),
+    '#description' => t("Select Yes to make the incident date required for all new grievances."),
+  );
+
   $form['grievance_status']['grievance_log_filed_status'] = array(
     '#type' => 'select',
     '#options' => taxonomy_allowed_values(field_info_field('field_grievance_status')),
