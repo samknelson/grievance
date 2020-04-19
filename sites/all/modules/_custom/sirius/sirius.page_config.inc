@@ -34,6 +34,7 @@ function sirius_page_config() {
 	$links['grievance']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
 	$links['grievance']['links']['grievance/admin/statuses/sequences'] = array('title' => 'Status Sequences', 'description' => 'Configure the sequences of statuses that constrain timelines.');
 	$links['grievance']['links']['admin/config/grievance/intake-log'] = array('title' => 'Intake Log', 'description' => 'Allow grievance intake to request specific log dates, such as the date of a discipline or termiantion.');
+	$links['grievance']['links']['grievances/irsets'] = array('title' => 'Information Request Sets', 'description' => 'Group multiple attachment types into an easily accessible "information request set".');
 
 	$links['dispatch'] = array('title' => 'Dispatch');
 	$links['dispatch']['links']['sirius/dispatch/config/run'] 	= array('title' => 'Running Job Settings', 'description' => 'Global settings for running jobs.');
