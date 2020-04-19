@@ -4,6 +4,7 @@ function grievance_form_grievance_node_callback_replace($form, $form_state) {
   $commands = array();
   $commands[] = ajax_command_replace("#grievance-node-form-replaceme", render($form));
   $commands[] = ajax_command_invoke(NULL, "grievance_bind_classification_term_map", array());
+  $commands[] = ajax_command_invoke(NULL, "grievance_bind_irset_map", array());
   return array(
     '#type' => 'ajax',
     '#commands' => $commands
