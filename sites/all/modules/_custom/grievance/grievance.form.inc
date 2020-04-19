@@ -180,6 +180,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
   $status_term = taxonomy_term_load($status_tid);
   if (!user_access('grievance admin')) {
+    $current_status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
     // 
     // Restrict the statuses based on the user roles
     //
@@ -207,6 +208,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     //
 
     foreach ($status_tids_to_disable as $check_status_tid) {
+      if ($check_status_tid == $current_status_tid) { continue; }
       unset($form['field_grievance_status']['und']['#options'][$check_status_tid]);
     }
   }

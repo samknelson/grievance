@@ -228,6 +228,7 @@ function grievance_uhmigrate_find_term_by_sirius_id($vocabulary_name, $external_
 
 function grievance_uhmigrate_node_save(&$node) {
   // return NULL;
+  node_object_prepare($node);
   return node_save($node); 
 }
 

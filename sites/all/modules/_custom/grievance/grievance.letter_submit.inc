@@ -405,6 +405,7 @@ function grievance_letter_render_html($grievance_node, $letter_nids, $other_toke
 	$tokens['other_tokens'] = $other_tokens;
 
 	$body = '';
+	if ($_REQUEST['uid'] && sirius_loopback_access()) { sirius_become_superuser(TRUE, $_REQUEST['uid']); }
 	foreach ($letter_nodes as $letter_nid => $letter_node) {
 		$letter_part = $letter_node->body['und'][0]['value'];
 		$letter_part = token_replace(
