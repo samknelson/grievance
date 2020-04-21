@@ -125,3 +125,27 @@ function sirius_contact_get_nid_from_worker($worker_nid) {
 	$hr = $stmt->fetchAssoc();
 	return $hr['field_sirius_contact_target_id'];
 }
+
+function sirius_contact_list_sources() {
+	$sources_by_domain =& drupal_static(__FUNCTION__, array());
+
+	$domain_nid = sirius_domain_nid();
+	if (!isset($sources_by_domain[$domain_nid])) {
+		$sql = "select distinct field_sirius_source_value as source from node ";
+		$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+		$sql .= "left join field_data_field_sirius_source on field_data_field_sirius_source.entity_type = 'node' and field_data_field_sirius_source.entity_id = node.nid ";
+		$sql .= "where node.type = 'sirius_contact' ";
+		if ($domain_nid) {
+			$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+			$sql_args[':domain_nid'] = $domain_nid;
+		}
+		$sql .= "order by field_sirius_source_value ";
+		$stmt = db_query($sql, $sql_args);
+		$sources_by_domain[$domain_nid] = array();
+		while ($hr = $stmt->fetchAssoc()) {
+			if ($hr['source']) { $sources_by_domain[$domain_nid][] = $hr['source']; }
+		}
+	}
+
+	return $sources_by_domain[$domain_nid];
+}
