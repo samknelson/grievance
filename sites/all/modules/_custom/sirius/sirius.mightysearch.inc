@@ -18,6 +18,9 @@ function sirius_mightysearch_clause_count($form_state) {
 	return $count;
 }
 function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id, $title, $json_forms, $actions) {
+  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/mightysearch.js');
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/mightysearch.css');
+
 	$form_state['json_forms'] = $json_forms;
 	$form_state['actions'] = $actions;
 	$form_state['mightysearch_id'] = $mightysearch_id;
@@ -68,6 +71,8 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 	for ($i=0; $i<$clause_count; ++$i) {
 		$form['mightysearch'][$i] = array(
 			'#type' => 'fieldset',
+			'#prefix' => '<div class="sirius_mightysearch_clause">',
+			'#suffix' => '</div>',
 		);
 
 		$form['mightysearch'][$i]['andor'] = array(
@@ -76,7 +81,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 				'and' => 'AND',
 				'or' => 'OR',
 			),
-			'#prefix' => '<div style="float: left; min-width: 80px;">',
+			'#prefix' => '<div class="sirius_mightsearch_clausepart sirius_mightsearch_clausepart_andor">',
 			'#suffix' => '</div>',
 			'#default_value' => $my_saved_mightysearch[$i]['andor'],
 		);
@@ -91,7 +96,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 				'(((' => '(((',
 				'((((' => '((((',
 			),
-			'#prefix' => '<div style="float: left;">',
+			'#prefix' => '<div class="sirius_mightsearch_clausepart">',
 			'#suffix' => '</div>',
 			'#default_value' => $my_saved_mightysearch[$i]['open'],
 		);
@@ -99,7 +104,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		$form['mightysearch'][$i]['field'] = array(
 			'#type' => 'select',
 			'#options' => $paths,
-			'#prefix' => '<div style="float: left;">',
+			'#prefix' => '<div class="sirius_mightsearch_clausepart">',
 			'#suffix' => '</div>',
 	    '#ajax' => array('callback' => 'sirius_mightysearch_ajax_valuefield'),
 	    '#ajax_args' => array('clause_number' => $i),
@@ -119,31 +124,42 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 				'not like' => 'does not contain',
 				'starts' => 'starts with',
 				'ends' => 'ends with',
+				'empty' => 'empty',
+				'not empty' => 'not empty',
 			),
-			'#prefix' => '<div style="float: left;">',
+			'#prefix' => '<div class="sirius_mightsearch_clausepart">',
 			'#suffix' => '</div>',
 			'#default_value' => $my_saved_mightysearch[$i]['criterion'],
+	    '#ajax' => array('callback' => 'sirius_mightysearch_ajax_valuefield'),
+	    '#ajax_args' => array('clause_number' => $i),
 		);
 
 		$full_path = $form_state['values']['mightysearch'][$i]['field'];
+		$criterion = $form_state['values']['mightysearch'][$i]['criterion'];
 		if ($full_path) {
-			list ($node_type, $which_form, $path) = sirius_mightysearch_parse_path($full_path);
-			if ($which_form == 'core') {
-				list ($field_name, $column) = explode(':', $path);
-				if ($field_name == 'field_sirius_source' && $column == 'value') {
-					$element = array('#type' => 'select', '#options' => drupal_map_assoc(sirius_contact_list_sources()));
+			if ($criterion == 'empty' || $criterion == 'not empty') {
+				$element = array('#type' => 'hidden');
+			} else if ($criterion == '=') {
+				list ($node_type, $which_form, $path) = sirius_mightysearch_parse_path($full_path);
+				if ($which_form == 'core') {
+					list ($field_name, $column) = explode(':', $path);
+					if ($field_name == 'field_sirius_source' && $column == 'value') {
+						$element = array('#type' => 'select', '#options' => drupal_map_assoc(sirius_contact_list_sources()));
+					} else {
+						$element = array('#type' => 'textfield');
+					}
 				} else {
-					$element = array('#type' => 'textfield');
+					$element = sirius_jsonfield_util_get_from_path($json_forms[$node_type][$which_form], $path);
+					unset($element['#sirius']);
+					unset($element['#title']);
 				}
 			} else {
-				$element = sirius_jsonfield_util_get_from_path($json_forms[$node_type][$which_form], $path);
-				unset($element['#sirius']);
-				unset($element['#title']);
+				$element = array('#type' => 'textfield');
 			}
 		} else {
 			$element = array('#type' => 'textfield');
 		}
-		$element['#prefix'] = "<div style=\"float: left;\" id=\"sirius_mightysearch_valuefield_$i\">";
+		$element['#prefix'] = "<div class=\"sirius_mightsearch_clausepart\" id=\"sirius_mightysearch_valuefield_$i\">";
 		$element['#suffix'] = '</div>';
 		$element['#default_value'] = $my_saved_mightysearch[$i]['value'];
 
@@ -158,9 +174,13 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 				')))' => ')))',
 				'))))' => '))))',
 			),
-			'#prefix' => '<div style="float: left;">',
+			'#prefix' => '<div class="sirius_mightsearch_clausepart">',
 			'#suffix' => '</div>',
 			'#default_value' => $my_saved_mightysearch[$i]['close'],
+		);
+
+		$form['mightysearch'][$i]['clear'] = array(
+			'#markup' => "<div class=\"sirius_mightsearch_clausepart sirius_mightsearch_clausepart_clearlink\"><div><a href=\"\">Clear</a></div></div>"
 		);
 	}
 
@@ -280,7 +300,6 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 		$i = $sql_parts['i'];
 		if ($i == 1) { $sql_parts['where'] .= 'and ('; }
 		else 				 { $sql_parts['where'] .= $values['andor'] . ' '; }
-		$sql_parts['where'] .= $values['open'];
 	}
 
 	list ($node_type, $which_form, $path) = sirius_mightysearch_parse_path($full_path);
@@ -289,9 +308,9 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 		list ($field_name, $column) = explode(':', $path);
 
 		if ($field_name == 'title') {
-			if ($criterion) { $sql_parts['where'] .= "title "; }
+			if ($criterion) { $where_name = "title "; }
 		} else {
-			if ($criterion) { $sql_parts['where'] .= "${field_name}_$column "; }
+			if ($criterion) { $where_name = "${field_name}_$column "; }
 			if (!$sql_parts['joins_nodupe'][$field_name]) {
 				$sql_parts['joins_nodupe'][$field_name] = TRUE;
 				$sql_parts['joins'] .= "left join field_data_$field_name on field_data_$field_name.entity_type = 'node' and field_data_$field_name.entity_id = node.nid ";
@@ -303,7 +322,7 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 		}
 	} else {
 		$path_for_query = '$.' . $which_form . '.results.' . preg_replace('/:/', '.', $path);
-		if ($criterion) { $sql_parts['where'] .= "lower(json_unquote(json_extract(field_sirius_json_value, '$path_for_query'))) "; }
+		if ($criterion) { $where_name = "lower(json_unquote(json_extract(field_sirius_json_value, '$path_for_query'))) "; }
 	}
 
 	if ($criterion) {
@@ -315,12 +334,22 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 		} else if ($criterion == 'ends') {
 			$criterion = 'like';
 			$value = '%' . $value;
+		} else if ($criterion == 'empty') {
 		}
 
-		$sql_parts['where'] .= $criterion . ' ';
-		$sql_parts['where'] .= ":value_$i ";
+		$sql_parts['where'] .= $values['open'];
+
+		if ($criterion == 'empty') {
+			$sql_parts['where'] .= "($where_name IS NULL OR $where_name = '') ";
+		} else if ($criterion == 'not empty') {
+			$sql_parts['where'] .= "($where_name IS NOT NULL OR $where_name != '') ";
+		} else {
+			$sql_parts['where'] .= $where_name . ' ';
+			$sql_parts['where'] .= $criterion . ' ';
+			$sql_parts['where'] .= ":value_$i ";
+			$sql_args[":value_$i"] = $value;
+		}
 		$sql_parts['where'] .= $values['close'];
-		$sql_args[":value_$i"] = $value;
 	}
 
 	return TRUE;

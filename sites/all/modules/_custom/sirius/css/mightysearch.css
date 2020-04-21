@@ -1,0 +1,12 @@
+.sirius_mightsearch_clausepart {
+  float: left;
+}
+
+.sirius_mightsearch_clausepart_andor {
+	min-width: 80px;
+}
+
+.sirius_mightsearch_clausepart_clearlink {
+	padding-top: 14px;
+	float: right;
+}
