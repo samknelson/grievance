@@ -397,7 +397,7 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 }
 
 function sirius_mightysearch_form_submit($form, &$form_state) {
-	$limit = 10;
+	$limit = 1000;
 
 	$json_forms = $form_state['json_forms'];
 	$actions = $form_state['actions'];
