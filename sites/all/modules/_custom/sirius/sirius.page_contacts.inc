@@ -25,6 +25,9 @@ function sirius_page_contacts_form($form, &$form_state) {
 			'export' => array(
 				'title' => 'Export',
 			),
+			'tag' => array(
+				'title' => 'Add / Remove Tags',
+			),
 		)
 	);
 

@@ -149,3 +149,28 @@ function sirius_contact_list_sources() {
 
 	return $sources_by_domain[$domain_nid];
 }
+
+function sirius_contact_tag_add($contact_node, $tid) {
+	$current_tids = sirius_fieldvals($contact_node, 'field_sirius_contact_tags', 'tid');
+	if (in_array($tid, $current_tids)) { return array('success' => TRUE, 'msg' => 'Contact already had the tag.'); }
+
+	$contact_node->field_sirius_contact_tags['und'][] = array('tid' => $tid); 
+	node_save($contact_node);
+	return array('success' => TRUE, 'msg' => 'Contact saved.');
+}
+
+function sirius_contact_tag_remove($contact_node, $tid) {
+	$current_tids = sirius_fieldvals($contact_node, 'field_sirius_contact_tags', 'tid');
+	if (!in_array($tid, $current_tids)) { return array('success' => TRUE, 'msg' => 'Contact already did not have the tag.'); }
+
+	$new_value = array();
+	foreach ($current_tids as $candidate_tid) {
+		if ($candidate_tid == $tid) { continue; }
+		$new_value[] = array('tid' => $candidate_tid); 
+	}
+
+	if ($new_value) 	{ $contact_node->field_sirius_contact_tags['und'] = $new_value; } 
+	else 							{ unset($contact_node->field_sirius_contact_tags); } 
+	node_save($contact_node);
+	return array('success' => TRUE, 'msg' => 'Contact saved.');
+}
