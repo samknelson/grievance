@@ -190,6 +190,7 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 			":$node_type:field_sirius_address:locality" => 'City',
 			":$node_type:field_sirius_address:thoroughfare" => 'Address',
 			":$node_type:field_sirius_address:postal_code" => 'Zip',
+			":$node_type:field_sirius_source:value" => 'Source',
 		);
 	}
 
