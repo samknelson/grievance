@@ -82,6 +82,10 @@ function sirius_event_page_landing() {
 		$html .= $create_html;
 	}
 
+	if (!$html) {
+		$html = "There are no events or event types.";
+	}
+
 	return $html;
 }
 
