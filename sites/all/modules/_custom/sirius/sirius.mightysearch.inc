@@ -278,7 +278,8 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 	if ($criterion) {
 		$sql_parts['i']++;
 		$i = $sql_parts['i'];
-		if ($i > 1) { $sql_parts['where'] .= $values['andor'] . ' '; }
+		if ($i == 1) { $sql_parts['where'] .= 'and ('; }
+		else 				 { $sql_parts['where'] .= $values['andor'] . ' '; }
 		$sql_parts['where'] .= $values['open'];
 	}
 
@@ -326,7 +327,7 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 }
 
 function sirius_mightysearch_form_submit($form, &$form_state) {
-	$limit = 10;
+	$limit = 1000;
 
 	$json_forms = $form_state['json_forms'];
 	$actions = $form_state['actions'];
@@ -359,12 +360,12 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		$sql_args[':domain_nid'] = $domain_nid;
 	}
 
-	$sql_parts['where'] .= 'and (';
+	$found = FALSE;
 	for ($i=0; $i<$clause_count; ++$i) {
 		$values = $form_state['values']['mightysearch'][$i];
-		sirius_mightysearch_add_clause($sql_parts, $sql_args, $values);
+		if (sirius_mightysearch_add_clause($sql_parts, $sql_args, $values)) { $found = TRUE; }
 	}
-	$sql_parts['where'] .= ") ";
+	if ($found) { $sql_parts['where'] .= ') '; }
 
 	$form_state['rebuild'] = TRUE;
 
