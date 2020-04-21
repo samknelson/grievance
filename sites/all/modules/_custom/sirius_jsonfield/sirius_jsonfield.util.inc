@@ -173,6 +173,7 @@ function sirius_jsonfield_util_add_node_fields($node, &$form, &$values) {
 		$form[$node_type][$field_name][$col] = array('#type' => 'textfield', '#title' => $title);
 		$value = '';
 		if ($field_name == 'title') { $value = $node->title; }
+		else if ($field_name == 'nid') { $value = $node->nid; }
 		else { $value = sirius_fieldval($node, $field_name, $col); }
 		$values[$node_type][$field_name][$col] = $value;
 	}
