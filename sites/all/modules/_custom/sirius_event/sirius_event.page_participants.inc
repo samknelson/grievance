@@ -88,6 +88,7 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 }
 
 function sirius_event_participant_role_status_tids($participant_role_tid) {
+	if (!$participant_role_tid) { return array(); }
 	$args = array();
 	$sql = "select tid, name from taxonomy_term_data, field_data_field_sirius_event_proles ";
 	$sql .= "where taxonomy_term_data.tid = entity_id ";
