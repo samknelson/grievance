@@ -67,7 +67,9 @@ function sirius_node_tab_event_participants_current($event_node) {
 
 function sirius_node_tab_event_participants_current_rule($event_node, $rule, $widget, $prole) {
 	$prole_term = taxonomy_term_load($prole);
-	drupal_set_title(drupal_get_title() . ': ' . $rule['name'] . ' - ' . $widget);
+
+	$all_widgets = sirius_event_participants_widgets();
+	drupal_set_title(drupal_get_title() . ': ' . $rule['name'] . ' - ' . $all_widgets[$widget]);
 	if ($widget == 'view') {
 		return views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
 	} else if ($widget == 'status') {
@@ -82,8 +84,10 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 		return sirius_event_page_participant_attendance($event_node, $rule);
 	} else if ($widget == 'certifications') {
 		return sirius_event_page_participant_certifications($event_node, $rule);
+	} else if ($widget == 'mightysearch') {
+		return sirius_event_page_participant_mightysearch($event_node, $rule);
 	} else {
-		return t('Widget not found: @widget.', array('@widget' => $widget));;
+		return t('Widget not found: @widget.', array('@widget' => $widget));
 	}
 }
 

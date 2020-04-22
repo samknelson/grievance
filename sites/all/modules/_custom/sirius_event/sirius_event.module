@@ -19,6 +19,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_attendance.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_certifications.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_mightysearch.inc';
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_landing.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.participant_definition.inc";
