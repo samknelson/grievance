@@ -40,6 +40,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.fax.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overrides.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
