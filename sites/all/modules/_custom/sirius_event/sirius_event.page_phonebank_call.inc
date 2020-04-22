@@ -350,6 +350,11 @@ function sirius_event_phonebank_prep_survey(&$form, $defaults) {
 					if ($type == 'date_popup') { $form[$key]['#default_value'] = date('Y-m-d H:i:s', strtotime($defaults[$key]['date'] . ' ' . $defaults[$key]['time'])); }
 					else { $form[$key]['#default_value'] = $defaults[$key]; }
 				}
+				if ($form[$key]['#required']) {
+					unset($form[$key]['#required']);
+					$form[$key]['#title'] = '<strong>[' . t('Required') . ']</strong> ' . $form[$key]['#title'];
+					$form[$key]['#attributes']['class'][] = 'sirius_phonebank_field_required'; 
+				}
 			}
 		} else {
 			sirius_event_phonebank_prep_survey($form[$key], $defaults[$key]);
