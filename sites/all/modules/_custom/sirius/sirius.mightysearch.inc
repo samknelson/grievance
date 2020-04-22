@@ -231,6 +231,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
   	'#options' => $options,
 		'#default_value' => $my_saved_mightysearch['additional_fields']['display'],
   );
+  if ($my_saved_mightysearch['additional_fields']['display']) { $form['mightysearch']['additional_fields']['display']['#default_value'] = $my_saved_mightysearch['additional_fields']['display']; }
 
   $form['mightysearch']['accordion_close_display'] = array('#markup' => '</div>');
   $form['mightysearch']['accordion_close'] = array('#markup' => '</div>');
