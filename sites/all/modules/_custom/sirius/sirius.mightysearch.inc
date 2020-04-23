@@ -229,7 +229,6 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
   $form['mightysearch']['additional_fields']['display'] = array(
   	'#type' => 'checkboxes',
   	'#options' => $options,
-		'#default_value' => $my_saved_mightysearch['additional_fields']['display'],
   );
   if ($my_saved_mightysearch['additional_fields']['display']) { $form['mightysearch']['additional_fields']['display']['#default_value'] = $my_saved_mightysearch['additional_fields']['display']; }
 
@@ -264,6 +263,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		if ($actions['register']) { $action_options['register'] = $actions['register']['title']; }
 		if ($actions['export']) 	{ $action_options['export'] = $actions['export']['title']; }
 		if ($actions['tag']) 			{ $action_options['tag_add'] = 'Add Tag'; $action_options['tag_remove'] = 'Remove Tag'; }
+		if ($actions['delete']) 	{ $action_options['delete'] = $actions['delete']['title']; }
 		if (user_access('sirius admin')) { $action_options['sql'] = 'Display SQL Query'; }
 
 		$form['mightysearch_results']['action'] = array(
@@ -304,9 +304,9 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 			);
 		}
 
-		if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove']) {
+		if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete']) {
 			if ($count_total > $count) {
-				$form['mightysearch_results']['results_select_all'] = array(
+				$form['mightysearch_results']['results_select_allxyz'] = array(
 					'#type' => 'checkbox', 
 					'#title' => t("Apply to ALL matching contacts, including any not listed below."),
 					'#states' => array(
@@ -315,6 +315,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 								array('value' => 'register'), 
 								array('value' => 'tag_add'), 
 								array('value' => 'tag_remove'),
+								array('value' => 'delete'),
 							),
 						),
 					),
@@ -530,8 +531,10 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	}
 	if ($found) { $sql_parts['where'] .= ') '; }
 
-	foreach (array_values($form_state['values']['mightysearch']['additional_fields']['display']) as $full_path) {
-		if ($path) { sirius_mightysearch_add_clause($sql_parts, $sql_args, array('field' => $full_path)); }
+	if ($form_state['values']['mightysearch']['additional_fields']['display']) {
+		foreach (array_values($form_state['values']['mightysearch']['additional_fields']['display']) as $full_path) {
+			if ($full_path) { sirius_mightysearch_add_clause($sql_parts, $sql_args, array('field' => $full_path)); }
+		}
 	}
 	
 
@@ -597,9 +600,9 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	// Batch
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove') {
+	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete') {
 		$contact_nids = array();
-		if ($form_state['values']['mightysearch_results']['results_select_all']) {
+		if ($form_state['values']['mightysearch_results']['results_select_allxyz']) {
 			$sql = $sql_parts['select_nids'] . $sql_parts['joins'] . $sql_parts['where']; 
 			$stmt = sirius_sql_query($sql, $sql_args);
 			while ($hr = $stmt->fetchAssoc()) { $contact_nids[] = $hr['nid']; }
@@ -610,7 +613,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 			drupal_set_message("No contacts selected", 'error');
 			return;
 		}
-		$chunks = array_chunk($contact_nids, 5, TRUE);		
+		$chunks = array_chunk($contact_nids, 50, TRUE);		
 
 		$operations = array();
 		$current_path = current_path();
@@ -696,6 +699,11 @@ function sirius_mightysearch_batch($chunk, $params, &$context) {
 			$contact_node = node_load($contact_nid);
 			if ($action_name == 'tag_add') 	{ $result = sirius_contact_tag_add($contact_node, $tag_tid); }
  			else 														{ $result = sirius_contact_tag_remove($contact_node, $tag_tid); }
+		}
+
+		if ($action_name == 'delete') {
+			node_delete($contact_nid);
+			$result = array('success' => TRUE, 'msg' => 'Contact deleted.');
 		}
 
 		if ($result['success']) {
