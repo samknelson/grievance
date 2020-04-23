@@ -73,17 +73,17 @@ function sirius_node_tabs() {
 
   /*
   $node_tabs['sirius_worker']['sirius_worker_letter'] = array(
-    'title' => 'Letters',
+    'title' => 'Letters (Dev)',
     'description' => '',
     'callback' => 'sirius_node_tab_entity_letter',
-    'permissions' => array('sirius worker admin'),
+    'permissions' => array('sirius admin'),
   );
 
   $node_tabs['grievance']['grievance_letter'] = array(
-    'title' => 'Letters (New)',
+    'title' => 'Letters (Dev)',
     'description' => '',
     'callback' => 'sirius_node_tab_entity_letter',
-    'permissions' => array('grievance user'),
+    'permissions' => array('sirius admin'),
   );
   */
 
