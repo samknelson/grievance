@@ -28,6 +28,9 @@ function sirius_page_contacts_form($form, &$form_state) {
 			'tag' => array(
 				'title' => 'Add / Remove Tags',
 			),
+			'delete' => array(
+				'title' => 'Delete',
+			),
 		)
 	);
 
