@@ -16,6 +16,7 @@ function sirius_event_page_landing() {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_event_participant');
 	$query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
+	if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
 	$query->propertyOrderBy('nid', 'desc');
   $stmt = $query->execute();
   if ($stmt['node']) {
@@ -124,10 +125,11 @@ function sirius_event_page_landing_render($event_nodes, $participant_nodes = arr
 		if (user_access('sirius event admin')) { $rules = $all_rules; } 
 		else { $rules = sirius_event_paccess_rule_match($event_node->nid, $all_rules, TRUE); }
 		if ($rules) {
+			$first = TRUE;
 			foreach ($rules as $delta => $rule) {
 				foreach ($rule['widget'] as $widget) {
+					if ($first) { $tools .= '<br />' . t('Register: '); $first = FALSE; }
 					if ($widget == 'user_self' && $participant_map[$event_nid]) { continue; }
-					if ($tools) { $tools .= ' '; }
 					$tools .= l($widgets[$widget], 'node/' . $event_nid . '/sirius_event_participants_register', array('attributes' => array('class' => array('tool-button')), 'query' => array('delta' => $delta, 'widget' => $widget))); 
 				}
 			}

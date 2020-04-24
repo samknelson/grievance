@@ -75,10 +75,17 @@ function sirius_node_tab_event_phonebank_call($event_node) {
 		$phone = sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_tid);
 		if (!$phone) { return 'There are no more calls to make!'; }
 	} 
-	return drupal_get_form('sirius_node_tab_event_phonebank_call_form', $event_node->nid, $phone);
+
+	if ($mode == 'direct') {
+		$phone = sirius_phone_format($_REQUEST['phone']);
+		if (!$phone) { return 'Called with "direct" mode, but no phone number was specified.'; }
+		$participant_nodes = sirius_event_phonebank_participants_by_phone($event_node, $prole_tid, $phone);
+		if (!$participant_nodes) { return "No event participant found with the phone number [$phone]."; }
+	}
+	return drupal_get_form('sirius_node_tab_event_phonebank_call_form', $event_node->nid, $phone, $mode);
 }
 
-function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_nid, $phone) {
+function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_nid, $phone, $mode) {
 	$event_node = node_load($event_nid);
 	$json = sirius_jsonfield_util_node_json_get($event_node);
 	$type_json = sirius_event_type_json($event_node);
@@ -132,8 +139,12 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		if ($form_state['input']['pstatus']) { $participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $form_state['input']['pstatus']; }
 	}
 
+	// Close button. We can't use a native "destination" parameter, because we might submit a form several times
+	// and we don't want to go back to the destination each time.
+	$return_to = $_REQUEST['return_to'];
+	if (!$return_to) { $return_to = current_path(); }
 	$form['#tree'] = TRUE;
-	$form['close1'] = array('#markup' => '<div id="phonebank_wrapper">' . l('Close', current_path(), array('attributes' => array('class' => array('tool-button', 'phonebank-close-button')))));
+	$form['close1'] = array('#markup' => '<div id="phonebank_wrapper">' . l('Close', $return_to, array('attributes' => array('class' => array('tool-button', 'phonebank-close-button')))));
 	$form['prefix'] = array('#markup' => '<div class="sirius-form" id="sirius_event_phonebank_survey"><table><tr>');
 	$form['prefix_col_1'] = array('#markup' => '<td valign="top" style="vertical-align: top;">');
 	$form['survey'] = $survey_form;
@@ -240,18 +251,20 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		}
 	}
 
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Save and Next'),
-		'#disabled' => $submit_disabled,
-		'#prefix' => '<div id="submit_wrap">',
-		'#suffix' => '</div>',
-	);
+	if ($mode == 'live') {
+		$form['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t('Save and Next'),
+			'#disabled' => $submit_disabled,
+			'#prefix' => '<div id="submit_wrap">',
+			'#suffix' => '</div>',
+		);
+	}
 
 	$form['suffix_col_2'] = array('#markup' => '</td');
 	$form['suffix'] = array('#markup' => '</tr></table></div>');
 
-	$form['close2'] = array('#markup' => l('Close', current_path(), array('attributes' => array('class' => array('tool-button', 'phonebank-close-button')))) . '</div>');
+	$form['close2'] = array('#markup' => l('Close', $return_to, array('attributes' => array('class' => array('tool-button', 'phonebank-close-button')))) . '</div>');
 
 	return $form;
 }
