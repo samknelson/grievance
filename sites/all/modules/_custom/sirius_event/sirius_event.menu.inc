@@ -11,6 +11,22 @@ function sirius_event_node_tabs() {
     'weight' => 1,
   );
 
+  $node_tabs['sirius_event_participant']['sirius_event_participant_json/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_view',
+    'permissions' => array('sirius event admin'),
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_json/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_edit',
+    'permissions' => array('sirius event admin'),
+    'weight' => 2,
+  );
+
   $node_tabs['sirius_event']['sirius_event_info'] = array(
     'title' => 'Info',
     'description' => '',
