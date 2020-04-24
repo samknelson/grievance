@@ -522,6 +522,8 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 
 		$sql_parts['where'] .= "and field_sirius_event_prole_tid = :prole_tid ";
 		$sql_args[':prole_tid'] = $json_forms['sirius_event_participant']['prole_tid'];
+
+		$sql_parts['select_fields'] .= ', participant_json.entity_id as participant_nid ';
 	}
 
 	$found = FALSE;
@@ -570,6 +572,10 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 			$tools = '';
 			$tools .= l('View', 'node/' . $hr['nid'], array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
 			$tools .= l('Custom Fields', 'node/' . $hr['nid'] . '/sirius_contact_json', array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+			if ($hr['participant_nid']) {
+				$tools .= l('Participant', 'node/' . $hr['participant_nid'] . '/sirius_event_participant_json', array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+			}
+
 			$row[] = $tools;
 			$rows[$hr['nid']] = $row;
 			++$count;
