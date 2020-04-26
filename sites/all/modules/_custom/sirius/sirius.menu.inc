@@ -176,6 +176,7 @@ function sirius_menu() {
   $node_tabs = sirius_node_tab_all('node_tabs');
   foreach ($node_tabs as $node_type => $node_record) {
     foreach ($node_record as $tab_name => $tab_record) {
+      if ($tab_record['type']) { $type = $tab_record['type']; } else { $type = MENU_LOCAL_TASK; }
       $items['node/%node/' . $tab_name] = array(
         'title' => $tab_record['title'],
         'description' => $tab_record['description'],
@@ -183,7 +184,7 @@ function sirius_menu() {
         'page arguments' => array(1, $tab_name),
         'access callback' => 'sirius_node_tab_access',
         'access arguments' => array(1, $tab_name),
-        'type' => MENU_LOCAL_TASK,
+        'type' => $type,
       );
       if ($tab_record['weight']) {
         $items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
@@ -197,6 +198,7 @@ function sirius_menu() {
   $term_tabs = sirius_term_tab_all('term_tabs');
   foreach ($term_tabs as $term_type => $term_record) {
     foreach ($term_record as $tab_name => $tab_record) {
+      if ($tab_record['type']) { $type = $tab_record['type']; } else { $type = MENU_LOCAL_TASK; }
       $items['taxonomy/term/%taxonomy_term/' . $tab_name] = array(
         'title' => $tab_record['title'],
         'description' => $tab_record['description'],
@@ -204,7 +206,7 @@ function sirius_menu() {
         'page arguments' => array(2, $tab_name),
         'access callback' => 'sirius_term_tab_access',
         'access arguments' => array(2, $tab_name),
-        'type' => MENU_LOCAL_TASK,
+        'type' => $type,
       );
       if ($tab_record['weight']) {
         $items['taxonomy/term/%taxonomy_term/' . $tab_name]['weight'] = $tab_record['weight'];
