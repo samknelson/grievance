@@ -6,8 +6,8 @@ function sirius_event_node_tabs() {
   $node_tabs['sirius_event_participant']['sirius_event_participant_json'] = array(
     'title' => 'Survey',
     'description' => '',
-    'callback' => 'sirius_node_tab_event_participant_json',
-    'permissions' => array('sirius event admin'),
+    'callback' => 'sirius_node_tab_event_participant_json_view',
+    'permissions' => array('sirius'),
     'weight' => 1,
   );
 
@@ -15,15 +15,16 @@ function sirius_event_node_tabs() {
     'title' => 'View',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_json_view',
-    'permissions' => array('sirius event admin'),
+    'permissions' => array('sirius'),
     'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   $node_tabs['sirius_event_participant']['sirius_event_participant_json/edit'] = array(
     'title' => 'Edit',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_json_edit',
-    'permissions' => array('sirius event admin'),
+    'permissions' => array('sirius'),
     'weight' => 2,
   );
 
