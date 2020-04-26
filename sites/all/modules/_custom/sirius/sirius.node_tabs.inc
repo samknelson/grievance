@@ -30,7 +30,7 @@ function sirius_node_tab_access($node, $in_tab_name) {
   if (!user_access('sirius admin') && $node->type != 'sirius_domain') {
     $node_domain_nid = $node->field_sirius_domain['und'][0]['target_id'];
     $my_domain_nid = sirius_domain_nid();
-    if ($node_domain_nid != $my_domain_nid) { return FALSE; }
+    if ($node_domain_nid && ($node_domain_nid != $my_domain_nid)) { return FALSE; }
   }
 
   // Check generic permissions
