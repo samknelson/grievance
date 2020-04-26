@@ -1,16 +1,49 @@
 <?php
 
-//
-//  $html .= 
-//
-
 function sirius_node_tab_event_participant_json_access($participant_node) {
+	// Participant nodes don't have domains, but in order to see this page the participant and the event must both have
+	// the same domain, and we must be in it.
+	$domain_nid = sirius_domain_nid();
+
 	$event_nid = $participant_node->field_sirius_event['und'][0]['target_id'];
-	if (!$event_nid) { return FALSE; }
 	$event_node = node_load($event_nid);
+	if (!$event_node) { return FALSE; }
+	if ($domain_nid != $event_node->field_sirius_domain['und'][0]['target_id']) { return FALSE; }
+
+	$contact_nid = $participant_node->field_sirius_contact['und'][0]['target_id'];
+	$contact_node = node_load($contact_nid);
+	if (!$contact_node) { return FALSE; }
+	if ($domain_nid != $contact_node->field_sirius_domain['und'][0]['target_id']) { return FALSE; }
+
+	// Must have a survey.
 	$survey_nid = $event_node->field_sirius_json_definition['und'][0]['target_id'];
 	$survey_node = node_load($survey_nid);
 	if (!$survey_node) { return FALSE; }
+
+	// Must have access to any participant rule that matches this participant's prole.
+	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+	$all_rules = $json['participants']['rules'];
+	if (user_access('sirius_event_admin')) {
+		$rules = $all_rules;
+	} else {
+		$rules = sirius_event_paccess_rule_match($event_node->nid, $all_rules, TRUE);
+	}
+
+	$prole_tid = $participant_node->field_sirius_event_prole['und'][0]['tid'];
+	$pstatus_tid = $participant_node->field_sirius_event_pstatus['und'][0]['tid'];
+	$found = FALSE;
+	foreach ($rules as $rule) {
+		if ($rule['participants']) {
+			foreach ($rule['participants'] as $key) {
+				list ($probe_prole_tid, $probe_pstatus_tid) = explode('|', $key);
+				if ($probe_prole_tid == $prole_tid && $probe_pstatus_tid = $pstatus_tid) { $found = TRUE; }
+			}
+		}
+	}
+
+	if (!$found) { return FALSE; }
+
 	return TRUE;
 }
 
@@ -19,10 +52,6 @@ function sirius_node_tab_event_participant_json_edit_access($participant_node) {
 
 function sirius_node_tab_event_participant_json_backlinks($participant_node, $event_node) {
 	return l('Back to participant list', "node/" . $event_node->nid . "/sirius_event_participants_current", array('attributes' => array('class' => 'tool-button')));
-}
-
-function sirius_node_tab_event_participant_json($participant_node) {
-	drupal_goto(current_path() . '/view');
 }
 
 function sirius_node_tab_event_participant_json_view($participant_node) {
