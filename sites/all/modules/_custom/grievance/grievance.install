@@ -830,3 +830,21 @@ function grievance_update_7037() {
     // variable_set('grievance_hidefields', variable_get('grievance_hidefields' . "\n" . ))
   }
 }
+
+/**
+ * - Enable tzfield and per-user timezones
+ */
+
+function grievance_update_7038() {
+  //
+  // Enable some required modules
+  //
+
+  $modules = array('tzfield');
+  foreach ($modules as $module) {
+    print "Enabling module: $module.\n";
+    try { module_enable(array($module), TRUE); } catch (exception $ignore) { }
+  }
+
+  variable_set('configurable_timezones', 1);
+}
