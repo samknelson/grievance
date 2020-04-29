@@ -11,7 +11,7 @@ function sirius_page_voice_forward_to_operator() {
    }
 
   // Find any recent forwarded calls
-  $cutoff = strtotime('-400 hours');
+  $cutoff = strtotime('-4 hours');
 	$query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_log');
@@ -29,7 +29,7 @@ function sirius_page_voice_forward_to_operator() {
   $log_nodes = node_load_multiple($log_nids);
   foreach ($log_nodes as $log_nid => $log_node) {
   	$json = json_decode($log_node->field_sirius_json['und'][0]['value'], TRUE);
-  	$from = sirius_phone_format($json['from']);
+  	$from = sirius_phone_format($json['context']['from']);
 
 		$html .= '<div class="sirius_call">';
 
