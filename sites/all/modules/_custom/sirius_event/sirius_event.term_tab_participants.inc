@@ -9,6 +9,7 @@ function sirius_event_participants_widgets() {
 		'summary' => t('View a Summary'),
 		'attendance' => t('Attendance Sheets'),
 		'certifications' => t('Certifications'),
+		'mightysearch_lite' => t('Advanced Search'),
 		'mightysearch' => t('Advanced Search and Tag'),
 	);
 }
