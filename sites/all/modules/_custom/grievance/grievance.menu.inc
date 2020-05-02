@@ -6,7 +6,7 @@
  * shows housing-related functions. 
  */
  
-function grievance_node_tabs() {
+function grievance_xnode_tabs() {
 	$node_tabs = array();
 
 	$node_tabs['grievance']['letter'] = array(
@@ -300,7 +300,7 @@ function grievance_menu() {
 	// Node Tabs
   // 
 
-	$node_tabs = grievance_node_tabs();
+	$node_tabs = grievance_xnode_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		foreach ($node_record as $tab_name => $tab_record) {
 			$items['node/%node/' . $tab_name] = array(
@@ -479,15 +479,6 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
-	$items['admin/config/grievance/log_types'] = array(
-		'title' => 'Grievance Module - Log Types',
-		'description' => t('Settings for the Grievance Module log types'),
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('grievance_admin_log_types'),
-		'access arguments' => array('grievance admin'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-
 	$items['admin/config/grievance/gform'] = array(
 		'title' => 'Grievance Module - Form',
 		'description' => t('Settings for the Grievance Form'),
@@ -515,15 +506,6 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
-	$items['admin/config/grievance/intake-log'] = array(
-		'title' => 'Grievance Module - Intake Log',
-		'description' => t('Intake logging'),
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('grievance_log_intake_admin'),
-		'access arguments' => array('grievance admin'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-
 	$items['admin/config/grievance/quicksearch'] = array(
 		'title' => 'Grievance Module - QuickSearch',
 		'description' => t('Settings for the quicksearch'),
@@ -540,6 +522,48 @@ function grievance_menu() {
 		'page arguments' => array('grievance_contacts_admin'),
 		'access arguments' => array('grievance admin'),
 		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['admin/config/grievance/workersync'] = array(
+		'title' => 'Grievance Module - Worker Sync',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_workersync_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+
+	$items['admin/config/grievance/workersync/settings'] = array(
+		'title' => 'Settings',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_workersync_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'weight' => 1,
+	);
+
+	$items['admin/config/grievance/workersync/test'] = array(
+		'title' => 'Test',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_workersync_test_form'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 2,
+	);
+
+	$items['admin/config/grievance/workersync/sync'] = array(
+		'title' => 'Sync',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_workersync_sync_form'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 3,
+	);
+
+	$items['grievance/workersync/lookup/%'] = array(
+		'page callback' => 'grievance_workersync_lookup_ajax',
+		'page arguments' => array(3),
+		'access arguments' => array('grievance worker lookup'),
+		'type' => MENU_CALLBACK,
 	);
 
 	$items['grievance/report/bytype'] = array(
@@ -712,7 +736,7 @@ function grievance_menu_deny() { return 'Access denied.'; }
 function grievance_menu_deny_access() { return FALSE; }
 
 function grievance_node_tab_content($node, $in_tab_name) {
-	$node_tabs = grievance_node_tabs();
+	$node_tabs = grievance_xnode_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		if ($node->type == $node_type) {
 			foreach ($node_record as $tab_name => $tab_record) {
@@ -739,7 +763,7 @@ function grievance_node_tab_access($node, $in_tab_name) {
 	}
 
 	// Check generic permissions
-	$node_tabs = grievance_node_tabs();
+	$node_tabs = grievance_xnode_tabs();
 	foreach ($node_tabs as $node_type => $node_record) {
 		if ($node->type == $node_type) {
 			foreach ($node_record as $tab_name => $tab_record) {

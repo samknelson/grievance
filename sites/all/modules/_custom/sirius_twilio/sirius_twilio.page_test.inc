@@ -1,7 +1,5 @@
 <?php
 
-use Twilio\Rest\Client;
-
 function sirius_twilio_page_test() {
 	return drupal_get_form('sirius_twilio_page_test_form');
 }
@@ -32,19 +30,13 @@ function sirius_twilio_page_test_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 	$to = $form_state['values']['to'];
 
-	try {
-		$client = sirius_twilio_client_get();
-		$client->messages->create(
-	    $to,
-	    array(
-	      'from' => variable_get('sirius_twilio_phone', ''),
-	      'body' => 'This is a test SMS message. If you are receiving this, then Sirius Twilio is properly configured.'
-	    )
-		);
-	} catch (Exception $e) {
-		drupal_set_message('Twilio error: ' . $e->getCode() . ' - ' . $e->getMessage(), 'error');
-		return;
+	$result = sirius_twilio_outgoing_sms($to, 'This is a test SMS message. If you are receiving this, then Sirius Twilio is properly configured.');
+	if ($result['success']) {
+		drupal_set_message(t('Message sent. Twilio is properly configured.'));
+	} else {
+		drupal_set_message(t('There was a problem sending the message by SMS: @msg Please check your settings and try again.', array('@msg' => $result['msg'])), 'warning');
+		if ($result['details']) {
+			drupal_set_message($result['details'], 'warning');
+		}
 	}
-
-	drupal_set_message(t('Message sent. Twilio is properly configured.'));
 }

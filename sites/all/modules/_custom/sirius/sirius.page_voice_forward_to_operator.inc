@@ -29,7 +29,7 @@ function sirius_page_voice_forward_to_operator() {
   $log_nodes = node_load_multiple($log_nids);
   foreach ($log_nodes as $log_nid => $log_node) {
   	$json = json_decode($log_node->field_sirius_json['und'][0]['value'], TRUE);
-  	$from = sirius_phone_format($json['from']);
+  	$from = sirius_phone_format($json['context']['from']);
 
 		$html .= '<div class="sirius_call">';
 

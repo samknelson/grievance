@@ -4,6 +4,7 @@ function grievance_form_grievance_node_callback_replace($form, $form_state) {
   $commands = array();
   $commands[] = ajax_command_replace("#grievance-node-form-replaceme", render($form));
   $commands[] = ajax_command_invoke(NULL, "grievance_bind_classification_term_map", array());
+  $commands[] = ajax_command_invoke(NULL, "grievance_bind_irset_map", array());
   return array(
     '#type' => 'ajax',
     '#commands' => $commands
@@ -29,7 +30,57 @@ function grievance_form_current_value($field, $column, $form, $form_state) {
   }
 }
 
+function grievance_form_no_more_required_recursive(&$form) {
+  if (!is_array($form)) { return; }
+  foreach ($form as $key => $value) {
+    if (!is_array($value)) { continue; }
+    unset($form[$key]['#required']);
+    grievance_form_no_more_required_recursive($form[$key]);
+  }
+}
+
+
+
+function grievance_node_validate($node, $form, &$form_state) {
+  // Don't run on ajax callbacks
+  if (!$form_state['submitted']) { return; }
+
+  // For grievance nodes only
+  if ($node->type == 'grievance') {
+
+    // For insert only
+    if (!$node->nid) {
+
+      // Require a category
+      $status_tid = $node->field_grievance_status['und'][0]['tid'];
+      if (!$status_tid) {
+        form_set_error('field_grievance_status', 'Please select a status.');
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
 function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
+  //
+  // Damn limit validation problme
+  //
+
+  // @todo: we need to think about what's required and add a node_validate which only runs when
+  // if ($form_state['triggering_element']['#value'] == 'Search') looks right
+  grievance_form_no_more_required_recursive($form);
+
+  //
+  // Add the worker sync functions
+  //
+
+  grievance_workersync_search_form($form, $form_state);
+
   //
   // Load our custom javascript
   //
@@ -99,8 +150,10 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $form['#groups']['group_grievance_form']->format_settings['formatter'] = 'open';
   } else if ($form_state['triggering_element']['#field_name']) {
     $form['#groups']['group_grievance_status']->format_settings['formatter'] = 'open';
+  } else if ($form_state['triggering_element']['#value'] == 'Search') {
+    $form['#groups']['group_grievance_employee']->format_settings['formatter'] = 'open';
   }
-  
+
   //////////////////////////////////////////////////////
   // These things happen on rebuild
   //////////////////////////////////////////////////////
@@ -128,6 +181,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
   $status_term = taxonomy_term_load($status_tid);
   if (!user_access('grievance admin')) {
+    $current_status_tid = grievance_form_current_value('field_grievance_status', 'tid', $form, $form_state);
     // 
     // Restrict the statuses based on the user roles
     //
@@ -155,6 +209,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     //
 
     foreach ($status_tids_to_disable as $check_status_tid) {
+      if ($check_status_tid == $current_status_tid) { continue; }
       unset($form['field_grievance_status']['und']['#options'][$check_status_tid]);
     }
   }
@@ -194,6 +249,11 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   if ($contract_tplt_nid) {
     $contract_tplt_node = node_load($contract_tplt_nid);
   }
+  /*
+  if ($form_state['triggering_element']['#value'] == 'Search') { 
+    drupal_set_message("Here with:"); 
+  }
+  */
 
   // 
   // Set the list of clauses
@@ -581,7 +641,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
 
   if (!$grievance_node->nid) {
     for ($i=1; $i<=5; ++$i) {
-      $log_type_tid = variable_get("grievance_log_intake_${i}_type", '');
+      $log_type_tid = sirius_get_special_tid("grievance_log_types|intake_$i"); 
       if (!$log_type_tid) { continue; }
       $log_type_term = taxonomy_term_load($log_type_tid);
 

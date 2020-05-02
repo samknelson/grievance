@@ -55,7 +55,7 @@ function grievance_update_7002() {
 
 function grievance_update_7003() {
   // First set all to 0
-  $sql = "select * from node where type in ('grievance_contract_clause', 'grievance_contract_section') ";
+  $sql = "select * from node where type in ('grievance_contract_clause', 'grievance_con') ";
   $sql .= "order by nid ";
   $stmt = db_query($sql, array());
   $nids = array();
@@ -518,3 +518,333 @@ function grievance_update_7030() {
   print "Deleted field: $field\n";
 }
 */
+
+function grievance_update_7031() {
+  $tables = array('field_data_field_sirius_json', 'field_revision_field_sirius_json');
+  foreach ($tables as $table) {
+    $sql = "delete from $table where not json_valid(field_sirius_json_value);";
+    try { $stmt = db_query($sql, array()); } catch (exception $ignore) { print "Unable to execute: $sql. Please run manually after the database has been upgraded.\n"; }
+
+    $sql = "alter table $table change field_sirius_json_value field_sirius_json_value json";
+    try { $stmt = db_query($sql, array()); } catch (exception $ignore) { print "Unable to execute: $sql. Please run manually after the database has been upgraded.\n"; }
+  }
+}
+
+/**
+ * Disable pathauto; get rid of unnecessary aliases
+ */
+
+function grievance_update_7032() {
+  // Disable pathauto
+  print "Disabling pathauto\n";
+  module_disable(array('pathauto'), TRUE);
+
+  // Get rid of unnecessary aliases
+  $sql = "delete from url_alias where alias like 'sirius-dispatch/%' or alias like 'sirius-help/%' or alias like 'sirius-worker/%' or alias like 'grievance/%' or alias like 'sirius-dispatch-job/%' or alias like 'sirius-dispatch-facility-hall/%' or alias like 'sirius-dispatch-facility/%' or alias like 'sirius-twilio-conversation/%'";
+  print "$sql\n";
+  $stmt = db_query($sql, array());
+}
+
+
+/**
+ * Add index on id3
+ */
+
+function grievance_update_7033() {
+  $table = 'field_data_field_sirius_id3';
+  $column = 'field_sirius_id3_value';
+  try { db_add_index($table, "${table}_${column}", array($column)); } catch (exception $ignore) { }
+}
+
+/**
+ * Create the hours table. Raw sql.
+ */
+
+function grievance_update_7034() {
+
+  $sqls = array();
+
+  $sqls[] = "create table sirius_hours_cache (
+    payperiod_nid integer,
+    year integer,
+    month integer,
+    day integer,
+    worker_nid integer,
+    employer_nid integer,
+    hours_type_tid integer,
+    department_tid integer,
+    hours numeric(10,6),
+    total numeric(10,2),
+    worker_name varchar(255),
+    employer_name varchar(255),
+    hours_type_name varchar(255),
+    department_name varchar(255)
+  );";
+
+  $sqls[] = 'create index sirius_hours_cache_idx01 on sirius_hours_cache (payperiod_nid);';
+  $sqls[] = 'create index sirius_hours_cache_idx02 on sirius_hours_cache (year, month, day);';
+  $sqls[] = 'create index sirius_hours_cache_idx03 on sirius_hours_cache (worker_nid);';
+  $sqls[] = 'create index sirius_hours_cache_idx04 on sirius_hours_cache (employer_nid);';
+  $sqls[] = 'create index sirius_hours_cache_idx05 on sirius_hours_cache (worker_nid, year, month, day);';
+
+  $sqls[] = 'create table sirius_lock (
+    id varchar(255),
+    type varchar(255),
+    uid integer,
+    ts integer,
+    primary key (id, type),
+    index (id),
+    index (uid)
+  );';
+
+  foreach ($sqls as $sql)
+  try { 
+    print "Executing: $sql\n";
+    db_query($sql, array());
+  } catch (exception $ignore) {
+    // Do nothing.
+  }
+}
+
+/**
+ * Move the "field_sirius_dispatch_notesdef" into json
+ */
+
+function grievance_update_7035() {
+  try {
+    $sql = "select * from field_data_field_sirius_dispatch_notesdef order by entity_id";
+    $stmt = db_query($sql, array());
+    while ($hr = $stmt->fetchAssoc()) {
+      $entity_type = $hr['entity_type'];
+      $entity_id = $hr['entity_id'];
+      $notes = $hr['field_sirius_dispatch_notesdef_value'];
+
+      if ($entity_type == 'node') {
+        $entity = node_load($entity_id);
+      } else if ($entity_type == 'taxonomy_term') {
+        $entity = taxonomy_term_load($entity_id);
+      }
+      $json = json_decode($entity->field_sirius_json['und'][0]['value'], TRUE);
+      $json['dispatch']['default']['notes'] = $notes;
+      $entity->field_sirius_json['und'][0]['value'] = json_encode($json);
+      if ($entity_type == 'node') { 
+        node_save($entity);
+      } else if ($entity_type == 'taxonomy_term') {
+        taxonomy_term_save($entity);
+      }
+
+      print "Moved notes to json: $entity_type, $entity_id\n\n";
+    }
+  } catch (exception $ignore) { }
+
+  if ($instance = field_info_instance('node', 'field_sirius_dispatch_notesdef', 'grievance_shop')) {
+    print "Deleting: grievance_shop / field_sirius_dispatch_notesdef\n";
+    field_delete_instance($instance);
+  }
+
+  if ($instance = field_info_instance('taxonomy_term', 'field_sirius_dispatch_notesdef', 'sirius_industry')) {
+    print "Deleting: sirius_industry / field_sirius_dispatch_notesdef\n";
+    field_delete_instance($instance);
+  }
+}
+
+/**
+ * Move the employer's "field_sirius_skill" into json
+ */
+
+function grievance_update_7036() {
+  try {
+    print "Moving skill settings for employers into JSON...\n";
+    $sql = "select * from field_data_field_sirius_skill where entity_type = 'node' and bundle = 'grievance_shop' order by entity_id ";
+    $stmt = db_query($sql, array());
+    while ($hr = $stmt->fetchAssoc()) {
+      $nid = $hr['entity_id'];
+      $node = node_load($nid);
+
+      $json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+      $json['dispatch']['pay_at_skilled_rate']['skill'][] = $hr['field_sirius_skill_tid'];
+      $node->field_sirius_json['und'][0]['value'] = json_encode($json);
+      node_save($node);
+
+      print "Updated: $node->title ($nid)\n";
+    }
+
+  } catch (exception $ignore) { }
+
+  $bundle = 'grievance_shop';
+  $field = 'field_sirius_skill';
+  if ($instance = field_info_instance('node', $field, $bundle)) {
+    print "Deleting: $bundle / $field\n";
+    field_delete_instance($instance);
+  }
+}
+
+/**
+ * - Default the content type for letters
+ * - Clear Phaxio credentials that were mistakenly copied
+ * - Copy log type TID settings into the sirius_specialtid framework
+ * - Copy field overrides into a variable
+ * - Remove "Notify" from Sirius News
+ * - Remove the "Grievance News" content type
+ * - Disable the grievance_worker module
+ * - Create a full-length index on node (type)
+ */
+
+function grievance_update_7037() {
+  // 
+  // All letters should default to grievance letters
+  //
+
+  $sql = "select nid from node where type = 'grievance_letter_template' order by nid";
+  $stmt = db_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) { $nids[] = $hr['nid']; }
+
+  foreach ($nids as $nid) { 
+    $node = node_load($nid);
+    if ($node->field_sirius_letter_content_type['und'][0]['value']) { continue; }
+    $node->field_sirius_letter_content_type['und'][0]['value'] = 'grievance';
+    node_save($node);
+    print "Updated: " . $node->title . "\n";
+  }
+
+  //
+  // We mistakenly cloned Phaxio account information to several sites. Need to clear it for everybody who's not UNITE HERE.
+  //
+
+  $banner_name = variable_get('sirius_banner_name', '');
+  if (variable_get('grievance_phaxio_api_key') == 'f6c8ae8477505334fb3ed01a98e2e959951d325d') {
+    if (!preg_match('/UNITE/i', $banner_name)) {
+      $keys = array('grievance_phaxio_api_key', 'grievance_phaxio_api_secret', 'grievance_phaxio_api_host', 'grievance_phaxio_callback_token');
+      foreach ($keys as $key) { 
+        print "Clearing: $key\n";
+        variable_set($key, '');
+      }
+    }
+  }
+
+  //
+  // Copy special TID settings
+  //
+
+  print "Migrating log type settings\n";
+  variable_set('sirius_specialtid_grievance_log_types|modal_default',                 variable_get('grievance_log_modal_default_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|incident',                      variable_get('grievance_log_incident_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|insert',                        variable_get('grievance_log_insert_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|update_with_status_change',     variable_get('grievance_log_update_type_with_status_change', ''));
+  variable_set('sirius_specialtid_grievance_log_types|update_without_status_change',  variable_get('grievance_log_update_type_without_status_change', ''));
+  variable_set('sirius_specialtid_grievance_log_types|notify',                        variable_get('grievance_log_notify_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|member_forward',                variable_get('grievance_log_member_forward_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|assignment',                    variable_get('grievance_log_assignment_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|first_call',                    variable_get('grievance_log_first_call_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|phaxio_callback',               variable_get('grievance_log_phaxio_callback_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|spi',                           variable_get('grievance_log_spi_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|term',                          variable_get('grievance_log_term_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|written_warning',               variable_get('grievance_log_written_warning_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|final_warning',                 variable_get('grievance_log_final_warning_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|suspension',                    variable_get('grievance_log_suspension_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|merge',                         variable_get('grievance_log_merge_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|timelines_extended',            variable_get('grievance_log_timelines_extended_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|intake_1',                      variable_get('grievance_log_intake_1_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|intake_2',                      variable_get('grievance_log_intake_2_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|intake_3',                      variable_get('grievance_log_intake_3_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|intake_4',                      variable_get('grievance_log_intake_4_type', ''));
+  variable_set('sirius_specialtid_grievance_log_types|intake_5',                      variable_get('grievance_log_intake_5_type', ''));
+
+  //
+  // Copy field overrides
+  //
+
+  print "Migrating field overrides\n";
+  $sql = "select nid from node where type = 'grievance_field_overrides' ";
+  $stmt = db_query($sql, array());
+  $nids = array();
+  while ($hr = $stmt->fetchAssoc()) { $nids[] = $hr['nid']; }
+  $nodes = node_load_multiple($nids);
+  $json = array();
+  foreach ($nodes as $nid => $node) {
+    $json[] = array(
+      'entity_type' => $node->field_grievance_entity_type['und'][0]['value'],
+      'bundle' => $node->field_grievance_bundle['und'][0]['value'],
+      'field_name' => $node->field_grievance_field_name['und'][0]['value'],
+      'label' =>  $node->field_grievance_label['und'][0]['value'],
+    );
+  }
+  variable_set('sirius_field_overrides', json_encode($json));
+
+  //
+  // Remove "Notify" from "sirius news"
+  //
+
+  $bundle = 'sirius_news';
+  $field = 'field_sirius_notify';
+  if ($instance = field_info_instance('node', $field, $bundle)) {
+    print "Deleting: $bundle / $field\n";
+    field_delete_instance($instance);
+  }
+
+  //
+  // Remove the grievance_news content type
+  //
+
+  print "Removing the Grievance News content type\n";
+  $sql = "update node_type set locked = 0 where type = 'grievance_news'";
+  $stmt = db_query($sql, array());
+  try { node_type_delete('grievance_news'); } catch (exception $e) { print_r($e); }
+
+  //
+  // Disable some obsolete modules
+  //
+
+  $modules = array('grievance_worker');
+  foreach ($modules as $module) {
+    print "Disabling module: $module.\n";
+    try { module_disable(array($module), TRUE); } catch (exception $ignore) { }
+  }
+
+  //
+  // Enable some required modules
+  //
+
+  $modules = array('date_popup_timepicker', 'checkall');
+  foreach ($modules as $module) {
+    print "Enabling module: $module.\n";
+    try { module_enable(array($module), TRUE); } catch (exception $ignore) { }
+  }
+
+  //
+  // Create an index on node_type; see https://www.drupal.org/project/drupal/issues/2675434
+  //
+
+  try {
+    print "Indexing node_type, see https://www.drupal.org/project/drupal/issues/2675434\n";
+    $sql = "create index node_type_full on node (type)";
+    $stmt = db_query($sql, array());
+    print "... Done.\n";
+  } catch (exception $ignore) { }
+
+  //
+  // Hide some new fields by default
+  //
+
+  if (!preg_match('/631/', $banner_name)) {
+    // variable_set('grievance_hidefields', variable_get('grievance_hidefields' . "\n" . ))
+  }
+}
+
+/**
+ * - Enable tzfield and per-user timezones
+ */
+
+function grievance_update_7038() {
+  //
+  // Enable some required modules
+  //
+
+  $modules = array('tzfield');
+  foreach ($modules as $module) {
+    print "Enabling module: $module.\n";
+    try { module_enable(array($module), TRUE); } catch (exception $ignore) { }
+  }
+
+  variable_set('configurable_timezones', 1);
+}

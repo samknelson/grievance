@@ -1,7 +1,6 @@
 <?php
 
 function sirius_node_tab_entity_log($node) {
-
 	return drupal_get_form('sirius_node_tab_entity_log_form', $node);
 }
 

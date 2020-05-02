@@ -18,8 +18,34 @@ function sirius_minilog_render() {
 	$result = '';
 	foreach ($log as $log_entry) {
 		if (!$log_entry['type']) { $log_entry['type'] = 'status'; }
-		$result .= date('c', $log_entry['ts']) . ': ' . $log_entry['type'] . ': ' . $log_entry['msg'] . "\n";
+		$result .= date('c', $log_entry['ts']) . ': ' . $log_entry['type'] . ': ';
+		$result .= wordwrap($log_entry['msg'], 120, "\n                           ", TRUE);
+		$result .= "\n";
 	}
 
 	return $result;
+}
+
+function sirius_minilog_render_html() {
+	$log = sirius_minilog();
+	$result = '';
+	foreach ($log as $log_entry) {
+		if (!$log_entry['type']) { $log_entry['type'] = 'status'; }
+		$result .= '<div class="sirius_minilog_row">';
+		$result .= '<strong>';
+		$result .= date('Y-m-d H:i:s ', $log_entry['ts']);
+		if ($log_entry['type'] != 'info') {
+			$result .= $log_entry['type'] . ': ';
+		}
+		$result .= '</strong>';
+		$result .= $log_entry['msg'];
+		$result .= '</div>';
+	}
+
+	return $result;
+}
+
+function sirius_minilog_watchdog($type) {
+	$log = sirius_minilog();
+	foreach ($log as $log_entry) { watchdog($type, $log_entry['msg']); }
 }

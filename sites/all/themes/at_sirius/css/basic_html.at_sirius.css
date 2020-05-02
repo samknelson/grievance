@@ -30,6 +30,7 @@ a.tool-button {
 	padding: 4px 11px;
 	border: 1px solid #a0bbf5;
 	display: inline-block;
+	margin-right: 10px;
 }
 a.tool-button:hover {
 	color: #1b4784;

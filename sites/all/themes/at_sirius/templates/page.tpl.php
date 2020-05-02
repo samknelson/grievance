@@ -68,6 +68,12 @@ if (at_sirius_is_popup()) {
             print $user->name;
 						print "&nbsp;&nbsp;&nbsp;&nbsp;";
 
+            $domain = sirius_domain();
+            if (user_access('sirius domain switch')) {
+              print l('domain','sirius/domain/switch');
+              print ' / ';
+            }
+
             $user_full = user_load($user->uid);
             if ($user_full->field_grievance_shops['und'][0]['target_id'] && !$user_full->field_grievance_shops['und'][1]['target_id']) {
               $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
@@ -85,11 +91,7 @@ if (at_sirius_is_popup()) {
 
             if (user_access('sirius edit own user')) {
               print l(t('account'),'user/'.$user->uid.'/edit');
-              print " / ";
-            }
-            if (user_access('sirius domain switch')) {
-              print l(t('domain'),'sirius/domain/switch');
-              print " / ";
+              print ' / ';
             }
             print l(t("logout"),"user/logout");
             print t('</div>');
@@ -128,7 +130,13 @@ if (at_sirius_is_popup()) {
               }
               ?>
               <span class="banner-name-wrapper">
-                <?php echo(variable_get('sirius_banner_name', '')); ?>
+                <?php 
+                echo(variable_get('sirius_banner_name', '')); 
+                if ($domain) {
+                  echo(' / ');
+                  echo($domain->title);
+                }
+                ?>
               </span>
             </a>
           </div>

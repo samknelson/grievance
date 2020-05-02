@@ -72,10 +72,9 @@ function grievance_phaxio_callback_sent() {
   $log_node->comment = 0;
 
   $log_node->field_grievance = $original_log_node->field_grievance;
-  $log_node->field_grievance_log_type['und'][0]['tid'] = variable_get(
-  	'grievance_log_phaxio_callback_type',
-  	$original_log_node->field_grievance_log_type['und'][0]['tid']
-  );
+  $log_type_tid = sirius_get_special_tid("grievance_log_types|phaxio_callback"); 
+  if (!$log_type_tid) { $log_type_tid = $original_log_node->field_grievance_log_type['und'][0]['tid']; }
+  $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
   $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s'); 
   $log_node->body['und'][0]['value'] = print_r($data, 1);
   $log_node = node_submit($log_node); // Prepare node for saving

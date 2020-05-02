@@ -1,0 +1,54 @@
+#sirius_browserphone {
+  width: 100%;
+}
+
+#sirius_browserphone_volume {
+  display: none;
+  width: 200px;
+  text-align: left;
+}
+
+#sirius_browserphone_volume > div {
+  display: block;
+  height: 20px;
+  width: 0;
+}
+
+div#controls div#log {
+  border: 1px solid #686865;
+  height: 250px;
+  text-align: left;
+  padding: 5px;
+  margin-top: 5px;
+  overflow-y: scroll;
+  display: none;
+}
+
+#sirius_browserphone_number {
+  width: 135px;
+}
+
+#sirius_browserphone button {
+  background-image: none;
+  margin: 14px 0;
+  background-image: none;
+  border: 0;
+  outline: none;
+  border-radius: initial;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: #1b4784;
+  color: #ffffff;
+  padding: 9px 20px;
+  font-size: 14px;
+  margin: 9px;
+}
+
+#sirius_browserphone_devices {
+  width: 135px;
+}
+
+#sirius_browserphone .ui-tabs .ui-tabs-panel {
+  padding: 10px;
+}

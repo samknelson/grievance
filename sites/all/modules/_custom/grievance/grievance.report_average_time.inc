@@ -160,13 +160,6 @@ function grievance_report_average_time_batch($grievance_nids, $values, $report_i
 function grievance_report_average_time_nid($grievance_nid, $open_status_tids, $closed_status_tids, $from_to_status_tids, $values) {
 	$grievance_node = node_load($grievance_nid);
 
-	/*
-  $log_update_tids = array(
-    variable_get('grievance_log_insert_type', ''), 
-    variable_get('grievance_log_update_type_with_status_change', ''), 
-  );
-  */
-
   // Find break points for each status
   $all_ts = array();
   $found_count = 0;

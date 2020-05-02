@@ -1,0 +1,103 @@
+diff --git a/masquerade.module b/masquerade.module
+index a487b60..39b1b05 100644
+--- a/masquerade.module
++++ b/masquerade.module
+@@ -18,6 +18,32 @@ function masquerade_help($path, $arg) {
+ }
+ 
+ /**
++ * Implements hook_hook_info().
++ *
++ * Identifies the hooks exposed by masquerade.
++ *
++ * @see hook_hook_info()
++ */
++function masquerade_hook_info() {
++  $group = 'masquerade';
++  $hooks = array(
++    'masquerade_to_begin' => array(
++      'group' => $group,
++    ),
++    'masquerade_to_end' => array(
++      'group' => $group,
++    ),
++    'masquerade_began' => array(
++      'group' => $group,
++    ),
++    'masquerade_ended' => array(
++      'group' => $group,
++    ),
++  );
++  return $hooks;
++}
++
++/**
+  * Implements hook_permission().
+  *
+  * @return array
+@@ -361,12 +387,17 @@ function masquerade_user_logout($account) {
+     global $user;
+     cache_clear_all($user->uid, 'cache_menu', TRUE);
+     $real_user = user_load($user->masquerading);
++    // Let other modules identify when the masquerade is about to end.
++    module_invoke_all('masquerade_to_end', $user, $real_user);
+     watchdog('masquerade', "User %user no longer masquerading as %masq_as.", array('%user' => $real_user->name, '%masq_as' => $user->name), WATCHDOG_INFO);
+ 
+     $query = db_delete('masquerade');
+     $query->condition('sid', session_id());
+     $query->condition('uid_as', $account->uid);
+     $query->execute();
++
++    // Let other modules identify when the masquerade finished.
++    module_invoke_all('masquerade_ended', $user, $real_user);
+   }
+ }
+ 
+@@ -787,6 +818,9 @@ function masquerade_switch_user($uid) {
+     return FALSE;
+   }
+ 
++  // Allow other modules to identify when the masquerade is about to start.
++  module_invoke_all('masquerade_to_begin', $user, $new_user);
++
+   // Call logout hooks when switching from original user.
+   module_invoke_all('user_logout', $user);
+   drupal_session_regenerate();
+@@ -803,8 +837,13 @@ function masquerade_switch_user($uid) {
+   watchdog('masquerade', 'User %user now masquerading as %masq_as.', array('%user' => $user->name, '%masq_as' => $new_user->name ? $new_user->name : variable_get('anonymous', t('Anonymous'))), WATCHDOG_INFO);
+   drupal_set_message(t('You are now masquerading as !masq_as.', array('!masq_as' => theme('username', array('account' => $new_user)))));
+   $user->masquerading = $new_user->uid;
+-  $user = $new_user;
+ 
++  // Allow other modules to identify when the masquerade started.
++  module_invoke_all('masquerade_began', $user, $new_user);
++
++  // Finalize the switch.
++  $user = $new_user;
++
+   // Call all login hooks when switching to masquerading user.
+   $edit = array(); // Passed by reference.
+   user_module_invoke('login', $edit, $user);
+@@ -848,11 +887,21 @@ function masquerade_switch_back() {
+   $query->execute();
+   $oldname = ($user->uid == 0 ? variable_get('anonymous', t('Anonymous')) : $user->name);
+ 
++  $current_user = $user;
++  $resume_user = user_load($uid);
++
++  // Allow other modules to identify when the masquerade is about to end.
++  module_invoke_all('masquerade_to_end', $current_user, $resume_user);
++
+   // Call logout hooks when switching from masquerading user.
+   module_invoke_all('user_logout', $user);
+   drupal_session_regenerate();
+ 
+-  $user = user_load($uid);
++  // Replace the global $user object.
++  $user = $resume_user;
++
++  // Allow other modules to identify when the masquerade ended.
++  module_invoke_all('masquerade_ended', $current_user, $user);
+ 
+   // Call all login hooks when switching back to original user.
+   $edit = array(); // Passed by reference.

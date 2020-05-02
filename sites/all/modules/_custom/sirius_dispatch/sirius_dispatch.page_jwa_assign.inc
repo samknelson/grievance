@@ -1,14 +1,85 @@
 <?php
 
+function sirius_dispatch_jwa_prefs() {
+	global $user;
+	$user_full = user_load($user->uid);
+	$json = json_decode($user_full->field_sirius_json['und'][0]['value'], TRUE);
+	return $json['sirius']['dispatch']['jwa']['prefs'];
+}
+
+function sirius_dispatch_jwa_hours_clause($prefs) {
+  $sql = "";
+  $delta = 0;
+  $date_range = $prefs['date_range'];
+  $date_range_days = $prefs['date_range_days'];
+  $date_range_months = $prefs['date_range_months'];
+  $month = date('m');
+  $year = date('Y');
+  $day = date('d');
+  if ($date_range == 'all') {
+    // No date range
+  } else if ($date_range == 'this_month') {
+    $target_year = $year;
+    $target_month = $month;
+    $date_range_sql = "(year = $target_year and month = target_month) ";
+  } else if ($date_range == 'last_month') {
+    $target_year = $year;
+    $target_month = $month--;
+    if ($target_month < 1) { $target_month = 12; --$target_year; }
+    $date_range_sql = "(year = $target_year and month = target_month) ";
+  } else if ($date_range == 'this_year') {
+    $target_year = $year;
+    $date_range_sql = "(year = $target_year) ";
+  } else if ($date_range == 'last_year') {
+    $target_year = $year-1;
+    $date_range_sql = "(year = $target_year) ";
+  } else if ($date_range == 'days') {
+    $target_date = date('Y-m-d', strtotime("-$date_range_days days"));
+    list ($target_year, $target_month, $target_day) = explode('-', $target_date);
+    $target_thingy = ($target_year * 1000000) + $target_month * 1000 + $target_day;
+    $date_range_sql = "( (year * 1000000 + month * 1000 + day) >= $target_thingy ) ";
+  } else if ($date_range == 'months') {
+    $target_date = date('Y-m', strtotime("-$date_range_months months"));
+    list ($target_year, $target_month) = explode('-', $target_date);
+    $target_thingy = ($target_year * 1000000) + $target_month * 1000;
+    $date_range_sql = "( (year * 1000000 + month * 1000) >= $target_thingy ) ";
+  }
+
+  $delta = 0;
+  foreach ($prefs['hour_type'] as $type) {
+    $clauses = array();
+    list ($hours_type_tid, $department_tid) = explode('|', $type);
+    if ($hours_type_tid > 0) { $clauses[] = "hours_type_tid = $hours_type_tid "; }
+    if ($department_tid > 0) { $clauses[] = "department_tid = $department_tid "; }
+    if ($date_range_sql) { $clauses[] = $date_range_sql; }
+    if (!$clauses) { $clauses[] = 'TRUE'; }
+    $sql .= "\nSUM(CASE WHEN ( ";
+    $sql .= join(' AND ', $clauses);
+    $sql .= ") THEN hours ELSE 0 END) AS hours_$delta,\n ";
+    ++$delta;
+  }
+
+  return $sql;
+}
+
+function sirius_dispatch_jwa_hours_render($prefs, $hr) {
+	$hours = '';
+	$is_first = TRUE;
+	$delta = 0;
+	foreach ($prefs['hour_type'] as $type) { 
+		if ($is_first) { $is_first = FALSE; } else { $hours .= '&nbsp;/&nbsp;'; }
+		$hours .= round($hr["hours_$delta"], 2); 
+		++$delta;
+	}
+	return $hours;
+}
+
 function sirius_dispatch_page_jwa_assign() {
 	return drupal_get_form('sirius_dispatch_page_jwa_assign_form');
 }
 
 function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
-	global $user;
-	$user_full = user_load($user->uid);
-	$json = json_decode($user_full->field_sirius_json['und'][0]['value'], TRUE);
-	$prefs = $json['sirius']['dispatch']['jwa']['prefs'];
+	$prefs = sirius_dispatch_jwa_prefs();
 	if (!$prefs) {
 		drupal_set_message(t('Please set your Job / Worker Assign Preferences.'), 'warning');
 		return array();
@@ -61,55 +132,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	// Fetch the workers. SQL for speed
 	$args = array();
 	$sql = "select node.nid as worker_nid, ";
-	$delta = 0;
-	$date_range = $prefs['date_range'];
-	$date_range_days = $prefs['date_range_days'];
-	$date_range_months = $prefs['date_range_months'];
-	$month = date('m');
-	$year = date('Y');
-	$day = date('d');
-	if ($date_range == 'all') {
-		// No date range
-	} else if ($date_range == 'this_month') {
-		$target_year = $year;
-		$target_month = $month;
-		$date_range_sql = "(year = $target_year and month = target_month) ";
-	} else if ($date_range == 'last_month') {
-		$target_year = $year;
-		$target_month = $month--;
-		if ($target_month < 1) { $target_month = 12; --$target_year; }
-		$date_range_sql = "(year = $target_year and month = target_month) ";
-	} else if ($date_range == 'this_year') {
-		$target_year = $year;
-		$date_range_sql = "(year = $target_year) ";
-	} else if ($date_range == 'last_year') {
-		$target_year = $year-1;
-		$date_range_sql = "(year = $target_year) ";
-	} else if ($date_range == 'days') {
-		$target_date = date('Y-m-d', strtotime("-$date_range_days days"));
-		list ($target_year, $target_month, $target_day) = explode('-', $target_date);
-		$target_thingy = ($target_year * 1000000) + $target_month * 1000 + $target_day;
-		$date_range_sql = "( (year * 1000000 + month * 1000 + day) >= $target_thingy ) ";
-	} else if ($date_range == 'months') {
-		$target_date = date('Y-m', strtotime("-$date_range_months months"));
-		list ($target_year, $target_month) = explode('-', $target_date);
-		$target_thingy = ($target_year * 1000000) + $target_month * 1000;
-		$date_range_sql = "( (year * 1000000 + month * 1000) >= $target_thingy ) ";
-	}
-
-	$delta = 0;
-	foreach ($prefs['hour_type'] as $type) {
-		$clauses = array();
-		list ($hours_type_tid, $department_tid) = explode('|', $type);
-		if ($hours_type_tid > 0) { $clauses[] = "hours_type_tid = $hours_type_tid "; }
-		if ($department_tid > 0) { $clauses[] = "department_tid = $department_tid "; }
-		if ($date_range_sql) { $clauses[] = $date_range_sql; }
-		if (!$clauses) { $clauses[] = 'TRUE'; }
-		$sql .= "\nSUM(CASE WHEN ( ";
-		$sql .= join(' AND ', $clauses);
-		$sql .= ") THEN hours ELSE 0 END) AS hours_$delta,\n ";
-		++$delta;
-	}
+	$sql .= sirius_dispatch_jwa_hours_clause($prefs);
 
 	$worker_max = variable_get('sirius_dispatch_jwa_worker_max', 500);
 	$sql .= "field_sirius_dispatch_availdate_value as availdate, ";
@@ -118,6 +141,8 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	$sql .= "field_sirius_id_value as sirius_id, ";
 	$sql .= "ds_term.name as dispatch_status_name, ";
 	$sql .= "field_sirius_dispatch_eba_value as eba_name, ";
+	$sql .= "field_sirius_json_value as json_value, ";
+	$sql .= "group_concat(distinct field_sirius_member_status_tid separator ',') as ms_tid, ";
 	// $sql .= "group_concat(substr(field_sirius_dispatch_eba_dates_value, 6, 5) order by field_sirius_dispatch_eba_dates_value separator '<br>') as eba_dates ";
 	$sql .= "(select group_concat(substr(field_sirius_dispatch_eba_dates_value, 6, 5) order by field_sirius_dispatch_eba_dates_value separator '<br>') from field_data_field_sirius_dispatch_eba_dates where entity_type = 'node' and entity_id = node.nid) as eba_dates ";
 	$sql .= "from node ";
@@ -127,6 +152,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	$sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
 	$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_worker_dispstatus on field_data_field_sirius_worker_dispstatus.entity_type = 'node' and field_data_field_sirius_worker_dispstatus.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_dispatch_eba on field_data_field_sirius_dispatch_eba.entity_type = 'node' and field_data_field_sirius_dispatch_eba.entity_id = node.nid ";
 	// $sql .= "left join field_data_field_sirius_dispatch_eba_dates on field_data_field_sirius_dispatch_eba_dates.entity_type = 'node' and field_data_field_sirius_dispatch_eba_dates.entity_id = node.nid ";
 	$sql .= "left join taxonomy_term_data ds_term on ds_term.tid = field_sirius_worker_dispstatus_tid ";
@@ -152,22 +178,31 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	}
 
 	// Fetch the current dispatches for each worker
-	$sql = "select nid as dispatch_nid, ";
-	$sql .= "field_sirius_worker_target_id as worker_nid, ";
-	$sql .= "field_sirius_dispatch_status_value as dispatch_status, ";
-	$sql .= "field_grievance_shop_target_id as employer_nid ";
-	$sql .= "from node ";
-	$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";
-	$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = field_sirius_dispatch_job_target_id ";
-	$sql .= "where type = 'sirius_dispatch' ";
-	$sql .= "and field_sirius_worker_target_id in (:worker_nids) ";
-	$sql .= "and field_sirius_dispatch_status_value in ('notified', 'notification failed', 'accepted', 'accepted_secondary') ";
-	$sql .= "limit " . 10 * $worker_max;
-	$stmt = db_query($sql, array(':worker_nids' => array_keys($workers)));
-	while ($hr = $stmt->fetchAssoc()) {
-		$workers[$hr['worker_nid']]['dispatches'][] = $hr;
+	if ($workers) { 
+		$sql_args = array();
+		$sql_args[':worker_nids'] = array_keys($workers);
+		$sql_args[':now'] = gmdate('Y-m-d 00:00:00', strtotime("-2 days"));
+
+		$sql = "select nid as dispatch_nid, ";
+		$sql .= "field_sirius_worker_target_id as worker_nid, ";
+		$sql .= "field_sirius_dispatch_status_value as dispatch_status, ";
+		$sql .= "field_grievance_shop_target_id as employer_nid, ";
+		$sql .= "field_sirius_datetime_value as report_date ";
+		$sql .= "from node ";
+		$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+		$sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
+		$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";
+		$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = field_sirius_dispatch_job_target_id ";
+		$sql .= "left join field_data_field_sirius_datetime on field_data_field_sirius_datetime.entity_type = 'node' and field_data_field_sirius_datetime.entity_id = field_sirius_dispatch_job_target_id ";
+		$sql .= "where type = 'sirius_dispatch' ";
+		$sql .= "and field_sirius_worker_target_id in (:worker_nids) ";
+		$sql .= "and field_sirius_dispatch_status_value in ('notified', 'notification failed', 'accepted', 'accepted_secondary') ";
+		$sql .= "and not (field_sirius_dispatch_status_value in ('notified', 'notification failed') and field_sirius_datetime_value < :now) ";
+		$sql .= "limit " . 10 * $worker_max;
+		$stmt = db_query($sql, $sql_args);
+		while ($hr = $stmt->fetchAssoc()) {
+			$workers[$hr['worker_nid']]['dispatches'][] = $hr;
+		}
 	}
 
 	// Build our output
@@ -187,6 +222,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
   	t('Worker'),
   	t('ID'),
   	t('Seniority'),
+  	t('Member Status'),
   	t('Dispatch Status'),
   	t('EBA'),
   	t('Employer'),
@@ -195,7 +231,28 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
   );
 
   $rows = array();
-  foreach ($workers as $worker_nid => $hr) {
+  $all_levels = sirius_training_levels_fetch_all();
+  $ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+
+	foreach ($workers as $worker_nid => $hr) {
+		$ms_name = '';
+
+  	$json = json_decode($hr['json_value'], TRUE);
+  	$ms_tids = explode(',', $hr['ms_tid']);
+  	$level_titles = array();
+  	foreach ($ms_tids as $ms_tid) {
+  		if ($ms_name) { $ms_name .= ' / '; }
+  		$ms_name .= $ms_terms[$ms_tid]->name;
+  		$level_code = $json['training']['levels'][$ms_tid]['code'];
+  		if ($level_code) {
+  			$level = $all_levels[$ms_tid][$level_code];
+  			if ($level) {
+  				$ms_name .= ' '; 
+  				$ms_name .= $level['title'];
+  			}
+  		}
+  	}
+
   	$employer_name = $employers[$hr['employer_nid']];
   	if (!$employer_name) { $employer_name = 'AVAILABLE'; }
  		$tools = l(t('Worker'), "node/$worker_nid", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
@@ -208,14 +265,8 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 		 		$tools .= l($dispatch['dispatch_status'], "node/$dispatch[dispatch_nid]/sirius_dispatch_manage", array('attributes' => array('target' => '_blank', 'class' => array('tool-button')))) . ' ';
  			}
  		}
- 		$hours = '';
- 		$is_first = TRUE;
- 		$delta = 0;
-		foreach ($prefs['hour_type'] as $type) { 
-			if ($is_first) { $is_first = FALSE; } else { $hours .= '&nbsp;/&nbsp;'; }
-			$hours .= round($hr["hours_$delta"], 2); 
-			++$delta;
-		}
+
+ 		$hours = sirius_dispatch_jwa_hours_render($prefs, $hr);
 
 		if ($hr['eba_name'] == 'Yes') { $eba = $hr['eba_dates']; } else { $eba = ''; }
 
@@ -223,6 +274,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 		$row[] = $hr['worker_name'];
 		$row[] = $hr['sirius_id'];
 		$row[] = $hr['availdate'];
+		$row[] = $ms_name;
 		$row[] = $hr['dispatch_status_name'];
 		$row[] = $eba;
   	$row[] = $employer_name;

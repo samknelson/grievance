@@ -1,0 +1,17 @@
+.sirius_training_event_list td {
+	vertical-align: top;
+}
+
+.sirius_training_event_list td table,
+.sirius_training_event_list td tbody,
+.sirius_training_event_list td td,
+.sirius_training_event_list td tr {
+	border: 0;
+}
+
+.sirius_training_event_list td td {
+	vertical-align: middle;
+	padding: 2px;
+	width: 33%;
+}
+

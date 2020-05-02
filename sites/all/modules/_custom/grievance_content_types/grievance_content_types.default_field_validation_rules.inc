@@ -24,6 +24,7 @@ function grievance_content_types_default_field_validation_rule() {
   $rule->settings = array(
     'data' => 'bundle',
     'per_user' => 0,
+    'ignore_empty' => 1,
     'bypass' => 0,
     'roles' => array(
       1 => 0,
@@ -42,6 +43,9 @@ function grievance_content_types_default_field_validation_rule() {
       15 => 0,
       17 => 0,
       19 => 0,
+      26 => 0,
+      27 => 0,
+      29 => 0,
     ),
     'errors' => 0,
     'condition' => 0,
@@ -110,6 +114,7 @@ function grievance_content_types_default_field_validation_rule() {
   $rule->settings = array(
     'data' => 'bundle',
     'per_user' => 0,
+    'ignore_empty' => 1,
     'bypass' => 0,
     'roles' => array(
       1 => 0,
@@ -128,12 +133,15 @@ function grievance_content_types_default_field_validation_rule() {
       15 => 0,
       17 => 0,
       19 => 0,
+      26 => 0,
+      27 => 0,
+      29 => 0,
     ),
     'errors' => 0,
     'condition' => 0,
     'condition_wrapper' => array(
-      'condition_field' => '',
-      'condition_operator' => 'equals',
+      'condition_field' => 'sirius_worker_unique_ssn ',
+      'condition_operator' => 'not_equals',
       'condition_value' => '',
     ),
   );

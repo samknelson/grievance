@@ -203,8 +203,16 @@ function sirius_mail($key, &$message, $params) {
 
   // Pass params through to the message
   if (isset($params['attachments'])) { $message['params']['attachments'] = $params['attachments']; }
-  if ($params['headers']['Cc']) { $message['headers']['Cc'] = $params['headers']['cc']; } 
-  if ($params['headers']['Bcc']) { $message['headers']['Bcc'] = $params['headers']['bcc']; } 
+  
+  if ($params['headers']['Cc']) { $message['headers']['Cc'] = $params['headers']['Cc']; } 
+  if ($params['headers']['cc']) { $message['headers']['Cc'] = $params['headers']['cc']; } 
+  if ($params['headers']['Bcc']) { $message['headers']['Bcc'] = $params['headers']['Bcc']; } 
+  if ($params['headers']['bcc']) { $message['headers']['Bcc'] = $params['headers']['bcc']; } 
+
+  // See comment from Takirimi https://api.drupal.org/api/drupal/includes%21mail.inc/function/drupal_mail/7.x
+  $message['headers']['Cc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Cc']);
+  $message['headers']['Bcc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Bcc']);
+
   $message['subject'] = $params['subject'];
   $message['body'][] = $params['body'];
 

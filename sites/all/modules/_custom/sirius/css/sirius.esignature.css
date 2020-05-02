@@ -1,0 +1,109 @@
+
+.sirius_esignature_pane_wrap {
+	width: 100%;
+	padding-bottom: 20%;
+	height: 0;
+	position: relative;
+}
+
+.sirius_esignature_pane {
+	width: 100%;
+	height: 100%;
+	background-color: #ffffff;
+	border-bottom: 3px dashed #000000;
+	-ms-touch-action: none;
+	position: absolute;
+	left;
+}
+
+.sirius_esignature_pane_accepted {
+	border-bottom: 3px dashed #116b23;
+}
+
+.sirius_esignature_statement_body {
+	height: 400px;
+	overflow: scroll;
+	border: 1px solid #000000;
+	padding: 10px;
+	background-color: #ffffff;
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+
+
+.sirius_esignature_render {
+	position: relative;
+}
+
+.sirius_esignature_render_img {
+	width: 200px;
+	border-bottom: 3px dashed #000000;
+}
+
+.sirius_esignature_render_missing {
+	width: 200px;
+	height: 40px;
+	border-bottom: 3px dashed #aaaaaa;
+}
+
+.sirius_esignature_render_img_full {
+	width: 400px;
+	border-bottom: 3px dashed #000000;
+}
+
+.sirius_esignature_render_date {
+	float: left;
+	position: absolute;
+	z-index: 10;
+	bottom: 5px;
+	left: 5px;
+	font-size: 12px;
+	font-weight: bold;
+	font-family: monospace;
+	opacity: 0.5;
+	color: #000000;
+}
+
+
+
+
+
+.sirius_esignature_popup_overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
+  z-index: 9998;
+  background-color: black;
+}
+.sirius_esignature_popup_wrap {
+  position: absolute;
+  z-index: 9999;
+  overflow: auto;
+  background: white;
+  border-radius: 8px;
+  -moz-box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+.sirius_esignature_popup_contents {
+  padding: 20px;
+}
+.sirius_esignature_popup_close {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  height: 26px;
+  width: 26px;
+  background: url('../images/popup-announcement-icons.png');
+}
+.sirius_esignature_popup_close:hover {
+  background: url('../images/popup-announcement-icons.png') 0 -28px;
+  cursor: pointer;
+}

@@ -38,7 +38,6 @@ function sirius_dispatch_job_recompute_from_dispatch($dispatch_node, $is_delete 
 	foreach ($dispatches as $ignore => $status) {
 		if ($status == 'notified') { ++$count_notified; }
 		if ($status == 'accepted' || $status == 'accepted_secondary' || $status == 'resigned' || $status == 'vlri' || $status == 'terminated') { ++$count_yes; }
-		if ($status == 'accepted_secondary') { ++$count_yes; }
 		if ($status == 'declined' || $status == 'notification failed' || $status == 'expired') { ++$count_no; }
 	}
 
@@ -165,7 +164,8 @@ function sirius_dispatch_job_workerform($form, &$form_state, $states = NULL) {
 		if ($nid) { $non_dispatchable_workers[$nid] = TRUE; }
 	}
 	foreach ($non_dispatchable_workers as $nid => $ignore) {
-		$sql = "select * from field_data_field_sirius_id, field_data_field_sirius_name ";
+		$sql = "select field_data_field_sirius_id.entity_id, field_sirius_id_value, field_sirius_name_family, field_sirius_name_given ";
+		$sql .= "from field_data_field_sirius_id, field_data_field_sirius_name ";
 		$sql .= "where field_data_field_sirius_id.entity_id = :nid ";
 		$sql .= "and field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.bundle = 'sirius_worker' ";
 		$sql .= "and field_data_field_sirius_name.entity_type = 'node' and field_data_field_sirius_name.bundle = 'sirius_worker' ";
@@ -191,6 +191,7 @@ function sirius_dispatch_job_workerform($form, &$form_state, $states = NULL) {
   	$tid = $worker['member_status_tid'];
   	$worker_options[$worker_nid] = $worker['family'] . ', ' . $worker['given'];
   	if ($tid) { $worker_options[$worker_nid] .= ' [' . $member_status_abbrv[$tid] . ']'; }
+  	if ($worker['eba'] == 'Yes') { $worker_options[$worker_nid] .= ' [EBA]'; }
   	if ($worker['msg']) { $worker_options[$worker_nid] .= '<br><span class="msg">' . $worker['msg'] . '</span>'; }
   }
 
@@ -267,6 +268,9 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		$member_status_weights[$member_status_tid] = $member_status_term->field_grievance_weight['und'][0]['value'];
 	}
 
+	// Get the facility NID
+	$facility_nid = $job_node->field_sirius_dispatch_facility['und'][0]['target_id'];
+
 	// Get the employer nid
 	$employer_nid = $job_node->field_grievance_shop['und'][0]['target_id'];
 
@@ -283,6 +287,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		'field_data_field_sirius_dispatch_hfe',
 		'field_data_field_sirius_dispatch_hfe_until',
 		'field_data_field_sirius_dispatch_eba',
+		'field_data_field_sirius_contact',
 	);
 
 	// Writing this in SQL for speed
@@ -298,13 +303,15 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		$sql .= "field_sirius_name_family as family, ";
 		$sql .= "taxonomy_term_data_member_status.tid as member_status_tid, ";
 		$sql .= "taxonomy_term_data_member_status.name as member_status_name, ";
+		$sql .= "field_sirius_contact_target_id as contact_nid, ";
 		$sql .= "case ";
 		foreach ($member_status_weights as $tid => $weight) {
 			$sql .= "when taxonomy_term_data_member_status.tid = $tid then $weight ";
 		}
 		$sql .= "end as member_status_weight, ";
 		$sql .= "field_sirius_dispatch_availdate_value as availdate, ";
-		$sql .= "field_sirius_id_value as id ";
+		$sql .= "field_sirius_id_value as id, ";
+		$sql .= "field_sirius_dispatch_eba_value as eba ";
 	}
 
 	// Tables
@@ -318,7 +325,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	$sql .= "where node.type = 'sirius_worker' ";
 
 	// Exclude current dispatches
-	if (!$filters['redispatch']) {
+	if (!$filters['redispatch'] && !$filters['ignore_redispatch']) {
 		$sql .= "and nid not in (";
 		$sql .= "  select a1.field_sirius_worker_target_id as n from ";
 		$sql .= "  node n1, ";
@@ -444,9 +451,10 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	$sql .= "  select 1 from field_revision_field_sirius_dispatch_dncs ";
 	$sql .= "  where field_revision_field_sirius_dispatch_dncs.entity_type = 'node' ";
 	$sql .= "  and field_revision_field_sirius_dispatch_dncs.entity_id = node.nid ";
-	$sql .= "  and field_sirius_dispatch_dncs_target_id = :employer_nid1 ";
+	$sql .= "  and field_sirius_dispatch_dncs_target_id in (:employer_nid1) ";
+	$args[':employer_nid1'] = array($employer_nid);
+	if ($facility_nid) { $args[':employer_nid1'][] = $facility_nid; }
 	$sql .= ") ";
-	$args[':employer_nid1'] = $employer_nid;
 
 	// Exclude employee-initiated DNCs
 	$sql .= "and not exists (";
@@ -504,8 +512,45 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		$args[':roll_employer_nid'] = $employer_nid;
 		$args[':roll_cutoff'] = $roll_cutoff;
 	}
-	// drupal_set_message($sql);
-	// dpm($args);
+
+	// Event
+	$event_nids = sirius_fieldvals($job_node, 'field_sirius_events', 'target_id');
+	if ($event_nids && !$filters['ignore_event']) {
+		$event_node = node_load($event_nids[0]);
+		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+		$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+		list ($prole_tid, $pstatus_tid) = explode('|', $json['bullpen']['pre_dispatch']);
+		$sql .= "and exists (";
+		$sql .= "select 1 from "; 
+		$sql .= "field_data_field_sirius_contact worker_contact, ";
+		$sql .= "field_data_field_sirius_contact participant_contact, ";
+		$sql .= "field_data_field_sirius_event, ";
+		$sql .= "field_data_field_sirius_event_prole, ";
+		$sql .= "field_data_field_sirius_event_pstatus ";
+
+		$sql .= "where worker_contact.entity_type = 'node' ";
+		$sql .= "and worker_contact.entity_id = node.nid ";
+
+		$sql .= "and participant_contact.entity_type = 'node' ";
+		$sql .= "and participant_contact.field_sirius_contact_target_id = worker_contact.field_sirius_contact_target_id ";
+		$sql .= "and participant_contact.bundle = 'sirius_event_participant' ";
+
+		$sql .= "and field_data_field_sirius_event.entity_type = 'node' ";
+		$sql .= "and field_data_field_sirius_event.entity_id = participant_contact.entity_id ";
+		$sql .= "and field_data_field_sirius_event.field_sirius_event_target_id in (:event_nids) ";
+
+		$sql .= "and field_data_field_sirius_event_prole.entity_type = 'node' ";
+		$sql .= "and field_data_field_sirius_event_prole.entity_id = participant_contact.entity_id ";
+		$sql .= "and field_data_field_sirius_event_prole.field_sirius_event_prole_tid = :prole_tid ";
+
+		$sql .= "and field_data_field_sirius_event_pstatus.entity_type = 'node' ";
+		$sql .= "and field_data_field_sirius_event_pstatus.entity_id = participant_contact.entity_id ";
+		$sql .= "and field_data_field_sirius_event_pstatus.field_sirius_event_pstatus_tid = :pstatus_tid ";
+		$sql .= ") ";
+		$args[':event_nids'] = $event_nids;
+		$args[':prole_tid'] = $prole_tid;
+		$args[':pstatus_tid'] = $pstatus_tid;
+	}
 
 	// Order
 	if (!$filters['count']) {
@@ -595,6 +640,9 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	$worker_node = node_load($worker_nid);
 	$employer_nid = $job_node->field_grievance_shop['und'][0]['target_id'];
 	$employer_node = node_load($employer_nid);
+
+	// Get the facility NID
+	$facility_nid = $job_node->field_sirius_dispatch_facility['und'][0]['target_id'];
 
 	// Exclude current dispatches
 	if (!$filters['ignore_redispatch']) {
@@ -726,9 +774,57 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 		}
 	}
 
+	$event_nids = sirius_fieldvals($job_node, 'field_sirius_events', 'target_id');
+	if ($event_nids && !$filters['ignore_event']) {
+		$event_node = node_load($event_nids[0]);
+		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+		$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+		list ($prole_tid, $pstatus_tid) = explode('|', $json['bullpen']['pre_dispatch']);
+		$sql = "select count(*) as c from "; 
+		$sql .= "field_data_field_sirius_contact worker_contact, ";
+		$sql .= "field_data_field_sirius_contact participant_contact, ";
+		$sql .= "field_data_field_sirius_event, ";
+		$sql .= "field_data_field_sirius_event_prole, ";
+		$sql .= "field_data_field_sirius_event_pstatus ";
+
+		$sql .= "where worker_contact.entity_type = 'node' ";
+		$sql .= "and worker_contact.entity_id = :worker_nid ";
+
+		$sql .= "and participant_contact.entity_type = 'node' ";
+		$sql .= "and participant_contact.field_sirius_contact_target_id = worker_contact.field_sirius_contact_target_id ";
+		$sql .= "and participant_contact.bundle = 'sirius_event_participant' ";
+
+		$sql .= "and field_data_field_sirius_event.entity_type = 'node' ";
+		$sql .= "and field_data_field_sirius_event.entity_id = participant_contact.entity_id ";
+		$sql .= "and field_data_field_sirius_event.field_sirius_event_target_id in (:event_nids) ";
+
+		$sql .= "and field_data_field_sirius_event_prole.entity_type = 'node' ";
+		$sql .= "and field_data_field_sirius_event_prole.entity_id = participant_contact.entity_id ";
+		$sql .= "and field_data_field_sirius_event_prole.field_sirius_event_prole_tid = :prole_tid ";
+
+		$sql .= "and field_data_field_sirius_event_pstatus.entity_type = 'node' ";
+		$sql .= "and field_data_field_sirius_event_pstatus.entity_id = participant_contact.entity_id ";
+		$sql .= "and field_data_field_sirius_event_pstatus.field_sirius_event_pstatus_tid = :pstatus_tid ";
+		$args = array();
+		$args[':worker_nid'] = $worker_nid;
+		$args[':event_nids'] = $event_nids;
+		$args[':prole_tid'] = $prole_tid;
+		$args[':pstatus_tid'] = $pstatus_tid;
+		$stmt = db_query($sql, $args);
+		$hr = $stmt->fetchAssoc();
+		if (!$hr['c']) {
+			return array('success' => FALSE, 'msg' => t('The worker is not currently signed in to the bullpen associated with this job.'));
+		}
+	}
+
 	// Exclude employer-initiated DNCs
 	if ($employer_nid && in_array($employer_nid, sirius_fieldvals($worker_node, 'field_sirius_dispatch_dncs', 'target_id'))) {
 		return array('success' => FALSE, 'msg' => t('The worker has been placed on the do-not-call list for this employer.'));
+	}
+
+	// Exclude employer-initiated DNCs
+	if ($facility_nid && in_array($facility_nid, sirius_fieldvals($worker_node, 'field_sirius_dispatch_dncs', 'target_id'))) {
+		return array('success' => FALSE, 'msg' => t('The worker has been placed on the do-not-call list for this facility.'));
 	}
 
 	// Exclude employee-initiated DNCs

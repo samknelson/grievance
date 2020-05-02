@@ -631,6 +631,75 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'sirius_event_participant_role' => array(
+      'name' => 'Sirius Event Participant Role',
+      'machine_name' => 'sirius_event_participant_role',
+      'description' => 'List of participant roles, e.g. "Student" or "Volunteer"',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'sirius_event_participant_status' => array(
+      'name' => 'Sirius Event Participant Status',
+      'machine_name' => 'sirius_event_participant_status',
+      'description' => 'List of participant statuses.  e.g. "Registered" or "Attended"',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'sirius_event_type' => array(
+      'name' => 'Sirius Event Type',
+      'machine_name' => 'sirius_event_type',
+      'description' => 'List the available event types, e.g. "Class", "Rally", etc.',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'sirius_gender' => array(
       'name' => 'Sirius Gender',
       'machine_name' => 'sirius_gender',
@@ -727,7 +796,7 @@ function grievance_content_types_taxonomy_default_vocabularies() {
       'name' => 'Sirius Skill',
       'machine_name' => 'sirius_skill',
       'description' => 'The skills a worker has, and how long they last.',
-      'hierarchy' => 1,
+      'hierarchy' => 0,
       'module' => 'taxonomy',
       'weight' => 0,
       'rdf_mapping' => array(

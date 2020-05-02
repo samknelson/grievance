@@ -13,12 +13,16 @@ function sirius_news_popup_block_view() {
 	if (!$user->roles) { return NULL; }
 
   // Find any pending news announcements good for a popup
+  $domain = sirius_domain();
 	$query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_news');
   $query->fieldCondition('field_sirius_roles', 'value', array_keys($user->roles), 'in');
   $query->fieldCondition('field_sirius_boolean', 'value', 'yes');
   $query->fieldCondition('field_sirius_datetime_completed', 'value', date('Y-m-d H:i:s'), '>=');
+  if ($domain) {
+	  $query->fieldCondition('field_sirius_domain', 'target_id', $domain->nid);
+  }
   $query->propertyOrderBy('created', 'desc');
   $stmt = $query->execute();
   if (!$stmt['node']) { return NULL; }

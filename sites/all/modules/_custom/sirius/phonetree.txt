@@ -1,0 +1,227 @@
+The ROOT() function is called every time a call is initiated, or every time the worker provides input ("digits").
+
+ROOT()
+	IF [there's an outgoing message] OUTGOING_MESSAGE()
+	IF [digits = 9] FORWARD_TO_OPERATOR()
+	IF [digits = *] REPEAT()
+	IF [user is not logged in] LOGIN()
+	ELSE WORKER_MENU()
+
+===============================
+
+The OUTGOING_MESSAGE() function is called when the system initiates a new call, generally speaking, a dispatch notification.  It repeats the outgoing message three times.
+
+OUTGOING_MESSAGE()
+	SAY: This is an automated call from [site_name]. [msg]. Enter star to hear this message again. Enter 0 to return to the main menu. 
+	SAY: This is an automated call from [site_name]. [msg]. Enter star to hear this message again. Enter 0 to return to the main menu. 
+	SAY: This is an automated call from [site_name]. [msg]. Enter star to hear this message again. Enter 0 to return to the main menu. 
+
+===============================
+
+The LOGIN() function is called when the user hasn't been logged in yet. In general, for outgoing messages to a specific user, we skip the login step.
+
+LOGIN()
+	IF (not expecting anything)
+		SAY: You have reached [site_name]. Please enter your worker I.D.
+		SAY: You may enter 9 at any time to be connected with the operator. Enter star to hear this message again.\
+		EXPECT: [worker id]
+	IF (expecting worker id)
+		IF (digits is not a valid worker ID)
+			SAY: That is not a valid worker ID
+		ELSE
+			IF (worker requires access code)
+				SAY: Please enter your access code
+				EXPECT: [access code]
+			ELSE
+				WORKER_MENU()
+	IF (expecting access code)
+		IF (access code is incorrect)
+			SAY: That is not the correct access code
+		ELSE
+			WORKER_MENU()
+
+===============================
+
+The WORKER_MENU() function is the root menu for logged-in workers
+
+WORKER_MENU()
+	IF (digits = 1) DISPATCH_LIST()
+	IF (digits = 2) BULLPEN()
+	IF (digits = 3) DISPATCH_STATUS()
+	IF (digits = 4) DISPATCH_CURRENT()
+	ELSE
+		SAY: Hi, [first name]!
+		IF [worker is available]
+			SAY: Enter 1 to hear your dispatches
+		Say: Enter 2 to hear the bullpen list.
+		If [worker is not employed]
+			SAY: Enter 3 to sign in or out of the out of work list.
+		IF worker is employed
+			SAY: Enter 4 to hear your current dispatch.
+		SAY: Enter 9 at any time to be connected with the operator.
+		SAY: Enter star to hear this message again.
+
+===============================
+
+The DISPATCH_LIST() function lists the dispatches available to the current worker.
+
+DISPATCH_LIST()
+	IF (digits = 8)
+		WORKER_MENU()
+	ELSE IF (digits = 1 x)
+		DISPATCH()
+	ELSE
+		IF (there are dispatches available)
+			FOR EACH DISPATCH [x]
+				SAY: You have a dispatch from [employer name].
+				SAY: To select this dispatch, enter 1 [x]
+		ELSE
+			SAY: There are no pending dispatches for you.
+	SAY: Enter 0 8 to return to the previous mehnu.
+	SAY: Enter 0 9 to be connected with an operator.
+	SAY: Enter star to hear this messgae again.
+
+===============================
+
+The DISPATCH() function provides details about a specific dispatch, and gives the worker the option to accept or decline it.
+
+DISPATCH()
+	IF (no digits)
+		SAY: [site name] is announcing a job from [employer name]
+		SAY: The call type is [call type]
+		SAY: The report date is [date] at [time]
+		SAY: Press 1 for more details.
+		SAY: Press 2 to accept.
+		SAY: Press 3 to decline.
+		SAY: Press 8 to return to the previous menu.
+		SAY: Press 9 to be connected with the operator.
+		SAY: Press star to hear this message again.
+
+	IF (digits = 1) 
+		SAY: The employer is [employer name]
+		SAY: The facility is [facility name]
+		SAY: Press 1 for more details.
+		SAY: Press 2 to accept.
+		SAY: Press 3 to decline.
+		SAY: Press 8 to return to the previous menu. 
+		SAY: Press 9 to be connected with the operator.
+		SAY: Press star to hear this message again.
+
+	IF (digits = 2)
+		Accept the dispatch
+		IF (successful)
+			SAY: The dispatch has been accepted.
+			SAY: The report time is [date] at [time]
+			SAY: Please report to [facility name]
+			IF (hall) SAY: [hall name]
+			IF (address notes) SAY: [address notes]
+			SAY: Press 8 to return to the previous menu
+			SAY: Press 9 to be connected with the operator
+			SAY: Press star to hear this message again
+		ELSE
+			SAY: We were unable to process your request: [reason].
+			SAY: Press 8 to return to the previous menu
+			SAY: Press 9 to be connected with the operator
+			SAY: Press star to hear this message again
+
+	IF (digits = 3)
+		Decline the dispatch
+		IF (successful) 
+			SAY: The dispatch has been declined. Thank you.
+		ELSE
+			SAY: We were unable to process your request: [reason].
+
+	IF (digits = 8)
+		WORKER_MENU()
+
+===============================
+
+The DISPATCH_CURRENT() function provides details about the current dispatch, and tools to allow you to resign.
+
+DISPATCH_CURRENT()
+	IF (no current dispatch)
+		SAY: You do not have a current dispatch
+	ELSE
+		IF (no digits)
+			SAY: You are currently on a dispatch from [employer name]
+			SAY: The call type is: [call type]
+			SAY: The report date is: [date] at [time]
+			IF (possible to voluntary layoff)
+				SAY: Enter 6 to voluntary layoff this dispatch
+			SAY: Enter 8 to return to the previous menu.
+			SAY: Enter 9 to be connected with an operator.
+			SAY: Enter star to hear this message again.
+		IF (digits = 8)
+			WORKER_MENU()
+		IF (digits = 6)
+			Voluntary layoff
+			If (successful)
+				SAY: You have gone on voluntary layoff for this dispatch.
+				SAY: Enter 8 to return to the previous menu.
+				SAY: Enter 9 to be connected with an operator.
+				SAY: Enter star to hear this message again.
+			ELSE
+				SAY: Voluntary layoff failed: [message]
+				SAY: Enter 8 to return to the previous menu.
+				SAY: Enter 9 to be connected with an operator.
+				SAY: Enter star to hear this message again.
+
+===============================
+
+The DISPATCH_STATUS() function allows workers to sign in or out of the out-of-work list.
+
+DISPATCH_STATUS()
+	IF (digits = 8)
+		WORKER_MENU()
+	IF (digits = 1)
+		If (signed out)
+			Sign in
+			IF (success) SAY: You have been placed on the "available" list, and you will receive notifications about new dispatches.
+			ELSE SAY: Your request failed: [message]
+		Else
+			Sign out
+			IF (success) SAY: You have been removed from the "availabe" list, and you will not receive notifications about new dispatches.
+			ELSE SAY: Your request failed: [message]
+	SAY: Your current dispatch status is [dispatch status].
+	IF (signed out)
+		SAY: Enter 1 to be placed on the "available" list for upcoming dispatches.
+		ELSE SAY: Enter 1 to be removed from the "available" list for upcoming dispatches.
+	SAY: Enter 8 to return to the previous menu.
+	SAY: Enter 9 to be connected with an operator.
+	SAY: Enter star to hear this message again.
+
+===============================
+
+The BULLPEN() function lists bullpens.
+
+BULLPEN()
+	IF (digits = 8)
+		WORKER_MENU()
+	IF (there are upcoming bullpens for which the worker is eligible)
+		SAY: There are [count] upcoming bullpens.
+		FOR EACH Bullpen
+			SAY: Bullpen number [x].
+			SAY: [employer name] ON [date]
+			SAY: Report to [facility name] AT [time]
+		SAY: Press star to hear this list again.
+	ELSE
+		SAY: There are no upcoming bullpens.
+	SAY: Enter 8 to return to the previous menu.
+
+===============================
+
+The FORWARD_TO_OPERATOR() function forwards a call to the operator.
+
+FORWARD_TO_OPERATOR()
+	If (the office is closed)
+		If (there's a "closed" message)
+			SAY: [closed message]
+		ELSE
+			SAY: We're sorry, the office is closed right now.
+		SAY: Enter 8 to return to the previous menu.
+		SAY: Enter star to hear this message again.
+	ELSE
+		SAY: Please wait while we connect you with an operator.
+		Forward the call to the operator.
+
+

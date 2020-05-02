@@ -1,0 +1,37 @@
+.sirius_training_certification {
+	padding: 20px;
+	margin: 20px;
+	border: 1px solid #cccccc;
+	background-color: #ffffff;
+}
+
+.sirius_training_certification_draft {
+	background-color: #cccccc;
+}
+
+.sirius_training_certification_signed {
+	background-color: #cccccc;
+}
+
+.sirius_training_certification_granted {
+	background-color: #ffffff;
+}
+
+.sirius_training_certification_discarded {
+	background-color: #fca4a4;
+}
+
+.sirius_training_certification_revoked {
+	background-color: #fca4a4;
+}
+
+#content .sirius_training_certification h2 {
+	padding-top: 0;
+	margin-top: 0;
+	padding-right: 10px;
+}
+
+
+#content .sirius_training_certification h2.field-label {
+	width: 25%;
+}

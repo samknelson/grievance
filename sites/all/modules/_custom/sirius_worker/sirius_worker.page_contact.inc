@@ -11,6 +11,14 @@ function sirius_node_tab_worker_contact($worker_node) {
 function sirius_node_tab_worker_contact_form($form, &$form_state, $worker_node) {
   module_load_include('inc', 'field_ui', 'field_ui.admin');
 
+  if (user_access('sirius worker admin')) {
+  	$contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
+  	$html = t('This worker is associated with: ');
+  	$html .= '<strong>';
+  	$html .= l(t('Contact #@contact_nid', array('@contact_nid' => $contact_nid)), 'node/' . $contact_nid);
+  	$form['contact_intro'] = array('#markup' => $html);
+  }
+
 	$form_state['worker_node'] = $worker_node;
 
 	$form['email'] = array(

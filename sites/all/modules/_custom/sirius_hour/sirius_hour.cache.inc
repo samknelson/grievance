@@ -1,5 +1,29 @@
 <?php
 
+function sirius_hour_cache_set_worker($worker_nid) {
+	sirius_hour_cache_clear_worker($worker_nid);
+
+	$sql = 'select entity_id from field_data_field_sirius_worker ';
+	$sql .= "where entity_type = 'node' ";
+	$sql .= "and bundle = 'sirius_payperiod' ";
+	$sql .= "and field_sirius_worker_target_id = :worker_nid ";
+	$stmt = db_query($sql, array(':worker_nid' => $worker_nid));
+
+	$payperiod_nids = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$payperiod_nids[] = $hr['entity_id'];
+	}
+	$payperiod_nodes = node_load_multiple($payperiod_nids);
+	foreach ($payperiod_nodes as $payperiod_nid => $payperiod_node) {
+		sirius_hour_cache_set($payperiod_node);
+	}
+}
+
+function sirius_hour_cache_clear_worker($worker_nid) {
+	$sql = "delete from sirius_hours_cache where worker_nid = :worker_nid";
+	$stmt = db_query($sql, array(':worker_nid' => $worker_nid));
+}
+
 function sirius_hour_cache_set($payperiod_node) {
 	// Clear the cache
 	sirius_hour_cache_clear($payperiod_node);

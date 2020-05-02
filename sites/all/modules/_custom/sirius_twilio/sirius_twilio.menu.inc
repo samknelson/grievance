@@ -27,37 +27,6 @@ function sirius_twilio_node_tabs() {
 function sirius_twilio_menu() {
   $items = array();
 
-  //
-  // Node Tabs
-  // 
-
-  $node_tabs = sirius_twilio_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    foreach ($node_record as $tab_name => $tab_record) {
-      $items['node/%node/' . $tab_name] = array(
-        'title' => $tab_record['title'],
-        'description' => $tab_record['description'],
-        'page callback' => 'sirius_twilio_node_tab_content',
-        'page arguments' => array(1, $tab_name),
-        'access callback' => 'sirius_twilio_node_tab_access',
-        'access arguments' => array(1, $tab_name),
-        'type' => MENU_LOCAL_TASK,
-      );
-      if ($tab_record['weight']) {
-        $items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
-      }
-    }
-  }
-
-  $items['sirius/twilio/test'] = array(
-    'title' => 'Sirius: Twilio: Test',
-    'description' => '',
-    'page callback' => 'sirius_twilio_page_test',
-    'page arguments' => array(),
-    'access arguments' => array('sirius twilio admin'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
   $items['sirius/twilio/incoming/sms'] = array(
     'title' => 'Sirius: Twilio: Incoming: SMS',
     'description' => '',
@@ -76,13 +45,34 @@ function sirius_twilio_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/twilio/phone'] = array(
-    'title' => 'Sirius: Twilio: Phone',
+  $items['sirius/twilio/browserphone/twiml'] = array(
+    'title' => 'TwiML BrowserPhone Server',
     'description' => '',
-    'page callback' => 'sirius_twilio_page_phone',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_twilio_browserphone_twiml_dial',
     'page arguments' => array(),
-    'access arguments' => array('sirius twilio admin'),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/twilio/browserphone/twiml/omg'] = array(
+    'page callback' => 'sirius_twilio_browserphone_twiml_omg',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['sirius/twilio/browserphone/twiml/omg/play'] = array(
+    'page callback' => 'sirius_twilio_browserphone_twiml_omg_play',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['sirius/twilio/browserphone/twiml/omg/stream'] = array(
+    'page callback' => 'sirius_twilio_browserphone_twiml_omg_stream',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/twilio/phone'] = array(
@@ -94,64 +84,25 @@ function sirius_twilio_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/admin/twilio'] = array(
-    'title' => 'Twilio Configuration ',
+  $items['sirius/config/phone/twilio-settings'] = array(
+    'title' => 'Twilio Settings',
     'description' => '',
-    'access arguments' => array('sirius admin'),
+    'access arguments' => array('sirius domain admin'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_twilio_config'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/config/phone/twilio-test'] = array(
+    'title' => 'Twilio Test',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_test',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_LOCAL_TASK,
   );
 
 
 
   return $items;
 }
-
-function sirius_twilio_node_tab_content($node, $in_tab_name) {
-  $node_tabs = sirius_twilio_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          $callback = $tab_record['callback'];
-          return $callback($node);
-        }
-      }
-    }
-  }
-  
-  drupal_set_message("Bad tab: $node->type, $in_tab_name");
-  
-  return "";
-}
-
-function sirius_twilio_node_tab_access($node, $in_tab_name) {
-  // Check generic permissions
-  $node_tabs = sirius_twilio_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          foreach ($tab_record['permissions'] as $permission) {
-            if (!user_access($permission)) { return false; }
-          }
-          
-          // Check for a custom access permission
-          $access_function_name = $tab_record['callback'] . '_access';
-          if (function_exists($access_function_name)) {
-            if (!$access_function_name($node)) {
-              return false;
-            }
-          }
-          
-          return true;
-        }
-      }
-    }
-  }
-  
-  return false;
-}
-
-

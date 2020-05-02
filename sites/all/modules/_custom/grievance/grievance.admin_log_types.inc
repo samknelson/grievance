@@ -1,6 +1,13 @@
 <?php
+///////////////////////////////////
+// DEFUNCT
+///////////////////////////////////
 
-function grievance_admin_log_types() {
+//
+// This code should never be called, and may be removed in a subsequent upgrade. See sirius.specialtid.inc.
+//
+
+function grievance_admin_log_types_DEFUNCT() {
 
   $form['intro'] = array(
     '#type' => 'markup',

@@ -43,7 +43,7 @@ function grievance_merge_form_submit($form, &$form_state) {
 	global $user;
 
 	// Need to have configured a "merge type" for the log
-	$log_type_tid = variable_get('grievance_log_merge_type', '');
+	$log_type_tid = sirius_get_special_tid("grievance_log_types|merge");
 	if (!$log_type_tid) {
 		drupal_set_message('Please configure a log entry "Merge" type on the "Special log types" screen.', 'error');
 		$form_state['rebuild'] = TRUE;
