@@ -46,7 +46,9 @@ function sirius_wizard_info($wizard_name) {
 }
 
 function sirius_wizard_info_all() {
-	return module_invoke_all('sirius_wizard_info');
+	$all = module_invoke_all('sirius_wizard_info');
+	ksort($all);
+	return $all;
 }
 
 function sirius_wizard_steps($info, $data = NULL, $node = NULL) {
@@ -161,58 +163,12 @@ function sirius_sirius_wizard_info() {
     			'required' => TRUE,
     		),
     	),
-    	'batch_size' => 50,
+    	'batch_size' => 500,
 	    'callback_row_verify' => 'sirius_feed_wws_row_verify',
 	    'callback_row_process' =>'sirius_feed_wws_row_process',
     ),
     'callback_launch' => 'sirius_feed_wizard_launch',
     'callback_launch_args' => array('feed_wws'),
-  );
-
-  $items['feed_worker'] = array(
-    'name' => 'feed_worker',
-    'title' => 'Workers',
-    'description' => 'Upload a new list of workers.',
-    'steps' => array(
-			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
-			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
-			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
-			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
-			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
-			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
-    ),
-    'feed' => array(
-	    'pks' => array(
-	    	'id' => 'ID',
-	    	'ssn' => 'SSN',
-	    ),
-    	'fields' => array(
-    		'ssn' => array('title' => 'SSN'),
-    		'id' => array('title' => 'ID'),
-    		'id2' => array('title' => 'ID2'),
-    		'id3' => array('title' => 'ID3'),
-    		'name_given' => array('title' => 'First Name'),
-    		'name_family' => array('title' => 'Last Name'),
-    		'name_middle' => array('title' => 'Middle Name'),
-    		'address_thoroughfare' => array('title' => 'Address 1'),
-    		'address_premise' => array('title' => 'Address 2'),
-    		'address_locality' => array('title' => 'City'),
-    		'address_administrative_area' => array('title' => 'State'),
-    		'address_postal_code' => array('title' => 'Zip'),
-    		'email' => array('title' => 'Email'),
-    		'phone' => array('title' => 'Phone'),
-    		'phone_alt' => array('title' => 'Phone (Alt)'),
-    		'phone_mobile' => array('title' => 'Phone (Mobile)'),
-    		'shop_name' => array('title' => 'Current Employer Name'),
-    		'member_status' => array('title' => 'Member Status'),
-    		'dispatch_job_nid' => array('title' => 'Dispatch to Job (NID)'),
-    	),
-    	'batch_size' => 50,
-	    'callback_row_verify' => 'sirius_feed_worker_row_verify',
-	    'callback_row_process' =>'sirius_feed_worker_row_process',
-    ),
-    'callback_launch' => 'sirius_feed_wizard_launch',
-    'callback_launch_args' => array('feed_worker'),
   );
 
   $items['feed_hours'] = array(
@@ -246,7 +202,7 @@ function sirius_sirius_wizard_info() {
     		'notes2' => array('title' => 'Notes 2'),
     		'notes3' => array('title' => 'Notes 3'),
     	),
-    	'batch_size' => 50,
+    	'batch_size' => 500,
 	    'callback_row_verify' => 'sirius_feed_hours_row_verify',
 	    'callback_row_process' =>'sirius_feed_hours_row_process',
     ),
@@ -268,7 +224,7 @@ function sirius_sirius_wizard_info() {
 			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
     ),
     'feed' => array(
-    	'batch_size' => 50,
+    	'batch_size' => 500,
 	    'callback_row_verify' => 'sirius_feed_contact_row_verify',
 	    'callback_row_process' =>'sirius_feed_contact_row_process',
 			'callback_fields' => 'sirius_feed_contact_fields',
@@ -276,9 +232,47 @@ function sirius_sirius_wizard_info() {
     'callback_launch' => 'sirius_feed_wizard_launch',
     'callback_launch_args' => array('feed_contact'),
   );
+
+  $items['feed_worker_skill'] = array(
+    'name' => 'feed_worker_skill',
+    'title' => 'Worker Skills',
+    'description' => 'Upload worker skills and expiration dates.',
+    'steps' => array(
+			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
+			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
+			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
+			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
+			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
+			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
+    ),
+    'feed' => array(
+	    'pks' => array(
+	    	'id' => 'ID',
+	    	'ssn' => 'SSN',
+	    ),
+    	'fields' => array(
+    		'id' => array('title' => 'ID'),
+    		'ssn' => array('title' => 'SSN'),
+    		'skill' => array('title' => 'Skill', 'description' => 'Enter the skill name exactly as it appears, or the short name, ID, External ID, or NID.'),
+    		'skill_expiration' => array('title' => 'Expiration Date'),
+    		'skill_action' => array('title' => 'Action', 'description' => 'Enter "add" or "remove"'),
+    		'skill_comment' => array('title' => 'Comment'),
+    	),
+    	'batch_size' => 500,
+	    'callback_row_verify' => 'sirius_feed_worker_skill_row_verify',
+	    'callback_row_process' =>'sirius_feed_worker_skill_row_process',
+    ),
+    'callback_launch' => 'sirius_feed_wizard_launch',
+    'callback_launch_args' => array('feed_worker_skill'),
+  );
+
+  $items += sirius_feed_grievance_info();
+  $items += sirius_feed_grievance_log_info();
+  $items += sirius_letter_wizard_info();
+  $items += sirius_feed_worker_info();
+
   return $items;
 }
-
 
 function sirius_wizard_submit($info, $data, $node, $current_step, $msg = NULL) {
 	// Mark this step as complete

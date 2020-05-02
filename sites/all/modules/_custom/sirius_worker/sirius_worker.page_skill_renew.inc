@@ -144,7 +144,7 @@ function sirius_node_tab_worker_skill_renew_form_submit($form, &$form_state) {
   	if (!$form_state['values'][$delta]['checkbox']) { continue; }
   	$tid = $form_state['values'][$delta]['skill'];
   	$expires = $form_state['values'][$delta]['renew'];
-  	if (strtotime($expires) < 1) { $expires = NULL; }
+  	if (sirius_strtotime($expires) < 1) { $expires = NULL; }
 		$result = sirius_worker_skill_set($worker_node, array($tid), $expires, 'add', $reason, $files);
 		if ($result['success']) {
 			drupal_set_message($result['msg']);

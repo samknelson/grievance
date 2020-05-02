@@ -1,0 +1,24 @@
+.sirius_training_evaluation {
+	padding: 20px;
+	margin: 20px;
+	border: 1px solid #cccccc;
+	width: 450px;
+	background-color: #ffffff;
+}
+
+.sirius_training_evaluation_draft {
+	background-color: #cccccc;
+}
+
+.sirius_training_evaluation_accepted {
+	background-color: #ffffff;
+}
+
+.sirius_training_evaluation_rejected {
+	background-color: #fca4a4;
+}
+
+#content .sirius_training_evaluation h2 {
+	padding-top: 0;
+	margin-top: 0;
+}

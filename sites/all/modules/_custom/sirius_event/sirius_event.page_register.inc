@@ -57,8 +57,13 @@ function sirius_node_tab_event_participants_register_rule($event_node, $rule, $w
 		return drupal_get_form('sirius_event_register_bullpen_signin_form', $event_node, $rule);
 	} else if ($widget == 'worker_byname') {
 		return drupal_get_form('sirius_event_register_worker_byname_form', $event_node, $rule);
+	} else if ($widget == 'user_self') {
+		return drupal_get_form('sirius_event_register_user_self_form', $event_node, $rule);
+	} else if ($widget == 'contact_bulk') {
+		list ($prole_tid, $pstatus_tid) = explode('|', array_values($rule['register_as'])[0]);
+		return drupal_get_form('sirius_node_tab_event_participants_register_bulk_form', $event_node, $prole_tid);
 	}
 
-	return t('Widget not found.');
+	return t('Widget not found: @widget', array('@widget' => $widget));
 }
 

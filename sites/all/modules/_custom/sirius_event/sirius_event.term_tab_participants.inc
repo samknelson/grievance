@@ -2,8 +2,15 @@
 
 function sirius_event_participants_widgets() {
 	return array(
-		'view' => t('View Participant List'),
-		'status' => t('Manage Participant List'),
+		'view' => t('View Worker Participant List'),
+		'status' => t('Manage Worker Participant List'),
+		'contact' => t('Manage Contact Participant List'),
+		'reports' => t('Download reports'),
+		'summary' => t('View a Summary'),
+		'attendance' => t('Attendance Sheets'),
+		'certifications' => t('Certifications'),
+		'mightysearch_lite' => t('Advanced Search'),
+		'mightysearch' => t('Advanced Search and Tag'),
 	);
 }
 

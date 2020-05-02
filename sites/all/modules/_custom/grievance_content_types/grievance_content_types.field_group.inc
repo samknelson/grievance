@@ -77,19 +77,20 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_details';
   $field_group->data = array(
-    'label' => 'Body',
-    'weight' => '2',
+    'label' => 'PDF',
+    'weight' => '3',
     'children' => array(
       0 => 'body',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'PDF',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-body field-group-accordion-item',
         'required_fields' => 1,
+        'classes' => 'group-body field-group-accordion-item',
+        'description' => 'Settings for generated PDFs which will be attached to the letter.',
       ),
+      'formatter' => 'closed',
     ),
   );
   $field_groups['group_body|node|grievance_letter_template|form'] = $field_group;
@@ -107,12 +108,12 @@ function grievance_content_types_field_group_info() {
     'label' => 'Detail',
     'weight' => '0',
     'children' => array(
-      0 => 'group_identity',
-      1 => 'group_body',
-      2 => 'group_email',
-      3 => 'group_attachments',
-      4 => 'group_log',
-      5 => 'group_access',
+      0 => 'group_access',
+      1 => 'group_attachments',
+      2 => 'group_body',
+      3 => 'group_email',
+      4 => 'group_identity',
+      5 => 'group_log',
     ),
     'format_type' => 'accordion',
     'format_settings' => array(
@@ -137,7 +138,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_details';
   $field_group->data = array(
     'label' => 'Email',
-    'weight' => '3',
+    'weight' => '2',
     'children' => array(
       0 => 'field_grievance_emails',
       1 => 'field_grievance_notify_body',
@@ -329,13 +330,8 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_grievance';
   $field_group->data = array(
     'label' => 'Arbitration',
-    'weight' => '10',
-    'children' => array(
-      0 => 'field_grievance_arbitration_a',
-      1 => 'field_grievance_arbitration_b',
-      2 => 'field_grievance_arbitration_c',
-      3 => 'field_grievance_arbitration_d',
-    ),
+    'weight' => '11',
+    'children' => array(),
     'format_type' => 'accordion-item',
     'format_settings' => array(
       'label' => 'Arbitration',
@@ -1081,8 +1077,8 @@ function grievance_content_types_field_group_info() {
       13 => 'field_grievance_min',
       14 => 'field_grievance_corrected',
       15 => 'field_grievance_class_tid',
-      16 => 'field_grievance_department_tid',
-      17 => 'field_grievance_daysoff',
+      16 => 'field_grievance_daysoff',
+      17 => 'field_grievance_department_tid',
       18 => 'field_grievance_shift',
       19 => 'field_grievance_work_status',
       20 => 'field_grievance_gender',
@@ -1218,8 +1214,8 @@ function grievance_content_types_field_group_info() {
       4 => 'field_grievance_type_other',
       5 => 'field_grievance_violation',
       6 => 'field_grievance_clauseref',
-      7 => 'field_grievance_date_2',
-      8 => 'field_grievance_category',
+      7 => 'field_grievance_category',
+      8 => 'field_grievance_date_2',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1470,15 +1466,15 @@ function grievance_content_types_field_group_info() {
       1 => 'field_grievance_arbitration_b',
       2 => 'field_grievance_arbitration_c',
       3 => 'field_grievance_arbitration_d',
-      4 => 'field_grievance_resproc_an',
-      5 => 'field_grievance_resproc_lh',
-      6 => 'field_grievance_resproc_er',
-      7 => 'field_grievance_outcome',
-      8 => 'field_grievance_resproc_ea',
+      4 => 'field_grievance_outcome',
+      5 => 'field_grievance_resproc_an',
+      6 => 'field_grievance_resproc_ea',
+      7 => 'field_grievance_resproc_er',
+      8 => 'field_grievance_resproc_lh',
       9 => 'field_grievance_resproc_ur',
       10 => 'field_field_grievance_resproc_ua',
-      11 => 'field_grievance_resproc_hd',
-      12 => 'field_grievance_resproc_cd',
+      11 => 'field_grievance_resproc_cd',
+      12 => 'field_grievance_resproc_hd',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1516,8 +1512,8 @@ function grievance_content_types_field_group_info() {
       7 => 'field_grievance_meeting_date',
       8 => 'field_grievance_contract_tplt',
       9 => 'field_grievance_status_date',
-      10 => 'field_grievance_classaction',
-      11 => 'field_grievance_broughtby',
+      10 => 'field_grievance_broughtby',
+      11 => 'field_grievance_classaction',
       12 => 'field_grievance_external_id',
       13 => 'title',
     ),
@@ -1825,16 +1821,17 @@ function grievance_content_types_field_group_info() {
     'label' => 'Grievance',
     'weight' => '0',
     'children' => array(
-      0 => 'group_grievance_comments',
-      1 => 'group_grievance_company',
-      2 => 'group_grievance_employee',
-      3 => 'group_grievance_form',
-      4 => 'group_grievance_resproc',
-      5 => 'group_grievance_status',
-      6 => 'group_grievance_stewards',
-      7 => 'group_grievance_supervisor',
-      8 => 'group_grievance_union_rep',
-      9 => 'group_inforeq',
+      0 => 'group_grievance_arbitration',
+      1 => 'group_grievance_comments',
+      2 => 'group_grievance_company',
+      3 => 'group_grievance_employee',
+      4 => 'group_grievance_form',
+      5 => 'group_grievance_resproc',
+      6 => 'group_grievance_status',
+      7 => 'group_grievance_stewards',
+      8 => 'group_grievance_supervisor',
+      9 => 'group_grievance_union_rep',
+      10 => 'group_inforeq',
     ),
     'format_type' => 'accordion',
     'format_settings' => array(
@@ -1861,7 +1858,8 @@ function grievance_content_types_field_group_info() {
     'weight' => '1',
     'children' => array(
       0 => 'field_grievance_shortname',
-      1 => 'title',
+      1 => 'field_sirius_letter_content_type',
+      2 => 'title',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -1914,7 +1912,7 @@ function grievance_content_types_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_details';
   $field_group->data = array(
-    'label' => 'Log and Update',
+    'label' => 'Grievance Settings',
     'weight' => '4',
     'children' => array(
       0 => 'field_grievance_update_rep',
@@ -1923,12 +1921,13 @@ function grievance_content_types_field_group_info() {
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Grievance Settings',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-log field-group-accordion-item',
         'required_fields' => 1,
+        'classes' => 'group-log field-group-accordion-item',
+        'description' => 'Settings for letter templates used with grievances only.',
       ),
+      'formatter' => 'closed',
     ),
   );
   $field_groups['group_log|node|grievance_letter_template|form'] = $field_group;
@@ -3025,7 +3024,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_sirius_worker_preferences|node|sirius_worker|form'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_sirius_worker_skill_exp|node|sirius_worker|default';
   $field_group->group_name = 'group_sirius_worker_skill_exp';
@@ -3053,7 +3052,7 @@ function grievance_content_types_field_group_info() {
   $field_groups['group_sirius_worker_skill_exp|node|sirius_worker|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_sirius_worker_skills|node|sirius_worker|default';
   $field_group->group_name = 'group_sirius_worker_skills';
@@ -3151,6 +3150,34 @@ function grievance_content_types_field_group_info() {
   );
   $field_groups['group_sirius_worker_status|node|sirius_worker|form'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_skills|node|sirius_worker|default';
+  $field_group->group_name = 'group_skills';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_worker';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Skills',
+    'weight' => '50',
+    'children' => array(
+      0 => 'field_sirius_skill',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Skills',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-skills field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_skills|node|sirius_worker|default'] = $field_group;
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Access');
@@ -3159,7 +3186,6 @@ function grievance_content_types_field_group_info() {
   t('Arbitration Comments');
   t('Assignment');
   t('Attachments');
-  t('Body');
   t('Comments');
   t('Company Contact');
   t('Company Rep');
@@ -3181,15 +3207,16 @@ function grievance_content_types_field_group_info() {
   t('General Grievance');
   t('Grievance');
   t('Grievance Form');
+  t('Grievance Settings');
   t('Holds');
   t('Identity');
   t('Information Request');
   t('Job Details');
   t('Job Info');
-  t('Log and Update');
   t('Name and Role');
   t('Notification Settings');
   t('Notifications');
+  t('PDF');
   t('Phone and Email');
   t('Resolution Procedure');
   t('Shop Steward');

@@ -1,301 +1,198 @@
 <?php
 
-// I hate notice errors
-ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
-
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_timss') . "/grievance_timss.menu.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_timss') . "/grievance_timss.admin.inc";
-
 /**
- * Implement hook_cron() 
+ * Implements hook_grievance_workersync_plugin_info
  */
 
-function grievance_timss_cron() {
-  // Run once a day
-  $today = date('Y-m-d');
-  $last_run = variable_get('grievance_timss_last_date', 0);
-  if ($last_run == $today && !$force) { return; }
-  variable_set('grievance_timss_last_date', $today);
+function grievance_timss_grievance_workersync_plugin_info() {
+  $info = array();
+  $info['timss'] = array(
+    'title' => 'TIMSS',
+    'description' => 'Fetch workers from a TIMSS data source',
+    'settings_callback' => 'grievance_timss_callback_settings',
+    'search_callback' => 'grievance_timss_callback_search',
+    'search_description' => 'Enter the last name or SSN of the employee',
+    'lookup_callback' => 'grievance_timss_callback_lookup',
+  );
 
-  // Don't run before a specific time
-  $hour = variable_get('grievance_timss_start_hr', 1);
-  $min = variable_get('grievance_timss_start_min', 30);
-  if (time() < strtotime("$today $hour:$min") && !$force) { return; }
-
-  grievance_timss_resync();
-  grievance_timss_resync_shop_stewards();
+  return $info;
 }
 
-// @todo: not currently resyncing if there's no "broughtby" term
-function grievance_timss_resync_shop_stewards() {
-  watchdog('grievance_timss', 'TIMSS shop steward resync: Starting');
+/**
+ * Plugin callback: settings
+ */
 
-	$steward_type_tid = variable_get('grievance_contacts_st_type', '');
-	if (!$steward_type_tid) { 
-  	watchdog('grievance_timss', 'TIMSS shop steward resync: No steward_type_tid.  Skipping.');
-  	return;
-	}
+function grievance_timss_callback_settings(&$form, &$form_state) {
+  $variable_name = sirius_domain_variable_name('grievance_workersync_timss_url');
+  $form['plugin_settings'][$variable_name] = array(
+    '#type' => 'textfield',
+    '#default_value' => variable_get($variable_name, ''),
+    '#title' => t('TIMSS URL'),
+  );
 
-  // Find all open grievances where the data hasn't been changed manually.
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_shop_contact');
-  $query->fieldCondition('field_grievance_contact_types', 'tid',  $steward_type_tid);
-  $stmt = $query->execute();
-  if (!$stmt['node']) { continue; }
-  $contact_nids = array_keys($stmt['node']);
+   $variable_name = sirius_domain_variable_name('grievance_workersync_timss_user');
+   $form['plugin_settings'][$variable_name] = array(
+    '#type' => 'textfield',
+    '#title' => t('TIMSS User'),
+    '#default_value' => variable_get($variable_name, ''),
+  );
 
-  foreach ($contact_nids as $contact_nid) {
-    ++$examined_count;
-    watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: Scanning");
-
-    // Load the steward
-    $contact_node = node_load($contact_nid);
-
-    // Find the member ID
-    $member_id = $contact_node->field_grievance_min['und'][0]['value'];
-    if (!$member_id) {
-      watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: No member ID. Skipping.");
-      continue;
-    }
-
-    // Load the candidate from TIMSS
-    $candidate = grievance_timss_lookup($member_id, 'DEFAULT');
-    if (!$candidate || !is_array($candidate)) {
-      watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: TIMSS record not found. Skipping.");
-      continue;
-    }
-    $candidate = $candidate[0];
-    if (!$candidate) { 
-      watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: TIMSS record not found. Skipping.");
-      continue;
-    }
-
-    // Update the member
-    $fields = array();
-    $fields['field_grievance_co_city']           = 'city';
-    $fields['field_grievance_co_state']          = 'state';
-    $fields['field_grievance_co_address']        = 'street_Address';
-    $fields['field_grievance_co_phone']          = 'phone_Number';
-    $fields['field_grievance_co_email']          = 'email_Address';
-
-    $columns = array();
-    $columns['field_grievance_co_city']           = 'value';
-    $columns['field_grievance_co_state']          = 'value';
-    $columns['field_grievance_co_address']        = 'value';
-    $columns['field_grievance_co_phone']          = 'value';
-    $columns['field_grievance_co_email']          = 'email';
-
-    $subsections = array();
-    $subsections['field_grievance_co_city']           = NULL;
-    $subsections['field_grievance_co_state']          = NULL;
-    $subsections['field_grievance_co_address']        = NULL;
-    $subsections['field_grievance_co_phone']          = NULL;
-    $subsections['field_grievance_co_email']          = NULL;
-
-    $is_changed = FALSE;
-    foreach ($fields as $drupal_field => $json_field) {
-      $column = $columns[$drupal_field];
-      $subsection = $subsections[$drupal_field];
-
-      $old_value = $contact_node->{$drupal_field}['und'][0][$column];
-
-      $new_value = NULL;
-      if ($subsection) {
-        $new_value = $candidate->{$subsection}->{$json_field};
-      } else {
-        $new_value = $candidate->{$json_field};
-      }
-      $new_value = preg_replace("/(?:\r\n|\r|\n)/", ', ', $new_value);
-      if ($drupal_field == 'field_grievance_co_phone') {
-      	if ($new_value) {
-      		$new_value = grievance_format_phone_number($new_value);
-      	}
-      }
-
-      if (!$new_value) { continue; }
-      if ($new_value == $old_value) { continue; }
-
-      $contact_node->{$drupal_field}['und'][0][$column] = $new_value;
-      $is_changed = TRUE;
-    }
-
-    if (!$is_changed) {
-      watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: No changes. Skipping.");
-      continue;
-    }
-
-    watchdog('grievance_timss', "TIMSS shop steward resync: $contact_nid: Data has changed in TIMSS. Updating the node.");
-    node_save($contact_node);
-    ++$updated_count;
-  }
-
-  watchdog('grievance_timss', 'TIMSS shop steward resync: Finishing.');
+   $variable_name = sirius_domain_variable_name('grievance_workersync_timss_pass');
+   $form['plugin_settings'][$variable_name] = array(
+    '#type' => 'textfield',
+    '#title' => t('TIMSS Pass'),
+    '#default_value' => variable_get($variable_name, ''),
+  );
 }
 
-
-// @todo: not currently resyncing if there's no "broughtby" term
-function grievance_timss_resync($force = NULL) {
-  watchdog('grievance_timss', 'TIMSS resync: Starting');
-
-  $broughtby_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_broughtby');
-  if (!$broughtby_vocabulary) { return; }
-  $broughtby_terms = taxonomy_get_tree($broughtby_vocabulary->vid);
-  if (!$broughtby_terms) { $broughtby_terms['DEFAULT'] = (object) array('name' => 'DEFAULT'); }
- 
-  // Load all "open" TIDs
-  $status_vocab = taxonomy_vocabulary_machine_name_load('grievance_status ');
-  if (!$status_vocab) { return; }
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'taxonomy_term');
-  $query->propertyCondition('vid', $status_vocab->vid);
-  $query->fieldCondition('field_grievance_open', 'value', 1);
-  $stmt = $query->execute();
-  if (!$stmt['taxonomy_term']) { return; }
-  $status_tids = array_keys($stmt['taxonomy_term']);
-
-  $examined_count = 0;
-  $updated_count = 0;
-
-  foreach ($broughtby_terms as $broughtby_tid => $broughtby_term) {
-    watchdog('grievance_timss', 'TIMSS resync: Starting ' . $broughtby_term->name);
-
-    // Find all open grievances where the data hasn't been changed manually.
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node');
-    $query->entityCondition('bundle', 'grievance');
-    if ($broughtby_tid != 'DEFAULT') { $query->fieldCondition('field_grievance_broughtby', 'tid',  $broughtby_tid); }
-    $query->fieldCondition('field_grievance_status', 'tid', $status_tids, 'in');
-    // The following would be nice, but doesn't handle nulls.  So we check manually later.
-    // $query->fieldCondition('field_grievance_corrected', 'value', 'Pending', '!=');
-    $stmt = $query->execute();
-    if (!$stmt['node']) { continue; }
-    $grievance_nids = array_keys($stmt['node']);
-
-    foreach ($grievance_nids as $grievance_nid) {
-      ++$examined_count;
-      watchdog('grievance_timss', "TIMSS resync: $grievance_nid: Scanning");
-
-      // Load the grievance
-      $grievance_node = node_load($grievance_nid);
-
-      // Skip "Pending" (meaning that the data has been corrected manually)
-      if ($grievance_node->field_grievance_corrected['und'][0]['value'] == 'Pending') {
-        watchdog('grievance_timss', "TIMSS resync: $grievance_nid: Data marked as manually corrected. Skipping.");
-        continue;
-      }
-
-      // Find the member ID
-      $member_id = $grievance_node->field_grievance_min['und'][0]['value'];
-      if (!$member_id) {
-        watchdog('grievance_timss', "TIMSS resync: $grievance_nid: No member ID. Skipping.");
-        continue;
-      }
-
-      // Load the candidate from TIMSS
-      $candidate = grievance_timss_lookup($member_id, $broughtby_tid);
-      if (!$candidate || !is_array($candidate)) {
-        watchdog('grievance_timss', "TIMSS resync: $grievance_nid: TIMSS record not found. Skipping.");
-        continue;
-      }
-      $candidate = $candidate[0];
-      if (!$candidate) { 
-        watchdog('grievance_timss', "TIMSS resync: $grievance_nid: TIMSS record not found. Skipping.");
-        continue;
-      }
-
-      // Update the member
-      $fields = array();
-      $fields['field_grievance_first_name']     = 'first_Name';
-      $fields['field_grievance_last_name']      = 'last_Name';
-      $fields['field_grievance_city']           = 'city';
-      $fields['field_grievance_state']          = 'state';
-      $fields['field_grievance_address']        = 'street_Address';
-      $fields['field_grievance_city']           = 'city';
-      $fields['field_grievance_phone']          = 'phone_Number';
-      $fields['field_grievance_email']          = 'email_Address';
-      $fields['field_grievance_department']     = 'department';
-      $fields['field_grievance_classification'] = 'classification';
-
-      $columns = array();
-      $columns['field_grievance_first_name']     = 'value';
-      $columns['field_grievance_last_name']      = 'value';
-      $columns['field_grievance_city']           = 'value';
-      $columns['field_grievance_state']          = 'value';
-      $columns['field_grievance_address']        = 'value';
-      $columns['field_grievance_city']           = 'value';
-      $columns['field_grievance_phone']          = 'value';
-      $columns['field_grievance_email']          = 'email';
-      $columns['field_grievance_department']     = 'value';
-      $columns['field_grievance_classification'] = 'value';
-
-      $subsections = array();
-      $subsections['field_grievance_first_name']     = NULL;
-      $subsections['field_grievance_last_name']      = NULL;
-      $subsections['field_grievance_city']           = NULL;
-      $subsections['field_grievance_state']          = NULL;
-      $subsections['field_grievance_address']        = NULL;
-      $subsections['field_grievance_city']           = NULL;
-      $subsections['field_grievance_phone']          = NULL;
-      $subsections['field_grievance_email']          = NULL;
-      $subsections['field_grievance_department']     = NULL;
-      $subsections['field_grievance_classification'] = NULL;
-
-      $is_changed = FALSE;
-      foreach ($fields as $drupal_field => $json_field) {
-        $column = $columns[$drupal_field];
-        $subsection = $subsections[$drupal_field];
-
-        $old_value = $grievance_node->{$drupal_field}['und'][0][$column];
-
-        $new_value = NULL;
-        if ($subsection) {
-          $new_value = $candidate->{$subsection}->{$json_field};
-        } else {
-          $new_value = $candidate->{$json_field};
-        }
-        $new_value = preg_replace("/(?:\r\n|\r|\n)/", ', ', $new_value);
-
-        if (!$new_value) { continue; }
-        if ($new_value == $old_value) { continue; }
-        if (preg_replace('/[\s\-\(\)]/', '', $new_value) == preg_replace('/[\s\-\(\)]/', '', $old_value)) { continue; }
-
-        $grievance_node->{$drupal_field}['und'][0][$column] = $new_value;
-        $is_changed = TRUE;
-        // print "Changed: $drupal_field / $column / $new_value\n";
-      }
-
-      if (!$is_changed) {
-        watchdog('grievance_timss', "TIMSS resync: $grievance_nid: No changes. Skipping.");
-        continue;
-      }
-
-      watchdog('grievance_timss', "TIMSS resync: $grievance_nid: Data has changed in TIMSS. Updating the node.");
-      node_save($grievance_node);
-      ++$updated_count;
-    }
-
-    watchdog('grievance_timss', 'TIMSS resync: Finishing ' . $broughtby_term->name);
-  }
-
-  watchdog('grievance_timss', "TIMSS resync: Complete. Examined $examined_count nodes, updated $updated_count.");
-}
-
-// @todo Currently each function does its own REST query.  Would probably be AGoodThing(tm) to 
-//       abstract the network layer.
-function grievance_timss_login($broughtby_tid) {
-  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
-  drupal_set_message("Connecting to TIMSS");
-  $timss_url = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_url');
-  $timss_user = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_user');
-  $timss_pass = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_pass');
+function grievance_timss_callback_search($str, $verbose = FALSE) {
+  $json_token = _grievance_timss_get_token($verbose);
+  if (!$json_token) { return; }
+  $timss_url = sirius_domain_variable_get('grievance_workersync_timss_url');
+  $timss_user = sirius_domain_variable_get('grievance_workersync_timss_user');
+  $timss_pass = sirius_domain_variable_get('grievance_workersync_timss_pass');
 
   if (!$timss_url || !$timss_user || !$timss_pass) {
     drupal_set_message(t('TIMSS access is not configured.'), 'error');
     return NULL;
   }
 
+  $timss_url .= '/api/Employees';
+
+  if (preg_match('/^[a-zA-Z]+\d+$/', $str)) {
+    $str = strtoupper($str);
+    $timss_url .= '?timssId=' . urlencode($str);
+  } else if (preg_match('/[0-9\-]/', $str)) {
+    $str = preg_replace('/[^0-9]/', '', $str);
+    if (strlen($str) == 9) {
+      $str = substr($str, 0, 3) . '-' . substr($str, 3, 2) . '-' . substr($str, 5, 4);
+    }
+    $timss_url .= '?ssn=' . urlencode($str);
+  } else {
+    $timss_url .= '?lastname=' . urlencode($str);
+  }
+  if ($verbose) { sirius_minilog("Searching at $timss_url"); }
+
+  $options = array(
+    'headers' => array('Authorization' => 'Bearer ' . $json_token['access_token']),
+    'method' => 'GET',
+    'context' => stream_context_create(array('ssl' => ['verify_peer' => FALSE, 'verify_peer_name' => FALSE])),
+  );
+  $response = drupal_http_request($timss_url, $options);
+  if ($verbose) { sirius_minilog("Raw response data follows."); }
+  if ($verbose) { sirius_minilog('<pre>' . print_r($response, 1) . '</pre>'); }
+
+  // HTTP Request execute
+  if ($response->code != 200) {
+    drupal_set_message(
+      t(
+        'Unable to connect to server at @url: @error (@code)', 
+        array(
+          '@url' => $timss_url,
+          '@error' => $response->error,
+          '@code' => $response->code
+        )
+      ),
+      'error'
+    );
+    return NULL;
+  }
+  if (!$response->data) { 
+    if ($verbose) { sirius_minilog("Response had no data"); }
+    return array();
+  }
+  $candidates = json_decode($response->data, TRUE);
+  if ($candidates) {
+    foreach ($candidates as $candidate) {
+      $id = $candidate['timsS_Member_ID'];
+      $matches[$id]['id'] = $id;
+      list ($first, $last, $rest) = explode(';', $candidate['name']);
+      $matches[$id]['title'] = trim("$first $rest $last");
+      $matches[$id]['sort'] = "$last $first";
+
+      if ($matches[$id]['employer']) { $matches[$id]['employer'] .= ', '; }
+      $matches[$id]['employer'] .= $candidate['employer_Name'];
+    }
+  }
+  return array_values($matches);
+}
+
+function grievance_timss_callback_lookup($timss_id, $verbose = FALSE) {
+  $json_token = _grievance_timss_get_token($verbose);
+  if (!$json_token) { return; }
+  $timss_url = sirius_domain_variable_get('grievance_workersync_timss_url');
+  $timss_user = sirius_domain_variable_get('grievance_workersync_timss_user');
+  $timss_pass = sirius_domain_variable_get('grievance_workersync_timss_pass');
+
+  if (!$timss_url || !$timss_user || !$timss_pass) {
+    drupal_set_message(t('TIMSS access is not configured.'), 'error');
+    return NULL;
+  }
+
+  $timss_url .= '/api/TimssMembers';
+  $timss_url .= '?TimssId=' . urlencode($timss_id);
+  if ($verbose) { sirius_minilog("Connecting to: $timss_url"); }
+
+  $options = array(
+    'headers' => array('Authorization' => 'Bearer ' . $json_token['access_token']),
+    'method' => 'GET',
+    'context' => stream_context_create(array('ssl' => ['verify_peer' => FALSE, 'verify_peer_name' => FALSE])),
+  );
+
+  $response = drupal_http_request($timss_url, $options);
+  if ($verbose) { sirius_minilog("Raw response data follows."); }
+  if ($verbose) { sirius_minilog('<pre>' . print_r($response, 1) . '</pre>'); }
+
+  // HTTP Request execute
+  if ($response->code != 200) {
+    drupal_set_message(
+      t(
+        'Unable to connect to server at @url: @error (@code)', 
+        array(
+          '@url' => $timss_url,
+          '@error' => $response->error,
+          '@code' => $response->code
+        )
+      ),
+      'error'
+    );
+    return NULL;
+  }
+  if (!$response->data) { return NULL; }
+  $json = json_decode($response->data, TRUE);
+  $json = $json[0];
+  if (!$json) { return NULL; }
+  $result = array();
+  $result['first_name']   = $json['first_Name'];
+  $result['last_name']    = $json['last_Name'];
+  $result['city']         = $json['zip'];
+  $result['state']        = $json['state'];
+  $result['zip']          = $json['state'];
+  $result['street']       = $json['city'];
+  $result['street2']      = $json['street_Address'];
+  $result['gender']       = $json['gender'];
+  $result['department']   = $json['department'];
+  $result['phone']        = $json['phone_Number'];
+  $result['email']        = $json['email_Address'];;
+  $result['id']           = $json['timsS_Member_ID'];
+  return $result;
+}
+
+
+// @todo Currently each function does its own REST query.  Would probably be AGoodThing(tm) to 
+//       abstract the network layer.
+function _grievance_timss_login($verbose = FALSE) {
+  $timss_url = sirius_domain_variable_get('grievance_workersync_timss_url');
+  $timss_user = sirius_domain_variable_get('grievance_workersync_timss_user');
+  $timss_pass = sirius_domain_variable_get('grievance_workersync_timss_pass');
+
+  if (!$timss_url || !$timss_user || !$timss_pass) {
+    drupal_set_message('TIMSS access is not configured.', 'error');
+    return NULL;
+  }
+
   $timss_url .= '/token';
+  if ($verbose) { sirius_minilog("About to sign in to $timss_url, user $timss_user."); }
   $headers = array('Content-Type' => 'application/x-www-form-urlencoded');
   $params = array (
     'grant_type' => 'password',
@@ -309,6 +206,8 @@ function grievance_timss_login($broughtby_tid) {
     'context' => stream_context_create(array('ssl' => ['verify_peer' => FALSE, 'verify_peer_name' => FALSE])),
   );
   $response = drupal_http_request($timss_url, $options);
+  if ($verbose) { sirius_minilog("Raw response data follows."); }
+  if ($verbose) { sirius_minilog('<pre>' . print_r($response, 1) . '</pre>'); }
 
   // HTTP Request execute
   if ($response->code != 200) {
@@ -336,90 +235,51 @@ function grievance_timss_login($broughtby_tid) {
   }
 
   $json_token_encoded = drupal_json_encode($json_token);
-  variable_set('grievance_timss_broughtby_' . $broughtby_tid . '_token', $json_token_encoded);
+  sirius_domain_variable_set('grievance_timss_token', $json_token_encoded);
   
   return $json_token;
 }
 
-function grievance_timss_get_token($broughtby_tid) {
-  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
-  $json_token_encoded = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_token', '');
+function _grievance_timss_get_token($verbose = FALSE) {
+  $json_token_encoded = sirius_domain_variable_get('grievance_timss_token', $json_token_encoded);
   $json_token = drupal_json_decode($json_token_encoded);
   if (!$json_token) {
-    $json_token = grievance_timss_login($broughtby_tid);
+    if ($verbose) { sirius_minilog("No token found, logging in."); }
+    $json_token = _grievance_timss_login($verbose);
   } else if ($json_token['granted'] + $json_token['expires_in'] <= time() - 100) {
-    $json_token = grievance_timss_login($broughtby_tid);
+    if ($verbose) { sirius_minilog("Our token has expired, logging in."); }
+    $json_token = _grievance_timss_login($verbose);
   } 
 
+  if ($verbose) { sirius_minilog("Our prior token is still good, no need to log in again."); }
   return $json_token;
 }
 
-function grievance_timss_search($str, $broughtby_tid, $return_raw = FALSE) {
-  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
-  $json_token = grievance_timss_get_token($broughtby_tid);
-  $timss_url = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_url');
-  $timss_user = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_user');
-  $timss_pass = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_pass');
 
-  if (!$timss_url || !$timss_user || !$timss_pass) {
-    drupal_set_message(t('TIMSS access is not configured.'), 'error');
-    return NULL;
-  }
 
-  $timss_url .= '/api/Employees';
 
-  if (preg_match('/^[a-zA-Z]+\d+$/', $str)) {
-    $str = strtoupper($str);
-    $timss_url .= '?timssId=' . urlencode($str);
-  } else if (preg_match('/[0-9\-]/', $str)) {
-    $str = preg_replace('/[^0-9]/', '', $str);
-    if (strlen($str) == 9) {
-      $str = substr($str, 0, 3) . '-' . substr($str, 3, 2) . '-' . substr($str, 5, 4);
-    }
-    $timss_url .= '?ssn=' . urlencode($str);
-  } else {
-    $timss_url .= '?lastname=' . urlencode($str);
-  }
 
-  $options = array(
-    'headers' => array('Authorization' => 'Bearer ' . $json_token['access_token']),
-    'method' => 'GET',
-    'context' => stream_context_create(array('ssl' => ['verify_peer' => FALSE, 'verify_peer_name' => FALSE])),
-  );
-  $response = drupal_http_request($timss_url, $options);
 
-  // HTTP Request execute
-  if ($response->code != 200) {
-    drupal_set_message(
-      t(
-        'Unable to connect to server at @url: @error (@code)', 
-        array(
-          '@url' => $timss_url,
-          '@error' => $response->error,
-          '@code' => $response->code
-        )
-      ),
-      'error'
-    );
-    return NULL;
-  }
 
-  if ($return_raw) { return $response; }
-  
-  return json_decode($response->data);
-}
 
-function grievance_timss_lookup_ajax($timss_id) {
-  $broughtby_tid = $_GET['broughtby_tid'];
-  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
-  drupal_json_output(grievance_timss_lookup_raw($timss_id, $broughtby_tid));
-  exit;
-}
 
-function grievance_timss_lookup($timss_id, $broughtby_tid) {
-  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
-  return json_decode(grievance_timss_lookup_raw($timss_id, $broughtby_tid));
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function grievance_timss_lookup_raw($timss_id, $broughtby_tid) {
   if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
@@ -464,104 +324,3 @@ function grievance_timss_lookup_raw($timss_id, $broughtby_tid) {
 }
 
 
-function grievance_timss_form_grievance_node_callback_replace($form, $form_state) {
-  $commands = array();
-  // $commands[] = ajax_command_replace("#grievance-timss-search-result", render($form['grievance_timss_search_result']));
-  $commands[] = ajax_command_replace("#grievance-timss-search-result", $form['grievance_timss_search_result']['#markup']);
-
-  return array(
-    '#type' => 'ajax',
-    '#commands' => $commands
-  );
-}
-
-function grievance_timss_form_grievance_node_callback_submit($form, &$form_state) {
-  $form_state['rebuild'] = TRUE;
-}
-
-function grievance_timss_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
-  // Add TIMSS Search elements to the form
-
-  // Don't show TIMSS search for class action grievances (obsoleted by request from 226)
-  // $classaction = grievance_form_current_value('field_grievance_classaction', 'value', $form, $form_state);
-  // if ($classaction == 'Yes') { return; }
-
-  $broughtby_tid = grievance_form_current_value('field_grievance_broughtby', 'tid', $form, $form_state);
-  if (!$broughtby_tid) { 
-    $broughtby_tid = 'DEFAULT';
-  }
-
-  $form['grievance_timss_search'] = array(
-    '#type' => 'textfield',
-    '#title' => t('TIMSS Search'),
-    '#description' => t('Enter the last name or SSN of the employee.'),
-  );
-  $form['#groups']['group_grievance_employee']->children[] = 'grievance_timss_search';
-  $form['#group_children']['grievance_timss_search'] = 'group_grievance_employee';
-
-  $form['grievance_timss_search_submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Search TIMSS'),
-    '#submit' => array('grievance_timss_form_grievance_node_callback_submit'),
-    '#ajax' => array(
-      'callback' => 'grievance_timss_form_grievance_node_callback_replace',
-      'method' => 'replace',
-    ),
-  );
-  $form['#groups']['group_grievance_employee']->children[] = 'grievance_timss_search_submit';
-  $form['#group_children']['grievance_timss_search_submit'] = 'group_grievance_employee';
-
-  $candidates = array();
-  if ($form_state['values']['grievance_timss_search']) {
-    if (!$broughtby_tid || $broughtby_tid == 'DEFAULT') { 
-      $broughtby_tid = 'DEFAULT';
-      $broughtby_name = 'Default';
-    } else {
-      $broughtby_term = taxonomy_term_load($broughtby_tid);
-      $broughtby_name = $broughtby_term->name;
-    }
-    $timss_url = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_url');
-    $timss_user = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_user');
-    $timss_pass = variable_get('grievance_timss_broughtby_' . $broughtby_tid . '_pass');
-    if ($timss_url && $timss_user && $timss_pass) {
-      $candidates = grievance_timss_search($form_state['values']['grievance_timss_search'], $broughtby_tid);
-      $result_body = '';
-    } else {
-      $candidates = array();
-      $result_body = '<strong>' . t('TIMSS access is not configured for [@broughtby_name].', array('@broughtby_name' => $broughtby_name)) . '</strong><br><br>';
-    }
-
-    if (!$candidates) {
-      $result_body .= t('No members match your search criteria: ') . '<strong>' . $form_state['values']['grievance_timss_search'] . '</strong>';
-    } else {
-
-      usort($candidates, function($a, $b) { return strcasecmp($a->name, $b->name); });
-
-      $header = array(
-        t('TIMSS ID'),
-        t('Name'),
-        t('Employer'),
-      );
-      $attributes = array();
-      $rows = array();
-      foreach ($candidates as $candidate) {
-        $row = array();
-        $row[] = '<a href="#" class="grievance-timss-id-for-insert">' . $candidate->timsS_Member_ID . '</a>';
-        $row[] = $candidate->name;
-        $row[] = $candidate->employer_Name;
-        $rows[] = $row;
-      }
-      $result_body = theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
-    }
-
-    $result_body .= '<span style="display: none;"><a href="#" id="grievance-timss-broughtby-tid-for-insert">' . $broughtby_tid . '</a></span>';
-  }
-
-  $form['grievance_timss_search_result'] = array(
-    '#type' => 'markup',
-    '#markup' => '<div id="grievance-timss-search-result">' . $result_body . '</div>',
-  );
-  $form['#groups']['group_grievance_employee']->children[] = 'grievance_timss_search_result';
-  $form['#group_children']['grievance_timss_search_result'] = 'group_grievance_employee';
-
-}

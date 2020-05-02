@@ -39,6 +39,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_member_status_ratios.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_notification_preferences.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.report_prior_employed_list.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_landing.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_manage.inc';
@@ -192,6 +193,16 @@ function sirius_dispatch_report_cache_info() {
     'form_callback' => 'sirius_dispatch_report_notification_preferences_form',
     'pk_list_callback' => 'sirius_dispatch_report_notification_preferences_pks',
     'batch_callback' => 'sirius_dispatch_report_notification_preferences_batch',
+  );
+
+  $items['sirius-dispatch-prior-employed-list'] = array(
+    'name' => t('Prior Employed List'),
+    'description' => '',
+    'access' => 'sirius report',
+    'fields' => sirius_dispatch_report_prior_employed_list_fields(),
+    'form_callback' => 'sirius_dispatch_report_prior_employed_list_form',
+    'pk_list_callback' => 'sirius_dispatch_report_prior_employed_list_pks',
+    'batch_callback' => 'sirius_dispatch_report_prior_employed_list_batch',
   );
 
   return $items;

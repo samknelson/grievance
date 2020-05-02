@@ -1,0 +1,20 @@
+.sirius_mightsearch_clausepart {
+  float: left;
+}
+
+.sirius_mightsearch_clausepart_andor {
+	min-width: 80px;
+}
+
+.sirius_mightsearch_clausepart_clearlink {
+	padding-top: 14px;
+	float: right;
+}
+
+.sirius_mightsearch_clausepart input {
+	width: 200px;
+}
+
+.sirius_mightsearch_clausepart_field select {
+	max-width: 400px;
+}

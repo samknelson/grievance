@@ -3,6 +3,31 @@
 function sirius_event_node_tabs() {
 	$node_tabs = array();
 
+  $node_tabs['sirius_event_participant']['sirius_event_participant_json'] = array(
+    'title' => 'Survey',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_view',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_json/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_view',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_json/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_edit',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+  );
+
   $node_tabs['sirius_event']['sirius_event_info'] = array(
     'title' => 'Info',
     'description' => '',
@@ -115,13 +140,22 @@ function sirius_event_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_event_participant']['sirius_event_participant_comments'] = array(
+    'title' => 'Comments',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_participant_comments',
+    'permissions' => array('sirius event admin'),
+    'weight' => 2,
+  );
+
   $node_tabs['sirius_event_participant']['sirius_event_participant_json_log'] = array(
     'title' => 'Change Log',
     'description' => '',
     'callback' => 'sirius_jsonfield_log_render',
     'permissions' => array('sirius event admin'),
-    'weight' => 2,
+    'weight' => 3,
   );
+
   /*
   $node_tabs['sirius_json_definition']['sirius_event_participant_definition_settings'] = array(
     'title' => 'Settings',
@@ -132,18 +166,42 @@ function sirius_event_node_tabs() {
   );
   */
 
-  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_edit'] = array(
-    'title' => 'Fields',
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form'] = array(
+    'title' => 'Form',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_definition_edit',
     'permissions' => array('sirius domain admin'),
     'weight' => 2,
   );
 
-  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_preview'] = array(
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_edit',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form/preview'] = array(
     'title' => 'Preview',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_definition_preview',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form/signatures'] = array(
+    'title' => 'Signatures',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_signatures',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form/exim'] = array(
+    'title' => 'Export / Import',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_exim',
     'permissions' => array('sirius domain admin'),
     'weight' => 4,
   );
@@ -163,15 +221,6 @@ function sirius_event_node_tabs() {
     'permissions' => array('sirius domain admin'),
     'weight' => 3,
   );
-
-  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_clone'] = array(
-    'title' => 'Clone',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_participant_definition_clone',
-    'permissions' => array('sirius domain admin'),
-    'weight' => 4,
-  );
-
 
 	return $node_tabs;
 }
@@ -227,6 +276,14 @@ function sirius_event_term_tabs() {
     'weight' => 5,
   );
 
+  $term_tabs['sirius_event_type']['sirius_event_type_policy/materials'] = array(
+    'title' => 'Materials',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_policy_materials',
+    'permissions' => array('sirius event admin'),
+    'weight' => 5,
+  );
+
   $term_tabs['sirius_event_type']['sirius_event_type_schedule'] = array(
     'title' => 'Schedule',
     'description' => '',
@@ -240,7 +297,7 @@ function sirius_event_term_tabs() {
     'description' => '',
     'callback' => 'sirius_event_term_tab_phonebank',
     'permissions' => array('sirius event admin'),
-    'weight' => 3,
+    'weight' => 4,
   );
 
   $term_tabs['sirius_event_type']['sirius_event_type_bullpen'] = array(
@@ -248,7 +305,7 @@ function sirius_event_term_tabs() {
     'description' => '',
     'callback' => 'sirius_event_term_tab_bullpen',
     'permissions' => array('sirius event admin'),
-    'weight' => 4,
+    'weight' => 5,
   );
 
   $term_tabs['sirius_event_type']['sirius_event_type_class'] = array(
@@ -256,7 +313,7 @@ function sirius_event_term_tabs() {
     'description' => '',
     'callback' => 'sirius_event_term_tab_class',
     'permissions' => array('sirius event admin'),
-    'weight' => 5,
+    'weight' => 6,
   );
 
   return $term_tabs;
@@ -294,6 +351,16 @@ function sirius_event_menu() {
     'page callback' => 'sirius_event_page_list_bullpens',
     'page arguments' => array(),
     'access callback' => array('sirius_event_page_list_bullpens_access'),
+    'access arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/event/classes'] = array(
+    'title' => 'Class List',
+    'description' => '',
+    'page callback' => 'sirius_event_page_list_classes',
+    'page arguments' => array(),
+    'access callback' => array('sirius_event_page_list_classes_access'),
     'access arguments' => array(),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -360,7 +427,7 @@ function sirius_event_menu() {
   $items['sirius/ajax/bullpen-quicksearch'] = array(
     'page callback' => 'grievance_quicksearch_autocomplete',
     'page arguments' => array(),
-    'access arguments' => array('sirius dispatch bullpen signin others'),
+    'access arguments' => array('sirius'),
     'type' => MENU_CALLBACK,
   );
 

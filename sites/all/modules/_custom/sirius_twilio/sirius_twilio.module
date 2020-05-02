@@ -12,6 +12,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twil
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.admin.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.callerid.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.browserphone.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.lookup.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.page_test.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/sirius_twilio.page_phone.inc';

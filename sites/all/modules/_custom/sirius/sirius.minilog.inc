@@ -44,3 +44,8 @@ function sirius_minilog_render_html() {
 
 	return $result;
 }
+
+function sirius_minilog_watchdog($type) {
+	$log = sirius_minilog();
+	foreach ($log as $log_entry) { watchdog($type, $log_entry['msg']); }
+}

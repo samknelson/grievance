@@ -86,3 +86,28 @@ function sirius_event_phonebank_participants_by_phone($event_node, $prole_tid, $
   }
   return node_load_multiple($participant_nids);
 }
+
+function sirius_phonebank_active($event_node) {
+  $json = sirius_jsonfield_util_node_json_get($event_node);
+  if ($json['phonebank']['active'] == 'Yes') { return TRUE; }
+  else if ($json['phonebank']['active'] == 'No') { return FALSE; }
+  else if ($json['phonebank']['active'] == 'Auto') { 
+    $open_grace = $json['phonebank']['active_grace_open'];
+    if ($open_grace > 0) { $open_grace *= 60; } else { $open_grace = 0; }
+
+    $close_grace = $json['phonebank']['active_grace_close'];
+    if ($close_grace) { $close_grace *= 60; } else { $close_grace = 0; }
+
+    if ($event_node->field_sirius_daterepeat['und']) {
+      $ts_now = time();
+      foreach ($event_node->field_sirius_daterepeat['und'] as $tmp) {
+        $start_ts = strtotime($tmp['value'] . ' ' . $tmp['timezone_db']);
+        $end_ts = strtotime($tmp['value2'] . ' ' . $tmp['timezone_db']);
+        if ($start_ts <= 1 || $end_ts <= 1) { continue; }
+        $start_ts -= $open_grace;
+        $end_ts += $close_grace;
+        if ($ts_now >= $start_ts && $ts_now <= $end_ts) { return TRUE; }
+      }
+    }
+  } else { return FALSE; }
+}

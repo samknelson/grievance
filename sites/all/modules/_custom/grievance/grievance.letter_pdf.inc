@@ -10,6 +10,7 @@ function grievance_letter_loopback($grievance_node) {
 
 	$letter_nids = explode(',', $_GET['letter_nids']);
 
+	$render_uid = $_REQUEST['uid'];
 	return grievance_letter_render_html($grievance_node, $letter_nids, array_merge($_GET, $_POST));
 }
 
@@ -61,6 +62,8 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 	$url .= $_SERVER['SERVER_NAME'] . '/node/' . $node->nid . '/loopback-letter';
 	$url .= '?letter_nids=' . join(',', $letter_nids);
 	$url .= "&" . 'delivery_tid=' . urlencode($values['delivery_tid']);
+	global $user;
+	if ($user) { $url .= '&' . 'uid=' . $user->uid; }
 
 	// $html = file_get_contents($url);
 

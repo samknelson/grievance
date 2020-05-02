@@ -1,5 +1,10 @@
 <?php
 
+function sirius_node_tab_event_participant_definition_callerid_access($definition_node) {
+	if ($definition_node->field_sirius_type['und'][0]['value'] != 'node:sirius_event_participant:field_sirius_json') { return FALSE; }
+	return TRUE;
+}
+
 function sirius_node_tab_event_participant_definition_callerid($definition_node) {
 	return drupal_get_form('sirius_node_tab_event_participant_definition_callerid_form', $definition_node->nid);
 }
@@ -8,13 +13,22 @@ function sirius_node_tab_event_participant_definition_callerid_form($form, &$for
 	$form_state['definition_nid'] = $definition_nid;
 	$definition_node = node_load($definition_nid);
 
-	$form['intro'] = array('#markup' => '<div class="sirius_form_intro">' . t('Use the form below to select the available caller IDs for this survey.') . '<br /><br /></div>');
+	$intro_html = '<div class="sirius_form_intro">';
+	$intro_html .= t('Use the form below to select the available caller IDs for this survey.');
+	if (drupal_valid_path('sirius/config/phone/callerid')) {
+		$intro_html .= ' ';
+		$intro_html .= 'To add a new caller ID to the system, ';
+		$intro_html .= l('click here.', 'sirius/config/phone/callerid');
+	}
+	$intro_html .= '<br /><br />';
+	$intro_html .= '</div>';
+	$form['intro'] = array('#markup' => $intro_html);
 
 	$callerid_nodes = sirius_callerid_list();
 	$callerid_options = array(NULL => t('-- Select --'));
 	foreach ($callerid_nodes as $callerid_nid => $callerid_node) {
 		if ($callerid_node->field_sirius_active['und'][0]['value'] == 'Yes') {
-			$callerid_options[$callerid_nid] = $callerid_node->title;
+			$callerid_options[$callerid_nid] = $callerid_node->title . ' (' . $callerid_node->field_sirius_phone['und'][0]['value'] . ')';
 		}
 	}
 

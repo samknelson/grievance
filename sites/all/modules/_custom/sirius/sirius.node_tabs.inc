@@ -2,9 +2,7 @@
 
 function sirius_node_tab_all() {
   $all = &drupal_static(__FUNCTION__, array());
-  if (!$all) {
-    $all = module_invoke_all('node_tabs');
-  }
+  if (!$all) { $all = module_invoke_all('node_tabs'); }
   return $all;
 }
 
@@ -28,6 +26,13 @@ function sirius_node_tab_content($node, $in_tab_name) {
 }
 
 function sirius_node_tab_access($node, $in_tab_name) {
+  // Deny access to all nodes that are not in your domain
+  if (!user_access('sirius admin') && $node->type != 'sirius_domain') {
+    $node_domain_nid = $node->field_sirius_domain['und'][0]['target_id'];
+    $my_domain_nid = sirius_domain_nid();
+    if ($node_domain_nid && ($node_domain_nid != $my_domain_nid)) { return FALSE; }
+  }
+
   // Check generic permissions
   $node_tabs = sirius_node_tab_all();
   $tab_record = $node_tabs[$node->type][$in_tab_name];
@@ -35,16 +40,16 @@ function sirius_node_tab_access($node, $in_tab_name) {
 
   // Check basic permission
   foreach ($tab_record['permissions'] as $permission) {
-    if (!user_access($permission)) { return false; }
+    if (!user_access($permission)) { return FALSE; }
   }
 
   // Check for a custom access permission
   $access_function_name = $tab_record['callback'] . '_access';
   if (function_exists($access_function_name)) {
-    if (!$access_function_name($node)) { return false; }
+    if (!$access_function_name($node)) { return FALSE; }
   }
   
-  return true;
+  return TRUE;
 }
 
 
@@ -81,6 +86,13 @@ function sirius_term_tab_access($term, $in_tab_name) {
   $term_tabs = sirius_term_tab_all();
   $tab_record = $term_tabs[$term->vocabulary_machine_name][$in_tab_name];
 
+  // Deny access to all nodes that are not in your domain
+  if (!user_access('sirius admin')) {
+    $term_domain_nid = $term->field_sirius_domain['und'][0]['target_id'];
+    $my_domain_nid = sirius_domain_nid();
+    if ($term_domain_nid != $my_domain_nid) { return FALSE; }
+  }
+
   if (!$tab_record) { return FALSE; }
 
   // Check basic permission
@@ -95,4 +107,24 @@ function sirius_term_tab_access($term, $in_tab_name) {
   }
   
   return true;
+}
+
+/**
+ * Get extra arguments to a node tab. For instance, if tab name is
+ *     sirius_worker_tc/classes
+ * and the path is
+ *     node/12345/sirius_worker_tc/classes/6890
+ * then sirius_node_tab_arg(0) returns "6890"
+ */
+
+function sirius_node_tab_arg($idx) {
+  $item = &drupal_static(__FUNCTION__, NULL);
+  if (!$item) { $item = menu_get_item(); } 
+  if (!$item) { return NULL; }
+  $page_arguments = $item['page_arguments'];
+  if (!$page_arguments) { return NULL; }
+
+  // argument 0 = %node
+  // argument 1 = tab_name
+  return $page_arguments[$idx+2];
 }

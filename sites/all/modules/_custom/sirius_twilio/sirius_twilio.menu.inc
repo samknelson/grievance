@@ -27,15 +27,6 @@ function sirius_twilio_node_tabs() {
 function sirius_twilio_menu() {
   $items = array();
 
-  $items['sirius/twilio/test'] = array(
-    'title' => 'Sirius: Twilio: Test',
-    'description' => '',
-    'page callback' => 'sirius_twilio_page_test',
-    'page arguments' => array(),
-    'access arguments' => array('sirius twilio admin'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
   $items['sirius/twilio/incoming/sms'] = array(
     'title' => 'Sirius: Twilio: Incoming: SMS',
     'description' => '',
@@ -93,13 +84,22 @@ function sirius_twilio_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/admin/twilio'] = array(
-    'title' => 'Twilio Configuration ',
+  $items['sirius/config/phone/twilio-settings'] = array(
+    'title' => 'Twilio Settings',
     'description' => '',
-    'access arguments' => array('sirius admin'),
+    'access arguments' => array('sirius domain admin'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_twilio_config'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/config/phone/twilio-test'] = array(
+    'title' => 'Twilio Test',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_test',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_LOCAL_TASK,
   );
 
 

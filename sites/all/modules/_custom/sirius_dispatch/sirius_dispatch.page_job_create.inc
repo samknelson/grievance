@@ -241,7 +241,7 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 	// Member status
 	$show_closed_statuses = FALSE;
-	if ($job_policy['event']['has_event'] == 'Yes') { drupal_set_message("Here..."); $show_closed_statuses = TRUE; }
+	if ($job_policy['event']['has_event'] == 'Yes') { $show_closed_statuses = TRUE; }
 	$open_member_statuses = sirius_worker_member_status_get_open_statuses($industry_tid, $show_closed_statuses, $job_type_tid);
 	$open_member_status_tids = array_keys($open_member_statuses);
 	$open_member_status_options = array();

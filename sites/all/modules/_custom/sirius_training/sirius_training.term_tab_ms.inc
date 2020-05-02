@@ -10,6 +10,16 @@ function sirius_term_tab_ms_form($form, &$form_state, $ms_term) {
 
 	$form['#tree'] = TRUE;
 
+	$form['evaluations_enabled'] = array(
+		'#title' => t('Evaluations Enabled?'),
+		'#type' => 'select',
+		'#options' => array(
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $json['training']['evaluations_enabled'],
+	);
+
 	$form['levels_enabled'] = array(
 		'#title' => t('Levels Enabled?'),
 		'#type' => 'select',
@@ -68,12 +78,39 @@ function sirius_term_tab_ms_form($form, &$form_state, $ms_term) {
 			'#size' => 4,
 		);
 
-		$form['levels'][$level_code]['notification_emails'] = array(
-			'#title' => t('Notification Emails'),
-			'#type' => 'textarea',
-			'#default_value' => $level['notification_emails'],
-			'#description' => t('Enter email addresses which should be notified when a worker attains this level, one per line.')
-		);
+		$recipients = array();
+		if (is_array($level['notification_emails'])) {
+			foreach ($level['notification_emails'] as $delta => $recipient) {
+				if (!$recipient['name'] && !$recipient['email']) { continue; }
+				$recipients[] = $recipient;
+			}
+		}
+		for ($i=0; $i<5; ++$i) { $recipients[] = array(); }
+
+		$form["levels"][$level_code]['notification_emails']['table_intro'] = array('#markup' => '<table><tr><th>Name</th><th>Email</th></tr>');
+
+		$delta = 0;
+		foreach ($recipients as $recipient) {
+			$form["levels"][$level_code]['notification_emails'][$delta]['tr_intro'] = array('#markup' => '<tr>');
+
+			$form["levels"][$level_code]['notification_emails'][$delta]['name'] = array(
+				'#prefix' => '<td>',
+				'#suffix' => '</td>',
+				'#type' => 'textfield',
+				'#default_value' => $recipient['name'],
+			);
+
+			$form["levels"][$level_code]['notification_emails'][$delta]['email'] = array(
+				'#prefix' => '<td>',
+				'#suffix' => '</td>',
+				'#type' => 'textfield',
+				'#default_value' => $recipient['email'],
+			);
+
+			$form["levels"][$level_code]['notification_emails'][$delta]['tr_outro'] = array('#markup' => '</tr>');
+			++$delta;
+		}
+		$form["levels"][$level_code]['notification_emails']['table_outro'] = array('#markup' => '</table>');
 
 		$hour_requirements = $level['hour_requirements'];
 		if (!$hour_requirements) { $hour_requirements = array(); }
@@ -103,6 +140,20 @@ function sirius_term_tab_ms_form($form, &$form_state, $ms_term) {
 }
 
 
+function sirius_term_tab_ms_form_validate($form, &$form_state) {
+	$ms_tid = $form_state['ms_tid'];
+	$all_levels = sirius_training_levels_fetch_all();
+	foreach ($form_state['values']['levels'] as $level_code => $ignore) {
+		if ($form_state['values']['levels'][$level_code]['notification_emails']) {
+			foreach ($form_state['values']['levels'][$level_code]['notification_emails'] as $delta => $recipient) {
+				if (!$recipient['email']) { continue; }
+				if (!sirius_email_validate($recipient['email'])) {
+					form_set_error("levels][$level_code][notification_emails][$delta][email", 'Please enter a valid email address.');
+				}
+			}
+		}
+	}
+}
 
 function sirius_term_tab_ms_form_submit($form, &$form_state) {
 	$ms_tid = $form_state['ms_tid'];

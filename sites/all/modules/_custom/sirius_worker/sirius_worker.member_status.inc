@@ -109,16 +109,9 @@ function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reaso
   node_save($worker_node);
 
   $category = 'worker:member_status';
-  if ($tf) { 
-    $type = 'set';
-    $message = $worker_node->title . ' has added the member status ' . $new_ms_term->name;
-  }
-  else {
-    $type = 'clear';
-    $message = $worker_node->title . ' has removed the member status ' . $new_ms_term->name;
-  }
+  if ($tf) { $type = 'set'; } else { $type = 'clear'; }
   $summary = $reason;
   $notes = $new_ms_tid;
   $handler_nids = array($worker_node->nid);
-  sirius_log($category, $type, $message, $summary, $notes, $handler_nids, $attachments);
+  sirius_log($category, $type, $msg, $summary, $notes, $handler_nids, $attachments);
 }

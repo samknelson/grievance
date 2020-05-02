@@ -2,15 +2,15 @@ ul.sirius_wizard {
 	margin: 0;
 	padding: 0;
 	list-style: none;
-    margin: 0 0 32px 0;
+	margin: 0 0 32px 0;
 }
 
 ul.sirius_wizard li { 
 	display: inline-block; 
 	padding: 0 14px 0 0;
 	overflow: visible;
-    height: 18px;
-    border-bottom: 1px solid #5984be;
+	height: 18px;
+  border-bottom: 1px solid #5984be;
 }
 ul.sirius_wizard li:last-child { 
 	padding: 0;
@@ -23,17 +23,15 @@ ul.sirius_wizard li a {
 	border-radius: 18px;
 	border: 1px solid #5984be;
 	background-color: #e8edf3;
-	color: #5984be;
 	letter-spacing: 1px;
 	font-weight: normal;
 }
 
-
 ul.sirius_wizard li a {
 	border: 1px solid #5984be;
 	background-color: #5984be;
-	color: #fff;
 }
+
 ul.sirius_wizard li a:hover {
 	/* lightest blue: #e8edf3;  background */
 	/* light blue: #a0bbf5; table button border */
@@ -52,4 +50,9 @@ ul.sirius_wizard li.sirius_wizard_step_current a {
 }
 
 ul.sirius_wizard li.sirius_wizard_step_incomplete span {
+}
+
+ul.sirius_wizard a,
+ul.sirius_wizard a:visited {
+	color: #ffffff;
 }
