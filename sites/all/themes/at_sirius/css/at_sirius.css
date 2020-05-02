@@ -2509,6 +2509,10 @@ input.teaser-button {
 
 }
 
+input.form-button-disabled {
+  background-color: #666666;
+}
+
 a.button:hover, 
 input.form-submit:hover, 
 input.teaser-button:hover {
@@ -2940,6 +2944,10 @@ body.loopback {
     width: 100%;
   }
 
+}
+
+.container-inline .form-type-checkbox {
+  white-space: nowrap;
 }
 
 

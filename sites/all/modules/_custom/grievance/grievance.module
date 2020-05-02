@@ -12,7 +12,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.attac
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.settlement.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.permission.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.admin.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.admin_log_types.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.gform.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.arbitrationform.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_bytype.inc";
@@ -53,6 +52,8 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.shops
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.merge.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.vbo.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.status_correct.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.workersync.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.workersync_local.inc";
 
 /**
  * Implements hook_views_pre_view
@@ -74,6 +75,7 @@ function grievance_cron() {
   grievance_alert_all();
   grievance_mailattach_fetch();
   grievance_bundle_cleanup();
+  grievance_workersync_cron();
 }
 
 /**
@@ -91,6 +93,8 @@ function grievance_node_update($node) {
     if ($node->field_grievance_status['und'][0]['tid'] != $node->original->field_grievance_status['und'][0]['tid']) {
       $node->grievance_status_changed = TRUE;
     }
+
+    grievance_workersync_backsync($node);
   }
 }
 
@@ -99,7 +103,10 @@ function grievance_node_update($node) {
  */
 
 function grievance_node_insert($node) {
-  if ($node->type == 'grievance') { $node->grievance_assignment_changed = TRUE; }
+  if ($node->type == 'grievance') { 
+    $node->grievance_assignment_changed = TRUE;
+    grievance_workersync_backsync($node);
+  }
 }
 
 /*
@@ -275,7 +282,7 @@ function grievance_mail($key, &$message, $params) {
   }
 
   // @TODO Put this into a configuration variable!!!!
-  $from_email = variable_get('grievance_from_email', '');
+  $from_email = variable_get('sirius_email_default_from_address', '');
   if (!$from_email) {
     drupal_set_message(t('The from_email for this server has not been configured.  Mails will not be delivered correctly!'), 'error');
   }

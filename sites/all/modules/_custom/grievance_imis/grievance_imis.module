@@ -1,292 +1,68 @@
 <?php
 
-// I hate notice errors
-ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
-
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_imis') . "/grievance_imis.menu.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_imis') . "/grievance_imis.admin.inc";
-
 /**
- * Implement hook_cron() 
+ * Implements hook_grievance_workersync_plugin_info
  */
 
-function grievance_imis_cron() {
-  grievance_imis_resync();
-  grievance_imis_resync_shop_stewards();
+function grievance_imis_grievance_workersync_plugin_info() {
+  $info = array();
+  $info['imis'] = array(
+    'title' => 'iMIS',
+    'description' => 'Fetch workers from an iMIS data source',
+    'settings_callback' => 'grievance_imis_callback_settings',
+    'search_callback' => 'grievance_imis_callback_search',
+    'search_description' => 'Enter the last name or SSN of the employee.',
+    'lookup_callback' => 'grievance_imis_callback_lookup',
+  );
+
+  return $info;
 }
 
-// @todo: not currently resyncing if there's no "broughtby" term
-function grievance_imis_resync_shop_stewards() {
-  watchdog('grievance_imis', 'IMIS shop steward resync: Starting');
+/**
+ * Plugin callback: settings
+ */
 
-	$steward_type_tid = variable_get('grievance_contacts_st_type', '');
-	if (!$steward_type_tid) { 
-  	watchdog('grievance_imis', 'IMIS shop steward resync: No steward_type_tid.  Skipping.');
-  	return;
-	}
+function grievance_imis_callback_settings(&$form, &$form_state) {
+  $variable_name = sirius_domain_variable_name('grievance_workersync_imis_url');
+  $form['plugin_settings'][$variable_name] = array(
+    '#type' => 'textfield',
+    '#default_value' => variable_get($variable_name, ''),
+    '#title' => t('iMIS URL'),
+    '#description' => t('This will be something like: https://unite-test3.burstingsilver.com/BSi.iMIS.WebServices/api/member/grievance'),
+  );
 
-  // Find all open grievances where the data hasn't been changed manually.
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_shop_contact');
-  $query->fieldCondition('field_grievance_contact_types', 'tid',  $steward_type_tid);
-  $stmt = $query->execute();
-  if (!$stmt['node']) { continue; }
-  $contact_nids = array_keys($stmt['node']);
-
-  foreach ($contact_nids as $contact_nid) {
-    ++$examined_count;
-    watchdog('grievance_imis', "IMIS shop steward resync: $contact_nid: Scanning");
-
-    // Load the steward
-    $contact_node = node_load($contact_nid);
-
-    // Find the member ID
-    $member_id = $contact_node->field_grievance_min['und'][0]['value'];
-    if (!$member_id) {
-      watchdog('grievance_imis', "IMIS shop steward resync: $contact_nid: No member ID. Skipping.");
-      continue;
-    }
-
-    // Load the candidate from IMIS
-    $candidate = grievance_imis_lookup($member_id, 'DEFAULT');
-    if (!$candidate || !is_array($candidate)) {
-      watchdog('grievance_imis', "imis shop steward resync: $contact_nid: imis record not found. Skipping.");
-      continue;
-    }
-    $candidate = $candidate[0];
-    if (!$candidate) { 
-      watchdog('grievance_imis', "imis shop steward resync: $contact_nid: imis record not found. Skipping.");
-      continue;
-    }
-
-    // Update the member
-    $fields = array();
-    $fields['field_grievance_co_city']           = 'city';
-    $fields['field_grievance_co_state']          = 'state';
-    $fields['field_grievance_co_address']        = 'street_Address';
-    $fields['field_grievance_co_phone']          = 'phone_Number';
-    $fields['field_grievance_co_email']          = 'email_Address';
-
-    $columns = array();
-    $columns['field_grievance_co_city']           = 'value';
-    $columns['field_grievance_co_state']          = 'value';
-    $columns['field_grievance_co_address']        = 'value';
-    $columns['field_grievance_co_phone']          = 'value';
-    $columns['field_grievance_co_email']          = 'email';
-
-    $subsections = array();
-    $subsections['field_grievance_co_city']           = NULL;
-    $subsections['field_grievance_co_state']          = NULL;
-    $subsections['field_grievance_co_address']        = NULL;
-    $subsections['field_grievance_co_phone']          = NULL;
-    $subsections['field_grievance_co_email']          = NULL;
-
-    $is_changed = FALSE;
-    foreach ($fields as $drupal_field => $json_field) {
-      $column = $columns[$drupal_field];
-      $subsection = $subsections[$drupal_field];
-
-      $old_value = $contact_node->{$drupal_field}['und'][0][$column];
-
-      $new_value = NULL;
-      if ($subsection) {
-        $new_value = $candidate->{$subsection}->{$json_field};
-      } else {
-        $new_value = $candidate->{$json_field};
-      }
-      $new_value = preg_replace("/(?:\r\n|\r|\n)/", ', ', $new_value);
-      if ($drupal_field == 'field_grievance_co_phone') {
-      	if ($new_value) {
-      		$new_value = grievance_format_phone_number($new_value);
-      	}
-      }
-
-      if (!$new_value) { continue; }
-      if ($new_value == $old_value) { continue; }
-
-      $contact_node->{$drupal_field}['und'][0][$column] = $new_value;
-      $is_changed = TRUE;
-    }
-
-    if (!$is_changed) {
-      watchdog('grievance_imis', "imis shop steward resync: $contact_nid: No changes. Skipping.");
-      continue;
-    }
-
-    watchdog('grievance_imis', "imis shop steward resync: $contact_nid: Data has changed in imis. Updating the node.");
-    node_save($contact_node);
-    ++$updated_count;
-  }
-
-  watchdog('grievance_imis', 'imis shop steward resync: Finishing.');
+   $variable_name = sirius_domain_variable_name('grievance_workersync_imis_apikey');
+   $form['plugin_settings'][$variable_name] = array(
+    '#type' => 'textarea',
+    '#title' => t('IMIS API Key'),
+    '#description'   => t('IMIS API Key.'),
+    '#default_value' => variable_get($variable_name, ''),
+  );
 }
 
-
-// @todo: not currently resyncing if there's no "broughtby" term
-function grievance_imis_resync() {
-  watchdog('grievance_imis', 'imis resync: Starting');
-
-  $broughtby_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_broughtby');
-  if (!$broughtby_vocabulary) { return; }
-  $broughtby_terms = taxonomy_get_tree($broughtby_vocabulary->vid);
- 
-  // Load all "open" TIDs
-  $status_vocab = taxonomy_vocabulary_machine_name_load('grievance_status ');
-  if (!$status_vocab) { return; }
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'taxonomy_term');
-  $query->propertyCondition('vid', $status_vocab->vid);
-  $query->fieldCondition('field_grievance_open', 'value', 1);
-  $stmt = $query->execute();
-  if (!$stmt['taxonomy_term']) { return; }
-  $status_tids = array_keys($stmt['taxonomy_term']);
-
-  $examined_count = 0;
-  $updated_count = 0;
-
-  foreach ($broughtby_terms as $broughtby_term) {
-    watchdog('grievance_imis', 'imis resync: Starting ' . $broughtby_term->name);
-
-    // Find all open grievances where the data hasn't been changed manually.
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node');
-    $query->entityCondition('bundle', 'grievance');
-    $query->fieldCondition('field_grievance_broughtby', 'tid',  $broughtby_term->tid);
-    $query->fieldCondition('field_grievance_status', 'tid', $status_tids, 'in');
-    // The following would be nice, but doesn't handle nulls.  So we check manually later.
-    // $query->fieldCondition('field_grievance_corrected', 'value', 'Pending', '!=');
-    $stmt = $query->execute();
-    if (!$stmt['node']) { continue; }
-    $grievance_nids = array_keys($stmt['node']);
-
-    foreach ($grievance_nids as $grievance_nid) {
-      ++$examined_count;
-      watchdog('grievance_imis', "imis resync: $grievance_nid: Scanning");
-
-      // Load the grievance
-      $grievance_node = node_load($grievance_nid);
-
-      // Skip "Pending" (meaning that the data has been corrected manually)
-      if ($grievance_node->field_grievance_corrected['und'][0]['value'] == 'Pending') {
-        watchdog('grievance_imis', "imis resync: $grievance_nid: Data marked as manually corrected. Skipping.");
-        continue;
-      }
-
-      // Find the member ID
-      $member_id = $grievance_node->field_grievance_min['und'][0]['value'];
-      if (!$member_id) {
-        watchdog('grievance_imis', "imis resync: $grievance_nid: No member ID. Skipping.");
-        continue;
-      }
-
-      // Load the candidate from imis
-      $candidate = grievance_imis_lookup($member_id, $broughtby_term->tid);
-      if (!$candidate || !is_array($candidate)) {
-        watchdog('grievance_imis', "imis resync: $grievance_nid: imis record not found. Skipping.");
-        continue;
-      }
-      $candidate = $candidate[0];
-      if (!$candidate) { 
-        watchdog('grievance_imis', "imis resync: $grievance_nid: imis record not found. Skipping.");
-        continue;
-      }
-
-      // Update the member
-      $fields = array();
-      $fields['field_grievance_first_name']     = 'first_Name';
-      $fields['field_grievance_last_name']      = 'last_Name';
-      $fields['field_grievance_city']           = 'city';
-      $fields['field_grievance_state']          = 'state';
-      $fields['field_grievance_address']        = 'street_Address';
-      $fields['field_grievance_city']           = 'city';
-      $fields['field_grievance_phone']          = 'phone_Number';
-      $fields['field_grievance_email']          = 'email_Address';
-      $fields['field_grievance_department']     = 'department';
-      $fields['field_grievance_classification'] = 'classification';
-
-      $columns = array();
-      $columns['field_grievance_first_name']     = 'value';
-      $columns['field_grievance_last_name']      = 'value';
-      $columns['field_grievance_city']           = 'value';
-      $columns['field_grievance_state']          = 'value';
-      $columns['field_grievance_address']        = 'value';
-      $columns['field_grievance_city']           = 'value';
-      $columns['field_grievance_phone']          = 'value';
-      $columns['field_grievance_email']          = 'email';
-      $columns['field_grievance_department']     = 'value';
-      $columns['field_grievance_classification'] = 'value';
-
-      $subsections = array();
-      $subsections['field_grievance_first_name']     = NULL;
-      $subsections['field_grievance_last_name']      = NULL;
-      $subsections['field_grievance_city']           = NULL;
-      $subsections['field_grievance_state']          = NULL;
-      $subsections['field_grievance_address']        = NULL;
-      $subsections['field_grievance_city']           = NULL;
-      $subsections['field_grievance_phone']          = NULL;
-      $subsections['field_grievance_email']          = NULL;
-      $subsections['field_grievance_department']     = NULL;
-      $subsections['field_grievance_classification'] = NULL;
-
-      $is_changed = FALSE;
-      foreach ($fields as $drupal_field => $json_field) {
-        $column = $columns[$drupal_field];
-        $subsection = $subsections[$drupal_field];
-
-        $old_value = $grievance_node->{$drupal_field}['und'][0][$column];
-
-        $new_value = NULL;
-        if ($subsection) {
-          $new_value = $candidate->{$subsection}->{$json_field};
-        } else {
-          $new_value = $candidate->{$json_field};
-        }
-        $new_value = preg_replace("/(?:\r\n|\r|\n)/", ', ', $new_value);
-
-        if (!$new_value) { continue; }
-        if ($new_value == $old_value) { continue; }
-
-        $grievance_node->{$drupal_field}['und'][0][$column] = $new_value;
-        $is_changed = TRUE;
-      }
-
-      if (!$is_changed) {
-        watchdog('grievance_imis', "imis resync: $grievance_nid: No changes. Skipping.");
-        continue;
-      }
-
-      watchdog('grievance_imis', "imis resync: $grievance_nid: Data has changed in imis. Updating the node.");
-      node_save($grievance_node);
-      ++$updated_count;
-    }
-
-    watchdog('grievance_imis', 'imis resync: Finishing ' . $broughtby_term->name);
-  }
-
-  watchdog('grievance_imis', "imis resync: Complete. Examined $examined_count nodes, updated $updated_count.");
-}
-
-function grievance_imis_search($str, $broughtby_tid, $return_raw = FALSE) {
-  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
-  $imis_url = variable_get('grievance_imis_broughtby_' . $broughtby_tid . '_url');
-  $imis_apikey = variable_get('grievance_imis_broughtby_' . $broughtby_tid . '_apikey');
+function grievance_imis_callback_search($str, $verbose = FALSE) {
+  $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url');
+  $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey');
 
   if (!$imis_url || !$imis_apikey) {
-    drupal_set_message(t('imis access is not configured.'), 'error');
+    sirius_minilog('imis access is not configured.', 'error');
     return NULL;
   }
 
   $imis_url .= '/find';
+  if ($verbose) { sirius_minilog("Connecting to: $imis_url"); }
 
   if (preg_match('/^\d+$/', $str) && (strlen($str) != 9)) {
     $str = strtoupper($str);
     $imis_url .= '?imisId=' . urlencode($str);
+    if ($verbose) { sirius_minilog("Assume search is on iMIS ID: $imis_url"); }
   } else if (strlen(preg_replace('/\-/', '', $str)) == 9) {
     $str = preg_replace('/[\-]/', '', $str);
     $imis_url .= '?ssn=' . urlencode($str);
+    if ($verbose) { sirius_minilog("Assume search is on SSN: $imis_url"); }
   } else {
     $imis_url .= '?lastname=' . urlencode($str);
+    if ($verbose) { sirius_minilog("Assume search is on Last Name: $imis_url"); }
   }
 
   $options = array(
@@ -295,6 +71,8 @@ function grievance_imis_search($str, $broughtby_tid, $return_raw = FALSE) {
     'context' => stream_context_create(array('ssl' => ['verify_peer' => FALSE, 'verify_peer_name' => FALSE])),
   );
   $response = drupal_http_request($imis_url, $options);
+  if ($verbose) { sirius_minilog("Raw response data follows."); }
+  if ($verbose) { sirius_minilog('<pre>' . print_r($response, 1) . '</pre>'); }
 
   // HTTP Request execute
   if ($response->code != 200) {
@@ -312,35 +90,46 @@ function grievance_imis_search($str, $broughtby_tid, $return_raw = FALSE) {
     return NULL;
   }
 
-  if ($return_raw) { return $response; }
-  
-  return json_decode($response->data);
+  $matches = array();
+  $candidates = json_decode($response->data);
+  if ($candidates) {
+    foreach ($candidates as $candidate) {
+      $match = array();
+      $match['id'] = $candidate->ImisId;
+      $match['title'] = $candidate->FullName;
+      $extra = '';
+      if ($candidate->TimssId) {
+        if ($extra) { $extra .= ' / '; }
+        $extra .= $candidate->TimssId;
+      }
+      $match['extra'] = $extra;
+      $employers = array();
+      if ($candidate->Employments) {
+        foreach ($candidate->Employments as $employment) {
+          $employers[$employment->EmployerName]++;
+        }
+      }
+      $match['employer'] = join(', ', array_keys($employers));
+      $match['sort'] = $candidate->LastName . ' ' . $candidate->FirstName;
+
+      $matches[] = $match;
+    }
+  }
+  return $matches;
 }
 
-function grievance_imis_lookup_ajax($imis_id) {
-  $broughtby_tid = $_GET['broughtby_tid'];
-  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
-  drupal_json_output(grievance_imis_lookup_raw($imis_id, $broughtby_tid));
-  exit;
-}
-
-function grievance_imis_lookup($imis_id, $broughtby_tid) {
-  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
-  return json_decode(grievance_imis_lookup_raw($imis_id, $broughtby_tid));
-}
-
-function grievance_imis_lookup_raw($imis_id, $broughtby_tid) {
-  if (!$broughtby_tid) { $broughtby_tid = 'DEFAULT'; }
-  $imis_url = variable_get('grievance_imis_broughtby_' . $broughtby_tid . '_url');
-  $imis_apikey = variable_get('grievance_imis_broughtby_' . $broughtby_tid . '_apikey');
+function grievance_imis_callback_lookup($imis_id, $verbose = FALSE) {
+  $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url');
+  $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey');
 
   if (!$imis_url || !$imis_apikey) {
-    drupal_set_message(t('imis access is not configured.'), 'error');
+    sirius_minilog('imis access is not configured.', 'error');
     return NULL;
   }
 
   $imis_url .= '/detail';
   $imis_url .= '?imisId=' . urlencode($imis_id);
+  if ($verbose) { sirius_minilog("Connecting to: $imis_url"); }
 
   $options = array(
     'headers' => array('ApiKey' => $imis_apikey),
@@ -349,6 +138,8 @@ function grievance_imis_lookup_raw($imis_id, $broughtby_tid) {
   );
 
   $response = drupal_http_request($imis_url, $options);
+  if ($verbose) { sirius_minilog("Raw response data follows."); }
+  if ($verbose) { sirius_minilog('<pre>' . print_r($response, 1) . '</pre>'); }
 
   // HTTP Request execute
   if ($response->code != 200) {
@@ -366,103 +157,21 @@ function grievance_imis_lookup_raw($imis_id, $broughtby_tid) {
     return NULL;
   }
 
-  return $response->data;
-}
-
-
-function grievance_imis_form_grievance_node_callback_replace($form, $form_state) {
-  $commands = array();
-  // $commands[] = ajax_command_replace("#grievance-imis-search-result", render($form['grievance_imis_search_result']));
-  $commands[] = ajax_command_replace("#grievance-imis-search-result", $form['grievance_imis_search_result']['#markup']);
-
-  return array(
-    '#type' => 'ajax',
-    '#commands' => $commands
-  );
-}
-
-function grievance_imis_form_grievance_node_callback_submit($form, &$form_state) {
-  $form_state['rebuild'] = TRUE;
-}
-
-function grievance_imis_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
-  // Add imis Search elements to the form
-  $broughtby_tid = grievance_form_current_value('field_grievance_broughtby', 'tid', $form, $form_state);
-  if (!$broughtby_tid) { 
-    $broughtby_tid = 'DEFAULT';
+  if (!$response->data) { return NULL; }
+  $json = json_decode($response->data, TRUE);
+  $result = array();
+  $result['first_name']   = $json['FirstName'];
+  $result['last_name']    = $json['LastName'];
+  if ($json['WorkerAddress']) {
+    $result['city']         = $json['WorkerAddress']['City'];
+    $result['state']        = $json['WorkerAddress']['State'];
+    $result['zip']          = $json['WorkerAddress']['Zip'];
+    $result['street']       = $json['WorkerAddress']['Address1'];
+    $result['street2']       = $json['WorkerAddress']['Address2'];
   }
-
-  $form['grievance_imis_search'] = array(
-    '#type' => 'textfield',
-    '#title' => t('IMIS Search'),
-    '#description' => t('Enter the last name or SSN of the employee.'),
-  );
-  $form['#groups']['group_grievance_employee']->children[] = 'grievance_imis_search';
-  $form['#group_children']['grievance_imis_search'] = 'group_grievance_employee';
-
-  $form['grievance_imis_search_submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Search imis'),
-    '#submit' => array('grievance_imis_form_grievance_node_callback_submit'),
-    '#ajax' => array(
-      'callback' => 'grievance_imis_form_grievance_node_callback_replace',
-      'method' => 'replace',
-    ),
-    '#limit_validation_errors' => array(array('field_grievance_broughtby'),array('grievance_imis_search')),
-  );
-  $form['#groups']['group_grievance_employee']->children[] = 'grievance_imis_search_submit';
-  $form['#group_children']['grievance_imis_search_submit'] = 'group_grievance_employee';
-
-  $candidates = array();
-  if ($form_state['values']['grievance_imis_search']) {
-    if (!$broughtby_tid || $broughtby_tid == 'DEFAULT') { 
-      $broughtby_tid = 'DEFAULT';
-      $broughtby_name = 'Default';
-    } else {
-      $broughtby_term = taxonomy_term_load($broughtby_tid);
-      $broughtby_name = $broughtby_term->name;
-    }
-    $candidates = grievance_imis_search($form_state['values']['grievance_imis_search'], $broughtby_tid);
-    $result_body = '';
-
-    if (!$candidates) {
-      $result_body .= t('No members match your search criteria: ') . '<strong>' . $form_state['values']['grievance_imis_search'] . '</strong>';
-    } else {
-
-      usort($candidates, function($a, $b) { return strcasecmp($a->FullName, $b->FullName); });
-
-      $header = array(
-        t('imis ID'),
-        t('Name'),
-        t('Employer'),
-      );
-      $attributes = array();
-      $rows = array();
-      foreach ($candidates as $candidate) {
-        $row = array();
-        $row[] = '<a href="#" class="grievance-imis-id-for-insert">' . $candidate->ImisId . '</a>';
-        $row[] = $candidate->FullName;
-        $employer = '';
-        if ($candidate->Employments) {
-          foreach ($candidate->Employments as $employment) {
-            if ($employer) { $employer .= ', '; }
-            $employer .= $employment->EmployerName;
-          }
-        }
-        $row[] = $employer;
-        $rows[] = $row;
-      }
-      $result_body = theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
-    }
-
-    $result_body .= '<span style="display: none;"><a href="#" id="grievance-imis-broughtby-tid-for-insert">' . $broughtby_tid . '</a></span>';
-  }
-
-  $form['grievance_imis_search_result'] = array(
-    '#type' => 'markup',
-    '#markup' => '<div id="grievance-imis-search-result">' . $result_body . '</div>',
-  );
-  $form['#groups']['group_grievance_employee']->children[] = 'grievance_imis_search_result';
-  $form['#group_children']['grievance_imis_search_result'] = 'group_grievance_employee';
-
+  $result['gender']       = $json['Gender'];
+  $result['phone']        = $json['Phones'][0]['Phone'];
+  $result['email']        = $json['Emails'][0]['Email'];;
+  $result['id']           = $json['ImisId'];
+  return $result;
 }

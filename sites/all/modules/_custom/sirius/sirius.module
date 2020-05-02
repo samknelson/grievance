@@ -35,6 +35,12 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.volunteer.i
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lock.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.node_tabs.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.masquerade.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.fax.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overrides.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -43,20 +49,31 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_worker
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_contact.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_hours.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance_log.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_materials.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contacts.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_resync_all.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_json.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_definition_display.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_users.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_switch.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_subdomains.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_delete.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_term_exim.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_sort.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_vocabulary_list.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_list.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_vocabulary_admin.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_resync_all.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_field_overrides.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_letter_template_recipients.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_config.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_esignature_test.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_license.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_voice_forward_to_operator.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
 
@@ -85,7 +102,7 @@ function sirius_entity_presave($entity, $type) {
  */
 
 function sirius_node_presave($node) {
-  if ($node->type == 'sirius_worker') {
+  if ($node->type == 'sirius_worker' || $node->type == 'sirius_contact') {
     $fields = array(
       'field_sirius_phone', 
       'field_sirius_phone_alt', 
@@ -102,7 +119,7 @@ function sirius_node_presave($node) {
     }
   }
 
-  if ($node->type == 'sirius_worker') {
+  if ($node->type == 'sirius_worker' || $node->type == 'sirius_contact') {
     $fields = array(
       'field_sirius_email', 
     );
@@ -112,6 +129,8 @@ function sirius_node_presave($node) {
       }
     }
   }
+
+  if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_presave($node); }
 }
 
 
@@ -247,42 +266,35 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   }
 
   // Remove the domain
-  if ($form['field_sirius_domain']) {
-    if (!user_access('sirius admin')) {
-      // Check our domain. Might come from the query.
-      $domain_nid = $_GET['sirius_domain'];
-
-      // If not, might come from the default value (current field value)
-      if (!$domain_nid) {
-        $domain_nid = $form['field_sirius_domain']['und']['#default_value'][0];
-      }
-
-      // If not, default to our very own domain.
-      if (!$domain_nid) {
-        $domain_node = sirius_domain();
-        $domain_nid = $domain_node->nid;
-      }
-
-      if ($domain_nid) {
-        if (!sirius_domain_access($domain_nid)) { 
-          drupal_set_message("Attempting to create a record in a domain without access.", 'error');
-          $form['#access'] = FALSE;
-        }
-        $form['field_sirius_domain']['und']['#value']['target_id'] = $domain_nid;
-        $form['field_sirius_domain']['#access'] = FALSE;
-      }
-    }
+  if (preg_match('/_node_form/', $form_id)) {
+    sirius_domain_form_alter_node($form, $form_state, $form_id);
   }
 
   // Filter the taxonomy by domain
   if ($form_id == 'taxonomy_form_term' || preg_match('/_node_form/', $form_id)) {
+    sirius_domain_restrict_taxonomy_fields($form, $form_id);
   }
 
   // Remove access to some JSON fields
-  if ($form_id == 'grievance_shop_node_form' ||
-      $form_id == 'sirius_dispatch_job_node_form') {
+  if ($form_id == 'sirius_worker' ||
+      $form_id == 'grievance_shop_node_form' ||
+      $form_id == 'sirius_dispatch_job_node_form' ||
+      $form_id == 'grievance_node_form' ||
+      $form_id == 'sirius_contact_node_form' || 
+      $form_id == 'sirius_json_definition_node_form' ||
+      $form_id == 'sirius_event_participant_node_form') {
     $form['field_sirius_json']['#access'] = FALSE;
   }
+
+  // Remove access to caller ID fields which are set in a node tab
+  if ($form_id == 'sirius_json_definition_node_form') {
+    $form['field_sirius_callerids']['#access'] = FALSE;
+    $form['field_sirius_audio']['#access'] = FALSE;
+    if ($_GET['sirius_type']) { $form['field_sirius_type']['#access'] = FALSE; }
+  }
+
+  // Field overrides
+  sirius_field_overrides_form_alter($form, $form_state, $form_id);
 }
 
 /**
@@ -300,6 +312,7 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
   if (!user_access('sirius dispatch admin')) {
     $form['field_sirius_worker']['#access'] = FALSE;
   }
+
   if (!user_access('sirius dispatch admin') && !user_access('grievance admin') && !user_access('grievance user')) {
     $form['field_grievance_rep_lead']['#access'] = FALSE;
     $form['field_grievance_rep_organizer']['#access'] = FALSE;
@@ -309,24 +322,17 @@ function sirius_form_user_profile_form_alter(&$form, &$form_state) {
     $form['field_sirius_json']['#access'] = FALSE;
   }
 
-  if (!user_access('sirius domain user admin')) {
-    $form['field_sirius_domain']['#accesss'] = FALSE;
+  if (!user_access('sirius admin')) {
+    $form['field_sirius_domain']['#access'] = FALSE;
+    $form['field_sirius_contact']['#access'] = FALSE;
   }
 
   if (!user_access('sirius signature edit')) {
     $form['field_sirius_signature']['#access'] = FALSE;
   }
-
-  if (!user_access('sirius domain user admin')) {
-    $form['field_sirius_domain']['#access'] = FALSE;
-  }
-
-  if (!user_access('sirius contact admin')) {
-    $form['field_sirius_contact']['#access'] = FALSE;
-  }
 }
 
-function sirius_become_superuser($tf) {
+function sirius_become_superuser($tf, $uid = 1) {
   global $user;
   static $original_user;
   static $old_state;
@@ -341,7 +347,7 @@ function sirius_become_superuser($tf) {
     $original_user = $user; 
     $old_state = drupal_save_session(); 
     drupal_save_session(FALSE); 
-    $user = user_load(1); 
+    $user = user_load($uid); 
   } else {
     $user = $original_user; 
     drupal_save_session($old_state); 
@@ -402,9 +408,23 @@ function sirius_block_view($delta = '') {
 function sirius_menu_alter(&$items) {
   $items['user/%user']['access callback'] = 'sirius_user_view_access';
   $items['user/%user/edit']['access callback'] = 'sirius_user_edit_access';
-  unset($items['taxonomy/term/%taxonomy_term']);
-  unset($items['taxonomy/term/%taxonomy_term/view']);
-  unset($items['taxonomy/term/%taxonomy_term/feed']);
+
+  $items['taxonomy/term/%taxonomy_term']['page callback'] = 'sirius_no_more_term_listings';
+  $items['taxonomy/term/%taxonomy_term']['page arguments'] = array();
+  $items['taxonomy/term/%taxonomy_term']['access arguments'] = array('access content');
+
+
+  $items['taxonomy/term/%taxonomy_term/view']['page callback'] = 'sirius_no_more_term_listings';
+  $items['taxonomy/term/%taxonomy_term/view']['page arguments'] = array();
+  $items['taxonomy/term/%taxonomy_term/view']['access arguments'] = array('access content');
+
+  $items['taxonomy/term/%taxonomy_term/feed']['page callback'] = 'sirius_no_more_term_listings';
+  $items['taxonomy/term/%taxonomy_term/feed']['page arguments'] = array();
+  $items['taxonomy/term/%taxonomy_term/feed']['access arguments'] = array('access content');
+}
+
+function sirius_no_more_term_listings() {
+  return '(taxonomy term listings disabled.)';
 }
 
 function sirius_user_view_access($account) {
@@ -444,11 +464,17 @@ function sirius_user_edit_access($account) {
  * Implements hook_node_view
  */
 
-/*
 function sirius_node_view($node, $view_mode, $langcode) {
-  // if ($node->content['field_sirius_representatives']) { sirius_representatives_node_view($node, $view_mode, $langcode); }
+  return sirius_field_overrides_node_view($node, $view_mode, $langcode);
 }
-*/
+
+/**
+ * Implements hook_node_validate
+ */
+
+function sirius_node_validate($node, $form, &$form_state) {
+  if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_validate($node, $form, $form_state); }
+}
 
 
 
@@ -456,13 +482,15 @@ function sirius_node_view($node, $view_mode, $langcode) {
  * Stupid utility function to get multiple values from a field
  */
 
-function sirius_fieldvals($node, $field, $col = 'value') {
+function sirius_fieldvals($node, $field, $col = 'value', $format = 'Y-m-d H:i') {
   $result = array();
   if (!$node->{$field}['und']) { return array(); }
 
-  foreach ($node->{$field}['und'] as $tmp) {
+  foreach ($node->{$field}['und'] as $delta => $tmp) {
     if ($col == 'ts') {
       $result[] = strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']);
+    } else if ($col == 'date') {
+      $result[] = date($format, strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']));
     } else {
       $result[] = $tmp[$col];
     }
@@ -479,13 +507,15 @@ function sirius_fieldval($node, $field, $col = 'value', $params = array()) {
   }
 }
 
-function sirius_fakerender_field($title, $values) {
+function sirius_fakerender_field($title, $values, $options = array()) {
   if (!is_array($values)) { $values = array($values); }
 
   $html = '<section class="field field-name-fake field-label-inline clearfix view-mode-full">';
-  $html .= '<h2 class="field-label">';
-  $html .= $title;
-  $html .= '</h2>';
+  if (!$options['hide_title']) {
+    $html .= '<h2 class="field-label">';
+    $html .= $title;
+    $html .= '</h2>';
+  }
   $html .= '<div class="field-items">';
   foreach ($values as $value) {
     $html .= '<div class="field-item">';
@@ -578,7 +608,18 @@ function sirius_sirius_jsonfield_form_definitions() {
  */
 
 function sirius_file_download_access($file_item, $entity_type, $entity) {
+  // Allow loopback requests (from the originating server)
   if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
+
+  // Employers can see headshots. @todo this should probably live in the sirius_employer module.
+  if ($entity_type == 'node' && $entity->type == 'sirius_worker' && preg_match('/private:\/\/sirius_headshot/', $file_item['uri'])) {
+    if (user_access('sirius dispatch employer')) { return TRUE; }
+  }
+
+  // Materials get treated specially
+  if ($entity_type == 'node' && $entity->type == 'sirius_log' && $entity->field_sirius_category['und'][0]['value'] == 'material') {
+    return sirius_materials_download_access($file_item, $entity_type, $entity);
+  }
 }
 
 /**
@@ -596,8 +637,8 @@ function sirius_user_login(&$edit, $account) {
  * Implements hook_node_insert
  */
 
-function sirius_node_insert($node) {
-}
+// function sirius_node_insert($node) {
+// }
 
 
 /**
@@ -687,4 +728,14 @@ function sirius_quicknav($links) {
   $html .= '</div>';
 
   return $html;
+}
+
+/**
+ * Copied from drupal_html_to_text. 
+ */
+
+function sirius_text_to_html($string) {
+  $string = htmlentities($string);
+  $string = nl2br($string);
+  return $string;
 }

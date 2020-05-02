@@ -72,6 +72,14 @@ function sirius_dispatch_node_tabs() {
     'weight' => 8,
   );
 
+  $node_tabs['sirius_dispatch']['sirius_dispatch_payrate'] = array(
+    'title' => 'Pay Rate',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_payrate',
+    'permissions' => array('sirius dispatch payrate override'),
+    'weight' => 8,
+  );
+
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_fore'] = array(
     'title' => 'Foreperson',
     'description' => '',
@@ -295,12 +303,31 @@ function sirius_dispatch_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/dispatch/config/threestrikes'] = array(
+  $items['sirius/dispatch/threestrikes'] = array(
+    'title' => 'Three Strikes',
+    'description' => '',
+    'access arguments' => array('sirius dispatch staff'),
+    'page callback' => 'sirius_dispatch_threestrikes_page',
+    'weight' => 1,
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/dispatch/threestrikes/test'] = array(
+    'title' => 'Three Strikes Tester',
+    'description' => '',
+    'access arguments' => array('sirius dispatch staff'),
+    'page callback' => 'sirius_dispatch_threestrikes_page',
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['sirius/dispatch/threestrikes/config'] = array(
     'title' => 'Three-Strikes Settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_dispatch_threestrikes_admin'),
     'access arguments' => array('sirius dispatch admin'),
-    'type' => MENU_NORMAL_ITEM,
+    'weight' => 2,
+    'type' => MENU_LOCAL_TASK,
   );
 
   $items['sirius/dispatch/jwa'] = array(

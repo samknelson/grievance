@@ -66,9 +66,6 @@ function sirius_node_tab_event_bullpen_self_register_form_submit($form, &$form_s
   if ($result['success']) { drupal_set_message(t('You have been signed in to this bullpen.')); } else { drupal_set_message($result['msg'], 'error'); }
 }
 
-
-
-
 function sirius_node_tab_event_bullpen_self_edit_form($form, &$form_state, $event_node, $participant_node) {
 	$form_state['event_nid'] = $event_node->nid;
 	$form_state['participant_nid'] = $participant_node->nid;
@@ -130,6 +127,9 @@ function sirius_node_tab_event_bullpen_self_edit_form_submit($form, &$form_state
 }
 
 function sirius_event_bullpen_selfsignin_possible($event_node) {
+  $event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+  $event_type_json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+
   // Self sign-in must be open
   $ts = sirius_event_bullpen_ts($event_node);
   $datestr = 'g:i A, l, F j';
@@ -157,9 +157,11 @@ function sirius_event_bullpen_selfsignin_possible($event_node) {
   }
 
   // Must be employed by the current employer
-  $current_employer_nid = $worker_node->field_grievance_shop['und'][0]['target_id'];
-  if ($current_employer_nid != $job_node->field_grievance_shop['und'][0]['target_id']) {
-    return array('success' => FALSE, 'msg' => "You can only sign yourself into bullpens offered by your current employer.");
+  if ($event_type_json['bullpen']['self_signin_must_be_employed'] != 'no') {
+    $current_employer_nid = $worker_node->field_grievance_shop['und'][0]['target_id'];
+    if ($current_employer_nid != $job_node->field_grievance_shop['und'][0]['target_id']) {
+      return array('success' => FALSE, 'msg' => "You can only sign yourself into bullpens offered by your current employer.");
+    }
   }
 
   // Must be EBA on the correct date

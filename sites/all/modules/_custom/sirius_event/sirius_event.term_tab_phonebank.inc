@@ -35,7 +35,7 @@ function sirius_event_term_tab_phonebank_form($form, &$form_state, $event_type_t
 		'#type' => 'checkboxes',
 		'#title' => t('Caller Roles'),
 		'#options' => $prole_options,
-		'#description' => t('Phone calls will be made to participants with this role.'),
+		'#description' => t('Phone calls will be made from participants with this role.'),
 	);
 	if ($json['phonebank']['caller_prole_tids']) { $form['caller_prole_tids']['#default_value'] = $json['phonebank']['caller_prole_tids']; }
 

@@ -203,10 +203,6 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 		  	$replacements[$original] = $replacement;
 			}
 
-
-
-
-
 			//
 			// Add specially tagged clauses from contract templates
 			//
@@ -264,8 +260,6 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 
 		  	$replacements[$original] = $replacement;
 			}
-
-
 
 			//
 			// Add log date for status changes

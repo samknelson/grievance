@@ -155,7 +155,21 @@ function grievance_permission() {
     'grievance mine expanded' => array(
         'title' => t('My Grievances - Tickler'),
     ),
- );
+
+    'grievance worker lookup' => array(
+      'title' => t('Grievance Workersync Lookup'), 
+      'description' => t('Permission to look up workers from the worker database'),
+    ),
+    'grievance worker edit' => array(
+      'title' => t('Grievance Workersync Edit'), 
+      'description' => t('Permission to update existing workers via the grievance form'),
+    ),
+    'grievance worker create' => array(
+      'title' => t('Grievance Workersync Create'), 
+      'description' => t('Permission to create new workers via the grievance form'),
+    ),
+
+    );
 }
 
 function grievance_node_access($node, $op, $account) {

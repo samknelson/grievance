@@ -172,14 +172,6 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
-    'grievance_news' => array(
-      'name' => t('Grievance News'),
-      'base' => 'node_content',
-      'description' => '',
-      'has_title' => '1',
-      'title_label' => t('Title'),
-      'help' => '',
-    ),
     'grievance_settlement' => array(
       'name' => t('Grievance Settlement'),
       'base' => 'node_content',
@@ -342,6 +334,22 @@ function grievance_content_types_node_info() {
     ),
     'sirius_payperiod' => array(
       'name' => t('Sirius Payperiod'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_phonenumber' => array(
+      'name' => t('Sirius Phonenumber'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_term_proxy' => array(
+      'name' => t('Sirius Term Proxy'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',

@@ -87,36 +87,6 @@ function grievance_content_types_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
-  $ds_fieldsetting->id = 'node|grievance_news|teaser';
-  $ds_fieldsetting->entity_type = 'node';
-  $ds_fieldsetting->bundle = 'grievance_news';
-  $ds_fieldsetting->view_mode = 'teaser';
-  $ds_fieldsetting->settings = array(
-    'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'node_link' => array(
-      'weight' => '4',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'author' => array(
-      'weight' => '2',
-      'label' => 'hidden',
-      'format' => 'author',
-    ),
-    'post_date' => array(
-      'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'ds_post_date_long',
-    ),
-  );
-  $export['node|grievance_news|teaser'] = $ds_fieldsetting;
-
-  $ds_fieldsetting = new stdClass();
-  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|grievance|default';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'grievance';
@@ -442,25 +412,6 @@ function grievance_content_types_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_sirius_skill' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'func' => 'theme_ds_field_expert',
-          'fis' => TRUE,
-          'fis-el' => 'div',
-          'fis-cl' => '',
-          'fis-at' => '',
-          'fis-def-at' => FALSE,
-          'fi' => TRUE,
-          'fi-el' => 'div',
-          'fi-cl' => '',
-          'fi-at' => '',
-          'fi-def-at' => FALSE,
-          'fi-odd-even' => FALSE,
-          'fi-first-last' => FALSE,
-        ),
-      ),
-    ),
     'field_sirius_aat' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -751,45 +702,6 @@ function grievance_content_types_ds_layout_settings_info() {
     'page_option_title' => '',
   );
   $export['node|grievance_log|default'] = $ds_layout;
-
-  $ds_layout = new stdClass();
-  $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|grievance_news|teaser';
-  $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'grievance_news';
-  $ds_layout->view_mode = 'teaser';
-  $ds_layout->layout = 'ds_1col';
-  $ds_layout->settings = array(
-    'regions' => array(
-      'ds_content' => array(
-        0 => 'title',
-        1 => 'post_date',
-        2 => 'author',
-        3 => 'body',
-        4 => 'node_link',
-      ),
-    ),
-    'fields' => array(
-      'title' => 'ds_content',
-      'post_date' => 'ds_content',
-      'author' => 'ds_content',
-      'body' => 'ds_content',
-      'node_link' => 'ds_content',
-    ),
-    'classes' => array(),
-    'wrappers' => array(
-      'ds_content' => 'div',
-    ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
-    'hide_page_title' => '0',
-    'page_option_title' => '',
-  );
-  $export['node|grievance_news|teaser'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -1894,10 +1806,11 @@ function grievance_content_types_ds_layout_settings_info() {
         3 => 'field_sirius_message',
         4 => 'field_sirius_notes',
         5 => 'field_sirius_summary',
-        6 => 'post_date',
-        7 => 'field_sirius_attachments',
-        8 => 'author',
-        9 => 'field_sirius_json',
+        6 => 'field_sirius_attachments',
+        7 => 'post_date',
+        8 => 'field_sirius_json',
+        9 => 'author',
+        10 => 'field_sirius_domain',
       ),
     ),
     'fields' => array(
@@ -1907,10 +1820,11 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_sirius_message' => 'ds_content',
       'field_sirius_notes' => 'ds_content',
       'field_sirius_summary' => 'ds_content',
-      'post_date' => 'ds_content',
       'field_sirius_attachments' => 'ds_content',
-      'author' => 'ds_content',
+      'post_date' => 'ds_content',
       'field_sirius_json' => 'ds_content',
+      'author' => 'ds_content',
+      'field_sirius_domain' => 'ds_content',
     ),
     'classes' => array(),
     'wrappers' => array(
@@ -1984,11 +1898,13 @@ function grievance_content_types_ds_layout_settings_info() {
         12 => 'field_sirius_id3',
         14 => 'field_sirius_aat',
         15 => 'field_sirius_gender',
-        21 => 'field_sirius_phone',
-        22 => 'field_sirius_phone_alt',
-        23 => 'field_sirius_phone_fax',
-        24 => 'field_sirius_email',
-        25 => 'field_sirius_address',
+        17 => 'field_sirius_skill',
+        20 => 'field_sirius_phone',
+        21 => 'field_sirius_phone_alt',
+        22 => 'field_sirius_phone_fax',
+        23 => 'field_sirius_email',
+        24 => 'field_sirius_address',
+        39 => 'group_skills',
       ),
       'above_right' => array(
         2 => 'group_sirius_worker_status',
@@ -1998,32 +1914,24 @@ function grievance_content_types_ds_layout_settings_info() {
         11 => 'field_sirius_worker_dispstatus',
         13 => 'field_sirius_dispatch_availdate',
         16 => 'field_grievance_shop',
-        19 => 'field_sirius_dispatch_dncs',
-        20 => 'field_sirius_industry',
-        26 => 'field_sirius_dispatch_medium',
-        27 => 'field_sirius_dispatch_asi',
-        29 => 'field_sirius_dispatch_sib_status',
-        30 => 'field_sirius_dispatch_cbn',
-        31 => 'field_sirius_skills_avail',
-        32 => 'field_sirius_skills_availx',
-        33 => 'field_grievance_departments',
-        34 => 'field_sirius_dispatch_dncs2',
-        35 => 'field_sirius_dispatch_hfe',
-        36 => 'field_sirius_dispatch_hfe_until',
-        37 => 'field_sirius_aat_required',
-        38 => 'field_sirius_dispatch_eba',
-        39 => 'field_sirius_dispatch_eba_dates',
-      ),
-      'below_left' => array(
-        17 => 'field_sirius_skill',
-        41 => 'group_sirius_worker_skills',
-      ),
-      'below_right' => array(
-        18 => 'field_sirius_skill_expire',
-        40 => 'group_sirius_worker_skill_exp',
+        18 => 'field_sirius_dispatch_dncs',
+        19 => 'field_sirius_industry',
+        25 => 'field_sirius_dispatch_medium',
+        26 => 'field_sirius_dispatch_asi',
+        28 => 'field_sirius_dispatch_sib_status',
+        29 => 'field_sirius_dispatch_cbn',
+        30 => 'field_sirius_skills_avail',
+        31 => 'field_sirius_skills_availx',
+        32 => 'field_grievance_departments',
+        33 => 'field_sirius_dispatch_dncs2',
+        34 => 'field_sirius_dispatch_hfe',
+        35 => 'field_sirius_dispatch_hfe_until',
+        36 => 'field_sirius_aat_required',
+        37 => 'field_sirius_dispatch_eba',
+        38 => 'field_sirius_dispatch_eba_dates',
       ),
       'header' => array(
-        28 => 'field_sirius_headshot',
+        27 => 'field_sirius_headshot',
       ),
     ),
     'fields' => array(
@@ -2044,8 +1952,7 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_sirius_aat' => 'above_left',
       'field_sirius_gender' => 'above_left',
       'field_grievance_shop' => 'above_right',
-      'field_sirius_skill' => 'below_left',
-      'field_sirius_skill_expire' => 'below_right',
+      'field_sirius_skill' => 'above_left',
       'field_sirius_dispatch_dncs' => 'above_right',
       'field_sirius_industry' => 'above_right',
       'field_sirius_phone' => 'above_left',
@@ -2067,8 +1974,7 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_sirius_aat_required' => 'above_right',
       'field_sirius_dispatch_eba' => 'above_right',
       'field_sirius_dispatch_eba_dates' => 'above_right',
-      'group_sirius_worker_skill_exp' => 'below_right',
-      'group_sirius_worker_skills' => 'below_left',
+      'group_skills' => 'above_left',
     ),
     'classes' => array(),
     'wrappers' => array(

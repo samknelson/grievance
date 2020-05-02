@@ -17,12 +17,8 @@ function sirius_page_taxonomy_list($vocabulary_machine_name) {
 
 	if (sirius_domain_taxonomy_is_multidomain($vocabulary_machine_name)) { $domain_nid = sirius_domain_nid(); }
 
-	$view = variable_get("sirius_taxonomy_view_$vocabulary_machine_name", '');
-	$display = variable_get("sirius_taxonomy_view_display_$vocabulary_machine_name", '');
-	if (!$view || !$display) {
-		return "Please set the system variables sirius_taxonomy_view_$vocabulary_machine_name and sirius_taxonomy_view_display_$vocabulary_machine_name";
-	}
+  $settings = sirius_taxonomy_settings($vocabulary_machine_name);
 
-	return views_embed_view($view, $display, $vocabulary_machine_name, $domain_nid);
+	return views_embed_view($settings['view'], $settings['display'], $vocabulary_machine_name, $domain_nid);
 }
 

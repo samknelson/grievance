@@ -3,6 +3,39 @@
 
 	$(document).ready(function () {
 
+		// Worker Sync
+		Drupal.behaviors.grievance_timss = {
+	    attach: function(context, settings) {
+			$('.grievance_workersync_id_for_insert').once().click(function(event) {
+				event.preventDefault(); 
+				grievance_workersync_handle_recipient_click($(this));
+			});
+
+			function grievance_workersync_handle_recipient_click(elt) {
+				val = elt.html();
+				console.log("Looking up: " + val);
+
+				var jqxhr = $.getJSON('/grievance/workersync/lookup/' + val);
+				jqxhr.complete(function(data) {
+					$('.form-item-field-grievance-first-name-und-0-value input').val(data.responseJSON.first_name);
+					$('.form-item-field-grievance-last-name-und-0-value input').val(data.responseJSON.last_name);
+					$('.form-item-field-grievance-city-und-0-value input').val(data.responseJSON.city);
+					$('.form-item-field-grievance-state-und-0-value input').val(data.responseJSON.state);
+					$('.form-item-field-grievance-zip-und-0-value input').val(data.responseJSON.zip);
+					$('.form-item-field-grievance-address-und-0-value input').val(data.responseJSON.street);
+					$('.form-item-field-grievance-gender-und select').val(data.responseJSON.gender);
+					$('.form-item-field-grievance-phone-und-0-value input').val(data.responseJSON.phone);
+					$('.form-item-field-grievance-email-und-0-email input').val(data.responseJSON.email);
+					$('.form-item-field-grievance-department-und-0-value input').val(data.responseJSON.department);
+					$('.form-item-field-grievance-classification-und-0-value input').val(data.responseJSON.classification);
+					$('.form-item-field-grievance-min-und-0-value input').val(data.responseJSON.id);
+				});
+
+			}
+		},
+	}
+
+
 		$.fn.grievance_bind_classification_term_map = function() {
 			// console.log("Binding...");
 
@@ -74,20 +107,25 @@
 			});
 		}
 
-		if (Drupal.settings && Drupal.settings.grievance_form_irsets) {
-			$('.form-item-irsets input').change(function() {
-				nid = $(this).val();
-				checked = $(this).prop('checked');
-				tids = Drupal.settings.grievance_form_irsets[nid];
-				if (tids.length) {
-					for (i=0; i<tids.length; ++i) {
-						tid = tids[i];
-						$('.field-name-field-grievance-document-types-form .form-item-field-grievance-document-types-und-' + tid + ' input:checkbox').prop('checked', checked); 
+		$.fn.grievance_bind_irset_map = function() {
+			if (Drupal.settings && Drupal.settings.grievance_form_irsets) {
+				$('.form-item-irsets input').change(function() {
+					nid = $(this).val();
+					checked = $(this).prop('checked');
+					tids = Drupal.settings.grievance_form_irsets[nid];
+					if (tids.length) {
+						for (i=0; i<tids.length; ++i) {
+							tid = tids[i];
+							$('.field-name-field-grievance-document-types-form .form-item-field-grievance-document-types-und-' + tid + ' input:checkbox').prop('checked', checked); 
+						}
 					}
+				});
+				for (nid in Drupal.settings.grievance_form_irsets) {
 				}
-			});
-			for (nid in Drupal.settings.grievance_form_irsets) {
 			}
 		}
+
+		$.fn.grievance_bind_irset_map();
+
 	});
 }(jQuery));

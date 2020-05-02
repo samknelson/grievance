@@ -29,6 +29,7 @@ function sirius_node_tab_worker_skill_add_form($form, &$form_state, $worker_node
 
 	$form['b1'] = array('#markup' => '<h2>' . t('Add New Skills') . '</h2>');
 	$form['b2'] = array('#markup' => '<table>');
+	$form['b2x'] = array('#markup' => '<tr><th>Skill</th><th>Expiration Date</th></tr>');
 	for ($delta = 1; $delta < 10; ++$delta) {
 		$form[$delta]['tr_open'] = array('#markup' => '<tr>');
 
@@ -149,7 +150,7 @@ function sirius_node_tab_worker_skill_add_form_submit($form, &$form_state) {
   while ($form_state['values'][$delta]['skill']) {
   	$tid = $form_state['values'][$delta]['skill'];
   	$expires = $form_state['values'][$delta]['renew'];
-  	if (strtotime($expires) < 1) { $expires = NULL; }
+  	if (sirius_strtotime($expires) < 1) { $expires = NULL; }
 		$result = sirius_worker_skill_set($worker_node, array($tid), $expires, 'add', $reason, $files);
 		if ($result['success']) {
 			drupal_set_message($result['msg']);

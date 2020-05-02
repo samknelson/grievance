@@ -382,21 +382,38 @@ function grievance_letter_form_submit($form, &$form_state) {
 }
 
 function grievance_letter_render_html($grievance_node, $letter_nids, $other_tokens) {
+	// Add the worker node as a tokenized object
+	$tokens = array();
+	$token_aliases = array();
+
+	$workersync_plugin = grievance_workersync_plugin_fetch();
+	if ($workersync_plugin['id'] == 'local') {
+		$worker_id = $grievance_node->field_grievance_min['und'][0]['value'];
+		$worker_node = sirius_worker_get_by_id($worker_id);
+		if ($worker_node) {
+			$tokens['worker_node'] = $worker_node;
+			$token_aliases['worker_node'] = 'node';
+		}
+	}
+
 	if ($other_tokens['letter_body']) {
 		return '<div id="grievance-letter-body">' . $other_tokens['letter_body'] . '</div>';
 	}
 	$letter_nodes = node_load_multiple($letter_nids);
+
+	$tokens['node'] = $grievance_node;
+	$tokens['other_tokens'] = $other_tokens;
+
 	$body = '';
+	if ($_REQUEST['uid'] && sirius_loopback_access()) { sirius_become_superuser(TRUE, $_REQUEST['uid']); }
 	foreach ($letter_nodes as $letter_nid => $letter_node) {
 		$letter_part = $letter_node->body['und'][0]['value'];
 		$letter_part = token_replace(
 			$letter_part, 
-			array(
-				'node' => $grievance_node,
-				'grievance-letter' => $other_tokens,
-			),
+			$tokens,
 			array(
 				'clear' => TRUE,
+				'aliases' => $token_aliases,
 			)
 		);
 

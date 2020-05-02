@@ -1,0 +1,4 @@
+table.sirius_materials td:nth-child(1) { width: 20%; }
+table.sirius_materials td:nth-child(2) { width: 40%; }
+table.sirius_materials td:nth-child(3) { width: 20%; }
+table.sirius_materials td:nth-child(4) { width: 20%; }

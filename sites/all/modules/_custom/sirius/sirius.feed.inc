@@ -86,7 +86,7 @@ function sirius_feed_page_list($wizard_name) {
  ************************************************************************************************/
 
 function sirius_feed_page_landing_access() {
-	return user_access('sirius admin');
+	return user_access('sirius domain admin');
 }
 
 function sirius_feed_page_landing() {
@@ -129,12 +129,18 @@ function sirius_feed_spout_get_reader($feed_node) {
 	$path = drupal_realpath($dest);
 
 	sirius_feed_spout_init();
-	$reader = ReaderEntityFactory::createReaderFromFile($path);
-	$reader->open($path);
-	return $reader;
+	try {
+		$reader = ReaderEntityFactory::createReaderFromFile($path);
+		$reader->open($path);
+		return $reader;
+	} catch (exception $e) {
+		drupal_set_message($e->getMessage(), 'error');
+		return NULL;
+	}
 }
 
 function sirius_feed_spout_get_sheet($reader, $sheet_name) {
+	if (!$reader) { return NULL; }
 	foreach ($reader->getSheetIterator() as $sheet) {
 		if (!$sheet_name) { break; }
   	if ($sheet->getName() == $sheet_name) { break; }
@@ -144,11 +150,12 @@ function sirius_feed_spout_get_sheet($reader, $sheet_name) {
 
 
 function sirius_feed_spout_get_header($sheet, $header_row) {
+	if (!$sheet) { return NULL; }
 	$header = array();
 	foreach ($sheet->getRowIterator() as $row) {
 		$cells = array();
 		foreach ($row->getCells() as $cell) {
-			$cells[] = $cell->getValue();
+			$cells[] = sirius_feed_spout_get_cell_value($cell);
 		}
 		if ($header_row == 'Yes') {
 			$header = $cells;
@@ -165,16 +172,51 @@ function sirius_feed_spout_get_header($sheet, $header_row) {
 function sirius_feed_spout_get_cell($row, $col) {
 	$cell = $row->getCellAtIndex($col);
 	if (!$cell) { return NULL; }
-	return $cell->getValue();
+
+	return sirius_feed_spout_get_cell_value($cell);
 }
 
-function sirius_feed_spout_get_import_row($fields, $row, $data, $count) {
+function sirius_feed_spout_get_cell_value($cell) {
+	try {
+		// Start with the reaw cell value
+		$value = $cell->getValue();
+
+		// If it's an object, try to render it. But don't try too hard.
+		if (is_object($value)) {
+			$class = get_class($value);
+			if ($class = 'DateTime') { $value = $value->format('Y-m-d H:i:s e'); }
+			else { $value = '(object)'; }
+		}
+
+		// Convert to UTF8 and trim
+		$value = mb_convert_encoding($value, 'UTF-8');
+		$value = trim($value);
+
+		return $value;
+	} catch (exception $e) {
+		drupal_set_message($e->getMessage(), 'error');
+		return NULL;
+	}
+}
+
+function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header) {
 	$import_data_row = array('xxxrowcountxxx' => $count);
 	foreach ($fields as $field_name => $field_info) {
 		$col = $data["map_$field_name"];
 		if ($col === NULL || $col === '') { continue; }
 		$import_data_row[$field_name] = sirius_feed_spout_get_cell($row, $col);
 	}
+
+	$raw_row = array();
+	$delta = 0;
+	foreach ($row->getCells() as $cell) {
+		$title = $header[$delta];
+		if (!$title) { $title = $delta; }
+		$raw_row[$title] = sirius_feed_spout_get_cell_value($cell);
+		++$delta;
+	}
+	$import_data_row['xxxrawxxx'] = $raw_row;
+
 	return $import_data_row;
 }
 
@@ -187,8 +229,7 @@ function sirius_feed_page_launch_access($wizard_name) {
 	if (!$info) { return FALSE; }
 
 	// @todo
-	return user_access('sirius');
-	// return user_access('sirius admin');
+	return user_access('sirius domain admin');
 }
 
 function sirius_feed_page_launch($wizard_name) {
@@ -352,6 +393,10 @@ function sirius_feed_wizard_sheet_form($form, &$form_state, $info, $data, $feed_
 	$last_data = sirius_feed_lastdata($info, $feed_node);
 
 	$reader = sirius_feed_spout_get_reader($feed_node);
+	if (!$reader) {
+		drupal_set_message("Unable to load the spreadsheet.", 'error');
+		return array();
+	}
 	$names = array();
 	$i = 0;
 	foreach ($reader->getSheetIterator() as $sheet) {
@@ -433,6 +478,12 @@ function sirius_feed_wizard_map_form($form, &$form_state, $info, $data, $feed_no
 
 	$count = 0;
 	$html_rows = array();
+
+	if (!$sheet) { 
+		drupal_set_message("Unable to load spreadsheet.", 'error');
+		return array();
+	}
+
 	foreach ($sheet->getRowIterator() as $row) {
 		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
 		$html_row = array();
@@ -545,6 +596,10 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	// Preview
 	$reader = sirius_feed_spout_get_reader($feed_node);
 	$sheet = sirius_feed_spout_get_sheet($reader, $data['worksheet']);
+	if (!$sheet) { 
+		drupal_set_message("Unable to load the spreadsheet", 'error');
+		return array();
+	}
 	$header = sirius_feed_spout_get_header($sheet, $data['header_row']);
 
 	$import_header = array('xxxrowcountxxx' => 'Row');
@@ -564,8 +619,10 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$callback = $info['feed']['callback_row_verify'];
 	foreach ($sheet->getRowIterator() as $row) {
 		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
-		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count);
+		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
+
 		$result = $callback($feed_node, $info, $data, $import_data_row, FALSE);
+
 		if ($result['success']) { $import_data_row['xxxsuccsssxxx'] = 'Yes'; } else { $import_data_row['xxxsuccsssxxx'] = 'No'; }
 		$import_data_row['xxxmsgxxx'] = $result['msg'];
 		foreach ($fields as $field_name => $field_info) {
@@ -573,7 +630,8 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 			if ($col === NULL || $col === '') { 
 				unset($import_data_row[$field_name]);
 			}
-			}
+		}
+		unset($import_data_row['xxxrawxxx']);
 
 		++$counts[$result['msg']];
 		if ($counts[$result['msg']] == 6) { $import_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
@@ -688,7 +746,7 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 		++$count;
 		if ($count < $idx) { continue; }
 		if ($count > $idx+$batch_size) { break; }
-		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count);
+		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 		$result = $callback($feed_node, $info, $data, $import_data_row);
 		++$counts[$result['msg']];
 

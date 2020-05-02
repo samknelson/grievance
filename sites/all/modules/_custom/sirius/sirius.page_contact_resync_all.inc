@@ -54,14 +54,16 @@ function sirius_page_contact_resync_all_form_submit($form, &$form_state) {
 }
 
 function sirius_page_contact_resync_all_batch_workers($batch, &$context) {
+	$count = 0;
 	foreach ($batch as $worker_nid) {
 		$worker_node = node_load($worker_nid);
 		if (!$worker_node->field_sirius_contact['und'][0]['target_id']) {
 			node_save($worker_node);
 			$context['results']['workers']++;
+			++$count;
 		}
 	}
-	$context['message'] = 'Processing workers.';
+	$context['message'] = "Updated $count workers (total " . number_format($context['results']['workers'], 0) . ")";
 }
 
 function sirius_page_contact_resync_all_batch_users($batch, &$context) {

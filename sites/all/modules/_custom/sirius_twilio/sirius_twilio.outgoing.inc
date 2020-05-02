@@ -14,9 +14,9 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
 	}
 
   // Are we in a global disable mode?
-  $disable = variable_get("sirius_sms_global_disable", '');
+  $disable = sirius_domain_variable_get("sirius_sms_global_disable", '');
   if ($disable == 'Yes') { 
-	  $whitelist = variable_get("sirius_sms_global_disable_whitelist", '');
+	  $whitelist = sirius_domain_variable_get("sirius_sms_global_disable_whitelist", '');
 	  $probe = sirius_phone_format($phone);
 	  if (strpos($whitelist, $probe) === FALSE) { return array('success' => FALSE, 'msg' => "Global SMS disable is on and $probe is not whitelisted."); }
 	}
@@ -25,8 +25,11 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
   if (!$phone)                        { return array('success' => FALSE, 'msg' => "No phone number"); }
   if (!sirius_phone_validate($phone)) { return array('success' => FALSE, 'msg' => "[$phone] is not a valid phone number."); }
 
+  $possible = sirius_phonenumber_sms_possible($phone);
+  if (!$possible) 										{ return array('success' => FALSE, 'msg' => "[$phone] does not appear to be a mobile-enabled number."); }
+
   static $registered;
-  if (variable_get('sirius_twilio_sms_consolidate', FALSE)) {
+  if (sirius_domain_variable_get('sirius_twilio_sms_consolidate', FALSE)) {
 		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg);
 		if (!$registered) {
 			$registered = TRUE;
@@ -58,7 +61,6 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 		if ($queue[$phone]) { $queue[$phone] .= "\n\n"; }
 		$queue[$phone] .= $msg;
 	}
-
 	if (!$deliver_now) { return array('success' => TRUE, 'msg' => "Queued for delivery: $phone, $msg"); }
 
 	foreach ($queue as $phone => $msg) {
@@ -67,18 +69,19 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 			$client->messages->create(
 		    $phone,
 		    array(
-		      'from' => variable_get('sirius_twilio_phone', ''),
+		      'from' => sirius_domain_variable_get('sirius_twilio_phone', ''),
 		      'body' => $msg,
 		    )
 			);
 		} catch (Exception $e) {
+			$result = array('success' => FALSE, 'msg' => "SMS message failed.", 'details' => "Failed to send message [$msg]: " . $e->getCode() . ' - ' . $e->getMessage());
 			$msg =  $e->getCode() . ' - ' . $e->getMessage() . ": " . $msg;
 			sirius_log('twilio:conversation', 'error', $msg, $msg, $phone, array($handler_nid));
-			$result = array('success' => FALSE, 'msg' => "SMS message failed.");
 		}
 	}
 
 	$queue = NULL;
+	if ($result && !$result['success']) { return $result; }
 	return array('success' => TRUE, 'msg' => 'Queue delivered.');
 }
 
@@ -95,9 +98,9 @@ function sirius_twilio_outgoing_voice($phone, $context) {
 	global $base_url;
 	$phone = sirius_phone_format_e164($phone);
 
-  $disable = variable_get("sirius_sms_global_disable", '');
+  $disable = sirius_domain_variable_get("sirius_sms_global_disable", '');
   if ($disable == 'Yes') { 
-	  $whitelist = variable_get("sirius_sms_global_disable_whitelist", '');
+	  $whitelist = sirius_domain_variable_get("sirius_sms_global_disable_whitelist", '');
 	  $probe = sirius_phone_format($phone);
 	  if (strpos($whitelist, $probe) === FALSE) { return array('success' => FALSE, 'msg' => "Global SMS disable is on and $probe is not whitelisted."); }
 	}
@@ -106,7 +109,7 @@ function sirius_twilio_outgoing_voice($phone, $context) {
 	$msg = "Outgoing call initiated to $phone";
 	try {
 		$client = sirius_twilio_client_get();
-		$call = $client->calls->create($phone, variable_get('sirius_twilio_phone', ''), array("url" => $base_url . '/sirius/twilio/incoming/voice'));
+		$call = $client->calls->create($phone, sirius_domain_variable_get('sirius_twilio_phone', ''), array("url" => $base_url . '/sirius/twilio/incoming/voice'));
 		$call_sid = sirius_twilio_call_sid($call);
 		$result = array('success' => TRUE, 'msg' => 'Initiated call to ' . $phone);
 	} catch (Exception $e) {
@@ -132,9 +135,9 @@ function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_dig
 	header('Content-Type: text/xml');
 	print "<Response>";
 	if ($gather_digits) { print "<Gather numDigits=\"$gather_digits\">"; }
-	print variable_get('sirius_twilio_twiml_open', '<Say><prosody>');
+	print sirius_domain_variable_get('sirius_twilio_twiml_open', '<Say><prosody>');
 	print sirius_twilio_outgoing_voice_clean($msg);
-	print variable_get('sirius_twilio_twiml_close', '</prosody></Say>');
+	print sirius_domain_variable_get('sirius_twilio_twiml_close', '</prosody></Say>');
 	if ($gather_digits) { print "</Gather>"; }
 	print "</Response>";
 

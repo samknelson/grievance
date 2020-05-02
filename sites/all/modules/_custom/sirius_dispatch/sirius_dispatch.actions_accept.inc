@@ -39,8 +39,11 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 		return $possible;
 	}
 
-	// Remove from the event
+	// Get the job polic
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+	$policy = sirius_dispatch_job_policy($job_node);
+
+	// Remove from the event
 	$event_nid = $job_node->field_sirius_events['und'][0]['target_id'];
 	if ($event_nid) {
 		$contact_nid = sirius_contact_get_nid_from_worker($dispatch_node->field_sirius_worker['und'][0]['target_id']);
@@ -56,7 +59,9 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 
 	// Set the status
 	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
-	if ($worker_node->field_grievance_shop['und'][0]['target_id']) {
+	if ($policy['workers']['always_secondary'] == 'Yes') {
+		$new_status = 'accepted_secondary';
+	} else if ($worker_node->field_grievance_shop['und'][0]['target_id']) {
 		$new_status = 'accepted_secondary';
 	} else {
 		$new_status = 'accepted';

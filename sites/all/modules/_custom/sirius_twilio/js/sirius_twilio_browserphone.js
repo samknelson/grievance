@@ -98,7 +98,7 @@
 
 		$('#sirius_browserphone_button_call').click(function() {
 			var params = {
-		  	to: $('#sirius_browserphone_number').val(),
+		  	To: $('#sirius_browserphone_number').val(),
 		  	token: token,
 		  	callerid_nid: $('#sirius_browserphone_callerid').val()
 			};
@@ -115,7 +115,7 @@
 
 		$('#sirius_browserphone_button_omg').click(function () {
 			sirius_browserphone_log('Transferring to OMG...');
-			url = '/sirius/twilio/browserphone/twiml/omg?token=' + token + '&omg_key=' + $('#sirius_browserphone_omg').val();
+			url = '/sirius/twilio/browserphone/twiml/omg?token=' + token + '&omg_key=' + $('#sirius_browserphone_omg').val() + '&phone=' + $('#sirius_browserphone_number').val();
 			$.ajax({url: url}).done(function(data) { 
 				sirius_browserphone_log('... ' + data);
 				if (data == 'Ok.') {

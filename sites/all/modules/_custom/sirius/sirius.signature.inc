@@ -1,5 +1,8 @@
 <?php
 
+// This file deals with the image signature fields attached to users. If you wanted to sign things electronically,
+// look for the prefix "esginature".  Sorry about that.
+
 function sirius_signature_render($account) {
 	$html = '<div class="sirius_signature_wrapper">';
 

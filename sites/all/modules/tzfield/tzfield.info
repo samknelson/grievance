@@ -1,0 +1,11 @@
+name = Time zone field
+description = Defines a time zone field type.
+dependencies[] = options
+core = 7.x
+files[] = tzfield.test
+
+; Information added by Drupal.org packaging script on 2018-11-10
+version = "7.x-1.2"
+core = "7.x"
+project = "tzfield"
+datestamp = "1541808484"

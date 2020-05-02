@@ -55,6 +55,10 @@ function sirius_log(
   $log_node->field_sirius_message['und'][0]['value'] = substr($message, 0, 254);
   $log_node->field_sirius_summary['und'][0]['value'] = $summary;
   $log_node->field_sirius_notes['und'][0]['value'] = $notes;
+
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $log_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; } 
+
   if ($files) {
     $log_node->field_sirius_attachments['und'] = $files;
   }
@@ -77,6 +81,8 @@ function sirius_log(
   $log_node = node_submit($log_node);
   node_object_prepare($log_node);
   node_save($log_node);
+
+  return $log_node;
 }
 
 function sirius_node_access_log($log_node, $op, $account) {
@@ -106,8 +112,8 @@ function sirius_log_render_form($param1, $param2 = NULL) {
 
   $form['log_wrapper'] = array(
     '#type' => 'fieldset',
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    // '#collapsible' => TRUE,
+    // '#collapsed' => TRUE,
     '#title' => 'Change Log',
   );
 

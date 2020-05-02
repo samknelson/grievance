@@ -23,7 +23,7 @@ function sirius_node_tab_event_phonebank_lock_form($form, &$form_state, $event_n
 		$row = array();
 		$row[] = $hr['name'] . ' [' . $hr['mail'] . ']';
 		$row[] = $hr['id'];
-		$row[] = date('Y-m-d h:i:s a');
+		$row[] = date('Y-m-d h:i:s a', $hr['ts']);
 		$options[$hr['uid']] = $row;
 	}
 

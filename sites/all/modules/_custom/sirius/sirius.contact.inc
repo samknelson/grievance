@@ -113,14 +113,7 @@ function sirius_contact_nid_get_from_user($uid = NULL) {
 }
 
 function sirius_contact_sirius_jsonfield_form_definitions() {
-	$definitions['node']['sirius_contact']['field_sirius_json'] = array('#callback' => 'sirius_contact_sirius_jsonfield_form_definitions_callback');
-	return $definitions;
-}
-
-function sirius_contact_sirius_jsonfield_form_definitions_callback($element) {
-	$contact_node = $element['#entity'];
-	$domain_nid = $contact_node->field_sirius_domain['und'][0]['target_id'];
-	return sirius_contact_definition($domain_nid);
+	return array();
 }
 
 function sirius_contact_get_nid_from_worker($worker_nid) {
@@ -131,4 +124,53 @@ function sirius_contact_get_nid_from_worker($worker_nid) {
 	$stmt = db_query($sql, array(':worker_nid' => $worker_nid));
 	$hr = $stmt->fetchAssoc();
 	return $hr['field_sirius_contact_target_id'];
+}
+
+function sirius_contact_list_sources() {
+	$sources_by_domain =& drupal_static(__FUNCTION__, array());
+
+	$domain_nid = sirius_domain_nid();
+	if (!isset($sources_by_domain[$domain_nid])) {
+		$sql = "select distinct field_sirius_source_value as source from node ";
+		$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+		$sql .= "left join field_data_field_sirius_source on field_data_field_sirius_source.entity_type = 'node' and field_data_field_sirius_source.entity_id = node.nid ";
+		$sql .= "where node.type = 'sirius_contact' ";
+		if ($domain_nid) {
+			$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+			$sql_args[':domain_nid'] = $domain_nid;
+		}
+		$sql .= "order by field_sirius_source_value ";
+		$stmt = db_query($sql, $sql_args);
+		$sources_by_domain[$domain_nid] = array();
+		while ($hr = $stmt->fetchAssoc()) {
+			if ($hr['source']) { $sources_by_domain[$domain_nid][] = $hr['source']; }
+		}
+	}
+
+	return $sources_by_domain[$domain_nid];
+}
+
+function sirius_contact_tag_add($contact_node, $tid) {
+	$current_tids = sirius_fieldvals($contact_node, 'field_sirius_contact_tags', 'tid');
+	if (in_array($tid, $current_tids)) { return array('success' => TRUE, 'msg' => 'Contact already had the tag.'); }
+
+	$contact_node->field_sirius_contact_tags['und'][] = array('tid' => $tid); 
+	node_save($contact_node);
+	return array('success' => TRUE, 'msg' => 'Contact saved.');
+}
+
+function sirius_contact_tag_remove($contact_node, $tid) {
+	$current_tids = sirius_fieldvals($contact_node, 'field_sirius_contact_tags', 'tid');
+	if (!in_array($tid, $current_tids)) { return array('success' => TRUE, 'msg' => 'Contact already did not have the tag.'); }
+
+	$new_value = array();
+	foreach ($current_tids as $candidate_tid) {
+		if ($candidate_tid == $tid) { continue; }
+		$new_value[] = array('tid' => $candidate_tid); 
+	}
+
+	if ($new_value) 	{ $contact_node->field_sirius_contact_tags['und'] = $new_value; } 
+	else 							{ unset($contact_node->field_sirius_contact_tags); } 
+	node_save($contact_node);
+	return array('success' => TRUE, 'msg' => 'Contact saved.');
 }

@@ -51,7 +51,7 @@ function sirius_event_page_create_form($form, &$form_state, $event_type_tid) {
   $form["duration"] = array(
     '#title' => t('Duration'),
 		'#type' => 'select',
-		'#options' => sirius_event_duration_options(),
+		'#options' => sirius_event_duration_options($event_type_term),
 		'#required' => TRUE,
   );
 
