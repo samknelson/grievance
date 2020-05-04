@@ -14,82 +14,78 @@ use Twilio\TwiML\TwiML;
 class Prompt extends TwiML {
     /**
      * Prompt constructor.
-     * 
+     *
      * @param array $attributes Optional attributes
      */
-    public function __construct($attributes = array()) {
+    public function __construct($attributes = []) {
         parent::__construct('Prompt', null, $attributes);
     }
 
     /**
      * Add Say child.
-     * 
+     *
      * @param string $message Message to say
      * @param array $attributes Optional attributes
-     * @return TwiML Child element.
+     * @return Say Child element.
      */
-    public function say($message, $attributes = array()) {
+    public function say($message, $attributes = []): Say {
         return $this->nest(new Say($message, $attributes));
     }
 
     /**
      * Add Play child.
-     * 
-     * @param url $url Media URL
+     *
+     * @param string $url Media URL
      * @param array $attributes Optional attributes
-     * @return TwiML Child element.
+     * @return Play Child element.
      */
-    public function play($url = null, $attributes = array()) {
+    public function play($url = null, $attributes = []): Play {
         return $this->nest(new Play($url, $attributes));
     }
 
     /**
      * Add Pause child.
-     * 
+     *
      * @param array $attributes Optional attributes
-     * @return TwiML Child element.
+     * @return Pause Child element.
      */
-    public function pause($attributes = array()) {
+    public function pause($attributes = []): Pause {
         return $this->nest(new Pause($attributes));
     }
 
     /**
      * Add For_ attribute.
-     * 
-     * @param prompt:Enum:For $for_ Name of the credit card data element
-     * @return TwiML $this.
+     *
+     * @param string $for_ Name of the payment source data element
      */
-    public function setFor_($for_) {
+    public function setFor_($for_): self {
         return $this->setAttribute('for_', $for_);
     }
 
     /**
      * Add ErrorType attribute.
-     * 
-     * @param prompt:Enum:ErrorType $errorType Type of error
-     * @return TwiML $this.
+     *
+     * @param string[] $errorType Type of error
      */
-    public function setErrorType($errorType) {
+    public function setErrorType($errorType): self {
         return $this->setAttribute('errorType', $errorType);
     }
 
     /**
      * Add CardType attribute.
-     * 
-     * @param prompt:Enum:CardType $cardType Type of the credit card
-     * @return TwiML $this.
+     *
+     * @param string[] $cardType Type of the credit card
      */
-    public function setCardType($cardType) {
+    public function setCardType($cardType): self {
         return $this->setAttribute('cardType', $cardType);
     }
 
     /**
      * Add Attempt attribute.
-     * 
-     * @param integer $attempt Current attempt count
-     * @return TwiML $this.
+     *
+     * @param int[] $attempt Current attempt count
      */
-    public function setAttempt($attempt) {
+    public function setAttempt($attempt): self {
         return $this->setAttribute('attempt', $attempt);
     }
 }

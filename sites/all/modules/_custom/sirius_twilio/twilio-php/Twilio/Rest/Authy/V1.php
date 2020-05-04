@@ -11,35 +11,39 @@ namespace Twilio\Rest\Authy;
 
 use Twilio\Domain;
 use Twilio\Exceptions\TwilioException;
+use Twilio\InstanceContext;
 use Twilio\Rest\Authy\V1\FormList;
 use Twilio\Rest\Authy\V1\ServiceList;
 use Twilio\Version;
 
 /**
- * @property \Twilio\Rest\Authy\V1\ServiceList services
- * @property \Twilio\Rest\Authy\V1\FormList forms
- * @method \Twilio\Rest\Authy\V1\ServiceContext services(string $sid)
+ * @property FormList $forms
+ * @property ServiceList $services
  * @method \Twilio\Rest\Authy\V1\FormContext forms(string $formType)
+ * @method \Twilio\Rest\Authy\V1\ServiceContext services(string $sid)
  */
 class V1 extends Version {
-    protected $_services = null;
-    protected $_forms = null;
+    protected $_forms;
+    protected $_services;
 
     /**
      * Construct the V1 version of Authy
-     * 
-     * @param \Twilio\Domain $domain Domain that contains the version
-     * @return \Twilio\Rest\Authy\V1 V1 version of Authy
+     *
+     * @param Domain $domain Domain that contains the version
      */
     public function __construct(Domain $domain) {
         parent::__construct($domain);
         $this->version = 'v1';
     }
 
-    /**
-     * @return \Twilio\Rest\Authy\V1\ServiceList 
-     */
-    protected function getServices() {
+    protected function getForms(): FormList {
+        if (!$this->_forms) {
+            $this->_forms = new FormList($this);
+        }
+        return $this->_forms;
+    }
+
+    protected function getServices(): ServiceList {
         if (!$this->_services) {
             $this->_services = new ServiceList($this);
         }
@@ -47,25 +51,15 @@ class V1 extends Version {
     }
 
     /**
-     * @return \Twilio\Rest\Authy\V1\FormList 
-     */
-    protected function getForms() {
-        if (!$this->_forms) {
-            $this->_forms = new FormList($this);
-        }
-        return $this->_forms;
-    }
-
-    /**
      * Magic getter to lazy load root resources
-     * 
+     *
      * @param string $name Resource to return
      * @return \Twilio\ListResource The requested resource
-     * @throws \Twilio\Exceptions\TwilioException For unknown resource
+     * @throws TwilioException For unknown resource
      */
-    public function __get($name) {
-        $method = 'get' . ucfirst($name);
-        if (method_exists($this, $method)) {
+    public function __get(string $name) {
+        $method = 'get' . \ucfirst($name);
+        if (\method_exists($this, $method)) {
             return $this->$method();
         }
 
@@ -74,16 +68,16 @@ class V1 extends Version {
 
     /**
      * Magic caller to get resource contexts
-     * 
+     *
      * @param string $name Resource to return
      * @param array $arguments Context parameters
-     * @return \Twilio\InstanceContext The requested resource context
-     * @throws \Twilio\Exceptions\TwilioException For unknown resource
+     * @return InstanceContext The requested resource context
+     * @throws TwilioException For unknown resource
      */
-    public function __call($name, $arguments) {
+    public function __call(string $name, array $arguments): InstanceContext {
         $property = $this->$name;
-        if (method_exists($property, 'getContext')) {
-            return call_user_func_array(array($property, 'getContext'), $arguments);
+        if (\method_exists($property, 'getContext')) {
+            return \call_user_func_array(array($property, 'getContext'), $arguments);
         }
 
         throw new TwilioException('Resource does not have a context');
@@ -91,10 +85,10 @@ class V1 extends Version {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
+    public function __toString(): string {
         return '[Twilio.Authy.V1]';
     }
 }

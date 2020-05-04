@@ -9,6 +9,7 @@
 
 namespace Twilio\Rest\Preview\Understand\Assistant;
 
+use Twilio\Exceptions\TwilioException;
 use Twilio\InstanceContext;
 use Twilio\Options;
 use Twilio\Serialize;
@@ -21,35 +22,28 @@ use Twilio\Version;
 class AssistantInitiationActionsContext extends InstanceContext {
     /**
      * Initialize the AssistantInitiationActionsContext
-     * 
-     * @param \Twilio\Version $version Version that contains the resource
+     *
+     * @param Version $version Version that contains the resource
      * @param string $assistantSid The assistant_sid
-     * @return \Twilio\Rest\Preview\Understand\Assistant\AssistantInitiationActionsContext 
      */
     public function __construct(Version $version, $assistantSid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('assistantSid' => $assistantSid, );
+        $this->solution = ['assistantSid' => $assistantSid, ];
 
-        $this->uri = '/Assistants/' . rawurlencode($assistantSid) . '/InitiationActions';
+        $this->uri = '/Assistants/' . \rawurlencode($assistantSid) . '/InitiationActions';
     }
 
     /**
-     * Fetch a AssistantInitiationActionsInstance
-     * 
+     * Fetch the AssistantInitiationActionsInstance
+     *
      * @return AssistantInitiationActionsInstance Fetched
      *                                            AssistantInitiationActionsInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
-        $params = Values::of(array());
-
-        $payload = $this->version->fetch(
-            'GET',
-            $this->uri,
-            $params
-        );
+    public function fetch(): AssistantInitiationActionsInstance {
+        $payload = $this->version->fetch('GET', $this->uri);
 
         return new AssistantInitiationActionsInstance(
             $this->version,
@@ -60,25 +54,18 @@ class AssistantInitiationActionsContext extends InstanceContext {
 
     /**
      * Update the AssistantInitiationActionsInstance
-     * 
+     *
      * @param array|Options $options Optional Arguments
      * @return AssistantInitiationActionsInstance Updated
      *                                            AssistantInitiationActionsInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function update($options = array()) {
+    public function update(array $options = []): AssistantInitiationActionsInstance {
         $options = new Values($options);
 
-        $data = Values::of(array(
-            'InitiationActions' => Serialize::jsonObject($options['initiationActions']),
-        ));
+        $data = Values::of(['InitiationActions' => Serialize::jsonObject($options['initiationActions']), ]);
 
-        $payload = $this->version->update(
-            'POST',
-            $this->uri,
-            array(),
-            $data
-        );
+        $payload = $this->version->update('POST', $this->uri, [], $data);
 
         return new AssistantInitiationActionsInstance(
             $this->version,
@@ -89,14 +76,14 @@ class AssistantInitiationActionsContext extends InstanceContext {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Preview.Understand.AssistantInitiationActionsContext ' . implode(' ', $context) . ']';
+        return '[Twilio.Preview.Understand.AssistantInitiationActionsContext ' . \implode(' ', $context) . ']';
     }
 }

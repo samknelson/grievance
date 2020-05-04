@@ -14,244 +14,362 @@ use Twilio\Values;
 
 abstract class ParticipantOptions {
     /**
-     * @param boolean $muted Indicates if the participant should be muted
-     * @param boolean $hold Specifying true will hold the participant, while false
-     *                      will un-hold.
-     * @param string $holdUrl The 'HoldUrl' attribute lets you specify a URL for
-     *                        music that plays when a participant is held.
-     * @param string $holdMethod Specify GET or POST, defaults to GET
-     * @param string $announceUrl The 'AnnounceUrl' attribute lets you specify a
-     *                            URL for announcing something to the participant.
-     * @param string $announceMethod Specify GET or POST, defaults to POST
+     * @param bool $muted Whether the participant should be muted
+     * @param bool $hold Whether the participant should be on hold
+     * @param string $holdUrl The URL we call using the `hold_method` for  music
+     *                        that plays when the participant is on hold
+     * @param string $holdMethod The HTTP method we should use to call hold_url
+     * @param string $announceUrl The URL we call using the `announce_method` for
+     *                            an announcement to the participant
+     * @param string $announceMethod The HTTP method we should use to call
+     *                               announce_url
+     * @param string $waitUrl URL that hosts pre-conference hold music
+     * @param string $waitMethod The HTTP method we should use to call `wait_url`
+     * @param bool $beepOnExit Whether to play a notification beep to the
+     *                         conference when the participant exit
+     * @param bool $endConferenceOnExit Whether to end the conference when the
+     *                                  participant leaves
+     * @param bool $coaching Indicates if the participant changed to coach
+     * @param string $callSidToCoach The SID of the participant who is being
+     *                               `coached`
      * @return UpdateParticipantOptions Options builder
      */
-    public static function update($muted = Values::NONE, $hold = Values::NONE, $holdUrl = Values::NONE, $holdMethod = Values::NONE, $announceUrl = Values::NONE, $announceMethod = Values::NONE) {
-        return new UpdateParticipantOptions($muted, $hold, $holdUrl, $holdMethod, $announceUrl, $announceMethod);
+    public static function update(bool $muted = Values::NONE, bool $hold = Values::NONE, string $holdUrl = Values::NONE, string $holdMethod = Values::NONE, string $announceUrl = Values::NONE, string $announceMethod = Values::NONE, string $waitUrl = Values::NONE, string $waitMethod = Values::NONE, bool $beepOnExit = Values::NONE, bool $endConferenceOnExit = Values::NONE, bool $coaching = Values::NONE, string $callSidToCoach = Values::NONE): UpdateParticipantOptions {
+        return new UpdateParticipantOptions($muted, $hold, $holdUrl, $holdMethod, $announceUrl, $announceMethod, $waitUrl, $waitMethod, $beepOnExit, $endConferenceOnExit, $coaching, $callSidToCoach);
     }
 
     /**
-     * @param string $statusCallback URL for conference event callback.
-     * @param string $statusCallbackMethod Method Twilio should use to reach the
-     *                                     status callback URL.
-     * @param string $statusCallbackEvent Set state change events that will trigger
-     *                                    a callback.
-     * @param integer $timeout Number of seconds Twilio will wait for an answer.
-     * @param boolean $record Record the agent and their conferences.
-     * @param boolean $muted Mute the agent.
-     * @param string $beep Play a beep when the participant joins the conference.
-     * @param boolean $startConferenceOnEnter Begin the conference when the
-     *                                        participant joins.
-     * @param boolean $endConferenceOnExit End the conference when the participant
-     *                                     leaves.
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     `status_callback`
+     * @param string[] $statusCallbackEvent Set state change events that will
+     *                                      trigger a callback
+     * @param int $timeout he number of seconds that we should wait for an answer
+     * @param bool $record Whether to record the participant and their conferences
+     * @param bool $muted Whether to mute the agent
+     * @param string $beep Whether to play a notification beep to the conference
+     *                     when the participant joins
+     * @param bool $startConferenceOnEnter Whether the conference starts when the
+     *                                     participant joins the conference
+     * @param bool $endConferenceOnExit Whether to end the conference when the
+     *                                  participant leaves
      * @param string $waitUrl URL that hosts pre-conference hold music
-     * @param string $waitMethod The method Twilio should use to request `WaitUrl`.
-     * @param boolean $earlyMedia Agents can hear the state of the outbound call.
-     * @param integer $maxParticipants Maximum number of agent conference
-     *                                 participants.
-     * @param string $conferenceRecord Record the conference.
-     * @param string $conferenceTrim Trim silence from audio files.
-     * @param string $conferenceStatusCallback Callback URL for conference events.
+     * @param string $waitMethod The HTTP method we should use to call `wait_url`
+     * @param bool $earlyMedia Whether agents can hear the state of the outbound
+     *                         call
+     * @param int $maxParticipants The maximum number of agent conference
+     *                             participants
+     * @param string $conferenceRecord Whether to record the conference the
+     *                                 participant is joining
+     * @param string $conferenceTrim Whether to trim leading and trailing silence
+     *                               from your recorded conference audio files
+     * @param string $conferenceStatusCallback The callback URL for conference
+     *                                         events
      * @param string $conferenceStatusCallbackMethod HTTP method for requesting
-     *                                               `ConferenceStatusCallback` URL.
-     * @param string $conferenceStatusCallbackEvent Set which conference state
-     *                                              changes should webhook to the
-     *                                              `ConferenceStatusCallback`
-     * @param string $recordingChannels Specify `mono` or `dual` recording channels.
-     * @param string $recordingStatusCallback The absolute URL for Twilio's webhook
-     *                                        with recording status information.
-     * @param string $recordingStatusCallbackMethod HTTP method for
-     *                                              `RecordingStatusCallback`
-     * @param string $sipAuthUsername SIP username used for authenticating.
-     * @param string $sipAuthPassword SIP password for authentication.
-     * @param string $region The region where Twilio should mix the conference
-     *                       audio.
-     * @param string $conferenceRecordingStatusCallback Conference recording
-     *                                                  callback URL.
-     * @param string $conferenceRecordingStatusCallbackMethod Method Twilio should
-     *                                                        use to request the
-     *                                                        `ConferenceRecordingStatusCallback` URL.
-     * @param string $recordingStatusCallbackEvent Set which recording state
-     *                                             changes should webhook to the
-     *                                             `RecordingStatusCallback`
-     * @param string $conferenceRecordingStatusCallbackEvent Set which conference
-     *                                                       recording state
-     *                                                       changes should webhook
-     *                                                       to the
-     *                                                       `ConferenceRecordingStatusCallback`
+     *                                               `conference_status_callback`
+     *                                               URL
+     * @param string[] $conferenceStatusCallbackEvent The conference state changes
+     *                                                that should generate a call
+     *                                                to
+     *                                                `conference_status_callback`
+     * @param string $recordingChannels Specify `mono` or `dual` recording channels
+     * @param string $recordingStatusCallback The URL that we should call using the
+     *                                        `recording_status_callback_method`
+     *                                        when the recording status changes
+     * @param string $recordingStatusCallbackMethod The HTTP method we should use
+     *                                              when we call
+     *                                              `recording_status_callback`
+     * @param string $sipAuthUsername The SIP username used for authentication
+     * @param string $sipAuthPassword The SIP password for authentication
+     * @param string $region The region where we should mix the conference audio
+     * @param string $conferenceRecordingStatusCallback The URL we should call
+     *                                                  using the
+     *                                                  `conference_recording_status_callback_method` when the conference recording is available
+     * @param string $conferenceRecordingStatusCallbackMethod The HTTP method we
+     *                                                        should use to call
+     *                                                        `conference_recording_status_callback`
+     * @param string[] $recordingStatusCallbackEvent The recording state changes
+     *                                               that should generate a call to
+     *                                               `recording_status_callback`
+     * @param string[] $conferenceRecordingStatusCallbackEvent The conference
+     *                                                         recording state
+     *                                                         changes that should
+     *                                                         generate a call to
+     *                                                         `conference_recording_status_callback`
+     * @param bool $coaching Indicates if the participant changed to coach
+     * @param string $callSidToCoach The SID of the participant who is being
+     *                               `coached`
+     * @param string $byoc BYOC trunk SID (Beta)
      * @return CreateParticipantOptions Options builder
      */
-    public static function create($statusCallback = Values::NONE, $statusCallbackMethod = Values::NONE, $statusCallbackEvent = Values::NONE, $timeout = Values::NONE, $record = Values::NONE, $muted = Values::NONE, $beep = Values::NONE, $startConferenceOnEnter = Values::NONE, $endConferenceOnExit = Values::NONE, $waitUrl = Values::NONE, $waitMethod = Values::NONE, $earlyMedia = Values::NONE, $maxParticipants = Values::NONE, $conferenceRecord = Values::NONE, $conferenceTrim = Values::NONE, $conferenceStatusCallback = Values::NONE, $conferenceStatusCallbackMethod = Values::NONE, $conferenceStatusCallbackEvent = Values::NONE, $recordingChannels = Values::NONE, $recordingStatusCallback = Values::NONE, $recordingStatusCallbackMethod = Values::NONE, $sipAuthUsername = Values::NONE, $sipAuthPassword = Values::NONE, $region = Values::NONE, $conferenceRecordingStatusCallback = Values::NONE, $conferenceRecordingStatusCallbackMethod = Values::NONE, $recordingStatusCallbackEvent = Values::NONE, $conferenceRecordingStatusCallbackEvent = Values::NONE) {
-        return new CreateParticipantOptions($statusCallback, $statusCallbackMethod, $statusCallbackEvent, $timeout, $record, $muted, $beep, $startConferenceOnEnter, $endConferenceOnExit, $waitUrl, $waitMethod, $earlyMedia, $maxParticipants, $conferenceRecord, $conferenceTrim, $conferenceStatusCallback, $conferenceStatusCallbackMethod, $conferenceStatusCallbackEvent, $recordingChannels, $recordingStatusCallback, $recordingStatusCallbackMethod, $sipAuthUsername, $sipAuthPassword, $region, $conferenceRecordingStatusCallback, $conferenceRecordingStatusCallbackMethod, $recordingStatusCallbackEvent, $conferenceRecordingStatusCallbackEvent);
+    public static function create(string $statusCallback = Values::NONE, string $statusCallbackMethod = Values::NONE, array $statusCallbackEvent = Values::ARRAY_NONE, int $timeout = Values::NONE, bool $record = Values::NONE, bool $muted = Values::NONE, string $beep = Values::NONE, bool $startConferenceOnEnter = Values::NONE, bool $endConferenceOnExit = Values::NONE, string $waitUrl = Values::NONE, string $waitMethod = Values::NONE, bool $earlyMedia = Values::NONE, int $maxParticipants = Values::NONE, string $conferenceRecord = Values::NONE, string $conferenceTrim = Values::NONE, string $conferenceStatusCallback = Values::NONE, string $conferenceStatusCallbackMethod = Values::NONE, array $conferenceStatusCallbackEvent = Values::ARRAY_NONE, string $recordingChannels = Values::NONE, string $recordingStatusCallback = Values::NONE, string $recordingStatusCallbackMethod = Values::NONE, string $sipAuthUsername = Values::NONE, string $sipAuthPassword = Values::NONE, string $region = Values::NONE, string $conferenceRecordingStatusCallback = Values::NONE, string $conferenceRecordingStatusCallbackMethod = Values::NONE, array $recordingStatusCallbackEvent = Values::ARRAY_NONE, array $conferenceRecordingStatusCallbackEvent = Values::ARRAY_NONE, bool $coaching = Values::NONE, string $callSidToCoach = Values::NONE, string $byoc = Values::NONE): CreateParticipantOptions {
+        return new CreateParticipantOptions($statusCallback, $statusCallbackMethod, $statusCallbackEvent, $timeout, $record, $muted, $beep, $startConferenceOnEnter, $endConferenceOnExit, $waitUrl, $waitMethod, $earlyMedia, $maxParticipants, $conferenceRecord, $conferenceTrim, $conferenceStatusCallback, $conferenceStatusCallbackMethod, $conferenceStatusCallbackEvent, $recordingChannels, $recordingStatusCallback, $recordingStatusCallbackMethod, $sipAuthUsername, $sipAuthPassword, $region, $conferenceRecordingStatusCallback, $conferenceRecordingStatusCallbackMethod, $recordingStatusCallbackEvent, $conferenceRecordingStatusCallbackEvent, $coaching, $callSidToCoach, $byoc);
     }
 
     /**
-     * @param boolean $muted Filter by muted participants
-     * @param boolean $hold Only show participants that are held or unheld.
+     * @param bool $muted Whether to return only participants that are muted
+     * @param bool $hold Whether to return only participants that are on hold
+     * @param bool $coaching Whether to return only participants who are coaching
+     *                       another call
      * @return ReadParticipantOptions Options builder
      */
-    public static function read($muted = Values::NONE, $hold = Values::NONE) {
-        return new ReadParticipantOptions($muted, $hold);
+    public static function read(bool $muted = Values::NONE, bool $hold = Values::NONE, bool $coaching = Values::NONE): ReadParticipantOptions {
+        return new ReadParticipantOptions($muted, $hold, $coaching);
     }
 }
 
 class UpdateParticipantOptions extends Options {
     /**
-     * @param boolean $muted Indicates if the participant should be muted
-     * @param boolean $hold Specifying true will hold the participant, while false
-     *                      will un-hold.
-     * @param string $holdUrl The 'HoldUrl' attribute lets you specify a URL for
-     *                        music that plays when a participant is held.
-     * @param string $holdMethod Specify GET or POST, defaults to GET
-     * @param string $announceUrl The 'AnnounceUrl' attribute lets you specify a
-     *                            URL for announcing something to the participant.
-     * @param string $announceMethod Specify GET or POST, defaults to POST
+     * @param bool $muted Whether the participant should be muted
+     * @param bool $hold Whether the participant should be on hold
+     * @param string $holdUrl The URL we call using the `hold_method` for  music
+     *                        that plays when the participant is on hold
+     * @param string $holdMethod The HTTP method we should use to call hold_url
+     * @param string $announceUrl The URL we call using the `announce_method` for
+     *                            an announcement to the participant
+     * @param string $announceMethod The HTTP method we should use to call
+     *                               announce_url
+     * @param string $waitUrl URL that hosts pre-conference hold music
+     * @param string $waitMethod The HTTP method we should use to call `wait_url`
+     * @param bool $beepOnExit Whether to play a notification beep to the
+     *                         conference when the participant exit
+     * @param bool $endConferenceOnExit Whether to end the conference when the
+     *                                  participant leaves
+     * @param bool $coaching Indicates if the participant changed to coach
+     * @param string $callSidToCoach The SID of the participant who is being
+     *                               `coached`
      */
-    public function __construct($muted = Values::NONE, $hold = Values::NONE, $holdUrl = Values::NONE, $holdMethod = Values::NONE, $announceUrl = Values::NONE, $announceMethod = Values::NONE) {
+    public function __construct(bool $muted = Values::NONE, bool $hold = Values::NONE, string $holdUrl = Values::NONE, string $holdMethod = Values::NONE, string $announceUrl = Values::NONE, string $announceMethod = Values::NONE, string $waitUrl = Values::NONE, string $waitMethod = Values::NONE, bool $beepOnExit = Values::NONE, bool $endConferenceOnExit = Values::NONE, bool $coaching = Values::NONE, string $callSidToCoach = Values::NONE) {
         $this->options['muted'] = $muted;
         $this->options['hold'] = $hold;
         $this->options['holdUrl'] = $holdUrl;
         $this->options['holdMethod'] = $holdMethod;
         $this->options['announceUrl'] = $announceUrl;
         $this->options['announceMethod'] = $announceMethod;
+        $this->options['waitUrl'] = $waitUrl;
+        $this->options['waitMethod'] = $waitMethod;
+        $this->options['beepOnExit'] = $beepOnExit;
+        $this->options['endConferenceOnExit'] = $endConferenceOnExit;
+        $this->options['coaching'] = $coaching;
+        $this->options['callSidToCoach'] = $callSidToCoach;
     }
 
     /**
-     * Specifying `true` will mute the participant, while `false` will un-mute. Anything other than `true` or `false` is interpreted as `false`.
-     * 
-     * @param boolean $muted Indicates if the participant should be muted
+     * Whether the participant should be muted. Can be `true` or `false`. `true` will mute the participant, and `false` will un-mute them. Anything value other than `true` or `false` is interpreted as `false`.
+     *
+     * @param bool $muted Whether the participant should be muted
      * @return $this Fluent Builder
      */
-    public function setMuted($muted) {
+    public function setMuted(bool $muted): self {
         $this->options['muted'] = $muted;
         return $this;
     }
 
     /**
-     * Specifying `true` will hold the participant, while `false` will remove them from hold.
-     * 
-     * @param boolean $hold Specifying true will hold the participant, while false
-     *                      will un-hold.
+     * Whether the participant should be on hold. Can be: `true` or `false`. `true` puts the participant on hold, and `false` lets them rejoin the conference.
+     *
+     * @param bool $hold Whether the participant should be on hold
      * @return $this Fluent Builder
      */
-    public function setHold($hold) {
+    public function setHold(bool $hold): self {
         $this->options['hold'] = $hold;
         return $this;
     }
 
     /**
-     * The 'HoldUrl' attribute lets you specify a URL for music that plays when a participant is on hold. The URL may be an MP3, a WAV or a TwiML document that uses `<Play>`, `<Say>` or `<Redirect>`.
-     * 
-     * @param string $holdUrl The 'HoldUrl' attribute lets you specify a URL for
-     *                        music that plays when a participant is held.
+     * The URL we call using the `hold_method` for  music that plays when the participant is on hold. The URL may return an MP3 file, a WAV file, or a TwiML document that contains the `<Play>`, `<Say>` or `<Redirect>` commands.
+     *
+     * @param string $holdUrl The URL we call using the `hold_method` for  music
+     *                        that plays when the participant is on hold
      * @return $this Fluent Builder
      */
-    public function setHoldUrl($holdUrl) {
+    public function setHoldUrl(string $holdUrl): self {
         $this->options['holdUrl'] = $holdUrl;
         return $this;
     }
 
     /**
-     * Specify the HTTP method Twilio should use to request your `HoldUrl`, either `GET` or `POST`. Defaults to `GET`.
-     * 
-     * @param string $holdMethod Specify GET or POST, defaults to GET
+     * The HTTP method we should use to call `hold_url`. Can be: `GET` or `POST` and the default is `GET`.
+     *
+     * @param string $holdMethod The HTTP method we should use to call hold_url
      * @return $this Fluent Builder
      */
-    public function setHoldMethod($holdMethod) {
+    public function setHoldMethod(string $holdMethod): self {
         $this->options['holdMethod'] = $holdMethod;
         return $this;
     }
 
     /**
-     * The 'AnnounceUrl' attribute lets you specify a URL for announcing something to the participant. The URL may return an MP3, a WAV or a TwiML document with `<Play>` or `<Say>`.
-     * 
-     * @param string $announceUrl The 'AnnounceUrl' attribute lets you specify a
-     *                            URL for announcing something to the participant.
+     * The URL we call using the `announce_method` for an announcement to the participant. The URL must return an MP3 file, a WAV file, or a TwiML document that contains `<Play>` or `<Say>` commands.
+     *
+     * @param string $announceUrl The URL we call using the `announce_method` for
+     *                            an announcement to the participant
      * @return $this Fluent Builder
      */
-    public function setAnnounceUrl($announceUrl) {
+    public function setAnnounceUrl(string $announceUrl): self {
         $this->options['announceUrl'] = $announceUrl;
         return $this;
     }
 
     /**
-     * Specify the HTTP method Twilio should use to request your `AnnounceUrl`, either `GET` or `POST`. Defaults to `POST`.
-     * 
-     * @param string $announceMethod Specify GET or POST, defaults to POST
+     * The HTTP method we should use to call `announce_url`. Can be: `GET` or `POST` and defaults to `POST`.
+     *
+     * @param string $announceMethod The HTTP method we should use to call
+     *                               announce_url
      * @return $this Fluent Builder
      */
-    public function setAnnounceMethod($announceMethod) {
+    public function setAnnounceMethod(string $announceMethod): self {
         $this->options['announceMethod'] = $announceMethod;
+        return $this;
+    }
+
+    /**
+     * The URL we should call using the `wait_method` for the music to play while participants are waiting for the conference to start. The default value is the URL of our standard hold music. [Learn more about hold music](https://www.twilio.com/labs/twimlets/holdmusic).
+     *
+     * @param string $waitUrl URL that hosts pre-conference hold music
+     * @return $this Fluent Builder
+     */
+    public function setWaitUrl(string $waitUrl): self {
+        $this->options['waitUrl'] = $waitUrl;
+        return $this;
+    }
+
+    /**
+     * The HTTP method we should use to call `wait_url`. Can be `GET` or `POST` and the default is `POST`. When using a static audio file, this should be `GET` so that we can cache the file.
+     *
+     * @param string $waitMethod The HTTP method we should use to call `wait_url`
+     * @return $this Fluent Builder
+     */
+    public function setWaitMethod(string $waitMethod): self {
+        $this->options['waitMethod'] = $waitMethod;
+        return $this;
+    }
+
+    /**
+     * Whether to play a notification beep to the conference when the participant exits. Can be: `true` or `false`.
+     *
+     * @param bool $beepOnExit Whether to play a notification beep to the
+     *                         conference when the participant exit
+     * @return $this Fluent Builder
+     */
+    public function setBeepOnExit(bool $beepOnExit): self {
+        $this->options['beepOnExit'] = $beepOnExit;
+        return $this;
+    }
+
+    /**
+     * Whether to end the conference when the participant leaves. Can be: `true` or `false` and defaults to `false`.
+     *
+     * @param bool $endConferenceOnExit Whether to end the conference when the
+     *                                  participant leaves
+     * @return $this Fluent Builder
+     */
+    public function setEndConferenceOnExit(bool $endConferenceOnExit): self {
+        $this->options['endConferenceOnExit'] = $endConferenceOnExit;
+        return $this;
+    }
+
+    /**
+     * Whether the participant is coaching another call. Can be: `true` or `false`. If not present, defaults to `false` unless `call_sid_to_coach` is defined. If `true`, `call_sid_to_coach` must be defined.
+     *
+     * @param bool $coaching Indicates if the participant changed to coach
+     * @return $this Fluent Builder
+     */
+    public function setCoaching(bool $coaching): self {
+        $this->options['coaching'] = $coaching;
+        return $this;
+    }
+
+    /**
+     * The SID of the participant who is being `coached`. The participant being coached is the only participant who can hear the participant who is `coaching`.
+     *
+     * @param string $callSidToCoach The SID of the participant who is being
+     *                               `coached`
+     * @return $this Fluent Builder
+     */
+    public function setCallSidToCoach(string $callSidToCoach): self {
+        $this->options['callSidToCoach'] = $callSidToCoach;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Api.V2010.UpdateParticipantOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Api.V2010.UpdateParticipantOptions ' . $options . ']';
     }
 }
 
 class CreateParticipantOptions extends Options {
     /**
-     * @param string $statusCallback URL for conference event callback.
-     * @param string $statusCallbackMethod Method Twilio should use to reach the
-     *                                     status callback URL.
-     * @param string $statusCallbackEvent Set state change events that will trigger
-     *                                    a callback.
-     * @param integer $timeout Number of seconds Twilio will wait for an answer.
-     * @param boolean $record Record the agent and their conferences.
-     * @param boolean $muted Mute the agent.
-     * @param string $beep Play a beep when the participant joins the conference.
-     * @param boolean $startConferenceOnEnter Begin the conference when the
-     *                                        participant joins.
-     * @param boolean $endConferenceOnExit End the conference when the participant
-     *                                     leaves.
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     `status_callback`
+     * @param string[] $statusCallbackEvent Set state change events that will
+     *                                      trigger a callback
+     * @param int $timeout he number of seconds that we should wait for an answer
+     * @param bool $record Whether to record the participant and their conferences
+     * @param bool $muted Whether to mute the agent
+     * @param string $beep Whether to play a notification beep to the conference
+     *                     when the participant joins
+     * @param bool $startConferenceOnEnter Whether the conference starts when the
+     *                                     participant joins the conference
+     * @param bool $endConferenceOnExit Whether to end the conference when the
+     *                                  participant leaves
      * @param string $waitUrl URL that hosts pre-conference hold music
-     * @param string $waitMethod The method Twilio should use to request `WaitUrl`.
-     * @param boolean $earlyMedia Agents can hear the state of the outbound call.
-     * @param integer $maxParticipants Maximum number of agent conference
-     *                                 participants.
-     * @param string $conferenceRecord Record the conference.
-     * @param string $conferenceTrim Trim silence from audio files.
-     * @param string $conferenceStatusCallback Callback URL for conference events.
+     * @param string $waitMethod The HTTP method we should use to call `wait_url`
+     * @param bool $earlyMedia Whether agents can hear the state of the outbound
+     *                         call
+     * @param int $maxParticipants The maximum number of agent conference
+     *                             participants
+     * @param string $conferenceRecord Whether to record the conference the
+     *                                 participant is joining
+     * @param string $conferenceTrim Whether to trim leading and trailing silence
+     *                               from your recorded conference audio files
+     * @param string $conferenceStatusCallback The callback URL for conference
+     *                                         events
      * @param string $conferenceStatusCallbackMethod HTTP method for requesting
-     *                                               `ConferenceStatusCallback` URL.
-     * @param string $conferenceStatusCallbackEvent Set which conference state
-     *                                              changes should webhook to the
-     *                                              `ConferenceStatusCallback`
-     * @param string $recordingChannels Specify `mono` or `dual` recording channels.
-     * @param string $recordingStatusCallback The absolute URL for Twilio's webhook
-     *                                        with recording status information.
-     * @param string $recordingStatusCallbackMethod HTTP method for
-     *                                              `RecordingStatusCallback`
-     * @param string $sipAuthUsername SIP username used for authenticating.
-     * @param string $sipAuthPassword SIP password for authentication.
-     * @param string $region The region where Twilio should mix the conference
-     *                       audio.
-     * @param string $conferenceRecordingStatusCallback Conference recording
-     *                                                  callback URL.
-     * @param string $conferenceRecordingStatusCallbackMethod Method Twilio should
-     *                                                        use to request the
-     *                                                        `ConferenceRecordingStatusCallback` URL.
-     * @param string $recordingStatusCallbackEvent Set which recording state
-     *                                             changes should webhook to the
-     *                                             `RecordingStatusCallback`
-     * @param string $conferenceRecordingStatusCallbackEvent Set which conference
-     *                                                       recording state
-     *                                                       changes should webhook
-     *                                                       to the
-     *                                                       `ConferenceRecordingStatusCallback`
+     *                                               `conference_status_callback`
+     *                                               URL
+     * @param string[] $conferenceStatusCallbackEvent The conference state changes
+     *                                                that should generate a call
+     *                                                to
+     *                                                `conference_status_callback`
+     * @param string $recordingChannels Specify `mono` or `dual` recording channels
+     * @param string $recordingStatusCallback The URL that we should call using the
+     *                                        `recording_status_callback_method`
+     *                                        when the recording status changes
+     * @param string $recordingStatusCallbackMethod The HTTP method we should use
+     *                                              when we call
+     *                                              `recording_status_callback`
+     * @param string $sipAuthUsername The SIP username used for authentication
+     * @param string $sipAuthPassword The SIP password for authentication
+     * @param string $region The region where we should mix the conference audio
+     * @param string $conferenceRecordingStatusCallback The URL we should call
+     *                                                  using the
+     *                                                  `conference_recording_status_callback_method` when the conference recording is available
+     * @param string $conferenceRecordingStatusCallbackMethod The HTTP method we
+     *                                                        should use to call
+     *                                                        `conference_recording_status_callback`
+     * @param string[] $recordingStatusCallbackEvent The recording state changes
+     *                                               that should generate a call to
+     *                                               `recording_status_callback`
+     * @param string[] $conferenceRecordingStatusCallbackEvent The conference
+     *                                                         recording state
+     *                                                         changes that should
+     *                                                         generate a call to
+     *                                                         `conference_recording_status_callback`
+     * @param bool $coaching Indicates if the participant changed to coach
+     * @param string $callSidToCoach The SID of the participant who is being
+     *                               `coached`
+     * @param string $byoc BYOC trunk SID (Beta)
      */
-    public function __construct($statusCallback = Values::NONE, $statusCallbackMethod = Values::NONE, $statusCallbackEvent = Values::NONE, $timeout = Values::NONE, $record = Values::NONE, $muted = Values::NONE, $beep = Values::NONE, $startConferenceOnEnter = Values::NONE, $endConferenceOnExit = Values::NONE, $waitUrl = Values::NONE, $waitMethod = Values::NONE, $earlyMedia = Values::NONE, $maxParticipants = Values::NONE, $conferenceRecord = Values::NONE, $conferenceTrim = Values::NONE, $conferenceStatusCallback = Values::NONE, $conferenceStatusCallbackMethod = Values::NONE, $conferenceStatusCallbackEvent = Values::NONE, $recordingChannels = Values::NONE, $recordingStatusCallback = Values::NONE, $recordingStatusCallbackMethod = Values::NONE, $sipAuthUsername = Values::NONE, $sipAuthPassword = Values::NONE, $region = Values::NONE, $conferenceRecordingStatusCallback = Values::NONE, $conferenceRecordingStatusCallbackMethod = Values::NONE, $recordingStatusCallbackEvent = Values::NONE, $conferenceRecordingStatusCallbackEvent = Values::NONE) {
+    public function __construct(string $statusCallback = Values::NONE, string $statusCallbackMethod = Values::NONE, array $statusCallbackEvent = Values::ARRAY_NONE, int $timeout = Values::NONE, bool $record = Values::NONE, bool $muted = Values::NONE, string $beep = Values::NONE, bool $startConferenceOnEnter = Values::NONE, bool $endConferenceOnExit = Values::NONE, string $waitUrl = Values::NONE, string $waitMethod = Values::NONE, bool $earlyMedia = Values::NONE, int $maxParticipants = Values::NONE, string $conferenceRecord = Values::NONE, string $conferenceTrim = Values::NONE, string $conferenceStatusCallback = Values::NONE, string $conferenceStatusCallbackMethod = Values::NONE, array $conferenceStatusCallbackEvent = Values::ARRAY_NONE, string $recordingChannels = Values::NONE, string $recordingStatusCallback = Values::NONE, string $recordingStatusCallbackMethod = Values::NONE, string $sipAuthUsername = Values::NONE, string $sipAuthPassword = Values::NONE, string $region = Values::NONE, string $conferenceRecordingStatusCallback = Values::NONE, string $conferenceRecordingStatusCallbackMethod = Values::NONE, array $recordingStatusCallbackEvent = Values::ARRAY_NONE, array $conferenceRecordingStatusCallbackEvent = Values::ARRAY_NONE, bool $coaching = Values::NONE, string $callSidToCoach = Values::NONE, string $byoc = Values::NONE) {
         $this->options['statusCallback'] = $statusCallback;
         $this->options['statusCallbackMethod'] = $statusCallbackMethod;
         $this->options['statusCallbackEvent'] = $statusCallbackEvent;
@@ -280,396 +398,448 @@ class CreateParticipantOptions extends Options {
         $this->options['conferenceRecordingStatusCallbackMethod'] = $conferenceRecordingStatusCallbackMethod;
         $this->options['recordingStatusCallbackEvent'] = $recordingStatusCallbackEvent;
         $this->options['conferenceRecordingStatusCallbackEvent'] = $conferenceRecordingStatusCallbackEvent;
+        $this->options['coaching'] = $coaching;
+        $this->options['callSidToCoach'] = $callSidToCoach;
+        $this->options['byoc'] = $byoc;
     }
 
     /**
-     * The absolute URL where Twilio should send a webhook with conference event information that you request with the `StatusCallbackEvent` parameter.
-     * 
-     * @param string $statusCallback URL for conference event callback.
+     * The URL we should call using the `status_callback_method` to send status information to your application.
+     *
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
      * @return $this Fluent Builder
      */
-    public function setStatusCallback($statusCallback) {
+    public function setStatusCallback(string $statusCallback): self {
         $this->options['statusCallback'] = $statusCallback;
         return $this;
     }
 
     /**
-     * The method Twilio should use when requesting your `StatusCallback` URL. Options are `GET` and `POST`. Defaults to `POST`.
-     * 
-     * @param string $statusCallbackMethod Method Twilio should use to reach the
-     *                                     status callback URL.
+     * The HTTP method we should use to call `status_callback`. Can be: `GET` and `POST` and defaults to `POST`.
+     *
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     `status_callback`
      * @return $this Fluent Builder
      */
-    public function setStatusCallbackMethod($statusCallbackMethod) {
+    public function setStatusCallbackMethod(string $statusCallbackMethod): self {
         $this->options['statusCallbackMethod'] = $statusCallbackMethod;
         return $this;
     }
 
     /**
-     * Specifies which conference state changes should generate a webhook to the `StatusCallback` URL. Options are `initiated`, `ringing`, `answered`, and `completed`. To specify multiple values, separate each with a space. Defaults to `completed`.
-     * 
-     * @param string $statusCallbackEvent Set state change events that will trigger
-     *                                    a callback.
+     * The conference state changes that should generate a call to `status_callback`. Can be: `initiated`, `ringing`, `answered`, and `completed`. Separate multiple values with a space. The default value is `completed`.
+     *
+     * @param string[] $statusCallbackEvent Set state change events that will
+     *                                      trigger a callback
      * @return $this Fluent Builder
      */
-    public function setStatusCallbackEvent($statusCallbackEvent) {
+    public function setStatusCallbackEvent(array $statusCallbackEvent): self {
         $this->options['statusCallbackEvent'] = $statusCallbackEvent;
         return $this;
     }
 
     /**
-     * The number of seconds (integer) that Twilio should allow the phone to ring before assuming there is no answer. Defaults to 60 seconds. Minimum allowed timeout is `5`, max is `600`. Twilio always adds a 5-second timeout buffer to outgoing calls, so if you enter a timeout value of 10 seconds, you will see an actual timeout closer to 15 seconds.
-     * 
-     * @param integer $timeout Number of seconds Twilio will wait for an answer.
+     * The number of seconds that we should allow the phone to ring before assuming there is no answer. Can be an integer between `5` and `600`, inclusive. The default value is `60`. We always add a 5-second timeout buffer to outgoing calls, so  value of 10 would result in an actual timeout that was closer to 15 seconds.
+     *
+     * @param int $timeout he number of seconds that we should wait for an answer
      * @return $this Fluent Builder
      */
-    public function setTimeout($timeout) {
+    public function setTimeout(int $timeout): self {
         $this->options['timeout'] = $timeout;
         return $this;
     }
 
     /**
-     * Records the agent and their conferences, including downtime between conferences. Values may be `true` or `false`. Defaults to `false`.
-     * 
-     * @param boolean $record Record the agent and their conferences.
+     * Whether to record the participant and their conferences, including the time between conferences. Can be `true` or `false` and the default is `false`.
+     *
+     * @param bool $record Whether to record the participant and their conferences
      * @return $this Fluent Builder
      */
-    public function setRecord($record) {
+    public function setRecord(bool $record): self {
         $this->options['record'] = $record;
         return $this;
     }
 
     /**
-     * Specify whether the agent can speak in the conference. Values can be `true` or `false`. Defaults to `false`.
-     * 
-     * @param boolean $muted Mute the agent.
+     * Whether the agent is muted in the conference. Can be `true` or `false` and the default is `false`.
+     *
+     * @param bool $muted Whether to mute the agent
      * @return $this Fluent Builder
      */
-    public function setMuted($muted) {
+    public function setMuted(bool $muted): self {
         $this->options['muted'] = $muted;
         return $this;
     }
 
     /**
-     * Play a notification beep to the conference when this participant joins. Options are `true`, `false`, `onEnter`, or `onExit`. Defaults to `true`.
-     * 
-     * @param string $beep Play a beep when the participant joins the conference.
+     * Whether to play a notification beep to the conference when the participant joins. Can be: `true`, `false`, `onEnter`, or `onExit`. The default value is `true`.
+     *
+     * @param string $beep Whether to play a notification beep to the conference
+     *                     when the participant joins
      * @return $this Fluent Builder
      */
-    public function setBeep($beep) {
+    public function setBeep(string $beep): self {
         $this->options['beep'] = $beep;
         return $this;
     }
 
     /**
-     * If the conference has not already begun, `true` will start the conference when this participant joins. Specifying `false` will mute the participant and play background music until the conference begins. Defaults to `true`.
-     * 
-     * @param boolean $startConferenceOnEnter Begin the conference when the
-     *                                        participant joins.
+     * Whether to start the conference when the participant joins, if it has not already started. Can be: `true` or `false` and the default is `true`. If `false` and the conference has not started, the participant is muted and hears background music until another participant starts the conference.
+     *
+     * @param bool $startConferenceOnEnter Whether the conference starts when the
+     *                                     participant joins the conference
      * @return $this Fluent Builder
      */
-    public function setStartConferenceOnEnter($startConferenceOnEnter) {
+    public function setStartConferenceOnEnter(bool $startConferenceOnEnter): self {
         $this->options['startConferenceOnEnter'] = $startConferenceOnEnter;
         return $this;
     }
 
     /**
-     * If `true`, will end the conference when this participant leaves. Defaults to `false`.
-     * 
-     * @param boolean $endConferenceOnExit End the conference when the participant
-     *                                     leaves.
+     * Whether to end the conference when the participant leaves. Can be: `true` or `false` and defaults to `false`.
+     *
+     * @param bool $endConferenceOnExit Whether to end the conference when the
+     *                                  participant leaves
      * @return $this Fluent Builder
      */
-    public function setEndConferenceOnExit($endConferenceOnExit) {
+    public function setEndConferenceOnExit(bool $endConferenceOnExit): self {
         $this->options['endConferenceOnExit'] = $endConferenceOnExit;
         return $this;
     }
 
     /**
-     * Specify an absolute URL that hosts music to play before the  conference starts. Defualts to Twilio's standard [hold music](https://www.twilio.com/labs/twimlets/holdmusic).
-     * 
+     * The URL we should call using the `wait_method` for the music to play while participants are waiting for the conference to start. The default value is the URL of our standard hold music. [Learn more about hold music](https://www.twilio.com/labs/twimlets/holdmusic).
+     *
      * @param string $waitUrl URL that hosts pre-conference hold music
      * @return $this Fluent Builder
      */
-    public function setWaitUrl($waitUrl) {
+    public function setWaitUrl(string $waitUrl): self {
         $this->options['waitUrl'] = $waitUrl;
         return $this;
     }
 
     /**
-     * Specify which method, `GET` or `POST`, Twilio should use to request the `WaitUrl` for this conference. Be sure to use `GET` if you are directly requesting static audio files so that Twilio properly caches the files. Defaults to `POST`.
-     * 
-     * @param string $waitMethod The method Twilio should use to request `WaitUrl`.
+     * The HTTP method we should use to call `wait_url`. Can be `GET` or `POST` and the default is `POST`. When using a static audio file, this should be `GET` so that we can cache the file.
+     *
+     * @param string $waitMethod The HTTP method we should use to call `wait_url`
      * @return $this Fluent Builder
      */
-    public function setWaitMethod($waitMethod) {
+    public function setWaitMethod(string $waitMethod): self {
         $this->options['waitMethod'] = $waitMethod;
         return $this;
     }
 
     /**
-     * Allow an agent to hear the state of the outbound call, including ringing or disconnect messages. Can be `true` or `false`. Defaults to `true`.
-     * 
-     * @param boolean $earlyMedia Agents can hear the state of the outbound call.
+     * Whether to allow an agent to hear the state of the outbound call, including ringing or disconnect messages. Can be: `true` or `false` and defaults to `true`.
+     *
+     * @param bool $earlyMedia Whether agents can hear the state of the outbound
+     *                         call
      * @return $this Fluent Builder
      */
-    public function setEarlyMedia($earlyMedia) {
+    public function setEarlyMedia(bool $earlyMedia): self {
         $this->options['earlyMedia'] = $earlyMedia;
         return $this;
     }
 
     /**
-     * The maximum number of participants within this agent conference. Values can be positive integers from `2`-`10`. Defaults to `10`.
-     * 
-     * @param integer $maxParticipants Maximum number of agent conference
-     *                                 participants.
+     * The maximum number of participants in the conference. Can be a positive integer from `2` to `250`. The default value is `250`.
+     *
+     * @param int $maxParticipants The maximum number of agent conference
+     *                             participants
      * @return $this Fluent Builder
      */
-    public function setMaxParticipants($maxParticipants) {
+    public function setMaxParticipants(int $maxParticipants): self {
         $this->options['maxParticipants'] = $maxParticipants;
         return $this;
     }
 
     /**
-     * Records the conference that this participant is joining. Options are `true`, `false`, `record-from-start`, and `do-not-record`. Deafults to `false`
-     * 
-     * @param string $conferenceRecord Record the conference.
+     * Whether to record the conference the participant is joining. Can be: `true`, `false`, `record-from-start`, and `do-not-record`. The default value is `false`.
+     *
+     * @param string $conferenceRecord Whether to record the conference the
+     *                                 participant is joining
      * @return $this Fluent Builder
      */
-    public function setConferenceRecord($conferenceRecord) {
+    public function setConferenceRecord(string $conferenceRecord): self {
         $this->options['conferenceRecord'] = $conferenceRecord;
         return $this;
     }
 
     /**
-     * Specify whether to trim leading and trailing silence from your recorded conference audio files. Options are `trim-silence` and `do-not-trim`. Defaults to `trim-silence`
-     * 
-     * @param string $conferenceTrim Trim silence from audio files.
+     * Whether to trim leading and trailing silence from your recorded conference audio files. Can be: `trim-silence` or `do-not-trim` and defaults to `trim-silence`.
+     *
+     * @param string $conferenceTrim Whether to trim leading and trailing silence
+     *                               from your recorded conference audio files
      * @return $this Fluent Builder
      */
-    public function setConferenceTrim($conferenceTrim) {
+    public function setConferenceTrim(string $conferenceTrim): self {
         $this->options['conferenceTrim'] = $conferenceTrim;
         return $this;
     }
 
     /**
-     * The absolute URL Twilio should request with conference events specified in `ConferenceStatusCallbackEvent`. This value is set by the first Participant to join the conference, and subsequent callback URLs will be ignored.
-     * 
-     * @param string $conferenceStatusCallback Callback URL for conference events.
+     * The URL we should call using the `conference_status_callback_method` when the conference events in `conference_status_callback_event` occur. Only the value set by the first participant to join the conference is used. Subsequent `conference_status_callback` values are ignored.
+     *
+     * @param string $conferenceStatusCallback The callback URL for conference
+     *                                         events
      * @return $this Fluent Builder
      */
-    public function setConferenceStatusCallback($conferenceStatusCallback) {
+    public function setConferenceStatusCallback(string $conferenceStatusCallback): self {
         $this->options['conferenceStatusCallback'] = $conferenceStatusCallback;
         return $this;
     }
 
     /**
-     * The HTTP method Twilio should use when requesting the `ConferenceStatusCallback` URL. Either `GET` or `POST`. Defaults to `POST`.
-     * 
+     * The HTTP method we should use to call `conference_status_callback`. Can be: `GET` or `POST` and defaults to `POST`.
+     *
      * @param string $conferenceStatusCallbackMethod HTTP method for requesting
-     *                                               `ConferenceStatusCallback` URL.
+     *                                               `conference_status_callback`
+     *                                               URL
      * @return $this Fluent Builder
      */
-    public function setConferenceStatusCallbackMethod($conferenceStatusCallbackMethod) {
+    public function setConferenceStatusCallbackMethod(string $conferenceStatusCallbackMethod): self {
         $this->options['conferenceStatusCallbackMethod'] = $conferenceStatusCallbackMethod;
         return $this;
     }
 
     /**
-     * Specifies which conference state changes should generate a webhook to the URL specified in the `ConferenceStatusCallback` attribute. Available values are `start`, `end`, `join`, `leave`, `mute`, `hold`, and `speaker`. To specify multiple values, separate them with a space. Defaults to `start` and `end`.
-     * 
-     * @param string $conferenceStatusCallbackEvent Set which conference state
-     *                                              changes should webhook to the
-     *                                              `ConferenceStatusCallback`
+     * The conference state changes that should generate a call to `conference_status_callback`. Can be: `start`, `end`, `join`, `leave`, `mute`, `hold`, and `speaker`. Separate multiple values with a space. Defaults to `start end`.
+     *
+     * @param string[] $conferenceStatusCallbackEvent The conference state changes
+     *                                                that should generate a call
+     *                                                to
+     *                                                `conference_status_callback`
      * @return $this Fluent Builder
      */
-    public function setConferenceStatusCallbackEvent($conferenceStatusCallbackEvent) {
+    public function setConferenceStatusCallbackEvent(array $conferenceStatusCallbackEvent): self {
         $this->options['conferenceStatusCallbackEvent'] = $conferenceStatusCallbackEvent;
         return $this;
     }
 
     /**
-     * Set the recording channels for the final agent/conference recording. Either `mono` or `dual`. Defaults to `mono`.
-     * 
-     * @param string $recordingChannels Specify `mono` or `dual` recording channels.
+     * The recording channels for the final recording. Can be: `mono` or `dual` and the default is `mono`.
+     *
+     * @param string $recordingChannels Specify `mono` or `dual` recording channels
      * @return $this Fluent Builder
      */
-    public function setRecordingChannels($recordingChannels) {
+    public function setRecordingChannels(string $recordingChannels): self {
         $this->options['recordingChannels'] = $recordingChannels;
         return $this;
     }
 
     /**
-     * Specifies the `absolute URL` that Twilio should request when the recording is available if the agent and conference are recorded.
-     * 
-     * @param string $recordingStatusCallback The absolute URL for Twilio's webhook
-     *                                        with recording status information.
+     * The URL that we should call using the `recording_status_callback_method` when the recording status changes.
+     *
+     * @param string $recordingStatusCallback The URL that we should call using the
+     *                                        `recording_status_callback_method`
+     *                                        when the recording status changes
      * @return $this Fluent Builder
      */
-    public function setRecordingStatusCallback($recordingStatusCallback) {
+    public function setRecordingStatusCallback(string $recordingStatusCallback): self {
         $this->options['recordingStatusCallback'] = $recordingStatusCallback;
         return $this;
     }
 
     /**
-     * The HTTP method Twilio should use when requesting the `RecordingStatusCallback`. `GET` or `POST`. Defaults to `POST`.
-     * 
-     * @param string $recordingStatusCallbackMethod HTTP method for
-     *                                              `RecordingStatusCallback`
+     * The HTTP method we should use when we call `recording_status_callback`. Can be: `GET` or `POST` and defaults to `POST`.
+     *
+     * @param string $recordingStatusCallbackMethod The HTTP method we should use
+     *                                              when we call
+     *                                              `recording_status_callback`
      * @return $this Fluent Builder
      */
-    public function setRecordingStatusCallbackMethod($recordingStatusCallbackMethod) {
+    public function setRecordingStatusCallbackMethod(string $recordingStatusCallbackMethod): self {
         $this->options['recordingStatusCallbackMethod'] = $recordingStatusCallbackMethod;
         return $this;
     }
 
     /**
-     * SIP username used for authenticating.
-     * 
-     * @param string $sipAuthUsername SIP username used for authenticating.
+     * The SIP username used for authentication.
+     *
+     * @param string $sipAuthUsername The SIP username used for authentication
      * @return $this Fluent Builder
      */
-    public function setSipAuthUsername($sipAuthUsername) {
+    public function setSipAuthUsername(string $sipAuthUsername): self {
         $this->options['sipAuthUsername'] = $sipAuthUsername;
         return $this;
     }
 
     /**
-     * SIP password for authentication.
-     * 
-     * @param string $sipAuthPassword SIP password for authentication.
+     * The SIP password for authentication.
+     *
+     * @param string $sipAuthPassword The SIP password for authentication
      * @return $this Fluent Builder
      */
-    public function setSipAuthPassword($sipAuthPassword) {
+    public function setSipAuthPassword(string $sipAuthPassword): self {
         $this->options['sipAuthPassword'] = $sipAuthPassword;
         return $this;
     }
 
     /**
-     * Specifies the [region](https://support.twilio.com/hc/en-us/articles/223132167-How-global-low-latency-routing-and-region-selection-work-for-conferences-and-Client-calls) where Twilio should mix the recorded audio. Options are `us1`, `ie1`, `de1`, `sg1`, `br1`, `au1`, `jp1`.
-     * 
-     * @param string $region The region where Twilio should mix the conference
-     *                       audio.
+     * The [region](https://support.twilio.com/hc/en-us/articles/223132167-How-global-low-latency-routing-and-region-selection-work-for-conferences-and-Client-calls) where we should mix the recorded audio. Can be:`us1`, `ie1`, `de1`, `sg1`, `br1`, `au1`, or `jp1`.
+     *
+     * @param string $region The region where we should mix the conference audio
      * @return $this Fluent Builder
      */
-    public function setRegion($region) {
+    public function setRegion(string $region): self {
         $this->options['region'] = $region;
         return $this;
     }
 
     /**
-     * The `absolute URL` Twilio should request when the conference recording is available.
-     * 
-     * @param string $conferenceRecordingStatusCallback Conference recording
-     *                                                  callback URL.
+     * The URL we should call using the `conference_recording_status_callback_method` when the conference recording is available.
+     *
+     * @param string $conferenceRecordingStatusCallback The URL we should call
+     *                                                  using the
+     *                                                  `conference_recording_status_callback_method` when the conference recording is available
      * @return $this Fluent Builder
      */
-    public function setConferenceRecordingStatusCallback($conferenceRecordingStatusCallback) {
+    public function setConferenceRecordingStatusCallback(string $conferenceRecordingStatusCallback): self {
         $this->options['conferenceRecordingStatusCallback'] = $conferenceRecordingStatusCallback;
         return $this;
     }
 
     /**
-     * The HTTP method Twilio should use when requesting your recording status callback URL, either `GET` or `POST`. Defaults to `POST`.
-     * 
-     * @param string $conferenceRecordingStatusCallbackMethod Method Twilio should
-     *                                                        use to request the
-     *                                                        `ConferenceRecordingStatusCallback` URL.
+     * The HTTP method we should use to call `conference_recording_status_callback`. Can be: `GET` or `POST` and defaults to `POST`.
+     *
+     * @param string $conferenceRecordingStatusCallbackMethod The HTTP method we
+     *                                                        should use to call
+     *                                                        `conference_recording_status_callback`
      * @return $this Fluent Builder
      */
-    public function setConferenceRecordingStatusCallbackMethod($conferenceRecordingStatusCallbackMethod) {
+    public function setConferenceRecordingStatusCallbackMethod(string $conferenceRecordingStatusCallbackMethod): self {
         $this->options['conferenceRecordingStatusCallbackMethod'] = $conferenceRecordingStatusCallbackMethod;
         return $this;
     }
 
     /**
-     * Specifies which recording state changes should generate a webhook to the URL specified in the `RecordingStatusCallback` attribute. Available values are `in-progress`, `completed`, `failed`. To specify multiple values, separate them with a space. Defaults to `in-progress`, `completed`, `failed`.
-     * 
-     * @param string $recordingStatusCallbackEvent Set which recording state
-     *                                             changes should webhook to the
-     *                                             `RecordingStatusCallback`
+     * The recording state changes that should generate a call to `recording_status_callback`. Can be: `in-progress`, `completed`, and `failed`. Separate multiple values with a space. The default value is `in-progress completed failed`.
+     *
+     * @param string[] $recordingStatusCallbackEvent The recording state changes
+     *                                               that should generate a call to
+     *                                               `recording_status_callback`
      * @return $this Fluent Builder
      */
-    public function setRecordingStatusCallbackEvent($recordingStatusCallbackEvent) {
+    public function setRecordingStatusCallbackEvent(array $recordingStatusCallbackEvent): self {
         $this->options['recordingStatusCallbackEvent'] = $recordingStatusCallbackEvent;
         return $this;
     }
 
     /**
-     * Specifies which conference recording state changes should generate a webhook to the URL specified in the `ConferenceRecordingStatusCallback` attribute. Available values are `in-progress`, `completed`, `failed`. To specify multiple values, separate them with a space. Defaults to `in-progress`, `completed`, `failed`.
-     * 
-     * @param string $conferenceRecordingStatusCallbackEvent Set which conference
-     *                                                       recording state
-     *                                                       changes should webhook
-     *                                                       to the
-     *                                                       `ConferenceRecordingStatusCallback`
+     * The conference recording state changes that generate a call to `conference_recording_status_callback`. Can be: `in-progress`, `completed`, and `failed`. Separate multiple values with a space. The default value is `in-progress completed failed`.
+     *
+     * @param string[] $conferenceRecordingStatusCallbackEvent The conference
+     *                                                         recording state
+     *                                                         changes that should
+     *                                                         generate a call to
+     *                                                         `conference_recording_status_callback`
      * @return $this Fluent Builder
      */
-    public function setConferenceRecordingStatusCallbackEvent($conferenceRecordingStatusCallbackEvent) {
+    public function setConferenceRecordingStatusCallbackEvent(array $conferenceRecordingStatusCallbackEvent): self {
         $this->options['conferenceRecordingStatusCallbackEvent'] = $conferenceRecordingStatusCallbackEvent;
+        return $this;
+    }
+
+    /**
+     * Whether the participant is coaching another call. Can be: `true` or `false`. If not present, defaults to `false` unless `call_sid_to_coach` is defined. If `true`, `call_sid_to_coach` must be defined.
+     *
+     * @param bool $coaching Indicates if the participant changed to coach
+     * @return $this Fluent Builder
+     */
+    public function setCoaching(bool $coaching): self {
+        $this->options['coaching'] = $coaching;
+        return $this;
+    }
+
+    /**
+     * The SID of the participant who is being `coached`. The participant being coached is the only participant who can hear the participant who is `coaching`.
+     *
+     * @param string $callSidToCoach The SID of the participant who is being
+     *                               `coached`
+     * @return $this Fluent Builder
+     */
+    public function setCallSidToCoach(string $callSidToCoach): self {
+        $this->options['callSidToCoach'] = $callSidToCoach;
+        return $this;
+    }
+
+    /**
+     * The SID of a BYOC (Bring Your Own Carrier) trunk to route this call with. Note that `byoc` is only meaningful when `to` is a phone number; it will otherwise be ignored. (Beta)
+     *
+     * @param string $byoc BYOC trunk SID (Beta)
+     * @return $this Fluent Builder
+     */
+    public function setByoc(string $byoc): self {
+        $this->options['byoc'] = $byoc;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Api.V2010.CreateParticipantOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Api.V2010.CreateParticipantOptions ' . $options . ']';
     }
 }
 
 class ReadParticipantOptions extends Options {
     /**
-     * @param boolean $muted Filter by muted participants
-     * @param boolean $hold Only show participants that are held or unheld.
+     * @param bool $muted Whether to return only participants that are muted
+     * @param bool $hold Whether to return only participants that are on hold
+     * @param bool $coaching Whether to return only participants who are coaching
+     *                       another call
      */
-    public function __construct($muted = Values::NONE, $hold = Values::NONE) {
+    public function __construct(bool $muted = Values::NONE, bool $hold = Values::NONE, bool $coaching = Values::NONE) {
         $this->options['muted'] = $muted;
         $this->options['hold'] = $hold;
+        $this->options['coaching'] = $coaching;
     }
 
     /**
-     * Only return participants that are muted or unmuted. Either `true` or `false`.
-     * 
-     * @param boolean $muted Filter by muted participants
+     * Whether to return only participants that are muted. Can be: `true` or `false`.
+     *
+     * @param bool $muted Whether to return only participants that are muted
      * @return $this Fluent Builder
      */
-    public function setMuted($muted) {
+    public function setMuted(bool $muted): self {
         $this->options['muted'] = $muted;
         return $this;
     }
 
     /**
-     * Only return participants that are on hold or not on hold. Either `true` or `false`.
-     * 
-     * @param boolean $hold Only show participants that are held or unheld.
+     * Whether to return only participants that are on hold. Can be: `true` or `false`.
+     *
+     * @param bool $hold Whether to return only participants that are on hold
      * @return $this Fluent Builder
      */
-    public function setHold($hold) {
+    public function setHold(bool $hold): self {
         $this->options['hold'] = $hold;
+        return $this;
+    }
+
+    /**
+     * Whether to return only participants who are coaching another call. Can be: `true` or `false`.
+     *
+     * @param bool $coaching Whether to return only participants who are coaching
+     *                       another call
+     * @return $this Fluent Builder
+     */
+    public function setCoaching(bool $coaching): self {
+        $this->options['coaching'] = $coaching;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Api.V2010.ReadParticipantOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Api.V2010.ReadParticipantOptions ' . $options . ']';
     }
 }

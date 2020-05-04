@@ -14,22 +14,21 @@ use Twilio\TwiML\TwiML;
 class Room extends TwiML {
     /**
      * Room constructor.
-     * 
+     *
      * @param string $name Room name
      * @param array $attributes Optional attributes
      */
-    public function __construct($name, $attributes = array()) {
+    public function __construct($name, $attributes = []) {
         parent::__construct('Room', $name, $attributes);
     }
 
     /**
-     * Add Participantidentity attribute.
-     * 
-     * @param string $participantidentity Participant identity when connecting to
+     * Add ParticipantIdentity attribute.
+     *
+     * @param string $participantIdentity Participant identity when connecting to
      *                                    the Room
-     * @return TwiML $this.
      */
-    public function setParticipantidentity($participantidentity) {
-        return $this->setAttribute('participantidentity', $participantidentity);
+    public function setParticipantIdentity($participantIdentity): self {
+        return $this->setAttribute('participantIdentity', $participantIdentity);
     }
 }

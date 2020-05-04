@@ -16,50 +16,49 @@ use Twilio\Values;
 use Twilio\Version;
 
 /**
- * @property string accountSid
- * @property \DateTime dateCreated
- * @property \DateTime dateUpdated
- * @property string friendlyName
- * @property string sid
+ * @property string $accountSid
+ * @property \DateTime $dateCreated
+ * @property \DateTime $dateUpdated
+ * @property string $friendlyName
+ * @property string $sid
  */
 class AuthCallsIpAccessControlListMappingInstance extends InstanceResource {
     /**
      * Initialize the AuthCallsIpAccessControlListMappingInstance
-     * 
-     * @param \Twilio\Version $version Version that contains the resource
+     *
+     * @param Version $version Version that contains the resource
      * @param mixed[] $payload The response payload
-     * @param string $accountSid The unique id of the account that sent the call
-     * @param string $domainSid A string that uniquely identifies the SIP Domain
-     * @param string $sid Fetch by unique IP Access Control List Sid
-     * @return \Twilio\Rest\Api\V2010\Account\Sip\Domain\AuthTypes\AuthTypeCalls\AuthCallsIpAccessControlListMappingInstance 
+     * @param string $accountSid The SID of the Account that created the resource
+     * @param string $domainSid The unique string that identifies the resource
+     * @param string $sid The unique string that identifies the resource
      */
-    public function __construct(Version $version, array $payload, $accountSid, $domainSid, $sid = null) {
+    public function __construct(Version $version, array $payload, string $accountSid, string $domainSid, string $sid = null) {
         parent::__construct($version);
 
         // Marshaled Properties
-        $this->properties = array(
+        $this->properties = [
             'accountSid' => Values::array_get($payload, 'account_sid'),
             'dateCreated' => Deserialize::dateTime(Values::array_get($payload, 'date_created')),
             'dateUpdated' => Deserialize::dateTime(Values::array_get($payload, 'date_updated')),
             'friendlyName' => Values::array_get($payload, 'friendly_name'),
             'sid' => Values::array_get($payload, 'sid'),
-        );
+        ];
 
-        $this->solution = array(
+        $this->solution = [
             'accountSid' => $accountSid,
             'domainSid' => $domainSid,
             'sid' => $sid ?: $this->properties['sid'],
-        );
+        ];
     }
 
     /**
      * Generate an instance context for the instance, the context is capable of
      * performing various actions.  All instance actions are proxied to the context
-     * 
-     * @return \Twilio\Rest\Api\V2010\Account\Sip\Domain\AuthTypes\AuthTypeCalls\AuthCallsIpAccessControlListMappingContext Context for this
-     *                                                                                                                      AuthCallsIpAccessControlListMappingInstance
+     *
+     * @return AuthCallsIpAccessControlListMappingContext Context for this
+     *                                                    AuthCallsIpAccessControlListMappingInstance
      */
-    protected function proxy() {
+    protected function proxy(): AuthCallsIpAccessControlListMappingContext {
         if (!$this->context) {
             $this->context = new AuthCallsIpAccessControlListMappingContext(
                 $this->version,
@@ -73,40 +72,40 @@ class AuthCallsIpAccessControlListMappingInstance extends InstanceResource {
     }
 
     /**
-     * Fetch a AuthCallsIpAccessControlListMappingInstance
-     * 
+     * Fetch the AuthCallsIpAccessControlListMappingInstance
+     *
      * @return AuthCallsIpAccessControlListMappingInstance Fetched
      *                                                     AuthCallsIpAccessControlListMappingInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
+    public function fetch(): AuthCallsIpAccessControlListMappingInstance {
         return $this->proxy()->fetch();
     }
 
     /**
-     * Deletes the AuthCallsIpAccessControlListMappingInstance
-     * 
-     * @return boolean True if delete succeeds, false otherwise
+     * Delete the AuthCallsIpAccessControlListMappingInstance
+     *
+     * @return bool True if delete succeeds, false otherwise
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function delete() {
+    public function delete(): bool {
         return $this->proxy()->delete();
     }
 
     /**
      * Magic getter to access properties
-     * 
+     *
      * @param string $name Property to access
      * @return mixed The requested property
      * @throws TwilioException For unknown properties
      */
-    public function __get($name) {
-        if (array_key_exists($name, $this->properties)) {
+    public function __get(string $name) {
+        if (\array_key_exists($name, $this->properties)) {
             return $this->properties[$name];
         }
 
-        if (property_exists($this, '_' . $name)) {
-            $method = 'get' . ucfirst($name);
+        if (\property_exists($this, '_' . $name)) {
+            $method = 'get' . \ucfirst($name);
             return $this->$method();
         }
 
@@ -115,14 +114,14 @@ class AuthCallsIpAccessControlListMappingInstance extends InstanceResource {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Api.V2010.AuthCallsIpAccessControlListMappingInstance ' . implode(' ', $context) . ']';
+        return '[Twilio.Api.V2010.AuthCallsIpAccessControlListMappingInstance ' . \implode(' ', $context) . ']';
     }
 }

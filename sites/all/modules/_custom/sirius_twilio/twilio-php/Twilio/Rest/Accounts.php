@@ -14,18 +14,16 @@ use Twilio\Exceptions\TwilioException;
 use Twilio\Rest\Accounts\V1;
 
 /**
- * @property \Twilio\Rest\Accounts\V1 v1
- * @property \Twilio\Rest\Accounts\V1\CredentialList credentials
+ * @property \Twilio\Rest\Accounts\V1 $v1
+ * @property \Twilio\Rest\Accounts\V1\CredentialList $credentials
  */
 class Accounts extends Domain {
-    protected $_v1 = null;
+    protected $_v1;
 
     /**
      * Construct the Accounts Domain
-     * 
-     * @param \Twilio\Rest\Client $client Twilio\Rest\Client to communicate with
-     *                                    Twilio
-     * @return \Twilio\Rest\Accounts Domain for Accounts
+     *
+     * @param Client $client Client to communicate with Twilio
      */
     public function __construct(Client $client) {
         parent::__construct($client);
@@ -34,9 +32,9 @@ class Accounts extends Domain {
     }
 
     /**
-     * @return \Twilio\Rest\Accounts\V1 Version v1 of accounts
+     * @return V1 Version v1 of accounts
      */
-    protected function getV1() {
+    protected function getV1(): V1 {
         if (!$this->_v1) {
             $this->_v1 = new V1($this);
         }
@@ -45,14 +43,14 @@ class Accounts extends Domain {
 
     /**
      * Magic getter to lazy load version
-     * 
+     *
      * @param string $name Version to return
      * @return \Twilio\Version The requested version
-     * @throws \Twilio\Exceptions\TwilioException For unknown versions
+     * @throws TwilioException For unknown versions
      */
-    public function __get($name) {
-        $method = 'get' . ucfirst($name);
-        if (method_exists($this, $method)) {
+    public function __get(string $name) {
+        $method = 'get' . \ucfirst($name);
+        if (\method_exists($this, $method)) {
             return $this->$method();
         }
 
@@ -61,34 +59,31 @@ class Accounts extends Domain {
 
     /**
      * Magic caller to get resource contexts
-     * 
+     *
      * @param string $name Resource to return
      * @param array $arguments Context parameters
      * @return \Twilio\InstanceContext The requested resource context
-     * @throws \Twilio\Exceptions\TwilioException For unknown resource
+     * @throws TwilioException For unknown resource
      */
-    public function __call($name, $arguments) {
-        $method = 'context' . ucfirst($name);
-        if (method_exists($this, $method)) {
-            return call_user_func_array(array($this, $method), $arguments);
+    public function __call(string $name, array $arguments) {
+        $method = 'context' . \ucfirst($name);
+        if (\method_exists($this, $method)) {
+            return \call_user_func_array([$this, $method], $arguments);
         }
 
         throw new TwilioException('Unknown context ' . $name);
     }
 
-    /**
-     * @return \Twilio\Rest\Accounts\V1\CredentialList 
-     */
-    protected function getCredentials() {
+    protected function getCredentials(): \Twilio\Rest\Accounts\V1\CredentialList {
         return $this->v1->credentials;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
+    public function __toString(): string {
         return '[Twilio.Accounts]';
     }
 }

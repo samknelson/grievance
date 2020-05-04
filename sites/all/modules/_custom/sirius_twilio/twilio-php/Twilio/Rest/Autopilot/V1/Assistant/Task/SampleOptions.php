@@ -17,186 +17,159 @@ use Twilio\Values;
  */
 abstract class SampleOptions {
     /**
-     * @param string $language An ISO language-country string that specifies the
-     *                         language used for this sample. For example: en-US.
+     * @param string $language The ISO language-country string that specifies the
+     *                         language used for the sample
      * @return ReadSampleOptions Options builder
      */
-    public static function read($language = Values::NONE) {
+    public static function read(string $language = Values::NONE): ReadSampleOptions {
         return new ReadSampleOptions($language);
     }
 
     /**
-     * @param string $sourceChannel The communication channel from which the sample
-     *                              was captured. It can be: voice, sms, chat,
-     *                              alexa, google-assistant, or slack. If not
-     *                              included the value will be null
+     * @param string $sourceChannel The communication channel from which the new
+     *                              sample was captured
      * @return CreateSampleOptions Options builder
      */
-    public static function create($sourceChannel = Values::NONE) {
+    public static function create(string $sourceChannel = Values::NONE): CreateSampleOptions {
         return new CreateSampleOptions($sourceChannel);
     }
 
     /**
-     * @param string $language An ISO language-country string that specifies the
-     *                         language used for this sample. For example: en-US.
-     * @param string $taggedText The text example of how end-users may express this
-     *                           task. The sample may contain Field tag blocks.
+     * @param string $language The ISO language-country string that specifies the
+     *                         language used for the sample
+     * @param string $taggedText The text example of how end users might express
+     *                           the task
      * @param string $sourceChannel The communication channel from which the sample
-     *                              was captured. It can be: voice, sms, chat,
-     *                              alexa, google-assistant, or slack. If not
-     *                              included the value will be null
+     *                              was captured
      * @return UpdateSampleOptions Options builder
      */
-    public static function update($language = Values::NONE, $taggedText = Values::NONE, $sourceChannel = Values::NONE) {
+    public static function update(string $language = Values::NONE, string $taggedText = Values::NONE, string $sourceChannel = Values::NONE): UpdateSampleOptions {
         return new UpdateSampleOptions($language, $taggedText, $sourceChannel);
     }
 }
 
 class ReadSampleOptions extends Options {
     /**
-     * @param string $language An ISO language-country string that specifies the
-     *                         language used for this sample. For example: en-US.
+     * @param string $language The ISO language-country string that specifies the
+     *                         language used for the sample
      */
-    public function __construct($language = Values::NONE) {
+    public function __construct(string $language = Values::NONE) {
         $this->options['language'] = $language;
     }
 
     /**
-     * An ISO language-country string that specifies the language used for this sample. For example: en-US.
-     * 
-     * @param string $language An ISO language-country string that specifies the
-     *                         language used for this sample. For example: en-US.
+     * The [ISO language-country](https://docs.oracle.com/cd/E13214_01/wli/docs92/xref/xqisocodes.html) string that specifies the language used for the sample. For example: `en-US`.
+     *
+     * @param string $language The ISO language-country string that specifies the
+     *                         language used for the sample
      * @return $this Fluent Builder
      */
-    public function setLanguage($language) {
+    public function setLanguage(string $language): self {
         $this->options['language'] = $language;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Autopilot.V1.ReadSampleOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Autopilot.V1.ReadSampleOptions ' . $options . ']';
     }
 }
 
 class CreateSampleOptions extends Options {
     /**
-     * @param string $sourceChannel The communication channel from which the sample
-     *                              was captured. It can be: voice, sms, chat,
-     *                              alexa, google-assistant, or slack. If not
-     *                              included the value will be null
+     * @param string $sourceChannel The communication channel from which the new
+     *                              sample was captured
      */
-    public function __construct($sourceChannel = Values::NONE) {
+    public function __construct(string $sourceChannel = Values::NONE) {
         $this->options['sourceChannel'] = $sourceChannel;
     }
 
     /**
-     * The communication channel from which the sample was captured. It can be: *voice*, *sms*, *chat*, *alexa*, *google-assistant*, or *slack*. If not included the value will be null
-     * 
-     * @param string $sourceChannel The communication channel from which the sample
-     *                              was captured. It can be: voice, sms, chat,
-     *                              alexa, google-assistant, or slack. If not
-     *                              included the value will be null
+     * The communication channel from which the new sample was captured. Can be: `voice`, `sms`, `chat`, `alexa`, `google-assistant`, `slack`, or null if not included.
+     *
+     * @param string $sourceChannel The communication channel from which the new
+     *                              sample was captured
      * @return $this Fluent Builder
      */
-    public function setSourceChannel($sourceChannel) {
+    public function setSourceChannel(string $sourceChannel): self {
         $this->options['sourceChannel'] = $sourceChannel;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Autopilot.V1.CreateSampleOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Autopilot.V1.CreateSampleOptions ' . $options . ']';
     }
 }
 
 class UpdateSampleOptions extends Options {
     /**
-     * @param string $language An ISO language-country string that specifies the
-     *                         language used for this sample. For example: en-US.
-     * @param string $taggedText The text example of how end-users may express this
-     *                           task. The sample may contain Field tag blocks.
+     * @param string $language The ISO language-country string that specifies the
+     *                         language used for the sample
+     * @param string $taggedText The text example of how end users might express
+     *                           the task
      * @param string $sourceChannel The communication channel from which the sample
-     *                              was captured. It can be: voice, sms, chat,
-     *                              alexa, google-assistant, or slack. If not
-     *                              included the value will be null
+     *                              was captured
      */
-    public function __construct($language = Values::NONE, $taggedText = Values::NONE, $sourceChannel = Values::NONE) {
+    public function __construct(string $language = Values::NONE, string $taggedText = Values::NONE, string $sourceChannel = Values::NONE) {
         $this->options['language'] = $language;
         $this->options['taggedText'] = $taggedText;
         $this->options['sourceChannel'] = $sourceChannel;
     }
 
     /**
-     * An ISO language-country string that specifies the language used for this sample. For example: en-US.
-     * 
-     * @param string $language An ISO language-country string that specifies the
-     *                         language used for this sample. For example: en-US.
+     * The [ISO language-country](https://docs.oracle.com/cd/E13214_01/wli/docs92/xref/xqisocodes.html) string that specifies the language used for the sample. For example: `en-US`.
+     *
+     * @param string $language The ISO language-country string that specifies the
+     *                         language used for the sample
      * @return $this Fluent Builder
      */
-    public function setLanguage($language) {
+    public function setLanguage(string $language): self {
         $this->options['language'] = $language;
         return $this;
     }
 
     /**
-     * The text example of how end-users may express this task. The sample may contain Field tag blocks.
-     * 
-     * @param string $taggedText The text example of how end-users may express this
-     *                           task. The sample may contain Field tag blocks.
+     * The text example of how end users might express the task. The sample can contain [Field tag blocks](https://www.twilio.com/docs/autopilot/api/task-sample#field-tagging).
+     *
+     * @param string $taggedText The text example of how end users might express
+     *                           the task
      * @return $this Fluent Builder
      */
-    public function setTaggedText($taggedText) {
+    public function setTaggedText(string $taggedText): self {
         $this->options['taggedText'] = $taggedText;
         return $this;
     }
 
     /**
-     * The communication channel from which the sample was captured. It can be: *voice*, *sms*, *chat*, *alexa*, *google-assistant*, or *slack*. If not included the value will be null
-     * 
+     * The communication channel from which the sample was captured. Can be: `voice`, `sms`, `chat`, `alexa`, `google-assistant`, `slack`, or null if not included.
+     *
      * @param string $sourceChannel The communication channel from which the sample
-     *                              was captured. It can be: voice, sms, chat,
-     *                              alexa, google-assistant, or slack. If not
-     *                              included the value will be null
+     *                              was captured
      * @return $this Fluent Builder
      */
-    public function setSourceChannel($sourceChannel) {
+    public function setSourceChannel(string $sourceChannel): self {
         $this->options['sourceChannel'] = $sourceChannel;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Autopilot.V1.UpdateSampleOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Autopilot.V1.UpdateSampleOptions ' . $options . ']';
     }
 }

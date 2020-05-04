@@ -11,6 +11,7 @@ namespace Twilio\Rest\Trunking\V1;
 
 use Twilio\Exceptions\TwilioException;
 use Twilio\InstanceContext;
+use Twilio\ListResource;
 use Twilio\Options;
 use Twilio\Rest\Trunking\V1\Trunk\CredentialListList;
 use Twilio\Rest\Trunking\V1\Trunk\IpAccessControlListList;
@@ -21,76 +22,69 @@ use Twilio\Values;
 use Twilio\Version;
 
 /**
- * @property \Twilio\Rest\Trunking\V1\Trunk\OriginationUrlList originationUrls
- * @property \Twilio\Rest\Trunking\V1\Trunk\CredentialListList credentialsLists
- * @property \Twilio\Rest\Trunking\V1\Trunk\IpAccessControlListList ipAccessControlLists
- * @property \Twilio\Rest\Trunking\V1\Trunk\PhoneNumberList phoneNumbers
+ * @property OriginationUrlList $originationUrls
+ * @property CredentialListList $credentialsLists
+ * @property IpAccessControlListList $ipAccessControlLists
+ * @property PhoneNumberList $phoneNumbers
  * @method \Twilio\Rest\Trunking\V1\Trunk\OriginationUrlContext originationUrls(string $sid)
  * @method \Twilio\Rest\Trunking\V1\Trunk\CredentialListContext credentialsLists(string $sid)
  * @method \Twilio\Rest\Trunking\V1\Trunk\IpAccessControlListContext ipAccessControlLists(string $sid)
  * @method \Twilio\Rest\Trunking\V1\Trunk\PhoneNumberContext phoneNumbers(string $sid)
  */
 class TrunkContext extends InstanceContext {
-    protected $_originationUrls = null;
-    protected $_credentialsLists = null;
-    protected $_ipAccessControlLists = null;
-    protected $_phoneNumbers = null;
+    protected $_originationUrls;
+    protected $_credentialsLists;
+    protected $_ipAccessControlLists;
+    protected $_phoneNumbers;
 
     /**
      * Initialize the TrunkContext
-     * 
-     * @param \Twilio\Version $version Version that contains the resource
-     * @param string $sid The sid
-     * @return \Twilio\Rest\Trunking\V1\TrunkContext 
+     *
+     * @param Version $version Version that contains the resource
+     * @param string $sid The unique string that identifies the resource
      */
     public function __construct(Version $version, $sid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('sid' => $sid, );
+        $this->solution = ['sid' => $sid, ];
 
-        $this->uri = '/Trunks/' . rawurlencode($sid) . '';
+        $this->uri = '/Trunks/' . \rawurlencode($sid) . '';
     }
 
     /**
-     * Fetch a TrunkInstance
-     * 
+     * Fetch the TrunkInstance
+     *
      * @return TrunkInstance Fetched TrunkInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
-        $params = Values::of(array());
-
-        $payload = $this->version->fetch(
-            'GET',
-            $this->uri,
-            $params
-        );
+    public function fetch(): TrunkInstance {
+        $payload = $this->version->fetch('GET', $this->uri);
 
         return new TrunkInstance($this->version, $payload, $this->solution['sid']);
     }
 
     /**
-     * Deletes the TrunkInstance
-     * 
-     * @return boolean True if delete succeeds, false otherwise
+     * Delete the TrunkInstance
+     *
+     * @return bool True if delete succeeds, false otherwise
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function delete() {
-        return $this->version->delete('delete', $this->uri);
+    public function delete(): bool {
+        return $this->version->delete('DELETE', $this->uri);
     }
 
     /**
      * Update the TrunkInstance
-     * 
+     *
      * @param array|Options $options Optional Arguments
      * @return TrunkInstance Updated TrunkInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function update($options = array()) {
+    public function update(array $options = []): TrunkInstance {
         $options = new Values($options);
 
-        $data = Values::of(array(
+        $data = Values::of([
             'FriendlyName' => $options['friendlyName'],
             'DomainName' => $options['domainName'],
             'DisasterRecoveryUrl' => $options['disasterRecoveryUrl'],
@@ -98,24 +92,17 @@ class TrunkContext extends InstanceContext {
             'Recording' => $options['recording'],
             'Secure' => Serialize::booleanToString($options['secure']),
             'CnamLookupEnabled' => Serialize::booleanToString($options['cnamLookupEnabled']),
-        ));
+        ]);
 
-        $payload = $this->version->update(
-            'POST',
-            $this->uri,
-            array(),
-            $data
-        );
+        $payload = $this->version->update('POST', $this->uri, [], $data);
 
         return new TrunkInstance($this->version, $payload, $this->solution['sid']);
     }
 
     /**
      * Access the originationUrls
-     * 
-     * @return \Twilio\Rest\Trunking\V1\Trunk\OriginationUrlList 
      */
-    protected function getOriginationUrls() {
+    protected function getOriginationUrls(): OriginationUrlList {
         if (!$this->_originationUrls) {
             $this->_originationUrls = new OriginationUrlList($this->version, $this->solution['sid']);
         }
@@ -125,10 +112,8 @@ class TrunkContext extends InstanceContext {
 
     /**
      * Access the credentialsLists
-     * 
-     * @return \Twilio\Rest\Trunking\V1\Trunk\CredentialListList 
      */
-    protected function getCredentialsLists() {
+    protected function getCredentialsLists(): CredentialListList {
         if (!$this->_credentialsLists) {
             $this->_credentialsLists = new CredentialListList($this->version, $this->solution['sid']);
         }
@@ -138,10 +123,8 @@ class TrunkContext extends InstanceContext {
 
     /**
      * Access the ipAccessControlLists
-     * 
-     * @return \Twilio\Rest\Trunking\V1\Trunk\IpAccessControlListList 
      */
-    protected function getIpAccessControlLists() {
+    protected function getIpAccessControlLists(): IpAccessControlListList {
         if (!$this->_ipAccessControlLists) {
             $this->_ipAccessControlLists = new IpAccessControlListList($this->version, $this->solution['sid']);
         }
@@ -151,10 +134,8 @@ class TrunkContext extends InstanceContext {
 
     /**
      * Access the phoneNumbers
-     * 
-     * @return \Twilio\Rest\Trunking\V1\Trunk\PhoneNumberList 
      */
-    protected function getPhoneNumbers() {
+    protected function getPhoneNumbers(): PhoneNumberList {
         if (!$this->_phoneNumbers) {
             $this->_phoneNumbers = new PhoneNumberList($this->version, $this->solution['sid']);
         }
@@ -164,14 +145,14 @@ class TrunkContext extends InstanceContext {
 
     /**
      * Magic getter to lazy load subresources
-     * 
+     *
      * @param string $name Subresource to return
-     * @return \Twilio\ListResource The requested subresource
-     * @throws \Twilio\Exceptions\TwilioException For unknown subresources
+     * @return ListResource The requested subresource
+     * @throws TwilioException For unknown subresources
      */
-    public function __get($name) {
-        if (property_exists($this, '_' . $name)) {
-            $method = 'get' . ucfirst($name);
+    public function __get(string $name): ListResource {
+        if (\property_exists($this, '_' . $name)) {
+            $method = 'get' . \ucfirst($name);
             return $this->$method();
         }
 
@@ -180,16 +161,16 @@ class TrunkContext extends InstanceContext {
 
     /**
      * Magic caller to get resource contexts
-     * 
+     *
      * @param string $name Resource to return
      * @param array $arguments Context parameters
-     * @return \Twilio\InstanceContext The requested resource context
-     * @throws \Twilio\Exceptions\TwilioException For unknown resource
+     * @return InstanceContext The requested resource context
+     * @throws TwilioException For unknown resource
      */
-    public function __call($name, $arguments) {
+    public function __call(string $name, array $arguments): InstanceContext {
         $property = $this->$name;
-        if (method_exists($property, 'getContext')) {
-            return call_user_func_array(array($property, 'getContext'), $arguments);
+        if (\method_exists($property, 'getContext')) {
+            return \call_user_func_array(array($property, 'getContext'), $arguments);
         }
 
         throw new TwilioException('Resource does not have a context');
@@ -197,14 +178,14 @@ class TrunkContext extends InstanceContext {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Trunking.V1.TrunkContext ' . implode(' ', $context) . ']';
+        return '[Twilio.Trunking.V1.TrunkContext ' . \implode(' ', $context) . ']';
     }
 }
