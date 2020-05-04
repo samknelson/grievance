@@ -43,7 +43,7 @@ function sirius_page_config() {
 	$links['dispatch']['links']['sirius/dispatch/config/vlri'] 	= array('title' => 'VLRI', 'description' => 'VLRI - Voluntary layoff with a request to convert to an involuntary configuration.');
 
 	$links['bulk'] = array('title' => 'Bulk Messenger');
-	$links['bulk']['links']['sirius/config/bulk'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
+	$links['bulk']['links']['sirius/bulk/config'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
 
 	$links['training'] = array('title' => 'Training Center');
 	$links['training']['links']['sirius/config/training'] 					= array('title' => 'Training Center Settings', 'description' => 'Settings for the training center (evaluations, etc.).');
