@@ -368,6 +368,8 @@ function sirius_event_phonebank_prep_survey(&$form, $defaults) {
 					$form[$key]['#title'] = '<strong>[' . t('Required') . ']</strong> ' . $form[$key]['#title'];
 					$form[$key]['#attributes']['class'][] = 'sirius_phonebank_field_required'; 
 				}
+			} else if ($type == 'fieldset') {
+				sirius_event_phonebank_prep_survey($form[$key], $defaults[$key]);
 			}
 		} else {
 			sirius_event_phonebank_prep_survey($form[$key], $defaults[$key]);
