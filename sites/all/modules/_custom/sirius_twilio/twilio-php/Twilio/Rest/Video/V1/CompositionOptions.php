@@ -17,50 +17,55 @@ use Twilio\Values;
  */
 abstract class CompositionOptions {
     /**
-     * @param string $status Only show Compositions with the given status.
-     * @param \DateTime $dateCreatedAfter Only show Compositions that started on or
-     *                                    after this ISO8601 date-time.
-     * @param \DateTime $dateCreatedBefore Only show Compositions that started
-     *                                     before this this ISO8601 date-time.
-     * @param string $roomSid Only show Compositions with the given Room SID.
+     * @param string $status Read only Composition resources with this status
+     * @param \DateTime $dateCreatedAfter Read only Composition resources created
+     *                                    on or after this [ISO
+     *                                    8601](https://en.wikipedia.org/wiki/ISO_8601) date-time with time zone
+     * @param \DateTime $dateCreatedBefore Read only Composition resources created
+     *                                     before this ISO 8601 date-time with time
+     *                                     zone
+     * @param string $roomSid Read only Composition resources with this Room SID
      * @return ReadCompositionOptions Options builder
      */
-    public static function read($status = Values::NONE, $dateCreatedAfter = Values::NONE, $dateCreatedBefore = Values::NONE, $roomSid = Values::NONE) {
+    public static function read(string $status = Values::NONE, \DateTime $dateCreatedAfter = Values::NONE, \DateTime $dateCreatedBefore = Values::NONE, string $roomSid = Values::NONE): ReadCompositionOptions {
         return new ReadCompositionOptions($status, $dateCreatedAfter, $dateCreatedBefore, $roomSid);
     }
 
     /**
-     * @param string $roomSid Twilio Room SID.
-     * @param array $videoLayout The JSON video layout description.
-     * @param string $audioSources A list of audio sources related to this
-     *                             Composition.
-     * @param string $audioSourcesExcluded A list of audio sources excluded related
-     *                                     to this Composition.
-     * @param string $resolution Pixel resolution of the composed video.
-     * @param string $format Container format of the Composition media file. Any of
-     *                       the following: `mp4`, `webm`.
-     * @param string $statusCallback A URL that Twilio sends asynchronous webhook
-     *                               requests to on every composition event.
-     * @param string $statusCallbackMethod HTTP method Twilio should use when
-     *                                     requesting the above URL.
-     * @param boolean $trim Boolean flag for clipping intervals that have no media.
+     * @param array $videoLayout An object that describes the video layout of the
+     *                           composition
+     * @param string[] $audioSources An array of track names from the same group
+     *                               room to merge
+     * @param string[] $audioSourcesExcluded An array of track names to exclude
+     * @param string $resolution A string that describes the columns (width) and
+     *                           rows (height) of the generated composed video in
+     *                           pixels
+     * @param string $format The container format of the composition's media files
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     status_callback
+     * @param bool $trim Whether to clip the intervals where there is no active
+     *                   media in the composition
      * @return CreateCompositionOptions Options builder
      */
-    public static function create($roomSid = Values::NONE, $videoLayout = Values::NONE, $audioSources = Values::NONE, $audioSourcesExcluded = Values::NONE, $resolution = Values::NONE, $format = Values::NONE, $statusCallback = Values::NONE, $statusCallbackMethod = Values::NONE, $trim = Values::NONE) {
-        return new CreateCompositionOptions($roomSid, $videoLayout, $audioSources, $audioSourcesExcluded, $resolution, $format, $statusCallback, $statusCallbackMethod, $trim);
+    public static function create(array $videoLayout = Values::ARRAY_NONE, array $audioSources = Values::ARRAY_NONE, array $audioSourcesExcluded = Values::ARRAY_NONE, string $resolution = Values::NONE, string $format = Values::NONE, string $statusCallback = Values::NONE, string $statusCallbackMethod = Values::NONE, bool $trim = Values::NONE): CreateCompositionOptions {
+        return new CreateCompositionOptions($videoLayout, $audioSources, $audioSourcesExcluded, $resolution, $format, $statusCallback, $statusCallbackMethod, $trim);
     }
 }
 
 class ReadCompositionOptions extends Options {
     /**
-     * @param string $status Only show Compositions with the given status.
-     * @param \DateTime $dateCreatedAfter Only show Compositions that started on or
-     *                                    after this ISO8601 date-time.
-     * @param \DateTime $dateCreatedBefore Only show Compositions that started
-     *                                     before this this ISO8601 date-time.
-     * @param string $roomSid Only show Compositions with the given Room SID.
+     * @param string $status Read only Composition resources with this status
+     * @param \DateTime $dateCreatedAfter Read only Composition resources created
+     *                                    on or after this [ISO
+     *                                    8601](https://en.wikipedia.org/wiki/ISO_8601) date-time with time zone
+     * @param \DateTime $dateCreatedBefore Read only Composition resources created
+     *                                     before this ISO 8601 date-time with time
+     *                                     zone
+     * @param string $roomSid Read only Composition resources with this Room SID
      */
-    public function __construct($status = Values::NONE, $dateCreatedAfter = Values::NONE, $dateCreatedBefore = Values::NONE, $roomSid = Values::NONE) {
+    public function __construct(string $status = Values::NONE, \DateTime $dateCreatedAfter = Values::NONE, \DateTime $dateCreatedBefore = Values::NONE, string $roomSid = Values::NONE) {
         $this->options['status'] = $status;
         $this->options['dateCreatedAfter'] = $dateCreatedAfter;
         $this->options['dateCreatedBefore'] = $dateCreatedBefore;
@@ -68,86 +73,83 @@ class ReadCompositionOptions extends Options {
     }
 
     /**
-     * Only show Compositions with the given status.
-     * 
-     * @param string $status Only show Compositions with the given status.
+     * Read only Composition resources with this status. Can be: `enqueued`, `processing`, `completed`, `deleted`, or `failed`.
+     *
+     * @param string $status Read only Composition resources with this status
      * @return $this Fluent Builder
      */
-    public function setStatus($status) {
+    public function setStatus(string $status): self {
         $this->options['status'] = $status;
         return $this;
     }
 
     /**
-     * Only show Compositions that started on or after this ISO8601 date-time, given as `YYYY-MM-DDThh:mm:ss-hh:mm`.
-     * 
-     * @param \DateTime $dateCreatedAfter Only show Compositions that started on or
-     *                                    after this ISO8601 date-time.
+     * Read only Composition resources created on or after this [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date-time with time zone.
+     *
+     * @param \DateTime $dateCreatedAfter Read only Composition resources created
+     *                                    on or after this [ISO
+     *                                    8601](https://en.wikipedia.org/wiki/ISO_8601) date-time with time zone
      * @return $this Fluent Builder
      */
-    public function setDateCreatedAfter($dateCreatedAfter) {
+    public function setDateCreatedAfter(\DateTime $dateCreatedAfter): self {
         $this->options['dateCreatedAfter'] = $dateCreatedAfter;
         return $this;
     }
 
     /**
-     * Only show Compositions that started before this this ISO8601 date-time, given as `YYYY-MM-DDThh:mm:ss-hh:mm`.
-     * 
-     * @param \DateTime $dateCreatedBefore Only show Compositions that started
-     *                                     before this this ISO8601 date-time.
+     * Read only Composition resources created before this ISO 8601 date-time with time zone.
+     *
+     * @param \DateTime $dateCreatedBefore Read only Composition resources created
+     *                                     before this ISO 8601 date-time with time
+     *                                     zone
      * @return $this Fluent Builder
      */
-    public function setDateCreatedBefore($dateCreatedBefore) {
+    public function setDateCreatedBefore(\DateTime $dateCreatedBefore): self {
         $this->options['dateCreatedBefore'] = $dateCreatedBefore;
         return $this;
     }
 
     /**
-     * Only show Compositions with the given Room SID.
-     * 
-     * @param string $roomSid Only show Compositions with the given Room SID.
+     * Read only Composition resources with this Room SID.
+     *
+     * @param string $roomSid Read only Composition resources with this Room SID
      * @return $this Fluent Builder
      */
-    public function setRoomSid($roomSid) {
+    public function setRoomSid(string $roomSid): self {
         $this->options['roomSid'] = $roomSid;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Video.V1.ReadCompositionOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Video.V1.ReadCompositionOptions ' . $options . ']';
     }
 }
 
 class CreateCompositionOptions extends Options {
     /**
-     * @param string $roomSid Twilio Room SID.
-     * @param array $videoLayout The JSON video layout description.
-     * @param string $audioSources A list of audio sources related to this
-     *                             Composition.
-     * @param string $audioSourcesExcluded A list of audio sources excluded related
-     *                                     to this Composition.
-     * @param string $resolution Pixel resolution of the composed video.
-     * @param string $format Container format of the Composition media file. Any of
-     *                       the following: `mp4`, `webm`.
-     * @param string $statusCallback A URL that Twilio sends asynchronous webhook
-     *                               requests to on every composition event.
-     * @param string $statusCallbackMethod HTTP method Twilio should use when
-     *                                     requesting the above URL.
-     * @param boolean $trim Boolean flag for clipping intervals that have no media.
+     * @param array $videoLayout An object that describes the video layout of the
+     *                           composition
+     * @param string[] $audioSources An array of track names from the same group
+     *                               room to merge
+     * @param string[] $audioSourcesExcluded An array of track names to exclude
+     * @param string $resolution A string that describes the columns (width) and
+     *                           rows (height) of the generated composed video in
+     *                           pixels
+     * @param string $format The container format of the composition's media files
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     status_callback
+     * @param bool $trim Whether to clip the intervals where there is no active
+     *                   media in the composition
      */
-    public function __construct($roomSid = Values::NONE, $videoLayout = Values::NONE, $audioSources = Values::NONE, $audioSourcesExcluded = Values::NONE, $resolution = Values::NONE, $format = Values::NONE, $statusCallback = Values::NONE, $statusCallbackMethod = Values::NONE, $trim = Values::NONE) {
-        $this->options['roomSid'] = $roomSid;
+    public function __construct(array $videoLayout = Values::ARRAY_NONE, array $audioSources = Values::ARRAY_NONE, array $audioSourcesExcluded = Values::ARRAY_NONE, string $resolution = Values::NONE, string $format = Values::NONE, string $statusCallback = Values::NONE, string $statusCallbackMethod = Values::NONE, bool $trim = Values::NONE) {
         $this->options['videoLayout'] = $videoLayout;
         $this->options['audioSources'] = $audioSources;
         $this->options['audioSourcesExcluded'] = $audioSourcesExcluded;
@@ -159,138 +161,121 @@ class CreateCompositionOptions extends Options {
     }
 
     /**
-     * Group Room SID owning the media tracks to be used as Composition sources.
-     * 
-     * @param string $roomSid Twilio Room SID.
+     * An object that describes the video layout of the composition in terms of regions. See [Specifying Video Layouts](https://www.twilio.com/docs/video/api/compositions-resource#specifying-video-layouts) for more info. Please, be aware that either video_layout or audio_sources have to be provided to get a valid creation request
+     *
+     * @param array $videoLayout An object that describes the video layout of the
+     *                           composition
      * @return $this Fluent Builder
      */
-    public function setRoomSid($roomSid) {
-        $this->options['roomSid'] = $roomSid;
-        return $this;
-    }
-
-    /**
-     * A JSON object defining the video layout of the Composition in terms of regions. See the section [Managing Video Layouts](#managing-video-layouts) below for further information.
-     * 
-     * @param array $videoLayout The JSON video layout description.
-     * @return $this Fluent Builder
-     */
-    public function setVideoLayout($videoLayout) {
+    public function setVideoLayout(array $videoLayout): self {
         $this->options['videoLayout'] = $videoLayout;
         return $this;
     }
 
     /**
-     * An array of audio sources to merge. All the specified sources must belong to the same Group Room. It can include: 
-    * Zero or more `RecordingTrackSid`
-    * Zero or more `MediaTrackSid`
-    * Zero or more `ParticipantSid`
-    * Zero or more Track names. These can be specified using wildcards (e.g. `student*`). The use of `[*]` has semantics "all if any" meaning zero or more (i.e. all) depending on whether the target room had audio tracks.
-     * 
-     * @param string $audioSources A list of audio sources related to this
-     *                             Composition.
+     * An array of track names from the same group room to merge into the new composition. Can include zero or more track names. The new composition includes all audio sources specified in `audio_sources` except for those specified in `audio_sources_excluded`. The track names in this parameter can include an asterisk as a wild card character, which will match zero or more characters in a track name. For example, `student*` includes `student` as well as `studentTeam`. Please, be aware that either video_layout or audio_sources have to be provided to get a valid creation request
+     *
+     * @param string[] $audioSources An array of track names from the same group
+     *                               room to merge
      * @return $this Fluent Builder
      */
-    public function setAudioSources($audioSources) {
+    public function setAudioSources(array $audioSources): self {
         $this->options['audioSources'] = $audioSources;
         return $this;
     }
 
     /**
-     * An array of audio sources to exclude from the Composition. Any new Composition shall include all audio sources specified in `AudioSources` except for the ones specified in `AudioSourcesExcluded`. This parameter may include: 
-    * Zero or more `RecordingTrackSid`
-    * Zero or more `MediaTrackSid`
-    * Zero or more `ParticipantSid`
-    * Zero or more Track names. These can be specified using wildcards (e.g. `student*`)
-     * 
-     * @param string $audioSourcesExcluded A list of audio sources excluded related
-     *                                     to this Composition.
+     * An array of track names to exclude. The new composition includes all audio sources specified in `audio_sources` except for those specified in `audio_sources_excluded`. The track names in this parameter can include an asterisk as a wild card character, which will match zero or more characters in a track name. For example, `student*` excludes `student` as well as `studentTeam`. This parameter can also be empty.
+     *
+     * @param string[] $audioSourcesExcluded An array of track names to exclude
      * @return $this Fluent Builder
      */
-    public function setAudioSourcesExcluded($audioSourcesExcluded) {
+    public function setAudioSourcesExcluded(array $audioSourcesExcluded): self {
         $this->options['audioSourcesExcluded'] = $audioSourcesExcluded;
         return $this;
     }
 
     /**
-     * A string representing the numbers of pixels for rows (width) and columns (height) of the generated composed video. This string must have the format `{width}x{height}`. This parameter must comply with the following constraints: 
-    * `width >= 16 && width <= 1280`
-    * `height >= 16 && height <= 1280`
-    * `width * height <= 921,600`
-    Typical values are: 
+     * A string that describes the columns (width) and rows (height) of the generated composed video in pixels. Defaults to `640x480`.
+    The string's format is `{width}x{height}` where:
+
+    * 16 <= `{width}` <= 1280
+    * 16 <= `{height}` <= 1280
+    * `{width}` * `{height}` <= 921,600
+
+    Typical values are:
+
     * HD = `1280x720`
     * PAL = `1024x576`
     * VGA = `640x480`
     * CIF = `320x240`
-    Note that the `Resolution` implicitly imposes an aspect ratio to the resulting composition. When the original video tracks get constrained by this aspect ratio they are scaled-down to fit. You can find detailed information in the [Managing Video Layouts](#managing-video-layouts) section. Defaults to `640x480`.
-     * 
-     * @param string $resolution Pixel resolution of the composed video.
+
+    Note that the `resolution` imposes an aspect ratio to the resulting composition. When the original video tracks are constrained by the aspect ratio, they are scaled to fit. See [Specifying Video Layouts](https://www.twilio.com/docs/video/api/compositions-resource#specifying-video-layouts) for more info.
+     *
+     * @param string $resolution A string that describes the columns (width) and
+     *                           rows (height) of the generated composed video in
+     *                           pixels
      * @return $this Fluent Builder
      */
-    public function setResolution($resolution) {
+    public function setResolution(string $resolution): self {
         $this->options['resolution'] = $resolution;
         return $this;
     }
 
     /**
-     * Container format of the Composition media file. Can be any of the following: `mp4`, `webm`. The use of `mp4` or `webm` makes mandatory the specification of `AudioSources` and/or one `VideoLayout` element containing a valid `video_sources` list, otherwise an error is fired. Defaults to `webm`.
-     * 
-     * @param string $format Container format of the Composition media file. Any of
-     *                       the following: `mp4`, `webm`.
+     * The container format of the composition's media files. Can be: `mp4` or `webm` and the default is `webm`. If you specify `mp4` or `webm`, you must also specify one or more `audio_sources` and/or a `video_layout` element that contains a valid `video_sources` list, otherwise an error occurs.
+     *
+     * @param string $format The container format of the composition's media files
      * @return $this Fluent Builder
      */
-    public function setFormat($format) {
+    public function setFormat(string $format): self {
         $this->options['format'] = $format;
         return $this;
     }
 
     /**
-     * A URL that Twilio sends asynchronous webhook requests to on every composition event. If not provided, status callback events will not be dispatched.
-     * 
-     * @param string $statusCallback A URL that Twilio sends asynchronous webhook
-     *                               requests to on every composition event.
+     * The URL we should call using the `status_callback_method` to send status information to your application on every composition event. If not provided, status callback events will not be dispatched.
+     *
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
      * @return $this Fluent Builder
      */
-    public function setStatusCallback($statusCallback) {
+    public function setStatusCallback(string $statusCallback): self {
         $this->options['statusCallback'] = $statusCallback;
         return $this;
     }
 
     /**
-     * HTTP method Twilio should use when requesting the above URL. Defaults to `POST`.
-     * 
-     * @param string $statusCallbackMethod HTTP method Twilio should use when
-     *                                     requesting the above URL.
+     * The HTTP method we should use to call `status_callback`. Can be: `POST` or `GET` and the default is `POST`.
+     *
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     status_callback
      * @return $this Fluent Builder
      */
-    public function setStatusCallbackMethod($statusCallbackMethod) {
+    public function setStatusCallbackMethod(string $statusCallbackMethod): self {
         $this->options['statusCallbackMethod'] = $statusCallbackMethod;
         return $this;
     }
 
     /**
-     * When activated, clips all the Composition intervals where there is no active media. This results in shorter compositions in cases when the Room was created but no Participant joined for some time, or if all the Participants left the room and joined at a later stage, as those gaps will be removed. You can find further information in the [Managing Video Layouts](#managing-video-layouts) section. Defaults to `true`.
-     * 
-     * @param boolean $trim Boolean flag for clipping intervals that have no media.
+     * Whether to clip the intervals where there is no active media in the composition. The default is `true`. Compositions with `trim` enabled are shorter when the Room is created and no Participant joins for a while as well as if all the Participants leave the room and join later, because those gaps will be removed. See [Specifying Video Layouts](https://www.twilio.com/docs/video/api/compositions-resource#specifying-video-layouts) for more info.
+     *
+     * @param bool $trim Whether to clip the intervals where there is no active
+     *                   media in the composition
      * @return $this Fluent Builder
      */
-    public function setTrim($trim) {
+    public function setTrim(bool $trim): self {
         $this->options['trim'] = $trim;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Video.V1.CreateCompositionOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Video.V1.CreateCompositionOptions ' . $options . ']';
     }
 }

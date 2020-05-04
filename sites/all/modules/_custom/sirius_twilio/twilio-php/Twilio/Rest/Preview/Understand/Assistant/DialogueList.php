@@ -18,34 +18,32 @@ use Twilio\Version;
 class DialogueList extends ListResource {
     /**
      * Construct the DialogueList
-     * 
+     *
      * @param Version $version Version that contains the resource
      * @param string $assistantSid The unique ID of the parent Assistant.
-     * @return \Twilio\Rest\Preview\Understand\Assistant\DialogueList 
      */
-    public function __construct(Version $version, $assistantSid) {
+    public function __construct(Version $version, string $assistantSid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('assistantSid' => $assistantSid, );
+        $this->solution = ['assistantSid' => $assistantSid, ];
     }
 
     /**
      * Constructs a DialogueContext
-     * 
+     *
      * @param string $sid The sid
-     * @return \Twilio\Rest\Preview\Understand\Assistant\DialogueContext 
      */
-    public function getContext($sid) {
+    public function getContext(string $sid): DialogueContext {
         return new DialogueContext($this->version, $this->solution['assistantSid'], $sid);
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
+    public function __toString(): string {
         return '[Twilio.Preview.Understand.DialogueList]';
     }
 }

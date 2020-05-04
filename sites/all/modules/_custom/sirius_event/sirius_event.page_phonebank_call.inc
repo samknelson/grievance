@@ -9,7 +9,7 @@ function sirius_node_tab_event_phonebank_call_access($event_node) {
 	if (!$participant_nid) { return FALSE; }
 	$participant_node = node_load($participant_nid);
 	$type_json = sirius_event_type_json($event_node);
-	$json = sirius_jsonfield_util_node_json_get($event_node);
+	$event_json = sirius_jsonfield_util_node_json_get($event_node);
 
 	$prole_tid = $participant_node->field_sirius_event_prole['und'][0]['tid'];
 	$caller_prole_tids = array_values($type_json['phonebank']['caller_prole_tids']);
@@ -20,10 +20,10 @@ function sirius_node_tab_event_phonebank_call_access($event_node) {
 
 function sirius_node_tab_event_phonebank_call($event_node) {
 	$active = sirius_phonebank_active($event_node);
-	$json = sirius_jsonfield_util_node_json_get($event_node);
+	$event_json = sirius_jsonfield_util_node_json_get($event_node);
 	$type_json = sirius_event_type_json($event_node);
 	$prole_tid = $type_json['phonebank']['prole_tid'];
-	$pstatus_tid = $json['phonebank']['pstatus_tid'];
+	$pstatus_tid = $event_json['phonebank']['pstatus_tid'];
 	if (!$prole_tid || !$pstatus_tid) {
 		return 'Please go to the settings page and select the role and status to call.';
 	}
@@ -54,9 +54,7 @@ function sirius_node_tab_event_phonebank_call($event_node) {
 		  }
 		}
 
-
-		$json = sirius_jsonfield_util_node_json_get($event_node);
-		$html .= $json['phonebank']['caller_intro'];
+		$html .= $event_json['phonebank']['caller_intro'];
 		$html .= '<br />';
 		$html .= sirius_fakerender_field('Current Time:', date('l, F d Y - g:ia'));
 		$html .= '<br />';
@@ -87,10 +85,10 @@ function sirius_node_tab_event_phonebank_call($event_node) {
 
 function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_nid, $phone, $mode) {
 	$event_node = node_load($event_nid);
-	$json = sirius_jsonfield_util_node_json_get($event_node);
+	$event_json = sirius_jsonfield_util_node_json_get($event_node);
 	$type_json = sirius_event_type_json($event_node);
 	$prole_tid = $type_json['phonebank']['prole_tid'];
-	$pstatus_tid = $json['phonebank']['pstatus_tid'];
+	$pstatus_tid = $event_json['phonebank']['pstatus_tid'];
 	$participant_nodes = sirius_event_phonebank_participants_by_phone($event_node, $prole_tid, $phone);
 
 	//drupal_add_js(drupal_get_path('module', 'sirius_event') . '/js/sirius_event.phonebank.js', 'file');
@@ -159,6 +157,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$browserphone_params['default_phone'] = $phone;
 	$browserphone_params['callerid_nids'] = sirius_fieldvals($survey_node, 'field_sirius_callerids', 'target_id');
 	$browserphone_params['omg_nid'] = $survey_node->nid;
+	if ($event_json['phonebank']['conference'] == 'Yes') { $browserphone_params['conference_number'] = $event_json['phonebank']['conference_number']; }
 	$form['phone_interface_html'] = array('#markup' => sirius_twilio_browserphone_render($browserphone_params));
 
 	$participant_options = array();

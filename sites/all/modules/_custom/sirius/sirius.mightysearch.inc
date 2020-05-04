@@ -67,6 +67,11 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 	  	$paths[':sirius_event_participant:phonebank:caller:uid'] = ':sirius_event_participant:phonebank:caller:uid';
 		}
   }
+  if ($json_forms['sirius_bulk']) {
+  	$paths[':sirius_bulk:core:status'] = ':sirius_bulk:core:status';
+
+  	$bulk_statuses = sirius_bulk_queue_statuses();
+  }
   foreach ($paths as $key => $label) {
   	$label = preg_replace('/^\:sirius_/', '', $label);
   	$label = preg_replace('/:value/', '', $label);
@@ -189,6 +194,20 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 						unset($element['#title']);
 						unset($element['#weight']);
 					}
+				} else if ($node_type == 'sirius_bulk') {
+					if ($which_form == 'core') {
+						list ($field_name, $column) = explode(':', $path);
+						if ($field_name == 'status') {
+							$element = array('#type' => 'select', '#options' => $bulk_statuses);
+						} else {
+							$element = array('#type' => 'textfield');
+						}
+					} else {
+						$element = sirius_jsonfield_util_get_from_path($json_forms[$node_type][$which_form], $path);
+						unset($element['#sirius']);
+						unset($element['#title']);
+						unset($element['#weight']);
+					}
 				}
 			} else {
 				$element = array('#type' => 'textfield');
@@ -260,11 +279,13 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		$form['mightysearch_results']['summary'] = array('#markup' => '<hr><h2>' . $results_summary . '</h2>');
 
 		$action_options = array(NULL => t('-- Select --'));
-		if ($actions['register']) { $action_options['register'] = $actions['register']['title']; }
-		if ($actions['export']) 	{ $action_options['export'] = $actions['export']['title']; }
-		if ($actions['tag']) 			{ $action_options['tag_add'] = 'Add Tag'; $action_options['tag_remove'] = 'Remove Tag'; }
-		if ($actions['delete']) 	{ $action_options['delete'] = $actions['delete']['title']; }
-		if (user_access('sirius admin')) { $action_options['sql'] = 'Display SQL Query'; }
+		if ($actions['register']) 					{ $action_options['register'] = $actions['register']['title']; }
+		if ($actions['export']) 						{ $action_options['export'] = $actions['export']['title']; }
+		if ($actions['tag']) 								{ $action_options['tag_add'] = 'Add Tag'; $action_options['tag_remove'] = 'Remove Tag'; }
+		if ($actions['bulk_recipient_add']) { $action_options['bulk_recipient_add'] = $actions['bulk_recipient_add']['title']; }
+		if ($actions['bulk_recipient_remove']) { $action_options['bulk_recipient_remove'] = $actions['bulk_recipient_remove']['title']; }
+		if ($actions['delete']) 						{ $action_options['delete'] = $actions['delete']['title']; }
+		if (user_access('sirius admin')) 		{ $action_options['sql'] = 'Display SQL Query'; }
 
 		$form['mightysearch_results']['action'] = array(
 			'#type' => 'select',
@@ -304,7 +325,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 			);
 		}
 
-		if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete']) {
+		if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove']) {
 			if ($count_total > $count) {
 				$form['mightysearch_results']['results_select_allxyz'] = array(
 					'#type' => 'checkbox', 
@@ -316,6 +337,8 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 								array('value' => 'tag_add'), 
 								array('value' => 'tag_remove'),
 								array('value' => 'delete'),
+								array('value' => 'bulk_recipient_add'),
+								array('value' => 'bulk_recipient_remove'),
 							),
 						),
 					),
@@ -443,7 +466,30 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 			$path_for_query = '$.' . $which_form . '.results.' . preg_replace('/:/', '.', $path);
 			if ($criterion) { $where_name = "lower(json_unquote(json_extract(participant_json.field_sirius_json_value, '$path_for_query'))) "; }
 		}
+	} else if ($node_type == 'sirius_bulk') {
+		//
+		// Bulk fields
+		//
+		
+		if ($which_form == 'core') {
+			list ($field_name, $column) = explode(':', $path);
+
+			if ($field_name == 'status') {
+				if (!$sql_parts['joins_nodupe'][$field_name]) {
+					$sql_parts['joins_nodupe'][$field_name] = TRUE;
+				}
+				if (!$sql_parts['fields_nodupe']['pstatus']) {
+					$sql_parts['fields_nodupe']['pstatus'] = TRUE;
+					$sql_parts['select_fields'] .= ", field_sirius_type_value as bulk_status ";
+				}
+				if ($criterion) { $where_name = 'field_sirius_type_value'; }
+			}
+		} else {
+			$path_for_query = '$.' . $which_form . '.results.' . preg_replace('/:/', '.', $path);
+			if ($criterion) { $where_name = "lower(json_unquote(json_extract(bulk_json.field_sirius_json_value, '$path_for_query'))) "; }
+		}
 	}
+
 
 	if ($criterion) {
 		if ($criterion == 'like' || $criterion == 'not like') {
@@ -502,6 +548,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		$sql_parts['joins'] .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 	}
 	$sql_parts['joins'] .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
+
 	if ($json_forms['sirius_event_participant']) {
 		$sql_parts['joins'] .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_sirius_contact_target_id = node.nid and field_data_field_sirius_contact.bundle = 'sirius_event_participant' ";
 		$sql_parts['joins'] .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = field_data_field_sirius_contact.entity_id ";
@@ -509,6 +556,15 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		$sql_parts['select_fields'] .= ", participant_json.field_sirius_json_value as participant_json_value ";
 
 		$sql_parts['joins'] .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = field_data_field_sirius_contact.entity_id ";
+	}
+
+	if ($json_forms['sirius_bulk']) {
+		$sql_parts['joins'] .= "left join field_data_field_sirius_log_handler handler_a on handler_a.entity_type = 'node' and handler_a.field_sirius_log_handler_target_id = node.nid and handler_a.bundle = 'sirius_log' ";
+		$sql_parts['joins'] .= "left join field_data_field_sirius_log_handler handler_b on handler_b.entity_type = 'node' and handler_b.entity_id = handler_a.entity_id ";
+		$sql_parts['joins'] .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = handler_a.entity_id ";
+		$sql_parts['joins'] .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = handler_a.entity_id ";
+
+		$sql_parts['select_fields'] .= ", handler_a.entity_id as bulk_nid ";
 	}
 
 	$sql_parts['where'] = "where type = 'sirius_contact' ";
@@ -524,6 +580,12 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		$sql_args[':prole_tid'] = $json_forms['sirius_event_participant']['prole_tid'];
 
 		$sql_parts['select_fields'] .= ', participant_json.entity_id as participant_nid ';
+	}
+
+	if ($json_forms['sirius_bulk']) {
+		$sql_parts['where'] .= "and handler_b.field_sirius_log_handler_target_id = :bulk_nid ";
+		$sql_parts['where'] .= "and field_sirius_category_value = 'bulk:queue' ";
+		$sql_args[':bulk_nid'] = $json_forms['sirius_bulk']['bulk_nid'];
 	}
 
 	$found = FALSE;
@@ -575,7 +637,9 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 			if ($hr['participant_nid']) {
 				$tools .= l('Participant', 'node/' . $hr['participant_nid'] . '/sirius_event_participant_json', array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
 			}
-
+			if ($hr['bulk_nid']) {
+				$tools .= l('Bulk', 'node/' . $hr['bulk_nid'] . '', array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+			}
 			$row[] = $tools;
 			$rows[$hr['nid']] = $row;
 			++$count;
@@ -606,7 +670,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	// Batch
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete') {
+	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete' || $action == 'bulk_recipient_add' || $action == 'bulk_recipient_remove') {
 		$contact_nids = array();
 		if ($form_state['values']['mightysearch_results']['results_select_allxyz']) {
 			$sql = $sql_parts['select_nids'] . $sql_parts['joins'] . $sql_parts['where']; 
@@ -712,6 +776,16 @@ function sirius_mightysearch_batch($chunk, $params, &$context) {
 			$result = array('success' => TRUE, 'msg' => 'Contact deleted.');
 		}
 
+		if ($action_name == 'bulk_recipient_add')  {
+			$bulk_nid = $action['bulk_nid'];
+			$result = sirius_bulk_recipient_add($bulk_nid, $contact_nid);
+		}
+
+		if ($action_name == 'bulk_recipient_remove')  {
+			$bulk_nid = $action['bulk_nid'];
+			$result = sirius_bulk_recipient_remove($bulk_nid, $contact_nid);
+		}
+
 		if ($result['success']) {
 			$context['results']['success']++;
 			$context['results']['successes'][$result['msg']]++;
@@ -742,6 +816,8 @@ function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
 	list ($node_type, $which_form, $path) = sirius_mightysearch_parse_path($full_path);
 	if ($node_type == 'sirius_event_participant') {
 		$json = json_decode($hr['participant_json_value'], TRUE);
+	} else if ($node_type == 'sirius_bulk') {
+		$json = json_decode($hr['bulk_json_value'], TRUE);
 	} else {
 		$json = json_decode($hr['field_sirius_json_value'], TRUE);
 	}
@@ -770,6 +846,21 @@ function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
 				return $hr['prole'];
 			} else if ($field_name == 'status') {
 				return $hr['pstatus'];
+			} 
+		} else if ($which_form == 'phonebank') {
+			list ($field_name, $column) = explode(':', $path);
+			return $json[$which_form][$field_name][$column];
+		} else {
+			$json_form = $json_forms[$node_type][$which_form];
+			$json_results = sirius_jsonfield_util_results_get($json, $which_form);
+			return sirius_jsonfield_util_render_values($json_form, $json_results, array($path), array('raw' => TRUE));
+		}
+	} else if ($node_type == 'sirius_bulk') {
+		if ($which_form == 'core') {
+			list ($field_name, $column) = explode(':', $path);
+			if ($field_name == 'status') {
+				$bulk_statuses = sirius_bulk_queue_statuses();
+				return $bulk_statuses[$hr['bulk_status']];
 			} 
 		} else if ($which_form == 'phonebank') {
 			list ($field_name, $column) = explode(':', $path);

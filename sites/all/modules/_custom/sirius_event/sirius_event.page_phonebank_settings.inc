@@ -28,6 +28,7 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 	$prole_tids = sirius_fieldvals($event_type_term, 'field_sirius_event_proles', 'tid');
 
 	$form['#tree'] = TRUE;
+
 	$form['phonebank']['active'] = array(
 		'#type' => 'select',
 		'#title' => t('Active?'),
@@ -81,6 +82,31 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 		'#default_value' => $json['phonebank']['caller_intro'],
 		'#description' => t('Callers will receive this message on the landing page of the phonebank.'),
 	);
+
+	$form['phonebank']['conference'] = array(
+		'#type' => 'select',
+		'#title' => t('Conference Connect?'),
+		'#options' => array(
+			'No' => t('No'), 
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $json['phonebank']['conference'],
+		'#description' => t('Do you want to set a "conference connect" number for this phonebank?'),
+	);
+
+	$form['phonebank']['conference_number'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Conference Connect Number'),
+		'#description' => t('Enter the phone number that volunteers can use for a conference connect'),
+    '#states' => array(
+      'visible' => array(
+        array(':input[name="phonebank[conference]"]' => array('value' => 'Yes')),
+      )
+    ),
+		'#default_value' => $json['phonebank']['conference_number'],
+	);
+
+
 
 	$form['submit'] = array(
 		'#type' => 'submit',

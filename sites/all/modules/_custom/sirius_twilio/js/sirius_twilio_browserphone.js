@@ -14,6 +14,8 @@
 		callerid_options = Drupal.settings.sirius_twilio_browserphone.callerid_options;
 		omg_options = Drupal.settings.sirius_twilio_browserphone.omg_options;
 
+		var connection;
+
 		//
 		// Setup Twilio.Device
 		//
@@ -23,6 +25,9 @@
 		$('#sirius_browserphone_button_hangup').hide();
 		$('#sirius_browserphone_button_omg').hide();
 		$('#sirius_browserphone_omg').hide();
+		$('#sirius_browserphone_button_conference').hide();
+		$('#sirius_browserphone_button_conference_add').hide();
+		$('#sirius_browserphone_button_conference_remove').hide();
 
 		device.on('ready',function (device) {
 			sirius_browserphone_log('Sirius Phone Ready.');
@@ -38,7 +43,8 @@
 			$('#sirius_browserphone_button_hangup').show();
 			$('#sirius_browserphone_button_omg').show();
 			$('#sirius_browserphone_omg').show();
-			$('#sirius_browserphone_volume').show();
+			// $('#sirius_browserphone_volume').show();
+			$('#sirius_browserphone_button_conference').show();
 			sirius_browserphone_volume_bind(conn);
 		});
 
@@ -48,7 +54,11 @@
 			$('#sirius_browserphone_button_hangup').hide();
 			$('#sirius_browserphone_button_omg').hide();
 			$('#sirius_browserphone_omg').hide();
-			$('#sirius_browserphone_volume').hide();
+			// $('#sirius_browserphone_volume').hide();
+			$('#sirius_browserphone_button_conference').hide();
+			$('#sirius_browserphone_button_conference_add').hide();
+			$('#sirius_browserphone_button_conference_remove').hide();
+			Drupal.settings.sirius_twilio_browserphone.connection = null;
 		});
 
 		device.on('incoming', function (conn) {
@@ -102,7 +112,7 @@
 		  	token: token,
 		  	callerid_nid: $('#sirius_browserphone_callerid').val()
 			};
-			device.connect(params);
+			Drupal.settings.sirius_twilio_browserphone.connection = device.connect(params);
 			return false;
 		});
 
@@ -125,6 +135,89 @@
 			return false;
 		});
 
+		$('#sirius_browserphone_button_conference').click(function () {
+			sirius_browserphone_log('Joining conference...');
+
+			// 1. Put the outgoing leg (the child call) into the conference.
+			Drupal.settings.sirius_twilio_browserphone.conference_name = sirius_browserphone_conference_name();
+			twiml = '<Response><Say>Entering the conference</Say><Dial><Conference endConferenceOnExit="true">' + Drupal.settings.sirius_twilio_browserphone.conference_name + '</Conference></Dial></Response>';
+			url = '/sirius/twilio/browserphone/twiml/echo?token=' + token + '&twiml=' + encodeURIComponent(twiml);
+			$.ajax({url: url}).done(function(data) { 
+				sirius_browserphone_log('... ' + data);
+				if (data == 'Ok.') {
+					sirius_browserphone_log('Callee connected');
+				}
+			});
+
+			twiml = '<Response><Dial><Conference endConferenceOnExit="true">' + Drupal.settings.sirius_twilio_browserphone.conference_name + '</Conference></Dial></Response>';
+			url = '/sirius/twilio/browserphone/twiml/echo?token=' + token + '&twiml=' + encodeURIComponent(twiml) + '&parent=1';
+			$.ajax({url: url}).done(function(data) { 
+				sirius_browserphone_log('... ' + data);
+				if (data == 'Ok.') {
+					// device.disconnectAll(); 
+					sirius_browserphone_log('Caller connected');
+				}
+			});
+
+			$('#sirius_browserphone_button_conference_add').show();
+			$('#sirius_browserphone_button_conference').hide();
+
+			return false;
+		});
+
+		$('#sirius_browserphone_button_conference_add').click(function () {
+			sirius_browserphone_log("Adding participant ...");
+			url = '/sirius/twilio/browserphone/twiml/conference/add?token=' + token + '&conference_name=' + Drupal.settings.sirius_twilio_browserphone.conference_name;
+			$.ajax({url: url}).done(function(data) { 
+				sirius_browserphone_log('... ' + data);
+				if (data == 'Ok.') { 
+					sirius_browserphone_log("Participant added.");
+					$('#sirius_browserphone_button_conference_add').hide();
+					$('#sirius_browserphone_button_conference_remove').show();
+				}
+			});
+
+			return false;
+		});
+
+		$('#sirius_browserphone_button_conference_remove').click(function () {
+			sirius_browserphone_log("Removing participant ...");
+			twiml = '<Response><Hangup/></Response>';
+			url = '/sirius/twilio/browserphone/twiml/echo?token=' + token + '&twiml=' + encodeURIComponent(twiml) + '&phone=' + encodeURIComponent(Drupal.settings.sirius_twilio_browserphone.conference_number); 
+			$.ajax({url: url}).done(function(data) { 
+				sirius_browserphone_log('... ' + data);
+				if (data == 'Ok.') {
+					sirius_browserphone_log("Participant removed.");
+					$('#sirius_browserphone_button_conference_add').show();
+					$('#sirius_browserphone_button_conference_remove').hide();
+				}
+			});
+
+			return false;
+		});
+
+
+		$('#sirius_browserphone_button_keypad_1').click(function () { return sirius_browserphone_keypad('1'); });
+		$('#sirius_browserphone_button_keypad_2').click(function () { return sirius_browserphone_keypad('2'); });
+		$('#sirius_browserphone_button_keypad_3').click(function () { return sirius_browserphone_keypad('3'); });
+		$('#sirius_browserphone_button_keypad_4').click(function () { return sirius_browserphone_keypad('4'); });
+		$('#sirius_browserphone_button_keypad_5').click(function () { return sirius_browserphone_keypad('5'); });
+		$('#sirius_browserphone_button_keypad_6').click(function () { return sirius_browserphone_keypad('6'); });
+		$('#sirius_browserphone_button_keypad_7').click(function () { return sirius_browserphone_keypad('7'); });
+		$('#sirius_browserphone_button_keypad_8').click(function () { return sirius_browserphone_keypad('8'); });
+		$('#sirius_browserphone_button_keypad_9').click(function () { return sirius_browserphone_keypad('9'); });
+		$('#sirius_browserphone_button_keypad_0').click(function () { return sirius_browserphone_keypad('0'); });
+		$('#sirius_browserphone_button_keypad_s').click(function () { return sirius_browserphone_keypad('*'); });
+		$('#sirius_browserphone_button_keypad_n').click(function () { return sirius_browserphone_keypad('#'); });
+
+		function sirius_browserphone_keypad(s) {
+			if (Drupal.settings.sirius_twilio_browserphone.connection) {
+				Drupal.settings.sirius_twilio_browserphone.connection.sendDigits(s);
+			}
+			return false;
+		};
+
+
 		//
 		// Utility functions
 		//
@@ -139,10 +232,10 @@
 				if (outputVolume < .50) { outputColor = 'green'; }
 				else if (outputVolume < .75) { outputColor = 'yellow'; }
 
-				$('#sirius_browserphone_volume_input').css('width', Math.floor(inputVolume * 300) + 'px');
+				$('#sirius_browserphone_volume_input').css('width', Math.floor(inputVolume * 200) + 'px');
 				$('#sirius_browserphone_volume_input').css('background-color', inputColor);
 
-				$('#sirius_browserphone_volume_output').css('width', Math.floor(outputVolume * 300) + 'px');
+				$('#sirius_browserphone_volume_output').css('width', Math.floor(outputVolume * 200) + 'px');
 				$('#sirius_browserphone_volume_output').css('background-color', outputColor);
 			});
 		}
@@ -156,7 +249,13 @@
 
 		function sirius_browserphone_log(message) {
 		  $('#sirius_browserphone_log').append(message + '<br />');
+		  console.log(message);
 		}
 
+		function sirius_browserphone_conference_name() {
+			name = Drupal.settings.sirius_twilio_browserphone.user.name;
+			name += Date.now();
+			return name;
+		}
 	});
 }(jQuery));

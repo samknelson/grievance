@@ -17,143 +17,173 @@ use Twilio\Values;
  */
 abstract class CompositionHookOptions {
     /**
-     * @param boolean $enabled Only show Composition Hooks enabled or disabled.
-     * @param \DateTime $dateCreatedAfter Only show Composition Hooks created on or
-     *                                    after this ISO8601 date-time.
-     * @param \DateTime $dateCreatedBefore Only show Composition Hooks created
-     *                                     before this this ISO8601 date-time.
+     * @param bool $enabled Read only CompositionHook resources with an enabled
+     *                      value that matches this parameter
+     * @param \DateTime $dateCreatedAfter Read only CompositionHook resources
+     *                                    created on or after this ISO 8601
+     *                                    datetime with time zone
+     * @param \DateTime $dateCreatedBefore Read only CompositionHook resources
+     *                                     created before this ISO 8601 datetime
+     *                                     with time zone
+     * @param string $friendlyName Read only CompositionHook resources with
+     *                             friendly names that match this string
      * @return ReadCompositionHookOptions Options builder
      */
-    public static function read($enabled = Values::NONE, $dateCreatedAfter = Values::NONE, $dateCreatedBefore = Values::NONE) {
-        return new ReadCompositionHookOptions($enabled, $dateCreatedAfter, $dateCreatedBefore);
+    public static function read(bool $enabled = Values::NONE, \DateTime $dateCreatedAfter = Values::NONE, \DateTime $dateCreatedBefore = Values::NONE, string $friendlyName = Values::NONE): ReadCompositionHookOptions {
+        return new ReadCompositionHookOptions($enabled, $dateCreatedAfter, $dateCreatedBefore, $friendlyName);
     }
 
     /**
-     * @param boolean $enabled Boolean flag for activating the Composition Hook.
-     * @param array $videoLayout The JSON video layout description.
-     * @param string $audioSources A list of audio sources related to this
-     *                             Composition Hook.
-     * @param string $audioSourcesExcluded A list of audio sources excluded related
-     *                                     to this Composition Hook.
-     * @param string $resolution Pixel resolution of the composed video.
-     * @param string $format Container format of the Composition Hook media file.
-     *                       Any of the following: `mp4`, `webm`.
-     * @param string $statusCallback A URL that Twilio sends asynchronous webhook
-     *                               requests to on every composition event.
-     * @param string $statusCallbackMethod HTTP method Twilio should use when
-     *                                     requesting the above URL.
-     * @param boolean $trim Boolean flag for clipping intervals that have no media.
+     * @param bool $enabled Whether the composition hook is active
+     * @param array $videoLayout An object that describes the video layout of the
+     *                           composition hook
+     * @param string[] $audioSources An array of track names from the same group
+     *                               room to merge
+     * @param string[] $audioSourcesExcluded An array of track names to exclude
+     * @param string $resolution A string that describes the rows (width) and
+     *                           columns (height) of the generated composed video
+     *                           in pixels
+     * @param string $format The container format of the media files used by the
+     *                       compositions created by the composition hook
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     status_callback
+     * @param bool $trim Whether to clip the intervals where there is no active
+     *                   media in the Compositions triggered by the composition hook
      * @return CreateCompositionHookOptions Options builder
      */
-    public static function create($enabled = Values::NONE, $videoLayout = Values::NONE, $audioSources = Values::NONE, $audioSourcesExcluded = Values::NONE, $resolution = Values::NONE, $format = Values::NONE, $statusCallback = Values::NONE, $statusCallbackMethod = Values::NONE, $trim = Values::NONE) {
+    public static function create(bool $enabled = Values::NONE, array $videoLayout = Values::ARRAY_NONE, array $audioSources = Values::ARRAY_NONE, array $audioSourcesExcluded = Values::ARRAY_NONE, string $resolution = Values::NONE, string $format = Values::NONE, string $statusCallback = Values::NONE, string $statusCallbackMethod = Values::NONE, bool $trim = Values::NONE): CreateCompositionHookOptions {
         return new CreateCompositionHookOptions($enabled, $videoLayout, $audioSources, $audioSourcesExcluded, $resolution, $format, $statusCallback, $statusCallbackMethod, $trim);
     }
 
     /**
-     * @param boolean $enabled Boolean flag for activating the Composition Hook.
-     * @param array $videoLayout The JSON video layout description.
-     * @param string $audioSources A list of audio sources related to this
-     *                             Composition Hook.
-     * @param string $audioSourcesExcluded A list of audio sources excluded related
-     *                                     to this Composition Hook.
-     * @param boolean $trim Boolean flag for clipping intervals that have no media.
-     * @param string $format Container format of the Composition Hook media file.
-     *                       Any of the following: `mp4`, `webm`.
-     * @param string $resolution Pixel resolution of the composed video.
-     * @param string $statusCallback A URL that Twilio sends asynchronous webhook
-     *                               requests to on every composition event.
-     * @param string $statusCallbackMethod HTTP method Twilio should use when
-     *                                     requesting the above URL.
+     * @param bool $enabled Whether the composition hook is active
+     * @param array $videoLayout A JSON object that describes the video layout of
+     *                           the composition hook
+     * @param string[] $audioSources An array of track names from the same group
+     *                               room to merge
+     * @param string[] $audioSourcesExcluded An array of track names to exclude
+     * @param bool $trim Whether to clip the intervals where there is no active
+     *                   media in the Compositions triggered by the composition hook
+     * @param string $format The container format of the media files used by the
+     *                       compositions created by the composition hook
+     * @param string $resolution A string that describes the columns (width) and
+     *                           rows (height) of the generated composed video in
+     *                           pixels
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     status_callback
      * @return UpdateCompositionHookOptions Options builder
      */
-    public static function update($enabled = Values::NONE, $videoLayout = Values::NONE, $audioSources = Values::NONE, $audioSourcesExcluded = Values::NONE, $trim = Values::NONE, $format = Values::NONE, $resolution = Values::NONE, $statusCallback = Values::NONE, $statusCallbackMethod = Values::NONE) {
+    public static function update(bool $enabled = Values::NONE, array $videoLayout = Values::ARRAY_NONE, array $audioSources = Values::ARRAY_NONE, array $audioSourcesExcluded = Values::ARRAY_NONE, bool $trim = Values::NONE, string $format = Values::NONE, string $resolution = Values::NONE, string $statusCallback = Values::NONE, string $statusCallbackMethod = Values::NONE): UpdateCompositionHookOptions {
         return new UpdateCompositionHookOptions($enabled, $videoLayout, $audioSources, $audioSourcesExcluded, $trim, $format, $resolution, $statusCallback, $statusCallbackMethod);
     }
 }
 
 class ReadCompositionHookOptions extends Options {
     /**
-     * @param boolean $enabled Only show Composition Hooks enabled or disabled.
-     * @param \DateTime $dateCreatedAfter Only show Composition Hooks created on or
-     *                                    after this ISO8601 date-time.
-     * @param \DateTime $dateCreatedBefore Only show Composition Hooks created
-     *                                     before this this ISO8601 date-time.
+     * @param bool $enabled Read only CompositionHook resources with an enabled
+     *                      value that matches this parameter
+     * @param \DateTime $dateCreatedAfter Read only CompositionHook resources
+     *                                    created on or after this ISO 8601
+     *                                    datetime with time zone
+     * @param \DateTime $dateCreatedBefore Read only CompositionHook resources
+     *                                     created before this ISO 8601 datetime
+     *                                     with time zone
+     * @param string $friendlyName Read only CompositionHook resources with
+     *                             friendly names that match this string
      */
-    public function __construct($enabled = Values::NONE, $dateCreatedAfter = Values::NONE, $dateCreatedBefore = Values::NONE) {
+    public function __construct(bool $enabled = Values::NONE, \DateTime $dateCreatedAfter = Values::NONE, \DateTime $dateCreatedBefore = Values::NONE, string $friendlyName = Values::NONE) {
         $this->options['enabled'] = $enabled;
         $this->options['dateCreatedAfter'] = $dateCreatedAfter;
         $this->options['dateCreatedBefore'] = $dateCreatedBefore;
+        $this->options['friendlyName'] = $friendlyName;
     }
 
     /**
-     * Only show Composition Hooks that are enabled or disabled.
-     * 
-     * @param boolean $enabled Only show Composition Hooks enabled or disabled.
+     * Read only CompositionHook resources with an `enabled` value that matches this parameter.
+     *
+     * @param bool $enabled Read only CompositionHook resources with an enabled
+     *                      value that matches this parameter
      * @return $this Fluent Builder
      */
-    public function setEnabled($enabled) {
+    public function setEnabled(bool $enabled): self {
         $this->options['enabled'] = $enabled;
         return $this;
     }
 
     /**
-     * Only show Composition Hooks created on or after this ISO8601 date-time, given as `YYYY-MM-DDThh:mm:ss-hh:mm`.
-     * 
-     * @param \DateTime $dateCreatedAfter Only show Composition Hooks created on or
-     *                                    after this ISO8601 date-time.
+     * Read only CompositionHook resources created on or after this [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) datetime with time zone.
+     *
+     * @param \DateTime $dateCreatedAfter Read only CompositionHook resources
+     *                                    created on or after this ISO 8601
+     *                                    datetime with time zone
      * @return $this Fluent Builder
      */
-    public function setDateCreatedAfter($dateCreatedAfter) {
+    public function setDateCreatedAfter(\DateTime $dateCreatedAfter): self {
         $this->options['dateCreatedAfter'] = $dateCreatedAfter;
         return $this;
     }
 
     /**
-     * Only show Composition Hooks created before this this ISO8601 date-time, given as `YYYY-MM-DDThh:mm:ss-hh:mm`.
-     * 
-     * @param \DateTime $dateCreatedBefore Only show Composition Hooks created
-     *                                     before this this ISO8601 date-time.
+     * Read only CompositionHook resources created before this [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) datetime with time zone.
+     *
+     * @param \DateTime $dateCreatedBefore Read only CompositionHook resources
+     *                                     created before this ISO 8601 datetime
+     *                                     with time zone
      * @return $this Fluent Builder
      */
-    public function setDateCreatedBefore($dateCreatedBefore) {
+    public function setDateCreatedBefore(\DateTime $dateCreatedBefore): self {
         $this->options['dateCreatedBefore'] = $dateCreatedBefore;
+        return $this;
+    }
+
+    /**
+     * Read only CompositionHook resources with friendly names that match this string. The match is not case sensitive and can include asterisk `*` characters as wildcard match.
+     *
+     * @param string $friendlyName Read only CompositionHook resources with
+     *                             friendly names that match this string
+     * @return $this Fluent Builder
+     */
+    public function setFriendlyName(string $friendlyName): self {
+        $this->options['friendlyName'] = $friendlyName;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Video.V1.ReadCompositionHookOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Video.V1.ReadCompositionHookOptions ' . $options . ']';
     }
 }
 
 class CreateCompositionHookOptions extends Options {
     /**
-     * @param boolean $enabled Boolean flag for activating the Composition Hook.
-     * @param array $videoLayout The JSON video layout description.
-     * @param string $audioSources A list of audio sources related to this
-     *                             Composition Hook.
-     * @param string $audioSourcesExcluded A list of audio sources excluded related
-     *                                     to this Composition Hook.
-     * @param string $resolution Pixel resolution of the composed video.
-     * @param string $format Container format of the Composition Hook media file.
-     *                       Any of the following: `mp4`, `webm`.
-     * @param string $statusCallback A URL that Twilio sends asynchronous webhook
-     *                               requests to on every composition event.
-     * @param string $statusCallbackMethod HTTP method Twilio should use when
-     *                                     requesting the above URL.
-     * @param boolean $trim Boolean flag for clipping intervals that have no media.
+     * @param bool $enabled Whether the composition hook is active
+     * @param array $videoLayout An object that describes the video layout of the
+     *                           composition hook
+     * @param string[] $audioSources An array of track names from the same group
+     *                               room to merge
+     * @param string[] $audioSourcesExcluded An array of track names to exclude
+     * @param string $resolution A string that describes the rows (width) and
+     *                           columns (height) of the generated composed video
+     *                           in pixels
+     * @param string $format The container format of the media files used by the
+     *                       compositions created by the composition hook
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     status_callback
+     * @param bool $trim Whether to clip the intervals where there is no active
+     *                   media in the Compositions triggered by the composition hook
      */
-    public function __construct($enabled = Values::NONE, $videoLayout = Values::NONE, $audioSources = Values::NONE, $audioSourcesExcluded = Values::NONE, $resolution = Values::NONE, $format = Values::NONE, $statusCallback = Values::NONE, $statusCallbackMethod = Values::NONE, $trim = Values::NONE) {
+    public function __construct(bool $enabled = Values::NONE, array $videoLayout = Values::ARRAY_NONE, array $audioSources = Values::ARRAY_NONE, array $audioSourcesExcluded = Values::ARRAY_NONE, string $resolution = Values::NONE, string $format = Values::NONE, string $statusCallback = Values::NONE, string $statusCallbackMethod = Values::NONE, bool $trim = Values::NONE) {
         $this->options['enabled'] = $enabled;
         $this->options['videoLayout'] = $videoLayout;
         $this->options['audioSources'] = $audioSources;
@@ -166,154 +196,158 @@ class CreateCompositionHookOptions extends Options {
     }
 
     /**
-     * When activated, the Composition Hook is enabled and a composition will be triggered for every Video room completed by this account from this point onwards; `false` indicates the Composition Hook is left inactive.
-     * 
-     * @param boolean $enabled Boolean flag for activating the Composition Hook.
+     * Whether the composition hook is active. When `true`, the composition hook will be triggered for every completed Group Room in the account. When `false`, the composition hook will never be triggered.
+     *
+     * @param bool $enabled Whether the composition hook is active
      * @return $this Fluent Builder
      */
-    public function setEnabled($enabled) {
+    public function setEnabled(bool $enabled): self {
         $this->options['enabled'] = $enabled;
         return $this;
     }
 
     /**
-     * A JSON object defining the video layout of the Composition Hook in terms of regions. See the section [Managing Video Layouts](#managing-video-layouts) below for further information.
-     * 
-     * @param array $videoLayout The JSON video layout description.
+     * An object that describes the video layout of the composition hook in terms of regions. See [Specifying Video Layouts](https://www.twilio.com/docs/video/api/compositions-resource#specifying-video-layouts) for more info.
+     *
+     * @param array $videoLayout An object that describes the video layout of the
+     *                           composition hook
      * @return $this Fluent Builder
      */
-    public function setVideoLayout($videoLayout) {
+    public function setVideoLayout(array $videoLayout): self {
         $this->options['videoLayout'] = $videoLayout;
         return $this;
     }
 
     /**
-     * An array of audio sources to merge. All the specified sources must belong to the same Group Room. It can include: 
-    * Zero or more Track names. These can be specified using wildcards (e.g. `student*`). The use of `[*]` has semantics "all if any" meaning zero or more (i.e. all) depending on whether the Group Room had audio tracks.
-     * 
-     * @param string $audioSources A list of audio sources related to this
-     *                             Composition Hook.
+     * An array of track names from the same group room to merge into the compositions created by the composition hook. Can include zero or more track names. A composition triggered by the composition hook includes all audio sources specified in `audio_sources` except those specified in `audio_sources_excluded`. The track names in this parameter can include an asterisk as a wild card character, which matches zero or more characters in a track name. For example, `student*` includes tracks named `student` as well as `studentTeam`.
+     *
+     * @param string[] $audioSources An array of track names from the same group
+     *                               room to merge
      * @return $this Fluent Builder
      */
-    public function setAudioSources($audioSources) {
+    public function setAudioSources(array $audioSources): self {
         $this->options['audioSources'] = $audioSources;
         return $this;
     }
 
     /**
-     * An array of audio sources to exclude from the Composition Hook. Any new Composition triggered by the Composition Hook shall include all audio sources specified in `AudioSources` except for the ones specified in `AudioSourcesExcluded`. This parameter may include: 
-    * Zero or more Track names. These can be specified using wildcards (e.g. `student*`)
-     * 
-     * @param string $audioSourcesExcluded A list of audio sources excluded related
-     *                                     to this Composition Hook.
+     * An array of track names to exclude. A composition triggered by the composition hook includes all audio sources specified in `audio_sources` except for those specified in `audio_sources_excluded`. The track names in this parameter can include an asterisk as a wild card character, which matches zero or more characters in a track name. For example, `student*` excludes `student` as well as `studentTeam`. This parameter can also be empty.
+     *
+     * @param string[] $audioSourcesExcluded An array of track names to exclude
      * @return $this Fluent Builder
      */
-    public function setAudioSourcesExcluded($audioSourcesExcluded) {
+    public function setAudioSourcesExcluded(array $audioSourcesExcluded): self {
         $this->options['audioSourcesExcluded'] = $audioSourcesExcluded;
         return $this;
     }
 
     /**
-     * A string representing the numbers of pixels for rows (width) and columns (height) of the generated composed video. This string must have the format `{width}x{height}`. This parameter must comply with the following constraints: 
-    * `width >= 16 && width <= 1280`
-    * `height >= 16 && height <= 1280`
-    * `width * height <= 921,600`
-    Typical values are: 
+     * A string that describes the columns (width) and rows (height) of the generated composed video in pixels. Defaults to `640x480`.
+    The string's format is `{width}x{height}` where:
+
+    * 16 <= `{width}` <= 1280
+    * 16 <= `{height}` <= 1280
+    * `{width}` * `{height}` <= 921,600
+
+    Typical values are:
+
     * HD = `1280x720`
     * PAL = `1024x576`
     * VGA = `640x480`
     * CIF = `320x240`
-    Note that the `Resolution` implicitly imposes an aspect ratio to the resulting composition. When the original video tracks get constrained by this aspect ratio they are scaled-down to fit. You can find detailed information in the [Managing Video Layouts](#managing-video-layouts) section. Defaults to `640x480`.
-     * 
-     * @param string $resolution Pixel resolution of the composed video.
+
+    Note that the `resolution` imposes an aspect ratio to the resulting composition. When the original video tracks are constrained by the aspect ratio, they are scaled to fit. See [Specifying Video Layouts](https://www.twilio.com/docs/video/api/compositions-resource#specifying-video-layouts) for more info.
+     *
+     * @param string $resolution A string that describes the rows (width) and
+     *                           columns (height) of the generated composed video
+     *                           in pixels
      * @return $this Fluent Builder
      */
-    public function setResolution($resolution) {
+    public function setResolution(string $resolution): self {
         $this->options['resolution'] = $resolution;
         return $this;
     }
 
     /**
-     * Container format of the Composition media files created by the Composition Hook. Can be any of the following: `mp4`, `webm`. The use of `mp4` or `webm` makes mandatory the specification of `AudioSources` and/or one `VideoLayout` element containing a valid `video_sources` list, otherwise an error is fired. Defaults to `webm`.
-     * 
-     * @param string $format Container format of the Composition Hook media file.
-     *                       Any of the following: `mp4`, `webm`.
+     * The container format of the media files used by the compositions created by the composition hook. Can be: `mp4` or `webm` and the default is `webm`. If `mp4` or `webm`, `audio_sources` must have one or more tracks and/or a `video_layout` element must contain a valid `video_sources` list, otherwise an error occurs.
+     *
+     * @param string $format The container format of the media files used by the
+     *                       compositions created by the composition hook
      * @return $this Fluent Builder
      */
-    public function setFormat($format) {
+    public function setFormat(string $format): self {
         $this->options['format'] = $format;
         return $this;
     }
 
     /**
-     * A URL that Twilio sends asynchronous webhook requests to on every composition event. If not provided, status callback events will not be dispatched.
-     * 
-     * @param string $statusCallback A URL that Twilio sends asynchronous webhook
-     *                               requests to on every composition event.
+     * The URL we should call using the `status_callback_method` to send status information to your application on every composition event. If not provided, status callback events will not be dispatched.
+     *
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
      * @return $this Fluent Builder
      */
-    public function setStatusCallback($statusCallback) {
+    public function setStatusCallback(string $statusCallback): self {
         $this->options['statusCallback'] = $statusCallback;
         return $this;
     }
 
     /**
-     * HTTP method Twilio should use when requesting the above URL. Defaults to `POST`.
-     * 
-     * @param string $statusCallbackMethod HTTP method Twilio should use when
-     *                                     requesting the above URL.
+     * The HTTP method we should use to call `status_callback`. Can be: `POST` or `GET` and the default is `POST`.
+     *
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     status_callback
      * @return $this Fluent Builder
      */
-    public function setStatusCallbackMethod($statusCallbackMethod) {
+    public function setStatusCallbackMethod(string $statusCallbackMethod): self {
         $this->options['statusCallbackMethod'] = $statusCallbackMethod;
         return $this;
     }
 
     /**
-     * When activated, clips all the intervals where there is no active media in the Compositions triggered by the Composition Hook. This results in shorter compositions in cases when the Room was created but no Participant joined for some time, or if all the Participants left the room and joined at a later stage, as those gaps will be removed. You can find further information in the [Managing Video Layouts](#managing-video-layouts) section. Defaults to `true`.
-     * 
-     * @param boolean $trim Boolean flag for clipping intervals that have no media.
+     * Whether to clip the intervals where there is no active media in the Compositions triggered by the composition hook. The default is `true`. Compositions with `trim` enabled are shorter when the Room is created and no Participant joins for a while as well as if all the Participants leave the room and join later, because those gaps will be removed. See [Specifying Video Layouts](https://www.twilio.com/docs/video/api/compositions-resource#specifying-video-layouts) for more info.
+     *
+     * @param bool $trim Whether to clip the intervals where there is no active
+     *                   media in the Compositions triggered by the composition hook
      * @return $this Fluent Builder
      */
-    public function setTrim($trim) {
+    public function setTrim(bool $trim): self {
         $this->options['trim'] = $trim;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Video.V1.CreateCompositionHookOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Video.V1.CreateCompositionHookOptions ' . $options . ']';
     }
 }
 
 class UpdateCompositionHookOptions extends Options {
     /**
-     * @param boolean $enabled Boolean flag for activating the Composition Hook.
-     * @param array $videoLayout The JSON video layout description.
-     * @param string $audioSources A list of audio sources related to this
-     *                             Composition Hook.
-     * @param string $audioSourcesExcluded A list of audio sources excluded related
-     *                                     to this Composition Hook.
-     * @param boolean $trim Boolean flag for clipping intervals that have no media.
-     * @param string $format Container format of the Composition Hook media file.
-     *                       Any of the following: `mp4`, `webm`.
-     * @param string $resolution Pixel resolution of the composed video.
-     * @param string $statusCallback A URL that Twilio sends asynchronous webhook
-     *                               requests to on every composition event.
-     * @param string $statusCallbackMethod HTTP method Twilio should use when
-     *                                     requesting the above URL.
+     * @param bool $enabled Whether the composition hook is active
+     * @param array $videoLayout A JSON object that describes the video layout of
+     *                           the composition hook
+     * @param string[] $audioSources An array of track names from the same group
+     *                               room to merge
+     * @param string[] $audioSourcesExcluded An array of track names to exclude
+     * @param bool $trim Whether to clip the intervals where there is no active
+     *                   media in the Compositions triggered by the composition hook
+     * @param string $format The container format of the media files used by the
+     *                       compositions created by the composition hook
+     * @param string $resolution A string that describes the columns (width) and
+     *                           rows (height) of the generated composed video in
+     *                           pixels
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     status_callback
      */
-    public function __construct($enabled = Values::NONE, $videoLayout = Values::NONE, $audioSources = Values::NONE, $audioSourcesExcluded = Values::NONE, $trim = Values::NONE, $format = Values::NONE, $resolution = Values::NONE, $statusCallback = Values::NONE, $statusCallbackMethod = Values::NONE) {
+    public function __construct(bool $enabled = Values::NONE, array $videoLayout = Values::ARRAY_NONE, array $audioSources = Values::ARRAY_NONE, array $audioSourcesExcluded = Values::ARRAY_NONE, bool $trim = Values::NONE, string $format = Values::NONE, string $resolution = Values::NONE, string $statusCallback = Values::NONE, string $statusCallbackMethod = Values::NONE) {
         $this->options['enabled'] = $enabled;
         $this->options['videoLayout'] = $videoLayout;
         $this->options['audioSources'] = $audioSources;
@@ -326,132 +360,133 @@ class UpdateCompositionHookOptions extends Options {
     }
 
     /**
-     * When activated, the Composition Hook is enabled and a composition will be triggered for every Video room completed by this account from this point onwards; `false` indicates the Composition Hook is left inactive.
-     * 
-     * @param boolean $enabled Boolean flag for activating the Composition Hook.
+     * Whether the composition hook is active. When `true`, the composition hook will be triggered for every completed Group Room in the account. When `false`, the composition hook never triggers.
+     *
+     * @param bool $enabled Whether the composition hook is active
      * @return $this Fluent Builder
      */
-    public function setEnabled($enabled) {
+    public function setEnabled(bool $enabled): self {
         $this->options['enabled'] = $enabled;
         return $this;
     }
 
     /**
-     * A JSON object defining the video layout of the Composition Hook in terms of regions. See the section [Managing Video Layouts](#managing-video-layouts) below for further information.
-     * 
-     * @param array $videoLayout The JSON video layout description.
+     * A JSON object that describes the video layout of the composition hook in terms of regions. See [Specifying Video Layouts](https://www.twilio.com/docs/video/api/compositions-resource#specifying-video-layouts) for more info.
+     *
+     * @param array $videoLayout A JSON object that describes the video layout of
+     *                           the composition hook
      * @return $this Fluent Builder
      */
-    public function setVideoLayout($videoLayout) {
+    public function setVideoLayout(array $videoLayout): self {
         $this->options['videoLayout'] = $videoLayout;
         return $this;
     }
 
     /**
-     * An array of audio sources to merge. All the specified sources must belong to the same Group Room. It can include: 
-    * Zero or more Track names. These can be specified using wildcards (e.g. `student*`). The use of `[*]` has semantics "all if any" meaning zero or more (i.e. all) depending on whether the Group Room had audio tracks.
-     * 
-     * @param string $audioSources A list of audio sources related to this
-     *                             Composition Hook.
+     * An array of track names from the same group room to merge into the compositions created by the composition hook. Can include zero or more track names. A composition triggered by the composition hook includes all audio sources specified in `audio_sources` except those specified in `audio_sources_excluded`. The track names in this parameter can include an asterisk as a wild card character, which matches zero or more characters in a track name. For example, `student*` includes tracks named `student` as well as `studentTeam`.
+     *
+     * @param string[] $audioSources An array of track names from the same group
+     *                               room to merge
      * @return $this Fluent Builder
      */
-    public function setAudioSources($audioSources) {
+    public function setAudioSources(array $audioSources): self {
         $this->options['audioSources'] = $audioSources;
         return $this;
     }
 
     /**
-     * An array of audio sources to exclude from the Composition Hook. Any new Composition triggered by the Composition Hook shall include all audio sources specified in `AudioSources` except for the ones specified in `AudioSourcesExcluded`. This parameter may include: 
-    * Zero or more Track names. These can be specified using wildcards (e.g. `student*`)
-     * 
-     * @param string $audioSourcesExcluded A list of audio sources excluded related
-     *                                     to this Composition Hook.
+     * An array of track names to exclude. A composition triggered by the composition hook includes all audio sources specified in `audio_sources` except for those specified in `audio_sources_excluded`. The track names in this parameter can include an asterisk as a wild card character, which matches zero or more characters in a track name. For example, `student*` excludes `student` as well as `studentTeam`. This parameter can also be empty.
+     *
+     * @param string[] $audioSourcesExcluded An array of track names to exclude
      * @return $this Fluent Builder
      */
-    public function setAudioSourcesExcluded($audioSourcesExcluded) {
+    public function setAudioSourcesExcluded(array $audioSourcesExcluded): self {
         $this->options['audioSourcesExcluded'] = $audioSourcesExcluded;
         return $this;
     }
 
     /**
-     * When activated, clips all the intervals where there is no active media in the Compositions triggered by the Composition Hook. This results in shorter compositions in cases when the Room was created but no Participant joined for some time, or if all the Participants left the room and joined at a later stage, as those gaps will be removed. You can find further information in the [Managing Video Layouts](#managing-video-layouts) section. Defaults to `true`.
-     * 
-     * @param boolean $trim Boolean flag for clipping intervals that have no media.
+     * Whether to clip the intervals where there is no active media in the compositions triggered by the composition hook. The default is `true`. Compositions with `trim` enabled are shorter when the Room is created and no Participant joins for a while as well as if all the Participants leave the room and join later, because those gaps will be removed. See [Specifying Video Layouts](https://www.twilio.com/docs/video/api/compositions-resource#specifying-video-layouts) for more info.
+     *
+     * @param bool $trim Whether to clip the intervals where there is no active
+     *                   media in the Compositions triggered by the composition hook
      * @return $this Fluent Builder
      */
-    public function setTrim($trim) {
+    public function setTrim(bool $trim): self {
         $this->options['trim'] = $trim;
         return $this;
     }
 
     /**
-     * Container format of the Composition media files created by the Composition Hook. Can be any of the following: `mp4`, `webm`. The use of `mp4` or `webm` makes mandatory the specification of `AudioSources` and/or one `VideoLayout` element containing a valid `video_sources` list, otherwise an error is fired. Defaults to `webm`.
-     * 
-     * @param string $format Container format of the Composition Hook media file.
-     *                       Any of the following: `mp4`, `webm`.
+     * The container format of the media files used by the compositions created by the composition hook. Can be: `mp4` or `webm` and the default is `webm`. If `mp4` or `webm`, `audio_sources` must have one or more tracks and/or a `video_layout` element must contain a valid `video_sources` list, otherwise an error occurs.
+     *
+     * @param string $format The container format of the media files used by the
+     *                       compositions created by the composition hook
      * @return $this Fluent Builder
      */
-    public function setFormat($format) {
+    public function setFormat(string $format): self {
         $this->options['format'] = $format;
         return $this;
     }
 
     /**
-     * A string representing the numbers of pixels for rows (width) and columns (height) of the generated composed video. This string must have the format `{width}x{height}`. This parameter must comply with the following constraints: 
-    * `width >= 16 && width <= 1280`
-    * `height >= 16 && height <= 1280`
-    * `width * height <= 921,600`
-    Typical values are: 
+     * A string that describes the columns (width) and rows (height) of the generated composed video in pixels. Defaults to `640x480`.
+    The string's format is `{width}x{height}` where:
+
+    * 16 <= `{width}` <= 1280
+    * 16 <= `{height}` <= 1280
+    * `{width}` * `{height}` <= 921,600
+
+    Typical values are:
+
     * HD = `1280x720`
     * PAL = `1024x576`
     * VGA = `640x480`
     * CIF = `320x240`
-    Note that the `Resolution` implicitly imposes an aspect ratio to the resulting composition. When the original video tracks get constrained by this aspect ratio they are scaled-down to fit. You can find detailed information in the [Managing Video Layouts](#managing-video-layouts) section. Defaults to `640x480`.
-     * 
-     * @param string $resolution Pixel resolution of the composed video.
+
+    Note that the `resolution` imposes an aspect ratio to the resulting composition. When the original video tracks are constrained by the aspect ratio, they are scaled to fit. See [Specifying Video Layouts](https://www.twilio.com/docs/video/api/compositions-resource#specifying-video-layouts) for more info.
+     *
+     * @param string $resolution A string that describes the columns (width) and
+     *                           rows (height) of the generated composed video in
+     *                           pixels
      * @return $this Fluent Builder
      */
-    public function setResolution($resolution) {
+    public function setResolution(string $resolution): self {
         $this->options['resolution'] = $resolution;
         return $this;
     }
 
     /**
-     * A URL that Twilio sends asynchronous webhook requests to on every composition event. If not provided, status callback events will not be dispatched.
-     * 
-     * @param string $statusCallback A URL that Twilio sends asynchronous webhook
-     *                               requests to on every composition event.
+     * The URL we should call using the `status_callback_method` to send status information to your application on every composition event. If not provided, status callback events will not be dispatched.
+     *
+     * @param string $statusCallback The URL we should call to send status
+     *                               information to your application
      * @return $this Fluent Builder
      */
-    public function setStatusCallback($statusCallback) {
+    public function setStatusCallback(string $statusCallback): self {
         $this->options['statusCallback'] = $statusCallback;
         return $this;
     }
 
     /**
-     * HTTP method Twilio should use when requesting the above URL. Defaults to `POST`.
-     * 
-     * @param string $statusCallbackMethod HTTP method Twilio should use when
-     *                                     requesting the above URL.
+     * The HTTP method we should use to call `status_callback`. Can be: `POST` or `GET` and the default is `POST`.
+     *
+     * @param string $statusCallbackMethod The HTTP method we should use to call
+     *                                     status_callback
      * @return $this Fluent Builder
      */
-    public function setStatusCallbackMethod($statusCallbackMethod) {
+    public function setStatusCallbackMethod(string $statusCallbackMethod): self {
         $this->options['statusCallbackMethod'] = $statusCallbackMethod;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Video.V1.UpdateCompositionHookOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Video.V1.UpdateCompositionHookOptions ' . $options . ']';
     }
 }
