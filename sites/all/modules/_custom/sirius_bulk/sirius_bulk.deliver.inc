@@ -18,7 +18,7 @@ function sirius_bulk_deliver($force = FALSE) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_bulk');
   $query->fieldCondition('field_sirius_bulk_status', 'value', 'pending');
-  $query->fieldCondition('field_sirius_datetime', 'value', date('Y-m-d H:i:s'), '<=');
+  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d H:i:s'), '<=');
   $query->propertyOrderBy('title');
   $stmt = $query->execute();
   if (!$stmt['node']) { return array('success' => TRUE, 'msg' => 'No nodes with status "pending" and a send date before now.'); }
@@ -28,8 +28,11 @@ function sirius_bulk_deliver($force = FALSE) {
   $count = 0;
   foreach ($bulk_nodes as $bulk_nid => $bulk_node) {
   	++$count;
-  	sirius_bulk_deliver_batch($bulk_node, $force);
+  	sirius_minilog("About to deliver: " . $bulk_node->title);
+  	$result = sirius_bulk_deliver_batch($bulk_node, $force);
+  	sirius_minilog("Delivered: " . $bulk_node->title . ': ' . $result['msg']);
   }
+
   return array('success' => TRUE, 'msg' => "Delivered the next batch on $count bulk node(s).");
 }
 
@@ -72,29 +75,53 @@ function sirius_bulk_deliver_batch($bulk_node, $force = FALSE) {
   }
   $log_nids = array_keys($stmt['node']);
 
+  $count_success = $count_error = $count = 0;
   foreach ($log_nids as $log_nid) {
-  	sirius_bulk_deliver_entry($log_nid);
+  	$result = sirius_bulk_deliver_entry($log_nid);
+  	++$count; 
+  	if ($result['success']) { ++$count_success; } else { ++$count_error; }
+  	sirius_minilog("Delivery to recipient #$log_nid via " . $result['medium'] . ": " . $result['to'] . ': ' . $result['msg']);
   }
 
-
-	return array('success' => TRUE, 'msg' => 'Yay.');
+	return array('success' => TRUE, 'msg' => "Attempted delivery of $count messages, with $count_success success and $count_error error.");;
 }
 
 function sirius_bulk_deliver_entry($log_nid) {
+	// Get the log node
 	$log_node = node_load($log_nid);
-	if (!$log_node) { return; }
-	if ($log_node->field_sirius_category['und'][0]['value'] != 'bulk:queue') { return; }
-	if ($log_node->field_sirius_type['und'][0]['value'] != 'add') { return; }
+	if (!$log_node) { return array('success' => FALSE, 'msg' => 'No queue entry.'); }
+	if ($log_node->field_sirius_category['und'][0]['value'] != 'bulk:queue') { return  array('success' => FALSE, 'msg' => 'Not a queue entry.'); }
+	if ($log_node->field_sirius_type['und'][0]['value'] != 'add') { return array('success' => FALSE, 'msg' => 'Not a pending queue entry.'); }
 
-	$bulk_nid = $log_node->field_sirius_log_handler['und'][0]['target_id'];
-	if (!$bulk_nid) { return; }
-	$bulk_node = node_load($bulk_nid);
-	if (!$bulk_node) { return; }
-	if ($bulk_node->type != 'sirius_bulk') { return; }
+	// Get the bulk and contact nodes
+	$handler_nids = sirius_fieldvals($log_node, 'field_sirius_log_handler', 'target_id');
+	$handler_nodes = node_load_multiple($handler_nids);
+	foreach ($handler_nodes as $handler_nid => $handler_node) {
+		if ($handler_node->type == 'sirius_bulk') { $bulk_node = $handler_node; }
+		if ($handler_node->type == 'sirius_contact') { $contact_node = $handler_node; }
+	}
+	if (!$bulk_node) { return array('success' => FALSE, 'msg' => 'No bulk node.'); }
+	if (!$contact_node) { return array('success' => FALSE, 'msg' => 'No contact node.'); }
 
-	$to = $log_node->field_sirius_notes['und'][0]['value'];
+	// Get the medium
+	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
+	if ($medium == 'choice') {
+		$worker_node = sirius_worker_get_by_contact_nid($contact_node->nid);
+		if ($worker_node) {
+			$medium = $worker_node->field_sirius_dispatch_medium['und'][2]['value'];
+		}
+	}
+	if (!$medium || $medium == 'choice' || $medium == 'none') {
+		$medium = 'email';
+	}
 
-	$result = sirius_bulk_deliver_impl($bulk_node, $to);
+	// Get the recipient
+	if ($medium == 'email') { $to = sirius_email_format($contact_node->field_sirius_email['und'][0]['value']); }
+	else { $to = sirius_phone_format($contact_node->field_sirius_phone['und'][0]['value']); }
+
+	$result = sirius_bulk_deliver_impl($bulk_node, $medium, $to);
+	$result['to'] = $to;
+	$result['medium'] = $medium;
 
 	if ($result['success']) {
 		$log_node->field_sirius_type['und'][0]['value'] = 'sent';
@@ -107,59 +134,18 @@ function sirius_bulk_deliver_entry($log_nid) {
 	return $result;
 }
 
-function sirius_bulk_deliver_impl($bulk_node, $to_input, $is_test = FALSE) {
-	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
+function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $is_test = FALSE) {
+	if (!$to) { return array('success' => FALSE, 'msg' => 'No recipient.'); }
 	$params = array();
 	$params['handler_nids'] = array($bulk_node->nid);
-
-	if (is_numeric($to_input)) {
-		$worker_node = node_load($to_input);
-		$params['handler_nids'][] = $worker_node->nid;
-		$params['worker_nid'] = $worker_node->nid;
-	}
-
-	//
-	// Figure out the medium.
-	//
-
-	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
-	if ($medium == 'choice') {
-		if ($worker_node) {
-			$medium = $worker_node->field_sirius_dispatch_medium['und'][2]['value'];
-		} else if (preg_match('/@/', $to_input)) {
-			$medium = 'email';
-		} else {
-			$medium = 'sms';
-		}
-	}
-	if (!$medium || $medium == 'choice' || $medium == 'none') {
-		$medium = 'email';
-	}
-
-	//
-	// Figure out the recipient
-	//
-
-	if ($worker_node) {
-		if ($medium == 'email') {
-			$to = $worker_node->field_sirius_email['und'][0]['value'];
-		} else {
-			$to = $worker_node->field_sirius_phone['und'][0]['value'];
-		}
-	} else {
-		$to = $to_input;
-	}
 	$params['to'] = $to;
-
 	$params['subject'] = $bulk_node->title;
 	$params['body'] = $bulk_node->body['und'][0]['value'];
-	// $params['sms'] = $bulk_node->title . "\n\n" . drupal_html_to_text($bulk_node->body['und'][0]['value']);
 	$params['sms'] = $bulk_node->title . "\n\n" . $bulk_node->field_sirius_sms['und'][0]['value'];
-	// $params['voice'] = drupal_html_to_text($bulk_node->body['und'][0]['value']);
 	$params['voice'] = $bulk_node->title . "\n\n" . $bulk_node->field_sirius_voice['und'][0]['value'];
 
 	if (!$is_test) {
-		$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $bulk_node->nid . '/' . $to_input;
+		$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $bulk_node->nid . '/' . $to;
 	}
 
 	if ($medium == 'email') {

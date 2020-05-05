@@ -10,9 +10,13 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.v
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.deliver.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.oneclick.inc";
 
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_create.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_medium.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_body.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_recipients.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_recipients_workers.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_recipients_contacts.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_send.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_queue.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_test.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_oneclick.inc";
@@ -69,4 +73,104 @@ function sirius_bulk_views_pre_render(&$view) {
 			}
 		}
 	}
+}
+
+function sirius_bulk_media()  {
+	return array(
+		'email' => 'Email',
+		'sms' => 'SMS (text message)',
+		'voice' => 'Voice (robocall)',
+		'choice' => 'Choice (user selects email or SMS)'
+	);
+}
+
+function sirius_bulk_queue_statuses()  {
+	return array(
+		'add' => 'Pending',
+		'sent' => 'Sent',
+		'error' => 'Error'
+	);
+}
+
+function sirius_bulk_recipient_remove($bulk_nid, $contact_nid) {
+	// Don't add to the queue twice.
+	$hr = sirius_bulk_recipient_check($bulk_nid, $contact_nid);
+	if (!$hr) { return array('success' => FALSE, 'msg' => 'The contact is not a recipient.'); }
+
+	node_delete($hr['nid']);
+	return array('success' => TRUE, 'msg' => 'Contact removed from the bulk message queue.');
+}
+
+function sirius_bulk_recipient_add($bulk_nid, $contact_nid) {
+	// Don't add to the queue twice.
+	$hr = sirius_bulk_recipient_check($bulk_nid, $contact_nid);
+	if ($hr) { return array('success' => FALSE, 'msg' => 'The contact has already been added as a recipient.'); }
+
+  // Add to the queue.
+  $contact_node = node_load($contact_nid);
+	sirius_log('bulk:queue', 'add', $contact_node->title, '', '', array($bulk_nid, $contact_nid));
+	return array('success' => TRUE, 'msg' => 'Contact added to the bulk message queue.');
+}
+
+function sirius_bulk_recipient_check($bulk_nid, $contact_nid) {
+	$sql = "select nid, field_sirius_type_value from node ";
+	$sql .= "join field_data_field_sirius_log_handler handler_a on handler_a.entity_type = 'node' and handler_a.entity_id = node.nid ";
+	$sql .= "join field_data_field_sirius_log_handler handler_b on handler_b.entity_type = 'node' and handler_b.entity_id = node.nid ";
+	$sql .= "join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+	$sql .= "join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+	$sql .= "where type = 'sirius_log' ";
+	$sql .= "and handler_a.field_sirius_log_handler_target_id = :bulk_nid ";
+	$sql .= "and handler_b.field_sirius_log_handler_target_id = :contact_nid ";
+	$sql_args[':bulk_nid'] = $bulk_nid;
+	$sql_args[':contact_nid'] = $contact_nid;
+
+	$stmt = db_query($sql, $sql_args);
+	$hr = $stmt->fetchAssoc();
+	return $hr;
+}
+
+function sirius_bulk_queue_summary($bulk_nid) {
+	$sql = "select field_sirius_type_value, count(*) as c ";
+	$sql .= "from node ";
+	$sql .= "join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+	$sql .= "join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+	$sql .= "join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_log' ";
+	$sql .= "and field_sirius_category_value = 'bulk:queue' ";
+	$sql .= "and field_sirius_log_handler_target_id = :bulk_nid ";
+	$sql .= "group by field_sirius_type_value ";
+	$sql .= "order by field_sirius_type_value ";
+
+	$stmt = db_query($sql, array(':bulk_nid' => $bulk_nid));
+	$result = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$result[$hr['field_sirius_type_value']] = $hr['c'];
+	}
+
+	return $result;
+}
+
+function sirius_bulk_queue_summary_render($bulk_node) {
+	$html = '<div class="sirius_bulk_summary">';
+
+	$summary = sirius_bulk_queue_summary($bulk_node->nid);
+	$total_recipients = 0;
+	if ($summary) {
+		foreach ($summary as $type => $count) {
+			$total_recipients += $count;
+		}
+	}
+	$html .= drupal_render(field_view_field('node', $bulk_node, 'field_sirius_bulk_medium', 'full'));
+	$html .= drupal_render(field_view_field('node', $bulk_node, 'field_sirius_bulk_status', 'full'));
+	$html .= drupal_render(field_view_field('node', $bulk_node, 'field_sirius_datetime', 'full'));
+	$html .= drupal_render(field_view_field('node', $bulk_node, 'field_sirius_datetime_completed', 'full'));
+	$html .= sirius_fakerender_field('Total Recipients: ', number_format($total_recipients, 0));
+	if ($summary) {
+		foreach ($summary as $type => $count) {
+			$html .= sirius_fakerender_field('-- Status: ' . $type, number_format($count, 0));
+		}
+	}
+
+	$html .= '</div>';
+	return $html;
 }
