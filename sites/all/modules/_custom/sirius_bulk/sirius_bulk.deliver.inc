@@ -18,7 +18,7 @@ function sirius_bulk_deliver($force = FALSE) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_bulk');
   $query->fieldCondition('field_sirius_bulk_status', 'value', 'pending');
-  $query->fieldCondition('field_sirius_datetime', 'value', date('Y-m-d H:i:s'), '<=');
+  $query->fieldCondition('field_sirius_datetime', 'value', gmdate('Y-m-d H:i:s'), '<=');
   $query->propertyOrderBy('title');
   $stmt = $query->execute();
   if (!$stmt['node']) { return array('success' => TRUE, 'msg' => 'No nodes with status "pending" and a send date before now.'); }
