@@ -4,13 +4,28 @@ function sirius_event_report_wwe_form($form, &$form_state, $report_type) {
   report_cache_form_prepare($report_type, $form, $form_state);
 
 	$event_type_options = sirius_taxonomy_load('sirius_event_type', 'tid', 'name', TRUE);
-  $member_status_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name', TRUE);
+  $ms_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name', TRUE);
+
+  $all_levels = sirius_training_levels_fetch_all();
+  $level_options = array();
+  $level_options[NULL] = t('-- Select --');
+  foreach ($all_levels as $ms_tid => $records) {
+    foreach ($records as $level_code => $record) {
+      $level_options["$ms_tid|$level_code"] = $ms_options[$ms_tid] . ': ' . $record['title'];
+    }
+  }
 
   $form['ms_tid'] = array(
-    '#title' => t('Search for active workers with this work status'),
+    '#title' => t('Search for active workers with this work status ...'),
     '#type' => 'select',
-    '#options' => $member_status_options,
+    '#options' => $ms_options,
     '#required' => TRUE,
+  );
+
+  $form['level'] = array(
+    '#title' => t('... and this level ... '),
+    '#type' => 'select',
+    '#options' => $level_options,
   );
 
   $form['event_type_tid'] = array(
@@ -35,6 +50,7 @@ function sirius_event_report_wwe_fields() {
 	$fields['worker_nid'] = 'Worker NID';
   $fields['worker_id'] = 'Worker ID';
   $fields['worker_name'] = 'Worker Name';
+  $fields['worker_level'] = 'Worker Level';
 	return $fields;
 }
 
@@ -103,6 +119,9 @@ function sirius_event_report_wwe_batch($worker_nids, $values, $report_id, $repor
   }
 
   // Walk the workers
+  $ms_tid = $values['ms_tid'];
+  $required_level = $values['level'];
+  list ($ignore, $required_level_code) = explode('|', $required_level);
   $rows = array('is_multiple' => TRUE, 'rows' => array());
   foreach ($worker_nids as $worker_nid) {
     $contact_nid = $worker_to_contact_map[$worker_nid];
@@ -111,18 +130,33 @@ function sirius_event_report_wwe_batch($worker_nids, $values, $report_id, $repor
 
     $sql_args = array();
     $sql_args[':worker_nid'] = $worker_nid;
-    $sql = "select title, field_sirius_id_value ";
+
+    $worker_node = node_load($worker_nid); 
+    $sql = "select title, field_sirius_id_value, field_sirius_json_value ";
     $sql .= "from node ";
-    $sql .= "join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
     $sql .= "where node.type = 'sirius_worker' ";
     $sql .= "and node.nid = :worker_nid";
     $stmt = sirius_sql_query($sql, $sql_args);
     $hr = $stmt->fetchAssoc();
+    $json = json_decode($hr['field_sirius_json_value'], TRUE);
+    $level = $level_code = '';
+    $level_record = $json['training']['levels'][$ms_tid];
+    if ($level_record) {
+      $level_code = $level_record['code'];
+      $level = sirius_training_levels_fetch_title($ms_tid, $level_code);
+    }
+
+    if ($required_level_code && ($required_level_code != $level_code)) { continue; }
+
     $row['worker_nid'] = $worker_nid;
-    $row['worker_name'] = $hr['title'];
     $row['worker_id'] = $hr['field_sirius_id_value'];
+    $row['worker_name'] = $hr['title'];
+    $row['worker_level'] = $level;
     $rows['rows'][$worker_nid] = $row;
   }
+
   return $rows; 
 }
 
@@ -137,10 +171,15 @@ function sirius_event_report_wwe_view($report_type, $report_id) {
   $parameters = unserialize($hr['report_data']);
   $ms_term = taxonomy_term_load($parameters['ms_tid']);
   $event_type_term = taxonomy_term_load($parameters['event_type_tid']);
+  $required_level = $parameters['level'];
+  list ($ignore, $required_level_code) = explode('|', $required_level);
+  $level_title = sirius_training_levels_fetch_title($ignore, $required_level_code);
 
   $html = '';
   $html .= '<h2>';
-  $html .= t('Active Workers with member status @ms who have NOT attended an event of type @event_type', array('@ms' => $ms_term->name, '@event_type' => $event_type_term->name));
+  $ms = $ms_term->name;
+  if ($level_title) { $ms .= ' (' . $level_title . ')';}
+  $html .= t('Active Workers with member status @ms who have NOT attended an event of type @event_type', array('@ms' => $ms, '@event_type' => $event_type_term->name));
   $html .= '</h2>';
 
   $query = db_select('report_cache');

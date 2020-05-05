@@ -20,7 +20,7 @@ abstract class SampleOptions {
      * @param string $language An ISO language-country string of the sample.
      * @return ReadSampleOptions Options builder
      */
-    public static function read($language = Values::NONE) {
+    public static function read(string $language = Values::NONE): ReadSampleOptions {
         return new ReadSampleOptions($language);
     }
 
@@ -31,7 +31,7 @@ abstract class SampleOptions {
      *                              value will be null
      * @return CreateSampleOptions Options builder
      */
-    public static function create($sourceChannel = Values::NONE) {
+    public static function create(string $sourceChannel = Values::NONE): CreateSampleOptions {
         return new CreateSampleOptions($sourceChannel);
     }
 
@@ -45,7 +45,7 @@ abstract class SampleOptions {
      *                              value will be null
      * @return UpdateSampleOptions Options builder
      */
-    public static function update($language = Values::NONE, $taggedText = Values::NONE, $sourceChannel = Values::NONE) {
+    public static function update(string $language = Values::NONE, string $taggedText = Values::NONE, string $sourceChannel = Values::NONE): UpdateSampleOptions {
         return new UpdateSampleOptions($language, $taggedText, $sourceChannel);
     }
 }
@@ -54,34 +54,29 @@ class ReadSampleOptions extends Options {
     /**
      * @param string $language An ISO language-country string of the sample.
      */
-    public function __construct($language = Values::NONE) {
+    public function __construct(string $language = Values::NONE) {
         $this->options['language'] = $language;
     }
 
     /**
      * An ISO language-country string of the sample.
-     * 
+     *
      * @param string $language An ISO language-country string of the sample.
      * @return $this Fluent Builder
      */
-    public function setLanguage($language) {
+    public function setLanguage(string $language): self {
         $this->options['language'] = $language;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Preview.Understand.ReadSampleOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Preview.Understand.ReadSampleOptions ' . $options . ']';
     }
 }
 
@@ -92,37 +87,32 @@ class CreateSampleOptions extends Options {
      *                              google-assistant, or slack. If not included the
      *                              value will be null
      */
-    public function __construct($sourceChannel = Values::NONE) {
+    public function __construct(string $sourceChannel = Values::NONE) {
         $this->options['sourceChannel'] = $sourceChannel;
     }
 
     /**
      * The communication channel the sample was captured. It can be: *voice*, *sms*, *chat*, *alexa*, *google-assistant*, or *slack*. If not included the value will be null
-     * 
+     *
      * @param string $sourceChannel The communication channel the sample was
      *                              captured. It can be: voice, sms, chat, alexa,
      *                              google-assistant, or slack. If not included the
      *                              value will be null
      * @return $this Fluent Builder
      */
-    public function setSourceChannel($sourceChannel) {
+    public function setSourceChannel(string $sourceChannel): self {
         $this->options['sourceChannel'] = $sourceChannel;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Preview.Understand.CreateSampleOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Preview.Understand.CreateSampleOptions ' . $options . ']';
     }
 }
 
@@ -136,7 +126,7 @@ class UpdateSampleOptions extends Options {
      *                              google-assistant, or slack. If not included the
      *                              value will be null
      */
-    public function __construct($language = Values::NONE, $taggedText = Values::NONE, $sourceChannel = Values::NONE) {
+    public function __construct(string $language = Values::NONE, string $taggedText = Values::NONE, string $sourceChannel = Values::NONE) {
         $this->options['language'] = $language;
         $this->options['taggedText'] = $taggedText;
         $this->options['sourceChannel'] = $sourceChannel;
@@ -144,53 +134,48 @@ class UpdateSampleOptions extends Options {
 
     /**
      * An ISO language-country string of the sample.
-     * 
+     *
      * @param string $language An ISO language-country string of the sample.
      * @return $this Fluent Builder
      */
-    public function setLanguage($language) {
+    public function setLanguage(string $language): self {
         $this->options['language'] = $language;
         return $this;
     }
 
     /**
      * The text example of how end-users may express this task. The sample may contain Field tag blocks.
-     * 
+     *
      * @param string $taggedText The text example of how end-users may express this
      *                           task. The sample may contain Field tag blocks.
      * @return $this Fluent Builder
      */
-    public function setTaggedText($taggedText) {
+    public function setTaggedText(string $taggedText): self {
         $this->options['taggedText'] = $taggedText;
         return $this;
     }
 
     /**
      * The communication channel the sample was captured. It can be: *voice*, *sms*, *chat*, *alexa*, *google-assistant*, or *slack*. If not included the value will be null
-     * 
+     *
      * @param string $sourceChannel The communication channel the sample was
      *                              captured. It can be: voice, sms, chat, alexa,
      *                              google-assistant, or slack. If not included the
      *                              value will be null
      * @return $this Fluent Builder
      */
-    public function setSourceChannel($sourceChannel) {
+    public function setSourceChannel(string $sourceChannel): self {
         $this->options['sourceChannel'] = $sourceChannel;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Preview.Understand.UpdateSampleOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Preview.Understand.UpdateSampleOptions ' . $options . ']';
     }
 }

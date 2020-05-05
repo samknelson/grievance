@@ -54,6 +54,15 @@ function sirius_twilio_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/twilio/browserphone/twiml/callended'] = array(
+    'title' => 'TwiML BrowserPhone Server',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_twilio_browserphone_twiml_callended',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/twilio/browserphone/twiml/omg'] = array(
     'page callback' => 'sirius_twilio_browserphone_twiml_omg',
     'page arguments' => array(),
@@ -74,6 +83,32 @@ function sirius_twilio_menu() {
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
+
+  $items['sirius/twilio/browserphone/twiml/conference'] = array(
+    'page callback' => 'sirius_twilio_browserphone_twiml_conference',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['sirius/twilio/browserphone/twiml/echo'] = array(
+    'title' => 'TwiML BrowserPhone Server',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_twilio_browserphone_twiml_echo',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/twilio/browserphone/twiml/conference/add'] = array(
+    'title' => 'TwiML BrowserPhone Server',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_twilio_browserphone_twiml_conference_add',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
 
   $items['sirius/twilio/phone'] = array(
     'title' => 'Sirius: Twilio: Phone',
