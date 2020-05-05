@@ -17,125 +17,106 @@ use Twilio\Values;
  */
 abstract class PhoneNumberOptions {
     /**
-     * @param string $sid Phone Number Sid of Twilio Number to assign to your Proxy
-     *                    Service
-     * @param string $phoneNumber Twilio Number to assign to your Proxy Service
-     * @param boolean $isReserved Reserve for manual assignment to participants
-     *                            only.
+     * @param string $sid The SID of a Twilio IncomingPhoneNumber resource
+     * @param string $phoneNumber The phone number in E.164 format
+     * @param bool $isReserved Whether the new phone number should be reserved
      * @return CreatePhoneNumberOptions Options builder
      */
-    public static function create($sid = Values::NONE, $phoneNumber = Values::NONE, $isReserved = Values::NONE) {
+    public static function create(string $sid = Values::NONE, string $phoneNumber = Values::NONE, bool $isReserved = Values::NONE): CreatePhoneNumberOptions {
         return new CreatePhoneNumberOptions($sid, $phoneNumber, $isReserved);
     }
 
     /**
-     * @param boolean $isReserved Reserve for manual assignment to participants
-     *                            only.
+     * @param bool $isReserved Whether the new phone number should be reserved
      * @return UpdatePhoneNumberOptions Options builder
      */
-    public static function update($isReserved = Values::NONE) {
+    public static function update(bool $isReserved = Values::NONE): UpdatePhoneNumberOptions {
         return new UpdatePhoneNumberOptions($isReserved);
     }
 }
 
 class CreatePhoneNumberOptions extends Options {
     /**
-     * @param string $sid Phone Number Sid of Twilio Number to assign to your Proxy
-     *                    Service
-     * @param string $phoneNumber Twilio Number to assign to your Proxy Service
-     * @param boolean $isReserved Reserve for manual assignment to participants
-     *                            only.
+     * @param string $sid The SID of a Twilio IncomingPhoneNumber resource
+     * @param string $phoneNumber The phone number in E.164 format
+     * @param bool $isReserved Whether the new phone number should be reserved
      */
-    public function __construct($sid = Values::NONE, $phoneNumber = Values::NONE, $isReserved = Values::NONE) {
+    public function __construct(string $sid = Values::NONE, string $phoneNumber = Values::NONE, bool $isReserved = Values::NONE) {
         $this->options['sid'] = $sid;
         $this->options['phoneNumber'] = $phoneNumber;
         $this->options['isReserved'] = $isReserved;
     }
 
     /**
-     * A Twilio [IncomingPhoneNumber](https://www.twilio.com/docs/phone-numbers/api/incoming-phone-numbers) Sid that represents the Twilio Number you would like to assign to your Proxy Service (e.g. `PN1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d`).
-     * 
-     * @param string $sid Phone Number Sid of Twilio Number to assign to your Proxy
-     *                    Service
+     * The SID of a Twilio [IncomingPhoneNumber](https://www.twilio.com/docs/phone-numbers/api/incomingphonenumber-resource) resource that represents the Twilio Number you would like to assign to your Proxy Service.
+     *
+     * @param string $sid The SID of a Twilio IncomingPhoneNumber resource
      * @return $this Fluent Builder
      */
-    public function setSid($sid) {
+    public function setSid(string $sid): self {
         $this->options['sid'] = $sid;
         return $this;
     }
 
     /**
-     * A string that represents the Twilio Number you would like to assign to your Proxy Service. Provide number in [E.164](https://en.wikipedia.org/wiki/E.164) format (e.g. `+16175551212`).
-     * 
-     * @param string $phoneNumber Twilio Number to assign to your Proxy Service
+     * The phone number in [E.164](https://www.twilio.com/docs/glossary/what-e164) format.  E.164 phone numbers consist of a + followed by the country code and subscriber number without punctuation characters. For example, +14155551234.
+     *
+     * @param string $phoneNumber The phone number in E.164 format
      * @return $this Fluent Builder
      */
-    public function setPhoneNumber($phoneNumber) {
+    public function setPhoneNumber(string $phoneNumber): self {
         $this->options['phoneNumber'] = $phoneNumber;
         return $this;
     }
 
     /**
-     * Whether or not the number should be excluded from being assigned to a participant using proxy pool logic
-     * 
-     * @param boolean $isReserved Reserve for manual assignment to participants
-     *                            only.
+     * Whether the new phone number should be reserved and not be assigned to a participant using proxy pool logic. See [Reserved Phone Numbers](https://www.twilio.com/docs/proxy/reserved-phone-numbers) for more information.
+     *
+     * @param bool $isReserved Whether the new phone number should be reserved
      * @return $this Fluent Builder
      */
-    public function setIsReserved($isReserved) {
+    public function setIsReserved(bool $isReserved): self {
         $this->options['isReserved'] = $isReserved;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Proxy.V1.CreatePhoneNumberOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Proxy.V1.CreatePhoneNumberOptions ' . $options . ']';
     }
 }
 
 class UpdatePhoneNumberOptions extends Options {
     /**
-     * @param boolean $isReserved Reserve for manual assignment to participants
-     *                            only.
+     * @param bool $isReserved Whether the new phone number should be reserved
      */
-    public function __construct($isReserved = Values::NONE) {
+    public function __construct(bool $isReserved = Values::NONE) {
         $this->options['isReserved'] = $isReserved;
     }
 
     /**
-     * Whether or not the number should be excluded from being assigned to a participant using proxy pool logic
-     * 
-     * @param boolean $isReserved Reserve for manual assignment to participants
-     *                            only.
+     * Whether the phone number should be reserved and not be assigned to a participant using proxy pool logic. See [Reserved Phone Numbers](https://www.twilio.com/docs/proxy/reserved-phone-numbers) for more information.
+     *
+     * @param bool $isReserved Whether the new phone number should be reserved
      * @return $this Fluent Builder
      */
-    public function setIsReserved($isReserved) {
+    public function setIsReserved(bool $isReserved): self {
         $this->options['isReserved'] = $isReserved;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Proxy.V1.UpdatePhoneNumberOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Proxy.V1.UpdatePhoneNumberOptions ' . $options . ']';
     }
 }

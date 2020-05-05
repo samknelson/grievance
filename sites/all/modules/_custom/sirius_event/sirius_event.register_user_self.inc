@@ -30,8 +30,12 @@ function sirius_event_register_user_self_form($form, &$form_state, $event_node, 
 }
 
 function sirius_event_register_user_self_form_submit($form, &$form_state) {
+	$rule = $form_state['rule'];
 	$event_nid = $form_state['event_nid'];
 	$event_node = node_load($event_nid);
+	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+	$event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
+	$widget_settings = $event_type_json['widget_settings']['register'][$rule['delta']]['user_self'];
 
 	$contact_nid = 	sirius_contact_nid_get_from_user();
 	if (!$contact_nid) {
@@ -45,8 +49,11 @@ function sirius_event_register_user_self_form_submit($form, &$form_state) {
 	$pstatus_term = taxonomy_term_load($pstatus_tid);
 
 	$result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
+
 	if ($result['success']) { 
-		drupal_set_message($result['msg']);
+		$confirmation_text = $widget_settings['confirmation_text'];
+		if (!$confirmation_text) { $confirmation_text = $result['msg']; }
+		drupal_set_message($confirmation_text);
 	} else { 
 		drupal_set_message($result['msg'], 'error'); 
 		return;

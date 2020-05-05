@@ -16,42 +16,41 @@ use Twilio\Version;
 
 /**
  * PLEASE NOTE that this class contains preview products that are subject to change. Use them with caution. If you currently do not have developer preview access, please contact help@twilio.com.
- * 
- * @property string formType
- * @property array forms
- * @property array formMeta
- * @property string url
+ *
+ * @property string $formType
+ * @property array $forms
+ * @property array $formMeta
+ * @property string $url
  */
 class FormInstance extends InstanceResource {
     /**
      * Initialize the FormInstance
-     * 
-     * @param \Twilio\Version $version Version that contains the resource
+     *
+     * @param Version $version Version that contains the resource
      * @param mixed[] $payload The response payload
-     * @param string $formType The Form Type of this Form
-     * @return \Twilio\Rest\Authy\V1\FormInstance 
+     * @param string $formType The Type of this Form
      */
-    public function __construct(Version $version, array $payload, $formType = null) {
+    public function __construct(Version $version, array $payload, string $formType = null) {
         parent::__construct($version);
 
         // Marshaled Properties
-        $this->properties = array(
+        $this->properties = [
             'formType' => Values::array_get($payload, 'form_type'),
             'forms' => Values::array_get($payload, 'forms'),
             'formMeta' => Values::array_get($payload, 'form_meta'),
             'url' => Values::array_get($payload, 'url'),
-        );
+        ];
 
-        $this->solution = array('formType' => $formType ?: $this->properties['formType'], );
+        $this->solution = ['formType' => $formType ?: $this->properties['formType'], ];
     }
 
     /**
      * Generate an instance context for the instance, the context is capable of
      * performing various actions.  All instance actions are proxied to the context
-     * 
-     * @return \Twilio\Rest\Authy\V1\FormContext Context for this FormInstance
+     *
+     * @return FormContext Context for this FormInstance
      */
-    protected function proxy() {
+    protected function proxy(): FormContext {
         if (!$this->context) {
             $this->context = new FormContext($this->version, $this->solution['formType']);
         }
@@ -60,29 +59,29 @@ class FormInstance extends InstanceResource {
     }
 
     /**
-     * Fetch a FormInstance
-     * 
+     * Fetch the FormInstance
+     *
      * @return FormInstance Fetched FormInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
+    public function fetch(): FormInstance {
         return $this->proxy()->fetch();
     }
 
     /**
      * Magic getter to access properties
-     * 
+     *
      * @param string $name Property to access
      * @return mixed The requested property
      * @throws TwilioException For unknown properties
      */
-    public function __get($name) {
-        if (array_key_exists($name, $this->properties)) {
+    public function __get(string $name) {
+        if (\array_key_exists($name, $this->properties)) {
             return $this->properties[$name];
         }
 
-        if (property_exists($this, '_' . $name)) {
-            $method = 'get' . ucfirst($name);
+        if (\property_exists($this, '_' . $name)) {
+            $method = 'get' . \ucfirst($name);
             return $this->$method();
         }
 
@@ -91,14 +90,14 @@ class FormInstance extends InstanceResource {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Authy.V1.FormInstance ' . implode(' ', $context) . ']';
+        return '[Twilio.Authy.V1.FormInstance ' . \implode(' ', $context) . ']';
     }
 }

@@ -9,6 +9,7 @@
 
 namespace Twilio\Rest\Proxy\V1\Service;
 
+use Twilio\Exceptions\TwilioException;
 use Twilio\InstanceContext;
 use Twilio\Options;
 use Twilio\Serialize;
@@ -21,45 +22,39 @@ use Twilio\Version;
 class ShortCodeContext extends InstanceContext {
     /**
      * Initialize the ShortCodeContext
-     * 
-     * @param \Twilio\Version $version Version that contains the resource
-     * @param string $serviceSid Service Sid.
-     * @param string $sid A string that uniquely identifies this Short Code.
-     * @return \Twilio\Rest\Proxy\V1\Service\ShortCodeContext 
+     *
+     * @param Version $version Version that contains the resource
+     * @param string $serviceSid The SID of the parent Service to fetch the
+     *                           resource from
+     * @param string $sid The unique string that identifies the resource
      */
     public function __construct(Version $version, $serviceSid, $sid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('serviceSid' => $serviceSid, 'sid' => $sid, );
+        $this->solution = ['serviceSid' => $serviceSid, 'sid' => $sid, ];
 
-        $this->uri = '/Services/' . rawurlencode($serviceSid) . '/ShortCodes/' . rawurlencode($sid) . '';
+        $this->uri = '/Services/' . \rawurlencode($serviceSid) . '/ShortCodes/' . \rawurlencode($sid) . '';
     }
 
     /**
-     * Deletes the ShortCodeInstance
-     * 
-     * @return boolean True if delete succeeds, false otherwise
+     * Delete the ShortCodeInstance
+     *
+     * @return bool True if delete succeeds, false otherwise
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function delete() {
-        return $this->version->delete('delete', $this->uri);
+    public function delete(): bool {
+        return $this->version->delete('DELETE', $this->uri);
     }
 
     /**
-     * Fetch a ShortCodeInstance
-     * 
+     * Fetch the ShortCodeInstance
+     *
      * @return ShortCodeInstance Fetched ShortCodeInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
-        $params = Values::of(array());
-
-        $payload = $this->version->fetch(
-            'GET',
-            $this->uri,
-            $params
-        );
+    public function fetch(): ShortCodeInstance {
+        $payload = $this->version->fetch('GET', $this->uri);
 
         return new ShortCodeInstance(
             $this->version,
@@ -71,22 +66,17 @@ class ShortCodeContext extends InstanceContext {
 
     /**
      * Update the ShortCodeInstance
-     * 
+     *
      * @param array|Options $options Optional Arguments
      * @return ShortCodeInstance Updated ShortCodeInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function update($options = array()) {
+    public function update(array $options = []): ShortCodeInstance {
         $options = new Values($options);
 
-        $data = Values::of(array('IsReserved' => Serialize::booleanToString($options['isReserved']), ));
+        $data = Values::of(['IsReserved' => Serialize::booleanToString($options['isReserved']), ]);
 
-        $payload = $this->version->update(
-            'POST',
-            $this->uri,
-            array(),
-            $data
-        );
+        $payload = $this->version->update('POST', $this->uri, [], $data);
 
         return new ShortCodeInstance(
             $this->version,
@@ -98,14 +88,14 @@ class ShortCodeContext extends InstanceContext {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Proxy.V1.ShortCodeContext ' . implode(' ', $context) . ']';
+        return '[Twilio.Proxy.V1.ShortCodeContext ' . \implode(' ', $context) . ']';
     }
 }

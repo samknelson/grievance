@@ -9,6 +9,7 @@
 
 namespace Twilio\Rest\Autopilot\V1\Assistant\Task;
 
+use Twilio\Exceptions\TwilioException;
 use Twilio\InstanceContext;
 use Twilio\Options;
 use Twilio\Serialize;
@@ -21,35 +22,31 @@ use Twilio\Version;
 class TaskActionsContext extends InstanceContext {
     /**
      * Initialize the TaskActionsContext
-     * 
-     * @param \Twilio\Version $version Version that contains the resource
-     * @param string $assistantSid The unique ID of the parent Assistant.
-     * @param string $taskSid The unique ID of the Task.
-     * @return \Twilio\Rest\Autopilot\V1\Assistant\Task\TaskActionsContext 
+     *
+     * @param Version $version Version that contains the resource
+     * @param string $assistantSid The SID of the Assistant that is the parent of
+     *                             the Task for which the task actions to fetch
+     *                             were defined
+     * @param string $taskSid The SID of the Task for which the task actions to
+     *                        fetch were defined
      */
     public function __construct(Version $version, $assistantSid, $taskSid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('assistantSid' => $assistantSid, 'taskSid' => $taskSid, );
+        $this->solution = ['assistantSid' => $assistantSid, 'taskSid' => $taskSid, ];
 
-        $this->uri = '/Assistants/' . rawurlencode($assistantSid) . '/Tasks/' . rawurlencode($taskSid) . '/Actions';
+        $this->uri = '/Assistants/' . \rawurlencode($assistantSid) . '/Tasks/' . \rawurlencode($taskSid) . '/Actions';
     }
 
     /**
-     * Fetch a TaskActionsInstance
-     * 
+     * Fetch the TaskActionsInstance
+     *
      * @return TaskActionsInstance Fetched TaskActionsInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
-        $params = Values::of(array());
-
-        $payload = $this->version->fetch(
-            'GET',
-            $this->uri,
-            $params
-        );
+    public function fetch(): TaskActionsInstance {
+        $payload = $this->version->fetch('GET', $this->uri);
 
         return new TaskActionsInstance(
             $this->version,
@@ -61,22 +58,17 @@ class TaskActionsContext extends InstanceContext {
 
     /**
      * Update the TaskActionsInstance
-     * 
+     *
      * @param array|Options $options Optional Arguments
      * @return TaskActionsInstance Updated TaskActionsInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function update($options = array()) {
+    public function update(array $options = []): TaskActionsInstance {
         $options = new Values($options);
 
-        $data = Values::of(array('Actions' => Serialize::jsonObject($options['actions']), ));
+        $data = Values::of(['Actions' => Serialize::jsonObject($options['actions']), ]);
 
-        $payload = $this->version->update(
-            'POST',
-            $this->uri,
-            array(),
-            $data
-        );
+        $payload = $this->version->update('POST', $this->uri, [], $data);
 
         return new TaskActionsInstance(
             $this->version,
@@ -88,14 +80,14 @@ class TaskActionsContext extends InstanceContext {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Autopilot.V1.TaskActionsContext ' . implode(' ', $context) . ']';
+        return '[Twilio.Autopilot.V1.TaskActionsContext ' . \implode(' ', $context) . ']';
     }
 }

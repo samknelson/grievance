@@ -11,6 +11,7 @@ namespace Twilio\Rest\Authy\V1;
 
 use Twilio\Exceptions\TwilioException;
 use Twilio\InstanceContext;
+use Twilio\ListResource;
 use Twilio\Options;
 use Twilio\Rest\Authy\V1\Service\EntityList;
 use Twilio\Values;
@@ -18,85 +19,82 @@ use Twilio\Version;
 
 /**
  * PLEASE NOTE that this class contains preview products that are subject to change. Use them with caution. If you currently do not have developer preview access, please contact help@twilio.com.
- * 
- * @property \Twilio\Rest\Authy\V1\Service\EntityList entities
+ *
+ * @property EntityList $entities
  * @method \Twilio\Rest\Authy\V1\Service\EntityContext entities(string $identity)
  */
 class ServiceContext extends InstanceContext {
-    protected $_entities = null;
+    protected $_entities;
 
     /**
      * Initialize the ServiceContext
-     * 
-     * @param \Twilio\Version $version Version that contains the resource
+     *
+     * @param Version $version Version that contains the resource
      * @param string $sid A string that uniquely identifies this Service.
-     * @return \Twilio\Rest\Authy\V1\ServiceContext 
      */
     public function __construct(Version $version, $sid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('sid' => $sid, );
+        $this->solution = ['sid' => $sid, ];
 
-        $this->uri = '/Services/' . rawurlencode($sid) . '';
+        $this->uri = '/Services/' . \rawurlencode($sid) . '';
     }
 
     /**
-     * Deletes the ServiceInstance
-     * 
-     * @return boolean True if delete succeeds, false otherwise
+     * Delete the ServiceInstance
+     *
+     * @param array|Options $options Optional Arguments
+     * @return bool True if delete succeeds, false otherwise
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function delete() {
-        return $this->version->delete('delete', $this->uri);
+    public function delete(array $options = []): bool {
+        $options = new Values($options);
+
+        $headers = Values::of(['Twilio-Authy-Sandbox-Mode' => $options['twilioAuthySandboxMode'], ]);
+
+        return $this->version->delete('DELETE', $this->uri, [], [], $headers);
     }
 
     /**
-     * Fetch a ServiceInstance
-     * 
+     * Fetch the ServiceInstance
+     *
+     * @param array|Options $options Optional Arguments
      * @return ServiceInstance Fetched ServiceInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
-        $params = Values::of(array());
+    public function fetch(array $options = []): ServiceInstance {
+        $options = new Values($options);
 
-        $payload = $this->version->fetch(
-            'GET',
-            $this->uri,
-            $params
-        );
+        $headers = Values::of(['Twilio-Authy-Sandbox-Mode' => $options['twilioAuthySandboxMode'], ]);
+
+        $payload = $this->version->fetch('GET', $this->uri, [], [], $headers);
 
         return new ServiceInstance($this->version, $payload, $this->solution['sid']);
     }
 
     /**
      * Update the ServiceInstance
-     * 
+     *
      * @param array|Options $options Optional Arguments
      * @return ServiceInstance Updated ServiceInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function update($options = array()) {
+    public function update(array $options = []): ServiceInstance {
         $options = new Values($options);
 
-        $data = Values::of(array('FriendlyName' => $options['friendlyName'], ));
+        $data = Values::of(['FriendlyName' => $options['friendlyName'], 'Push' => $options['push'], ]);
+        $headers = Values::of(['Twilio-Authy-Sandbox-Mode' => $options['twilioAuthySandboxMode'], ]);
 
-        $payload = $this->version->update(
-            'POST',
-            $this->uri,
-            array(),
-            $data
-        );
+        $payload = $this->version->update('POST', $this->uri, [], $data, $headers);
 
         return new ServiceInstance($this->version, $payload, $this->solution['sid']);
     }
 
     /**
      * Access the entities
-     * 
-     * @return \Twilio\Rest\Authy\V1\Service\EntityList 
      */
-    protected function getEntities() {
+    protected function getEntities(): EntityList {
         if (!$this->_entities) {
             $this->_entities = new EntityList($this->version, $this->solution['sid']);
         }
@@ -106,14 +104,14 @@ class ServiceContext extends InstanceContext {
 
     /**
      * Magic getter to lazy load subresources
-     * 
+     *
      * @param string $name Subresource to return
-     * @return \Twilio\ListResource The requested subresource
-     * @throws \Twilio\Exceptions\TwilioException For unknown subresources
+     * @return ListResource The requested subresource
+     * @throws TwilioException For unknown subresources
      */
-    public function __get($name) {
-        if (property_exists($this, '_' . $name)) {
-            $method = 'get' . ucfirst($name);
+    public function __get(string $name): ListResource {
+        if (\property_exists($this, '_' . $name)) {
+            $method = 'get' . \ucfirst($name);
             return $this->$method();
         }
 
@@ -122,16 +120,16 @@ class ServiceContext extends InstanceContext {
 
     /**
      * Magic caller to get resource contexts
-     * 
+     *
      * @param string $name Resource to return
      * @param array $arguments Context parameters
-     * @return \Twilio\InstanceContext The requested resource context
-     * @throws \Twilio\Exceptions\TwilioException For unknown resource
+     * @return InstanceContext The requested resource context
+     * @throws TwilioException For unknown resource
      */
-    public function __call($name, $arguments) {
+    public function __call(string $name, array $arguments): InstanceContext {
         $property = $this->$name;
-        if (method_exists($property, 'getContext')) {
-            return call_user_func_array(array($property, 'getContext'), $arguments);
+        if (\method_exists($property, 'getContext')) {
+            return \call_user_func_array(array($property, 'getContext'), $arguments);
         }
 
         throw new TwilioException('Resource does not have a context');
@@ -139,14 +137,14 @@ class ServiceContext extends InstanceContext {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Authy.V1.ServiceContext ' . implode(' ', $context) . ']';
+        return '[Twilio.Authy.V1.ServiceContext ' . \implode(' ', $context) . ']';
     }
 }
