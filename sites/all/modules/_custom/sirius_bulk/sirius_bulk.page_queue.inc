@@ -1,32 +1,40 @@
 <?php
 
 function sirius_bulk_node_tab_queue($bulk_node) {
-	$sql = "select field_sirius_type_value, count(*) as c ";
-	$sql .= "from node ";
-	$sql .= "join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
-	$sql .= "join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
-	$sql .= "join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
-	$sql .= "where node.type = 'sirius_log' ";
-	$sql .= "and field_sirius_category_value = 'bulk:queue' ";
-	$sql .= "and field_sirius_log_handler_target_id = :bulk_nid ";
-	$sql .= "group by field_sirius_type_value ";
-	$sql .= "order by field_sirius_type_value ";
+	return drupal_get_form('sirius_bulk_node_tab_queue_form', $bulk_node);
+}
 
-	$stmt = db_query($sql, array(':bulk_nid' => $bulk_node->nid));
-	$rows = array();
-	while ($hr = $stmt->fetchAssoc()) {
-		$row = array();
-		$row[] = $hr['field_sirius_type_value'];
-		$row[] = number_format($hr['c']);
-		$rows[] = $row;
-	}
-	$header = array('Status', 'Count');
+function sirius_bulk_node_tab_queue_form($form, &$form_state, $bulk_node) {
+	drupal_add_css(drupal_get_path('module', 'sirius_bulk') . '/css/bulk.css');
 
-	$html .= '<h2>' . t('Summary') . '</h2>';
-	$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
+	$form['summary'] = array('#markup' => sirius_bulk_queue_summary_render($bulk_node));
 
-	$html .= '<h2>' . t('Queue') . '</h2>';
-	$html .= views_embed_view('sirius_bulk_queue', 'block', $bulk_node->nid);
+	$contact_definition_json = sirius_contact_definition();
+	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
 
-	return $html;
+	sirius_mightysearch_form_prepare(
+		$form, 
+		$form_state, 
+		$event_node->nid,
+		'Bulk Registration', 
+		array(
+			'sirius_contact' => array(
+				'default' => $contact_definition_form
+			),
+			'sirius_bulk' => array(
+				'bulk_nid' => $bulk_node->nid,
+			),
+		),
+		array(
+			'search' => array(
+				'title' => 'Search',
+			),
+		)
+	);
+
+	return $form;
+}
+
+function sirius_bulk_node_tab_queue_form_submit($form, &$form_state) {
+	sirius_mightysearch_form_submit($form, $form_state);
 }

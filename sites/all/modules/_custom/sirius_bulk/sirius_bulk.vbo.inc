@@ -26,18 +26,8 @@ function sirius_bulk_queue(&$node, $context) {
     return;
   }
 
-	// Don't add to the queue twice.
-	$query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'sirius_log');
-  $query->fieldCondition('field_sirius_log_handler', 'target_id', $bulk_nid);
-  // @todo: should be checking handler, but EntityFieldQuery can't check multiple values at the same time.
-  $query->fieldCondition('field_sirius_notes', 'value', $node->nid); 
-  $query->fieldCondition('field_sirius_category', 'value', 'bulk:queue');
-  $stmt = $query->execute();
-  if ($stmt['node']) { return; }
-
-  // Add to the queue.
-	sirius_log('bulk:queue', 'add', $node->title, '', $node->nid, array($bulk_nid, $node->nid));
+  $contact_nid = $node->field_sirius_contact['und'][0]['target_id'];
+  if (!$contact_nid) { $contact_nid = $node->nid; }
+  sirius_bulk_recipient_add($bulk_nid, $contact_nid);
 }
 

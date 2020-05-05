@@ -3,12 +3,7 @@
 function sirius_bulk_config() {
   $form = array();
 
-  $media = array(
-  	'email' => 'Email',
-  	'sms' => 'SMS (text message)',
-  	'voice' => 'Voice (robocall)',
-  	'choice' => 'Choice (user selects email or SMS)'
-  );
+	$media = sirius_bulk_media();
 
   foreach ($media as $medium => $medium_label) {
 	  $form["sirius_bulk_batch_$medium"] = array(
@@ -29,4 +24,43 @@ function sirius_bulk_config() {
   return system_settings_form($form);
 }
 
+function sirius_bulk_page_poll() {
+	return drupal_get_form('sirius_bulk_page_poll_form');
+}
 
+function sirius_bulk_page_poll_form($form, &$form_state) {
+	$form['force'] = array(
+		'#type' => 'select',
+		'#title' => t('Force?'),
+		'#options' => array(
+			'no' => t('No, poll normally'),
+			'yes' => t('Yes, force-deliver all messages'),
+		),
+		'#description' => t('Force-deliver will disregard time limitations and flood limitations for services.'),
+		'#default_value' => 'no',
+	);
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
+
+	if ($form_state['results']) {
+		$form['results'] = array(
+			'#markup' => '<h2>' . t('Results') . '</h2><hr>' . $form_state['results'],
+		);
+	}
+
+	return $form;
+}
+
+function sirius_bulk_page_poll_form_submit($form, &$form_state) {
+	if ($form_state['values']['force'] == 'yes') { $force = TRUE; } else { $force = FALSE; }
+
+	$result = sirius_bulk_deliver($force);
+	drupal_set_message($result['msg']);
+	sirius_minilog($result['msg']);
+
+	$form_state['rebuild'] = TRUE;
+	$form_state['results'] = sirius_minilog_render_html();
+}
