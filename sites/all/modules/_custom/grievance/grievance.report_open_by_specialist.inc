@@ -5,6 +5,16 @@ function grievance_report_open_by_specialist() {
 }
 
 function grievance_report_open_by_specialist_form($form, &$form_state) {
+	$broughtby_options = sirius_taxonomy_load('grievance_broughtby', 'tid', 'name', TRUE);
+
+	if (count($broughtby_options) > 1) {
+	  $form['broughtby_tid'] = array(
+	    '#type' => 'select',
+	    '#title' => t('Brought By'),
+	    '#options' => $broughtby_options,
+	  );
+	}
+
   $form['organizer'] = array(
     '#type' => 'entityreference',
     '#title' => t('Organizer'),
@@ -30,7 +40,7 @@ function grievance_report_open_by_specialist_form($form, &$form_state) {
   $form['classaction'] = array(
     '#type' => 'select',
     '#title' => t('General Grievances Only?'),
-    '#options' => array(NULL => t('Both Individual and General'), 'No' => t('Individual Grievnaces Only'), 'Yes' => t('General / Class Action Grievances Only')),
+    '#options' => array(NULL => t('Both Individual and General'), 'No' => t('Individual Grievances Only'), 'Yes' => t('General / Class Action Grievances Only')),
   );
 
   $form['submit'] = array(
@@ -92,14 +102,13 @@ function grievance_report_open_by_specialist_form_submit($form, &$form_state) {
 	}
 
 	$classaction = $form_state['values']['classaction'];
+	if (!$classaction) { $classaction = 'all'; }
+	$broughtby_tid = $form_state['values']['broughtby_tid'];
+	if (!$broughtby_tid) { $broughtby_tid = 'all'; }
 
 	$results = '';
 	foreach ($organizers as $organizer_uid) {
-		if ($classaction) {
-			$tmp = views_embed_view('grievance_open_report', 'page', $organizer_uid, $shop_str, $classaction);
-		} else {
-			$tmp = views_embed_view('grievance_open_report', 'page', $organizer_uid, $shop_str);
-		}
+		$tmp = views_embed_view('grievance_open_report', 'page', $organizer_uid, $shop_str, $classaction, $broughtby_tid);
 		if (preg_match('/table/', $tmp)) {
 			$organizer = user_load($organizer_uid);
 			$results .= '<h2>' . $organizer->name . '</h2>' . $tmp;

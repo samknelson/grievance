@@ -24,7 +24,7 @@ function sirius_event_register_widgets() {
 	return array(
 		'user_select' => t('User Select'),
 		'user_byname' => t('User by Name'),
-		'user_self' => t('Self-Registration'),
+		'user_self' => t('Self Registration'),
 		'worker_byname' => t('Worker by Name'),
 		'contact_bulk' => t('Contact Bulk'),
 		'bullpen_signin' => t('Bullpen Signin'),

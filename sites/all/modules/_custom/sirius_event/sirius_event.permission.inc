@@ -50,7 +50,9 @@ function sirius_event_paccess_rule_match($event_nid, $rules, $multiple = FALSE) 
 
   $matches = array();
   if ($rules) {
-    foreach ($rules as $rule) {
+    $delta = -1;
+    foreach ($rules as $delta => $rule) {
+      $rule['delta'] = $delta;
       if (!$rule['paccess']) { continue; }
       foreach ($rule['paccess'] as $paccess) {
         list ($prole_tid, $rest) = explode('|', $paccess);

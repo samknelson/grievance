@@ -11,22 +11,20 @@ namespace Twilio\Rest;
 
 use Twilio\Domain;
 use Twilio\Exceptions\TwilioException;
-use Twilio\Rest\Verify\V1;
+use Twilio\Rest\Verify\V2;
 
 /**
- * @property \Twilio\Rest\Verify\V1 v1
- * @property \Twilio\Rest\Verify\V1\ServiceList services
- * @method \Twilio\Rest\Verify\V1\ServiceContext services(string $sid)
+ * @property \Twilio\Rest\Verify\V2 $v2
+ * @property \Twilio\Rest\Verify\V2\ServiceList $services
+ * @method \Twilio\Rest\Verify\V2\ServiceContext services(string $sid)
  */
 class Verify extends Domain {
-    protected $_v1 = null;
+    protected $_v2;
 
     /**
      * Construct the Verify Domain
-     * 
-     * @param \Twilio\Rest\Client $client Twilio\Rest\Client to communicate with
-     *                                    Twilio
-     * @return \Twilio\Rest\Verify Domain for Verify
+     *
+     * @param Client $client Client to communicate with Twilio
      */
     public function __construct(Client $client) {
         parent::__construct($client);
@@ -35,25 +33,25 @@ class Verify extends Domain {
     }
 
     /**
-     * @return \Twilio\Rest\Verify\V1 Version v1 of verify
+     * @return V2 Version v2 of verify
      */
-    protected function getV1() {
-        if (!$this->_v1) {
-            $this->_v1 = new V1($this);
+    protected function getV2(): V2 {
+        if (!$this->_v2) {
+            $this->_v2 = new V2($this);
         }
-        return $this->_v1;
+        return $this->_v2;
     }
 
     /**
      * Magic getter to lazy load version
-     * 
+     *
      * @param string $name Version to return
      * @return \Twilio\Version The requested version
-     * @throws \Twilio\Exceptions\TwilioException For unknown versions
+     * @throws TwilioException For unknown versions
      */
-    public function __get($name) {
-        $method = 'get' . ucfirst($name);
-        if (method_exists($this, $method)) {
+    public function __get(string $name) {
+        $method = 'get' . \ucfirst($name);
+        if (\method_exists($this, $method)) {
             return $this->$method();
         }
 
@@ -62,42 +60,38 @@ class Verify extends Domain {
 
     /**
      * Magic caller to get resource contexts
-     * 
+     *
      * @param string $name Resource to return
      * @param array $arguments Context parameters
      * @return \Twilio\InstanceContext The requested resource context
-     * @throws \Twilio\Exceptions\TwilioException For unknown resource
+     * @throws TwilioException For unknown resource
      */
-    public function __call($name, $arguments) {
-        $method = 'context' . ucfirst($name);
-        if (method_exists($this, $method)) {
-            return call_user_func_array(array($this, $method), $arguments);
+    public function __call(string $name, array $arguments) {
+        $method = 'context' . \ucfirst($name);
+        if (\method_exists($this, $method)) {
+            return \call_user_func_array([$this, $method], $arguments);
         }
 
         throw new TwilioException('Unknown context ' . $name);
     }
 
-    /**
-     * @return \Twilio\Rest\Verify\V1\ServiceList 
-     */
-    protected function getServices() {
-        return $this->v1->services;
+    protected function getServices(): \Twilio\Rest\Verify\V2\ServiceList {
+        return $this->v2->services;
     }
 
     /**
-     * @param string $sid Verification Service Instance SID.
-     * @return \Twilio\Rest\Verify\V1\ServiceContext 
+     * @param string $sid The unique string that identifies the resource
      */
-    protected function contextServices($sid) {
-        return $this->v1->services($sid);
+    protected function contextServices(string $sid): \Twilio\Rest\Verify\V2\ServiceContext {
+        return $this->v2->services($sid);
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
+    public function __toString(): string {
         return '[Twilio.Verify]';
     }
 }

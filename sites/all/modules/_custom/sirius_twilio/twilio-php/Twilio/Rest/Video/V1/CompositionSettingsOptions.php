@@ -17,43 +17,35 @@ use Twilio\Values;
  */
 abstract class CompositionSettingsOptions {
     /**
-     * @param string $awsCredentialsSid SID of the Stored Credential resource CRxx
-     * @param string $encryptionKeySid SID of the Public Key resource CRxx
-     * @param string $awsS3Url Identity of the external location where the
-     *                         compositions should be stored. We only support
-     *                         DNS-compliant URLs like
-     *                         http://<my-bucket>.s3-<aws-region>.amazonaws.com/compositions, where compositions is the path where you want compositions to be stored.
-     * @param boolean $awsStorageEnabled true|false When set to true, all
-     *                                   Compositions will be written to the
-     *                                   AwsS3Url specified above. When set to
-     *                                   false, all Compositions will be stored in
-     *                                   Twilio's cloud.
-     * @param boolean $encryptionEnabled true|false When set to true, all
-     *                                   Compositions will be stored encrypted.
+     * @param string $awsCredentialsSid The SID of the stored Credential resource
+     * @param string $encryptionKeySid The SID of the Public Key resource to use
+     *                                 for encryption
+     * @param string $awsS3Url The URL of the AWS S3 bucket where the compositions
+     *                         should be stored
+     * @param bool $awsStorageEnabled Whether all compositions should be written to
+     *                                the aws_s3_url
+     * @param bool $encryptionEnabled Whether all compositions should be stored in
+     *                                an encrypted form
      * @return CreateCompositionSettingsOptions Options builder
      */
-    public static function create($awsCredentialsSid = Values::NONE, $encryptionKeySid = Values::NONE, $awsS3Url = Values::NONE, $awsStorageEnabled = Values::NONE, $encryptionEnabled = Values::NONE) {
+    public static function create(string $awsCredentialsSid = Values::NONE, string $encryptionKeySid = Values::NONE, string $awsS3Url = Values::NONE, bool $awsStorageEnabled = Values::NONE, bool $encryptionEnabled = Values::NONE): CreateCompositionSettingsOptions {
         return new CreateCompositionSettingsOptions($awsCredentialsSid, $encryptionKeySid, $awsS3Url, $awsStorageEnabled, $encryptionEnabled);
     }
 }
 
 class CreateCompositionSettingsOptions extends Options {
     /**
-     * @param string $awsCredentialsSid SID of the Stored Credential resource CRxx
-     * @param string $encryptionKeySid SID of the Public Key resource CRxx
-     * @param string $awsS3Url Identity of the external location where the
-     *                         compositions should be stored. We only support
-     *                         DNS-compliant URLs like
-     *                         http://<my-bucket>.s3-<aws-region>.amazonaws.com/compositions, where compositions is the path where you want compositions to be stored.
-     * @param boolean $awsStorageEnabled true|false When set to true, all
-     *                                   Compositions will be written to the
-     *                                   AwsS3Url specified above. When set to
-     *                                   false, all Compositions will be stored in
-     *                                   Twilio's cloud.
-     * @param boolean $encryptionEnabled true|false When set to true, all
-     *                                   Compositions will be stored encrypted.
+     * @param string $awsCredentialsSid The SID of the stored Credential resource
+     * @param string $encryptionKeySid The SID of the Public Key resource to use
+     *                                 for encryption
+     * @param string $awsS3Url The URL of the AWS S3 bucket where the compositions
+     *                         should be stored
+     * @param bool $awsStorageEnabled Whether all compositions should be written to
+     *                                the aws_s3_url
+     * @param bool $encryptionEnabled Whether all compositions should be stored in
+     *                                an encrypted form
      */
-    public function __construct($awsCredentialsSid = Values::NONE, $encryptionKeySid = Values::NONE, $awsS3Url = Values::NONE, $awsStorageEnabled = Values::NONE, $encryptionEnabled = Values::NONE) {
+    public function __construct(string $awsCredentialsSid = Values::NONE, string $encryptionKeySid = Values::NONE, string $awsS3Url = Values::NONE, bool $awsStorageEnabled = Values::NONE, bool $encryptionEnabled = Values::NONE) {
         $this->options['awsCredentialsSid'] = $awsCredentialsSid;
         $this->options['encryptionKeySid'] = $encryptionKeySid;
         $this->options['awsS3Url'] = $awsS3Url;
@@ -62,80 +54,71 @@ class CreateCompositionSettingsOptions extends Options {
     }
 
     /**
-     * SID of the Stored Credential resource `CRxx`
-     * 
-     * @param string $awsCredentialsSid SID of the Stored Credential resource CRxx
+     * The SID of the stored Credential resource.
+     *
+     * @param string $awsCredentialsSid The SID of the stored Credential resource
      * @return $this Fluent Builder
      */
-    public function setAwsCredentialsSid($awsCredentialsSid) {
+    public function setAwsCredentialsSid(string $awsCredentialsSid): self {
         $this->options['awsCredentialsSid'] = $awsCredentialsSid;
         return $this;
     }
 
     /**
-     * SID of the Public Key resource `CRxx`
-     * 
-     * @param string $encryptionKeySid SID of the Public Key resource CRxx
+     * The SID of the Public Key resource to use for encryption.
+     *
+     * @param string $encryptionKeySid The SID of the Public Key resource to use
+     *                                 for encryption
      * @return $this Fluent Builder
      */
-    public function setEncryptionKeySid($encryptionKeySid) {
+    public function setEncryptionKeySid(string $encryptionKeySid): self {
         $this->options['encryptionKeySid'] = $encryptionKeySid;
         return $this;
     }
 
     /**
-     * Identity of the external location where the compositions should be stored. We only support DNS-compliant URLs like `http://<my-bucket>.s3-<aws-region>.amazonaws.com/compositions`,  where `compositions` is the path where you want compositions to be stored.
-     * 
-     * @param string $awsS3Url Identity of the external location where the
-     *                         compositions should be stored. We only support
-     *                         DNS-compliant URLs like
-     *                         http://<my-bucket>.s3-<aws-region>.amazonaws.com/compositions, where compositions is the path where you want compositions to be stored.
+     * The URL of the AWS S3 bucket where the compositions should be stored. We only support DNS-compliant URLs like `http://<my-bucket>.s3-<aws-region>.amazonaws.com/compositions`, where `compositions` is the path in which you want the compositions to be stored.
+     *
+     * @param string $awsS3Url The URL of the AWS S3 bucket where the compositions
+     *                         should be stored
      * @return $this Fluent Builder
      */
-    public function setAwsS3Url($awsS3Url) {
+    public function setAwsS3Url(string $awsS3Url): self {
         $this->options['awsS3Url'] = $awsS3Url;
         return $this;
     }
 
     /**
-     * `true|false` When set to `true`, all Compositions will be written to the `AwsS3Url` specified above. When set to `false`, all Compositions will be stored in Twilio's cloud.
-     * 
-     * @param boolean $awsStorageEnabled true|false When set to true, all
-     *                                   Compositions will be written to the
-     *                                   AwsS3Url specified above. When set to
-     *                                   false, all Compositions will be stored in
-     *                                   Twilio's cloud.
+     * Whether all compositions should be written to the `aws_s3_url`. When `false`, all compositions are stored in our cloud.
+     *
+     * @param bool $awsStorageEnabled Whether all compositions should be written to
+     *                                the aws_s3_url
      * @return $this Fluent Builder
      */
-    public function setAwsStorageEnabled($awsStorageEnabled) {
+    public function setAwsStorageEnabled(bool $awsStorageEnabled): self {
         $this->options['awsStorageEnabled'] = $awsStorageEnabled;
         return $this;
     }
 
     /**
-     * `true|false` When set to `true`, all Compositions will be stored encrypted. Dafault value is `false`
-     * 
-     * @param boolean $encryptionEnabled true|false When set to true, all
-     *                                   Compositions will be stored encrypted.
+     * Whether all compositions should be stored in an encrypted form. The default is `false`.
+     *
+     * @param bool $encryptionEnabled Whether all compositions should be stored in
+     *                                an encrypted form
      * @return $this Fluent Builder
      */
-    public function setEncryptionEnabled($encryptionEnabled) {
+    public function setEncryptionEnabled(bool $encryptionEnabled): self {
         $this->options['encryptionEnabled'] = $encryptionEnabled;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Video.V1.CreateCompositionSettingsOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Video.V1.CreateCompositionSettingsOptions ' . $options . ']';
     }
 }

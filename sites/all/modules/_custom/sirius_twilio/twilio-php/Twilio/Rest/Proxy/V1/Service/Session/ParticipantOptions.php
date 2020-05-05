@@ -17,119 +17,74 @@ use Twilio\Values;
  */
 abstract class ParticipantOptions {
     /**
-     * @param string $identifier The identifier
-     * @return ReadParticipantOptions Options builder
-     */
-    public static function read($identifier = Values::NONE) {
-        return new ReadParticipantOptions($identifier);
-    }
-
-    /**
-     * @param string $friendlyName A human-readable description of this resource.
-     * @param string $proxyIdentifier The proxy phone number to use for this
-     *                                Participant.
-     * @param string $proxyIdentifierSid The proxy_identifier_sid
+     * @param string $friendlyName The string that you assigned to describe the
+     *                             participant
+     * @param string $proxyIdentifier The proxy phone number to use for the
+     *                                Participant
+     * @param string $proxyIdentifierSid The Proxy Identifier Sid
      * @return CreateParticipantOptions Options builder
      */
-    public static function create($friendlyName = Values::NONE, $proxyIdentifier = Values::NONE, $proxyIdentifierSid = Values::NONE) {
+    public static function create(string $friendlyName = Values::NONE, string $proxyIdentifier = Values::NONE, string $proxyIdentifierSid = Values::NONE): CreateParticipantOptions {
         return new CreateParticipantOptions($friendlyName, $proxyIdentifier, $proxyIdentifierSid);
-    }
-}
-
-class ReadParticipantOptions extends Options {
-    /**
-     * @param string $identifier The identifier
-     */
-    public function __construct($identifier = Values::NONE) {
-        $this->options['identifier'] = $identifier;
-    }
-
-    /**
-     * The identifier
-     * 
-     * @param string $identifier The identifier
-     * @return $this Fluent Builder
-     */
-    public function setIdentifier($identifier) {
-        $this->options['identifier'] = $identifier;
-        return $this;
-    }
-
-    /**
-     * Provide a friendly representation
-     * 
-     * @return string Machine friendly representation
-     */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Proxy.V1.ReadParticipantOptions ' . implode(' ', $options) . ']';
     }
 }
 
 class CreateParticipantOptions extends Options {
     /**
-     * @param string $friendlyName A human-readable description of this resource.
-     * @param string $proxyIdentifier The proxy phone number to use for this
-     *                                Participant.
-     * @param string $proxyIdentifierSid The proxy_identifier_sid
+     * @param string $friendlyName The string that you assigned to describe the
+     *                             participant
+     * @param string $proxyIdentifier The proxy phone number to use for the
+     *                                Participant
+     * @param string $proxyIdentifierSid The Proxy Identifier Sid
      */
-    public function __construct($friendlyName = Values::NONE, $proxyIdentifier = Values::NONE, $proxyIdentifierSid = Values::NONE) {
+    public function __construct(string $friendlyName = Values::NONE, string $proxyIdentifier = Values::NONE, string $proxyIdentifierSid = Values::NONE) {
         $this->options['friendlyName'] = $friendlyName;
         $this->options['proxyIdentifier'] = $proxyIdentifier;
         $this->options['proxyIdentifierSid'] = $proxyIdentifierSid;
     }
 
     /**
-     * A human-readable description of this resource, up to 64 characters. Should not include PII.
-     * 
-     * @param string $friendlyName A human-readable description of this resource.
+     * The string that you assigned to describe the participant. This value must be 255 characters or fewer. **This value should not have PII.**
+     *
+     * @param string $friendlyName The string that you assigned to describe the
+     *                             participant
      * @return $this Fluent Builder
      */
-    public function setFriendlyName($friendlyName) {
+    public function setFriendlyName(string $friendlyName): self {
         $this->options['friendlyName'] = $friendlyName;
         return $this;
     }
 
     /**
-     * The proxy phone number to use for this Participant. If not specified, Proxy will select a number from the pool.
-     * 
-     * @param string $proxyIdentifier The proxy phone number to use for this
-     *                                Participant.
+     * The proxy phone number to use for the Participant. If not specified, Proxy will select a number from the pool.
+     *
+     * @param string $proxyIdentifier The proxy phone number to use for the
+     *                                Participant
      * @return $this Fluent Builder
      */
-    public function setProxyIdentifier($proxyIdentifier) {
+    public function setProxyIdentifier(string $proxyIdentifier): self {
         $this->options['proxyIdentifier'] = $proxyIdentifier;
         return $this;
     }
 
     /**
-     * The proxy_identifier_sid
-     * 
-     * @param string $proxyIdentifierSid The proxy_identifier_sid
+     * The SID of the Proxy Identifier to assign to the Participant.
+     *
+     * @param string $proxyIdentifierSid The Proxy Identifier Sid
      * @return $this Fluent Builder
      */
-    public function setProxyIdentifierSid($proxyIdentifierSid) {
+    public function setProxyIdentifierSid(string $proxyIdentifierSid): self {
         $this->options['proxyIdentifierSid'] = $proxyIdentifierSid;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Proxy.V1.CreateParticipantOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Proxy.V1.CreateParticipantOptions ' . $options . ']';
     }
 }

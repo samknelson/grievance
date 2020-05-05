@@ -477,8 +477,8 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
           $set['field_grievance_status_tid']['#theme'] = 'select_as_checkboxes';
         }
       }
+      require_once DRUPAL_ROOT . "/sites/all/modules/better_exposed_filters/better_exposed_filters.theme";
     }
-    require_once DRUPAL_ROOT . "/sites/all/modules/better_exposed_filters/better_exposed_filters.theme";
   }
 
   // On the clause search, restrict the list of avaiable tags based on the contract.
