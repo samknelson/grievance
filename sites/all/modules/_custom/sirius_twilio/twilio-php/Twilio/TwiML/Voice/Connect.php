@@ -14,51 +14,59 @@ use Twilio\TwiML\TwiML;
 class Connect extends TwiML {
     /**
      * Connect constructor.
-     * 
+     *
      * @param array $attributes Optional attributes
      */
-    public function __construct($attributes = array()) {
+    public function __construct($attributes = []) {
         parent::__construct('Connect', null, $attributes);
     }
 
     /**
      * Add Room child.
-     * 
+     *
      * @param string $name Room name
      * @param array $attributes Optional attributes
-     * @return TwiML Child element.
+     * @return Room Child element.
      */
-    public function room($name, $attributes = array()) {
+    public function room($name, $attributes = []): Room {
         return $this->nest(new Room($name, $attributes));
     }
 
     /**
      * Add Autopilot child.
-     * 
+     *
      * @param string $name Autopilot assistant sid or unique name
-     * @return TwiML Child element.
+     * @return Autopilot Child element.
      */
-    public function autopilot($name) {
+    public function autopilot($name): Autopilot {
         return $this->nest(new Autopilot($name));
     }
 
     /**
-     * Add Action attribute.
-     * 
-     * @param url $action Action URL
-     * @return TwiML $this.
+     * Add Stream child.
+     *
+     * @param array $attributes Optional attributes
+     * @return Stream Child element.
      */
-    public function setAction($action) {
+    public function stream($attributes = []): Stream {
+        return $this->nest(new Stream($attributes));
+    }
+
+    /**
+     * Add Action attribute.
+     *
+     * @param string $action Action URL
+     */
+    public function setAction($action): self {
         return $this->setAttribute('action', $action);
     }
 
     /**
      * Add Method attribute.
-     * 
-     * @param httpMethod $method Action URL method
-     * @return TwiML $this.
+     *
+     * @param string $method Action URL method
      */
-    public function setMethod($method) {
+    public function setMethod($method): self {
         return $this->setAttribute('method', $method);
     }
 }

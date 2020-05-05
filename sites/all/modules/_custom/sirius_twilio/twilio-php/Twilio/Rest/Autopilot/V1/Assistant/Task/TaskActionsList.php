@@ -18,25 +18,23 @@ use Twilio\Version;
 class TaskActionsList extends ListResource {
     /**
      * Construct the TaskActionsList
-     * 
+     *
      * @param Version $version Version that contains the resource
-     * @param string $assistantSid The unique ID of the parent Assistant.
-     * @param string $taskSid The unique ID of the Task.
-     * @return \Twilio\Rest\Autopilot\V1\Assistant\Task\TaskActionsList 
+     * @param string $assistantSid The SID of the Assistant that is the parent of
+     *                             the Task associated with the resource
+     * @param string $taskSid The SID of the Task associated with the resource
      */
-    public function __construct(Version $version, $assistantSid, $taskSid) {
+    public function __construct(Version $version, string $assistantSid, string $taskSid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('assistantSid' => $assistantSid, 'taskSid' => $taskSid, );
+        $this->solution = ['assistantSid' => $assistantSid, 'taskSid' => $taskSid, ];
     }
 
     /**
      * Constructs a TaskActionsContext
-     * 
-     * @return \Twilio\Rest\Autopilot\V1\Assistant\Task\TaskActionsContext 
      */
-    public function getContext() {
+    public function getContext(): TaskActionsContext {
         return new TaskActionsContext(
             $this->version,
             $this->solution['assistantSid'],
@@ -46,10 +44,10 @@ class TaskActionsList extends ListResource {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
+    public function __toString(): string {
         return '[Twilio.Autopilot.V1.TaskActionsList]';
     }
 }

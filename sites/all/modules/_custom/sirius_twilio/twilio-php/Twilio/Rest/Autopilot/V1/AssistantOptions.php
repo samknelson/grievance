@@ -17,69 +17,59 @@ use Twilio\Values;
  */
 abstract class AssistantOptions {
     /**
-     * @param string $friendlyName A text description for the Assistant. It is
-     *                             non-unique and can be up to 255 characters long.
-     * @param boolean $logQueries A boolean that specifies whether queries should
-     *                            be logged for 30 days further training. If false,
-     *                            no queries will be stored, if true, queries will
-     *                            be stored for 30 days and deleted thereafter.
-     *                            Defaults to true if no value is provided.
-     * @param string $uniqueName A user-provided string that uniquely identifies
-     *                           this resource as an alternative to the sid. Unique
-     *                           up to 64 characters long.
-     * @param string $callbackUrl The callback_url
-     * @param string $callbackEvents The callback_events
-     * @param array $styleSheet A JSON object that defines the assistant style sheet
-     * @param array $defaults A JSON object that defines the assistant's default
+     * @param string $friendlyName A string to describe the new resource
+     * @param bool $logQueries Whether queries should be logged and kept after
+     *                         training
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the new resource
+     * @param string $callbackUrl Reserved
+     * @param string $callbackEvents Reserved
+     * @param array $styleSheet A JSON string that defines the Assistant's style
+     *                          sheet
+     * @param array $defaults A JSON object that defines the Assistant's default
      *                        tasks for various scenarios
      * @return CreateAssistantOptions Options builder
      */
-    public static function create($friendlyName = Values::NONE, $logQueries = Values::NONE, $uniqueName = Values::NONE, $callbackUrl = Values::NONE, $callbackEvents = Values::NONE, $styleSheet = Values::NONE, $defaults = Values::NONE) {
+    public static function create(string $friendlyName = Values::NONE, bool $logQueries = Values::NONE, string $uniqueName = Values::NONE, string $callbackUrl = Values::NONE, string $callbackEvents = Values::NONE, array $styleSheet = Values::ARRAY_NONE, array $defaults = Values::ARRAY_NONE): CreateAssistantOptions {
         return new CreateAssistantOptions($friendlyName, $logQueries, $uniqueName, $callbackUrl, $callbackEvents, $styleSheet, $defaults);
     }
 
     /**
-     * @param string $friendlyName A text description for the Assistant. It is
-     *                             non-unique and can be up to 255 characters long.
-     * @param boolean $logQueries A boolean that specifies whether queries should
-     *                            be logged for 30 days further training. If false,
-     *                            no queries will be stored, if true, queries will
-     *                            be stored for 30 days and deleted thereafter.
-     *                            Defaults to true if no value is provided.
-     * @param string $uniqueName A user-provided string that uniquely identifies
-     *                           this resource as an alternative to the sid. Unique
-     *                           up to 64 characters long.
-     * @param string $callbackUrl The callback_url
-     * @param string $callbackEvents The callback_events
-     * @param array $styleSheet A JSON object that defines the assistant style sheet
-     * @param array $defaults A JSON object that defines the assistant's default
-     *                        tasks for various scenarios
+     * @param string $friendlyName A string to describe the resource
+     * @param bool $logQueries Whether queries should be logged and kept after
+     *                         training
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
+     * @param string $callbackUrl Reserved
+     * @param string $callbackEvents Reserved
+     * @param array $styleSheet A JSON string that defines the Assistant's style
+     *                          sheet
+     * @param array $defaults A JSON object that defines the Assistant's [default
+     *                        tasks](https://www.twilio.com/docs/autopilot/api/assistant/defaults) for various scenarios
+     * @param string $developmentStage A string describing the state of the
+     *                                 assistant.
      * @return UpdateAssistantOptions Options builder
      */
-    public static function update($friendlyName = Values::NONE, $logQueries = Values::NONE, $uniqueName = Values::NONE, $callbackUrl = Values::NONE, $callbackEvents = Values::NONE, $styleSheet = Values::NONE, $defaults = Values::NONE) {
-        return new UpdateAssistantOptions($friendlyName, $logQueries, $uniqueName, $callbackUrl, $callbackEvents, $styleSheet, $defaults);
+    public static function update(string $friendlyName = Values::NONE, bool $logQueries = Values::NONE, string $uniqueName = Values::NONE, string $callbackUrl = Values::NONE, string $callbackEvents = Values::NONE, array $styleSheet = Values::ARRAY_NONE, array $defaults = Values::ARRAY_NONE, string $developmentStage = Values::NONE): UpdateAssistantOptions {
+        return new UpdateAssistantOptions($friendlyName, $logQueries, $uniqueName, $callbackUrl, $callbackEvents, $styleSheet, $defaults, $developmentStage);
     }
 }
 
 class CreateAssistantOptions extends Options {
     /**
-     * @param string $friendlyName A text description for the Assistant. It is
-     *                             non-unique and can be up to 255 characters long.
-     * @param boolean $logQueries A boolean that specifies whether queries should
-     *                            be logged for 30 days further training. If false,
-     *                            no queries will be stored, if true, queries will
-     *                            be stored for 30 days and deleted thereafter.
-     *                            Defaults to true if no value is provided.
-     * @param string $uniqueName A user-provided string that uniquely identifies
-     *                           this resource as an alternative to the sid. Unique
-     *                           up to 64 characters long.
-     * @param string $callbackUrl The callback_url
-     * @param string $callbackEvents The callback_events
-     * @param array $styleSheet A JSON object that defines the assistant style sheet
-     * @param array $defaults A JSON object that defines the assistant's default
+     * @param string $friendlyName A string to describe the new resource
+     * @param bool $logQueries Whether queries should be logged and kept after
+     *                         training
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the new resource
+     * @param string $callbackUrl Reserved
+     * @param string $callbackEvents Reserved
+     * @param array $styleSheet A JSON string that defines the Assistant's style
+     *                          sheet
+     * @param array $defaults A JSON object that defines the Assistant's default
      *                        tasks for various scenarios
      */
-    public function __construct($friendlyName = Values::NONE, $logQueries = Values::NONE, $uniqueName = Values::NONE, $callbackUrl = Values::NONE, $callbackEvents = Values::NONE, $styleSheet = Values::NONE, $defaults = Values::NONE) {
+    public function __construct(string $friendlyName = Values::NONE, bool $logQueries = Values::NONE, string $uniqueName = Values::NONE, string $callbackUrl = Values::NONE, string $callbackEvents = Values::NONE, array $styleSheet = Values::ARRAY_NONE, array $defaults = Values::ARRAY_NONE) {
         $this->options['friendlyName'] = $friendlyName;
         $this->options['logQueries'] = $logQueries;
         $this->options['uniqueName'] = $uniqueName;
@@ -90,125 +80,114 @@ class CreateAssistantOptions extends Options {
     }
 
     /**
-     * A text description for the Assistant. It is non-unique and can be up to 255 characters long.
-     * 
-     * @param string $friendlyName A text description for the Assistant. It is
-     *                             non-unique and can be up to 255 characters long.
+     * A descriptive string that you create to describe the new resource. It is not unique and can be up to 255 characters long.
+     *
+     * @param string $friendlyName A string to describe the new resource
      * @return $this Fluent Builder
      */
-    public function setFriendlyName($friendlyName) {
+    public function setFriendlyName(string $friendlyName): self {
         $this->options['friendlyName'] = $friendlyName;
         return $this;
     }
 
     /**
-     * A boolean that specifies whether queries should be logged for 30 days further training. If false, no queries will be stored, if true, queries will be stored for 30 days and deleted thereafter. Defaults to true if no value is provided.
-     * 
-     * @param boolean $logQueries A boolean that specifies whether queries should
-     *                            be logged for 30 days further training. If false,
-     *                            no queries will be stored, if true, queries will
-     *                            be stored for 30 days and deleted thereafter.
-     *                            Defaults to true if no value is provided.
+     * Whether queries should be logged and kept after training. Can be: `true` or `false` and defaults to `true`. If `true`, queries are stored for 30 days, and then deleted. If `false`, no queries are stored.
+     *
+     * @param bool $logQueries Whether queries should be logged and kept after
+     *                         training
      * @return $this Fluent Builder
      */
-    public function setLogQueries($logQueries) {
+    public function setLogQueries(bool $logQueries): self {
         $this->options['logQueries'] = $logQueries;
         return $this;
     }
 
     /**
-     * A user-provided string that uniquely identifies this resource as an alternative to the sid. Unique up to 64 characters long.
-     * 
-     * @param string $uniqueName A user-provided string that uniquely identifies
-     *                           this resource as an alternative to the sid. Unique
-     *                           up to 64 characters long.
+     * An application-defined string that uniquely identifies the new resource. It can be used as an alternative to the `sid` in the URL path to address the resource. The first 64 characters must be unique.
+     *
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the new resource
      * @return $this Fluent Builder
      */
-    public function setUniqueName($uniqueName) {
+    public function setUniqueName(string $uniqueName): self {
         $this->options['uniqueName'] = $uniqueName;
         return $this;
     }
 
     /**
-     * The callback_url
-     * 
-     * @param string $callbackUrl The callback_url
+     * Reserved.
+     *
+     * @param string $callbackUrl Reserved
      * @return $this Fluent Builder
      */
-    public function setCallbackUrl($callbackUrl) {
+    public function setCallbackUrl(string $callbackUrl): self {
         $this->options['callbackUrl'] = $callbackUrl;
         return $this;
     }
 
     /**
-     * The callback_events
-     * 
-     * @param string $callbackEvents The callback_events
+     * Reserved.
+     *
+     * @param string $callbackEvents Reserved
      * @return $this Fluent Builder
      */
-    public function setCallbackEvents($callbackEvents) {
+    public function setCallbackEvents(string $callbackEvents): self {
         $this->options['callbackEvents'] = $callbackEvents;
         return $this;
     }
 
     /**
-     * A JSON object that defines the assistant style sheet
-     * 
-     * @param array $styleSheet A JSON object that defines the assistant style sheet
+     * The JSON string that defines the Assistant's [style sheet](https://www.twilio.com/docs/autopilot/api/assistant/stylesheet)
+     *
+     * @param array $styleSheet A JSON string that defines the Assistant's style
+     *                          sheet
      * @return $this Fluent Builder
      */
-    public function setStyleSheet($styleSheet) {
+    public function setStyleSheet(array $styleSheet): self {
         $this->options['styleSheet'] = $styleSheet;
         return $this;
     }
 
     /**
-     * A JSON object that defines the assistant's default tasks for various scenarios
-     * 
-     * @param array $defaults A JSON object that defines the assistant's default
+     * A JSON object that defines the Assistant's [default tasks](https://www.twilio.com/docs/autopilot/api/assistant/defaults) for various scenarios, including initiation actions and fallback tasks.
+     *
+     * @param array $defaults A JSON object that defines the Assistant's default
      *                        tasks for various scenarios
      * @return $this Fluent Builder
      */
-    public function setDefaults($defaults) {
+    public function setDefaults(array $defaults): self {
         $this->options['defaults'] = $defaults;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Autopilot.V1.CreateAssistantOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Autopilot.V1.CreateAssistantOptions ' . $options . ']';
     }
 }
 
 class UpdateAssistantOptions extends Options {
     /**
-     * @param string $friendlyName A text description for the Assistant. It is
-     *                             non-unique and can be up to 255 characters long.
-     * @param boolean $logQueries A boolean that specifies whether queries should
-     *                            be logged for 30 days further training. If false,
-     *                            no queries will be stored, if true, queries will
-     *                            be stored for 30 days and deleted thereafter.
-     *                            Defaults to true if no value is provided.
-     * @param string $uniqueName A user-provided string that uniquely identifies
-     *                           this resource as an alternative to the sid. Unique
-     *                           up to 64 characters long.
-     * @param string $callbackUrl The callback_url
-     * @param string $callbackEvents The callback_events
-     * @param array $styleSheet A JSON object that defines the assistant style sheet
-     * @param array $defaults A JSON object that defines the assistant's default
-     *                        tasks for various scenarios
+     * @param string $friendlyName A string to describe the resource
+     * @param bool $logQueries Whether queries should be logged and kept after
+     *                         training
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
+     * @param string $callbackUrl Reserved
+     * @param string $callbackEvents Reserved
+     * @param array $styleSheet A JSON string that defines the Assistant's style
+     *                          sheet
+     * @param array $defaults A JSON object that defines the Assistant's [default
+     *                        tasks](https://www.twilio.com/docs/autopilot/api/assistant/defaults) for various scenarios
+     * @param string $developmentStage A string describing the state of the
+     *                                 assistant.
      */
-    public function __construct($friendlyName = Values::NONE, $logQueries = Values::NONE, $uniqueName = Values::NONE, $callbackUrl = Values::NONE, $callbackEvents = Values::NONE, $styleSheet = Values::NONE, $defaults = Values::NONE) {
+    public function __construct(string $friendlyName = Values::NONE, bool $logQueries = Values::NONE, string $uniqueName = Values::NONE, string $callbackUrl = Values::NONE, string $callbackEvents = Values::NONE, array $styleSheet = Values::ARRAY_NONE, array $defaults = Values::ARRAY_NONE, string $developmentStage = Values::NONE) {
         $this->options['friendlyName'] = $friendlyName;
         $this->options['logQueries'] = $logQueries;
         $this->options['uniqueName'] = $uniqueName;
@@ -216,105 +195,109 @@ class UpdateAssistantOptions extends Options {
         $this->options['callbackEvents'] = $callbackEvents;
         $this->options['styleSheet'] = $styleSheet;
         $this->options['defaults'] = $defaults;
+        $this->options['developmentStage'] = $developmentStage;
     }
 
     /**
-     * A text description for the Assistant. It is non-unique and can be up to 255 characters long.
-     * 
-     * @param string $friendlyName A text description for the Assistant. It is
-     *                             non-unique and can be up to 255 characters long.
+     * A descriptive string that you create to describe the resource. It is not unique and can be up to 255 characters long.
+     *
+     * @param string $friendlyName A string to describe the resource
      * @return $this Fluent Builder
      */
-    public function setFriendlyName($friendlyName) {
+    public function setFriendlyName(string $friendlyName): self {
         $this->options['friendlyName'] = $friendlyName;
         return $this;
     }
 
     /**
-     * A boolean that specifies whether queries should be logged for 30 days further training. If false, no queries will be stored, if true, queries will be stored for 30 days and deleted thereafter. Defaults to true if no value is provided.
-     * 
-     * @param boolean $logQueries A boolean that specifies whether queries should
-     *                            be logged for 30 days further training. If false,
-     *                            no queries will be stored, if true, queries will
-     *                            be stored for 30 days and deleted thereafter.
-     *                            Defaults to true if no value is provided.
+     * Whether queries should be logged and kept after training. Can be: `true` or `false` and defaults to `true`. If `true`, queries are stored for 30 days, and then deleted. If `false`, no queries are stored.
+     *
+     * @param bool $logQueries Whether queries should be logged and kept after
+     *                         training
      * @return $this Fluent Builder
      */
-    public function setLogQueries($logQueries) {
+    public function setLogQueries(bool $logQueries): self {
         $this->options['logQueries'] = $logQueries;
         return $this;
     }
 
     /**
-     * A user-provided string that uniquely identifies this resource as an alternative to the sid. Unique up to 64 characters long.
-     * 
-     * @param string $uniqueName A user-provided string that uniquely identifies
-     *                           this resource as an alternative to the sid. Unique
-     *                           up to 64 characters long.
+     * An application-defined string that uniquely identifies the resource. It can be used as an alternative to the `sid` in the URL path to address the resource. The first 64 characters must be unique.
+     *
+     * @param string $uniqueName An application-defined string that uniquely
+     *                           identifies the resource
      * @return $this Fluent Builder
      */
-    public function setUniqueName($uniqueName) {
+    public function setUniqueName(string $uniqueName): self {
         $this->options['uniqueName'] = $uniqueName;
         return $this;
     }
 
     /**
-     * The callback_url
-     * 
-     * @param string $callbackUrl The callback_url
+     * Reserved.
+     *
+     * @param string $callbackUrl Reserved
      * @return $this Fluent Builder
      */
-    public function setCallbackUrl($callbackUrl) {
+    public function setCallbackUrl(string $callbackUrl): self {
         $this->options['callbackUrl'] = $callbackUrl;
         return $this;
     }
 
     /**
-     * The callback_events
-     * 
-     * @param string $callbackEvents The callback_events
+     * Reserved.
+     *
+     * @param string $callbackEvents Reserved
      * @return $this Fluent Builder
      */
-    public function setCallbackEvents($callbackEvents) {
+    public function setCallbackEvents(string $callbackEvents): self {
         $this->options['callbackEvents'] = $callbackEvents;
         return $this;
     }
 
     /**
-     * A JSON object that defines the assistant style sheet
-     * 
-     * @param array $styleSheet A JSON object that defines the assistant style sheet
+     * The JSON string that defines the Assistant's [style sheet](https://www.twilio.com/docs/autopilot/api/assistant/stylesheet)
+     *
+     * @param array $styleSheet A JSON string that defines the Assistant's style
+     *                          sheet
      * @return $this Fluent Builder
      */
-    public function setStyleSheet($styleSheet) {
+    public function setStyleSheet(array $styleSheet): self {
         $this->options['styleSheet'] = $styleSheet;
         return $this;
     }
 
     /**
-     * A JSON object that defines the assistant's default tasks for various scenarios
-     * 
-     * @param array $defaults A JSON object that defines the assistant's default
-     *                        tasks for various scenarios
+     * A JSON object that defines the Assistant's [default tasks](https://www.twilio.com/docs/autopilot/api/assistant/defaults) for various scenarios, including initiation actions and fallback tasks.
+     *
+     * @param array $defaults A JSON object that defines the Assistant's [default
+     *                        tasks](https://www.twilio.com/docs/autopilot/api/assistant/defaults) for various scenarios
      * @return $this Fluent Builder
      */
-    public function setDefaults($defaults) {
+    public function setDefaults(array $defaults): self {
         $this->options['defaults'] = $defaults;
+        return $this;
+    }
+
+    /**
+     * A string describing the state of the assistant.
+     *
+     * @param string $developmentStage A string describing the state of the
+     *                                 assistant.
+     * @return $this Fluent Builder
+     */
+    public function setDevelopmentStage(string $developmentStage): self {
+        $this->options['developmentStage'] = $developmentStage;
         return $this;
     }
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $options = array();
-        foreach ($this->options as $key => $value) {
-            if ($value != Values::NONE) {
-                $options[] = "$key=$value";
-            }
-        }
-        return '[Twilio.Autopilot.V1.UpdateAssistantOptions ' . implode(' ', $options) . ']';
+    public function __toString(): string {
+        $options = \http_build_query(Values::of($this->options), '', ' ');
+        return '[Twilio.Autopilot.V1.UpdateAssistantOptions ' . $options . ']';
     }
 }

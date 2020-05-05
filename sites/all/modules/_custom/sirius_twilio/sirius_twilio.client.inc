@@ -8,7 +8,7 @@ function sirius_twilio_client_get() {
 	if (!$client) {
 		require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/twilio-php/Twilio/autoload.php';
 		// Autoload error with respect to TwiML, I think it has to do with capitalization
-		require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/twilio-php/Twilio/Twiml.php';
+		// require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/twilio-php/Twilio/Twiml.php';
 		
 		$account_sid = sirius_domain_variable_get('sirius_twilio_account_sid', '');
 		$account_token = sirius_domain_variable_get('sirius_twilio_account_token', '');

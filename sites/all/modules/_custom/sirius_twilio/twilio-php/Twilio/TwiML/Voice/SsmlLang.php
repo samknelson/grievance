@@ -14,21 +14,20 @@ use Twilio\TwiML\TwiML;
 class SsmlLang extends TwiML {
     /**
      * SsmlLang constructor.
-     * 
+     *
      * @param string $words Words to speak
      * @param array $attributes Optional attributes
      */
-    public function __construct($words, $attributes = array()) {
+    public function __construct($words, $attributes = []) {
         parent::__construct('lang', $words, $attributes);
     }
 
     /**
      * Add Xml:Lang attribute.
-     * 
-     * @param ssmlLang:Enum:XmlLang $xml:Lang Specify the language
-     * @return TwiML $this.
+     *
+     * @param string $xmlLang Specify the language
      */
-    public function setXmlLang($xmlLang) {
+    public function setXmlLang($xmlLang): self {
         return $this->setAttribute('xml:Lang', $xmlLang);
     }
 }

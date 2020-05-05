@@ -95,7 +95,7 @@ function sirius_event_node_tabs() {
   $node_tabs['sirius_event']['sirius_event_phonebank'] = array(
     'title' => 'Phonebank',
     'description' => '',
-    'callback' => 'sirius_node_tab_event_phonebank',
+    'callback' => 'sirius_node_tab_event_phonebank_call',
     'permissions' => array('sirius'),
     'weight' => 3,
   );
@@ -106,6 +106,7 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_phonebank_call',
     'permissions' => array('sirius'),
     'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   $node_tabs['sirius_event']['sirius_event_phonebank/status'] = array(
@@ -130,6 +131,23 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_phonebank_settings',
     'permissions' => array('sirius'),
     'weight' => 4,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_class'] = array(
+    'title' => 'Class',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_class_settings',
+    'permissions' => array('sirius'),
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_class/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_class_settings',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    // 'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   $node_tabs['sirius_event']['sirius_event_bullpen_self'] = array(
@@ -292,6 +310,15 @@ function sirius_event_term_tabs() {
     'weight' => 2,
   );
 
+  $term_tabs['sirius_event_type']['sirius_event_type_widgets'] = array(
+    'title' => 'Widgets',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_widgets',
+    'permissions' => array('sirius event admin'),
+    'weight' => 6,
+  );
+
+
   $term_tabs['sirius_event_type']['sirius_event_type_phonebank'] = array(
     'title' => 'Phonebank',
     'description' => '',
@@ -351,6 +378,16 @@ function sirius_event_menu() {
     'page callback' => 'sirius_event_page_list_bullpens',
     'page arguments' => array(),
     'access callback' => array('sirius_event_page_list_bullpens_access'),
+    'access arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/event/classes'] = array(
+    'title' => 'Class List',
+    'description' => '',
+    'page callback' => 'sirius_event_page_list_classes',
+    'page arguments' => array(),
+    'access callback' => array('sirius_event_page_list_classes_access'),
     'access arguments' => array(),
     'type' => MENU_NORMAL_ITEM,
   );

@@ -9,6 +9,7 @@
 
 namespace Twilio\Rest\Autopilot\V1\Assistant\Task;
 
+use Twilio\Exceptions\TwilioException;
 use Twilio\InstanceContext;
 use Twilio\Values;
 use Twilio\Version;
@@ -19,35 +20,30 @@ use Twilio\Version;
 class TaskStatisticsContext extends InstanceContext {
     /**
      * Initialize the TaskStatisticsContext
-     * 
-     * @param \Twilio\Version $version Version that contains the resource
-     * @param string $assistantSid The assistant_sid
-     * @param string $taskSid The task_sid
-     * @return \Twilio\Rest\Autopilot\V1\Assistant\Task\TaskStatisticsContext 
+     *
+     * @param Version $version Version that contains the resource
+     * @param string $assistantSid The SID of the Assistant that is the parent of
+     *                             the resource to fetch
+     * @param string $taskSid The SID of the Task that is associated with the
+     *                        resource to fetch
      */
     public function __construct(Version $version, $assistantSid, $taskSid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('assistantSid' => $assistantSid, 'taskSid' => $taskSid, );
+        $this->solution = ['assistantSid' => $assistantSid, 'taskSid' => $taskSid, ];
 
-        $this->uri = '/Assistants/' . rawurlencode($assistantSid) . '/Tasks/' . rawurlencode($taskSid) . '/Statistics';
+        $this->uri = '/Assistants/' . \rawurlencode($assistantSid) . '/Tasks/' . \rawurlencode($taskSid) . '/Statistics';
     }
 
     /**
-     * Fetch a TaskStatisticsInstance
-     * 
+     * Fetch the TaskStatisticsInstance
+     *
      * @return TaskStatisticsInstance Fetched TaskStatisticsInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
-        $params = Values::of(array());
-
-        $payload = $this->version->fetch(
-            'GET',
-            $this->uri,
-            $params
-        );
+    public function fetch(): TaskStatisticsInstance {
+        $payload = $this->version->fetch('GET', $this->uri);
 
         return new TaskStatisticsInstance(
             $this->version,
@@ -59,14 +55,14 @@ class TaskStatisticsContext extends InstanceContext {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Autopilot.V1.TaskStatisticsContext ' . implode(' ', $context) . ']';
+        return '[Twilio.Autopilot.V1.TaskStatisticsContext ' . \implode(' ', $context) . ']';
     }
 }

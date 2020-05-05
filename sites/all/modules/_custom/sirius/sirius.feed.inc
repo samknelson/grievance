@@ -326,6 +326,17 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 		);
 	}
 
+	$tag_taxonomy = $info['feed']['tag_taxonomy'];
+	if ($tag_taxonomy) { 
+		$options = sirius_taxonomy_load($tag_taxonomy, 'tid', 'name', TRUE);
+		$form['tag'] = array(
+			'#type' => 'select',
+			'#title' => 'Tag records with',
+			'#options' => $options,
+			'#default_value' => $data['tag'],
+		);
+	}
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Submit',
@@ -374,6 +385,7 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
   }
   $data['source'] = $form_state['values']['source'];
   $data['pk'] = $form_state['values']['pk'];
+  $data['tag'] = $form_state['values']['tag'];
 
 	sirius_wizard_submit($info, $data, $feed_node, $current_step, "File uploaded.");
 }

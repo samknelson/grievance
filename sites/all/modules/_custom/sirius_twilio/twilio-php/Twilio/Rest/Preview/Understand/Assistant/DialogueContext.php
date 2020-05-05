@@ -9,6 +9,7 @@
 
 namespace Twilio\Rest\Preview\Understand\Assistant;
 
+use Twilio\Exceptions\TwilioException;
 use Twilio\InstanceContext;
 use Twilio\Values;
 use Twilio\Version;
@@ -19,35 +20,28 @@ use Twilio\Version;
 class DialogueContext extends InstanceContext {
     /**
      * Initialize the DialogueContext
-     * 
-     * @param \Twilio\Version $version Version that contains the resource
+     *
+     * @param Version $version Version that contains the resource
      * @param string $assistantSid The assistant_sid
      * @param string $sid The sid
-     * @return \Twilio\Rest\Preview\Understand\Assistant\DialogueContext 
      */
     public function __construct(Version $version, $assistantSid, $sid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('assistantSid' => $assistantSid, 'sid' => $sid, );
+        $this->solution = ['assistantSid' => $assistantSid, 'sid' => $sid, ];
 
-        $this->uri = '/Assistants/' . rawurlencode($assistantSid) . '/Dialogues/' . rawurlencode($sid) . '';
+        $this->uri = '/Assistants/' . \rawurlencode($assistantSid) . '/Dialogues/' . \rawurlencode($sid) . '';
     }
 
     /**
-     * Fetch a DialogueInstance
-     * 
+     * Fetch the DialogueInstance
+     *
      * @return DialogueInstance Fetched DialogueInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
-        $params = Values::of(array());
-
-        $payload = $this->version->fetch(
-            'GET',
-            $this->uri,
-            $params
-        );
+    public function fetch(): DialogueInstance {
+        $payload = $this->version->fetch('GET', $this->uri);
 
         return new DialogueInstance(
             $this->version,
@@ -59,14 +53,14 @@ class DialogueContext extends InstanceContext {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Preview.Understand.DialogueContext ' . implode(' ', $context) . ']';
+        return '[Twilio.Preview.Understand.DialogueContext ' . \implode(' ', $context) . ']';
     }
 }

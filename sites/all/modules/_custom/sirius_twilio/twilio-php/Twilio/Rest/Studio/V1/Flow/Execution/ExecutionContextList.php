@@ -15,25 +15,22 @@ use Twilio\Version;
 class ExecutionContextList extends ListResource {
     /**
      * Construct the ExecutionContextList
-     * 
+     *
      * @param Version $version Version that contains the resource
-     * @param string $flowSid Flow Sid.
-     * @param string $executionSid Execution Sid.
-     * @return \Twilio\Rest\Studio\V1\Flow\Execution\ExecutionContextList 
+     * @param string $flowSid The SID of the Flow
+     * @param string $executionSid The SID of the Execution
      */
-    public function __construct(Version $version, $flowSid, $executionSid) {
+    public function __construct(Version $version, string $flowSid, string $executionSid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('flowSid' => $flowSid, 'executionSid' => $executionSid, );
+        $this->solution = ['flowSid' => $flowSid, 'executionSid' => $executionSid, ];
     }
 
     /**
      * Constructs a ExecutionContextContext
-     * 
-     * @return \Twilio\Rest\Studio\V1\Flow\Execution\ExecutionContextContext 
      */
-    public function getContext() {
+    public function getContext(): ExecutionContextContext {
         return new ExecutionContextContext(
             $this->version,
             $this->solution['flowSid'],
@@ -43,10 +40,10 @@ class ExecutionContextList extends ListResource {
 
     /**
      * Provide a friendly representation
-     * 
+     *
      * @return string Machine friendly representation
      */
-    public function __toString() {
+    public function __toString(): string {
         return '[Twilio.Studio.V1.ExecutionContextList]';
     }
 }
