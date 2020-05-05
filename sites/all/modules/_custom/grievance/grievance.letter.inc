@@ -34,7 +34,6 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 
   // Replacement values for tokens that require additional contextual data.
   if ($type == 'grievance-letter') {
-    $record = $data['grievance-letter'];
     foreach ($tokens as $name => $original) {
 
     	//
@@ -42,7 +41,7 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
     	//
 
     	if ($name == 'delivery') {
-    		$delivery_tid = $record['delivery_tid'];
+    		$delivery_tid = $data['other_tokens']['delivery_tid'];
     		$delivery_term = taxonomy_term_load($delivery_tid);
     		$replacement = $delivery_term->description;
     		if (!$replacement) {
