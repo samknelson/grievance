@@ -131,6 +131,7 @@ function sirius_contact_list_sources() {
 
 	$domain_nid = sirius_domain_nid();
 	if (!isset($sources_by_domain[$domain_nid])) {
+	$sql_args = array();
 		$sql = "select distinct field_sirius_source_value as source from node ";
 		$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 		$sql .= "left join field_data_field_sirius_source on field_data_field_sirius_source.entity_type = 'node' and field_data_field_sirius_source.entity_id = node.nid ";
