@@ -69,6 +69,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
   }
   if ($json_forms['sirius_bulk']) {
   	$paths[':sirius_bulk:core:status'] = ':sirius_bulk:core:status';
+  	$paths[':sirius_bulk:core:summary'] = ':sirius_bulk:core:summary';
 
   	$bulk_statuses = sirius_bulk_queue_statuses();
   }
@@ -483,6 +484,15 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 					$sql_parts['select_fields'] .= ", field_sirius_type_value as bulk_status ";
 				}
 				if ($criterion) { $where_name = 'field_sirius_type_value'; }
+			} else if ($field_name == 'summary') {
+				if (!$sql_parts['joins_nodupe'][$field_name]) {
+					$sql_parts['joins_nodupe'][$field_name] = TRUE;
+				}
+				if (!$sql_parts['fields_nodupe']['bulk_summary']) {
+					$sql_parts['fields_nodupe']['bulk_summary'] = TRUE;
+					$sql_parts['select_fields'] .= ", field_sirius_summary_value ";
+				}
+				if ($criterion) { $where_name = 'field_sirius_summary_value'; }
 			}
 		} else {
 			$path_for_query = '$.' . $which_form . '.results.' . preg_replace('/:/', '.', $path);
@@ -563,6 +573,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		$sql_parts['joins'] .= "left join field_data_field_sirius_log_handler handler_b on handler_b.entity_type = 'node' and handler_b.entity_id = handler_a.entity_id ";
 		$sql_parts['joins'] .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = handler_a.entity_id ";
 		$sql_parts['joins'] .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = handler_a.entity_id ";
+		$sql_parts['joins'] .= "left join field_data_field_sirius_summary on field_data_field_sirius_summary.entity_type = 'node' and field_data_field_sirius_summary.entity_id = handler_a.entity_id ";
 
 		$sql_parts['select_fields'] .= ", handler_a.entity_id as bulk_nid ";
 	}
@@ -861,6 +872,8 @@ function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
 			if ($field_name == 'status') {
 				$bulk_statuses = sirius_bulk_queue_statuses();
 				return $bulk_statuses[$hr['bulk_status']];
+			} else if ($field_name == 'summary') {
+				return $hr['field_sirius_summary_value'];
 			} 
 		} else if ($which_form == 'phonebank') {
 			list ($field_name, $column) = explode(':', $path);
