@@ -17,6 +17,10 @@ function sirius_training_node_tab_worker_customfields_form($form, &$form_state,$
 
   $contact_definition_json = sirius_contact_definition();
   $contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, $which);
+  if (!$contact_definition_form) { 
+    drupal_set_message("No custom fields have been configured. They can be set up " . l('here', 'sirius/config/training/customfields'));
+    return array();
+  }
 
   $worker_json = sirius_jsonfield_util_node_json_get($worker_node);
   $worker_results = sirius_jsonfield_util_results_get($worker_json, $which);
