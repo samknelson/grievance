@@ -15,6 +15,16 @@ function sirius_training_levels_fetch_all() {
 	return $all_levels;
 }
 
+function sirius_training_levels_fetch_record($ms_tid, $level_code) {
+	$all_levels = sirius_training_levels_fetch_all();
+	return $all_levels[$ms_tid][$level_code];
+}
+
+function sirius_training_levels_fetch_title($ms_tid, $level_code) {
+	$record = sirius_training_levels_fetch_record($ms_tid, $level_code);
+	return $record['title'];
+}
+
 function sirius_training_levels_fetch($ms_term_or_tid) {
 	if (is_object($ms_term_or_tid)) { $ms_term = $ms_term_or_tid; } else { $ms_term = taxonomy_term_load($ms_term_or_tid); }
 	$json = json_decode($ms_term->field_sirius_json['und'][0]['value'], TRUE);
