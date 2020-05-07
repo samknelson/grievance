@@ -101,27 +101,29 @@ function sirius_bulk_deliver_entry($log_nid) {
 		if ($handler_node->type == 'sirius_contact') { $contact_node = $handler_node; }
 	}
 	if (!$bulk_node) { return array('success' => FALSE, 'msg' => 'No bulk node.'); }
-	if (!$contact_node) { return array('success' => FALSE, 'msg' => 'No contact node.'); }
-
-	// Get the medium
-	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
-	if ($medium == 'choice') {
-		$worker_node = sirius_worker_get_by_contact_nid($contact_node->nid);
-		if ($worker_node) {
-			$medium = $worker_node->field_sirius_dispatch_medium['und'][2]['value'];
+	if (!$contact_node) { 
+		$result = array('success' => FALSE, 'msg' => 'No contact node'); 
+	} else {
+		// Get the medium
+		$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
+		if ($medium == 'choice') {
+			$worker_node = sirius_worker_get_by_contact_nid($contact_node->nid);
+			if ($worker_node) {
+				$medium = $worker_node->field_sirius_dispatch_medium['und'][2]['value'];
+			}
 		}
-	}
-	if (!$medium || $medium == 'choice' || $medium == 'none') {
-		$medium = 'email';
-	}
+		if (!$medium || $medium == 'choice' || $medium == 'none') {
+			$medium = 'email';
+		}
 
-	// Get the recipient
-	if ($medium == 'email') { $to = sirius_email_format($contact_node->field_sirius_email['und'][0]['value']); }
-	else { $to = sirius_phone_format($contact_node->field_sirius_phone['und'][0]['value']); }
+		// Get the recipient
+		if ($medium == 'email') { $to = sirius_email_format($contact_node->field_sirius_email['und'][0]['value']); }
+		else { $to = sirius_phone_format($contact_node->field_sirius_phone['und'][0]['value']); }
 
-	$result = sirius_bulk_deliver_impl($bulk_node, $medium, $to);
-	$result['to'] = $to;
-	$result['medium'] = $medium;
+		$result = sirius_bulk_deliver_impl($bulk_node, $medium, $to);
+		$result['to'] = $to;
+		$result['medium'] = $medium;
+	}
 
 	if ($result['success']) {
 		$log_node->field_sirius_type['und'][0]['value'] = 'sent';
