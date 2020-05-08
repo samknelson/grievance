@@ -154,10 +154,9 @@ function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone) {
 	$phone = sirius_phone_format_e164($phone);
 	$client = sirius_twilio_client_get();
 
-
-	$response = new TwiML();
-	$response->say(sirius_twilio_outgoing_voice_clean($msg));
-	$response->dial($phone);
+	// $response = new TwiML();
+	// $response->say(sirius_twilio_outgoing_voice_clean($msg));
+	// $response->dial($phone);
 
 	header('Content-Type: text/xml');
 	print "<Response>";
