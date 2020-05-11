@@ -45,10 +45,18 @@ function grievance_node_delete_cascades() {
 				'grievance_contract_clause'
 			),
 		),
+		'sirius_contact' => array(
+			'field_sirius_contact' => array(
+				'sirius_event_participant'
+			),
+		),
 	);
 }
 
-function grievance_delete_form_alter_node_delete_confirm(&$form, &$form_state) {
+function grievance_delete_form_alter_node_delete_confirm(&$form, &$form_state) { return grievance_delete_confirm($form, $form_state); }
+function sirius_contact_delete_form_alter_node_delete_confirm(&$form, &$form_state) { return grievance_delete_confirm($form, $form_state); }
+
+function grievance_delete_confirm($form, $form_state) {
 	$source_node = $form['#node'];
 	if (!$source_node) { return; }
 	$source_nid = $source_node->nid;
