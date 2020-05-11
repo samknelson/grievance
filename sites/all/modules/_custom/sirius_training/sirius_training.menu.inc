@@ -37,6 +37,14 @@ function sirius_training_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_tc/customfields'] = array(
+    'title' => 'Custom Fields',
+    'description' => '',
+    'callback' => 'sirius_training_node_tab_worker_customfields',
+    'permissions' => array('sirius'),
+    'weight' => 3,
+  );
+
   $node_tabs['sirius_worker']['sirius_worker_tc/certifications'] = array(
     'title' => 'Certifications',
     'description' => '',
@@ -162,13 +170,49 @@ function sirius_training_menu() {
     'weight' => 1,
   );
 
+
+
+  $items['sirius/config/training/customfields'] = array(
+    'title' => 'Custom Fields',
+    'page callback' => 'sirius_training_config_customfields_edit',
+    'access arguments' => array('sirius training admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/config/training/customfields/form'] = array(
+    'title' => 'Form Edit',
+    'page callback' => 'sirius_training_config_customfields_edit',
+    'access arguments' => array('sirius training admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/config/training/customfields/preview'] = array(
+    'title' => 'Form Preview',
+    'page callback' => 'sirius_training_config_customfields_preview',
+    'access arguments' => array('sirius training admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/config/training/customfields/exim'] = array(
+    'title' => 'Form Export / Import',
+    'page callback' => 'sirius_training_config_customfields_exim',
+    'access arguments' => array('sirius training admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
+
+
   $items['sirius/config/training/evaluations'] = array(
     'title' => 'Evaluations',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_training_config_evaluations'),
     'access arguments' => array('sirius training admin'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
+    'weight' => 3,
   );
 
   $items['sirius/config/training/evaluations/general'] = array(

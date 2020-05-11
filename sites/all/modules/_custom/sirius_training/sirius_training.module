@@ -9,6 +9,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_tr
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_config.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_config_evaluations.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_config_customfields.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_config_certifications.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_employer.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker.inc';
@@ -20,6 +21,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_tr
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_certifications.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_evaluations_request.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_classes.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_worker_customfields.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_evaluation_evaluate.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_evaluation_evaluate_launch.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.page_evaluation_edit.inc';

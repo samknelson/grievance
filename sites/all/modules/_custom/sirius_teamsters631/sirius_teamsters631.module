@@ -71,3 +71,32 @@ function sirius_teamsters631_oneoff_notification_update() {
 		print "... Updated.\n";
 	}
 }
+
+function sirius_teamsters631_oneoff_10hrosha() {
+	$sql = "select * from field_data_field_sirius_skill, field_data_field_sirius_skill_expire ";
+	$sql .= "where field_data_field_sirius_skill.entity_type = 'node' ";
+	$sql .= "and field_data_field_sirius_skill.bundle = 'sirius_worker' ";
+	$sql .= "and field_data_field_sirius_skill_expire.entity_type = 'node' ";
+	$sql .= "and field_data_field_sirius_skill_expire.bundle = 'sirius_worker' ";
+	$sql .= "and field_data_field_sirius_skill_expire.entity_id = field_data_field_sirius_skill.entity_id ";
+	$sql .= "and field_data_field_sirius_skill_expire.delta = field_data_field_sirius_skill.delta ";
+	$sql .= "and field_sirius_skill_tid = 594 ";
+	$sql .= "order by field_sirius_skill_expire_value ";
+
+	$stmt = db_query($sql, array());
+	while ($hr = $stmt->fetchAssoc()) {
+		$worker_nid = $hr['entity_id'];
+		$workers[$worker_nid] = array('delta' => $hr['delta'], 'expires' => $hr['field_sirius_skill_expire_value']);
+
+		print "$worker_nid: $hr[field_sirius_skill_expire_value]\n";
+	}
+	print_r($workers);
+
+	return;
+	foreach ($worker_nids as $worker_nid) {
+		$worker_node = node_load($worker_nid);
+		// Grant 745, expire 5 years after [something]
+		// Set 594 to expire [never]
+	}
+	print_r($worker_nids);
+}

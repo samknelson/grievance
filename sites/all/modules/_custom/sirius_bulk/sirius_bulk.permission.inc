@@ -17,13 +17,24 @@ function sirius_bulk_permission() {
   );
 }
 
-function sirius_bulk_node_access($node, $op, $account) {
-  // Only interested in bulk message nodes
-	if ($node->type != 'sirius_bulk') { return NODE_ACCESS_IGNORE; }
+/**
+ * Implements hook_node_access
+ */
 
-  // Admins can access
-  if (user_access('sirius bulk send', $account)) { return NODE_ACCESS_ALLOW; }
+function sirius_bulk_node_access($node, $op, $account) {
+  if (is_object($node)) { $type = $node->type; } else { $type = $node; }
+  if ($type != 'sirius_bulk') { return NODE_ACCESS_IGNORE; }
+
+  // ALL bulk functionality is accessed via tabs. So there's never any reason for anybody to access any node directly.
+  if (user_access('sirius admin')) { return NODE_ACCESS_IGNORE; }
+
+  return NODE_ACCESS_DENY;
+
+  /*
+  // Admins can do anything
+  if ($op == 'view' && user_access('sirius bulk send', $account)) {return NODE_ACCESS_IGNORE; }
 
   // Nobody else can do anything
-  return NODE_ACCESS_DENY;
+  return NODE_ACCESS_IGNORE;
+  */
 }

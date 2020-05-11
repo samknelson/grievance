@@ -153,12 +153,20 @@ function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_dig
 function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone) {
 	$phone = sirius_phone_format_e164($phone);
 	$client = sirius_twilio_client_get();
-	$response = new TwiML();
-	$response->say(sirius_twilio_outgoing_voice_clean($msg));
-	$response->dial($phone);
+
+	// $response = new TwiML();
+	// $response->say(sirius_twilio_outgoing_voice_clean($msg));
+	// $response->dial($phone);
 
 	header('Content-Type: text/xml');
-	echo $response;
+	print "<Response>";
+	print "<Say>";
+	print sirius_twilio_outgoing_voice_clean($msg);
+	print "</Say>";
+	print "<Dial>";
+	print $phone;
+	print "</Dial>";
+	print "</Response>";
 
 	$msg = "Forwarded call from " . $context['phone'] . " to " . $phone;
 	if (isset($context['request']['Digits'])) {

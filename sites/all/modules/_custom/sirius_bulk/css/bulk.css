@@ -1,0 +1,19 @@
+.sirius_bulk_summary {
+	border: 1px solid #cccccc;
+	padding: 20px;
+	margin: 20px;
+	background-color: #ffffff;
+}
+
+.sirius_bulk_summary .sirius_bulk_summary_statustable {
+	margin-right: 20px;
+}
+
+.sirius_bulk_summary .sirius_bulk_summary_statustable th, 
+.sirius_bulk_summary .sirius_bulk_summary_statustable td {
+	padding: 5px;
+}
+
+
+.sirius_bulk_summary .sirius_bulk_summary_fields {
+}

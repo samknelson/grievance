@@ -210,6 +210,28 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 		'#suffix' => '</div>',
 	);
 
+	$form['default_value'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Default Value',
+		'#states' => array(
+			'visible' => array(
+				array(
+					':input[name="action"]' => array('value' => 'edit'),
+					':input[name="type"]' => array(
+						array('value' => 'textfield'), 
+						array('value' => 'textarea'), 
+						array('value' => 'select'), 
+						array('value' => 'radios'), 
+						array('value' => 'checkboxes')
+					),
+				),
+			),
+		),
+		'#default_value' => $leaf['#default_value'],
+		'#prefix' => '<div class="container-inline">',
+		'#suffix' => '</div>',
+	);
+
 	$form['size'] = array(
 		'#type' => 'textfield',
 		'#title' => 'Size',
@@ -522,7 +544,11 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		}
 		if ($form_state['values']['type'] == 'markup') {
 			$leaf['#markup'] = $form_state['values']['markup'];
-		} 
+		}
+
+		if ($form_state['values']['default_value']) {
+			$leaf['#default_value'] = $form_state['values']['default_value'];
+		}
 		if ($leaf['#sirius']['style'] == 'inline_label') {
 			if ($form_state['values']['type'] == 'checkboxes') {
 				$leaf['#prefix'] = '<div class="checkboxes-inline">';

@@ -19,6 +19,7 @@ function sirius_feed_worker_info() {
         'id' => 'ID',
         'ssn' => 'SSN',
       ),
+      'tag_taxonomy' => 'sirius_contact_tags',
       'fields' => array(
         'ssn' => array('title' => 'SSN'),
         'id' => array('title' => 'ID'),
@@ -253,6 +254,13 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
 
   if ($row['dispatch_job_nid']) {
     $result = sirius_dispatch_actions_create($row['job_node'], $worker_node->nid, 'No', 'accepted');
+  }
+
+  $contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+  if ($data['tag']) { sirius_contact_tag_add($contact_node, $data['tag']); }
+  if ($contact_node->field_sirius_source['und'][0]['value'] != $data['source']) {
+    $contact_node->field_sirius_source['und'][0]['value'] = $data['source'];
+    node_save($contact_node);
   }
 
   if ($is_new) {

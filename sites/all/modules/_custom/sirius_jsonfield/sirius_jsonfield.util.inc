@@ -143,7 +143,7 @@ function sirius_jsonfield_util_set_defaults(&$form, $defaults) {
 		if ($type && $type != 'fieldset') {
 			if ($type == 'select' || $type == 'textfield' || $type == 'textarea' || $type == 'date_popup' || $type == 'radios' || $type == 'checkboxes')  {
 				if (isset($defaults[$key])) {
-					if ($type == 'date_popup') { $form[$key]['#default_value'] =  date('Y-m-d H:i:s', strtotime($defaults[$key]['date'] . ' ' . $defaults[$key]['time'])); } 
+					if ($type == 'date_popup' && is_array($defaults[$key])) { $form[$key]['#default_value'] =  date('Y-m-d H:i:s', strtotime($defaults[$key]['date'] . ' ' . $defaults[$key]['time'])); } 
 					else { $form[$key]['#default_value'] = $defaults[$key]; }
 				}
 			}
