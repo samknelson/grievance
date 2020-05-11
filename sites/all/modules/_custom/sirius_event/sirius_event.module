@@ -254,7 +254,7 @@ function sirius_event_report_cache_info() {
  */
 
 function sirius_event_cron() {
-  // sirius_event_cleanup();
+  sirius_event_cleanup();
 }
 
 function sirius_event_cleanup($force = FALSE) {
@@ -275,7 +275,7 @@ function sirius_event_cleanup($force = FALSE) {
   $sql .= "and (event_node.nid is null ";
   $sql .= "or contact_node.nid is null) ";
   $sql .= "order by node.nid ";
-  $sql .= "limit 1000";
+  $sql .= "limit 5000";
   $stmt = db_query($sql, $sql_args);
   $to_delete = array();
   while ($hr = $stmt->fetchAssoc()) {
@@ -288,7 +288,7 @@ function sirius_event_cleanup($force = FALSE) {
   }
 
   watchdog('sirius_event_cleanup', 'Found ' . count($to_delete) . ' orphaned participant records. Deleting.');
-  foreach ($to_delete as $participant_nid) { node_delete($participant_nid); print "Deleted: $participant_nid\n"; }
+  foreach ($to_delete as $participant_nid) { node_delete($participant_nid); /* print "Deleted: $participant_nid\n"; */ }
   watchdog('sirius_event_cleanup', 'Orphan participant cleanup complete.');
 
 }
