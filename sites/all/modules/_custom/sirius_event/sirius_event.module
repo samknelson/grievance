@@ -272,8 +272,8 @@ function sirius_event_cleanup($force = FALSE) {
   $sql .= "left join node event_node on event_node.nid = field_sirius_event_target_id ";
   $sql .= "left join node contact_node on contact_node.nid = field_sirius_contact_target_id ";
   $sql .= "where node.type = 'sirius_event_participant' ";
-  $sql .= "and event_node.nid is null ";
-  $sql .= "and contact_node.nid is null ";
+  $sql .= "and (event_node.nid is null ";
+  $sql .= "or contact_node.nid is null) ";
   $sql .= "order by node.nid ";
   $stmt = db_query($sql, $sql_args);
   $to_delete = array();
