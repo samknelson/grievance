@@ -1209,6 +1209,7 @@ function system_library() {
     'version' => '2.52',
     'js' => array(
       'misc/jquery.form.js' => array(),
+      'misc/jquery-ajaxsubmit.js' => array(),
     ),
     'dependencies' => array(
       array('system', 'jquery.cookie'),
