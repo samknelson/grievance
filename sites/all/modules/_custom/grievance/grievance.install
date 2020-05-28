@@ -848,3 +848,33 @@ function grievance_update_7038() {
 
   variable_set('configurable_timezones', 1);
 }
+
+/**
+ * - Default content type for all existing document types is "grievance"
+ */
+
+function grievance_update_7039() {
+  $terms = sirius_taxonomy_load('grievance_document_types', 'tid', 'full');
+
+  foreach ($terms as $tid => $term) {
+    if ($term->field_sirius_content_types['und'][0]['value']) { continue; }
+    $term->field_sirius_content_types['und'][0]['value'] = 'grievance';
+    taxonomy_term_save($term);
+    print "Updated: " . $term->name . "\n";
+  }
+}
+
+/**
+ * - Add JSON field to users
+ */
+
+function grievance_update_7040() {
+  try {
+    $instance = field_info_instance('node', 'field_sirius_json', 'sirius_json_definition');
+    $instance['entity_type'] = 'user';
+    $instance['bundle'] = 'user';
+    field_create_instance($instance);
+  } catch (exception $ignore) {
+    // print_r($ignore);
+  }
+}
