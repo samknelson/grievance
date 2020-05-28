@@ -866,6 +866,7 @@ function grievance_update_7039() {
 
 /**
  * - Add JSON field to users
+ * - Make sure that the SMTP module allows HTML
  */
 
 function grievance_update_7040() {
@@ -877,4 +878,6 @@ function grievance_update_7040() {
   } catch (exception $ignore) {
     // print_r($ignore);
   }
+
+  variable_set('smtp_allowhtml', 1);
 }
