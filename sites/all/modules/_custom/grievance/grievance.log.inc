@@ -692,15 +692,23 @@ function grievance_log_views_pre_render($view) {
     $sql .= "where node.type = 'sirius_log' ";
     $sql .= "and field_sirius_log_handler_target_id in (:grievance_log_nids) ";
     $sql .= "order by node.created ";
-    $sql .= "limit 5000 ";
+    $sql .= "limit 21 ";
     $stmt = db_query($sql, array(':grievance_log_nids' => $grievance_log_nids));
     while ($hr = $stmt->fetchAssoc()) {
+      ++$count;
       $results[$hr['field_sirius_log_handler_target_id']][] = $hr;
     }
     foreach ($view->result as $row) {
       if (!$results[$row->nid]) { continue; }
       $html = '<br /><strong>' . t('Events') . '</strong>';
+      $count = 0;
       foreach ($results[$row->nid] as $result) {
+        ++$count;
+        if ($count > 20) {
+          $html .= "<br />";
+          $html .= "(Subsequent events for this entry are suppressed.)";
+          break;
+        }
         $html .= '<br />';
         $html .= date('Y-m-d H:i:s', $result['created']);
         $html .= ' / ';
