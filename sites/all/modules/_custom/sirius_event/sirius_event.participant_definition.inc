@@ -6,6 +6,12 @@ function sirius_event_page_participant_definitions() {
 	return views_embed_view('sirius_json_definitions', 'block_1', $domain_nid, $type);
 }
 
+// kludge
+function sirius_node_tab_event_participant_definition_edit_access($definition_node) { return ($definition_node->field_sirius_type['und'][0]['value'] != 'sirius_ledger:policy'); }
+function sirius_node_tab_event_participant_definition_preview_access($definition_node) { return sirius_node_tab_event_participant_definition_edit_access($definition_node); }
+function sirius_node_tab_event_participant_definition_signatures_access($definition_node) { return sirius_node_tab_event_participant_definition_edit_access($definition_node); }
+function sirius_node_tab_event_participant_definition_exim_access($definition_node) { return sirius_node_tab_event_participant_definition_edit_access($definition_node); }
+
 function sirius_node_tab_event_participant_definition_edit($definition_node) {
 	$contact_json = sirius_contact_definition();
 	$contact_form = sirius_jsonfield_util_form_get($contact_json, 'default');
