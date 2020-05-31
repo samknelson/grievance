@@ -13,6 +13,12 @@ function sirius_node_access_domain($node, $op, $account) {
   return NODE_ACCESS_DENY;
 }
 
+function sirius_domain_node_validate($node, $form, &$form_state) {
+  if ($node->nid && ($node->field_sirius_domain['und'][0]['target_id'] == $node->nid)) {
+    form_set_error('field_sirius_domain', t('Parent cannot be self.'));
+  }
+}
+
 /**
  * Fetch the root domain for the current user
  */
@@ -359,9 +365,8 @@ function sirius_domain_restrict_taxonomy_fields(&$form, $form_id) {
   } else {
     $domain_nid = sirius_domain_nid();
   }
-  if (!$domain_nid) { 
-    return;
-  }
+
+  if (!$domain_nid) { return; }
 
   foreach ($form as $field_name => &$form_field) {
     if (!preg_match('/^field_/', $field_name)) { continue; }
@@ -369,12 +374,21 @@ function sirius_domain_restrict_taxonomy_fields(&$form, $form_id) {
     if ($info['type'] != 'taxonomy_term_reference') { continue; }
     $vocabulary_machine_name = $info['settings']['allowed_values'][0]['vocabulary'];
     if (!$vocabulary_machine_name) { continue; }
-    $options = sirius_taxonomy_load($vocabulary_machine_name, 'tid', 'name');
+    $options = sirius_taxonomy_load($vocabulary_machine_name, 'tid', 'name') + array('_none' => '- None -');
+
+    // @todo there has to be an easier way.
     if ($form_field['und']['#options']) {
       $form_field['und']['#options'] = array_intersect($form_field['und']['#options'], $options);
     }
+    if ($form_field['und'][0]['tid']['#options']) {
+      $form_field['und'][0]['tid']['#options'] = array_intersect($form_field['und'][0]['tid']['#options'], $options);
+    }
+    if ($form_field['und'][1]['tid']['#options']) {
+      $form_field['und'][1]['tid']['#options'] = array_intersect($form_field['und'][1]['tid']['#options'], $options);
+    }
   }
 }
+
 function sirius_domain_form_alter_node(&$form, &$form_state, $form_id) {
   // We only care about nodes with a domain field.
   if (!$form['field_sirius_domain']) { return; }
@@ -418,4 +432,21 @@ function sirius_domain_form_alter_node(&$form, &$form_state, $form_id) {
 
   // And, finally ... hide this field from anybody without domain admin permission
   if (!user_access('sirius domain admin')) { $form['field_sirius_domain']['#access'] = FALSE; }
+}
+
+function sirius_domain_form_restrict(&$form) {
+  foreach (array('field_grievance_shop_target_id', 'field_grievance_settlement_tags_tid') as $field_name) {
+    if (!$form[$field_name]['#options']) { continue; }
+    $keys = array_keys($form[$field_name]['#options']);
+
+    if ($field_name == 'field_grievance_shop_target_id') { $good_options = sirius_employer_list(FALSE); }
+    if ($field_name == 'field_grievance_settlement_tags_tid') { $good_options = sirius_taxonomy_load('grievance_settlement_tags', 'tid', 'name'); }
+
+    foreach ($keys as $key) {
+      if ($key == NULL) { continue; }
+      if ($key == 'All') { continue; }
+      if ($good_options[$key]) { continue; }
+      unset($form[$field_name]['#options'][$key]);
+    }
+  }
 }
