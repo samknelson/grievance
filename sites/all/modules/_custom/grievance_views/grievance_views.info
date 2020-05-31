@@ -86,6 +86,7 @@ features[views_view][] = sirius_log_calls
 features[views_view][] = sirius_member_status
 features[views_view][] = sirius_news
 features[views_view][] = sirius_news_admin
+features[views_view][] = sirius_payments
 features[views_view][] = sirius_payperiods
 features[views_view][] = sirius_phonenumbers
 features[views_view][] = sirius_skills
