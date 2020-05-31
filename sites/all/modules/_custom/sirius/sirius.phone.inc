@@ -279,7 +279,7 @@ function sirius_phonenumber_lookup($phonenumber) {
   $nid = $hr['entity_id'];
   if ($nid) {
     $node = node_load($nid);
-    sirius_minilog("Existing record found.");
+    sirius_minilog("Existing record found for $phonenumber.");
   } else {
     global $user;
     $node = new stdClass();
@@ -292,7 +292,7 @@ function sirius_phonenumber_lookup($phonenumber) {
     $node->comment = 0;
     $node->field_sirius_id['und'][0]['value'] = $phonenumber;
     if ($domain_nid) { $node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
-    sirius_minilog("Existing record not found, creating a new one.");
+    sirius_minilog("Existing record not found for $phonenumber, creating a new one.");
   }
 
   return $node;
@@ -367,7 +367,6 @@ function sirius_page_phonenumber_check_form_validate($form, &$form_state) {
     form_set_error('phonenumber', t('Please enter a valid phone number.'));
   }
 }
-
 
 function sirius_page_phonenumber_check_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
