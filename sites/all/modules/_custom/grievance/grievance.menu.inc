@@ -479,6 +479,25 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	$items['admin/config/grievance/core/core'] = array(
+		'title' => 'Core',
+		'description' => t('Settings for the Grievance Module core'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('grievance_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+	);
+
+	$items['admin/config/grievance/core/alert-tester'] = array(
+		'title' => 'Alert Tester',
+		'description' => t('Settings for the Grievance Module core'),
+		'page callback' => 'grievance_page_alert_test',
+		'page arguments' => array('grievance_admin'),
+		'access arguments' => array('grievance admin'),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 2,
+	);
+
 	$items['admin/config/grievance/gform'] = array(
 		'title' => 'Grievance Module - Form',
 		'description' => t('Settings for the Grievance Form'),
@@ -727,6 +746,15 @@ function grievance_menu() {
 		'access callback' => 'grievance_menu_deny_access',
 		'access arguments' => array(),
 		'type' => MENU_CALLBACK,
+	);
+
+	$items['user/%/grievance_preferences'] = array(
+		'title' => 'Grievance Preferences',
+		'page callback' => 'grievance_page_preferences',
+		'page arguments' => array(1),
+		'access callback' => 'grievance_page_preferences_access',
+		'access arguments' => array(1),
+		'type' => MENU_LOCAL_TASK,
 	);
 
   return $items;
