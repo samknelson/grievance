@@ -54,6 +54,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.vbo.i
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.status_correct.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.workersync.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.workersync_local.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.preferences.inc";
 
 /**
  * Implements hook_views_pre_view
