@@ -3293,10 +3293,17 @@ function system_update_7082() {
 }
 
 /**
- * Add 'jquery-ajaxsubmit.js' to the 'jquery.form' library.
+ * Add 'jquery-html-prefilter-3.5.0-backport.js' to the 'jquery' library.
+ */
+function system_update_7083() {
+  // Empty update to force a rebuild of hook_library() and JS aggregates.
+}
+
+/**
+ * Rebuild JavaScript aggregates to include 'ajax.js' fix for Chrome 83.
  */
 function system_update_7084() {
-  // Empty update to force a rebuild of hook_library() and JS aggregates.
+  // Empty update to force a rebuild of JS aggregates.
 }
 
 /**
