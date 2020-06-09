@@ -1,5 +1,49 @@
 <?php
 
+function sirius_feed_hours_info() {
+  $items = array();
+  $items['feed_hours'] = array(
+    'name' => 'feed_hours',
+    'title' => 'Hours',
+    'description' => 'Upload a new list of hours.',
+    'steps' => array(
+      'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
+      'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),
+      'map'       => array('label' => 'Mapping',    'callback' => 'sirius_feed_wizard_map'),
+      'verify'    => array('label' => 'Verify',     'callback' => 'sirius_feed_wizard_verify'),
+      'process'   => array('label' => 'Process',    'callback' => 'sirius_feed_wizard_process'),
+      'review'    => array('label' => 'Review',     'callback' => 'sirius_feed_wizard_review'),
+    ),
+    'feed' => array(
+      'pks' => array(
+        'id' => 'ID',
+        'id3' => 'ID3',
+        'ssn' => 'SSN',
+      ),
+      'fields' => array(
+        'id' => array('title' => 'ID'),
+        'ssn' => array('title' => 'SSN'),
+        'id3' => array('title' => 'ID3'),
+        'hour_type' => array('title' => 'Hour Type'),
+        'employer' => array('title' => 'Employer'),
+        'date' => array('title' => 'Date'),
+        'hours' => array('title' => 'Hours'),
+        'department' => array('title' => 'Department'),
+        'notes1' => array('title' => 'Notes 1'),
+        'notes2' => array('title' => 'Notes 2'),
+        'notes3' => array('title' => 'Notes 3'),
+      ),
+      'batch_size' => 500,
+      'callback_row_verify' => 'sirius_feed_hours_row_verify',
+      'callback_row_process' =>'sirius_feed_hours_row_process',
+      // 'employer_access' => TRUE,
+    ),
+    'callback_launch' => 'sirius_feed_wizard_launch',
+    'callback_launch_args' => array('feed_hours'),
+  );
+  return $items;
+}
+
 function sirius_feed_hours_row_verify($feed_node, $info, $data, &$row, $precompute) {
   $pk = $data['pk'];
   if (!$pk) { $pk = 'id'; }

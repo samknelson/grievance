@@ -2,12 +2,37 @@
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
+function sirius_node_tab_feed_wizard_access($feed_node) {
+	$domain_nid = sirius_domain_nid();
+	if ($domain_nid != $feed_node->field_sirius_domain['und'][0]['target_id']) { return FALSE; }
+
+	if (user_access('sirius admin')) { return TRUE; }
+	if (user_access('sirius domain admin')) { return TRUE; }
+
+	$wizard_name = $feed_node->field_sirius_type['und'][0]['value'];
+	$info = sirius_wizard_info($wizard_name);
+	if (!$info) { return FALSE; }
+
+	if ($info['feed']['employer_access'] && user_access('sirius employer user manager')) { 
+		$employer_node = sirius_employer_get();
+		if ($employer_node && ($employer_node->nid == $feed_node->field_grievance_shop['und'][0]['target_id'])) { return TRUE; }
+	}
+
+	return FALSE;
+}
+
 function sirius_node_tab_feed_wizard($feed_node) {
 	return sirius_node_tab_wizard($feed_node, $feed_node->field_sirius_type['und'][0]['value']);
 }
 
 function sirius_node_access_feed($feed_node, $op, $account) {
-	return user_access('sirius');
+	// Admin can edit these nodes directly
+	if (user_access('sirius admin')) { return NODE_ACCESS_IGNORE; }
+
+	// Everybody else can only view
+	if ($op == 'view' && sirius_node_tab_feed_wizard_access($feed_node)) { return NODE_ACCESS_IGNORE; }
+	
+	return NODE_ACCESS_DENY;
 }
 
 function sirius_feed_default_column_title($col) {
@@ -62,11 +87,22 @@ function sirius_feed_node_search($id, $bundle, $fields) {
  ************************************************************************************************/
 
 function sirius_feed_page_list_access($wizard_name) {
+	// Must be a legitimate feed
 	$info = sirius_wizard_info($wizard_name);
-	// drupal_set_message('<pre>' . print_r($info, 1) . '</pre>)');
-	// return user_access('sirius admin');
-	// @todo!
-	return user_access('sirius');
+	if (!$info) { return FALSE; }
+
+	// Admins can access
+	if (user_access('sirius admin')) { return TRUE; }
+	if (user_access('sirius domain admin')) { return TRUE; }
+
+	// @todo should be in a callback
+	if ($info['feed']['employer_access'] && user_access('sirius employer user manager')) { 
+		$employer_node = sirius_employer_get();
+		if (!$employer_node) { return FALSE; }
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 function sirius_feed_page_list($wizard_name) {
@@ -76,7 +112,15 @@ function sirius_feed_page_list($wizard_name) {
 
 	drupal_set_title("Feed list: " . $info['title']);
 
-	$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain->nid);
+	if (user_access('sirius admin') || user_access('sirius_domain_admin')) {
+		// admins see the full list
+		$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain->nid);
+	} else {
+		// Non-admins see a filtered list
+		$employer_node = sirius_employer_get();
+		if (!$employer_node) { return 'No employer set for this user.'; }
+		$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain->nid, $employer_node->nid);
+	}
 
 	return $html;
 }
@@ -85,20 +129,33 @@ function sirius_feed_page_list($wizard_name) {
  * Landing page
  ************************************************************************************************/
 
+/**
+ * More or less anybody can access the landing page. But they can only see the feed lists that they have access to
+ */
+
 function sirius_feed_page_landing_access() {
-	return user_access('sirius domain admin');
+	return user_access('sirius');
 }
 
 function sirius_feed_page_landing() {
 	$all_info = sirius_wizard_info_all();
 	$html = '<h2>Available Feeds</h2>';
+	$found = FALSE;
 	foreach ($all_info as $key => $info) {
 		if (!$info['feed']) { continue; }
-		$html .= "<li>";
-		$html .= l($info['title'], "sirius/feeds/$key");
-		$html .= '</li>';
+		$path = "sirius/feeds/$key";
+		if (drupal_valid_path($path)) {
+			$html .= "<li>";
+			$html .= l($info['title'], "sirius/feeds/$key");
+			$html .= '</li>';
+			$found = TRUE;
+		}
 	}
 	$html .= '</ul>';
+
+	if (!$found) {
+		return 'You do not have access to any feeds.';
+	}
 
 	return $html;
 }
@@ -225,11 +282,7 @@ function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header)
  ************************************************************************************************/
 
 function sirius_feed_page_launch_access($wizard_name) {
-	$info = sirius_wizard_info($wizard_name);
-	if (!$info) { return FALSE; }
-
-	// @todo
-	return user_access('sirius domain admin');
+	return sirius_feed_page_list_access($wizard_name);
 }
 
 function sirius_feed_page_launch($wizard_name) {
@@ -272,6 +325,16 @@ function sirius_feed_wizard_launch($wizard_name) {
   if ($domain) { $feed_node->field_sirius_domain['und'][0]['target_id'] = $domain->nid; }
   $feed_node->field_sirius_type['und'][0]['value'] = $wizard_name;
   $feed_node->field_sirius_feed_status['und'][0]['value'] = 'draft';
+
+  if (!user_access('sirius admin') && !user_access('sirius domain admin')) {
+  	$employer_node = sirius_employer_get();
+  	if (!$employer_node) {
+  		drupal_set_message("No employer.", 'error');
+  		return;
+  	}
+  	$feed_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
+  }
+
   $feed_node = node_submit($feed_node);
   node_object_prepare($feed_node);
   node_save($feed_node);
@@ -324,6 +387,19 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 			'#options' => $pks,
 			'#default_value' => $data['pk'],
 		);
+	}
+
+	if ($info['feed']['employer_access']) {
+		$employer_node = sirius_employer_get();
+		if (!$employer_node) {
+			$employers = array(NULL => t('-- Select --')) + sirius_employer_list();
+			$form['employer_nid'] = array(
+				'#type' => 'select',
+				'#options' => $employers,
+				'#title' => t('Employer'),
+				'#default_value' => $feed_node->field_grievance_shop['und'][0]['target_id'],
+			);
+		}
 	}
 
 	$tag_taxonomy = $info['feed']['tag_taxonomy'];
@@ -386,6 +462,13 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
   $data['source'] = $form_state['values']['source'];
   $data['pk'] = $form_state['values']['pk'];
   $data['tag'] = $form_state['values']['tag'];
+
+	if ($info['feed']['employer_access']) {
+		$employer_node = sirius_employer_get();
+		if (!$employer_node) {
+			$feed_node->field_grievance_shop['und'][0]['target_id'] = $form_state['values']['employer_nid'];
+		}
+	}
 
 	sirius_wizard_submit($info, $data, $feed_node, $current_step, "File uploaded.");
 }
