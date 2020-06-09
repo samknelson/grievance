@@ -359,7 +359,7 @@ function sirius_event_phonebank_prep_survey(&$form, $defaults) {
 				$form[$key]['#ajax'] = array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax');
 				if (isset($defaults[$key])) {
 					$form[$key]['#default_value'] = $defaults[$key];
-					if ($type == 'date_popup' && is_array($default[$key])) { 
+					if ($type == 'date_popup' && is_array($defaults[$key])) { 
 						$form[$key]['#default_value'] = date('Y-m-d H:i:s', strtotime($defaults[$key]['date'] . ' ' . $defaults[$key]['time']));
 						$form[$key]['#attributes']['autocomplete'] = 'off';
 					}
