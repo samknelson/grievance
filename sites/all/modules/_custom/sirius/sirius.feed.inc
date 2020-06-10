@@ -112,7 +112,7 @@ function sirius_feed_page_list($wizard_name) {
 
 	drupal_set_title("Feed list: " . $info['title']);
 
-	if (user_access('sirius admin') || user_access('sirius_domain_admin')) {
+	if (user_access('sirius admin') || user_access('sirius domain admin')) {
 		// admins see the full list
 		$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain->nid);
 	} else {
