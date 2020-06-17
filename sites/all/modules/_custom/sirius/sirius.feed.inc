@@ -110,7 +110,9 @@ function sirius_feed_page_list($wizard_name) {
 	$info = sirius_wizard_info($wizard_name);
 	if (!$info) { return "No such wizard."; }
 
-	if (user_access('sirius admin') || user_access('sirius_domain_admin')) {
+	drupal_set_title("Feed list: " . $info['title']);
+
+	if (user_access('sirius admin') || user_access('sirius domain admin')) {
 		// admins see the full list
 		$html .= views_embed_view('sirius_feeds', 'block_2', $wizard_name, $domain_nid);
 	} else {
