@@ -106,20 +106,18 @@ function sirius_feed_page_list_access($wizard_name) {
 }
 
 function sirius_feed_page_list($wizard_name) {
-	$domain = sirius_domain();
+	$domain_nid = sirius_domain_nid();
 	$info = sirius_wizard_info($wizard_name);
 	if (!$info) { return "No such wizard."; }
 
-	drupal_set_title("Feed list: " . $info['title']);
-
 	if (user_access('sirius admin') || user_access('sirius_domain_admin')) {
 		// admins see the full list
-		$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain->nid);
+		$html .= views_embed_view('sirius_feeds', 'block_2', $wizard_name, $domain_nid);
 	} else {
 		// Non-admins see a filtered list
 		$employer_node = sirius_employer_get();
 		if (!$employer_node) { return 'No employer set for this user.'; }
-		$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain->nid, $employer_node->nid);
+		$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain_nid, $employer_node->nid);
 	}
 
 	return $html;
@@ -800,6 +798,7 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 	$idx = 0;
 	$rows = $data['rows'];
 	$batch_count = 0;
+	$data['process_ts'] = time();
 	while ($idx < $rows) {
 		$operations[] = array('sirius_feed_wizard_process_batch', array($feed_node, $info, $data, $idx));
 		$idx += $batch_size;
