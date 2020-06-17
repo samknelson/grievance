@@ -230,7 +230,7 @@ function sirius_sirius_wizard_info() {
   $items += sirius_feed_grievance_log_info();
   $items += sirius_letter_wizard_info();
   $items += sirius_feed_worker_info();
-  // $items += sirius_feed_employee_info();
+  $items += sirius_feed_employee_info();
   $items += sirius_feed_hours_info();
 
   return $items;

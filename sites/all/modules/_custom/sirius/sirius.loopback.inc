@@ -7,6 +7,18 @@
  * Because of public / private issues and HTTP_X_FORWARDED_FOR, this is harder than it sounds.
  */
 
+function sirius_loopback_url() {
+	global $is_https;
+	if ($is_https ||
+		(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) {
+		$url = 'https://';
+	} else { 
+		$url = 'http://';
+	}
+	$url .= $_SERVER['SERVER_NAME'];
+	return $url;
+}
+
 function sirius_loopback_access() {
   if (user_access('sirius admin')) { return TRUE; }
 
@@ -69,4 +81,12 @@ function sirius_loopback_sample_html($letterhead_node = NULL, $paragraph_count =
 		$html .= '</p>';
 	}
 	return $html;
+}
+
+function sirius_loopback_echo() {
+	grievance_classes_array('loopback');
+
+	$body = $_REQUEST['body'];
+	if (!$body) { $body = 'No body.'; }
+	return $body;
 }
