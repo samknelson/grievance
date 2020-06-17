@@ -67,6 +67,8 @@ function grievance_node_validate($node, $form, &$form_state) {
 
 
 function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
+  $domain_nid = sirius_domain_nid();
+
   //
   // Damn limit validation problme
   //
@@ -669,6 +671,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'grievance_irset');
+    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->propertyOrderBy('title');
     $stmt = $query->execute();
     if ($stmt['node']) {
