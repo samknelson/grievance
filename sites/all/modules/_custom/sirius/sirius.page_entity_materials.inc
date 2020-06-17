@@ -1,5 +1,27 @@
 <?php
 
+function sirius_materials_document_types($content_type) {
+	$cache = &drupal_static(__FUNCTION__);
+	if (!isset($cache['all_terms'])) {
+		$cache['all_terms'] = sirius_taxonomy_load('grievance_document_types', 'tid', 'full');
+	}
+
+	if (!isset($cache[$content_type])) {
+		global $user;
+		$cache[$content_type] = array();
+		foreach ($cache['all_terms'] as $tid => $term) {
+			if (!in_array($content_type, sirius_fieldvals($term, 'field_sirius_content_types'))) { continue; }
+			$type_rids = sirius_fieldvals($term, 'field_sirius_roles', 'value');
+			$my_rids = array_keys($user->roles);
+			if (!array_intersect($type_rids, $my_rids)) { continue; }
+
+			$cache[$content_type][$tid] = $term;
+		}
+	}
+
+	return $cache[$content_type];
+}
+
 function sirius_materials_download_access($file_item, $entity_type, $material_node) {
 	if ($entity_type != 'node') { return FALSE; }
 
@@ -20,7 +42,14 @@ function sirius_materials_list($entity) {
   $query->propertyOrderBy('title');
   $stmt = $query->execute();
   if (!$stmt['node']) { return array(); }
-  return node_load_multiple(array_keys($stmt['node']));
+
+  $all_nodes = node_load_multiple(array_keys($stmt['node']));
+  $good_nodes = array();
+  foreach ($all_nodes as $nid => $node) {
+  	if (!sirius_materials_access('view', $entity, $node)) { continue; }
+  	$good_nodes[$nid] = $node;
+  }
+  return $good_nodes;
 }
 
 function sirius_materials_has_body($material_node) {
@@ -29,6 +58,8 @@ function sirius_materials_has_body($material_node) {
 }
 
 function sirius_materials_access($action, $entity, $material_node = NULL) {
+	global $user; 
+
 	if ($entity->tid) { $node = sirius_taxonomy_proxy($entity->tid); } else { $node = $entity; } 
 
 	// Verify that this material belongs to this node or entity
@@ -43,6 +74,12 @@ function sirius_materials_access($action, $entity, $material_node = NULL) {
 		}
 		if (!$good) { return FALSE; }
 	}
+
+	// Verify that the user has access to this document type, if any
+	$document_types = sirius_materials_document_types($entity->type);
+	$json = sirius_jsonfield_util_node_json_get($material_node);
+	$document_type_tid = $json['material']['document_type_tid'];
+	if ($document_type_tid && !in_array($document_type_tid, array_keys($document_types))) { return FALSE; }
 
 	// Admins can do anything
 	if (user_access('sirius admin')) { return TRUE; }
@@ -73,6 +110,7 @@ function sirius_materials_access($action, $entity, $material_node = NULL) {
 	if ($node->type == 'sirius_term_proxy') {
 		if ($entity->tid) { $term = $entity; } else { $term = taxonomy_term_load($node->field_sirius_term_proxy['und'][0]['target_id']); } 
 		if ($term->vocabulary_machine_name == 'sirius_event_type') {
+
 			// Admins can do anything
 			if (user_access('sirius event admin')) { return TRUE; }
 			if (user_access('sirius training admin')) { return TRUE; }
@@ -83,6 +121,20 @@ function sirius_materials_access($action, $entity, $material_node = NULL) {
 			// Oh well
 			return FALSE;
 		}
+	}
+
+	if ($node->type == 'sirius_worker') {
+		if (!node_access('view', $node)) { return FALSE; }
+
+		// Admins can do anything
+		if (user_access('sirius admin')) { return TRUE; }
+		if (user_access('sirius domain admin')) { return TRUE; }
+		if (user_access('sirius worker admin')) { return TRUE; }
+
+		// Anybody can view or list
+		if ($action == 'view' || $action == 'list') { return TRUE; }
+
+		return FALSE;
 	}
 
 	return FALSE;
@@ -112,6 +164,7 @@ function sirius_node_tab_entity_materials($entity) {
 }
 
 function sirius_node_tab_entity_materials_list($entity, $options = array()) {
+	$document_types = sirius_materials_document_types($entity->type);
 	if ($entity->tid) { $node = sirius_taxonomy_proxy($entity->tid); } else { $node = $entity; } 
 
 	$materials = sirius_materials_list($entity);
@@ -143,8 +196,13 @@ function sirius_node_tab_entity_materials_list($entity, $options = array()) {
 			$attachment_render = '';
 		}
 
+		$title = '';
+		$type_name = $material_node->field_sirius_type['und'][0]['value'];
+		if ($type_name && $type_name != 'material') { $title = '<strong>' . $type_name . '</strong><br />'; }
+		$title .= $material_node->title;
+
 		$row = array();
-		$row[] = $material_node->title;
+		$row[] = $title;
 		$row[] = sirius_text_to_html(sirius_fieldval($material_node, 'field_sirius_summary'));
 		$row[] = $attachment_render;	
 		$row[] = $tools;
@@ -197,12 +255,25 @@ function sirius_node_tab_entity_materials_addedit_form($form, &$form_state, $ent
 	if ($entity->tid) { $node = sirius_taxonomy_proxy($entity->tid); } else { $node = $entity; } 
 
 	if ($material_node) { $form_state['material_nid'] = $material_node->nid; }
+	$document_types = sirius_materials_document_types($entity->type);
 
 	$json = sirius_jsonfield_util_node_json_get($material_node);
 
 	$form_state['nid'] = $node->nid;
 
 	$form['#tree'] = TRUE;
+
+	if ($document_types) {
+		$document_type_options = array();
+		foreach ($document_types as $tid => $term) { $document_type_options[$tid] = $term->name; }
+		$form['material']['document_type_tid'] = array(
+			'#type' => 'select',
+			'#title' => t('Type'),
+			'#options' => $document_type_options,
+			'#required' => TRUE,
+		);
+		if ($json['material']['document_type_tid']) { $form['material']['document_type_tid']['#default_value'] = $json['material']['document_type_tid']; }
+	}
 
 	$form['material']['title'] = array(
 		'#type' => 'textfield',
@@ -270,12 +341,21 @@ function sirius_node_tab_entity_materials_addedit_form_submit($form, &$form_stat
 
 	$node = node_load($form_state['nid']);
 
+	$type_tid = $form_state['values']['material']['document_type_tid'];
+	if ($type_tid) {
+		$type_term = taxonomy_term_load($type_tid);
+		$type_name = $type_term->name; 
+	} else {
+		$type_name = 'material';
+	}
+
 	$material_node = node_load($form_state['material_nid']);
 	if ($material_node) {
 		$json = sirius_jsonfield_util_node_json_get($material_node);
 		$json['material'] = $form_state['values']['material'];
 		sirius_jsonfield_util_node_json_set($material_node, $json);
 		$material_node->field_sirius_summary['und'][0]['value'] = $form_state['values']['material']['summary'];
+		$material_node->field_sirius_type['und'][0]['value'] = $type_name;
 		if ($files) { $material_node->field_sirius_attachments['und'] = $files; }
 		$material_node->title = $json['material']['title'];
 		node_save($material_node);
@@ -285,8 +365,7 @@ function sirius_node_tab_entity_materials_addedit_form_submit($form, &$form_stat
 		$json['material'] = $form_state['values']['material'];
 		$summary = $form_state['values']['material']['summary'];
 		$category = 'material';
-		$type = 'material';
-		$material_node = sirius_log($category, $type, $summary, $summary, NULL, array($node->nid), $files, $json);
+		$material_node = sirius_log($category, $type_name, $summary, $summary, NULL, array($node->nid), $files, $json);
 		$material_node->title = $json['material']['title'];
 		node_save($material_node);
 		drupal_set_message(t('Material added.'));
