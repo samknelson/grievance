@@ -10,52 +10,36 @@
 function sirius_hour_node_tabs() {
   $node_tabs = array();
 
-  $node_tabs['sirius_payperiod']['sirius_payperiod_entries'] = array(
-    'title' => 'Entries',
+  $node_tabs['sirius_payperiod']['sirius_payperiod_entries_summary'] = array(
+    'title' => 'Totals',
     'description' => '',
-    'callback' => 'sirius_hour_node_tab_payperiod_entries',
+    'callback' => 'sirius_hour_node_tab_payperiod_entries_summary',
     'permissions' => array('sirius hour user'),
     'weight' => 0,
   );
 
-  $node_tabs['sirius_payperiod']['sirius_payperiod_entries/list'] = array(
-    'title' => 'View',
+  $node_tabs['sirius_payperiod']['sirius_payperiod_entries_view'] = array(
+    'title' => 'List Entries',
     'description' => '',
-    'callback' => 'sirius_hour_node_tab_payperiod_entries_list',
+    'callback' => 'sirius_hour_node_tab_payperiod_entries_view',
     'permissions' => array('sirius hour user'),
     'weight' => 1,
   );
 
-  $node_tabs['sirius_payperiod']['sirius_payperiod_entries/edit'] = array(
-    'title' => 'Edit',
+  $node_tabs['sirius_payperiod']['sirius_payperiod_entries_edit'] = array(
+    'title' => 'Edit Entries',
     'description' => '',
     'callback' => 'sirius_hour_node_tab_payperiod_entries_edit',
     'permissions' => array('sirius hour admin'),
     'weight' => 2,
   );
 
-  $node_tabs['sirius_payperiod']['sirius_payperiod_entries/totals'] = array(
-    'title' => 'Totals',
+  $node_tabs['sirius_payperiod']['sirius_payperiod_entries_reconcile'] = array(
+    'title' => 'Reconcile',
     'description' => '',
-    'callback' => 'sirius_hour_node_tab_payperiod_entries_totals',
-    'permissions' => array('sirius hour user'),
+    'callback' => 'sirius_hour_node_tab_payperiod_entries_reconcile',
+    'permissions' => array('sirius hour admin'),
     'weight' => 3,
-  );
-
-  $node_tabs['sirius_payperiod']['sirius_payperiod_entries/monthly'] = array(
-    'title' => 'Monthly',
-    'description' => '',
-    'callback' => 'sirius_hour_node_tab_payperiod_entries_monthly',
-    'permissions' => array('sirius hour user'),
-    'weight' => 4,
-  );
-
-  $node_tabs['sirius_payperiod']['sirius_payperiod_entries/daily'] = array(
-    'title' => 'Daily',
-    'description' => '',
-    'callback' => 'sirius_hour_node_tab_payperiod_entries_daily',
-    'permissions' => array('sirius hour user'),
-    'weight' => 5,
   );
 
   $node_tabs['sirius_worker']['sirius_worker_hours'] = array(
