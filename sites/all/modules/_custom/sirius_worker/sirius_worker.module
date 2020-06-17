@@ -13,6 +13,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.notify.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.vbo.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.merge.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.ein.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_duplicate_id.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_multiple_member_status.inc";
@@ -28,6 +29,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_remove.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_term_delete.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_term_renew.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_ein.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_contact.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_industry.inc";
@@ -40,7 +42,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 function sirius_worker_get_by_id($id) {
 	if (!$id) { return NULL; }
 
-	// Get the bullpens
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_worker');
@@ -51,6 +52,37 @@ function sirius_worker_get_by_id($id) {
 
 	return node_load(array_keys($stmt['node'])[0]);
 }
+
+function sirius_worker_get_by_contact_nid($contact_nid) {
+  if (!$contact_nid) { return NULL; }
+
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_worker');
+  $query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
+  $query->propertyOrderBy('nid', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
+function sirius_worker_get_by_ssn($id) {
+  if (!$id) { return NULL; }
+
+  $domain_nid = sirius_domain_nid();
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_worker');
+  $query->fieldCondition('field_sirius_ssn', 'value', $id);
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+  $query->propertyOrderBy('nid', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
 
 /*
  * Post-save
@@ -139,6 +171,8 @@ function sirius_worker_form_alter(&$form, &$form_state, $form_id) {
     // Some fields must be edited within tabs, can't be modified here.
     $form['field_sirius_skill']['#access'] = FALSE;
     $form['field_sirius_skill_expire']['#access'] = FALSE;
+    $form['field_sirius_member_status']['#access'] = FALSE;
+    $form['field_sirius_industry']['#access'] = FALSE;
 
     // @todo - Have you ever seen such crappy code?  Good god, it must be 11:00 PM on the night we're launching.
     //        Somebody should really clean this up tout suite.
@@ -221,3 +255,10 @@ function sirius_worker_report_cache_info() {
   return $items;
 }
 
+/**
+ * Implements hook_node_view
+ */
+
+function sirius_worker_node_view($node, $view_mode, $langcode) {
+  return sirius_worker_ein_node_view($node, $view_mode, $langcode);
+}

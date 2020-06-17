@@ -232,6 +232,51 @@ function sirius_worker_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/worker/ein'] = array(
+    'title' => 'Employee ID Numbers',
+    'access callback' => 'sirius_worker_page_ein_access',
+    'page callback' => 'sirius_worker_page_ein',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/worker/ein/%'] = array(
+    'title' => 'Employee ID Numbers',
+    'access callback' => 'sirius_worker_page_ein_employer_access',
+    'access arguments' => array(3, 'lookup'),
+    'page callback' => 'sirius_worker_page_ein_employer',
+    'page arguments' => array(3, 'lookup'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/worker/ein/%/lookup'] = array(
+    'title' => 'Lookup',
+    'access callback' => 'sirius_worker_page_ein_employer_access',
+    'access arguments' => array(3, 'lookup'),
+    'page callback' => 'sirius_worker_page_ein_employer',
+    'page arguments' => array(3, 'lookup'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/worker/ein/%/set'] = array(
+    'title' => 'Assign',
+    'access callback' => 'sirius_worker_page_ein_employer_access',
+    'access arguments' => array(3, 'assign'),
+    'page callback' => 'sirius_worker_page_ein_employer',
+    'page arguments' => array(3, 'assign'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/worker/ein/%/upload'] = array(
+    'title' => 'Upload',
+    'access callback' => 'sirius_worker_page_ein_employer_access',
+    'access arguments' => array(3, 'upload'),
+    'page callback' => 'sirius_worker_page_ein_employer',
+    'page arguments' => array(3, 'upload'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
 
   return $items;
 }
