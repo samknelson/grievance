@@ -236,7 +236,7 @@ function sirius_event_report_cache_info() {
   $items['sirius-event-wwe'] = array(
     'name' => t('Workers who have NOT attended Events'),
     'description' => '',
-    'access' => 'sirius report',
+    'access' => 'sirius event admin',
     'fields' => sirius_event_report_wwe_fields(),
     'form_callback' => 'sirius_event_report_wwe_form',
     'pk_list_callback' => 'sirius_event_report_wwe_pks',
