@@ -297,6 +297,12 @@ function sirius_node_tab_entity_materials_addedit_form($form, &$form_state, $ent
 	$default_body = $json['material']['body']['value'];
 	if ($default_body) { $form['material']['body']['#default_value'] = $default_body; }
 
+	$renderable = field_view_field('node', $material_node, 'field_sirius_attachments', 'full');
+	if ($renderable) {
+		$renderable['#title'] = 'Current File';
+		$form["attach_current"] = array('#markup' => '<div><br />' . drupal_render($renderable) . '</div>');
+	}
+
 	$form["attach"] = array(
 		'#type' => 'file',
 		'#title' => t('Attachment'),
