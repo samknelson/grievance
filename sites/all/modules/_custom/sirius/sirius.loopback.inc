@@ -30,6 +30,7 @@ function sirius_loopback_access() {
   global $base_url;
   $url = $base_url . '/sirius/loopback/remote-ip';
   $server_ip = file_get_contents($url);
+
   if ($server_ip == $remote_ip) { return TRUE; }
 
   return FALSE;
@@ -42,6 +43,7 @@ function sirius_loopback_remote_ip() {
 }
 
 function sirius_loopback_remote_ip_print() {
+	drupal_add_http_header('Content-Type', 'text/plain');
   print sirius_loopback_remote_ip(); 
   exit();
 }
