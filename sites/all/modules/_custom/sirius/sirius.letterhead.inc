@@ -51,6 +51,7 @@ function sirius_letterhead_sirius_jsonfield_form_definitions() {
 }
 
 function sirius_letterhead_preview_loopback($letterhead_node) {
+	return TRUE;
 	return sirius_pdf_loopback(sirius_loopback_sample_html(), $letterhead_node);
 }
 

@@ -128,7 +128,7 @@ function sirius_node_tabs() {
     'title' => 'Preview',
     'description' => '',
     'callback' => 'sirius_node_tab_letterhead_preview',
-    'permissions' => array('sirius dispatch letterhead edit'),
+    'permissions' => array('sirius letterhead edit'),
   );
 
   $node_tabs['sirius_domain']['sirius_domain_subdomains'] = array(
