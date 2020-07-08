@@ -287,8 +287,10 @@ function sirius_node_tab_entity_materials_addedit_form($form, &$form_state, $ent
 		'#title' => t('Summary'),
 		'#required' => TRUE,
 	);
-	$default_summary = sirius_fieldval($material_node, 'field_sirius_summary');
-	if ($default_summary) { $form['material']['summary']['#default_value'] = $default_summary; }
+	if ($material_node) {
+		$default_summary = sirius_fieldval($material_node, 'field_sirius_summary');
+		if ($default_summary) { $form['material']['summary']['#default_value'] = $default_summary; }
+	}
 
 	$form['material']['body'] = array(
 		'#type' => 'text_format',
@@ -297,10 +299,12 @@ function sirius_node_tab_entity_materials_addedit_form($form, &$form_state, $ent
 	$default_body = $json['material']['body']['value'];
 	if ($default_body) { $form['material']['body']['#default_value'] = $default_body; }
 
-	$renderable = field_view_field('node', $material_node, 'field_sirius_attachments', 'full');
-	if ($renderable) {
-		$renderable['#title'] = 'Current File';
-		$form["attach_current"] = array('#markup' => '<div><br />' . drupal_render($renderable) . '</div>');
+	if ($material_node) {
+		$renderable = field_view_field('node', $material_node, 'field_sirius_attachments', 'full');
+		if ($renderable) {
+			$renderable['#title'] = 'Current File';
+			$form["attach_current"] = array('#markup' => '<div><br />' . drupal_render($renderable) . '</div>');
+		}
 	}
 
 	$form["attach"] = array(
