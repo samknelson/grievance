@@ -224,7 +224,7 @@ function sirius_sirius_wizard_info() {
 			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
     ),
     'feed' => array(
-    	'batch_size' => 500,
+    	'batch_size' => 2000,
 	    'callback_row_verify' => 'sirius_feed_contact_row_verify',
 	    'callback_row_process' =>'sirius_feed_contact_row_process',
 			'callback_fields' => 'sirius_feed_contact_fields',
