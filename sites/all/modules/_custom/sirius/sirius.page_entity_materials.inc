@@ -140,6 +140,10 @@ function sirius_materials_access($action, $entity, $material_node = NULL) {
 	return FALSE;
 }
 
+function sirius_node_tab_entity_materials_access($entity) {
+	return sirius_materials_access('list', $entity);
+}
+
 function sirius_node_tab_entity_materials($entity) {
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/materials.css');
 	$action = sirius_node_tab_arg(0);
@@ -297,10 +301,12 @@ function sirius_node_tab_entity_materials_addedit_form($form, &$form_state, $ent
 	$default_body = $json['material']['body']['value'];
 	if ($default_body) { $form['material']['body']['#default_value'] = $default_body; }
 
-	$renderable = field_view_field('node', $material_node, 'field_sirius_attachments', 'full');
-	if ($renderable) {
-		$renderable['#title'] = 'Current File';
-		$form["attach_current"] = array('#markup' => '<div><br />' . drupal_render($renderable) . '</div>');
+	if ($material_node) {
+		$renderable = field_view_field('node', $material_node, 'field_sirius_attachments', 'full');
+		if ($renderable) {
+			$renderable['#title'] = 'Current File';
+			$form["attach_current"] = array('#markup' => '<div><br />' . drupal_render($renderable) . '</div>');
+		}
 	}
 
 	$form["attach"] = array(
@@ -377,8 +383,6 @@ function sirius_node_tab_entity_materials_addedit_form_submit($form, &$form_stat
 		drupal_set_message(t('Material added.'));
 	}
 }
-
-
 
 function sirius_node_tab_entity_materials_delete_form($form, &$form_state, $entity, $material_node) {
 	if ($entity->tid) { $node = sirius_taxonomy_proxy($entity->tid); } else { $node = $entity; } 
