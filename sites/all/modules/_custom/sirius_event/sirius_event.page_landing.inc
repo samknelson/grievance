@@ -1,7 +1,7 @@
 <?php
 
 function sirius_event_page_landing_access() {
-	return user_access('sirius');
+	return TRUE;
 }
 
 function sirius_event_page_landing() {
