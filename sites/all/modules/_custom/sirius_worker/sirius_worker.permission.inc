@@ -20,6 +20,8 @@ function sirius_worker_permission() {
 function sirius_worker_node_access($node, $op, $account) {
 	if ($node->type == 'sirius_worker' || $node == 'sirius_worker') { return sirius_worker_node_access_worker($node, $op, $account); }
   if ($node->type == 'sirius_skill' || $node == 'sirius_skill') { return sirius_worker_node_access_skill($node, $op, $account); }
+  if ($node->type == 'sirius_employee' || $node == 'sirius_employee') { return sirius_worker_node_access_employee($node, $op, $account); }
+
 
 	return NODE_ACCESS_IGNORE;
 }
@@ -47,3 +49,12 @@ function sirius_worker_node_access_skill($node, $op, $account) {
   return NODE_ACCESS_DENY;
 }
 
+/**
+ * Emplolyee nodes are created and managed programatically, and can only be directly accessed
+ * by users with the "sirius admin" permission
+ */
+
+function sirius_worker_node_access_employee($node, $op, $account) {
+  if (user_access('sirius admin')) { return NODE_ACCESS_IGNORE; }
+  return NODE_ACCESS_DENY;
+}

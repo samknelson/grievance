@@ -1,5 +1,13 @@
 <?php
 
+function grievance_node_tab_letter_access($grievance_node, $is_loopback = FALSE) {
+	// Disable access if the new interface is enabled.
+	$enabled_types = variable_get('sirius_letter_content_types');
+	if ($enabled_types['grievance']) { return FALSE; }
+	return TRUE;
+}
+
+
 function grievance_node_tab_letter($grievance_node, $is_loopback = FALSE) {
   return drupal_get_form('grievance_letter_form', $grievance_node);
 }

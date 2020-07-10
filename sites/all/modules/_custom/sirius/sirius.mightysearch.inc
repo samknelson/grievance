@@ -326,6 +326,23 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 			);
 		}
 
+		if ($action_options['bulk_recipient_add']) {
+			if (user_access('sirius bulk manual')) {
+				$form['mightysearch_results']['bulk_recipient_add']['manual'] = array(
+					'#type' => 'checkbox', 
+					'#title' => t("Require manual sending"),
+					'#description' => t('If checked, then the system will not send to these recipients in bulk. Instead, delivery to each recipient must be confirmed with a manual click. Recipients added with this option will not receive a "mass mailing".'),
+					'#states' => array(
+						'visible' => array(
+							":input[name=\"mightysearch_results[action]\"]" => array(
+								array('value' => 'bulk_recipient_add'),
+							),
+						),
+					),
+				);
+			}
+		}
+
 		if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove']) {
 			if ($count_total > $count) {
 				$form['mightysearch_results']['results_select_allxyz'] = array(
@@ -789,7 +806,7 @@ function sirius_mightysearch_batch($chunk, $params, &$context) {
 
 		if ($action_name == 'bulk_recipient_add')  {
 			$bulk_nid = $action['bulk_nid'];
-			$result = sirius_bulk_recipient_add($bulk_nid, $contact_nid);
+			$result = sirius_bulk_recipient_add($bulk_nid, $contact_nid, $values['mightysearch_results']['bulk_recipient_add']);
 		}
 
 		if ($action_name == 'bulk_recipient_remove')  {

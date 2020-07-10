@@ -1,10 +1,28 @@
 <?php
 
 function sirius_email_test_form($form, &$form_state) {
+  $form['#tree'] = TRUE; 
+
   $form['to'] = array(
     '#type' => 'textfield',
     '#title' => 'To',
   );
+
+  $form['headers']['cc'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Cc',
+  );
+
+  $form['headers']['bcc'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Bcc',
+  );
+
+  $form['headers']['reply-to'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Reply-To',
+  );
+
   $form['subject'] = array(
     '#type' => 'textfield',
     '#title' => 'Subject',
@@ -27,11 +45,11 @@ function sirius_email_test_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   $params = $form_state['values'];
   $result = sirius_email_send($params);
-  $msg = $result['msg'];
+  $msg = htmlspecialchars($result['msg']);
   if ($result['success']) {
     drupal_set_message($msg);
   } else {
-    drupal_setMessage($msg, 'error');
+    drupal_set_message($msg, 'error');
   }
 }
 
@@ -147,8 +165,77 @@ function sirius_mail_alter(&$message) {
   $message['send'] = FALSE;
 }
 
+function sirius_email_rfc822_format($name, $email) {
+  $email = sirius_email_format($email);
+  if (!sirius_email_validate($email)) { return NULL; }
+  $name = preg_replace('/[^a-zA-Z0-9_ ]/', '', $name);
+  if ($name) { $rfc822 = "$name <$email>"; } else { $rfc822 = $email; }
+  return $rfc822;
+}
 
-function sirius_email_send($params) {
+function sirius_email_rfc822_parse($rfc822) {
+  if (!function_exists('mailparse_rfc822_parse_addresses')) { return array(); }
+
+  $error_reporting_orig = error_reporting();
+  error_reporting(0);
+  $records = mailparse_rfc822_parse_addresses($rfc822);
+  error_reporting($error_reporting_orig);
+
+  return $records;
+}
+
+function sirius_email_rfc822_validate($rfc822) {
+  if (!function_exists('mailparse_rfc822_parse_addresses')) { return TRUE; }
+
+  $records = sirius_email_rfc822_parse($rfc822);
+  if (!$records) { return FALSE; }
+
+  foreach ($records as $record) {
+    if (!sirius_email_validate($record['address'])) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+function sirius_email_whitelist_validate($email) {
+  $disable = variable_get("sirius_email_global_disable", '');
+  if ($disable != 'Yes') { return TRUE; }
+  $whitelist_patterns = explode("\n", variable_get("sirius_email_global_disable_whitelist", ''));
+
+  foreach ($whitelist_patterns as $whitelist_pattern) {
+    $whitelist_pattern = trim($whitelist_pattern);
+    if (!$whitelist_pattern) { continue; }
+    if (preg_match("/$whitelist_pattern/", $email)) { return TRUE; }
+  }
+  return FALSE;
+}
+
+function sirius_email_send_possible($params) {
+  // Need a main recipient
+  if (!$params['to']) { return array('success' => FALSE, 'msg' => 'There is no "to" email address.'); }
+
+  // For each of the recipients....
+  foreach (array('to', 'cc', 'Cc', 'bcc', 'Bcc', 'from', 'From', 'reply-to', 'Reply-To') as $key) {
+    if ($key == 'to') { $rfc822 = $params[$key]; } else { $rfc822 = $params['headers'][$key]; }
+    if (!$rfc822) { continue; }
+    $records = sirius_email_rfc822_parse($rfc822);
+    if (!$records) { continue; }
+
+    foreach ($records as $record) {
+      // Must be a valid email address
+      if (!sirius_email_validate($record['address'])) { 
+        return array('success' => FALSE, 'msg' => "The header for $key, $rfc822, does not look like a valid rfc822-formatted email address.");
+      }
+
+      // Must be whitelisted
+      if (!sirius_email_whitelist_validate($record['address'])) { 
+        return array('success' => FALSE, 'msg' => "Email is globally disabled and the header for $key, " . htmlspecialchars($rfc822) . ", does not match any of the whitelist patterns.");
+      }
+    }
+  }
+
   // Allow callers to set the X-Sirius-Id, and don't resent with the same ID. This allows callers to set unique email keys.
   $id = $params['X-Sirius-Id'];
   if ($id) {
@@ -157,17 +244,13 @@ function sirius_email_send($params) {
     }
   }
 
-  if (!$params['to']) {
-    return array('success' => FALSE, 'msg' => "No email address.");
-  }
+  return array('success' => TRUE);
+}
 
-  $to = $params['to'];
-  if (function_exists('mailparse_rfc822_parse_addresses')) {
-    $to = mailparse_rfc822_parse_addresses($params['to']);
-    if (!$to) {
-      return array('success' => FALSE, 'msg' => $params['to'] . " does not look like a valid email address.");
-    }
-  }
+
+function sirius_email_send($params) {
+  $result = sirius_email_send_possible($params);
+  if (!$result['success']) { return $result; }
 
 	$message = drupal_mail(
 		'sirius', 
@@ -177,14 +260,15 @@ function sirius_email_send($params) {
 		$params 
 	);
 
-  // Don't log attachments
+  // Don't log attachments or body
   unset($message['params']['attachments']);
+  unset($message['body']);
   
   sirius_log(
     'email', 
     'sending', 
     $params['to'], 
-    $params['body'],
+    strip_tags($params['body']),
     $message['headers']['X-Sirius-Id'], 
     $params['handler_nids'],
     NULL,
@@ -309,3 +393,59 @@ function sirius_email_callback($id, $type, $json) {
     $json
   );
 }
+
+function sirius_page_emailaddress_list() {
+  return views_embed_view('sirius_emailaddresses', 'block_1');
+}
+
+
+function sirius_emailaddress_node_validate($node, $form, &$form_state) {
+  if (!sirius_email_validate($node->field_sirius_id['und'][0]['value'])) {
+   form_set_error('field_sirius_id', t('Please enter a valid phone number.'));
+  }
+}
+
+function sirius_emailaddress_node_presave($node) {
+  $node->field_sirius_id['und'][0]['value'] = sirius_email_format($node->field_sirius_id['und'][0]['value']);
+  $node->title = $node->field_sirius_id['und'][0]['value'];
+}
+
+function sirius_emailaddress_lookup($emailaddress) {
+  // Look up the node
+  $domain_nid = sirius_domain_nid();
+  $emailaddress = sirius_email_format($emailaddress);
+  $sql_args = array(':emailaddress' => $emailaddress);
+  $sql = "select field_data_field_sirius_id.entity_id from field_data_field_sirius_id ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = field_data_field_sirius_id.entity_id ";
+  $sql .= "where field_data_field_sirius_id.entity_type = 'node' ";
+  $sql .= "and field_data_field_sirius_id.bundle = 'sirius_emailaddress' ";
+  $sql .= "and field_data_field_sirius_id.field_sirius_id_value = :emailaddress ";
+
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  }
+  $stmt = db_query($sql, $sql_args);
+  $hr = $stmt->fetchAssoc();
+  $nid = $hr['entity_id'];
+  if ($nid) {
+    $node = node_load($nid);
+    sirius_minilog("Existing record found.");
+  } else {
+    global $user;
+    $node = new stdClass();
+    $node->type = 'sirius_emailaddress';
+    node_object_prepare($node);
+    $node->language = LANGUAGE_NONE;
+    $node->uid = $user->uid;
+    $node->status = 1;
+    $node->promote = 0;
+    $node->comment = 0;
+    $node->field_sirius_id['und'][0]['value'] = $emailaddress;
+    if ($domain_nid) { $node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
+    sirius_minilog("Existing record not found, creating a new one.");
+  }
+
+  return $node;
+}
+

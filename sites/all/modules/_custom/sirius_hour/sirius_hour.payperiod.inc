@@ -33,46 +33,75 @@ function sirius_hour_payperiod_list_mine() {
 	return $html;
 }
 
+function sirius_hour_payperiod_sources($json) {
+	$sources = array();
+	if ($json['entries']) {
+		foreach ($json['entries'] as $source_key => $entry) {
+			$sources[$source_key] = $entry['source_name'];
+		}
+	}
+	if (!$sources['manual']) { $sources['manual'] = 'Manual'; }
+	return $sources;
+}
+
 function sirius_hour_payperiod_compute(&$json) {
-	$totals_payperiod = array();
-	$totals_monthly = array();
-	$totals_daily = array();
+	if (!$json['entries']) { $json['entries'] = array(); }
+	$json['totals'] = array();
 
-	$horus_payperiod = array();
-	$hours_monthly = array();
-	$hours_daily = array();
+	// First pass: data cleanup, compute totals
+	$live_count = 0;
+	$live_source_key = '';
+	$note = '';
+	foreach ($json['entries'] as $source_key => $entry) {
+		// Walk the rows
+		$totals = array();
+		if (!$entry['rows']) { $entry['rows'] = array(); }
+		foreach ($entry['rows'] as $delta => $row) {
+			// Remove empty or deleted rows
+			if (!array_filter(array_values($row)) || $row['delete']) { 
+				unset($json['entries'][$source_key]['rows'][$delta]);
+				continue; 
+			}
 
-	if ($json['entries']) { 
+			$qty = $row['qty'];
+			if (!is_numeric($qty)) { $qty = 0; }
+			$department_tid = $row['department'];
+			$hour_type_tid = $row['hour_type'];
+			$day = $row['day'];
+			if (!$department_tid || !$hour_type_tid || !$day) { 
+				$json['entries'][$source_key]['rows'][$delta]['note'] = "Incomplete";
+				continue;
+			}
 
-		usort($json['entries'], function($a, $b) {
-			return $a['start_ts'] <=> $b['start_ts'];
-		});
-		
-		foreach ($json['entries'] as $entry) {
-			$day = date('Y-m-d', $entry['start_ts']);
-			$month = date('Y-m', $entry['start_ts']);
-			$duration = round( ($entry['end_ts'] - $entry['start_ts']) / (60*60), 2);
-			$rate = $entry['rate'];
-			$hour_type_tid = $entry['hour_type_tid'];
-			$department_tid = $entry['department_tid'];
+			$totals['hours']['total'] += $qty;
+			$totals['hours']['by_type'][$hour_type_tid] += $qty;
+			$totals['hours']['by_dept'][$department_tid] += $qty;
+			$totals['hours']['by_type_dept'][$hour_type_tid][$department_tid] += $qty;
+			$totals['hours']['by_dept_type'][$department_tid][$hour_type_tid] += $qty;
 
-			$hours_payperiod[$hour_type_tid][$department_tid] += $duration;
-			$hours_monthly[$month][$hour_type_tid][$department_tid] += $duration;
-			$hours_daily[$day][$hour_type_tid][$department_tid] += $duration;
+			$totals['hours']['by_day'][$day]['total'] += $qty;
+			$totals['hours']['by_day'][$day]['by_type'][$hour_type_tid] += $qty;
+			$totals['hours']['by_day'][$day]['by_dept'][$department_tid] += $qty;
+			$totals['hours']['by_day'][$day]['by_type_dept'][$hour_type_tid][$department_tid] += $qty;
+			$totals['hours']['by_day'][$day]['by_dept_type'][$department_tid][$hour_type_tid] += $qty;
+		}
+		$json['entries'][$source_key]['totals'] = $totals;
+		if (!$entry['rows']) { continue; }
 
-			$totals_payperiod[$hour_type_tid][$department_tid] += $rate * $duration;
-			$totals_monthly[$month][$hour_type_tid][$department_tid] += $rate * $duration;
-			$totals_daily[$day][$hour_type_tid][$department_tid] += $rate * $duration;
+		// First live entry generates the actual totals.
+		if ($entry['status'] == 'live') {
+			++$live_count;
+			$live_source_key = $source_key;
+			$json['totals'] = $totals;
 		}
 	}
 
-	$json['hours']['payperiod'] = $hours_payperiod;
-	$json['hours']['monthly'] = $hours_monthly;
-	$json['hours']['daily'] = $hours_daily;
+	// Set some warnings
+	if ($live_count > 1) { $note .= "There are $live_count sets of entries marked as \"live\"."; }
+	if ($live_count < 1) { $note .= "No entries are marked as \"live\"."; }
 
-	$json['totals']['payperiod'] = $totals_payperiod;
-	$json['totals']['monthly'] = $totals_monthly;
-	$json['totals']['daily'] = $totals_daily;
+	$json['reconcile']['msg'] = $note;
+	if ($note && $json['reconcile']['status'] != 'reconciled') { $json['reconcile']['status'] = 'warning'; }
 }
 
 function sirius_hour_payperiod_load($worker_nid, $employer_nid, $year, $month, $day, $create_active = FALSE) {

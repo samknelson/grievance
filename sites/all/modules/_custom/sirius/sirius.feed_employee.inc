@@ -29,6 +29,7 @@ function sirius_feed_employee_info() {
       'batch_size' => 50,
       'callback_row_verify' => 'sirius_feed_employee_row_verify',
       'callback_row_process' =>'sirius_feed_employee_row_process',
+      'employer_access' => TRUE,
     ),
     'callback_launch' => 'sirius_feed_wizard_launch',
     'callback_launch_args' => array('feed_employee'),

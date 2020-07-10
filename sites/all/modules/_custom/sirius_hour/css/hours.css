@@ -1,0 +1,54 @@
+table.sirius_hours_entries_form td, 
+table.sirius_hours_entries_form .th {
+	padding: 10px;
+}
+
+table.sirius_hours_entries_form .form-item {
+	margin: 0;
+}
+
+table.sirius_hours_entries_form tr {
+	border-bottom: none;
+}
+
+table.sirius_hours_entries_form tr.sirius_table_detailrow {
+	border-bottom: 1px solid #5984be;
+}
+
+table.sirius_hours_entries_form tr.sirius_table_detailrow td {
+	padding: 0;
+}
+
+table.sirius_hours_entries_form tr.sirius_table_detailrow div.sirius_table_detailrow_details {
+	display: none;
+	padding: 10px;
+}
+
+.sirius_hour_summaries {
+	display: table;
+	width: 100%;
+}
+
+.sirius_hour_summary {
+	width: 30%;
+	padding: 10px;
+	display: table-cell;
+	background-color: #cccccc;
+	border-left: 1px solid #999999;
+}
+
+.sirius_hour_summary h2 {
+	padding: 0;
+	margin: 0;
+}
+
+
+table.sirius_hours_entries {
+	table-layout: fixed;
+}
+
+div.sirius_hour_warning {
+	padding: 10px;
+	margin: 10px;
+	color: #9c3842;
+}

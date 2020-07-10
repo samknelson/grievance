@@ -8,10 +8,9 @@ function sirius_page_config() {
 	$links['domain']['links']['sirius/domain/config/usermanage'] 	= array('title' => 'Domain User Manager', 'description' => 'Settings for the domain-specific user manager.');
 	
 	$links['core'] = array('title' => 'Core');
-	$links['core']['links']['sirius/taxonomy'] 									= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');
-	$links['core']['links']['grievance/admin/letter-templates'] = array('title' => 'Letters', 'description' => 'Set up letter templates, such as a grievance notification or a graduation announcement for a worker..');
-	$links['core']['links']['sirius/admin/banner'] 							= array('title' => 'Site Banner', 'description' => 'Configure the banner to be shown at the top of all web pages.');
-	$links['core']['links']['sirius/field_overrides']						= array('title' => 'Field Overrides', 'description' => 'Change the names of fields.');
+	$links['core']['links']['sirius/taxonomy'] 										= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');
+	$links['core']['links']['sirius/admin/banner'] 								= array('title' => 'Site Banner', 'description' => 'Configure the banner to be shown at the top of all web pages.');
+	$links['core']['links']['sirius/field_overrides']							= array('title' => 'Field Overrides', 'description' => 'Change the names of fields.');
 	$links['core']['links']['admin/config/grievance/quicksearch'] = array('title' => 'Quickseach', 'description' => 'Settings for the banner "quicksearch" tool.');
 	$links['core']['links']['sirius/document-retention'] 				= array('title' => 'Document Retention', 'description' => 'Manage document retention policies.');
 	$links['core']['links']['sirius/auditlog/config'] 					= array('title' => 'Audit Log', 'description' => 'Configure audit logging.');
@@ -21,6 +20,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/admin/letterhead'] 					= array('title' => 'Letterhead', 'description' => 'Manage letterheads and watermarks for the site.');
 	$links['core']['links']['sirius/contact/definition'] 				= array('title' => 'Contact Definition', 'description' => 'Set additional domain-specific fields for contacts.');
 	$links['core']['links']['sirius/contact/resync/all']				= array('title' => 'Contact Resync', 'description' => 'A data integrity utility to re-connect all worker and user accounts with contacts.');
+	$links['core']['links']['sirius/config/letter']							= array('title' => 'Letters', 'description' => 'Configure the Letters system and manage letter templates.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
@@ -47,6 +47,9 @@ function sirius_page_config() {
 
 	$links['training'] = array('title' => 'Training Center');
 	$links['training']['links']['sirius/config/training'] 					= array('title' => 'Training Center Settings', 'description' => 'Settings for the training center (evaluations, etc.).');
+
+	$links['ledger'] = array('title' => 'A/R Accounting and Ledger');
+	$links['ledger']['links']['sirius/config/ledger'] 					= array('title' => 'A/R Settings', 'description' => 'Settings for the A/R accounting system: ledger, dues, payments, charges, etc.');
 
 	$links['users'] = array('title' => 'Users');
 	$links['users']['links']['admin/people/permissions'] = array('title' => 'Permissions', 'description' => 'Define which roles have which permissions.');

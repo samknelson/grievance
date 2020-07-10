@@ -363,12 +363,12 @@ function grievance_content_types_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
     'author' => array(
-      'weight' => '7',
+      'weight' => '8',
       'label' => 'inline',
       'format' => 'author',
     ),
     'post_date' => array(
-      'weight' => '6',
+      'weight' => '7',
       'label' => 'inline',
       'format' => 'ds_post_date_long',
     ),
@@ -1813,9 +1813,8 @@ function grievance_content_types_ds_layout_settings_info() {
         5 => 'field_sirius_summary',
         6 => 'field_sirius_attachments',
         7 => 'post_date',
-        8 => 'field_sirius_json',
-        9 => 'author',
-        10 => 'field_sirius_domain',
+        8 => 'author',
+        9 => 'field_sirius_domain',
       ),
     ),
     'fields' => array(
@@ -1827,7 +1826,6 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_sirius_summary' => 'ds_content',
       'field_sirius_attachments' => 'ds_content',
       'post_date' => 'ds_content',
-      'field_sirius_json' => 'ds_content',
       'author' => 'ds_content',
       'field_sirius_domain' => 'ds_content',
     ),

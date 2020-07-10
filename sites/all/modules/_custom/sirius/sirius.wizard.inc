@@ -1,6 +1,5 @@
 <?php
 
-
 function sirius_node_tab_wizard($node, $wizard_name) {
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/wizard.css');
 
@@ -103,7 +102,7 @@ function sirius_wizard_data($info, $node) {
 	return $json['wizard'][$wizard_name];
 }
 
-function sirius_wizard_data_set($info, $node, $data) {
+function sirius_wizard_data_set($info, &$node, $data) {
 	$wizard_name = $info['name'];
 	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
 	$json['wizard'][$wizard_name] = $data;
@@ -171,45 +170,6 @@ function sirius_sirius_wizard_info() {
     'callback_launch_args' => array('feed_wws'),
   );
 
-  $items['feed_hours'] = array(
-    'name' => 'feed_hours',
-    'title' => 'Hours',
-    'description' => 'Upload a new list of hours.',
-    'steps' => array(
-			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
-			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
-			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
-			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
-			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
-			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
-    ),
-    'feed' => array(
-	    'pks' => array(
-	    	'id' => 'ID',
-	    	'id3' => 'ID3',
-	    	'ssn' => 'SSN',
-	    ),
-    	'fields' => array(
-    		'id' => array('title' => 'ID'),
-    		'ssn' => array('title' => 'SSN'),
-    		'id3' => array('title' => 'ID3'),
-    		'hour_type' => array('title' => 'Hour Type'),
-    		'employer' => array('title' => 'Employer'),
-    		'date' => array('title' => 'Date'),
-    		'hours' => array('title' => 'Hours'),
-    		'department' => array('title' => 'Department'),
-    		'notes1' => array('title' => 'Notes 1'),
-    		'notes2' => array('title' => 'Notes 2'),
-    		'notes3' => array('title' => 'Notes 3'),
-    	),
-    	'batch_size' => 500,
-	    'callback_row_verify' => 'sirius_feed_hours_row_verify',
-	    'callback_row_process' =>'sirius_feed_hours_row_process',
-    ),
-    'callback_launch' => 'sirius_feed_wizard_launch',
-    'callback_launch_args' => array('feed_hours'),
-  );
-
   $items['feed_contact'] = array(
     'name' => 'feed_contact',
     'title' => 'Contacts',
@@ -270,11 +230,13 @@ function sirius_sirius_wizard_info() {
   $items += sirius_feed_grievance_log_info();
   $items += sirius_letter_wizard_info();
   $items += sirius_feed_worker_info();
+  $items += sirius_feed_employee_info();
+  $items += sirius_feed_hours_info();
 
   return $items;
 }
 
-function sirius_wizard_submit($info, $data, $node, $current_step, $msg = NULL) {
+function sirius_wizard_submit($info, $data, &$node, $current_step, $msg = NULL) {
 	// Mark this step as complete
 	$data['steps'][$current_step]['complete'] = TRUE;
 

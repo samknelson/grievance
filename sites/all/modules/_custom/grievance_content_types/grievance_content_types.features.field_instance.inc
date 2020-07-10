@@ -20581,7 +20581,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -20616,12 +20616,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
-        'weight' => 7,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22134,7 +22131,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22171,12 +22168,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
-        'weight' => 6,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22210,13 +22204,13 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 8,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',

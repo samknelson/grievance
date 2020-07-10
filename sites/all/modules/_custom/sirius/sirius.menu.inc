@@ -25,6 +25,22 @@ function sirius_node_tabs() {
     'weight' => 20,
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_materials'] = array(
+    'title' => 'Materials',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_materials',
+    'permissions' => array('sirius'),
+    'weight' => 20,
+  );
+
+  $node_tabs['grievance_shop']['grievance_shop_materials'] = array(
+    'title' => 'Materials',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_materials',
+    'permissions' => array('sirius'),
+    'weight' => 20,
+  );
+
   // 
   // Entity Log
   //
@@ -71,21 +87,26 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
-  /*
+  $node_tabs['sirius_payment']['sirius_payment_log'] = array(
+    'title' => 'Log',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_log',
+    'permissions' => array('sirius ledger admin'),
+  );
+
   $node_tabs['sirius_worker']['sirius_worker_letter'] = array(
-    'title' => 'Letters (Dev)',
+    'title' => 'Letters',
     'description' => '',
     'callback' => 'sirius_node_tab_entity_letter',
     'permissions' => array('sirius admin'),
   );
 
   $node_tabs['grievance']['grievance_letter'] = array(
-    'title' => 'Letters (Dev)',
+    'title' => 'Letters',
     'description' => '',
     'callback' => 'sirius_node_tab_entity_letter',
     'permissions' => array('sirius admin'),
   );
-  */
 
   $node_tabs['grievance_letter_template']['sirius_letter_template_recipients'] = array(
     'title' => 'Recipients',
@@ -107,7 +128,7 @@ function sirius_node_tabs() {
     'title' => 'Preview',
     'description' => '',
     'callback' => 'sirius_node_tab_letterhead_preview',
-    'permissions' => array('sirius dispatch letterhead edit'),
+    'permissions' => array('sirius letterhead edit'),
   );
 
   $node_tabs['sirius_domain']['sirius_domain_subdomains'] = array(
@@ -179,7 +200,6 @@ function sirius_menu() {
       if ($tab_record['type']) { $type = $tab_record['type']; } else { $type = MENU_LOCAL_TASK; }
       $items['node/%node/' . $tab_name] = array(
         'title' => $tab_record['title'],
-        'description' => $tab_record['description'],
         'page callback' => 'sirius_node_tab_content',
         'page arguments' => array(1, $tab_name),
         'access callback' => 'sirius_node_tab_access',
@@ -188,6 +208,9 @@ function sirius_menu() {
       );
       if ($tab_record['weight']) {
         $items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
+      }
+      if ($tab_record['description']) {
+        $items['node/%node/' . $tab_name]['weight'] = $tab_record['description'];
       }
       if ($tab_record['page arguments']) {
         $items['node/%node/' . $tab_name]['page_arguments'] = array_merge($items['node/%node/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
@@ -285,12 +308,22 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/config/email/config'] = array(
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_email_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
   $items['sirius/config/email/test'] = array(
-    'title' => 'Email Configuration Tester',
+    'title' => 'Test',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_email_test_form'),
     'access arguments' => array('sirius admin'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
   );
 
   $items['sirius/config/phone'] = array(
@@ -325,6 +358,23 @@ function sirius_menu() {
     'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
   );
+
+  $items['sirius/config/letter'] = array(
+    'title' => 'Letter Configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_letter_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/config/letter/general'] = array(
+    'title' => 'General',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_letter_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
 
   $items['sirius/voice/forward-to-operator'] = array(
     'title' => 'Incoming Calls',
@@ -369,31 +419,30 @@ function sirius_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
-  $items['sirius/letterhead/sample-html/%node'] = array(
-    'title' => 'Sample HTML for Letterhead',
-    'description' => '',
-    'access callback' => 'sirius_loopback_access',
-    'page callback' => 'sirius_letterhead_preview_loopback',
-    'page arguments' => array(3),
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items['sirius/letterhead/sample-html/%node'] = array(
-    'title' => 'Sample HTML for Letterhead',
-    'description' => '',
-    'access callback' => 'sirius_loopback_access',
-    'page callback' => 'sirius_letterhead_preview_loopback',
-    'page arguments' => array(3),
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items['sirius/letter/htmltemplate'] = array(
-    'title' => 'Letter Template',
+  $items['sirius/loopback/echo'] = array(
+    'title' => 'Loopback Echo',
     'description' => '',
     'access callback' => TRUE,
-    'page callback' => 'sirius_letter_htmltemplate',
-    'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'sirius_loopback_echo',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/letterhead/sample-html/%node'] = array(
+    'title' => 'Sample HTML for Letterhead',
+    'description' => '',
+    'access callback' => 'sirius_loopback_access',
+    'page callback' => 'sirius_letterhead_preview_loopback',
+    'page arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['sirius/letterhead/sample-html/%node'] = array(
+    'title' => 'Sample HTML for Letterhead',
+    'description' => '',
+    'access callback' => 'sirius_loopback_access',
+    'page callback' => 'sirius_letterhead_preview_loopback',
+    'page arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
   );
 
   $items['sirius/feeds/launch/%'] = array(
@@ -634,6 +683,23 @@ function sirius_menu() {
     'access arguments' => array('sirius'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
+  );
+
+  $items['sirius/emailaddress'] = array(
+    'title' => 'Manage Email Addresses',
+    'page callback' => 'sirius_page_emailaddress_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/emailaddress/list'] = array(
+    'title' => 'Email Address List',
+    'page callback' => 'sirius_page_emailaddress_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
   );
 
 

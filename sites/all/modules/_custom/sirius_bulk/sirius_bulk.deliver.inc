@@ -57,26 +57,35 @@ function sirius_bulk_deliver_batch($bulk_node, $force = FALSE) {
 		if (!$ok['success']) { return $ok; }
 	}
 
-	// Get the recipients
+	// Get the recipients, both "add" and "add-manual".
 	$batch_size = variable_get("sirius_bulk_batch_$medium", 50);
-	$query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'sirius_log');
-  $query->fieldCondition('field_sirius_log_handler', 'target_id', $bulk_node->nid);
-  $query->fieldCondition('field_sirius_category', 'value', 'bulk:queue');
-	$query->fieldCondition('field_sirius_type', 'value', 'add');
-  $query->range(0, $batch_size);
-  $stmt = $query->execute();
-  if (!$stmt['node']) { 
+	$queue = array();
+	foreach (array('add', 'add-manual') as $type) {
+		$query = new EntityFieldQuery();
+	  $query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'sirius_log');
+	  $query->fieldCondition('field_sirius_log_handler', 'target_id', $bulk_node->nid);
+	  $query->fieldCondition('field_sirius_category', 'value', 'bulk:queue');
+		$query->fieldCondition('field_sirius_type', 'value', $type);
+	  $query->range(0, $batch_size);
+	  $stmt = $query->execute();
+	  if ($stmt['node']) { $queue[$type] = array_keys($stmt['node']); }
+	}
+
+	// If there are no recipients, the bulk delivery is complete.
+	if (!$queue['add'] && !$queue['add-manual']) {
   	$bulk_node->field_sirius_bulk_status['und'][0]['value'] = 'sent';
   	$bulk_node->field_sirius_datetime_completed['und'][0]['value'] = date('Y-m-d H:i:s');
   	node_save($bulk_node);
   	return array('success' => TRUE, 'msg' => 'No more pending recipients. Delivery complete.');
   }
-  $log_nids = array_keys($stmt['node']);
+
+  if (!$queue['add']) {
+  	return array('success' => TRUE, 'msg' => 'There are no more pending recipients, but there are still some recipients requiring manual confirmation. Message delivery will continue.');
+  }
 
   $count_success = $count_error = $count = 0;
-  foreach ($log_nids as $log_nid) {
+  foreach ($queue['add'] as $log_nid) {
   	$result = sirius_bulk_deliver_entry($log_nid);
   	++$count; 
   	if ($result['success']) { ++$count_success; } else { ++$count_error; }

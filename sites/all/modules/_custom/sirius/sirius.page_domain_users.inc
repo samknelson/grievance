@@ -207,6 +207,7 @@ function sirius_node_tab_domain_users_add_form_submit($form, &$form_state) {
 		}
 	}
 	$new_user->status = $form_state['values']['status'];
+	if ($domain_node->field_sirius_tz['und'][0]['value']) { $new_user->timezone = $domain_node->field_sirius_tz['und'][0]['value']; }
 
 	$new_user = user_save($new_user, $edit);
 	//dpm($new_user);

@@ -32,8 +32,7 @@ function sirius_hour_cache_set($payperiod_node) {
 	if ($payperiod_node->field_sirius_active['und'][0]['value'] != 'Yes') { return; }
 
 	// Get JSON data
-	$data = json_decode($payperiod_node->field_sirius_json['und'][0]['value'], TRUE);
-	if (!$data || !$data['hours']['daily']) { return; }
+	$json = sirius_jsonfield_util_node_json_get($payperiod_node);
 
 	$payperiod_nid = $payperiod_node->nid;
 	$employer_nid = $payperiod_node->field_grievance_shop['und'][0]['target_id'];
@@ -51,36 +50,42 @@ function sirius_hour_cache_set($payperiod_node) {
 	$hr = $stmt->fetchAssoc();
 	$employer_name = $hr['title'];
 
-	// Get looks for hours type and departments
-	$department_names = sirius_taxonomy_load('grievance_department', 'tid', 'name');
-	$hour_type_names = sirius_taxonomy_load('sirius_hour_type', 'tid', 'name');
+	// Get lookups for hours type and departments
+	static $department_names;
+	if (!$department_names) { $department_names = sirius_taxonomy_load('grievance_department', 'tid', 'name'); }
+	static $hour_type_names;
+	if (!$hour_type_names) { $hour_type_names = sirius_taxonomy_load('sirius_hour_type', 'tid', 'name'); }
 
-	foreach ($data['hours']['daily'] as $date => $hours_by_type) {
-		list ($year, $month, $day) = explode('-', $date);
-		foreach ($hours_by_type as $hours_type_tid => $hours_by_department) {
-			$hours_type_name = $hour_type_names[$hours_type_tid];
-			foreach ($hours_by_department as $department_tid => $hours) {
-				$department_name = $department_names[$department_tid];
-				$total = $data['totals']['daily'][$date][$hours_type_tid][$department_tid];
-				$sql = 'insert into sirius_hours_cache (payperiod_nid, year, month, day, worker_nid, employer_nid, hours_type_tid, department_tid, hours, total, employer_name, worker_name, hours_type_name, department_name) ';
-				$sql .= 'values (:payperiod_nid, :year, :month, :day, :worker_nid, :employer_nid, :hours_type_tid, :department_tid, :hours, :total, :employer_name, :worker_name, :hours_type_name, :department_name)';
-				$stmt = db_query($sql, array(
-						':payperiod_nid' => $payperiod_nid,
-						':year' => $year,
-						':month' => $month,
-						':day' => $day,
-						':worker_nid' => $worker_nid,
-						':employer_nid' => $employer_nid,
-						':hours_type_tid' => $hours_type_tid,
-						':department_tid' => $department_tid,
-						':hours' => $hours,
-						':total' => $total,
-						':employer_name' => $employer_name,
-						':worker_name' => $worker_name,
-						':hours_type_name' => $hours_type_name,
-						':department_name' => $department_name,
-					)
-				);
+	if ($json['totals']['hours']['by_day']) {
+		$payperiod_ts = sirius_fieldval($payperiod_node, 'field_sirius_datetime', 'ts');
+		$month = gmdate('n', $payperiod_ts);
+		$year = gmdate('Y', $payperiod_ts);
+		foreach ($json['totals']['hours']['by_day'] as $day => $by_day) {
+			foreach ($by_day['by_type_dept'] as $hours_type_tid => $by_dept) {
+				$hours_type_name = $hour_type_names[$hours_type_tid];
+				foreach ($by_dept as $department_tid => $qty) {
+					// drupal_set_message("Records for: $payperiod_ts, $year-$month-$day / $worker_nid / $employer_nid / $hours_type_tid / $department_tid / $qty");
+					$department_name = $department_names[$department_tid];
+					$sql = 'insert into sirius_hours_cache (payperiod_nid, year, month, day, worker_nid, employer_nid, hours_type_tid, department_tid, hours, total, employer_name, worker_name, hours_type_name, department_name) ';
+					$sql .= 'values (:payperiod_nid, :year, :month, :day, :worker_nid, :employer_nid, :hours_type_tid, :department_tid, :hours, :total, :employer_name, :worker_name, :hours_type_name, :department_name)';
+					$stmt = db_query($sql, array(
+							':payperiod_nid' => $payperiod_nid,
+							':year' => $year,
+							':month' => $month,
+							':day' => $day,
+							':worker_nid' => $worker_nid,
+							':employer_nid' => $employer_nid,
+							':hours_type_tid' => $hours_type_tid,
+							':department_tid' => $department_tid,
+							':hours' => $qty,
+							':total' => 0,
+							':employer_name' => $employer_name,
+							':worker_name' => $worker_name,
+							':hours_type_name' => $hours_type_name,
+							':department_name' => $department_name,
+						)
+					);
+				}
 			}
 		}
 	}

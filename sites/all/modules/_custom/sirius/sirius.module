@@ -36,6 +36,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lock.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.node_tabs.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.masquerade.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter_wizard.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.fax.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overrides.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.inc';
@@ -50,9 +51,11 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_contac
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_hours.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance_log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_employee.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_materials.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_letters.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contacts.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_resync_all.inc';
@@ -131,6 +134,7 @@ function sirius_node_presave($node) {
   }
 
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_presave($node); }
+  if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_presave($node); }
 }
 
 
@@ -276,13 +280,20 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   }
 
   // Remove access to some JSON fields
-  if ($form_id == 'sirius_worker' ||
+  if ($form_id == 'sirius_worker_node_form' ||
       $form_id == 'grievance_shop_node_form' ||
       $form_id == 'sirius_dispatch_job_node_form' ||
       $form_id == 'grievance_node_form' ||
       $form_id == 'sirius_contact_node_form' || 
       $form_id == 'sirius_json_definition_node_form' ||
-      $form_id == 'sirius_event_participant_node_form') {
+      $form_id == 'sirius_event_participant_node_form' ||
+      $form_id == 'sirius_phonenumber_node_form' || 
+      $form_id == 'sirius_emailaddress_node_form' || 
+      $form_id == 'sirius_bulk_node_form' ||
+      $form_id == 'taxonomy_form_term' ||
+      $form_id == 'sirius_ledger_account_node_form' ||
+      $form_id == 'sirius_employee_node_form' ||
+      $form_id == 'grievance_letter_template_node_form') {
     $form['field_sirius_json']['#access'] = FALSE;
   }
 
@@ -295,6 +306,11 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
 
   // Field overrides
   sirius_field_overrides_form_alter($form, $form_state, $form_id);
+
+  // Restrict views exposed filters
+  if ($form_id == 'views_exposed_form') {
+    sirius_domain_form_restrict($form);
+  }
 }
 
 /**
@@ -474,6 +490,8 @@ function sirius_node_view($node, $view_mode, $langcode) {
 
 function sirius_node_validate($node, $form, &$form_state) {
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_validate($node, $form, $form_state); }
+  if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_validate($node, $form, $form_state); }
+  if ($node->type == 'sirius_domain') { sirius_domain_node_validate($node, $form, $form_state); }
 }
 
 
@@ -500,8 +518,12 @@ function sirius_fieldvals($node, $field, $col = 'value', $format = 'Y-m-d H:i') 
 }
 
 function sirius_fieldval($node, $field, $col = 'value', $params = array()) {
-  if ($col == 'ts') { 
-    return strtotime($node->{$field}['und'][0]['value'] . ' ' . $node->{$field}['und'][0]['timezone_db']);
+  if ($col == 'ts') {
+    if ($node->{$field}['und'][0]['value']) {
+      return strtotime($node->{$field}['und'][0]['value'] . ' ' . $node->{$field}['und'][0]['timezone_db']);
+    } else {
+      return NULL;
+    }
   } else {
     return $node->{$field}['und'][0][$col];
   }
@@ -654,9 +676,19 @@ function sirius_node_update($node) {
  */
 
 function sirius_views_query_alter(&$view, &$query) {
-  // Irritatingly, within Views contextual filters, there's no way to have a default value of NULL. 
-  // So, for example, you can't say "give me all the results for value X, and if X is missing, give me all the results where X is null."
-  // This hideous snippet of code allows you to put a default value of the (string) "NULL". When it detects it, it converts it into a "IS NULL" condition.
+  // If the argument expects CURRENT_DOMAIN, make sure that we haven't passed any arguments in via the URL. 
+  if ($view->argument) {
+    foreach ($view->argument as $argument_key => $argument) {
+      if ($argument_key != 'field_sirius_domain_target_id') { continue; }
+      if ($argument->options['default_argument_options']['argument'] != 'CURRENT_DOMAIN') { continue; }
+      $arg = $view->args[$argument->position];
+      $domain_nid = sirius_domain_nid();
+      if ($arg && $arg != 'CURRENT_DOMAIN' && $arg != $domain_nid && !user_access('sirius admin')) {
+        print "A domain of $arg was passed into the URL. Access denied.";
+        exit();
+      }
+    }
+  }
 
   if ($query->where) {
     foreach ($query->where as $delta => &$clause) {
@@ -676,7 +708,9 @@ function sirius_views_query_alter(&$view, &$query) {
               }
             }
 
-            // If the value is NULL, rewrite the query to support NULL.
+            // Irritatingly, within Views contextual filters, there's no way to have a default value of NULL. 
+            // So, for example, you can't say "give me all the results for value X, and if X is missing, give me all the results where X is null."
+            // This hideous snippet of code allows you to put a default value of the (string) "NULL". When it detects it, it converts it into a "IS NULL" condition.
             if (is_array($condition['value']) && $condition['value'][$var] == 'NULL') {
               $condition['field'] = 'field_data_field_sirius_domain.field_sirius_domain_target_id';
               $condition['operator'] = 'IS NULL';
@@ -694,6 +728,27 @@ function sirius_views_pre_view(&$view, &$display_id, &$args) {
   if ($view->name == 'taxonomy_term') {
     $args = array(-999);
   }
+}
+
+function sirius_views_pre_build_disabled(&$view) {
+  // Validate the domain argument if we're expecting CURRENT_DOMAIN
+  dpm($view->argument);
+  if ($view->argument) {
+    $delta = -1;
+    foreach ($view->argument as $argument_key => $argument) {
+      ++$delta;
+      if ($argument_key != 'field_sirius_domain_target_id') { continue; }
+      if ($argument->options['default_argument_options']['argument'] != 'CURRENT_DOMAIN') { continue; }
+
+      $arg = $view->arg[$delta];
+
+      $view->argument[$argument_key]->specify_validation = 1;
+      $view->argument[$argument_key]->validate = array('type' => 'php', 'fail' => 'access denied');
+      $domain_nid = sirius_domain_nid();
+      $view->argument[$argument_key]->validate_options = array('code' => "drupal_set_message('Generated validator here!'); return \$argument == $domain_nid;");
+    }
+  }
+  dpm($view->argument);
 }
 
 /**
