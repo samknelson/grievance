@@ -713,6 +713,9 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$counts = array();
 	$callback = $info['feed']['callback_row_verify'];
 	foreach ($sheet->getRowIterator() as $row) {
+		++$count;
+		if ($count > 10000) { continue; }
+
 		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
 		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 
@@ -731,8 +734,6 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 		++$counts[$result['msg']];
 		if ($counts[$result['msg']] == 6) { $import_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
 		if ($counts[$result['msg']] <= 6) { $import_data[] = $import_data_row; }
-
-		++$count;
 	}
 	$data['rows'] = $count + 1;
 	$form_state['data'] = $data;
