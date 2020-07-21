@@ -749,7 +749,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 				$is_empty = ($option === NULL || $option === '');
 				if ($is_empty) { $option = '[empty]'; }
 
-				if ($option_count < 8) {
+				if ($option_count < 50) {
 					$row = array();
 					$row[] = $option;
 					$row[] = $count;
