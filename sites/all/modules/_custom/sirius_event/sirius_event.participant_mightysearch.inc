@@ -31,6 +31,7 @@ function sirius_event_page_participant_mightysearch_form($form, &$form_state, $e
 	if (!$lite) {
 		$actions['tag'] = array('title' => 'Add or Remove Tags');
 		$actions['export'] = array('title' => 'Export');
+		$actions['report'] = array('title' => 'Report');
 	}
 
 	sirius_mightysearch_form_prepare(
