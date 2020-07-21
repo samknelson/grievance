@@ -18,3 +18,25 @@
 .sirius_mightsearch_clausepart_field select {
 	max-width: 400px;
 }
+
+.sirius_mightysearch_report table, 
+.sirius_mightysearch_report tr, 
+.sirius_mightysearch_report td, 
+.sirius_mightysearch_report th {
+	border: 1px solid #aaaaaa;
+}
+
+#content .sirius_mightysearch_report table h2 {
+	padding: 0;
+	margin: 0;
+}
+
+.sirius_mightysearch_report th, 
+.sirius_mightysearch_report td {
+	padding: 5px;
+}
+
+.sirius_mightysearch_report td.sirius_mightysearch_report_header {
+	font-size: 125%;
+	background-color: #cccccc;
+}
