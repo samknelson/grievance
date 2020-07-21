@@ -255,18 +255,122 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
   $form['mightysearch']['accordion_close_display'] = array('#markup' => '</div>');
   $form['mightysearch']['accordion_close'] = array('#markup' => '</div>');
 
+  /*
 	$form['mightysearch']['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Search'),
 	);
+	*/
 
   $form['mightysearch']['close'] = array('#markup' => '</div>');
 
 	$form['suffix'] = array('#markup' => '</div>');
 
+	$count = $form_state['results']['count'];
+	$count_total = $form_state['results']['count_total'];
+
+	$action_options = array(NULL => t('Search'));
+	if ($actions['register']) 					{ $action_options['register'] = $actions['register']['title']; }
+	if ($actions['export']) 						{ $action_options['export'] = $actions['export']['title']; }
+	if ($actions['tag']) 								{ $action_options['tag_add'] = 'Add Tag'; $action_options['tag_remove'] = 'Remove Tag'; }
+	if ($actions['bulk_recipient_add']) { $action_options['bulk_recipient_add'] = $actions['bulk_recipient_add']['title']; }
+	if ($actions['bulk_recipient_remove']) { $action_options['bulk_recipient_remove'] = $actions['bulk_recipient_remove']['title']; }
+	if ($actions['delete']) 						{ $action_options['delete'] = $actions['delete']['title']; }
+	if ($actions['report']) 						{ $action_options['report'] = $actions['report']['title']; }
+	if (user_access('sirius admin')) 		{ $action_options['sql'] = 'Display SQL Query'; }
+
+	$form['mightysearch_results']['action'] = array(
+		'#type' => 'select',
+		'#title' => t('Action'),
+		'#options' => $action_options,
+		'#default_value' => 'search',
+	);
+
+	// @todo: Actions should be callbacks
+
+	if ($action_options['register']) {
+		$pstatus_options = $actions['register']['pstatus_options'];
+		if (!$pstatus_options) { drupal_set_message("No participant status options for this role. Registration is not possible.", 'error'); }
+		else {
+			$form['mightysearch_results']['pstatus_tid'] = array(
+				'#title' => 'Register With Status',
+				'#options' => $pstatus_options,
+				'#type' => 'select',
+				'#states' => array('visible' => array(array(":input[name=\"mightysearch_results[action]\"]" => array('value' => 'register')))),
+			);
+		}
+	}
+
+	if ($action_options['tag_add'] || $action_options['tag_remove']) {
+		$form['mightysearch_results']['tag_tid'] = array(
+			'#title' => 'Tag',
+			'#options' => $tag_options,
+			'#description' => 'Tags can be managed <strong>' . l('here.', 'sirius/taxonomy/sirius_contact_tags', array('attributes' => array('target' => '_blank'))) . '</strong>',
+			'#type' => 'select',
+				'#states' => array(
+					'visible' => array(
+						":input[name=\"mightysearch_results[action]\"]" => array(
+							array('value' => 'tag_add'), 
+							array('value' => 'tag_remove'),
+						),
+					),
+				),
+		);
+	}
+
+	if ($action_options['bulk_recipient_add']) {
+		if (user_access('sirius bulk manual')) {
+			$form['mightysearch_results']['bulk_recipient_add']['manual'] = array(
+				'#type' => 'checkbox', 
+				'#title' => t("Require manual sending"),
+				'#description' => t('If checked, then the system will not send to these recipients in bulk. Instead, delivery to each recipient must be confirmed with a manual click. Recipients added with this option will not receive a "mass mailing".'),
+				'#states' => array(
+					'visible' => array(
+						":input[name=\"mightysearch_results[action]\"]" => array(
+							array('value' => 'bulk_recipient_add'),
+						),
+					),
+				),
+			);
+		}
+	}
+
+	if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove']) {
+		if ($count_total > $count) {
+			$form['mightysearch_results']['results_select_allxyz'] = array(
+				'#type' => 'checkbox', 
+				'#title' => t("Apply to ALL matching contacts, including any not listed below."),
+				'#states' => array(
+					'visible' => array(
+						":input[name=\"mightysearch_results[action]\"]" => array(
+							array('value' => 'register'), 
+							array('value' => 'tag_add'), 
+							array('value' => 'tag_remove'),
+							array('value' => 'delete'),
+							array('value' => 'bulk_recipient_add'),
+							array('value' => 'bulk_recipient_remove'),
+						),
+					),
+				),
+			);
+		}
+	}
+
+	if ($action_options['export']) {
+		$form['mightysearch_results']['results_all_fields'] = array(
+			'#type' => 'checkbox',
+			'#title' => t("Export ALL fields"),
+			'#states' => array('visible' => array(array(":input[name=\"mightysearch_results[action]\"]" => array('value' => 'export')))),
+		);
+	}
+
+	$form['mightysearch_results']['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
+
 	if ($form_state['results']) {
-		$count = $form_state['results']['count'];
-		$count_total = $form_state['results']['count_total'];
+
 		if ($form_state['results']['rendered']) {
 			$results_summary = t('Results');
 		} else if ($count_total > $count) {
@@ -278,104 +382,6 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		}
 
 		$form['mightysearch_results']['summary'] = array('#markup' => '<hr><h2>' . $results_summary . '</h2>');
-
-		$action_options = array(NULL => t('-- Select --'));
-		if ($actions['register']) 					{ $action_options['register'] = $actions['register']['title']; }
-		if ($actions['export']) 						{ $action_options['export'] = $actions['export']['title']; }
-		if ($actions['tag']) 								{ $action_options['tag_add'] = 'Add Tag'; $action_options['tag_remove'] = 'Remove Tag'; }
-		if ($actions['bulk_recipient_add']) { $action_options['bulk_recipient_add'] = $actions['bulk_recipient_add']['title']; }
-		if ($actions['bulk_recipient_remove']) { $action_options['bulk_recipient_remove'] = $actions['bulk_recipient_remove']['title']; }
-		if ($actions['delete']) 						{ $action_options['delete'] = $actions['delete']['title']; }
-		if (user_access('sirius admin')) 		{ $action_options['sql'] = 'Display SQL Query'; }
-
-		$form['mightysearch_results']['action'] = array(
-			'#type' => 'select',
-			'#title' => t('Action'),
-			'#options' => $action_options,
-		);
-
-		// @todo: Actions should be callbacks
-
-		if ($action_options['register']) {
-			$pstatus_options = $actions['register']['pstatus_options'];
-			if (!$pstatus_options) { drupal_set_message("No participant status options for this role. Registration is not possible.", 'error'); }
-			else {
-				$form['mightysearch_results']['pstatus_tid'] = array(
-					'#title' => 'Register With Status',
-					'#options' => $pstatus_options,
-					'#type' => 'select',
-					'#states' => array('visible' => array(array(":input[name=\"mightysearch_results[action]\"]" => array('value' => 'register')))),
-				);
-			}
-		}
-
-		if ($action_options['tag_add'] || $action_options['tag_remove']) {
-			$form['mightysearch_results']['tag_tid'] = array(
-				'#title' => 'Tag',
-				'#options' => $tag_options,
-				'#description' => 'Tags can be managed <strong>' . l('here.', 'sirius/taxonomy/sirius_contact_tags', array('attributes' => array('target' => '_blank'))) . '</strong>',
-				'#type' => 'select',
-					'#states' => array(
-						'visible' => array(
-							":input[name=\"mightysearch_results[action]\"]" => array(
-								array('value' => 'tag_add'), 
-								array('value' => 'tag_remove'),
-							),
-						),
-					),
-			);
-		}
-
-		if ($action_options['bulk_recipient_add']) {
-			if (user_access('sirius bulk manual')) {
-				$form['mightysearch_results']['bulk_recipient_add']['manual'] = array(
-					'#type' => 'checkbox', 
-					'#title' => t("Require manual sending"),
-					'#description' => t('If checked, then the system will not send to these recipients in bulk. Instead, delivery to each recipient must be confirmed with a manual click. Recipients added with this option will not receive a "mass mailing".'),
-					'#states' => array(
-						'visible' => array(
-							":input[name=\"mightysearch_results[action]\"]" => array(
-								array('value' => 'bulk_recipient_add'),
-							),
-						),
-					),
-				);
-			}
-		}
-
-		if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove']) {
-			if ($count_total > $count) {
-				$form['mightysearch_results']['results_select_allxyz'] = array(
-					'#type' => 'checkbox', 
-					'#title' => t("Apply to ALL matching contacts, including any not listed below."),
-					'#states' => array(
-						'visible' => array(
-							":input[name=\"mightysearch_results[action]\"]" => array(
-								array('value' => 'register'), 
-								array('value' => 'tag_add'), 
-								array('value' => 'tag_remove'),
-								array('value' => 'delete'),
-								array('value' => 'bulk_recipient_add'),
-								array('value' => 'bulk_recipient_remove'),
-							),
-						),
-					),
-				);
-			}
-		}
-
-		if ($action_options['export']) {
-			$form['mightysearch_results']['results_all_fields'] = array(
-				'#type' => 'checkbox',
-				'#title' => t("Export ALL fields"),
-				'#states' => array('visible' => array(array(":input[name=\"mightysearch_results[action]\"]" => array('value' => 'export')))),
-			);
-		}
-
-		$form['mightysearch_results']['submit'] = array(
-			'#type' => 'submit',
-			'#value' => t('Submit'),
-		);
 
 		if ($count > 0) {
 			$form['mightysearch_results']['results_select'] = array(
@@ -568,7 +574,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	$sql_parts['select_counts'] = "select count(nid) as c "; 
 	$sql_parts['select_nids'] = "select nid "; 
 
-	$sql_parts['limit'] = "group by nid limit $limit ";
+	$sql_parts['limit'] = "limit $limit ";
 
 	$sql_parts['joins'] = "from node ";
 	if ($domain_nid) {
@@ -615,6 +621,8 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		$sql_parts['where'] .= "and field_sirius_category_value = 'bulk:queue' ";
 		$sql_args[':bulk_nid'] = $json_forms['sirius_bulk']['bulk_nid'];
 	}
+
+	$sql_parts['where'] .= "group by nid ";
 
 	$found = FALSE;
 	for ($i=0; $i<$clause_count; ++$i) {
@@ -692,6 +700,97 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 			'rows' => $rows,
 			'header' => $header,
 		);
+
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Report
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	if ($action == 'report') {
+		$sql = $sql_parts['select_fields'] . $sql_parts['joins'] . $sql_parts['where'];
+		$stmt = sirius_sql_query($sql, $sql_args);
+
+
+		// comeback
+		$elements = array();
+		foreach (array_keys($sql_parts['headers']) as $full_path) {
+			list ($node_type, $which_form, $path) = sirius_mightysearch_parse_path($full_path);
+			$elements[$full_path] = sirius_jsonfield_util_get_from_path($json_forms[$node_type][$which_form], $path);
+		}
+
+		$result_data = array();
+		while ($hr = $stmt->fetchAssoc()) {
+			foreach (array_keys($sql_parts['headers']) as $full_path) {
+				$val = sirius_mightysearch_render_result($json_forms, $hr, $full_path);
+				$result_data[$full_path][$val]++;
+			}
+		}
+		ksort($result_data);
+
+		foreach ($result_data as $full_path => $option_data) {
+			if ($elements[$full_path]['#title']) {
+				$title = $elements[$full_path]['#title'] . ' (' . $full_path . ')';
+			} else {
+				$title = $full_path;
+			}
+
+			$row = array();
+			$row[] = array('data' => $title, 'colspan' => 2, 'class' => array('sirius_mightysearch_report_header'));
+			$rows[] = $row;
+			ksort($option_data);
+
+			$total = 0;
+			$option_count = 0;
+			$other_option_total = 0;
+			foreach ($option_data as $option => $count) {
+				++$option_count;
+
+				$is_empty = ($option === NULL || $option === '');
+				if ($is_empty) { $option = '[empty]'; }
+
+				if ($option_count < 8) {
+					$row = array();
+					$row[] = $option;
+					$row[] = $count;
+					$rows[] = $row;
+				} else {
+					$other_option_total += $count;
+				}
+
+				if (!$is_empty) { $total += $count; }
+			}
+
+			if ($other_option_total) {
+				$row = array();
+				$row[] = '[all other responses]';
+				$row[] = $other_option_total;
+				$rows[] = $row;
+			}
+
+			$row = array();
+			$row[] = '<strong>' . t('Total') . '</strong>';
+			$row[] = $total;
+			$rows[] = $row;
+
+		}
+
+		$header = array();
+
+		$html = '<div class="sirius_mightysearch_report">';
+		$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+		$html .= '</div>';
+
+		$form_state['results'] = array('rendered' => $html);
+		/*
+		$form_state['results'] = array(
+			'count' => $count,
+			'count_total' => $count_total,
+			'results_summary' => $results_summary,
+			'rows' => $rows,
+			'header' => $header,
+		);
+		*/
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
