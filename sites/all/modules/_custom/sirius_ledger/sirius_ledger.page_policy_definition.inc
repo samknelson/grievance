@@ -1,0 +1,179 @@
+<?php
+
+function sirius_ledger_node_tab_policy_definition_access($definition_node) {
+	return $definition_node->field_sirius_type['und'][0]['value'] == 'sirius_ledger:policy';
+}
+
+function sirius_ledger_node_tab_policy_definition($definition_node) {
+	return drupal_get_form('sirius_ledger_node_tab_policy_definition_form', $definition_node);
+}
+
+function sirius_ledger_ms_level_options() {
+	$ms_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+	$ms_level_options = array();
+	foreach ($ms_options as $ms_tid => $ms_name) {
+		$levels = sirius_training_levels_fetch($ms_tid);
+		$ms_level_options[$ms_tid] = $ms_name;
+		foreach ($levels as $level_code => $level) {
+			$ms_level_options["$ms_tid|$level_code"] = $ms_name . ': ' . $level['title'];
+		}
+	}
+	return $ms_level_options;
+}
+
+function sirius_ledger_node_tab_policy_definition_form($form, &$form_state, $definition_node) {
+	$form_state['definition_nid'] = $definition_node->nid;
+
+	$json = sirius_jsonfield_util_node_json_get($definition_node);
+
+	$form['#tree'] = TRUE;
+
+	$form['ledger']['policy']['settings']['schedule'] = array(
+		'#title' => t('Schedule'),
+		'#type' => 'checkboxes',
+		'#options' => sirius_ledger_policy_schedule_options(),
+	);
+	if ($json['ledger']['policy']['settings']['schedule']) { $form['ledger']['policy']['settings']['schedule']['#default_value'] = $json['ledger']['policy']['settings']['schedule']; }
+
+	$account_options = array('pay' => t('Pay Rate'));
+	$account_options += sirius_ledger_account_list();
+	$form['ledger']['policy']['settings']['accounts'] = array(
+		'#type' => 'checkboxes',
+		'#title' => t('Accounts'),
+		'#options' => $account_options,
+	);
+	if ($json['ledger']['policy']['settings']['accounts']) { $form['ledger']['policy']['settings']['accounts']['#default_value'] = $json['ledger']['policy']['settings']['accounts']; }
+
+	$form['ledger']['policy']['settings']['monthly_charge_day'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Monthly Charge Day'),
+		'#size' => 2,
+		'#description' => t('For monthly charges, on which day of the month should the charge be entered?')
+	);
+	if ($json['ledger']['policy']['settings']['accounts']) { $form['ledger']['policy']['settings']['monthly_charge_day']['#default_value'] = $json['ledger']['policy']['settings']['monthly_charge_day']; }
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
+
+	return $form;
+}
+
+function sirius_ledger_node_tab_policy_definition_form_submit($form, $form_state) {
+	$definition_node = node_load($form_state['definition_nid']);
+	$json = sirius_jsonfield_util_node_json_get($definition_node);
+	$json['ledger']['policy']['settings'] = $form_state['values']['ledger']['policy']['settings'];
+	sirius_jsonfield_util_node_json_set($definition_node, $json);
+	node_save($definition_node);
+	drupal_set_message("Policy updated.");
+}
+
+
+function sirius_ledger_node_tab_policy_definition_exim_access($definition_node) { return sirius_ledger_node_tab_policy_definition_access($definition_node); }
+
+function sirius_ledger_node_tab_policy_definition_exim($definition_node) { return drupal_get_form('sirius_json_definition_exim_form', $definition_node->nid, 'ALL'); }
+
+
+function sirius_ledger_policy_schedule_options() {
+	return array(
+		'month' => 'Monthly',
+		'hour' => 'Hourly',
+	);
+}
+
+
+
+
+
+
+
+
+
+function sirius_ledger_node_tab_policy_definition_rates_access($definition_node) {
+	return sirius_ledger_node_tab_policy_definition_access($definition_node);
+}
+
+function sirius_ledger_node_tab_policy_definition_rates($definition_node) {
+	return drupal_get_form('sirius_ledger_node_tab_policy_definition_rates_form', $definition_node);
+}
+
+function sirius_ledger_node_tab_policy_definition_rates_form($form, &$form_state, $definition_node) {
+	$form_state['definition_nid'] = $definition_node->nid;
+	$json = sirius_jsonfield_util_node_json_get($definition_node);
+
+	$account_options = sirius_ledger_policy_accounts($json);
+	$ms_level_options = sirius_ledger_ms_level_options();
+	$schedule_options = sirius_ledger_policy_schedule_options();
+	$schedules = sirius_ledger_policy_schedules($json);
+
+	if (!$schedules) {
+		drupal_set_message("Please select at least one schedule on the settings page.", 'warning');
+		return array();
+	}
+
+	$form['#tree'] = TRUE;
+
+	$table_open_html = '<table><tr><th>Member Status</th>';
+	foreach ($account_options as $account_nid => $account_name) {
+		$table_open_html .= '<th>' . $account_name . '</th>';
+	}
+	$table_open_html .= '</tr>';
+
+	foreach ($schedules as $schedule_key => $schedule_name) {
+		$form['ledger']['policy']['rates'][$schedule_key]['intro'] = array('#markup' => '<h2>' . t('Rates: ') . $schedule_name . '</h2>');
+
+		$form['ledger']['policy']['rates'][$schedule_key]['table'] = array('#markup' => $table_open_html);
+		foreach ($ms_level_options as $ms_level_code => $ms_level_name) {
+			$form['ledger']['policy']['rates'][$schedule_key][$ms_level_code]['tr'] = array('#markup' => '<tr><td>' . $ms_level_name . '</td>');
+			foreach ($account_options as $account_nid => $account_name) {
+				$form['ledger']['policy']['rates'][$schedule_key][$ms_level_code][$account_nid] = array(
+					'#type' => 'textfield',
+					'#size' => 5,
+					'#default_value' => $json['ledger']['policy']['rates'][$schedule_key][$ms_level_code][$account_nid],
+					'#prefix' => '<td>',
+					'#suffix' => '</td>',
+				);
+			}
+			$form['ledger']['policy']['rates'][$schedule_key][$ms_level_code]['trc'] = array('#markup' => '</tr>');
+		}
+		$form['ledger']['policy']['rates'][$schedule_key]['tablec'] = array('#markup' => '</table>');
+	}
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
+
+	return $form;
+}
+
+function sirius_ledger_node_tab_policy_definition_rates_form_submit($form, $form_state) {
+	$definition_node = node_load($form_state['definition_nid']);
+	$json = sirius_jsonfield_util_node_json_get($definition_node);
+	$json['ledger']['policy']['rates'] = $form_state['values']['ledger']['policy']['rates'];
+	sirius_jsonfield_util_node_json_set($definition_node, $json);
+	node_save($definition_node);
+	drupal_set_message("Policy updated.");
+}
+
+function sirius_ledger_policy_accounts($policy_json) {
+	$account_options = array('pay' => t('Pay Rate'));
+	$account_options += sirius_ledger_account_list();
+
+	if (!$policy_json['ledger']['policy']['settings']['accounts']) { return array(); }
+	$nids = array_filter(array_values($policy_json['ledger']['policy']['settings']['accounts']));
+	$result = array();
+	foreach ($nids as $nid) { $result[$nid] = $account_options[$nid]; }
+	return $result;
+}
+
+function sirius_ledger_policy_schedules($policy_json) {
+	$schedule_options = sirius_ledger_policy_schedule_options();
+
+	if (!$policy_json['ledger']['policy']['settings']['schedule']) { return array(); }
+	$keys = array_filter(array_values($policy_json['ledger']['policy']['settings']['schedule']));
+	$result = array();
+	foreach ($keys as $key) { $result[$key] = $schedule_options[$key]; }
+	return $result;
+}

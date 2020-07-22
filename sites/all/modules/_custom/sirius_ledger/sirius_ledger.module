@@ -1,0 +1,31 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.accounts.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.policy.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.monthly.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.transmittal.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_config.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_policy_definition.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_create.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_update.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_post.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_allocate.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_settings.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_transmittal.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_contact_payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_entity_policy.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_transmittal.inc';
