@@ -715,8 +715,7 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	foreach ($sheet->getRowIterator() as $row) {
 		++$count;
 		if ($count > 10000) { continue; }
-
-		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
+		if ($count == 1 && $data['header_row'] == 'Yes') { ++$count; continue; }
 		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 
 		$result = $callback($feed_node, $info, $data, $import_data_row, FALSE);
