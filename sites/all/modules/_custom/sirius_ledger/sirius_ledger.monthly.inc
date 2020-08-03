@@ -114,7 +114,7 @@ function sirius_ledger_monthly_charge_batch($mode) {
 		return;
 	}
 
-	$batch_size = variable_get('siriius_ledger_monthly_batch_size', 100);
+	$batch_size = sirius_domain_variable_get('sirius_ledger_monthly_batch_size', 1000);
 
 	$batch_status = json_decode(sirius_domain_variable_get('sirius_ledger_monthly_batch_status'), TRUE);
 	$today = date('Y-m-d');
@@ -180,6 +180,10 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode) {
 	sirius_minilog("Operating mode: $mode");
 
 	$work_status_term = taxonomy_term_load($worker_node->field_sirius_work_status['und'][0]['tid']);
+	if (!$work_status_term) {
+		sirius_minilog('The member has no work status.');
+		return;
+	}
 	if (!$work_status_term->field_sirius_member_active['und'][0]['value'] == 'Yes') {
 		sirius_minilog("The member has work status " . $work_status_term->name . '. Dues are not charged to members with this status.');
 		return;
