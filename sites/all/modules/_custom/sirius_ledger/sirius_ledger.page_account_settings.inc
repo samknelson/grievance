@@ -19,6 +19,7 @@ function sirius_ledger_node_tab_account_settings_form($form, &$form_state, $acco
 			'simple' => t('Simple: one entry per check, credited to the payer'),
 			'manual' => t('Manual: multiple entries per check, credited to workers'),
 			'upload' => t('Upload: multiple entries per check, credited to workers'),
+			'transmittal' => t('Transmittal form: Multiple entries per check including hours and withholding, credited to workers'),
 		),
 	);
 	if ($account_json['settings']['payments']['allocate']['employer']) { $form['settings']['payments']['allocate']['employer']['#default_value'] = $account_json['settings']['payments']['allocate']['employer']; }
@@ -95,7 +96,7 @@ function sirius_ledger_node_tab_account_settings_form($form, &$form_state, $acco
 }
 
 
-function sirius_ledger_node_tab_account_settings_submit($form, &$form_state) {
+function sirius_ledger_node_tab_account_settings_form_submit($form, &$form_state) {
 	$account_node = node_load($form_state['account_nid']);
 	$account_json = sirius_jsonfield_util_node_json_get($account_node);
 	$account_json['settings']['payments'] = $form_state['values']['settings']['payments'];

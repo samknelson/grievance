@@ -44,6 +44,14 @@ function sirius_ledger_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['sirius_payment']['sirius_payment_allocate/transmittal'] = array(
+    'title' => 'Transmittal',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_payment_allocate_transmittal',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 4,
+  );
+
   $node_tabs['sirius_payment']['sirius_payment_post'] = array(
     'title' => 'Post',
     'description' => '',
@@ -234,12 +242,22 @@ function sirius_ledger_menu() {
   );
 
   $items['sirius/config/ledger/test-monthly'] = array(
-    'title' => 'Tester - Monthly',
+    'title' => 'Tester - Monthly Charges',
     'page callback' => 'sirius_ledger_page_monthly_test',
     'access arguments' => array('sirius ledger admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
   );
+
+  $items['sirius/config/ledger/transmittal'] = array(
+    'title' => 'Transmittal Sheets',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_ledger_config_transmittal'),
+    'access arguments' => array('sirius ledger admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
 
  $items['sirius/ledger/payment/create'] = array(
     'title' => 'Create a Payment',

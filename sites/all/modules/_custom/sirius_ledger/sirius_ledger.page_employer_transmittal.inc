@@ -38,70 +38,27 @@ function sirius_ledger_node_tab_employer_transmittal_form($form, &$form_state, $
 	$form['#tree'] = TRUE;
 	$form['wrap_open'] = array('#markup' => '<div class="sirius_ledger_transmittal">');
 
+	$contact_node = sirius_ledger_transmittal_contact($employer_node->nid);
+	if ($contact_node) {
+		$address_html = '<div class="sirius_ledger_transmittal_address">';
+		$address_html .= $employer_node->title;
+		$address_html .= '<br />' . $contact_node->field_grievance_co_address['und'][0]['value'];
+		if ($contact_node->field_grievance_co_address_2) { $address_html .= '<br />' . $contact_node->field_grievance_co_address2['und'][0]['value']; }
+		$address_html .= '<br />' . $contact_node->field_grievance_co_city['und'][0]['value'] . ', ' . $contact_node->field_grievance_co_state['und'][0]['value'] . ' ' . $contact_node->field_grievance_co_zip['und'][0]['value'];
+		$address_html .= '</div>';
+		$form['address'] = array('#markup' => $address_html);
+	}
+
 	$intro_html .= '<div class="sirius_form_intro">';
 	$intro_html .= '<h1>' . $employer_node->title . '<br />' . 'Transmittal Form ' . date('F Y') . '</h1>';
-	/*
-	if ($rates) {
-		$intro_html .= '<div class="sirius_ledger_transmittal_rates">';
-		$intro_html .= '<h2>Rates</h2>';
-		$level_options = sirius_ledger_ms_level_options();
-		$intro_html .= '<table>';
-		$intro_html .= '<tr>';
-		$intro_html .= '<th>Member Status</th>';
-		foreach ($account_options as $account_nid => $account_name) {
-			$intro_html .= '<th>' . $account_name . '</th>';
-		}
-		$intro_html .= '</tr>';
-		foreach ($rates as $key => $values) {
-			$intro_html .= '<tr>';
-			$intro_html .= '<td>' . $level_options[$key] . '</td>';
-			foreach ($account_options as $account_nid => $account_name) {
-				$intro_html .= '<td>' . '$' . number_format($values[$account_nid], 2) . '</td>';
-			}
-			$intro_html .= '</tr>';
-		}
-		$intro_html .= '</table>';
-		$intro_html .= '</div>';
-	}
-	*/
-
 	$intro_html .= '</div>';
 	$form['intro'] = array('#markup' => $intro_html);
 
-	// Get all current dispatches for this employer. SQL for speed.
-	$sql_args = array();
-	$sql = "select node.nid, ";
-	$sql .= "field_sirius_dispatch_status_value, ";
-	$sql .= "job_node.title as job_title, ";
-	$sql .= "worker_node.title as worker_title, ";
-	$sql .= "field_sirius_payrate_value,  ";
-	$sql .= "industry_term.tid as industry_tid, ";
-	$sql .= "field_sirius_ssn_value, ";
-	$sql .= "worker_json.field_sirius_json_value as worker_json, ";
-	$sql .= "group_concat(distinct field_sirius_member_status_tid separator ',') as ms_tids, ";
-	$sql .= "field_sirius_contact_target_id as contact_nid ";
-	$sql .= "from node ";
-	$sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_payrate on field_data_field_sirius_payrate.entity_type = 'node' and field_data_field_sirius_payrate.entity_id = node.nid ";
-	$sql .= "left join node job_node on job_node.nid = field_sirius_dispatch_job_target_id ";
-	$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
-	$sql .= "left join node worker_node on worker_node.nid = field_sirius_worker_target_id ";
-	$sql .= "left join field_data_field_sirius_ssn on field_data_field_sirius_ssn.entity_type = 'node' and field_data_field_sirius_ssn.entity_id = worker_node.nid ";
-	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = worker_node.nid ";
-	$sql .= "left join field_data_field_sirius_json worker_json on worker_json.entity_type = 'node' and worker_json.entity_id = worker_node.nid ";
-	$sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = worker_node.nid ";
-	$sql .= "left join field_data_field_sirius_industry on field_data_field_sirius_industry.entity_type = 'node' and field_data_field_sirius_industry.entity_id = job_node.nid ";
-	$sql .= "left join taxonomy_term_data industry_term on field_sirius_industry_tid = industry_term.tid ";
-	$sql .= "where node.type = 'sirius_dispatch' ";
-	$sql .= "and field_grievance_shop_target_id = :employer_nid ";
-	$sql_args[':employer_nid'] = $employer_node->nid;
-	$sql .= "and field_sirius_dispatch_status_value in ('accepted', 'accepted_secondary') ";
-	$sql .= "group by worker_node.nid ";
-	$sql .= "order by node.nid ";
+	$header = sirius_domain_variable_get('sirius_ledger_transmittal_header', '');
+	if ($header) { $form['header'] = array('#markup' => '<div class="sirius_ledger_transmittal_header">' . $header . '</div>'); }
 
-	$stmt = sirius_sql_query($sql, $sql_args);
+	// Get all current dispatches for this employer. SQL for speed.
+	$dispatches = sirius_ledger_transmittal_dispatches($employer_node->nid);
 
 	$table_open_html .= '<table class="sirius_ledger_transmittal">';
 	$table_open_html .= '<tr>';
@@ -121,11 +78,8 @@ function sirius_ledger_node_tab_employer_transmittal_form($form, &$form_state, $
 	$form['transmittal']['table_open'] = array('#markup' => $table_open_html);
 
 
-	$dispatches = array();
-	while ($hr = $stmt->fetchAssoc()) {
-		$dispatches[$hr['nid']] = $hr;
-	}
-	for ($i=0; $i<10; ++$i) {
+	$extra_rows = sirius_domain_variable_get('sirius_ledger_transmittal_extra_rows', 5);
+	for ($i=0; $i<$extra_rows; ++$i) {
 		$dispatches["extra_" . $i] = array();
 	}
 
@@ -206,6 +160,11 @@ function sirius_ledger_node_tab_employer_transmittal_form($form, &$form_state, $
 
 
 	$form['transmittal']['table_close'] = array('#markup' => '<table>');
+
+	$footer = sirius_domain_variable_get('sirius_ledger_transmittal_footer', '');
+	if ($footer) { $form['footer'] = array('#markup' => '<div class="sirius_ledger_transmittal_footer">' . $footer . '</div>'); }
+
+
 
 	$form['wrap_close'] = array('#markup' => '</div>');
 

@@ -15,6 +15,15 @@ function sirius_ledger_node_tab_payment_allocate_options($payment_node) {
 function sirius_ledger_node_tab_payment_allocate($payment_node) {
 	$html = "";
 
+	$json = sirius_jsonfield_util_node_json_get($payment_node);
+	if ($json['allocate']['feed']['nid']) {
+		$feed_nid = $json['allocate']['feed']['nid'];
+		$feed_node = node_load($feed_nid);
+		$html .= 'This payment was allocated via an upload feed.<br />';
+		$html .= l('View the Feed', "node/$feed_nid/sirius_feed_wizard", array('attributes' => array('class' => array('tool-button'))));
+		$html .= "<br /><br />";
+	}
+
 	$fields = array(
 		'field_sirius_ledger_allocated',
 		'field_sirius_payment_status',
@@ -158,7 +167,26 @@ function sirius_ledger_node_tab_payment_allocate_upload_access($payment_node) {
 }
 
 function sirius_ledger_node_tab_payment_allocate_upload($payment_node) {
-	return '[Allocation by upload not yet implemented.]';
+	$json = sirius_jsonfield_util_node_json_get($payment_node);
+	if ($json['allocate']['feed']['nid']) {
+		$feed_nid = $json['allocate']['feed']['nid'];
+		$feed_node = node_load($feed_nid);
+		$html .= 'This payment as already been allocated via an uploaded feed.<br />';
+		$title = t('View the Feed');
+		$path = "node/$feed_nid/sirius_feed_wizard";
+	} else {
+		$html .= "To allocate this payment, create a new feed of type \"A/R Payment Allocation\".<br />";
+		$path = 'sirius/feeds/launch/ledger_feed_allocate';
+		$title = t('Create the Feed');
+	}
+
+	if (drupal_valid_path($path)) {
+		$html .= l($title, $path, array('attributes' => array('class' => array('tool-button'))));
+	} else {
+		$html .= '<em>' . t('Feed access denied.') . '</em>';
+	}
+
+	return $html;
 }
 
 function sirius_ledger_node_tab_payment_allocate_simple_access($payment_node) {
