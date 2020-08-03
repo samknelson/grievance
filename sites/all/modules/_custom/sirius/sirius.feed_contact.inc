@@ -7,7 +7,7 @@ function sirius_feed_contact_info() {
   $items['feed_contact'] = array(
     'name' => 'feed_contact',
     'title' => 'Contacts',
-    'description' => 'Upload a new list of contacts.',
+    'description' => 'Create or update contacts. This feed should not be used for members or workers.',
     'steps' => array(
       'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
       'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),

@@ -5,7 +5,7 @@ function sirius_feed_worker_info() {
   $items['feed_worker'] = array(
     'name' => 'feed_worker',
     'title' => 'Workers',
-    'description' => 'Upload a new list of workers.',
+    'description' => 'Create or update workers. Workers are generally union members or other individuals who may be dispatched to a job.',
     'steps' => array(
       'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
       'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),
