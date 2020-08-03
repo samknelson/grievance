@@ -33,3 +33,11 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_ar.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_entity_policy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_transmittal.inc';
+
+/**
+ * Implements hook_cron
+ */
+
+function sirius_ledger_cron() {
+	sirius_ledger_monthly_cron();
+}

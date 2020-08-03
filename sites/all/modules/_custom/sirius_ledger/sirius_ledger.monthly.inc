@@ -17,6 +17,19 @@ function sirius_ledger_page_monthly_test_form($form, &$form_state) {
 		'#markup' => '<div class="sirius_form_intro">' . t('Use the form below to test the monthly charges for a specific worker.') . '</div>',
 	);
 
+	$html = '<h2>Monthly Dues Batch Status</h2>';
+	$batch_status = json_decode(sirius_domain_variable_get('sirius_ledger_monthly_batch_status'), TRUE);
+	$date = $batch_status['date'];
+	if (!$date) { $date = '[none]'; }
+	$html .= sirius_fakerender_field('Date:', $date);
+	$complete = $batch_status['complete'];
+	if ($complete) { $complete = 'True'; } else { $complete = 'False'; }
+	$html .= sirius_fakerender_field('Complete:', $complete);
+	$last_worker_nid = $batch_status['last_worker_nid'];
+	if (!$last_worker_nid) { $last_worker_nid = '[none]'; }
+	$html .= sirius_fakerender_field('Last Worker NID:', $last_worker_nid);
+	$form['status'] = array('#markup' => $html);
+
 	$form['mode'] = array(
 		'#type' => 'select',
 		'#title' => t('Mode'),
@@ -69,6 +82,13 @@ function sirius_ledger_page_monthly_test_form_submit($form, &$form_state) {
 	} else {
 		sirius_ledger_monthly_charge_batch($form_state['values']['mode']);
 	}
+}
+
+function sirius_ledger_monthly_cron() {
+	$last_ts = variable_get('sirius_ledger_monthly_cron_last_ts');
+	if (time() - $last_ts < 3600) { return; }
+	variable_set('sirius_ledger_monthly_cron_last_ts', time());
+	sirius_ledger_monthly_charge_batch_all('live');
 }
 
 function sirius_ledger_monthly_charge_batch_all($mode) {
@@ -180,14 +200,15 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode) {
 
 	$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, 'month');
 	$accounts = sirius_ledger_account_list();
-	foreach ($rates as $account_nid => $rate) {
+	foreach ($rates as $account_nid => $rate_record) {
+		$rate = $rate_record['rate'];
 		if ($account_nid == 'pay') { continue; }
 
 		// Figure out who to charge
 		$account_node = node_load($account_nid);
 		$account_json = sirius_jsonfield_util_node_json_get($account_node);
 		if ($account_json['settings']['payments']['allocate']['employer']['simple']) { $charge_to = 'employer'; } else { $charge_to = 'worker'; }
-		sirius_minilog("- Montly charge for " .  $accounts[$account_nid] . ": \$$rate charged to $charge_to");
+		sirius_minilog("- Monthly charge for " .  $accounts[$account_nid] . ": \$$rate charged to $charge_to");
 
 		// Start building the entry
 		$entry = array();
@@ -213,13 +234,20 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode) {
 				sirius_minilog('- Found a previous ledger entry with a different rate. Updating.');
 				if ($mode == 'live') { sirius_ledger_ar_update($entry); } else { sirius_minilog("(Test mode, skipping insert)"); }
 			}
-			continue;
 		}
 
 		$entry['ledger_amount'] = $rate;
 		$entry['ledger_ts'] = time();
-		$entry['ledger_memo'] = "Monthly charge of $rate for " . $worker_node->title;
-		sirius_minilog('- Creating a new ledger entry.');
+
+		$memo = "Monthly charge for " . $worker_node->title . ': ';
+		$memo .= '$' . number_format($rate, 2);
+		$memo .= ' (MS ';
+		$memo .= $rate_record['ms_name'];
+		if ($rate_record['level_name']) { $memo .= ' ' . $rate_record['level_name']; }
+		$memo .= ')';
+
+		$entry['ledger_memo'] = $memo;
+		sirius_minilog('- Creating a new ledger entry for ' . $worker_node->title);
 		if ($mode == 'live') { sirius_ledger_ar_insert($entry); } else { sirius_minilog("(Test mode, skipping insert)"); }
 	}
 }
