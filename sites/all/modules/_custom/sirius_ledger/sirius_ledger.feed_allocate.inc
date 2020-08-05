@@ -28,7 +28,9 @@ function sirius_ledger_feed_allocate_info() {
         'id' => array('title' => 'Badge ID'),
         'ein' => array('title' => 'EIN'),
         'amount' => array('title' => 'Amount'),
-        'account' => array('title' => 'Account'),
+        'account' => array('title' => 'Account', 'description' => 'May match the name, short name, or any of the aliases for the account'),
+        'memo_prefix' => array('title' => 'Memo Prefix', 'description' => 'The memo will be the name of the payment. You may also select a field to prefix to the memo. Memos will be truncated to 255 characters.'),
+        'memo_suffix' => array('title' => 'Memo Suffix', 'description' => 'The memo will be the name of the payment. You may also select a field to suffix to the memo. Memos will be truncated to 255 characters.'),
       ),
       'batch_size' => 500,
       'callback_row_verify' => 'sirius_ledger_feed_allocate_row_verify',
@@ -222,11 +224,15 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
     $sql .= "from node ";
     $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
     $sql .= "left join field_data_field_sirius_name_short on field_data_field_sirius_name_short.entity_type = 'node' and field_data_field_sirius_name_short.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
     $sql .= "where node.type = 'sirius_ledger_account' ";
     $sql .= "and ( ";
     $sql .= "  field_sirius_name_short_value = :name_a ";
     $sql .= "  or title = :name_b ";
     $sql .= "  or nid = :name_c ";
+    // Not sure why but cannot embed a parameter into json_contains
+    $inline = preg_replace('/[^a-zA-Z0-9_ ]/', '', $row['account']);
+    $sql .= "  or json_contains(field_sirius_json_value, '\"$inline\"', '$.settings.aliases') ";
     $sql .= ") ";
     $sql_args[':name_a'] = $sql_args[':name_b'] = $sql_args[':name_c'] = $row['account'];
     if ($domain_nid) {
@@ -270,6 +276,10 @@ function sirius_ledger_feed_allocate_row_process($feed_node, $info, $data, $row)
     return array('success' => FALSE, 'msg' => "This payment has a status of \"Cleared\". No entries can be created or updated.");
   }
   $memo = sirius_ledger_payment_memo($payment_node);
+  if ($row['memo_prefix']) { $memo = $row['memo_prefix'] . ' ' . $memo; }
+  if ($row['memo_suffix']) { $memo = $memo . ' ' . $row['memo_suffix']; }
+  $memo = substr($memo, 0, 255);
+
   $amount = $row['amount'];
   $worker_nid = $row['worker_nid'];
   $worker_node = node_load($worker_nid);

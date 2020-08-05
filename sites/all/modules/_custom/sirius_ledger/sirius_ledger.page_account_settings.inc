@@ -87,6 +87,22 @@ function sirius_ledger_node_tab_account_settings_form($form, &$form_state, $acco
 		),
 	);
 
+	$form['settings']['aliases']['intro'] = array('#markup' => '<h2>Aliases</h2>');
+	if ($account_json['settings']['aliases']) {
+		$aliases = array_values(array_filter(array_values($account_json['settings']['aliases'])));
+	} else {
+		$aliases = array();
+	}
+
+	$count = count($aliases) + 2;
+	for ($i=0; $i<$count; ++$i) {
+		$form['settings']['aliases'][$i] = array(
+			'#type' => 'textfield',
+			'#title' => "Alias #" . ($i+1),
+			'#default_value' => $aliases[$i],
+		);
+	}
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -100,6 +116,7 @@ function sirius_ledger_node_tab_account_settings_form_submit($form, &$form_state
 	$account_node = node_load($form_state['account_nid']);
 	$account_json = sirius_jsonfield_util_node_json_get($account_node);
 	$account_json['settings']['payments'] = $form_state['values']['settings']['payments'];
+	$account_json['settings']['aliases'] = $form_state['values']['settings']['aliases'];
 	sirius_jsonfield_util_node_json_set($account_node, $account_json);
 	node_save($account_node);
 	drupal_set_message("Settings saved");
