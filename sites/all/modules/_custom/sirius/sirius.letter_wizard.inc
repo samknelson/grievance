@@ -153,9 +153,9 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 
 	$tokens = array('node' => $entity_node);
 	$tokens['other_tokens']['delivery_tid'] = $data['tokens']['delivery'];
-	$subject = token_replace($subject, $tokens, array());
-	$body = token_replace($body, $tokens, array());
-	$pdf_body = token_replace($pdf_body, $tokens, array());
+	$subject = token_replace($subject, $tokens, array('clear' => TRUE));
+	$body = token_replace($body, $tokens, array('clear' => TRUE));
+	$pdf_body = token_replace($pdf_body, $tokens, array('clear' => TRUE));
 	$data['subject'] = $subject;
 	$data['body'] = $body;
 	$data['pdf_body'] = $pdf_body;
@@ -190,7 +190,7 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 				'name' => $user->name,
 				'email' => $user->mail,
 				'description' => 'Self',
-				'disposition' => 'from',
+				'disposition' => 'Reply-To',
 				'delta' => $delta++,
 			);
 		}
@@ -518,7 +518,7 @@ function sirius_letter_wizard_recipients_email_form($form, &$form_state, $info, 
 			'#suffix' => '</td>',
 			'#type' => 'select',
 			'#default_value' => $recipient['disposition'],
-			'#options' => array('skip' => t('Skip'), 'from' => t('From'), 'to' => t('To'), 'cc' => t('Cc'), 'bcc' => t('Bcc'))
+			'#options' => array('skip' => t('Skip'), 'Reply-To' => t('From'), 'to' => t('To'), 'cc' => t('Cc'), 'bcc' => t('Bcc'))
 		);
 
 		if ($recipient['locked'] == 'yes') {
@@ -555,7 +555,7 @@ function sirius_letter_wizard_recipients_email_form_validate($form, &$form_state
 	// Verify exactly one "From"
 	$found_from = FALSE;
 	for ($delta = 0; $delta < $recipient_count; ++$delta) {
-		if ($form_state['values']["disposition_$delta"] == 'from') {
+		if ($form_state['values']["disposition_$delta"] == 'Reply-To') {
 			if ($found_from) { form_set_error("disposition_$delta", 'Select exactly one recipient as the sender.'); }
 			$found_from = TRUE;
 		}
@@ -783,6 +783,63 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		$pdf_contents = sirius_letter_pdf_contents($letter_node);
 	}
 
+	// Log the letter
+	if ($form_state['values']['logging']) {
+
+		$log_title = "Letter :" . $data['format'] . ': ';
+		$is_first = TRUE;
+		for ($i=0; $i<100; ++$i) {
+			if ($template_nid = $data['letter_template_nid_' . $i]) {
+				if ($is_first) { $is_first = FALSE; } else { $log_title .= ' / '; }
+				$template_node = node_load($template_nid);
+				$log_title .= $template_node->title;
+			}
+		}
+		$log_type_tid = $form_state['values']['logging'];
+
+		$log_body = '';
+		if ($data['recipients']) {
+			foreach ($data['recipients'] as $recipient) {
+				if ($recipient['disposition'] == 'skip') { continue; }
+				$log_body .= $recipient['disposition'] . ': ' . sirius_email_rfc822_format($recipient['name'], $recipient['email']) . "\n";
+			}
+		}
+		if ($data['subject']) {
+			$log_body .= "Subject: " . $data['subject'] . "\n";
+		}
+
+	  global $user;
+	  $log_node = new stdClass();
+	  $log_node->title = $log_title;
+	  $log_node->type = 'grievance_log';
+	  node_object_prepare($log_node);
+	  $log_node->language = LANGUAGE_NONE;
+	  $log_node->uid = $user->uid; 
+	  $log_node->status = 1;
+	  $log_node->promote = 0;
+	  $log_node->comment = 0;
+	  $log_node->field_grievance['und'][0]['target_id'] = $entity_node->nid;
+	  $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
+	  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s'); 
+		if ($external_id) {
+			$log_node->field_grievance_external_id['und'][0]['value'] = $external_id;
+		}
+	  $log_node->body['und'][0]['value'] = $log_body;
+
+	  if ($pdf_contents) {
+		  $file = file_save_data(
+		    $pdf_contents, 
+		    'private://grievance_attachments/' . $pdf_basename . '.pdf', 
+		    FILE_EXISTS_RENAME
+		  );
+		  $file->display = 1;
+		  $log_node->field_grievance_attachments["und"][0] = (array) $file;
+		}
+
+	  $log_node = node_submit($log_node); // Prepare node for saving
+	  node_save($log_node);
+	}
+
 	// If format is PDF, just output it and exit
 	if ($format == 'pdf') {
 		// Dump to browser and exit
@@ -801,6 +858,9 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 	// If format is "email", send
 	if ($format == 'email') {
 		$params = array();
+		$params['handler_nids'] = array();
+		$params['handler_nids'][] = $letter_node->nid;
+		if ($log_node) { $params['handler_nids'][] = $log_node->nid; }
 		$params['body'] = $data['body'];
 		$params['subject'] =  $data['subject'];
 
@@ -897,63 +957,6 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		}
 	}
 
-	// Log the letter
-	if ($form_state['values']['logging']) {
-
-		$log_title = "Letter :" . $data['format'] . ': ';
-		$is_first = TRUE;
-		for ($i=0; $i<100; ++$i) {
-			if ($template_nid = $data['letter_template_nid_' . $i]) {
-				if ($is_first) { $is_first = FALSE; } else { $log_title .= ' / '; }
-				$template_node = node_load($template_nid);
-				$log_title .= $template_node->title;
-			}
-		}
-		$log_type_tid = $form_state['values']['logging'];
-
-		$log_body = '';
-		if ($data['recipients']) {
-			foreach ($data['recipients'] as $recipient) {
-				if ($recipient['disposition'] == 'skip') { continue; }
-				$log_body .= $recipient['disposition'] . ': ' . sirius_email_rfc822_format($recipient['name'], $recipient['email']) . "\n";
-			}
-		}
-		if ($data['subject']) {
-			$log_body .= "Subject: " . $data['subject'] . "\n";
-		}
-
-	  global $user;
-	  $log_node = new stdClass();
-	  $log_node->title = $log_title;
-	  $log_node->type = 'grievance_log';
-	  node_object_prepare($log_node);
-	  $log_node->language = LANGUAGE_NONE;
-	  $log_node->uid = $user->uid; 
-	  $log_node->status = 1;
-	  $log_node->promote = 0;
-	  $log_node->comment = 0;
-	  $log_node->field_grievance['und'][0]['target_id'] = $entity_node->nid;
-	  $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
-	  $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s'); 
-		if ($external_id) {
-			$log_node->field_grievance_external_id['und'][0]['value'] = $external_id;
-		}
-	  $log_node->body['und'][0]['value'] = $log_body;
-
-	  if ($pdf_contents) {
-		  $file = file_save_data(
-		    $pdf_contents, 
-		    'private://grievance_attachments/' . $pdf_basename . '.pdf', 
-		    FILE_EXISTS_RENAME
-		  );
-		  $file->display = 1;
-		  $log_node->field_grievance_attachments["und"][0] = (array) $file;
-		}
-
-	  $log_node = node_submit($log_node); // Prepare node for saving
-	  node_save($log_node);
-	}
-
 	$letter_node->field_sirius_type['und'][0]['value'] = $status;
 	$data['sent_ts'] = time();
 
@@ -972,12 +975,14 @@ function sirius_letter_wizard_review($info, $data, $letter_node, $current_step) 
 
 	if ($data['subject']) { $html = sirius_fakerender_field("Subject:", $data['subject']); }
 
-	foreach ($data['recipients'] as $recipient) {
-		if ($recipient['disposition'] == 'skip') { continue; }
-		if ($data['format'] == 'email') {
-			$html .= sirius_fakerender_field($recipient['disposition'] . ':', htmlspecialchars(sirius_email_rfc822_format($recipient['name'], $recipient['email'])));
-		} else if ($data['format'] == 'sms') {
-			$html .= sirius_fakerender_field($recipient['disposition'] . ':', $recipient['name'] . ' [' . $recipient['phone'] . ']');
+	if ($data['recipients']) {
+		foreach ($data['recipients'] as $recipient) {
+			if ($recipient['disposition'] == 'skip') { continue; }
+			if ($data['format'] == 'email') {
+				$html .= sirius_fakerender_field($recipient['disposition'] . ':', htmlspecialchars(sirius_email_rfc822_format($recipient['name'], $recipient['email'])));
+			} else if ($data['format'] == 'sms') {
+				$html .= sirius_fakerender_field($recipient['disposition'] . ':', $recipient['name'] . ' [' . $recipient['phone'] . ']');
+			}
 		}
 	}
 
