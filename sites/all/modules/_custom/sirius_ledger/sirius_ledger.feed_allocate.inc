@@ -216,8 +216,6 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
       $other_nid = $hr['b'];
       if (!$worker_nid) { return array('success' => FALSE, 'msg' => "Worker not found with this ID ($table, $column)."); }
       if ($worker_nid != $other_nid) { return array('success' => FALSE, 'msg' => "Multiple workers found with this ID ($table, $column)."); }
-
-      if (!$account_nid) { return array('success' => FALSE, 'msg' => 'Account not found.'); }
     }
 
     $row['worker_nid'] = $worker_nid;
@@ -251,6 +249,7 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
     $other_nid = $hr['b'];
     if (!$account_nid) { return array('success' => FALSE, 'msg' => "Account not found."); }
     if ($account_nid != $other_nid) { return array('success' => FALSE, 'msg' => "Multiple accounts found."); }
+    if (!$account_nid) { return array('success' => FALSE, 'msg' => 'Account not found.'); }
     $row['account_nid'] = $account_nid;
 
     // Payment NID
