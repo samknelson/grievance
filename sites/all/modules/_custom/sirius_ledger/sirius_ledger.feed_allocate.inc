@@ -184,10 +184,14 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
         $table = 'field_data_field_sirius_id';
         $column = 'field_sirius_id_value';
         $value = $row['id'];
-      } else if ($pk == 'id3') { 
-        $table = 'field_data_field_sirius_id3';
-        $column = 'field_sirius_id3_value';
-        $value = $row['id3'];
+      } else if ($pk == 'id') { 
+        $table = 'field_data_field_sirius_id';
+        $column = 'field_sirius_id_value';
+        $value = $row['id'];
+      } else if ($pk == 'id2') { 
+        $table = 'field_data_field_sirius_id2';
+        $column = 'field_sirius_id2_value';
+        $value = $row['id2'];
       } else if ($pk == 'id3') { 
         $table = 'field_data_field_sirius_ssn';
         $column = 'field_sirius_ssn_value';
