@@ -83,7 +83,8 @@ function sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule
 		}
 
 		if ($rates) {
-			foreach ($rates as $account_nid => $rate) {
+			foreach ($rates as $account_nid => $rate_record) {
+				$rate = $rate_record['rate'];
 				if ($rate > $max_rates[$account_nid]) {
 					$max_rates[$account_nid] = array(
 						'rate' => $rate,
@@ -91,6 +92,7 @@ function sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule
 						'ms_name' => $lookups['ms'][$ms_tid],
 						'level_code' => $level_code,
 						'level_name' => $lookups['level'][$ms_tid][$level_code]['title'],
+						'triggers' => $rate_record['triggers'],
 					);
 				}
 			}

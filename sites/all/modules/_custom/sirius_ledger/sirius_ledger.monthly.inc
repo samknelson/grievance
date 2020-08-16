@@ -14,10 +14,10 @@ function sirius_ledger_page_monthly_test() {
 
 function sirius_ledger_page_monthly_test_form($form, &$form_state) {
 	$form['intro'] = array(
-		'#markup' => '<div class="sirius_form_intro">' . t('Use the form below to test the monthly charges for a specific worker.') . '</div>',
+		'#markup' => '<div class="sirius_form_intro">' . t('Use the form below to test the monthly and semi-monthly charges for a specific worker.') . '</div>',
 	);
 
-	$html = '<h2>Monthly Dues Batch Status</h2>';
+	$html = '<h2>Monthly and Semi-Monthly Dues Batch Status</h2>';
 	$batch_status = json_decode(sirius_domain_variable_get('sirius_ledger_monthly_batch_status'), TRUE);
 	$date = $batch_status['date'];
 	if (!$date) { $date = '[none]'; }
@@ -51,6 +51,30 @@ function sirius_ledger_page_monthly_test_form($form, &$form_state) {
 		),
 	);
 
+	$form['trigger'] = array(
+		'#type' => 'select',
+		'#title' => t('Trigger'),
+		'#required' => TRUE,
+		'#options' => sirius_ledger_policy_trigger_options('month'),
+		'#states' => array(
+			'visible' => array(
+				":input[name=\"action\"]" => array('value' => 'worker')
+			),
+		),
+	);
+
+	$form['date'] = array(
+		'#type' => 'date_popup',
+		'#title' => t('As Of'),
+		'#states' => array(
+			'visible' => array(
+				":input[name=\"action\"]" => array('value' => 'worker')
+			),
+		),
+    '#attributes' => array(
+      'autocomplete' => 'off',
+    ),
+	);
 
 	$form['worker_nid'] = array(
 		'#type' => 'textfield',
@@ -76,7 +100,9 @@ function sirius_ledger_page_monthly_test_form($form, &$form_state) {
 function sirius_ledger_page_monthly_test_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 	if ($form_state['values']['action'] == 'worker') {
-		sirius_ledger_monthly_charge_worker($form_state['values']['worker_nid'], $form_state['values']['mode']);
+		$ts = strtotime($form_state['values']['date']);
+		if ($ts <= 1) { $ts = NULL; }
+		sirius_ledger_monthly_charge_worker($form_state['values']['worker_nid'], $form_state['values']['mode'], $form_state['values']['trigger'], $ts);
 	} else if ($form_state['values']['action'] == 'batch_reset') {
 		sirius_ledger_monthly_charge_batch_reset();
 	} else {
@@ -110,12 +136,11 @@ function sirius_ledger_monthly_charge_batch_reset() {
 
 function sirius_ledger_monthly_charge_batch($mode) {
 	if (!sirius_ledger_monthly_enabled()) {
-		sirius_minilog('Monthly billing is not enabled.');
+		sirius_minilog('Monthly billing is not enabled for this domain.');
 		return;
 	}
 
 	$batch_size = sirius_domain_variable_get('sirius_ledger_monthly_batch_size', 1000);
-
 	$batch_status = json_decode(sirius_domain_variable_get('sirius_ledger_monthly_batch_status'), TRUE);
 	$today = date('Y-m-d');
 	if ($batch_status['date'] != $today) {
@@ -144,7 +169,7 @@ function sirius_ledger_monthly_charge_batch($mode) {
 
   $count = 0;
   foreach ($worker_nids as $worker_nid) {
-  	sirius_ledger_monthly_charge_worker($worker_nid, $mode);
+  	sirius_ledger_monthly_charge_worker($worker_nid, $mode, 'auto');
 		$batch_status['last_worker_nid'] = $worker_nid;
 		++$count;
   }
@@ -158,7 +183,9 @@ function sirius_ledger_monthly_charge_batch($mode) {
 	}
 }
 
-function sirius_ledger_monthly_charge_worker($worker_nid, $mode) {
+function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts = NULL) {
+	if (!$ts) { $ts = time(); }
+
 	if (!sirius_ledger_monthly_enabled()) {
 		sirius_minilog('Monthly billing is not enabled.');
 		return;
@@ -176,7 +203,11 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode) {
 		return;
 	}
 
-	sirius_minilog("Calculating monthly dues for " . $worker_node->title);
+	$trigger_options = sirius_ledger_policy_trigger_options('month');
+	$today_day = date('j', $ts);
+	$today_month = date('m', $ts);
+	$today_year = date('Y', $ts);
+	sirius_minilog("Calculating monthly dues for " . $worker_node->title . " using trigger " .  $trigger_options[$trigger] . " as of $today_year-$today_month-$today_day");
 	sirius_minilog("Operating mode: $mode");
 
 	$work_status_term = taxonomy_term_load($worker_node->field_sirius_work_status['und'][0]['tid']);
@@ -189,70 +220,116 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode) {
 		return;
 	}
 
-	$policy_node = sirius_ledger_policy_lookup('month', $worker_node);
-	if (!$policy_node) {
-		sirius_minilog("No ledger policy found for " . $worker_node->title, 'warning');
-		return;
-	}
-
-	$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
-	$monthly_charge_day = $policy_json['ledger']['policy']['settings']['monthly_charge_day'];
-	if ($monthly_charge_day > date('j')) {
-		sirius_minilog("Monthly charges under this policy will not be made until day $monthly_charge_day day of the month.");
-		return;
-	}
-
-	$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, 'month');
 	$accounts = sirius_ledger_account_list();
-	foreach ($rates as $account_nid => $rate_record) {
-		$rate = $rate_record['rate'];
-		if ($account_nid == 'pay') { continue; }
+	$schedules = array('month' => 'Monthly', 'semimonth' => 'Semi-Monthly');
+	$total_charged = 0;
 
-		// Figure out who to charge
-		$account_node = node_load($account_nid);
-		$account_json = sirius_jsonfield_util_node_json_get($account_node);
-		if ($account_json['settings']['payments']['allocate']['employer']['simple']) { $charge_to = 'employer'; } else { $charge_to = 'worker'; }
-		sirius_minilog("- Monthly charge for " .  $accounts[$account_nid] . ": \$$rate charged to $charge_to");
-
-		// Start building the entry
-		$entry = array();
-		$entry['ledger_status'] = 'Cleared';
-		$entry['ledger_account'] = $account_nid;
-		if ($charge_to == 'worker') { 
-			$entry['ledger_participant'] = $worker_node->field_sirius_contact['und'][0]['target_id'];
-		} else {
-			$entry['ledger_participant'] = $worker_node->field_grievance_shop['und'][0]['target_id'];
+	foreach ($schedules as $schedule => $schedule_name) {
+		$policy_node = sirius_ledger_policy_lookup($schedule, $worker_node);
+		if (!$policy_node) {
+			sirius_minilog("No ledger policy found for " . $worker_node->title, 'warning');
+			continue;
 		}
-		$entry['ledger_key'] = $worker_node->nid . '|' . date('Y-m');
-		$entry['ledger_reference'] = $policy_node->nid;
+		$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
 
-		// Charged already?
-		$previous_entries = sirius_ledger_ar_fetch($entry);
-		if ($previous_entries) {
-			$entry = $previous_entries[0];
-			if ($entry['ledger_amount'] == $rate) {
-				sirius_minilog('- Found a previous ledger entry with the same rate. Skipping.');
-			} else {
+		$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule);
+
+		if ($schedule == 'month') { 
+			$charge_days = array($policy_json['ledger']['policy']['settings']['monthly_charge_day']);
+		} else {
+			$charge_days = array(
+				$policy_json['ledger']['policy']['settings']['semimonthly_charge_day_1'],
+				$policy_json['ledger']['policy']['settings']['semimonthly_charge_day_2']
+			);
+		}
+
+		foreach ($charge_days as $delta => $charge_day) {
+			$next_charge_day = $charge_days[$delta+1];
+			if ($schedule == 'semimonth') { $schedule_name = 'Semi-Monthly Charge #' . ($delta+1); }
+			else { $schedule_name = 'Monthly charge'; }
+			if ($charge_day > $today_day) {
+				sirius_minilog("$schedule_name under this policy will not be made until day $charge_day of the month.");
+				continue;
+			}
+
+			if ($next_charge_day && ($today_day >= $next_charge_day)) {
+				sirius_minilog("$schedule_name under this policy will not be made after day $next_charge_day of the month.");
+				continue;
+			}
+
+			foreach ($rates as $account_nid => $rate_record) {
+				if ($account_nid == 'pay') { continue; }
+				$rate = $rate_record['rate'];
+				if (!$rate_record['triggers'][$trigger]) {
+					sirius_minilog("$schedule_name under this policy cannot be charged via trigger " . $trigger_options[$trigger]);
+					continue;
+				}
+
+				// Figure out who to charge
+				$account_node = node_load($account_nid);
+				$account_json = sirius_jsonfield_util_node_json_get($account_node);
+				if ($account_json['settings']['payments']['allocate']['employer']['simple']) { $charge_to = 'employer'; } else { $charge_to = 'worker'; }
+				sirius_minilog("$schedule_name for " .  $accounts[$account_nid] . ": \$$rate charged to $charge_to");
+
+				// Start building the entry
+				$entry = array();
+				$entry['ledger_status'] = 'Cleared';
+				$entry['ledger_account'] = $account_nid;
+				if ($charge_to == 'worker') { 
+					$entry['ledger_participant'] = $worker_node->field_sirius_contact['und'][0]['target_id'];
+				} else {
+					$entry['ledger_participant'] = $worker_node->field_grievance_shop['und'][0]['target_id'];
+				}
+				$entry['ledger_reference'] = $policy_node->nid;
+
+				if ($schedule == 'month') {
+					$entry['ledger_key'] = $worker_node->nid . '|' . date('Y-m', $ts);
+				} else {
+					$entry['ledger_key'] = $worker_node->nid . '|' . $delta . '|' . date('Y-m', $ts);
+				}
+
+				// Charged already?
+				$previous_entries = sirius_ledger_ar_fetch($entry);
+				if ($previous_entries) {
+					$entry = $previous_entries[0];
+					if ($entry['ledger_amount'] == $rate) {
+						sirius_minilog('- Found a previous ledger entry with the same rate. Skipping.');
+						continue;
+					} else {
+						sirius_minilog('- Found a previous ledger entry with a different rate.');
+					}
+				}
+
 				$entry['ledger_amount'] = $rate;
-				$entry['ledger_ts'] = time();
-				sirius_minilog('- Found a previous ledger entry with a different rate. Updating.');
-				if ($mode == 'live') { sirius_ledger_ar_update($entry); } else { sirius_minilog("(Test mode, skipping insert)"); }
+				$entry['ledger_ts'] = $ts;
+
+				$memo = $schedule_name;
+				$memo .= ' charge ';
+				if ($schedule != 'month') { $memo .= '#' . ($delta+1) . ' '; }
+				$memo .= "for " . $worker_node->title . ': ';
+				$memo .= '$' . number_format($rate, 2);
+				$memo .= ' (MS ';
+				$memo .= $rate_record['ms_name'];
+				if ($rate_record['level_name']) { $memo .= ' ' . $rate_record['level_name']; }
+				$memo .= ')';
+
+				$entry['ledger_memo'] = $memo;
+				sirius_minilog('- Ledger entry saved for ' . $worker_node->title);
+				if ($mode == 'live') { 
+					if ($entry['ledger_id']) {
+						sirius_ledger_ar_update($entry);
+					} else {
+						sirius_ledger_ar_insert($entry);
+					}
+				} else {
+					sirius_minilog("(Test mode, skipping insert)");
+				}
+
+				$total_charged += $rate;
 			}
 		}
-
-		$entry['ledger_amount'] = $rate;
-		$entry['ledger_ts'] = time();
-
-		$memo = "Monthly charge for " . $worker_node->title . ': ';
-		$memo .= '$' . number_format($rate, 2);
-		$memo .= ' (MS ';
-		$memo .= $rate_record['ms_name'];
-		if ($rate_record['level_name']) { $memo .= ' ' . $rate_record['level_name']; }
-		$memo .= ')';
-
-		$entry['ledger_memo'] = $memo;
-		sirius_minilog('- Creating a new ledger entry for ' . $worker_node->title);
-		if ($mode == 'live') { sirius_ledger_ar_insert($entry); } else { sirius_minilog("(Test mode, skipping insert)"); }
 	}
+
+	return $total_charged;
 }
 

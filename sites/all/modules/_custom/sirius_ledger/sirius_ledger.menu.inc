@@ -114,7 +114,7 @@ function sirius_ledger_node_tabs() {
     'description' => '',
     'callback' => 'sirius_ledger_node_tab_worker_ar',
     'permissions' => array('sirius ledger admin'),
-    'weight' => 2,
+    'weight' => 1,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
@@ -124,6 +124,14 @@ function sirius_ledger_node_tabs() {
     'callback' => 'sirius_ledger_node_tab_worker_payments',
     'permissions' => array('sirius ledger admin'),
     'weight' => 2,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_ledger/monthly'] = array(
+    'title' => 'Monthly Charge',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_worker_monthly',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 3,
   );
 
   $node_tabs['grievance_shop']['sirius_employer_ledger'] = array(

@@ -109,6 +109,42 @@ function sirius_ledger_feed_allocate_payments_form($form, &$form_state, $info, $
     );
   }
 
+  $form['payment_settings']['ledger_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Enter payments as of'),
+    '#attributes' => array(
+      'autocomplete' => 'off',
+    ),
+  );
+  if ($data['payment_settings']['ledger_date']) { $form['payment_settings']['ledger_date']['#default_value'] = $data['payment_settings']['ledger_date']; }
+
+  $form['charge_settings']['monthly'] = array(
+    '#type' => 'select',
+    '#title' => t('Create monthly charges for all workers on this upload?'),
+    '#options' => array(
+      NULL => t('-- Select --'),
+      'No' => t('No'),
+      'Yes' => t('Yes'),
+    ),
+    '#description' => t('If you select "Yes", then each worker who appears on this workload will also have a monthly charge with the trigger "Payment".'),
+    '#id' => 'sirius_ledger_form_charges_monthly',
+  );
+  if ($data['charge_settings']['monthly']) { $form['charge_settings']['monthly']['#default_value'] = $data['charge_settings']['monthly']; }
+
+  $form['charge_settings']['ledger_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Enter charges as of'),
+    '#states' => array(
+      'visible' => array(
+        ":input[id=\"sirius_ledger_form_charges_monthly\"]" => array('value' => 'Yes')
+      ),
+    ),
+    '#attributes' => array(
+      'autocomplete' => 'off',
+    ),
+  );
+  if ($data['charge_settings']['ledger_date']) { $form['charge_settings']['ledger_date']['#default_value'] = $data['charge_settings']['ledger_date']; }
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Submit',
@@ -123,6 +159,8 @@ function sirius_ledger_feed_allocate_payments_form_submit($form, &$form_state) {
   $feed_node = $form_state['feed_node'];
   $current_step = $form_state['current_step'];
   $data['payments'] = $form_state['values']['payments'];
+  $data['payment_settings'] = $form_state['values']['payment_settings'];
+  $data['charge_settings'] = $form_state['values']['charge_settings'];
 
   sirius_wizard_submit($info, $data, $feed_node, $current_step, "Payment selection saved.");
 }
@@ -292,12 +330,20 @@ function sirius_ledger_feed_allocate_row_process($feed_node, $info, $data, $row)
   $entry['ledger_account'] = $payment_node->field_sirius_ledger_account['und'][0]['target_id'];
   $entry['ledger_status'] = $payment_node->field_sirius_payment_status['und'][0]['value'];
   $entry['ledger_memo'] = $memo;
-  $entry['ledger_ts'] = sirius_fieldval($payment_node, 'field_sirius_datetime', 'ts');
+  $entry['ledger_ts'] = strtotime($data['payment_settings']['ledger_date']);
   $entry['ledger_reference'] = $payment_node->nid;
   $entry['ledger_participant'] = $contact_nid;
   sirius_ledger_ar_insert($entry);
 
-  return array('success' => TRUE, 'msg' => 'Payment allocated.');
+  if ($amount > 0) {
+    $charged = sirius_ledger_monthly_charge_worker($worker_nid, 'live', 'payment', strtotime($data['charge_settings']['ledger_date']));
+  }
+
+  if ($charged) {
+    return array('success' => TRUE, 'msg' => 'Payment allocated and charge created.');
+  } else {
+    return array('success' => TRUE, 'msg' => 'Payment allocated.');
+  }
 }
 
 function sirius_ledger_feed_allocate_preprocess($feed_node, $info, $data) {
@@ -318,6 +364,7 @@ function sirius_ledger_feed_allocate_postprocess($feed_node, $info, $data) {
     foreach ($data['payments'] as $account_nid => $payment_nid) {
       if (!$payment_nid) { continue; }
       $payment_node = node_load($payment_nid);
+      if (!$payment_node) { continue; }
       drupal_set_message("Finalizing allocation for: " . $payment_node->title);
       $payment_json = sirius_jsonfield_util_node_json_get($payment_node);
       $payment_json['allocate']['feed']['nid'] = $feed_node->nid;
