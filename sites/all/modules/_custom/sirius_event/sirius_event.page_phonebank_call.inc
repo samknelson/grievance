@@ -35,24 +35,7 @@ function sirius_node_tab_event_phonebank_call($event_node) {
 		$lock_type = sirius_event_phonebank_lock_type($event_node);
 		sirius_lock_release_by_uid($lock_type, $user->uid);
 
-		if (!$active) {
-		  if ($event_node->field_sirius_daterepeat['und']) {
-		    $ts_now = time();
-				$opens_in = 999999999;
-		    foreach ($event_node->field_sirius_daterepeat['und'] as $tmp) {
-		      $start_ts = strtotime($tmp['value'] . ' ' . $tmp['timezone_db']);
-		      $end_ts = strtotime($tmp['value2'] . ' ' . $tmp['timezone_db']);
-		      if ($start_ts <= 1 || $end_ts <= 1) { continue; }
-		      if ($start_ts >= $ts_now) {
-		      	$range = $start_ts - $ts_now;
-		      	if ($range && $range < $opens_in) { $opens_in = $range; }
-		      }
-		    }
-		    if ($opens_in > 1 && $opens_in < 999999999) {
-		    	drupal_set_message(t('Opening in: @interval', array('@interval' => format_interval($opens_in))));
-		    }
-		  }
-		}
+		if (!$active['success']) { drupal_set_message($active['msg']); }
 
 		$html .= $event_json['phonebank']['caller_intro'];
 		$html .= '<br />';
@@ -62,14 +45,14 @@ function sirius_node_tab_event_phonebank_call($event_node) {
 		$html .= '<br />';
 
 		$html .= l(t('Dry Run'), current_path(),  array('query' => array('mode' => 'test'), 'attributes' => array('class' => array('tool-button'))));
-		if ($active) { 
+		if ($active['success']) { 
 			$html .= l(t('Start Making Calls'), current_path(),  array('query' => array('mode' => 'live'), 'attributes' => array('class' => array('tool-button'))));
 		}
 		return $html;
 	}
 
 	// Get the participant
-	if ($mode == 'live' && $active == 'Yes') {
+	if ($mode == 'live' && $active['success']) {
 		$phone = sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_tid);
 		if (!$phone) { return 'There are no more calls to make!'; }
 	} 

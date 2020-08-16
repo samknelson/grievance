@@ -125,12 +125,20 @@ function sirius_event_node_tabs() {
     'weight' => 3,
   );
 
+  $node_tabs['sirius_event']['sirius_event_phonebank/prescan'] = array(
+    'title' => 'Pre-Scan',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_phonebank_prescan',
+    'permissions' => array('sirius'),
+    'weight' => 4,
+  );
+
   $node_tabs['sirius_event']['sirius_event_phonebank/settings'] = array(
     'title' => 'Settings',
     'description' => '',
     'callback' => 'sirius_node_tab_event_phonebank_settings',
     'permissions' => array('sirius'),
-    'weight' => 4,
+    'weight' => 5,
   );
 
   $node_tabs['sirius_event']['sirius_event_class'] = array(
