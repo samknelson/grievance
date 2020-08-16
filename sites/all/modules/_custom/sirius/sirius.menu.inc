@@ -155,12 +155,22 @@ function sirius_node_tabs() {
     'weight' => 5,
   );
 
+  /*
+  $node_tabs['sirius_domain']['sirius_domain_activity'] = array(
+    'title' => 'Activity',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_activity',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 6,
+  );
+  */
+
   $node_tabs['sirius_domain']['sirius_domain_delete'] = array(
     'title' => 'Delete',
     'description' => '',
     'callback' => 'sirius_node_tab_sirius_domain_delete',
     'permissions' => array('sirius domain admin'),
-    'weight' => 6,
+    'weight' => 7,
   );
 
   $node_tabs['sirius_contact']['sirius_contact_json'] = array(
@@ -258,13 +268,62 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/admin/do_not_disturb'] = array(
+    'title' => 'Do Not Disurb Configuration',
+    'description' => '',
+    'access arguments' => array('sirius domain admin'),
+    'page callback' => 'sirius_page_do_not_disurb_config',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/admin/do_not_disturb/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'access arguments' => array('sirius domain admin'),
+    'page callback' => 'sirius_page_do_not_disurb_config',
+    'page arguments' => array(),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/admin/do_not_disturb/test'] = array(
+    'title' => 'Test',
+    'description' => '',
+    'access arguments' => array('sirius domain admin'),
+    'page callback' => 'sirius_page_do_not_disurb_test',
+    'page arguments' => array(),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
   $items['sirius/admin/banner'] = array(
-    'title' => 'Banner Configuration ',
+    'title' => 'Banner and Footer Configuration',
     'description' => '',
     'access arguments' => array('sirius admin'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_banner_config'),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/admin/banner/banner'] = array(
+    'title' => 'Banner',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_banner_config'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/admin/banner/footer'] = array(
+    'title' => 'Footer',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_footer_config'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
   );
 
   $items['sirius/auditlog/config'] = array(
