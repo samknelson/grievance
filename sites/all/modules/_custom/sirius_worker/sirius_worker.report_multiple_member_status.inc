@@ -26,14 +26,23 @@ function sirius_worker_report_multiple_member_status_fields() {
 }
 
 function sirius_worker_report_multiple_member_status_pks(&$form_state) {
-  $sql = "select distinct entity_id as nid from field_data_field_sirius_member_status ";
-  $sql .= "where entity_type = 'node' ";
-  $sql .= "and bundle = 'sirius_worker' ";
-  $sql .= "and delta > 0 ";
-  // $sql .= "and entity_id = 23732 ";
-  $sql .= "order by entity_id ";
+  $domain_nid = sirius_domain_nid();
+  $sql_args = array();
 
-  $stmt = db_query($sql, array());
+  $sql = "select distinct nid from node ";
+  $sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "where node.type = 'sirius_worker' ";
+  $sql .= "and field_data_field_sirius_member_status.delta > 0 ";
+  if ($domain_nid) { 
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id is NULL ";
+  }
+  $sql .= "order by nid ";
+
+  $stmt = sirius_sql_query($sql, $sql_args);
   $worker_nids = array();
   while ($hr = $stmt->fetchAssoc()) {
     $worker_nids[] = $hr['nid'];

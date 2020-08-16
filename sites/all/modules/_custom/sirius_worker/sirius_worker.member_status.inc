@@ -7,18 +7,16 @@ function sirius_worker_member_status_get_open_statuses($industry_tid = NULL, $in
     $rids = array_keys($user->roles);
   }
 
+  $domain_nid = sirius_domain_nid();
 	$query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'taxonomy_term');
   $query->entityCondition('bundle', 'sirius_member_status');
-  if (!$include_closed) {
-    $query->fieldCondition('field_sirius_dispatch_roles', 'value', $rids, 'IN');
-  }
-  if ($industry_tid) {
-    $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid);
-  }
-  if ($job_type_tid) {
-    $query->fieldCondition('field_sirius_dispatch_job_types', 'tid', $job_type_tid);
-  }
+
+  if (!$include_closed)   { $query->fieldCondition('field_sirius_dispatch_roles', 'value', $rids, 'IN'); }
+  if ($industry_tid)      { $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid); }
+  if ($job_type_tid)      { $query->fieldCondition('field_sirius_dispatch_job_types', 'tid', $job_type_tid); }
+  if ($domain_nid)        { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+
   $query->propertyOrderBy('weight');
   $stmt = $query->execute();
   if (!$stmt['taxonomy_term']) { return array(); }
