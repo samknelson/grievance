@@ -23,12 +23,40 @@ function sirius_domain_node_validate($node, $form, &$form_state) {
  * Fetch the root domain for the current user
  */
 
-function sirius_domain_root() {
+function sirius_domain_root_nid() {
+  $cache =& drupal_static(__FUNCTION__, array());
+
 	global $user;
 	if (!$user) { return NULL; }
 	if (!$user->uid) { return NULL; }
-	$user_full = user_load($user->uid);
-	return node_load($user_full->field_sirius_domain['und'][0]['target_id']);
+
+  $uid = $user->uid;
+  if (!array_key_exists($uid, $cache)) {
+    // $sql for speed
+    $sql = "select field_sirius_domain_target_id ";
+    $sql .= "from field_data_field_sirius_domain ";
+    $sql .= "where entity_type = 'user' and entity_id = :uid ";
+    $stmt = sirius_sql_query($sql, array(':uid' => $uid));
+    $hr = $stmt->fetchAssoc();
+    $cache[$uid] = $hr['field_sirius_domain_target_id'];
+  }
+
+  return $cache[$uid];
+
+	// $user_full = user_load($user->uid);
+	// return node_load($user_full->field_sirius_domain['und'][0]['target_id']);
+}
+
+function sirius_domain_nid() {
+  $domain_nid = $_SESSION['domain_nid'];
+  if (!$domain_nid) { $domain_nid = sirius_domain_root_nid(); }
+  return $domain_nid;
+}
+
+function sirius_domain_root() {
+  $domain_nid = sirius_domain_root_nid();
+  if (!$domain_nid) { return NULL; }
+  return node_load($domain_nid);
 }
 
 /**
@@ -39,18 +67,15 @@ function sirius_domain($new_domain_nid = NULL) {
 	// Set if necessary
 	if ($new_domain_nid) { $_SESSION['domain_nid'] = $new_domain_nid; }
 
-	// Look up from the session
-	if ($_SESSION['domain_nid']) { return node_load($_SESSION['domain_nid']); }
-
-	// Fetch the root domain for the current user.
-	return sirius_domain_root();
+  $domain_nid = sirius_domain_nid();
+  if (!$domain_nid) { return NULL; }
+  return node_load($domain_nid);
 }
 
-function sirius_domain_nid() {
-  $domain_node = sirius_domain();
-  if (!$domain_node) { return NULL; }
-  return $domain_node->nid;
-}
+
+
+
+
 
 function sirius_domain_active($domain_nid) {
   $sql = "select field_sirius_active_value, field_sirius_domain_target_id ";
@@ -435,12 +460,22 @@ function sirius_domain_form_alter_node(&$form, &$form_state, $form_id) {
 }
 
 function sirius_domain_form_restrict(&$form) {
-  foreach (array('field_grievance_shop_target_id', 'field_grievance_settlement_tags_tid') as $field_name) {
+  $field_names = array(
+    'field_grievance_shop_target_id' => NULL,
+    'field_grievance_settlement_tags_tid' => 'grievance_settlement_tags',
+    'field_sirius_member_status_tid' => 'sirius_member_status',
+    'field_sirius_industry_tid' => 'sirius_industry',
+    'field_sirius_skill_tid' => 'sirius_skill',
+    'field_sirius_dispatch_sib_status_tid' => 'sirius_dispatch_sib_status',
+    'field_sirius_worker_dispstatus_tid' => 'sirius_worker_dispstatus'
+  );
+
+  foreach ($field_names as $field_name => $taxonomy) {
     if (!$form[$field_name]['#options']) { continue; }
     $keys = array_keys($form[$field_name]['#options']);
 
-    if ($field_name == 'field_grievance_shop_target_id') { $good_options = sirius_employer_list(FALSE); }
-    if ($field_name == 'field_grievance_settlement_tags_tid') { $good_options = sirius_taxonomy_load('grievance_settlement_tags', 'tid', 'name'); }
+    if ($field_name == 'field_grievance_shop_target_id') { $good_options = sirius_employer_list(FALSE); } 
+    else { $good_options = sirius_taxonomy_load($taxonomy, 'tid', 'name'); }
 
     foreach ($keys as $key) {
       if ($key == NULL) { continue; }
@@ -449,4 +484,66 @@ function sirius_domain_form_restrict(&$form) {
       unset($form[$field_name]['#options'][$key]);
     }
   }
+}
+
+function sirius_domain_activity_ts_ranges() {
+	return array(
+		'day' 			=> array('label' => 'Last 24 Hours', 	'ts' => strtotime('-1 day')),
+		'week' 			=> array('label' => 'Last 7 days', 		'ts' => strtotime('-7 days')),
+		'month' 		=> array('label' => 'Last 30 days', 	'ts' => strtotime('-30 days')),
+		'all_time' 	=> array('label' => 'All Time', 			'ts' => 0),
+	);
+}
+function sirius_domain_activity_render($domain_nids) {
+	// Get the node types
+	$sql = "select type, name from node_type";
+	$stmt = sirius_sql_query($sql, array());
+	while ($hr = $stmt->fetchAssoc()) {
+		$type = $hr['type'];
+		$name = $hr['name'];
+		$name = preg_replace('/Sirius /', '', $name);
+		$name = preg_replace('/Grievance /', '', $name);
+		$type_names[$type] = $name;
+	}
+	asort($type_names);
+
+	// New nodes
+	$ts_ranges = sirius_domain_activity_ts_ranges();
+
+	$node_counts = array();
+	$found_node_types = array();
+	foreach ($ts_ranges as $range_id => $range) {
+		$sql_args = array();
+		$sql = "select type, count(*) as c from node ";
+		$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+		$sql .= "where field_sirius_domain_target_id in (:domain_nids) ";
+		$sql_args[':domain_nids'] = $domain_nids;
+		$sql .= "and created > :ts ";
+		$sql_args[':ts'] = $range['ts'];
+		$sql .= "group by node.type order by node.type ";
+		$stmt = sirius_sql_query($sql, $sql_args);
+		while ($hr = $stmt->fetchAssoc()) {
+			$node_counts[$range_id][$hr['type']] = $hr['c'];
+			$found_node_types[$hr['type']] = TRUE;
+		}
+	}
+
+	$header = array('Type');
+	foreach ($ts_ranges as $range_id => $range) { $header[] = $range['label']; }
+
+	$rows = array();
+	foreach ($type_names as $type => $type_name) {
+		if (!$found_node_types[$type]) { continue; }
+		$row = array();
+		$row[] = $type_name;
+		foreach ($ts_ranges as $range_id => $range) {
+			$row[] = $node_counts[$range_id][$type];
+		}
+		$rows[] = $row;
+	}
+
+	$html = '<h2>Content</h2>';
+	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+
+	return $html;
 }
