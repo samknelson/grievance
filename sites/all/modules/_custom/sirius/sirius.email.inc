@@ -3,32 +3,32 @@
 function sirius_email_test_form($form, &$form_state) {
   $form['#tree'] = TRUE; 
 
-  $form['to'] = array(
+  $form['message']['to'] = array(
     '#type' => 'textfield',
     '#title' => 'To',
   );
 
-  $form['headers']['cc'] = array(
+  $form['message']['headers']['cc'] = array(
     '#type' => 'textfield',
     '#title' => 'Cc',
   );
 
-  $form['headers']['bcc'] = array(
+  $form['message']['headers']['bcc'] = array(
     '#type' => 'textfield',
     '#title' => 'Bcc',
   );
 
-  $form['headers']['reply-to'] = array(
+  $form['message']['headers']['reply-to'] = array(
     '#type' => 'textfield',
     '#title' => 'Reply-To',
   );
 
-  $form['subject'] = array(
+  $form['message']['subject'] = array(
     '#type' => 'textfield',
     '#title' => 'Subject',
   );
 
-  $form['body'] = array(
+  $form['message']['body'] = array(
     '#type' => 'textarea',
     '#title' => 'Body',
   );
@@ -43,7 +43,7 @@ function sirius_email_test_form($form, &$form_state) {
 
 function sirius_email_test_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
-  $params = $form_state['values'];
+  $params = $form_state['values']['message'];
   $result = sirius_email_send($params);
   $msg = htmlspecialchars($result['msg']);
   if ($result['success']) {
@@ -320,9 +320,13 @@ function sirius_mail($key, &$message, $params) {
   }
   $message['headers']['X-Sirius-Id'] = $id;
 
+
   // "From" 
   $from_email = $params['from'];
   if (!$from_email) { $from_email = variable_get("sirius_email_default_from_address", ''); }
+
+  // A hack. Because of something weird with UNITE HERE's AWS configuration
+  // if (preg_match('/uhgrievance/', $from_email)) { unset($message['headers']['Reply-To']); }
 
   // Custom header: 
   $message['from'] = 

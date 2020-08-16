@@ -222,10 +222,14 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
         $table = 'field_data_field_sirius_id';
         $column = 'field_sirius_id_value';
         $value = $row['id'];
-      } else if ($pk == 'id3') { 
-        $table = 'field_data_field_sirius_id3';
-        $column = 'field_sirius_id3_value';
-        $value = $row['id3'];
+      } else if ($pk == 'id') { 
+        $table = 'field_data_field_sirius_id';
+        $column = 'field_sirius_id_value';
+        $value = $row['id'];
+      } else if ($pk == 'id2') { 
+        $table = 'field_data_field_sirius_id2';
+        $column = 'field_sirius_id2_value';
+        $value = $row['id2'];
       } else if ($pk == 'id3') { 
         $table = 'field_data_field_sirius_ssn';
         $column = 'field_sirius_ssn_value';
@@ -250,8 +254,6 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
       $other_nid = $hr['b'];
       if (!$worker_nid) { return array('success' => FALSE, 'msg' => "Worker not found with this ID ($table, $column)."); }
       if ($worker_nid != $other_nid) { return array('success' => FALSE, 'msg' => "Multiple workers found with this ID ($table, $column)."); }
-
-      if (!$account_nid) { return array('success' => FALSE, 'msg' => 'Account not found.'); }
     }
 
     $row['worker_nid'] = $worker_nid;
@@ -285,6 +287,7 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
     $other_nid = $hr['b'];
     if (!$account_nid) { return array('success' => FALSE, 'msg' => "Account not found."); }
     if ($account_nid != $other_nid) { return array('success' => FALSE, 'msg' => "Multiple accounts found."); }
+    if (!$account_nid) { return array('success' => FALSE, 'msg' => 'Account not found.'); }
     $row['account_nid'] = $account_nid;
 
     // Payment NID
