@@ -9,7 +9,8 @@ function sirius_page_config() {
 	
 	$links['core'] = array('title' => 'Core');
 	$links['core']['links']['sirius/taxonomy'] 										= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');
-	$links['core']['links']['sirius/admin/banner'] 								= array('title' => 'Site Banner', 'description' => 'Configure the banner to be shown at the top of all web pages.');
+	$links['core']['links']['sirius/admin/do_not_disturb'] 				= array('title' => 'Do Not Disturb', 'description' => 'Set do-not-disturb blackout times, e.g. "do not call after 9:00 PM".');
+	$links['core']['links']['sirius/admin/banner'] 								= array('title' => 'Site Banner', 'description' => 'Configure the banner and footer to be shown on all web pages.');
 	$links['core']['links']['sirius/field_overrides']							= array('title' => 'Field Overrides', 'description' => 'Change the names of fields.');
 	$links['core']['links']['admin/config/grievance/quicksearch'] = array('title' => 'Quickseach', 'description' => 'Settings for the banner "quicksearch" tool.');
 	$links['core']['links']['sirius/document-retention'] 				= array('title' => 'Document Retention', 'description' => 'Manage document retention policies.');
