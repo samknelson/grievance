@@ -935,6 +935,7 @@ features[field_instance][] = taxonomy_term-sirius_event_participant_role-field_s
 features[field_instance][] = taxonomy_term-sirius_event_participant_role-field_sirius_term_source
 features[field_instance][] = taxonomy_term-sirius_event_participant_status-field_sirius_domain
 features[field_instance][] = taxonomy_term-sirius_event_participant_status-field_sirius_event_proles
+features[field_instance][] = taxonomy_term-sirius_event_participant_status-field_sirius_json
 features[field_instance][] = taxonomy_term-sirius_event_participant_status-field_sirius_term_source
 features[field_instance][] = taxonomy_term-sirius_event_type-field_sirius_domain
 features[field_instance][] = taxonomy_term-sirius_event_type-field_sirius_event_proles
