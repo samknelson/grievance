@@ -881,3 +881,28 @@ function grievance_update_7040() {
 
   variable_set('smtp_allowhtml', 1);
 }
+
+/**
+ * Add domain field to report cache
+ */
+
+function grievance_update_7041() {
+
+  $sqls = array(
+    'alter table report_cache add report_domain_nid integer',
+    'alter table report_cache drop primary key',
+    'alter table report_cache add primary key (report_domain_nid, report_type, report_id, report_row_pk)',
+    'alter table report_cache add index(report_id)',
+    'alter table report_cache add index(report_row_pk)',
+    'alter table report_cache add index(report_type)',
+    'alter table report_cache add index(report_domain_nid)',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { }
+  }
+}
