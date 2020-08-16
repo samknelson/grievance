@@ -1,9 +1,19 @@
 <?php
 
 function report_cache_page_report($report_type) {
-	
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 	$report_id = $_REQUEST['report_id'];
 	$action = $_REQUEST['action'];
+
+	if ($report_id) {
+		$sql = "select report_domain_nid from report_cache where report_type = :report_type and report_id = :report_id ";
+		$stmt = db_query($sql, array(':report_type' => $report_type, ':report_id' => $report_id));
+		$hr = $stmt->fetchAssoc();
+		$report_domain_nid = $hr['report_domain_nid'];
+		if ($report_domain_nid != $domain_nid) {
+			return 'Access denied.';
+		}
+	}
 
 	$report_type_infos = module_invoke_all('report_cache_info');
 	$report_type_info = $report_type_infos[$report_type];
@@ -28,8 +38,14 @@ function report_cache_page_report($report_type) {
 		return $html;
 	}
 
-	$sql = "select distinct report_id from report_cache where report_type = :report_type order by report_id desc";
-	$stmt = db_query($sql, array(':report_type' => $report_type));
+	$sql_args = array();
+	$sql = "select distinct report_id from report_cache ";
+	$sql .= "where report_type = :report_type ";
+	$sql_args[':report_type'] = $report_type;
+	$sql .= "and report_domain_nid = :domain_nid ";
+	$sql_args[':domain_nid'] = $domain_nid;
+	$sql .= "order by report_id desc ";
+	$stmt = db_query($sql, $sql_args);
 	$report_ids = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		$report_ids[] = $hr['report_id'];
@@ -99,6 +115,7 @@ function report_cache_page_report($report_type) {
 
 
 function report_cache_preview($report_type, $report_id, $report_type_info) {
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 	$fields = $report_type_info['fields'];
 
 	$result = '';
@@ -110,6 +127,7 @@ function report_cache_preview($report_type, $report_id, $report_type_info) {
 	$query->fields('report_cache');
 	$query->condition('report_id', $report_id);
 	$query->condition('report_type', $report_type);
+	$query->condition('report_domain_nid', $domain_nid);
 	$query = $query->extend('PagerDefault');
 	$query->limit(100);
 	
@@ -145,7 +163,7 @@ function report_cache_render($report_type, $report_id, $report_type_info, $callb
 
 
 function report_cache_download($report_type, $report_id, $report_type_info) {
-
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 	if ($report_type_info['download_callback']) {
 		$callback = $report_type_info['download_callback'];
 		return $callback($report_type, $report_id, $report_type_info);
@@ -166,7 +184,9 @@ function report_cache_download($report_type, $report_id, $report_type_info) {
 
 	$query = db_select('report_cache');
 	$query->fields('report_cache');
+	$query->condition('report_type', $report_type);
 	$query->condition('report_id', $report_id);
+	$query->condition('report_domain_nid', $domain_nid);
 	$stmt = $query->execute();
 	
 	while ($hr = $stmt->fetchAssoc()) {
