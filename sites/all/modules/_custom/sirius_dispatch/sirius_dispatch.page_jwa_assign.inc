@@ -208,6 +208,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	// Build our output
   drupal_add_library('system', 'ui.accordion');
   drupal_add_js('jQuery(document).ready(function () { jQuery("#sirius_accordion").accordion({active: false, collapsible: true, autoehight: true, heightStyle: "content"}); });', 'inline');
+	drupal_add_library('system', 'ui.tooltip');
 	drupal_add_js(drupal_get_path('module', 'sirius_dispatch') . '/js/sirius_dispatch.jwa.js', 'file');
 
   //
@@ -217,6 +218,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
   //$form['table_open'] = array('#markup' => '<table style="border: none; background: none;">');
   //$form['tr_open'] = array('#markup' => '<tr style="border: none; background: none;">');
   //$form['td_1_open'] = array('#markup' => '<td style="vertical-align: top; width: 50%; border: none; background: none; margin-right: 20;">');
+
 
   $header = array(
   	t('Worker'),
@@ -270,12 +272,16 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 
 		if ($hr['eba_name'] == 'Yes') { $eba = $hr['eba_dates']; } else { $eba = ''; }
 
+  	$dispatch_status_render = $hr['dispatch_status_name'];
+  	$schedule = sirius_worker_schedule($worker_nid);
+  	if ($schedule) { $dispatch_status_render .= sirius_worker_schedule_render($schedule, 'tiny'); }
+
    	$row = array();
 		$row[] = $hr['worker_name'];
 		$row[] = $hr['sirius_id'];
 		$row[] = $hr['availdate'];
 		$row[] = $ms_name;
-		$row[] = $hr['dispatch_status_name'];
+		$row[] = $dispatch_status_render;
 		$row[] = $eba;
   	$row[] = $employer_name;
   	$row[] = $hours;
