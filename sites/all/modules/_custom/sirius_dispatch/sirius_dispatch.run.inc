@@ -122,7 +122,7 @@ function sirius_dispatch_run_finalize($job_node) {
 
 function sirius_dispatch_run_notify($job_node) {
 	// Make sure we're ok to send automatic notifications
-	$result = sirius_dispatch_notify_schedule_ok();
+  $result = sirius_do_not_disturb_check('default');
 	if (!$result['success']) {
     if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
       sirius_log('job:run', 'notify', $result['msg'], '', '', array($job_node->nid));
@@ -316,83 +316,6 @@ function sirius_dispatch_run_admin() {
     '#default_value' => variable_get($var, 25),
     '#description' => t("Maximum number of dispatches that will be created each time a running job is polled"),
   );
-
-  $days = array(
-  	1 => 'Monday',
-  	2 => 'Tuesday',
-  	3 => 'Wednesday',
-  	4 => 'Thursday',
-  	5 => 'Friday',
-  	6 => 'Saturday',
-  	7 => 'Sunday',
-  );
-
-  $hours = array();
-  for ($i=0; $i<=24; ++$i) {
-  	$hours[$i] = $i;
-  }
-
-  $minutes = array();
-  for ($i=0; $i<=59; ++$i) {
-  	$minutes[$i] = str_pad($i, 2, '0', STR_PAD_LEFT);
-
-  }
-
-  foreach ($days as $day => $day_label) {
-  	$form["sirius_dispatch_run_schedule_$day"] = array(
-  		'#type' => 'fieldset',
-  	);
-
-  	$var = "sirius_dispatch_run_schedule_${day}_enable}";
-  	$form["sirius_dispatch_run_schedule_$day"][$var] = array(
-  		'#type' => 'select',
-  		'#title' => 'Send on ' . $day_label . 's?',
-  		'#options' => array('Yes' => 'Yes', 'No' => 'No'),
-  		'#default_value' => variable_get($var, 'Yes'),
-  		'#prefix' => '<div style="float: left; padding-right: 10px; width: 200px;">',
-  		'#suffix' => '</div>',
-  	);
-
-  	$var = "sirius_dispatch_run_schedule_${day}_start_hour}";
-  	$form["sirius_dispatch_run_schedule_$day"][$var] = array(
-  		'#type' => 'select',
-  		'#title' => 'Start hour',
-  		'#options' => $hours,
-  		'#default_value' => variable_get($var, 9),
-  		'#prefix' => '<div style="float: left; padding-right: 10px;">',
-  		'#suffix' => '</div>',
-  	);
-
-  	$var = "sirius_dispatch_run_schedule_${day}_start_minute";
-  	$form["sirius_dispatch_run_schedule_$day"][$var] = array(
-  		'#type' => 'select',
-  		'#title' => 'Start minute',
-  		'#options' => $minutes,
-  		'#default_value' => variable_get($var, 0),
-  		'#prefix' => '<div style="float: left; padding-right: 10px;">',
-  		'#suffix' => '</div>',
-  	);
-
-  	$var = "sirius_dispatch_run_schedule_${day}_stop_hour}";
-  	$form["sirius_dispatch_run_schedule_$day"][$var] = array(
-  		'#type' => 'select',
-  		'#title' => 'Stop hour',
-  		'#options' => $hours,
-  		'#default_value' => variable_get($var, 17),
-  		'#prefix' => '<div style="float: left; padding-right: 10px;">',
-  		'#suffix' => '</div>',
-  	);
-
-  	$var = "sirius_dispatch_run_schedule_${day}_stop_minute";
-  	$form["sirius_dispatch_run_schedule_$day"][$var] = array(
-  		'#type' => 'select',
-  		'#title' => 'Stop minute',
-  		'#options' => $minutes,
-  		'#default_value' => variable_get($var, 0),
-  		'#prefix' => '<div style="float: left; padding-right: 10px;">',
-  		'#suffix' => '</div>',
-  	);
-  }
 
   $form["sirius_dispatch_log_level"] = array(
     '#type' => 'select',

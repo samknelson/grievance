@@ -28,6 +28,8 @@ function sirius_ledger_feed_allocate_info() {
         'id' => array('title' => 'Badge ID'),
         'ein' => array('title' => 'EIN'),
         'amount' => array('title' => 'Amount'),
+        'payment_date' => array('title' => 'Payment Date', 'description' => 'Date that the payment will be credited.'),
+        'charge_date' => array('title' => 'Charge Date', 'description' => 'For any charges generated as part of the upload, date that the charge will be posted.'),
         'account' => array('title' => 'Account', 'description' => 'May match the name, short name, or any of the aliases for the account'),
         'memo_prefix' => array('title' => 'Memo Prefix', 'description' => 'The memo will be the name of the payment. You may also select a field to prefix to the memo. Memos will be truncated to 255 characters.'),
         'memo_suffix' => array('title' => 'Memo Suffix', 'description' => 'The memo will be the name of the payment. You may also select a field to suffix to the memo. Memos will be truncated to 255 characters.'),
@@ -115,6 +117,7 @@ function sirius_ledger_feed_allocate_payments_form($form, &$form_state, $info, $
     '#attributes' => array(
       'autocomplete' => 'off',
     ),
+    '#description' => t('If there is no payment date in the upload, use this date.'),
   );
   if ($data['payment_settings']['ledger_date']) { $form['payment_settings']['ledger_date']['#default_value'] = $data['payment_settings']['ledger_date']; }
 
@@ -142,6 +145,7 @@ function sirius_ledger_feed_allocate_payments_form($form, &$form_state, $info, $
     '#attributes' => array(
       'autocomplete' => 'off',
     ),
+    '#description' => t('If there is no charge date in the upload, use this date.'),
   );
   if ($data['charge_settings']['ledger_date']) { $form['charge_settings']['ledger_date']['#default_value'] = $data['charge_settings']['ledger_date']; }
 
@@ -208,9 +212,38 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
     return array('success' => FALSE, 'msg' => 'Amount is not a numeric value.');
   }
 
+  static $default_payment_ts;
+  if (!isset($default_payment_ts)) { $default_payment_ts = strtotime($data['payment_settings']['ledger_date']); }
+  $payment_ts = 0;
+  if ($row['payment_date']) {
+    $payment_ts = strtotime($row['payment_date']);
+  } else {
+    $payment_ts = $default_payment_ts;
+  }
+  if ($payment_ts < 1) {
+    return array('success' => FALSE, 'msg' => "Invalid or missing payment date.");
+  }
+
+  static $default_charge_ts;
+  if (!isset($default_charge_ts)) { $default_charge_ts = strtotime($data['charge_settings']['ledger_date']); }
+  $charge_ts = 0;
+  if ($row['charge_date'] && FALSE) {
+    $charge_ts = strtotime($row['charge_date']);
+  } else {
+    $charge_ts = $default_charge_ts;
+  }
+  if ($data['charge_settings']['monthly'] == 'Yes') {
+    if ($charge_ts < 1) {
+      return array('success' => FALSE, 'msg' => "Invalid or missing charge date.");
+    }
+  }
+
+
   // Worker
   if ($precompute) {
     $row['employer_nid'] = $employer_nid;
+    $row['payment_ts'] = $payment_ts;
+    $row['charge_ts'] = $charge_ts;
 
     $domain_nid = $feed_node->field_sirius_domain['und'][0]['target_id'];
 
@@ -333,13 +366,15 @@ function sirius_ledger_feed_allocate_row_process($feed_node, $info, $data, $row)
   $entry['ledger_account'] = $payment_node->field_sirius_ledger_account['und'][0]['target_id'];
   $entry['ledger_status'] = $payment_node->field_sirius_payment_status['und'][0]['value'];
   $entry['ledger_memo'] = $memo;
-  $entry['ledger_ts'] = strtotime($data['payment_settings']['ledger_date']);
+  $entry['ledger_ts'] = $row['payment_ts'];
   $entry['ledger_reference'] = $payment_node->nid;
   $entry['ledger_participant'] = $contact_nid;
   sirius_ledger_ar_insert($entry);
 
   if ($amount > 0) {
-    $charged = sirius_ledger_monthly_charge_worker($worker_nid, 'live', 'payment', strtotime($data['charge_settings']['ledger_date']));
+    if ($data['charge_settings']['monthly'] == 'Yes') {
+      $charged = sirius_ledger_monthly_charge_worker($worker_nid, 'live', 'payment', $row['charge_ts']);
+    }
   }
 
   if ($charged) {
