@@ -2909,7 +2909,8 @@ fieldset legend a:visited {
 .loopback .primary-local-tasks-wrapper,
 .loopback .secondary-tasks-wrapper,
 .loopback .banner-menu-outer-wrapper,
-.loopback #block-user-login {
+.loopback #block-user-login,
+.loopback #environment-indicator {
   display: none;
 }
 
