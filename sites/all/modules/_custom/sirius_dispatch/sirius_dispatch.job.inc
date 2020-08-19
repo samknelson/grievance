@@ -266,6 +266,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	foreach ($member_status_tids as $member_status_tid) {
 		$member_status_term = taxonomy_term_load($member_status_tid);
 		$member_status_weights[$member_status_tid] = $member_status_term->field_grievance_weight['und'][0]['value'];
+		if (!$member_status_weights[$member_status_tid]) { $member_status_weights[$member_status_tid] = 0; }
 	}
 
 	// Get the facility NID
