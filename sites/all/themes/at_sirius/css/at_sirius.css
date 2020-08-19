@@ -2907,7 +2907,9 @@ fieldset legend a:visited {
 .loopback #primary-tasks,
 .loopback #secondary-tasks,
 .loopback .primary-local-tasks-wrapper,
-.loopback .secondary-tasks-wrapper { 
+.loopback .secondary-tasks-wrapper,
+.loopback .banner-menu-outer-wrapper,
+.loopback #block-user-login {
   display: none;
 }
 
