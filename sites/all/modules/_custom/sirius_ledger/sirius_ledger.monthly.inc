@@ -205,7 +205,7 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 
 	$trigger_options = sirius_ledger_policy_trigger_options('month');
 	$today_day = date('j', $ts);
-	$today_month = date('m', $ts);
+	$today_month = date('n', $ts);
 	$today_year = date('Y', $ts);
 	sirius_minilog("Calculating monthly dues for " . $worker_node->title . " using trigger " .  $trigger_options[$trigger] . " as of $today_year-$today_month-$today_day");
 	sirius_minilog("Operating mode: $mode");
@@ -231,14 +231,18 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 			continue;
 		}
 		$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
+		if ($policy_json['ledger']['policy']['monthly']['skip_months'][$today_month]) {
+			sirius_minilog("The ledger policy lists the current month, month #$today_month, as a \"skip month\". Monthly dues are not charged this month.");
+			continue;
+		}
 
 		$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule);
 
 		if ($schedule == 'month') { 
-			$charge_days = array($policy_json['ledger']['policy']['settings']['monthly_charge_day']);
+			$charge_days = array($policy_json['ledger']['policy']['monthly']['monthly_charge_day']);
 		} else {
 			$charge_days = array(
-				$policy_json['ledger']['policy']['settings']['semimonthly_charge_day_1'],
+				$policy_json['ledger']['policy']['monthly']['semimonthly_charge_day_1'],
 				$policy_json['ledger']['policy']['settings']['semimonthly_charge_day_2']
 			);
 		}

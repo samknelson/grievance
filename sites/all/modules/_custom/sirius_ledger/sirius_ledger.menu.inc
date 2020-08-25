@@ -184,19 +184,29 @@ function sirius_ledger_node_tabs() {
     'permissions' => array('sirius ledger admin'),
     'weight' => 2,
   );
+
   $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/definition'] = array(
-    'title' => 'Settings',
+    'title' => 'General Settings',
     'callback' => 'sirius_ledger_node_tab_policy_definition',
     'permissions' => array('sirius ledger admin'),
     'weight' => 1,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
+
+  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/monthly'] = array(
+    'title' => 'Monthly Settings',
+    'callback' => 'sirius_ledger_node_tab_policy_definition_monthly',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 2,
+  );
+
   $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/rates'] = array(
     'title' => 'Rates',
     'callback' => 'sirius_ledger_node_tab_policy_definition_rates',
     'permissions' => array('sirius ledger admin'),
     'weight' => 2,
   );
+
   $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/exim'] = array(
     'title' => 'Export / Import',
     'callback' => 'sirius_ledger_node_tab_policy_definition_exim',

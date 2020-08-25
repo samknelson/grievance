@@ -44,30 +44,6 @@ function sirius_ledger_node_tab_policy_definition_form($form, &$form_state, $def
 	);
 	if ($json['ledger']['policy']['settings']['accounts']) { $form['ledger']['policy']['settings']['accounts']['#default_value'] = $json['ledger']['policy']['settings']['accounts']; }
 
-	$form['ledger']['policy']['settings']['monthly_charge_day'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Monthly Charge Day'),
-		'#size' => 2,
-		'#description' => t('For monthly charges, on which day of the month should the charge be entered?')
-	);
-	if ($json['ledger']['policy']['settings']['monthly_charge_day']) { $form['ledger']['policy']['settings']['monthly_charge_day']['#default_value'] = $json['ledger']['policy']['settings']['monthly_charge_day']; }
-
-	$form['ledger']['policy']['settings']['semimonthly_charge_day_1'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Semi-Monthly Charge Day 1'),
-		'#size' => 2,
-		'#description' => t('For sem-monthly charges, on which day of the month should the first charge be entered?')
-	);
-	if ($json['ledger']['policy']['settings']['semimonthly_charge_day_1']) { $form['ledger']['policy']['settings']['semimonthly_charge_day_1']['#default_value'] = $json['ledger']['policy']['settings']['semimonthly_charge_day_1']; }
-
-	$form['ledger']['policy']['settings']['semimonthly_charge_day_2'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Semi-Monthly Charge Day 2'),
-		'#size' => 2,
-		'#description' => t('For monthly charges, on which day of the month should the second charge be entered?')
-	);
-	if ($json['ledger']['policy']['settings']['semimonthly_charge_day_2']) { $form['ledger']['policy']['settings']['semimonthly_charge_day_2']['#default_value'] = $json['ledger']['policy']['settings']['semimonthly_charge_day_2']; }
-
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -193,10 +169,6 @@ function sirius_ledger_node_tab_policy_definition_rates_form($form, &$form_state
 	return $form;
 }
 
-
-
-
-
 function sirius_ledger_node_tab_policy_definition_rates_form_submit($form, $form_state) {
 	$definition_node = node_load($form_state['definition_nid']);
 	$json = sirius_jsonfield_util_node_json_get($definition_node);
@@ -225,4 +197,81 @@ function sirius_ledger_policy_schedules($policy_json) {
 	$result = array();
 	foreach ($keys as $key) { $result[$key] = $schedule_options[$key]; }
 	return $result;
+}
+
+
+function sirius_ledger_node_tab_policy_definition_monthly_access($definition_node) {
+	return sirius_ledger_node_tab_policy_definition_access($definition_node);
+}
+
+function sirius_ledger_node_tab_policy_definition_monthly($definition_node) {
+	return drupal_get_form('sirius_ledger_node_tab_policy_definition_monthly_form', $definition_node);
+}
+
+function sirius_ledger_node_tab_policy_definition_monthly_form($form, &$form_state, $definition_node) {
+	$form_state['definition_nid'] = $definition_node->nid;
+
+	$json = sirius_jsonfield_util_node_json_get($definition_node);
+
+	$form['#tree'] = TRUE;
+
+	$form['ledger']['policy']['monthly']['monthly_charge_day'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Monthly Charge Day'),
+		'#size' => 2,
+		'#description' => t('For monthly charges, on which day of the month should the charge be entered?')
+	);
+	if ($json['ledger']['policy']['monthly']['monthly_charge_day']) { $form['ledger']['policy']['monthly']['monthly_charge_day']['#default_value'] = $json['ledger']['policy']['monthly']['monthly_charge_day']; }
+
+	$form['ledger']['policy']['monthly']['semimonthly_charge_day_1'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Semi-Monthly Charge Day 1'),
+		'#size' => 2,
+		'#description' => t('For sem-monthly charges, on which day of the month should the first charge be entered?')
+	);
+	if ($json['ledger']['policy']['monthly']['semimonthly_charge_day_1']) { $form['ledger']['policy']['monthly']['semimonthly_charge_day_1']['#default_value'] = $json['ledger']['policy']['monthly']['semimonthly_charge_day_1']; }
+
+	$form['ledger']['policy']['monthly']['semimonthly_charge_day_2'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Semi-Monthly Charge Day 2'),
+		'#size' => 2,
+		'#description' => t('For monthly charges, on which day of the month should the second charge be entered?')
+	);
+	if ($json['ledger']['policy']['monthly']['semimonthly_charge_day_2']) { $form['ledger']['policy']['monthly']['semimonthly_charge_day_2']['#default_value'] = $json['ledger']['policy']['monthly']['semimonthly_charge_day_2']; }
+
+	$form['ledger']['policy']['monthly']['skip_months'] = array(
+		'#type' => 'checkboxes',
+		'#title' => t('Omit monthly charges on the following months'),
+		'#options' => array(
+			1 => t('January'),
+			2 => t('February'),
+			3 => t('March'),
+			4 => t('April'),
+			5 => t('May'),
+			6 => t('June'),
+			7 => t('July'),
+			8 => t('August'),
+			9 => t('September'),
+			10 => t('October'),
+			11 => t('November'),
+			12 => t('December'),
+		),
+	);
+	if ($json['ledger']['policy']['monthly']['skip_months']) { $form['ledger']['policy']['monthly']['skip_months']['#default_value'] = $json['ledger']['policy']['monthly']['skip_months']; }
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
+
+	return $form;
+}
+
+function sirius_ledger_node_tab_policy_definition_monthly_form_submit($form, $form_state) {
+	$definition_node = node_load($form_state['definition_nid']);
+	$json = sirius_jsonfield_util_node_json_get($definition_node);
+	$json['ledger']['policy']['monthly'] = $form_state['values']['ledger']['policy']['monthly'];
+	sirius_jsonfield_util_node_json_set($definition_node, $json);
+	node_save($definition_node);
+	drupal_set_message("Policy updated.");
 }
