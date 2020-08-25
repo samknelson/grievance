@@ -258,6 +258,18 @@ if (at_sirius_is_popup()) {
   <?php if ($page['footer']): ?>
     <footer id="page-footer">
       <div class="container">
+
+        <div class="sirius_footer">
+          <div class="block-inner">
+            <?php
+              print sirius_footer_html();
+              if (variable_get('grievance_last_updated', '')) {
+                print '<br />Last Updated: <strong>' . variable_get('grievance_last_updated', '') . '</strong>';
+              }
+            ?>
+          </div>
+        </div>
+
         <?php print render($page['footer']); ?>
       </div>
     </footer>

@@ -106,6 +106,21 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 		'#default_value' => $json['phonebank']['conference_number'],
 	);
 
+	$form['phonebank']['do_not_disturb'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Do Not Disturb',
+	);
+	$options = array(NULL => '-- Select --') + sirius_do_not_disturb_list();
+	$form['phonebank']['do_not_disturb']['id'] = array(
+		'#type' => 'select',
+		'#options' => $options,
+		'#title' => t('Which Do Not Disturb schedule should be used?'),
+		'#default_value' => $json['phonebank']['do_not_disturb']['id'],
+	);
+
+	if ($json['phonebank']['do_not_disturb']['id']) {
+		$form['phonebank']['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disurb_render($json['phonebank']['do_not_disturb']['id']));
+	}
 
 
 	$form['submit'] = array(

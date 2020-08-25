@@ -36,11 +36,27 @@ function sirius_worker_report_duplicate_id_fields() {
 }
 
 function sirius_worker_report_duplicate_id_pks(&$form_state) {
+  $domain_nid = sirius_domain_nid();
+
   $key = $form_state['values']['key'];
   $table = 'field_data_field_sirius_' . $key;
   $col = 'field_sirius_' . $key . '_value';
-  $sql = "select $col as identifier from $table where entity_type = 'node' and bundle = 'sirius_worker' and $col is not null and $col != '' group by $col having count(*) > 1 order by entity_id";
-  $stmt = db_query($sql, array());
+
+  $sql_args = array();
+  $sql = "select $col as identifier ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "left join $table on $table.entity_type = 'node' and $table.entity_id = node.nid ";
+  $sql .= "where node.type = 'sirius_worker' ";
+  if ($domain_nid) { 
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id is NULL ";
+  }
+  $sql .= "group by $col having count(*) > 1 order by node.nid ";
+
+  $stmt = sirius_sql_query($sql, $sql_args);
   $identifiers = array();
   while ($hr = $stmt->fetchAssoc()) {
     $identifiers[] = $hr['identifier'];

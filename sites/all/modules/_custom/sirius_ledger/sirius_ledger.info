@@ -1,0 +1,4 @@
+name = Sirius Ledger
+description = Sirius ledger and accounting
+core = 7.x
+package = sirius

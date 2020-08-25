@@ -152,25 +152,36 @@ function sirius_dispatch_node_tabs() {
     'weight' => 5,
   );
 
-  $node_tabs['grievance_shop']['sirius_employer_dispatch_preferences'] = array(
-    'title' => 'Dispatch Preferences',
+  $node_tabs['grievance_shop']['sirius_employer_dispatch'] = array(
+    'title' => 'Dispatch',
     'description' => '',
     'callback' => 'sirius_node_tab_employer_dispatch_preferences',
     'permissions' => array('sirius dispatch employer'),
   );
 
-  $node_tabs['grievance_shop']['sirius_employer_dispatch_attachments'] = array(
-    'title' => 'Dispatch Attachments',
+  $node_tabs['grievance_shop']['sirius_employer_dispatch/preferences'] = array(
+    'title' => 'Preferences',
+    'description' => '',
+    'callback' => 'sirius_node_tab_employer_dispatch_preferences',
+    'permissions' => array('sirius dispatch employer'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $node_tabs['grievance_shop']['sirius_employer_dispatch/attachments'] = array(
+    'title' => 'Attachments',
     'description' => '',
     'callback' => 'sirius_node_tab_employer_dispatch_attachments',
     'permissions' => array('sirius dispatch employer'),
+    'weight' => 2,
   );
 
-  $node_tabs['grievance_shop']['sirius_employer_dispatch_payrate'] = array(
-    'title' => 'Dispatch Payrate',
+  $node_tabs['grievance_shop']['sirius_employer_dispatch/payrate'] = array(
+    'title' => 'Payrate',
     'description' => '',
     'callback' => 'sirius_node_tab_employer_dispatch_payrate',
     'permissions' => array('sirius dispatch staff'),
+    'weight' => 3,
   );
 
   return $node_tabs;
@@ -183,9 +194,19 @@ function sirius_dispatch_term_tabs() {
     'title' => 'Dispatch',
     'description' => '',
     'callback' => 'sirius_dispatch_term_tab_industry',
-    'permissions' => array('sirius dispatch staff'),
+    'permissions' => array('sirius dispatch admin'),
     'weight' => 4,
   );
+
+  /*
+  $term_tabs['sirius_dispatch_job_type']['sirius_dispatch_job_type'] = array(
+    'title' => 'Policy',
+    'description' => '',
+    'callback' => 'sirius_dispatch_term_tab_job_type',
+    'permissions' => array('sirius dispatch admin'),
+    'weight' => 4,
+  );
+  */
 
   return $term_tabs;
 }
@@ -230,6 +251,16 @@ function sirius_dispatch_menu() {
     'page arguments' => array(4, 5),
     'access callback' => 'sirius_dispatch_page_job_create_access',
     'access arguments' => array(4, 5),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/dispatch/job/create/%node/%/%'] = array(
+    'title' => 'Create a Job',
+    'description' => '',
+    'page callback' => 'sirius_dispatch_page_job_create',
+    'page arguments' => array(4, 5, 6),
+    'access callback' => 'sirius_dispatch_page_job_create_access',
+    'access arguments' => array(4, 5, 6),
     'type' => MENU_NORMAL_ITEM,
   );
 

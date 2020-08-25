@@ -8,7 +8,7 @@ function sirius_dispatch_vlri_possible($dispatch_node) {
 
 	// Verify the dispatch status
 	$status = $dispatch_node->field_sirius_dispatch_status['und'][0]['value'];
-	if ($status != 'accepted') {
+	if ($status != 'accepted' && $status != 'accepted_secondary') {
 		return array('success' => FALSE, 'msg' => "Dispatch status is $status");
 	}
 

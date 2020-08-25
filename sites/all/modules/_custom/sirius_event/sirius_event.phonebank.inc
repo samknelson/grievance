@@ -87,10 +87,34 @@ function sirius_event_phonebank_participants_by_phone($event_node, $prole_tid, $
   return node_load_multiple($participant_nids);
 }
 
+function sirius_phonebank_opens_in($event_node) {
+  if (!$event_node->field_sirius_daterepeat['und']) { return ''; }
+  $ts_now = time();
+  $opens_in = 999999999;
+  foreach ($event_node->field_sirius_daterepeat['und'] as $tmp) {
+    $start_ts = strtotime($tmp['value'] . ' ' . $tmp['timezone_db']);
+    $end_ts = strtotime($tmp['value2'] . ' ' . $tmp['timezone_db']);
+    if ($start_ts <= 1 || $end_ts <= 1) { continue; }
+    if ($start_ts >= $ts_now) {
+      $range = $start_ts - $ts_now;
+      if ($range && $range < $opens_in) { $opens_in = $range; }
+    }
+  }
+  if ($opens_in > 1 && $opens_in < 999999999) {
+    return t('Opening in: @interval', array('@interval' => format_interval($opens_in)));
+  }
+}
+
 function sirius_phonebank_active($event_node) {
+  $result = NULL;
+
   $json = sirius_jsonfield_util_node_json_get($event_node);
-  if ($json['phonebank']['active'] == 'Yes') { return TRUE; }
-  else if ($json['phonebank']['active'] == 'No') { return FALSE; }
+
+  if ($json['phonebank']['active'] == 'Yes') { 
+    $result = array('success' => TRUE);
+  } else if ($json['phonebank']['active'] == 'No') { 
+    $result = array('success' => FALSE, 'msg' => "The phone bank has been closed by an administrator.");
+  }
   else if ($json['phonebank']['active'] == 'Auto') { 
     $open_grace = $json['phonebank']['active_grace_open'];
     if ($open_grace > 0) { $open_grace *= 60; } else { $open_grace = 0; }
@@ -106,8 +130,22 @@ function sirius_phonebank_active($event_node) {
         if ($start_ts <= 1 || $end_ts <= 1) { continue; }
         $start_ts -= $open_grace;
         $end_ts += $close_grace;
-        if ($ts_now >= $start_ts && $ts_now <= $end_ts) { return TRUE; }
+        if ($ts_now >= $start_ts && $ts_now <= $end_ts) {
+          $result = array('success' => TRUE);
+        }
       }
     }
-  } else { return FALSE; }
+    if (!$result['success']) {
+      $result = array('success' => FALSE, 'msg' => "The phone bank is currently closed. " . sirius_phonebank_opens_in($event_node));
+    }
+  } else { 
+    $result = array('success' => FALSE);
+  }
+
+  if (!$result['success']) { return $result; }
+
+  $do_not_disturb_id = $json['phonebank']['do_not_disturb']['id'];
+  if ($do_not_disturb_id) { return sirius_do_not_disturb_check($do_not_disturb_id); }
+
+  return $result;
 }

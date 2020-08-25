@@ -10,22 +10,40 @@
 function sirius_worker_node_tabs() {
 	$node_tabs = array();
 
-	$node_tabs['sirius_worker']['worker_user'] = array(
-		'title' => 'User',
-		'description' => '',
-		'callback' => 'sirius_node_tab_worker_user',
-		'permissions' => array('sirius worker admin'),
-	);
-
   $node_tabs['sirius_worker']['sirius_worker_work_status'] = array(
     'title' => 'Work Status',
-    'description' => '',
     'callback' => 'sirius_node_tab_worker_work_status',
     'permissions' => array('sirius'),
   );
 
 
+  $node_tabs['sirius_worker']['sirius_worker_schedule'] = array(
+    'title' => 'Schedule',
+    'callback' => 'sirius_worker_node_tab_schedule',
+    'permissions' => array('sirius'),
+  );
 
+  $node_tabs['sirius_worker']['sirius_worker_schedule/overview'] = array(
+    'title' => 'Overview',
+    'callback' => 'sirius_worker_node_tab_schedule',
+    'permissions' => array('sirius'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_schedule/tor'] = array(
+    'title' => 'Time-Off Requests',
+    'callback' => 'sirius_worker_node_tab_schedule_tor',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_schedule/tos'] = array(
+    'title' => 'Time-Off Sick',
+    'callback' => 'sirius_worker_node_tab_schedule_tos',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+  );
 
 
 
@@ -98,6 +116,24 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_contact/contact'] = array(
+    'title' => 'Contact',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_contact',
+    'permissions' => array('sirius'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_contact/user'] = array(
+    'title' => 'User',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_user',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 2,
+  );
+
+
   $node_tabs['sirius_worker']['sirius_worker_industry'] = array(
     'title' => 'Industries',
     'description' => '',
@@ -123,6 +159,22 @@ function sirius_worker_term_tabs() {
     'title' => 'Opt-In',
     'description' => '',
     'callback' => 'sirius_worker_term_tab_member_status_optin',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 4,
+  );
+
+  $term_tabs['sirius_member_status']['sirius_member_status_tor'] = array(
+    'title' => 'Time-Off Requests',
+    'description' => '',
+    'callback' => 'sirius_worker_term_tab_member_status_tor',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 4,
+  );
+
+  $term_tabs['sirius_member_status']['sirius_member_status_tos'] = array(
+    'title' => 'Time-Off Sick',
+    'description' => '',
+    'callback' => 'sirius_worker_term_tab_member_status_tos',
     'permissions' => array('sirius worker admin'),
     'weight' => 4,
   );
@@ -276,6 +328,20 @@ function sirius_worker_menu() {
     'page arguments' => array(3, 'upload'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 3,
+  );
+
+  $items['sirius/worker/schedule/tor'] = array(
+    'title' => 'Time-Off Requests',
+    'access callback' => 'sirius_worker_page_schedule_tor_access',
+    'page callback' => 'sirius_worker_page_schedule_tor',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/worker/schedule/tos'] = array(
+    'title' => 'Time-Off Sick',
+    'access callback' => 'sirius_worker_page_schedule_tos_access',
+    'page callback' => 'sirius_worker_page_schedule_tos',
+    'type' => MENU_NORMAL_ITEM,
   );
 
   return $items;

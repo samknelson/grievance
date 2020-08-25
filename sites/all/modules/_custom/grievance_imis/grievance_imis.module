@@ -56,7 +56,7 @@ function grievance_imis_callback_search($str, $verbose = FALSE) {
     $str = strtoupper($str);
     $imis_url .= '?imisId=' . urlencode($str);
     if ($verbose) { sirius_minilog("Assume search is on iMIS ID: $imis_url"); }
-  } else if (strlen(preg_replace('/\-/', '', $str)) == 9) {
+  } else if (preg_match('/^[\-0-9]+$/', $str) && strlen(preg_replace('/\-/', '', $str)) == 9) {
     $str = preg_replace('/[\-]/', '', $str);
     $imis_url .= '?ssn=' . urlencode($str);
     if ($verbose) { sirius_minilog("Assume search is on SSN: $imis_url"); }

@@ -141,17 +141,22 @@ function sirius_feed_page_landing() {
 	$all_info = sirius_wizard_info_all();
 	$html = '<h2>Available Feeds</h2>';
 	$found = FALSE;
+	$html .= '<dl>';
 	foreach ($all_info as $key => $info) {
 		if (!$info['feed']) { continue; }
 		$path = "sirius/feeds/$key";
 		if (drupal_valid_path($path)) {
-			$html .= "<li>";
+			$html .= "<dt>";
 			$html .= l($info['title'], "sirius/feeds/$key");
-			$html .= '</li>';
+			$html .= '</dt>';
+			$html .= "<dd>";
+			$html .= $info['description'];
+			$html .= '<br /><br />';
+			$html .= '</dd>';
 			$found = TRUE;
 		}
 	}
-	$html .= '</ul>';
+	$html .= '</dl>';
 
 	if (!$found) {
 		return 'You do not have access to any feeds.';
@@ -715,8 +720,7 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	foreach ($sheet->getRowIterator() as $row) {
 		++$count;
 		if ($count > 10000) { continue; }
-
-		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
+		if ($count == 1 && $data['header_row'] == 'Yes') { ++$count; continue; }
 		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 
 		$result = $callback($feed_node, $info, $data, $import_data_row, FALSE);
@@ -802,11 +806,21 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 	$rows = $data['rows'];
 	$batch_count = 0;
 	$data['process_ts'] = time();
+	$operations = array();
+
+	$callback_preprocess = $info['feed']['callback_preprocess'];
+	if ($callback_preprocess) { 
+		$operations[] = array($callback_preprocess, array($feed_node, $info, $data));
+	}
 	while ($idx < $rows) {
 		$operations[] = array('sirius_feed_wizard_process_batch', array($feed_node, $info, $data, $idx));
 		$idx += $batch_size;
 		++$batch_count;
 		if ($limit && $batch_count >= $limit) { break; }
+	}
+	$callback_postprocess = $info['feed']['callback_postprocess'];
+	if ($callback_postprocess) { 
+		$operations[] = array($callback_postprocess, array($feed_node, $info, $data));
 	}
 	$operations[] = array('sirius_feed_wizard_process_finish', array($feed_node, $info, $data, $idx));
 	$batch = array('operations' => $operations);
@@ -898,7 +912,6 @@ function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed
 	$renderable = field_view_field('node', $feed_node, 'field_sirius_attachments', 'full');
 	$form['attachments_intro'] = array('#markup' => '<div>' . t('The first file below contains the original upload data. The second contains the full set of results.') . '</div>');
 	$form['attachments'] = array('#markup' => drupal_render($renderable));
-
 
 	return $form;
 }

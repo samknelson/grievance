@@ -40,14 +40,20 @@ function sirius_wizard_render_steps($steps, $current_step) {
 }
 
 function sirius_wizard_info($wizard_name) {
-	$wizard_infos = module_invoke_all('sirius_wizard_info');
+  $wizard_infos = &drupal_static(__FUNCTION__); 
+  if (!isset($wizard_infos)) { 
+  	$wizard_infos = sirius_wizard_info_all();
+  }
 	return $wizard_infos[$wizard_name];
 }
 
 function sirius_wizard_info_all() {
-	$all = module_invoke_all('sirius_wizard_info');
-	ksort($all);
-	return $all;
+  $wizard_infos = &drupal_static(__FUNCTION__);
+  if (!isset($wizard_infos)) {
+  	$wizard_infos = module_invoke_all('sirius_wizard_info');
+		ksort($wizard_infos);
+  }
+	return $wizard_infos;
 }
 
 function sirius_wizard_steps($info, $data = NULL, $node = NULL) {
@@ -170,33 +176,10 @@ function sirius_sirius_wizard_info() {
     'callback_launch_args' => array('feed_wws'),
   );
 
-  $items['feed_contact'] = array(
-    'name' => 'feed_contact',
-    'title' => 'Contacts',
-    'description' => 'Upload a new list of contacts.',
-    'steps' => array(
-			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
-			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
-			// 'tag' 			=> array('label' => 'Tag', 				'callback' => 'sirius_feed_wizard_tag'),
-			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
-			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
-			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
-			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
-    ),
-    'feed' => array(
-    	'batch_size' => 2000,
-	    'callback_row_verify' => 'sirius_feed_contact_row_verify',
-	    'callback_row_process' =>'sirius_feed_contact_row_process',
-			'callback_fields' => 'sirius_feed_contact_fields',
-    ),
-    'callback_launch' => 'sirius_feed_wizard_launch',
-    'callback_launch_args' => array('feed_contact'),
-  );
-
   $items['feed_worker_skill'] = array(
     'name' => 'feed_worker_skill',
     'title' => 'Worker Skills',
-    'description' => 'Upload worker skills and expiration dates.',
+    'description' => 'Create or upload worker skills and expireation dates.',
     'steps' => array(
 			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
 			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
@@ -226,6 +209,7 @@ function sirius_sirius_wizard_info() {
     'callback_launch_args' => array('feed_worker_skill'),
   );
 
+  $items += sirius_feed_contact_info();
   $items += sirius_feed_grievance_info();
   $items += sirius_feed_grievance_log_info();
   $items += sirius_letter_wizard_info();

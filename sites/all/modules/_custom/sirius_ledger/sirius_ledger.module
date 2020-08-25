@@ -1,0 +1,82 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.accounts.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.policy.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.monthly.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.transmittal.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.feed.inc';
+// require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.feed_charges.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.feed_allocate.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_config.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_policy_definition.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_create.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_update.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_post.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_allocate.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_allocate_transmittal.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_settings.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_transmittal.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_contact_payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_payments.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_monthly.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_entity_policy.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_transmittal.inc';
+
+/**
+ * Implements hook_cron
+ */
+
+function sirius_ledger_cron() {
+	sirius_ledger_monthly_cron();
+}
+
+/**
+ * Implements hook_node_view_alter
+ */
+
+function sirius_ledger_node_view($node, $view_mode, $langcode) {
+	// Change rendering for "Payer"
+	/*
+	if ($view_mode == 'full' && $node->type == 'sirius_payment') {
+		$html = '';
+
+		$contact_nid = $node->field_sirius_payer['und'][0]['target_id'];
+		if ($contact_nid) {
+			$path = "node/$contact_nid";
+			if (drupal_valid_path($path)) { $html .= l("Payer - Contact", $path, array('attributes' => array('class' => 'tool-button'))); }
+
+			$worker_node = sirius_worker_get_by_contact_nid($contact_nid);
+			if ($worker_node) {
+				$worker_nid = $worker_node->nid;
+				$path = "node/$worker_nid/sirius_worker_ledger/payments";
+				if (drupal_valid_path($path)) { $html .= l("Payer - Worker", $path, array('attributes' => array('class' => 'tool-button'))); }
+			}
+		}
+
+		$account_nid = $node->field_sirius_ledger_account['und'][0]['target_id'];
+		if ($account_nid) {
+			$path = "node/$account_nid/sirius_ledger_account_payments";
+			if (drupal_valid_path($path)) { $html .= l("Account", $path, array('attributes' => array('class' => 'tool-button'))); }
+		}
+
+		if ($html) {
+			$html = '<div class="sirius_node_suffix">' . $html . '</div>';
+			$node->content['sirius_node_suffix']['#markup'] = $html;
+			$node->content['sirius_node_suffix']['#weight'] = 1000;
+		}
+	}
+	*/
+}

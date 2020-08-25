@@ -53,7 +53,13 @@ function sirius_bulk_deliver_batch($bulk_node, $force = FALSE) {
 
 	// Don't send messages at night
 	if (!$force) {
-		$ok = sirius_dispatch_notify_schedule_ok();
+		$json = sirius_jsonfield_util_node_json_get($bulk_node);
+		$do_not_disurb_id = $json['do_not_disturb']['id'];
+		if (!$do_not_disurb_id) { $do_not_disurb_id = 'default'; }
+		drupal_set_message("Here with $do_not_disurb_id");
+		dpm($json);
+		$ok = sirius_do_not_disturb_check($do_not_disurb_id);
+		// $ok = sirius_dispatch_notify_schedule_ok();
 		if (!$ok['success']) { return $ok; }
 	}
 

@@ -276,6 +276,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'sirius_employer_payperiod' => array(
+      'name' => t('Sirius Employer Payperiod'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'sirius_event' => array(
       'name' => t('Sirius Event'),
       'base' => 'node_content',

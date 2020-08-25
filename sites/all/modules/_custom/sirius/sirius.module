@@ -14,6 +14,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.date.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.permission.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.banner.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.footer.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phonetree.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.email.inc';
@@ -42,6 +43,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overr
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.do_not_disturb.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -66,6 +68,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_subdomains.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_delete.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_activity.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_term_exim.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_sort.inc';
@@ -290,10 +293,16 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
       $form_id == 'sirius_phonenumber_node_form' || 
       $form_id == 'sirius_emailaddress_node_form' || 
       $form_id == 'sirius_bulk_node_form' ||
-      $form_id == 'taxonomy_form_term' ||
       $form_id == 'sirius_ledger_account_node_form' ||
       $form_id == 'sirius_employee_node_form' ||
       $form_id == 'grievance_letter_template_node_form') {
+    $form['field_sirius_json']['#access'] = FALSE;
+  }
+
+  // @todo: sirius_dispatch_job_type shouldn't edit json in the main taxonomy term form, it should have a separate tab.
+  // Ugh. Some taxonomy terms inline the JSON field on the main term page, some don't. 
+  // Really they should be refactored so that the JSON field is never edited inline. But I can't be distracted to do that at the moment.
+  if ($form_id == 'taxonomy_form_term' && $form['field_sirius_json'] && $form_state['term']->vocabulary_machine_name != 'sirius_dispatch_job_type' && $form_state['term']->vocabulary_machine_name != 'grievance_contact_types') {
     $form['field_sirius_json']['#access'] = FALSE;
   }
 
@@ -507,6 +516,8 @@ function sirius_fieldvals($node, $field, $col = 'value', $format = 'Y-m-d H:i') 
   foreach ($node->{$field}['und'] as $delta => $tmp) {
     if ($col == 'ts') {
       $result[] = strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']);
+    } else if ($col == 'ts2') {
+      $result[] = strtotime($node->{$field}['und'][$delta]['value2'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']);
     } else if ($col == 'date') {
       $result[] = date($format, strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']));
     } else {

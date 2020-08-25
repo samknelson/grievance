@@ -133,7 +133,8 @@ function sirius_hour_node_tab_worker_hours_form_submit($form, &$form_state) {
 	$employer_nid = $form_state['values']['employer_nid'];
 
 	// Get the payperiod node
-	$payperiod_node = sirius_hour_payperiod_load($worker_nid, $employer_nid, $year, $month, $day, 'Yes');
+	$domain_nid = sirius_domain_nid();
+	$payperiod_node = sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $year, $month, $day, 'Yes');
 	drupal_goto('node/' . $payperiod_node->nid . '/sirius_payperiod_entries/edit');
 }
 

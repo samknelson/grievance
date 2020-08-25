@@ -5,6 +5,7 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATE
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.menu.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.epayperiod.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.payperiod.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.cache.inc';
 
@@ -20,10 +21,12 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.p
  * Implements hook_sirius_jsonfield_form_definitions 
  */
 
+/*
 function sirius_hour_sirius_jsonfield_form_definitions() {
   $definitions['node']['sirius_payperiod']['field_sirius_json'] = sirius_hour_payperiod_definition();
   return $definitions;
 }
+*/
 
 /**
  * Implements hook_node_insert()

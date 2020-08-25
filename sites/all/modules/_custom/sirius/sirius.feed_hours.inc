@@ -194,7 +194,8 @@ function sirius_feed_hours_row_process($feed_node, $info, $data, $row) {
   $day = (int) $row['day'];
   $hour_type_tid = $row['hour_type_tid'];
 
-  $payperiod_node = sirius_hour_payperiod_load($worker_nid, $employer_nid, $year, $month, $day, 'Yes');
+  $domain_nid = $feed_node->field_sirius_domain['und'][0]['target_id'];
+  $payperiod_node = sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $year, $month, $day, 'Yes');
   $json = sirius_jsonfield_util_node_json_get($payperiod_node);
 
   // Sort through the entries in this payperiod, removing any that match our incoming department, type, and start ts. 
