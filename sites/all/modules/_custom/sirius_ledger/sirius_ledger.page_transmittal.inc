@@ -7,8 +7,6 @@ function sirius_ledger_page_transmittal() {
 function sirius_ledger_page_transmittal_form($form, &$form_state) {
 	$employers = sirius_employer_list();
 
-	$form['#attributes'] = array('target' => '_blank');
-
 	$form['employers'] = array(
 		'#type' => 'checkboxes',
 		'#options' => $employers,
@@ -31,22 +29,35 @@ function sirius_ledger_page_transmittal_form($form, &$form_state) {
 function sirius_ledger_page_transmittal_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 	$employer_nids = array_filter(array_values($form_state['values']['employers']));
-	drupal_goto('sirius/ledger/transmittal/render', array('query' => array('employer_nids' => $employer_nids)));
-}
-
-function sirius_ledger_page_transmittal_render() {
-	$employer_nodes = node_load_multiple($_GET['employer_nids']);
-	if (!$employer_nodes) { return 'No employer selected.'; }
+	$employer_nodes = node_load_multiple($employer_nids);
+	if (!$employer_nodes) { 
+		drupal_set_message("No employer selected", 'error');
+		return;
+	}
 	$domain_nid = sirius_domain_nid();
 
 	$html = '';
+	$is_first = TRUE;
 	foreach ($employer_nodes as $employer_nid => $employer_node) {
 		if ($employer_node->field_sirius_domain['und'][0]['target_id'] != $domain_nid) {
 			return 'You do not have access to one of the specified employers (wrong domain).';
 		}
-		$html .= '<div style="page-break-after: always; class="sirius_ledger_transmittal_wrapper">';
-		$html .= drupal_render(drupal_get_form('sirius_ledger_node_tab_employer_transmittal_form', $employer_node));
+		if ($is_first) {
+			$is_first = FALSE;
+			$html .= '<div style="margin: 0; padding: 0;" class="sirius_ledger_transmittal_wrapper">';
+		} else {
+			$html .= '<div style="page-break-before: always; margin: 0; padding: 0;" class="sirius_ledger_transmittal_wrapper">';
+		}
+		$html .= sirius_ledger_node_tab_employer_transmittal_print($employer_node);
 		$html .= '</div>';
 	}
-	return $html;
+	// $form_state['results'] = $html;
+	// return;
+
+	$params = array();
+	$params['post']['body'] = $html;
+	$params['post']['css_paths'] = 'sites/all/modules/_custom/sirius_ledger/css/transmittal.css';
+	$params['letterhead'] = sirius_domain_variable_get('sirius_ledger_transmittal_letterhead', '');
+	$params['filename'] = 'transmittal_batch_' . date('Ymd') . '.pdf';
+	sirius_pdf_stream(sirius_loopback_url() . '/sirius/loopback/echo', $params);
 }

@@ -9,16 +9,6 @@ function sirius_ledger_config_transmittal($form, &$form_state) {
     '#default_value' => variable_get($name, 5),
   );
 
-  $contact_type_options = sirius_taxonomy_load('grievance_contact_types', 'tid', 'name', TRUE);
-  $name = sirius_domain_variable_name('sirius_ledger_transmittal_contact_type');
-  $form[$name] = array(
-    '#type' => 'select',
-    '#title' => t('Contact Type for Address'),
-    '#description' => t('Select the employer contact type that will be used to fetch the address to display on the transmittal sheet.'),
-    '#default_value' => variable_get($name, NULL),
-    '#options' => $contact_type_options,
-  );
-
   $name = sirius_domain_variable_name('sirius_ledger_transmittal_header');
   $form[$name] = array(
     '#type' => 'textarea',
@@ -33,6 +23,44 @@ function sirius_ledger_config_transmittal($form, &$form_state) {
     '#title' => t('Footer'),
     '#description' => t('Enter the footer as it should appear after the transmittal sheet. May include HTML.'),
     '#default_value' => variable_get($name, ''),
+  );
+
+	$options = array(NULL => t('No Letterhead'));
+	$letterheads = sirius_letterhead_list();
+	foreach ($letterheads as $nid => $title) { $options[$nid] = $title; }
+  $name = sirius_domain_variable_name('sirius_ledger_transmittal_letterhead');
+  $form[$name] = array(
+    '#type' => 'select',
+    '#options' => $options,
+    '#title' => t('Letterhead'),
+    '#default_value' => variable_get($name, ''),
+  );
+
+
+  $contact_type_options = sirius_taxonomy_load('grievance_contact_types', 'tid', 'name', TRUE);
+  $name = sirius_domain_variable_name('sirius_ledger_transmittal_contact_type');
+  $form[$name] = array(
+    '#type' => 'select',
+    '#title' => t('Contact Type for Address'),
+    '#description' => t('Select the employer contact type that will be used to fetch the address to display on the transmittal sheet.'),
+    '#default_value' => variable_get($name, NULL),
+    '#options' => $contact_type_options,
+  );
+
+  $name = sirius_domain_variable_name('sirius_ledger_transmittal_address_left');
+  $form[$name] = array(
+    '#type' => 'textfield',
+    '#title' => t('Left margin for address'),
+    '#default_value' => variable_get($name, '0.41in'),
+    '#description' => t('Enter the left margin that should be used for the address box so that it fits into an envelope display window. This should be 1in from the left of the page, but different letterheads have different left margins. If letterhead is not being used, this should be 1in - 0.59in = 0.41in.'),
+  );
+
+  $name = sirius_domain_variable_name('sirius_ledger_transmittal_address_top');
+  $form[$name] = array(
+    '#type' => 'textfield',
+    '#title' => t('Top margin for address'),
+    '#default_value' => variable_get($name, '1.5975in'),
+    '#description' => t('Enter the top margin that should be used for the address box so that it fits into an envelope display window. This should be 2.1875in from the top of the page, but different letterheads have different left margins. If letterhead is not being used, this should be 2.1875in - 0.59in = 1.5975in.'),
   );
 
   return system_settings_form($form);
