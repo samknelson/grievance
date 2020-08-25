@@ -311,7 +311,7 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 		);
 
 		$form['conditional_value'] = array(
-			'#type' => 'textfield',
+			'#type' => 'textarea',
 			'#title' => 'Conditional: Value',
 			'#default_value' => $leaf['#sirius']['conditional_value'],
 			'#states' => array(
@@ -322,6 +322,7 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 			),
 			'#prefix' => '<div class="container-inline">',
 			'#suffix' => '</div>',
+			'#description' => 'If there are multiple possible values, enter one per line. Remember to enter the value, not the prompt.',
 		);
 	}
 
@@ -573,12 +574,17 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 			$leaf['#sirius']['conditional_target'] = $id;
 			$leaf['#sirius']['conditional_value'] = $value;
 
+			$conditional_options = array_filter(explode("\n", $value));
+			$conditional_value = array();
+			foreach($conditional_options as $conditional_option) {
+				$conditional_value[] = array('value' => trim($conditional_option));
+			}
 
 			$leaf['#states'] = array(
 				'visible' => array(
-					array(":input[id='$id']" => array('value' => $value)),
+					array(":input[id='$id']" => $conditional_value),
 					'or',
-					array("#$id :input" => array('value' => $value)),
+					array("#$id :input" => $conditional_value),
 				),
 			);
 
