@@ -727,7 +727,7 @@ function sirius_menu() {
   );
 
   $items['sirius/phonenumber/list'] = array(
-    'title' => 'Phone Number List',
+    'title' => 'List',
     'page callback' => 'sirius_page_phonenumber_list',
     'page arguments' => array(),
     'access arguments' => array('sirius'),
@@ -736,7 +736,7 @@ function sirius_menu() {
   );
 
   $items['sirius/phonenumber/check'] = array(
-    'title' => 'Phone Number Lookup',
+    'title' => 'Lookup',
     'page callback' => 'sirius_page_phonenumber_check',
     'page arguments' => array(),
     'access arguments' => array('sirius'),
@@ -760,7 +760,6 @@ function sirius_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
   );
-
 
   $items['sirius/config'] = array(
     'title' => 'Sirius Configuration',
