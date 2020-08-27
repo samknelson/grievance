@@ -15,6 +15,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.p
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.page_payperiod_entries_edit.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.page_payperiod_entries_reconcile.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.page_worker_hours.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.page_employer_hours.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.page_config.inc';
 
 
 /**
