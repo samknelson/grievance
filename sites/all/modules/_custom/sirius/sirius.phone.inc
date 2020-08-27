@@ -314,10 +314,16 @@ function sirius_phonenumber_check($phonenumber, $force_refresh = FALSE) {
   $node->field_sirius_datetime['und'][0]['value'] = date('Y-m-d H:i:s');
   $node->field_sirius_json['und'][0]['value'] = json_encode($json);
   if ($json['result']['carrier']['mobile_network_code']) { $node->field_sirius_sms_possible['und'][0]['value'] = 'Yes'; } else { $node->field_sirius_sms_possible['und'][0]['value'] = 'No'; }
+  if ($json['result']['carrier']['name']) { $node->field_sirius_voice_possible['und'][0]['value'] = 'Yes'; } else { $node->field_sirius_voice_possible['und'][0]['value'] = 'No'; }
   node_object_prepare($node);
   $node = node_submit($node);
   node_save($node);
   return $node;
+}
+
+function sirius_phonenumber_voice_possible($phonenumber) {
+  $node = sirius_phonenumber_check($phonenumber);
+  return $node->field_sirius_voice_possible['und'][0]['value'] != 'No';
 }
 
 function sirius_phonenumber_sms_possible($phonenumber) {
@@ -372,8 +378,8 @@ function sirius_page_phonenumber_check_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   $phonenumber = $form_state['values']['phonenumber'];
   if ($form_state['values']['force'] == 'yes') { $force = TRUE; } else { $force = FALSE; }
-
   $node = sirius_phonenumber_check($phonenumber, $force);
   sirius_minilog("SMS Possible: " . $node->field_sirius_sms_possible['und'][0]['value']);
+  sirius_minilog("Voice Possible: " . $node->field_sirius_voice_possible['und'][0]['value']);
   sirius_minilog("Details: " . l("Node " . $node->nid, 'node/' . $node->nid));
 }
