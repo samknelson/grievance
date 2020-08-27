@@ -77,6 +77,7 @@ function sirius_ledger_transmittal_dispatches($employer_nid) {
 	$sql .= "field_sirius_ssn_value, ";
 	$sql .= "worker_json.field_sirius_json_value as worker_json, ";
 	$sql .= "group_concat(distinct field_sirius_member_status_tid separator ',') as ms_tids, ";
+	$sql .= "worker_node.nid as worker_nid, ";
 	$sql .= "field_sirius_contact_target_id as contact_nid ";
 	$sql .= "from node ";
 	$sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";

@@ -184,7 +184,9 @@ function sirius_ledger_node_tab_employer_transmittal_print($employer_node) {
 	return $html;
 }
 
-
+/*
+ * Defunct I think.
+ *
 
 function sirius_ledger_node_tab_employer_transmittal_form($form, &$form_state, $employer_node) {
 	drupal_add_css('sites/all/modules/_custom/sirius_ledger/css/transmittal.css');
@@ -341,3 +343,4 @@ function sirius_ledger_node_tab_employer_transmittal_form($form, &$form_state, $
 
   return $form;
 }
+*/
