@@ -70,7 +70,7 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
 
   $row['ssn'] = sirius_ssn_format($row['ssn']);
   if ($pk == 'id') {
-   if (!preg_match('/^\d+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
+   if (!preg_match('/^[a-zA-Z0-9_]+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
   } else if ($pk == 'ssn') {
     if (!sirius_ssn_validate($row['ssn'])) { return array('success' => FALSE, 'msg' => 'Invalid SSN'); }
   }
