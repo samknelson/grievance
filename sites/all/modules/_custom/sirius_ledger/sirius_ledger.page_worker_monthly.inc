@@ -38,11 +38,6 @@ function sirius_ledger_node_tab_worker_monthly_form($form, &$form_state, $worker
 	$form['date'] = array(
 		'#type' => 'date_popup',
 		'#title' => t('As Of'),
-		'#states' => array(
-			'visible' => array(
-				":input[name=\"action\"]" => array('value' => 'worker')
-			),
-		),
     '#attributes' => array(
       'autocomplete' => 'off',
     ),
