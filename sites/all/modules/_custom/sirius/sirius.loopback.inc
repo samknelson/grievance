@@ -88,7 +88,16 @@ function sirius_loopback_sample_html($letterhead_node = NULL, $paragraph_count =
 function sirius_loopback_echo() {
 	grievance_classes_array('loopback');
 
-	$body = $_REQUEST['body'];
+	$body = '';
+	
+	if ($_REQUEST['css_paths']) {
+		$css_paths = explode('|', $_REQUEST['css_paths']);
+		foreach ($css_paths as $css_path) {
+			drupal_add_css($css_path);
+		}
+	}
+
+	$body .= $_REQUEST['body'];
 	if (!$body) { $body = 'No body.'; }
 	return $body;
 }

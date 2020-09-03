@@ -13,6 +13,10 @@ function sirius_hour_node_tab_payperiod_entries_edit_form($form, &$form_state, $
 	$json = json_decode($payperiod_node->field_sirius_json['und'][0]['value'], TRUE);
 	$hour_types = sirius_taxonomy_load('sirius_hour_type', 'tid', 'name', TRUE);
 	$departments = sirius_taxonomy_load('grievance_department', 'tid', 'name', TRUE);
+
+	// @todo: Restrict this to options available to this user and employer; default to their current member status and level?
+	$ms_level_options = array(NULL => t('-- Select --')) + sirius_ledger_ms_level_options();
+
 	$payperiod_type = $payperiod_node->field_sirius_payperiod_type['und'][0]['value'];
 
 	$extra_entries = $form_state['extra_entries'];
@@ -141,6 +145,13 @@ function sirius_hour_node_tab_payperiod_entries_edit_form($form, &$form_state, $
 	  	$form['entries'][$source_key]['rows'][$i]['row_close'] = array('#markup' => '</tr>');
 
 	  	$form['entries'][$source_key]['rows'][$i]['row2_open'] = array('#markup' => '<tr class="sirius_table_detailrow"><td colspan="5"><div class="sirius_table_detailrow_details">');
+
+			$form['entries'][$source_key]['rows'][$i]['ms_level'] = array(
+				'#type' => 'select',
+				'#title' => t('Member Status / Level'),
+				'#options' => $ms_level_options,
+			);
+			if ($json['entries'][$source_key]['rows'][$i]['ms_level']) { $form['entries'][$source_key]['rows'][$i]['ms_level']['#default_value'] = $json['entries'][$source_key]['rows'][$i]['ms_level']; }
 
 			$form['entries'][$source_key]['rows'][$i]['comment'] = array(
 				'#type' => 'textarea',

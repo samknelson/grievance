@@ -296,15 +296,6 @@ function sirius_ledger_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
- $items['sirius/ledger/transmittal/render'] = array(
-    'title' => 'Transmittal Sheets',
-    'description' => '',
-    'access arguments' => array('sirius ledger admin'),
-    'page callback' => 'sirius_ledger_page_transmittal_render',
-    'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
   return $items;
 }
 

@@ -49,6 +49,13 @@ function sirius_hour_node_tabs() {
     'permissions' => array('sirius hour admin'),
   );
 
+  $node_tabs['grievance_shop']['sirius_employer_hours'] = array(
+    'title' => 'Hours',
+    'description' => '',
+    'callback' => 'sirius_hour_node_tab_employer_hours',
+    'permissions' => array('sirius hour admin'),
+  );
+
   /*
   $node_tabs['sirius_payperiod']['sirius_payperiod_entries/accrual'] = array(
     'title' => 'Accrual',
@@ -102,6 +109,15 @@ function sirius_hour_menu() {
     'page callback' => 'sirius_hour_payperiod_list_mine',
     'page arguments' => array(),
     'access arguments' => array('sirius hour user'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/hour/config'] = array(
+    'title' => 'Hour Configuration',
+    'description' => '',
+    'access arguments' => array('sirius hour admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_hour_config'),
     'type' => MENU_NORMAL_ITEM,
   );
 

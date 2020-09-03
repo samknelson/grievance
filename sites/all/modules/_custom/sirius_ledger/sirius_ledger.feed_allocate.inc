@@ -185,9 +185,9 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
   if ($row['ssn']) { $row['ssn'] = sirius_ssn_format($row['ssn']); }
 
   if ($pk == 'id') {
-   if (!preg_match('/^\d+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
+   if (!preg_match('/^[a-zA-Z0-9_]+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
   } else if ($pk == 'id3') {
-   if (!preg_match('/^\d+$/', $row['id3'])) { return array('success' => FALSE, 'msg' => 'Invalid ID3'); }
+   if (!preg_match('/^[a-zA-Z0-9_]+$/', $row['id3'])) { return array('success' => FALSE, 'msg' => 'Invalid ID3'); }
   } else if ($pk == 'ssn') {
     if (!sirius_ssn_validate($row['ssn'])) { return array('success' => FALSE, 'msg' => 'Invalid SSN'); }
   } else if ($pk == 'ein') {
