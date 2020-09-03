@@ -882,7 +882,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		$stmt = sirius_sql_query($sql, $sql_args);
 
 		$header = array('Internal ID', 'Name');
-		foreach (array_keys($sql_parts['headers']) as $full_paths) { $header[] = $all_paths[$full_path]; }
+		foreach (array_keys($sql_parts['headers']) as $full_path) { $header[] = $all_paths[$full_path]; }
 
 		$fp = fopen('php://output', 'w');
 		$filename = 'contacts.csv';
