@@ -1,4 +1,4 @@
-name = Grievance IMIS
-description = Functionality to connect the Grievance application to the IMIS CRM
+name = Grievance SePuede
+description = Functionality to connect the Grievance application to the IMIS CRM (aka SePuede)
 package = grievance
 core = 7.x

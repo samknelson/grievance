@@ -7,8 +7,8 @@
 function grievance_imis_grievance_workersync_plugin_info() {
   $info = array();
   $info['imis'] = array(
-    'title' => 'iMIS',
-    'description' => 'Fetch workers from an iMIS data source',
+    'title' => 'SePuede',
+    'description' => 'Fetch workers from an SePuede data source',
     'settings_callback' => 'grievance_imis_callback_settings',
     'search_callback' => 'grievance_imis_callback_search',
     'search_description' => 'Enter the last name or SSN of the employee.',
@@ -27,15 +27,15 @@ function grievance_imis_callback_settings(&$form, &$form_state) {
   $form['plugin_settings'][$variable_name] = array(
     '#type' => 'textfield',
     '#default_value' => variable_get($variable_name, ''),
-    '#title' => t('iMIS URL'),
+    '#title' => t('SePuede URL'),
     '#description' => t('This will be something like: https://unite-test3.burstingsilver.com/BSi.iMIS.WebServices/api/member/grievance'),
   );
 
    $variable_name = sirius_domain_variable_name('grievance_workersync_imis_apikey');
    $form['plugin_settings'][$variable_name] = array(
     '#type' => 'textarea',
-    '#title' => t('IMIS API Key'),
-    '#description'   => t('IMIS API Key.'),
+    '#title' => t('SePuede API Key'),
+    '#description'   => t('SePuede API Key.'),
     '#default_value' => variable_get($variable_name, ''),
   );
 }
@@ -45,7 +45,7 @@ function grievance_imis_callback_search($str, $verbose = FALSE) {
   $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey');
 
   if (!$imis_url || !$imis_apikey) {
-    sirius_minilog('imis access is not configured.', 'error');
+    sirius_minilog('SePuede access is not configured.', 'error');
     return NULL;
   }
 
@@ -123,7 +123,7 @@ function grievance_imis_callback_lookup($imis_id, $verbose = FALSE) {
   $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey');
 
   if (!$imis_url || !$imis_apikey) {
-    sirius_minilog('imis access is not configured.', 'error');
+    sirius_minilog('SePuede access is not configured.', 'error');
     return NULL;
   }
 
