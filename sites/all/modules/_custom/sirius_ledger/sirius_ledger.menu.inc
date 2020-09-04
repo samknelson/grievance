@@ -276,6 +276,13 @@ function sirius_ledger_menu() {
     'weight' => 3,
   );
 
+  $items['sirius/config/ledger/purge'] = array(
+    'title' => 'Purge',
+    'page callback' => 'sirius_ledger_page_ar_purge',
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+  );
 
  $items['sirius/ledger/payment/create'] = array(
     'title' => 'Create a Payment',
