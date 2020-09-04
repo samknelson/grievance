@@ -23,7 +23,7 @@ function sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_ti
   //        But I really can't be bothered. So it's theoretically possible to attempt to serve the same participant to multiple users.
   //        In which case, we return an error message and they reload the page. Oh well.
 
-  $sql = "select node.nid, field_sirius_phone_value$s as phone from node ";
+  $sql = "select node.nid, field_sirius_phone_value as phone from node ";
   $sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
