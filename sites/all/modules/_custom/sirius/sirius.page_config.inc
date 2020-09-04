@@ -64,7 +64,7 @@ function sirius_page_config() {
 
 	$links['systems'] = array('title' => 'Systems');
 	$links['systems']['links']['sirius/config/server-paths'] 					= array('title' => 'Server Paths', 'description' => 'Locations of services on the server: wkhtmltopdf, pdftk, etc.');
-	$links['systems']['links']['sirius/callerid'] 									= array('title' => 'Caller ID', 'description' => 'Create or manage Caller ID entries.');
+	$links['systems']['links']['sirius/config/phone/callerid'] 									= array('title' => 'Caller ID', 'description' => 'Create or manage Caller ID entries.');
 	$links['systems']['links']['sirius/admin/caller-id-full-list'] 	= array('title' => 'Cross-Domain Caller ID List', 'description' => 'View a list of all caller IDs across all domains.');
 	$links['systems']['links']['sirius/config/specialrid'] 			= array('title' => 'Special Roles', 'description' => 'Certain roles have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');
