@@ -48,7 +48,7 @@ function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include
   $domain_nid = sirius_domain_nid();
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
   if ($value_type == 'name') { $load_entities = FALSE; } else { $load_entities = TRUE; }
-  $terms = sirius_domain_taxonomy_get_tree($vocabulary->vid, 0, NULL, $load_entities, sirius_domain_nid());
+  $terms = sirius_domain_taxonomy_get_tree($vocabulary->vid, 0, NULL, $load_entities, $domain_nid);
 
   $map = array();
   if ($include_null) {
@@ -121,13 +121,6 @@ function sirius_taxonomy_lookup_by_anything($vocabulary_name, $value, $employer_
   $tid = NULL;
   if ($employer_nid) { $tid = $preload[$vocabulary_name][$employer_nid][$value]; }
   if (!$tid) { $tid = $preload[$vocabulary_name]['global'][$value]; }
-
-  /*
-  if (!$tid) {
-    drupal_set_message("Searching for: $value");
-    dpm($preload);
-  }
-  */
 
   return $tid;
 }
@@ -262,7 +255,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['grievance_types']['multidomain'] = 'No';
     $settings['grievance_work_status']['view'] = 'sirius_taxonomy';
     $settings['grievance_work_status']['display'] = 'block';
-    $settings['grievance_work_status']['multidomain'] = 'No';
+    $settings['grievance_work_status']['multidomain'] = 'Yes';
     $settings['sirius_contact_tags']['view'] = 'sirius_taxonomy';
     $settings['sirius_contact_tags']['display'] = 'block';
     $settings['sirius_contact_tags']['multidomain'] = 'Yes';
@@ -305,7 +298,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_worker_dispatch_status']['multidomain'] = 'No';
     $settings['sirius_work_status']['view'] = 'sirius_taxonomy';
     $settings['sirius_work_status']['display'] = 'block_8';
-    $settings['sirius_work_status']['multidomain'] = 'No';
+    $settings['sirius_work_status']['multidomain'] = 'Yes';
     $settings['sirius_ledger_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_ledger_type']['display'] = 'block';
     $settings['sirius_ledger_type']['multidomain'] = 'Yes';
