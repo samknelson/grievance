@@ -414,6 +414,7 @@ function sirius_twilio_browserphone_render_error($msg) {
 
 /**
  * Get and set parameters, indexed by token, during the life of a call.
+ * @todo: It's kind of stupid that these functions aren't simply calls to get_context and set_context. What was I thinking?
  */
 
 function sirius_twilio_browserphone_parameters_get_node($capability_token) {
