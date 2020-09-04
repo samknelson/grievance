@@ -99,7 +99,6 @@ function sirius_taxonomy_lookup_by_anything($vocabulary_name, $value, $employer_
         }
       }
     }
-    dpm($preload);
   }
 
   if ($employer_nid) {
