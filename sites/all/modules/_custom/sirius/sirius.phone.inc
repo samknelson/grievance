@@ -204,6 +204,10 @@ function sirius_voice_send($params) {
   }
 
   $phone = $params['to'];
+
+  $possible = sirius_phonenumber_voice_possible($phone);
+  if (!$possible) { return array('success' => FALSE, 'msg' => "$phone does not appear to have a valid voice carrier."); }
+
   $msg = $params['voice'];
   $handler_nids = $params['handler_nids'];
   if (is_array($handler_nids)) {
@@ -216,9 +220,9 @@ function sirius_voice_send($params) {
   $context['outgoing_msg'] = $msg;
   $context['handler_nid'] = $handler_nid;
   $context['worker_nid'] = $params['worker_nid'];
+  $context['callerid_nid'] = $params['callerid_nid'];
 
-
-  sirius_twilio_outgoing_voice($phone, $context);
+  $result = sirius_twilio_outgoing_voice($phone, $context);
 
   sirius_log(
     'voice', 
@@ -229,7 +233,7 @@ function sirius_voice_send($params) {
     $handler_nids
   );
 
-  return array('success' => TRUE, 'msg' => 'Voice message sent.');
+  return $result; 
 }
 
 function sirius_voice_already_sent($id) {

@@ -400,5 +400,13 @@ function sirius_dispatch_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['sirius/dispatch/job/stub'] = array(
+    'title' => 'Stub Jobs',
+    'page callback' => 'sirius_dispatch_page_job_stub',
+    'page arguments' => array(),
+    'access arguments' => array('sirius dispatch admin'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }

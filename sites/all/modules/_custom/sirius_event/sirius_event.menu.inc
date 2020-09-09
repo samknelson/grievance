@@ -233,7 +233,7 @@ function sirius_event_node_tabs() {
   );
 
   $node_tabs['sirius_json_definition']['sirius_event_participant_definition_audio'] = array(
-    'title' => 'Audio',
+    'title' => 'Outgoing Message',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_definition_audio',
     'permissions' => array('sirius domain admin'),

@@ -155,6 +155,14 @@ function sirius_node_tabs() {
     'weight' => 5,
   );
 
+  $node_tabs['sirius_domain']['sirius_domain_components'] = array(
+    'title' => 'Components',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_components',
+    'permissions' => array('sirius admin'),
+    'weight' => 6,
+  );
+
   /*
   $node_tabs['sirius_domain']['sirius_domain_activity'] = array(
     'title' => 'Activity',
@@ -340,6 +348,14 @@ function sirius_menu() {
     'page callback' => 'sirius_aatlink',
     'page arguments' => array(1,2),
     'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/config/server-paths'] = array(
+    'title' => 'Server Paths',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_server_paths_admin'),
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
   );
 

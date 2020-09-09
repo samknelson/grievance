@@ -12,104 +12,6 @@ function grievance_content_types_uuid_features_default_content() {
   $nodes = array();
 
   $nodes[] = array(
-  'title' => 'Sirius - Help Module - Publish',
-  'log' => '',
-  'status' => 1,
-  'comment' => 0,
-  'promote' => 0,
-  'sticky' => 0,
-  'ds_switch' => 'default',
-  'type' => 'sirius_help',
-  'language' => 'en',
-  'created' => 1597840084,
-  'tnid' => 0,
-  'translate' => 0,
-  'uuid' => '09cfa66f-633f-4c73-9bd7-f61d84cd5d7f',
-  'body' => array(),
-  'field_sirius_paths' => array(
-    'und' => array(
-      0 => array(
-        'value' => 'sirius/help/publish',
-        'format' => NULL,
-      ),
-    ),
-  ),
-  'field_sirius_summary' => array(
-    'und' => array(
-      0 => array(
-        'value' => '<p>Before doing this, remember to execute from the command line:</p>
-
-<pre>
- cd /var/www/test.dispatch.teamsters631.com/sites/all/modules/_custom/grievance_content_types; chmod 666 *</pre>
-
-<p>Afeter executing, remember to execute</p>
-
-<pre>
-cd /var/www/test.dispatch.teamsters631.com/sites/all/modules/_custom/grievance_content_types; chmod 664 *; git commit -m "Updated help text" .</pre>
-',
-        'format' => 'full_html',
-      ),
-    ),
-  ),
-  'rdf_mapping' => array(
-    'rdftype' => array(
-      0 => 'sioc:Item',
-      1 => 'foaf:Document',
-    ),
-    'title' => array(
-      'predicates' => array(
-        0 => 'dc:title',
-      ),
-    ),
-    'created' => array(
-      'predicates' => array(
-        0 => 'dc:date',
-        1 => 'dc:created',
-      ),
-      'datatype' => 'xsd:dateTime',
-      'callback' => 'date_iso8601',
-    ),
-    'changed' => array(
-      'predicates' => array(
-        0 => 'dc:modified',
-      ),
-      'datatype' => 'xsd:dateTime',
-      'callback' => 'date_iso8601',
-    ),
-    'body' => array(
-      'predicates' => array(
-        0 => 'content:encoded',
-      ),
-    ),
-    'uid' => array(
-      'predicates' => array(
-        0 => 'sioc:has_creator',
-      ),
-      'type' => 'rel',
-    ),
-    'name' => array(
-      'predicates' => array(
-        0 => 'foaf:name',
-      ),
-    ),
-    'comment_count' => array(
-      'predicates' => array(
-        0 => 'sioc:num_replies',
-      ),
-      'datatype' => 'xsd:integer',
-    ),
-    'last_activity' => array(
-      'predicates' => array(
-        0 => 'sioc:last_activity_date',
-      ),
-      'datatype' => 'xsd:dateTime',
-      'callback' => 'date_iso8601',
-    ),
-  ),
-  'date' => '2020-08-19 05:28:04 -0700',
-  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
-);
-  $nodes[] = array(
   'title' => 'ASI Disclaimer',
   'log' => '',
   'status' => 1,
@@ -414,104 +316,6 @@ cd /var/www/test.dispatch.teamsters631.com/sites/all/modules/_custom/grievance_c
     ),
   ),
   'date' => '2018-11-19 09:03:09 -0800',
-  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
-);
-  $nodes[] = array(
-  'title' => 'Domain User Manager',
-  'log' => '',
-  'status' => 1,
-  'comment' => 0,
-  'promote' => 0,
-  'sticky' => 0,
-  'ds_switch' => 'default',
-  'type' => 'sirius_help',
-  'language' => 'en',
-  'created' => 1597837548,
-  'tnid' => 0,
-  'translate' => 0,
-  'uuid' => '5942dd12-3daf-470d-a0c4-b4ef25f468a2',
-  'body' => array(),
-  'field_sirius_paths' => array(
-    'und' => array(
-      0 => array(
-        'value' => 'sirius/domain/config/usermanage',
-        'format' => NULL,
-      ),
-    ),
-  ),
-  'field_sirius_summary' => array(
-    'und' => array(
-      0 => array(
-        'value' => '<p>Use the form below to set server-wide settings about how the domain user manager should behave.&nbsp;For each role, it is possible to select whether the user manager should&nbsp;</p>
-
-<ul>
-	<li><strong>Omit</strong>&nbsp;the role, meaning that the role is not available through the user manager. Typically higher-permissioned roles such as "sirius admin" will be omitted.</li>
-	<li><strong>Require</strong>&nbsp;the role, meaning that all users created through the domain user manager will automatically have the role. Typically a low-permissioned role such as "sirius user" will be required.</li>
-	<li>Make the role <strong>optional</strong>, meaning that the domain administrator creating the user can optionally decide whether or not to grant that role. Typically these will be roles that a domain admin might grant to some users but not others, such as "event admin" or "bulk message admin".</li>
-</ul>
-
-<p><em>This page has security implications and should be used with caution.</em></p>
-',
-        'format' => 'full_html',
-      ),
-    ),
-  ),
-  'rdf_mapping' => array(
-    'rdftype' => array(
-      0 => 'sioc:Item',
-      1 => 'foaf:Document',
-    ),
-    'title' => array(
-      'predicates' => array(
-        0 => 'dc:title',
-      ),
-    ),
-    'created' => array(
-      'predicates' => array(
-        0 => 'dc:date',
-        1 => 'dc:created',
-      ),
-      'datatype' => 'xsd:dateTime',
-      'callback' => 'date_iso8601',
-    ),
-    'changed' => array(
-      'predicates' => array(
-        0 => 'dc:modified',
-      ),
-      'datatype' => 'xsd:dateTime',
-      'callback' => 'date_iso8601',
-    ),
-    'body' => array(
-      'predicates' => array(
-        0 => 'content:encoded',
-      ),
-    ),
-    'uid' => array(
-      'predicates' => array(
-        0 => 'sioc:has_creator',
-      ),
-      'type' => 'rel',
-    ),
-    'name' => array(
-      'predicates' => array(
-        0 => 'foaf:name',
-      ),
-    ),
-    'comment_count' => array(
-      'predicates' => array(
-        0 => 'sioc:num_replies',
-      ),
-      'datatype' => 'xsd:integer',
-    ),
-    'last_activity' => array(
-      'predicates' => array(
-        0 => 'sioc:last_activity_date',
-      ),
-      'datatype' => 'xsd:dateTime',
-      'callback' => 'date_iso8601',
-    ),
-  ),
-  'date' => '2020-08-19 04:45:48 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -1177,6 +981,98 @@ cd /var/www/test.dispatch.teamsters631.com/sites/all/modules/_custom/grievance_c
     ),
   ),
   'date' => '2019-10-07 13:12:01 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'sirius/dispatch/job/stub',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1599302955,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'cddbdd66-1025-4fd8-9cc7-cce96a5a6309',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/dispatch/job/stub',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>A "stub" job is a job that is created at an employer as an administrative tool to allow dispatching workers without the need to create an a real job. For example, if legacy dispatch data needs to be imported in a situation where good historical job data doesn\'t exist, it might be appropriate to create a "stub" job at each employer, as a placeholder for historic dispatches. Similarly, if an employer has a single ongoing contract with workers coming and going periodically, it might be appropriate to give the employer a single ongoing "stub" job.</p>
+
+<p>This tool can be used to manage stub jobs. Select "create" to create or update stub jobs at selected employers. (There will never be more than one stub job for a given employer and industry.) Select "download" to download the list of stub jobs; this can be useful, for example, if it is necesary to dispatch workers in bulk to stub jobs via a feed.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2020-09-05 03:49:15 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(

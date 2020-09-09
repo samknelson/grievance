@@ -185,3 +185,74 @@ function sirius_ledger_ar_format_balance($balance) {
 		return '<span class="sirius_ledger_balance">' . '$' . number_format($balance, 2) . '</span>';
 	}
 }
+
+function sirius_ledger_page_ar_purge() {
+	return drupal_get_form('sirius_ledger_page_ar_purge_form');
+}
+
+function sirius_ledger_page_ar_purge_form($form, &$form_state) {
+	 $accounts = array(NULL => t('-- Select --')) + sirius_ledger_account_list();
+
+	 $form['account_nid'] = array(
+	 	'#type' => 'select',
+	 	'#options' => $accounts,
+	 	'#required' => TRUE,
+	 	'#title' => t('Account'),
+	 );
+
+	 $form['confirm'] = array(
+	 	'#type' => 'checkbox',
+	 	'#title' => t('I understand that his will permanently and completely delete entries from the ledger. There will be no way to retrieve or restore any data lost.'),
+	 	'#required' => TRUE,
+	 );
+
+	 $form['submit'] = array(
+	 	'#type' => 'submit',
+	 	'#value' => t('Submit'),
+	 );
+
+	 return $form;
+}
+
+function sirius_ledger_page_ar_purge_form_submit($form, &$form_state) {
+	$account_nid = $form_state['values']['account_nid'];
+	if (!$account_nid) {
+		drupal_set_message("Please select an account.");
+		return;
+	}
+
+	$params = array();
+	$params['ledger_account'] = $account_nid;
+	$count = sirius_ledger_ar_purge($params);
+	drupal_set_message("Account purged. $count records deleted.");
+}
+
+function sirius_ledger_ar_purge($params) {
+	$sql_args = array();
+	$sql = "delete from sirius_ledger_ar ";
+	$sql .= "where 1 = 1 ";
+
+	if ($params['ledger_status']) { 
+		$sql .= "and ledger_status = :ledger_status ";
+		$sql_args[':ledger_status'] = $params['ledger_status'];
+	}
+	if ($params['ledger_account']) { 
+		$sql .= "and ledger_account = :ledger_account ";
+		$sql_args[':ledger_account'] = $params['ledger_account'];
+	}
+	if ($params['ledger_participant']) { 
+		$sql .= "and ledger_participant = :ledger_participant ";
+		$sql_args[':ledger_participant'] = $params['ledger_participant'];
+	}
+	if ($params['ledger_reference']) { 
+		$sql .= "and ledger_reference = :ledger_reference ";
+		$sql_args[':ledger_reference'] = $params['ledger_reference'];
+	}
+	if ($params['ledger_key']) { 
+		$sql .= "and ledger_key = :ledger_key ";
+		$sql_args[':ledger_key'] = $params['ledger_key'];
+	}
+
+	$stmt = sirius_sql_query($sql, $sql_args);
+	return $stmt->rowCount();
+}

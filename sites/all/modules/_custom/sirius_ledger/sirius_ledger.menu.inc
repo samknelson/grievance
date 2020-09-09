@@ -214,6 +214,13 @@ function sirius_ledger_node_tabs() {
     'weight' => 3,
   );
 
+  $node_tabs['sirius_payperiod']['sirius_payperiod_ledger_test'] = array(
+    'title' => 'Ledger Tester',
+    'callback' => 'sirius_ledger_node_tab_payperiod_test',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 11,
+  );
+
   return $node_tabs;
 }
 
@@ -276,6 +283,13 @@ function sirius_ledger_menu() {
     'weight' => 3,
   );
 
+  $items['sirius/config/ledger/purge'] = array(
+    'title' => 'Purge',
+    'page callback' => 'sirius_ledger_page_ar_purge',
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+  );
 
  $items['sirius/ledger/payment/create'] = array(
     'title' => 'Create a Payment',
@@ -294,6 +308,26 @@ function sirius_ledger_menu() {
     'page callback' => 'sirius_ledger_page_transmittal',
     'page arguments' => array(),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+ $items['sirius/ledger/transmittal'] = array(
+    'title' => 'Manage',
+    'description' => '',
+    'access arguments' => array('sirius ledger admin'),
+    'page callback' => 'sirius_ledger_page_transmittal',
+    'page arguments' => array(),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+ $items['sirius/ledger/transmittal/print'] = array(
+    'title' => 'Print',
+    'description' => '',
+    'access arguments' => array('sirius ledger admin'),
+    'page callback' => 'sirius_ledger_page_transmittal',
+    'page arguments' => array(),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
   );
 
   return $items;

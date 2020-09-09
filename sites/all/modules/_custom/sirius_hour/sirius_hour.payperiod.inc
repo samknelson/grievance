@@ -75,11 +75,14 @@ function sirius_hour_payperiod_compute(&$json) {
 				continue;
 			}
 
+			$ms_level = $row['ms_level'];
+
 			$totals['hours']['total'] += $qty;
 			$totals['hours']['by_type'][$hour_type_tid] += $qty;
 			$totals['hours']['by_dept'][$department_tid] += $qty;
 			$totals['hours']['by_type_dept'][$hour_type_tid][$department_tid] += $qty;
 			$totals['hours']['by_dept_type'][$department_tid][$hour_type_tid] += $qty;
+			if ($ms_level) { $totals['hours']['by_ms_level'][$ms_level] += $qty; }
 
 			$totals['hours']['by_day'][$day]['total'] += $qty;
 			$totals['hours']['by_day'][$day]['by_type'][$hour_type_tid] += $qty;

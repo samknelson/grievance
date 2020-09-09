@@ -44,6 +44,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.do_not_disturb.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.server_paths.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -69,6 +70,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_delete.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_activity.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_components.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_term_exim.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_sort.inc';
@@ -309,7 +311,9 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   // Remove access to caller ID fields which are set in a node tab
   if ($form_id == 'sirius_json_definition_node_form') {
     $form['field_sirius_callerids']['#access'] = FALSE;
-    $form['field_sirius_audio']['#access'] = FALSE;
+    if (!user_access('sirius admin')) {
+      $form['field_sirius_audio']['#access'] = FALSE;
+    }
     if ($_GET['sirius_type']) { $form['field_sirius_type']['#access'] = FALSE; }
   }
 
@@ -805,3 +809,4 @@ function sirius_text_to_html($string) {
   $string = nl2br($string);
   return $string;
 }
+

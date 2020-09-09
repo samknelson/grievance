@@ -42,6 +42,7 @@ function sirius_page_config() {
 	$links['dispatch']['links']['sirius/dispatch/threestrikes'] = array('title' => '"Three Strikes"', 'description' => 'Configure or test the "three strikes" rule, blocking users who decline dispatches on multiple successive days.');
 	$links['dispatch']['links']['sirius/dispatch/config/view'] 	= array('title' => 'Dispatch Display', 'description' => 'Configure the header, footer, and style for the dispatch page.');
 	$links['dispatch']['links']['sirius/dispatch/config/vlri'] 	= array('title' => 'VLRI', 'description' => 'VLRI - Voluntary layoff with a request to convert to an involuntary configuration.');
+	$links['dispatch']['links']['sirius/dispatch/job/stub'] 		= array('title' => 'Stub Jobs', 'description' => 'Create or manage "stub" jobs, for generic dispatches or for importing legacy data.');
 
 	$links['bulk'] = array('title' => 'Bulk Messenger');
 	$links['bulk']['links']['sirius/bulk/config'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
@@ -63,7 +64,9 @@ function sirius_page_config() {
 	$links['users']['links']['admin/config/people/tfa-trusted-ip'] = array('title' => 'TFA Trusted IPs', 'description' => 'Set the list of trusted IP addresses for two-factor authentication.');
 
 	$links['systems'] = array('title' => 'Systems');
-	$links['systems']['links']['sirius/callerid'] 							= array('title' => 'Caller ID', 'description' => 'Create or manage Caller ID entries.');
+	$links['systems']['links']['sirius/config/server-paths'] 					= array('title' => 'Server Paths', 'description' => 'Locations of services on the server: wkhtmltopdf, pdftk, etc.');
+	$links['systems']['links']['sirius/config/phone/callerid'] 									= array('title' => 'Caller ID', 'description' => 'Create or manage Caller ID entries.');
+	$links['systems']['links']['sirius/admin/caller-id-full-list'] 	= array('title' => 'Cross-Domain Caller ID List', 'description' => 'View a list of all caller IDs across all domains.');
 	$links['systems']['links']['sirius/config/specialrid'] 			= array('title' => 'Special Roles', 'description' => 'Certain roles have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/email'] 					= array('title' => 'Email', 'description' => 'Oubound email settings');

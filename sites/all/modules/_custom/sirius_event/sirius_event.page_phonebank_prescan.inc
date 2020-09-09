@@ -1,7 +1,10 @@
 <?php
 
 function sirius_node_tab_event_phonebank_prescan_access($event_node) {
-	return sirius_node_tab_event_phonebank_settings_access($event_node);
+	if (!sirius_node_tab_event_phonebank_settings_access($event_node)) { return FALSE; }
+	if (!sirius_domain_component_enabled('activist:phonebank:prescan')) { return FALSE; }
+
+	return TRUE;
 }
 
 function sirius_node_tab_event_phonebank_prescan($event_node) {
@@ -76,15 +79,27 @@ function sirius_node_tab_event_phonebank_prescan_form_submit($form, &$form_state
 
 function sirius_node_tab_event_phonebank_prescan_batch($participant_nids, $pstatus_tid, &$context) {
 	$context['results']['pstatus_tid'] = $pstatus_tid;
-	foreach ($participant_nids as $participant_nid) {
+
+  $sql = "select node.nid as participant_nid, field_sirius_phone_value as phone from node ";
+  $sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
+  $sql .= "left join node contact_node on contact_node.nid = field_sirius_contact_target_id ";
+  $sql .= "left join field_data_field_sirius_phone on field_data_field_sirius_phone.entity_type = 'node' and field_data_field_sirius_phone.entity_id = contact_node.nid ";
+  $sql .= "where node.nid in (:participant_nids) ";
+  $sql .= "order by node.nid ";
+  $stmt = sirius_sql_query($sql, array(':participant_nids' => $participant_nids));
+  while ($hr = $stmt->fetchAssoc()) {
 		++$context['results']['count'];
-		// Under development
+		if (!$hr['phone']) { continue; }
+		if (sirius_phonenumber_voice_possible($hr['phone'])) { continue; }
+		++$context['results']['count_bad'];
+		$participant_node = node_load($hr['participant_nid']);
+		$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $pstatus_tid;
+		node_save($participant_node);
 	}
 }
 
 function sirius_node_tab_event_phonebank_prescan_batch_finished($success, $results, $operations) {
-	drupal_set_message(t('Scanned @count participants.', array('@count' => number_format($results['count']))));
-	drupal_set_message("Feature under development.");
+	drupal_set_message(t('Scanned @count participants. Removed @count_bad phone numbers that did not have a carrier name.', array('@count' => number_format($results['count']), '@count_bad' => number_format($results['count_bad']))));
 }
 
 
