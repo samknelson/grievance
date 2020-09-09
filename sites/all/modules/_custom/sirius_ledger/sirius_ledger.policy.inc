@@ -14,7 +14,7 @@ function sirius_ledger_policy_list() {
 	return node_load_multiple(array_keys($stmt['node']));
 }
 
-function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node = NULL) {
+function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node = NULL, $account_nid = NULL) {
 	// Get the employer
 	if (!$employer_node) {
 		$employer_node = node_load($worker_node->field_grievance_shop['und'][0]['target_id']);
@@ -27,7 +27,10 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 		$employer_json = sirius_jsonfield_util_node_json_get($employer_node);
 		$policy_node = node_load($employer_json['ledger']['policy']['nid']['default']);
 		$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
-		if ($policy_node && $policy_json['ledger']['policy']['settings']['schedule'][$schedule_key]) {
+		if ($policy_node && 
+			$policy_json['ledger']['policy']['settings']['schedule'][$schedule_key] &&
+			(!$account_nid || $policy_json['ledger']['policy']['settings']['accounts'][$account_nid])) {
+
 			sirius_minilog("Policy lookup for $schedule_key: Found the policy " . $policy_node->title . " for " . $worker_node->title . ' at employer ' . $employer_node->title);
 			return $policy_node;
 		}
@@ -38,7 +41,9 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 			$contract_tplt_json = sirius_jsonfield_util_node_json_get($contract_tplt_node);
 			$policy_node = node_load($contract_tplt_json['ledger']['policy']['nid']['default']);
 			$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
-			if ($policy_node && $policy_json['ledger']['policy']['settings']['schedule'][$schedule_key]) {
+			if ($policy_node && 
+				$policy_json['ledger']['policy']['settings']['schedule'][$schedule_key] &&
+				(!$account_nid || $policy_json['ledger']['policy']['settings']['accounts'][$account_nid])) {
 				sirius_minilog("Policy lookup: Found the policy for " . $worker_node->title . ' at employer ' . $employer_node->title . ' in contract template ' . $contract_tplt_node->title);
 				return $policy_node;
 			}
@@ -47,7 +52,9 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 
 	$policy_node = node_load(sirius_domain_variable_get('sirius_ledger_default_policy'));
 	$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
-	if ($policy_node && $policy_json['ledger']['policy']['settings']['schedule'][$schedule_key]) {
+	if ($policy_node && 
+		$policy_json['ledger']['policy']['settings']['schedule'][$schedule_key] &&
+			(!$account_nid || $policy_json['ledger']['policy']['settings']['accounts'][$account_nid])) {
 		sirius_minilog("Policy lookup for $schedule_key: No policy found for " . $worker_node->title . ' at employer ' . $employer_name . ' in contract template ' . $contract_tplt_name . '. Using the global policy.');
 		return $policy_node;
 	}

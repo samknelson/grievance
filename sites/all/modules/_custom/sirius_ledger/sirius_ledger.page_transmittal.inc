@@ -7,11 +7,40 @@ function sirius_ledger_page_transmittal() {
 function sirius_ledger_page_transmittal_form($form, &$form_state) {
 	$employers = sirius_employer_list();
 
+	$form['format'] = array(
+		'#type' => 'select',
+		'#title' => t('Format'),
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'html' => t('Web'),
+			'pdf' => t('PDF'),
+		),
+		'#required' => TRUE,
+	);
+
 	$form['employers'] = array(
 		'#type' => 'checkboxes',
 		'#options' => $employers,
 		'#title' => 'Generate Transmittal Sheets For',
 		'#checkall' => TRUE,
+	);
+
+	$accounts = sirius_ledger_account_list();
+	$form['accounts'] = array(
+		'#type' => 'checkboxes',
+		'#title' => t('Accounts'),
+		'#checkall' => TRUE,
+		'#options' => $accounts,
+	);
+
+	$form['hours'] = array(
+		'#type' => 'select',
+		'#title' => t('Include hours?'),
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'Yes' => t('Yes'),
+			'No' => t('No'),
+		),
 	);
 
 	$form['submit'] = array(
@@ -36,6 +65,10 @@ function sirius_ledger_page_transmittal_form_submit($form, &$form_state) {
 	}
 	$domain_nid = sirius_domain_nid();
 
+	$account_nids = array_filter(array_values($form_state['values']['accounts']));
+
+	$format = $form_state['values']['format'];
+
 	$html = '';
 	$is_first = TRUE;
 	foreach ($employer_nodes as $employer_nid => $employer_node) {
@@ -48,11 +81,15 @@ function sirius_ledger_page_transmittal_form_submit($form, &$form_state) {
 		} else {
 			$html .= '<div style="page-break-before: always; margin: 0; padding: 0;" class="sirius_ledger_transmittal_wrapper">';
 		}
-		$html .= sirius_ledger_node_tab_employer_transmittal_print($employer_node);
+		$html .= sirius_ledger_node_tab_employer_transmittal_print($employer_node, $account_nids, $form_state['values']['hours']);
 		$html .= '</div>';
 	}
-	// $form_state['results'] = $html;
-	// return;
+
+	if ($format == 'html') {
+		$form_state['results'] = $html;
+		return;
+	} 
+
 
 	$params = array();
 	$params['post']['body'] = $html;

@@ -11,6 +11,7 @@ function sirius_ledger_node_tab_payment_allocate_transmittal($payment_node) {
 function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_state, $payment_node) {
 	$form_state['payment_nid'] = $payment_node->nid;
 	$payment_json = sirius_jsonfield_util_node_json_get($payment_node);
+
 	$employer_node = node_load($payment_node->field_sirius_payer['und'][0]['target_id']);
 	if (!$employer_node) {
 		drupal_set_message("No payer found for this payment.", 'error');
@@ -21,18 +22,16 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 		return array();
 	}
 
+	// Get our transmittal NID
+	$transmittal_nid = $payment_json['transmittal_nid'];
+	$transmittal_node = node_load($transmittal_nid);
+	$transmittal_json = sirius_jsonfield_util_node_json_get($transmittal_node);
+	if (!$transmittal_node) { drupal_set_message("No transmittal form associated with this payment."); return array(); }
+	$form['backlink'] = array('#markup' => l('Back to Transmittal Form', 'node/' . $employer_node->nid . '/sirius_employer_ledger/transmittal', array('attributes' => array('class' => array('tool-button')))));
+
 	// Fetch the indsutries
 	$industries = sirius_taxonomy_load('sirius_industry', 'tid', 'full');
 	$ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
-
-	// Get the policy for this employer
-	$schedule_key = 'hour';
-	$policy_node = sirius_ledger_policy_lookup($schedule_key, NULL, $employer_node);
-	if (!$policy_node) {
-		drupal_set_message("No charge policy found: " . sirius_minilog_render_html(), 'warning');
-		return array();
-	}
-	$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
 
 	$account_node = node_load($payment_node->field_sirius_ledger_account['und'][0]['target_id']);
 	if (!$account_node) {
@@ -42,9 +41,27 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 	$account_nid = $account_node->nid;
 	$account_name = $account_node->title;
 
+	// Create ms_level dropdown options
+	$industries = sirius_taxonomy_load('sirius_industry', 'tid', 'full');
+	$ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+	$employer_industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
+	$employer_ms_tids = array();
+	foreach ($ms_terms as $ms_tid => $ms_term) {
+		$industry_tid = $ms_term->field_sirius_industry['und'][0]['tid'];
+		if (in_array($industry_tid, $employer_industry_tids)) { $employer_ms_tids[] = $ms_tid; }
+	}
+
+	$ms_level_options = array(NULL => t('-- Select --'));
+	foreach ($employer_ms_tids as $ms_tid) {
+		$levels = sirius_training_levels_fetch($ms_tid);
+		$ms_level_options[$ms_tid] = $ms_terms[$ms_tid]->name;
+		foreach ($levels as $level_code => $level) {
+			$ms_level_options["$ms_tid|$level_code"] = $ms_terms[$ms_tid]->name . ': ' . $level['title'];
+		}
+	}
 
 	// Get all current dispatches for this employer. SQL for speed.
-	$dispatches = sirius_ledger_transmittal_dispatches($employer_node->nid);
+	$dispatches = $transmittal_json['transmittal']['dispatches'];
 
 	$form['#tree'] = TRUE;
 
@@ -62,7 +79,6 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 
 	$table_open_html .= '<table class="sirius_ledger_transmittal">';
 	$table_open_html .= '<tr>';
-	$table_open_html .= '<th>SSN</th>';
 	$table_open_html .= '<th>Name</th>';
 	$table_open_html .= '<th>Member Status</th>';
 	$table_open_html .= '<th>Withheld</th>';
@@ -70,58 +86,15 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 	$table_open_html .= '</tr>';
 	$form['transmittal']['table_open'] = array('#markup' => $table_open_html);
 
-	$extra_rows = sirius_domain_variable_get('sirius_ledger_transmittal_extra_rows', 5);
-	for ($i=0; $i<$extra_rows; ++$i) {
-		$dispatches["extra_" . $i] = array();
-	}
-
+	$balance_total = 0;
+	$deltas = array();
 	foreach ($dispatches as $dispatch_nid => $dispatch) {
-		$worker_json = json_decode($dispatch['worker_json'], TRUE);
-
-		// Figure out the member status. Since I might have multiple member statuses, I neede to pick the one that corresponds to the industry of the job.
-		$industry_tid = $dispatch['industry_tid'];
-		$industry_name = $ms_tid = $ms_name = NULL;
-		if ($industry_tid) {
-			$industry_name = $industries[$industry_tid]->name;
-			$ms_tids = explode(',', $dispatch['ms_tids']);
-			foreach ($ms_tids as $probe) {
-				if ($ms_terms[$probe]->field_sirius_industry['und'][0]['tid'] == $industry_tid) {
-					$ms_tid = $probe;
-					$ms_name = $ms_terms[$probe]->name;
-				}
-			}
-		}
-
-		// I might have a level within an MS
-		$level_code = $worker_json['training']['levels'][$ms_tid]['code'];
-		$level_name = NULL; 
-		if ($level_code) { $level_name = sirius_training_levels_fetch_title($ms_tid, $level_code); }
-		if ($level_name) { $ms_name .= '<br />' . $level_name; }
-
+		$worker_nid = $dispatch['worker_nid'];
+		if (!$worker_nid) { continue; }
 		$form['transmittal']['dispatches'][$dispatch_nid]['tr_open'] = array('#markup' => '<tr>');
 
-		if ($dispatch) {
-			$worker_title = $dispatch['worker_title'];
-			$contact_nid = $dispatch['contact_nid'];
-			if (!$worker_title) { $worker_title = ''; }
-			$ssn = $dispatch['field_sirius_ssn_value'];
-			$form['transmittal']['dispatches'][$dispatch_nid]['ssn'] = array('#markup' => '<td>' . $ssn . '</td>');
-			$form['transmittal']['dispatches'][$dispatch_nid]['worker_nid'] = array('#type' => 'hidden', '#value' => $dispatch['worker_nid']);
-			$form['transmittal']['dispatches'][$dispatch_nid]['contact_nid'] = array('#type' => 'hidden', '#value' => $dispatch['contact_nid']);
-		} else {
-			$worker_title = $payment_json['transmittal_calcs']['dispatches'][$dispatch_nid]['worker_name'];
-			$contact_nid = $payment_json['transmittal_calcs']['dispatches'][$dispatch_nid]['contact_nid'];
-			$form['transmittal']['dispatches'][$dispatch_nid]['ssn'] = array(
-				'#type' => 'textfield',
-				'#size' => 11,
-				'#prefix' => '<td class="container-inline">SSN',
-				'#suffix' => '</td>',
-			);
-			if (isset($payment_json['transmittal']['dispatches'][$dispatch_nid]['ssn'])) { $form['transmittal']['dispatches'][$dispatch_nid]['ssn']['#default_value'] = $payment_json['transmittal']['dispatches'][$dispatch_nid]['ssn']; }
-		}
-
-		$form['transmittal']['dispatches'][$dispatch_nid]['name'] = array('#markup' => '<td>' . $worker_title . '</td>');
-		$form['transmittal']['dispatches'][$dispatch_nid]['ms_name'] = array('#markup' => '<td>' . $ms_name . '</td>');
+		$form['transmittal']['dispatches'][$dispatch_nid]['name'] = array('#markup' => '<td>' . $dispatch['worker_name'] . '</td>');
+		$form['transmittal']['dispatches'][$dispatch_nid]['ms_name'] = array('#markup' => '<td>' . $ms_level_options[$dispatch['ms_level']] . '</td>');
 
 		$form['transmittal']['dispatches'][$dispatch_nid]['payment'] = array(
 			'#type' => 'textfield',
@@ -133,14 +106,12 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 
 		// Get the balance
 		$balance = 0;
-		if ($contact_nid) {
-			$params = array();
-			$params['ledger_account'] = $account_nid;
-			$params['ledger_participant'] = $dispatch['contact_nid'];
-			$params['balance'] = TRUE;
-			$balance = sirius_ledger_ar_fetch($params);
-			if (!$balance) { $balance = 0; }
-		}
+		$params = array();
+		$params['ledger_account'] = $account_nid;
+		$params['ledger_participant'] = $dispatch['contact_nid'];
+		$params['balance'] = TRUE;
+		$balance = sirius_ledger_ar_fetch($params);
+		if (!$balance) { $balance = 0; }
 		if (isset($balance)) {
 			$balance_format = sirius_ledger_ar_format_balance($balance);
 		} else {
@@ -148,16 +119,18 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 		}
 
 		$form['transmittal']['dispatches'][$dispatch_nid]['balance'] = array('#markup' => '<td>' . $balance_format . '</td>');
-		$form['transmittal']['dispatches'][$dispatch_nid]['balance_calc'] = array('#type' => 'hidden', '#value' => $balance);
+
+		// If a worker appears multiple times, only add their balance once.
+		if (!$deltas[$worker_nid] && is_numeric($balance)) { $balance_total += $balance; }
+		++$deltas[$worker_nid];
 	}
 
 	$form['transmittal']['dispatches'][$dispatch_nid]['tr_close'] = array('#markup' => '</tr>');
 
 	$payment_total = $payment_json['transmittal_calcs']['payment_total'];
-	$balance_total = $payment_json['transmittal_calcs']['balance_total'];
 	if ($payment_total) {
 		$form['transmittal']['dispatches']['total']['tr_open'] = array('#markup' => '<tr>');
-		$form['transmittal']['dispatches']['total']['title'] = array('#markup' => '<th colspan="3">Total</th>');
+		$form['transmittal']['dispatches']['total']['title'] = array('#markup' => '<th colspan="2">Total</th>');
 		$form['transmittal']['dispatches']['total']['total'] = array('#markup' => '<th>' . sirius_ledger_ar_format_balance($payment_total) . '</th>');
 		$form['transmittal']['dispatches']['total']['balance'] = array('#markup' => '<th>' . sirius_ledger_ar_format_balance($balance_total) . '</th>');
 		$form['transmittal']['dispatches']['total']['tr_close'] = array('#markup' => '</tr>');
@@ -175,6 +148,11 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 
 function sirius_ledger_node_tab_payment_allocate_transmittal_form_validate($form, &$form_state) {
 	$payment_node = node_load($form_state['payment_nid']);
+	$payment_json = sirius_jsonfield_util_node_json_get($payment_node);
+
+	$transmittal_nid = $payment_json['transmittal_nid'];
+	$transmittal_node = node_load($transmittal_nid);
+	$transmittal_json = sirius_jsonfield_util_node_json_get($transmittal_node);
 
 	$payment_total = 0;
 	$balance_total = 0;
@@ -185,44 +163,19 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form_validate($form
 			continue;
 		}
 
+		$worker_nid = $transmittal_json['transmittal']['dispatches'][$dispatch_nid]['worker_nid'];
+		$contact_nid = $transmittal_json['transmittal']['dispatches'][$dispatch_nid]['contact_nid'];
+		if (!$worker_nid) {
+			form_set_error("transmittal][dispatches][$dispatch_nid][payment", 'Worker not found');
+			continue;
+		}
+		if (!$contact_nid) {
+			form_set_error("transmittal][dispatches][$dispatch_nid][payment", 'Contact not found');
+			continue;
+		}
+
 		if (is_numeric($payment)) { $payment_total += $payment; }
 		if (is_numeric($transmittal['balance_calc'])) { $balance_total += $transmittal['balance_calc']; }
-
-		if ($dispatch_nid > 0) {
-			if (!$transmittal['contact_nid']) {
-				form_set_error("transmittal][dispatches][$dispatch_nid][payment", 'There is no contact associated with this worker.');
-				continue;
-			}
-		} else {
-			$ssn = $transmittal['ssn'];
-			if ($ssn || $payment) {
-				if (!$payment) {
-					form_set_error("transmittal][dispatches][$dispatch_nid][payment", 'Please enter a payment');
-					continue; 
-				}
-				if (!$ssn) {
-					form_set_error("transmittal][dispatches][$dispatch_nid][ssn", 'Please enter a SSN');
-					continue; 
-				}
-				if (!sirius_ssn_validate($ssn)) {
-					form_set_error("transmittal][dispatches][$dispatch_nid][ssn", 'Please enter a valid SSN');
-					continue; 
-				}
-				$ssn = sirius_ssn_format($ssn);
-				$worker_node = sirius_worker_get_by_ssn($ssn);
-				if (!$worker_node) {
-					form_set_error("transmittal][dispatches][$dispatch_nid][ssn", 'No worker found with this SSN');
-					continue; 
-				}
-				$form_state['storage']['dispatches'][$dispatch_nid]['worker_nid'] = $worker_node->nid;
-				$form_state['storage']['dispatches'][$dispatch_nid]['worker_name'] = $worker_node->title;
-				$form_state['storage']['dispatches'][$dispatch_nid]['contact_nid'] = $worker_node->field_sirius_contact['und'][0]['target_id'];
-				if (!$worker_node->field_sirius_contact['und'][0]['target_id']) {
-					form_set_error("transmittal][dispatches][$dispatch_nid][ssn", 'There is no contact associated with this worker.');
-					continue; 
-				}
-			}
-		}
 	}
 	$form_state['storage']['payment_total'] = $payment_total;
 	$form_state['storage']['balance_total'] = $balance_total;
@@ -236,12 +189,22 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form_validate($form
 
 function sirius_ledger_node_tab_payment_allocate_transmittal_form_submit($form, &$form_state) {
 	$payment_node = node_load($form_state['payment_nid']);
-	$json = sirius_jsonfield_util_node_json_get($payment_node);
-	$json['transmittal'] = $form_state['values']['transmittal'];
-	$json['transmittal_calcs'] = $form_state['storage'];
-	unset($json['allocate']);
-	sirius_jsonfield_util_node_json_set($payment_node, $json);
+	$payment_json = sirius_jsonfield_util_node_json_get($payment_node);
+
+	$year = $form_state['year'];
+	$month = $form_state['month'];
+	$day = 1;
+	$domain_nid = sirius_domain_nid();
+
+	$payment_json['transmittal'] = $form_state['values']['transmittal'];
+	$payment_json['transmittal_calcs'] = $form_state['storage'];
+	unset($payment_json['allocate']);
+	sirius_jsonfield_util_node_json_set($payment_node, $payment_json);
 	node_save($payment_node);
+
+	$transmittal_nid = $payment_json['transmittal_nid'];
+	$transmittal_node = node_load($transmittal_nid);
+	$transmittal_json = sirius_jsonfield_util_node_json_get($transmittal_node);
 
 	sirius_ledger_payment_clear($payment_node->nid);
   $memo = sirius_ledger_payment_memo($payment_node);
@@ -250,13 +213,9 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form_submit($form, 
 	foreach ($form_state['values']['transmittal']['dispatches'] as $dispatch_nid => $transmittal) {
 		$payment = $transmittal['payment'];
 		if (!$payment) { continue; }
-		if ($dispatch_nid > 0) {
-			$worker_nid = $transmittal['worker_nid'];
-			$contact_nid = $transmittal['contact_nid'];
-		} else {
-			$worker_nid = $form_state['storage']['dispatches'][$dispatch_nid]['worker_nid'];
-			$contact_nid = $form_state['storage']['dispatches'][$dispatch_nid]['contact_nid'];
-		}
+
+		$worker_nid = $transmittal_json['transmittal']['dispatches'][$dispatch_nid]['worker_nid'];
+		$contact_nid = $transmittal_json['transmittal']['dispatches'][$dispatch_nid]['contact_nid'];
 
 	  $entry = array();
 	  $entry['ledger_amount'] = -1 * $payment;
