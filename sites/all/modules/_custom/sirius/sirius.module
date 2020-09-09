@@ -311,7 +311,9 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   // Remove access to caller ID fields which are set in a node tab
   if ($form_id == 'sirius_json_definition_node_form') {
     $form['field_sirius_callerids']['#access'] = FALSE;
-    $form['field_sirius_audio']['#access'] = FALSE;
+    if (!user_access('sirius admin')) {
+      $form['field_sirius_audio']['#access'] = FALSE;
+    }
     if ($_GET['sirius_type']) { $form['field_sirius_type']['#access'] = FALSE; }
   }
 
@@ -807,3 +809,4 @@ function sirius_text_to_html($string) {
   $string = nl2br($string);
   return $string;
 }
+
