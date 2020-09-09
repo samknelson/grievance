@@ -54,7 +54,6 @@ function sirius_twilio_browserphone_twiml_dial() {
 
 // @todo: When call ends, if we're supposed to move into a conference, go for it.
 function sirius_twilio_browserphone_twiml_callended() {
-	watchdog('debug', "Call Ended");
 	header('Content-Type: text/xml');
 	print "<Response>";
 	print "<Say>Call ended</Say>";
@@ -240,10 +239,25 @@ function sirius_twilio_browserphone_twiml_omg_play() {
 	$parameters = sirius_twilio_browserphone_parameters_get($token);
 	if (!$parameters) { sirius_twilio_browserphone_twiml_dial_error("Unable to load the parameters for this browser phone."); }
 	if (!$parameters['omg_options'][$omg_key]) { sirius_twilio_browserphone_twiml_dial_error("Access to that outgoing message is denied."); }
-	global $base_url;
-	$url = "$base_url/sirius/twilio/browserphone/twiml/omg/stream?token=$token&omg_key=$omg_key";
-	header('Content-Type: text/xml');
-	print "<Response><Play>" . htmlspecialchars($url, ENT_XML1 | ENT_QUOTES) . "</Play></Response>";
+
+	$omg_record = sirius_event_omg_fetch_from_key($omg_key);
+
+	if ($omg_record['sms'] == 'Yes') {
+		$sms_params = array();
+		$sms_params['sms'] = $omg_record['sms_body'];
+		$sms_params['to'] = $parameters['phone'];
+		$result = sirius_sms_send($sms_params);
+	}
+
+	if ($omg_record['audio'] == 'Yes') {
+		global $base_url;
+		$url = "$base_url/sirius/twilio/browserphone/twiml/omg/stream?token=$token&omg_key=$omg_key";
+		header('Content-Type: text/xml');
+		print "<Response><Play>" . htmlspecialchars($url, ENT_XML1 | ENT_QUOTES) . "</Play></Response>";
+	} else {
+		header('Content-Type: text/xml');
+		print "<Response><Hangup/></Response>";
+	}
 	exit();
 }
 
@@ -290,10 +304,11 @@ function sirius_twilio_browserphone_render($parameters = array()) {
 
 	$omg_nid = $parameters['omg_nid'];
 	$omg_node = node_load($omg_nid);
-	if ($omg_node && $omg_node->field_sirius_audio['und'][0]) {
+	$omg_records = sirius_event_omg_list($omg_node);
+	if ($omg_node && $omg_records) {
 		$omg_options = array();
-		foreach ($omg_node->field_sirius_audio['und'] as $delta => $item) {
-			$omg_options["$omg_nid-$delta"] = $item['description'];
+		foreach ($omg_records as $delta => $item) {
+			$omg_options["$omg_nid-$delta"] = $item['title'];
 		}
 		$parameters['omg_options'] = $omg_options;
 	}
