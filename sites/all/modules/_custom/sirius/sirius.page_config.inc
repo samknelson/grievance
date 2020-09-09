@@ -42,6 +42,7 @@ function sirius_page_config() {
 	$links['dispatch']['links']['sirius/dispatch/threestrikes'] = array('title' => '"Three Strikes"', 'description' => 'Configure or test the "three strikes" rule, blocking users who decline dispatches on multiple successive days.');
 	$links['dispatch']['links']['sirius/dispatch/config/view'] 	= array('title' => 'Dispatch Display', 'description' => 'Configure the header, footer, and style for the dispatch page.');
 	$links['dispatch']['links']['sirius/dispatch/config/vlri'] 	= array('title' => 'VLRI', 'description' => 'VLRI - Voluntary layoff with a request to convert to an involuntary configuration.');
+	$links['dispatch']['links']['sirius/dispatch/job/stub'] 		= array('title' => 'Stub Jobs', 'description' => 'Create or manage "stub" jobs, for generic dispatches or for importing legacy data.');
 
 	$links['bulk'] = array('title' => 'Bulk Messenger');
 	$links['bulk']['links']['sirius/bulk/config'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
