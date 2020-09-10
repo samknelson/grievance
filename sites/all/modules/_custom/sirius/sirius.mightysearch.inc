@@ -43,6 +43,7 @@ function sirius_mightysearch_form_prepare_valuefield($form_state, $json_forms, $
 					$element = sirius_jsonfield_util_get_from_path($json_forms[$node_type][$which_form], $path);
 				}
 			} else if ($node_type == 'sirius_event_participant') {
+ 				$pstatuses = sirius_event_participant_role_status_tids($json_forms['sirius_event_participant']['prole_tid']);
 				if ($which_form == 'core') {
 					list ($field_name, $column) = explode(':', $path);
 					if ($field_name == 'status') {
@@ -50,6 +51,8 @@ function sirius_mightysearch_form_prepare_valuefield($form_state, $json_forms, $
 					} else {
 						$element = array('#type' => 'textfield');
 					}
+				} else if ($which_form == 'phonebank') {
+					$element = array('#type' => 'textfield');
 				} else {
 					$element = sirius_jsonfield_util_get_from_path($json_forms[$node_type][$which_form], $path);
 				}
