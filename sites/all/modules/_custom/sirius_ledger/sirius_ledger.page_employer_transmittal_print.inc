@@ -53,7 +53,7 @@ function sirius_ledger_node_tab_employer_transmittal_print_form_submit($form, &$
 	if ($format == 'html') {
 		$form_state['results'] = sirius_ledger_node_tab_employer_transmittal_print($employer_node, $account_nids, $form_state['values']['hours']);
 	} else {
-		sirius_ledger_node_tab_employer_transmittal_print_pdf($employer_node, $account_nids);
+		sirius_ledger_node_tab_employer_transmittal_print_pdf($employer_node, $account_nids, $form_state['values']['hours']);
 	}
 }
 
