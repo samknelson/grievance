@@ -228,6 +228,10 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form_submit($form, 
 		sirius_ledger_ar_insert($entry);
 	}
 
+	$payment_node->field_sirius_ledger_allocated['und'][0]['value'] = 'Yes';
+	$payment_node->field_sirius_payment_status['und'][0]['value'] = 'Cleared';
+	$payment_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s');
+	node_save($payment_node);
   drupal_set_message("Allocation saved.");
 }
 

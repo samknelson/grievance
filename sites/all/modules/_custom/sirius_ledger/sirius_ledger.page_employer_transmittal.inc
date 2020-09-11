@@ -275,7 +275,7 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 			}
 
 			// I might have a level within an MS
-			$level_code = $worker_json['training']['levels'][$ms_tid]['code'];
+			$level_code = $worker_json['training']['levels'][$dispatch_ms_level]['code'];
 			if ($level_code) { $dispatch_ms_level .= '|' . $level_code; }
 		}
 
