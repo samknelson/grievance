@@ -66,9 +66,8 @@ function sirius_feed_wws_row_verify($feed_node, $info, $data, &$row, $precompute
       $hr = $stmt->fetchAssoc();
       $nid = $hr['a'];
       $other_nid = $hr['b'];
-      if ($nid != $other_nid) {
-        return array('success' => FALSE, 'msg' => 'Multiple workers found with this ID.');
-      }
+      if (!$nid) { return array('success' => FALSE, 'msg' => 'No worker found with this ID.'); }
+      if ($nid != $other_nid) { return array('success' => FALSE, 'msg' => 'Multiple workers found with this ID.'); }
       $row['worker_nid'] = $nid;
     } else if ($pk == 'ssn') {
       $sql_args = array();
@@ -89,9 +88,8 @@ function sirius_feed_wws_row_verify($feed_node, $info, $data, &$row, $precompute
       $hr = $stmt->fetchAssoc();
       $nid = $hr['a'];
       $other_nid = $hr['b'];
-      if ($nid != $other_nid) {
-        return array('success' => FALSE, 'msg' => 'Multiple workers found with this SSN.');
-      }
+      if (!$nid) { return array('success' => FALSE, 'msg' => 'No worker found with this SSN.'); }
+      if ($nid != $other_nid) { return array('success' => FALSE, 'msg' => 'Multiple workers found with this SSN.'); }
       $row['worker_nid'] = $nid;
     }
   } 
