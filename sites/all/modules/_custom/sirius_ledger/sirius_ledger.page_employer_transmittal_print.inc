@@ -115,7 +115,7 @@ function sirius_ledger_node_tab_employer_transmittal_print($employer_node, $acco
 		$address_html = "<div class=\"sirius_ledger_transmittal_address\" style=\"padding-left: $left; padding-top: $top; padding-right: 0; padding-bottom: 0; margin: 0; width: 3.125in; height: 1in;\" >";
 		$address_html .= $employer_node->title;
 		$address_html .= '<br />' . $contact_node->field_grievance_co_address['und'][0]['value'];
-		if ($contact_node->field_grievance_co_address_2) { $address_html .= '<br />' . $contact_node->field_grievance_co_address2['und'][0]['value']; }
+		if ($contact_node->field_grievance_co_address_2) { $address_html .= '<br />' . $contact_node->field_grievance_co_address_2['und'][0]['value']; }
 		$address_html .= '<br />' . $contact_node->field_grievance_co_city['und'][0]['value'] . ', ' . $contact_node->field_grievance_co_state['und'][0]['value'] . ' ' . $contact_node->field_grievance_co_zip['und'][0]['value'];
 		$address_html .= '</div>';
 		$html .= $address_html;
