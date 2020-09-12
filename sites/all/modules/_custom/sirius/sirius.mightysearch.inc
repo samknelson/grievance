@@ -576,7 +576,7 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 		if ($criterion == 'empty') {
 			$sql_parts['where'] .= "($where_name IS NULL OR $where_name = '') ";
 		} else if ($criterion == 'not empty') {
-			$sql_parts['where'] .= "($where_name IS NOT NULL OR $where_name != '') ";
+			$sql_parts['where'] .= "($where_name IS NOT NULL AND $where_name != '') ";
 		} else {
 			$sql_parts['where'] .= $where_name . ' ';
 			$sql_parts['where'] .= $criterion . ' ';
