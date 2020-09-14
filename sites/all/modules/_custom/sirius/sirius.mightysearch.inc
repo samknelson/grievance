@@ -393,6 +393,20 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		);
 	}
 
+	if ($action_options['delete']) {
+		$form['mightysearch_results']['delete_confirm'] = array(
+			'#title' => 'Really delete these contacts? Deletion is permanent and the deleted contacts can never be retrieved. There is no "undo" for this actions.',
+			'#type' => 'checkbox',
+			'#states' => array(
+				'visible' => array(
+					":input[name=\"mightysearch_results[action]\"]" => array(
+						array('value' => 'delete'), 
+					),
+				),
+			),
+		);
+	}
+
 	$form['mightysearch_results']['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -579,7 +593,7 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 		if ($criterion == 'empty') {
 			$sql_parts['where'] .= "($where_name IS NULL OR $where_name = '') ";
 		} else if ($criterion == 'not empty') {
-			$sql_parts['where'] .= "($where_name IS NOT NULL OR $where_name != '') ";
+			$sql_parts['where'] .= "($where_name IS NOT NULL AND $where_name != '') ";
 		} else {
 			$sql_parts['where'] .= $where_name . ' ';
 			$sql_parts['where'] .= $criterion . ' ';
@@ -843,6 +857,11 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete' || $action == 'bulk_recipient_add' || $action == 'bulk_recipient_remove') {
+		if ($action == 'delete' && !$form_state['values']['mightysearch_results']['delete_confirm']) {
+			drupal_set_message("Please check the confirmation box.", 'error');
+			return;
+		}
+
 		$contact_nids = array();
 		if ($form_state['values']['mightysearch_results']['results_select_allxyz']) {
 			$sql = $sql_parts['select_nids'] . $sql_parts['joins'] . $sql_parts['where'] . $sql_parts['group'];
@@ -855,7 +874,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 			drupal_set_message("No contacts selected", 'error');
 			return;
 		}
-		$chunks = array_chunk($contact_nids, 50, TRUE);		
+		$chunks = array_chunk($contact_nids, 50, TRUE);
 
 		$operations = array();
 		$current_path = current_path();
