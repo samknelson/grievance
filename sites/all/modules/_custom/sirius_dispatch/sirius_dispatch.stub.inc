@@ -112,7 +112,7 @@ function sirius_dispatch_page_job_stub_form_submit($form, &$form_state) {
     $filename = 'stubs.csv';
     drupal_add_http_header('Content-Type', 'text/csv');
     drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
-    fputcsv($fp, array('Employer', 'Industry', 'Stub NID'));
+    fputcsv($fp, array('Employer Name', 'Employer ID', 'Employer External ID', 'Industry', 'Stub NID'));
 
 		$query = new EntityFieldQuery;
 		$query->entityCondition('entity_type', 'node');
@@ -125,7 +125,14 @@ function sirius_dispatch_page_job_stub_form_submit($form, &$form_state) {
 		foreach ($stub_nodes as $stub_nid => $stub_node) {
 			$employer_node = node_load($stub_node->field_grievance_shop['und'][0]['target_id']);
 			$industry_name = $industries[$stub_node->field_sirius_industry['und'][0]['tid']];
-			fputcsv($fp, array($employer_node->title, $industry_name, $stub_node->nid));
+			fputcsv($fp, array(
+				$employer_node->title,
+				$employer_node->field_sirius_id['und'][0]['value'],
+				$employer_node->field_grievance_external_id['und'][0]['value'],
+				$industry_name, 
+				$stub_node->nid
+				)
+			);
 		}
 		fclose($fp);
 		exit();

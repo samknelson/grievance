@@ -482,7 +482,7 @@ function sirius_domain_form_restrict(&$form) {
     'field_sirius_industry_tid' => 'sirius_industry',
     'field_sirius_skill_tid' => 'sirius_skill',
     'field_sirius_dispatch_sib_status_tid' => 'sirius_dispatch_sib_status',
-    'field_sirius_worker_dispstatus_tid' => 'sirius_worker_dispstatus',
+    'field_sirius_worker_dispstatus_tid' => 'sirius_worker_dispatch_status',
     'field_sirius_work_status_tid' => 'sirius_work_status',
   );
 

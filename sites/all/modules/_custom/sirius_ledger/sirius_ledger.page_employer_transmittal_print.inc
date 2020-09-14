@@ -53,7 +53,7 @@ function sirius_ledger_node_tab_employer_transmittal_print_form_submit($form, &$
 	if ($format == 'html') {
 		$form_state['results'] = sirius_ledger_node_tab_employer_transmittal_print($employer_node, $account_nids, $form_state['values']['hours']);
 	} else {
-		sirius_ledger_node_tab_employer_transmittal_print_pdf($employer_node, $account_nids);
+		sirius_ledger_node_tab_employer_transmittal_print_pdf($employer_node, $account_nids, $form_state['values']['hours']);
 	}
 }
 
@@ -84,15 +84,17 @@ function sirius_ledger_node_tab_employer_transmittal_print($employer_node, $acco
 	$ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
 	$account_names = sirius_ledger_account_list();
 
-	// Get the policy for this employer
+	// We assume that if you're showing an hours column, we look for hourly rates, and otherwise 
+	// we look for monthly rates. 
+	// @todo this is a little kludgey. You might want hourly rates but no hours column. And what about semimonthly or
+	//       other rates? But at the moment all the transmittal form clients only have hourly and monthly rates and
+	//       they put them on separate transmittals. So it's good enough to be getting on with.
+	if ($include_hours == 'Yes') { $schedule_key = 'hour'; } else { $schedule_key = 'month'; }
 
-	$schedule_keys = array_keys(sirius_ledger_policy_schedule_options());
+	// Get the policy for this employer
 	$policy_nodes = array();
 	foreach ($account_nids as $account_nid) {
-		foreach ($schedule_keys as $schedule_key) {
-			$policy_node = sirius_ledger_policy_lookup($schedule_key, NULL, $employer_node, $account_nid);
-			if ($policy_node) { break; }
-		}
+		$policy_node = sirius_ledger_policy_lookup($schedule_key, NULL, $employer_node, $account_nid);
 		if (!$policy_node) {
 			drupal_set_message("No charge policy found: " . sirius_minilog_render_html(), 'warning');
 			return array();
@@ -115,7 +117,7 @@ function sirius_ledger_node_tab_employer_transmittal_print($employer_node, $acco
 		$address_html = "<div class=\"sirius_ledger_transmittal_address\" style=\"padding-left: $left; padding-top: $top; padding-right: 0; padding-bottom: 0; margin: 0; width: 3.125in; height: 1in;\" >";
 		$address_html .= $employer_node->title;
 		$address_html .= '<br />' . $contact_node->field_grievance_co_address['und'][0]['value'];
-		if ($contact_node->field_grievance_co_address_2) { $address_html .= '<br />' . $contact_node->field_grievance_co_address2['und'][0]['value']; }
+		if ($contact_node->field_grievance_co_address_2) { $address_html .= '<br />' . $contact_node->field_grievance_co_address_2['und'][0]['value']; }
 		$address_html .= '<br />' . $contact_node->field_grievance_co_city['und'][0]['value'] . ', ' . $contact_node->field_grievance_co_state['und'][0]['value'] . ' ' . $contact_node->field_grievance_co_zip['und'][0]['value'];
 		$address_html .= '</div>';
 		$html .= $address_html;
