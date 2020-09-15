@@ -895,19 +895,30 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if ($action == 'export') {
+		// Don't lock the database
+		db_query('SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED');
+
 		if ($form_state['values']['mightysearch_results']['results_all_fields']) {
 			foreach ($all_paths as $full_path => $label) {
 				sirius_mightysearch_add_clause($sql_parts, $sql_args, array('field' => $full_path));
 			}
 		}
-		$sql = $sql_parts['select_fields'] . $sql_parts['joins'] . $sql_parts['where'] . $sql_parts['group'];
+
+		global $user;
+		$tablename = 'mightysearch_export_' . $user->uid;
+		$sql = "drop table if exists tmp";
+		$stmt = sirius_sql_query($sql, $sql_args);
+		$sql = "create $tablename tmp as (" . $sql_parts['select_fields'] . $sql_parts['joins'] . $sql_parts['where'] . $sql_parts['group'] . ')';
 		$stmt = sirius_sql_query($sql, $sql_args);
 
+		$sql = "select * from $tablename";
+		$stmt = sirius_sql_query($sql, array());
 		$header = array('Internal ID', 'Name');
 		foreach (array_keys($sql_parts['headers']) as $full_path) { $header[] = $all_paths[$full_path]; }
 
 		$fp = fopen('php://output', 'w');
 		$filename = 'contacts.csv';
+		ob_end_clean();
 		drupal_add_http_header('Content-Type', 'text/csv');
 		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
 		fputcsv($fp, $header);
