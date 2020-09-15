@@ -800,8 +800,7 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 	$current_step = $form_state['current_step'];
 	$limit = $form_state['values']['limit'];
 
-	$batch_size = $info['feed']['batch_size'];
-	if (!$batch_size) { $batch_size = 10; }
+	$batch_size = sirius_feed_batch_size($info['name']);
 	$idx = 0;
 	$rows = $data['rows'];
 	$batch_count = 0;
@@ -814,7 +813,7 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 	}
 	while ($idx < $rows) {
 		$operations[] = array('sirius_feed_wizard_process_batch', array($feed_node, $info, $data, $idx));
-		$idx += $batch_size;
+		$idx += $batch_size + 1;
 		++$batch_count;
 		if ($limit && $batch_count >= $limit) { break; }
 	}
@@ -914,4 +913,30 @@ function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed
 	$form['attachments'] = array('#markup' => drupal_render($renderable));
 
 	return $form;
+}
+
+function sirius_feed_batch_size($key) {
+	$size = variable_get('sirius_feed_batch_size_' . $key);
+	if (!$size) { 
+		$info = sirius_wizard_info($key);
+		$size = $info['feed']['batch_size'];
+	}
+	if (!$size) { $size = 10; }
+	return $size;
+}
+
+function sirius_feed_admin() {
+	$info_all = sirius_wizard_info_all();
+	foreach ($info_all as $key => $info) {
+		if (!$info['feed']) { continue; }
+		$variable_name = 'sirius_feed_batch_size_' . $key;
+		$form[$variable_name] = array(
+			'#type' => 'textfield',
+			'#default_value' => sirius_feed_batch_size($key),
+			'#title' => $info['title'],
+			'#description' => $info['description'],
+		);
+	}
+
+  return system_settings_form($form);
 }
