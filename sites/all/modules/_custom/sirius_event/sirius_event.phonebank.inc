@@ -37,7 +37,7 @@ function sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_ti
   $sql .= "and not exists (select 1 from sirius_lock where sirius_lock.type = :lock_type and sirius_lock.id = field_sirius_phone_value and sirius_lock.uid != :uid) ";
   $sql .= "and field_sirius_phone_value is not null ";
   $sql .= "and field_sirius_phone_value != '' ";
-  $sql .= "order by node.nid ";
+  $sql .= "order by RAND() ";
   $sql .= "limit 1 ";
   $stmt = db_query($sql, array(
     ':event_nid' => $event_node->nid, 
