@@ -908,7 +908,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		$tablename = 'mightysearch_export_' . $user->uid;
 		$sql = "drop table if exists $tablename";
 		$stmt = sirius_sql_query($sql, $sql_args);
-		$sql = "create table $tablename as (" . $sql_parts['select_fields'] . $sql_parts['joins'] . $sql_parts['where'] . $sql_parts['group'] . ')';
+		$sql = "create temporary table $tablename as (" . $sql_parts['select_fields'] . $sql_parts['joins'] . $sql_parts['where'] . $sql_parts['group'] . ')';
 		$stmt = sirius_sql_query($sql, $sql_args);
 		$count = $stmt->rowCount();
 
