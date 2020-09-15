@@ -906,32 +906,45 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 
 		global $user;
 		$tablename = 'mightysearch_export_' . $user->uid;
-		//$sql = "drop table if exists $tablename";
-		//$stmt = sirius_sql_query($sql, $sql_args);
-		//$sql = "create table $tablename as (" . $sql_parts['select_fields'] . $sql_parts['joins'] . $sql_parts['where'] . $sql_parts['group'] . ')';
-		//$stmt = sirius_sql_query($sql, $sql_args);
+		$sql = "drop table if exists $tablename";
+		$stmt = sirius_sql_query($sql, $sql_args);
+		$sql = "create table $tablename as (" . $sql_parts['select_fields'] . $sql_parts['joins'] . $sql_parts['where'] . $sql_parts['group'] . ')';
+		$stmt = sirius_sql_query($sql, $sql_args);
+		$count = $stmt->rowCount();
 
-		$sql = "select * from $tablename";
-		$stmt = sirius_sql_query($sql, array());
-		$header = array('Internal ID', 'Name');
-		foreach (array_keys($sql_parts['headers']) as $full_path) { $header[] = $all_paths[$full_path]; }
-
-		// $fp = fopen('php://output', 'w');
+		$fp = fopen('php://output', 'w');
 		$filename = 'contacts.csv';
 		ob_end_clean();
-		//drupal_add_http_header('Content-Type', 'text/csv');
-		//drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		ini_set('output_buffering', 0);
+		drupal_add_http_header('Content-Type', 'text/csv');
+		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+
+		$header = array('Internal ID', 'Name');
+		foreach (array_keys($sql_parts['headers']) as $full_path) { $header[] = $all_paths[$full_path]; }
 		fputcsv($fp, $header);
 
-		while ($hr = $stmt->fetchAssoc()) {
-			$row = array();
-			$row[] = $hr['nid'];
-			$row[] = $hr['title'];
-			foreach (array_keys($sql_parts['headers']) as $full_path) {
-				$row[] = sirius_mightysearch_render_result($json_forms, $hr, $full_path);
+		$offset = 0;
+		$limit = 100;
+		while ($offset < $count) {
+			$sql = "select * from $tablename limit $limit offset $offset";
+			drupal_set_message($sql);
+			$stmt = sirius_sql_query($sql, array());
+
+			while ($hr = $stmt->fetchAssoc()) {
+				$row = array();
+				$row[] = $hr['nid'];
+				$row[] = $hr['title'];
+				foreach (array_keys($sql_parts['headers']) as $full_path) {
+					$row[] = sirius_mightysearch_render_result($json_forms, $hr, $full_path);
+				}
+				fputcsv($fp, $row);
 			}
-			fputcsv($fp, $row);
+
+			$offset += $limit;
 		}
+
+
+
 		fclose($fp);
 		exit();
 	}
