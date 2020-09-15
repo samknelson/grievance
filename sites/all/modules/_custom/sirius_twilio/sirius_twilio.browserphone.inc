@@ -16,6 +16,8 @@ function sirius_twilio_browserphone_twiml_dial() {
 	$callerid_nid = $_REQUEST['callerid_nid'];
 	$conference_name = $_REQUEST['conference_name'];
 
+	global $user;
+
 	// Get our parameters
 	$parameters = sirius_twilio_browserphone_parameters_get($token);
 	if (!$parameters) { sirius_twilio_browserphone_twiml_dial_error('Unable to load the parameters for this browser phone.'); }
@@ -222,7 +224,7 @@ function sirius_twilio_browserphone_twiml_omg() {
 		//$call->update(array("twiml" => $twiml));
 
 		global $base_url;
-		$url = "$base_url/sirius/twilio/browserphone/twiml/omg/play?token=$token&omg_key=$omg_key";
+		$url = "$base_url/sirius/twilio/browserphone/twiml/omg/play?token=" . rawurlencode($token) . "&omg_key=$omg_key";
 		$call->update(array('Url' => $url));
 		print "Ok.";
 		exit();
@@ -251,7 +253,7 @@ function sirius_twilio_browserphone_twiml_omg_play() {
 
 	if ($omg_record['audio'] == 'Yes') {
 		global $base_url;
-		$url = "$base_url/sirius/twilio/browserphone/twiml/omg/stream?token=$token&omg_key=$omg_key";
+		$url = "$base_url/sirius/twilio/browserphone/twiml/omg/stream?token=" . rawurlencode($token) . "&omg_key=$omg_key";
 		header('Content-Type: text/xml');
 		print "<Response><Play>" . htmlspecialchars($url, ENT_XML1 | ENT_QUOTES) . "</Play></Response>";
 	} else {
@@ -319,12 +321,14 @@ function sirius_twilio_browserphone_render($parameters = array()) {
 
   drupal_add_library('system', 'ui.tabs');
 	drupal_add_js('https://media.twiliocdn.com/sdk/js/client/v1.6/twilio.min.js', 'external');
-	drupal_add_js('sites/all/modules/_custom/sirius_twilio/js/sirius_twilio_browserphone.js', 'file');
+	drupal_add_js('sites/all/modules/_custom/sirius_twilio/js/sirius_twilio_browserphone_2.js', 'file');
 	drupal_add_css(drupal_get_path('module', 'sirius_twilio') . '/css/sirius_twilio_browserphone.css');
 	
 	if (!$parameters['token']) {
 		$client = sirius_twilio_client_get();
 		$token = sirius_twilio_capability_token_get();
+
+		$token .= '|' . $user->uid . '|' . mt_rand();
 		$parameters['token'] = $token;
 	}
 	if (!$parameters['token']) {
