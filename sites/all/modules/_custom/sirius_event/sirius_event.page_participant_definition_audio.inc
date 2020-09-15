@@ -44,7 +44,7 @@ function sirius_node_tab_event_participant_definition_audio_form($form, &$form_s
 			'#type' => 'select',
 			'#title' => t('Audio File'),
 			'#options' => array(
-				// 'No' => 'No Audio File',
+				'No' => 'No Audio File',
 				'Yes' => 'Yes, Play an Audio File',
 			),
 			'#default_value' => $omg_record['audio'],
