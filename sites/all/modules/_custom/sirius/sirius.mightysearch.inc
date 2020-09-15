@@ -919,8 +919,8 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		// $fp = fopen('php://output', 'w');
 		$filename = 'contacts.csv';
 		ob_end_clean();
-		drupal_add_http_header('Content-Type', 'text/csv');
-		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		//drupal_add_http_header('Content-Type', 'text/csv');
+		//drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
 		fputcsv($fp, $header);
 
 		while ($hr = $stmt->fetchAssoc()) {
