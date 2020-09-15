@@ -44,7 +44,7 @@ function sirius_node_tab_event_participant_definition_audio_form($form, &$form_s
 			'#type' => 'select',
 			'#title' => t('Audio File'),
 			'#options' => array(
-				'No' => 'No Audio File',
+				// 'No' => 'No Audio File',
 				'Yes' => 'Yes, Play an Audio File',
 			),
 			'#default_value' => $omg_record['audio'],
@@ -68,7 +68,7 @@ function sirius_node_tab_event_participant_definition_audio_form($form, &$form_s
 			$form['omg']['records'][$delta]['audio_file']['#field_prefix'] = render($renderable) . '<br />';
 		}
 
-
+		/*
 		$sms_html_id = "omg_records_${delta}_sms";
 		$form['omg']['records'][$delta]['sms'] = array(
 			'#type' => 'select',
@@ -91,6 +91,7 @@ function sirius_node_tab_event_participant_definition_audio_form($form, &$form_s
 				)
 			),
 		);
+		*/
 	}
 
 	$form['submit'] = array(
