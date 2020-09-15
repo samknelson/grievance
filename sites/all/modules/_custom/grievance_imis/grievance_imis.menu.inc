@@ -8,8 +8,8 @@ function grievance_imis_menu() {
   $items = array();
 
 	$items['admin/config/grievance/imis'] = array(
-		'title' => 'Grievance Module - IMIS',
-		'description' => t('Settings for the IMIS integration'),
+		'title' => 'Grievance Module - SePuede',
+		'description' => t('Settings for the SePuede integration'),
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('grievance_imis_admin'),
 		'access arguments' => array('grievance admin'),
@@ -18,7 +18,7 @@ function grievance_imis_menu() {
 
 	$items['admin/config/grievance/imis/settings'] = array(
 		'title' => 'Settings',
-		'description' => t('Settings for the IMIS integration'),
+		'description' => t('Settings for the SePuede integration'),
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('grievance_imis_admin'),
 		'access arguments' => array('grievance admin'),
@@ -27,7 +27,7 @@ function grievance_imis_menu() {
 
 	$items['admin/config/grievance/imis/test'] = array(
 		'title' => 'Test',
-		'description' => t('Test the IMIS connection and search'),
+		'description' => t('Test the SePuede connection and search'),
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('grievance_imis_test_form'),
 		'access arguments' => array('grievance admin'),

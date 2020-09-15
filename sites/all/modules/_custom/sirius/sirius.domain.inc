@@ -72,10 +72,25 @@ function sirius_domain($new_domain_nid = NULL) {
   return node_load($domain_nid);
 }
 
+function sirius_domain_component_info_all() {
+  // @todo: Implement a complicate and hard to follow system of callbacks so that each module defines its own components.
+  return array(
+    'activist:phonebank:prescan' => array(
+      'title' => 'Activist - Phonebank - Prescan',
+      'description' => 'For a given phonebank, enable the "prescan" function, allowing phonebank admins to remove invalid phone numbers.',
+    ),
+  );
+}
 
+function sirius_domain_component_enabled($key, $domain_node = NULL) {
+  if (!$domain_node) { $domain_node = sirius_domain(); }
+  if (!$domain_node) { return FALSE; }
 
+  $json = sirius_jsonfield_util_node_json_get($domain_node);
 
-
+  if ($json['component'][$key]['enabled'] == 'Yes') { return TRUE; }
+  return FALSE; 
+}
 
 function sirius_domain_active($domain_nid) {
   $sql = "select field_sirius_active_value, field_sirius_domain_target_id ";
@@ -467,7 +482,8 @@ function sirius_domain_form_restrict(&$form) {
     'field_sirius_industry_tid' => 'sirius_industry',
     'field_sirius_skill_tid' => 'sirius_skill',
     'field_sirius_dispatch_sib_status_tid' => 'sirius_dispatch_sib_status',
-    'field_sirius_worker_dispstatus_tid' => 'sirius_worker_dispstatus'
+    'field_sirius_worker_dispstatus_tid' => 'sirius_worker_dispatch_status',
+    'field_sirius_work_status_tid' => 'sirius_work_status',
   );
 
   foreach ($field_names as $field_name => $taxonomy) {

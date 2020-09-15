@@ -60,23 +60,54 @@ function sirius_hour_node_tab_employer_hours_date_form_submit($form, &$form_stat
 }
 
 function sirius_hour_node_tab_employer_hours_form($form, &$form_state, $employer_node, $year, $month) {
+	$domain_nid = sirius_domain_nid();
+	$day = 1;
+
+	$epayperiod_node = sirius_hour_epayperiod_load($domain_nid, $employer_node->nid, $year, $month, $day);
+	$epayperiod_json = sirius_jsonfield_util_node_json_get($epayperiod_node);
+
+	// Get our transmittal NID
+	$transmittal_nid = $epayperiod_json['transmittal_nid'];
+	$transmittal_node = node_load($transmittal_nid);
+	$transmittal_json = sirius_jsonfield_util_node_json_get($transmittal_node);
+	if (!$transmittal_node) { drupal_set_message("No transmittal form associated with this payment."); return array(); }
+	$form['backlink'] = array('#markup' => l('Back to Transmittal Form', 'node/' . $employer_node->nid . '/sirius_employer_ledger/transmittal', array('attributes' => array('class' => array('tool-button')))));
+
+	$form_state['transmittal_nid'] = $transmittal_nid;
 	$form_state['employer_nid'] = $employer_node->nid;
 	$form_state['year'] = $year;
 	$form_state['month'] = $month;
 
+	$account_names = sirius_ledger_account_list();
+	$accounts = array();
+	foreach ($transmittal_json['transmittal']['accounts'] as $account_nid => $record) {
+		if ($record['active'] == 'Yes') { $accounts[$account_nid] = $account_names[$account_nid]; }
+	}
+
+	$hour_types = sirius_taxonomy_load('sirius_hour_type', 'tid', 'name', TRUE);
+	$departments = sirius_taxonomy_load('grievance_department', 'tid', 'name', TRUE);
+	$form['hour_type'] = array(
+		'#type' => 'select',
+		'#title' => t('Hour Type'),
+		'#options' => $hour_types,
+	);
+	if ($epayperiod_json['hour_type']) { $form['hour_type']['#default_value'] = $epayperiod_json['hour_type']; }
+
+	$form['department'] = array(
+		'#type' => 'select',
+		'#title' => t('Department'),
+		'#options' => $departments,
+	);
+	if ($epayperiod_json['department']) { $form['department']['#default_value'] = $epayperiod_json['department']; }
+
 	// Get (or create) the employer payperiod entry.
 	$domain_nid = sirius_domain_nid();
 	$employer_nid = $employer_node->nid;
-	$day = 1;
-	$epayperiod_node = sirius_hour_epayperiod_load($domain_nid, $employer_nid, $year, $month, $day, 'No');
-	$epayperiod_json = sirius_jsonfield_util_node_json_get($epayperiod_node);
 
 	$form['#tree'] = TRUE; 
 	$form['intro'] = array('#markup' => '<h2>' . t('Simple Monthly Hours: ') . "$month/$year" . '</h2>');
 
-	$form_state['payment_nid'] = $payment_node->nid;
-
-	// Create dropdown ms_level dropdown options
+	// Create ms_level dropdown options
 	$industries = sirius_taxonomy_load('sirius_industry', 'tid', 'full');
 	$ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
 	$employer_industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
@@ -95,72 +126,36 @@ function sirius_hour_node_tab_employer_hours_form($form, &$form_state, $employer
 		}
 	}
 
-	// Get all current dispatches for this employer. SQL for speed.
-	$dispatches = sirius_ledger_transmittal_dispatches($employer_node->nid);
+	// Get all current dispatches for this employer.
+	$dispatches = $transmittal_json['transmittal']['dispatches'];
 
 	$table_open_html .= '<table class="sirius_employer_hours">';
 	$table_open_html .= '<tr>';
-	$table_open_html .= '<th>SSN</th>';
 	$table_open_html .= '<th>Name</th>';
 	$table_open_html .= '<th>Member Status</th>';
 	$table_open_html .= '<th>Hours</th>';
+	foreach ($accounts as $account_nid => $account_name) {
+		$table_open_html .= '<th>' . $account_name . '</th>';
+	}
 	$table_open_html .= '</tr>';
 	$form['hours']['table_open'] = array('#markup' => $table_open_html);
 
-	$extra_rows = sirius_domain_variable_get('sirius_ledger_transmittal_extra_rows', 5);
-	for ($i=0; $i<$extra_rows; ++$i) {
-		$dispatches["extra_" . $i] = array();
-	}
-
+	$deltas = array();
 	foreach ($dispatches as $dispatch_nid => $dispatch) {
-		$worker_json = json_decode($dispatch['worker_json'], TRUE);
-
-		// Figure out the member status. Since I might have multiple member statuses, I neede to pick the one that corresponds to the industry of the job.
-		$industry_tid = $dispatch['industry_tid'];
-		$dispatch_ms_level = NULL;
-		if ($industry_tid) {
-			$ms_tids = explode(',', $dispatch['ms_tids']);
-			foreach ($ms_tids as $probe) {
-				if ($ms_terms[$probe]->field_sirius_industry['und'][0]['tid'] == $industry_tid) {
-					$dispatch_ms_level = $probe;
-				}
-			}
+		$worker_nid = $dispatch['worker_nid'];
+		if (!$worker_nid) { continue; }
+		$payperiod_node = sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_node->nid, $year, $month, $day, 'Yes');
+		$payperiod_json = sirius_jsonfield_util_node_json_get($payperiod_node);
+		$entry = array();
+		if ($payperiod_json['entries']['employer_monthly']['rows']) {
+			if (!$deltas[$worker_nid]) { $deltas[$worker_nid] = 0; }
+			$entry = $payperiod_json['entries']['employer_monthly']['rows'][$deltas[$worker_nid]];
+			++$deltas[$worker_nid];
 		}
-
-		// I might have a level within an MS
-		$level_code = $worker_json['training']['levels'][$ms_tid]['code'];
-		if ($level_code) { $dispatch_ms_level .= '|' . $level_code; }
 
 		$form['hours']['dispatches'][$dispatch_nid]['tr_open'] = array('#markup' => '<tr>');
-
-		if ($dispatch) {
-			$worker_title = $dispatch['worker_title'];
-			$contact_nid = $dispatch['contact_nid'];
-			if (!$worker_title) { $worker_title = ''; }
-			$ssn = $dispatch['field_sirius_ssn_value'];
-			$form['hours']['dispatches'][$dispatch_nid]['ssn'] = array('#markup' => '<td>' . $ssn . '</td>');
-			$form['hours']['dispatches'][$dispatch_nid]['worker_nid'] = array('#type' => 'hidden', '#value' => $dispatch['worker_nid']);
-			$form['hours']['dispatches'][$dispatch_nid]['contact_nid'] = array('#type' => 'hidden', '#value' => $dispatch['contact_nid']);
-		} else {
-			$worker_title = $payment_json['transmittal_calcs']['dispatches'][$dispatch_nid]['worker_name'];
-			$contact_nid = $payment_json['transmittal_calcs']['dispatches'][$dispatch_nid]['contact_nid'];
-			$form['hours']['dispatches'][$dispatch_nid]['ssn'] = array(
-				'#type' => 'textfield',
-				'#size' => 11,
-				'#prefix' => '<td class="container-inline">SSN',
-				'#suffix' => '</td>',
-			);
-			if (isset($payment_json['hours']['dispatches'][$dispatch_nid]['ssn'])) { $form['hours']['dispatches'][$dispatch_nid]['ssn']['#default_value'] = $payment_json['hours']['dispatches'][$dispatch_nid]['ssn']; }
-		}
-
-		$form['hours']['dispatches'][$dispatch_nid]['name'] = array('#markup' => '<td>' . $worker_title . '</td>');
-		$form['hours']['dispatches'][$dispatch_nid]['ms_level'] = array(
-			'#type' => 'select',
-			'#options' => $ms_level_options,
-			'#prefix' => '<td>',
-			'#suffix' => '</td>',
-			'#default_value' => $dispatch_ms_level,
-		);
+		$form['hours']['dispatches'][$dispatch_nid]['name'] = array('#markup' => '<td>' . $dispatch['worker_name'] . '</td>');
+		$form['hours']['dispatches'][$dispatch_nid]['ms_level'] = array('#markup' => '<td>' . $ms_level_options[$dispatch['ms_level']] . '</td>');
 
 		$form['hours']['dispatches'][$dispatch_nid]['qty'] = array(
 			'#type' => 'textfield',
@@ -168,11 +163,31 @@ function sirius_hour_node_tab_employer_hours_form($form, &$form_state, $employer
 			'#prefix' => '<td>',
 			'#suffix' => '</td>',
 		);
-		if (isset($payment_json['hours']['dispatches'][$dispatch_nid]['qty'])) { $form['hours']['dispatches'][$dispatch_nid]['qty']['#default_value'] = $payment_json['hours']['dispatches'][$dispatch_nid]['qty']; }
+		if ($entry['qty']) { $form['hours']['dispatches'][$dispatch_nid]['qty']['#default_value'] = $entry['qty']; }
+
+		foreach ($accounts as $account_nid => $account_name) {
+			$balance = 0;
+			$params = array();
+			$params['ledger_account'] = $account_nid;
+			$params['ledger_participant'] = $dispatch['contact_nid'];
+			$params['ledger_reference'] = $payperiod_node->nid;
+			$params['ledger_key'] = $dispatch['contact_nid'] . '|' . $payperiod_node->nid . '|' . $dispatch['ms_level'];
+			$params['balance'] = TRUE;
+			$balance = sirius_ledger_ar_fetch($params);
+			if (!$balance) { $balance = 0; }
+			if (isset($balance)) {
+				$balance_format = sirius_ledger_ar_format_balance($balance);
+			} else {
+				$balance_format = '';
+			}
+
+			$form['hours']['dispatches'][$dispatch_nid][$account_nid] = array('#markup' => '<td>' . $balance_format . '</td>');
+		}
 	}
 
 	$form['hours']['dispatches'][$dispatch_nid]['tr_close'] = array('#markup' => '</tr>');
 
+	/*
 	$payment_total = $payment_json['transmittal_calcs']['payment_total'];
 	if ($payment_total) {
 		$form['hours']['dispatches']['total']['tr_open'] = array('#markup' => '<tr>');
@@ -180,6 +195,7 @@ function sirius_hour_node_tab_employer_hours_form($form, &$form_state, $employer
 		$form['hours']['dispatches']['total']['balance'] = array('#markup' => '<th>' . sirius_ledger_ar_format_balance($balance_total) . '</th>');
 		$form['hours']['dispatches']['total']['tr_close'] = array('#markup' => '</tr>');
 	}
+	*/
 
 	$form['hours']['table_close'] = array('#markup' => '</table>');
 
@@ -189,4 +205,89 @@ function sirius_hour_node_tab_employer_hours_form($form, &$form_state, $employer
 	);
 
 	return $form;
+}
+
+function sirius_hour_node_tab_employer_hours_form_validate($form, &$form_state) {
+	$employer_node = node_load($form_state['employer_nid']);
+	$year = $form_state['year'];
+	$month = $form_state['month'];
+	$day = 1;
+
+	foreach ($form_state['values']['hours']['dispatches'] as $dispatch_nid => $hour_record) {
+		$qty = $hour_record['qty'];
+		if ($qty < 0) {
+			form_set_error("hours][dispatches][$dispatch_nid][qty", 'Payment cannot be negative');
+			continue;
+		}
+
+		if ($qty && !is_numeric($qty)) { 
+			form_set_error("hours][dispatches][$dispatch_nid][qty", 'Payment must be a number');
+			continue;
+		}
+	}
+}
+
+function sirius_hour_node_tab_employer_hours_form_submit($form, &$form_state) {
+	$employer_node = node_load($form_state['employer_nid']);
+	$transmittal_node = node_load($form_state['transmittal_nid']);
+	$year = $form_state['year'];
+	$month = $form_state['month'];
+	$day = 1;
+	$domain_nid = sirius_domain_nid();
+
+	// Save the transmittal nid in the epayperiod node
+	$epayperiod_node = sirius_hour_epayperiod_load($domain_nid, $employer_node->nid, $year, $month, $day, 'Yes');
+	$epayperiod_json = sirius_jsonfield_util_node_json_get($epayperiod_node);
+	$epayperiod_json['transmittal_nid'] = $transmittal_node->nid;
+	$epayperiod_json['hour_type'] = $form_state['values']['hour_type'];
+	$epayperiod_json['department'] = $form_state['values']['department'];
+	sirius_jsonfield_util_node_json_set($epayperiod_node, $epayperiod_json);
+	node_save($epayperiod_node);
+
+	$transmittal_json = sirius_jsonfield_util_node_json_get($transmittal_node);
+
+	$source_key = 'employer_monthly';
+	$source_name = 'Employer Monthly';
+
+	$payperiod_nodes = array();
+	foreach ($form_state['values']['hours']['dispatches'] as $dispatch_nid => $hour_record) {
+		$qty = $hour_record['qty'];
+		$ms_level = $transmittal_json['transmittal']['dispatches'][$dispatch_nid]['ms_level'];
+		$worker_nid = $transmittal_json['transmittal']['dispatches'][$dispatch_nid]['worker_nid'];
+
+		$is_first = FALSE;
+		if (!$payperiod_nodes[$worker_nid]) { 
+			$payperiod_nodes[$worker_nid] = sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_node->nid, $year, $month, $day, 'Yes');
+			$is_first = TRUE;
+		}
+		
+		$payperiod_json = sirius_jsonfield_util_node_json_get($payperiod_nodes[$worker_nid]);
+
+		if ($is_first) { 
+			$payperiod_json['entries'][$source_key]['source_name'] = $source_name;
+			$payperiod_json['entries'][$source_key]['status'] = 'live';
+			$payperiod_json['entries'][$source_key]['rows'] = array();
+		}	
+
+		$payperiod_json['entries'][$source_key]['rows'][] = array(
+			'qty' => $qty,
+			'ms_level' => $ms_level,
+			'day' => $day,
+			'hour_type' => $form_state['values']['hour_type'],
+			'department' => $form_state['values']['department'],
+		);
+		sirius_jsonfield_util_node_json_set($payperiod_nodes[$worker_nid], $payperiod_json);
+	}
+
+	foreach (array_keys($payperiod_nodes) as $worker_nid) {
+		$payperiod_nodes[$worker_nid]->field_sirius_active['und'][0]['value'] = 'Yes';
+		$payperiod_json = sirius_jsonfield_util_node_json_get($payperiod_nodes[$worker_nid]);
+		sirius_hour_payperiod_compute($payperiod_json);
+		sirius_jsonfield_util_node_json_set($payperiod_nodes[$worker_nid], $payperiod_json);
+		node_save($payperiod_nodes[$worker_nid]);
+	}
+
+	drupal_set_message("Hours saved.");
+
+	// drupal_set_message('<pre>' . sirius_minilog_render_html() . '</pre>');
 }

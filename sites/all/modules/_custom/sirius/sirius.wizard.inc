@@ -145,37 +145,6 @@ function sirius_sirius_wizard_info() {
     ),
   );
 
-  $items['feed_wws'] = array(
-    'name' => 'feed_wws',
-    'title' => 'Worker Work Status',
-    'description' => 'Upload a new list of worker work statuses.',
-    'steps' => array(
-			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
-			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
-			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
-			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
-			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
-			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
-    ),
-    'feed' => array(
-    	'fields' => array(
-    		'ssn' => array(
-    			'title' => 'SSN',
-    			'required' => TRUE,
-    		),
-    		'work_status_id' => array(
-    			'title' => 'Work Status ID',
-    			'required' => TRUE,
-    		),
-    	),
-    	'batch_size' => 500,
-	    'callback_row_verify' => 'sirius_feed_wws_row_verify',
-	    'callback_row_process' =>'sirius_feed_wws_row_process',
-    ),
-    'callback_launch' => 'sirius_feed_wizard_launch',
-    'callback_launch_args' => array('feed_wws'),
-  );
-
   $items['feed_worker_skill'] = array(
     'name' => 'feed_worker_skill',
     'title' => 'Worker Skills',
@@ -214,6 +183,7 @@ function sirius_sirius_wizard_info() {
   $items += sirius_feed_grievance_log_info();
   $items += sirius_letter_wizard_info();
   $items += sirius_feed_worker_info();
+  $items += sirius_feed_wws_info();
   $items += sirius_feed_employee_info();
   $items += sirius_feed_hours_info();
 

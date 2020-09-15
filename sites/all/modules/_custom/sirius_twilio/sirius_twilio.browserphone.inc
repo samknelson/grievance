@@ -16,6 +16,8 @@ function sirius_twilio_browserphone_twiml_dial() {
 	$callerid_nid = $_REQUEST['callerid_nid'];
 	$conference_name = $_REQUEST['conference_name'];
 
+	global $user;
+
 	// Get our parameters
 	$parameters = sirius_twilio_browserphone_parameters_get($token);
 	if (!$parameters) { sirius_twilio_browserphone_twiml_dial_error('Unable to load the parameters for this browser phone.'); }
@@ -54,7 +56,6 @@ function sirius_twilio_browserphone_twiml_dial() {
 
 // @todo: When call ends, if we're supposed to move into a conference, go for it.
 function sirius_twilio_browserphone_twiml_callended() {
-	watchdog('debug', "Call Ended");
 	header('Content-Type: text/xml');
 	print "<Response>";
 	print "<Say>Call ended</Say>";
@@ -223,7 +224,7 @@ function sirius_twilio_browserphone_twiml_omg() {
 		//$call->update(array("twiml" => $twiml));
 
 		global $base_url;
-		$url = "$base_url/sirius/twilio/browserphone/twiml/omg/play?token=$token&omg_key=$omg_key";
+		$url = "$base_url/sirius/twilio/browserphone/twiml/omg/play?token=" . rawurlencode($token) . "&omg_key=$omg_key";
 		$call->update(array('Url' => $url));
 		print "Ok.";
 		exit();
@@ -240,10 +241,25 @@ function sirius_twilio_browserphone_twiml_omg_play() {
 	$parameters = sirius_twilio_browserphone_parameters_get($token);
 	if (!$parameters) { sirius_twilio_browserphone_twiml_dial_error("Unable to load the parameters for this browser phone."); }
 	if (!$parameters['omg_options'][$omg_key]) { sirius_twilio_browserphone_twiml_dial_error("Access to that outgoing message is denied."); }
-	global $base_url;
-	$url = "$base_url/sirius/twilio/browserphone/twiml/omg/stream?token=$token&omg_key=$omg_key";
-	header('Content-Type: text/xml');
-	print "<Response><Play>" . htmlspecialchars($url, ENT_XML1 | ENT_QUOTES) . "</Play></Response>";
+
+	$omg_record = sirius_event_omg_fetch_from_key($omg_key);
+
+	if ($omg_record['sms'] == 'Yes') {
+		$sms_params = array();
+		$sms_params['sms'] = $omg_record['sms_body'];
+		$sms_params['to'] = $parameters['phone'];
+		$result = sirius_sms_send($sms_params);
+	}
+
+	if ($omg_record['audio'] == 'Yes') {
+		global $base_url;
+		$url = "$base_url/sirius/twilio/browserphone/twiml/omg/stream?token=" . rawurlencode($token) . "&omg_key=$omg_key";
+		header('Content-Type: text/xml');
+		print "<Response><Play>" . htmlspecialchars($url, ENT_XML1 | ENT_QUOTES) . "</Play></Response>";
+	} else {
+		header('Content-Type: text/xml');
+		print "<Response><Hangup/></Response>";
+	}
 	exit();
 }
 
@@ -290,10 +306,11 @@ function sirius_twilio_browserphone_render($parameters = array()) {
 
 	$omg_nid = $parameters['omg_nid'];
 	$omg_node = node_load($omg_nid);
-	if ($omg_node && $omg_node->field_sirius_audio['und'][0]) {
+	$omg_records = sirius_event_omg_list($omg_node);
+	if ($omg_node && $omg_records) {
 		$omg_options = array();
-		foreach ($omg_node->field_sirius_audio['und'] as $delta => $item) {
-			$omg_options["$omg_nid-$delta"] = $item['description'];
+		foreach ($omg_records as $delta => $item) {
+			$omg_options["$omg_nid-$delta"] = $item['title'];
 		}
 		$parameters['omg_options'] = $omg_options;
 	}
@@ -304,12 +321,14 @@ function sirius_twilio_browserphone_render($parameters = array()) {
 
   drupal_add_library('system', 'ui.tabs');
 	drupal_add_js('https://media.twiliocdn.com/sdk/js/client/v1.6/twilio.min.js', 'external');
-	drupal_add_js('sites/all/modules/_custom/sirius_twilio/js/sirius_twilio_browserphone.js', 'file');
+	drupal_add_js('sites/all/modules/_custom/sirius_twilio/js/sirius_twilio_browserphone_2.js', 'file');
 	drupal_add_css(drupal_get_path('module', 'sirius_twilio') . '/css/sirius_twilio_browserphone.css');
 	
 	if (!$parameters['token']) {
 		$client = sirius_twilio_client_get();
 		$token = sirius_twilio_capability_token_get();
+
+		$token .= '|' . $user->uid . '|' . mt_rand();
 		$parameters['token'] = $token;
 	}
 	if (!$parameters['token']) {
@@ -414,6 +433,7 @@ function sirius_twilio_browserphone_render_error($msg) {
 
 /**
  * Get and set parameters, indexed by token, during the life of a call.
+ * @todo: It's kind of stupid that these functions aren't simply calls to get_context and set_context. What was I thinking?
  */
 
 function sirius_twilio_browserphone_parameters_get_node($capability_token) {

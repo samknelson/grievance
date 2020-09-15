@@ -106,10 +106,19 @@ function sirius_twilio_outgoing_voice($phone, $context) {
 	}
 
 	$context['phone'] = $phone;
+
+	$callerid_nid = $context['callerid_nid'];
+	if ($callerid_nid) { 
+		$callerid_node = node_load($callerid_nid);
+		$callerid_phone = $callerid_node->field_sirius_phone['und'][0]['value'];
+	}
+	if (!$callerid_phone) { $callerid_phone = sirius_domain_variable_get('sirius_twilio_phone', ''); }
+
 	$msg = "Outgoing call initiated to $phone";
+
 	try {
 		$client = sirius_twilio_client_get();
-		$call = $client->calls->create($phone, sirius_domain_variable_get('sirius_twilio_phone', ''), array("url" => $base_url . '/sirius/twilio/incoming/voice'));
+		$call = $client->calls->create($phone, $callerid_phone, array("url" => $base_url . '/sirius/twilio/incoming/voice'));
 		$call_sid = sirius_twilio_call_sid($call);
 		$result = array('success' => TRUE, 'msg' => 'Initiated call to ' . $phone);
 	} catch (Exception $e) {

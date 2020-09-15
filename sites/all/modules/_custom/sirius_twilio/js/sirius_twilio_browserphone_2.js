@@ -8,6 +8,7 @@
 		// 
 
 		token = Drupal.settings.sirius_twilio_browserphone.token;
+		capability_token = token.split('|')[0];
 		event_nid = Drupal.settings.sirius_twilio_browserphone.event_nid;
 		default_phone = Drupal.settings.sirius_twilio_browserphone.default_phone;
 		if (default_phone) { $('#sirius_browserphone_number').val(default_phone); }
@@ -21,7 +22,7 @@
 		//
 		
 		var device;
-		device = new Twilio.Device(token);
+		device = new Twilio.Device(capability_token);
 		$('#sirius_browserphone_button_hangup').hide();
 		$('#sirius_browserphone_button_omg').hide();
 		$('#sirius_browserphone_omg').hide();
@@ -108,7 +109,8 @@
 			var params = {
 		  	To: $('#sirius_browserphone_number').val(),
 		  	token: token,
-		  	callerid_nid: $('#sirius_browserphone_callerid').val()
+		  	callerid_nid: $('#sirius_browserphone_callerid').val(),
+		  	whatever: 'I am an extra parameter.',
 			};
 			Drupal.settings.sirius_twilio_browserphone.connection = device.connect(params);
 			return false;

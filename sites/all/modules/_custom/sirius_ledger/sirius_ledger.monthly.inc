@@ -54,26 +54,16 @@ function sirius_ledger_page_monthly_test_form($form, &$form_state) {
 	$form['trigger'] = array(
 		'#type' => 'select',
 		'#title' => t('Trigger'),
-		'#required' => TRUE,
 		'#options' => sirius_ledger_policy_trigger_options('month'),
-		'#states' => array(
-			'visible' => array(
-				":input[name=\"action\"]" => array('value' => 'worker')
-			),
-		),
 	);
 
 	$form['date'] = array(
 		'#type' => 'date_popup',
 		'#title' => t('As Of'),
-		'#states' => array(
-			'visible' => array(
-				":input[name=\"action\"]" => array('value' => 'worker')
-			),
-		),
     '#attributes' => array(
       'autocomplete' => 'off',
     ),
+    '#description' => t('Leave blank to make charges "as of" today. If running in batch mode, selecting a date will clear the batch progress for today.'),
 	);
 
 	$form['worker_nid'] = array(
@@ -98,6 +88,10 @@ function sirius_ledger_page_monthly_test_form($form, &$form_state) {
 }
 
 function sirius_ledger_page_monthly_test_form_submit($form, &$form_state) {
+
+	$ts = strtotime($form_state['values']['date']);
+	if ($ts <= 1) { $ts = NULL; }
+
 	$form_state['rebuild'] = TRUE;
 	if ($form_state['values']['action'] == 'worker') {
 		$ts = strtotime($form_state['values']['date']);
@@ -106,7 +100,7 @@ function sirius_ledger_page_monthly_test_form_submit($form, &$form_state) {
 	} else if ($form_state['values']['action'] == 'batch_reset') {
 		sirius_ledger_monthly_charge_batch_reset();
 	} else {
-		sirius_ledger_monthly_charge_batch($form_state['values']['mode']);
+		sirius_ledger_monthly_charge_batch($form_state['values']['mode'], $ts, $form_state['values']['trigger']);
 	}
 }
 
@@ -134,7 +128,8 @@ function sirius_ledger_monthly_charge_batch_reset() {
 	sirius_domain_variable_set('sirius_ledger_monthly_batch_status', NULL);
 }
 
-function sirius_ledger_monthly_charge_batch($mode) {
+function sirius_ledger_monthly_charge_batch($mode, $ts = NULL, $trigger = 'cron') {
+	if (!$ts) { $ts = time(); }
 	if (!sirius_ledger_monthly_enabled()) {
 		sirius_minilog('Monthly billing is not enabled for this domain.');
 		return;
@@ -142,7 +137,7 @@ function sirius_ledger_monthly_charge_batch($mode) {
 
 	$batch_size = sirius_domain_variable_get('sirius_ledger_monthly_batch_size', 1000);
 	$batch_status = json_decode(sirius_domain_variable_get('sirius_ledger_monthly_batch_status'), TRUE);
-	$today = date('Y-m-d');
+	$today = date('Y-m-d', $ts);
 	if ($batch_status['date'] != $today) {
 		$batch_status = array('date' => $today);
 		sirius_minilog("Starting batch processing for $today"); 
@@ -169,7 +164,7 @@ function sirius_ledger_monthly_charge_batch($mode) {
 
   $count = 0;
   foreach ($worker_nids as $worker_nid) {
-  	sirius_ledger_monthly_charge_worker($worker_nid, $mode, 'auto');
+  	sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts);
 		$batch_status['last_worker_nid'] = $worker_nid;
 		++$count;
   }
@@ -184,6 +179,7 @@ function sirius_ledger_monthly_charge_batch($mode) {
 }
 
 function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts = NULL) {
+	$trigger_options = sirius_ledger_policy_trigger_options('month');
 	if (!$ts) { $ts = time(); }
 
 	if (!sirius_ledger_monthly_enabled()) {
@@ -203,7 +199,6 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 		return;
 	}
 
-	$trigger_options = sirius_ledger_policy_trigger_options('month');
 	$today_day = date('j', $ts);
 	$today_month = date('n', $ts);
 	$today_year = date('Y', $ts);
