@@ -924,10 +924,9 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		fputcsv($fp, $header);
 
 		$offset = 0;
-		$limit = 100;
+		$limit = 10000;
 		while ($offset < $count) {
 			$sql = "select * from $tablename limit $limit offset $offset";
-			drupal_set_message($sql);
 			$stmt = sirius_sql_query($sql, array());
 
 			while ($hr = $stmt->fetchAssoc()) {
@@ -942,8 +941,6 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 
 			$offset += $limit;
 		}
-
-
 
 		fclose($fp);
 		exit();
