@@ -279,7 +279,7 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 			if ($level_code) { $dispatch_ms_level .= '|' . $level_code; }
 		}
 
-		$form['transmittal']['dispatches'][$dispatch_nid]['tr_open'] = array('#markup' => '<tr>');
+		$form['transmittal']['dispatches'][$dispatch_nid]['tr_open'] = array('#markup' => '<tr style="page-break-inside: avoid;">');
 
 		if ($dispatch) {
 			$worker_title = $dispatch['worker_title'];
