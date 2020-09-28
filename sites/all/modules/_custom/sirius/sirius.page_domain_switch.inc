@@ -50,7 +50,14 @@ function sirius_domain_page_switch() {
 }
 
 function sirius_domain_page_switch_render($tree, $depth = NULL) {
-	if (!$depth) { $html .= '<table>'; }
+	if (!$depth) {
+		$html .= '<table>';
+		$html .= '<tr>';
+		$html .= '<th>' . t('Domain') . '</th>';
+		$html .= '<th>' . t('Switch') . '</th>';
+		$html .= '<th>' . t('Tools') . '</th>';
+		$html .= '</tr>';
+	}
 	foreach ($tree as $nid => $branch) {
 		$html .= '<tr>';
 		$html .= '<td>';
@@ -69,6 +76,7 @@ function sirius_domain_page_switch_render($tree, $depth = NULL) {
 			'users' => 'node/' . $nid . '/sirius_domain_users',
 			'clone' => 'node/' . $nid . '/sirius_domain_clone',
 			'components' => 'node/' . $nid . '/sirius_domain_components',
+			'delete' => 'node/' . $nid . '/sirius_domain_delete',
 		);
 		foreach ($tools as $name => $path) {
 			if (drupal_valid_path($path)) {
