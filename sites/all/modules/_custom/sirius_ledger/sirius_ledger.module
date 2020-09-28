@@ -8,6 +8,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.accounts.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.payments.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.balance.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.policy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.monthly.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.hourly.inc';
@@ -36,6 +37,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_monthly.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_entity_policy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_transmittal.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_list_workers.inc';
 
 /**
  * Implements hook_cron

@@ -143,7 +143,9 @@ function sirius_ledger_ar_insert($entry) {
 	$sql_args[':ledger_memo'] = $entry['ledger_memo'];
 	$sql_args[':ledger_key'] = $entry['ledger_key'];
 
-	$stmt = db_query($sql, $sql_args);
+	$stmt = sirius_sql_query($sql, $sql_args);
+
+	sirius_ledger_balance_update($entry['ledger_participant'], $entry['ledger_account']);
 }
 
 function sirius_ledger_ar_update($entry) {
@@ -170,12 +172,16 @@ function sirius_ledger_ar_update($entry) {
 	$sql_args[':ledger_id'] = $entry['ledger_id'];
 
 	$stmt = sirius_sql_query($sql, $sql_args);
+
+	sirius_ledger_balance_update($entry['ledger_participant'], $entry['ledger_account']);
 }
 
 function sirius_ledger_ar_delete($entry) {
 	$sql = 'delete from sirius_ledger_ar where ledger_id = :ledger_id';
 	$sql_args = array(':ledger_id' => $entry['ledger_id']);
 	$stmt = db_query($sql, $sql_args);
+
+	sirius_ledger_balance_update($entry['ledger_participant'], $entry['ledger_account']);
 }
 
 function sirius_ledger_ar_format_balance($balance) {
@@ -255,4 +261,6 @@ function sirius_ledger_ar_purge($params) {
 
 	$stmt = sirius_sql_query($sql, $sql_args);
 	return $stmt->rowCount();
+
+	sirius_ledger_balance_purge($entry['ledger_participant'], $entry['ledger_account']);
 }
