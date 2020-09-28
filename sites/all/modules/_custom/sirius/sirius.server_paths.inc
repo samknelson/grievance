@@ -32,7 +32,7 @@ function sirius_server_paths_info($key) {
 	return $info_all[$key];
 }
 
-function siriuS_server_paths($key) {
+function sirius_server_paths($key) {
 	$variable_name = 'sirius_server_paths_' . $key;
 	$info = sirius_server_paths_info($key);
 	$path = variable_get($variable_name, $info['default_value']);
@@ -47,7 +47,7 @@ function sirius_server_paths_admin() {
 		$variable_name = 'sirius_server_paths_' . $key;
 		$form[$variable_name] = array(
 			'#type' => 'textfield',
-			'#default_value' => siriuS_server_paths($key),
+			'#default_value' => sirius_server_paths($key),
 			'#title' => $info['title'],
 			'#description' => $info['description'],
 		);
