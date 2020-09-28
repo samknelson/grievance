@@ -44,14 +44,7 @@ function sirius_ledger_payer_type($payer_node_type) {
 }
 
 function sirius_ledger_payment_clear($payment_nid) {
-	if (!$payment_nid) { return NULL; }
-	$entries = sirius_ledger_ar_fetch(array('ledger_reference' => $payment_nid));
-	$count = 0;
-	foreach ($entries as $entry) { 
-		++$count; 
-		sirius_ledger_ar_delete($entry);
-	}
-	return $count;
+	sirius_ledger_ar_delete_by_reference($payment_nid);
 }
 
 function sirius_ledger_payment_memo($payment_node) {
