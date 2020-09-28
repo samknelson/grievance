@@ -351,6 +351,14 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/config/feed'] = array(
+    'title' => 'Feeds',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_feed_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/config/server-paths'] = array(
     'title' => 'Server Paths',
     'page callback' => 'drupal_get_form',
@@ -833,6 +841,15 @@ function sirius_menu() {
     'page arguments' => array(2),
     'type' => MENU_LOCAL_TASK,
     'weight' => 60,
+  );
+
+  $items['s/%'] = array(
+    'title' => 'Shortlink',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_shortlink_clicked',
+    'page arguments' => array(1),
+    'type' => MENU_NORMAL_ITEM,
   );
 
   return $items;
