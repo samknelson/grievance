@@ -43,19 +43,43 @@ function sirius_domain_page_switch() {
 	} else {
 		$html .= l($domain_root->title, current_path(), array('query' => array('switch' => $domain_root->nid)));
 	}
+	$html .= '<br /><br />';
 	$html .= sirius_domain_page_switch_render($tree);
 
 	return $html;
 }
 
-function sirius_domain_page_switch_render($tree) {
-	$html = '<ul>';
+function sirius_domain_page_switch_render($tree, $depth = NULL) {
+	if (!$depth) { $html .= '<table>'; }
 	foreach ($tree as $nid => $branch) {
-		$html .= '<li>';
-		$html .= l($branch['title'], current_path(), array('query' => array('switch' => $nid)));
-		$html .= sirius_domain_page_switch_render($branch['children']);
-		$html .= '</li>';
+		$html .= '<tr>';
+		$html .= '<td>';
+		for ($i=0; $i<$depth; ++$i) {
+			$html .= '-- ';
+		}
+		$html .= $branch['title'];
+		$html .= '</td>';
+		$html .= '<td>';
+		$html .= l('switch into this domain', current_path(), array('query' => array('switch' => $nid), 'attributes' => array('class' => array('tool-button'))));;
+		$html .= '</td>';
+		$html .= '<td>';
+		$tools = array(
+			'view' => 'node/' . $nid,
+			'edit' => 'node/' . $nid . '/edit',
+			'users' => 'node/' . $nid . '/sirius_domain_users',
+			'clone' => 'node/' . $nid . '/sirius_domain_clone',
+			'components' => 'node/' . $nid . '/sirius_domain_components',
+		);
+		foreach ($tools as $name => $path) {
+			if (drupal_valid_path($path)) {
+				$html .= l($name, $path, array('attributes' => array('class' => array('tool-button'))));
+			}
+		}
+		$html .= '</td>';
+		$html .= '</tr>';
+
+		$html .= sirius_domain_page_switch_render($branch['children'], $depth + 1);
 	}
-	$html .= '</ul>';
+	if (!$depth) { $html .= '</table>'; }
 	return $html;
 }
