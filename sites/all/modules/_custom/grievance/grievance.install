@@ -947,5 +947,9 @@ function grievance_update_7042() {
     } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
   }
 
-  sirius_ledger_balance_update_all();
+  if (function_exists('sirius_ledger_balance_update_all')) {
+    print "Updating all balances...\n";
+    sirius_ledger_balance_update_all();
+    print "... Done updating all balances.\n";
+  }
 }
