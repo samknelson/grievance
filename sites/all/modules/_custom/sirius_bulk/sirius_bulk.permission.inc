@@ -14,6 +14,10 @@ function sirius_bulk_permission() {
       'title' => t('Sirius Bulk Send'), 
       'description' => t('Create and send bulk messages.'),
     ),
+    'sirius bulk manual' => array(
+      'title' => t('Sirius Bulk Manual'), 
+      'description' => t('Deliver existing queue entries which require manual confirmation'),
+    ),
   );
 }
 

@@ -2,13 +2,15 @@
 
 function grievance_node_tab_letter_access($grievance_node, $is_loopback = FALSE) {
 	// Disable access if the new interface is enabled.
-	$enabled_types = variable_get('sirius_letter_content_types');
-	if ($enabled_types['grievance']) { return FALSE; }
+	// $enabled_types = variable_get('sirius_letter_content_types');
+	// if ($enabled_types['grievance']) { return FALSE; }
 	return TRUE;
 }
 
-
 function grievance_node_tab_letter($grievance_node, $is_loopback = FALSE) {
+	 $enabled_types = variable_get('sirius_letter_content_types');
+	if ($enabled_types['grievance']) { drupal_goto('node/' . $grievance_node->nid . '/grievance_letter'); }
+
   return drupal_get_form('grievance_letter_form', $grievance_node);
 }
 

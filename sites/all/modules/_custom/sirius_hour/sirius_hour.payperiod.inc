@@ -1,5 +1,6 @@
 <?php
 
+/*
 function sirius_hour_payperiod_definition() {
 	$form = array();
 
@@ -7,6 +8,7 @@ function sirius_hour_payperiod_definition() {
 
 	return $form;
 }
+*/
 
 function sirius_hour_payperiod_list_requested() {
 	$html .= views_embed_view('sirius_payperiods', 'block_1');
@@ -73,11 +75,14 @@ function sirius_hour_payperiod_compute(&$json) {
 				continue;
 			}
 
+			$ms_level = $row['ms_level'];
+
 			$totals['hours']['total'] += $qty;
 			$totals['hours']['by_type'][$hour_type_tid] += $qty;
 			$totals['hours']['by_dept'][$department_tid] += $qty;
 			$totals['hours']['by_type_dept'][$hour_type_tid][$department_tid] += $qty;
 			$totals['hours']['by_dept_type'][$department_tid][$hour_type_tid] += $qty;
+			if ($ms_level) { $totals['hours']['by_ms_level'][$ms_level] += $qty; }
 
 			$totals['hours']['by_day'][$day]['total'] += $qty;
 			$totals['hours']['by_day'][$day]['by_type'][$hour_type_tid] += $qty;
@@ -104,7 +109,7 @@ function sirius_hour_payperiod_compute(&$json) {
 	if ($note && $json['reconcile']['status'] != 'reconciled') { $json['reconcile']['status'] = 'warning'; }
 }
 
-function sirius_hour_payperiod_load($worker_nid, $employer_nid, $year, $month, $day, $create_active = FALSE) {
+function sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $year, $month, $day, $create_active = FALSE) {
 	// Search for an existing payperiod node
 	$date = "$year-$month-$day 00:00:00";
 	$date_db = gmdate('Y-m-d H:i:s', strtotime($date));
@@ -115,6 +120,7 @@ function sirius_hour_payperiod_load($worker_nid, $employer_nid, $year, $month, $
   $query->fieldCondition('field_grievance_shop', 'target_id', $employer_nid);
   $query->fieldCondition('field_sirius_datetime', 'value', $date_db, '<=');
   $query->fieldCondition('field_sirius_datetime_completed', 'value', $date_db, '>');
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
   $query->propertyOrderBy('nid');
   $stmt = $query->execute();
   if ($stmt['node']) { return node_load(array_keys($stmt['node'])[0]); }
@@ -140,8 +146,13 @@ function sirius_hour_payperiod_load($worker_nid, $employer_nid, $year, $month, $
   $payperiod_node->field_sirius_active['und'][0]['value'] = $create_active;
   $payperiod_node->field_sirius_worker['und'][0]['target_id'] = $worker_nid;
   $payperiod_node->field_grievance_shop['und'][0]['target_id'] = $employer_nid;
+  if ($domain_nid) { $payperiod_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
   $payperiod_node = node_submit($payperiod_node);
   node_object_prepare($payperiod_node);
   node_save($payperiod_node);
+
+  // Create the employer payperiod as a side effect
+  sirius_hour_epayperiod_load($domain_nid, $employer_nid, $year, $month, $day, $create_active);
+
   return $payperiod_node;
 }

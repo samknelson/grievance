@@ -307,6 +307,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		$sql .= "field_sirius_contact_target_id as contact_nid, ";
 		$sql .= "case ";
 		foreach ($member_status_weights as $tid => $weight) {
+			if (!$weight) { $weight = 0; }
 			$sql .= "when taxonomy_term_data_member_status.tid = $tid then $weight ";
 		}
 		$sql .= "end as member_status_weight, ";
@@ -326,7 +327,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	$sql .= "where node.type = 'sirius_worker' ";
 
 	// Exclude current dispatches
-	if (!$filters['redispatch'] && !$filters['ignore_redispatch']) {
+	if (!$filters['redispatch'] && !$filters['ignore_redispatch'] && $job_node->nid) {
 		$sql .= "and nid not in (";
 		$sql .= "  select a1.field_sirius_worker_target_id as n from ";
 		$sql .= "  node n1, ";
@@ -567,7 +568,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	}
 
 	// Execute
-	$stmt = db_query($sql, $args);
+	$stmt = sirius_sql_query($sql, $args);
 
 	// Count only?
 	if ($filters['count']) { 

@@ -48,18 +48,30 @@ function sirius_node_tab_sirius_domain_delete_form($form, &$form_state, $root_do
 		'#type' => 'checkboxes',
 		'#title' => 'Delete these node types',
 		'#options' => $node_bundles,
+		'#checkall' => TRUE,
 	);
 
 	$form['taxonomy_term_bundles'] = array(
 		'#type' => 'checkboxes',
 		'#title' => 'Delete these taxonomy terms',
 		'#options' => $taxonomy_bundles,
+		'#checkall' => TRUE,
 	);
 
 	$form['user_bundles'] = array(
 		'#type' => 'checkboxes',
 		'#title' => 'Delete the users?',
 		'#options' => array('user' => 'Yes, also delete the users in these domains.'),
+	);
+
+	$form['report_cache'] = array(
+		'#type' => 'select',
+		'#title' => 'Delete the reports?',
+		'#options' => array(
+			'No' => t('No, leave any generated reports.'),
+			'Yes' => t('Yes, delete generated reports.'),
+		),
+		'#description' => t('If deleteing the domain, please check ALL content and taxonomy types.'),
 	);
 
 	$form['delete_domain'] = array(
@@ -74,7 +86,7 @@ function sirius_node_tab_sirius_domain_delete_form($form, &$form_state, $root_do
 
 	$form['confirm'] = array(
 		'#type' => 'checkbox',
-		'#title' => t('Yes, permanently and completely delete the domain @title. This action cannot be undone.', array('@title' => $domain_node->title)),
+		'#title' => t('Yes, permanently and completely delete the domain @title. This action cannot be undone.', array('@title' => $root_domain_node->title)),
 		'#required' => TRUE,
 	);
 
@@ -112,6 +124,22 @@ function sirius_node_tab_sirius_domain_delete_form_submit($form, &$form_state) {
 				}
 			}
 		}
+
+		if ($form_state['values']['report_cache'] == 'Yes') {
+			$operations[] = array(
+				'sirius_domain_delete_report_cache', 
+				array($mode, $domain_nid),
+			);
+		}
+
+	}
+
+	// Put the domain nodes themselves as the very end.
+	if ($form_state['values']['delete_domain'] == 'Yes') {
+		$operations[] = array(
+			'sirius_domain_delete_batch', 
+			array($mode, $root_domain_node->nid, 'node', 'sirius_domain', array_keys($domains_to_delete)),
+		);
 	}
 
 	// Put the domain nodes themselves as the very end.
@@ -128,6 +156,33 @@ function sirius_node_tab_sirius_domain_delete_form_submit($form, &$form_state) {
 		'finished' => 'sirius_domain_delete_batch_finished',
   );
 	batch_set($batch);
+}
+
+function sirius_domain_delete_report_cache($mode, $domain_nid, &$context) {
+	$sql = "select report_type, count(*) as c from report_cache where report_domain_nid = :domain_nid group by report_type ";
+	$stmt = db_query($sql, array(':domain_nid' => $domain_nid));
+	$report_types = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$report_types[$hr['report_type']] = $hr['c'];
+	}
+
+	$total = 0;
+	foreach ($report_types as $report_type => $count) {
+		$total += $count;
+		$msg = "Deleting: Domain #$domain_nid: Report of type $report_type";
+		if ($mode == 'live') {
+			$sql = "delete from report_cache where report_type = :report_type and report_domain_nid = :domain_nid";
+			$stmt = db_query($sql, array(':report_type' => $report_type, ':domain_nid' => $domain_nid));
+		}
+
+		if ($mode == 'live') { $msg .= " [LIVE MODE]"; } else { $msg .= " [TEST MODE, NO RECORDS DELETED]"; }
+		$context['results']['msgs'][] = $msg;
+		$context['results']['deleted']['report_cache'][$report_type]['count'] += $count;
+	}
+
+	$msg = "Deleting: Domain #$domain_nid: Total of $total reports";
+	$context['message'] = $msg;
+	$context['results']['mode'] = $mode;
 }
 
 function sirius_domain_delete_batch($mode, $domain_nid, $entity_type, $bundle, $entity_ids, &$context) {
@@ -154,12 +209,14 @@ function sirius_domain_delete_batch($mode, $domain_nid, $entity_type, $bundle, $
 
 function sirius_domain_delete_batch_finished($success, $results, $operations) {
 	$mode = $results['mode'];
-	foreach ($results['deleted'] as $entity_type => $bundles) {
-		foreach ($bundles as $bundle => $details) {
-			$count = $details['count'];
-			$msg = "Deleted: $count records of type $entity_type, bundle $bundle.";
-			if ($mode == 'live') { $msg .= " [LIVE MODE]"; } else { $msg .= " [TEST MODE, NO RECORDS DELETED]"; }
-			drupal_set_message($msg);
+	if ($results['deleted']) {
+		foreach ($results['deleted'] as $entity_type => $bundles) {
+			foreach ($bundles as $bundle => $details) {
+				$count = $details['count'];
+				$msg = "Deleted: $count records of type $entity_type, bundle $bundle.";
+				if ($mode == 'live') { $msg .= " [LIVE MODE]"; } else { $msg .= " [TEST MODE, NO RECORDS DELETED]"; }
+				drupal_set_message($msg);
+			}
 		}
 	}
 	if ($mode == 'live') { drupal_goto('<front>'); }

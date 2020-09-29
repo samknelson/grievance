@@ -12,5 +12,5 @@
  * - Read the _README file in this directory, it contains useful help and other information.
  */
 html /* Example style to show how to target a device range */ {
- font-size: 112.5%; /* Increase the default font size on small devices */
+ font-size: 113%; /* Increase the default font size on small devices */
 }

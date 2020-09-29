@@ -23,7 +23,7 @@ function sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_ti
   //        But I really can't be bothered. So it's theoretically possible to attempt to serve the same participant to multiple users.
   //        In which case, we return an error message and they reload the page. Oh well.
 
-  $sql = "select node.nid, field_sirius_phone_value$s as phone from node ";
+  $sql = "select node.nid, field_sirius_phone_value as phone from node ";
   $sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
@@ -37,7 +37,7 @@ function sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_ti
   $sql .= "and not exists (select 1 from sirius_lock where sirius_lock.type = :lock_type and sirius_lock.id = field_sirius_phone_value and sirius_lock.uid != :uid) ";
   $sql .= "and field_sirius_phone_value is not null ";
   $sql .= "and field_sirius_phone_value != '' ";
-  $sql .= "order by node.nid ";
+  $sql .= "order by RAND() ";
   $sql .= "limit 1 ";
   $stmt = db_query($sql, array(
     ':event_nid' => $event_node->nid, 
@@ -87,10 +87,34 @@ function sirius_event_phonebank_participants_by_phone($event_node, $prole_tid, $
   return node_load_multiple($participant_nids);
 }
 
+function sirius_phonebank_opens_in($event_node) {
+  if (!$event_node->field_sirius_daterepeat['und']) { return ''; }
+  $ts_now = time();
+  $opens_in = 999999999;
+  foreach ($event_node->field_sirius_daterepeat['und'] as $tmp) {
+    $start_ts = strtotime($tmp['value'] . ' ' . $tmp['timezone_db']);
+    $end_ts = strtotime($tmp['value2'] . ' ' . $tmp['timezone_db']);
+    if ($start_ts <= 1 || $end_ts <= 1) { continue; }
+    if ($start_ts >= $ts_now) {
+      $range = $start_ts - $ts_now;
+      if ($range && $range < $opens_in) { $opens_in = $range; }
+    }
+  }
+  if ($opens_in > 1 && $opens_in < 999999999) {
+    return t('Opening in: @interval', array('@interval' => format_interval($opens_in)));
+  }
+}
+
 function sirius_phonebank_active($event_node) {
+  $result = NULL;
+
   $json = sirius_jsonfield_util_node_json_get($event_node);
-  if ($json['phonebank']['active'] == 'Yes') { return TRUE; }
-  else if ($json['phonebank']['active'] == 'No') { return FALSE; }
+
+  if ($json['phonebank']['active'] == 'Yes') { 
+    $result = array('success' => TRUE);
+  } else if ($json['phonebank']['active'] == 'No') { 
+    $result = array('success' => FALSE, 'msg' => "The phone bank has been closed by an administrator.");
+  }
   else if ($json['phonebank']['active'] == 'Auto') { 
     $open_grace = $json['phonebank']['active_grace_open'];
     if ($open_grace > 0) { $open_grace *= 60; } else { $open_grace = 0; }
@@ -106,8 +130,22 @@ function sirius_phonebank_active($event_node) {
         if ($start_ts <= 1 || $end_ts <= 1) { continue; }
         $start_ts -= $open_grace;
         $end_ts += $close_grace;
-        if ($ts_now >= $start_ts && $ts_now <= $end_ts) { return TRUE; }
+        if ($ts_now >= $start_ts && $ts_now <= $end_ts) {
+          $result = array('success' => TRUE);
+        }
       }
     }
-  } else { return FALSE; }
+    if (!$result['success']) {
+      $result = array('success' => FALSE, 'msg' => "The phone bank is currently closed. " . sirius_phonebank_opens_in($event_node));
+    }
+  } else { 
+    $result = array('success' => FALSE);
+  }
+
+  if (!$result['success']) { return $result; }
+
+  $do_not_disturb_id = $json['phonebank']['do_not_disturb']['id'];
+  if ($do_not_disturb_id) { return sirius_do_not_disturb_check($do_not_disturb_id); }
+
+  return $result;
 }

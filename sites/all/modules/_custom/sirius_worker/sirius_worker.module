@@ -14,6 +14,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.vbo.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.merge.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.ein.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.schedule.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_duplicate_id.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_multiple_member_status.inc";
@@ -30,14 +31,18 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_term_delete.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_term_renew.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_ein.inc";
-
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_contact.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_industry.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_me.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_expiring.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_merge.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_schedule.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_schedule_tor.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_schedule_tos.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_optin.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tor.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tos.inc";
 
 function sirius_worker_get_by_id($id) {
 	if (!$id) { return NULL; }
@@ -173,6 +178,31 @@ function sirius_worker_form_alter(&$form, &$form_state, $form_id) {
     $form['field_sirius_skill_expire']['#access'] = FALSE;
     $form['field_sirius_member_status']['#access'] = FALSE;
     $form['field_sirius_industry']['#access'] = FALSE;
+    $form['field_sirius_work_status']['#access'] = FALSE;
+    $form['field_sirius_member_status']['#access'] = FALSE;
+    $form['field_sirius_worker_dispstatus']['#access'] = FALSE;
+    $form['field_sirius_dispatch_availdate']['#access'] = FALSE;
+    $form['field_sirius_skill']['#access'] = FALSE;
+    $form['field_sirius_skill_expire']['#access'] = FALSE;
+    $form['field_sirius_dispatch_dncs']['#access'] = FALSE;
+    $form['field_sirius_dispatch_asi']['#access'] = FALSE;
+    $form['field_sirius_dispatch_sib_status']['#access'] = FALSE;
+    $form['field_sirius_dispatch_medium']['#access'] = FALSE;
+    $form['field_sirius_skills_avail']['#access'] = FALSE;
+    $form['field_sirius_skills_availx']['#access'] = FALSE;
+    $form['field_grievance_departments']['#access'] = FALSE;
+    $form['field_sirius_dispatch_cbn']['#access'] = FALSE;
+    $form['field_sirius_dispatch_dncs2']['#access'] = FALSE;
+    $form['field_sirius_aat_required']['#access'] = FALSE;
+    $form['field_sirius_dispatch_hfe']['#access'] = FALSE;
+    $form['field_sirius_dispatch_hfe_until']['#access'] = FALSE;
+    $form['field_sirius_dispatch_eba']['#access'] = FALSE;
+    $form['field_sirius_dispatch_eba_dates']['#access'] = FALSE;
+    $form['field_sirius_email']['#access'] = FALSE;
+    $form['field_sirius_address']['#access'] = FALSE;
+    $form['field_sirius_phone_fax']['#access'] = FALSE;
+    $form['field_sirius_phone_alt']['#access'] = FALSE;
+    $form['field_sirius_phone']['#access'] = FALSE;
 
     // @todo - Have you ever seen such crappy code?  Good god, it must be 11:00 PM on the night we're launching.
     //        Somebody should really clean this up tout suite.
@@ -262,3 +292,18 @@ function sirius_worker_report_cache_info() {
 function sirius_worker_node_view($node, $view_mode, $langcode) {
   return sirius_worker_ein_node_view($node, $view_mode, $langcode);
 }
+
+/**
+ * Implements hook_file_download_access
+ */
+
+function sirius_worker_file_download_access($file_item, $entity_type, $entity) {
+  // Time-off entries get treated specially
+  if ($entity_type == 'node' && $entity->type == 'sirius_log' && $entity->field_sirius_category['und'][0]['value'] == 'tor') {
+    return sirius_worker_schedule_tor_download_access($file_item, $entity_type, $entity);
+  }
+  if ($entity_type == 'node' && $entity->type == 'sirius_log' && $entity->field_sirius_category['und'][0]['value'] == 'tos') {
+    return sirius_worker_schedule_tos_download_access($file_item, $entity_type, $entity);
+  }
+}
+

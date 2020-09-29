@@ -20,6 +20,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.p
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_queue.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_test.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_oneclick.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_manual.inc";
 
 /**
  * Implements hook_cron()
@@ -101,15 +102,29 @@ function sirius_bulk_recipient_remove($bulk_nid, $contact_nid) {
 	return array('success' => TRUE, 'msg' => 'Contact removed from the bulk message queue.');
 }
 
-function sirius_bulk_recipient_add($bulk_nid, $contact_nid) {
+function sirius_bulk_recipient_add($bulk_nid, $contact_nid, $params = array()) {
 	// Don't add to the queue twice.
 	$hr = sirius_bulk_recipient_check($bulk_nid, $contact_nid);
 	if ($hr) { return array('success' => FALSE, 'msg' => 'The contact has already been added as a recipient.'); }
 
+	$type = 'add';
+	if ($params['manual']) { 
+		$type = 'add-manual';
+		$msg = "Contacted added to the bulk message queue with manual confirmation required.";
+	} else {
+		$type = 'add';
+		$msg = "Contacted added to the bulk message queue.";
+	}
+
   // Add to the queue.
   $contact_node = node_load($contact_nid);
-	sirius_log('bulk:queue', 'add', $contact_node->title, '', '', array($bulk_nid, $contact_nid));
-	return array('success' => TRUE, 'msg' => 'Contact added to the bulk message queue.');
+	sirius_log('bulk:queue', $type, $contact_node->title, '', '', array($bulk_nid, $contact_nid));
+
+	if ($type == 'add-manual') { 
+	} else {
+
+	}
+	return array('success' => TRUE, 'msg' => $msg);
 }
 
 function sirius_bulk_recipient_check($bulk_nid, $contact_nid) {
@@ -151,6 +166,8 @@ function sirius_bulk_queue_summary($bulk_nid) {
 }
 
 function sirius_bulk_queue_summary_render($bulk_node) {
+	$status_options = sirius_bulk_status_options();
+
 	$html = '<div class="sirius_bulk_summary">';
 
 	$summary = sirius_bulk_queue_summary($bulk_node->nid);
@@ -164,13 +181,30 @@ function sirius_bulk_queue_summary_render($bulk_node) {
 	$html .= drupal_render(field_view_field('node', $bulk_node, 'field_sirius_bulk_status', 'full'));
 	$html .= drupal_render(field_view_field('node', $bulk_node, 'field_sirius_datetime', 'full'));
 	$html .= drupal_render(field_view_field('node', $bulk_node, 'field_sirius_datetime_completed', 'full'));
-	$html .= sirius_fakerender_field('Total Recipients: ', number_format($total_recipients, 0));
+	$recipients_html = '<strong>' . number_format($total_recipients, 0) . ' total recipients</strong>';
 	if ($summary) {
+		$recipients_html .= ': ';
+		$rows = array();
+		$is_first = TRUE;
 		foreach ($summary as $type => $count) {
-			$html .= sirius_fakerender_field('-- Status: ' . $type, number_format($count, 0));
+			if ($is_first) { $is_first = FALSE; } else { $recipients_html .= ' / '; }
+
+			$type_render = $status_options[$type];
+			if (!$type_render) { $type_render = $type; }
+			$recipients_html .= ' <strong>' . number_format($count, 0) . '</strong> ' . $type_render;
 		}
 	}
+	$html .= sirius_fakerender_field('Recipients: ', $recipients_html);
 
 	$html .= '</div>';
 	return $html;
+}
+
+function sirius_bulk_status_options() {
+	return array(
+		'add' => 'Pending delivery',
+		'add-manual' => 'Pending confirmation',
+		'sent' => 'Sent',
+		'error' => 'Error',
+	);
 }

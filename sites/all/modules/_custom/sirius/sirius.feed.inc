@@ -141,17 +141,22 @@ function sirius_feed_page_landing() {
 	$all_info = sirius_wizard_info_all();
 	$html = '<h2>Available Feeds</h2>';
 	$found = FALSE;
+	$html .= '<dl>';
 	foreach ($all_info as $key => $info) {
 		if (!$info['feed']) { continue; }
 		$path = "sirius/feeds/$key";
 		if (drupal_valid_path($path)) {
-			$html .= "<li>";
+			$html .= "<dt>";
 			$html .= l($info['title'], "sirius/feeds/$key");
-			$html .= '</li>';
+			$html .= '</dt>';
+			$html .= "<dd>";
+			$html .= $info['description'];
+			$html .= '<br /><br />';
+			$html .= '</dd>';
 			$found = TRUE;
 		}
 	}
-	$html .= '</ul>';
+	$html .= '</dl>';
 
 	if (!$found) {
 		return 'You do not have access to any feeds.';
@@ -713,7 +718,9 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$counts = array();
 	$callback = $info['feed']['callback_row_verify'];
 	foreach ($sheet->getRowIterator() as $row) {
-		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
+		++$count;
+		if ($count > 10000) { continue; }
+		if ($count == 1 && $data['header_row'] == 'Yes') { ++$count; continue; }
 		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 
 		$result = $callback($feed_node, $info, $data, $import_data_row, FALSE);
@@ -731,8 +738,6 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 		++$counts[$result['msg']];
 		if ($counts[$result['msg']] == 6) { $import_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
 		if ($counts[$result['msg']] <= 6) { $import_data[] = $import_data_row; }
-
-		++$count;
 	}
 	$data['rows'] = $count + 1;
 	$form_state['data'] = $data;
@@ -795,17 +800,26 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 	$current_step = $form_state['current_step'];
 	$limit = $form_state['values']['limit'];
 
-	$batch_size = $info['feed']['batch_size'];
-	if (!$batch_size) { $batch_size = 10; }
+	$batch_size = sirius_feed_batch_size($info['name']);
 	$idx = 0;
 	$rows = $data['rows'];
 	$batch_count = 0;
 	$data['process_ts'] = time();
+	$operations = array();
+
+	$callback_preprocess = $info['feed']['callback_preprocess'];
+	if ($callback_preprocess) { 
+		$operations[] = array($callback_preprocess, array($feed_node, $info, $data));
+	}
 	while ($idx < $rows) {
 		$operations[] = array('sirius_feed_wizard_process_batch', array($feed_node, $info, $data, $idx));
-		$idx += $batch_size;
+		$idx += $batch_size + 1;
 		++$batch_count;
 		if ($limit && $batch_count >= $limit) { break; }
+	}
+	$callback_postprocess = $info['feed']['callback_postprocess'];
+	if ($callback_postprocess) { 
+		$operations[] = array($callback_postprocess, array($feed_node, $info, $data));
 	}
 	$operations[] = array('sirius_feed_wizard_process_finish', array($feed_node, $info, $data, $idx));
 	$batch = array('operations' => $operations);
@@ -898,6 +912,31 @@ function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed
 	$form['attachments_intro'] = array('#markup' => '<div>' . t('The first file below contains the original upload data. The second contains the full set of results.') . '</div>');
 	$form['attachments'] = array('#markup' => drupal_render($renderable));
 
-
 	return $form;
+}
+
+function sirius_feed_batch_size($key) {
+	$size = variable_get('sirius_feed_batch_size_' . $key);
+	if (!$size) { 
+		$info = sirius_wizard_info($key);
+		$size = $info['feed']['batch_size'];
+	}
+	if (!$size) { $size = 10; }
+	return $size;
+}
+
+function sirius_feed_admin() {
+	$info_all = sirius_wizard_info_all();
+	foreach ($info_all as $key => $info) {
+		if (!$info['feed']) { continue; }
+		$variable_name = 'sirius_feed_batch_size_' . $key;
+		$form[$variable_name] = array(
+			'#type' => 'textfield',
+			'#default_value' => sirius_feed_batch_size($key),
+			'#title' => $info['title'],
+			'#description' => $info['description'],
+		);
+	}
+
+  return system_settings_form($form);
 }

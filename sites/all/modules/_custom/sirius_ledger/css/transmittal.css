@@ -1,0 +1,9 @@
+.sirius_ledger_transmittal_rates {
+}
+
+table.sirius_ledger_transmittal, 
+table.sirius_ledger_transmittal tr, 
+sirius_ledger_transmittal.th, 
+sirius_ledger_transmittal.td {
+	border: none;
+}

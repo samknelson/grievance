@@ -14,7 +14,10 @@ function sirius_event_term_tab_phonebank_form($form, &$form_state, $event_type_t
 	foreach ($prole_terms as $term) {
 		$prole_options[$term->tid] = $term->name;
 	}
+	$prole_tids = array_keys($prole_terms);
+	$pstatus_options = array(NULL => t('-- Select --')) + sirius_event_participant_role_status_tids($prole_tids);
 
+	$form['#tree'] = TRUE;
 	$form['phonebank_enabled'] = array(
 		'#type' => 'select',
 		'#title' => t('Phonebank Enabled?'),
@@ -46,6 +49,15 @@ function sirius_event_term_tab_phonebank_form($form, &$form_state, $event_type_t
 		'#description' => t('These roles have permission to administer the phonebank.'),
 	);
 	if ($json['phonebank']['admin_prole_tids']) { $form['admin_prole_tids']['#default_value'] = $json['phonebank']['admin_prole_tids']; }
+
+	$form['prescan']['pstatus_tid'] = array(
+		'#type' => 'select',
+		'#title' => t('Pre-Scan Default Status'),
+		'#options' => $pstatus_options,
+		'#description' => t('When a pre-scan for invalid phone numbers is performed, use this as the default status when an invalid number is found.'),
+		'#required' => TRUE,
+	);
+	if ($json['phonebank']['prescan']['pstatus_tid']) { $form['prescan']['pstatus_tid']['#default_value'] = $json['phonebank']['prescan']['pstatus_tid']; }
 
 	$form['submit'] = array(
 		'#type' => 'submit',

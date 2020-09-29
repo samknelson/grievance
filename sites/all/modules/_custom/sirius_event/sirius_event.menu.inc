@@ -125,12 +125,20 @@ function sirius_event_node_tabs() {
     'weight' => 3,
   );
 
+  $node_tabs['sirius_event']['sirius_event_phonebank/prescan'] = array(
+    'title' => 'Pre-Scan',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_phonebank_prescan',
+    'permissions' => array('sirius'),
+    'weight' => 4,
+  );
+
   $node_tabs['sirius_event']['sirius_event_phonebank/settings'] = array(
     'title' => 'Settings',
     'description' => '',
     'callback' => 'sirius_node_tab_event_phonebank_settings',
     'permissions' => array('sirius'),
-    'weight' => 4,
+    'weight' => 5,
   );
 
   $node_tabs['sirius_event']['sirius_event_class'] = array(
@@ -225,7 +233,7 @@ function sirius_event_node_tabs() {
   );
 
   $node_tabs['sirius_json_definition']['sirius_event_participant_definition_audio'] = array(
-    'title' => 'Audio',
+    'title' => 'Outgoing Message',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_definition_audio',
     'permissions' => array('sirius domain admin'),
@@ -339,6 +347,14 @@ function sirius_event_term_tabs() {
     'title' => 'Class',
     'description' => '',
     'callback' => 'sirius_event_term_tab_class',
+    'permissions' => array('sirius event admin'),
+    'weight' => 6,
+  );
+
+  $term_tabs['sirius_event_participant_status']['sirius_event_pstatus'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_pstatus',
     'permissions' => array('sirius event admin'),
     'weight' => 6,
   );

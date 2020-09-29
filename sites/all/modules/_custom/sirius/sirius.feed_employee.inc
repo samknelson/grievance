@@ -5,7 +5,7 @@ function sirius_feed_employee_info() {
   $items['feed_employee'] = array(
     'name' => 'feed_employee',
     'title' => 'Employees',
-    'description' => 'Upload employee records.',
+    'description' => 'Create or update records about an individual worker\'s employement at a specific employer. This feed is generally used to update EINs. It is generally not used to update workers or contacts.',
     'steps' => array(
       'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
       'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),

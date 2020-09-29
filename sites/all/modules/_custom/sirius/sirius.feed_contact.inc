@@ -1,5 +1,35 @@
 <?php
 
+function sirius_feed_contact_info() {
+
+  $items = array();
+
+  $items['feed_contact'] = array(
+    'name' => 'feed_contact',
+    'title' => 'Contacts',
+    'description' => 'Create or update contacts. This feed should not be used for members or workers.',
+    'steps' => array(
+      'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
+      'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),
+      // 'tag'      => array('label' => 'Tag',        'callback' => 'sirius_feed_wizard_tag'),
+      'map'       => array('label' => 'Mapping',    'callback' => 'sirius_feed_wizard_map'),
+      'verify'    => array('label' => 'Verify',     'callback' => 'sirius_feed_wizard_verify'),
+      'process'   => array('label' => 'Process',    'callback' => 'sirius_feed_wizard_process'),
+      'review'    => array('label' => 'Review',     'callback' => 'sirius_feed_wizard_review'),
+    ),
+    'feed' => array(
+      'batch_size' => 2000,
+      'callback_row_verify' => 'sirius_feed_contact_row_verify',
+      'callback_row_process' =>'sirius_feed_contact_row_process',
+      'callback_fields' => 'sirius_feed_contact_fields',
+    ),
+    'callback_launch' => 'sirius_feed_wizard_launch',
+    'callback_launch_args' => array('feed_contact'),
+  );
+
+  return $items;
+}
+
 function sirius_feed_contact_fields($info, $data, $feed_node, $current_step) {
   // Core fields
   $fields = array(

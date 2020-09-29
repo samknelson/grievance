@@ -195,6 +195,20 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 			":$node_type:field_sirius_address:postal_code" => 'Zip',
 			":$node_type:field_sirius_source:value" => 'Source',
 		);
+	} else if ($node_type == 'sirius_worker') {
+		$fields = array(
+			":$node_type:nid" => 'Internal ID',
+			":$node_type:title:value" => 'Name',
+			":$node_type:field_sirius_id:value" => 'ID',
+			":$node_type:field_sirius_phone:value" => 'Phone',
+			":$node_type:field_sirius_email:value" => 'Email',
+			":$node_type:field_sirius_address:country" => 'Country',
+			":$node_type:field_sirius_address:administrative_area" => 'State',
+			":$node_type:field_sirius_address:locality" => 'City',
+			":$node_type:field_sirius_address:thoroughfare" => 'Address',
+			":$node_type:field_sirius_address:postal_code" => 'Zip',
+			":$node_type:field_sirius_work_status:value" => 'Work Status',
+		);
 	}
 
 	return $fields;

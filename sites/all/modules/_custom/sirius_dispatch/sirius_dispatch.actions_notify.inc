@@ -166,32 +166,3 @@ function sirius_dispatch_notify(&$dispatch_node, $requested_medium = NULL, $note
 	node_save($dispatch_node);
 	return array('success' => $success, 'msg' => $msg);
 }
-
-function sirius_dispatch_notify_schedule_ok() {
-	$day = date('N');
-	$hour = date('G');
-	$minute = (int) date('i');
-
-	$enabled = variable_get("sirius_dispatch_run_schedule_${day}_enable}", "Yes");
-	$start_hour 	= variable_get("sirius_dispatch_run_schedule_${day}_start_hour}", 0);
-	$start_minute = variable_get("sirius_dispatch_run_schedule_${day}_start_minute}", 0);
-	$start_minute_display = str_pad($start_minute, 2, '0', STR_PAD_LEFT);
-	$stop_hour 		= variable_get("sirius_dispatch_run_schedule_${day}_stop_hour}", 0);
-	$stop_minute 	= variable_get("sirius_dispatch_run_schedule_${day}_stop_minute}", 0);
-	$stop_minute_display = str_pad($stop_minute, 2, '0', STR_PAD_LEFT);
-
-	if ($enabled != 'Yes') {
-		return array('success' => FALSE, 'msg' => 'Notifications cannot be sent today.');
-	}
-
-	if ($start_hour > $hour || ($start_hour == $hour && $start_minute > $minute)) {
-		return array('success' => FALSE, 'msg' => "Notifications cannot be sent until $start_hour:$start_minute_display. (It is now $hour:$minute)");
-	}
-
-	if ($hour > $stop_hour || ($hour == $stop_hour && $minute > $stop_minute)) {
-		return array('success' => FALSE, 'msg' => "Notifications cannot be sent after $stop_hour:$stop_minute_display. (It is now $hour:$minute)");
-	}
-
-	return array('success' => TRUE);
-}
-

@@ -39,6 +39,18 @@ function sirius_letter_access($action, $entity, $letter_node = NULL) {
 		return FALSE;
 	}
 
+	if ($node->type == 'grievance') {
+		if (!node_access('view', $node)) { return FALSE; }
+
+		// Admins can do anything
+		if (user_access('sirius admin')) { return TRUE; }
+		if (user_access('sirius domain admin')) { return TRUE; }
+		if (user_access('grievance admin')) { return TRUE; }
+		if (user_access('grievance user')) { return TRUE; }
+
+		return FALSE;
+	}
+
 	return FALSE;
 }
 

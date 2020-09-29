@@ -1,4 +1,4 @@
-.sirius_bulk_summary {
+.sirius_bulk_summary, .sirius_bulk_manual_instructions {
 	border: 1px solid #cccccc;
 	padding: 20px;
 	margin: 20px;
@@ -16,4 +16,53 @@
 
 
 .sirius_bulk_summary .sirius_bulk_summary_fields {
+}
+
+.sirius_bulk_manual_recipient {
+}
+
+.sirius_bulk_manual_recipient {
+  margin: 0;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 0;
+  float: left;
+}
+
+.sirius_bulk_manual_recipient div.form-item {
+  padding: 0; 
+  margin: 0;
+}
+
+/* Initial styles for the unselected elements */
+.sirius_bulk_manual_recipient label {
+  display: block;
+  border: 1px solid #c5c5c5;
+  background-color: #f6f6f6;
+  color: #454545;
+  padding: 2px 13px;
+  margin: 0;
+  font-weight: normal;
+  border-radius: 3px;
+  width: 160px;
+  height: 55px;
+}
+
+/* Styles for elements onHover state */
+.sirius_bulk_manual_recipient label:hover {
+  background-color: #ededed;
+  color: #2b2b2b;
+}
+
+/* Styles for elements onChecked state */
+.sirius_bulk_manual_recipient input:checked + label {
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #2e6da4;
+}
+
+/* Hide default inputs */
+.sirius_bulk_manual_recipient input[type="radio"],
+.sirius_bulk_manual_recipient input[type="checkbox"] {
+  display: none;
 }

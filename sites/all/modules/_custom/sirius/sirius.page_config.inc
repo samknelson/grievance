@@ -9,7 +9,8 @@ function sirius_page_config() {
 	
 	$links['core'] = array('title' => 'Core');
 	$links['core']['links']['sirius/taxonomy'] 										= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');
-	$links['core']['links']['sirius/admin/banner'] 								= array('title' => 'Site Banner', 'description' => 'Configure the banner to be shown at the top of all web pages.');
+	$links['core']['links']['sirius/admin/do_not_disturb'] 				= array('title' => 'Do Not Disturb', 'description' => 'Set do-not-disturb blackout times, e.g. "do not call after 9:00 PM".');
+	$links['core']['links']['sirius/admin/banner'] 								= array('title' => 'Site Banner', 'description' => 'Configure the banner and footer to be shown on all web pages.');
 	$links['core']['links']['sirius/field_overrides']							= array('title' => 'Field Overrides', 'description' => 'Change the names of fields.');
 	$links['core']['links']['admin/config/grievance/quicksearch'] = array('title' => 'Quickseach', 'description' => 'Settings for the banner "quicksearch" tool.');
 	$links['core']['links']['sirius/document-retention'] 				= array('title' => 'Document Retention', 'description' => 'Manage document retention policies.');
@@ -21,6 +22,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/contact/definition'] 				= array('title' => 'Contact Definition', 'description' => 'Set additional domain-specific fields for contacts.');
 	$links['core']['links']['sirius/contact/resync/all']				= array('title' => 'Contact Resync', 'description' => 'A data integrity utility to re-connect all worker and user accounts with contacts.');
 	$links['core']['links']['sirius/config/letter']							= array('title' => 'Letters', 'description' => 'Configure the Letters system and manage letter templates.');
+	$links['core']['links']['sirius/config/feed']							= array('title' => 'Letters', 'description' => 'Configure the feeds system.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
@@ -41,9 +43,13 @@ function sirius_page_config() {
 	$links['dispatch']['links']['sirius/dispatch/threestrikes'] = array('title' => '"Three Strikes"', 'description' => 'Configure or test the "three strikes" rule, blocking users who decline dispatches on multiple successive days.');
 	$links['dispatch']['links']['sirius/dispatch/config/view'] 	= array('title' => 'Dispatch Display', 'description' => 'Configure the header, footer, and style for the dispatch page.');
 	$links['dispatch']['links']['sirius/dispatch/config/vlri'] 	= array('title' => 'VLRI', 'description' => 'VLRI - Voluntary layoff with a request to convert to an involuntary configuration.');
+	$links['dispatch']['links']['sirius/dispatch/job/stub'] 		= array('title' => 'Stub Jobs', 'description' => 'Create or manage "stub" jobs, for generic dispatches or for importing legacy data.');
 
 	$links['bulk'] = array('title' => 'Bulk Messenger');
 	$links['bulk']['links']['sirius/bulk/config'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
+
+	$links['hour'] = array('title' => 'Hours');
+	$links['hour']['links']['sirius/hour/config'] 					= array('title' => 'Hour settings', 'description' => 'General settings for hour tracking.');
 
 	$links['training'] = array('title' => 'Training Center');
 	$links['training']['links']['sirius/config/training'] 					= array('title' => 'Training Center Settings', 'description' => 'Settings for the training center (evaluations, etc.).');
@@ -59,7 +65,9 @@ function sirius_page_config() {
 	$links['users']['links']['admin/config/people/tfa-trusted-ip'] = array('title' => 'TFA Trusted IPs', 'description' => 'Set the list of trusted IP addresses for two-factor authentication.');
 
 	$links['systems'] = array('title' => 'Systems');
-	$links['systems']['links']['sirius/callerid'] 							= array('title' => 'Caller ID', 'description' => 'Create or manage Caller ID entries.');
+	$links['systems']['links']['sirius/config/server-paths'] 					= array('title' => 'Server Paths', 'description' => 'Locations of services on the server: wkhtmltopdf, pdftk, etc.');
+	$links['systems']['links']['sirius/config/phone/callerid'] 									= array('title' => 'Caller ID', 'description' => 'Create or manage Caller ID entries.');
+	$links['systems']['links']['sirius/admin/caller-id-full-list'] 	= array('title' => 'Cross-Domain Caller ID List', 'description' => 'View a list of all caller IDs across all domains.');
 	$links['systems']['links']['sirius/config/specialrid'] 			= array('title' => 'Special Roles', 'description' => 'Certain roles have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/email'] 					= array('title' => 'Email', 'description' => 'Oubound email settings');
