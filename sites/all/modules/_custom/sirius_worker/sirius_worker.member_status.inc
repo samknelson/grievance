@@ -112,4 +112,37 @@ function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reaso
   $notes = $new_ms_tid;
   $handler_nids = array($worker_node->nid);
   sirius_log($category, $type, $msg, $summary, $notes, $handler_nids, $attachments);
+
+  // Send notifications
+  $notify_ms_tids = $clear_ms_tids;
+  $notify_ms_tids[] = $new_ms_tid;
+  $notify_ms_tids = array_unique($notify_ms_tids);
+  $notify_ms_terms = taxonomy_term_load_multiple($notify_ms_tids);
+  $notify_emails = array();
+  foreach ($notify_ms_terms as $notify_ms_tid => $notify_ms_term) {
+    $notify_json = sirius_jsonfield_util_term_json_get($notify_ms_term);
+    if ($notify_json['subscribe']['notify']) {
+      foreach ($notify_json['subscribe']['notify'] as $email) { $notify_emails[] = $email; }
+    }
+  }
+  $notify_emails = array_unique($notify_emails);
+  if ($notify_emails) {
+    $params = array();
+    $params['subject'] = 'Member status change for ' . $worker_node->title;
+    $params['body'] = 'There has been a member status change for ' . $worker_node->title . '.';
+    $params['body'] .= '<br /><br />';
+    $params['body'] .= $msg;
+    $params['body'] .= '<br /><br />';
+    $params['body'] .= $reason;
+    $params['body'] .= '<br /><br />';
+    global $base_url;
+    $url = $base_url . '/node/' . $worker_node->nid . '/sirius_worker_industry';
+    $params['body'] .= "Link: <a href=\"$url\">$url</a>";
+    foreach ($notify_emails as $email) {
+      $params['to'] = $email;
+      sirius_email_send($params);
+    }
+  }
+
+  return array('success' => TRUE, 'msg' => $msg);
 }
