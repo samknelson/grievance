@@ -16,7 +16,7 @@ function sirius_bulk_node_tab_queue_form($form, &$form_state, $bulk_node) {
 		$form, 
 		$form_state, 
 		$event_node->nid,
-		'Bulk Registration', 
+		'Recipient Search', 
 		array(
 			'sirius_contact' => array(
 				'default' => $contact_definition_form
