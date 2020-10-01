@@ -177,6 +177,7 @@ function sirius_domain_stats_calc_all() {
 
 function sirius_domain_stats_calc_tree($domain_nid, $depth = 0) {
   if ($depth > 1000) { return array(); }
+  $all_keys = array_keys(sirius_domain_stats_info_all());
   $domain_node = node_load($domain_nid);
   $json = sirius_jsonfield_util_node_json_get($domain_node);
   $stats_total = $json['stats'];
@@ -192,10 +193,11 @@ function sirius_domain_stats_calc_tree($domain_nid, $depth = 0) {
   }
 
   foreach ($child_domain_nids as $child_domain_nid) {
+    $child_domain_node = node_load($child_domain_nid);
     $stats_sub = sirius_domain_stats_calc_tree($child_domain_nid, $depth+1);
-    $all_keys = array_unique(array_keys($stats_total) + array_keys($stats_sub));
     foreach ($all_keys as $key) {
-      $stats_total[$key] = $stats_total[$key] + $stats_sub[$key];
+      if (!$stats_total[$key] && !$stats_sub[$key]) { continue; }
+      $stats_total[$key] += $stats_sub[$key];
     }
   }
 
