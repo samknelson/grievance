@@ -227,7 +227,7 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
   static $default_charge_ts;
   if (!isset($default_charge_ts)) { $default_charge_ts = strtotime($data['charge_settings']['ledger_date']); }
   $charge_ts = 0;
-  if ($row['charge_date'] && FALSE) {
+  if ($row['charge_date']) {
     $charge_ts = strtotime($row['charge_date']);
   } else {
     $charge_ts = $default_charge_ts;
