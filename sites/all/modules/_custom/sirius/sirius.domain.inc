@@ -504,6 +504,7 @@ function sirius_domain_form_restrict(&$form) {
 
 function sirius_domain_activity_ts_ranges() {
 	return array(
+    'hour'      => array('label' => 'Last Hour',      'ts' => strtotime('-1 hour')),
 		'day' 			=> array('label' => 'Last 24 Hours', 	'ts' => strtotime('-1 day')),
 		'week' 			=> array('label' => 'Last 7 days', 		'ts' => strtotime('-7 days')),
 		'month' 		=> array('label' => 'Last 30 days', 	'ts' => strtotime('-30 days')),

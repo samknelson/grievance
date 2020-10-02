@@ -48,12 +48,14 @@ function sirius_node_tab_sirius_domain_delete_form($form, &$form_state, $root_do
 		'#type' => 'checkboxes',
 		'#title' => 'Delete these node types',
 		'#options' => $node_bundles,
+		'#checkall' => TRUE,
 	);
 
 	$form['taxonomy_term_bundles'] = array(
 		'#type' => 'checkboxes',
 		'#title' => 'Delete these taxonomy terms',
 		'#options' => $taxonomy_bundles,
+		'#checkall' => TRUE,
 	);
 
 	$form['user_bundles'] = array(

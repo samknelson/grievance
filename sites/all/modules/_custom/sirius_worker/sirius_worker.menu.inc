@@ -179,6 +179,14 @@ function sirius_worker_term_tabs() {
     'weight' => 4,
   );
 
+  $term_tabs['sirius_member_status']['sirius_member_status_tos'] = array(
+    'title' => 'Subscriptions',
+    'description' => '',
+    'callback' => 'sirius_worker_term_tab_member_status_subscribe',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 5,
+  );
+
   return $term_tabs;
 }
 

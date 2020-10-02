@@ -17,9 +17,9 @@ function sirius_ledger_feed_allocate_info() {
     ),
     'feed' => array(
       'pks' => array(
+        'id' => 'Badge ID',
         'nid' => 'Worker NID',
         'ssn' => 'SSN',
-        'id' => 'Badge ID',
         'ein' => 'Employee ID',
       ),
       'fields' => array(

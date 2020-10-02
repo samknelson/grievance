@@ -43,6 +43,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_optin.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tor.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tos.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_subscribe.inc";
 
 function sirius_worker_get_by_id($id) {
 	if (!$id) { return NULL; }
@@ -178,6 +179,31 @@ function sirius_worker_form_alter(&$form, &$form_state, $form_id) {
     $form['field_sirius_skill_expire']['#access'] = FALSE;
     $form['field_sirius_member_status']['#access'] = FALSE;
     $form['field_sirius_industry']['#access'] = FALSE;
+    $form['field_sirius_work_status']['#access'] = FALSE;
+    $form['field_sirius_member_status']['#access'] = FALSE;
+    $form['field_sirius_worker_dispstatus']['#access'] = FALSE;
+    $form['field_sirius_dispatch_availdate']['#access'] = FALSE;
+    $form['field_sirius_skill']['#access'] = FALSE;
+    $form['field_sirius_skill_expire']['#access'] = FALSE;
+    $form['field_sirius_dispatch_dncs']['#access'] = FALSE;
+    $form['field_sirius_dispatch_asi']['#access'] = FALSE;
+    $form['field_sirius_dispatch_sib_status']['#access'] = FALSE;
+    $form['field_sirius_dispatch_medium']['#access'] = FALSE;
+    $form['field_sirius_skills_avail']['#access'] = FALSE;
+    $form['field_sirius_skills_availx']['#access'] = FALSE;
+    $form['field_grievance_departments']['#access'] = FALSE;
+    $form['field_sirius_dispatch_cbn']['#access'] = FALSE;
+    $form['field_sirius_dispatch_dncs2']['#access'] = FALSE;
+    $form['field_sirius_aat_required']['#access'] = FALSE;
+    $form['field_sirius_dispatch_hfe']['#access'] = FALSE;
+    $form['field_sirius_dispatch_hfe_until']['#access'] = FALSE;
+    $form['field_sirius_dispatch_eba']['#access'] = FALSE;
+    $form['field_sirius_dispatch_eba_dates']['#access'] = FALSE;
+    $form['field_sirius_email']['#access'] = FALSE;
+    $form['field_sirius_address']['#access'] = FALSE;
+    $form['field_sirius_phone_fax']['#access'] = FALSE;
+    $form['field_sirius_phone_alt']['#access'] = FALSE;
+    $form['field_sirius_phone']['#access'] = FALSE;
 
     // @todo - Have you ever seen such crappy code?  Good god, it must be 11:00 PM on the night we're launching.
     //        Somebody should really clean this up tout suite.

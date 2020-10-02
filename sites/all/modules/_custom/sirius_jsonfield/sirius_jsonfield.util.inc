@@ -276,3 +276,11 @@ function sirius_jsonfield_util_term_json_set(&$node, $json) {
 	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
 }
 
+function sirius_jsonfield_util_user_json_get($user) {
+	return json_decode($user->field_sirius_json['und'][0]['value'], TRUE);
+}
+
+function sirius_jsonfield_util_user_json_set(&$user, $json) {
+	$user->field_sirius_json['und'][0]['value'] = json_encode($json);
+}
+

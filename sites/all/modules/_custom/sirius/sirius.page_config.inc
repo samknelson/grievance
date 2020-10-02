@@ -4,8 +4,8 @@ function sirius_page_config() {
 	$links = array();
 
 	$links['domain'] = array('title' => 'Domains');
-	$links['domain']['links']['sirius/domains'] 									= array('title' => 'Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
-	$links['domain']['links']['sirius/domain/config/usermanage'] 	= array('title' => 'Domain User Manager', 'description' => 'Settings for the domain-specific user manager.');
+	$links['domain']['links']['sirius/domains'] 									= array('title' => 'Manage Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
+	$links['domain']['links']['sirius/domain/config'] 						= array('title' => 'Domain Settings', 'description' => 'Global domain settings -- user manager, stats configuration, etc.');
 	
 	$links['core'] = array('title' => 'Core');
 	$links['core']['links']['sirius/taxonomy'] 										= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');

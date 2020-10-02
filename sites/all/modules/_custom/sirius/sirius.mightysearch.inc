@@ -393,6 +393,17 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		);
 	}
 
+	if ($action_options['report']) {
+		$form['mightysearch_results']['report_optioncount'] = array(
+			'#type' => 'textfield',
+			'#size' => 4,
+			'#title' => t("Maximum number of options"),
+			'#default_value' => 50,
+			'#description' => t('Enter the maximum number of rows that will be shown for each report variable. Additional options will be displayed as "all other options". This value cannot be greater than 1,000.'),
+			'#states' => array('visible' => array(array(":input[name=\"mightysearch_results[action]\"]" => array('value' => 'report')))),
+		);
+	}
+
 	if ($action_options['delete']) {
 		$form['mightysearch_results']['delete_confirm'] = array(
 			'#title' => 'Really delete these contacts? Deletion is permanent and the deleted contacts can never be retrieved. There is no "undo" for this actions.',
@@ -805,13 +816,16 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 			$total = 0;
 			$option_count = 0;
 			$other_option_total = 0;
+			$max_option_count = $form_state['values']['mightysearch_results']['report_optioncount'];
+			if ($max_option_count < 1) { $max_option_count = 50; }
+			if ($max_option_count > 1000) { $max_option_count = 1000; }
 			foreach ($option_data as $option => $count) {
 				++$option_count;
 
 				$is_empty = ($option === NULL || $option === '');
 				if ($is_empty) { $option = '[empty]'; }
 
-				if ($option_count < 50) {
+				if ($option_count <= $max_option_count) {
 					$row = array();
 					$row[] = $option;
 					$row[] = $count;

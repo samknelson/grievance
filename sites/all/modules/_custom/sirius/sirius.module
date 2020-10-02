@@ -30,6 +30,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.taxonomy.in
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact_definition.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.domain.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.domain_stats.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.signature.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.callerid.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.volunteer.inc';
@@ -45,6 +46,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearc
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.do_not_disturb.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.server_paths.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.shortlink.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -71,6 +73,10 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_delete.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_activity.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_components.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_stats.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_list.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_list_stats.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_list_prefs.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_term_exim.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_sort.inc';
@@ -92,6 +98,7 @@ require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
 function sirius_cron() {
   sirius_auditlog();
   sirius_signature_cleanup();
+  sirius_domain_stats_cron();
 }
 
 /**
@@ -298,7 +305,7 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
       $form_id == 'sirius_ledger_account_node_form' ||
       $form_id == 'sirius_employee_node_form' ||
       $form_id == 'grievance_letter_template_node_form') {
-    $form['field_sirius_json']['#access'] = FALSE;
+    if (!user_access('sirius admin')) { $form['field_sirius_json']['#access'] = FALSE; }
   }
 
   // @todo: sirius_dispatch_job_type shouldn't edit json in the main taxonomy term form, it should have a separate tab.
@@ -311,9 +318,7 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   // Remove access to caller ID fields which are set in a node tab
   if ($form_id == 'sirius_json_definition_node_form') {
     $form['field_sirius_callerids']['#access'] = FALSE;
-    if (!user_access('sirius admin')) {
-      $form['field_sirius_audio']['#access'] = FALSE;
-    }
+    if (!user_access('sirius admin')) { $form['field_sirius_audio']['#access'] = FALSE; }
     if ($_GET['sirius_type']) { $form['field_sirius_type']['#access'] = FALSE; }
   }
 
