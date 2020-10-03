@@ -89,7 +89,8 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 	$sql .= "field_sirius_work_status_tid, ";
 	$sql .= "field_sirius_name_family, ";
 	$sql .= "field_sirius_name_given, ";
-	$sql .= "balance_amount ";
+	$sql .= "balance_amount,  ";
+	$sql .= "group_concat(distinct ms_term.name order by ms_term.name separator ', ') as ms_names ";
 
 	$sql .= " from node ";
 
@@ -101,10 +102,9 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
 	$sql .= "left join sirius_ledger_balance on (sirius_ledger_balance.balance_participant = field_sirius_contact_target_id and balance_account = :account_tid) ";
 	$sql_args[':account_tid'] = $form_state['values']['account_tid'];
-	if ($form_state['values']['ms_tid']) {
-		$sql_args[':ms_tid'] = $form_state['values']['ms_tid'];
-		$sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid ";
-	}
+	$sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid ";
+	$sql .= "left join taxonomy_term_data ms_term on ms_term.tid = field_sirius_member_status_tid ";
+	if ($form_state['values']['ms_tid']) { $sql_args[':ms_tid'] = $form_state['values']['ms_tid']; }
 
 	$sql .= "where type = 'sirius_worker' ";
 	$sql .= "and field_sirius_domain_target_id = :domain_nid ";
@@ -132,6 +132,7 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 		}
 	}
 
+	$sql .= "group by node.nid ";
 	$sql .= "order by field_sirius_name_family, field_sirius_name_given ";
 	$sql_args[':domain_nid'] = sirius_domain_nid();
 	$stmt = sirius_sql_query($sql, $sql_args);
@@ -141,12 +142,12 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 		t('Worker'),
 		t('ID'),
 		t('Work Status'),
+		t('Member Status'),
 		t('Balance'),
 		t('Tools'),
 	);
 	$rows = array();
 	while ($hr = $stmt->fetchAssoc()) {
-
 		$tools = '';
 		$paths = array(
 			'node/' . $hr['nid'] => t('Worker'),
@@ -162,6 +163,7 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 		$row[] = $hr['title'];
 		$row[] = $hr['field_sirius_id_value'];
 		$row[] = $ws_options[$hr['field_sirius_work_status_tid']];
+		$row[] = $hr['ms_names'];
 		$row[] = sirius_ledger_ar_format_balance($hr['balance_amount']);
 		$row[] = $tools;
 		$rows[] = $row;
