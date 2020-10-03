@@ -66,6 +66,16 @@ function sirius_ledger_page_list_workers_form($form, &$form_state) {
 		'#default_value' => 'active',
 	);
 
+	$form['output'] = array(
+		'#type' => 'select',
+		'#title' => t('Output'),
+		'#options' => array(
+			'screen' => t('Display the results on the screen'),
+			'csv' => t('Download the results as a a CSV file'),
+		),
+		'#default_value' => 'screen',
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -81,6 +91,9 @@ function sirius_ledger_page_list_workers_form($form, &$form_state) {
 function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 
+	$output = $form_state['values']['output'];
+	if ($output != 'csv') { $limit = 300; }
+
 	$sql_args = array();
 	$sql = "select  ";
 	$sql .= "node.nid, ";
@@ -89,7 +102,7 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 	$sql .= "field_sirius_work_status_tid, ";
 	$sql .= "field_sirius_name_family, ";
 	$sql .= "field_sirius_name_given, ";
-	$sql .= "balance_amount,  ";
+	$sql .= "balance_amount, ";
 	$sql .= "group_concat(distinct ms_term.name order by ms_term.name separator ', ') as ms_names ";
 
 	$sql .= " from node ";
@@ -134,44 +147,94 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 
 	$sql .= "group by node.nid ";
 	$sql .= "order by field_sirius_name_family, field_sirius_name_given ";
+	if ($limit) { $sql .= "limit $limit "; }
 	$sql_args[':domain_nid'] = sirius_domain_nid();
 	$stmt = sirius_sql_query($sql, $sql_args);
 
 	$ws_options = sirius_taxonomy_load('sirius_work_status', 'tid', 'name');
-	$header = array(
-		t('Worker'),
-		t('ID'),
-		t('Work Status'),
-		t('Member Status'),
-		t('Balance'),
-		t('Tools'),
-	);
-	$rows = array();
-	while ($hr = $stmt->fetchAssoc()) {
-		$tools = '';
-		$paths = array(
-			'node/' . $hr['nid'] => t('Worker'),
-			'node/' . $hr['nid'] . '/sirius_worker_ledger' => t('A/R'),
+
+	if ($output == 'csv') {
+		$header = array(
+			t('Worker'),
+			t('ID'),
+			t('Work Status'),
+			t('Member Status'),
+			t('Balance'),
 		);
-		foreach ($paths as $path => $title) {
-			if (drupal_valid_path($path)) {
-				$tools .= l($title, $path, array('attributes' => array('class' => array('tool-button'))));
+	}
+
+	if ($output == 'screen') {
+		$header = array(
+			t('Worker'),
+			t('ID'),
+			t('Work Status'),
+			t('Member Status'),
+			t('Balance'),
+			t('Tools'),
+		);
+	}
+
+
+	if ($output == 'csv') {
+		$fp = fopen('php://output', 'w');
+		$filename = 'balance_report.csv';
+		drupal_add_http_header('Content-Type', 'text/csv');
+		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		fputcsv($fp, $header);
+	}
+
+	$rows = array();
+	$count = 0;
+	while ($hr = $stmt->fetchAssoc()) {
+		++$count;
+
+		if ($output == 'screen') {
+			$tools = '';
+			$paths = array(
+				'node/' . $hr['nid'] => t('Worker'),
+				'node/' . $hr['nid'] . '/sirius_worker_ledger' => t('A/R'),
+			);
+			foreach ($paths as $path => $title) {
+				if (drupal_valid_path($path)) {
+					$tools .= l($title, $path, array('attributes' => array('class' => array('tool-button'))));
+				}
 			}
 		}
+
+		$balance = $hr['balance_amount'];
+		if ($output == 'screen') { $balance = sirius_ledger_ar_format_balance($balance); }
 
 		$row = array();
 		$row[] = $hr['title'];
 		$row[] = $hr['field_sirius_id_value'];
 		$row[] = $ws_options[$hr['field_sirius_work_status_tid']];
 		$row[] = $hr['ms_names'];
-		$row[] = sirius_ledger_ar_format_balance($hr['balance_amount']);
-		$row[] = $tools;
-		$rows[] = $row;
+		$row[] = $balance;
+		if ($output == 'screen') { $row[] = $tools; }
+
+		if ($output == 'screen') {
+			$rows[] = $row;
+		}
+
+		if ($output == 'csv') {
+			fputcsv($fp, $row);
+		}
 	}
 
-	if ($rows) {
-		$form_state['results'] = theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
-	} else {
-		$form_state['results'] = t('No records found matching the search criteria.');
+	if ($output == 'csv') {
+		fclose($fp);
+		exit();
 	}
+
+	$result_html = '';
+	if ($rows) {
+		if ($count == $limit) {
+			$result_html .= '<p><em>' . t('Showing the first @limit rows. To view all results, download the output as a CSV file.', array('@limit' => $limit)) . '</em></p>';
+		}
+		$result_html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+	} else {
+		$result_html .= t('No records found matching the search criteria.');
+	}
+
+	$form_state['results'] = $result_html;
 }
