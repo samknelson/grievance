@@ -18,6 +18,10 @@ function sirius_feed_contact_info() {
       'review'    => array('label' => 'Review',     'callback' => 'sirius_feed_wizard_review'),
     ),
     'feed' => array(
+      'pks' => array(
+        'id' => 'ID',
+        'nid' => 'NID',
+      ),
       'batch_size' => 2000,
       'callback_row_verify' => 'sirius_feed_contact_row_verify',
       'callback_row_process' =>'sirius_feed_contact_row_process',
@@ -35,7 +39,11 @@ function sirius_feed_contact_fields($info, $data, $feed_node, $current_step) {
   $fields = array(
     'id' => array(
       'title' => 'ID',
-      'required' => TRUE,
+      'required' => FALSE,
+    ),
+    'nid' => array(
+      'title' => 'NID',
+      'required' => FALSE,
     ),
     'name_given' => array(
       'title' => 'First Name',
@@ -115,31 +123,41 @@ function sirius_feed_contact_row_verify($feed_node, $info, $data, &$row, $precom
 
   $domain_nid = $feed_node->field_sirius_domain['und'][0]['target_id'];
 
+  $pk = $data['pk'];
+  if (!$pk) { $pk = 'id'; }
+  if ($pk == 'nid') {
+   if (!preg_match('/^[0-9]+$/', $row['nid'])) { return array('success' => FALSE, 'msg' => 'Invalid NID'); }
+  }
+
   // Contact
   if ($precompute) {
-    $args = array();
-    $args[':id'] = $row['id'];
+    if ($pk == 'id') {
+      $args = array();
+      $args[':id'] = $row['id'];
 
-  	$sql = "select max(field_data_field_sirius_id.entity_id) as a, min(field_data_field_sirius_id.entity_id) as b from field_data_field_sirius_id ";
-    if ($domain_nid) {
-      $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = field_data_field_sirius_id.entity_id ";
-    }
-  	$sql .= "where field_data_field_sirius_id.entity_type = 'node' ";
-  	$sql .= "and field_data_field_sirius_id.bundle = 'sirius_contact' ";
-  	$sql .= "and field_data_field_sirius_id.field_sirius_id_value = :id ";
-    if ($domain_nid) {
-      $sql .= "and field_sirius_domain_target_id = :domain_nid";
-      $args[':domain_nid'] = $domain_nid;
-    }
+    	$sql = "select max(field_data_field_sirius_id.entity_id) as a, min(field_data_field_sirius_id.entity_id) as b from field_data_field_sirius_id ";
+      if ($domain_nid) {
+        $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = field_data_field_sirius_id.entity_id ";
+      }
+    	$sql .= "where field_data_field_sirius_id.entity_type = 'node' ";
+    	$sql .= "and field_data_field_sirius_id.bundle = 'sirius_contact' ";
+    	$sql .= "and field_data_field_sirius_id.field_sirius_id_value = :id ";
+      if ($domain_nid) {
+        $sql .= "and field_sirius_domain_target_id = :domain_nid";
+        $args[':domain_nid'] = $domain_nid;
+      }
 
-  	$stmt = db_query($sql, $args);
-  	$hr = $stmt->fetchAssoc();
-  	$nid = $hr['a'];
-  	$other_nid = $hr['b'];
-  	if ($nid != $other_nid) {
-  		return array('success' => FALSE, 'msg' => 'Multiple contacts found with this ID.');
-  	}
-  	$row['contact_nid'] = $nid;
+    	$stmt = db_query($sql, $args);
+    	$hr = $stmt->fetchAssoc();
+    	$nid = $hr['a'];
+    	$other_nid = $hr['b'];
+    	if ($nid != $other_nid) {
+    		return array('success' => FALSE, 'msg' => 'Multiple contacts found with this ID.');
+    	}
+      $row['contact_nid'] = $nid;
+    } else {
+      $row['contact_nid'] = $row['nid'];      
+    }
   }
 
   return array('success' => TRUE, 'msg' => 'Looks good.');
