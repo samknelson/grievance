@@ -110,7 +110,6 @@
 		  	To: $('#sirius_browserphone_number').val(),
 		  	token: token,
 		  	callerid_nid: $('#sirius_browserphone_callerid').val(),
-		  	whatever: 'I am an extra parameter.',
 			};
 			Drupal.settings.sirius_twilio_browserphone.connection = device.connect(params);
 			return false;

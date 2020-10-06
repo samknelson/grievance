@@ -13,24 +13,16 @@ function sirius_page_contacts_form($form, &$form_state) {
 		$form_state, 
 		'main_contact_search',
 		'Contact Search', 
-		array('sirius_contact' => 
-			array(
-				'default' => $contact_definition_form
-			)
+		array(
+			'sirius_contact' => array('default' => $contact_definition_form),
+			'sirius_worker' => array('default' => array()),
 		),
 		array(
-			'search' => array(
-				'title' => 'Search',
-			),
-			'export' => array(
-				'title' => 'Export',
-			),
-			'tag' => array(
-				'title' => 'Add / Remove Tags',
-			),
-			'delete' => array(
-				'title' => 'Delete',
-			),
+			'search' => array('title' => 'Search'),
+			'export' => array('title' => 'Export'),
+			'report' => array('title' => 'Report'),
+			'tag' => array('title' => 'Add / Remove Tags'),
+			'delete' => array('title' => 'Delete'),
 		)
 	);
 

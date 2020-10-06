@@ -124,7 +124,7 @@ function sirius_ledger_node_tab_employer_transmittal_print($employer_node, $acco
 	}
 
 	$intro_html .= '<div class="sirius_form_intro">';
-	$intro_html .= '<h1>' . $employer_node->title . '<br />' . 'Transmittal Form ' . date('F Y') . '</h1>';
+	$intro_html .= '<h1>' . $employer_node->title . '<br />' . 'Transmittal Form ' . date('F j, Y') . '</h1>';
 	$intro_html .= '</div>';
 	$html .= $intro_html;
 

@@ -4,8 +4,8 @@ function sirius_page_config() {
 	$links = array();
 
 	$links['domain'] = array('title' => 'Domains');
-	$links['domain']['links']['sirius/domains'] 									= array('title' => 'Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
-	$links['domain']['links']['sirius/domain/config/usermanage'] 	= array('title' => 'Domain User Manager', 'description' => 'Settings for the domain-specific user manager.');
+	$links['domain']['links']['sirius/domains'] 									= array('title' => 'Manage Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
+	$links['domain']['links']['sirius/domain/config'] 						= array('title' => 'Domain Settings', 'description' => 'Global domain settings -- user manager, stats configuration, etc.');
 	
 	$links['core'] = array('title' => 'Core');
 	$links['core']['links']['sirius/taxonomy'] 										= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');
@@ -22,6 +22,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/contact/definition'] 				= array('title' => 'Contact Definition', 'description' => 'Set additional domain-specific fields for contacts.');
 	$links['core']['links']['sirius/contact/resync/all']				= array('title' => 'Contact Resync', 'description' => 'A data integrity utility to re-connect all worker and user accounts with contacts.');
 	$links['core']['links']['sirius/config/letter']							= array('title' => 'Letters', 'description' => 'Configure the Letters system and manage letter templates.');
+	$links['core']['links']['sirius/config/feed']							= array('title' => 'Letters', 'description' => 'Configure the feeds system.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');

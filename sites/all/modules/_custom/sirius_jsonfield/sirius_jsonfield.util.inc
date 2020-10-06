@@ -207,7 +207,8 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 			":$node_type:field_sirius_address:locality" => 'City',
 			":$node_type:field_sirius_address:thoroughfare" => 'Address',
 			":$node_type:field_sirius_address:postal_code" => 'Zip',
-			":$node_type:field_sirius_work_status:value" => 'Work Status',
+			":$node_type:field_sirius_work_status" => 'Work Status',
+			":$node_type:field_sirius_member_status" => 'Member Status',
 		);
 	}
 
@@ -274,5 +275,13 @@ function sirius_jsonfield_util_term_json_get($term) {
 
 function sirius_jsonfield_util_term_json_set(&$node, $json) {
 	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
+}
+
+function sirius_jsonfield_util_user_json_get($user) {
+	return json_decode($user->field_sirius_json['und'][0]['value'], TRUE);
+}
+
+function sirius_jsonfield_util_user_json_set(&$user, $json) {
+	$user->field_sirius_json['und'][0]['value'] = json_encode($json);
 }
 

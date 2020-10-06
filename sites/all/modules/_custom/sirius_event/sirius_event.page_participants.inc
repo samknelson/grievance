@@ -108,7 +108,7 @@ function sirius_event_participant_role_status_tids($participant_role_tid) {
 		$args[':participant_role_tid'] = $participant_role_tid;
 	}
 	$sql .= "order by weight, name ";
-	$stmt = db_query($sql, $args);
+	$stmt = sirius_sql_query($sql, $args);
 	$statuses = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		$statuses[$hr['tid']] = $hr['name'];

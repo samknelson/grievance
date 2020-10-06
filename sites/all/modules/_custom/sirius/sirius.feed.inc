@@ -389,8 +389,9 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 		$form['pk'] = array(
 			'#type' => 'select',
 			'#title' => 'Primary Key',
-			'#options' => $pks,
+			'#options' => array(NULL => t('-- Select --')) + $pks,
 			'#default_value' => $data['pk'],
+			'#required' => TRUE,
 		);
 	}
 

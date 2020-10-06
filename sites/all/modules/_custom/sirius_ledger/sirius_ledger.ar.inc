@@ -30,10 +30,13 @@ function sirius_ledger_ar_fetch($params = array()) {
 		$sql .= "reference_node.title as reference_title ";
 	}
 	$sql .= "from sirius_ledger_ar ";
-	$sql .= "left join node participant_node on participant_node.nid = ledger_participant ";
-	$sql .= "left join node account_node on account_node.nid = ledger_account ";
-	$sql .= "left join node reference_node on reference_node.nid = ledger_reference ";
-	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.field_sirius_contact_target_id = participant_node.nid and field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.bundle = 'sirius_worker' ";
+	if ($params['balance']) {
+	} else {
+		$sql .= "left join node participant_node on participant_node.nid = ledger_participant ";
+		$sql .= "left join node account_node on account_node.nid = ledger_account ";
+		$sql .= "left join node reference_node on reference_node.nid = ledger_reference ";
+		$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.field_sirius_contact_target_id = participant_node.nid and field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.bundle = 'sirius_worker' ";
+	}
 
 	$sql .= "where 1 = 1 ";
 
@@ -57,10 +60,16 @@ function sirius_ledger_ar_fetch($params = array()) {
 		$sql .= "and ledger_key = :ledger_key ";
 		$sql_args[':ledger_key'] = $params['ledger_key'];
 	}
-	$sql .= "order by ledger_ts desc ";
+
+	if ($params['balance']) {
+	} else {
+		if (!$params['unsorted']) {
+			$sql .= "order by ledger_ts desc ";
+		}
+	}
 
 	$result = array();
-	$stmt = db_query($sql, $sql_args);
+	$stmt = sirius_sql_query($sql, $sql_args);
 	if ($params['balance']) {
 		$hr = $stmt->fetchAssoc();
 		return $hr['s'];
@@ -143,7 +152,9 @@ function sirius_ledger_ar_insert($entry) {
 	$sql_args[':ledger_memo'] = $entry['ledger_memo'];
 	$sql_args[':ledger_key'] = $entry['ledger_key'];
 
-	$stmt = db_query($sql, $sql_args);
+	$stmt = sirius_sql_query($sql, $sql_args);
+
+	sirius_ledger_balance_update($entry['ledger_participant'], $entry['ledger_account']);
 }
 
 function sirius_ledger_ar_update($entry) {
@@ -170,12 +181,30 @@ function sirius_ledger_ar_update($entry) {
 	$sql_args[':ledger_id'] = $entry['ledger_id'];
 
 	$stmt = sirius_sql_query($sql, $sql_args);
+
+	sirius_ledger_balance_update($entry['ledger_participant'], $entry['ledger_account']);
 }
 
 function sirius_ledger_ar_delete($entry) {
 	$sql = 'delete from sirius_ledger_ar where ledger_id = :ledger_id';
 	$sql_args = array(':ledger_id' => $entry['ledger_id']);
 	$stmt = db_query($sql, $sql_args);
+
+	sirius_ledger_balance_update($entry['ledger_participant'], $entry['ledger_account']);
+}
+
+function sirius_ledger_ar_delete_by_reference($ledger_reference) {
+	$sql = "select distinct ledger_participant, ledger_account from sirius_ledger_ar where ledger_reference = :ledger_reference ";
+	$stmt = sirius_sql_query($sql, array(':ledger_reference' => $ledger_reference));
+	$to_update = array();
+	while ($hr = $stmt->fetchAssoc()) { $to_update[] = $hr; }
+
+	$sql = 'delete from sirius_ledger_ar where ledger_reference = :ledger_reference ';
+	$stmt = sirius_sql_query($sql, array(':ledger_reference' => $ledger_reference));
+
+	foreach ($to_update as $hr) {
+		sirius_ledger_balance_update($hr['ledger_participant'], $hr['ledger_account']);
+	}
 }
 
 function sirius_ledger_ar_format_balance($balance) {
@@ -255,4 +284,6 @@ function sirius_ledger_ar_purge($params) {
 
 	$stmt = sirius_sql_query($sql, $sql_args);
 	return $stmt->rowCount();
+
+	sirius_ledger_balance_purge($entry['ledger_participant'], $entry['ledger_account']);
 }

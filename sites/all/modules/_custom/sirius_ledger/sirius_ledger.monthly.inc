@@ -238,7 +238,7 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 		} else {
 			$charge_days = array(
 				$policy_json['ledger']['policy']['monthly']['semimonthly_charge_day_1'],
-				$policy_json['ledger']['policy']['settings']['semimonthly_charge_day_2']
+				$policy_json['ledger']['policy']['monthly']['semimonthly_charge_day_2']
 			);
 		}
 

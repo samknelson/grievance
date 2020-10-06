@@ -163,22 +163,37 @@ function sirius_node_tabs() {
     'weight' => 6,
   );
 
-  /*
-  $node_tabs['sirius_domain']['sirius_domain_activity'] = array(
-    'title' => 'Activity',
+  $node_tabs['sirius_domain']['sirius_domain_stats'] = array(
+    'title' => 'Stats',
     'description' => '',
-    'callback' => 'sirius_node_tab_sirius_domain_activity',
+    'callback' => 'sirius_node_tab_sirius_domain_stats_total',
     'permissions' => array('sirius domain admin'),
     'weight' => 6,
   );
-  */
 
-  $node_tabs['sirius_domain']['sirius_domain_delete'] = array(
-    'title' => 'Delete',
+  $node_tabs['sirius_domain']['sirius_domain_stats/view'] = array(
+    'title' => 'Stats (Including Subdomains)',
     'description' => '',
-    'callback' => 'sirius_node_tab_sirius_domain_delete',
+    'callback' => 'sirius_node_tab_sirius_domain_stats_total',
     'permissions' => array('sirius domain admin'),
-    'weight' => 7,
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_domain']['sirius_domain_stats/domain_only'] = array(
+    'title' => 'Stats (This Domain Only)',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_stats',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_domain']['sirius_domain_stats/calc'] = array(
+    'title' => 'Recalc',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_stats_calc',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 3,
   );
 
   $node_tabs['sirius_contact']['sirius_contact_json'] = array(
@@ -186,7 +201,15 @@ function sirius_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_contact_json',
     'permissions' => array('sirius'),
-    'weight' => 6,
+    'weight' => 9,
+  );
+
+  $node_tabs['sirius_domain']['sirius_domain_delete'] = array(
+    'title' => 'Delete',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_delete',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 10,
   );
 
   return $node_tabs;
@@ -348,6 +371,14 @@ function sirius_menu() {
     'page callback' => 'sirius_aatlink',
     'page arguments' => array(1,2),
     'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/config/feed'] = array(
+    'title' => 'Feeds',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_feed_admin'),
+    'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -568,22 +599,84 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-
-  $items['sirius/domain/config/usermanage'] = array(
-    'title' => 'Domain User Manager Configuration',
+  $items['sirius/domain/config'] = array(
+    'title' => 'Domain Configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_domain_usermanage_admin'),
     'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/domain/config/usermanage'] = array(
+    'title' => 'User Manager',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_domain_usermanage_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/domain/config/stats'] = array(
+    'title' => 'Stats',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_domain_stats_admin'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
   $items['sirius/domain/switch'] = array(
-    'title' => 'Domain Switch',
+    'title' => 'Switch',
     'page callback' => 'sirius_domain_page_switch',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain switch'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+
+
+  $items['sirius/domain/list'] = array(
+    'title' => 'Domains',
+    'page callback' => 'sirius_domain_page_list',
     'page arguments' => array(),
     'access arguments' => array('sirius domain switch'),
     'type' => MENU_NORMAL_ITEM,
   );
+
+  $items['sirius/domain/list/tools'] = array(
+    'title' => 'Tools',
+    'page callback' => 'sirius_domain_page_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain switch'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/domain/list/stats'] = array(
+    'title' => 'Stats',
+    'page callback' => 'sirius_domain_page_list_stats',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain switch'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/domain/list/prefs'] = array(
+    'title' => 'Preferences',
+    'page callback' => 'sirius_domain_page_list_prefs',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain switch'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
+
+
+
+
+
+
 
   $items['sirius/domains'] = array(
     'title' => 'Domains',
@@ -833,6 +926,15 @@ function sirius_menu() {
     'page arguments' => array(2),
     'type' => MENU_LOCAL_TASK,
     'weight' => 60,
+  );
+
+  $items['s/%'] = array(
+    'title' => 'Shortlink',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_shortlink_clicked',
+    'page arguments' => array(1),
+    'type' => MENU_NORMAL_ITEM,
   );
 
   return $items;

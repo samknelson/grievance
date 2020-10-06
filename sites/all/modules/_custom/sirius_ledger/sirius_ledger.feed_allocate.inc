@@ -3,7 +3,7 @@
 function sirius_ledger_feed_allocate_info() {
   $items = array();
   $items['ledger_feed_allocate'] = array(
-    'name' => 'feed_ledger_allocate',
+    'name' => 'ledger_feed_allocate',
     'title' => 'A/R Payment Allocation',
     'description' => 'Allocate one or more payments. For example, if an employer submits a dues check accompanied by a spreadsheet indicating how much was withheld from each employee\'s paycheck, this feed can be used to allocate the payment against various employees\' accounts.',
     'steps' => array(
@@ -17,9 +17,9 @@ function sirius_ledger_feed_allocate_info() {
     ),
     'feed' => array(
       'pks' => array(
+        'id' => 'Badge ID',
         'nid' => 'Worker NID',
         'ssn' => 'SSN',
-        'id' => 'Badge ID',
         'ein' => 'Employee ID',
       ),
       'fields' => array(
@@ -227,7 +227,7 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
   static $default_charge_ts;
   if (!isset($default_charge_ts)) { $default_charge_ts = strtotime($data['charge_settings']['ledger_date']); }
   $charge_ts = 0;
-  if ($row['charge_date'] && FALSE) {
+  if ($row['charge_date']) {
     $charge_ts = strtotime($row['charge_date']);
   } else {
     $charge_ts = $default_charge_ts;
@@ -336,6 +336,7 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
 }
 
 function sirius_ledger_feed_allocate_row_process($feed_node, $info, $data, $row) {
+  // return array('success' => FALSE, 'msg' => 'Disabled');
 	$result = sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, $row, TRUE);
 	if (!$result['success']) { return $result; }
   if (!$row['worker_nid']) { return array('success' => FALSE, 'msg' => 'No worker.'); }
@@ -369,6 +370,10 @@ function sirius_ledger_feed_allocate_row_process($feed_node, $info, $data, $row)
   $entry['ledger_ts'] = $row['payment_ts'];
   $entry['ledger_reference'] = $payment_node->nid;
   $entry['ledger_participant'] = $contact_nid;
+  // static $count;
+  // ++$count;
+  // if ($count > 10) { return array('success' => FALSE, 'msg' => 'Suppressing.'); }
+  // dpm($entry);
   sirius_ledger_ar_insert($entry);
 
   if ($amount > 0) {
@@ -391,7 +396,7 @@ function sirius_ledger_feed_allocate_preprocess($feed_node, $info, $data) {
       if (!$payment_nid) { continue; }
       $payment_node = node_load($payment_nid);
       drupal_set_message("Clearing all previous entries for: " . $payment_node->title);
-      sirius_ledger_payment_clear($payment_nid);
+      sirius_ledger_ar_delete_by_reference($payment_nid);
     }
   }
 }

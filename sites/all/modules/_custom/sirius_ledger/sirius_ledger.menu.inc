@@ -330,6 +330,15 @@ function sirius_ledger_menu() {
     'weight' => 2,
   );
 
+ $items['sirius/ledger/workers'] = array(
+    'title' => 'Workers',
+    'description' => '',
+    'access arguments' => array('sirius ledger admin'),
+    'page callback' => 'sirius_ledger_page_list_workers',
+    'page arguments' => array(),
+  );
+
+
   return $items;
 }
 
