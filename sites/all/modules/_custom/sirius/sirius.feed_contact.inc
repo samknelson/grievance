@@ -183,9 +183,11 @@ function sirius_feed_contact_row_process($feed_node, $info, $data, $row) {
     $contact_node->field_sirius_id['und'][0]['value'] = $row['id'];
   }
 
-  $contact_node->field_sirius_name['und'][0]['given'] = $row['name_given'];
-  $contact_node->field_sirius_name['und'][0]['middle'] = $row['name_middle'];
-  $contact_node->field_sirius_name['und'][0]['family'] = $row['name_family'];
+  if ($row['name_given'] || $row['name_middle'] || $row['name_family']) {
+    $contact_node->field_sirius_name['und'][0]['given'] = $row['name_given'];
+    $contact_node->field_sirius_name['und'][0]['middle'] = $row['name_middle'];
+    $contact_node->field_sirius_name['und'][0]['family'] = $row['name_family'];
+  }
   $contact_node->field_sirius_source['und'][0]['value'] = $data['source'];
 
   $phone1 = $row['phone'];
@@ -209,7 +211,7 @@ function sirius_feed_contact_row_process($feed_node, $info, $data, $row) {
   }
 
   $json = sirius_jsonfield_util_node_json_get($contact_node);
-  $results_json = array();
+  $results_json = sirius_jsonfield_util_results_get($json, 'default');
   foreach ($row as $key => $value) {
     if (preg_match('/JSON:/', $key)) {
       sirius_jsonfield_util_set_from_path($results_json, preg_replace('/JSON:/', '', $key), $value);
