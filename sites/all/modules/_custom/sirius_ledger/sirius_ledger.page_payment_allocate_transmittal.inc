@@ -181,8 +181,8 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form_validate($form
 	$form_state['storage']['balance_total'] = $balance_total;
 	$check_value = -1 * $payment_node->field_sirius_dollar_amt['und'][0]['value'];
 
-	if ($check_value != $payment_total) {
-		form_set_error('transmittal][dispatches', 'The total payment amount (' . sirius_ledger_ar_format_balance($payment_total) . '), must match the payment value (' . sirius_ledger_ar_format_balance($check_value) . ')');
+	if (round($check_value,2) != round($payment_total,2)) {
+		form_set_error('transmittal][dispatches', 'The total payment amount (' . $payment_total . '), must match the payment value (' . $check_value . ')');
 	}
 }
 
