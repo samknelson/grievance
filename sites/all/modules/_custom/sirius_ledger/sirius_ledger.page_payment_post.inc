@@ -7,6 +7,17 @@ function sirius_ledger_node_tab_payment_post($payment_node) {
 function sirius_ledger_node_tab_payment_post_form($form, &$form_state, $payment_node) {
 	$form_state['payment_nid'] = $payment_node->nid;
 
+
+	$json = sirius_jsonfield_util_node_json_get($payment_node);
+	if ($json['allocate']['feed']['nid']) {
+		$feed_nid = $json['allocate']['feed']['nid'];
+		$feed_node = node_load($feed_nid);
+		$backlink_html = 'This payment was allocated via an upload feed: ';
+		$backlink_html .= l('View the Feed', "node/$feed_nid/sirius_feed_wizard", array('attributes' => array('class' => array('tool-button'))));
+		$backlink_html .= "<br /><br />";
+		$form['backlink'] = array('#markup' => $backlink_html);
+	}
+
 	$form['#tree'] = TRUE;
 
 	$form['payment']['payment_status'] = array(

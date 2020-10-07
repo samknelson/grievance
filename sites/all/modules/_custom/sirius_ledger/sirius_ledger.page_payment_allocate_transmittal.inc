@@ -9,8 +9,16 @@ function sirius_ledger_node_tab_payment_allocate_transmittal($payment_node) {
 }
 
 function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_state, $payment_node) {
+	drupal_add_js('sites/all/modules/_custom/sirius_ledger/js/transmittal.js', 'file');
+	drupal_add_css(drupal_get_path('module', 'sirius_twilio') . '/css/sirius_twilio_browserphone.css');
+	$js_parameters = array('iam' => 'here');
+	drupal_add_js(array('sirius_ledger_tramsmittal' => $js_parameters), array('type' => 'setting'));
+	drupal_add_css('sites/all/modules/_custom/sirius_ledger/css/transmittal.css');
+
 	$form_state['payment_nid'] = $payment_node->nid;
 	$payment_json = sirius_jsonfield_util_node_json_get($payment_node);
+	// sirius_jsonfield_util_node_json_set($payment_node, array());
+	// node_save($payment_node);
 
 	$employer_node = node_load($payment_node->field_sirius_payer['und'][0]['target_id']);
 	if (!$employer_node) {
@@ -79,10 +87,11 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 
 	$table_open_html .= '<table class="sirius_ledger_transmittal">';
 	$table_open_html .= '<tr>';
-	$table_open_html .= '<th>Name</th>';
-	$table_open_html .= '<th>Member Status</th>';
-	$table_open_html .= '<th>Withheld</th>';
-	$table_open_html .= '<th>Current Balance</th>';
+	$table_open_html .= '<th>' . t('Name') . '</th>';
+	$table_open_html .= '<th>' . t('Member Status') . '</th>';
+	$table_open_html .= '<th>' . t('Withheld') . '</th>';
+	$balance_button = "<a href=\"#\" class=\"sirius_transmittal_autofill_all\">&larr;</a>";
+	$table_open_html .= '<th>' . $balance_button . t('Current Balance') . '</th>';
 	$table_open_html .= '</tr>';
 	$form['transmittal']['table_open'] = array('#markup' => $table_open_html);
 
@@ -101,24 +110,39 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 			'#size' => 5,
 			'#prefix' => '<td class="container-inline">$',
 			'#suffix' => '</td>',
+			'#id' => "payment_$dispatch_nid",
 		);
 		if (isset($payment_json['transmittal']['dispatches'][$dispatch_nid]['payment'])) { $form['transmittal']['dispatches'][$dispatch_nid]['payment']['#default_value'] = $payment_json['transmittal']['dispatches'][$dispatch_nid]['payment']; }
 
 		// Get the balance
-		$balance = 0;
+		$balance_raw = 0;
+		if ($dispatch['contact_nid'] && $account_nid) { $balance_raw = sirius_ledger_balance_fetch($dispatch['contact_nid'], $account_nid); }
+		if (!$balance_raw) { $balance_raw = 0; }
+
 		$params = array();
+		$params['balance'] = TRUE;
 		$params['ledger_account'] = $account_nid;
 		$params['ledger_participant'] = $dispatch['contact_nid'];
-		$params['balance'] = TRUE;
-		$balance = sirius_ledger_ar_fetch($params);
-		if (!$balance) { $balance = 0; }
-		if (isset($balance)) {
-			$balance_format = sirius_ledger_ar_format_balance($balance);
+		$params['ledger_reference'] = $payment_node->nid;
+		$balance_payment = sirius_ledger_ar_fetch($params);
+		if (!$balance_payment) { $balance_payment = 0; }
+
+		if ($balance_payment) {
+			$balance_with_payment = $balance_raw;
+			$balance_without_payment = $balance_raw - $balance_payment;
+			$balance_render = sirius_ledger_ar_format_balance($balance_without_payment) . ' + ' . sirius_ledger_ar_format_balance($balance_payment) . ' = ' . sirius_ledger_ar_format_balance($balance_with_payment);
 		} else {
-			$balance_format = '';
+			$balance_without_payment = $balance_with_payment = $balance_raw;
+			$balance_render = sirius_ledger_ar_format_balance($balance_raw);
 		}
 
-		$form['transmittal']['dispatches'][$dispatch_nid]['balance'] = array('#markup' => '<td>' . $balance_format . '</td>');
+		if ($balance_without_payment < 0) { $balance_autofill = -1 * $balance_without_payment; } else { $balance_autofill = 0; }
+
+		$balance_button = "<a href=\"#\" class=\"sirius_transmittal_autofill\" data-amount=\"$balance_autofill\" data-target=\"payment_$dispatch_nid\">&larr;</a>";
+		$balance_render = $balance_button . $balance_render;
+
+
+		$form['transmittal']['dispatches'][$dispatch_nid]['balance'] = array('#markup' => '<td>' . $balance_render . '</td>');
 
 		// If a worker appears multiple times, only add their balance once.
 		if (!$deltas[$worker_nid] && is_numeric($balance)) { $balance_total += $balance; }
