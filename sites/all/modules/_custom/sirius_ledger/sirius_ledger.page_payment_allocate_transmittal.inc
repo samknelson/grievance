@@ -136,7 +136,7 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 			$balance_render = sirius_ledger_ar_format_balance($balance_raw);
 		}
 
-		if ($balance_without_payment < 0) { $balance_autofill = -1 * $balance_without_payment; } else { $balance_autofill = 0; }
+		if ($balance_without_payment > 0) { $balance_autofill = $balance_without_payment; } else { $balance_autofill = 0; }
 
 		$balance_button = "<a href=\"#\" class=\"sirius_transmittal_autofill\" data-amount=\"$balance_autofill\" data-target=\"payment_$dispatch_nid\">&larr;</a>";
 		$balance_render = $balance_button . $balance_render;
