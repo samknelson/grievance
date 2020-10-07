@@ -147,7 +147,7 @@ function sirius_feed_contact_row_verify($feed_node, $info, $data, &$row, $precom
         $args[':domain_nid'] = $domain_nid;
       }
 
-    	$stmt = db_query($sql, $args);
+    	$stmt = sirius_sql_query($sql, $args);
     	$hr = $stmt->fetchAssoc();
     	$nid = $hr['a'];
     	$other_nid = $hr['b'];
@@ -156,7 +156,24 @@ function sirius_feed_contact_row_verify($feed_node, $info, $data, &$row, $precom
     	}
       $row['contact_nid'] = $nid;
     } else {
-      $row['contact_nid'] = $row['nid'];      
+      $args = array();
+      $args[':nid'] = $row['nid'];
+      $sql = "select nid from node ";
+      if ($domain_nid) {
+        $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+      }
+      $sql .= "where node.type = 'sirius_contact' ";
+      if ($domain_nid) {
+        $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+        $args[':domain_nid'] = $domain_nid;
+      }
+      $sql .= "and node.nid = :nid ";
+
+      $stmt = sirius_sql_query($sql, $args);
+      $hr = $stmt->fetchAssoc();
+      $nid = $hr['nid'];
+      if (!$nid) { return array('success' => FALSE, 'msg' => 'Contact not found in this domain.'); }
+      $row['contact_nid'] = $nid;
     }
   }
 
