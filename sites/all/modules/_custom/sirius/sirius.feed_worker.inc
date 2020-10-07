@@ -18,31 +18,11 @@ function sirius_feed_worker_info() {
       'pks' => array(
         'id' => 'ID',
         'ssn' => 'SSN',
+        'nid' => 'NID',
       ),
       'tag_taxonomy' => 'sirius_contact_tags',
-      'fields' => array(
-        'ssn' => array('title' => 'SSN'),
-        'id' => array('title' => 'ID'),
-        'id2' => array('title' => 'ID2'),
-        'id3' => array('title' => 'ID3'),
-        'name_given' => array('title' => 'First Name'),
-        'name_family' => array('title' => 'Last Name'),
-        'name_middle' => array('title' => 'Middle Name'),
-        'address_thoroughfare' => array('title' => 'Address 1'),
-        'address_premise' => array('title' => 'Address 2'),
-        'address_locality' => array('title' => 'City'),
-        'address_administrative_area' => array('title' => 'State'),
-        'address_postal_code' => array('title' => 'Zip'),
-        'email' => array('title' => 'Email'),
-        'phone' => array('title' => 'Phone'),
-        'phone_alt' => array('title' => 'Phone (Alt)'),
-        'phone_mobile' => array('title' => 'Phone (Mobile)'),
-        'shop_name' => array('title' => 'Current Employer Name'),
-        'member_status' => array('title' => 'Member Status'),
-        'dispatch_job_nid' => array('title' => 'Dispatch to Job (NID)'),
-        'level' => array('title' => 'Training Center Level Code'),
-      ),
       'batch_size' => 50,
+      'callback_fields' => 'sirius_feed_worker_fields',
       'callback_row_verify' => 'sirius_feed_worker_row_verify',
       'callback_row_process' =>'sirius_feed_worker_row_process',
     ),
@@ -50,7 +30,44 @@ function sirius_feed_worker_info() {
     'callback_launch_args' => array('feed_worker'),
   );
   return $items;
-}  
+} 
+
+function sirius_feed_worker_fields($info, $data, $feed_node, $current_step) {
+  // Core fields
+  $fields = array(
+    'ssn' => array('title' => 'SSN'),
+    'id' => array('title' => 'ID'),
+    'id2' => array('title' => 'ID2'),
+    'id3' => array('title' => 'ID3'),
+    'nid' => array('title' => 'NID'),
+    'name_given' => array('title' => 'First Name'),
+    'name_family' => array('title' => 'Last Name'),
+    'name_middle' => array('title' => 'Middle Name'),
+    'address_thoroughfare' => array('title' => 'Address 1'),
+    'address_premise' => array('title' => 'Address 2'),
+    'address_locality' => array('title' => 'City'),
+    'address_administrative_area' => array('title' => 'State'),
+    'address_postal_code' => array('title' => 'Zip'),
+    'email' => array('title' => 'Email'),
+    'phone' => array('title' => 'Phone'),
+    'phone_alt' => array('title' => 'Phone (Alt)'),
+    'phone_mobile' => array('title' => 'Phone (Mobile)'),
+    'shop_name' => array('title' => 'Current Employer Name'),
+    'member_status' => array('title' => 'Member Status'),
+    'dispatch_job_nid' => array('title' => 'Dispatch to Job (NID)'),
+    'level' => array('title' => 'Training Center Level Code'),
+  );
+
+  // Json fields
+  $contact_definition_json = sirius_contact_definition();
+  $contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
+  $paths = array_values(sirius_jsonfield_util_form_list_paths($contact_definition_form, TRUE));
+  foreach ($paths as $path) {
+    $fields["CONTACT_JSON:$path"] = array('title' => "contact:$path");
+  }
+
+  return $fields;
+}
 
 function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precompute) {
   $pk = $data['pk'];
@@ -73,6 +90,8 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
    if (!preg_match('/^[a-zA-Z0-9_]+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
   } else if ($pk == 'ssn') {
     if (!sirius_ssn_validate($row['ssn'])) { return array('success' => FALSE, 'msg' => 'Invalid SSN'); }
+  } else if ($pk == 'nid') {
+   if (!preg_match('/^[0-9]+$/', $row['nid'])) { return array('success' => FALSE, 'msg' => 'Invalid NID'); }
   }
 
   if ($row['phone'] && !sirius_phone_validate($row['phone'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone'); } else { $row['phone'] = sirius_phone_format($row['phone']); }
@@ -130,6 +149,25 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
       if ($nid != $other_nid) {
         return array('success' => FALSE, 'msg' => 'Multiple workers found with this SSN.');
       }
+      $row['worker_nid'] = $nid;
+    } else if ($pk == 'nid') {
+      $args = array();
+      $args[':nid'] = $row['nid'];
+      $sql = "select nid from node ";
+      if ($domain_nid) {
+        $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+      }
+      $sql .= "where node.type = 'sirius_worker' ";
+      if ($domain_nid) {
+        $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+        $args[':domain_nid'] = $domain_nid;
+      }
+      $sql .= "and node.nid = :nid ";
+
+      $stmt = sirius_sql_query($sql, $args);
+      $hr = $stmt->fetchAssoc();
+      $nid = $hr['nid'];
+      if (!$nid) { return array('success' => FALSE, 'msg' => 'Worker not found in this domain.'); }
       $row['worker_nid'] = $nid;
     }
   } 
@@ -280,11 +318,35 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
     $result = sirius_dispatch_actions_create($row['job_node'], $worker_node->nid, 'No', 'accepted');
   }
 
+  //
+  // Contact
+  //
+
   $contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+  $need_save_contact = FALSE;
   if ($data['tag']) { sirius_contact_tag_add($contact_node, $data['tag']); }
   if ($contact_node->field_sirius_source['und'][0]['value'] != $data['source']) {
     $contact_node->field_sirius_source['und'][0]['value'] = $data['source'];
-    node_save($contact_node);
+    $need_save_contact = TRUE;
+  }
+
+  $contact_json = sirius_jsonfield_util_node_json_get($contact_node);
+  $contact_results_json = sirius_jsonfield_util_results_get($contact_json, 'default');
+  foreach ($row as $key => $value) {
+    if (preg_match('/CONTACT_JSON:/', $key)) {
+      sirius_jsonfield_util_set_from_path($contact_results_json, preg_replace('/CONTACT_JSON:/', '', $key), $value);
+      $need_save_contact = TRUE;
+    }
+  }
+  sirius_jsonfield_util_results_set($contact_json, 'default', $contact_results_json);
+  sirius_jsonfield_util_node_json_set($contact_node, $contact_json);
+
+  if ($need_save_contact) { 
+    try {
+      node_save($contact_node);
+    } catch (exception $e) {
+      return array('success' => FALSE, 'msg' => 'contact node_save() failed.');
+    }
   }
 
   if ($is_new) {
