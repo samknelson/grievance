@@ -74,7 +74,8 @@ function sirius_domain_page_list_render($tree, $depth = NULL, $options) {
 		global $user;
 		$user_full = user_load($user->uid);
 		$user_json = sirius_jsonfield_util_user_json_get($user_full);
-		$key_stats = array_filter($user_json['sirius']['domain']['stats']['key']);
+		if ($user_json['sirius']['domain']['stats']['key']) { $key_stats = array_filter($user_json['sirius']['domain']['stats']['key']); }
+		else { $key_stats = array(); }
 
 		$include_subdomains = FALSE;
 		if ($user_json['sirius']['domain']['stats']['include_subdomains'] == 'Yes') { $include_subdomains = TRUE; }
