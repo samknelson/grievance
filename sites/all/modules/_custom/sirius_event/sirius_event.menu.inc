@@ -141,6 +141,14 @@ function sirius_event_node_tabs() {
     'weight' => 5,
   );
 
+  $node_tabs['sirius_event']['sirius_event_phonebank/network_test'] = array(
+    'title' => 'Network Test',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_phonebank_network_test',
+    'permissions' => array('sirius'),
+    'weight' => 6,
+  );
+
   $node_tabs['sirius_event']['sirius_event_class'] = array(
     'title' => 'Class',
     'description' => '',
@@ -246,6 +254,14 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_participant_definition_callerid',
     'permissions' => array('sirius domain admin'),
     'weight' => 3,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_followup'] = array(
+    'title' => 'Follow-Up',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_followup',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 4,
   );
 
 	return $node_tabs;
@@ -472,6 +488,14 @@ function sirius_event_menu() {
     'page arguments' => array(),
     'access arguments' => array('sirius'),
     'type' => MENU_CALLBACK,
+  );
+
+  $items['sirius/twilio/network-test'] = array(
+    'title' => 'Twilio Network Test',
+    'page callback' => 'sirius_node_tab_event_phonebank_network_test',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_NORMAL_ITEM,
   );
 
   return $items;
