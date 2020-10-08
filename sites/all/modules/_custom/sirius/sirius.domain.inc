@@ -125,7 +125,7 @@ function sirius_domain_user_login(&$edit, $account) {
 }
 
 function sirius_domain_uids($domain_nid, $depth = 0) {
-  if ($depth > 100) { return; }
+  if ($depth > 100) { return array(); }
   // Users in this domain.
   $sql = "select entity_id from field_data_field_sirius_domain ";
   $sql .= "where entity_type = 'user' ";
