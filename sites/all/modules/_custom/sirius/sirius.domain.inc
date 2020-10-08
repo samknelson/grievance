@@ -150,6 +150,7 @@ function sirius_domain_uids($domain_nid, $depth = 0) {
     $uids = array_merge($uids, sirius_domain_uids($child_domain_nid, $depth+1));
   }
 
+  if (!$uids) { $uids = array(); }
   return $uids;
 }
 
