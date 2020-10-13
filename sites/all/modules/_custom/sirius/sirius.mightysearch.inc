@@ -723,7 +723,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	$sql_parts['headers'] = array();
 	$sql_parts['select_fields'] = "select node.nid, node.title, field_data_field_sirius_json.field_sirius_json_value ";
 	$sql_parts['select_counts'] = "select count(distinct node.nid) as c "; 
-	$sql_parts['select_nids'] = "select nid "; 
+	$sql_parts['select_nids'] = "select node.nid "; 
 
 	$sql_parts['limit'] = "limit $limit ";
 
