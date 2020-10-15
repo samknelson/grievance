@@ -102,6 +102,7 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 	$sql .= "field_sirius_work_status_tid, ";
 	$sql .= "field_sirius_name_family, ";
 	$sql .= "field_sirius_name_given, ";
+	$sql .= "field_sirius_name_middle, ";
 	$sql .= "balance_amount, ";
 	$sql .= "group_concat(distinct ms_term.name order by ms_term.name separator ', ') as ms_names ";
 
@@ -155,7 +156,9 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 
 	if ($output == 'csv') {
 		$header = array(
-			t('Worker'),
+			t('Last Name'),
+			t('First Name'),
+			t('Middle Name'),
 			t('ID'),
 			t('Work Status'),
 			t('Member Status'),
@@ -165,7 +168,9 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 
 	if ($output == 'screen') {
 		$header = array(
-			t('Worker'),
+			t('Last Name'),
+			t('First Name'),
+			t('Middle Name'),
 			t('ID'),
 			t('Work Status'),
 			t('Member Status'),
@@ -205,7 +210,9 @@ function sirius_ledger_page_list_workers_form_submit($form, &$form_state) {
 		if ($output == 'screen') { $balance = sirius_ledger_ar_format_balance($balance); }
 
 		$row = array();
-		$row[] = $hr['title'];
+		$row[] = $hr['field_sirius_name_family'];
+		$row[] = $hr['field_sirius_name_given'];
+		$row[] = $hr['field_sirius_name_middle'];
 		$row[] = $hr['field_sirius_id_value'];
 		$row[] = $ws_options[$hr['field_sirius_work_status_tid']];
 		$row[] = $hr['ms_names'];
