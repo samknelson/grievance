@@ -93,22 +93,33 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 	}
 }
 
-function sirius_event_participant_role_status_tids($participant_role_tid) {
+function sirius_event_participant_role_status_tids($participant_role_tid, $options = array()) {
 	if (!$participant_role_tid) { return array(); }
-	$args = array();
-	$sql = "select tid, name from taxonomy_term_data, field_data_field_sirius_event_proles ";
-	$sql .= "where taxonomy_term_data.tid = entity_id ";
-	$sql .= "and entity_type = 'taxonomy_term' ";
-	$sql .= "and bundle = 'sirius_event_participant_status' ";
+	$sql_args = array();
+	$sql = "select tid, name from taxonomy_term_data ";
+	$sql .= "left join field_data_field_sirius_event_proles on field_data_field_sirius_event_proles.entity_type = 'taxonomy_term' and field_data_field_sirius_event_proles.bundle = 'sirius_event_participant_status' and field_data_field_sirius_event_proles.entity_id = tid ";
+	if ($options['phonebank']['during_call']) {
+		$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'taxonomy_term' and field_data_field_sirius_json.entity_id = tid ";
+	}
 	if (is_array($participant_role_tid)) {
-		$sql .= "and field_sirius_event_proles_tid in (:participant_role_tid) ";
-		$args[':participant_role_tid'] = $participant_role_tid;
+		$sql .= "where field_sirius_event_proles_tid in (:participant_role_tid) ";
+		$sql_args[':participant_role_tid'] = $participant_role_tid;
 	} else {
-		$sql .= "and field_sirius_event_proles_tid = :participant_role_tid ";
-		$args[':participant_role_tid'] = $participant_role_tid;
+		$sql .= "where field_sirius_event_proles_tid = :participant_role_tid ";
+		$sql_args[':participant_role_tid'] = $participant_role_tid;
+	}
+	if ($options['phonebank']['during_call']) {
+		$sql .= "and ("; 
+		$sql .= "  field_sirius_json_value IS NULL OR ";
+		$sql .= "  lower(json_unquote(json_extract(field_sirius_json_value, '\$.phonebank.conceal_during_call'))) != 'yes' ";
+		if ($options['phonebank']['current_pstatus']) {
+			$sql .= "   or tid = :current_pstatus ";
+			$sql_args[':current_pstatus'] = $options['phonebank']['current_pstatus'];
+		}
+		$sql .= ") ";
 	}
 	$sql .= "order by weight, name ";
-	$stmt = sirius_sql_query($sql, $args);
+	$stmt = sirius_sql_query($sql, $sql_args);
 	$statuses = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		$statuses[$hr['tid']] = $hr['name'];
