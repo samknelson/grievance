@@ -45,6 +45,25 @@ function sirius_event_term_tab_pstatus_form($form, &$form_state, $pstatus_term) 
 	if (isset($json['schedule']['display']['title_short'])) { $form['schedule']['display']['title_short']['#default_value'] = $json['schedule']['display']['title_short']; } 
 	else { $form['schedule']['display']['title_short']['#default_value'] = substr($pstatus_term->name, 0, 4); }
 
+	$form['phonebank'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Phonebank Display'),
+		'#description' => t('The settings below indicate how this participant status should be handled in phonebanks.'),
+	);
+
+	$form['phonebank']['conceal_during_call'] = array(
+		'#title' => t('Conceal During Call?'),
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'Yes' => t('Yes'),
+			'No' => t('No'),
+		),
+		'#description' => t('Select "Yes" to conceal this status from phone banker users who are making a call.'),
+	);
+	if (isset($json['phonebank']['conceal_during_call'])) { $form['phonebank']['conceal_during_call']['#default_value'] = $json['phonebank']['conceal_during_call']; }
+
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Submit',
@@ -57,6 +76,7 @@ function sirius_event_term_tab_pstatus_form_submit($form, &$form_state) {
 	$pstatus_term = taxonomy_term_load($form_state['pstatus_tid']);
 	$json = sirius_jsonfield_util_term_json_get($pstatus_term);
 	$json['schedule'] = $form_state['values']['schedule'];
+	$json['phonebank'] = $form_state['values']['phonebank'];
 	sirius_jsonfield_util_term_json_set($pstatus_term, $json);
 	taxonomy_term_save($pstatus_term);
 
