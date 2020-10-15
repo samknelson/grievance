@@ -5,7 +5,6 @@
 	$('.secondary-tasks-wrapper').hide();
 	$('.primary-local-tasks-wrapper').hide();
 	$('#page-footer').hide();
-	console.log("Here.");
 	/*
 	participant_nid = Drupal.settings.sirius_event_phonebank.participant_nid;
 	console.log("Phone bank for " + participant_nid);

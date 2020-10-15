@@ -48,6 +48,7 @@ function sirius_node_tab_event_phonebank_call($event_node) {
 		if ($active['success']) { 
 			$html .= l(t('Start Making Calls'), current_path(),  array('query' => array('mode' => 'live'), 'attributes' => array('class' => array('tool-button'))));
 		}
+
 		return $html;
 	}
 
@@ -74,7 +75,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$pstatus_tid = $event_json['phonebank']['pstatus_tid'];
 	$participant_nodes = sirius_event_phonebank_participants_by_phone($event_node, $prole_tid, $phone);
 
-	//drupal_add_js(drupal_get_path('module', 'sirius_event') . '/js/sirius_event.phonebank.js', 'file');
+	drupal_add_js(drupal_get_path('module', 'sirius_event') . '/js/sirius_event.phonebank.js', 'file');
 	//drupal_add_js(array('sirius_event_phonebank' => array('participant_nid' => $participant_nid)), array('type' => 'setting'));
 	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/sirius_event.phonebank.css', 'file');
 
@@ -93,14 +94,59 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	}
 
 	$participant_node = $participant_nodes[$participant_nid];
-	$participant_prole = $participant_node->field_sirius_event_prole['und'][0]['tid'];
 	$participant_json = 	sirius_jsonfield_util_node_json_get($participant_node);
 	$event_node = node_load($event_nid);
 	$contact_nid = $participant_node->field_sirius_contact['und'][0]['target_id'];
 	$contact_node = node_load($contact_nid);
 	$participant_results = sirius_jsonfield_util_results_get($participant_json, 'survey');
 	sirius_event_phonebank_prep_survey($survey_form, $participant_results);
-	$pstatuses = sirius_event_participant_role_status_tids($participant_prole);
+	$pstatuses = sirius_event_participant_role_status_tids($prole_tid, array('phonebank' => array('during_call' => TRUE, 'current_pstatus' => $pstatus_tid)));
+
+	// 
+	// Handle "set all"
+	//
+
+	$form['set_all_pstatus_tid'] = array(
+		'#type' => 'hidden',
+		'#attributes' => array('id' => 'set_all_pstatus_tid'), 
+	);
+
+	$form['set_all_pstatus_submit'] = array(
+		'#id' => 'set_all_pstatus_submit',
+		'#type' => 'submit',
+		'#value' => 'Set All PStatus',
+		'#attributes' => array('hidden' => TRUE),
+	);
+
+	/*
+	// @todo: I can't decide whether this should happen here in a callback, or on swubmit.
+	//        "On submit" has the advantage that we move to the next caller in a phonebank. Which sometimes you might want and sometimes you might not.
+	//        But handling it here in a callback means that we don't have the option of submitting the form and going to the next caller.
+	//        So ... I'm doing it in the "on submit" for now, and leaving this code here to irritate me later.
+
+	$form['set_all_pstatus_button'] = array(
+		'#id' => 'set_all_pstatus_button',
+		'#type' => 'button',
+		'#ajax' => array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax_set_all_pstatus'),
+		'#value' => 'Set All Status',
+	);
+
+	if ($form_state['triggering_element']['#ajax']['callback'] == 'sirius_node_tab_event_phonebank_call_form_submit_ajax_set_all_pstatus') {
+		$set_all_pstatus_tid = $form_state['values']['set_all_pstatus_tid'];
+		drupal_set_message("Triggered with $set_all_pstatus_tid");
+		if ($set_all_pstatus_tid) {
+			drupal_set_message("Called with $set_all_pstatus_tid");
+			if ($participant_nodes && $pstatus[$set_all_pstatus_tid]);
+			foreach ($participant_nodes as $participant_nid => $participant_node) {
+				$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $set_all_pstatus_tid;
+				node_save($participant_node);
+				drupal_set_message("Set $participant_nid to $set_all_pstatus_tid");
+			}
+			unset($form_state['values']['pstatus']);
+			unset($form_state['input']['pstatus']);
+		}
+	}
+	*/
 
 	// If we changed participant, throw away our survey values.
 	if ($form_state['triggering_element']['#ajax']['callback'] == 'sirius_node_tab_event_phonebank_call_form_submit_ajax_change_recipient') {
@@ -113,6 +159,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		unset($form_state['values']['caller']);
 		unset($form_state['input']['caller']);
 	}
+
 	if ($form_state['triggering_element']['#ajax']['callback'] == 'sirius_node_tab_event_phonebank_call_form_submit_ajax') {
 		// A bit of a kludge. sirius_node_tab_event_phonebank_call_form_submit_ajax() saves the participant with a new pstatus. 
 		// But it happens after the form is built, and we need this value to decide whether to enable the submit button.
@@ -141,6 +188,10 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$browserphone_params['callerid_nids'] = sirius_fieldvals($survey_node, 'field_sirius_callerids', 'target_id');
 	$browserphone_params['omg_nid'] = $survey_node->nid;
 	if ($event_json['phonebank']['conference'] == 'Yes') { $browserphone_params['conference_number'] = $event_json['phonebank']['conference_number']; }
+	if ($survey_json['omg']['pstatus']) {
+		$browserphone_params['omg']['callback_js'] = 'sirius_event_phonebank_set_all_pstatus';
+		$browserphone_params['omg']['callback_js_args'] = array($survey_json['omg']['pstatus']);
+	}
 	$form['phone_interface_html'] = array('#markup' => sirius_twilio_browserphone_render($browserphone_params));
 
 	$participant_options = array();
@@ -251,6 +302,17 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	return $form;
 }
 
+/*
+function sirius_node_tab_event_phonebank_call_form_submit_ajax_set_all_pstatus($form, $form_state) {
+	$commands = array();
+  $commands[] = ajax_command_replace("#survey_wrap", render($form['survey']));
+  $commands[] = ajax_command_replace("#pstatus_wrap", render($form['pstatus']));
+  $commands[] = ajax_command_replace("#intro_wrap", render($form['intro']));
+  $commands[] = ajax_command_replace("#submit_wrap", render($form['submit']));
+	return array('#type' => 'ajax', '#commands' => $commands);
+}
+*/
+
 function sirius_node_tab_event_phonebank_call_form_submit_ajax_change_recipient($form, $form_state) {
 	$commands = array();
   $commands[] = ajax_command_replace("#survey_wrap", render($form['survey']));
@@ -325,6 +387,74 @@ function sirius_node_tab_event_phonebank_call_form_submit_ajax($form, $form_stat
 }
 
 function sirius_node_tab_event_phonebank_call_form_submit($form, &$form_state) {
+	// Handle "set_all"
+	// @todo: Much of this code is redundant and should be moved to functions
+	if ($form_state['values']['set_all_pstatus_tid']) {
+		$set_all_pstatus_tid = $form_state['values']['set_all_pstatus_tid'];
+		$event_nid =$form_state['event_nid'];
+		$event_node = node_load($event_nid);
+		$phone = $form_state['phone'];
+		$event_json = sirius_jsonfield_util_node_json_get($event_node);
+		$type_json = sirius_event_type_json($event_node);
+		$prole_tid = $type_json['phonebank']['prole_tid'];
+		$participant_nodes = sirius_event_phonebank_participants_by_phone($event_node, $prole_tid, $phone);
+		$pstatuses = sirius_event_participant_role_status_tids($prole_tid);
+
+		if ($participant_nodes) {
+			if ($pstatuses[$set_all_pstatus_tid]) {
+				foreach ($participant_nodes as $participant_nid => $participant_node) {
+					if ($participant_node->field_sirius_event_pstatus['und'][0]['tid'] != $set_all_pstatus_tid) {
+
+						$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
+						sirius_jsonfield_util_results_set($participant_json, 'survey', $form_state['values']['survey']);
+
+						// Set the caller;
+						$old_caller = $participant_json['phonebank']['caller'];
+						$new_caller_uid = $form_state['values']['caller'];
+						if ($new_caller_uid && ($new_caller_uid != $old_caller['uid'])) {
+							$new_caller_user = user_load($new_caller_uid);
+							$new_caller = array(
+								'uid' => $new_caller_uid,
+								'name' => $new_caller_user->name,
+								'mail' => $new_caller_user->mail,
+								'phone' => $new_caller_user->field_sirius_phone['und'][0]['value'],
+							);
+							$participant_json['phonebank']['caller'] = $new_caller;
+						}
+						if (!$participant_json['phonebank']['first_call']) {
+							$participant_json['phonebank']['first_call'] = array(
+								'ts' => time(),
+								'date' => date('l, F d Y - g:ia'),
+							);
+						}
+						$participant_json['phonebank']['last_call'] = array(
+							'ts' => time(),
+							'date' => date('l, F d Y - g:ia'),
+						);
+						$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $form_state['values']['pstatus'];
+
+						sirius_jsonfield_util_node_json_set($participant_node, $participant_json);
+
+						$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $set_all_pstatus_tid;
+						node_save($participant_node);
+						// drupal_set_message("Saved: " . $participant_node->title . ": " . $participant_node->nid);
+					}
+				}
+			} else {
+				drupal_set_message("Unable to set statuses to $set_all_pstatus_tid: that is not an approved status.", 'warning');
+			} 
+		}
+
+		/*
+		drupal_set_message("I am attempting to set all to $set_all_pstatus_tid");
+		drupal_set_message("For phone number $phone and event $event_nid.");
+		drupal_set_message("Assuming that $set_all_pstatus_tid is in the list below.");
+		dpm($pstatuses);
+		drupal_set_message("I'll walk through the following participants.");
+		dpm($participant_nodes);
+		*/
+	}
+
 	global $user;
 	$lock_type = sirius_event_phonebank_lock_type($event_node);
 	sirius_lock_release_by_uid($lock_type, $user->uid);
