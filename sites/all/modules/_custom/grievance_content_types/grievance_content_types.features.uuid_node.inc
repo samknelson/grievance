@@ -772,6 +772,104 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'sirius/twilio/network-test',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1602160552,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '901c4891-59ae-470b-ac0f-5943a902dbb3',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/twilio/network-test',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'node/%/sirius_event_phonebank/network_test',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This tool&nbsp;uses a network test suite provided by Twilio to check the capability of your computer to perform a Voice over Internet (VoIP) call.</p>
+
+<p>Use the button below to load the test tool on this page. The test will take about a minute. You may be asked to allow the page to use your microphone and / or camera.&nbsp;</p>
+
+<p>(Alternatively, you can use the tool on the Twilio site at&nbsp;<a href="https://networktest.twilio.com">https://networktest.twilio.com</a>.)</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2020-10-08 05:35:52 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Grievance Arbitration Form Settings',
   'log' => '',
   'status' => 1,
