@@ -40,6 +40,14 @@ function sirius_ledger_ar_fetch($params = array()) {
 
 	$sql .= "where 1 = 1 ";
 
+	if (isset($params['ledger_amount_min'])) {
+		$sql .= "and ledger_amount >= :ledger_amount_min ";
+		$sql_args[':ledger_amount_min'] = $params['ledger_amount_min'];
+	}
+	if (isset($params['ledger_amount_max'])) {
+		$sql .= "and ledger_amount <= :ledger_amount_max ";
+		$sql_args[':ledger_amount_max'] = $params['ledger_amount_max'];
+	}
 	if ($params['ledger_status']) { 
 		$sql .= "and ledger_status = :ledger_status ";
 		$sql_args[':ledger_status'] = $params['ledger_status'];
@@ -59,6 +67,14 @@ function sirius_ledger_ar_fetch($params = array()) {
 	if ($params['ledger_key']) { 
 		$sql .= "and ledger_key = :ledger_key ";
 		$sql_args[':ledger_key'] = $params['ledger_key'];
+	}
+	if ($params['ledger_ts_min']) {
+		$sql .= "and ledger_ts >= :ledger_ts_min ";
+		$sql_args[':ledger_ts_min'] = $params['ledger_ts_min'];
+	}
+	if ($params['ledger_ts_max']) {
+		$sql .= "and ledger_ts <= :ledger_ts_max ";
+		$sql_args[':ledger_ts_max'] = $params['ledger_ts_max'];
 	}
 
 	if ($params['balance']) {
@@ -131,7 +147,7 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 
 	foreach ($rows as $account_title => $sub_rows) {
 		$html .= '<h2>' . $account_title . '</h2>';
-		$html .= theme_table(array('header' => $header, 'rows' => $sub_rows, 'attributes' => array()));
+		$html .= theme_table(array('header' => $header, 'rows' => $sub_rows, 'attributes' => array('style' => 'table-layout: fixed;')));
 		$html .= 'Total: <strong>$' . number_format($totals[$account_title], 2) . '</strong>';
 	}
 
