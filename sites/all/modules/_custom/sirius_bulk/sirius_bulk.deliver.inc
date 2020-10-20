@@ -9,6 +9,7 @@ function sirius_bulk_deliver($force = FALSE) {
 	$last_ts = variable_get("sirius_bulk_last_ts", 0);
 	$delay = 60;
 	if (!$force && time() < $last_ts + $delay) {
+		sirius_minilog("sirius_bulk_deliver: too soon to run.");
 		return array('success' => FALSE, 'msg' => 'Too soon to run.');
 	}
 	variable_set("sirius_bulk_last_ts", time());
@@ -29,7 +30,21 @@ function sirius_bulk_deliver($force = FALSE) {
   foreach ($bulk_nodes as $bulk_nid => $bulk_node) {
   	++$count;
   	sirius_minilog("About to deliver: " . $bulk_node->title);
+
+		$old_domain_nid = sirius_domain_nid();
+		$new_domain_nid = $bulk_node->field_sirius_domain['und'][0]['target_id'];
+		if ($new_domain_nid != $old_domain_nid) {
+			$new_domain = sirius_domain($new_domain_nid);
+			sirius_minilog('Switched into domain: ' . $new_domain->title);
+		}
+
   	$result = sirius_bulk_deliver_batch($bulk_node, $force);
+
+		if ($new_domain_nid != $old_domain_nid) {
+			$old_domain = sirius_domain($old_domain_nid);
+			sirius_minilog('Switched back into domain: ' . $old_domain->title);
+		}
+
   	sirius_minilog("Delivered: " . $bulk_node->title . ': ' . $result['msg']);
   }
 
@@ -56,8 +71,6 @@ function sirius_bulk_deliver_batch($bulk_node, $force = FALSE) {
 		$json = sirius_jsonfield_util_node_json_get($bulk_node);
 		$do_not_disurb_id = $json['do_not_disturb']['id'];
 		if (!$do_not_disurb_id) { $do_not_disurb_id = 'default'; }
-		drupal_set_message("Here with $do_not_disurb_id");
-		dpm($json);
 		$ok = sirius_do_not_disturb_check($do_not_disurb_id);
 		// $ok = sirius_dispatch_notify_schedule_ok();
 		if (!$ok['success']) { return $ok; }
