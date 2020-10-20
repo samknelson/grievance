@@ -5,19 +5,20 @@ function sirius_worker_page_skill_expiring($days = NULL) {
 }
 
 function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NULL) {
+
 	$form['days'] = array(
 		'#type' => 'textfield',
 		'#default_value' => $days,
 		'#title' => t('Expires Before'),
-		'#description' => t('Search for skills expiring AT MOST this many days out.'),
-		'#size' => 4,
+		'#description' => t('Enter a date or a number of days (positive or negative).'),
+		'#size' => 12,
 	);
 
 	$form['days2'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Expires After'),
 		'#description' => t('Search for skills expiring AT LEAST this many days out.'),
-		'#size' => 4,
+		'#size' => 12,
 	);
 
 	$skills = sirius_taxonomy_load('sirius_skill', 'tid', 'name', TRUE);
@@ -39,6 +40,14 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 		'#title' => t('ID (Badge Number)'),
 		'#size' => 6,
 	);
+
+	$ms_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+	$form['ms'] = array(
+		'#type' => 'checkboxes',
+		'#title' => t('Member Status'),
+		'#options' => $ms_options,
+	);
+
 
 	$form['output'] = array(
 		'#type' => 'select',
@@ -69,18 +78,27 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	$args = array();
 	if (is_numeric($days)) {
 		$args[':end'] = gmdate('Y-m-d', strtotime("+$days days"));
+	} else if ($days) {
+		$args[':end'] = gmdate('Y-m-d', strtotime($days));
 	}
 	if (is_numeric($days2)) {
 		$args[':start'] = gmdate('Y-m-d', strtotime("+$days2 days"));
+	} else if ($days2) {
+		$args[':end'] = gmdate('Y-m-d', strtotime($days));
 	}
 
 	$output = $form_state['values']['output'];
 
+	$ms = array_filter(array_values($form_state['values']['ms']));
+
+	$domain_nid = sirius_domain_nid();
 	$sql = "select title, name, nid, field_sirius_skill_expire_value, field_sirius_id_value ";
 	$sql .= "from node ";
 	$sql .= "join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
 	$sql .= "join field_data_field_sirius_skill on field_data_field_sirius_skill.entity_type = 'node' and field_data_field_sirius_skill.entity_id = node.nid ";
 	$sql .= "join field_data_field_sirius_skill_expire on field_data_field_sirius_skill_expire.entity_type = 'node' and field_data_field_sirius_skill_expire.entity_id = node.nid ";
+	if ($domain_nid) { $sql .= "join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid "; }
+	if ($domain_nid) { $sql .= "join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid "; }
 	$sql .= "join taxonomy_term_data on taxonomy_term_data.tid = field_sirius_skill_tid ";
 	$sql .= "where node.type = 'sirius_worker' ";
 	$sql .= "and field_data_field_sirius_skill.delta = field_data_field_sirius_skill_expire.delta ";
@@ -101,6 +119,17 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	if ($form_state['values']['id']) {
 		$sql .= "and field_sirius_id_value = :id ";
 		$args['id'] = $form_state['values']['id'];
+	}
+	if ($domain_nid) {
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$args[':domain_nid'] = $domain_nid;
+	}
+	if ($ms) {
+		$sql .= "and field_sirius_member_status_tid in (:ms) ";
+		$args[':ms'] = $ms;
+	}
+	if ($ms) {
+		$sql .= "group by field_data_field_sirius_member_status.entity_id ";
 	}
 	$sql .= "order by field_sirius_skill_expire_value, node.nid ";
 
