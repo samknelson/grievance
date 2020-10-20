@@ -101,7 +101,7 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	$sql .= "join field_data_field_sirius_skill on field_data_field_sirius_skill.entity_type = 'node' and field_data_field_sirius_skill.entity_id = node.nid ";
 	$sql .= "join field_data_field_sirius_skill_expire on field_data_field_sirius_skill_expire.entity_type = 'node' and field_data_field_sirius_skill_expire.entity_id = node.nid ";
 	if ($domain_nid) { $sql .= "join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid "; }
-	if ($domain_nid) { $sql .= "join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid "; }
+	if ($ms) { $sql .= "join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid "; }
 	$sql .= "join taxonomy_term_data on taxonomy_term_data.tid = field_sirius_skill_tid ";
 	$sql .= "where node.type = 'sirius_worker' ";
 	$sql .= "and field_data_field_sirius_skill.delta = field_data_field_sirius_skill_expire.delta ";
