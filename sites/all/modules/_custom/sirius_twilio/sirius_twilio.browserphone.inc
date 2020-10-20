@@ -40,6 +40,8 @@ function sirius_twilio_browserphone_twiml_dial() {
 	if ($conference_name) { $parameters['conference_name'] = $conference_name; }
 	sirius_twilio_browserphone_parameters_set($token, $parameters); 
 
+	$phone = '+' . sirius_phone_format_e164($phone);
+
 	header('Content-Type: text/xml');
 	print "<Response>";
 	print "<Dial callerId=\"$callerid_phone\">";
