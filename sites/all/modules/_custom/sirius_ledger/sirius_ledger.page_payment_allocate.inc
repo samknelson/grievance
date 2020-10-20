@@ -19,7 +19,7 @@ function sirius_ledger_node_tab_payment_allocate($payment_node) {
 	if ($json['allocate']['feed']['nid']) {
 		$feed_nid = $json['allocate']['feed']['nid'];
 		$feed_node = node_load($feed_nid);
-		$html .= 'This payment was allocated via an upload feed.<br />';
+		$html .= 'This payment was allocated via an upload feed: ';
 		$html .= l('View the Feed', "node/$feed_nid/sirius_feed_wizard", array('attributes' => array('class' => array('tool-button'))));
 		$html .= "<br /><br />";
 	}

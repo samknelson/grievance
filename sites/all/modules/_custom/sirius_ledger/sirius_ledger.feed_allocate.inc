@@ -17,13 +17,11 @@ function sirius_ledger_feed_allocate_info() {
     ),
     'feed' => array(
       'pks' => array(
-        'nid' => 'Worker NID',
-        'ssn' => 'SSN',
         'id' => 'Badge ID',
+        'ssn' => 'SSN',
         'ein' => 'Employee ID',
       ),
       'fields' => array(
-        'nid' => array('title' => 'Worker NID'),
         'ssn' => array('title' => 'SSN'),
         'id' => array('title' => 'Badge ID'),
         'ein' => array('title' => 'EIN'),
@@ -227,7 +225,7 @@ function sirius_ledger_feed_allocate_row_verify($feed_node, $info, $data, &$row,
   static $default_charge_ts;
   if (!isset($default_charge_ts)) { $default_charge_ts = strtotime($data['charge_settings']['ledger_date']); }
   $charge_ts = 0;
-  if ($row['charge_date'] && FALSE) {
+  if ($row['charge_date']) {
     $charge_ts = strtotime($row['charge_date']);
   } else {
     $charge_ts = $default_charge_ts;
@@ -434,7 +432,8 @@ function sirius_ledger_feed_allocate_review_form($form, &$form_state, $info, $da
     $payment_node = node_load($payment_nid);
     if (!$payment_node) { continue; }
     $payment_html .= '<h2>' . $account_name . '</h2>';
-    $payment_html .= "Payments were allocated to: " . $payment_node->title;
+    $payment_html .= "Payments were allocated to: " . $payment_node->title . ' [' . $payment_node->field_sirius_payment_status['und'][0]['value'] . ']';
+
     $payment_html .= '<br />';
     $allocated_balance = sirius_ledger_ar_fetch(array('ledger_reference' => $payment_nid, 'balance' => TRUE));
     $payment_balance = $payment_node->field_sirius_dollar_amt['und'][0]['value'];

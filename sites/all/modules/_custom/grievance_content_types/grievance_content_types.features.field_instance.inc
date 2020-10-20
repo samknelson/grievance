@@ -22390,9 +22390,9 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
+          'bypass_access' => 1,
           'field_delimiter' => '',
-          'link' => FALSE,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
         'weight' => 3,
@@ -22841,9 +22841,9 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
+          'bypass_access' => 1,
           'field_delimiter' => '',
-          'link' => FALSE,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
         'weight' => 2,

@@ -23,6 +23,9 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_landing.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.participant_definition.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_audio.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_callerid.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_followup.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_list.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_list_bullpen.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_list_classes.inc";
@@ -35,14 +38,13 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_body.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_register.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_register_bulk.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_audio.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_participant_definition_callerid.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_call.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_lock.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_status.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_settings.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_prescan.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_phonebank_network_test.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_bullpen_view.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_bullpen_self.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.page_class_settings.inc";

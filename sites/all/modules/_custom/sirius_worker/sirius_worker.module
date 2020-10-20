@@ -43,6 +43,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_optin.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tor.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tos.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_subscribe.inc";
 
 function sirius_worker_get_by_id($id) {
 	if (!$id) { return NULL; }

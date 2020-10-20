@@ -23,7 +23,8 @@ function sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_ti
   //        But I really can't be bothered. So it's theoretically possible to attempt to serve the same participant to multiple users.
   //        In which case, we return an error message and they reload the page. Oh well.
 
-  $sql = "select node.nid, field_sirius_phone_value as phone from node ";
+  $sql = "select * from ";
+  $sql .= "(select node.nid, field_sirius_phone_value$s as phone from node ";
   $sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
@@ -37,8 +38,10 @@ function sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_ti
   $sql .= "and not exists (select 1 from sirius_lock where sirius_lock.type = :lock_type and sirius_lock.id = field_sirius_phone_value and sirius_lock.uid != :uid) ";
   $sql .= "and field_sirius_phone_value is not null ";
   $sql .= "and field_sirius_phone_value != '' ";
-  $sql .= "order by RAND() ";
-  $sql .= "limit 1 ";
+  $sql .= "order by node.nid limit 100) ";
+  $sql .= "as chunk ";
+  $sql .= "order by rand() limit 1";
+
   $stmt = db_query($sql, array(
     ':event_nid' => $event_node->nid, 
     ':prole_tid' => $prole_tid, 

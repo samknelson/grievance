@@ -10,7 +10,9 @@ function sirius_minilog($msg = NULL, $type = 'info') {
 	static $log = array();
 	if ($type == 'reset') { $log = array(); }
 	if (!$msg) { return $log; }
-	$log[] = array('ts' => time(), 'msg' => $msg, 'type' => $type);
+	$log_entry = array('ts' => time(), 'msg' => $msg, 'type' => $type);
+	sirius_minilog_echo($log_entry);
+	$log[] = $log_entry;
 }
 
 function sirius_minilog_render() {
@@ -48,4 +50,19 @@ function sirius_minilog_render_html() {
 function sirius_minilog_watchdog($type) {
 	$log = sirius_minilog();
 	foreach ($log as $log_entry) { watchdog($type, $log_entry['msg']); }
+}
+
+function sirius_minilog_echo_active($set_active = NULL) {
+	static $active;
+	if (isset($set_active)) { $active = TRUE; }
+	return $active;
+}
+
+function sirius_minilog_echo($log_entry) {
+	if (!sirius_minilog_echo_active()) { return; }
+
+	if (!$log_entry['type']) { $log_entry['type'] = 'status'; }
+	print $log_entry['type'] . ': ';
+	print $log_entry['msg'];
+	print "\n";
 }

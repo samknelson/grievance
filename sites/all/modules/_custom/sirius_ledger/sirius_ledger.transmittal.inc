@@ -87,6 +87,7 @@ function sirius_ledger_transmittal_dispatches($employer_nid) {
 	$sql .= "left join node job_node on job_node.nid = field_sirius_dispatch_job_target_id ";
 	$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
 	$sql .= "left join node worker_node on worker_node.nid = field_sirius_worker_target_id ";
+	$sql .= "left join field_data_field_sirius_name on field_data_field_sirius_name.entity_type = 'node' and field_data_field_sirius_name.entity_id = worker_node.nid ";
 	$sql .= "left join field_data_field_sirius_ssn on field_data_field_sirius_ssn.entity_type = 'node' and field_data_field_sirius_ssn.entity_id = worker_node.nid ";
 	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = worker_node.nid ";
 	$sql .= "left join field_data_field_sirius_json worker_json on worker_json.entity_type = 'node' and worker_json.entity_id = worker_node.nid ";
@@ -98,7 +99,7 @@ function sirius_ledger_transmittal_dispatches($employer_nid) {
 	$sql_args[':employer_nid'] = $employer_nid;
 	$sql .= "and field_sirius_dispatch_status_value in ('accepted', 'accepted_secondary') ";
 	$sql .= "group by worker_node.nid ";
-	$sql .= "order by node.nid ";
+	$sql .= "order by field_sirius_name_family, field_sirius_name_given ";
 
 	$stmt = sirius_sql_query($sql, $sql_args);
 	$dispatches = array();

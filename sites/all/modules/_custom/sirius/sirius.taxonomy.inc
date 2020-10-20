@@ -295,7 +295,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_skill']['multidomain'] = 'Yes';
     $settings['sirius_worker_dispatch_status']['view'] = 'sirius_taxonomy';
     $settings['sirius_worker_dispatch_status']['display'] = 'block';
-    $settings['sirius_worker_dispatch_status']['multidomain'] = 'No';
+    $settings['sirius_worker_dispatch_status']['multidomain'] = 'Yes';
     $settings['sirius_work_status']['view'] = 'sirius_taxonomy';
     $settings['sirius_work_status']['display'] = 'block_8';
     $settings['sirius_work_status']['multidomain'] = 'Yes';

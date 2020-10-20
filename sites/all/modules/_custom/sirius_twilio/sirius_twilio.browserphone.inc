@@ -41,7 +41,7 @@ function sirius_twilio_browserphone_twiml_dial() {
 	sirius_twilio_browserphone_parameters_set($token, $parameters); 
 
 	$phone = '+' . sirius_phone_format_e164($phone);
-
+	
 	header('Content-Type: text/xml');
 	print "<Response>";
 	print "<Dial callerId=\"$callerid_phone\">";
@@ -363,7 +363,7 @@ function sirius_twilio_browserphone_render($parameters = array()) {
 	if ($omg_options) {
 		$html .= '  <br />';
 		$html .= '  <select id="sirius_browserphone_omg"></select>';
-		$html .= '  <button id="sirius_browserphone_button_omg">Play OMG</button>';
+		$html .= '  <button id="sirius_browserphone_button_omg">Play Message</button>';
 	}
 	$html .= '</div>';
 

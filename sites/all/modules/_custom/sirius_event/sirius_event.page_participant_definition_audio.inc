@@ -17,6 +17,7 @@ function sirius_node_tab_event_participant_definition_audio($definition_node) {
 function sirius_node_tab_event_participant_definition_audio_form($form, &$form_state, $definition_nid) {
 	$form_state['definition_nid'] = $definition_nid;
 	$definition_node = node_load($definition_nid);
+	$json = sirius_jsonfield_util_node_json_get($definition_node);
 
 	$form['#tree'] = TRUE;
 	$form['intro'] = array('#markup' => '<div class="sirius_form_intro">' . t('Use this form to manage outgoing messages for phone banks. Audio outgoing messages may be uploaded in wav or mp3 format. (You may want to use a service such as <a href="https://online-voice-recorder.com/" target="_blank">online-voice-recorder.com</a>.) Outgoing messages may also be configured to use a text message.') . '<br /><br /></div>');
@@ -24,6 +25,15 @@ function sirius_node_tab_event_participant_definition_audio_form($form, &$form_s
 	$omg_records = sirius_event_omg_list($definition_node);
 	$omg_records[] = array();
 	$audio_items = field_get_items('node', $definition_node, 'field_sirius_audio');
+
+	$pstatus_options = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name', TRUE);
+	$form['omg']['pstatus'] = array(
+			'#type' => 'select',
+			'#title' => t('Participant Status'),
+			'#description' => t('When an outgoing message is played, all the members of the household should have their participant status set to this value.'),
+			'#options' => $pstatus_options,
+			'#default_value' => $json['omg']['pstatus'],
+		);
 
 	foreach ($omg_records as $delta => $omg_record) {
 
@@ -140,6 +150,7 @@ function sirius_node_tab_event_participant_definition_audio_form_submit($form, &
 		array_pop($json['omg']['records']);
 	}
 
+	$json['omg']['pstatus'] = $form_state['values']['omg']['pstatus'];
 	sirius_jsonfield_util_node_json_set($definition_node, $json);
 
 	// We're assuming that the delta for the omg record is the same as the delta for the field_audio field. 
