@@ -48,7 +48,7 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 		'#options' => $ms_options,
 		'#checkall' => TRUE,
 		'#prefix' => "<div class=\"checkboxes-inline\">",
-		'#suffix' => '</div>',
+		'#suffix' => '</div><br clear="left" />',
 	);
 
 
