@@ -112,6 +112,13 @@ function sirius_feed_page_list($wizard_name) {
 
 	drupal_set_title("Feed list: " . $info['title']);
 
+	// Is there a callback?
+	$callback = $info['feed']['callback_list'];
+	if ($callback) {
+		return $callback($wizard_name);
+	}
+
+	// Oh well, no callback. In that case we just hardcode some view.
 	if (user_access('sirius admin') || user_access('sirius domain admin')) {
 		// admins see the full list
 		$html .= views_embed_view('sirius_feeds', 'block_2', $wizard_name, $domain_nid);
@@ -365,6 +372,10 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 		$renderable = field_view_field('node', $feed_node, 'field_sirius_attachments', 'full');
 		$renderable['#title'] = 'Currently Processing';
 		$form['current'] = array('#markup' => render($renderable));
+		if ($data['origname']) {
+
+			$form['origname'] = array('#markup' => sirius_fakerender_field('Uploaded Filename:', $data['origname']));
+		}
 		$title = "Replace with";
 	} else {
 		$title = "Upload";
@@ -373,7 +384,6 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 	$form['file'] = array(
 		'#type' => 'file',
 		'#title' => $title,
-		'#default_value' => $data['steps'][$current_step]['data']['a_random_variable'],
 	);
 
 	$default = $data['source'];
@@ -459,6 +469,7 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
   $file = $form_state['storage']["file"];
   if ($file) {
 		$file = (array) $file;
+  	$data['origname'] = $file['origname'];
 		$file['display'] = 1;
 		unset($form_state['storage']["attach_$delta"]);
 		unset($file['destination']);
