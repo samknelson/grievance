@@ -212,7 +212,7 @@ function sirius_do_not_disturb_check($id = 'default', $ts = NULL) {
 	if (!$ts) { $ts = time(); }
 
 	$json = json_decode(sirius_domain_variable_get('sirius_do_not_disturb', ''), TRUE);
-	if (!$json['schedules']) { return array('success' => FALSE, 'msg' => 'No Do Not Disturbe schedules have been configured.'); }
+	if (!$json['schedules']) { return array('success' => FALSE, 'msg' => 'No Do Not Disturb schedules have been configured.'); }
 
 	$found = FALSE;
 	foreach ($json['schedules'] as $delta => $schedule) {
@@ -254,7 +254,7 @@ function sirius_do_not_disturb_check($id = 'default', $ts = NULL) {
 
 function sirius_do_not_disurb_render($id = 'default') {
 	$json = json_decode(sirius_domain_variable_get('sirius_do_not_disturb', ''), TRUE);
-	if (!$json['schedules']) { return '<div class="sirius_do_not_disturb_render">No Do Not Disturbe schedules have been configured.</div>'; }
+	if (!$json['schedules']) { return '<div class="sirius_do_not_disturb_render">No Do Not Disturb schedules have been configured.</div>'; }
 
 	$found = FALSE;
 	foreach ($json['schedules'] as $delta => $schedule) {
