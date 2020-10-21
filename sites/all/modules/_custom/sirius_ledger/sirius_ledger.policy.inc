@@ -21,6 +21,15 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 	}
 	$employer_name = '[no employer]';
 	$contract_tplt_name = '[no contract]';
+
+	$ws_tid = $worker_node->field_sirius_work_status['und'][0]['tid'];
+	$ws_term = taxonomy_term_load($ws_tid);
+	$ws_name = $ws_term->name;
+	if (!$ws_tid) {
+		sirius_minilog("Policy lookup for $schedule_key: No work status has been set for this worker. No policy will match.");
+		return NULL;
+	}
+
 	if ($employer_node) {
 		$employer_name = $employer_node->title;
 
@@ -29,9 +38,10 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 		$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
 		if ($policy_node && 
 			$policy_json['ledger']['policy']['settings']['schedule'][$schedule_key] &&
+			$policy_json['ledger']['policy']['settings']['ws'][$ws_tid] &&
 			(!$account_nid || $policy_json['ledger']['policy']['settings']['accounts'][$account_nid])) {
 
-			sirius_minilog("Policy lookup for $schedule_key: Found the policy " . $policy_node->title . " for " . $worker_node->title . ' at employer ' . $employer_node->title);
+			sirius_minilog("Policy lookup for $schedule_key / $ws_name: Found the policy " . $policy_node->title . " for " . $worker_node->title . ' at employer ' . $employer_node->title);
 			return $policy_node;
 		}
 
@@ -43,8 +53,9 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 			$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
 			if ($policy_node && 
 				$policy_json['ledger']['policy']['settings']['schedule'][$schedule_key] &&
+				$policy_json['ledger']['policy']['settings']['ws'][$ws_tid] &&
 				(!$account_nid || $policy_json['ledger']['policy']['settings']['accounts'][$account_nid])) {
-				sirius_minilog("Policy lookup: Found the policy for " . $worker_node->title . ' at employer ' . $employer_node->title . ' in contract template ' . $contract_tplt_node->title);
+				sirius_minilog("Policy lookup for $schedule_key / $ws_name: Found the policy for " . $worker_node->title . ' at employer ' . $employer_node->title . ' in contract template ' . $contract_tplt_node->title);
 				return $policy_node;
 			}
 		}
@@ -54,12 +65,13 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 	$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
 	if ($policy_node && 
 		$policy_json['ledger']['policy']['settings']['schedule'][$schedule_key] &&
+		$policy_json['ledger']['policy']['settings']['ws'][$ws_tid] &&
 			(!$account_nid || $policy_json['ledger']['policy']['settings']['accounts'][$account_nid])) {
-		sirius_minilog("Policy lookup for $schedule_key: No policy found for " . $worker_node->title . ' at employer ' . $employer_name . ' in contract template ' . $contract_tplt_name . '. Using the global policy.');
+		sirius_minilog("Policy lookup for $schedule_key / $ws_name: No policy found for " . $worker_node->title . ' at employer ' . $employer_name . ' in contract template ' . $contract_tplt_name . '. Using the global policy.');
 		return $policy_node;
 	}
 
-	sirius_minilog("Policy lookup for $schedule_key: No policy found for " . $worker_node->title . ' at employer ' . $employer_name . ' in contract template ' . $contract_tplt_name . ' and there is no global policy set.', 'warning');
+	sirius_minilog("Policy lookup for $schedule_key / $ws_name: No policy found for " . $worker_node->title . ' at employer ' . $employer_name . ' in contract template ' . $contract_tplt_name . ' and there is no matching global policy set.', 'warning');
 	return NULL;
 }
 
