@@ -33,6 +33,7 @@ function sirius_mightysearch_form_prepare_valuefield($form_state, $json_forms, $
 					if ($field_name == 'field_sirius_source' && $column == 'value') {
 						$element = array('#type' => 'select', '#options' => drupal_map_assoc(sirius_contact_list_sources()));
 					} else if ($field_name == 'tags') {
+						$tag_options = sirius_taxonomy_load('sirius_contact_tags', 'tid', 'name');
 						$element = array('#type' => 'select', '#options' => drupal_map_assoc(array_values($tag_options)));
 					} else if ($field_name == 'nid') {
 							$element = array('#type' => 'textfield', '#size' => 6);
