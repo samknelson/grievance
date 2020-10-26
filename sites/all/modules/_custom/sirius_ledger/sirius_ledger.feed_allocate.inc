@@ -114,6 +114,8 @@ function sirius_ledger_feed_allocate_list($wizard_name) {
     t('Tools')
   );
 
+  $html .= l('Add a New Entry', 'sirius/feeds/launch/' . $wizard_name, array('attributes' => array('class' => array('tool-button', 'action-button'))));
+
   $html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
 
   $html .= theme('pager');

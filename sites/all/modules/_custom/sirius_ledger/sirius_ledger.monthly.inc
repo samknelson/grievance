@@ -13,10 +13,6 @@ function sirius_ledger_page_monthly_test() {
 }
 
 function sirius_ledger_page_monthly_test_form($form, &$form_state) {
-	$form['intro'] = array(
-		'#markup' => '<div class="sirius_form_intro">' . t('Use the form below to test the monthly and semi-monthly charges for a specific worker.') . '</div>',
-	);
-
 	$html = '<h2>Monthly and Semi-Monthly Dues Batch Status</h2>';
 	$batch_status = json_decode(sirius_domain_variable_get('sirius_ledger_monthly_batch_status'), TRUE);
 	$date = $batch_status['date'];
@@ -60,9 +56,7 @@ function sirius_ledger_page_monthly_test_form($form, &$form_state) {
 	$form['date'] = array(
 		'#type' => 'date_popup',
 		'#title' => t('As Of'),
-    '#attributes' => array(
-      'autocomplete' => 'off',
-    ),
+    '#attributes' => array('autocomplete' => 'off'),
     '#description' => t('Leave blank to make charges "as of" today. If running in batch mode, selecting a date will clear the batch progress for today.'),
 	);
 
@@ -202,8 +196,8 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 	$today_day = date('j', $ts);
 	$today_month = date('n', $ts);
 	$today_year = date('Y', $ts);
-	sirius_minilog("Calculating monthly dues for " . $worker_node->title . " using trigger " .  $trigger_options[$trigger] . " as of $today_year-$today_month-$today_day");
-	sirius_minilog("Operating mode: $mode");
+	sirius_minilog("Calculating monthly dues for " . $worker_node->title . " using trigger " .  $trigger_options[$trigger] . " and mode $mode as of $today_year-$today_month-$today_day");
+
 
 	$work_status_term = taxonomy_term_load($worker_node->field_sirius_work_status['und'][0]['tid']);
 	if (!$work_status_term) {
@@ -291,12 +285,21 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 				$previous_entries = sirius_ledger_ar_fetch($entry);
 				if ($previous_entries) {
 					$entry = $previous_entries[0];
-					if ($entry['ledger_amount'] == $rate) {
+					if ($rate == 0) {
+						sirius_minilog('- Found a previous entry, but the new rate is $0. Deleting.');
+						sirius_ledger_ar_delete($entry);
+						continue;
+					} else if ($entry['ledger_amount'] == $rate) {
 						sirius_minilog('- Found a previous ledger entry with the same rate. Skipping.');
 						continue;
 					} else {
 						sirius_minilog('- Found a previous ledger entry with a different rate.');
 					}
+				}
+
+				if ($rate == 0) {
+					sirius_minilog('- Rate is $0, skipping.');
+					continue;
 				}
 
 				$entry['ledger_amount'] = $rate;

@@ -49,6 +49,7 @@ function sirius_ledger_node_tab_policy_definition_form($form, &$form_state, $def
 		'#type' => 'checkboxes',
 		'#title' => t('Work Status'),
 		'#options' => $ws_options,
+		'#description' => t('Workers whose work status does not match one of the options selected will be assumed to have a rate of $0.'),
 	);
 	if ($json['ledger']['policy']['settings']['ws']) { $form['ledger']['policy']['settings']['ws']['#default_value'] = $json['ledger']['policy']['settings']['ws']; }
 
