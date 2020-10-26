@@ -221,6 +221,8 @@ function sirius_voice_send($params) {
   $context['handler_nid'] = $handler_nid;
   $context['worker_nid'] = $params['worker_nid'];
   $context['callerid_nid'] = $params['callerid_nid'];
+  $context['phonetree'] = $params['phonetree'];
+  $context['amd'] = $params['amd'];
 
   $result = sirius_twilio_outgoing_voice($phone, $context);
 
