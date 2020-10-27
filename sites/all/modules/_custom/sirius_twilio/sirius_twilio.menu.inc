@@ -33,7 +33,7 @@ function sirius_twilio_menu() {
     'page callback' => 'sirius_twilio_incoming_sms',
     'page arguments' => array(),
     'access callback' => TRUE,
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/twilio/incoming/voice'] = array(
@@ -42,7 +42,16 @@ function sirius_twilio_menu() {
     'page callback' => 'sirius_twilio_incoming_voice',
     'page arguments' => array(),
     'access callback' => TRUE,
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['sirius/twilio/outgoing/voice/stream'] = array(
+    'title' => 'Sirius: Twilio: Outgoing: Stream',
+    'description' => '',
+    'page callback' => 'sirius_twilio_outgoing_voice_stream',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/twilio/browserphone/twiml'] = array(
@@ -51,7 +60,7 @@ function sirius_twilio_menu() {
     'access callback' => TRUE,
     'page callback' => 'sirius_twilio_browserphone_twiml_dial',
     'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/twilio/browserphone/twiml/callended'] = array(
@@ -60,7 +69,7 @@ function sirius_twilio_menu() {
     'access callback' => TRUE,
     'page callback' => 'sirius_twilio_browserphone_twiml_callended',
     'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/twilio/browserphone/twiml/omg'] = array(
@@ -119,7 +128,7 @@ function sirius_twilio_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['sirius/config/phone/twilio-settings'] = array(
+  $items['sirius/config/phone/twilio'] = array(
     'title' => 'Twilio Settings',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
@@ -128,13 +137,34 @@ function sirius_twilio_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
-  $items['sirius/config/phone/twilio-test'] = array(
-    'title' => 'Twilio Test',
+  $items['sirius/config/phone/twilio/global'] = array(
+    'title' => 'Global Settings',
+    'description' => '',
+    'access arguments' => array('sirius domain admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_twilio_config'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/config/phone/twilio/amd'] = array(
+    'title' => 'Answering Machine Detection',
+    'description' => '',
+    'access arguments' => array('sirius domain admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_twilio_config_amd'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/config/phone/twilio/test'] = array(
+    'title' => 'Test',
     'description' => '',
     'page callback' => 'sirius_twilio_page_test',
     'page arguments' => array(),
     'access arguments' => array('sirius domain admin'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
   );
 
 

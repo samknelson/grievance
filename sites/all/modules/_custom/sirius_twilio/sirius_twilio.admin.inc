@@ -78,4 +78,32 @@ function sirius_twilio_config() {
   return system_settings_form($form);
 }
 
+function sirius_twilio_amd_setting_names() {
+  return array(
+    'MachineDetectionTimeout',
+    'MachineDetectionSpeechThreshold',
+    'MachineDetectionSpeechEndThreshold',
+    'MachineDetectionSilenceTimeout'
+  ); 
+}
+
+function sirius_twilio_config_amd() {
+  $form = array();
+
+  $names = sirius_twilio_amd_setting_names();
+  foreach ($names as $raw_name) {
+    $name = sirius_domain_variable_name($raw_name);
+    $form[$name] = array(
+      '#type' => 'textfield',
+      '#title' => $raw_name,
+      '#default_value' => variable_get($name, ''),
+      '#size' => 6,
+    );
+  }
+
+  return system_settings_form($form);
+}
+
+
+
 
