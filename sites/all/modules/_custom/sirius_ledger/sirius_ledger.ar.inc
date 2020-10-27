@@ -301,5 +301,5 @@ function sirius_ledger_ar_purge($params) {
 	$stmt = sirius_sql_query($sql, $sql_args);
 	return $stmt->rowCount();
 
-	sirius_ledger_balance_purge($entry['ledger_participant'], $entry['ledger_account']);
+	sirius_ledger_balance_purge($params['ledger_participant'], $params['ledger_account']);
 }
