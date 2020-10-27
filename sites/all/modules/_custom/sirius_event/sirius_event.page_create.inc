@@ -103,6 +103,7 @@ function sirius_event_page_create_form_submit($form, &$form_state) {
 	if ($domain_nid) { $event_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
 	$event_node->body['und'][0]['value'] = $form_state['values']['description']['value'];
 	$event_node->body['und'][0]['format'] = $form_state['values']['description']['format'];
+	$event_node->field_sirius_active['und'][0]['value'] = 'Yes';
 	node_save($event_node);
 	drupal_set_message(t("Created a new event: ") . $event_type_term->name);
 

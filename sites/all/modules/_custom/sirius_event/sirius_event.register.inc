@@ -30,6 +30,15 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
 	$participant_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s');
 	if ($json) { sirius_jsonfield_util_node_json_set($participant_node, $json); }
 
+	$sql = "select title from node where nid = :nid";
+	$stmt = sirius_sql_query($sql, array(':nid' => $event_nid));
+	$hr = $stmt->fetchAssoc();
+	$participant_node->title = $hr['title'];
+
+	$sql = "select title from node where nid = :nid";
+	$stmt = sirius_sql_query($sql, array(':nid' => $contact_nid));
+	$hr = $stmt->fetchAssoc();
+	$participant_node->title .= ': ' . $hr['title'];
 	sirius_jsonfield_log($participant_node, 'registered', 'Participant registered.');
 	node_save($participant_node);
 
