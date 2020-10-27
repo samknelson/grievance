@@ -55,7 +55,8 @@ function sirius_phonetree($call_sid, $context) {
 
 	// Enter 9 to be connected with an operator.
 	if ($digits == 9 || $handler == 'operator') {
-		sirius_phonetree_operator($call_sid, $context); 
+		// sirius_phonetree_operator($call_sid, $context); 
+		sirius_twilio_outgoing_voice_dial($call_sid, $context, "Please wait while we connect you with an operator.", variable_get('sirius_twilio_operator', ''));
 	} 
 
 	// Enter * to hear this message again.
