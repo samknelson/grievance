@@ -69,7 +69,7 @@ function grievance_workersync_local_search($str, $verbose = FALSE) {
 	if ($domain_nid) {
 		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
 	}
-  $sql .= "order by node.title ";
+  // $sql .= "order by node.title ";
   $sql .= "limit 50 ";
 
   $str = preg_replace('/\%/', '', $str);
