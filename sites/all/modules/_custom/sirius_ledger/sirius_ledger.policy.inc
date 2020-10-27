@@ -21,6 +21,7 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 	}
 	$employer_name = '[no employer]';
 	$contract_tplt_name = '[no contract]';
+
 	if ($employer_node) {
 		$employer_name = $employer_node->title;
 
@@ -44,7 +45,7 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 			if ($policy_node && 
 				$policy_json['ledger']['policy']['settings']['schedule'][$schedule_key] &&
 				(!$account_nid || $policy_json['ledger']['policy']['settings']['accounts'][$account_nid])) {
-				sirius_minilog("Policy lookup: Found the policy for " . $worker_node->title . ' at employer ' . $employer_node->title . ' in contract template ' . $contract_tplt_node->title);
+				sirius_minilog("Policy lookup for $schedule_key: Found the policy for " . $worker_node->title . ' at employer ' . $employer_node->title . ' in contract template ' . $contract_tplt_node->title);
 				return $policy_node;
 			}
 		}
@@ -59,7 +60,7 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 		return $policy_node;
 	}
 
-	sirius_minilog("Policy lookup for $schedule_key: No policy found for " . $worker_node->title . ' at employer ' . $employer_name . ' in contract template ' . $contract_tplt_name . ' and there is no global policy set.', 'warning');
+	sirius_minilog("Policy lookup for $schedule_key: No policy found for " . $worker_node->title . ' at employer ' . $employer_name . ' in contract template ' . $contract_tplt_name . ' and there is no matching global policy set.', 'warning');
 	return NULL;
 }
 
@@ -72,6 +73,11 @@ function sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule
 	$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
 	$levels = sirius_training_levels_fetch_worker($worker_node);
 	$ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+
+	// If the work status isn't one of the ones listed in the term, we reset the rate to $0.
+	$ws_tid = $worker_node->field_sirius_work_status['und'][0]['tid'];
+	$ws_term = taxonomy_term_load($ws_tid);
+	$ws_name = $ws_term->name;
 
 	// Find the highest matching rate
 	$max_rates = array();
@@ -101,10 +107,14 @@ function sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule
 						'level_name' => $lookups['level'][$ms_tid][$level_code]['title'],
 						'triggers' => $rate_record['triggers'],
 					);
+					if (!$ws_tid || !$policy_json['ledger']['policy']['settings']['ws'][$ws_tid]) {
+						$max_rates[$account_nid]['rate'] = 0;
+					}
 				}
 			}
 		}
 	}
+
 
 	return $max_rates;
 }

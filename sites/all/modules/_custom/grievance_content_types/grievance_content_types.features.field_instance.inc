@@ -13721,11 +13721,11 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-sirius_bulk-field_sirius_audio'.
-  $field_instances['node-sirius_bulk-field_sirius_audio'] = array(
+  // Exported field_instance: 'node-sirius_bulk-field_sirius_audio_public'.
+  $field_instances['node-sirius_bulk-field_sirius_audio_public'] = array(
     'bundle' => 'sirius_bulk',
     'deleted' => 0,
-    'description' => 'Upload audio files in WAV or MP3 format. You may want to use a service such as <a href="https://online-voice-recorder.com/" target="_blank">online-voice-recorder.com</a>.',
+    'description' => '',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -13755,7 +13755,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'audiofield_player',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -13766,8 +13766,8 @@ function grievance_content_types_field_default_field_instances() {
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'field_sirius_audio',
-    'label' => 'Audio',
+    'field_name' => 'field_sirius_audio_public',
+    'label' => 'Audio (Public)',
     'required' => 0,
     'settings' => array(
       'description_field' => 0,
@@ -13789,7 +13789,7 @@ function grievance_content_types_field_default_field_instances() {
             'slashes' => 0,
             'transliterate' => 0,
           ),
-          'value' => 'sirius_audio',
+          'value' => 'sirius_audio_public',
         ),
         'redirect' => FALSE,
         'retroactive_update' => 0,
@@ -13805,7 +13805,7 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 12,
+      'weight' => 13,
     ),
   );
 
@@ -14204,7 +14204,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -29560,6 +29560,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Attachments');
   t('Attachments will be listed at the bottom of the page.');
   t('Audio');
+  t('Audio (Public)');
   t('Auto Sign In?');
   t('Available For Skills');
   t('Available Since');

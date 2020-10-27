@@ -83,8 +83,8 @@ function sirius_ledger_node_tab_worker_ar_form_submit($form, &$form_state) {
 	} else if ($form_state['values']['charge_or_payment'] == 'charge') {
 		$params['ledger_amount_max'] = 0;
 	} else if ($form_state['values']['charge_or_payment'] == 'range') {
-		if (!empty($form_state['values']['ledger_amount_max'])) { $params['ledger_amount_max'] = $form_state['values']['ledger_amount_max']; }
-		if (!empty($form_state['values']['ledger_amount_min'])) { $params['ledger_amount_min'] = $form_state['values']['ledger_amount_min']; }
+		if (isset($form_state['values']['ledger_amount_max'])) { $params['ledger_amount_max'] = $form_state['values']['ledger_amount_max']; }
+		if (isset($form_state['values']['ledger_amount_min'])) { $params['ledger_amount_min'] = $form_state['values']['ledger_amount_min']; }
 	}
 
 	if (!empty($form_state['values']['ledger_date_min'])) {

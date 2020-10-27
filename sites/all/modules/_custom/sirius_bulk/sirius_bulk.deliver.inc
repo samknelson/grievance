@@ -172,8 +172,13 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $is_test = FALSE) {
 	$params['subject'] = $bulk_node->title;
 	$params['body'] = $bulk_node->body['und'][0]['value'];
 	$params['sms'] = $bulk_node->title . "\n\n" . $bulk_node->field_sirius_sms['und'][0]['value'];
-	$params['voice'] = $bulk_node->title . "\n\n" . $bulk_node->field_sirius_voice['und'][0]['value'];
+	$params['voice'] = $bulk_node->field_sirius_voice['und'][0]['value'];
 	$params['callerid_nid'] = $bulk_node->field_sirius_callerids['und'][0]['target_id'];
+	if ($bulk_node->field_sirius_audio_public['und'][0]['uri']) { 
+		$params['phonetree']['play']['url'] = file_create_url($bulk_node->field_sirius_audio_public['und'][0]['uri']);
+	}
+	$params['phonetree']['disable'] = TRUE;
+	$params['amd']['MachineDetection'] = 'DetectMessageEnd';
 
 	if (!$is_test) {
 		$params['X-Sirius-Id'] = "UNIQUE/bulk/" . $bulk_node->nid . '/' . $to;
@@ -182,6 +187,8 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $is_test = FALSE) {
 	if ($medium == 'email') {
 		return sirius_email_send($params);
 	} else if ($medium == 'voice') {
+		// dpm($params);
+		// return array('succsss' => FALSE, 'msg' => "Just testing");
 		return sirius_voice_send($params);
 	} else {
 		return sirius_sms_send($params);

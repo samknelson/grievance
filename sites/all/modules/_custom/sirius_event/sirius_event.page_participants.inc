@@ -110,8 +110,9 @@ function sirius_event_participant_role_status_tids($participant_role_tid, $optio
 	}
 	if ($options['phonebank']['during_call']) {
 		$sql .= "and ("; 
-		$sql .= "  field_sirius_json_value IS NULL OR ";
-		$sql .= "  lower(json_unquote(json_extract(field_sirius_json_value, '\$.phonebank.conceal_during_call'))) != 'yes' ";
+		$sql .= "  field_sirius_json_value IS NULL ";
+		$sql .= "  or lower(json_unquote(json_extract(field_sirius_json_value, '\$.phonebank.conceal_during_call'))) != 'yes' ";
+		$sql .= "  or lower(json_unquote(json_extract(field_sirius_json_value, '\$.phonebank.conceal_during_call'))) is null ";
 		if ($options['phonebank']['current_pstatus']) {
 			$sql .= "   or tid = :current_pstatus ";
 			$sql_args[':current_pstatus'] = $options['phonebank']['current_pstatus'];
@@ -124,6 +125,7 @@ function sirius_event_participant_role_status_tids($participant_role_tid, $optio
 	while ($hr = $stmt->fetchAssoc()) {
 		$statuses[$hr['tid']] = $hr['name'];
 	}
+
 	return $statuses;
 }
 

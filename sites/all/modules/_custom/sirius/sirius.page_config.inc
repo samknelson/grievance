@@ -83,21 +83,41 @@ function sirius_page_config() {
 	$html .= '<tr>';
 	$html .= '<th>' . t('Feature') . '</th>';
 	$html .= '<th>' . t('Description') . '</th>';
-	$html .= '<th>' . t('Tools') . '</th>';
+	$html .= '<th colspan="2">' . t('Tools') . '</th>';
 	$html .= '</tr>';
 
 	foreach ($links as $category_name => $category) {
 		$html .= '<tr>';
-		$html .= '<td colspan="3"><h2>' . $category['title'] . '</h2></td>';
+		$html .= '<td colspan="4"><h2>' . $category['title'] . '</h2></td>';
 		$html .= '</tr>';
 
 		foreach ($category['links'] as $path => $link) {
 			if (drupal_valid_path($path)) {
+				// Get the local tasks for this item. 
+				// Copied from menu_local_tasks(), which really ought to not require a raw db query.
+				$sql = "select path, title from menu_router ";
+				$sql .= "where tab_root = :path ";
+				$sql .= "and type = " . MENU_LOCAL_TASK . ' ';
+				$sql .= "order by weight, title ";
+				$stmt = sirius_sql_query($sql, array(':path' => $path));
+				$sub_paths = array();
+				while ($hr = $stmt->fetchAssoc()) { 
+					if (drupal_valid_path($hr['path'])) {
+						$sub_paths[$hr['path']] = $hr['title'];
+					}
+				}
+
 				$html .= '<tr>';
 				$html .= '<td>' . $link['title'] . '</td>';
 				$html .= '<td>' . $link['description'] . '</td>';
 				$html .= '<td>' . l('Manage', $path, array('attributes' => array('class' => array('tool-button')))) . '</td>';
+				$html .= '<td>';
+				foreach ($sub_paths as $sub_path => $sub_title) {
+					$html .= l($sub_title, $sub_path, array('attributes' => array('class' => array('tool-button'))));
+				}
+				$html .= '</td>';
 				$html .= '</tr>';
+
 			}
 		}
 	}

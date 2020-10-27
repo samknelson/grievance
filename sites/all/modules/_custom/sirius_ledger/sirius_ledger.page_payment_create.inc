@@ -46,6 +46,12 @@ function sirius_ledger_page_payment_create_form($form, &$form_state) {
 		$form['payment']['payer_worker']['#default_value'] = $default_payer_worker;
 	}
 
+	$default_payer_employer = $_REQUEST['payer_employer'];
+	if ($default_payer_employer) {
+		$form['payment']['payer_type']['#default_value'] = 'employer';
+		$form['payment']['payer_employer']['#default_value'] = $default_payer_employer;
+	}
+
 	$accounts = sirius_ledger_account_list();
 	$form['payment']['ledger_account'] = array(
 		'#title' => t('To'),

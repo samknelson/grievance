@@ -953,3 +953,16 @@ function grievance_update_7042() {
     print "... Done updating all balances.\n";
   }
 }
+
+/**
+ * Delete field instance for private audio file from bulk node
+ */
+
+function grievance_update_7043() {
+  $content_type = 'sirius_bulk';
+  $field_name = 'field_sirius_audio';
+  print "Deleting $field_name from $content_type\n";
+  if ($instance = field_info_instance('node', $field_name, $content_type)) {
+    field_delete_instance($instance);
+  }
+}
