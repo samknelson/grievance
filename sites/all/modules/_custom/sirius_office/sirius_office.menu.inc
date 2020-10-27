@@ -10,42 +10,35 @@
 function sirius_office_node_tabs() {
   $node_tabs = array();
 
-  /*
-  $node_tabs['sirius_json_definition']['sirius_json_definition_edit'] = array(
-    'title' => 'Definition',
+  $node_tabs['sirius_operator']['sirius_operator_users'] = array(
+    'title' => 'Users',
     'description' => '',
-    'callback' => 'sirius_json_definition_edit',
-    'permissions' => array('sirius admin'),
+    'callback' => 'sirius_office_node_tab_operator_users',
+    'permissions' => array('sirius office operator admin'),
     'weight' => 1,
   );
-  */
+
+  $node_tabs['sirius_operator']['sirius_operator_status'] = array(
+    'title' => 'Status',
+    'description' => '',
+    'callback' => 'sirius_office_node_tab_operator_status',
+    'permissions' => array('sirius office operator user'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_operator']['sirius_operator_calls'] = array(
+    'title' => 'Incoming Calls',
+    'description' => '',
+    'callback' => 'sirius_office_node_tab_operator_calls',
+    'permissions' => array('sirius office operator user'),
+    'weight' => 3,
+  );
 
   return $node_tabs;
 }
 
 function sirius_office_menu() {
   $items = array();
-
-  $node_tabs = sirius_office_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    foreach ($node_record as $tab_name => $tab_record) {
-      $items['node/%node/' . $tab_name] = array(
-        'title' => $tab_record['title'],
-        'description' => $tab_record['description'],
-        'page callback' => 'sirius_office_node_tab_content',
-        'page arguments' => array(1, $tab_name),
-        'access callback' => 'sirius_office_node_tab_access',
-        'access arguments' => array(1, $tab_name),
-        'type' => MENU_LOCAL_TASK,
-      );
-      if ($tab_record['weight']) {
-        $items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
-      }
-      if ($tab_record['page arguments']) {
-        $items['node/%node/' . $tab_name]['page_arguments'] = array_merge($items['node/%node/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
-      }
-    }
-  }
 
   $items['sirius/office/iprestrict/admin'] = array(
     'title' => 'IP Restrictions',
@@ -56,56 +49,53 @@ function sirius_office_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/office/timeoff'] = array(
+    'title' => 'Timeoff Requests',
+    'description' => '',
+    'page callback' => 'sirius_office_page_timeoff_request',
+    'page arguments' => array(),
+    'access arguments' => array('sirius office timeoff request'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/office/timeoff/pending'] = array(
+    'title' => 'Pending',
+    'description' => '',
+    'page callback' => 'sirius_office_page_timeoff_request_list_pending',
+    'page arguments' => array(),
+    'access arguments' => array('sirius office timeoff admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
+  );
+
+  $items['sirius/office/timeoff/all'] = array(
+    'title' => 'All',
+    'description' => '',
+    'page callback' => 'sirius_office_page_timeoff_request_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius office timeoff admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/office/timeoff/mine'] = array(
+    'title' => 'Mine',
+    'description' => '',
+    'page callback' => 'sirius_office_page_timeoff_request_list_mine',
+    'page arguments' => array(),
+    'access arguments' => array('sirius office timeoff request'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/office/operator'] = array(
+    'title' => 'Operators',
+    'description' => '',
+    'page callback' => 'sirius_office_page_operator',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   return $items;
-}
-
-function sirius_office_node_tab_content($node, $in_tab_name) {
-  $node_tabs = sirius_office_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          $callback = $tab_record['callback'];
-          $args = array($node);
-          if ($tab_record['callback arguments']) {
-            $args = array_merge($args, $tab_record['callback arguments']);
-          }
-          return call_user_func_array($callback, $args);
-        }
-      }
-    }
-  }
-  
-  drupal_set_message("Bad tab: $node->type, $in_tab_name");
-  
-  return "";
-}
-
-function sirius_office_node_tab_access($node, $in_tab_name) {
-  // Check generic permissions
-  $node_tabs = sirius_office_node_tabs();
-  foreach ($node_tabs as $node_type => $node_record) {
-    if ($node->type == $node_type) {
-      foreach ($node_record as $tab_name => $tab_record) {
-        if ($tab_name == $in_tab_name) {
-          // Check basic permission
-          foreach ($tab_record['permissions'] as $permission) {
-            if (!user_access($permission)) { return false; }
-          }
-
-          // Check for a custom access permission
-          $access_function_name = $tab_record['callback'] . '_access';
-          if (function_exists($access_function_name)) {
-            if (!$access_function_name($node)) {
-              return false;
-            }
-          }
-          
-          return true;
-        }
-      }
-    }
-  }
-  
-  return false;
 }
