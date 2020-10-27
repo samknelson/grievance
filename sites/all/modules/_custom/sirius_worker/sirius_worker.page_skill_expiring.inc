@@ -51,6 +51,16 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 		'#suffix' => '</div><br clear="left" />',
 	);
 
+	$ws_options = sirius_taxonomy_load('sirius_work_status', 'tid', 'name');
+	$form['ws'] = array(
+		'#type' => 'checkboxes',
+		'#title' => t('Work Status'),
+		'#options' => $ws_options,
+		'#checkall' => TRUE,
+		'#prefix' => "<div class=\"checkboxes-inline\">",
+		'#suffix' => '</div><br clear="left" />',
+	);
+
 
 	$form['output'] = array(
 		'#type' => 'select',
@@ -89,21 +99,25 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	if (is_numeric($days2)) {
 		$args[':start'] = gmdate('Y-m-d', strtotime("+$days2 days"));
 	} else if ($days2) {
-		$args[':end'] = gmdate('Y-m-d', strtotime($days));
+		$args[':start'] = gmdate('Y-m-d', strtotime($days2));
 	}
 
 	$output = $form_state['values']['output'];
 
 	$ms = array_filter(array_values($form_state['values']['ms']));
+	$ws = array_filter(array_values($form_state['values']['ws']));
 
 	$domain_nid = sirius_domain_nid();
-	$sql = "select title, name, nid, field_sirius_skill_expire_value, field_sirius_id_value ";
+	$sql = "select title, name, nid, field_sirius_skill_expire_value, field_sirius_id_value, field_sirius_email_value, field_sirius_phone_value ";
 	$sql .= "from node ";
 	$sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_skill on field_data_field_sirius_skill.entity_type = 'node' and field_data_field_sirius_skill.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_skill_expire on field_data_field_sirius_skill_expire.entity_type = 'node' and field_data_field_sirius_skill_expire.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_email on field_data_field_sirius_email.entity_type = 'node' and field_data_field_sirius_email.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_phone on field_data_field_sirius_phone.entity_type = 'node' and field_data_field_sirius_phone.entity_id = node.nid ";
 	if ($domain_nid) { $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid "; }
 	if ($ms) { $sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid "; }
+	if ($ws) { $sql .= "left join field_data_field_sirius_work_status on field_data_field_sirius_work_status.entity_type = 'node' and field_data_field_sirius_work_status.entity_id = node.nid "; }
 	$sql .= "left join taxonomy_term_data on taxonomy_term_data.tid = field_sirius_skill_tid ";
 	$sql .= "where node.type = 'sirius_worker' ";
 	$sql .= "and field_data_field_sirius_skill.delta = field_data_field_sirius_skill_expire.delta ";
@@ -133,6 +147,10 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 		$sql .= "and field_sirius_member_status_tid in (:ms) ";
 		$args[':ms'] = $ms;
 	}
+	if ($ws) {
+		$sql .= "and field_sirius_work_status_tid in (:ws) ";
+		$args[':ws'] = $ws;
+	}
 	if ($ms) {
 		$sql .= "group by field_data_field_sirius_member_status.entity_id ";
 	}
@@ -150,6 +168,8 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 		$row[] = $hr['title'];
 		$row[] = $hr['field_sirius_id_value'];
 		$row[] = $hr['name'];
+		$row[] = $hr['field_sirius_phone_value'];
+		$row[] = $hr['field_sirius_email_value'];
 		$row[] = date('Y-m-d', strtotime($hr['field_sirius_skill_expire_value']));
 		if ($output == 'csv') {
 			$row[] = $hr['nid'];
@@ -161,7 +181,7 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 
 	if ($count >= $limit-1) { drupal_set_message("Only showing the first $limit records. Select a CSV export to download the full list."); }
 
-	$header = array('Worker', 'Badge #', 'Skill', 'Expiration', 'NID');
+	$header = array(t('Worker'), t('Badge #'), t('Skill'), t('Phone'), t('Email'), t('Expiration'), t('NID'));
 
 	if ($output == 'csv') {
 		$filename = "skill_expiration_report_" . date('YmdHis') . '_' . $days . '_' . $days2 . '.csv';
