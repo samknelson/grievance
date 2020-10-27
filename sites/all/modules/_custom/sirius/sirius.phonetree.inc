@@ -22,19 +22,35 @@ function sirius_phonetree($call_sid, $context) {
 	$digits = $context['digits'];
 	$handler = $context['handler'];
 
+	// If we have an outgoing audio, just play it
+	if ($context['phonetree']['play']['url']) {
+		sirius_twilio_outgoing_voice_play($call_sid, $context, $context['phonetree']['play']['url']);
+	}
+
 	// If we have an outgoing message, just say it.
 	if ($context['outgoing_msg']) {
-		$msg = $context['outgoing_msg'];
+		$raw_msg = $context['outgoing_msg'];
 		unset($context['outgoing_msg']);
-		$msg = "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to hear your dispatches. ";
-		$msg .= "Message repeates. ";
-		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to hear your dispatches. ";
-		$msg .= "Message repeates. ";
-		$msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ". " . $msg;
-		$msg .= " Enter star to hear this message again. Enter 0 to hear your dispatches. ";
-		sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, 1);
+		$msg = '';
+
+		$phonetree_disable = $context['phonetree']['disable'];
+
+		if (!$phonetree_disable) { $msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ' '; }
+		$msg .= $raw_msg . ' ';
+		if (!$phonetree_disable) { "Enter star to hear this message again. Enter 0 to hear your dispatches. "; }
+		$msg .= 'Message repeats. ';
+
+		if (!$phonetree_disable) { $msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ' '; }
+		$msg .= $raw_msg . ' ';
+		if (!$phonetree_disable) { "Enter star to hear this message again. Enter 0 to hear your dispatches. "; }
+		$msg .= 'Message repeats. ';
+
+		if (!$phonetree_disable) { $msg .= "This is an automated call from " . variable_get('sirius_twilio_site_name_tts', '') . ' '; }
+		$msg .= $raw_msg . ' ';
+		if (!$phonetree_disable) { $msg .= "Enter star to hear this message again. Enter 0 to hear your dispatches. "; }
+
+		if ($phonetree_disable) { $gather_digits = 0; } else { $gather_digits = 1; }
+		sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_digits);
 	}
 
 	// Enter 9 to be connected with an operator.
