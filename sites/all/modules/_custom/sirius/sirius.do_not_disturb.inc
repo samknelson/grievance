@@ -223,7 +223,7 @@ function sirius_do_not_disturb_check($id = 'default', $ts = NULL) {
 	$orig_tz = date_default_timezone_get();
 	$tz = sirius_do_not_disturb_tz();
 	date_default_timezone_set($tz);
-	$current_time = date("h:i A");
+	$current_time = date("H:i");
 	$day = date('N');
 	$hour = date('G');
 	$minute = (int) date('i');
@@ -242,11 +242,11 @@ function sirius_do_not_disturb_check($id = 'default', $ts = NULL) {
 	}
 
 	if ($start_hour > $hour || ($start_hour == $hour && $start_minute > $minute)) {
-		return array('success' => FALSE, 'msg' => "Notifications cannot be sent until $start_hour:$start_minute_display. (It is now $current_time)");
+		return array('success' => FALSE, 'msg' => "Notifications cannot be sent until $start_hour:$start_minute_display. (Using timezone $tz where it is now $current_time)");
 	}
 
 	if ($hour > $stop_hour || ($hour == $stop_hour && $minute > $stop_minute)) {
-		return array('success' => FALSE, 'msg' => "Notifications cannot be sent after $stop_hour:$stop_minute_display. (It is now $current_time)");
+		return array('success' => FALSE, 'msg' => "Notifications cannot be sent after $stop_hour:$stop_minute_display. (Using timezone $tz where it It is now $current_time)");
 	}
 
 	return array('success' => TRUE);
