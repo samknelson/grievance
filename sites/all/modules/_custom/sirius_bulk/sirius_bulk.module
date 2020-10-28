@@ -166,6 +166,7 @@ function sirius_bulk_queue_summary($bulk_nid) {
 }
 
 function sirius_bulk_queue_summary_render($bulk_node) {
+	$json = sirius_jsonfield_util_node_json_get($bulk_node);
 	$status_options = sirius_bulk_status_options();
 
 	$html = '<div class="sirius_bulk_summary">';
@@ -184,6 +185,23 @@ function sirius_bulk_queue_summary_render($bulk_node) {
 	if ($delivery_ts > time()) {
 		$html .= sirius_fakerender_field('Sending starts in:', format_interval($delivery_ts-time()));
 	}
+
+	if ($bulk_node->field_sirius_bulk_status['und'][0]['value'] != 'sent') {
+		$dnd_options = sirius_do_not_disturb_list();
+		$dnd_id = $json['do_not_disturb']['id'];
+		if (!$dnd_id) { $dnd_id = 'default'; }
+		$dnd_name = $dnd_options[$dnd_id];
+		$dnd_check = sirius_do_not_disturb_check();
+		$dnd_text = '';
+		if ($dnd_name) { $dnd_text = $dnd_name; } else { $dnd_text = $dnd_id; }
+		$dnd_text .= ' - ';
+		if ($dnd_check['success']) { $dnd_text .= 'Sending is currently permitted'; } else { $dnd_text .= $dnd_check['msg']; }
+		if (drupal_valid_path('sirius/admin/do_not_disturb')) { 
+			$dnd_text .= ' [' . l('Manage', 'sirius/admin/do_not_disturb') . ']';
+		}
+		$html .= sirius_fakerender_field('Do Not Disturb:', $dnd_text);
+	}
+
 	$html .= drupal_render(field_view_field('node', $bulk_node, 'field_sirius_datetime_completed', 'full'));
 	$recipients_html = '<strong>' . number_format($total_recipients, 0) . ' total recipients</strong>';
 	if ($summary) {
