@@ -192,13 +192,13 @@ function sirius_bulk_queue_summary_render($bulk_node) {
 		if (!$dnd_id) { $dnd_id = 'default'; }
 		$dnd_name = $dnd_options[$dnd_id];
 		$dnd_check = sirius_do_not_disturb_check();
-		$dnd_text = '';
-		if ($dnd_name) { $dnd_text = $dnd_name; } else { $dnd_text = $dnd_id; }
-		$dnd_text .= ' - ';
-		if ($dnd_check['success']) { $dnd_text .= 'Sending is currently permitted'; } else { $dnd_text .= $dnd_check['msg']; }
+		$dnd_text = 'Using Do Not Disutrb set ';
+		if ($dnd_name) { $dnd_text .= $dnd_name; } else { $dnd_text .= $dnd_id; }
 		if (drupal_valid_path('sirius/admin/do_not_disturb')) { 
 			$dnd_text .= ' [' . l('Manage', 'sirius/admin/do_not_disturb') . ']';
 		}
+		$dnd_text .= '<br />';
+		if ($dnd_check['success']) { $dnd_text .= 'Sending is permitted'; } else { $dnd_text .= 'Sending is NOT permitted: ' . $dnd_check['msg']; }
 		$html .= sirius_fakerender_field('Do Not Disturb:', $dnd_text);
 	}
 
