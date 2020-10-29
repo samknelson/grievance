@@ -389,3 +389,23 @@ function sirius_page_phonenumber_check_form_submit($form, &$form_state) {
   sirius_minilog("Voice Possible: " . $node->field_sirius_voice_possible['und'][0]['value']);
   sirius_minilog("Details: " . l("Node " . $node->nid, 'node/' . $node->nid));
 }
+
+function sirius_sms_segment_count($html_id) {
+  drupal_add_js(array('sirius_sms_segment_count' => array('html_id' => $html_id)), array('type' => 'setting'));
+  drupal_add_js('sites/all/modules/_custom/sirius/js/sms_segment_count.js');
+  drupal_add_css('sites/all/modules/_custom/sirius/css/sms_segment_count.css');
+
+  $html = '<div class="sirius_sms_segment_count" id="' . $html_id . '_count">';
+  $html .= t('SMS Segments:') . '<span class="stat messages"></span>';
+  $html .= ' / ';
+  $html .= t('Remaining in segment:') . '<span class="stat remaining"></span>';
+  $html .= ' / ';
+  $html .= t('Total length:') . '<span class="stat length"></span>';
+  $html .= ' / ';
+  // $html .= t('Per segment:') . '<span class="stat per_message"></span>';
+  // $html .= ' / ';
+  $html .= t('Encoding:') . '<span class="stat encoding"></span>';
+  $html .= '</div>';
+
+  return $html;
+}
