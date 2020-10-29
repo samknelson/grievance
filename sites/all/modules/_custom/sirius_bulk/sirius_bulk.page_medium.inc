@@ -12,7 +12,7 @@ function sirius_bulk_node_tab_medium_form($form, &$form_state, $bulk_node) {
 
 	$form['#tree'] = TRUE; 
   $form["medium"] = array(
-    '#title' => t('Medum'),
+    '#title' => t('Medium'),
 		'#type' => 'select',
 		'#options' => $media,
 	  '#default_value' => $medium,
