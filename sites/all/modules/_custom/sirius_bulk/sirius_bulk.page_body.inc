@@ -8,6 +8,10 @@ function sirius_bulk_node_tab_body_form($form, &$form_state, $bulk_node) {
 	$form_state['bulk_nid'] = $bulk_node->nid;
 	$media = sirius_bulk_media();
 	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
+
+	if (in_array($medium, array('sms', 'choice'))) {
+	}
+
 	$form['into'] = array('#markup' => '<div class="sirius_form_intro">' . t('Message type: ') . '<strong>' . $media[$medium] . '</strong>' . '</div>');
 
 	$form['title'] = array(
@@ -34,6 +38,8 @@ function sirius_bulk_node_tab_body_form($form, &$form_state, $bulk_node) {
 			'#type' => 'textarea',
 			'#default_value' => $bulk_node->field_sirius_sms['und'][0]['value'],
 			'#required' => TRUE,
+			'#id' => 'sms_body',
+			'#description' => sirius_sms_segment_count('sms_body'),
 		);
 	}
 
