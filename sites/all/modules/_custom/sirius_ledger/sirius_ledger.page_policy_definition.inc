@@ -231,6 +231,7 @@ function sirius_ledger_node_tab_policy_definition_monthly_form($form, &$form_sta
 		'#description' => t('For monthly charges, on which day of the month should the charge be entered?')
 	);
 	if ($json['ledger']['policy']['monthly']['monthly_charge_day']) { $form['ledger']['policy']['monthly']['monthly_charge_day']['#default_value'] = $json['ledger']['policy']['monthly']['monthly_charge_day']; }
+	if ($json['ledger']['policy']['settings']['schedule']['month']) { $form['ledger']['policy']['monthly']['monthly_charge_day']['#required'] = TRUE; }
 
 	$form['ledger']['policy']['monthly']['semimonthly_charge_day_1'] = array(
 		'#type' => 'textfield',
@@ -239,6 +240,7 @@ function sirius_ledger_node_tab_policy_definition_monthly_form($form, &$form_sta
 		'#description' => t('For sem-monthly charges, on which day of the month should the first charge be entered?')
 	);
 	if ($json['ledger']['policy']['monthly']['semimonthly_charge_day_1']) { $form['ledger']['policy']['monthly']['semimonthly_charge_day_1']['#default_value'] = $json['ledger']['policy']['monthly']['semimonthly_charge_day_1']; }
+	if ($json['ledger']['policy']['settings']['schedule']['semimonth']) { $form['ledger']['policy']['monthly']['semimonthly_charge_day_1']['#required'] = TRUE; }
 
 	$form['ledger']['policy']['monthly']['semimonthly_charge_day_2'] = array(
 		'#type' => 'textfield',
@@ -247,6 +249,7 @@ function sirius_ledger_node_tab_policy_definition_monthly_form($form, &$form_sta
 		'#description' => t('For monthly charges, on which day of the month should the second charge be entered?')
 	);
 	if ($json['ledger']['policy']['monthly']['semimonthly_charge_day_2']) { $form['ledger']['policy']['monthly']['semimonthly_charge_day_2']['#default_value'] = $json['ledger']['policy']['monthly']['semimonthly_charge_day_2']; }
+	if ($json['ledger']['policy']['settings']['schedule']['semimonth']) { $form['ledger']['policy']['monthly']['semimonthly_charge_day_2']['#required'] = TRUE; }
 
 	$form['ledger']['policy']['monthly']['skip_months'] = array(
 		'#type' => 'checkboxes',
