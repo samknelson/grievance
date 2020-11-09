@@ -514,7 +514,7 @@ function sirius_menu() {
     'description' => '',
     'access callback' => TRUE,
     'page callback' => 'sirius_loopback_remote_ip_print',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/loopback/sample-html'] = array(
@@ -899,7 +899,7 @@ function sirius_menu() {
     'page callback' => 'sirius_esignature_stream',
     'page arguments' => array(3,4),
     'access arguments' => array('sirius'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
   ); 
 
   $items['sirius/license'] = array(
