@@ -9,16 +9,30 @@ function sirius_bulk_node_tab_body_form($form, &$form_state, $bulk_node) {
 	$media = sirius_bulk_media();
 	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
 
-	if (in_array($medium, array('sms', 'choice'))) {
-	}
 
-	$form['into'] = array('#markup' => '<div class="sirius_form_intro">' . t('Message type: ') . '<strong>' . $media[$medium] . '</strong>' . '</div>');
+	// Add a link shortener
+  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/sirius.popup.js');
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.popup.css');
+  $html .= '<a href="#" class="sirius_popup_trigger tool-button">' . t('Link Shortener') . '</a>';
+  $html .= '<div style="display:none" class="sirius_popup_overlay"></div>';
+  $html .= '<div style="display:none" class="sirius_popup_wrap">';
+  $html .= '<div class="sirius_popup_contents">';
+  $shorten_block = block_load('shorten', 'shorten');
+	$shorten_build = module_invoke('shorten', 'block_view', 'shorten');
+	drupal_alter(array('block_view', "block_view_shorten_shorten"), $shorten_build, $shorten_block);
+	$html .= $shorten_build['content'];
+  $html .= '</div>';
+  $html .= '<div class="sirius_popup_close"></div>';
+  $html .= '</div>';
+  $form['#prefix'] = $html;
+
+	$form['intro'] = array('#markup' => '<div class="sirius_form_intro">' . t('Message type: ') . '<strong>' . $media[$medium] . '</strong></div>');
 
 	$form['title'] = array(
 		'#title' => t('Subject'),
 		'#type' => 'textfield',
 		'#default_value' => $bulk_node->title,
-		'#description' => t('Will be used as the subject for an email, and will be the first part of an SMS or robocall.'),
+		'#description' => t('Will be used as the subject for an email. The subject is <strong>not used</strong> for SMS (text messages) or audio messages (robocalls).'),
 		'#required' => TRUE,
 	);
 
