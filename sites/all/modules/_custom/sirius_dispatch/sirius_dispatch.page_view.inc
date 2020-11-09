@@ -381,6 +381,7 @@ function sirius_dispatch_view_admin() {
 	    '#description' => t('If you wish to show fund rates for certain accounts, select them here.'),
 	    '#default_value' => variable_get($var, NULL),
 	    '#options' => $accounts,
+	    '#checkall' => TRUE,
 	  );
 	}
 
