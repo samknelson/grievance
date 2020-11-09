@@ -145,8 +145,29 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['dispatch_section_b'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_id', t('Request ID')));
 	$form['dispatch_section_c'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_dispatch_cbn', t('Call by Name?')));
 	$form['dispatch_section_d'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_payrate', t('Pay Rate')));
-	$stupid_html = '<section class="field field-name-nid field-label-inline clearfix view-mode-full"><h2 class="field-label">Report #:&nbsp;</h2><div class="field-items"><div class="field-item even">' . $dispatch_node->nid . '</div></div></section>';
-	$form['dispatch_section_e'] = array('#markup' => $stupid_html);
+
+	$account_options = sirius_ledger_account_list();
+	$account_nids = array_filter(array_values(sirius_domain_variable_get('sirius_dispatch_view_accounts', array())));
+	if ($account_nids) {
+		$schedules = array('month' => 'Monthly', 'semimonth' => 'Semi-Monthly', 'hour' => 'Hourly');
+		foreach ($schedules as $schedule_key => $schedule_name) {
+			$policy_node = sirius_ledger_policy_lookup($schedule_key, $worker_node);
+			if (!$policy_node) { continue; }
+			$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
+			$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule_key);
+			foreach ($rates as $account_nid => $rate_record) {
+				if ($rate_record['rate'] && in_array($account_nid, $account_nids)) {
+					$title = $account_options[$account_nid] . ':';
+					$value = '$' . number_format($rate_record['rate'], 2) . ' ' . $schedule_name;
+					$form['dispatch_section_' . $account_nid . '_' . $schedule_key] = array('#markup' => sirius_fakerender_field($title, $value));
+				}
+			}
+			// dpm($policy_node);
+			// dpm($rates);
+		}
+	}
+
+	$form['dispatch_section_e'] = array('#markup' => sirius_fakerender_field('Report #', $dispatch_node->nid));
 	$form['dispatch_section_close'] = array('#markup' => '</div>');
 
 	$form['worker_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_worker_section">');
@@ -340,14 +361,28 @@ function sirius_dispatch_view_admin() {
   );
 
   $contact_type_options = sirius_taxonomy_load('grievance_contact_types', 'tid', 'name', TRUE);
-  $var = sirius_domain_variable_name('sirius_dispatch_view_contact_type');
-  $form[$var] = array(
-    '#type' => 'select',
-    '#title' => t('Contact Type for Address'),
-    '#description' => t('If you wish to show an employer contact at the bottom of the dispatch, select which contact type should be shown'),
-    '#default_value' => variable_get($var, NULL),
-    '#options' => $contact_type_options,
-  );
+  if (count($contact_type_options) > 1) {
+	  $var = sirius_domain_variable_name('sirius_dispatch_view_contact_type');
+	  $form[$var] = array(
+	    '#type' => 'select',
+	    '#title' => t('Contact Type for Address'),
+	    '#description' => t('If you wish to show an employer contact at the bottom of the dispatch, select which contact type should be shown'),
+	    '#default_value' => variable_get($var, NULL),
+	    '#options' => $contact_type_options,
+	  );
+	}
+
+	$accounts = sirius_ledger_account_list();
+	if ($accounts) {
+	  $var = sirius_domain_variable_name('sirius_dispatch_view_accounts');
+	  $form[$var] = array(
+	    '#type' => 'checkboxes',
+	    '#title' => t('Accounts'),
+	    '#description' => t('If you wish to show fund rates for certain accounts, select them here.'),
+	    '#default_value' => variable_get($var, NULL),
+	    '#options' => $accounts,
+	  );
+	}
 
   return system_settings_form($form);
 }
