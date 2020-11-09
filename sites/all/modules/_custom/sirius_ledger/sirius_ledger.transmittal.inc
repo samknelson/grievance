@@ -108,21 +108,3 @@ function sirius_ledger_transmittal_dispatches($employer_nid) {
 	}
 	return $dispatches;
 }
-
-function sirius_ledger_transmittal_contact($employer_nid) {
-	$contact_type_tid = sirius_domain_variable_get('sirius_ledger_transmittal_contact_type', NULL);
-	if (!$contact_type_tid) { return NULL; }
-
-	$domain_nid = sirius_domain_nid();
-	$query = new EntityFieldQuery;
-	$query->entityCondition('entity_type', 'node');
-	$query->entityCondition('bundle', 'grievance_shop_contact');
-	if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
-	$query->fieldCondition('field_grievance_shops', 'target_id', $employer_nid);
-	$query->range(0,1);
-	$query->propertyOrderBy('nid', 'desc');
-	$stmt = $query->execute();
-	if (!$stmt['node']) { return NULL; }
-	$contact_nid = array_keys($stmt['node'])[0];
-	return node_load($contact_nid);
-}

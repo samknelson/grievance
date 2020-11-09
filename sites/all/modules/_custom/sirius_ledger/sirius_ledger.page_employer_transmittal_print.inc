@@ -107,7 +107,7 @@ function sirius_ledger_node_tab_employer_transmittal_print($employer_node, $acco
 
 	$html .= '<div class="sirius_ledger_transmittal">';
 
-	$contact_node = sirius_ledger_transmittal_contact($employer_node->nid);
+	$contact_node = sirius_employer_contact_fetch($employer_node->nid, sirius_domain_variable_get('sirius_ledger_transmittal_contact_type', NULL));
 	if ($contact_node) {
 
 		// $arg = "'15mm'" = 0.590551in0.5
