@@ -58,8 +58,7 @@ function sirius_page_config() {
 	$links['ledger']['links']['sirius/config/ledger'] 					= array('title' => 'A/R Settings', 'description' => 'Settings for the A/R accounting system: ledger, dues, payments, charges, etc.');
 
 	$links['users'] = array('title' => 'Users');
-	$links['users']['links']['admin/people/permissions'] = array('title' => 'Permissions', 'description' => 'Define which roles have which permissions.');
-	$links['users']['links']['admin/people/permissions/roles'] = array('title' => 'Roles', 'description' => 'Define the system-wide user roles.');
+	$links['users']['links']['admin/people'] = array('title' => 'Users', 'description' => 'Sitewide user management');
 	$links['users']['links']['admin/config/system/flood-control'] = array('title' => 'Flood Control', 'description' => 'Settings for blocking multiple failed login attempts from the same IP address.');
 	$links['users']['links']['admin/config/system/flood-unblock'] = array('title' => 'Flood Unblock', 'description' => 'Clear the flood block for a legitimate user who is trying to sign in.');
 	$links['users']['links']['admin/config/people/tfa-trusted-ip'] = array('title' => 'TFA Trusted IPs', 'description' => 'Set the list of trusted IP addresses for two-factor authentication.');
@@ -76,8 +75,8 @@ function sirius_page_config() {
 	$links['systems']['links']['sirius/config/phone'] 					= array('title' => 'Phone', 'description' => 'Phone settings, including SMS and Twilio');
 	$links['systems']['links']['sirius/sns/config'] 						= array('title' => 'SNS', 'description' => 'Settings for Amazon Simple Notification Service (SNS)');
 	$links['systems']['links']['admin/config/grievance/phaxio'] = array('title' => 'Phaxio', 'description' => 'Configure the Phaxio fax service.');
+	$links['systems']['links']['admin/config/services/shorten'] = array('title' => 'Shorten', 'description' => 'Configure the link shortening services such as blt.ly.');
 	$links['systems']['links']['admin/config'] 									= array('title' => 'Drupal Configuration', 'description' => 'Enter the system-wide Drupal configuration screens.');
-
 	$html .= '<table>';
 
 	$html .= '<tr>';
