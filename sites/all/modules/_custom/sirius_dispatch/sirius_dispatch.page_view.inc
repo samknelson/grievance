@@ -173,6 +173,18 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$worker_node->field_sirius_member_status = $new_field;
 	$form['worker_section_h'] = array('#markup' => sirius_dispatch_view_render_field($worker_node, 'field_sirius_member_status'));	
 	$worker_node->field_sirius_member_status = $orig_field;
+
+	$contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+	$contact_json = sirius_jsonfield_util_node_json_get($contact_node);
+	$contact_results = sirius_jsonfield_util_results_get($contact_json, 'default');
+	sirius_jsonfield_util_add_node_fields($contact_node, $contact_definition_form, $contact_results);
+	$contact_definition_json = sirius_contact_definition();
+	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
+	$display_fields = sirius_contact_definition_display_get($contact_definition_json, 'dispatch-default');
+	if ($display_fields) {
+		$form['worker_section_custom'] = array('#markup' => sirius_jsonfield_util_render_values($contact_definition_form, $contact_results, $display_fields, array('show_title' => TRUE)));
+	}
+
 	$form['worker_section_close'] = array('#markup' => '</div>');
 
 
@@ -316,6 +328,8 @@ function sirius_dispatch_view_admin() {
     '#title' => t('Dispatch View CSS'),
     '#default_value' => variable_get($var, ''),
   );
+
+
 
   return system_settings_form($form);
 }
