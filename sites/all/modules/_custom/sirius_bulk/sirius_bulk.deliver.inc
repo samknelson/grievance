@@ -171,7 +171,7 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $is_test = FALSE) {
 	$params['to'] = $to;
 	$params['subject'] = $bulk_node->title;
 	$params['body'] = $bulk_node->body['und'][0]['value'];
-	$params['sms'] = $bulk_node->title . "\n\n" . $bulk_node->field_sirius_sms['und'][0]['value'];
+	$params['sms'] = $bulk_node->field_sirius_sms['und'][0]['value'];
 	$params['voice'] = $bulk_node->field_sirius_voice['und'][0]['value'];
 	$params['callerid_nid'] = $bulk_node->field_sirius_callerids['und'][0]['target_id'];
 	if ($bulk_node->field_sirius_audio_public['und'][0]['uri']) { 
