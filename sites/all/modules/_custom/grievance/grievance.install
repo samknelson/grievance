@@ -966,3 +966,14 @@ function grievance_update_7043() {
     field_delete_instance($instance);
   }
 }
+
+/**
+ * Enable the "shorten" module
+ */
+
+function grievance_update_7044() {
+  // Enable FPA
+  print "Enabling shorten modules\n";
+  module_enable(array('shorten', 'shortener'), TRUE);
+}
+
