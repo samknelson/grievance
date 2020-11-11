@@ -31,6 +31,8 @@ function sirius_bulk_node_tab_recipients_contacts_form($form, &$form_state, $bul
 				'title' => 'Remove Bulk Recipient',
 				'bulk_nid' => $bulk_node->nid,
 			),
+			'export' => array('title' => 'Export'),
+			'tag' => array('title' => 'Add / Remove Tags'),
 		)
 	);
 
