@@ -708,6 +708,7 @@ features[field_instance][] = node-sirius_dispatch-field_sirius_datetime_created
 features[field_instance][] = node-sirius_dispatch-field_sirius_dispatch_cbn
 features[field_instance][] = node-sirius_dispatch-field_sirius_dispatch_job
 features[field_instance][] = node-sirius_dispatch-field_sirius_dispatch_status
+features[field_instance][] = node-sirius_dispatch-field_sirius_domain
 features[field_instance][] = node-sirius_dispatch-field_sirius_id
 features[field_instance][] = node-sirius_dispatch-field_sirius_payrate
 features[field_instance][] = node-sirius_dispatch-field_sirius_worker

@@ -2256,6 +2256,9 @@ function grievance_content_types_strongarm() {
       'sirius_worker' => array(
         'custom_settings' => TRUE,
       ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
