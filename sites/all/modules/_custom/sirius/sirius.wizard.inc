@@ -44,6 +44,13 @@ function sirius_wizard_info($wizard_name) {
   if (!isset($wizard_infos)) { 
   	$wizard_infos = sirius_wizard_info_all();
   }
+
+	// @todo: This is a terrible kludge, put in place to avoid touching lots of feeds
+	//        Sinze we're no longer supporting XLSX files, there's no need to have a sheet-selection step.
+	//        The right thing to do is to remove it from the configuration for each feed.
+	//        But I'm lazy and scared to touch every feed, so I'm doing this atrocious thing here.
+	unset($wizard_infos[$wizard_name]['steps']['sheet']);
+
 	return $wizard_infos[$wizard_name];
 }
 
