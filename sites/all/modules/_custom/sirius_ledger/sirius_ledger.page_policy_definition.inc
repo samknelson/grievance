@@ -50,6 +50,7 @@ function sirius_ledger_node_tab_policy_definition_form($form, &$form_state, $def
 		'#title' => t('Work Status'),
 		'#options' => $ws_options,
 		'#description' => t('Workers whose work status does not match one of the options selected will be assumed to have a rate of $0.'),
+		'#checkall' => TRUE,
 	);
 	if ($json['ledger']['policy']['settings']['ws']) { $form['ledger']['policy']['settings']['ws']['#default_value'] = $json['ledger']['policy']['settings']['ws']; }
 
@@ -123,19 +124,17 @@ function sirius_ledger_node_tab_policy_definition_rates_form($form, &$form_state
 	$form['#tree'] = TRUE;
 	$table_open_html = '<table><tr><th rowspan="2">Member Status</th>';
 	foreach ($account_options as $account_nid => $account_name) {
-		if ($account_nid == 'pay') {
-			$table_open_html .= '<th>' . $account_name . '</th>';
-		} else {
-			$table_open_html .= '<th colspan="2">' . $account_name . '</th>';
-		}
+		$table_open_html .= '<th colspan="2">' . $account_name . '</th>';
 	}
 	$table_open_html .= '</tr>';
 	$table_open_html .= '<tr>';
 	foreach ($account_options as $account_nid => $account_name) {
 		if ($account_nid == 'pay') {
-			$table_open_html .= '<th>Rate</th>';
+			$table_open_html .= '<th>' . t('Regular') . '</th>';
+			$table_open_html .= '<th>' . t('Skilled') . '</th>';
 		} else {
-			$table_open_html .= '<th>Rate</th><th>Triggers</th>';
+			$table_open_html .= '<th>' . t('Rate') . '</th>';
+			$table_open_html .= '<th>' . t('Triggers') . '</th>';
 		}
 	}
 	$table_open_html .= '</tr>';
@@ -154,6 +153,16 @@ function sirius_ledger_node_tab_policy_definition_rates_form($form, &$form_state
 					'#prefix' => '<td>',
 					'#suffix' => '</td>',
 				);
+
+				if ($account_nid == 'pay') {
+					$form['ledger']['policy']['rates'][$schedule_key][$ms_level_code][$account_nid]['rate_skilled'] = array(
+						'#type' => 'textfield',
+						'#size' => 5,
+						'#default_value' => $json['ledger']['policy']['rates'][$schedule_key][$ms_level_code][$account_nid]['rate_skilled'],
+						'#prefix' => '<td>',
+						'#suffix' => '</td>',
+					);
+				}
 
 				if ($account_nid != 'pay') {
 					$form['ledger']['policy']['rates'][$schedule_key][$ms_level_code][$account_nid]['triggers'] = array(
