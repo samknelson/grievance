@@ -200,6 +200,8 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 			":$node_type:nid" => 'Internal ID',
 			":$node_type:title:value" => 'Name',
 			":$node_type:field_sirius_id:value" => 'ID',
+			":$node_type:field_sirius_id2:value" => 'ID2',
+			":$node_type:field_sirius_id3:value" => 'ID3',
 			":$node_type:field_sirius_phone:value" => 'Phone',
 			":$node_type:field_sirius_email:value" => 'Email',
 			":$node_type:field_sirius_address:country" => 'Country',
