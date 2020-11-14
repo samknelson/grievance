@@ -166,6 +166,7 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
   	return array('success' => FALSE, 'msg' => 'Using the pay rate override specified in the job.');
   }
 
+
   $industry_tid = $job_node->field_sirius_industry['und'][0]['tid'];
   if (!$industry_tid) { return array('success' => FALSE, 'msg' => 'There is no industry specified for the job.'); }
 
@@ -188,6 +189,8 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
   }
   if (!$found_industry) { return array('success' => FALSE, 'msg' => 'The worker does not have a member status associated with the industry for this job.'); }
 
+  $msg = $worker_node->title . ': ';
+
   // Need to determine if we should pay at the skilled rate.
   $is_skilled = FALSE;
 
@@ -198,7 +201,6 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
   }
 
   // Some employers always pay the skilled rate for workers with specific skills.
-  $msg = $worker_node->title . ': ';
   if (!$is_skilled) {
   	$json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
     $employer_skills = $json['dispatch']['pay_at_skilled_rate']['skill'];
@@ -224,23 +226,43 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
   }
   if (!$is_skilled) { $msg .= "Using unskilled payrate. "; }
 
-  $ms_json = json_decode($member_status_term->field_sirius_json['und'][0]['value'], TRUE);
+  $schedule_key = 'hour';
+	$policy_node = sirius_ledger_policy_lookup($schedule_key, $worker_node);
+	$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
+	$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule_key, $member_status_term->tid);
 
-  $payrate_skilled = $member_status_term->field_sirius_payrate_skilled['und'][0]['value'];
-  $payrate_unskilled = $member_status_term->field_sirius_payrate['und'][0]['value'];
-  $msg .= "Payrates for the member status are $payrate_unskilled / $payrate_skilled. ";
+	if ($policy_node) {
+		$payrate_unskilled = $rates['pay']['rate'];
+		$payrate_skilled = $rates['pay']['rate_skilled'];
+		if (!$payrate_skilled) { $payrate_skilled = $payrate_unskilled; }
+		$msg .= "Payrates set in the policy are $payrate_unskilled / $payrate_skilled. ";
+	} else {
+	  //
+	  // @todo: All of the following code ought to become obsolete.
+	  //        In the bad old days, we deduced the pay rate from values assocated with member statuses and levels. That logic is
+	  //        still in palce for Teamsters 631, which is why this code cannot be removed. However, going forward, everybody 
+	  //        ought to be setting the pay rate in the policy, rather than in the member status.
+	  // 
 
-  if ($ms_json['training']['levels_enabled']) {
-  	$msg .= "The member status is leveled, so looking at the worker's level ... ";
-  	$worker_json = json_decode($worker_node->field_sirius_json['und'][0]['value'], TRUE);
-  	$worker_level_code = $worker_json['training']['levels'][$member_status_term->tid]['code'];
-  	if ($worker_level_code) { $msg .= "found $worker_level_code. "; }
-  	if ($worker_level_code && $ms_json['training']['levels'][$worker_level_code]) {
-  		if ($ms_json['training']['levels'][$worker_level_code]['payrate_unskilled']) { $payrate_unskilled = $ms_json['training']['levels'][$worker_level_code]['payrate_unskilled']; }
-  		if ($ms_json['training']['levels'][$worker_level_code]['payrate_skilled']) { $payrate_skilled = $ms_json['training']['levels'][$worker_level_code]['payrate_skilled']; }
-			$msg .= "Payrates for level $worker_level_code are $payrate_unskilled / $payrate_skilled. ";
-  	}
-  }
+
+	  $ms_json = json_decode($member_status_term->field_sirius_json['und'][0]['value'], TRUE);
+
+	  $payrate_skilled = $member_status_term->field_sirius_payrate_skilled['und'][0]['value'];
+	  $payrate_unskilled = $member_status_term->field_sirius_payrate['und'][0]['value'];
+	  $msg .= "Payrates for the member status are $payrate_unskilled / $payrate_skilled. ";
+
+	  if ($ms_json['training']['levels_enabled']) {
+	  	$msg .= "The member status is leveled, so looking at the worker's level ... ";
+	  	$worker_json = json_decode($worker_node->field_sirius_json['und'][0]['value'], TRUE);
+	  	$worker_level_code = $worker_json['training']['levels'][$member_status_term->tid]['code'];
+	  	if ($worker_level_code) { $msg .= "found $worker_level_code. "; }
+	  	if ($worker_level_code && $ms_json['training']['levels'][$worker_level_code]) {
+	  		if ($ms_json['training']['levels'][$worker_level_code]['payrate_unskilled']) { $payrate_unskilled = $ms_json['training']['levels'][$worker_level_code]['payrate_unskilled']; }
+	  		if ($ms_json['training']['levels'][$worker_level_code]['payrate_skilled']) { $payrate_skilled = $ms_json['training']['levels'][$worker_level_code]['payrate_skilled']; }
+				$msg .= "Payrates for level $worker_level_code are $payrate_unskilled / $payrate_skilled. ";
+	  	}
+	  }
+	}
 
   if ($is_skilled) { $payrate = $payrate_skilled; } else { $payrate = $payrate_unskilled; }
   $msg .= "Final payrate is $payrate.";
