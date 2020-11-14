@@ -714,6 +714,8 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 	$job_node->status = 1;
 	$job_node->promote = 0;
 	$job_node->comment = 0;
+	$domain_nid = sirius_domain_nid();
+	if ($domain_nid) { $job_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
 
 	$job_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
 	$job_node->field_sirius_dispatch_job_type['und'][0]['tid'] = $job_type_term->tid;
@@ -868,6 +870,8 @@ function sirius_dispatch_page_job_create_get_event_node($form_state, $job_node) 
 	}
 	$event_node->field_sirius_active['und'][0]['value'] = 'Yes';
 	$event_node->type = 'sirius_event';
+	$domain_nid = sirius_domain_nid();
+	if ($domain_nid) { $event_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
 	node_object_prepare($event_node);
 	$event_node->language = LANGUAGE_NONE;
 	$event_node->uid = $user->uid;
