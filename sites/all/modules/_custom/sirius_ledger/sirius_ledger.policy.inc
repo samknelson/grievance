@@ -64,7 +64,7 @@ function sirius_ledger_policy_lookup($schedule_key, $worker_node, $employer_node
 	return NULL;
 }
 
-function sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule_key) {
+function sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule_key, $ms_tid = NULL) {
 	$lookups = &drupal_static(__FUNCTION__);
 	if (!isset($lookups)) { 
 		$lookups['ms'] = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
@@ -72,7 +72,11 @@ function sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule
 	}
 	$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
 	$levels = sirius_training_levels_fetch_worker($worker_node);
-	$ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+	if ($ms_tid) { 
+		$ms_tids = array($ms_tid);
+	} else {
+		$ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+	}
 
 	// If the work status isn't one of the ones listed in the term, we reset the rate to $0.
 	$ws_tid = $worker_node->field_sirius_work_status['und'][0]['tid'];
@@ -101,6 +105,7 @@ function sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule
 				if ($rate > $max_rates[$account_nid]) {
 					$max_rates[$account_nid] = array(
 						'rate' => $rate,
+						'rate_skilled' => $rate_record['rate_skilled'],
 						'ms_tid' => $ms_tid,
 						'ms_name' => $lookups['ms'][$ms_tid],
 						'level_code' => $level_code,
