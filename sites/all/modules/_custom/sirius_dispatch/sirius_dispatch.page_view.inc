@@ -179,21 +179,19 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['worker_section_e'] = array('#markup' => sirius_dispatch_view_render_field($worker_node, 'field_sirius_id2', t('Titan ID')));
 	$form['worker_section_f'] = array('#markup' => sirius_dispatch_view_render_field($worker_node, 'field_sirius_ssn', t('SSN')));
 
-	// Need to fake the worker node -- show only the member status(es) associated with the industry of this job.
+	// Find the member status corresponding to the dispatch.
+	// @todo: This should really be a function, sirius_dispatch_find_ms()
 	$job_industry_tids = sirius_fieldvals($job_node, 'field_sirius_industry', 'tid');
-	$member_status_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
-	$member_status_terms = taxonomy_term_load_multiple($member_status_tids);
-	$new_field = array();
-	foreach ($member_status_terms as $status_tid => $status_term) {
-		$status_industry_tids = sirius_fieldvals($status_term, 'field_sirius_industry', 'tid');
+	$ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+	$ms_terms = taxonomy_term_load_multiple($ms_tids);
+	foreach ($ms_terms as $probe_ms_tid => $probe_ms_term) {
+		$status_industry_tids = sirius_fieldvals($probe_ms_term, 'field_sirius_industry', 'tid');
 		if (array_intersect($job_industry_tids, $status_industry_tids)) {
-			$new_field['und'][]['tid'] = $status_tid;
+			$ms_tid = $probe_ms_tid;
+			$ms_term = $ms_terms[$ms_tid];
 		}
 	}
-	$orig_field = $worker_node->field_sirius_member_status;
-	$worker_node->field_sirius_member_status = $new_field;
-	$form['worker_section_h'] = array('#markup' => sirius_dispatch_view_render_field($worker_node, 'field_sirius_member_status'));	
-	$worker_node->field_sirius_member_status = $orig_field;
+	$form['worker_section_h'] = array('#markup' => sirius_fakerender_field('Member Status:', $ms_term->name));
 
 	$contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
 	$contact_json = sirius_jsonfield_util_node_json_get($contact_node);
