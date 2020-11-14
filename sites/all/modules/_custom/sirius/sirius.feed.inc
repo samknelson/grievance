@@ -366,6 +366,7 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 	$form_state['feed_node'] = $feed_node;
 	$form_state['current_step'] = $current_step;
 	$steps = sirius_wizard_steps($info, $data, $feed_node);
+	$last_data = sirius_feed_lastdata($info, $feed_node);
 
 	if ($feed_node->field_sirius_attachments['und'][0]) {
 		$mode = 'full';
@@ -429,6 +430,17 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 		);
 	}
 
+
+	$default = $data['header_row'];
+	if (!$default) { $default = $last_data['header_row']; }
+	$form['header_row'] = array(
+		'#title' => t('First row contains column headers?'),
+		'#type' => 'select',
+		'#options' => array('Yes' => 'Yes', 'No' => 'No'),
+		'#default_value' => $default,
+		'#required' => TRUE,
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Submit',
@@ -479,6 +491,8 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
   $data['source'] = $form_state['values']['source'];
   $data['pk'] = $form_state['values']['pk'];
   $data['tag'] = $form_state['values']['tag'];
+	$data['worksheet'] = 0;
+	$data['header_row'] = $form_state['values']['header_row'];
 
 	if ($info['feed']['employer_access']) {
 		$employer_node = sirius_employer_get();
@@ -531,6 +545,10 @@ function sirius_feed_wizard_sheet_form($form, &$form_state, $info, $data, $feed_
 		'#default_value' => $default,
 		'#required' => TRUE,
 	);
+	if (count($names) == 1) { 
+		$form['worksheet']['#type'] = 'hidden';
+		$form['worksheet']['#value'] = $names[0];
+	}
 
 	$default = $data['header_row'];
 	if (!$default) { $default = $last_data['header_row']; }
