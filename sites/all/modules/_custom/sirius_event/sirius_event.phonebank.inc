@@ -11,8 +11,9 @@ function sirius_event_phonebank_enabled_type($event_type_term) {
   return $json['phonebank']['phonebank_enabled'] == 'Yes';
 }
 
-function sirius_event_phonebank_lock_type($event_node) {
-  return 'phonebank_' . $event_node->nid;
+function sirius_event_phonebank_lock_type($event_node_or_nid) {
+  if (is_object($event_node_or_nid)) { $nid = $event_node_or_nid->nid; } else { $nid = $event_node_or_nid; }
+  return 'phonebank_' . $nid;
 }
 
 function sirius_event_phonebank_next_number($event_node, $prole_tid, $pstatus_tid) {
