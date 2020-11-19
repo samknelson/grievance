@@ -122,6 +122,20 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 		$form['phonebank']['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disurb_render($json['phonebank']['do_not_disturb']['id']));
 	}
 
+	$form['phonebank']['autosave'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Auto Save',
+	);
+	$options = array(NULL => '-- Select --');
+	$options['Yes'] = t('Yes, save after every field is edited');
+	$options['No'] = t('No, only save when the user clicks the "Save" button');
+	$form['phonebank']['autosave']['field'] = array(
+		'#type' => 'select',
+		'#options' => $options,
+		'#title' => t('Save Each Field?'),
+		'#default_value' => $json['phonebank']['autosave']['field'],
+		'#description' => 'Autosave ensures that data is not lost if the browser is closed without saving. However, it slows down the user interface.',
+	);
 
 	$form['submit'] = array(
 		'#type' => 'submit',

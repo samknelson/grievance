@@ -15,3 +15,36 @@
 	margin-bottom: 10px;
 	float: right;
 }
+
+#sirius_quicksave_msg {
+	font-weight: bold;
+}
+
+.sirius_quicksave_active {
+	color: #009900;
+}
+
+.sirius_quicksave_ready {
+	color: #000099;
+}
+
+.sirius_quicksave_error {
+	color: #990000;
+}
+
+#sirius-node-tab-event-phonebank-call-form input.form-submit, 
+#sirius-node-tab-event-phonebank-call-form input.form-submit.ajax-processed {
+	margin: 0;
+	margin-right: 5px;
+  background-color: #0f3871;
+  color: #ffffff;
+	border: 1px solid #5984be;
+}
+
+#sirius-node-tab-event-phonebank-call-form input.form-submit:hover {
+	background-color: #5984be;
+}
+
+#sirius-node-tab-event-phonebank-call-form input.form-submit:disabled {
+	background-color: #666666;
+}
