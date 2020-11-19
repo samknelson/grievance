@@ -498,6 +498,13 @@ function sirius_event_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/ajax/phonebank-quicksave'] = array(
+    'page callback' => 'sirius_event_phonebank_quicksave',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
