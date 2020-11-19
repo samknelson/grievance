@@ -60,6 +60,8 @@ function sirius_page_do_not_disurb_config_form($form, &$form_state) {
 		$form['do_not_disturb']['schedules'][$i] = array(
 			'#type' => 'fieldset',
 			'#title' => $title,
+			'#collapsible' => TRUE,
+			'#collapsed' => TRUE,
 		);
 
 		$form['do_not_disturb']['schedules'][$i]['title'] = array(
