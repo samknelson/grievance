@@ -3740,7 +3740,7 @@ fieldset.date-combo .container-inline-date .date-padding {
 div.sirius_help {
   background: url(images/help.png) no-repeat 8px 5px #f0f8ff;
   border: 0;
-  margin: 10px 10px 0;
+  margin: 10px;''
   padding: 0;
   border-radius: 2px;
 }
@@ -3901,23 +3901,6 @@ tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: l
 tr.sirius_bg_azure,         tr.sirius_bg_azure          td { background-color: azure; }
 tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
 tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
-
-/*
-snow  #FFFAFA
-mintcream #F5FFFA
-ivory #FFFFF0
-honeydew  #F0FFF0
-azure #F0FFFF 
-aliceblue #F0F8FF
-seashell  #FFF5EE
-beige #F5F5DC
-oldlace #FDF5E6
-floralwhite #FFFAF0
-antiquewhite  #FAEBD7
-linen #FAF0E6
-lavenderblush #FFF0F5
-mistyrose #FFE4E1
-*/
 
 div.sirius-view-multitable table {
   table-layout: fixed;
@@ -4166,4 +4149,22 @@ div.sirius_quicknav {
 
 .accordion_highlighted {
   background-color: #ffc;
+}
+
+table.sirius_data_table {
+  width: auto;
+}
+
+table.sirius_data_table_wide {
+  width: 100%;
+}
+
+table.sirius_data_table td {
+  border: 1px solid;
+  padding: 5px;
+}
+
+table.sirius_data_table th {
+  padding: 5px;
+  vertical-align: top;
 }

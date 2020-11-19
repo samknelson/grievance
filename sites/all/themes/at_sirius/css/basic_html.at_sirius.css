@@ -36,6 +36,8 @@ a.tool-button {
 	display: inline-block;
 	margin-right: 10px;
 	background-color: #ffffff;
+	min-width: 75px;
+	text-align: center;
 }
 a.tool-button:hover {
 	color: #1b4784;
