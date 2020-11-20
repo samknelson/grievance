@@ -81,7 +81,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	/////////////////////////////////////////////////////////////////////
 
 	$trigger_callback = $form_state['triggering_element']['#ajax']['callback'];
-	if (in_array($trigger_callback, array(
+	if ($participant_node && in_array($trigger_callback, array(
 			'sirius_node_tab_event_phonebank_call_form_submit_ajax', 
 			'sirius_node_tab_event_phonebank_call_form_submit_ajax_close',
 			'sirius_node_tab_event_phonebank_call_form_submit_ajax_change_recipient',
