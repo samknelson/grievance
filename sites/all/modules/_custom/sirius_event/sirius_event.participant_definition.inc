@@ -11,6 +11,7 @@ function sirius_node_tab_event_participant_definition_edit_access($definition_no
 function sirius_node_tab_event_participant_definition_preview_access($definition_node) { return sirius_node_tab_event_participant_definition_edit_access($definition_node); }
 function sirius_node_tab_event_participant_definition_signatures_access($definition_node) { return sirius_node_tab_event_participant_definition_edit_access($definition_node); }
 function sirius_node_tab_event_participant_definition_exim_access($definition_node) { return sirius_node_tab_event_participant_definition_edit_access($definition_node); }
+function sirius_node_tab_event_participant_definition_preferences_access($definition_node) { return sirius_node_tab_event_participant_definition_edit_access($definition_node); }
 
 function sirius_node_tab_event_participant_definition_edit($definition_node) {
 	$contact_json = sirius_contact_definition();
@@ -28,6 +29,10 @@ function sirius_node_tab_event_participant_definition_exim($definition_node) {
 
 function sirius_node_tab_event_participant_definition_signatures($definition_node) {
 	return drupal_get_form('sirius_json_definition_signatures_form', $definition_node->nid);
+}
+
+function sirius_node_tab_event_participant_definition_preferences($definition_node) {
+	return drupal_get_form('sirius_json_definition_preferences_form', $definition_node->nid);
 }
 
 function sirius_event_instance_participant_definition($event_node) {
