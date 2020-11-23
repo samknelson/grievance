@@ -7,6 +7,7 @@
 			$('.secondary-tasks-wrapper').hide();
 			$('.primary-local-tasks-wrapper').hide();
 			$('#page-footer').hide();
+			$('body').addClass('sirius_fullpage');
 
 			function enable_submit() {
 				if ($('#submit_wrap input').hasClass('disable_always')) { 
@@ -29,6 +30,41 @@
 					enable_submit();
 				});
 			});
+
+			
+
+
+			$('#sirius_ckstyles_script_instructions_toggle').once('react-to-toggle', function() {
+				$('#sirius_ckstyles_script_instructions_toggle').on('click', function(event) {
+					event.preventDefault();
+					instructions_toggle();
+				});
+			});
+
+			function instructions_toggle() {
+				if ($.cookie("sirius_ckstyles_script_instructions_hide") == 1) {
+					$.cookie("sirius_ckstyles_script_instructions_hide", 0);
+				} else {
+					$.cookie("sirius_ckstyles_script_instructions_hide", 1);
+				}
+				instructions_handle();
+			}
+
+			function instructions_handle() {
+				if ($('.sirius_ckstyles_script_instructions').length < 1) {
+					$('#sirius_ckstyles_script_instructions_toggle').hide();
+				} else {
+					if ($.cookie("sirius_ckstyles_script_instructions_hide") == 1) {
+						$('#sirius_ckstyles_script_instructions_toggle').html('[Show Instructions]');
+						$('.sirius_ckstyles_script_instructions').hide();
+					} else {
+						$('#sirius_ckstyles_script_instructions_toggle').html('[Hide Instructions]');
+						$('.sirius_ckstyles_script_instructions').show();
+					}
+				}
+			}
+
+			instructions_handle();
 
 			/*
 			participant_nid = Drupal.settings.sirius_event_phonebank.participant_nid;
