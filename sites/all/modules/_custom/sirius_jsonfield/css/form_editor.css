@@ -1,0 +1,27 @@
+#sirius-json-definition-edit-form .ckeditor_links { 
+	display: none !important;
+}
+
+
+#sirius-json-definition-edit-form .field_definition_wrap {
+	margin-right: 10px;
+}
+
+#sirius-json-definition-edit-form .field_list_wrap  h2 {
+	padding-top: 0;
+	margin: 0;
+}
+
+#sirius-json-definition-edit-form .field_list_wrap ol {
+  margin-left: 15px;
+  padding-inline-start: 0;
+	margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+#sirius-json-definition-edit-form .field_list_wrap ol ol {
+  margin-left: 20px;
+}
+
+#sirius-json-definition-edit-form .field_list_wrap a.new_field {
+}
