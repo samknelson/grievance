@@ -1,5 +1,6 @@
 #sirius_browserphone {
   width: 100%;
+  margin-bottom: 10px;
 }
 
 #sirius_browserphone_volume {
@@ -21,13 +22,19 @@
 }
 
 div#controls div#log {
-  border: 1px solid #686865;
+  border: 1px solid #333333;
   height: 250px;
   text-align: left;
   padding: 5px;
   margin-top: 5px;
   overflow-y: scroll;
   display: none;
+}
+
+#sirius_browserphone .ui-state-default, 
+#sirius_browserphone .ui-widget-content .ui-state-default, 
+#sirius_browserphone .ui-widget-header .ui-state-default {
+  border-color: #333333;
 }
 
 #sirius_browserphone_number {
@@ -74,4 +81,35 @@ div#controls div#log {
   border: 0;
   padding: 0;
   margin: 0;
+}
+
+#sirius_browserphone .ui-tabs {
+  padding: 0;
+  border: 0;
+}
+
+#sirius_browserphone .ui-tabs .ui-tabs-nav {
+  border: 0;
+}
+
+#sirius_browserphone .ui-tabs .ui-tabs-nav {
+  font-size: 12px;
+  padding: 0;
+}
+
+#sirius_browserphone .ui-widget-header {
+  background: none;
+}
+
+#sirius_browserphone .ui-tabs .ui-tabs-panel {
+  border: 1px solid #333333;
+}
+
+#sirius_browserphone .ui-tabs .ui-tabs-nav li {
+  margin-right: 8px;
+}
+
+#sirius_browserphone .ui-corner-all,
+#sirius_browserphone .ui-corner-bottom {
+  border-radius: 0;
 }
