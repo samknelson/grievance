@@ -1,6 +1,24 @@
 <?php
 
 function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json = NULL, $which_form = 'default') {
+	drupal_add_css(drupal_get_path('module', 'sirius_jsonfield') . '/css/form_editor.css', 'file');
+
+	global $user;
+	$user_full = user_load($user->uid);
+	$user_json = sirius_jsonfield_util_user_json_get($user_full);
+	$str = $user_json['sirius']['jsonfield']['form-builder']['preferences']['richtext'];
+	$use_richtext = ($str == 'Yes');
+	if ($use_richtext) {
+		$richtext_type = 'text_format';
+		$richtext_options = array(
+			'#format' => 'sirius_form_editor',
+			'#allowed_formats' => array('full_html'),
+		);
+	  $form['#after_build'][] = '_sirius_json_definition_edit_remove_format';
+	} else {
+		$richtext_type = 'textarea';
+	}
+
 	$form_state['nid'] = $nid;
 	$form_state['which_form'] = $which_form;
 	$node = node_load($nid);
@@ -39,7 +57,7 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 
 	$form['prefix'] = array('#markup' => '<div class="sirius-form"><table><tr>');
 
-	$form['prefix_col'] = array('#markup' => '<td valign="top" style="vertical-align: top;">');
+	$form['prefix_col'] = array('#markup' => '<td valign="top" style="vertical-align: top;"><div class="field_definition_wrap">');
 
 	$actions = array();
 	if ($leaf) {
@@ -122,7 +140,6 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 	$form['title'] = array(
 		'#type' => 'textfield',
 		'#title' => 'Title',
-		'#required' => TRUE,
 		'#default_value' => $leaf['#title'],
 		'#states' => array(
 			'visible' => array(
@@ -133,12 +150,14 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 		'#suffix' => '</div>',
 	);
 
+	$field_type = $leaf['#type'];
+	if ($field_type == 'markup') { $field_type = 'item'; }
 	$form['type'] = array(
 		'#type' => 'select',
 		'#title' => 'Type',
 		'#options' => array(
 			'fieldset' => 'Fieldset',
-			'markup' => 'Markup',
+			'item' => 'Markup',
 			'textfield' => 'Text field (one line)',
 			'textarea' => 'Text area (multi-line)',
 			'date_popup' => 'Date',
@@ -149,7 +168,7 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 			'checkboxes' => 'Checkboxes'
 		),
 		'#required' => TRUE,
-		'#default_value' => $leaf['#type'],
+		'#default_value' => $field_type,
 		'#states' => array(
 			'visible' => array(
 				array(':input[name="action"]' => array('value' => 'edit')),
@@ -250,35 +269,41 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 	);
 
 	$form['markup'] = array(
-		'#type' => 'textarea',
-		'#title' => 'Markup',
+		'#type' => $richtext_type,
+		'#title' => 'Enter the text as it should be displayed on the form.',
 		'#default_value' => $leaf['#markup'],
 		'#states' => array(
 			'visible' => array(
 				array(
 					':input[name="action"]' => array('value' => 'edit'),
-					':input[name="type"]' => array('value' => 'markup')
+					':input[name="type"]' => array('value' => 'item')
 				),
 			),
 		),
-		'#description' => t('Enter the text as it should be displayed on the form.'),
-		'#prefix' => '<div class="container-inline">',
-		'#suffix' => '</div>',
 	);
+	if ($use_richtext) { $form['markup'] += $richtext_options; }
 
 	$form['description'] = array(
-		'#type' => 'textfield',
-		'#title' => 'Description',
+		'#type' => $richtext_type,
+		'#title' => 'Help text, description, or special instructions for this field',
 		'#default_value' => $leaf['#description'],
 		'#states' => array(
 			'visible' => array(
-				array(':input[name="action"]' => array('value' => 'edit')),
+				array(
+					':input[name="action"]' => array('value' => 'edit'),
+					':input[name="type"]' => array(
+						array('value' => 'textfield'), 
+						array('value' => 'textarea'), 
+						array('value' => 'date_popup'), 
+						array('value' => 'select'), 
+						array('value' => 'radios'), 
+						array('value' => 'checkboxes')
+					),
+				),
 			),
 		),
-		'#description' => t('Help text, description, or special instructions for this field'),
-		'#prefix' => '<div class="container-inline">',
-		'#suffix' => '</div>',
 	);
+	if ($use_richtext) { $form['description'] += $richtext_options; }
 
 	if ($field_list) {
 		$form['conditional'] = array(
@@ -385,7 +410,7 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 	);
 
 	$form['xprefix'] = array(
-		'#type' => 'textarea',
+		'#type' => $richtext_type,
 		'#title' => 'Prefix',
 		'#states' => array(
 			'visible' => array(
@@ -403,12 +428,11 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 			),
 		),
 		'#default_value' => $leaf['#sirius']['prefix'],
-		'#prefix' => '<div class="container-inline">',
-		'#suffix' => '</div>',
 	);
+	if ($use_richtext) { $form['xprefix'] += $richtext_options; }
 
 	$form['xsuffix'] = array(
-		'#type' => 'textarea',
+		'#type' => $richtext_type,
 		'#title' => 'Suffix',
 		'#states' => array(
 			'visible' => array(
@@ -426,21 +450,22 @@ function sirius_json_definition_edit_form($form, &$form_state, $nid, $link_json 
 			),
 		),
 		'#default_value' => $leaf['#sirius']['suffix'],
-		'#prefix' => '<div class="container-inline">',
-		'#suffix' => '</div>',
 	);
+	if ($use_richtext) { $form['xsuffix'] += $richtext_options; }
 
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Save',
 	);
 
-	$form['suffix_col'] = array('#markup' => '</td>');
+	$form['suffix_col'] = array('#markup' => '</div></td>');
 
 	$form['tree'] = array(
 		'#markup' => '<td width="35%" valign="top" style="vertical-align: top; border-left: 1px solid #333333; padding-left: 10px;">' . 
+		'<div class="field_list_wrap">' . 
 		'<h2>Field List</h2>' . 
 		$tree . 
+		'</div>' .
 		'</td>',
 	);
 
@@ -536,15 +561,15 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		$leaf = array();
 
 		if ($form_state['values']['style']) { $leaf['#sirius']['style'] = $form_state['values']['style']; }
-		if ($form_state['values']['xprefix']) { $leaf['#sirius']['prefix'] = $form_state['values']['xprefix']; }
-		if ($form_state['values']['xsuffix']) { $leaf['#sirius']['suffix'] = $form_state['values']['xsuffix']; }
+		if ($form_state['values']['xprefix']) { $leaf['#sirius']['prefix'] = _sirius_json_definition_edit_handle_richtext($form_state['values']['xprefix']); }
+		if ($form_state['values']['xsuffix']) { $leaf['#sirius']['suffix'] = _sirius_json_definition_edit_handle_richtext($form_state['values']['xsuffix']); }
 
 		// Set basic attributes
 		foreach (array('title', 'type', 'description', 'size', 'required') as $key) {
-			$leaf['#' . $key] = $form_state['values'][$key];
+			$leaf['#' . $key] = _sirius_json_definition_edit_handle_richtext($form_state['values'][$key]);
 		}
-		if ($form_state['values']['type'] == 'markup') {
-			$leaf['#markup'] = $form_state['values']['markup'];
+		if ($form_state['values']['type'] == 'item') { 
+			$leaf['#markup'] = _sirius_json_definition_edit_handle_richtext($form_state['values']['markup']);
 		}
 
 		if ($form_state['values']['default_value']) {
@@ -658,7 +683,7 @@ function sirius_json_definition_canonical_field_name($name) {
 
 function _sirius_json_definition_edit_render_recursive($obj, $path = '') {
 	if (!$obj) {
-    return l('[New field]', current_path(), array('query' => array('json_path' => $path))) . '<br />';
+    return l('[New field]', current_path(), array('query' => array('json_path' => $path), 'attributes' => array('class' => array('new_field')))) . '<br />';
 	}
 
   if (!is_array($obj)) { 
@@ -681,7 +706,7 @@ function _sirius_json_definition_edit_render_recursive($obj, $path = '') {
 	  }
 
     $html .= '<li>';
-    $html .= l('[New field]', current_path(), array('query' => array('json_path' => $path)));
+    $html .= l('[New field]', current_path(), array('query' => array('json_path' => $path), 'attributes' => array('class' => array('new_field'))));
 	    if ($path == $_REQUEST['json_path'] && !$_REQUEST['field_name']) { $html .= '&nbsp;&larr;'; }
     $html .= '</li>';
 
@@ -724,3 +749,20 @@ function _sirius_json_definition_edit_fieldset_list_recursive(&$result, $obj, $p
   }
 }
 
+function _sirius_json_definition_edit_handle_richtext($value) {
+	if (is_array($value)) { 
+		return check_markup($value['value'], $value['format']);
+	} else { 
+		return $value;
+	}
+}
+
+function _sirius_json_definition_edit_remove_format(&$form) {
+	$fields = array('xprefix', 'xsuffix', 'markup', 'description');
+	foreach ($fields as $field) {
+		if ($form[$field]['format']) {
+			$form[$field]['format']['#access'] = FALSE;
+		}
+	}
+  return $form;
+}	
