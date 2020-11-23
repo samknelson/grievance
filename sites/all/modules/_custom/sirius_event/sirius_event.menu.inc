@@ -240,6 +240,14 @@ function sirius_event_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form/preferences'] = array(
+    'title' => 'Preferences',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_preferences',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 4,
+  );
+
   $node_tabs['sirius_json_definition']['sirius_event_participant_definition_audio'] = array(
     'title' => 'Outgoing Message',
     'description' => '',
