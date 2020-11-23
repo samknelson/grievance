@@ -13,7 +13,7 @@
 	if (default_phone) { $('#sirius_browserphone_number').val(default_phone); }
 	callerid_options = Drupal.settings.sirius_twilio_browserphone.callerid_options;
 	omg_options = Drupal.settings.sirius_twilio_browserphone.omg_options;
-	console.log(Drupal.settings.sirius_twilio_browserphone);
+	// console.log(Drupal.settings.sirius_twilio_browserphone);
 
 	var connection;
 
