@@ -118,8 +118,8 @@ function grievance_uh226_report_violation_nid($grievance_nid, $lookups, $values)
 
   // resolved
   $log_update_tids = array(
-    variable_get('grievance_log_insert_type', ''), 
-    variable_get('grievance_log_update_type_with_status_change', ''), 
+    sirius_get_special_tid('grievance_log_types|insert'), 
+    sirius_get_special_tid('grievance_log_types|update_with_status_change'), 
   );
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
@@ -301,11 +301,11 @@ function grievance_uh226_report_violation_lookups() {
     'won_tids'                        => $won_tids,
     'lost_tids'                       => $lost_tids,
 		'boa_held_status_tids' 						=> $boa_held_status_tids,
-    'spi_log_type_tid'                => variable_get('grievance_log_spi_type', ''),
-    'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
-    'suspension_log_type_tid'         => variable_get('grievance_log_suspension_type', ''),
-    'written_warning_log_type_tid'    => variable_get('grievance_log_written_warning_type', ''),
-    'final_warning_log_type_tid'      => variable_get('grievance_log_final_warning_type', ''),
+    'spi_log_type_tid'                => sirius_get_special_tid("grievance_log_types|spi"),
+    'term_log_type_tid'               => sirius_get_special_tid("grievance_log_types|term"),
+    'written_warning_log_type_tid'    => sirius_get_special_tid("grievance_log_types|written_warning"),
+    'final_warning_log_type_tid'      => sirius_get_special_tid("grievance_log_types|final_warning"),
+    'suspension_log_type_tid'         => sirius_get_special_tid("grievance_log_types|suspension"),
     'discrimination_nids'             => $discrimination_nids,
   );
 
