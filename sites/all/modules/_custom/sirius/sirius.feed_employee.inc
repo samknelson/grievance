@@ -79,7 +79,7 @@ function sirius_feed_employee_row_verify($feed_node, $info, $data, &$row, $preco
     $row['employer_nid'] = $employer_nid;
 
     // Raw row
-    $row['raw'] = "Imported record\n" . print_r($row['xxxrawxxx'], 1);
+    $row['xxxrawxxx'] = "Imported record\n" . print_r($row['xxxrawxxx'], 1);
   } 
 
   return array('success' => TRUE, 'msg' => 'Looks good.');
