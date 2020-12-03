@@ -27,7 +27,7 @@ function sirius_node_tab_worker_skill_renew_form($form, &$form_state, $worker_no
 	$empty = TRUE;
 	if ($worker_node->field_sirius_skill['und']) {
 		$form['a1'] = array('#markup' => '<h2>' . t('Renew Current Skills') . '</h2>');
-		$form['a2'] = array('#markup' => '<table>');
+		$form['a2'] = array('#markup' => '<table class="sirius_data_table">');
 		foreach ($worker_node->field_sirius_skill['und'] as $delta => $tmp) {
 			$skill_tid = $tmp['tid'];
 			$skill_term = $skill_terms[$skill_tid];

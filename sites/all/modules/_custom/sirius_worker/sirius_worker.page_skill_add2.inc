@@ -7,10 +7,7 @@ function sirius_node_tab_worker_skill_add2($worker_node) {
 function sirius_node_tab_worker_skill_add2_form($form, &$form_state, $worker_node) {
 	$form_state['worker_nid'] = $worker_node->nid;
 
-  $vocabulary = taxonomy_vocabulary_machine_name_load('sirius_skill');
-  $terms_nohash = taxonomy_get_tree($vocabulary->vid, 0, NULL, TRUE);
-  $count = 0;
-  foreach ($terms_nohash as $term) { $terms[$term->tid] = $term; }
+  $terms = sirius_taxonomy_load('sirius_skill', 'tid', 'full');
 
 	if ($worker_node->field_sirius_skill['und']) {
 		foreach ($worker_node->field_sirius_skill['und'] as $tmp) {

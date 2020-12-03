@@ -30,7 +30,7 @@ function sirius_node_tab_worker_skill_view($worker_node) {
 			$row[] = $expires;
 			$rows[] = $row;
 		}
-		$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
+		$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array('class' => array('sirius_data_table'))));
 	} else {
 		$html .= t('@name does not currently have any skills registered.', array('@name' => $worker_node->title));
 	}
