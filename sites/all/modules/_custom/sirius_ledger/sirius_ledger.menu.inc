@@ -52,6 +52,7 @@ function sirius_ledger_node_tabs() {
     'weight' => 4,
   );
 
+  /*
   $node_tabs['sirius_payment']['sirius_payment_post'] = array(
     'title' => 'Post',
     'description' => '',
@@ -59,6 +60,7 @@ function sirius_ledger_node_tabs() {
     'permissions' => array('sirius ledger admin'),
     'weight' => 2,
   );
+  */
 
   $node_tabs['sirius_payment']['sirius_payment_update'] = array(
     'title' => 'Update',
@@ -224,6 +226,19 @@ function sirius_ledger_node_tabs() {
   return $node_tabs;
 }
 
+function sirius_ledger_term_tabs() {
+  $term_tabs = array();
+
+  $term_tabs['sirius_payment_type']['sirius_ledger_payment_type_settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_ledger_term_tab_payment_type_settings',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 1,
+  );
+
+  return $term_tabs;
+}
 
 /**
  * Implements hook_menu

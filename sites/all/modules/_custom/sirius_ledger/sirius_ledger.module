@@ -39,6 +39,32 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_transmittal.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_list_workers.inc';
 
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.term_tab_payment_type_settings.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.report_discrepancy.inc';
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function sirius_ledger_report_cache_info() {
+  $items = array();
+
+  $items['sirius-ledger-discrepancy'] = array(
+    'name' => t('A/R Month-to-Month Discrepancy Report'),
+    'description' => 'Report accounts with differences in charges or payments between months',
+    'access' => 'sirius ledger admin',
+    'fields' => sirius_ledger_report_discrepancy_fields(),
+    'form_callback' => 'sirius_ledger_report_discrepancy_form',
+    'pk_list_callback' => 'sirius_ledger_report_discrepancy_pks',
+    'batch_callback' => 'sirius_ledger_report_discrepancy_batch',
+    'render_callbacks' => array(
+      'List' => 'sirius_ledger_report_discrepancy_fields_view',
+    ),
+  );
+
+  return $items;
+}
 /**
  * Implements hook_cron
  */

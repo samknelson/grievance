@@ -63,7 +63,7 @@ function sirius_ledger_node_tab_worker_ar_form($form, &$form_state, $worker_node
 
 	if (!$form_state['results']) {
 		$entries = sirius_ledger_ar_fetch(array('ledger_participant' => $contact_node->nid));
-		$form_state['results'] = sirius_ledger_ar_render($entries, array('hide_participant' => TRUE));
+		$form_state['results'] = sirius_ledger_ar_render($entries, array('hide_participant' => TRUE, 'hide_id' => TRUE));
 	}
 
 	$form['results'] = array('#markup' => $form_state['results']);

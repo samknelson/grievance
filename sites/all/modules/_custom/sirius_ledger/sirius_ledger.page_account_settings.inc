@@ -24,23 +24,6 @@ function sirius_ledger_node_tab_account_settings_form($form, &$form_state, $acco
 	);
 	if ($account_json['settings']['payments']['allocate']['employer']) { $form['settings']['payments']['allocate']['employer']['#default_value'] = $account_json['settings']['payments']['allocate']['employer']; }
 
-	$form['settings']['payments']['allocate']['employer_autoallocate'] = array(
-		'#title' => 'Automatically Allocate?',
-		'#type' => 'select',
-		'#options' => array(
-			NULL => '-- Select --',
-			'Yes' => 'Yes', 
-			'No' => 'No'
-		),
-		'#description' => 'Use this option when the payment should always be credited directly into the employer\'s own A/R account. This setting is usually appropriate for benefit funds, but NOT for dues.',
-		'#default_value' => $account_json['settings']['payments']['allocate']['employer_autoallocate'],
-		'#states' => array(
-			'visible' => array(
-				":input[name=\"settings[payments][allocate][employer][simple]\"]" => array('checked' => TRUE)
-			),
-		),
-	);
-
 	$form['settings']['payments']['allocate']['employer_autocharge'] = array(
 		'#title' => 'Create offsetting A/R charges?',
 		'#type' => 'select',
@@ -69,23 +52,6 @@ function sirius_ledger_node_tab_account_settings_form($form, &$form_state, $acco
 		),
 	);
 	if ($account_json['settings']['payments']['allocate']['worker']) { $form['settings']['payments']['allocate']['worker']['#default_value'] = $account_json['settings']['payments']['allocate']['worker']; }
-
-	$form['settings']['payments']['allocate']['worker_autoallocate'] = array(
-		'#title' => 'Automatically Allocate?',
-		'#type' => 'select',
-		'#options' => array(
-			NULL => '-- Select --',
-			'Yes' => 'Yes', 
-			'No' => 'No'
-		),
-		'#description' => 'Use this option when the payment should always be credited directly into the worker\'s own A/R account. This setting is usually appropriate unless worker payments need to be allocated manually or credited to other worker\'s accounts.',
-		'#default_value' => $account_json['settings']['payments']['allocate']['worker_autoallocate'],
-		'#states' => array(
-			'visible' => array(
-				":input[name=\"settings[payments][allocate][worker][simple]\"]" => array('checked' => TRUE)
-			),
-		),
-	);
 
 	$form['settings']['aliases']['intro'] = array('#markup' => '<h2>Aliases</h2>');
 	if ($account_json['settings']['aliases']) {

@@ -1,5 +1,6 @@
 <?php
 
+/*
 function sirius_ledger_node_tab_payment_post($payment_node) {
 	return drupal_get_form('sirius_ledger_node_tab_payment_post_form', $payment_node);
 }
@@ -55,6 +56,7 @@ function sirius_ledger_node_tab_payment_post_form_submit($form, &$form_state) {
 	if (!$ts) { $ts = time(); }
 	$payment_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s', $ts);
 
+	drupal_set_message("Here with " . $payment_node->nid);
 	$entries = sirius_ledger_ar_fetch(array('ledger_reference' => $payment_node->nid));
 	$count = 0;
 	foreach ($entries as $entry) {
@@ -62,6 +64,7 @@ function sirius_ledger_node_tab_payment_post_form_submit($form, &$form_state) {
 		$entry['ledger_status'] = $form_state['values']['payment']['payment_status'];
 		$entry['ledger_ts'] = $ts;
 		sirius_ledger_ar_update($entry);
+		dpM($entry);
 	}
 	if ($count) { 
 		drupal_set_message("$count A/R entries updated.");
@@ -74,3 +77,4 @@ function sirius_ledger_node_tab_payment_post_form_submit($form, &$form_state) {
 	node_save($payment_node);
 	drupal_set_message("Payment updated.");
 }
+*/

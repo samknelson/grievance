@@ -1,12 +1,11 @@
 <?php
 
 function sirius_ledger_page_payment_create() {
-	return drupal_get_form('sirius_ledger_page_payment_create_form');
+	return drupal_get_form('sirius_ledger_node_tab_payment_addedit_form');
 }
 
+/*
 function sirius_ledger_page_payment_create_form($form, &$form_state) {
-	$form['intro'] = array('#markup' => '<em>Under Development: Draft form, just trying to get the workflow in place</em><br /><br />');
-
 	$form['#tree'] = TRUE;
 
 	$employers = sirius_employer_list(FALSE);
@@ -66,13 +65,34 @@ function sirius_ledger_page_payment_create_form($form, &$form_state) {
 		'#type' => 'select',
 		'#options' => $payment_types,
 		'#required' => TRUE,
+		'#ajax' => array(
+			'callback' => 'sirius_ledger_page_payment_create_form_ajax_change_payment_type',
+			'wrapper' => 'sirius_ledger_page_payment_create_form_ajax_dollar_amt',
+			'method' => 'replace',
+		),
   );
 
+  $description = '';
+  $payment_type_tid = $form_state['values']['payment']['payment_type'];
+  if ($payment_type_tid) {
+  	$descriptions = array(
+			'payment' => t('Entering a payment. The value must be negative.'),
+			'charge' => t('Entering a charge. The value must be positive.'),
+			'adjustment' => t('Entering an adjustment. The value may be positive (a charge, or credit to the fund) or negative (a payment, or credit to the payer).'),
+		);
+  	$payment_type_term = taxonomy_term_load($payment_type_tid);
+  	$payment_type_json = sirius_jsonfield_util_term_json_get($payment_type_term);
+  	$sign = $payment_type_json["payment_settings"]["sign"];
+  	$description = $descriptions[$sign];
+  }
   $form['payment']['dollar_amt'] = array(
     '#title' => t('Amount'),
 		'#type' => 'textfield',
 		'#required' => TRUE,
 		'#size' => 5,
+		'#prefix' => '<div id="sirius_ledger_page_payment_create_form_ajax_dollar_amt">',
+		'#suffix' => '</div>',
+		'#description' => $description,
   );
 
   $form['payment']['merchant_name'] = array(
@@ -105,6 +125,29 @@ function sirius_ledger_page_payment_create_form($form, &$form_state) {
 	);
 
 	return $form;
+}
+
+function sirius_ledger_page_payment_create_form_validate($form, &$form_state) {
+  $payment_type_tid = $form_state['values']['payment']['payment_type'];
+	$payment_type_term = taxonomy_term_load($payment_type_tid);
+	$payment_type_json = sirius_jsonfield_util_term_json_get($payment_type_term);
+	$sign = $payment_type_json["payment_settings"]["sign"];
+	$max = $payment_type_json["payment_settings"]["max"];
+	$min = $payment_type_json["payment_settings"]["min"];
+
+	$amt = $form_state['values']['payment']['dollar_amt'];
+	if ($sign == 'payment' && $amt > 0) {
+		form_set_error('payment][dollar_amt', 'Payments must be negative.');
+	}
+	if ($sign == 'charge' && $amt < 0) {
+		form_set_error('payment][dollar_amt', 'Charges must be positive.');
+	}
+	if ($max && $amt > $amt) { 
+		form_set_error('payment][dollar_amt', 'Entries of type ' . $payment_type_term->name . ' must have a value less than ' . number_format($max, 2));
+	}
+	if ($min && $amt < $min) { 
+		form_set_error('payment][dollar_amt', 'Entries of type ' . $payment_type_term->name . ' must have a value greater than ' . number_format($min, 2));
+	}
 }
 
 function sirius_ledger_page_payment_create_form_submit($form, &$form_state) {
@@ -150,3 +193,10 @@ function sirius_ledger_page_payment_create_form_submit($form, &$form_state) {
 
 	drupal_goto('node/' . $payment_node->nid . '');
 }
+
+function sirius_ledger_page_payment_create_form_ajax_change_payment_type($form, $form_state) {
+	$commands = array();
+  $commands[] = ajax_command_replace("#sirius_ledger_page_payment_create_form_ajax_dollar_amt", render($form['payment']['dollar_amt']));
+	return array('#type' => 'ajax', '#commands' => $commands);
+}
+*/

@@ -172,7 +172,7 @@ function sirius_ledger_monthly_charge_batch($mode, $ts = NULL, $trigger = 'cron'
 	}
 }
 
-function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts = NULL) {
+function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts = NULL, $action = 'generate') {
 	$trigger_options = sirius_ledger_policy_trigger_options('month');
 	if (!$ts) { $ts = time(); }
 
@@ -252,7 +252,11 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 
 			foreach ($rates as $account_nid => $rate_record) {
 				if ($account_nid == 'pay') { continue; }
-				$rate = $rate_record['rate'];
+				if ($action == 'cancel') {
+					$rate = 0;
+				} else {
+					$rate = $rate_record['rate'];
+				}
 				if (!$rate_record['triggers'][$trigger]) {
 					sirius_minilog("$schedule_name under this policy cannot be charged via trigger " . $trigger_options[$trigger]);
 					continue;
@@ -287,7 +291,11 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 					$entry = $previous_entries[0];
 					if ($rate == 0) {
 						sirius_minilog('- Found a previous entry, but the new rate is $0. Deleting.');
-						sirius_ledger_ar_delete($entry);
+						if ($mode == 'live') {
+							sirius_ledger_ar_delete($entry);
+						} else {
+							sirius_minilog("(Test mode, skipping delete)");
+						}
 						continue;
 					} else if ($entry['ledger_amount'] == $rate) {
 						sirius_minilog('- Found a previous ledger entry with the same rate. Skipping.');

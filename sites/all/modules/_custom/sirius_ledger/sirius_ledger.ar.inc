@@ -99,11 +99,11 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 	
 	$header = array(
 		'id' => 'Id',
-		'amount' => 'Amount',
-		'status' => 'Status',
+		'amount' => array('data' => 'Amount', 'width' => '8%'),
+		'status' => array('data' => 'Status', 'width' => '8%'),
 		'participant' => 'Participant',
-		'reference' => 'Reference',
-		'memo' => 'Memo',
+		'reference' => array('data' => 'Reference', 'width' => '30%'),
+		'memo' => array('data' => 'Memo', 'width' => '30%'),
 		'date' => 'Date',
 		'tools' => 'Tools',
 	);
@@ -217,10 +217,13 @@ function sirius_ledger_ar_delete_by_reference($ledger_reference) {
 
 	$sql = 'delete from sirius_ledger_ar where ledger_reference = :ledger_reference ';
 	$stmt = sirius_sql_query($sql, array(':ledger_reference' => $ledger_reference));
+	$rowcount = $stmt->rowCount();
 
 	foreach ($to_update as $hr) {
 		sirius_ledger_balance_update($hr['ledger_participant'], $hr['ledger_account']);
 	}
+	
+	return $rowcount;
 }
 
 function sirius_ledger_ar_format_balance($balance) {
