@@ -3,15 +3,14 @@
 use Twilio\Rest\Client;
 use Twilio\Jwt\ClientToken;
 
-function sirius_twilio_client_get() {
+function sirius_twilio_client_get($account_sid = NULL, $account_token = NULL) {
 	static $client;
 	if (!$client) {
 		require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/twilio-php/Twilio/autoload.php';
 		// Autoload error with respect to TwiML, I think it has to do with capitalization
 		// require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/twilio-php/Twilio/Twiml.php';
-		
-		$account_sid = sirius_domain_variable_get('sirius_twilio_account_sid', '');
-		$account_token = sirius_domain_variable_get('sirius_twilio_account_token', '');
+		if (!$account_sid) { $account_sid = sirius_domain_variable_get('sirius_twilio_account_sid', ''); }
+		if (!$account_token) { $account_token = sirius_domain_variable_get('sirius_twilio_account_token', ''); }
 		$client = new Client($account_sid, $account_token);
 	}
 
