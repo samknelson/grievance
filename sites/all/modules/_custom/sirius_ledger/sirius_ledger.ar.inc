@@ -115,11 +115,11 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 		$header = array(
 			'id' => 'Id',
 			'date' => 'Date',
-			'amount' => array('data' => 'Amount', 'width' => '8%'),
-			'status' => array('data' => 'Status', 'width' => '8%'),
+			'amount' => array('data' => 'Amount'),
+			'status' => array('data' => 'Status'),
 			'participant' => 'Participant',
-			'reference' => array('data' => 'Reference', 'width' => '30%'),
-			'memo' => array('data' => 'Memo', 'width' => '30%'),
+			'reference' => array('data' => 'Reference'),
+			'memo' => array('data' => 'Memo'),
 			'tools' => 'Tools',
 		);
 	}
