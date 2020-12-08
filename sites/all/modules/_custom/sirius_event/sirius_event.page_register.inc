@@ -41,11 +41,10 @@ function sirius_node_tab_event_participants_register($event_node) {
 		return $html;
 	} else {
 		$rule = $rules[$delta];
+		$rule['delta'] = $delta;
 		$widget = $_REQUEST['widget'];
 		if (!$rule) { return t('No such rule.'); }
 		if (!in_array($widget, $rule['widget'])) { return t('No such widget.'); }
-
-
 		return sirius_node_tab_event_participants_register_rule($event_node, $rule, $widget);
 	}
 }
@@ -59,6 +58,8 @@ function sirius_node_tab_event_participants_register_rule($event_node, $rule, $w
 		return drupal_get_form('sirius_event_register_worker_byname_form', $event_node, $rule);
 	} else if ($widget == 'user_self') {
 		return drupal_get_form('sirius_event_register_user_self_form', $event_node, $rule);
+	} else if ($widget == 'intake') {
+		return drupal_get_form('sirius_event_register_intake_form', $event_node, $rule);
 	} else if ($widget == 'contact_bulk') {
 		list ($prole_tid, $pstatus_tid) = explode('|', array_values($rule['register_as'])[0]);
 		return drupal_get_form('sirius_node_tab_event_participants_register_bulk_form', $event_node, $prole_tid);

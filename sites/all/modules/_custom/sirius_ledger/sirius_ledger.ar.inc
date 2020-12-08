@@ -83,6 +83,9 @@ function sirius_ledger_ar_fetch($params = array()) {
 			$sql .= "order by ledger_ts desc ";
 		}
 	}
+	if ($params['limit']) {
+		$sql .= "limit " . $params['limit'];
+	}
 
 	$result = array();
 	$stmt = sirius_sql_query($sql, $sql_args);

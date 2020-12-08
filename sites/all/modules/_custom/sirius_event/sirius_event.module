@@ -16,6 +16,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_user_self.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_bullpen.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_worker_byname.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_intake.inc";
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_attendance.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_event/sirius_event.participant_certifications.inc';

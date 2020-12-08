@@ -303,7 +303,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_ledger_type']['display'] = 'block';
     $settings['sirius_ledger_type']['multidomain'] = 'Yes';
     $settings['sirius_payment_type']['view'] = 'sirius_taxonomy';
-    $settings['sirius_payment_type']['display'] = 'block';
+    $settings['sirius_payment_type']['display'] = 'block_10';
     $settings['sirius_payment_type']['multidomain'] = 'Yes';
   }
 

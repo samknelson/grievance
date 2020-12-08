@@ -326,6 +326,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 	if ($actions['bulk_recipient_remove']) { $action_options['bulk_recipient_remove'] = $actions['bulk_recipient_remove']['title']; }
 	if ($actions['delete']) 						{ $action_options['delete'] = $actions['delete']['title']; }
 	if ($actions['report']) 						{ $action_options['report'] = $actions['report']['title']; }
+	if ($actions['geocode']) 						{ $action_options['geocode'] = $actions['geocode']['title']; }
 	if (user_access('sirius admin')) 		{ $action_options['sql'] = 'Display SQL Query'; }
 
 	$form['mightysearch_results']['action'] = array(
@@ -384,7 +385,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		}
 	}
 
-	if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove']) {
+	if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove'] || $action_options['geocode']) {
 		if ($count_total > $count) {
 			$form['mightysearch_results']['results_select_allxyz'] = array(
 				'#type' => 'checkbox', 
@@ -398,6 +399,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 							array('value' => 'delete'),
 							array('value' => 'bulk_recipient_add'),
 							array('value' => 'bulk_recipient_remove'),
+							array('value' => 'geocode'),
 						),
 					),
 				),
@@ -959,7 +961,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	// Batch
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete' || $action == 'bulk_recipient_add' || $action == 'bulk_recipient_remove') {
+	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete' || $action == 'bulk_recipient_add' || $action == 'bulk_recipient_remove' || $action == 'geocode') {
 		if ($action == 'delete' && !$form_state['values']['mightysearch_results']['delete_confirm']) {
 			drupal_set_message("Please check the confirmation box.", 'error');
 			return;
@@ -1096,6 +1098,23 @@ function sirius_mightysearch_batch($chunk, $params, &$context) {
 		if ($action_name == 'bulk_recipient_remove')  {
 			$bulk_nid = $action['bulk_nid'];
 			$result = sirius_bulk_recipient_remove($bulk_nid, $contact_nid);
+		}
+
+		if ($action_name == 'geocode') {
+			$contact_node = node_load($contact_nid);
+			if ($contact_node->field_sirius_address_geo['und'][0]['lat']) {
+				$result = array('success' => FALSE, 'msg' => 'Already geocoded.');
+			} else if (!$contact_node->field_sirius_address['und'][0]['thoroughfare']) {
+				$result = array('success' => FALSE, 'msg' => 'Address is incomplete.');
+			} else {
+				$contact_node->field_sirius_address['und'][0]['data']++;
+				node_save($contact_node);
+				if ($contact_node->field_sirius_address_geo['und'][0]['lat']) {
+					$result = array('success' => TRUE);
+				} else {
+					$result = array('success' => FALSE, 'msg' => 'Geocoding failed.');
+				}
+			}
 		}
 
 		if ($result['success']) {

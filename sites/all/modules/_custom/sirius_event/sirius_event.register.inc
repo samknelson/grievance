@@ -55,3 +55,46 @@ function sirius_event_participant_get($event_nid, $contact_nid) {
   if (!$stmt['node']) { return; }
   return node_load(array_keys($stmt['node'])[0]);
 }
+
+function sirius_event_register_widgets() {
+	$info_all = &drupal_static(__FUNCTION__);
+	if (!$info_all) {
+		$info_all = sirius_event_register_widget_info_all();
+	}
+
+	$widgets = array();
+	foreach ($info_all as $key => $info) {
+		$widgets[$key] = $info['title'];
+	}
+
+	return $widgets;
+}
+
+function sirius_event_register_widget_info($key) {
+	$info_all = &drupal_static(__FUNCTION__);
+	if (!$info_all) {
+		$info_all = sirius_event_register_widget_info_all();
+	}
+
+	return $info_all[$key];
+}
+
+function sirius_event_register_widget_info_all() {
+	$info['user_select'] = array('title' => 'User Select');
+	$info['user_byname'] = array('title' => 'User by Name');
+
+	$info['user_self'] = array(
+		'title' => 'Self Registration',
+		'config_callback' => 'sirius_event_register_user_self_config_form'
+	);
+
+	$info['worker_byname'] = array('title' => 'Worker by Name');
+	$info['contact_bulk'] = array('title' => 'Contact Bulk');
+	$info['bullpen_signin'] = array('title' => 'Bullpen Signin');
+	$info['intake'] = array(
+		'title' => 'Intake',
+		'config_callback' => 'sirius_event_register_intake_config_form'
+	);
+
+	return $info;
+}
