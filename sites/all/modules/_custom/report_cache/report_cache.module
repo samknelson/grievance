@@ -75,6 +75,28 @@ function report_cache_purge($report_type, $report_id) {
 	return $count;
 }
 
+function report_cache_parameters($report_type, $report_id) {
+ 	$cache = &drupal_static(__FUNCTION__);
+
+ 	if ($cache[$report_type][$report_id]) { return $cache[$report_type][$report_id]; }
+
+  $query = db_select('report_cache');
+  $query->fields('report_cache');
+  $query->condition('report_id', $report_id);
+  $query->condition('report_type', $report_type . ' :: PARAMETERS');
+  $stmt = $query->execute();
+  $hr = $stmt->fetchAssoc();
+	$parameters = unserialize($hr['report_data']);
+
+	// Quick sloppy caching. 
+	// - Since we're doing a database query, we want to store the results in memory
+	// - But we might be called thousands of times for different report IDs.
+	// - So we only keep the first 100 results in memory.
+	if (!$cache[$report_type] || (count($cache[$report_type]) < 100)) { $cache[$report_type][$report_id] = $parameters; }
+
+	return $parameters;
+}
+
 function report_cache_purge_date($report_type, $start_ts = NULL, $end_ts = NULL) {
 	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 	if (!$start_ts) { $start_ts = strtotime('1970-1-1'); }

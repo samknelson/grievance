@@ -57,30 +57,23 @@ function report_cache_page_report($report_type) {
 
 	$header = array();
 	$header[] = t('Report ID');
-	$header[] = t('Preview');
-	$header[] = t('Download');
-	if ($report_type_info['render_callbacks']) {
-		foreach ($report_type_info['render_callbacks'] as $name => $callback) {
-			$header[] = $name;
-		}
-	}
-	$header[] = t('Purge');
+	if ($report_type_info['title_callback']) { $header[] = t('Title'); }
+	$header[] = t('Tools');
 
 	$attributes = array();
 
 	$rows = array();
 	foreach ($report_ids as $tmp_report_id) {
-		$row = array();
 
-		$row[] = $tmp_report_id;
-		$row[] = l(t('Preview'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
-		$row[] = l(t('Download'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
+		$tools = l(t('Preview'), "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
+		$tools .= l(t('Download'), "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
 		if ($report_type_info['render_callbacks']) {
 			foreach ($report_type_info['render_callbacks'] as $name => $callback) {
-				$row[] = l(
+				$tools .= l(
 					$name, 
 					"admin/reports/report-cache/$report_type", 
 					array(
+						'attributes' => array('class' => array('tool-button')), 
 						'query' => array(
 							'report_id' => $tmp_report_id, 
 							'action' => 'render',
@@ -90,12 +83,20 @@ function report_cache_page_report($report_type) {
 				);
 			}
 		}
-		$row[] = l(t('Purge'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
+		$tools .= l(t('Purge'), "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
 
+		$row = array();
+		$row[] = $tmp_report_id;
+		if ($report_type_info['title_callback']) { 
+			$row[] = $report_type_info['title_callback']($report_type, $tmp_report_id);
+		}
+
+		$row[] = $tools;
 		$rows[] = $row;
 	}
 
-	$result .= '<h2>' . t('All Reports of Type: @report_type', array('@report_type' => $report_type)) . '</h2>';
+	// $result .= '<h2>' . $report_type_info['name'] . '</h2>';
+	$result .= $report_type_info['description'];
 
 	$result .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
 
@@ -120,7 +121,13 @@ function report_cache_preview($report_type, $report_id, $report_type_info) {
 
 	$result = '';
 
-	$result .= "<h2>$report_id Preview</h2>";
+	$result = '<h2>';
+	if ($report_type_info['title_callback']) {
+		$result .= $report_type_info['title_callback']($report_type, $report_id);
+	} else {
+		$result .= "$report_id Preview";
+	}
+	$result .= '</h2>';
 
 	$header = array_values($fields);
 	$query = db_select('report_cache');
