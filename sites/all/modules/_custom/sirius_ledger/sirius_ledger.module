@@ -49,22 +49,10 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 
 function sirius_ledger_report_cache_info() {
   $items = array();
-
-  $items['sirius-ledger-discrepancy'] = array(
-    'name' => t('A/R Month-to-Month Discrepancy Report'),
-    'description' => 'Report accounts with differences in charges or payments between months',
-    'access' => 'sirius ledger admin',
-    'fields' => sirius_ledger_report_discrepancy_fields(),
-    'form_callback' => 'sirius_ledger_report_discrepancy_form',
-    'pk_list_callback' => 'sirius_ledger_report_discrepancy_pks',
-    'batch_callback' => 'sirius_ledger_report_discrepancy_batch',
-    'render_callbacks' => array(
-      'List' => 'sirius_ledger_report_discrepancy_fields_view',
-    ),
-  );
-
+  $items += sirius_ledger_report_discrepancy_info();
   return $items;
 }
+
 /**
  * Implements hook_cron
  */
