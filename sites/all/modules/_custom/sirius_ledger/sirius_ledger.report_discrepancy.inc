@@ -1,5 +1,22 @@
 <?php
 
+function sirius_ledger_report_discrepancy_info() {
+  $items['sirius-ledger-discrepancy'] = array(
+    'name' => t('A/R Month-to-Month Discrepancy Report'),
+    'description' => 'Report accounts with differences in charges or payments between months',
+    'access' => 'sirius ledger admin',
+    'fields' => sirius_ledger_report_discrepancy_fields(),
+    'form_callback' => 'sirius_ledger_report_discrepancy_form',
+    'pk_list_callback' => 'sirius_ledger_report_discrepancy_pks',
+    'batch_callback' => 'sirius_ledger_report_discrepancy_batch',
+    'render_callbacks' => array(
+      'Details' => 'sirius_ledger_report_discrepancy_view',
+    ),
+    'title_callback' => 'sirius_ledger_report_discrepancy_title',
+  );
+  return $items;
+}
+
 function sirius_ledger_report_discrepancy_form($form, &$form_state, $report_type) {
   report_cache_form_prepare($report_type, $form, $form_state);
 
@@ -24,7 +41,7 @@ function sirius_ledger_report_discrepancy_form($form, &$form_state, $report_type
   );
 
   $last_year = $this_year;
-  $last_month = $month-1;
+  $last_month = $this_month-1;
   if ($last_month < 1) {
     $last_month = 12;
     $last_year--;
@@ -35,12 +52,14 @@ function sirius_ledger_report_discrepancy_form($form, &$form_state, $report_type
     '#title' => t('First Year'),
     '#options' => $years,
     '#default_value' => $last_year,
+    '#required' => TRUE,
   );
   $form['month1'] = array(
     '#type' => 'select',
     '#title' => t('First Month'),
     '#options' => $months,
     '#default_value' => $last_month,
+    '#required' => TRUE,
   );
 
   $form['year2'] = array(
@@ -48,6 +67,7 @@ function sirius_ledger_report_discrepancy_form($form, &$form_state, $report_type
     '#title' => t('Second Year'),
     '#options' => $years,
     '#default_value' => $this_year,
+    '#required' => TRUE,
   );
 
   $form['month2'] = array(
@@ -55,27 +75,14 @@ function sirius_ledger_report_discrepancy_form($form, &$form_state, $report_type
     '#title' => t('Second Month'),
     '#options' => $months,
     '#default_value' => $this_month,
+    '#required' => TRUE,
   );
 
   $accounts = sirius_ledger_account_list();
-  $form['Account'] = array(
+  $form['account'] = array(
     '#type' => 'select',
     '#title' => t('Account'),
     '#options' => $accounts,
-  );
-
-	$member_status_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
-
-  $form['ratio_1'] = array(
-  	'#title' => t('For each employer, show me the ratio of employed workers with THIS member status ...'),
-  	'#type' => 'select',
-  	'#options' => $member_status_options,
-  );
-
-  $form['ratio_2'] = array(
-  	'#title' => t('... to THIS member status.'),
-  	'#type' => 'select',
-  	'#options' => $member_status_options,
   );
 
   $form['submit'] = array(
@@ -86,71 +93,132 @@ function sirius_ledger_report_discrepancy_form($form, &$form_state, $report_type
   return $form;
 }
 
-function sirius_ledger_report_discrepancy_form_submit($form, &$form_state) { return report_cache_form_submit($form, $form_state); }
+function sirius_ledger_report_discrepancy_ts($values) {
+  $year1 = $values['year1'];
+  $year2 = $values['year2'];
+  $month1 = $values['month1'];
+  $month2 = $values['month2'];
+
+  $start_ts = strtotime("$year1-$month1-1 00:00:00 UTC");
+  $t = date('t', $start_ts_1);
+  $end_ts = strtotime("$year1-$month1-$t 23:59:59 UTC");
+  $result[':start_ts_1'] = $start_ts;
+  $result[':end_ts_1'] = $end_ts;
+
+  $start_ts = strtotime("$year2-$month2-1 00:00:00 UTC");
+  $t = date('t', $start_ts_1);
+  $end_ts = strtotime("$year2-$month2-$t 23:59:59 UTC");
+  $result[':start_ts_2'] = $start_ts;
+  $result[':end_ts_2'] = $end_ts;
+
+  return $result;
+}
+
+function sirius_ledger_report_discrepancy_form_submit($form, &$form_state) { 
+  return report_cache_form_submit($form, $form_state);
+}
 
 function sirius_ledger_report_discrepancy_fields() {
 	$fields = array();
-	$fields['shop_nid'] = 'Employer NID';
-	$fields['shop_name'] = 'Employer';
-
-	$tmp = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
-	foreach ($tmp as $tid => $name) {
-		$fields['status_' . $tid] = $name;
-	}
+  $fields['contact_nid'] = 'Contact NID';
+  $fields['worker_nid'] = 'Worker NID';
+  $fields['worker_name'] = 'Name';
+  $fields['worker_ms'] = 'Member Status';
+  $fields['worker_ws'] = 'Work Status';
+  $fields['balance_1'] = 'First Total';
+  $fields['balance_2'] = 'Second Total';
 	return $fields;
 }
 
 function sirius_ledger_report_discrepancy_pks(&$form_state) {
-	$employers = sirius_employer_list();
-	return array_keys($employers);
-}
+  $sql_args = sirius_ledger_report_discrepancy_ts($form_state['values']);
+  $domain_nid = sirius_domain_nid();
 
-function sirius_ledger_report_discrepancy_batch($shop_nid, $values, $report_id, $report_action, &$context) {
-  // Find the name of this shop
-  $row = array();
-  $row['shop_nid'] = $shop_nid;
-
-  // Fetch the name of the shop
-  $sql = "select title from node where nid = :shop_nid";
-  $stmt = db_query($sql, array(':shop_nid' => $shop_nid));
-  $hr = $stmt->fetchAssoc();
-  $row['shop_name'] = $hr['title'];
-
-  // Count workers with this employer, grouping by member status.
-  $sql = "select count(distinct node.nid) as worker_count, ";
-  $sql .= "field_sirius_member_status_tid as member_status_tid ";
+  $sql = "select distinct nid ";
   $sql .= "from node ";
-  $sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid ";
-  $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid ";
-  $sql .= "where node.type = 'sirius_worker' ";
-  $sql .= "and field_grievance_shop_target_id = :shop_nid ";
-  $sql .= "group by field_sirius_member_status_tid ";
-  $stmt = db_query($sql, array(':shop_nid' => $shop_nid));
-  while ($hr = $stmt->fetchAssoc()) {
-  	$row['status_' . $hr['member_status_tid']] = $hr['worker_count'];
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "left join sirius_ledger_ar on node.nid = sirius_ledger_ar.ledger_participant ";
+  $sql .= "where node.type = 'sirius_contact' ";
+  $sql .= "and (";
+  $sql .= "   (ledger_ts >= :start_ts_1 and ledger_ts <= :end_ts_1) ";
+  $sql .= "   or ";
+  $sql .= "   (ledger_ts >= :start_ts_2 and ledger_ts <= :end_ts_2) ";
+  $sql .= ") ";
+  $sql .= "and ledger_account = :ledger_account ";
+  $sql_args[':ledger_account'] = $form_state['values']['account'];
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
   }
 
-  return $row;
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $nids[] = $hr['nid'];
+  }
+  return array_chunk($nids, 100, TRUE);
+}
+
+function sirius_ledger_report_discrepancy_batch($nids, $values, $report_id, $report_action, &$context) {
+  $ms_name_lookup = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+  $ws_name_lookup = sirius_taxonomy_load('sirius_work_status', 'tid', 'name');
+  $ts = sirius_ledger_report_discrepancy_ts($values);
+
+  $rows = array('is_multiple' => TRUE, 'rows' => array());
+  foreach ($nids as $contact_nid) {
+    $balance_1 = sirius_ledger_ar_fetch(array(
+      'ledger_ts_min' => $ts[':start_ts_1'],
+      'ledger_ts_max' => $ts[':end_ts_1'],
+      'ledger_participant' => $contact_nid,
+      'ledger_account' => $values['account'],
+      'balance' => TRUE,
+    ));
+
+    $balance_2 = sirius_ledger_ar_fetch(array(
+      'ledger_ts_min' => $ts[':start_ts_2'],
+      'ledger_ts_max' => $ts[':end_ts_2'],
+      'ledger_participant' => $contact_nid,
+      'ledger_account' => $values['account'],
+      'balance' => TRUE,
+    ));
+
+    if ($balance_1 == $balance_2) { continue; }
+
+    $contact_node = node_load($contact_nid);
+    $worker_node = sirius_worker_get_by_contact_nid($contact_nid);
+    
+    $ms_names = array();
+    $ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+    foreach ($ms_tids as $ms_tid) { $ms_names[] = $ms_name_lookup[$ms_tid]; }
+    $ms_name = join(', ', $ms_names);
+
+    $ws_name = $ws_name_lookup[$worker_node->field_sirius_work_status['und'][0]['tid']];
+
+    $row = array();
+    $row['contact_nid'] = $contact_nid;
+    $row['worker_nid'] = $worker_node->nid;
+    $row['worker_name'] = $worker_node->title;
+    $row['worker_ms'] = $ms_name;
+    $row['worker_ws'] = $ws_name;
+    $row['balance_1'] = $balance_1;
+    $row['balance_2'] = $balance_2;
+    $rows['rows'][] = $row;
+  }
+
+  return $rows;
+}
+
+function sirius_ledger_report_discrepancy_title($report_type, $report_id) {
+  // Load the parameters
+  $account_lookup = sirius_ledger_account_list();
+  $parameters = report_cache_parameters($report_type, $report_id);
+  $title = 'Discrepancy Report for ' . $account_lookup[$parameters['account']] . ' between ' . $parameters['month1'] . '/' . $parameters['year1'] . ' and ' . $parameters['month2'] . '/' . $parameters['year2'];
+  return $title;
 }
 
 function sirius_ledger_report_discrepancy_view($report_type, $report_id) {
-  // Load the parameters
-  $query = db_select('report_cache');
-  $query->fields('report_cache');
-  $query->condition('report_id', $report_id);
-  $query->condition('report_type', $report_type . ' :: PARAMETERS');
-  $stmt = $query->execute();
-  $hr = $stmt->fetchAssoc();
-  $parameters = unserialize($hr['report_data']);
-  $ratio_1_tid = $parameters['ratio_1'];
-  $ratio_2_tid = $parameters['ratio_2'];
-  $ratio_1_term = taxonomy_term_load($ratio_1_tid);
-  $ratio_2_term = taxonomy_term_load($ratio_2_tid);
-
-  $html = '';
-  $html .= '<h2>';
-  $html .= 'Ratio of employed workers with the member status <strong>' . $ratio_1_term->name . '</strong> to <strong>' . $ratio_2_term->name . '</strong>';
-  $html .= '</h2>';
+  $html = '<h2>' . sirius_ledger_report_discrepancy_title($report_type, $report_id) . '</h2>';
+  $parameters = report_cache_parameters($report_type, $report_id);
 
   $query = db_select('report_cache');
   $query->fields('report_cache');
@@ -163,52 +231,28 @@ function sirius_ledger_report_discrepancy_view($report_type, $report_id) {
   while ($hr = $stmt->fetchAssoc()) {
     $hr = unserialize($hr['report_data']);
 
-    $count_1 = $hr['status_' . $ratio_1_tid];
-    $count_2 = $hr['status_' . $ratio_2_tid];
-
-    $grand_total_1 += $count_1;
-    $grand_total_2 += $count_2;
-
-    $total = $count_1 + $count_2; 
-    if (!$total) { continue; }
-
-    $key = $hr['shop_name'];
+    $tools = l('Worker', 'node/' . $hr['worker_nid'], array('attributes' => array('class' => array('tool-button'))));
+    $tools .= l('A/R', 'node/' . $hr['worker_nid'] . '/sirius_worker_ledger', array('attributes' => array('class' => array('tool-button'))));
 
     $row = array();
-    $row[] = $key;
-    $row[] = $total;
-    $row[] = $count_1;
-    $row[] = (100 *number_format($count_1 / $total, 2)) . ' %';
-    $row[] = $count_2;
-    $row[] = (100 *number_format($count_2 / $total, 2)) . ' %';
-
-
-
-    $data[$key] = $row;
-  }
-
-  ksort($data);
-  $rows = array_values($data);
-
-  $grand_total = $grand_total_1 + $grand_total_2;
-  if ($grand_total) {
-  	$row = array();
-  	$row[] = '<strong>' . 'Total' . '</strong>';
-    $row[] = '<strong>' . $grand_total . '</strong>';
-    $row[] = '<strong>' . $grand_total_1 . '</strong>';
-    $row[] = '<strong>' . (100 *number_format($grand_total_1 / $grand_total, 2)) . ' %' . '</strong>';
-    $row[] = '<strong>' . $grand_total_2;
-    $row[] = '<strong>' . (100 *number_format($grand_total_2 / $grand_total, 2)) . ' %' . '</strong>';
+    $row[] = $hr['worker_name'];
+    $row[] = $hr['worker_ms'];
+    $row[] = $hr['worker_ws'];
+    $row[] = '$' . number_format($hr['balance_1'], 2);
+    $row[] = '$' . number_format($hr['balance_2'], 2);
+    $row[] = '$' . number_format($hr['balance_2'] - $hr['balance_1'], 2);
+    $row[] = $tools;
     $rows[] = $row;
   }
 
   $header = array(
-  	'Shop Name',
-  	'Total Workers',
-  	'Count: ' . $ratio_1_term->name,
-  	'Fraction: ' . $ratio_1_term->name,
-  	'Count: ' . $ratio_2_term->name,
-  	'Fraction: ' . $ratio_2_term->name,
+    'Worker', 
+    'Member Status',
+    'Work Status',
+    'Total for ' . $parameters['month1'] . '/' . $parameters['year1'],
+    'Total for ' . $parameters['month2'] . '/' . $parameters['year2'],
+    'Discrepancy',
+    'Tools',
   );
 
   $attributes = array();
