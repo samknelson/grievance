@@ -63,7 +63,6 @@ function sirius_ledger_page_list_workers_form($form, &$form_state) {
 		'#type' => 'select',
 		'#title' => t('Work Status'),
 		'#options' => $ws_options,
-		'#default_value' => 'active',
 	);
 
 	$form['output'] = array(
