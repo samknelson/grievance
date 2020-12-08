@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * Create the quickhash table
+ */
+
+/*
+function sirius_update_7001() {
+
+  $sqls = array(
+    'CREATE TABLE sirius_quickhash (
+    hash_key varchar(1024) primary key,
+    hash_json json,
+    hash_type varchar(255),
+    hash_domain integer,
+    hash_uid integer,
+    hash_ts integer
+    )',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
+*/
+
+/**
+ * Enable geocoding modules
+ */
+
+function sirius_update_7002() {
+  // Enable some modules
+  $modules = array('geocoder', 'geophp', 'geofield');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
