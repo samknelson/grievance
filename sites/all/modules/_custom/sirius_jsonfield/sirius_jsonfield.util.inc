@@ -193,6 +193,8 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 			":$node_type:field_sirius_address:locality" => 'City',
 			":$node_type:field_sirius_address:thoroughfare" => 'Address',
 			":$node_type:field_sirius_address:postal_code" => 'Zip',
+			":$node_type:field_sirius_address_geo:lat" => 'Latitude',
+			":$node_type:field_sirius_address_geo:lon" => 'Longitude',
 			":$node_type:field_sirius_source:value" => 'Source',
 		);
 	} else if ($node_type == 'sirius_worker') {

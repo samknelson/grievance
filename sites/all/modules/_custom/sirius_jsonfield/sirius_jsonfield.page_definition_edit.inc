@@ -588,8 +588,10 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 			$leaf['#suffix'] = '';
 		}
 
-		if ($leaf['#sirius']['prefix']) { $leaf['#prefix'] .= $leaf['#sirius']['prefix']; }
-		if ($leaf['#sirius']['suffix']) { $leaf['#suffix'] = $leaf['#sirius']['suffix'] . $leaf['#suffix']; }
+		$post_render = array();
+		if ($leaf['#sirius']['prefix']) { $post_render[] = 'sirius_jsonfield_render_prefix'; }
+		if ($leaf['#sirius']['suffix']) { $post_render[] = 'sirius_jsonfield_render_suffix'; }
+		$leaf['#post_render'] = $post_render; 
 
 		// Set conditional targets.
 		if ($form_state['values']['conditional'] == 'Yes') {
@@ -616,7 +618,7 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		} else {
 			$leaf['#sirius']['conditional'] = 'No';
 			unset($leaf['#sirius']['conditional_target']);
-			unset($leaf['#states']);
+			$leaf['#states'] = NULL;
 		}
 
 		// Set link targets.
@@ -766,3 +768,28 @@ function _sirius_json_definition_edit_remove_format(&$form) {
 	}
   return $form;
 }	
+
+/**
+ * Callback to insert the prefix. 
+ * 
+ * WTF, you ask? Why not just use #prefix?
+ * 
+ * Unfortunately, '#prefix' and '#suffix' are rendered without respect for #states. In other words, if you have conditional field,
+ * #prefix and #suffix are rendered no matter what. There does not appear to be a Drupal-friendly way around this, and hence
+ * the atrocity that you see before you.
+ */
+
+function sirius_jsonfield_render_prefix($markup, $element) {
+	if ($element['#sirius']['prefix']) { 
+		$markup = preg_replace('/\>/', '>' . '<div class="prefix_wrap"><div class="prefix">' . $element['#sirius']['prefix'] . '</div></div>', $markup, 1);
+	}
+	return $markup;
+}
+
+function sirius_jsonfield_render_suffix($markup, $element) {
+	if ($element['#sirius']['suffix']) {
+		$markup = preg_replace('/\<\/div\>$/', '<div class="suffix_wrap"><div class="suffix">' . $element['#sirius']['suffix'] . '</div></div></div>', $markup);
+	}
+	return $markup;
+}
+
