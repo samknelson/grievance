@@ -201,6 +201,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$participant_options = array();
 	$submit_disabled = FALSE;
 	$count = 0;
+	$caller_options = array($user->uid => $user->name);
 	foreach ($participant_nodes as $participant_nid_alt => $participant_node_alt) {
 		++$count;
 		$contact_nid_alt = $participant_node_alt->field_sirius_contact['und'][0]['target_id'];
@@ -208,6 +209,9 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		$participant_options[$participant_nid_alt] = $contact_node_alt->title . '<br />';
 		if ($participant_node_alt != $participant_node && $participant_node_alt->field_sirius_event_pstatus['und'][0]['tid'] == $pstatus_tid_to_call) { $submit_disabled = TRUE; }
 		$submit_disabled_msg .= "Set to $submit_disabled because $participant_nid_alt had status " . $participant_node_alt->field_sirius_event_pstatus['und'][0]['tid'] . " vs $pstatus_tid_to_call<br>"; 
+
+		$participant_json_alt = sirius_jsonfield_util_node_json_get($participant_node_alt);
+		$caller_options[$participant_json_alt['phonebank']['caller']['uid']] = $participant_json_alt['phonebank']['caller']['name'];
 	}
 	// drupal_set_message($submit_disabled_msg);
 
@@ -272,22 +276,18 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		}
 
 		$caller_uid = $participant_json['phonebank']['caller']['uid'];
-		global $user;
 		$my_uid = $user->uid;
-		if (!$caller_uid || ($caller_uid == $my_uid)) {
+
+		if (count($caller_options) <= 1) {
 			$form['caller'] = array(
 				'#type' => 'hidden',
 				'#name' => 'caller',
 				'#value' => $my_uid,
 			);
 		} else {
-			$caller_user = user_load($caller_uid);
 			$form['caller'] = array(
 				'#type' => 'select',
-				'#options' => array(
-					$user->uid => $user->name,
-					$caller_uid => $caller_user->name,
-				),
+				'#options' => $caller_options,
 				'#title' => 'Called by',
 				'#prefix' => '<div id="caller_wrap">',
 				'#suffix' => '</div>',
