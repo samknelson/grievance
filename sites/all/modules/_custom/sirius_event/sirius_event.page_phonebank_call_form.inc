@@ -289,7 +289,11 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 			'#prefix' => '<div id="caller_wrap">',
 			'#suffix' => '</div>',
 		);
-		if (!$caller_uid || ($caller_uid == $my_uid)) { $form['caller']['#type'] = 'hidden'; }
+		if (!$caller_uid || ($caller_uid == $my_uid)) { 
+			$form['caller']['#type'] = 'hidden';
+			unset($form['caller']['#options']);
+			$form['caller']['#value'] = $my_uid;
+		}
 		if ($event_json['phonebank']['autosave']['field'] == 'Yes') {
 			$form['caller']['#ajax'] = array(
 				'callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax',
