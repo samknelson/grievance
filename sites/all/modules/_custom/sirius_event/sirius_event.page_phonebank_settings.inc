@@ -77,10 +77,12 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 	);
 
 	$form['phonebank']['caller_intro'] = array(
-		'#type' => 'textarea',
+		'#type' => 'text_format',
 		'#title' => 'Introduction for callers',
 		'#default_value' => $json['phonebank']['caller_intro'],
 		'#description' => t('Callers will receive this message on the landing page of the phonebank.'),
+		'#format' => 'sirius_form_editor',
+		'#allowed_formats' => array('sirius_form_editor'),
 	);
 
 	$form['phonebank']['conference'] = array(
@@ -150,6 +152,7 @@ function sirius_node_tab_event_phonebank_settings_form_submit($form, &$form_stat
 	$event_node = node_load($event_nid);
 	$json = sirius_jsonfield_util_node_json_get($event_node);
 	$json['phonebank'] = $form_state['values']['phonebank'];
+	$json['phonebank']['caller_intro'] = sirius_richtext_handle_input($form_state['values']['phonebank']['caller_intro']);
 	sirius_jsonfield_util_node_json_set($event_node, $json);
 	node_save($event_node);
 	drupal_set_message(t('Settings saved.'));

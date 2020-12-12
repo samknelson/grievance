@@ -42,7 +42,8 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	global $user;
 
 	drupal_add_js(drupal_get_path('module', 'sirius_event') . '/js/sirius_event.phonebank.js', 'file');
-	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/sirius_event.phonebank.css', 'file');
+	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/phonebank.css', 'file');
+	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/survey.css', 'file');
 
 	$form_state['event_nid'] = $event_nid;
 	$form_state['phone'] = $phone;
@@ -53,8 +54,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$prole_tid = $type_json['phonebank']['prole_tid'];
 	$pstatus_tid_to_call = $pstatus_tid = $event_json['phonebank']['pstatus_tid'];
 	$participant_nodes = sirius_event_phonebank_participants_by_phone($event_node, $prole_tid, $phone);
-	$survey_nid = $event_node->field_sirius_json_definition['und'][0]['target_id'];
-	$survey_node = node_load($survey_nid);
+	$survey_node = sirius_event_survey_get($event_node);
 	if (!$survey_node) { drupal_set_message("No survey!"); return array(); }
 	$survey_json = sirius_jsonfield_util_node_json_get($survey_node);
 	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
@@ -394,10 +394,12 @@ function sirius_event_phonebank_prep_survey(&$form, $defaults, $settings) {
 					}
 					else { $form[$key]['#default_value'] = $defaults[$key]; }
 				}
-				if ($form[$key]['#required']) {
-					unset($form[$key]['#required']);
-					$form[$key]['#title'] = '<strong>[' . t('Required') . ']</strong> ' . $form[$key]['#title'];
-					$form[$key]['#attributes']['class'][] = 'sirius_phonebank_field_required'; 
+				if (!$settings['skip_required']) {
+					if ($form[$key]['#required']) {
+						unset($form[$key]['#required']);
+						$form[$key]['#title'] = '<strong>[' . t('Required') . ']</strong> ' . $form[$key]['#title'];
+						$form[$key]['#attributes']['class'][] = 'sirius_phonebank_field_required'; 
+					}
 				}
 			} else if ($type == 'fieldset') {
 				sirius_event_phonebank_prep_survey($form[$key], $defaults[$key], $settings);

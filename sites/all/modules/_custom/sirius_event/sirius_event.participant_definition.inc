@@ -35,16 +35,15 @@ function sirius_node_tab_event_participant_definition_preferences($definition_no
 	return drupal_get_form('sirius_json_definition_preferences_form', $definition_node->nid);
 }
 
-function sirius_event_instance_participant_definition($event_node) {
-	drupal_goto(current_path() . '/select');
-}
+
+
 
 function sirius_event_instance_participant_definition_select($event_node) {
 	return drupal_get_form('sirius_event_instance_participant_definition_select_form', $event_node);
 }
 
 function sirius_event_instance_participant_definition_select_form($form, &$form_state, $event_node) {
-	$form_state['event_node'] = $event_node;
+	$form_state['event_nid'] = $event_node->nid;
 	$domain_nid = sirius_domain_nid();
 	$type = 'node:sirius_event_participant:field_sirius_json';
 	$options = array(NULL => t('-- Select --'));
@@ -55,29 +54,43 @@ function sirius_event_instance_participant_definition_select_form($form, &$form_
 		}
 	}
 
-	$default_json_definition_nid = $event_node->field_sirius_json_definition['und'][0]['target_id'];
-	if ($default_json_definition_nid) {
-		$default_json_definition_node = node_load($default_json_definition_nid);
-		$html = '<div class="sirius_form_intro">';
-		$html .= 'The current survey is: <strong>' . $default_json_definition_node->title . '</strong>. ';
-		$paths = array(
-			"node/$default_json_definition_nid/sirius_event_participant_definition_edit" => 'Edit Fields', 
-			"node/$default_json_definition_nid/sirius_event_participant_definition_preview" => 'Preview', 
-		);
-		foreach ($paths as $path => $title) {
-			if (!drupal_valid_path($path)) { continue; }
-			$html .= l($title, $path, array('attributes' => array('class' => array('tool-button')))) . ' ';
-		}
-		$html .= '</div>';
-		$form['intro'] = array('#markup' => $html);
+	$surveys = array('default');
+
+	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+	$event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
+	if (sirius_event_rule_widget_exists($event_type_json['register']['rules'], 'intake')) {
+		$surveys[] = 'intake';
 	}
 
-	$form['field_sirius_json_definition'] = array(
-		'#type' => 'select',
-		'#title' => 'Survey',
-		'#options' => $options,
-		'#default_value' => $event_node->field_sirius_json_definition['und'][0]['target_id'],
-	);
+	$form['#tree'] = TRUE;
+
+	foreach ($surveys as $which) {
+		$survey_nid = sirius_event_survey_get_nid($event_node, $which);
+		$html = '<div class="sirius_form_intro">';
+		$html .= '<h2>' . sirius_event_survey_which_name($which) . '</h2>';
+		if ($survey_nid) {
+			$survey_node = node_load($survey_nid);
+			$html .= 'The current survey is: <strong>' . $survey_node->title . '</strong>. ';
+			$paths = array(
+				"node/$survey_nid/sirius_event_participant_definition_form/preview" => 'Preview', 
+				"node/$survey_nid/sirius_event_participant_definition_form" => 'Edit Fields', 
+			);
+			foreach ($paths as $path => $title) {
+				if (!drupal_valid_path($path)) { continue; }
+				$html .= l($title, $path, array('attributes' => array('class' => array('tool-button')))) . ' ';
+			}
+		}
+		$html .= '</div>';
+
+		$form['survey'][$which] = array(
+			'#type' => 'select',
+			'#title' => 'Survey',
+			'#options' => $options,
+			'#default_value' => $survey_nid,
+			'#prefix' => $html,
+		);
+	}
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Submit',
@@ -86,22 +99,9 @@ function sirius_event_instance_participant_definition_select_form($form, &$form_
 }
 
 function sirius_event_instance_participant_definition_select_form_submit($form, &$form_state) {
-	$event_node = $form_state['event_node'];
-	if ($form_state['values']['field_sirius_json_definition']) {
-		$event_node->field_sirius_json_definition['und'][0]['target_id'] = $form_state['values']['field_sirius_json_definition'];
-	} else {
-		unset($event_node->field_sirius_json_definition['und']);
-	}
+	$event_node = node_load($form_state['event_nid']);
+	$event_json = sirius_jsonfield_util_node_json_get($event_node);
+	$event_json['event']['survey'] = $form_state['values']['survey'];
+	sirius_jsonfield_util_node_json_set($event_node, $event_json);
 	node_save($event_node);
 }
-
-function sirius_event_instance_participant_definition_preview($event_node) {
-	$definition_node = node_load($event_node->field_sirius_json_definition['und'][0]['target_id']);
-	if (!$definition_node) {
-		drupal_set_message('There is no survey selected for this event.', 'warning');
-		return '';
-	}
-
-	return drupal_get_form('sirius_json_definition_preview_form', $definition_node->nid);
-}
-

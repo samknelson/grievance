@@ -195,7 +195,7 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$is_phonebank = sirius_event_phonebank_enabled_type($event_type_term);
 
-	$participant_definition_node = node_load($event_node->field_sirius_json_definition['und'][0]['target_id']);
+	$participant_definition_node = sirius_event_survey_get($event_node);
 	if (!$participant_definition_node) { drupal_set_message("No survey!"); return array(); }
 	$participant_definition_json = sirius_jsonfield_util_node_json_get($participant_definition_node);
 	$participant_definition_form = sirius_jsonfield_util_form_get($participant_definition_json, 'default');

@@ -5,6 +5,7 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.permission.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.menu.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.survey.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.participant.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.phonebank.inc";

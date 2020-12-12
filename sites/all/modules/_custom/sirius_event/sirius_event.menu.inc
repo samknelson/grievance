@@ -28,6 +28,31 @@ function sirius_event_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_event_participant']['sirius_event_participant_intake'] = array(
+    'title' => 'Intake',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_view_intake',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_intake/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_view_intake',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_intake/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_edit_intake',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+  );
+
   $node_tabs['sirius_event']['sirius_event_info'] = array(
     'title' => 'Info',
     'description' => '',
@@ -71,25 +96,9 @@ function sirius_event_node_tabs() {
   $node_tabs['sirius_event']['sirius_event_instance_participant_definition'] = array(
     'title' => 'Survey',
     'description' => '',
-    'callback' => 'sirius_event_instance_participant_definition',
-    'permissions' => array('sirius event admin'),
-    'weight' => 4,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_instance_participant_definition/select'] = array(
-    'title' => 'Select',
-    'description' => '',
     'callback' => 'sirius_event_instance_participant_definition_select',
     'permissions' => array('sirius event admin'),
-    'weight' => 1,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_instance_participant_definition/preview'] = array(
-    'title' => 'Preview',
-    'description' => '',
-    'callback' => 'sirius_event_instance_participant_definition_preview',
-    'permissions' => array('sirius event admin'),
-    'weight' => 2,
+    'weight' => 4,
   );
 
   $node_tabs['sirius_event']['sirius_event_phonebank'] = array(

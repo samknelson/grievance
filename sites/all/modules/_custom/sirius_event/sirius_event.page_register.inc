@@ -13,7 +13,6 @@ function sirius_node_tab_event_participants_register_access($event_node) {
 	return FALSE; 
 }
 
-
 function sirius_node_tab_event_participants_register($event_node) {
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
@@ -67,4 +66,3 @@ function sirius_node_tab_event_participants_register_rule($event_node, $rule, $w
 
 	return t('Widget not found: @widget', array('@widget' => $widget));
 }
-
