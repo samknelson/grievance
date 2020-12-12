@@ -85,6 +85,32 @@ function sirius_ledger_report_discrepancy_form($form, &$form_state, $report_type
     '#options' => $accounts,
   );
 
+  $form['charge_or_payment'] = array(
+    '#type' => 'select',
+    '#title' => 'Show Charges or Payments?',
+    '#options' => array(
+      'both' => t('Both'),
+      'charge' => t('Charges Only'),
+      'payment' => t('Payments Only'),
+      'range' => t('Custom Range'),
+    ),
+  );
+
+  $form['ledger_amount_min'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Minimum Value',
+    '#size' => 5,
+    '#description' => t('(Remember that charges are positive and payments are negative)'),
+    '#states' => array('visible' => array(":input[name=\"charge_or_payment\"]" => array('value' => 'range'))),
+  );
+
+  $form['ledger_amount_max'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Maximum Value',
+    '#size' => 5,
+    '#states' => array('visible' => array(":input[name=\"charge_or_payment\"]" => array('value' => 'range'))),
+  );
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Generate',
@@ -165,22 +191,30 @@ function sirius_ledger_report_discrepancy_batch($nids, $values, $report_id, $rep
   $ts = sirius_ledger_report_discrepancy_ts($values);
 
   $rows = array('is_multiple' => TRUE, 'rows' => array());
-  foreach ($nids as $contact_nid) {
-    $balance_1 = sirius_ledger_ar_fetch(array(
-      'ledger_ts_min' => $ts[':start_ts_1'],
-      'ledger_ts_max' => $ts[':end_ts_1'],
-      'ledger_participant' => $contact_nid,
-      'ledger_account' => $values['account'],
-      'balance' => TRUE,
-    ));
 
-    $balance_2 = sirius_ledger_ar_fetch(array(
-      'ledger_ts_min' => $ts[':start_ts_2'],
-      'ledger_ts_max' => $ts[':end_ts_2'],
-      'ledger_participant' => $contact_nid,
-      'ledger_account' => $values['account'],
-      'balance' => TRUE,
-    ));
+  $search_params = array(
+    'ledger_participant' => $contact_nid,
+    'ledger_account' => $values['account'],
+    'balance' => TRUE,
+  );
+
+  if ($values['charge_or_payment'] == 'charge') {
+    $search_params['ledger_amount_min'] = 0;
+  } else if ($values['charge_or_payment'] == 'payment') {
+    $search_params['ledger_amount_max'] = 0;
+  } else if ($values['charge_or_payment'] == 'range') {
+    if (isset($values['ledger_amount_max']) && ($values['ledger_amount_max'] !== '')) { $search_params['ledger_amount_max'] = $values['ledger_amount_max']; }
+    if (isset($values['ledger_amount_min']) && ($values['ledger_amount_min'] !== '')) { $search_params['ledger_amount_min'] = $values['ledger_amount_min']; }
+  }
+
+  foreach ($nids as $contact_nid) {
+    $search_params['ledger_ts_min'] = $ts[':start_ts_1'];
+    $search_params['ledger_ts_max'] = $ts[':end_ts_1'];
+    $balance_1 = sirius_ledger_ar_fetch($search_params);
+
+    $search_params['ledger_ts_min'] = $ts[':start_ts_2'];
+    $search_params['ledger_ts_max'] = $ts[':end_ts_2'];
+    $balance_2 = sirius_ledger_ar_fetch($search_params);
 
     if ($balance_1 == $balance_2) { continue; }
 
