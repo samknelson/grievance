@@ -91,6 +91,7 @@ function sirius_ledger_ar_fetch($params = array()) {
 	$stmt = sirius_sql_query($sql, $sql_args);
 	if ($params['balance']) {
 		$hr = $stmt->fetchAssoc();
+		if (!$hr['s']) { $hr['s'] = 0; }
 		return $hr['s'];
 	}
 	while ($hr = $stmt->fetchAssoc()) {  $result[] = $hr; }
