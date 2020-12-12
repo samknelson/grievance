@@ -237,7 +237,7 @@ function sirius_ledger_report_discrepancy_batch($nids, $values, $report_id, $rep
     $row['worker_ws'] = $ws_name;
     $row['balance_1'] = $balance_1;
     $row['balance_2'] = $balance_2;
-    $rows['rows'][] = $row;
+    $rows['rows'][$contact_nid] = $row;
   }
 
   return $rows;
