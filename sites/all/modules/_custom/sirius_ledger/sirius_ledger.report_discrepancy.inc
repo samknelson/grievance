@@ -208,6 +208,7 @@ function sirius_ledger_report_discrepancy_batch($nids, $values, $report_id, $rep
   }
 
   foreach ($nids as $contact_nid) {
+    $search_params['ledger_participant'] = $contact_nid; 
     $search_params['ledger_ts_min'] = $ts[':start_ts_1'];
     $search_params['ledger_ts_max'] = $ts[':end_ts_1'];
     $balance_1 = sirius_ledger_ar_fetch($search_params);
@@ -236,7 +237,7 @@ function sirius_ledger_report_discrepancy_batch($nids, $values, $report_id, $rep
     $row['worker_ws'] = $ws_name;
     $row['balance_1'] = $balance_1;
     $row['balance_2'] = $balance_2;
-    $rows['rows'][$contact_nid] = $row;
+    $rows['rows'][] = $row;
   }
 
   return $rows;
@@ -259,7 +260,9 @@ function sirius_ledger_report_discrepancy_view($report_type, $report_id) {
   $query->condition('report_id', $report_id);
   $query->condition('report_type', $report_type);
   $stmt = $query->execute();
-  $count = 0;
+  $data = array();
+  $grand_total_1 = 0;
+  $grand_total_2 = 0;
   while ($hr = $stmt->fetchAssoc()) {
     $hr = unserialize($hr['report_data']);
 
@@ -275,12 +278,6 @@ function sirius_ledger_report_discrepancy_view($report_type, $report_id) {
     $row[] = '$' . number_format($hr['balance_2'] - $hr['balance_1'], 2);
     $row[] = $tools;
     $rows[] = $row;
-
-    ++$count;
-    if ($count > 1000) {
-      drupal_set_message("Limiting output to 1,000 rows.", 'warning');
-      break;
-    }
   }
 
   $header = array(
