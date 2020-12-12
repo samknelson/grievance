@@ -751,6 +751,10 @@ function _sirius_json_definition_edit_fieldset_list_recursive(&$result, $obj, $p
   }
 }
 
+/**
+ * @todo: Switch to sirius_richtext_handle_input(); 
+ */
+
 function _sirius_json_definition_edit_handle_richtext($value) {
 	if (is_array($value)) { 
 		return check_markup($value['value'], $value['format']);
