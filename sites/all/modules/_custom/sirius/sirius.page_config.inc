@@ -22,7 +22,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/contact/definition'] 				= array('title' => 'Contact Definition', 'description' => 'Set additional domain-specific fields for contacts.');
 	$links['core']['links']['sirius/contact/resync/all']				= array('title' => 'Contact Resync', 'description' => 'A data integrity utility to re-connect all worker and user accounts with contacts.');
 	$links['core']['links']['sirius/config/letter']							= array('title' => 'Letters', 'description' => 'Configure the Letters system and manage letter templates.');
-	$links['core']['links']['sirius/config/feed']							= array('title' => 'Letters', 'description' => 'Configure the feeds system.');
+	$links['core']['links']['sirius/config/feed']							= array('title' => 'Feeds', 'description' => 'Configure the feeds system.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
@@ -73,8 +73,10 @@ function sirius_page_config() {
 	$links['systems']['links']['sirius/config/email'] 					= array('title' => 'Email', 'description' => 'Oubound email settings');
 	$links['systems']['links']['sirius/phonenumber'] 						= array('title' => 'Phone Number Cache', 'description' => 'Search and review the cache of phone numbers and deliverability metrics (i.e. SMS-enabled).');
 	$links['systems']['links']['sirius/config/phone'] 					= array('title' => 'Phone', 'description' => 'Phone settings, including SMS and Twilio');
-	$links['systems']['links']['admin/config/content/geocoder'] = array('title' => 'Geocod Service', 'description' => 'Settings for the GeoCoding service');
-	$links['systems']['links']['admin/config/content/geofield_map'] = array('title' => 'Map Service', 'description' => 'Settings for the Mapping service');
+	$links['systems']['links']['sirius/map/admin'] 							= array('title' => 'Map Settings', 'description' => 'Sirius map settings.');
+	$links['systems']['links']['admin/config/content/geocoder'] = array('title' => 'Geocode Service', 'description' => 'System settings for the GeoCoding service');
+	$links['systems']['links']['admin/config/content/geofield_map'] = array('title' => 'Geofield Service', 'description' => 'System settings for the Geofield Mapping service');
+	$links['systems']['links']['admin/config/system/leaflet_more_maps'] = array('title' => 'Leaflet More Maps', 'description' => 'System settings for the the Leaflet mapping interface');
 	$links['systems']['links']['sirius/sns/config'] 						= array('title' => 'SNS', 'description' => 'Settings for Amazon Simple Notification Service (SNS)');
 	$links['systems']['links']['admin/config/grievance/phaxio'] = array('title' => 'Phaxio', 'description' => 'Configure the Phaxio fax service.');
 	$links['systems']['links']['admin/config/services/shorten'] = array('title' => 'Shorten', 'description' => 'Configure the link shortening services such as blt.ly.');
