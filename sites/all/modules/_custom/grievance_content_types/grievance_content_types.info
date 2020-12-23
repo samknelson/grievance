@@ -811,6 +811,7 @@ features[field_instance][] = node-sirius_json_definition-field_sirius_domain
 features[field_instance][] = node-sirius_json_definition-field_sirius_json
 features[field_instance][] = node-sirius_json_definition-field_sirius_type
 features[field_instance][] = node-sirius_ledger_account-field_sirius_domain
+features[field_instance][] = node-sirius_ledger_account-field_sirius_id
 features[field_instance][] = node-sirius_ledger_account-field_sirius_json
 features[field_instance][] = node-sirius_ledger_account-field_sirius_name_short
 features[field_instance][] = node-sirius_letterhead-field_sirius_attachments

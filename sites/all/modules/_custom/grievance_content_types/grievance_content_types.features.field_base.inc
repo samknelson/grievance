@@ -6193,9 +6193,10 @@ function grievance_content_types_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
+        'sirius_contact' => 'Contact',
+        'grievance_shop' => 'Employer',
         'grievance' => 'Grievance',
         'sirius_worker' => 'Worker',
-        'sirius_employer' => 'Employer',
       ),
       'allowed_values_function' => '',
     ),
