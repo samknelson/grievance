@@ -173,3 +173,29 @@
 	font-size: 20px;
 }
 
+#survey_wrap {
+	color: #1b4784;
+}
+
+div.ctools-modal-content #survey_wrap .form-item label {
+	float: none;
+	width: auto;
+}
+
+#sirius_map_poll_message {
+	display: inline-block;
+}
+
+#sirius_map_poll_message div.messages { 
+	display: inline-block; 
+	border: none;
+	padding: 0;
+	margin: 0;
+	background: none;
+	font-size: 1em;
+}
+
+#sirius_map_poll_message h2 {
+	font-weight: bold;
+	display: inline-block;
+}

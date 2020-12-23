@@ -23,6 +23,7 @@ function sirius_event_survey_list($event_node) {
 function sirius_event_survey_which_name($which) {
 	if ($which == 'default') { return 'Default'; }
 	if ($which == 'intake') { return 'Intake'; }
+	if ($which == 'map') { return 'Map'; }
 	return $which;
 }
 

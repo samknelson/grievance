@@ -65,7 +65,7 @@ function sirius_event_participants_by_contact($contact_nid, $event_type_tids = N
   return $by_type;
 }
 
-function sirius_event_participant_list_by_rule($event_nid, $rule) {
+function sirius_event_participant_list_by_rule($event_nid, $rule, $limit = 0, $offset = 0) {
 	$sql_args = array();
 	$sql_args[':event_nid'] = $event_nid;
 	$sql = "select node.nid as participant_nid ";
@@ -88,6 +88,7 @@ function sirius_event_participant_list_by_rule($event_nid, $rule) {
 		}
 		$sql .= ') ';
 	}
+	if ($limit) { $sql .= "limit $limit offset $offset "; }
 
 	$stmt = db_query($sql, $sql_args);
 	$participant_nids = array();

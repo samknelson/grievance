@@ -63,6 +63,19 @@ function sirius_event_term_tab_pstatus_form($form, &$form_state, $pstatus_term) 
 	);
 	if (isset($json['phonebank']['conceal_during_call'])) { $form['phonebank']['conceal_during_call']['#default_value'] = $json['phonebank']['conceal_during_call']; }
 
+	$form['map'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Map Display'),
+		'#description' => t('The settings below indicate how this participant status should be displayed on a map.'),
+	);
+
+	$form['map']['icon'] = array(
+		'#title' => t('Icon'),
+		'#type' => 'select',
+		'#options' => array(NULL => t('-- Select --')) + sirius_map_icons(),
+		'#description' => t('Select the marker to use to render participants with this status.'),
+	);
+	if (isset($json['map']['icon'])) { $form['map']['icon']['#default_value'] = $json['map']['icon']; }
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -77,6 +90,7 @@ function sirius_event_term_tab_pstatus_form_submit($form, &$form_state) {
 	$json = sirius_jsonfield_util_term_json_get($pstatus_term);
 	$json['schedule'] = $form_state['values']['schedule'];
 	$json['phonebank'] = $form_state['values']['phonebank'];
+	$json['map'] = $form_state['values']['map'];
 	sirius_jsonfield_util_term_json_set($pstatus_term, $json);
 	taxonomy_term_save($pstatus_term);
 

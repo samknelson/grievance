@@ -158,6 +158,14 @@ function sirius_event_node_tabs() {
     'weight' => 6,
   );
 
+  $node_tabs['sirius_event']['sirius_event_map_settings'] = array(
+    'title' => 'Map',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_map_settings',
+    'permissions' => array('sirius'),
+    'weight' => 5,
+  );
+
   $node_tabs['sirius_event']['sirius_event_class'] = array(
     'title' => 'Class',
     'description' => '',
@@ -368,6 +376,14 @@ function sirius_event_term_tabs() {
     'weight' => 4,
   );
 
+  $term_tabs['sirius_event_type']['sirius_event_type_map'] = array(
+    'title' => 'Map',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_map',
+    'permissions' => array('sirius event admin'),
+    'weight' => 4,
+  );
+
   $term_tabs['sirius_event_type']['sirius_event_type_bullpen'] = array(
     'title' => 'Bullpen',
     'description' => '',
@@ -522,6 +538,36 @@ function sirius_event_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['sirius/modal/event/map/%/%'] = array(
+    'title'            => 'Participant Modal',
+    'page callback'    => 'sirius_event_map_modal',
+    'page arguments'   => array(4,5),
+    'access callback'   => 'sirius_event_map_modal_access',
+    'access arguments' => array(4,5),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
+  $items['sirius/modal/event/map-legend/%'] = array(
+    'title'            => 'Info',
+    'page callback'    => 'sirius_event_map_modal_legend',
+    'page arguments'   => array(4),
+    'access callback'   => 'sirius_event_map_modal_legend_access',
+    'access arguments' => array(4),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
+  $items['sirius/ajax/event/map/poll/%'] = array(
+    'page callback'    => 'sirius_event_map_ajax_poll',
+    'page arguments'   => array(5),
+    'access callback'   => 'sirius_event_map_ajax_poll_access',
+    'access arguments' => array(5),
+    'type'             => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -532,11 +578,13 @@ function sirius_event_menu() {
 function sirius_event_modal_paths() {
   $paths = array();
 
-  /*
-  $paths['grievance/modal/%node/log-add'] = array(
-    'style' => 'grievance-modal-style',
+  $paths['sirius/modal/event/map/%/%'] = array(
+    'style' => 'sirius-event-modal-style',
   );
-  */
+
+  $paths['sirius/modal/event/map-legend/%'] = array(
+    'style' => 'sirius-event-modal-style',
+  );
 
   return $paths;
 }
@@ -544,15 +592,13 @@ function sirius_event_modal_paths() {
 function sirius_event_modal_styles() {
   $styles = array();
 
-  /*
-  $styles['grievance-modal-style'] = array(
+  $styles['sirius-event-modal-style'] = array(
     'modalSize' => array(
       'type' => 'fixed',
-      'width' => 500,
-      'height' => 350,
+      'width' => 600,
+      'height' => 600,
     ),
   );
-  */
 
   return $styles;
 }
