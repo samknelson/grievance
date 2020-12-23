@@ -6,7 +6,7 @@ function sirius_event_page_participant_map($event_node, $rule) {
 	$js_settings = array();
 	$js_settings['current_location'] = array('show' => TRUE);
 	$js_settings['event_nid'] = $event_node->nid;
-	$js_settings['poll'] = array('active' => TRUE, 'timeout' => 30000);
+	$js_settings['poll'] = array('active' => TRUE, 'timeout' => 1000 * 60 * 3);
 	drupal_add_js(array('sirius_map' => $js_settings), 'setting');
 
 	global $user;
