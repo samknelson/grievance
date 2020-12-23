@@ -1,7 +1,7 @@
 <?php
 
 function sirius_node_tab_entity_letter_access($entity) {
-	$enabled_types = variable_get('sirius_letter_content_types');
+	$enabled_types = sirius_domain_variable_get('sirius_letter_content_types');
 	if (!$entity->type) { return TRUE; }
 	return $enabled_types[$entity->type];
 }
@@ -20,9 +20,8 @@ function sirius_node_tab_entity_letter($entity) {
 		return sirius_node_tab_entity_letter_add($entity);
 	} else if ($action == 'edit') {
 		return sirius_node_tab_entity_letter_edit($entity, $letter_node);
-	} else if ($action == 'delete') {
-		return 'delete';
-		return drupal_get_form('sirius_node_tab_entity_materials_delete_form', $entity, $material_node);
+	} else if ($action == 'oneclick') {
+		return sirius_node_tab_entity_letter_oneclick($entity);
 	} else {
 		return sirius_node_tab_entity_letter_list($entity);
 	}
@@ -87,30 +86,61 @@ function sirius_node_tab_entity_letter_add($entity) {
 		drupal_goto($path);
 	}
 
-  global $user;
-  $letter_node = new stdClass();
-  $letter_node->type = 'sirius_log';
-  $letter_node->no_recurse = TRUE;
-  node_object_prepare($letter_node);
-  $letter_node->language = LANGUAGE_NONE;
-  $letter_node->uid = $user->uid;
-  $letter_node->status = 1;
-  $letter_node->promote = 0;
-  $letter_node->comment = 0;
-  $letter_node->title = substr(date('c') . " - " . $category . " - " . $type . " - " . $message, 0, 254);
-  $letter_node->field_sirius_category['und'][0]['value'] = 'letter';
-  $letter_node->field_sirius_type['und'][0]['value'] = 'draft';
-
-  $domain_nid = sirius_domain_nid();
-  if ($domain_nid) { $letter_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; } 
-  $letter_node->field_sirius_log_handler['und'][0]['target_id'] = $entity_node->nid;
-
-  $letter_node = node_submit($letter_node);
-  node_object_prepare($letter_node);
-
+	$letter_node = sirius_letter_create($entity, FALSE);
 	return sirius_node_tab_wizard($letter_node, 'letter');
 }
 
 function sirius_node_tab_entity_letter_edit($entity, $letter_node) {
 	return sirius_node_tab_wizard($letter_node, 'letter');
 }
+
+function sirius_node_tab_entity_letter_oneclick($entity) {
+	return drupal_get_form('sirius_node_tab_entity_letter_oneclick_form', $entity);
+}
+
+function sirius_node_tab_entity_letter_oneclick_form($form, &$form_state, $entity) { 
+	if ($entity->tid) { $entity_node = sirius_taxonomy_proxy($entity->tid); } else { $entity_node = $entity; } 
+	$form_state['entity_nid'] = $entity_node->nid;
+
+	$letter_templates = sirius_letter_template_list($entity_node);
+	if (!$letter_templates) { drupal_set_message("You do not have access to any letter templates for this content type"); }
+	$letter_options = array(NULL => t('-- Select --'));
+	if ($letter_templates) {
+		foreach ($letter_templates as $letter_template_nid => $letter_template_node) {
+			$letter_options[$letter_template_nid] = $letter_template_node->title;
+		}
+	}
+	$form['#tree'] = TRUE;
+	$form["letter_template_nid_0"] = array(
+		'#type' => 'select',
+		'#title' => t('Template'),
+		'#options' => $letter_options,
+		'#required' => TRUE,
+	);
+	$format_options = array(NULL => t('-- Select --')) + sirius_letter_format_options($entity_node);
+	$form["format"] = array(
+		'#type' => 'select',
+		'#title' => t('Format'),
+		'#default_value' => $data["format"],
+		'#options' => $format_options,
+		'#required' => TRUE,
+	);
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
+
+	return $form;
+}
+
+function sirius_node_tab_entity_letter_oneclick_form_submit($form, &$form_state) {
+	$entity_node = node_load($form_state['entity_nid']);
+	$path = preg_replace('/\/oneclick.*/', '', current_path());
+
+	drupal_set_message("Working...");
+	$form_state['rebuild'] = TRUE;
+	return;
+	drupal_goto($path);
+}
+
