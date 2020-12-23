@@ -49,6 +49,7 @@ features[ds_field_settings][] = node|grievance|default
 features[ds_field_settings][] = node|grievance|grievance_form_226
 features[ds_field_settings][] = node|grievance|grievance_gform
 features[ds_field_settings][] = node|grievance|grievance_gform_a
+features[ds_field_settings][] = node|sirius_contact|default
 features[ds_field_settings][] = node|sirius_dispatch_facility|sirius_worker
 features[ds_field_settings][] = node|sirius_dispatch_job|default
 features[ds_field_settings][] = node|sirius_log|default
