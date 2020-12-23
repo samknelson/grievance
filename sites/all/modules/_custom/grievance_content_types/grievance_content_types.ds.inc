@@ -1466,6 +1466,60 @@ function grievance_content_types_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_contact|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_contact';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'two_column_66_33';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_sirius_domain',
+        1 => 'field_sirius_name',
+        2 => 'field_sirius_id',
+        3 => 'field_sirius_email',
+        4 => 'field_sirius_phone',
+        5 => 'field_sirius_phone_alt',
+        6 => 'field_sirius_phone_fax',
+        7 => 'field_sirius_contact_tags',
+        8 => 'field_sirius_source',
+      ),
+      'right' => array(
+        9 => 'field_sirius_address',
+        10 => 'field_sirius_address_geo',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_domain' => 'left',
+      'field_sirius_name' => 'left',
+      'field_sirius_id' => 'left',
+      'field_sirius_email' => 'left',
+      'field_sirius_phone' => 'left',
+      'field_sirius_phone_alt' => 'left',
+      'field_sirius_phone_fax' => 'left',
+      'field_sirius_contact_tags' => 'left',
+      'field_sirius_source' => 'left',
+      'field_sirius_address' => 'right',
+      'field_sirius_address_geo' => 'right',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_contact|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|sirius_dispatch_facility|sirius_worker';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'sirius_dispatch_facility';
