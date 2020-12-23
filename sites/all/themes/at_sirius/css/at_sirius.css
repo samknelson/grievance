@@ -11,20 +11,6 @@ body.section-admin {
   padding: 0;
 }
 
-/* If gutters are set in theme settings they will override these
-   values: see Extensions > Modify Output > Design */
-#main-content,
-.block-inner,
-.pane-inner,
-.menu-wrapper,
-.branding-elements,
-.breadcrumb-wrapper,
-.attribution,
-.at-panel .rounded-corner,
-.banner-wrapper,
-div.messages {
-}
-
 /* Panel pages need negative margin equal to the gutter width applied to #content,
   this is taken care of in theme settings as per above for normal gutters */
 .page-panels #content {
@@ -2374,13 +2360,15 @@ table.trustfund-payperiod tr.error {
 	background-color: #F2B6BA;
 }
 
-#content h2 {
+#content h2,
+#modal-content h2 {
 	padding-top: 15px;
 	padding-bottom: 5px;
 	font-size: 1.1em;
 }
 
-#content h2.field-label {
+#content h2.field-label,
+#modal-content h2.field-label {
 	font-size: 1em;
 	padding-top: 0;
 	padding-bottom: 0;
