@@ -94,19 +94,14 @@ function sirius_node_tabs() {
     'permissions' => array('sirius ledger admin'),
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_letter'] = array(
-    'title' => 'Letters',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_letter',
-    'permissions' => array('sirius admin'),
-  );
-
-  $node_tabs['grievance']['grievance_letter'] = array(
-    'title' => 'Letters',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_letter',
-    'permissions' => array('sirius admin'),
-  );
+  foreach (sirius_letter_content_types_all() as $content_type => $content_type_name) {
+    $node_tabs[$content_type][$content_type . '_letter'] = array(
+      'title' => 'Letters',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_letter',
+      'permissions' => array('sirius domain admin'),
+    );
+  }
 
   $node_tabs['grievance_letter_template']['sirius_letter_template_recipients'] = array(
     'title' => 'Recipients',
@@ -807,6 +802,15 @@ function sirius_menu() {
     'page callback' => 'sirius_page_volunteer_selfregister',
     'page arguments' => array(2),
     'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/map/admin'] = array(
+    'title' => 'Map Settings',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_map_admin'),
+    'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
   );
 
