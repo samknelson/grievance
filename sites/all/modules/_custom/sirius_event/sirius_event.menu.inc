@@ -158,12 +158,35 @@ function sirius_event_node_tabs() {
     'weight' => 6,
   );
 
-  $node_tabs['sirius_event']['sirius_event_map_settings'] = array(
+
+  $node_tabs['sirius_event']['sirius_event_map'] = array(
     'title' => 'Map',
     'description' => '',
-    'callback' => 'sirius_node_tab_event_map_settings',
+    'callback' => 'sirius_node_tab_event_map',
     'permissions' => array('sirius'),
     'weight' => 5,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_map/info'] = array(
+    'title' => 'Info',
+    'callback' => 'sirius_node_tab_event_map',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_map/view'] = array(
+    'title' => 'View',
+    'callback' => 'sirius_node_tab_event_map_view',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_map/settings'] = array(
+    'title' => 'Settings',
+    'callback' => 'sirius_node_tab_event_map_settings',
+    'permissions' => array('sirius'),
+    'weight' => 3,
   );
 
   $node_tabs['sirius_event']['sirius_event_class'] = array(
@@ -550,7 +573,7 @@ function sirius_event_menu() {
   );
 
   $items['sirius/modal/event/map-legend/%'] = array(
-    'title'            => 'Info',
+    'title'            => 'Legend',
     'page callback'    => 'sirius_event_map_modal_legend',
     'page arguments'   => array(4),
     'access callback'   => 'sirius_event_map_modal_legend_access',

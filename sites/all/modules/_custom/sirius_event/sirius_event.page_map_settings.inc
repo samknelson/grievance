@@ -8,7 +8,7 @@ function sirius_node_tab_event_map_settings_access($event_node) {
 	$participant_node = node_load($participant_nid);
 	$type_json = sirius_event_type_json($event_node);
 	$prole_tid = $participant_node->field_sirius_event_prole['und'][0]['tid'];
-	$admin_prole_tids = array_values($type_json['phonebank']['admin_prole_tids']);
+	$admin_prole_tids = array_values($type_json['map']['admin_prole_tids']);
 	if (!in_array($prole_tid, $admin_prole_tids)) { return FALSE; }
 
 	return TRUE;
@@ -28,6 +28,44 @@ function sirius_node_tab_event_map_settings_form($form, &$form_state, $event_nid
 
 	$form['#tree'] = TRUE;
 
+	$form['map']['active'] = array(
+		'#type' => 'select',
+		'#title' => t('Active?'),
+		'#options' => array(
+			'No' => t('No'), 
+			'Yes' => t('Yes'),
+			'Auto' => t('Auto'),
+		),
+		'#default_value' => $json['map']['active'],
+		'#description' => t('Is the map active -- i.e. is it possible to make calls? Select "Auto" to have the map automatically open and close at the scheduled time.'),
+	);
+
+	$form['map']['active_grace_open'] = array(
+		'#type' => 'textfield',
+		'#size' => 5,
+		'#title' => t('Grace Period - Open'),
+		'#description' => t('Enter the grace period for opening the phone bank. Calls can be made this many minutes before the scheduled open time.'),
+    '#states' => array(
+      'visible' => array(
+        array(':input[name="map[active]"]' => array('value' => 'Auto')),
+      )
+    ),
+		'#default_value' => $json['map']['active_grace_open'],
+	);
+
+	$form['map']['active_grace_close'] = array(
+		'#type' => 'textfield',
+		'#size' => 5,
+		'#title' => t('Grace Period - Close'),
+		'#description' => t('Enter the grace period for closing the phone bank. Calls can be made this many minutes after the scheduled close time.'),
+    '#states' => array(
+      'visible' => array(
+        array(':input[name="map[active]"]' => array('value' => 'Auto')),
+      )
+    ),
+		'#default_value' => $json['map']['active_grace_close'],
+	);
+
 	$form['map']['caller_intro'] = array(
 		'#type' => 'text_format',
 		'#title' => 'Introduction for callers',
@@ -36,6 +74,22 @@ function sirius_node_tab_event_map_settings_form($form, &$form_state, $event_nid
 		'#format' => 'sirius_form_editor',
 		'#allowed_formats' => array('sirius_form_editor'),
 	);
+
+	$form['map']['do_not_disturb'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Do Not Disturb',
+	);
+	$options = array(NULL => '-- Select --') + sirius_do_not_disturb_list();
+	$form['map']['do_not_disturb']['id'] = array(
+		'#type' => 'select',
+		'#options' => $options,
+		'#title' => t('Which Do Not Disturb schedule should be used?'),
+		'#default_value' => $json['map']['do_not_disturb']['id'],
+	);
+
+	if ($json['map']['do_not_disturb']['id']) {
+		$form['map']['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disurb_render($json['map']['do_not_disturb']['id']));
+	}
 
 	$form['submit'] = array(
 		'#type' => 'submit',

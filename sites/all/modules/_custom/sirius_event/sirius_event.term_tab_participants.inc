@@ -11,7 +11,6 @@ function sirius_event_participants_widgets() {
 		'certifications' => t('Certifications'),
 		'mightysearch_lite' => t('Advanced Search'),
 		'mightysearch' => t('Advanced Search and Tag'),
-		'map' => t('Map'),
 	);
 }
 

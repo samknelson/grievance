@@ -88,8 +88,6 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 		return sirius_event_page_participant_mightysearch($event_node, $rule, TRUE);
 	} else if ($widget == 'mightysearch') {
 		return sirius_event_page_participant_mightysearch($event_node, $rule, FALSE);
-	} else if ($widget == 'map') {
-		return sirius_event_page_participant_map($event_node, $rule, FALSE);
 	} else {
 		return t('Widget not found: @widget.', array('@widget' => $widget));
 	}

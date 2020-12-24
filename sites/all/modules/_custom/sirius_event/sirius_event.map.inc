@@ -37,7 +37,7 @@ function sirius_map_active($event_node) {
   if ($json['map']['active'] == 'Yes') { 
     $result = array('success' => TRUE);
   } else if ($json['map']['active'] == 'No') { 
-    $result = array('success' => FALSE, 'msg' => "The phone bank has been closed by an administrator.");
+    $result = array('success' => FALSE, 'msg' => "The map has been closed by an administrator.");
   }
   else if ($json['map']['active'] == 'Auto') { 
     $open_grace = $json['map']['active_grace_open'];
@@ -60,7 +60,7 @@ function sirius_map_active($event_node) {
       }
     }
     if (!$result['success']) {
-      $result = array('success' => FALSE, 'msg' => "The phone bank is currently closed. " . sirius_map_opens_in($event_node));
+      $result = array('success' => FALSE, 'msg' => "The map is currently closed. " . sirius_map_opens_in($event_node));
     }
   } else { 
     $result = array('success' => FALSE);
