@@ -294,6 +294,37 @@ function sirius_event_map_modal_form($form, &$form_state, $event_nid, $participa
 		'#default_value' => $pstatus_tid,
 	);
 
+	$caller_uid = $participant_json['phonebank']['caller']['uid'];
+	global $user;
+	$my_uid = $user->uid;
+	if (!$caller_uid || ($caller_uid == $my_uid)) {
+		$form['caller'] = array(
+			'#type' => 'hidden',
+			'#name' => 'caller',
+			'#value' => $my_uid,
+		);
+	} else {
+		$caller_user = user_load($caller_uid);
+		$form['caller'] = array(
+			'#type' => 'select',
+			'#options' => array(
+				$user->uid => $user->name,
+				$caller_uid => $caller_user->name,
+			),
+			'#title' => 'Visited by',
+			'#prefix' => '<div id="caller_wrap">',
+			'#suffix' => '</div>',
+			'#ajax' => array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax'),
+			'#default_value' => $caller_uid,
+		);
+		if ($event_json['phonebank']['autosave']['field'] == 'Yes') {
+			$form['caller']['#ajax'] = array(
+				'callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax',
+				'event' => 'blur'
+			);
+		}
+	}
+
 	$form['save'] = array(
 		'#type' => 'submit',
 		'#value' => t('Save'),
@@ -317,14 +348,51 @@ function sirius_event_map_modal_form_submit($form, &$form_state) {
 	$survey_json = sirius_jsonfield_util_node_json_get($survey_node);
 	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
 
-  // Register
   $participant_json = sirius_jsonfield_util_node_json_get($participant_node);
+
+  // Set the results
 	sirius_jsonfield_util_results_set($participant_json, 'survey', $form_state['values']['survey']);
+
+	// Set the caller;
+	$old_caller = $participant_json['phonebank']['caller'];
+	$new_caller_uid = $form_state['values']['caller'];
+	if ($new_caller_uid && ($new_caller_uid != $old_caller['uid'])) {
+		$new_caller_user = user_load($new_caller_uid);
+		$new_caller = array(
+			'uid' => $new_caller_uid,
+			'name' => $new_caller_user->name,
+			'mail' => $new_caller_user->mail,
+			'phone' => $new_caller_user->field_sirius_phone['und'][0]['value'],
+		);
+		$participant_json['phonebank']['caller'] = $new_caller;
+	}
+	if (!$participant_json['phonebank']['first_call']) {
+		$participant_json['phonebank']['first_call'] = array(
+			'ts' => time(),
+			'date' => date('l, F d Y - g:ia'),
+		);
+	}
+	$participant_json['phonebank']['last_call'] = array(
+		'ts' => time(),
+		'date' => date('l, F d Y - g:ia'),
+	);
+
+
 	sirius_jsonfield_util_node_json_set($participant_node, $participant_json);
 	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $form_state['values']['pstatus'];
 	node_save($participant_node);
 
+	// Set linked fields, formerly known as "candidate-issue"
 	$contact_node = node_load($participant_node->field_sirius_contact['und'][0]['target_id']);
+	$contact_json = sirius_jsonfield_util_node_json_get($contact_node);
+	$contact_results = sirius_jsonfield_util_results_get($contact_json, 'default');
+	$count = sirius_jsonfield_link_set($survey_form, $form_state['values']['survey'], $contact_results);
+	if ($count) {
+		sirius_jsonfield_util_results_set($contact_json, 'default', $contact_results);
+		sirius_jsonfield_util_node_json_set($contact_node, $contact_json);
+		node_save($contact_node);
+	}
+
 	drupal_set_message("Saved: " . $contact_node->title);
 }
 

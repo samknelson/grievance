@@ -214,6 +214,31 @@ function sirius_event_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_event']['sirius_event_clone'] = array(
+    'title' => 'Clone',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_clone',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 10,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_clone/clone'] = array(
+    'title' => 'Clone',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_clone',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_clone/exim'] = array(
+    'title' => 'Export / Import',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_exim',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 2,
+  );
+
   $node_tabs['sirius_event_participant']['sirius_event_participant_comments'] = array(
     'title' => 'Comments',
     'description' => '',

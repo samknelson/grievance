@@ -23,3 +23,50 @@ function sirius_node_tab_event_info($event_node) {
     return drupal_render($renderable);
   }
 }
+
+
+/**
+ * @todo: This should be in a different file
+ */
+
+function sirius_node_tab_event_exim($event_node) {
+  return drupal_get_form('sirius_json_definition_exim_form', $event_node->nid, 'ALL');
+}
+
+function sirius_node_tab_event_clone($event_node) {
+  return drupal_get_form('sirius_node_tab_event_clone_form', $event_node);
+}
+
+function sirius_node_tab_event_clone_form($form, &$form_state, $event_node) {
+  $form_state['event_nid'] = $event_node->nid;
+
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Event Title',
+    '#default_value' => $event_node->title . ' COPY',
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  return $form;
+}
+
+function sirius_node_tab_event_clone_form_submit($form, &$form_state) {
+  $event_node = node_load($form_state['event_nid']);
+
+  foreach ($event_node as $key => $value) {
+    // Keep all the fields
+    if (preg_match('/^field_/', $key)) { continue; }
+    if (in_array($key, array('uid', 'body', 'status', 'type', 'language'))) { continue; }
+    unset($event_node->{$key});
+  }
+  $event_node->title = $form_state['values']['title'];
+  node_object_prepare($event_node);
+  $event_node = node_submit($event_node);
+  node_save($event_node);
+
+  drupal_set_message("Success! New event created: " . l($event_node->title, 'node/' . $event_node->nid));
+}
