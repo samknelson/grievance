@@ -160,11 +160,13 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 
   	$event_node = node_load($json_forms['sirius_event_participant']['event_nid']);
 		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
-		$is_phonebank = sirius_event_phonebank_enabled_type($event_type_term);
+		$is_phonebank = (sirius_event_phonebank_enabled_type($event_type_term) || sirius_event_map_enabled_type($event_type_term));
 		if ($is_phonebank) {
 	  	$paths[':sirius_event_participant:phonebank:caller:name'] = ':sirius_event_participant:phonebank:caller:name';
 	  	$paths[':sirius_event_participant:phonebank:caller:mail'] = ':sirius_event_participant:phonebank:caller:mail';
 	  	$paths[':sirius_event_participant:phonebank:caller:uid'] = ':sirius_event_participant:phonebank:caller:uid';
+	  	$paths[':sirius_event_participant:phonebank:first_call:ts'] = ':sirius_event_participant:phonebank:first_call';
+	  	$paths[':sirius_event_participant:phonebank:last_call:ts'] = ':sirius_event_participant:phonebank:last_call';
 		}
   }
   if ($json_forms['sirius_bulk']) {
@@ -561,6 +563,8 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 			}
 
 		} else if ($which_form == 'phonebank') {
+			list ($field_name, $column) = explode(':', $path);
+			if ($field_name == 'first_call' || $field_name == 'last_call') { $value = strtotime($value); }
 			$path_for_query = '$.' . $which_form . '.' . preg_replace('/:/', '.', $path);
 			if ($criterion) { $where_name = "lower(json_unquote(json_extract(participant_json.field_sirius_json_value, '$path_for_query'))) "; }
 		} else {
@@ -1180,7 +1184,11 @@ function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
 			} 
 		} else if ($which_form == 'phonebank') {
 			list ($field_name, $column) = explode(':', $path);
-			return $json[$which_form][$field_name][$column];
+			if ($field_name == 'first_call' || $field_name == 'last_call') {
+				return date('Y-m-d H:i:s', $json[$which_form][$field_name][$column]);
+			} else {
+				return $json[$which_form][$field_name][$column];
+			}
 		} else {
 			$json_form = $json_forms[$node_type][$which_form];
 			$json_results = sirius_jsonfield_util_results_get($json, $which_form);
