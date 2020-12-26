@@ -137,7 +137,8 @@ function sirius_feed_page_list($wizard_name) {
  ************************************************************************************************/
 
 /**
- * More or less anybody can access the landing page. But they can only see the feed lists that they have access to
+ * You have access to the feed landing page if you have access to at least one feed.
+ * @todo: This is pretty expensive. We should probably just create a permission of some kind.
  */
 
 function sirius_feed_page_landing_access() {
