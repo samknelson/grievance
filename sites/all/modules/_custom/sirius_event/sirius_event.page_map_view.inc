@@ -120,7 +120,7 @@ function sirius_node_tab_event_map_view($event_node) {
 
 function sirius_event_map_ajax_poll_access($event_nid) {
 	$event_node = node_load($event_nid);
-	return sirius_node_tab_event_phonebank_call_access($event_node);
+	return sirius_node_tab_event_map_access($event_node);
 }
 
 function sirius_event_map_ajax_poll($event_nid) {
@@ -180,7 +180,7 @@ function sirius_event_map_modal_access($event_nid, $participant_nid) {
 	$event_node = node_load($event_nid);
 	$participant_node = node_load($participant_nid);
 	if ($participant_node->field_sirius_event['und'][0]['target_id'] != $event_nid) { return FALSE; }
-	return sirius_node_tab_event_phonebank_call_access($event_node);
+	return sirius_node_tab_event_map_access($event_node);
 }
 
 function sirius_event_map_modal($event_nid, $participant_nid) {
@@ -314,15 +314,8 @@ function sirius_event_map_modal_form($form, &$form_state, $event_nid, $participa
 			'#title' => 'Visited by',
 			'#prefix' => '<div id="caller_wrap">',
 			'#suffix' => '</div>',
-			'#ajax' => array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax'),
 			'#default_value' => $caller_uid,
 		);
-		if ($event_json['phonebank']['autosave']['field'] == 'Yes') {
-			$form['caller']['#ajax'] = array(
-				'callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax',
-				'event' => 'blur'
-			);
-		}
 	}
 
 	$form['save'] = array(
@@ -409,7 +402,7 @@ function sirius_map_popup_html($event_nid, $contact_nid, $contact_name, $thoroug
 
 function sirius_event_map_modal_legend_access($event_nid) {
 	$event_node = node_load($event_nid);
-	return sirius_node_tab_event_phonebank_call_access($event_node);
+	return sirius_node_tab_event_map_access($event_node);
 }
 
 function sirius_event_map_modal_legend($event_nid) {
