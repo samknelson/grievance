@@ -141,7 +141,14 @@ function sirius_feed_page_list($wizard_name) {
  */
 
 function sirius_feed_page_landing_access() {
-	return user_access('sirius');
+	$all_info = sirius_wizard_info_all();
+	foreach ($all_info as $key => $info) {
+		if (!$info['feed']) { continue; }
+		$path = "sirius/feeds/$key";
+		if (drupal_valid_path($path)) { return TRUE; }
+	}
+
+	return FALSE;
 }
 
 function sirius_feed_page_landing() {
