@@ -20965,7 +20965,125 @@ Grievance Form',
   $handler->display->display_options['access']['perm'] = 'sirius domain admin';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['type'] = 'better_exposed_filters';
+  $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
+  $handler->display->display_options['exposed_form']['options']['bef'] = array(
+    'general' => array(
+      'input_required' => 0,
+      'text_input_required' => array(
+        'text_input_required' => array(
+          'value' => 'Select any filter and click on Apply to see results',
+          'format' => 'full_html',
+        ),
+      ),
+      'allow_secondary' => 0,
+      'secondary_label' => 'Advanced options',
+      'secondary_collapse_override' => '0',
+    ),
+    'sort' => array(
+      'bef_format' => 'default',
+      'advanced' => array(
+        'collapsible' => 0,
+        'collapsible_label' => 'Sort options',
+        'combine' => 0,
+        'combine_param' => 'sort_bef_combine',
+        'combine_rewrite' => '',
+        'reset' => 0,
+        'reset_label' => '',
+        'is_secondary' => 0,
+        'autosubmit' => 0,
+      ),
+    ),
+    'rid' => array(
+      'bef_format' => 'default',
+      'more_options' => array(
+        'bef_select_all_none' => FALSE,
+        'bef_collapsible' => 0,
+        'autosubmit' => 0,
+        'is_secondary' => 0,
+        'any_label' => '',
+        'bef_filter_description' => '',
+        'tokens' => array(
+          'available' => array(
+            0 => 'global_types',
+          ),
+        ),
+        'rewrite' => array(
+          'filter_rewrite_values' => '',
+        ),
+      ),
+    ),
+    'name' => array(
+      'bef_format' => 'default',
+      'more_options' => array(
+        'autosubmit' => 0,
+        'is_secondary' => 0,
+        'any_label' => '',
+        'bef_filter_description' => '',
+        'tokens' => array(
+          'available' => array(
+            0 => 'global_types',
+          ),
+        ),
+        'rewrite' => array(
+          'filter_rewrite_values' => '',
+        ),
+      ),
+    ),
+    'mail' => array(
+      'bef_format' => 'default',
+      'more_options' => array(
+        'autosubmit' => 0,
+        'is_secondary' => 0,
+        'any_label' => '',
+        'bef_filter_description' => '',
+        'tokens' => array(
+          'available' => array(
+            0 => 'global_types',
+          ),
+        ),
+        'rewrite' => array(
+          'filter_rewrite_values' => '',
+        ),
+      ),
+    ),
+    'field_grievance_phone_value' => array(
+      'bef_format' => 'default',
+      'more_options' => array(
+        'autosubmit' => 0,
+        'is_secondary' => 0,
+        'any_label' => '',
+        'bef_filter_description' => '',
+        'tokens' => array(
+          'available' => array(
+            0 => 'global_types',
+          ),
+        ),
+        'rewrite' => array(
+          'filter_rewrite_values' => '',
+        ),
+      ),
+    ),
+    'status' => array(
+      'bef_format' => 'default',
+      'more_options' => array(
+        'bef_select_all_none' => FALSE,
+        'bef_collapsible' => 0,
+        'autosubmit' => 0,
+        'is_secondary' => 0,
+        'any_label' => '',
+        'bef_filter_description' => '',
+        'tokens' => array(
+          'available' => array(
+            0 => 'global_types',
+          ),
+        ),
+        'rewrite' => array(
+          'filter_rewrite_values' => '',
+        ),
+      ),
+    ),
+  );
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '100';
   $handler->display->display_options['pager']['options']['offset'] = '0';
@@ -21055,12 +21173,12 @@ Grievance Form',
   $handler->display->display_options['sorts']['name']['field'] = 'name';
   $handler->display->display_options['sorts']['name']['exposed'] = TRUE;
   $handler->display->display_options['sorts']['name']['expose']['label'] = 'Name';
-  /* Sort criterion: Field: Phone (field_grievance_phone) */
-  $handler->display->display_options['sorts']['field_grievance_phone_value']['id'] = 'field_grievance_phone_value';
-  $handler->display->display_options['sorts']['field_grievance_phone_value']['table'] = 'field_data_field_grievance_phone';
-  $handler->display->display_options['sorts']['field_grievance_phone_value']['field'] = 'field_grievance_phone_value';
-  $handler->display->display_options['sorts']['field_grievance_phone_value']['exposed'] = TRUE;
-  $handler->display->display_options['sorts']['field_grievance_phone_value']['expose']['label'] = 'Phone';
+  /* Sort criterion: User: Last access */
+  $handler->display->display_options['sorts']['access']['id'] = 'access';
+  $handler->display->display_options['sorts']['access']['table'] = 'users';
+  $handler->display->display_options['sorts']['access']['field'] = 'access';
+  $handler->display->display_options['sorts']['access']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['access']['expose']['label'] = 'Last access';
   /* Sort criterion: User: Created date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'users';
@@ -21073,12 +21191,12 @@ Grievance Form',
   $handler->display->display_options['sorts']['mail']['field'] = 'mail';
   $handler->display->display_options['sorts']['mail']['exposed'] = TRUE;
   $handler->display->display_options['sorts']['mail']['expose']['label'] = 'E-mail';
-  /* Sort criterion: User: Last access */
-  $handler->display->display_options['sorts']['access']['id'] = 'access';
-  $handler->display->display_options['sorts']['access']['table'] = 'users';
-  $handler->display->display_options['sorts']['access']['field'] = 'access';
-  $handler->display->display_options['sorts']['access']['exposed'] = TRUE;
-  $handler->display->display_options['sorts']['access']['expose']['label'] = 'Last access';
+  /* Sort criterion: Field: Phone (field_grievance_phone) */
+  $handler->display->display_options['sorts']['field_grievance_phone_value']['id'] = 'field_grievance_phone_value';
+  $handler->display->display_options['sorts']['field_grievance_phone_value']['table'] = 'field_data_field_grievance_phone';
+  $handler->display->display_options['sorts']['field_grievance_phone_value']['field'] = 'field_grievance_phone_value';
+  $handler->display->display_options['sorts']['field_grievance_phone_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_grievance_phone_value']['expose']['label'] = 'Phone';
   /* Contextual filter: Field: Domain (field_sirius_domain) */
   $handler->display->display_options['arguments']['field_sirius_domain_target_id']['id'] = 'field_sirius_domain_target_id';
   $handler->display->display_options['arguments']['field_sirius_domain_target_id']['table'] = 'field_data_field_sirius_domain';
@@ -21152,7 +21270,7 @@ Grievance Form',
 
   /* Display: Data export */
   $handler = $view->new_display('views_data_export', 'Data export', 'views_data_export_1');
-  $handler->display->display_options['pager']['type'] = 'some';
+  $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
   $handler->display->display_options['style_options']['provide_file'] = 1;
   $handler->display->display_options['style_options']['parent_sort'] = 0;
@@ -21233,6 +21351,9 @@ Grievance Form',
     t('Sort by'),
     t('Asc'),
     t('Desc'),
+    t('Select any filter and click on Apply to see results'),
+    t('Advanced options'),
+    t('Sort options'),
     t('Items per page'),
     t('- All -'),
     t('Offset'),
