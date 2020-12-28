@@ -73,3 +73,73 @@ function sirius_map_active($event_node) {
 
   return $result;
 }
+
+function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offset = 0) {
+  // Create settings for the map.
+  $type_json = sirius_event_type_json($event_node);
+  $prole_tid = $type_json['map']['prole_tid'];
+
+  $map_features = array();
+
+  $pstatus_terms = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'full');
+  $pstatus_makers = array();
+  foreach ($pstatus_terms as $pstatus_tid => $pstatus_term) {
+    $pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
+    $pstatus_markers[$pstatus_tid] = $pstatus_json['map']['icon'];
+  }
+
+  // Fetch all the relevant data about our participants
+  $sql_args = array();
+  $sql_args[':event_nid'] = $event_node->nid;
+  $sql_args[':prole_tid'] = $prole_tid;
+  $sql = "select contact_node.title, ";
+  $sql .= "contact_node.nid as contact_nid, ";
+  $sql .= "node.nid as participant_nid, ";
+  $sql .= "field_sirius_event_pstatus_tid, ";
+  $sql .= "field_sirius_address_thoroughfare, ";
+  $sql .= "field_sirius_address_premise, ";
+  $sql .= "field_sirius_address_geo_lat, ";
+  $sql .= "field_sirius_address_geo_lon ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
+  $sql .= "left join node contact_node on contact_node.nid = field_sirius_contact_target_id ";
+  $sql .= "left join field_data_field_sirius_address on field_data_field_sirius_address.entity_type = 'node' and field_data_field_sirius_address.entity_id = contact_node.nid ";
+  $sql .= "left join field_data_field_sirius_address_geo on field_data_field_sirius_address_geo.entity_type = 'node' and field_data_field_sirius_address_geo.entity_id = contact_node.nid ";
+  $sql .= "where field_sirius_event_target_id = :event_nid ";
+  $sql .= "and field_sirius_event_prole_tid = :prole_tid ";
+  $sql .= "and field_sirius_address_geo_lat is not null ";
+  if ($cutoff_ts) { 
+    $sql .= "and node.changed > :cutoff_ts ";
+    $sql_args[':cutoff_ts'] = $cutoff_ts;
+  }
+  $sql .= "limit $limit offset $offset ";
+
+  $stmt = sirius_sql_query($sql, $sql_args);
+  while ($hr = $stmt->fetchAssoc()) {
+    $pstatus_tid = $hr['field_sirius_event_pstatus_tid'];
+
+    $map_feature = array(
+      'type' => 'point',
+      'lat' => $hr['field_sirius_address_geo_lat'],
+      'lon' => $hr['field_sirius_address_geo_lon'],
+      'popup' => sirius_map_popup_html($event_node->nid, $hr['contact_nid'], $hr['title'], $hr['field_sirius_address_thoroughfare'], $hr['field_sirius_address_premise'], $hr['participant_nid'], $pstatus_terms[$pstatus_tid]->name),
+      'participant_nid'  => $hr['participant_nid'],
+      'leaflet_id' => 'participant_' . $hr['participant_nid'],
+      'sirius' => array('marker' => array('id' => $hr['participant_nid'])),
+    );
+
+    if ($pstatus_markers[$pstatus_tid]) {
+      $map_feature['icon'] = array('iconUrl' => '/sites/all/modules/_custom/sirius/images/map/' . $pstatus_markers[$pstatus_tid]);
+      $map_feature['icon_name'] = sirius_map_icon_name($pstatus_markers[$pstatus_tid]);
+    } else {
+      $map_feature['icon'] = array('iconUrl' => '/sites/all/modules/_custom/sirius/images/map/marker-icon-blue.png');
+      $map_feature['icon_name'] = 'Blue'; 
+    }
+    $map_features[] = $map_feature;
+  }
+
+  return $map_features;
+}

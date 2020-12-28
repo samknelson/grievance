@@ -98,3 +98,26 @@ function sirius_event_participant_list_by_rule($event_nid, $rule, $limit = 0, $o
 	return $participant_nids;
 }
 
+function sirius_event_participant_summary($event_nid, $prole_tid = NULL) {
+	$sql_args = array();
+	$sql_args[':event_nid'] = $event_nid;
+	$sql_args[':prole_tid'] = $prole_tid;
+	$sql = "select field_sirius_event_pstatus_tid, count(distinct node.nid) as c ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
+	$sql .= "left join node contact_node on field_sirius_contact_target_id = contact_node.nid ";
+	$sql .= "where node.type = 'sirius_event_participant' ";
+	$sql .= "and field_sirius_event_target_id = :event_nid ";
+	$sql .= "and field_sirius_event_prole_tid = :prole_tid ";
+	$sql .= "group by field_sirius_event_pstatus_tid ";
+
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$result = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$data[$hr['field_sirius_event_pstatus_tid']] = $hr['c'];
+	}
+	return $data;
+}

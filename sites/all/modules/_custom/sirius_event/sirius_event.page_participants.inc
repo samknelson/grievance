@@ -315,28 +315,13 @@ function sirius_node_tab_event_participants_summary($event_nid, $prole_tid = NUL
 	static $pstatus_names;
 	if (!$pstatus_names) { $pstatus_names = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name'); }
 
-	$sql_args = array();
-	$sql_args[':event_nid'] = $event_nid;
-	$sql_args[':prole_tid'] = $prole_tid;
-	$sql = "select field_sirius_event_pstatus_tid, count(distinct node.nid) as c ";
-	$sql .= "from node ";
-	$sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
-	$sql .= "left join node contact_node on field_sirius_contact_target_id = contact_node.nid ";
-	$sql .= "where node.type = 'sirius_event_participant' ";
-	$sql .= "and field_sirius_event_target_id = :event_nid ";
-	$sql .= "and field_sirius_event_prole_tid = :prole_tid ";
-	$sql .= "group by field_sirius_event_pstatus_tid ";
+	$summary = sirius_event_participant_summary($event_nid, $prole_tid);
 
 	$rows = array();
-	$stmt = db_query($sql, $sql_args);
-	$rows = array();
-	while ($hr = $stmt->fetchAssoc()) {
+	foreach ($pstatus_names as $pstatus_tid => $pstatus_name) {
 		$row = array();
-		$row[] = $pstatus_names[$hr['field_sirius_event_pstatus_tid']];
-		$row[] = $hr['c'];
+		$row[] = $pstatus_name;
+		$row[] = number_format($summary[$pstatus_tid], 0);
 		$rows[] = $row;
 	}
 

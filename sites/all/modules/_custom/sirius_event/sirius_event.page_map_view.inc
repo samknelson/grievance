@@ -46,67 +46,16 @@ function sirius_node_tab_event_map_view($event_node) {
 	$survey_json = sirius_jsonfield_util_node_json_get($survey_node);
 	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
 
-	// Get the list of participants
-	$participant_nids = sirius_event_participant_list_by_rule($event_node->nid, $rule, 3000);
-	if (!$participant_nids) {
-		drupal_set_message("No participants found for this event.", 'warning');
-		return $html;
-	}
-
-  // Create settings for the map.
-  $map_features = array();
-
-  $pstatus_terms = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'full');
-  $pstatus_makers = array();
-  foreach ($pstatus_terms as $pstatus_tid => $pstatus_term) {
-  	$pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
-  	$pstatus_markers[$pstatus_tid] = $pstatus_json['map']['icon'];
-  }
-
-	// Fetch all the relevant data about our participants
-	$sql = "select contact_node.title, ";
-	$sql .= "contact_node.nid as contact_nid, ";
-	$sql .= "node.nid as participant_nid, ";
-	$sql .= "field_sirius_event_pstatus_tid, ";
-	$sql .= "field_sirius_address_thoroughfare, ";
-	$sql .= "field_sirius_address_premise, ";
-	$sql .= "field_sirius_address_geo_lat, ";
-	$sql .= "field_sirius_address_geo_lon ";
-	$sql .= " from node ";
-	$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
-	$sql .= "left join node contact_node on contact_node.nid = field_sirius_contact_target_id ";
-	$sql .= "left join field_data_field_sirius_address on field_data_field_sirius_address.entity_type = 'node' and field_data_field_sirius_address.entity_id = contact_node.nid ";
-	$sql .= "left join field_data_field_sirius_address_geo on field_data_field_sirius_address_geo.entity_type = 'node' and field_data_field_sirius_address_geo.entity_id = contact_node.nid ";
-	$sql .= "where node.nid in (:participant_nids) ";
-	$sql .= "and field_sirius_address_geo_lat is not null ";
-	$stmt = sirius_sql_query($sql, array(':participant_nids' => $participant_nids));
-	while ($hr = $stmt->fetchAssoc()) {
-		$pstatus_tid = $hr['field_sirius_event_pstatus_tid'];
-
-		$map_feature = array(
-	    'type' => 'point',
-	    'lat' => $hr['field_sirius_address_geo_lat'],
-	    'lon' => $hr['field_sirius_address_geo_lon'],
-	    'popup' => sirius_map_popup_html($event_node->nid, $hr['contact_nid'], $hr['title'], $hr['field_sirius_address_thoroughfare'], $hr['field_sirius_address_premise'], $hr['participant_nid'], $pstatus_terms[$pstatus_tid]->name),
-	    'leaflet_id' => 'participant_' . $hr['participant_nid'],
-	    'sirius' => array('marker' => array('id' => $hr['participant_nid'])),
-		);
-
-		if ($pstatus_markers[$pstatus_tid]) {
-			$map_feature['icon'] = array('iconUrl' => '/sites/all/modules/_custom/sirius/images/map/' . $pstatus_markers[$pstatus_tid]);
-    }
-		$map_features[] = $map_feature;
-	}
+	$map_features = sirius_event_map_list($event_node);
 	if (!$map_features) {
-		drupal_set_message("None of the participants for this event have been geocoded.", 'warning');
+		drupal_set_message("No geocoded participants for this event have been found.", 'warning');
 		return $html;
 	}
 
 	// Get map implementation provided by http://drupal.org/project/leaflet_googlemaps.
 	$map = sirius_map_leaflet_create();
 	// $map['center'] = array('lon' => 0, 'lat' => 0);
-  $map_build = leaflet_build_map($map, $map_features, '600px');
+  $map_build = leaflet_build_map($map, $map_features, sirius_domain_variable_get('sirius_map_height', '600px'));
 	$html .= render($map_build);
 	$html .= l('Legend', 'sirius/modal/event/map-legend/' . $event_node->nid, array('attributes' => array('class' => array('tool-button'))));
 	$html .= '<a href="/sirius/map" id="sirius_map_poll" class="tool-button">Refresh Now</a>';
@@ -114,9 +63,6 @@ function sirius_node_tab_event_map_view($event_node) {
 
 	return $html;
 }
-
-
-
 
 function sirius_event_map_ajax_poll_access($event_nid) {
 	$event_node = node_load($event_nid);
@@ -126,53 +72,10 @@ function sirius_event_map_ajax_poll_access($event_nid) {
 function sirius_event_map_ajax_poll($event_nid) {
 	// Setup
 	$event_node = node_load($event_nid);
-	$cutoff = time() - 60*60;
-  $pstatus_terms = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'full');
-  $pstatus_icons = array();
-  foreach ($pstatus_terms as $pstatus_tid => $pstatus_term) {
-  	$pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
-  	$pstatus_icons[$pstatus_tid] = $pstatus_json['map']['icon'];
-  }
-	$icon_names = sirius_map_icons();
+	$cutoff_ts = time() - 60*60;
+	$map_features = sirius_event_map_list($event_node, $cutoff_ts);
 
-	// @todo: We really ought to be passing in the rule here, since this will include things like volunteers and other participants that we might not have access to.
-	$participant_nids = sirius_event_participant_list_by_rule($event_node->nid, $rule, 3000);
-	$sql = "select contact_node.title, ";
-	$sql .= "contact_node.nid as contact_nid, ";
-	$sql .= "node.nid as participant_nid, ";
-	$sql .= "field_sirius_event_pstatus_tid, ";
-	$sql .= "field_sirius_address_thoroughfare, ";
-	$sql .= "field_sirius_address_premise, ";
-	$sql .= "field_sirius_address_geo_lat, ";
-	$sql .= "field_sirius_address_geo_lon ";
-	$sql .= " from node ";
-	$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
-	$sql .= "left join node contact_node on contact_node.nid = field_sirius_contact_target_id ";
-	$sql .= "left join field_data_field_sirius_address on field_data_field_sirius_address.entity_type = 'node' and field_data_field_sirius_address.entity_id = contact_node.nid ";
-	$sql .= "left join field_data_field_sirius_address_geo on field_data_field_sirius_address_geo.entity_type = 'node' and field_data_field_sirius_address_geo.entity_id = contact_node.nid ";
-	$sql .= "where node.nid in (:participant_nids) ";
-	$sql .= "and field_sirius_address_geo_lat is not null ";
-	$sql .= "and node.changed > :cutoff ";
-	$sql_args = array();
-	$sql_args[':cutoff'] = $cutoff;
-	$sql_args[':participant_nids'] = $participant_nids;
-	$stmt = sirius_sql_query($sql, $sql_args);
-
-	$records = array();
-	while ($hr = $stmt->fetchAssoc()) {
-		$pstatus_tid = $hr['field_sirius_event_pstatus_tid'];
-
-		$icon_name = $icon_names[$pstatus_icons[$pstatus_tid]];
-		if (!$icon_name) { $icon_name = 'Blue'; }
-		$record = array(
-			'participant_nid' => $hr['participant_nid'],
-			'icon_name' => $icon_name,
-	    'popup_html' => sirius_map_popup_html($event_node->nid, $hr['contact_nid'], $hr['title'], $hr['field_sirius_address_thoroughfare'], $hr['field_sirius_address_premise'], $hr['participant_nid'], $pstatus_terms[$pstatus_tid]->name),
-		);
-		$records[] = $record;
-	}
-	drupal_json_output(array('updates' => $records));
+	drupal_json_output(array('updates' => $map_features));
 	exit();
 }
 
@@ -220,7 +123,7 @@ function sirius_event_map_modal_form($form, &$form_state, $event_nid, $participa
 	    'command' => 'sirius_command_map_update',
 	    'participant_nid' => $participant_nid,
 	    'icon_name' => $icon_name,
-	    'popup_html' => sirius_map_popup_html($event_nid, $contact_node->nid, $contact_node->title, $contact_node->field_sirius_address['und'][0]['thoroughfare'], $contact_node->field_sirius_address['und'][0]['premise'], $participant_nid, $pstatus_term->name),
+	    'popup' => sirius_map_popup_html($event_nid, $contact_node->nid, $contact_node->title, $contact_node->field_sirius_address['und'][0]['thoroughfare'], $contact_node->field_sirius_address['und'][0]['premise'], $participant_nid, $pstatus_term->name),
     );
 
     // Show any messages
@@ -425,6 +328,8 @@ function sirius_event_map_legend_render($event_nid) {
 	$pstatus_options = sirius_event_participant_role_status_tids($prole_tid, array('phonebank' => array('during_call' => TRUE, 'current_pstatus' => $pstatus_tid)));
 	$pstatus_terms = taxonomy_term_load_multiple(array_keys($pstatus_options));
 
+	$counts = sirius_event_participant_summary($event_nid, $prole_tid);
+
 	$rows = array();
 	foreach ($pstatus_terms as $pstatus_tid => $pstatus_term) {
 		$pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
@@ -434,10 +339,12 @@ function sirius_event_map_legend_render($event_nid) {
 		$row = array();
 		$row[] = sirius_map_icon_render($icon);
 		$row[] = $pstatus_term->name;
+		$row[] = number_format($counts[$pstatus_tid], 0);
 		$row[] = $pstatus_term->description;
 		$rows[] = $row;
 	}
-	$header = array('Marker', 'Status', 'Description');
+	$header = array('Marker', 'Status', 'Count', 'Description');
 	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
 	return $html;
 }
+
