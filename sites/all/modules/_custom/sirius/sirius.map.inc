@@ -3,13 +3,13 @@
 function sirius_map_leaflet_create($settings = array()) {
 	if (!$settings) {
 		$settings['zoom'] = 16;
-		$settings['fullscreenControl'] = TRUE;
-		$settings['fullscreenControlOptions'] = array('position' => 'topleft');
+		// $settings['fullscreenControl'] = TRUE;
+		// $settings['fullscreenControlOptions'] = array('position' => 'topleft');
 	}
 	// $map = leaflet_map_get_info('google-roadmap');
 	// dpm(leaflet_map_get_info());
-	drupal_add_css('sites/all/libraries/leaflet_fullscreen/Control.FullScreen.css');
- 	drupal_add_js('sites/all/libraries/leaflet_fullscreen/Control.FullScreen.js');
+	// drupal_add_css('sites/all/libraries/leaflet_fullscreen/Control.FullScreen.css');
+ 	// drupal_add_js('sites/all/libraries/leaflet_fullscreen/Control.FullScreen.js');
 	$map = leaflet_map_get_info(sirius_domain_variable_get('sirius_map_provider', 'OSM Mapnik'));
 	$map['settings'] = $settings;
 	return $map;
