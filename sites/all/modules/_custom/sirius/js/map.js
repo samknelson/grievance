@@ -45,7 +45,6 @@
 				// Handle current location. @todo this code is ugly.
 		  	if (Drupal.settings.sirius_map.current_location.show) {
 					var current_location_marker;
-					var current_location_circle;
 					map.locate({setView: false, watch: true})
         		.on('locationfound', function(e){
         			if (current_location_marker) { map.removeLayer(current_location_marker); }
@@ -54,7 +53,6 @@
         		})
        			.on('locationerror', function(e){
        				$('#sirius_map_poll_message').html(e.message);
-            	// alert(e.message);
         		});
 		  	}
 		  });
@@ -74,7 +72,6 @@
 	  	// Do an ajax refresh poll of the map
 	  	function sirius_map_poll() {
 	  		$('#sirius_map_poll_message').html('... refreshing the map ...');
-	  		console.log("Polling...");
 				$.ajax({
 					'url': '/sirius/ajax/event/map/poll/' + event_nid,
 					'type': 'GET',
@@ -89,7 +86,7 @@
 					    	marker = markers[record.participant_nid];
 					    	if (!marker) { continue; }
 					    	marker.setIcon(icons[record.icon_name]);
-					    	marker._popup.setContent(record.popup_html);
+					    	marker._popup.setContent(record.popup);
 							}
 						}
 						date = new Date();
@@ -119,7 +116,7 @@
 	    	marker = markers[response.participant_nid];
 	    	if (!marker) { return; }
 	    	marker.setIcon(icons[response.icon_name]);
-	    	marker._popup.setContent(response.popup_html);
+	    	marker._popup.setContent(response.popup);
 	    }
 
 	  } }
