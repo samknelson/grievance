@@ -66,6 +66,19 @@ function sirius_node_tab_event_map_settings_form($form, &$form_state, $event_nid
 		'#default_value' => $json['map']['active_grace_close'],
 	);
 
+	if (sirius_domain_component_enabled('mapping:checkin')) {
+		$form['map']['checkin']['active'] = array(
+			'#type' => 'select',
+			'#title' => t('Checkin Active?'),
+			'#options' => array(
+				'No' => t('No'), 
+				'Yes' => t('Yes'),
+			),
+			'#default_value' => $json['map']['checkin']['active'],
+			'#description' => t('Set to "Yes" to enable the "Checkin" feature. This will cause the locations of all map users to be reported back to the server, and will allow administrators to see the locations of other users as they move around the map.'),
+		);
+	}
+
 	$form['map']['caller_intro'] = array(
 		'#type' => 'text_format',
 		'#title' => 'Introduction for callers',

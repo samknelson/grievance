@@ -25,6 +25,14 @@ function sirius_node_tab_event_map_view_access($event_node) {
 }
 
 function sirius_node_tab_event_map_view($event_node) {
+	global $user;
+	$event_nid = $event_node->nid;
+	$event_json = sirius_jsonfield_util_node_json_get($event_node);
+	$type_json = sirius_event_type_json($event_node);
+	$survey_node = sirius_event_survey_get($event_node, 'map');
+	$survey_json = sirius_jsonfield_util_node_json_get($survey_node);
+	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
+
 	$active = sirius_map_active($event_node);
 	if (!$active['success']) {
 		$html = '<div><em>' . t('Map is closed. Admin access only is allowed.') . '</em></div>';
@@ -33,18 +41,20 @@ function sirius_node_tab_event_map_view($event_node) {
 	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/survey.css', 'file');
 	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/map.js', array('type' => 'file', 'weight' => -5));
 	$js_settings = array();
-	$js_settings['current_location'] = array('show' => TRUE);
+	$js_settings['current_location'] = array(
+		'show' => TRUE,
+	);
+
+	if (sirius_domain_component_enabled('mapping:checkin') && ($event_json['map']['checkin']['active'] == 'Yes')) {
+		$js_settings['current_location']['checkin'] = array(
+			'active' => TRUE,
+			'timeout' => 1000 * 60,
+		);
+	}
 	$js_settings['event_nid'] = $event_node->nid;
 	$js_settings['poll'] = array('active' => TRUE, 'timeout' => 1000 * 60 * 3);
 	drupal_add_js(array('sirius_map' => $js_settings), 'setting');
 
-	global $user;
-	$event_nid = $event_node->nid;
-	$event_json = sirius_jsonfield_util_node_json_get($event_node);
-	$type_json = sirius_event_type_json($event_node);
-	$survey_node = sirius_event_survey_get($event_node, 'map');
-	$survey_json = sirius_jsonfield_util_node_json_get($survey_node);
-	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
 
 	$map_features = sirius_event_map_list($event_node);
 	if (!$map_features) {
@@ -113,10 +123,10 @@ function sirius_event_map_modal_form($form, &$form_state, $event_nid, $participa
     // Find the icon
     $pstatus_term = taxonomy_term_load($pstatus_tid);
   	$pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
-  	$icon = $pstatus_json['map']['icon']; 
+  	$icon = $pstatus_json['map']['icon'];
+  	if (!$icon) { $icon = sirius_map_icon_default(); }
   	$markers = sirius_map_icons();
   	$icon_name = $markers[$icon];
-  	if (!$icon_name) { $icon_name = 'Blue'; }
 
   	// Update the map
     $commands[] = array(
@@ -124,6 +134,8 @@ function sirius_event_map_modal_form($form, &$form_state, $event_nid, $participa
 	    'participant_nid' => $participant_nid,
 	    'icon_name' => $icon_name,
 	    'popup' => sirius_map_popup_html($event_nid, $contact_node->nid, $contact_node->title, $contact_node->field_sirius_address['und'][0]['thoroughfare'], $contact_node->field_sirius_address['und'][0]['premise'], $participant_nid, $pstatus_term->name),
+	    'pstatus_tid' => $pstatus_tid,
+	    'icon_url' => sirius_map_icon_url($icon),
     );
 
     // Show any messages

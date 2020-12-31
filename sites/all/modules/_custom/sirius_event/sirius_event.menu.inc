@@ -182,11 +182,18 @@ function sirius_event_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_event']['sirius_event_map/list'] = array(
+    'title' => 'List',
+    'callback' => 'sirius_node_tab_event_map_list',
+    'permissions' => array('sirius'),
+    'weight' => 3,
+  );
+
   $node_tabs['sirius_event']['sirius_event_map/settings'] = array(
     'title' => 'Settings',
     'callback' => 'sirius_node_tab_event_map_settings',
     'permissions' => array('sirius'),
-    'weight' => 3,
+    'weight' => 4,
   );
 
   $node_tabs['sirius_event']['sirius_event_class'] = array(
@@ -614,6 +621,7 @@ function sirius_event_menu() {
     'access callback'   => 'sirius_event_map_ajax_poll_access',
     'access arguments' => array(5),
     'type'             => MENU_CALLBACK,
+    'weight' => 20,
   );
 
   return $items;
@@ -643,8 +651,8 @@ function sirius_event_modal_styles() {
   $styles['sirius-event-modal-style'] = array(
     'modalSize' => array(
       'type' => 'fixed',
-      'width' => 600,
-      'height' => 600,
+      'width' => 1000,
+      'height' => 800,
     ),
   );
 
