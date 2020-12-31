@@ -4,6 +4,7 @@ function sirius_map_leaflet_create($settings = array()) {
 	if (!$settings) {
 		$settings['zoom'] = 16;
 		$settings['fullscreenControl'] = TRUE;
+		$settings['tap'] = FALSE; // See https://github.com/Leaflet/Leaflet/issues/7255
 		// settings['fullscreenControlOptions'] = array('position' => 'topleft');
 	}
 	drupal_add_css('sites/all/libraries/leaflet_fullscreen/dist/leaflet.fullscreen.css');
