@@ -350,7 +350,7 @@ function sirius_twilio_browserphone_render($parameters = array()) {
   $html .= '<ul>';
   $html .= '<li><a href="#sirius_browserphone_tab_phone">Phone</a></li>';
   if ($conference_number) { $html .= '<li><a href="#sirius_browserphone_tab_conference">Conf</a></li>'; }
-  $html .= '<li><a href="#sirius_browserphone_tab_keypad">#</a></li>';
+  $html .= '<li><a href="#sirius_browserphone_tab_keypad">Keypad</a></li>';
   $html .= '<li><a href="#sirius_browserphone_tab_settings">Settings</a></li>';
   $html .= '</ul>';
 

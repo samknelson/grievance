@@ -169,7 +169,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
   $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
-  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
+  $query->fieldCondition('field_grievance_log_type', 'tid', sirius_get_special_tid('grievance_log_types|update_with_status_change'));
   $query->fieldCondition('field_grievance_status', 'tid', $closed_status_tids, 'in');
   $stmt = $query->execute();
   $count_once = array();
@@ -193,7 +193,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
   $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
-  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
+  $query->fieldCondition('field_grievance_log_type', 'tid', sirius_get_special_tid('grievance_log_types|update_with_status_change'));
   $query->fieldCondition('field_grievance_status', 'tid', $victory_status_tids, 'in');
   $stmt = $query->execute();
   $count_once = array();
@@ -217,7 +217,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
   $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
-  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
+  $query->fieldCondition('field_grievance_log_type', 'tid', sirius_get_special_tid('grievance_log_types|update_with_status_change'));
   $query->fieldCondition('field_grievance_status', 'tid', $adr_status_tids, 'in');
   $stmt = $query->execute();
   $count_once = array();
@@ -241,7 +241,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
   $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
-  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
+  $query->fieldCondition('field_grievance_log_type', 'tid', sirius_get_special_tid('grievance_log_types|update_with_status_change'));
   $query->fieldCondition('field_grievance_status', 'tid', $fmcs_status_tids, 'in');
   $stmt = $query->execute();
   $count_once = array();
@@ -265,7 +265,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
   $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
-  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
+  $query->fieldCondition('field_grievance_log_type', 'tid', sirius_get_special_tid('grievance_log_types|update_with_status_change'));
   $query->fieldCondition('field_grievance_status', 'tid', $mediation_status_tids, 'in');
   $stmt = $query->execute();
   $count_once = array();
@@ -289,7 +289,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
   $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
-  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
+  $query->fieldCondition('field_grievance_log_type', 'tid', sirius_get_special_tid('grievance_log_types|update_with_status_change'));
   $query->fieldCondition('field_grievance_status', 'tid', $formal_status_tids, 'in');
   $stmt = $query->execute();
   $count_once = array();
@@ -313,7 +313,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
   $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
-  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
+  $query->fieldCondition('field_grievance_log_type', 'tid', sirius_get_special_tid('grievance_log_types|update_with_status_change'));
   $query->fieldCondition('field_grievance_status', 'tid', $exp_arb_status_tids, 'in');
   $stmt = $query->execute();
   $count_once = array();
@@ -337,7 +337,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
   $query->entityCondition('bundle', 'grievance_log');
   $query->fieldCondition('field_grievance_status_date', 'value', $from_date, ">=");
   $query->fieldCondition('field_grievance_status_date', 'value', $to_date, "<=");
-  $query->fieldCondition('field_grievance_log_type', 'tid', variable_get('grievance_log_update_type_with_status_change', ''));
+  $query->fieldCondition('field_grievance_log_type', 'tid', sirius_get_special_tid('grievance_log_types|update_with_status_change'));
   $query->fieldCondition('field_grievance_status', 'tid', $boa_held_status_tids, 'in');
   $stmt = $query->execute();
   $count_once = array();
@@ -547,7 +547,7 @@ function grievance_uh226_report_summary_form_submit($form, &$form_state) {
       $report_row['new'] = count(array_keys($stmt['node']));
     }
 
-    $term_log_type_tid = variable_get('grievance_log_term_type', 0);
+    $term_log_type_tid = sirius_get_special_tid("grievance_log_types|term");
     $open_status_str = join(",", $open_status_tids);
 
     // Total terms

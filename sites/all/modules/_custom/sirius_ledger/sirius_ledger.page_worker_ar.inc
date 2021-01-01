@@ -56,6 +56,15 @@ function sirius_ledger_node_tab_worker_ar_form($form, &$form_state, $worker_node
 		'#attributes' => array('autocomplete' => 'off'),
 	);
 
+	$form['filters']['display'] = array(
+		'#type' => 'select',
+		'#title' => 'Display',
+		'#options' => array(
+			'screen' => t('Screen'),
+			'csv' => t('CSV Export'),
+		),
+	);
+
 	$form['filters']['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -63,7 +72,7 @@ function sirius_ledger_node_tab_worker_ar_form($form, &$form_state, $worker_node
 
 	if (!$form_state['results']) {
 		$entries = sirius_ledger_ar_fetch(array('ledger_participant' => $contact_node->nid));
-		$form_state['results'] = sirius_ledger_ar_render($entries, array('hide_participant' => TRUE));
+		$form_state['results'] = sirius_ledger_ar_render($entries, array('hide_participant' => TRUE, 'hide_id' => TRUE));
 	}
 
 	$form['results'] = array('#markup' => $form_state['results']);
@@ -73,14 +82,15 @@ function sirius_ledger_node_tab_worker_ar_form($form, &$form_state, $worker_node
 
 function sirius_ledger_node_tab_worker_ar_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
-	$worker_node = node_load($form_state['worker_nid']);
+	$worker_nid = $form_state['worker_nid'];
+	$worker_node = node_load($worker_nid);
 	$contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
 
 	$params = array('ledger_participant' => $contact_node->nid);
 
 	if ($form_state['values']['charge_or_payment'] == 'charge') {
 		$params['ledger_amount_min'] = 0;
-	} else if ($form_state['values']['charge_or_payment'] == 'charge') {
+	} else if ($form_state['values']['charge_or_payment'] == 'payment') {
 		$params['ledger_amount_max'] = 0;
 	} else if ($form_state['values']['charge_or_payment'] == 'range') {
 		if (isset($form_state['values']['ledger_amount_max'])) { $params['ledger_amount_max'] = $form_state['values']['ledger_amount_max']; }
@@ -94,5 +104,6 @@ function sirius_ledger_node_tab_worker_ar_form_submit($form, &$form_state) {
 		$params['ledger_ts_max'] = strtotime($form_state['values']['ledger_date_max']);
 	}
 	$entries = sirius_ledger_ar_fetch($params);
-	$form_state['results'] = sirius_ledger_ar_render($entries, array('hide_id' => TRUE, 'hide_participant' => TRUE));
+
+	$form_state['results'] = sirius_ledger_ar_render($entries, array('filename' => "ar_$worker_nid.csv", 'display' => $form_state['values']['display'], 'hide_id' => TRUE, 'hide_participant' => TRUE));
 }

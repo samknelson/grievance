@@ -83,11 +83,15 @@ function sirius_ledger_ar_fetch($params = array()) {
 			$sql .= "order by ledger_ts desc ";
 		}
 	}
+	if ($params['limit']) {
+		$sql .= "limit " . $params['limit'];
+	}
 
 	$result = array();
 	$stmt = sirius_sql_query($sql, $sql_args);
 	if ($params['balance']) {
 		$hr = $stmt->fetchAssoc();
+		if (!$hr['s']) { $hr['s'] = 0; }
 		return $hr['s'];
 	}
 	while ($hr = $stmt->fetchAssoc()) {  $result[] = $hr; }
@@ -97,22 +101,42 @@ function sirius_ledger_ar_fetch($params = array()) {
 function sirius_ledger_ar_render($entries, $options = array()) {
 	if (!$entries) { return '<p>' . t('No A/R entries found.') . '</p>'; }
 	
-	$header = array(
-		'id' => 'Id',
-		'amount' => 'Amount',
-		'status' => 'Status',
-		'participant' => 'Participant',
-		'reference' => 'Reference',
-		'memo' => 'Memo',
-		'date' => 'Date',
-		'tools' => 'Tools',
-	);
-
+	if ($options['display'] == 'csv') {
+		$header = array(
+			'account' => 'Account',
+			'id' => 'Id',
+			'date' => 'Date',
+			'amount' => 'Amount',
+			'status' => 'Status',
+			'participant' => 'Participant',
+			'reference' => 'Reference',
+			'memo' => 'Memo',
+		);
+	} else {
+		$header = array(
+			'id' => 'Id',
+			'date' => 'Date',
+			'amount' => array('data' => 'Amount'),
+			'status' => array('data' => 'Status'),
+			'participant' => 'Participant',
+			'reference' => array('data' => 'Reference'),
+			'memo' => array('data' => 'Memo'),
+			'tools' => 'Tools',
+		);
+	}
 	$keys = array_keys($header);
 	foreach ($keys as $key) { 
 		if ($options["hide_$key"]) { unset($header[$key]); }
 	}
-	$header = array_values($header);
+
+	if ($options['display'] == 'csv') {
+		$fp = fopen('php://output', 'w');
+		$filename = $options['filename'];
+		if (!$filename) { $filename = 'ar.csv'; }
+		drupal_add_http_header('Content-Type', 'text/csv');
+		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		fputcsv($fp, array_values($header));
+	}
 
 	$rows = array();
 	$totals = array();
@@ -121,10 +145,12 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 		$row = array();
 
 		$tools = '';
-		if (!$options['hide_id']) { $row[] = $entry['ledger_id']; }
-		if (!$options['hide_amount']) { $row[] = '$' . number_format($entry['ledger_amount'], 2); }
-		if (!$options['hide_status']) { $row[] = $entry['ledger_status']; }
-		if (!$options['hide_participant']) {
+		if ($header['account']) { $row[] = $entry['account_title']; }
+		if ($header['id']) { $row[] = $entry['ledger_id']; }
+		if ($header['date']) { $row[] = date('Y-m-d H:i:s', $entry['ledger_ts']); }
+		if ($header['amount']) { $row[] = '$' . number_format($entry['ledger_amount'], 2); }
+		if ($header['status']) { $row[] = $entry['ledger_status']; }
+		if ($header['participant']) {
 			$row[] = $entry['participant_title'];
 			if ($entry['worker_nid']) {
 				$tools .= l('Worker', 'node/' . $entry['worker_nid'], array('attributes' => array('class' => array('tool-button'))));
@@ -132,23 +158,30 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 				$tools .= l('Participant', 'node/' . $entry['ledger_participant'], array('attributes' => array('class' => array('tool-button'))));
 			}
 		}
-		if (!$options['hide_reference']) {
+		if ($header['reference']) {
 			$row[] = $entry['reference_title'];
 			$tools .= l('Reference', 'node/' . $entry['ledger_reference'], array('attributes' => array('class' => array('tool-button'))));
 		}
-		if (!$options['hide_memo']) { $row[] = $entry['ledger_memo']; }
-		if (!$options['hide_date']) { $row[] = date('Y-m-d H:i:s', $entry['ledger_ts']); }
-		if (!$options['hide_tools']) { $row[] = $tools; }
+		if ($header['memo']) { $row[] = $entry['ledger_memo']; }
+		if ($header['tools']) { $row[] = $tools; }
 
-		$rows[$entry['account_title']][] = $row;
+		if ($options['display'] == 'csv') {
+			fputcsv($fp, $row); 
+		} else {
+			$rows[$entry['account_title']][] = $row;
+			$totals[$entry['account_title']] += $entry['ledger_amount'];
+		}
+	}
 
-		$totals[$entry['account_title']] += $entry['ledger_amount'];
+	if ($options['display'] == 'csv') { 
+		fclose($fp);
+		exit();
 	}
 
 	foreach ($rows as $account_title => $sub_rows) {
 		$html .= '<h2>' . $account_title . '</h2>';
-		$html .= theme_table(array('header' => $header, 'rows' => $sub_rows, 'attributes' => array('style' => 'table-layout: fixed;')));
 		$html .= 'Total: <strong>$' . number_format($totals[$account_title], 2) . '</strong>';
+		$html .= theme_table(array('header' => array_values($header), 'rows' => $sub_rows, 'attributes' => array('style' => 'table-layout: fixed;')));
 	}
 
 	return $html;
@@ -217,10 +250,13 @@ function sirius_ledger_ar_delete_by_reference($ledger_reference) {
 
 	$sql = 'delete from sirius_ledger_ar where ledger_reference = :ledger_reference ';
 	$stmt = sirius_sql_query($sql, array(':ledger_reference' => $ledger_reference));
+	$rowcount = $stmt->rowCount();
 
 	foreach ($to_update as $hr) {
 		sirius_ledger_balance_update($hr['ledger_participant'], $hr['ledger_account']);
 	}
+	
+	return $rowcount;
 }
 
 function sirius_ledger_ar_format_balance($balance) {

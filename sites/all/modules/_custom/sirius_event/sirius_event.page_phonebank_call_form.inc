@@ -43,7 +43,8 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	global $user;
 
 	drupal_add_js(drupal_get_path('module', 'sirius_event') . '/js/sirius_event.phonebank.js', 'file');
-	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/sirius_event.phonebank.css', 'file');
+	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/phonebank.css', 'file');
+	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/survey.css', 'file');
 
 	$form_state['event_nid'] = $event_nid;
 	$form_state['phone'] = $phone;
@@ -54,8 +55,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 	$prole_tid = $type_json['phonebank']['prole_tid'];
 	$pstatus_tid_to_call = $pstatus_tid = $event_json['phonebank']['pstatus_tid'];
 	$participant_nodes = sirius_event_phonebank_participants_by_phone($event_node, $prole_tid, $phone);
-	$survey_nid = $event_node->field_sirius_json_definition['und'][0]['target_id'];
-	$survey_node = node_load($survey_nid);
+	$survey_node = sirius_event_survey_get($event_node);
 	if (!$survey_node) { drupal_set_message("No survey!"); return array(); }
 	$survey_json = sirius_jsonfield_util_node_json_get($survey_node);
 	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
@@ -178,11 +178,14 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 
 	$form['#tree'] = TRUE;
 
-	$form['prefix'] = array('#markup' => '<div class="sirius-form" id="sirius_event_phonebank_survey"><table><tr>');
+	$form['prefix'] = array('#markup' => '<div class="sirius-form" id="sirius_event_phonebank_survey"><table class="columns_table"><tr>');
 	$form['prefix_col_1'] = array('#markup' => '<td valign="top" style="vertical-align: top;">');
 	$form['survey'] = $survey_form;
 	$form['survey']['survey_wrap_open'] = array('#markup' => '<div id="survey_wrap">', '#weight' => -9999);
 	$form['survey']['survey_wrap_close'] = array('#markup' => '</div>', '#weight' => 9999);
+	$form['instructions_toggle'] = array(
+		'#markup' => '<div class="instructions_toggle_wrap"><a href="#" class="instructions_toggle" id="sirius_ckstyles_script_instructions_toggle"></a></div>',
+	);
 	$form['suffix_col_1'] = array('#markup' => '</td>');
 
 	$form['prefix_col_2'] = array('#markup' => '<td width="35%" valign="top" style="vertical-align: top; border-left: 1px solid #333333; padding-left: 10px;">');
@@ -198,6 +201,12 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		$browserphone_params['omg']['callback_js_args'] = array($survey_json['omg']['pstatus']);
 	}
 	$form['phone_interface_html'] = array('#markup' => sirius_twilio_browserphone_render($browserphone_params));
+
+	if ($_REQUEST['face']) {
+		$faces_json = json_decode(file_get_contents('https://api.generated.photos/api/v1/faces?api_key=il8RmHi2DkXsw8JxLr6Dnw&page=2&per_page=1'), TRUE);
+		$html = '<img src="' . $faces_json['faces'][0]['urls'][3]['256'] . '" width="150" height="150" style="">';
+		$form['faces'] = array('#markup' => $html);
+	}
 
 	$participant_options = array();
 	$submit_disabled = FALSE;
@@ -255,7 +264,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		$form['pstatus'] = array(
 			'#type' => 'radios',
 			'#options' => $pstatuses,
-			'#title' => 'Status',
+			'#title' => '',
 			'#default_value' => $participant_node->field_sirius_event_pstatus['und'][0]['tid'],
 			'#prefix' => '<div id="pstatus_wrap">',
 			'#suffix' => '</div>',
@@ -343,7 +352,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		);
 	}
 
-	$form['suffix_col_2'] = array('#markup' => '</td');
+	$form['suffix_col_2'] = array('#markup' => '</td>');
 	$form['suffix'] = array('#markup' => '</tr></table></div>');
 
 	return $form;
@@ -360,6 +369,15 @@ function sirius_event_phonebank_prep_survey(&$form, $defaults, $settings) {
 				// unset($form[$key]['#markup']);
 				// $form[$key]['#attributes']['class'][] = 'sirius_quicksave';
 
+				if ($form[$key]['#prefix']) { $form[$key]['#prefix'] = '<div class="prefix_wrap"><div class="prefix">' . $form[$key]['#prefix'] . '</div></div>'; }
+				if ($form[$key]['#suffix']) { $form[$key]['#suffix'] = '<div class="suffix_wrap"><div class="suffix">' . $form[$key]['#suffix'] . '</div></div>'; }
+				if ($form[$key]['#title']) {
+					$form[$key]['#title'] = '<span class="title_wrap">' . $form[$key]['#title'] . '</span>';
+				}
+				if ($form[$key]['#description']) {
+					$form[$key]['#description'] = '<div class="sirius_ckstyles_script_instructions">' . $form[$key]['#description'] . '</div>';	
+				}
+
 				if ($settings['phonebank']['autosave']['field'] == 'Yes') {
 					$form[$key]['#ajax'] = array(
 						'callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax',
@@ -375,10 +393,12 @@ function sirius_event_phonebank_prep_survey(&$form, $defaults, $settings) {
 					}
 					else { $form[$key]['#default_value'] = $defaults[$key]; }
 				}
-				if ($form[$key]['#required']) {
-					unset($form[$key]['#required']);
-					$form[$key]['#title'] = '<strong>[' . t('Required') . ']</strong> ' . $form[$key]['#title'];
-					$form[$key]['#attributes']['class'][] = 'sirius_phonebank_field_required'; 
+				if (!$settings['skip_required']) {
+					if ($form[$key]['#required']) {
+						unset($form[$key]['#required']);
+						$form[$key]['#title'] = '<strong>[' . t('Required') . ']</strong> ' . $form[$key]['#title'];
+						$form[$key]['#attributes']['class'][] = 'sirius_phonebank_field_required'; 
+					}
 				}
 			} else if ($type == 'fieldset') {
 				sirius_event_phonebank_prep_survey($form[$key], $defaults[$key], $settings);

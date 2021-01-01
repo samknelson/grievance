@@ -977,3 +977,36 @@ function grievance_update_7044() {
   module_enable(array('shorten', 'shortener'), TRUE);
 }
 
+/**
+ * Create index on sirius_notes
+ */
+
+function grievance_update_7045() {
+  $sqls = array(
+    'create index sirius_notes_idx1 on field_data_field_sirius_notes (field_sirius_notes_value(512))',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
+
+/**
+ * Grant permission on use text format sirius_form_editor
+ */
+
+function grievance_update_7046() {
+
+  // Grant "grievance contract view" for anybody with 
+  print "Granting new permission [use text format sirius_form_editor] to anybody with permission [sirius] ...\n";
+  $roles = user_roles(FALSE, 'sirius');
+  foreach ($roles as $rid => $name) {
+    print "... granting [use text format sirius_form_editor] to [$name]\n";
+    user_role_grant_permissions($rid, array('use text format sirius_form_editor'));
+  }
+}
+

@@ -137,11 +137,19 @@ function sirius_feed_page_list($wizard_name) {
  ************************************************************************************************/
 
 /**
- * More or less anybody can access the landing page. But they can only see the feed lists that they have access to
+ * You have access to the feed landing page if you have access to at least one feed.
+ * @todo: This is pretty expensive. We should probably just create a permission of some kind.
  */
 
 function sirius_feed_page_landing_access() {
-	return user_access('sirius');
+	$all_info = sirius_wizard_info_all();
+	foreach ($all_info as $key => $info) {
+		if (!$info['feed']) { continue; }
+		$path = "sirius/feeds/$key";
+		if (drupal_valid_path($path)) { return TRUE; }
+	}
+
+	return FALSE;
 }
 
 function sirius_feed_page_landing() {
@@ -720,8 +728,54 @@ function sirius_feed_wizard_verify($info, $data, $feed_node, $current_step) { re
 
 function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
 	$form_state['info'] = $info;
+	$form_state['data'] = $data;
 	$form_state['feed_node'] = $feed_node;
 	$form_state['current_step'] = $current_step;
+
+	$form['verify_limit'] = array(
+		'#type' => 'textfield',
+		'#size' => 5,
+		'#title' => t('Records to Verify'),
+		'#description' => t('For very large imports, it may take too long to verify all records. Select the maximum number of records which should be verified.'),
+		'#required' => TRUE,
+		'#default_value' => 1000,
+	);
+
+	$form['precompute'] = array(
+		'#type' => 'select',
+		'#title' => t('Precompute?'),
+		'#options' => array(
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#description' => t('"Precompute" performs a more in-depth verification. For example, it will ensure that referenced taxonomy terms exist or that IDs are unique. However, it is computationally expensive, so for large imports it may be better to omit this option.'),
+		'#required' => TRUE,
+		'#default_value' => 'No',
+	);
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'Submit',
+	);
+
+	if ($data['verify_html']) {
+		$form['verify_html'] = array('#markup' => $data['verify_html']);
+	}
+
+	return $form;
+}
+
+function sirius_feed_wizard_verify_form_validate($form, &$form_state) {
+	if (! ($form_state['values']['verify_limit'] > 0)) {
+		form_set_error('verify_limit', 'Please make sure that at least one row is verified.');
+	}
+}
+
+function sirius_feed_wizard_verify_form_submit($form, &$form_state) {
+	$info = $form_state['info'];
+	$data = $form_state['data'];
+	$feed_node = $form_state['feed_node'];
+	$current_step = $form_state['current_step'];
 
 	// Preview
 	$reader = sirius_feed_spout_get_reader($feed_node);
@@ -747,52 +801,37 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$import_data = array();
 	$counts = array();
 	$callback = $info['feed']['callback_row_verify'];
+	$verify_limit = $form_state['values']['verify_limit'];
+	$precompute = ($form_state['values']['precompute'] == 'Yes');
 	foreach ($sheet->getRowIterator() as $row) {
 		++$count;
-		if ($count > 10000) { continue; }
+		if ($count > $verify_limit+2) { continue; }
 		if ($count == 1 && $data['header_row'] == 'Yes') { ++$count; continue; }
 		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 
-		$result = $callback($feed_node, $info, $data, $import_data_row, FALSE);
-
-		if ($result['success']) { $import_data_row['xxxsuccsssxxx'] = 'Yes'; } else { $import_data_row['xxxsuccsssxxx'] = 'No'; }
-		$import_data_row['xxxmsgxxx'] = $result['msg'];
-		foreach ($fields as $field_name => $field_info) {
-			$col = $data["map_$field_name"];
-			if ($col === NULL || $col === '') { 
-				unset($import_data_row[$field_name]);
-			}
+		$preview_data_row = array();
+		foreach ($import_header as $field_name => $field_info) {
+			$preview_data_row[$field_name] = $import_data_row[$field_name];
 		}
-		unset($import_data_row['xxxrawxxx']);
+
+		$result = $callback($feed_node, $info, $data, $import_data_row, $precompute);
+
+		if ($result['success']) { $preview_data_row['xxxsuccessxxx'] = 'Yes'; } else { $preview_data_row['xxxsuccessxxx'] = 'No'; }
+		$preview_data_row['xxxmsgxxx'] = $result['msg'];
 
 		++$counts[$result['msg']];
-		if ($counts[$result['msg']] == 6) { $import_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
-		if ($counts[$result['msg']] <= 6) { $import_data[] = $import_data_row; }
+		if ($counts[$result['msg']] == 6) { $preview_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
+		if ($counts[$result['msg']] <= 6) { $import_data[] = $preview_data_row; }
 	}
 	$data['rows'] = $count + 1;
-	$form_state['data'] = $data;
 
-	$html = "<h2>Summary</h2>";
+	$html = "<h2>Verification Summary</h2>";
 	$summary_rows = array();
 	foreach ($counts as $key => $value) { $summary_rows[] = array($key, $value); }
 	$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => array()));
-	$html .= "<h2>Preview</h2>";
+	$html .= "<h2>Records to Import</h2>";
 	$html .= theme_table(array('rows' => $import_data, 'header' => $import_header, 'attributes' => array()));
-	$form["preview"] = array('#markup' => $html);
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => 'Submit',
-	);
-
-	return $form;
-}
-
-function sirius_feed_wizard_verify_form_submit($form, &$form_state) {
-	$info = $form_state['info'];
-	$data = $form_state['data'];
-	$feed_node = $form_state['feed_node'];
-	$current_step = $form_state['current_step'];
+	$data['verify_html'] = $html;
 	sirius_wizard_submit($info, $data, $feed_node, $current_step, "Ready to Process.");
 }
 
@@ -819,6 +858,10 @@ function sirius_feed_wizard_process_form($form, &$form_state, $info, $data, $fee
 		'#type' => 'submit',
 		'#value' => 'Import Now',
 	);
+
+	if ($data['verify_html']) {
+		$form['verify_html'] = array('#markup' => $data['verify_html']);
+	}
 
 	return $form;
 }

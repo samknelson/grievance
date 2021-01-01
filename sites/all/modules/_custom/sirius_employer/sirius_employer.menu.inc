@@ -35,6 +35,13 @@ function sirius_employer_node_tabs() {
 function sirius_employer_menu() {
   $items = array();
 
+  $items['sirius/employer/list'] = array(
+    'title' => 'Employers',
+    'access callback' => 'sirius_employer_page_list_access',
+    'page callback' => 'sirius_employer_page_list',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/employer/me'] = array(
     'title' => 'Sirius: Employer: Me',
     'description' => '',

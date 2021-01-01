@@ -28,6 +28,31 @@ function sirius_event_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_event_participant']['sirius_event_participant_intake'] = array(
+    'title' => 'Intake',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_view_intake',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_intake/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_view_intake',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_intake/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_json_edit_intake',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+  );
+
   $node_tabs['sirius_event']['sirius_event_info'] = array(
     'title' => 'Info',
     'description' => '',
@@ -71,25 +96,9 @@ function sirius_event_node_tabs() {
   $node_tabs['sirius_event']['sirius_event_instance_participant_definition'] = array(
     'title' => 'Survey',
     'description' => '',
-    'callback' => 'sirius_event_instance_participant_definition',
-    'permissions' => array('sirius event admin'),
-    'weight' => 4,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_instance_participant_definition/select'] = array(
-    'title' => 'Select',
-    'description' => '',
     'callback' => 'sirius_event_instance_participant_definition_select',
     'permissions' => array('sirius event admin'),
-    'weight' => 1,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_instance_participant_definition/preview'] = array(
-    'title' => 'Preview',
-    'description' => '',
-    'callback' => 'sirius_event_instance_participant_definition_preview',
-    'permissions' => array('sirius event admin'),
-    'weight' => 2,
+    'weight' => 4,
   );
 
   $node_tabs['sirius_event']['sirius_event_phonebank'] = array(
@@ -149,6 +158,44 @@ function sirius_event_node_tabs() {
     'weight' => 6,
   );
 
+
+  $node_tabs['sirius_event']['sirius_event_map'] = array(
+    'title' => 'Map',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_map',
+    'permissions' => array('sirius'),
+    'weight' => 5,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_map/info'] = array(
+    'title' => 'Info',
+    'callback' => 'sirius_node_tab_event_map',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_map/view'] = array(
+    'title' => 'View',
+    'callback' => 'sirius_node_tab_event_map_view',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_map/list'] = array(
+    'title' => 'List',
+    'callback' => 'sirius_node_tab_event_map_list',
+    'permissions' => array('sirius'),
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_map/settings'] = array(
+    'title' => 'Settings',
+    'callback' => 'sirius_node_tab_event_map_settings',
+    'permissions' => array('sirius'),
+    'weight' => 4,
+  );
+
   $node_tabs['sirius_event']['sirius_event_class'] = array(
     'title' => 'Class',
     'description' => '',
@@ -171,6 +218,31 @@ function sirius_event_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_event_bullpen_self',
     'permissions' => array(),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_clone'] = array(
+    'title' => 'Clone',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_clone',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 10,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_clone/clone'] = array(
+    'title' => 'Clone',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_clone',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_clone/exim'] = array(
+    'title' => 'Export / Import',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_exim',
+    'permissions' => array('sirius domain admin'),
     'weight' => 2,
   );
 
@@ -236,6 +308,14 @@ function sirius_event_node_tabs() {
     'title' => 'Export / Import',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_definition_exim',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 4,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_form/preferences'] = array(
+    'title' => 'Preferences',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_preferences',
     'permissions' => array('sirius domain admin'),
     'weight' => 4,
   );
@@ -347,6 +427,14 @@ function sirius_event_term_tabs() {
     'title' => 'Phonebank',
     'description' => '',
     'callback' => 'sirius_event_term_tab_phonebank',
+    'permissions' => array('sirius event admin'),
+    'weight' => 4,
+  );
+
+  $term_tabs['sirius_event_type']['sirius_event_type_map'] = array(
+    'title' => 'Map',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_map',
     'permissions' => array('sirius event admin'),
     'weight' => 4,
   );
@@ -505,6 +593,37 @@ function sirius_event_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['sirius/modal/event/map/%/%'] = array(
+    'title'            => 'Participant Modal',
+    'page callback'    => 'sirius_event_map_modal',
+    'page arguments'   => array(4,5),
+    'access callback'   => 'sirius_event_map_modal_access',
+    'access arguments' => array(4,5),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
+  $items['sirius/modal/event/map-legend/%'] = array(
+    'title'            => 'Legend',
+    'page callback'    => 'sirius_event_map_modal_legend',
+    'page arguments'   => array(4),
+    'access callback'   => 'sirius_event_map_modal_legend_access',
+    'access arguments' => array(4),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
+  $items['sirius/ajax/event/map/poll/%'] = array(
+    'page callback'    => 'sirius_event_map_ajax_poll',
+    'page arguments'   => array(5),
+    'access callback'   => 'sirius_event_map_ajax_poll_access',
+    'access arguments' => array(5),
+    'type'             => MENU_CALLBACK,
+    'weight' => 20,
+  );
+
   return $items;
 }
 
@@ -515,11 +634,13 @@ function sirius_event_menu() {
 function sirius_event_modal_paths() {
   $paths = array();
 
-  /*
-  $paths['grievance/modal/%node/log-add'] = array(
-    'style' => 'grievance-modal-style',
+  $paths['sirius/modal/event/map/%/%'] = array(
+    'style' => 'sirius-event-modal-style',
   );
-  */
+
+  $paths['sirius/modal/event/map-legend/%'] = array(
+    'style' => 'sirius-event-modal-style',
+  );
 
   return $paths;
 }
@@ -527,15 +648,13 @@ function sirius_event_modal_paths() {
 function sirius_event_modal_styles() {
   $styles = array();
 
-  /*
-  $styles['grievance-modal-style'] = array(
+  $styles['sirius-event-modal-style'] = array(
     'modalSize' => array(
       'type' => 'fixed',
-      'width' => 500,
-      'height' => 350,
+      'width' => 1000,
+      'height' => 800,
     ),
   );
-  */
 
   return $styles;
 }

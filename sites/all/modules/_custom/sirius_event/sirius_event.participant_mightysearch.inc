@@ -20,7 +20,7 @@ function sirius_event_page_participant_mightysearch_form($form, &$form_state, $e
 	$contact_definition_json = sirius_contact_definition();
 	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
 
-	$participant_definition_node = node_load($event_node->field_sirius_json_definition['und'][0]['target_id']);
+	$participant_definition_node = sirius_event_survey_get($event_node);
 	if ($participant_definition_node) { 
 		$participant_definition_json = sirius_jsonfield_util_node_json_get($participant_definition_node);
 		$participant_definition_form = sirius_jsonfield_util_form_get($participant_definition_json, 'default');

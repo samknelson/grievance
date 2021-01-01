@@ -111,15 +111,15 @@ function sirius_wizard_content_default($info, $data, $node, $current_step) {
 
 function sirius_wizard_data($info, $node) {
 	$wizard_name = $info['name'];
-	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_jsonfield_util_node_json_get($node);
 	return $json['wizard'][$wizard_name];
 }
 
 function sirius_wizard_data_set($info, &$node, $data) {
 	$wizard_name = $info['name'];
-	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_jsonfield_util_node_json_get($node);
 	$json['wizard'][$wizard_name] = $data;
-	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
+	sirius_jsonfield_util_node_json_set($node, $json);
   node_object_prepare($node);
   $node = node_submit($node);
 	return node_save($node);
@@ -155,7 +155,7 @@ function sirius_sirius_wizard_info() {
   $items['feed_worker_skill'] = array(
     'name' => 'feed_worker_skill',
     'title' => 'Worker Skills',
-    'description' => 'Create or upload worker skills and expireation dates.',
+    'description' => 'Create or upload worker skills and expiration dates.',
     'steps' => array(
 			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
 			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
@@ -193,6 +193,7 @@ function sirius_sirius_wizard_info() {
   $items += sirius_feed_wws_info();
   $items += sirius_feed_employee_info();
   $items += sirius_feed_hours_info();
+  $items += sirius_feed_user_info();
 
   return $items;
 }

@@ -108,3 +108,10 @@ function sirius_event_paccess_options($event_type_term, $settings = array()) {
   }
   return $paccess_options;
 }
+
+function sirius_event_rule_widget_exists($rules, $widget) {
+  foreach ($rules as $delta => $rule) {
+    if ($rule['widget'][$widget]) { return TRUE; }
+  }
+  return FALSE;
+}

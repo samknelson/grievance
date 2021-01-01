@@ -133,6 +133,13 @@ function sirius_worker_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_contact/customfields'] = array(
+    'title' => 'Custom Fields',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_contact_customfields',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 2,
+  );
 
   $node_tabs['sirius_worker']['sirius_worker_industry'] = array(
     'title' => 'Industries',
@@ -349,6 +356,13 @@ function sirius_worker_menu() {
     'title' => 'Time-Off Sick',
     'access callback' => 'sirius_worker_page_schedule_tos_access',
     'page callback' => 'sirius_worker_page_schedule_tos',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/worker/list'] = array(
+    'title' => 'Workers',
+    'access callback' => 'sirius_worker_page_list_access',
+    'page callback' => 'sirius_worker_page_list',
     'type' => MENU_NORMAL_ITEM,
   );
 

@@ -22,6 +22,7 @@ function sirius_page_contacts_form($form, &$form_state) {
 			'export' => array('title' => 'Export'),
 			'report' => array('title' => 'Report'),
 			'tag' => array('title' => 'Add / Remove Tags'),
+			'geocode' => array('title' => 'Geocode'),
 			'delete' => array('title' => 'Delete'),
 		)
 	);

@@ -241,3 +241,17 @@ function sirius_domain_usermanage_admin() {
 
   return system_settings_form($form);
 }
+
+/**
+ * Modify the user view to show only the roles that we have access to within the domain user manager
+ */
+
+function sirius_domain_users_view_form_alter(&$form, &$form_state) {
+	$roles = user_roles();
+	foreach ($roles as $rid => $role) {
+		$avail = variable_get("sirius_domain_userrmanage_$rid", 'omit');
+		if ($avail == 'omit') { 
+			unset($form['rid']['#options'][$rid]);
+		}
+	}
+}

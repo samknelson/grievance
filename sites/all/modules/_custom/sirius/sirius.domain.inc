@@ -75,9 +75,21 @@ function sirius_domain($new_domain_nid = NULL) {
 function sirius_domain_component_info_all() {
   // @todo: Implement a complicate and hard to follow system of callbacks so that each module defines its own components.
   return array(
+    'worker' => array(
+      'title' => 'Worker',
+      'description' => 'Use the worker database',
+    ),
+    'employer' => array(
+      'title' => 'Employer',
+      'description' => 'Use the employer database',
+    ),
     'activist:phonebank:prescan' => array(
       'title' => 'Activist - Phonebank - Prescan',
       'description' => 'For a given phonebank, enable the "prescan" function, allowing phonebank admins to remove invalid phone numbers.',
+    ),
+    'mapping' => array(
+      'title' => 'Mapping',
+      'description' => 'Enable geocoding and map generation.'
     ),
   );
 }

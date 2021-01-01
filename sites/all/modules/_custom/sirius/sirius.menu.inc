@@ -94,19 +94,14 @@ function sirius_node_tabs() {
     'permissions' => array('sirius ledger admin'),
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_letter'] = array(
-    'title' => 'Letters',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_letter',
-    'permissions' => array('sirius admin'),
-  );
-
-  $node_tabs['grievance']['grievance_letter'] = array(
-    'title' => 'Letters',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_letter',
-    'permissions' => array('sirius admin'),
-  );
+  foreach (sirius_letter_content_types_all() as $content_type => $content_type_name) {
+    $node_tabs[$content_type][$content_type . '_letter'] = array(
+      'title' => 'Letters',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_letter',
+      'permissions' => array('sirius domain admin'),
+    );
+  }
 
   $node_tabs['grievance_letter_template']['sirius_letter_template_recipients'] = array(
     'title' => 'Recipients',
@@ -810,6 +805,15 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/map/admin'] = array(
+    'title' => 'Map Settings',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_map_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/contact/resync/all'] = array(
     'title' => 'Resync All Contacts',
     'description' => '',
@@ -936,6 +940,24 @@ function sirius_menu() {
     'page arguments' => array(1),
     'type' => MENU_NORMAL_ITEM,
   );
+
+  $items['user/%/current_location'] = array(
+    'title' => 'Current Location',
+    'page callback' => 'sirius_user_tab_map_current_location',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_user_tab_map_current_location_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+
+  $items['sirius/ajax/map/current_location/checkin'] = array(
+    'page callback'    => 'sirius_map_current_location_checkin',
+    'page arguments'   => array(),
+    'access arguments' => array('sirius'),
+    'type'             => MENU_CALLBACK,
+  );
+
 
   return $items;
 }

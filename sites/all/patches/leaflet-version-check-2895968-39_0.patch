@@ -1,0 +1,18 @@
+diff --git a/leaflet.module b/leaflet.module
+index 74ada78..4ce4622 100644
+--- a/leaflet.module
++++ b/leaflet.module
+@@ -53,9 +53,10 @@ function leaflet_libraries_info() {
+     'vendor url' => 'http://leafletjs.com/',
+     'download url' => 'http://cdn.leafletjs.com/leaflet/v1.0.2/leaflet.zip',
+     'version arguments' => array(
+-      'file' => 'leaflet.js',
+-      // Handle patterns like  version: "1.0.2+4bbb16c"
+-      'pattern' => '/version[=: ]*[\'"]([\d+\.]+[\-a-z\.\d]*)[\'"]/',
++      'file' => 'leaflet-src.js',
++      // Handle patterns like "version: '1.0.2+4bbb16c'" or
++      // "version = '1.0.2+HEAD.4bbb16c';".
++      'pattern' => '/version[=: ]*[\'"]([\d+\.]+[\-\w\.\d]*)[\'"]/',
+     ),
+     'files' => array(
+       'js' => array(

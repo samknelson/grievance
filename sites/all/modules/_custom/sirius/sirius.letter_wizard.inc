@@ -67,14 +67,7 @@ function sirius_letter_wizard_which_form($form, &$form_state, $info, $data, $let
 		} 
 	}
 
-	$format_options = array(
-		NULL => t('-- Select --'),
-		'email' => t('Email'),
-		'pdf' => t('PDF Download'),
-	);
-	if (sirius_fax_enabled()) { $format_options['fax'] = t('Fax'); }
-	if (sirius_sms_enabled()) { $format_options['sms'] = t('SMS Text Message'); }
-
+	$format_options = array(NULL => t('-- Select --')) + sirius_letter_format_options($entity_node);
 	$form["format"] = array(
 		'#type' => 'select',
 		'#title' => t('Format'),
@@ -428,6 +421,7 @@ function sirius_letter_wizard_body_form_validate($form, &$form_state) {
 	  }
 	}
 }
+
 function sirius_letter_wizard_body_form_submit($form, &$form_state) {
 	$info = $form_state['info'];
 	$data = $form_state['data'];
@@ -451,11 +445,7 @@ function sirius_letter_wizard_body_form_submit($form, &$form_state) {
 	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
 
 	$data['subject'] = $form_state['values']['subject'];
-	if ($data['format'] == 'sms') {
-	  $data['body'] = $form_state['values']['body'];
-	} else {
-	  $data['body'] = $form_state['values']['body']['value'];
-	}
+	$data['body'] = sirius_richtext_handle_input($form_state['values']['body']);
   $data['pdf_body'] = $form_state['values']['pdf_body']['value'];
   $data['pdf_letterhead'] = $form_state['values']['pdf_letterhead'];
   $data['upload_others'] = $form_state['values']['upload_others'];
@@ -1010,134 +1000,4 @@ function sirius_letter_wizard_review($info, $data, $letter_node, $current_step) 
 	}
 
 	return array('markup' => array('#markup' => $html));
-}
-
-/************************************************************************************************
- * Utility Functions
- ************************************************************************************************/
-
-function sirius_letter_permission_check($letter_template_node) {
-	global $user;
-
-	// Admin can send any letter
-	if (user_access('sirius admin')) { return TRUE; }
-
-	// @todo Legacy - grievance admin can send any letter
-	if (user_access('grievance admin')) { return TRUE; }
-
-	// No permissions set, return false
-	if (!isset($letter_template_node->field_grievance_roles['und'])) { return FALSE; }
-
-	// Does the user have nay of the specified roles?
-	$user_roles = array_keys($user->roles);
-	$letter_roles = sirius_fieldvals($letter_template_node, 'field_grievance_roles', 'value');
-	if (array_intersect($user_roles, $letter_roles)) { return TRUE; }
-
-	// Apparently not.
-	return FALSE;
-}
-
-function sirius_letter_template_list($entity_node) {
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_letter_template');
-  $query->fieldCondition('field_sirius_letter_content_type', 'value', $entity_node->type);
-  $domain_nid = sirius_domain_nid();
-  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
-  $query->propertyOrderBy('title');
-  $stmt = $query->execute();
-  if (!$stmt['node']) { return array(); }
-	$letter_template_nodes = node_load_multiple(array_keys($stmt['node']));
-
-	$letter_template_nodes_with_access = array();
-	foreach ($letter_template_nodes as $letter_template_nid => $letter_template_node) {
-		if (sirius_letter_permission_check($letter_template_node)) { $letter_template_nodes_with_access[$letter_template_nid] = $letter_template_node; }
-  }
-
-  return $letter_template_nodes_with_access;
-}
-
-function sirius_letter_pdf_basename($letter_node) {
-	$wizard_name = 'letter';
-	$info = sirius_wizard_info($wizard_name);
-	$data = sirius_wizard_data($info, $letter_node);
-	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
-	$first_letter_template_node = node_load($data['letter_template_nid_0']);
-
-	$basename = '';
-
-	if ($entity_node->type == 'grievance') {
-		if ($entity_node->field_grievance_last_name['und'][0]['value']) {
-			$tmp = strtolower($entity_node->field_grievance_last_name['und'][0]['value']);
-			$tmp = preg_replace('/[^a-z]/', '', $tmp);
-			if ($tmp) { $basename .= $tmp . '_'; }
-		}
-		if ($entity_node->field_grievance_first_name['und'][0]['value']) {
-			$tmp = strtolower($entity_node->field_grievance_first_name['und'][0]['value']);
-			$tmp = preg_replace('/[^a-z]/', '', $tmp);
-			if ($tmp) { $basename .= $tmp . '_'; }
-		}
-		if ($entity_node->field_grievance_id['und'][0]['value']) {
-			$tmp = strtolower($entity_node->field_grievance_id['und'][0]['value']);
-			$tmp = preg_replace('/[^a-z0-9]/', '', $tmp);
-			if ($tmp) { $basename .= $tmp . '_'; }
-		}
-	} else {
-		$tmp  = strtolower($entity_node->title);
-		$tmp = preg_replace('/[^a-z]/', '', $tmp);
-		if ($tmp) { $basename .= $tmp . '_'; }
-		if ($entity_node->field_sirius_id['und'][0]['value']) {
-			$tmp = strtolower($entity_node->field_sirius_id['und'][0]['value']);
-			$tmp = preg_replace('/[^a-z0-9]/', '', $tmp);
-			if ($tmp) { $basename .= $tmp . '_'; }
-		}
-	}
-
-	if ($first_letter_template_node->field_grievance_shortname['und'][0]['value']) {
-		$tmp = strtolower($first_letter_template_node->field_grievance_shortname['und'][0]['value']);
-		$tmp = preg_replace('/[^a-z0-9]/', '', $tmp);
-		if ($tmp) { $basename .= $tmp . '_'; }
-	}
-	$basename .= date('Ymd');
-
-	return $basename;
-}
-
-function sirius_letter_pdf_contents($letter_node) {
-	$wizard_name = 'letter';
-	$info = sirius_wizard_info($wizard_name);
-	$data = sirius_wizard_data($info, $letter_node);
-	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
-	if (strlen($data['pdf_body']) < 100) { return ''; }
-
-	$url .= sirius_loopback_url() . '/sirius/loopback/echo';
-	$params = array();
-	$params['post']['body'] = '<div id="grievance-letter-body">' . $data['pdf_body'] . '</div>';
-	$params['letterhead'] = $data['pdf_letterhead'];
-	return sirius_pdf_generate($url, $params);
-
-	$html_path = DRUPAL_ROOT . '/sites/default/files/private/grievance_gform/' . $basename . '.html';
-	$pdf_path = DRUPAL_ROOT . '/sites/default/files/private/grievance_gform/' . $basename . '.pdf';
-}
-
-function sirius_letter_set_title($letter_node, $status = NULL, $sent_ts = NULL) {
-	$wizard_name = 'letter';
-	$info = sirius_wizard_info($wizard_name);
-	$data = sirius_wizard_data($info, $letter_node);
-	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
-
-	if (!$status) { $status = $letter_node->field_sirius_type['und'][0]['value']; }
-	if (!$sent_ts) { $sent_ts = $data['sent_ts']; }
-
-	$letter_title = '';
-  for ($i=0; $i<5; ++$i) {
-  	$letter_template_nid = $data["letter_template_nid_$i"];
-		if (!$letter_template_nid) { continue; }
-		$letter_template_node = node_load($letter_template_nid);
- 		$letter_title .= $letter_template_node->title . ' / ';
-	}
-	$letter_title .= $status;
-	if ($data['sent_ts']) { $letter_title .= ' ' . date('Y-m-d H:i:s', $sent_ts); }
-
-	$letter_node->title = $letter_title;
 }

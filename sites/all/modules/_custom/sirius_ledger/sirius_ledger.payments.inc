@@ -44,7 +44,7 @@ function sirius_ledger_payer_type($payer_node_type) {
 }
 
 function sirius_ledger_payment_clear($payment_nid) {
-	sirius_ledger_ar_delete_by_reference($payment_nid);
+	return sirius_ledger_ar_delete_by_reference($payment_nid);
 }
 
 function sirius_ledger_payment_memo($payment_node) {
@@ -60,3 +60,25 @@ function sirius_ledger_payment_memo($payment_node) {
 	$memo = substr($memo, 0, 255);
 	return $memo;
 }
+
+function sirius_ledger_payment_allocate_simple($payment_node) {
+	sirius_ledger_payment_clear($payment_node->nid);
+
+	$entry = array();
+	$entry['ledger_amount'] = $payment_node->field_sirius_dollar_amt['und'][0]['value'];
+	$entry['ledger_account'] = $payment_node->field_sirius_ledger_account['und'][0]['target_id'];
+	$entry['ledger_status'] = $payment_node->field_sirius_payment_status['und'][0]['value'];
+	$payment_type_term = taxonomy_term_load($payment_node->field_sirius_payment_type['und'][0]['tid']);
+	$payer_node = node_load($payment_node->field_sirius_payer['und'][0]['target_id']);
+	$entry['ledger_memo'] = sirius_ledger_payment_memo($payment_node);
+	$entry['ledger_ts'] = sirius_fieldval($payment_node, 'field_sirius_datetime', 'ts');
+	$entry['ledger_reference'] = $payment_node->nid;
+	$entry['ledger_participant'] = $payer_node->nid;
+
+	sirius_ledger_ar_insert($entry);
+
+	$payment_node->field_sirius_ledger_allocated['und'][0]['value'] = 'Yes';
+	$payment_node->revision;
+	node_save($payment_node);
+}
+

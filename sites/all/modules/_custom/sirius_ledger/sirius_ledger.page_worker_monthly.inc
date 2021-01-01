@@ -17,22 +17,23 @@ function sirius_ledger_node_tab_worker_monthly_form($form, &$form_state, $worker
 		),
 	);
 
-	/*
 	$form['action'] = array(
 		'#type' => 'select',
 		'#title' => t('Action'),
 		'#required' => TRUE,
 		'#options' => array(
-			'worker' => t('Compute for this worker'),
+			'generate' => t('Generate or update monthly dues charge'),
+			'cancel' => t('Cancel any existing monthly dues charge'),
 		),
+		'#default_value' => 'generate',
 	);
-	*/
 
 	$form['trigger'] = array(
 		'#type' => 'select',
 		'#title' => t('Trigger'),
 		'#required' => TRUE,
 		'#options' => sirius_ledger_policy_trigger_options('month'),
+		// '#states' => array('visible' => array(array(":input[name=\"action\"]" => array('value' => 'generate')))),
 	);
 
 	$form['date'] = array(
@@ -54,14 +55,13 @@ function sirius_ledger_node_tab_worker_monthly_form($form, &$form_state, $worker
 	return $form;
 }
 
-
-
-
 function sirius_ledger_node_tab_worker_monthly_form_submit($form, &$form_state) {
 	$worker_nid = $form_state['worker_nid'];
 	$form_state['rebuild'] = TRUE;
 	$ts = strtotime($form_state['values']['date']);
 	if ($ts <= 1) { $ts = NULL; }
-	sirius_ledger_monthly_charge_worker($worker_nid, $form_state['values']['mode'], $form_state['values']['trigger'], $ts);
+
+	$action = $_REQUEST['action'];
+	sirius_ledger_monthly_charge_worker($worker_nid, $form_state['values']['mode'], $form_state['values']['trigger'], $ts, $action);
 }
 

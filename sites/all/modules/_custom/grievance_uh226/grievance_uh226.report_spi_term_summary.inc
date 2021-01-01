@@ -121,7 +121,7 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups, $
   }
 
   // 1st call?
-  $first_call_log_type_tid = variable_get('grievance_log_first_call_type', '');
+  $first_call_log_type_tid = sirius_get_special_tid("grievance_log_types|first_call"); 
   $from_date = date('Y-m-d 00:00:00', strtotime($values['from_date']));
   $to_date = date('Y-m-d 00:00:00', strtotime($values['to_date']));
   $query = new EntityFieldQuery;
@@ -157,8 +157,8 @@ function grievance_uh226_report_spi_term_summary_nid($grievance_nid, $lookups, $
   // no_boa_held
   // boa_held
   $log_update_tids = array(
-    variable_get('grievance_log_insert_type', ''), 
-    variable_get('grievance_log_update_type_with_status_change', ''), 
+    sirius_get_special_tid('grievance_log_types|insert'), 
+    sirius_get_special_tid('grievance_log_types|update_with_status_change'), 
   );
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
@@ -302,8 +302,8 @@ function grievance_uh226_report_spi_term_summary_lookups() {
     'won_tids'                 => $won_tids,
     'lost_tids'                => $lost_tids,
 		'boa_held_status_tids' 						=> $boa_held_status_tids,
-    'spi_log_type_tid'                => variable_get('grievance_log_spi_type', ''),
-    'term_log_type_tid'               => variable_get('grievance_log_term_type', ''),
+    'spi_log_type_tid'                => sirius_get_special_tid("grievance_log_types|spi"),
+    'term_log_type_tid'               => sirius_get_special_tid("grievance_log_types|term"),
     'communication_log_type_tids'     => $communication_log_type_tids,
   );
 

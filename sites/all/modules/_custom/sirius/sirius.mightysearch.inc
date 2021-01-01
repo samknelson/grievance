@@ -160,11 +160,13 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 
   	$event_node = node_load($json_forms['sirius_event_participant']['event_nid']);
 		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
-		$is_phonebank = sirius_event_phonebank_enabled_type($event_type_term);
+		$is_phonebank = (sirius_event_phonebank_enabled_type($event_type_term) || sirius_event_map_enabled_type($event_type_term));
 		if ($is_phonebank) {
 	  	$paths[':sirius_event_participant:phonebank:caller:name'] = ':sirius_event_participant:phonebank:caller:name';
 	  	$paths[':sirius_event_participant:phonebank:caller:mail'] = ':sirius_event_participant:phonebank:caller:mail';
 	  	$paths[':sirius_event_participant:phonebank:caller:uid'] = ':sirius_event_participant:phonebank:caller:uid';
+	  	$paths[':sirius_event_participant:phonebank:first_call:ts'] = ':sirius_event_participant:phonebank:first_call';
+	  	$paths[':sirius_event_participant:phonebank:last_call:ts'] = ':sirius_event_participant:phonebank:last_call';
 		}
   }
   if ($json_forms['sirius_bulk']) {
@@ -326,6 +328,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 	if ($actions['bulk_recipient_remove']) { $action_options['bulk_recipient_remove'] = $actions['bulk_recipient_remove']['title']; }
 	if ($actions['delete']) 						{ $action_options['delete'] = $actions['delete']['title']; }
 	if ($actions['report']) 						{ $action_options['report'] = $actions['report']['title']; }
+	if ($actions['geocode']) 						{ $action_options['geocode'] = $actions['geocode']['title']; }
 	if (user_access('sirius admin')) 		{ $action_options['sql'] = 'Display SQL Query'; }
 
 	$form['mightysearch_results']['action'] = array(
@@ -384,7 +387,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		}
 	}
 
-	if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove']) {
+	if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove'] || $action_options['geocode']) {
 		if ($count_total > $count) {
 			$form['mightysearch_results']['results_select_allxyz'] = array(
 				'#type' => 'checkbox', 
@@ -398,6 +401,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 							array('value' => 'delete'),
 							array('value' => 'bulk_recipient_add'),
 							array('value' => 'bulk_recipient_remove'),
+							array('value' => 'geocode'),
 						),
 					),
 				),
@@ -559,6 +563,8 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 			}
 
 		} else if ($which_form == 'phonebank') {
+			list ($field_name, $column) = explode(':', $path);
+			if ($field_name == 'first_call' || $field_name == 'last_call') { $value = strtotime($value); }
 			$path_for_query = '$.' . $which_form . '.' . preg_replace('/:/', '.', $path);
 			if ($criterion) { $where_name = "lower(json_unquote(json_extract(participant_json.field_sirius_json_value, '$path_for_query'))) "; }
 		} else {
@@ -959,7 +965,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	// Batch
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete' || $action == 'bulk_recipient_add' || $action == 'bulk_recipient_remove') {
+	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete' || $action == 'bulk_recipient_add' || $action == 'bulk_recipient_remove' || $action == 'geocode') {
 		if ($action == 'delete' && !$form_state['values']['mightysearch_results']['delete_confirm']) {
 			drupal_set_message("Please check the confirmation box.", 'error');
 			return;
@@ -1098,6 +1104,23 @@ function sirius_mightysearch_batch($chunk, $params, &$context) {
 			$result = sirius_bulk_recipient_remove($bulk_nid, $contact_nid);
 		}
 
+		if ($action_name == 'geocode') {
+			$contact_node = node_load($contact_nid);
+			if ($contact_node->field_sirius_address_geo['und'][0]['lat']) {
+				$result = array('success' => FALSE, 'msg' => 'Already geocoded.');
+			} else if (!$contact_node->field_sirius_address['und'][0]['thoroughfare']) {
+				$result = array('success' => FALSE, 'msg' => 'Address is incomplete.');
+			} else {
+				$contact_node->field_sirius_address['und'][0]['data']++;
+				node_save($contact_node);
+				if ($contact_node->field_sirius_address_geo['und'][0]['lat']) {
+					$result = array('success' => TRUE);
+				} else {
+					$result = array('success' => FALSE, 'msg' => 'Geocoding failed.');
+				}
+			}
+		}
+
 		if ($result['success']) {
 			$context['results']['success']++;
 			$context['results']['successes'][$result['msg']]++;
@@ -1161,7 +1184,11 @@ function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
 			} 
 		} else if ($which_form == 'phonebank') {
 			list ($field_name, $column) = explode(':', $path);
-			return $json[$which_form][$field_name][$column];
+			if ($field_name == 'first_call' || $field_name == 'last_call') {
+				return date('Y-m-d H:i:s', $json[$which_form][$field_name][$column]);
+			} else {
+				return $json[$which_form][$field_name][$column];
+			}
 		} else {
 			$json_form = $json_forms[$node_type][$which_form];
 			$json_results = sirius_jsonfield_util_results_get($json, $which_form);

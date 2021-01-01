@@ -28,7 +28,7 @@ function sirius_node_tab_worker_skill_add_form($form, &$form_state, $worker_node
 	}
 
 	$form['b1'] = array('#markup' => '<h2>' . t('Add New Skills') . '</h2>');
-	$form['b2'] = array('#markup' => '<table>');
+	$form['b2'] = array('#markup' => '<table class="sirius_data_table">');
 	$form['b2x'] = array('#markup' => '<tr><th>Skill</th><th>Expiration Date</th></tr>');
 	for ($delta = 1; $delta < 10; ++$delta) {
 		$form[$delta]['tr_open'] = array('#markup' => '<tr>');

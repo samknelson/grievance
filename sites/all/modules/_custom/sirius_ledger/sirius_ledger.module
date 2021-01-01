@@ -39,6 +39,20 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_transmittal.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_list_workers.inc';
 
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.term_tab_payment_type_settings.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.report_discrepancy.inc';
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function sirius_ledger_report_cache_info() {
+  $items = array();
+  $items += sirius_ledger_report_discrepancy_info();
+  return $items;
+}
+
 /**
  * Implements hook_cron
  */

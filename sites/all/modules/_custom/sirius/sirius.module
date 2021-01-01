@@ -47,6 +47,10 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.do_not_disturb.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.server_paths.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.shortlink.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.quickhash.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.richtext.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.map.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -57,6 +61,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_hours.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_employee.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_user.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_materials.inc';
@@ -328,6 +333,11 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   // Restrict views exposed filters
   if ($form_id == 'views_exposed_form') {
     sirius_domain_form_restrict($form);
+  }
+
+  // View-specific modifications
+  if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'sirius_domain_users') {
+    sirius_domain_users_view_form_alter($form, $form_state); 
   }
 }
 

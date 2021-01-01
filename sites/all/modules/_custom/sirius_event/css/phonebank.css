@@ -16,22 +16,6 @@
 	float: right;
 }
 
-#sirius_quicksave_msg {
-	font-weight: bold;
-}
-
-.sirius_quicksave_active {
-	color: #009900;
-}
-
-.sirius_quicksave_ready {
-	color: #000099;
-}
-
-.sirius_quicksave_error {
-	color: #990000;
-}
-
 #sirius-node-tab-event-phonebank-call-form input.form-submit, 
 #sirius-node-tab-event-phonebank-call-form input.form-submit.ajax-processed {
 	margin: 0;
@@ -48,3 +32,29 @@
 #sirius-node-tab-event-phonebank-call-form input.form-submit:disabled {
 	background-color: #666666;
 }
+
+#sirius_event_phonebank_survey .instructions_toggle_wrap {
+	margin-top: 10px;
+}
+
+.sirius_fullpage #main-content #content {
+	margin-top: 10px;
+}
+
+#sirius_event_phonebank_survey .columns_table,
+#sirius_event_phonebank_survey .columns_table tr,
+#sirius_event_phonebank_survey .columns_table td {
+	border: 2px solid #5984be;
+}
+
+#sirius_event_phonebank_survey .columns_table td {
+	padding: 10px;
+}
+
+#sirius_event_phonebank_survey .columns_table table,
+#sirius_event_phonebank_survey .columns_table table tr,
+#sirius_event_phonebank_survey .columns_table table td {
+	border: 0;
+	padding: 0;
+}
+
