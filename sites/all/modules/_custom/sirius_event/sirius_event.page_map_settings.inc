@@ -8,6 +8,7 @@ function sirius_node_tab_event_map_settings_access($event_node) {
 	$participant_node = node_load($participant_nid);
 	$type_json = sirius_event_type_json($event_node);
 	$prole_tid = $participant_node->field_sirius_event_prole['und'][0]['tid'];
+	if (!$type_json['map']['admin_prole_tids']) { return FALSE; }
 	$admin_prole_tids = array_values($type_json['map']['admin_prole_tids']);
 	if (!in_array($prole_tid, $admin_prole_tids)) { return FALSE; }
 
