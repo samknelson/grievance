@@ -95,6 +95,8 @@ function sirius_feed_user_options_form_submit($form, &$form_state) {
 }
 
 function sirius_feed_user_row_verify($feed_node, $info, $data, &$row, $precompute) {
+  if ($row['xxxrowcountxxx'] > 100) { return array('success' => FALSE, 'msg' => 'Only 100 users can be uploaded at a time.'); }
+
   $pk = $data['pk'];
   if (!$pk) { $pk = 'mail'; }
 
@@ -122,7 +124,6 @@ function sirius_feed_user_row_verify($feed_node, $info, $data, &$row, $precomput
       if ($probe->field_sirius_domain['und'][0]['target_id'] != $domain_nid) { return array('success' => FALSE, 'msg' => 'A user with that name already exists in another domain.'); }
       if ($probe && ($probe->uid != $uid)) { return array('success' => FALSE, 'msg' => 'A user with that name already exists, but with a different email address.'); }
     }
-
   } 
 
   return array('success' => TRUE, 'msg' => 'Looks good.');
