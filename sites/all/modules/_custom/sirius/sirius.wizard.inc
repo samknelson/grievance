@@ -193,6 +193,7 @@ function sirius_sirius_wizard_info() {
   $items += sirius_feed_wws_info();
   $items += sirius_feed_employee_info();
   $items += sirius_feed_hours_info();
+  $items += sirius_feed_user_info();
 
   return $items;
 }

@@ -61,6 +61,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_hours.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_employee.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_user.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_materials.inc';
