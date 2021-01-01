@@ -941,6 +941,24 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['user/%/current_location'] = array(
+    'title' => 'Current Location',
+    'page callback' => 'sirius_user_tab_map_current_location',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_user_tab_map_current_location_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+
+  $items['sirius/ajax/map/current_location/checkin'] = array(
+    'page callback'    => 'sirius_map_current_location_checkin',
+    'page arguments'   => array(),
+    'access arguments' => array('sirius'),
+    'type'             => MENU_CALLBACK,
+  );
+
+
   return $items;
 }
 
