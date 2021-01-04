@@ -91,6 +91,10 @@ function sirius_domain_component_info_all() {
       'title' => 'Mapping',
       'description' => 'Enable geocoding and map generation.'
     ),
+    'mapping:checkin' => array(
+      'title' => 'Mapping - Checkin',
+      'description' => 'Enable users to "check in" with their current location, so that domain admins can follow their movements on maps.',
+    ),
   );
 }
 
