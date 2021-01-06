@@ -85,8 +85,6 @@ function sirius_letter_admin() {
   );
   if (variable_get($name)) { $form[$name]['#default_value'] = variable_get($name); }
 
-  $form['markup'] = array('#markup' => '<em>There are currently no letter configuration options.</em>');
-
   return system_settings_form($form);
 }
 
