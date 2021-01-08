@@ -121,3 +121,29 @@ function sirius_event_participant_summary($event_nid, $prole_tid = NULL) {
 	}
 	return $data;
 }
+
+
+
+
+function sirius_event_participant_nid_from_contact($event_nid, $contact_nid) {
+  if (!$event_nid || !$contact_nid) { return NULL; }
+
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_event_participant');
+  $query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
+  $query->fieldCondition('field_sirius_event', 'target_id', $event_nid);
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+  return array_keys($stmt['node'])[0];
+}
+
+function sirius_event_participant_delete_from_contact($event_nid, $contact_nid) {
+  if (!$event_nid) { return array('success' => FALSE, 'msg' => 'No event.'); }
+  if (!$contact_nid) { return array('success' => FALSE, 'msg' => 'No contact.'); }
+  $participant_nid = sirius_event_participant_nid_from_contact($event_nid, $contact_nid);
+  if (!$participant_nid) { return array('success' => FALSE, 'msg' => 'No participant record for this contact and event.'); }
+  node_delete($participant_nid);
+  return array('success' => TRUE, 'msg' => 'Participant record deleted.');
+}
+
