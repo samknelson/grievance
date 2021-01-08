@@ -32,6 +32,10 @@ function sirius_event_page_participant_mightysearch_form($form, &$form_state, $e
 		$actions['tag'] = array('title' => 'Add or Remove Tags');
 		$actions['export'] = array('title' => 'Export');
 		$actions['report'] = array('title' => 'Report');
+		$actions['delete_participant'] = array(
+			'title' => 'Delete Participant Record',
+			'event_nid' => $event_node->nid,
+		);
 	}
 
 	sirius_mightysearch_form_prepare(
