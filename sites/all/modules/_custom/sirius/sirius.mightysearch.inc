@@ -327,6 +327,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 	if ($actions['bulk_recipient_add']) { $action_options['bulk_recipient_add'] = $actions['bulk_recipient_add']['title']; }
 	if ($actions['bulk_recipient_remove']) { $action_options['bulk_recipient_remove'] = $actions['bulk_recipient_remove']['title']; }
 	if ($actions['delete']) 						{ $action_options['delete'] = $actions['delete']['title']; }
+	if ($actions['delete_participant']) { $action_options['delete_participant'] = $actions['delete_participant']['title']; }
 	if ($actions['report']) 						{ $action_options['report'] = $actions['report']['title']; }
 	if ($actions['geocode']) 						{ $action_options['geocode'] = $actions['geocode']['title']; }
 	if (user_access('sirius admin')) 		{ $action_options['sql'] = 'Display SQL Query'; }
@@ -387,7 +388,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		}
 	}
 
-	if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove'] || $action_options['geocode']) {
+	if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['delete_participant'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove'] || $action_options['geocode']) {
 		if ($count_total > $count) {
 			$form['mightysearch_results']['results_select_allxyz'] = array(
 				'#type' => 'checkbox', 
@@ -399,6 +400,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 							array('value' => 'tag_add'), 
 							array('value' => 'tag_remove'),
 							array('value' => 'delete'),
+							array('value' => 'delete_participant'),
 							array('value' => 'bulk_recipient_add'),
 							array('value' => 'bulk_recipient_remove'),
 							array('value' => 'geocode'),
@@ -430,12 +432,26 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 
 	if ($action_options['delete']) {
 		$form['mightysearch_results']['delete_confirm'] = array(
-			'#title' => 'Really delete these contacts? Deletion is permanent and the deleted contacts can never be retrieved. There is no "undo" for this actions.',
+			'#title' => 'Really delete these contacts? Deletion is permanent and the deleted contacts can never be retrieved. There is no "undo" for this action.',
 			'#type' => 'checkbox',
 			'#states' => array(
 				'visible' => array(
 					":input[name=\"mightysearch_results[action]\"]" => array(
 						array('value' => 'delete'), 
+					),
+				),
+			),
+		);
+	}
+
+	if ($action_options['delete_participant']) {
+		$form['mightysearch_results']['delete_participant_confirm'] = array(
+			'#title' => 'Really delete these records? Deletion is permanent and the deleted participant records can never be retrieved. There is no "undo" for this action. This action will only delete the participant record for this event; it will NOT delete the contact record.',
+			'#type' => 'checkbox',
+			'#states' => array(
+				'visible' => array(
+					":input[name=\"mightysearch_results[action]\"]" => array(
+						array('value' => 'delete_participant'), 
 					),
 				),
 			),
@@ -965,9 +981,17 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	// Batch
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete' || $action == 'bulk_recipient_add' || $action == 'bulk_recipient_remove' || $action == 'geocode') {
+	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete' || $action == 'delete_participant' || $action == 'bulk_recipient_add' || $action == 'bulk_recipient_remove' || $action == 'geocode') {
+
 		if ($action == 'delete' && !$form_state['values']['mightysearch_results']['delete_confirm']) {
 			drupal_set_message("Please check the confirmation box.", 'error');
+			$form_state['rebuild'] = TRUE;
+			return;
+		}
+
+		if ($action == 'delete_participant' && !$form_state['values']['mightysearch_results']['delete_participant_confirm']) {
+			drupal_set_message("Please check the confirmation box.", 'error');
+			$form_state['rebuild'] = TRUE;
 			return;
 		}
 
@@ -977,7 +1001,11 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 			$stmt = sirius_sql_query($sql, $sql_args);
 			while ($hr = $stmt->fetchAssoc()) { $contact_nids[] = $hr['nid']; }
 		} else {
-			$contact_nids = array_filter(array_values($form_state['values']['mightysearch_results']['results_select']));
+			if ($form_state['values']['mightysearch_results']['results_select']) {
+				$contact_nids = array_filter(array_values($form_state['values']['mightysearch_results']['results_select']));
+			} else {
+				$contacts_nids = array();
+			}
 		}
 		if (!$contact_nids) {
 			drupal_set_message("No contacts selected", 'error');
@@ -1092,6 +1120,10 @@ function sirius_mightysearch_batch($chunk, $params, &$context) {
 		if ($action_name == 'delete') {
 			node_delete($contact_nid);
 			$result = array('success' => TRUE, 'msg' => 'Contact deleted.');
+		}
+
+		if ($action_name == 'delete_participant') {
+			$result = sirius_event_participant_delete_from_contact($action['event_nid'], $contact_nid);
 		}
 
 		if ($action_name == 'bulk_recipient_add')  {
