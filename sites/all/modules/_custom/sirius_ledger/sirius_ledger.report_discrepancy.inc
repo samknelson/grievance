@@ -148,6 +148,8 @@ function sirius_ledger_report_discrepancy_fields() {
 	$fields = array();
   $fields['contact_nid'] = 'Contact NID';
   $fields['worker_nid'] = 'Worker NID';
+  $fields['worker_id'] = 'Worker ID';
+  $fields['worker_id2'] = 'Worker ID2';
   $fields['worker_name'] = 'Name';
   $fields['worker_ms'] = 'Member Status';
   $fields['worker_ws'] = 'Work Status';
@@ -232,6 +234,8 @@ function sirius_ledger_report_discrepancy_batch($nids, $values, $report_id, $rep
     $row = array();
     $row['contact_nid'] = $contact_nid;
     $row['worker_nid'] = $worker_node->nid;
+    $row['worker_id'] = $worker_node->field_sirius_id['und'][0]['value'];
+    $row['worker_id2'] = $worker_node->field_sirius_id2['und'][0]['value'];
     $row['worker_name'] = $worker_node->title;
     $row['worker_ms'] = $ms_name;
     $row['worker_ws'] = $ws_name;
@@ -270,6 +274,8 @@ function sirius_ledger_report_discrepancy_view($report_type, $report_id) {
     $tools .= l('A/R', 'node/' . $hr['worker_nid'] . '/sirius_worker_ledger', array('attributes' => array('class' => array('tool-button'))));
 
     $row = array();
+    $row[] = $hr['worker_id'];
+    $row[] = $hr['worker_id2'];
     $row[] = $hr['worker_name'];
     $row[] = $hr['worker_ms'];
     $row[] = $hr['worker_ws'];
@@ -281,6 +287,8 @@ function sirius_ledger_report_discrepancy_view($report_type, $report_id) {
   }
 
   $header = array(
+    'ID', 
+    'ID2', 
     'Worker', 
     'Member Status',
     'Work Status',
