@@ -150,7 +150,8 @@ function sirius_ledger_report_discrepancy_fields() {
   $fields['worker_nid'] = 'Worker NID';
   $fields['worker_id'] = 'Worker ID';
   $fields['worker_id2'] = 'Worker ID2';
-  $fields['worker_name'] = 'Name';
+  $fields['worker_name_family'] = 'Fmaily Name';
+  $fields['worker_name_given'] = 'Given Name';
   $fields['worker_ms'] = 'Member Status';
   $fields['worker_ws'] = 'Work Status';
   $fields['balance_1'] = 'First Total';
@@ -236,7 +237,8 @@ function sirius_ledger_report_discrepancy_batch($nids, $values, $report_id, $rep
     $row['worker_nid'] = $worker_node->nid;
     $row['worker_id'] = $worker_node->field_sirius_id['und'][0]['value'];
     $row['worker_id2'] = $worker_node->field_sirius_id2['und'][0]['value'];
-    $row['worker_name'] = $worker_node->title;
+    $row['worker_name_family'] = $worker_node->field_sirius_name['und'][0]['family'];
+    $row['worker_name_given'] = $worker_node->field_sirius_name['und'][0]['given'];
     $row['worker_ms'] = $ms_name;
     $row['worker_ws'] = $ws_name;
     $row['balance_1'] = $balance_1;
@@ -276,7 +278,8 @@ function sirius_ledger_report_discrepancy_view($report_type, $report_id) {
     $row = array();
     $row[] = $hr['worker_id'];
     $row[] = $hr['worker_id2'];
-    $row[] = $hr['worker_name'];
+    $row[] = $hr['worker_name_family'];
+    $row[] = $hr['worker_name_given'];
     $row[] = $hr['worker_ms'];
     $row[] = $hr['worker_ws'];
     $row[] = '$' . number_format($hr['balance_1'], 2);
@@ -289,7 +292,8 @@ function sirius_ledger_report_discrepancy_view($report_type, $report_id) {
   $header = array(
     'ID', 
     'ID2', 
-    'Worker', 
+    'Last Name', 
+    'First Name', 
     'Member Status',
     'Work Status',
     'Total for ' . $parameters['month1'] . '/' . $parameters['year1'],
