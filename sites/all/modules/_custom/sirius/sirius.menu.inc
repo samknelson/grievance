@@ -80,13 +80,6 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
-  $node_tabs['sirius_feed']['sirius_feed_log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_log',
-    'permissions' => array('sirius dispatch staff'),
-  );
-
   $node_tabs['sirius_payment']['sirius_payment_log'] = array(
     'title' => 'Log',
     'description' => '',
@@ -205,6 +198,14 @@ function sirius_node_tabs() {
     'callback' => 'sirius_node_tab_sirius_domain_delete',
     'permissions' => array('sirius domain admin'),
     'weight' => 10,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_json_definition_disclaimer'] = array(
+    'title' => 'Disclaimer',
+    'description' => '',
+    'callback' => 'sirius_node_tab_json_definition_disclaimer',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
   );
 
   return $node_tabs;
@@ -429,27 +430,28 @@ function sirius_menu() {
 
   $items['sirius/config/phone'] = array(
     'title' => 'Phone Configuration',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_sms_admin'),
-    'access arguments' => array('sirius admin'),
+    'page callback' => 'sirius_page_callerid',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['sirius/config/phone/sms'] = array(
-    'title' => 'SMS',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_sms_admin'),
-    'access arguments' => array('sirius admin'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -100,
   );
 
   $items['sirius/config/phone/callerid'] = array(
     'title' => 'Caller IDs',
     'page callback' => 'sirius_page_callerid',
     'page arguments' => array(),
-    'access arguments' => array('sirius callerid admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/config/phone/sms_global_disable'] = array(
+    'title' => 'SMS Global Disable',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_sms_admin'),
+    'access arguments' => array('sirius admin'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
   );
 
   $items['sirius/config/menu'] = array(
@@ -814,6 +816,44 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/disclaimer'] = array(
+    'title' => 'Disclaimers',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_disclaimer_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/disclaimer/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_disclaimer_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/disclaimer/list'] = array(
+    'title' => 'List',
+    'description' => '',
+    'page callback' => 'sirius_disclaimer_page_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/disclaimer/list/add'] = array(
+    'title' => 'Add a Disclaimer',
+    'description' => '',
+    'page callback' => 'sirius_disclaimer_add',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/contact/resync/all'] = array(
     'title' => 'Resync All Contacts',
     'description' => '',
@@ -957,6 +997,7 @@ function sirius_menu() {
     'access arguments' => array('sirius'),
     'type'             => MENU_CALLBACK,
   );
+
 
 
   return $items;
