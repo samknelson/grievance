@@ -22,7 +22,8 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/contact/definition'] 				= array('title' => 'Contact Definition', 'description' => 'Set additional domain-specific fields for contacts.');
 	$links['core']['links']['sirius/contact/resync/all']				= array('title' => 'Contact Resync', 'description' => 'A data integrity utility to re-connect all worker and user accounts with contacts.');
 	$links['core']['links']['sirius/config/letter']							= array('title' => 'Letters', 'description' => 'Configure the Letters system and manage letter templates.');
-	$links['core']['links']['sirius/config/feed']							= array('title' => 'Feeds', 'description' => 'Configure the feeds system.');
+	$links['core']['links']['sirius/disclaimer']						= array('title' => 'Disclaimers', 'description' => 'Configure dislcaimers -- text which can be attached to events or event types, and which must be accepted by the user.');
+	$links['core']['links']['sirius/config/feed']								= array('title' => 'Feeds', 'description' => 'Configure the feeds system.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
@@ -60,23 +61,22 @@ function sirius_page_config() {
 	$links['users'] = array('title' => 'Users');
 	$links['users']['links']['admin/people'] = array('title' => 'Users', 'description' => 'Sitewide user management');
 	$links['users']['links']['admin/config/system/flood-control'] = array('title' => 'Flood Control', 'description' => 'Settings for blocking multiple failed login attempts from the same IP address.');
-	$links['users']['links']['admin/config/system/flood-unblock'] = array('title' => 'Flood Unblock', 'description' => 'Clear the flood block for a legitimate user who is trying to sign in.');
+	$links['users']['links']['admin/config/system/flood-control']['sub_paths']['admin/config/system/flood-unblock'] = array('title' => 'Flood Unblock');
 	$links['users']['links']['admin/config/people/tfa-trusted-ip'] = array('title' => 'TFA Trusted IPs', 'description' => 'Set the list of trusted IP addresses for two-factor authentication.');
 
 	$links['systems'] = array('title' => 'Systems');
 	$links['systems']['links']['sirius/config/server-paths'] 					= array('title' => 'Server Paths', 'description' => 'Locations of services on the server: wkhtmltopdf, pdftk, etc.');
-	$links['systems']['links']['sirius/config/phone/callerid'] 				= array('title' => 'Caller ID', 'description' => 'Create or manage Caller ID entries.');
-	$links['systems']['links']['sirius/twilio/network-test'] 					= array('title' => 'Twilio Network Test', 'description' => 'Use the Twilio network test tool to verify if the client computer has sufficient connectivity to run a VoIP call.');
 	$links['systems']['links']['sirius/admin/caller-id-full-list'] 	= array('title' => 'Cross-Domain Caller ID List', 'description' => 'View a list of all caller IDs across all domains.');
 	$links['systems']['links']['sirius/config/specialrid'] 			= array('title' => 'Special Roles', 'description' => 'Certain roles have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/email'] 					= array('title' => 'Email', 'description' => 'Oubound email settings');
+	$links['systems']['links']['sirius/config/phone'] 					= array('title' => 'Phone', 'description' => 'Phone settings, including caller IDs, SMS and Twilio');
+	$links['systems']['links']['sirius/twilio/network-test'] 					= array('title' => 'Twilio Network Test', 'description' => 'Use the Twilio network test tool to verify if the client computer has sufficient connectivity to run a VoIP call.');
 	$links['systems']['links']['sirius/phonenumber'] 						= array('title' => 'Phone Number Cache', 'description' => 'Search and review the cache of phone numbers and deliverability metrics (i.e. SMS-enabled).');
-	$links['systems']['links']['sirius/config/phone'] 					= array('title' => 'Phone', 'description' => 'Phone settings, including SMS and Twilio');
 	$links['systems']['links']['sirius/map/admin'] 							= array('title' => 'Map Settings', 'description' => 'Sirius map settings.');
-	$links['systems']['links']['admin/config/content/geocoder'] = array('title' => 'Geocode Service', 'description' => 'System settings for the GeoCoding service');
-	$links['systems']['links']['admin/config/content/geofield_map'] = array('title' => 'Geofield Service', 'description' => 'System settings for the Geofield Mapping service');
-	$links['systems']['links']['admin/config/system/leaflet_more_maps'] = array('title' => 'Leaflet More Maps', 'description' => 'System settings for the the Leaflet mapping interface');
+	$links['systems']['links']['sirius/map/admin']['sub_paths']['admin/config/content/geocoder'] = array('title' => 'Geocode Service');
+	$links['systems']['links']['sirius/map/admin']['sub_paths']['admin/config/content/geofield_map'] = array('title' => 'Geofield Service');
+	$links['systems']['links']['sirius/map/admin']['sub_paths']['admin/config/system/leaflet_more_maps'] = array('title' => 'Leaflet "More Maps" Service');
 	$links['systems']['links']['sirius/sns/config'] 						= array('title' => 'SNS', 'description' => 'Settings for Amazon Simple Notification Service (SNS)');
 	$links['systems']['links']['admin/config/grievance/phaxio'] = array('title' => 'Phaxio', 'description' => 'Configure the Phaxio fax service.');
 	$links['systems']['links']['admin/config/services/shorten'] = array('title' => 'Shorten', 'description' => 'Configure the link shortening services such as blt.ly.');
@@ -90,10 +90,7 @@ function sirius_page_config() {
 	$html .= '</tr>';
 
 	foreach ($links as $category_name => $category) {
-		$html .= '<tr>';
-		$html .= '<td colspan="4"><h2>' . $category['title'] . '</h2></td>';
-		$html .= '</tr>';
-
+		$category_html = '';
 		foreach ($category['links'] as $path => $link) {
 			if (drupal_valid_path($path)) {
 				// Get the local tasks for this item. 
@@ -101,27 +98,35 @@ function sirius_page_config() {
 				$sql = "select path, title from menu_router ";
 				$sql .= "where tab_root = :path ";
 				$sql .= "and type = " . MENU_LOCAL_TASK . ' ';
-				$sql .= "order by weight, title ";
+				$sql .= "order by number_parts, weight, title ";
 				$stmt = sirius_sql_query($sql, array(':path' => $path));
-				$sub_paths = array();
 				while ($hr = $stmt->fetchAssoc()) { 
 					if (drupal_valid_path($hr['path'])) {
-						$sub_paths[$hr['path']] = $hr['title'];
+						$category['links'][$path]['sub_paths'][$hr['path']] = array('title' => $hr['title']);
 					}
 				}
 
-				$html .= '<tr>';
-				$html .= '<td>' . $link['title'] . '</td>';
-				$html .= '<td>' . $link['description'] . '</td>';
-				$html .= '<td>' . l('Manage', $path, array('attributes' => array('class' => array('tool-button')))) . '</td>';
-				$html .= '<td>';
-				foreach ($sub_paths as $sub_path => $sub_title) {
-					$html .= l($sub_title, $sub_path, array('attributes' => array('class' => array('tool-button'))));
+				$category_html .= '<tr>';
+				$category_html .= '<td>' . $link['title'] . '</td>';
+				$category_html .= '<td>' . $link['description'] . '</td>';
+				$category_html .= '<td>' . l('Manage', $path, array('attributes' => array('class' => array('tool-button')))) . '</td>';
+				$category_html .= '<td>';
+				if ($category['links'][$path]['sub_paths']) {
+					foreach ($category['links'][$path]['sub_paths'] as $sub_path => $sub_category) {
+						$sub_title = $sub_category['title'];
+						$category_html .= l($sub_title, $sub_path, array('attributes' => array('class' => array('tool-button'))));
+					}
 				}
-				$html .= '</td>';
-				$html .= '</tr>';
-
+				$category_html .= '</td>';
+				$category_html .= '</tr>';
 			}
+		}
+
+		if ($category_html) {
+			$html .= '<tr>';
+			$html .= '<td colspan="4"><h2>' . $category['title'] . '</h2></td>';
+			$html .= '</tr>';
+			$html .= $category_html;
 		}
 	}
 
