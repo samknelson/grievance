@@ -66,10 +66,6 @@ function sirius_permission() {
       'title' => t('Sirius Domain Delete'),
       'description' => t('Permission to delete a domain and all content associated with it. Requires permission on the domain (i.e. a domain admin with this permission can delete their own subdomains, but not other user\'s subdomains.)'),
     ),
-    'sirius callerid admin' => array(
-      'title' => t('Sirius CallerID Admin'),
-      'description' => t('Permission to add, edit, or delete Caller IDs.'),
-    ),
   );
 }
 
