@@ -1,5 +1,25 @@
 <?php
 
+function sirius_node_tab_set_module($module_name, &$node_tabs) {
+  foreach ($node_tabs as $content_type => $ignore) {
+    foreach ($node_tabs[$content_type] as $path => $ignore) {
+      $node_tabs[$content_type][$path]['module'] = $module_name;
+    }
+  }
+}
+
+function sirius_node_tab_handle_requires($tab_record) {
+  if ($tab_record['file']) { 
+    if (is_array($tab_record['file'])) { 
+      foreach ($tab_record['file'] as $file) {
+        sirius_require($tab_record['module'], $file);
+      }
+    } else {
+      sirius_require($tab_record['module'], $tab_record['file']);
+    }
+  }
+}
+
 function sirius_node_tab_all() {
   $all = &drupal_static(__FUNCTION__, array());
   if (!$all) { $all = module_invoke_all('node_tabs'); }
@@ -20,9 +40,8 @@ function sirius_node_tab_content($node, $in_tab_name) {
   if ($tab_record['callback arguments']) {
     $args = array_merge($args, $tab_record['callback arguments']);
   }
+  sirius_node_tab_handle_requires($tab_record);
   return call_user_func_array($callback, $args);
-  
-  return "";
 }
 
 function sirius_node_tab_access($node, $in_tab_name) {
@@ -44,6 +63,7 @@ function sirius_node_tab_access($node, $in_tab_name) {
   }
 
   // Check for a custom access permission
+  sirius_node_tab_handle_requires($tab_record);
   $access_function_name = $tab_record['callback'] . '_access';
   if (function_exists($access_function_name)) {
     if (!$access_function_name($node)) { return FALSE; }
@@ -76,6 +96,7 @@ function sirius_term_tab_content($term, $in_tab_name) {
   if ($tab_record['callback arguments']) {
     $args = array_merge($args, $tab_record['callback arguments']);
   }
+  sirius_node_tab_handle_requires($tab_record);
   return call_user_func_array($callback, $args);
   
   return "";
@@ -102,6 +123,7 @@ function sirius_term_tab_access($term, $in_tab_name) {
 
   // Check for a custom access permission
   $access_function_name = $tab_record['callback'] . '_access';
+  sirius_node_tab_handle_requires($tab_record);
   if (function_exists($access_function_name)) {
     if (!$access_function_name($term)) { return false; }
   }
