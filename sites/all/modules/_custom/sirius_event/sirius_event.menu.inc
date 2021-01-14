@@ -74,7 +74,7 @@ function sirius_event_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_event_body',
     'permissions' => array('sirius'),
-    'weight' => 2,
+    'weight' => 3,
   );
 
   $node_tabs['sirius_event']['sirius_event_participants_current'] = array(
@@ -158,6 +158,7 @@ function sirius_event_node_tabs() {
     'weight' => 6,
   );
 
+  $map_files = array('sirius_event.page_map.inc','sirius_event.page_map_list.inc','sirius_event.page_map_view.inc','sirius_event.page_map_settings.inc');
 
   $node_tabs['sirius_event']['sirius_event_map'] = array(
     'title' => 'Map',
@@ -165,6 +166,7 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_map',
     'permissions' => array('sirius'),
     'weight' => 5,
+    'file' => $map_files,
   );
 
   $node_tabs['sirius_event']['sirius_event_map/info'] = array(
@@ -173,6 +175,7 @@ function sirius_event_node_tabs() {
     'permissions' => array('sirius'),
     'weight' => 1,
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => $map_files,
   );
 
   $node_tabs['sirius_event']['sirius_event_map/view'] = array(
@@ -180,6 +183,7 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_map_view',
     'permissions' => array('sirius'),
     'weight' => 2,
+    'file' => $map_files,
   );
 
   $node_tabs['sirius_event']['sirius_event_map/list'] = array(
@@ -187,6 +191,7 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_map_list',
     'permissions' => array('sirius'),
     'weight' => 3,
+    'file' => $map_files,
   );
 
   $node_tabs['sirius_event']['sirius_event_map/settings'] = array(
@@ -194,6 +199,7 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_map_settings',
     'permissions' => array('sirius'),
     'weight' => 4,
+    'file' => $map_files,
   );
 
   $node_tabs['sirius_event']['sirius_event_class'] = array(
@@ -220,6 +226,94 @@ function sirius_event_node_tabs() {
     'permissions' => array(),
     'weight' => 2,
   );
+
+  $disclaimer_files = array('sirius_event.page_disclaimer.inc','sirius_event.page_disclaimer_list.inc','sirius_event.page_disclaimer_settings.inc');
+
+  $node_tabs['sirius_event']['sirius_event_disclaimer'] = array(
+    'title' => 'Disclaimer',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_disclaimer_view',
+    'permissions' => array('sirius'),
+    'weight' => 5,
+    'file' => $disclaimer_files,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_disclaimer/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_disclaimer_view',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => $disclaimer_files,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_disclaimer/list_yes'] = array(
+    'title' => 'List - Accepted',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_disclaimer_list',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+    'file' => $disclaimer_files,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_disclaimer/list_no'] = array(
+    'title' => 'List - Not Accepted',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_disclaimer_list',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+    'file' => $disclaimer_files,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_disclaimer/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_disclaimer_settings',
+    'permissions' => array('sirius'),
+    'weight' => 10,
+    'file' => $disclaimer_files,
+  );
+
+  $session_files = array('sirius_event.page_session.inc','sirius_event.page_session_settings.inc');
+
+  $node_tabs['sirius_event']['sirius_event_session'] = array(
+    'title' => 'Sessions',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_session',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+    'file' => $session_files,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_session/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_session',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'file' => $session_files,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_session/assign'] = array(
+    'title' => 'Assign',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_session_assign',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+    'file' => $session_files,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_session/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_session_settings',
+    'permissions' => array('sirius'),
+    'weight' => 10,
+    'file' => $session_files,
+  );
+
 
   $node_tabs['sirius_event']['sirius_event_clone'] = array(
     'title' => 'Clone',
@@ -252,6 +346,35 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_event_node_tab_participant_comments',
     'permissions' => array('sirius event admin'),
     'weight' => 2,
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_disclaimer'] = array(
+    'title' => 'Disclaimer',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_participant_disclaimer',
+    'permissions' => array('sirius event admin'),
+    'weight' => 2,
+    'file' => 'sirius_event.page_participant_disclaimer.inc',
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_disclaimer/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_participant_disclaimer',
+    'permissions' => array('sirius event admin'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'sirius_event.page_participant_disclaimer.inc',
+  );
+
+  $node_tabs['sirius_event_participant']['sirius_event_participant_disclaimer/revoke'] = array(
+    'title' => 'Revoke',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_participant_disclaimer_revoke',
+    'permissions' => array('sirius event admin'),
+    'weight' => 2,
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'sirius_event.page_participant_disclaimer.inc',
   );
 
   $node_tabs['sirius_event_participant']['sirius_event_participant_json_log'] = array(
@@ -344,6 +467,7 @@ function sirius_event_node_tabs() {
     'weight' => 4,
   );
 
+  sirius_node_tab_set_module('sirius_event', $node_tabs);
 	return $node_tabs;
 }
 
@@ -364,6 +488,7 @@ function sirius_event_term_tabs() {
     'callback' => 'sirius_event_term_tab_policy_create',
     'permissions' => array('sirius event admin'),
     'weight' => 1,
+    'file' => 'sirius_event.term_tab_create.inc'
   );
 
   $term_tabs['sirius_event_type']['sirius_event_type_policy/register'] = array(
@@ -439,12 +564,31 @@ function sirius_event_term_tabs() {
     'weight' => 4,
   );
 
+  $term_tabs['sirius_event_type']['sirius_event_type_session'] = array(
+    'title' => 'Sessions',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_session',
+    'permissions' => array('sirius event admin'),
+    'weight' => 5,
+    'file' => 'sirius_event.term_tab_session.inc',
+  );
+
+  $term_tabs['sirius_event_type']['sirius_event_type_disclaimer'] = array(
+    'title' => 'Disclaimer',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_disclaimer',
+    'permissions' => array('sirius event admin'),
+    'weight' => 5,
+    'file' => 'sirius_event.term_tab_disclaimer.inc',
+  );
+
   $term_tabs['sirius_event_type']['sirius_event_type_bullpen'] = array(
     'title' => 'Bullpen',
     'description' => '',
     'callback' => 'sirius_event_term_tab_bullpen',
     'permissions' => array('sirius event admin'),
     'weight' => 5,
+    'file' => 'sirius_event.term_tab_bullpen.inc',
   );
 
   $term_tabs['sirius_event_type']['sirius_event_type_class'] = array(
@@ -463,6 +607,7 @@ function sirius_event_term_tabs() {
     'weight' => 6,
   );
 
+  sirius_node_tab_set_module('sirius_event', $term_tabs);
   return $term_tabs;
 }
 

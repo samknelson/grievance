@@ -69,6 +69,7 @@ function sirius_event_term_tab_pstatus_form($form, &$form_state, $pstatus_term) 
 		'#description' => t('The settings below indicate how this participant status should be displayed on a map.'),
 	);
 
+	/*
 	$form['map']['icon'] = array(
 		'#title' => t('Icon'),
 		'#type' => 'select',
@@ -76,6 +77,9 @@ function sirius_event_term_tab_pstatus_form($form, &$form_state, $pstatus_term) 
 		'#description' => t('Select the marker to use to render participants with this status.'),
 	);
 	if (isset($json['map']['icon'])) { $form['map']['icon']['#default_value'] = $json['map']['icon']; }
+	*/
+
+	$form['map']['pin'] = sirius_map_pin_picker($json['map']['pin']);
 
 	$form['submit'] = array(
 		'#type' => 'submit',

@@ -1,6 +1,8 @@
 <?php
 
 function sirius_event_register_user_self_form($form, &$form_state, $event_node, $rule) {
+	drupal_add_css('sites/all/modules/_custom/sirius_event/css/event.css');
+
 	$form_state['event_nid'] = $event_node->nid;
 	$form_state['rule'] = $rule;
 	$form_state['participant_role_tid'] = $participant_role_tid;
@@ -30,11 +32,13 @@ function sirius_event_register_user_self_form($form, &$form_state, $event_node, 
 	$domain_nid = sirius_domain_nid();
 	$pstatus_tids = sirius_event_participant_role_status_tids($prole_tid);
 
+	$prole_tids = array();
 	foreach ($rule['register_as'] as $key) {
 		list ($prole_tid, $pstatus_tid) = explode('|', $key);
 		$prole_term = taxonomy_term_load($prole_tid);
 		$pstatus_term = taxonomy_term_load($pstatus_tid);
 		$register_as_options[$key] = $prole_term->name . ': ' . $pstatus_term->name;
+		$prole_tids[$prole_tid] = TRUE;
 	}
 
 	if ($participant_node) {
@@ -48,6 +52,19 @@ function sirius_event_register_user_self_form($form, &$form_state, $event_node, 
 		if (count($register_as_options) == 1) {
 			$form['register_as']['#type'] = 'hidden';
 			$form['register_as']['#value'] = array_keys($register_as_options)[0];
+		}
+
+		if (sirius_event_disclaimer_enabled($event_node)) {
+			$event_disclaimer_json = sirius_event_disclaimer_json($event_node);
+			$disclaimer_nodes = sirius_event_disclaimer_nodes($event_disclaimer_json);
+			if ($disclaimer_nodes) {
+				if ($event_disclaimer_json['prole_tids'] && array_keys($prole_tids) && array_intersect(array_keys($prole_tids), array_filter(array_values($event_disclaimer_json['prole_tids'])))) {
+					foreach ($disclaimer_nodes as $disclaimer_nid => $disclaimer_node) {
+						$disclaimer_json = sirius_jsonfield_util_node_json_get($disclaimer_node)['disclaimer'];
+						$form['disclaimer'][$disclaimer_nid] = sirius_disclaimer_render_form($disclaimer_json);			
+					}
+				}
+			}
 		}
 
 		$form['participant']['comments'] = array(
@@ -94,6 +111,11 @@ function sirius_event_register_user_self_form_submit($form, &$form_state) {
 	);
 
 	if ($result['success']) { 
+		if ($form_state['values']['disclaimer']) {
+			$disclaimer_nodes = node_load_multiple(array_keys($form_state['values']['disclaimer']));
+			$participant_node = node_load($result['nid']);
+			sirius_disclaimer_accept($participant_node, $disclaimer_nodes, array());
+		}
 		$confirmation_text = $widget_settings['confirmation_text'];
 		if (!$confirmation_text) { $confirmation_text = $result['msg']; }
 		drupal_set_message($confirmation_text);
@@ -138,7 +160,6 @@ function sirius_event_register_user_self_config_form_submit($form, &$form_state)
 	$rule_type = $form_state['rule_type'];
 	$delta = $form_state['delta'];
 	$widget = $form_state['widget'];
-
 	$event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
 	$event_type_json['widget_settings'][$rule_type][$delta][$widget] = $form_state['values']['settings'];
 	sirius_jsonfield_util_term_json_set($event_type_term, $event_type_json);

@@ -5,6 +5,7 @@ function sirius_node_tab_event_phonebank_lock_access($event_node) {
 }
 
 function sirius_node_tab_event_phonebank_lock($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	return drupal_get_form('sirius_node_tab_event_phonebank_lock_form', $event_node);
 }
 

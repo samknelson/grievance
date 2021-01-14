@@ -12,6 +12,7 @@ function sirius_node_tab_event_participants_current_access($event_node) {
 }
 
 function sirius_node_tab_event_participants_current($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
 	$all_rules = $json['participants']['rules'];

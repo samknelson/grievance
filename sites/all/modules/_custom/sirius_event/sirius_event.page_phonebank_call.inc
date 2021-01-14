@@ -19,6 +19,7 @@ function sirius_node_tab_event_phonebank_call_access($event_node) {
 }
 
 function sirius_node_tab_event_phonebank_call($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	$active = sirius_phonebank_active($event_node);
 	$event_json = sirius_jsonfield_util_node_json_get($event_node);
 	$type_json = sirius_event_type_json($event_node);

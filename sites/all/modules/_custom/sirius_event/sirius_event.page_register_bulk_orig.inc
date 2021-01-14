@@ -1,6 +1,7 @@
 <?php
 
 function sirius_node_tab_event_participants_register_bulk($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	$participant_role_tid = $_REQUEST["participant_role_tid"];
 	if (!$participant_role_tid) {
 		$html = sirius_node_tab_event_participants_quicknav($event_node, 'register/bulk');

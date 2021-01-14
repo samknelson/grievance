@@ -13,6 +13,7 @@ function sirius_node_tab_event_bullpen_self_access($event_node) {
 }
 
 function sirius_node_tab_event_bullpen_self($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
   global $user;
 
   $user_full = user_load($user->uid);

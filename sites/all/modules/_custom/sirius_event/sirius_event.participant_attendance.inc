@@ -90,6 +90,7 @@ function sirius_event_page_participant_attendance_form($form, &$form_state, $eve
 
 		$contact_node = node_load($participant_node->field_sirius_contact['und'][0]['target_id']);
 		$worker_node = sirius_worker_get_by_contact_nid($participant_node->field_sirius_contact['und'][0]['target_id']);
+		if (!$worker_node) { continue; }
 
 		$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
 		$signature = sirius_jsonfield_util_esignature_get($participant_json, "attendance_$which");
