@@ -27,33 +27,29 @@ function sirius_node_tab_event_session_access($event_node) {
 }
 
 function sirius_node_tab_event_session($event_node) {
-	return 'Pick a session...';
 	return drupal_get_form('sirius_node_tab_event_session_form', $event_node);
 }
 
 function sirius_node_tab_event_session_form($form, &$form_state, $event_node) {
 	$form_state['event_nid'] = $event_node->nid;
-	$json = sirius_jsonfield_util_node_json_get($event_node);
-	dpm($json);
+	$evemt_json = sirius_jsonfield_util_node_json_get($event_node);
+	$counts = sirius_event_session_counts($event_node);	
+
+	$participant_nid = sirius_event_participant_nid_from_user($event_node->nid);
+	$participant_node = node_load($participant_nid);
+	$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
+
+	foreach ($counts as $delta => $ts) {
+		$options[$ts] = date('l, F j, g:i A', $ts);
+	}
 
 	$form['#tree'] = TRUE;
 
-	$form['session']['enabled'] = array(
+	$form['session']['ts'] = array(
 		'#type' => 'select',
-		'#title' => 'Enabled?',
-		'#options' => array(
-			'Yes' => t('Yes'),
-			'No' => t('No'),
-		),
-		'#description' => t('Are sessions enabled for this event? If so, then participants should be assigned to a specific session, and should only attend that session.'),
-		'#default_value' => $json['session']['enabled'],
-	);
-
-	$form['session']['max_per_session'] = array(
-		'#type' => 'textfield',
-		'#size' => 4,
-		'#title' => 'Maximum Participants Per Session',
-		'#default_value' => $json['session']['max_per_session'],
+		'#options' => $options,
+		'#title' => t('Session'),
+		'#default_value' => $participant_json['session']['ts'],
 	);
 
 	$form['submit'] = array(
@@ -66,9 +62,15 @@ function sirius_node_tab_event_session_form($form, &$form_state, $event_node) {
 
 function sirius_node_tab_event_session_form_submit($form, &$form_state) {
 	$event_node = node_load($form_state['event_nid']);
-	$json = sirius_jsonfield_util_node_json_get($event_node);
-	$json['session'] = $form_state['values']['session'];
-	sirius_jsonfield_util_node_json_set($event_node, $json);
-	node_save($event_node);
-	drupal_set_message("Sessions settings saved.");
+	$participant_nid = sirius_event_participant_nid_from_user($event_node->nid);
+	$participant_node = node_load($participant_nid);
+	if (!$participant_node) { 
+		drupal_set_message("You are not registered for this event.", 'error'); 
+		return;
+	}
+	$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
+	$participant_json['session'] = $form_state['values']['session'];
+	sirius_jsonfield_util_node_json_set($participant_node, $participant_json);
+	node_save($participant_node);
+	drupal_set_message("Your selection has been saved.");
 }
