@@ -44,6 +44,15 @@ function sirius_disclaimer_add() {
 	return drupal_get_form('sirius_node_tab_json_definition_disclaimer_form');
 }
 
+function sirius_node_tab_json_definition_disclaimer_ajax_accept_text($form, $form_state) {
+  $commands = array();
+  $commands[] = ajax_command_replace('#sirius_node_tab_json_definition_disclaimer_ajax_accept_text', render($form['disclaimer']['accept_text']));
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands
+  );
+}
+
 function sirius_node_tab_json_definition_disclaimer_form($form, &$form_state, $disclaimer_node = NULL) {
 	if (!$disclaimer_node) { $disclaimer_node = new stdClass(); }
 	$form_state['disclaimer_nid'] = $disclaimer_node->nid;
@@ -79,12 +88,33 @@ function sirius_node_tab_json_definition_disclaimer_form($form, &$form_state, $d
 		$form['disclaimer']['body']['#description'] = t('Warning: changing the body of a disclaimer will cause all previous acceptances of that disclaimer to be marked as "invalid".');
 	}
 
+	$accept_lines = $form_state['accept_lines'];
+	if (!$accept_lines && is_array($disclaimer_json['accept_text'])) { $accept_lines = count(array_filter($disclaimer_json['accept_text'])); }
+  if (!$accept_lines) { $accept_lines = 1; }
+  if ($form_state['clicked_button']['#value'] == 'Add one') { $accept_lines++; }
+  if ($form_state['clicked_button']['#value'] == 'Add ten') { $accept_lines += 10; }
+  $form_state['accept_lines'] = $accept_lines;
+
 	$form['disclaimer']['accept_text'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Accept Line'),
-		'#default_value' => $disclaimer_json['accept_text'],
-		'#description' => 'For example, ' . sirius_disclaimer_accept_text_default(),
+		'#type' => 'fieldset',
+		'#prefix' => '<div id="sirius_node_tab_json_definition_disclaimer_ajax_accept_text">',
+		'#suffix' => '</div>',
 	);
+  for ($i=0; $i<$accept_lines; ++$i) {
+		$form['disclaimer']['accept_text'][$i] = array(
+			'#type' => 'textfield',
+			'#title' => t('Accept Line #@i', array('@i' => ($i+1))),
+			'#default_value' => $disclaimer_json['accept_text'][$i],
+		);
+	}
+	$form['disclaimer']['accept_text'][0]['#disclaimer'] = 'For example, ' . sirius_disclaimer_accept_text_default();
+
+  $form['disclaimer']['add_one'] = array(
+    '#type' => 'button',
+    '#value' => t('Add one'),
+    '#ajax' => array('callback' => 'sirius_node_tab_json_definition_disclaimer_ajax_accept_text'),
+    '#suffix' => '<br clear="both" />'
+  );
 
 	$form['disclaimer']['notify'] = array(
 		'#type' => 'select',
@@ -223,21 +253,25 @@ function sirius_disclaimer_render($disclaimer_json, $options = array()) {
 }
 
 function sirius_disclaimer_render_form($disclaimer_json, $acceptance_json = array()) {
-	$accept_text = $disclaimer_json['accept_text'];
-	if (!$accept_text) { $accept_text = sirius_disclaimer_accept_text_default(); }
 	$form['disclaimer_markup'] = array('#markup' => sirius_disclaimer_render($disclaimer_json, array('hide_wrap' => TRUE)));
-	$form['disclaimer_accept'] = array(
-		'#type' => 'checkbox',
-		'#title' => $accept_text,
-		'#required' => TRUE,
-    '#return_value' => TRUE,
-    '#default_value' => FALSE,
- 	);
+	if (is_array($disclaimer_json['accept_text'])) {
+		foreach (array_filter($disclaimer_json['accept_text']) as $delta => $accept_text) {
+			$form['disclaimer_accept'][$delta] = array(
+				'#type' => 'checkbox',
+				'#title' => $accept_text,
+				'#required' => TRUE,
+		    '#return_value' => TRUE,
+		    '#default_value' => FALSE,
+		 	);
+		 	if ($acceptance_json) {
+		 		$form['disclaimer_accept'][$delta]['#disabled'] = TRUE;
+		 		$form['disclaimer_accept'][$delta]['#value'] = TRUE;
+		 	}
+		}
+	}
  	$class = 'sirius_disclaimer ';
  	if ($acceptance_json) {
- 		$form['disclaimer_accept']['#disabled'] = TRUE;
- 		$form['disclaimer_accept']['#value'] = TRUE;
- 		$form['disclaimer_accept']['#suffix'] = '<strong>Accepted date:</strong> ' . date('l, F j, g:i A', $acceptance_json['ts']);
+		$form['disclaimer_accept']['#suffix'] = '<strong>Accepted date:</strong> ' . date('l, F j, g:i A', $acceptance_json['ts']);
  		$form['disclaimer_accept']['#suffix'] .= '<br /><strong>Accepted by:</strong> ' . $acceptance_json['user_name'];
  		$form['disclaimer_accept']['#suffix'] .= '<br /><strong>Hash:</strong> ' . $acceptance_json['sig'];
 		if (sirius_disclaimer_sig_check($acceptance_json['sig'], $disclaimer_json)) {
