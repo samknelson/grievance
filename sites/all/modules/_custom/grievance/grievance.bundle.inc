@@ -251,7 +251,6 @@ function grievance_bundle_form_submit($form, &$form_state) {
     'operations' => $operations,
 		'finished' => 'grievance_bundle_finished'
   );
-  dpm($batch);
   batch_set($batch);
 
   drupal_set_message("Bundling for this grievance is complete.");
