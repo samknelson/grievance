@@ -19540,7 +19540,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -19582,12 +19582,9 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'list',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'list_default',
-        'weight' => 3,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19732,14 +19729,9 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => 1,
-          'field_delimiter' => '',
-          'link' => 0,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 4,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19827,7 +19819,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19862,14 +19854,9 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 2,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
