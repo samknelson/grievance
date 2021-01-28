@@ -20,9 +20,6 @@ function sirius_bulk_node_tab_recipients_contacts_form($form, &$form_state, $bul
 			'sirius_worker' => array('default' => array()),
 		),
 		array(
-			'search' => array(
-				'title' => 'Search',
-			),
 			'bulk_recipient_add' => array(
 				'title' => 'Add Bulk Recipient',
 				'bulk_nid' => $bulk_node->nid,
@@ -32,7 +29,8 @@ function sirius_bulk_node_tab_recipients_contacts_form($form, &$form_state, $bul
 				'bulk_nid' => $bulk_node->nid,
 			),
 			'export' => array('title' => 'Export'),
-			'tag' => array('title' => 'Add / Remove Tags'),
+			'tag_add' => array('title' => 'Add a Tag'),
+			'tag_remove' => array('title' => 'Remove a Tag'),
 		)
 	);
 

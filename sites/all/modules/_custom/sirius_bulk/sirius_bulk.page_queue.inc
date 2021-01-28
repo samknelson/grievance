@@ -26,9 +26,9 @@ function sirius_bulk_node_tab_queue_form($form, &$form_state, $bulk_node) {
 			),
 		),
 		array(
-			'search' => array('title' => 'Search'),
 			'export' => array('title' => 'Export'),
-			'tag' => array('title' => 'Add / Remove Tags'),
+			'tag_add' => array('title' => 'Add a Tag'),
+			'tag_remove' => array('title' => 'Remove a Tag'),
 		)
 	);
 
