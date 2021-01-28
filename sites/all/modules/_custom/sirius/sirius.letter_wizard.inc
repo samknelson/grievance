@@ -782,7 +782,7 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 	// Log the letter
 	if ($form_state['values']['logging']) {
 
-		$log_title = "Letter :" . $data['format'] . ': ';
+		$log_title = "Letter: " . $data['format'] . ': ';
 		$is_first = TRUE;
 		for ($i=0; $i<100; ++$i) {
 			if ($template_nid = $data['letter_template_nid_' . $i]) {
@@ -797,11 +797,18 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		if ($data['recipients']) {
 			foreach ($data['recipients'] as $recipient) {
 				if ($recipient['disposition'] == 'skip') { continue; }
-				$log_body .= $recipient['disposition'] . ': ' . sirius_email_rfc822_format($recipient['name'], $recipient['email']) . "\n";
+				if (preg_match('/\@/', $recipient_email)) {
+					$log_body .= $recipient['disposition'] . ': ' . sirius_email_rfc822_format($recipient['name'], $recipient['email']) . "\n";
+				} else {
+					$log_body .= $recipient['disposition'] . ': ' . $recipient['name'] . ' ' . sirius_phone_format($recipient['phone']) . "\n";
+				}
 			}
 		}
 		if ($data['subject']) {
 			$log_body .= "Subject: " . $data['subject'] . "\n";
+		}
+		if ($data['format'] == 'sms') {
+			$log_body .= "Message: " . $data['body'] . "\n";
 		}
 
 	  global $user;
