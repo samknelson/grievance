@@ -4105,10 +4105,12 @@ input.ajax-processed:hover {
   font-style: italic;
   font-family: roboto, arial, helvetica, san-serif;  
 }
+
+/*
 .sirius_signature_wrapper img {
   height: 55px;
 }
-
+*/
 
 div.sirius_quicknav {
   padding-bottom: 10px;
