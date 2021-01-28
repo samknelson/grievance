@@ -275,43 +275,58 @@ function sirius_event_node_tabs() {
     'file' => $disclaimer_files,
   );
 
-  $session_files = array('sirius_event.page_session.inc','sirius_event.page_session_settings.inc');
-
-  $node_tabs['sirius_event']['sirius_event_session'] = array(
-    'title' => 'Sessions',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_session',
-    'permissions' => array('sirius'),
-    'weight' => 2,
-    'file' => $session_files,
+  $section_files = array(
+    'sirius_event.page_section.inc', 
+    'sirius_event.page_section_assign.inc',
+    'sirius_event.page_section_manage.inc',
+    'sirius_event.page_section_settings.inc', 
   );
 
-  $node_tabs['sirius_event']['sirius_event_session/view'] = array(
+  $node_tabs['sirius_event']['sirius_event_section'] = array(
+    'title' => 'Sections',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_section',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+    'file' => $section_files,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_section/view'] = array(
     'title' => 'View',
     'description' => '',
-    'callback' => 'sirius_node_tab_event_session',
+    'callback' => 'sirius_node_tab_event_section',
     'permissions' => array('sirius'),
     'weight' => 1,
-    'file' => $session_files,
+    'file' => $section_files,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
-  $node_tabs['sirius_event']['sirius_event_session/assign'] = array(
+  $node_tabs['sirius_event']['sirius_event_section/assign'] = array(
     'title' => 'Assign',
     'description' => '',
-    'callback' => 'sirius_node_tab_event_session_assign',
+    'callback' => 'sirius_node_tab_event_section_assign',
     'permissions' => array('sirius'),
     'weight' => 2,
-    'file' => $session_files,
+    'file' => $section_files,
   );
 
-  $node_tabs['sirius_event']['sirius_event_session/settings'] = array(
+  $node_tabs['sirius_event']['sirius_event_section/manage'] = array(
+    'title' => 'Manage',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_section_manage',
+    'permissions' => array('sirius'),
+    'weight' => 2,
+    'file' => $section_files,
+  );
+
+
+  $node_tabs['sirius_event']['sirius_event_section/settings'] = array(
     'title' => 'Settings',
     'description' => '',
-    'callback' => 'sirius_node_tab_event_session_settings',
+    'callback' => 'sirius_node_tab_event_section_settings',
     'permissions' => array('sirius'),
     'weight' => 10,
-    'file' => $session_files,
+    'file' => $section_files,
   );
 
 
@@ -564,13 +579,13 @@ function sirius_event_term_tabs() {
     'weight' => 4,
   );
 
-  $term_tabs['sirius_event_type']['sirius_event_type_session'] = array(
-    'title' => 'Sessions',
+  $term_tabs['sirius_event_type']['sirius_event_type_section'] = array(
+    'title' => 'Sections',
     'description' => '',
-    'callback' => 'sirius_event_term_tab_session',
+    'callback' => 'sirius_event_term_tab_section',
     'permissions' => array('sirius event admin'),
     'weight' => 5,
-    'file' => 'sirius_event.term_tab_session.inc',
+    'file' => 'sirius_event.term_tab_section.inc',
   );
 
   $term_tabs['sirius_event_type']['sirius_event_type_disclaimer'] = array(

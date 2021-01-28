@@ -4,3 +4,7 @@
 	border: 1px solid #cccccc;
 	background-color: #ffffff;
 }
+
+tr.sirius_table_row_with_details {
+	border-bottom: none;
+}

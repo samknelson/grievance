@@ -13,7 +13,7 @@ function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $ps
 
 	if ($prole_tid == $participant_node->field_sirius_event_prole['und'][0]['tid'] && 
 			$pstatus_tid == $participant_node->field_sirius_event_pstatus['und'][0]['tid']) {
-		// return array('success' => TRUE, 'msg' => 'No changes.');
+		return array('success' => TRUE, 'msg' => 'No changes.');
 	}
 
 	$participant_node->field_sirius_event_prole['und'][0]['tid'] = $prole_tid;
@@ -25,6 +25,7 @@ function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $ps
 	if (!$term_cache[$pstatus_tid]) { $term_cache[$pstatus_tid] = taxonomy_term_load($pstatus_tid); }
 	sirius_jsonfield_log($participant_node, 'status', "Set prole = " . $term_cache[$prole_tid]->name . ", pstatus = " . $term_cache[$pstatus_tid]->name);
 	node_save($participant_node);
+	return array('success' => TRUE, 'msg' => 'Participant status changed.');
 }
 
 /**

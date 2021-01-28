@@ -19,10 +19,29 @@ function sirius_node_tab_event_info($event_node) {
   sirius_event_disclaimer_redirect($event_node);
   if (sirius_node_tab_event_bullpen_view_access($event_node)) {
     return sirius_node_tab_event_bullpen_view($event_node);
-  } else {
-    $renderable = node_view($event_node, 'full');
-    return drupal_render($renderable);
   }
+
+  $renderable = node_view($event_node, 'full');
+
+  $participant_nid = sirius_event_participant_nid_from_user($event_node->nid);
+  $participant_node = node_load($participant_nid);
+  if ($participant_node) {
+    $html .= sirius_dispatch_view_render_field($participant_node, 'field_sirius_event_prole', t('Your Role'));
+    $html .= sirius_dispatch_view_render_field($participant_node, 'field_sirius_event_pstatus', t('Your Status'));
+
+    $section = sirius_event_section_get_from_participant($event_node, $participant_node);
+    if ($section) {
+      $section_title = sirius_event_section_title($section);
+      if ($section['comments']) { $section_title .= '<br />' . $section['comments']; }
+      $html .= sirius_fakerender_field('Section: ', $section_title);
+    }
+
+    $html .= '<br />';
+  }
+
+  $html .= drupal_render($renderable);
+
+  return $html;
 }
 
 
