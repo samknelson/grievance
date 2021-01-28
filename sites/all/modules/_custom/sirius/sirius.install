@@ -53,3 +53,16 @@ function sirius_update_7003() {
     module_enable(array($module), TRUE);
   }
 }
+
+/**
+ * Enable form_options_attributes modules
+ */
+
+function sirius_update_7004() {
+  // Enable some modules
+  $modules = array('form_options_attributes');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
