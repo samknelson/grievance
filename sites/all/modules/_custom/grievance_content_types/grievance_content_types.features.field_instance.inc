@@ -29642,7 +29642,7 @@ If the file has multiple pages, then each page in the input document will use th
         'active_updating' => 1,
         'file_name' => array(
           'options' => array(
-            'pathauto' => 0,
+            'pathauto' => FALSE,
             'slashes' => 0,
             'transliterate' => 0,
           ),
@@ -29650,7 +29650,7 @@ If the file has multiple pages, then each page in the input document will use th
         ),
         'file_path' => array(
           'options' => array(
-            'pathauto' => 0,
+            'pathauto' => FALSE,
             'slashes' => 0,
             'transliterate' => 0,
           ),

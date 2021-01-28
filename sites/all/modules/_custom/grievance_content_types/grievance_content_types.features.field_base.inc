@@ -6985,7 +6985,7 @@ Prof.',
     'module' => 'image',
     'settings' => array(
       'default_image' => 0,
-      'uri_scheme' => 'private',
+      'uri_scheme' => 'public',
     ),
     'translatable' => 0,
     'type' => 'image',
