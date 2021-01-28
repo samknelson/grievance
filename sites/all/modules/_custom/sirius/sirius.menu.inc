@@ -816,6 +816,15 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/signature/admin'] = array(
+    'title' => 'Signature Settings',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_signature_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/disclaimer'] = array(
     'title' => 'Disclaimers',
     'description' => '',

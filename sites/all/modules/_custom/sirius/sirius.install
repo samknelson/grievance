@@ -66,3 +66,21 @@ function sirius_update_7004() {
     module_enable(array($module), TRUE);
   }
 }
+
+/**
+ * Move all signatures from private files to public files
+ */
+
+function sirius_update_7005() {
+  // Enable some modules
+  $sql = 'select * from field_data_field_sirius_signature order by entity_id';
+  $stmt = sirius_sql_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    $file = file_load($hr['field_sirius_signature_fid']);
+    $dest = $file->uri;
+    if (!preg_match('/private/', $dest)) { continue; }
+    $dest = preg_replace('/private:/', 'public:', $dest);
+    file_move($file, $dest);
+    print "Moved: $dest\n";
+  }
+}

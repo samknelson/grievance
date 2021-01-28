@@ -78,6 +78,7 @@ function sirius_page_config() {
 	$links['systems']['links']['sirius/map/admin']['sub_paths']['admin/config/content/geofield_map'] = array('title' => 'Geofield Service');
 	$links['systems']['links']['sirius/map/admin']['sub_paths']['admin/config/system/leaflet_more_maps'] = array('title' => 'Leaflet "More Maps" Service');
 	$links['systems']['links']['sirius/sns/config'] 						= array('title' => 'SNS', 'description' => 'Settings for Amazon Simple Notification Service (SNS)');
+	$links['systems']['links']['sirius/signature/admin'] 				= array('title' => 'Signatures', 'description' => 'User signature settings (image)');
 	$links['systems']['links']['admin/config/grievance/phaxio'] = array('title' => 'Phaxio', 'description' => 'Configure the Phaxio fax service.');
 	$links['systems']['links']['admin/config/services/shorten'] = array('title' => 'Shorten', 'description' => 'Configure the link shortening services such as blt.ly.');
 	$links['systems']['links']['admin/config'] 									= array('title' => 'Drupal Configuration', 'description' => 'Enter the system-wide Drupal configuration screens.');

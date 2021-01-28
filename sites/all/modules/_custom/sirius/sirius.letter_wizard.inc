@@ -320,6 +320,8 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 			'#title' => t('Body'),
 			'#default_value' => $data['body'],
 			'#rows' => 20,
+			'#format' => 'sirius_form_editor',
+			'#allowed_formats' => array('full_html'),
 		);
 	}
 
@@ -338,6 +340,8 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 			'#title' => 'PDF Body',
 			'#default_value' => $data['pdf_body'],
 			'#rows' => 20,
+			'#format' => 'sirius_form_editor',
+			'#allowed_formats' => array('full_html'),
 		);
 
 		if (user_access('grievance letter variable letterhead')) {
@@ -351,6 +355,8 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 		    '#options' => $options,
 		    '#title' => t('Letterhead'),
 				'#default_value' => $data['pdf_letterhead'],
+				'#format' => 'sirius_form_editor',
+				'#allowed_formats' => array('full_html'),
 		  );
 		}
 	}

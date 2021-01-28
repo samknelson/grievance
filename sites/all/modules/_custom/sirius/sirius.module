@@ -104,7 +104,7 @@ require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
 
 function sirius_cron() {
   sirius_auditlog();
-  sirius_signature_cleanup();
+  // sirius_signature_cleanup();
   sirius_domain_stats_cron();
 }
 
