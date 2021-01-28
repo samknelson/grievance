@@ -1,0 +1,20 @@
+#content .sirius_disclaimer {
+	border: 1px solid #cccccc;
+	margin: 10px;
+	padding: 10px;
+	background-color: #ffffff;
+}
+
+#content .sirius_disclaimer_accepted {
+	background-color: #cccccc;
+}
+
+#content .sirius_disclaimer h2 {
+	margin: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+#content .sirius_disclaimer h3 {
+	margin: 0;
+}
