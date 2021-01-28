@@ -118,7 +118,6 @@ function sirius_twilio_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-
   $items['sirius/twilio/phone'] = array(
     'title' => 'Sirius: Twilio: Phone',
     'description' => '',
@@ -135,6 +134,7 @@ function sirius_twilio_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_twilio_config'),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
   );
 
   $items['sirius/config/phone/twilio/global'] = array(
