@@ -28,6 +28,7 @@ function sirius_event_section_options($event_node, $counts = NULL, &$options_att
 	$event_json = sirius_jsonfield_util_node_json_get($event_node);
 	$limit = $event_json['section']['limit'];
 	$section_list = $event_json['section_list'];
+	if (!$section_list) { $section_list = array(); }
 	uksort($section_list, function($a, $b) use ($section_list) { return $section_list[$a]['weight'] <=> $section_list[$b]['weight']; });
 	$options = array(NULL => t('-- Select --'));
 	foreach ($section_list as $section_uuid => $section) {
