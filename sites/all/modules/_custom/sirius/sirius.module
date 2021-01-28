@@ -43,6 +43,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.fax.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overrides.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch_actions.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.do_not_disturb.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.server_paths.inc';
@@ -837,4 +838,56 @@ function sirius_text_to_html($string) {
 
 function sirius_require($module_name, $file) {
   require_once DRUPAL_ROOT . '/' . drupal_get_path('module', $module_name) . '/' . $file;
+}
+
+/**
+ * Check to see whether it's "safe" to delete a node, i.e. verify that it's not referenced by something that needs it.
+ */
+
+function sirius_node_can_delete($node) {
+  if ($node->type == 'sirius_contact') {
+    return sirius_contact_can_delete($node);
+  }
+
+  return array('success' => TRUE);
+}
+
+/**
+ * Wrapper around node_delete, but check to make sure that it's safe first.
+ */
+
+function sirius_node_careful_delete($node) {
+  if (!is_object($node)) { 
+    $node = node_load($node);
+  }
+
+  if (!is_object($node)) { 
+    return array('success' => FALSE, 'msg' => 'Does not appear to be a node or nid.'); 
+  }
+
+  $can_delete = sirius_node_can_delete($node);
+  if (!$can_delete['success']) { 
+    return $can_delete;
+  }
+
+  node_delete($node->nid); 
+  return array('success' => TRUE, 'msg' => 'Record deleted.');
+}
+
+function sirius_ajax_generic_replace($form, $form_state) {
+  $params = $form_state['triggering_element']['#sirius_ajax'];
+  $wrapper = $params['wrapper'];
+  $element = $params['element'];
+  if ($params['files']) {
+    $module = $params['module'];
+    foreach ($params['files'] as $file) {
+      sirius_require($module, $file);
+    }
+  }
+  $commands = array();
+  $commands[] = ajax_command_replace($wrapper, render($form[$element]));
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands
+  );
 }
