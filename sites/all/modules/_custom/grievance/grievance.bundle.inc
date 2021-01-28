@@ -251,6 +251,7 @@ function grievance_bundle_form_submit($form, &$form_state) {
     'operations' => $operations,
 		'finished' => 'grievance_bundle_finished'
   );
+  dpm($batch);
   batch_set($batch);
 
   drupal_set_message("Bundling for this grievance is complete.");
@@ -288,12 +289,12 @@ function grievance_bundle_batch_add($grievance_node, $drupal_path, &$context) {
 	$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
 
 	if (file_exists($bundled_file)) {
-		$cmd = '/usr/bin/pdfunite ';
+		$cmd = sirius_server_paths('pdfunite') . ' ';
 		$cmd .= $bundled_file . ' ';
 		$cmd .= grievance_bundle_output_path($grievance_node, $drupal_path) . '.pdf ';
 		$cmd .= $tmp_file . ' ';
 	} else {
-		$cmd = '/bin/cp ';
+		$cmd = sirius_server_paths('cp') . ' ';
 		$cmd .= grievance_bundle_output_path($grievance_node, $drupal_path) . '.pdf ';
 		$cmd .= $tmp_file . ' ';
 	}
@@ -332,9 +333,10 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 			$dest = grievance_bundle_output_path($grievance_node, "node/$target_nid") . "_attachment_" . $delta . '.' . 'pdf';
 
 			// Execute wkhtmltopdf
-			$cmd = '/usr/bin/xvfb-run -a ';
+			$cmd = sirius_server_paths('xvfb-run') . ' ';
+			$cmd .= '-a ';
 			$cmd .= '--server-args="-screen 0 1024x768x24" ';
-			$cmd .= '/usr/local/bin/wkhtmltopdf ';
+			$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
 			$cmd .= $wkhtmltopdfargs . ' ';
 			$cmd .= '--print-media-type ';
 			$cmd .= '-q ';
@@ -354,12 +356,12 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
 
 		if (file_exists($bundled_file)) {
-			$cmd = '/usr/bin/pdfunite ';
+			$cmd = sirius_server_paths('pdfunite') . ' ';
 			$cmd .= $bundled_file . ' ';		
 			$cmd .= $dest . ' ';
 			$cmd .= $tmp_file . ' ';
 		} else {
-			$cmd = '/bin/cp ';
+			$cmd = sirius_server_paths('cp') . ' ';
 			$cmd .= $dest . ' ';
 			$cmd .= $tmp_file . ' ';
 		}
@@ -379,7 +381,7 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 function grievance_bundle_batch_generate($grievance_node, $drupal_path, &$context) {
 	$context['message'] = t('Generating path: @path', array('@path' => $drupal_path)); 
 
-	$cmd = '/usr/local/bin/drush ';
+	$cmd = sirius_server_paths('drush') . ' ';
 	$cmd .= '--user=1 ';
 	$cmd .= 'php-eval ';
 	$cmd .= '"\$_GET[\'q\'] = \'' . $drupal_path . '\'; menu_execute_active_handler(\'' . $drupal_path . '\');" ';
@@ -391,9 +393,7 @@ function grievance_bundle_batch_generate($grievance_node, $drupal_path, &$contex
 function grievance_bundle_batch_pdf($grievance_node, $drupal_path, &$context) {
 	$context['message'] = t('Converting to PDF: @path', array('@path' => $drupal_path)); 
 
-	//$cmd = '/usr/bin/xvfb-run -a ';
-	//$cmd .= '--server-args="-screen 0 1024x768x24" ';
-	$cmd .= '/usr/local/bin/wkhtmltopdf ';
+	$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
 	$cmd .= '--print-media-type ';
 	$cmd .= '--disable-javascript ';
 	$cmd .= '-q ';
