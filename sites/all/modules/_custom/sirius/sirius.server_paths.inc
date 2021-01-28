@@ -21,6 +21,21 @@ function sirius_server_paths_info_all() {
 			'description' => 'PDFTk utility for combining multiple PDF entries.',
 			'default_value' => '/usr/bin/pdftk',
 		),
+		'pdfunite' => array(
+			'title' => 'pdfunite',
+			'description' => 'PDFUnite utility for combining multiple PDF entries.',
+			'default_value' => '/usr/bin/pdfunite',
+		),
+		'cp' => array(
+			'title' => 'cp',
+			'description' => 'Linux file copy',
+			'default_value' => '/bin/cp',
+		),
+		'drush' => array(
+			'title' => 'cp',
+			'description' => 'DRUSH',
+			'default_value' => '/usr/bin/drush',
+		),
 	);
 
 
