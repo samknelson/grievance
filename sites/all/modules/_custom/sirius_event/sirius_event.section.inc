@@ -15,11 +15,11 @@ function sirius_event_section_enabled($event_node) {
 	return $event_json['section']['enabled'] == 'Yes';
 }
 
-function sirius_event_section_title($section) {
+function sirius_event_section_title($section, $empty_title = '(new section)') {
 	if ($section['title']) { $title = $section['title']; }
 	if (!$title && ($section['ts'] > 1)) { $title = sirius_event_section_render_ts($section['ts']); }
 	if (!$title) { $title = $section['uuid']; }
-	if (!$title) { $title = '(new section)'; }
+	if (!$title) { $title = $empty_title; }
 
 	return $title;
 }
@@ -183,15 +183,15 @@ function sirius_event_section_assign($participant_nid, $uuid, $options = array()
 		$email = $contact_node->field_sirius_email['und'][0]['value'];
 
 		$old_section = $event_json['section_list'][$old_uuid];
-		$new_section = $event_json['section_list'][$new_uuid];
+		$new_section = $event_json['section_list'][$uuid];
 
     $params = array();
     $params['subject'] = "Section Assignment Changed: " . $event_node->title;
     $params['body'] .= "Your section assignment for " . $event_node->title . " has been changed.<br /><br />";
     $params['body'] .= $options['notify']['comments'];
     $params['body'] .= "<br /><br />";
-    $params['body'] .= 'Old section: ' . sirius_event_section_title($old_section) . '<br />';
-    $params['body'] .= 'New section: <strong>' . sirius_event_section_title($new_section) . '</strong><br />';
+    $params['body'] .= 'Old section: ' . sirius_event_section_title($old_section, '(no section)') . '<br />';
+    $params['body'] .= 'New section: <strong>' . sirius_event_section_title($new_section, '(no section)') . '</strong><br />';
     $params['to'] = $email;
     $result = sirius_email_send($params);
 
