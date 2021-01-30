@@ -32,8 +32,8 @@ function sirius_server_paths_info_all() {
 			'default_value' => '/bin/cp',
 		),
 		'drush' => array(
-			'title' => 'cp',
-			'description' => 'DRUSH',
+			'title' => 'Drush',
+			'description' => 'Drush command-line Drupal utility',
 			'default_value' => '/usr/bin/drush',
 		),
 	);
