@@ -581,3 +581,85 @@ function sirius_domain_activity_render($domain_nids) {
 
 	return $html;
 }
+
+function sirius_domain_util_migrate_root_to_domain($domain_nid) {
+  $domain_node = node_load($domain_nid);
+  if (!$domain_node) { die("Domain not found: $domain_nid"); }
+  if (!$domain_node->type == 'sirius_domain') { die("Not a domain node: $domain_nid [" . $domain_node->title . "]"); }
+
+  // Get the list of node types that have a domain.
+  $info = field_info_field('field_sirius_domain');
+  $taxonomies = $info['bundles']['taxonomy_term'];
+  $content_types = $info['bundles']['node'];
+
+  // Get this list of nodes
+  $node_counts = array();
+  foreach ($content_types as $bundle) {
+    $sql_args = array(':bundle' => $bundle);
+    $sql = "select type, nid, title from node ";
+    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+    $sql .= "where field_sirius_domain_target_id is null ";
+    $sql .= "and type = :bundle ";
+    $sql .= "order by nid ";
+    $sql .= "limit 1000 ";
+    $types = array();
+    $stmt = sirius_sql_query($sql, $sql_args);
+    $count = 0;
+    while ($hr = $stmt->fetchAssoc()) {
+      ++$count;
+    }
+    $node_counts[$bundle] = $count;
+  }
+
+  // Get this list of nodes
+  $term_counts = array();
+  foreach ($taxonomies as $bundle) {
+    $sql_args = array(':bundle' => $bundle);
+    $sql = "select tid, taxonomy_term_data.name from taxonomy_term_data ";
+    $sql .= "left join taxonomy_vocabulary on taxonomy_vocabulary.vid = taxonomy_term_data.vid ";
+    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'taxonomy_term' and field_data_field_sirius_domain.entity_id = tid ";
+    $sql .= "where field_sirius_domain_target_id is null ";
+    $sql .= "and taxonomy_vocabulary.machine_name = :bundle ";
+    $sql .= "order by tid ";
+    $sql .= "limit 1000 ";
+    $types = array();
+    $stmt = db_query($sql, $sql_args);
+    $count = 0;
+    while ($hr = $stmt->fetchAssoc()) {
+      ++$count;
+    }
+    $term_counts[$bundle] = $count;
+  }
+
+  // Get this list of users
+  $sql_args = array(':bundle' => $bundle);
+  $sql = "select uid, name from users ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'user' and field_data_field_sirius_domain.entity_id = uid ";
+  $sql .= "where field_sirius_domain_target_id is null ";
+  $sql .= 'and uid != 1 ';
+  $sql .= "order by uid ";
+  $sql .= "limit 1000 ";
+  $types = array();
+  $stmt = db_query($sql, $sql_args);
+  $count = 0;
+  while ($hr = $stmt->fetchAssoc()) {
+    print_r($hr);
+    ++$user_count;
+  }
+
+  // Get the settings
+  $sql = "select name from variable where name like 'sirius%' or name like 'grievance%' ";
+  $stmt = db_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    print_r($hr);
+    ++$variable_count;
+  }
+  print "Node counts: ";
+  print_r($node_counts);
+
+  print "Term counts: ";
+  print_r($term_counts);
+
+  print "User count: $user_count\n";
+  print "Variable count: $variable_count\n";
+}
