@@ -306,6 +306,24 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
 	$steps = sirius_wizard_steps($info, $data, $entity_node);
 
+	if ($data['format'] == 'sms') {
+		// Add a link shortener
+	  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/sirius.popup.js');
+	  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.popup.css');
+	  $html .= '<br /><a href="#" class="sirius_popup_trigger tool-button">' . t('Link Shortener') . '</a>';
+	  $html .= '<div style="display:none" class="sirius_popup_overlay"></div>';
+	  $html .= '<div style="display:none" class="sirius_popup_wrap">';
+	  $html .= '<div class="sirius_popup_contents">';
+	  $shorten_block = block_load('shorten', 'shorten');
+		$shorten_build = module_invoke('shorten', 'block_view', 'shorten');
+		drupal_alter(array('block_view', "block_view_shorten_shorten"), $shorten_build, $shorten_block);
+		$html .= $shorten_build['content'];
+	  $html .= '</div>';
+	  $html .= '<div class="sirius_popup_close"></div>';
+	  $html .= '</div>';
+	  $form['#prefix'] = $html;
+	}
+
 	if ($data['format'] == 'email') {
 		$form['subject'] = array(
 			'#type' => 'textfield',
@@ -331,6 +349,8 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 			'#title' => 'Body',
 			'#default_value' => $data['body'],
 			'#rows' => 10,
+			'#id' => 'sms_body',
+			'#description' => sirius_sms_segment_count('sms_body'),
 		);
 	}
 
