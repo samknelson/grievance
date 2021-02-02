@@ -158,7 +158,7 @@ function sirius_event_node_tabs() {
     'weight' => 6,
   );
 
-  $map_files = array('sirius_event.page_map.inc','sirius_event.page_map_list.inc','sirius_event.page_map_view.inc','sirius_event.page_map_settings.inc');
+  // $map_files = array('sirius_event.page_map.inc','sirius_event.page_map_list.inc','sirius_event.page_map_view.inc','sirius_event.page_map_settings.inc');
 
   $node_tabs['sirius_event']['sirius_event_map'] = array(
     'title' => 'Map',
@@ -561,7 +561,6 @@ function sirius_event_term_tabs() {
     'permissions' => array('sirius event admin'),
     'weight' => 6,
   );
-
 
   $term_tabs['sirius_event_type']['sirius_event_type_phonebank'] = array(
     'title' => 'Phonebank',
