@@ -392,6 +392,9 @@ function grievance_bundle_batch_generate($grievance_node, $drupal_path, &$contex
 function grievance_bundle_batch_pdf($grievance_node, $drupal_path, &$context) {
 	$context['message'] = t('Converting to PDF: @path', array('@path' => $drupal_path)); 
 
+	$cmd = sirius_server_paths('xvfb-run') . ' ';
+	$cmd .= '-a ';
+	$cmd .= '--server-args="-screen 0 1024x768x24" ';
 	$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
 	$cmd .= '--print-media-type ';
 	$cmd .= '--disable-javascript ';

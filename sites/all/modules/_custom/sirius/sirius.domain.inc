@@ -595,6 +595,7 @@ function sirius_domain_util_migrate_root_to_domain($domain_nid) {
   // Get this list of nodes
   $node_counts = array();
   foreach ($content_types as $bundle) {
+    if ($bundle == 'sirius_domain') { continue; }
     $sql_args = array(':bundle' => $bundle);
     $sql = "select type, nid, title from node ";
     $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
@@ -606,6 +607,10 @@ function sirius_domain_util_migrate_root_to_domain($domain_nid) {
     $stmt = sirius_sql_query($sql, $sql_args);
     $count = 0;
     while ($hr = $stmt->fetchAssoc()) {
+      $node = node_load($hr['nid']);
+      $node->field_sirius_domain['und'][0]['target_id'] = $domain_nid;
+      node_save($node);
+      print "Saved: $hr[nid] - " . $node->title . "\n";
       ++$count;
     }
     $node_counts[$bundle] = $count;
@@ -626,6 +631,10 @@ function sirius_domain_util_migrate_root_to_domain($domain_nid) {
     $stmt = db_query($sql, $sql_args);
     $count = 0;
     while ($hr = $stmt->fetchAssoc()) {
+      $term = taxonomy_term_load($hr['tid']);
+      $term->field_sirius_domain['und'][0]['target_id'] = $domain_nid;
+      taxonomy_term_save($term);
+      print "Saved: $hr[tid] - " . $term->title . "\n";
       ++$count;
     }
     $term_counts[$bundle] = $count;
@@ -636,14 +645,17 @@ function sirius_domain_util_migrate_root_to_domain($domain_nid) {
   $sql = "select uid, name from users ";
   $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'user' and field_data_field_sirius_domain.entity_id = uid ";
   $sql .= "where field_sirius_domain_target_id is null ";
-  $sql .= 'and uid != 1 ';
+  $sql .= 'and uid > 1 ';
   $sql .= "order by uid ";
   $sql .= "limit 1000 ";
   $types = array();
   $stmt = db_query($sql, $sql_args);
   $count = 0;
   while ($hr = $stmt->fetchAssoc()) {
-    print_r($hr);
+    $u = user_load($hr['uid']);
+    print "Saving: " . $u->uid . " / " . $u->name . "\n";
+    user_save($u, array('field_sirius_domain' => array('und' => array(0 => array('target_id' => $domain_nid)))));
+    print "Saved: $hr[uid] - " . $u->name . "\n";
     ++$user_count;
   }
 
@@ -651,7 +663,10 @@ function sirius_domain_util_migrate_root_to_domain($domain_nid) {
   $sql = "select name from variable where name like 'sirius%' or name like 'grievance%' ";
   $stmt = db_query($sql, array());
   while ($hr = $stmt->fetchAssoc()) {
-    print_r($hr);
+    $name = $hr['name'];
+    $val = variable_get($name);
+    sirius_domain_variable_set("$name/$domain_nid", $val);
+    print "Set: $name\n";
     ++$variable_count;
   }
   print "Node counts: ";
