@@ -84,3 +84,24 @@ function sirius_update_7005() {
     print "Moved: $dest\n";
   }
 }
+
+/**
+ * Disable table_trash
+ * Disable login_destination
+ * Enable logintoboggan
+ */
+
+function sirius_update_7006() {
+  // Enable some modules
+  $modules = array('table_trash', 'login_destination');
+  foreach ($modules as $module) {
+    print "Disabling $module\n";
+    module_disable(array($module), TRUE);
+  }
+  $modules = array('logintoboggan');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
+
