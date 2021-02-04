@@ -371,7 +371,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 1,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 8,
@@ -549,7 +548,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 9,
@@ -3683,7 +3681,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 43,
@@ -5200,7 +5197,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'date',
         'settings' => array(
           'custom_date_format' => '',
@@ -5211,7 +5208,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 60,
@@ -5449,7 +5445,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'date',
         'settings' => array(
           'custom_date_format' => '',
@@ -5460,7 +5456,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 59,
@@ -7085,13 +7080,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 71,
       ),
       'grievance_arbitrationform' => array(
@@ -7159,11 +7149,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 72,
       ),
       'grievance_arbitrationform' => array(
