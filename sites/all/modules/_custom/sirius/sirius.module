@@ -480,6 +480,8 @@ function sirius_no_more_term_listings() {
 
 function sirius_user_view_access($account) {
   if (!user_access('sirius edit own user')) { 
+    drupal_goto('<front>');
+    /*
     // If we can't edit our own user, and we're a worker, we get redirected to the "edit the worker" page.
     $worker = sirius_worker_get();
     global $user;
@@ -490,12 +492,15 @@ function sirius_user_view_access($account) {
     } else {
       return FALSE;
     }
+    */
   }
   return user_view_access($account);
 }
 
 function sirius_user_edit_access($account) {
   if (!user_access('sirius edit own user')) { 
+    drupal_goto('<front>');
+    /*
     // If we can't edit our own user, and we're a worker, we get redirected to the "edit the worker" page.
     $worker = sirius_worker_get();
     global $user;
@@ -506,6 +511,7 @@ function sirius_user_edit_access($account) {
     } else {
       return FALSE;
     }
+    */
   }
   
   return user_edit_access($account);
