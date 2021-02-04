@@ -1695,5 +1695,6 @@ features[variable][] = pathauto_taxonomy_term_sirius_industry_pattern
 features[variable][] = pathauto_taxonomy_term_sirius_member_status_pattern
 features[variable][] = pathauto_taxonomy_term_sirius_skill_pattern
 features[variable][] = pathauto_taxonomy_term_sirius_work_status_pattern
+features[variable][] = site_403
 features[variable][] = theme_at_sirius_settings
 project path = sites/all/modules/_custom
