@@ -50,6 +50,23 @@ function sirius_event_section_options($event_node, $counts = NULL, &$options_att
 	return $options;
 }
 
+/**
+ * Which pstatus_tids are NOT excluded from the counts?
+ */
+
+function sirius_event_section_pstatus_tids($prole_tids) {
+  // What statuses are we interested in? 
+  $all_pstatus_tids = sirius_event_participant_role_status_tids($prole_tids);
+  $all_pstatus_terms = taxonomy_term_load_multiple(array_keys($all_pstatus_tids));
+  $pstatus_tids = array();
+  foreach ($all_pstatus_terms as $pstatus_tid => $pstatus_term) {
+  	$pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
+  	if ($pstatus_json['section']['exclude'] == 'Yes') { continue; }
+  	$pstatus_tids[] = $pstatus_tid;
+  }
+  return $pstatus_tids;
+}
+
 function sirius_event_section_counts($event_node) {
   // What role(s) are we interested in?
   $event_json = sirius_jsonfield_util_node_json_get($event_node);
@@ -57,6 +74,9 @@ function sirius_event_section_counts($event_node) {
   if (!$event_section_json['prole_tids']) { return array(); }
   $prole_tids = array_filter(array_values($event_section_json['prole_tids']));
   if (!$prole_tids) { return array(); }
+
+  $pstatus_tids = sirius_event_section_pstatus_tids($prole_tids);
+  if (!$pstatus_tids) { return array(); }
 
   // Write a query
 	$sql_args = array();
@@ -71,10 +91,20 @@ function sirius_event_section_counts($event_node) {
 	$sql .= "where node.type = 'sirius_event_participant' ";
 	$sql .= "and field_sirius_event_target_id = :event_nid ";
 	$sql .= "and (";
+	$delta = 0;
 	foreach ($prole_tids as $prole_tid) {
 		if ($delta > 0) { $sql .= ' or '; }
 		$sql .= " field_sirius_event_prole_tid = :prole_tid_$delta ";
 		$sql_args[":prole_tid_$delta"] = $prole_tid;
+		++$delta;
+	}
+	$sql .= ') ';
+	$sql .= "and (";
+	$delta = 0;
+	foreach ($pstatus_tids as $pstatus_tid) {
+		if ($delta > 0) { $sql .= ' or '; }
+		$sql .= " field_sirius_event_pstatus_tid = :pstatus_tid_$delta ";
+		$sql_args[":pstatus_tid_$delta"] = $pstatus_tid;
 		++$delta;
 	}
 	$sql .= ') ';
@@ -97,6 +127,9 @@ function sirius_event_section_participants($event_node) {
   if (!$event_section_json['prole_tids']) { return array(); }
   $prole_tids = array_filter(array_values($event_section_json['prole_tids']));
   if (!$prole_tids) { return array(); }
+
+  $pstatus_tids = sirius_event_section_pstatus_tids($prole_tids);
+  if (!$pstatus_tids) { return array(); }
 
   // Look up term names, to make life easier on client code
   $pstatus_names = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
@@ -125,10 +158,20 @@ function sirius_event_section_participants($event_node) {
 	$sql .= "where node.type = 'sirius_event_participant' ";
 	$sql .= "and field_sirius_event_target_id = :event_nid ";
 	$sql .= "and (";
+	$delta = 0;
 	foreach ($prole_tids as $prole_tid) {
 		if ($delta > 0) { $sql .= ' or '; }
 		$sql .= " field_sirius_event_prole_tid = :prole_tid_$delta ";
 		$sql_args[":prole_tid_$delta"] = $prole_tid;
+		++$delta;
+	}
+	$sql .= ') ';
+	$sql .= "and (";
+	$delta = 0;
+	foreach ($pstatus_tids as $pstatus_tid) {
+		if ($delta > 0) { $sql .= ' or '; }
+		$sql .= " field_sirius_event_pstatus_tid = :pstatus_tid_$delta ";
+		$sql_args[":pstatus_tid_$delta"] = $pstatus_tid;
 		++$delta;
 	}
 	$sql .= ') ';

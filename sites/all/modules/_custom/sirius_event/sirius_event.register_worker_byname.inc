@@ -1,7 +1,7 @@
 <?php
 
 function sirius_event_register_worker_byname_form($form, &$form_state, $event_node, $rule) {
-  drupal_add_css(drupal_get_path('module', 'sirius_jsonfield') . '/css/form_editor.css', 'file');
+  drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/event.css', 'file');
   $form['#after_build'][] = 'sirius_event_register_worker_byname_worker_remove_format';
 
   $form_state['event_nid'] = $event_node->nid;
@@ -14,7 +14,7 @@ function sirius_event_register_worker_byname_form($form, &$form_state, $event_no
   // $open = sirius_dispatch_bullpen_signin_open($job_node, FALSE);
   $form['#tree'] = TRUE; 
 
-  $form['table_open'] = array('#markup' => '<table>');
+  $form['table_open'] = array('#markup' => '<table class="columns_table">');
   $form['col1_open'] = array('#markup' => '<tr><td style="width: 66%; vertical-align: top;">');
   $form['worker'] = array(
     '#title' => t('Register a Worker'),

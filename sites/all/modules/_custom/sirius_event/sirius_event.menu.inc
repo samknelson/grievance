@@ -395,7 +395,7 @@ function sirius_event_node_tabs() {
   $node_tabs['sirius_event_participant']['sirius_event_participant_json_log'] = array(
     'title' => 'Change Log',
     'description' => '',
-    'callback' => 'sirius_jsonfield_log_render',
+    'callback' => 'sirius_jsonfield_node_tab_entity_sublog',
     'permissions' => array('sirius event admin'),
     'weight' => 3,
   );

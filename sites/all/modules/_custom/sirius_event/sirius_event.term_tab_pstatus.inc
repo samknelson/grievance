@@ -70,6 +70,27 @@ function sirius_event_term_tab_pstatus_form($form, &$form_state, $pstatus_term) 
 		if (isset($json['mypstatus']['options'])) { $form['mypstatus']['options']['#default_value'] = $json['mypstatus']['options']; }
 	}
 
+	$form['section'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Section Settings'),
+		'#description' => t('Indicate how participants with the status <strong>@name</strong> should interact with the the sections for a given event.', array('@name' => $pstatus_term->name)),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
+
+	$form['section']['exclude'] = array(
+		'#title' => t('Exclude?'),
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $json['section']['exclude'],
+		'#description' => t('Certain statuses should not be included in the count of participants registered for a section. For example, if a particular class has a section that can hold up to 5 participants, then participants with the status "withdrawn" should not be included in this count.'),
+	);
+
+
 	$form['schedule']['display'] = array(
 		'#type' => 'fieldset',
 		'#title' => t('Schedule Display'),
@@ -158,11 +179,11 @@ function sirius_event_term_tab_pstatus_form($form, &$form_state, $pstatus_term) 
 function sirius_event_term_tab_pstatus_form_submit($form, &$form_state) {
 	$pstatus_term = taxonomy_term_load($form_state['pstatus_tid']);
 	$json = sirius_jsonfield_util_term_json_get($pstatus_term);
-	$json['schedule'] = $form_state['values']['schedule'];
-	$json['phonebank'] = $form_state['values']['phonebank'];
-	$json['map'] = $form_state['values']['map'];
-	$json['mypstatus'] = $form_state['values']['mypstatus'];
-	$json['notification'] = $form_state['values']['notification'];
+
+	$keys = array('schedule', 'phonebank', 'map', 'mypstatus', 'notification', 'section');
+	foreach ($keys as $key) {
+		$json[$key] = $form_state['values'][$key];
+	}
 	$json['notification']['register']['email_body'] = sirius_richtext_handle_input($form_state['values']['notification']['register']['email_body']);
 	sirius_jsonfield_util_term_json_set($pstatus_term, $json);
 	taxonomy_term_save($pstatus_term);
