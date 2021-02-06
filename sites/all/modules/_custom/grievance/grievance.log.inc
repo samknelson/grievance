@@ -692,7 +692,7 @@ function grievance_log_views_pre_render($view) {
     $sql .= "where node.type = 'sirius_log' ";
     $sql .= "and field_sirius_log_handler_target_id in (:grievance_log_nids) ";
     $sql .= "order by node.created ";
-    $sql .= "limit 21 ";
+    $sql .= "limit 2100 ";
     $stmt = db_query($sql, array(':grievance_log_nids' => $grievance_log_nids));
     while ($hr = $stmt->fetchAssoc()) {
       ++$count;
