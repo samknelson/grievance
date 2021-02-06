@@ -117,6 +117,8 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
   $sql .= "where field_sirius_event_target_id = :event_nid ";
   $sql .= "and field_sirius_event_prole_tid = :prole_tid ";
   $sql .= "and field_sirius_address_geo_lat is not null ";
+  $sql .= "and field_sirius_address_thoroughfare is not null ";
+  $sql .= "and field_sirius_address_thoroughfare != '' ";
   if ($cutoff_ts) { 
     $sql .= "and node.changed > :cutoff_ts ";
     $sql_args[':cutoff_ts'] = $cutoff_ts;
