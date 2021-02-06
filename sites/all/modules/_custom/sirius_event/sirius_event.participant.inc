@@ -148,3 +148,15 @@ function sirius_event_participant_delete_from_contact($event_nid, $contact_nid) 
   return array('success' => TRUE, 'msg' => 'Participant record deleted.');
 }
 
+function sirius_event_participant_mypstatus_options($pstatus_json) {
+	if (!$pstatus_json['mypstatus']['options']) { return array(); }
+	$pstatus_tids = array_filter(array_values($pstatus_json['mypstatus']['options']));
+	if (!$pstatus_tids) { return array(); }
+	$sql = "select tid, name from taxonomy_term_data where tid in (:pstatus_tids) order by name";
+	$stmt = sirius_sql_query($sql, array(':pstatus_tids' => $pstatus_tids));
+	$options = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$options[$hr['tid']] = $hr['name'];
+	}
+	return $options;
+}
