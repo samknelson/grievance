@@ -111,9 +111,9 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 		file_copy($letterhead_source, $letterhead_pdf_uri, FILE_EXISTS_REPLACE);
 	}
 
-	$cmd = '/usr/bin/xvfb-run -a ';
+	$cmd = sirius_server_paths('xvfb-run') . ' -a ';
 	$cmd .= '--server-args="-screen 0 1024x768x24" ';
-	$cmd .= '/usr/local/bin/wkhtmltopdf ';
+	$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
 	if ($wkhtmltopdfargs) {
 		$cmd .= $wkhtmltopdfargs . ' ';
 	}
@@ -129,7 +129,7 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 
 	if ($letterhead_node) {
 		// Combine the letterhead with the source
-		$cmd = "/usr/bin/pdftk $pdf_path multibackground $letterhead_pdf_path output $pdf_path.combined";
+		$cmd = sirius_server_paths('pdftk') . ' ' . "$pdf_path multibackground $letterhead_pdf_path output $pdf_path.combined";
 		exec($cmd);
 		rename("$pdf_path.combined", "$pdf_path");
 	}
