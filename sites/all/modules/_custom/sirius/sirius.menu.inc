@@ -92,7 +92,7 @@ function sirius_node_tabs() {
       'title' => 'Letters',
       'description' => '',
       'callback' => 'sirius_node_tab_entity_letter',
-      'permissions' => array('sirius domain admin'),
+      'permissions' => array('sirius'),
     );
   }
 
@@ -208,6 +208,16 @@ function sirius_node_tabs() {
     'weight' => 1,
   );
 
+  $node_tabs['sirius_log']['sirius_log_json'] = array(
+    'title' => 'Details',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_json',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 3,
+    'file' => 'sirius.page_entity_json.inc',
+  );
+
+  sirius_node_tab_set_module('sirius', $node_tabs);
   return $node_tabs;
 }
 
@@ -863,6 +873,45 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/mailattach'] = array(
+    'title' => 'Mailattach',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_mailattach_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/mailattach/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_mailattach_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/mailattach/test'] = array(
+    'title' => 'Test',
+    'description' => '',
+    'page callback' => 'sirius_mailattach_page_test',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/mailattach/test-all'] = array(
+    'title' => 'Test (All Domains)',
+    'description' => '',
+    'page callback' => 'sirius_mailattach_page_test_all',
+    'page arguments' => array(),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
   $items['sirius/contact/resync/all'] = array(
     'title' => 'Resync All Contacts',
     'description' => '',
@@ -930,6 +979,17 @@ function sirius_menu() {
     'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
   );
+
+  $items['sirius/customfield/definition/list'] = array(
+    'title' => 'Custom Field Definitions',
+    'description' => '',
+    'access arguments' => array('sirius domain admin'),
+    'page callback' => 'sirius_customfield_definition_list',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius.page_customfield_definitions.inc',
+  );
+
 
   $items['sirius/esignature/test'] = array(
     'title' => 'Sirius eSignature Test',
