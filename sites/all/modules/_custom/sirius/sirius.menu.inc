@@ -92,7 +92,7 @@ function sirius_node_tabs() {
       'title' => 'Letters',
       'description' => '',
       'callback' => 'sirius_node_tab_entity_letter',
-      'permissions' => array('sirius domain admin'),
+      'permissions' => array('sirius'),
     );
   }
 
