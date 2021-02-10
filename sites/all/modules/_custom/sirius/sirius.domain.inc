@@ -412,7 +412,7 @@ function sirius_domain_variable_set($name, $value) {
 
 function sirius_domain_variable_name($name) {
   $domain_nid = sirius_domain_nid();
-  if ($domain_nid) { return $domain_nid . '/' . $name; } else { return $name; }
+  if ($domain_nid > 0) { return $domain_nid . '/' . $name; } else { return $name; }
 }
 
 
