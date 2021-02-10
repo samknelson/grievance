@@ -24,6 +24,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/config/letter']							= array('title' => 'Letters', 'description' => 'Configure the Letters system and manage letter templates.');
 	$links['core']['links']['sirius/disclaimer']						= array('title' => 'Disclaimers', 'description' => 'Configure dislcaimers -- text which can be attached to events or event types, and which must be accepted by the user.');
 	$links['core']['links']['sirius/config/feed']								= array('title' => 'Feeds', 'description' => 'Configure the feeds system.');
+	$links['core']['links']['sirius/mailattach']								= array('title' => 'Mailattach', 'description' => 'Configure the attach-by-email system.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
