@@ -105,3 +105,22 @@ function sirius_update_7006() {
   }
 }
 
+/**
+ * Rename mailattach variables
+ */
+
+function sirius_update_7007() {
+  $keys = array(
+    'grievance_mailattach_user' => 'sirius_mailattach_user', 
+    'grievance_mailattach_pass' => 'sirius_mailattach_pass',
+    'grievance_mailattach_imapstr' => 'sirius_mailattach_imapstr',
+    'grievance_mailattach_type' => 'sirius_mailattach_grievance_type', 
+  );
+  foreach ($keys as $old_key => $new_key) {
+    print "Setting: $old_key => $new_key\n";
+    variable_set($new_key, variable_get($old_key, ''));
+  }
+  if (!variable_get('sirius_mailattach_mode', '')) {
+    variable_set('sirius_mailattach_mode', 'live');
+  }
+}
