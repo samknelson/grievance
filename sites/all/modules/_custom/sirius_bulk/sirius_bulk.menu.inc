@@ -59,12 +59,20 @@ function sirius_bulk_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_bulk']['sirius_bulk_manual'] = array(
+    'title' => 'Manual Confirmation',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_manual',
+    'permissions' => array('sirius bulk manual'),
+    'weight' => 5,
+  );
+
   $node_tabs['sirius_bulk']['sirius_bulk_send'] = array(
     'title' => 'Send',
     'description' => '',
     'callback' => 'sirius_bulk_node_tab_send',
     'permissions' => array('sirius bulk send'),
-    'weight' => 5,
+    'weight' => 6,
   );
 
 	$node_tabs['sirius_bulk']['sirius_bulk_queue'] = array(
@@ -72,7 +80,7 @@ function sirius_bulk_node_tabs() {
 		'description' => '',
 		'callback' => 'sirius_bulk_node_tab_queue',
 		'permissions' => array('sirius bulk send'),
-		'weight' => 6,
+		'weight' => 7,
 	);
 
 	return $node_tabs;
@@ -140,6 +148,18 @@ function sirius_bulk_menu() {
     'page arguments' => array(),
     'type' => MENU_NORMAL_ITEM,
   );
+
+  $items['sirius/bulk/manual'] = array(
+    'title' => 'Manually Deliver Bulk Messages',
+    'description' => '',
+    'access arguments' => array('sirius bulk manual'),
+    'page callback' => 'sirius_bulk_page_manual',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 1,
+  );
+
+
   return $items;
 }
 

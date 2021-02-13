@@ -30,10 +30,43 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
 	$participant_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s');
 	if ($json) { sirius_jsonfield_util_node_json_set($participant_node, $json); }
 
+	$sql = "select title from node where nid = :nid";
+	$stmt = sirius_sql_query($sql, array(':nid' => $event_nid));
+	$hr = $stmt->fetchAssoc();
+	$participant_node->title = $hr['title'];
+
+	$sql = "select title from node where nid = :nid";
+	$stmt = sirius_sql_query($sql, array(':nid' => $contact_nid));
+	$hr = $stmt->fetchAssoc();
+	$participant_node->title .= ': ' . $hr['title'];
 	sirius_jsonfield_log($participant_node, 'registered', 'Participant registered.');
 	node_save($participant_node);
 
-	return array('success' => TRUE, 'msg' => 'Participant created.', 'nid' => $participant_node->nid);
+	$msg = "Participant created.";
+	if ($json['notification']['medium']) {
+		$contact_node = node_load($contact_nid);
+		$contact_email = $contact_node->field_sirius_email['und'][0]['value'];
+		$contact_phone = $contact_node->field_sirius_phone['und'][0]['value'];
+
+		if (in_array($json['notification']['medium'], array('sms', 'both')) && $contact_phone) {
+			$params = array();
+      $params['sms'] = $json['notification']['sms'];
+      $params['to'] = $contact_phone;
+      $result = sirius_sms_send($params);
+      if ($result['success']) { $msg .= " SMS sent to: $contact_phone."; } else { $msg .= " SMS to $contact_phone failed: " . $result['msg']; }
+    }
+
+		if (in_array($json['notification']['medium'], array('email', 'both')) && $contact_email) {
+			$params = array();
+      $params['body'] = $json['notification']['email_body'];
+      $params['subject'] = $json['notification']['email_subject'];
+      $params['to'] = $contact_email;
+      $result = sirius_email_send($params);
+      if ($result['success']) { $msg .= " Email sent to: $contact_email."; } else { $msg .= " Email to $contact_email failed: " . $result['msg']; }
+    }
+	}
+
+	return array('success' => TRUE, 'msg' => $msg, 'nid' => $participant_node->nid);
 }
 
 function sirius_event_participant_get($event_nid, $contact_nid) {
@@ -45,4 +78,47 @@ function sirius_event_participant_get($event_nid, $contact_nid) {
   $stmt = $query->execute();
   if (!$stmt['node']) { return; }
   return node_load(array_keys($stmt['node'])[0]);
+}
+
+function sirius_event_register_widgets() {
+	$info_all = &drupal_static(__FUNCTION__);
+	if (!$info_all) {
+		$info_all = sirius_event_register_widget_info_all();
+	}
+
+	$widgets = array();
+	foreach ($info_all as $key => $info) {
+		$widgets[$key] = $info['title'];
+	}
+
+	return $widgets;
+}
+
+function sirius_event_register_widget_info($key) {
+	$info_all = &drupal_static(__FUNCTION__);
+	if (!$info_all) {
+		$info_all = sirius_event_register_widget_info_all();
+	}
+
+	return $info_all[$key];
+}
+
+function sirius_event_register_widget_info_all() {
+	$info['user_select'] = array('title' => 'User Select');
+	$info['user_byname'] = array('title' => 'User by Name');
+
+	$info['user_self'] = array(
+		'title' => 'Self Registration',
+		'config_callback' => 'sirius_event_register_user_self_config_form'
+	);
+
+	$info['worker_byname'] = array('title' => 'Worker by Name');
+	$info['contact_bulk'] = array('title' => 'Contact Bulk');
+	$info['bullpen_signin'] = array('title' => 'Bullpen Signin');
+	$info['intake'] = array(
+		'title' => 'Intake',
+		'config_callback' => 'sirius_event_register_intake_config_form'
+	);
+
+	return $info;
 }

@@ -1,8 +1,8 @@
 <?php
 
 function sirius_node_tab_dispatch_view($dispatch_node) {
-	if (variable_get('sirius_dispatch_view_css', '')) {
-		drupal_add_css(variable_get('sirius_dispatch_view_css', ''), 'inline');
+	if ($css = sirius_domain_variable_get('sirius_dispatch_view_css', '')) {
+		drupal_add_css($css, 'inline');
 	}
 
 	// All users can "access" this page. But only certain users can access the details.
@@ -98,8 +98,8 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	if (user_access('sirius dispatch worker')) { $is_worker = TRUE; }
 	if (sirius_aat_check($dispatch_node)) { $is_worker = TRUE; }
 
-	if (variable_get('sirius_dispatch_view_print_header', '')) { $form['print_header'] = array('#markup' => '<div class="sirius_dispatch_view_print_header">' . variable_get('sirius_dispatch_view_print_header', '') . '</div>'); }
-	if (variable_get('sirius_dispatch_view_screen_header', '')) { $form['screen_header'] = array('#markup' => '<div class="sirius_dispatch_view_screen_header">' . variable_get('sirius_dispatch_view_screen_header', '') . '</div>'); }
+	if (sirius_domain_variable_get('sirius_dispatch_view_print_header', '')) { $form['print_header'] = array('#markup' => '<div class="sirius_dispatch_view_print_header">' . sirius_domain_variable_get('sirius_dispatch_view_print_header', '') . '</div>'); }
+	if (sirius_domain_variable_get('sirius_dispatch_view_screen_header', '')) { $form['screen_header'] = array('#markup' => '<div class="sirius_dispatch_view_screen_header">' . sirius_domain_variable_get('sirius_dispatch_view_screen_header', '') . '</div>'); }
 
 	$actions = array(NULL => t('-- Select --'));
 	if ($is_staff || $is_worker) {
@@ -145,8 +145,29 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['dispatch_section_b'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_id', t('Request ID')));
 	$form['dispatch_section_c'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_dispatch_cbn', t('Call by Name?')));
 	$form['dispatch_section_d'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_payrate', t('Pay Rate')));
-	$stupid_html = '<section class="field field-name-nid field-label-inline clearfix view-mode-full"><h2 class="field-label">Report #:&nbsp;</h2><div class="field-items"><div class="field-item even">' . $dispatch_node->nid . '</div></div></section>';
-	$form['dispatch_section_e'] = array('#markup' => $stupid_html);
+
+	$account_options = sirius_ledger_account_list();
+	$account_nids = array_filter(array_values(sirius_domain_variable_get('sirius_dispatch_view_accounts', array())));
+	if ($account_nids) {
+		$schedules = array('month' => 'Monthly', 'semimonth' => 'Semi-Monthly', 'hour' => 'Hourly');
+		foreach ($schedules as $schedule_key => $schedule_name) {
+			$policy_node = sirius_ledger_policy_lookup($schedule_key, $worker_node);
+			if (!$policy_node) { continue; }
+			$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
+			$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule_key);
+			foreach ($rates as $account_nid => $rate_record) {
+				if ($rate_record['rate'] && in_array($account_nid, $account_nids)) {
+					$title = $account_options[$account_nid] . ':';
+					$value = '$' . number_format($rate_record['rate'], 2) . ' ' . $schedule_name;
+					$form['dispatch_section_' . $account_nid . '_' . $schedule_key] = array('#markup' => sirius_fakerender_field($title, $value));
+				}
+			}
+			// dpm($policy_node);
+			// dpm($rates);
+		}
+	}
+
+	$form['dispatch_section_e'] = array('#markup' => sirius_fakerender_field('Report #', $dispatch_node->nid));
 	$form['dispatch_section_close'] = array('#markup' => '</div>');
 
 	$form['worker_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_worker_section">');
@@ -158,28 +179,48 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['worker_section_e'] = array('#markup' => sirius_dispatch_view_render_field($worker_node, 'field_sirius_id2', t('Titan ID')));
 	$form['worker_section_f'] = array('#markup' => sirius_dispatch_view_render_field($worker_node, 'field_sirius_ssn', t('SSN')));
 
-	// Need to fake the worker node -- show only the member status(es) associated with the industry of this job.
+	// Find the member status corresponding to the dispatch.
+	// @todo: This should really be a function, sirius_dispatch_find_ms()
 	$job_industry_tids = sirius_fieldvals($job_node, 'field_sirius_industry', 'tid');
-	$member_status_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
-	$member_status_terms = taxonomy_term_load_multiple($member_status_tids);
-	$new_field = array();
-	foreach ($member_status_terms as $status_tid => $status_term) {
-		$status_industry_tids = sirius_fieldvals($status_term, 'field_sirius_industry', 'tid');
+	$ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+	$ms_terms = taxonomy_term_load_multiple($ms_tids);
+	foreach ($ms_terms as $probe_ms_tid => $probe_ms_term) {
+		$status_industry_tids = sirius_fieldvals($probe_ms_term, 'field_sirius_industry', 'tid');
 		if (array_intersect($job_industry_tids, $status_industry_tids)) {
-			$new_field['und'][]['tid'] = $status_tid;
+			$ms_tid = $probe_ms_tid;
+			$ms_term = $ms_terms[$ms_tid];
 		}
 	}
-	$orig_field = $worker_node->field_sirius_member_status;
-	$worker_node->field_sirius_member_status = $new_field;
-	$form['worker_section_h'] = array('#markup' => sirius_dispatch_view_render_field($worker_node, 'field_sirius_member_status'));	
-	$worker_node->field_sirius_member_status = $orig_field;
+	$form['worker_section_h'] = array('#markup' => sirius_fakerender_field('Member Status:', $ms_term->name));
+
+	$contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+	$contact_json = sirius_jsonfield_util_node_json_get($contact_node);
+	$contact_results = sirius_jsonfield_util_results_get($contact_json, 'default');
+	sirius_jsonfield_util_add_node_fields($contact_node, $contact_definition_form, $contact_results);
+	$contact_definition_json = sirius_contact_definition();
+	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
+	$display_fields = sirius_contact_definition_display_get($contact_definition_json, 'dispatch-default');
+	if ($display_fields) {
+		$form['worker_section_custom'] = array('#markup' => sirius_jsonfield_util_render_values($contact_definition_form, $contact_results, $display_fields, array('show_title' => TRUE)));
+	}
+
 	$form['worker_section_close'] = array('#markup' => '</div>');
 
 
 	$form['job_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_job_section">');
 
 	$form['job_employer_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_job_employer_section">');
-	$form['job_employer_section_a'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_grievance_shop'));
+
+
+	$address_html = $employer_node->title;
+	$contact_node = sirius_employer_contact_fetch($employer_node->nid, sirius_domain_variable_get('sirius_dispatch_view_contact_type', NULL));
+	if ($contact_node) {
+		$address_html .= '<br />' . $contact_node->field_grievance_co_address['und'][0]['value'];
+		if ($contact_node->field_grievance_co_address_2) { $address_html .= '<br />' . $contact_node->field_grievance_co_address_2['und'][0]['value']; }
+		$address_html .= '<br />' . $contact_node->field_grievance_co_city['und'][0]['value'] . ', ' . $contact_node->field_grievance_co_state['und'][0]['value'] . ' ' . $contact_node->field_grievance_co_zip['und'][0]['value'];
+		$html .= $address_html;
+	}
+	$form['job_employer_section_a'] = array('#markup' => sirius_fakerender_field('Employer:', $address_html));
 	$form['job_employer_section_close'] = array('#markup' => '</div>');
 
 	$form['job_location_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_job_location_section">');
@@ -241,8 +282,8 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 
 	$form['job_section_close'] = array('#markup' => '</div>');
 
-	if (variable_get('sirius_dispatch_view_print_footer', '')) { $form['print_footer'] = array('#markup' => '<div class="sirius_dispatch_view_print_footer">' . variable_get('sirius_dispatch_view_print_footer', '') . '</div>'); }
-	if (variable_get('sirius_dispatch_view_screen_footer', '')) { $form['screen_footer'] = array('#markup' => '<div class="sirius_dispatch_view_screen_footer">' . variable_get('sirius_dispatch_view_screen_footer', '') . '</div>'); }
+	if (sirius_domain_variable_get('sirius_dispatch_view_print_footer', '')) { $form['print_footer'] = array('#markup' => '<div class="sirius_dispatch_view_print_footer">' . sirius_domain_variable_get('sirius_dispatch_view_print_footer', '') . '</div>'); }
+	if (sirius_domain_variable_get('sirius_dispatch_view_screen_footer', '')) { $form['screen_footer'] = array('#markup' => '<div class="sirius_dispatch_view_screen_footer">' . sirius_domain_variable_get('sirius_dispatch_view_screen_footer', '') . '</div>'); }
 
 	return $form;
 }
@@ -282,40 +323,65 @@ function sirius_dispatch_view_render_field($node, $field_name, $title = '') {
 function sirius_dispatch_view_admin() {
   $form = array();
 
-  $var = 'sirius_dispatch_view_print_header';
+  $var = sirius_domain_variable_name('sirius_dispatch_view_print_header');
   $form[$var] = array(
     '#type' => 'textarea',
     '#title' => t('Dispatch View Print Header'),
     '#default_value' => variable_get($var, ''),
   );
 
-  $var = 'sirius_dispatch_view_screen_header';
+  $var = sirius_domain_variable_name('sirius_dispatch_view_screen_header');
   $form[$var] = array(
     '#type' => 'textarea',
     '#title' => t('Dispatch View Screen Header'),
     '#default_value' => variable_get($var, ''),
   );
 
-  $var = 'sirius_dispatch_view_print_footer';
+  $var = sirius_domain_variable_name('sirius_dispatch_view_print_footer');
   $form[$var] = array(
     '#type' => 'textarea',
     '#title' => t('Dispatch View Print Footer'),
     '#default_value' => variable_get($var, ''),
   );
 
-  $var = 'sirius_dispatch_view_screen_footer';
+  $var = sirius_domain_variable_name('sirius_dispatch_view_screen_footer');
   $form[$var] = array(
     '#type' => 'textarea',
     '#title' => t('Dispatch View Screen Footer'),
     '#default_value' => variable_get($var, ''),
   );
 
-  $var = 'sirius_dispatch_view_css';
+  $var = sirius_domain_variable_name('sirius_dispatch_view_css');
   $form[$var] = array(
     '#type' => 'textarea',
     '#title' => t('Dispatch View CSS'),
     '#default_value' => variable_get($var, ''),
   );
+
+  $contact_type_options = sirius_taxonomy_load('grievance_contact_types', 'tid', 'name', TRUE);
+  if (count($contact_type_options) > 1) {
+	  $var = sirius_domain_variable_name('sirius_dispatch_view_contact_type');
+	  $form[$var] = array(
+	    '#type' => 'select',
+	    '#title' => t('Contact Type for Address'),
+	    '#description' => t('If you wish to show an employer contact at the bottom of the dispatch, select which contact type should be shown'),
+	    '#default_value' => variable_get($var, NULL),
+	    '#options' => $contact_type_options,
+	  );
+	}
+
+	$accounts = sirius_ledger_account_list();
+	if ($accounts) {
+	  $var = sirius_domain_variable_name('sirius_dispatch_view_accounts');
+	  $form[$var] = array(
+	    '#type' => 'checkboxes',
+	    '#title' => t('Accounts'),
+	    '#description' => t('If you wish to show fund rates for certain accounts, select them here.'),
+	    '#default_value' => variable_get($var, NULL),
+	    '#options' => $accounts,
+	    '#checkall' => TRUE,
+	  );
+	}
 
   return system_settings_form($form);
 }

@@ -18,8 +18,8 @@ function sirius_node_tab_worker_skill_remove_form($form, &$form_state, $worker_n
 		return array('empty' => array('#markup' => t('This worker does not have any skills.')));
 	}
 
-	$form['a1'] = array('#markup' => '<h2>' . t('Renew Current Skills') . '</h2>');
-	$form['a2'] = array('#markup' => '<table>');
+	$form['a1'] = array('#markup' => '<h2>' . t('Skills to Remove') . '</h2>');
+	$form['a2'] = array('#markup' => '<table class="sirius_data_table">');
 	foreach ($worker_node->field_sirius_skill['und'] as $delta => $tmp) {
 		$skill_tid = $tmp['tid'];
 		$skill_term = $skill_terms[$skill_tid];

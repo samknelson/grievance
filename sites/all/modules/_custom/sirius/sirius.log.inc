@@ -86,14 +86,20 @@ function sirius_log(
 }
 
 function sirius_node_access_log($log_node, $op, $account) {
-  // Check admin permissions
-  if ($op == 'view' && user_access('sirius log view', $account)) { return NODE_ACCESS_ALLOW; }
-  if (user_access('sirius log edit', $account)) { return NODE_ACCESS_ALLOW; }
-
-  // @todo: The logic below should be delegated to modules.  But we're hardcoding it here for the time being.
+  // Admin can do anything
+  if (user_access('sirius admin')) { return NODE_ACCESS_IGNORE; }
 
   // Get the category
   $category = $log_node->field_sirius_category['und'][0]['value'];
+
+  // @todo: The logic below should be delegated to modules.  But we're hardcoding it here for the time being.
+
+  // "material"-type log entries can never be  seen or edited directly.
+  if ($category == 'material') { return NODE_ACCESS_DENY; }
+
+  // Check admin permissions
+  if ($op == 'view' && user_access('sirius log view', $account)) { return NODE_ACCESS_ALLOW; }
+  if (user_access('sirius log edit', $account)) { return NODE_ACCESS_ALLOW; }
 
   // Workers can see their own dispatch:dnc nodes
   if ($category == 'dispatch:dnc' || $category == 'worker:member_status' || $category == 'worker:skill') {
@@ -114,7 +120,7 @@ function sirius_log_render_form($param1, $param2 = NULL) {
     '#type' => 'fieldset',
     // '#collapsible' => TRUE,
     // '#collapsed' => TRUE,
-    '#title' => 'Change Log',
+    '#title' => '',
   );
 
   $form['log_wrapper']['log'] = array(

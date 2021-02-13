@@ -123,6 +123,8 @@ function grievance_quicksearch_results($string, $limit = 20) {
 	if (!$types) { return array();}
 
 
+	$domain_nid = sirius_domain_nid();
+
 	// Search the title
 	if (!preg_match('!\d!', $string)) {
 		$query = new EntityFieldQuery();
@@ -130,7 +132,8 @@ function grievance_quicksearch_results($string, $limit = 20) {
 		$query->entityCondition('bundle', array_keys($types), 'in');
 		$query->propertyCondition('status', 1);
 		$query->propertyCondition('title', '%' . $string . '%', 'like');
-		$query->propertyOrderBy('created', 'desc');
+		if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+		// $query->propertyOrderBy('created', 'desc');
 		$query->range(0, $limit);
 		$result = $query->execute();
 		if (isset($result['node'])) {
@@ -157,8 +160,9 @@ function grievance_quicksearch_results($string, $limit = 20) {
 			$query->entityCondition('entity_type', 'node');
 			$query->entityCondition('bundle', array_keys($tmp), 'in');
 			$query->propertyCondition('status', 1);
-			$query->propertyOrderBy('created', 'desc');
-			$query->fieldCondition('field_grievance_id', 'value', '%' . $id . '%', 'like');
+			// $query->propertyOrderBy('created', 'desc');
+			$query->fieldCondition('field_grievance_id', 'value', $id);
+			if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
 			$query->range(0, $limit);
 			$result = $query->execute();
 			if (isset($result['node'])) {
@@ -177,8 +181,9 @@ function grievance_quicksearch_results($string, $limit = 20) {
 			$query->entityCondition('entity_type', 'node');
 			$query->entityCondition('bundle', array_keys($tmp), 'in');
 			$query->propertyCondition('status', 1);
-			$query->propertyOrderBy('created', 'desc');
-			$query->fieldCondition('field_sirius_id', 'value', '%' . $id . '%', 'like');
+			// $query->propertyOrderBy('created', 'desc');
+			$query->fieldCondition('field_sirius_id', 'value', $id, 'like');
+			if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
 			$query->range(0, $limit);
 			$result = $query->execute();
 			if (isset($result['node'])) {
@@ -197,8 +202,9 @@ function grievance_quicksearch_results($string, $limit = 20) {
 			$query->entityCondition('entity_type', 'node');
 			$query->entityCondition('bundle', array_keys($tmp), 'in');
 			$query->propertyCondition('status', 1);
-			$query->propertyOrderBy('created', 'desc');
+			// $query->propertyOrderBy('created', 'desc');
 			$query->fieldCondition('field_sirius_id2', 'value', $id);
+			if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
 			$query->range(0, $limit);
 			$result = $query->execute();
 			if (isset($result['node'])) {
@@ -218,8 +224,9 @@ function grievance_quicksearch_results($string, $limit = 20) {
 			$query->entityCondition('entity_type', 'node');
 			$query->entityCondition('bundle', 'sirius_worker');
 			$query->propertyCondition('status', 1);
-			$query->propertyOrderBy('created', 'desc');
+			// $query->propertyOrderBy('created', 'desc');
 			$query->fieldCondition('field_sirius_ssn', 'value', $ssn);
+			if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
 			$query->range(0, $limit);
 			$result = $query->execute();
 			if (isset($result['node'])) {
@@ -237,8 +244,9 @@ function grievance_quicksearch_results($string, $limit = 20) {
 			$query->entityCondition('entity_type', 'node');
 			$query->entityCondition('bundle', 'sirius_worker');
 			$query->propertyCondition('status', 1);
-			$query->propertyOrderBy('created', 'desc');
+			// $query->propertyOrderBy('created', 'desc');
 			$query->fieldCondition('field_sirius_phone', 'value', $phone);
+			if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
 			$query->range(0, $limit);
 			$result = $query->execute();
 			if (isset($result['node'])) {

@@ -14,6 +14,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.date.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.permission.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.banner.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.footer.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phonetree.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.email.inc';
@@ -29,6 +30,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.taxonomy.in
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.contact_definition.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.domain.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.domain_stats.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.signature.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.callerid.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.volunteer.inc';
@@ -36,11 +38,22 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lock.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.node_tabs.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.masquerade.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter_wizard.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.fax.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overrides.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch_actions.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.do_not_disturb.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.server_paths.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.shortlink.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.quickhash.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.richtext.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.map.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.disclaimer.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mailattach.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -50,9 +63,12 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_contac
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_hours.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grievance_log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_employee.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_user.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_materials.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_letters.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contacts.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_contact_resync_all.inc';
@@ -63,6 +79,12 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_subdomains.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_delete.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_activity.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_components.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_stats.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_list.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_list_stats.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_list_prefs.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_term_exim.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_sort.inc';
@@ -83,7 +105,9 @@ require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
 
 function sirius_cron() {
   sirius_auditlog();
-  sirius_signature_cleanup();
+  // sirius_signature_cleanup();
+  sirius_domain_stats_cron();
+  sirius_mailattach_fetch();
 }
 
 /**
@@ -131,6 +155,7 @@ function sirius_node_presave($node) {
   }
 
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_presave($node); }
+  if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_presave($node); }
 }
 
 
@@ -276,25 +301,53 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   }
 
   // Remove access to some JSON fields
-  if ($form_id == 'sirius_worker' ||
+  if ($form_id == 'sirius_worker_node_form' ||
       $form_id == 'grievance_shop_node_form' ||
       $form_id == 'sirius_dispatch_job_node_form' ||
       $form_id == 'grievance_node_form' ||
       $form_id == 'sirius_contact_node_form' || 
       $form_id == 'sirius_json_definition_node_form' ||
-      $form_id == 'sirius_event_participant_node_form') {
+      $form_id == 'sirius_event_participant_node_form' ||
+      $form_id == 'sirius_phonenumber_node_form' || 
+      $form_id == 'sirius_emailaddress_node_form' || 
+      $form_id == 'sirius_bulk_node_form' ||
+      $form_id == 'sirius_ledger_account_node_form' ||
+      $form_id == 'sirius_employee_node_form' ||
+      $form_id == 'grievance_letter_template_node_form') {
+    if (!user_access('sirius admin')) { $form['field_sirius_json']['#access'] = FALSE; }
+  }
+
+  // Can't change the "type" of a JSON Definition
+  if ($form_id == 'sirius_json_definition_node_form') {
+    if (!user_access('sirius admin')) { $form['field_sirius_type']['#access'] = FALSE; }
+  }
+
+  // @todo: sirius_dispatch_job_type shouldn't edit json in the main taxonomy term form, it should have a separate tab.
+  // Ugh. Some taxonomy terms inline the JSON field on the main term page, some don't. 
+  // Really they should be refactored so that the JSON field is never edited inline. But I can't be distracted to do that at the moment.
+  if ($form_id == 'taxonomy_form_term' && $form['field_sirius_json'] && $form_state['term']->vocabulary_machine_name != 'sirius_dispatch_job_type' && $form_state['term']->vocabulary_machine_name != 'grievance_contact_types') {
     $form['field_sirius_json']['#access'] = FALSE;
   }
 
   // Remove access to caller ID fields which are set in a node tab
   if ($form_id == 'sirius_json_definition_node_form') {
     $form['field_sirius_callerids']['#access'] = FALSE;
-    $form['field_sirius_audio']['#access'] = FALSE;
+    if (!user_access('sirius admin')) { $form['field_sirius_audio']['#access'] = FALSE; }
     if ($_GET['sirius_type']) { $form['field_sirius_type']['#access'] = FALSE; }
   }
 
   // Field overrides
   sirius_field_overrides_form_alter($form, $form_state, $form_id);
+
+  // Restrict views exposed filters
+  if ($form_id == 'views_exposed_form') {
+    sirius_domain_form_restrict($form);
+  }
+
+  // View-specific modifications
+  if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'sirius_domain_users') {
+    sirius_domain_users_view_form_alter($form, $form_state); 
+  }
 }
 
 /**
@@ -429,6 +482,8 @@ function sirius_no_more_term_listings() {
 
 function sirius_user_view_access($account) {
   if (!user_access('sirius edit own user')) { 
+    drupal_goto('<front>');
+    /*
     // If we can't edit our own user, and we're a worker, we get redirected to the "edit the worker" page.
     $worker = sirius_worker_get();
     global $user;
@@ -439,12 +494,15 @@ function sirius_user_view_access($account) {
     } else {
       return FALSE;
     }
+    */
   }
   return user_view_access($account);
 }
 
 function sirius_user_edit_access($account) {
   if (!user_access('sirius edit own user')) { 
+    drupal_goto('<front>');
+    /*
     // If we can't edit our own user, and we're a worker, we get redirected to the "edit the worker" page.
     $worker = sirius_worker_get();
     global $user;
@@ -455,6 +513,7 @@ function sirius_user_edit_access($account) {
     } else {
       return FALSE;
     }
+    */
   }
   
   return user_edit_access($account);
@@ -474,6 +533,8 @@ function sirius_node_view($node, $view_mode, $langcode) {
 
 function sirius_node_validate($node, $form, &$form_state) {
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_validate($node, $form, $form_state); }
+  if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_validate($node, $form, $form_state); }
+  if ($node->type == 'sirius_domain') { sirius_domain_node_validate($node, $form, $form_state); }
 }
 
 
@@ -489,6 +550,8 @@ function sirius_fieldvals($node, $field, $col = 'value', $format = 'Y-m-d H:i') 
   foreach ($node->{$field}['und'] as $delta => $tmp) {
     if ($col == 'ts') {
       $result[] = strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']);
+    } else if ($col == 'ts2') {
+      $result[] = strtotime($node->{$field}['und'][$delta]['value2'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']);
     } else if ($col == 'date') {
       $result[] = date($format, strtotime($node->{$field}['und'][$delta]['value'] . ' ' . $node->{$field}['und'][$delta]['timezone_db']));
     } else {
@@ -500,8 +563,12 @@ function sirius_fieldvals($node, $field, $col = 'value', $format = 'Y-m-d H:i') 
 }
 
 function sirius_fieldval($node, $field, $col = 'value', $params = array()) {
-  if ($col == 'ts') { 
-    return strtotime($node->{$field}['und'][0]['value'] . ' ' . $node->{$field}['und'][0]['timezone_db']);
+  if ($col == 'ts') {
+    if ($node->{$field}['und'][0]['value']) {
+      return strtotime($node->{$field}['und'][0]['value'] . ' ' . $node->{$field}['und'][0]['timezone_db']);
+    } else {
+      return NULL;
+    }
   } else {
     return $node->{$field}['und'][0][$col];
   }
@@ -654,9 +721,19 @@ function sirius_node_update($node) {
  */
 
 function sirius_views_query_alter(&$view, &$query) {
-  // Irritatingly, within Views contextual filters, there's no way to have a default value of NULL. 
-  // So, for example, you can't say "give me all the results for value X, and if X is missing, give me all the results where X is null."
-  // This hideous snippet of code allows you to put a default value of the (string) "NULL". When it detects it, it converts it into a "IS NULL" condition.
+  // If the argument expects CURRENT_DOMAIN, make sure that we haven't passed any arguments in via the URL. 
+  if ($view->argument) {
+    foreach ($view->argument as $argument_key => $argument) {
+      if ($argument_key != 'field_sirius_domain_target_id') { continue; }
+      if ($argument->options['default_argument_options']['argument'] != 'CURRENT_DOMAIN') { continue; }
+      $arg = $view->args[$argument->position];
+      $domain_nid = sirius_domain_nid();
+      if ($arg && $arg != 'CURRENT_DOMAIN' && $arg != $domain_nid && !user_access('sirius admin')) {
+        print "A domain of $arg was passed into the URL. Access denied.";
+        exit();
+      }
+    }
+  }
 
   if ($query->where) {
     foreach ($query->where as $delta => &$clause) {
@@ -676,7 +753,9 @@ function sirius_views_query_alter(&$view, &$query) {
               }
             }
 
-            // If the value is NULL, rewrite the query to support NULL.
+            // Irritatingly, within Views contextual filters, there's no way to have a default value of NULL. 
+            // So, for example, you can't say "give me all the results for value X, and if X is missing, give me all the results where X is null."
+            // This hideous snippet of code allows you to put a default value of the (string) "NULL". When it detects it, it converts it into a "IS NULL" condition.
             if (is_array($condition['value']) && $condition['value'][$var] == 'NULL') {
               $condition['field'] = 'field_data_field_sirius_domain.field_sirius_domain_target_id';
               $condition['operator'] = 'IS NULL';
@@ -694,6 +773,27 @@ function sirius_views_pre_view(&$view, &$display_id, &$args) {
   if ($view->name == 'taxonomy_term') {
     $args = array(-999);
   }
+}
+
+function sirius_views_pre_build_disabled(&$view) {
+  // Validate the domain argument if we're expecting CURRENT_DOMAIN
+  dpm($view->argument);
+  if ($view->argument) {
+    $delta = -1;
+    foreach ($view->argument as $argument_key => $argument) {
+      ++$delta;
+      if ($argument_key != 'field_sirius_domain_target_id') { continue; }
+      if ($argument->options['default_argument_options']['argument'] != 'CURRENT_DOMAIN') { continue; }
+
+      $arg = $view->arg[$delta];
+
+      $view->argument[$argument_key]->specify_validation = 1;
+      $view->argument[$argument_key]->validate = array('type' => 'php', 'fail' => 'access denied');
+      $domain_nid = sirius_domain_nid();
+      $view->argument[$argument_key]->validate_options = array('code' => "drupal_set_message('Generated validator here!'); return \$argument == $domain_nid;");
+    }
+  }
+  dpm($view->argument);
 }
 
 /**
@@ -738,4 +838,64 @@ function sirius_text_to_html($string) {
   $string = htmlentities($string);
   $string = nl2br($string);
   return $string;
+}
+
+/** 
+ * Wrapper around require_once()
+ */
+
+function sirius_require($module_name, $file) {
+  require_once DRUPAL_ROOT . '/' . drupal_get_path('module', $module_name) . '/' . $file;
+}
+
+/**
+ * Check to see whether it's "safe" to delete a node, i.e. verify that it's not referenced by something that needs it.
+ */
+
+function sirius_node_can_delete($node) {
+  if ($node->type == 'sirius_contact') {
+    return sirius_contact_can_delete($node);
+  }
+
+  return array('success' => TRUE);
+}
+
+/**
+ * Wrapper around node_delete, but check to make sure that it's safe first.
+ */
+
+function sirius_node_careful_delete($node) {
+  if (!is_object($node)) { 
+    $node = node_load($node);
+  }
+
+  if (!is_object($node)) { 
+    return array('success' => FALSE, 'msg' => 'Does not appear to be a node or nid.'); 
+  }
+
+  $can_delete = sirius_node_can_delete($node);
+  if (!$can_delete['success']) { 
+    return $can_delete;
+  }
+
+  node_delete($node->nid); 
+  return array('success' => TRUE, 'msg' => 'Record deleted.');
+}
+
+function sirius_ajax_generic_replace($form, $form_state) {
+  $params = $form_state['triggering_element']['#sirius_ajax'];
+  $wrapper = $params['wrapper'];
+  $element = $params['element'];
+  if ($params['files']) {
+    $module = $params['module'];
+    foreach ($params['files'] as $file) {
+      sirius_require($module, $file);
+    }
+  }
+  $commands = array();
+  $commands[] = ajax_command_replace($wrapper, render($form[$element]));
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands
+  );
 }

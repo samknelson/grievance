@@ -9,6 +9,8 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_em
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.pages_employer_users.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.pages_me.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.pages_taxonomy_mappings.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.page_list.inc";
 
 /**
  * @todo: Migrate grievance_shop functionality to this module
@@ -25,22 +27,30 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_em
 
 
 function sirius_employer_list($active_only = TRUE, $industry_tid = NULL) {
-	$args = array();
+	$domain_nid = sirius_domain_nid();
 
+	$sql_args = array();
 	$sql = "select nid, title, field_sirius_active_value from node ";
 	if ($industry_tid) {
 		$sql .= "join field_data_field_sirius_industry on field_data_field_sirius_industry.entity_type = 'node' and field_data_field_sirius_industry.entity_id = node.nid and field_sirius_industry_tid = :industry_tid ";
-		$args[':industry_tid'] = $industry_tid;
+		$sql_args[':industry_tid'] = $industry_tid;
 	}
 	$sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 	$sql .= "where type = 'grievance_shop' ";
 	if ($active_only) {
 		// For some reason this inhibits indexing and results in a painfully slow query.
 		// $sql .= "and field_sirius_active_value is null or field_sirius_active_value = 'Yes' ";
 	}
+	if ($domain_nid) {
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	} else {
+		$sql .= "and field_sirius_domain_target_id is null ";
+	}
 	$sql .= "order by title";
 
-	$stmt = db_query($sql, $args);
+	$stmt = db_query($sql, $sql_args);
 	$options = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		if ($active_only && $hr['field_sirius_active_value'] != 'Yes') { continue; }
@@ -50,3 +60,19 @@ function sirius_employer_list($active_only = TRUE, $industry_tid = NULL) {
 	return $options;
 }
 
+function sirius_employer_contact_fetch($employer_nid, $contact_type_tid) {
+	if (!$contact_type_tid) { return NULL; }
+
+	$domain_nid = sirius_domain_nid();
+	$query = new EntityFieldQuery;
+	$query->entityCondition('entity_type', 'node');
+	$query->entityCondition('bundle', 'grievance_shop_contact');
+	if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+	$query->fieldCondition('field_grievance_shops', 'target_id', $employer_nid);
+	$query->range(0,1);
+	$query->propertyOrderBy('nid', 'desc');
+	$stmt = $query->execute();
+	if (!$stmt['node']) { return NULL; }
+	$contact_nid = array_keys($stmt['node'])[0];
+	return node_load($contact_nid);
+}

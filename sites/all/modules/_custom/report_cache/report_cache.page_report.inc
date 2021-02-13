@@ -1,9 +1,19 @@
 <?php
 
 function report_cache_page_report($report_type) {
-	
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 	$report_id = $_REQUEST['report_id'];
 	$action = $_REQUEST['action'];
+
+	if ($report_id) {
+		$sql = "select report_domain_nid from report_cache where report_type = :report_type and report_id = :report_id ";
+		$stmt = db_query($sql, array(':report_type' => $report_type, ':report_id' => $report_id));
+		$hr = $stmt->fetchAssoc();
+		$report_domain_nid = $hr['report_domain_nid'];
+		if ($report_domain_nid != $domain_nid) {
+			return 'Access denied.';
+		}
+	}
 
 	$report_type_infos = module_invoke_all('report_cache_info');
 	$report_type_info = $report_type_infos[$report_type];
@@ -28,8 +38,14 @@ function report_cache_page_report($report_type) {
 		return $html;
 	}
 
-	$sql = "select distinct report_id from report_cache where report_type = :report_type order by report_id desc";
-	$stmt = db_query($sql, array(':report_type' => $report_type));
+	$sql_args = array();
+	$sql = "select distinct report_id from report_cache ";
+	$sql .= "where report_type = :report_type ";
+	$sql_args[':report_type'] = $report_type;
+	$sql .= "and report_domain_nid = :domain_nid ";
+	$sql_args[':domain_nid'] = $domain_nid;
+	$sql .= "order by report_id desc ";
+	$stmt = db_query($sql, $sql_args);
 	$report_ids = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		$report_ids[] = $hr['report_id'];
@@ -41,30 +57,23 @@ function report_cache_page_report($report_type) {
 
 	$header = array();
 	$header[] = t('Report ID');
-	$header[] = t('Preview');
-	$header[] = t('Download');
-	if ($report_type_info['render_callbacks']) {
-		foreach ($report_type_info['render_callbacks'] as $name => $callback) {
-			$header[] = $name;
-		}
-	}
-	$header[] = t('Purge');
+	if ($report_type_info['title_callback']) { $header[] = t('Title'); }
+	$header[] = t('Tools');
 
 	$attributes = array();
 
 	$rows = array();
 	foreach ($report_ids as $tmp_report_id) {
-		$row = array();
 
-		$row[] = $tmp_report_id;
-		$row[] = l(t('Preview'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
-		$row[] = l(t('Download'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
+		$tools = l(t('Preview'), "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
+		$tools .= l(t('Download'), "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
 		if ($report_type_info['render_callbacks']) {
 			foreach ($report_type_info['render_callbacks'] as $name => $callback) {
-				$row[] = l(
+				$tools .= l(
 					$name, 
 					"admin/reports/report-cache/$report_type", 
 					array(
+						'attributes' => array('class' => array('tool-button')), 
 						'query' => array(
 							'report_id' => $tmp_report_id, 
 							'action' => 'render',
@@ -74,12 +83,20 @@ function report_cache_page_report($report_type) {
 				);
 			}
 		}
-		$row[] = l(t('Purge'), "admin/reports/report-cache/$report_type", array('query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
+		$tools .= l(t('Purge'), "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
 
+		$row = array();
+		$row[] = $tmp_report_id;
+		if ($report_type_info['title_callback']) { 
+			$row[] = $report_type_info['title_callback']($report_type, $tmp_report_id);
+		}
+
+		$row[] = $tools;
 		$rows[] = $row;
 	}
 
-	$result .= '<h2>' . t('All Reports of Type: @report_type', array('@report_type' => $report_type)) . '</h2>';
+	// $result .= '<h2>' . $report_type_info['name'] . '</h2>';
+	$result .= $report_type_info['description'];
 
 	$result .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
 
@@ -99,17 +116,25 @@ function report_cache_page_report($report_type) {
 
 
 function report_cache_preview($report_type, $report_id, $report_type_info) {
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 	$fields = $report_type_info['fields'];
 
 	$result = '';
 
-	$result .= "<h2>$report_id Preview</h2>";
+	$result = '<h2>';
+	if ($report_type_info['title_callback']) {
+		$result .= $report_type_info['title_callback']($report_type, $report_id);
+	} else {
+		$result .= "$report_id Preview";
+	}
+	$result .= '</h2>';
 
 	$header = array_values($fields);
 	$query = db_select('report_cache');
 	$query->fields('report_cache');
 	$query->condition('report_id', $report_id);
 	$query->condition('report_type', $report_type);
+	$query->condition('report_domain_nid', $domain_nid);
 	$query = $query->extend('PagerDefault');
 	$query->limit(100);
 	
@@ -145,7 +170,7 @@ function report_cache_render($report_type, $report_id, $report_type_info, $callb
 
 
 function report_cache_download($report_type, $report_id, $report_type_info) {
-
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 	if ($report_type_info['download_callback']) {
 		$callback = $report_type_info['download_callback'];
 		return $callback($report_type, $report_id, $report_type_info);
@@ -166,7 +191,9 @@ function report_cache_download($report_type, $report_id, $report_type_info) {
 
 	$query = db_select('report_cache');
 	$query->fields('report_cache');
+	$query->condition('report_type', $report_type);
 	$query->condition('report_id', $report_id);
+	$query->condition('report_domain_nid', $domain_nid);
 	$stmt = $query->execute();
 	
 	while ($hr = $stmt->fetchAssoc()) {

@@ -1,6 +1,33 @@
-.sirius_event_survey_results {
+#content .sirius_event_survey_results {
 	padding: 20px;
 	margin: 20px;
 	border: 1px solid #cccccc;
 	background-color: #ffffff;
 }
+
+#content tr.sirius_table_row_with_details {
+	border-bottom: none;
+}
+
+
+#content .ckeditor_links {
+	display: none !important;
+}
+
+#content .columns_table,
+#content .columns_table tr,
+#content .columns_table td {
+	border: 2px solid #5984be;
+}
+
+#content .columns_table td {
+	padding: 10px;
+}
+
+#content .columns_table table,
+#content .columns_table table tr,
+#content .columns_table table td {
+	border: 0;
+	padding: 0;
+}
+

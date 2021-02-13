@@ -24,6 +24,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.rollover.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.payrate.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.fore.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.stub.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_accept.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_decline.inc';
@@ -66,6 +67,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_payrate.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.term_tab_industry.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.term_tab_job_type.inc';
 
 /**
  * Implements hook_cron
@@ -175,7 +177,7 @@ function sirius_dispatch_report_cache_info() {
   $items['sirius-dispatch-member-status-ratios'] = array(
     'name' => t('Member Status Ratios'),
     'description' => '',
-    'access' => 'sirius report',
+    'access' => 'sirius dispatch admin',
     'fields' => sirius_dispatch_report_member_status_ratios_fields(),
     'form_callback' => 'sirius_dispatch_report_member_status_ratios_form',
     'pk_list_callback' => 'sirius_dispatch_report_member_status_ratios_pks',
@@ -188,7 +190,7 @@ function sirius_dispatch_report_cache_info() {
   $items['sirius-dispatch-notification_preferences'] = array(
     'name' => t('Notification Preferences'),
     'description' => '',
-    'access' => 'sirius report',
+    'access' => 'sirius dispatch admin',
     'fields' => sirius_dispatch_report_notification_preferences_fields(),
     'form_callback' => 'sirius_dispatch_report_notification_preferences_form',
     'pk_list_callback' => 'sirius_dispatch_report_notification_preferences_pks',
@@ -198,7 +200,7 @@ function sirius_dispatch_report_cache_info() {
   $items['sirius-dispatch-prior-employed-list'] = array(
     'name' => t('Prior Employed List'),
     'description' => '',
-    'access' => 'sirius report',
+    'access' => 'sirius dispatch admin',
     'fields' => sirius_dispatch_report_prior_employed_list_fields(),
     'form_callback' => 'sirius_dispatch_report_prior_employed_list_form',
     'pk_list_callback' => 'sirius_dispatch_report_prior_employed_list_pks',

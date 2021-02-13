@@ -2,12 +2,37 @@
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
+function sirius_node_tab_feed_wizard_access($feed_node) {
+	$domain_nid = sirius_domain_nid();
+	if ($domain_nid != $feed_node->field_sirius_domain['und'][0]['target_id']) { return FALSE; }
+
+	if (user_access('sirius admin')) { return TRUE; }
+	if (user_access('sirius domain admin')) { return TRUE; }
+
+	$wizard_name = $feed_node->field_sirius_type['und'][0]['value'];
+	$info = sirius_wizard_info($wizard_name);
+	if (!$info) { return FALSE; }
+
+	if ($info['feed']['employer_access'] && user_access('sirius employer user manager')) { 
+		$employer_node = sirius_employer_get();
+		if ($employer_node && ($employer_node->nid == $feed_node->field_grievance_shop['und'][0]['target_id'])) { return TRUE; }
+	}
+
+	return FALSE;
+}
+
 function sirius_node_tab_feed_wizard($feed_node) {
 	return sirius_node_tab_wizard($feed_node, $feed_node->field_sirius_type['und'][0]['value']);
 }
 
 function sirius_node_access_feed($feed_node, $op, $account) {
-	return user_access('sirius');
+	// Admin can edit these nodes directly
+	if (user_access('sirius admin')) { return NODE_ACCESS_IGNORE; }
+
+	// Everybody else can only view
+	if ($op == 'view' && sirius_node_tab_feed_wizard_access($feed_node)) { return NODE_ACCESS_IGNORE; }
+	
+	return NODE_ACCESS_DENY;
 }
 
 function sirius_feed_default_column_title($col) {
@@ -62,21 +87,47 @@ function sirius_feed_node_search($id, $bundle, $fields) {
  ************************************************************************************************/
 
 function sirius_feed_page_list_access($wizard_name) {
+	// Must be a legitimate feed
 	$info = sirius_wizard_info($wizard_name);
-	// drupal_set_message('<pre>' . print_r($info, 1) . '</pre>)');
-	// return user_access('sirius admin');
-	// @todo!
-	return user_access('sirius');
+	if (!$info) { return FALSE; }
+
+	// Admins can access
+	if (user_access('sirius admin')) { return TRUE; }
+	if (user_access('sirius domain admin')) { return TRUE; }
+
+	// @todo should be in a callback
+	if ($info['feed']['employer_access'] && user_access('sirius employer user manager')) { 
+		$employer_node = sirius_employer_get();
+		if (!$employer_node) { return FALSE; }
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 function sirius_feed_page_list($wizard_name) {
-	$domain = sirius_domain();
+	$domain_nid = sirius_domain_nid();
 	$info = sirius_wizard_info($wizard_name);
 	if (!$info) { return "No such wizard."; }
 
 	drupal_set_title("Feed list: " . $info['title']);
 
-	$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain->nid);
+	// Is there a callback?
+	$callback = $info['feed']['callback_list'];
+	if ($callback) {
+		return $callback($wizard_name);
+	}
+
+	// Oh well, no callback. In that case we just hardcode some view.
+	if (user_access('sirius admin') || user_access('sirius domain admin')) {
+		// admins see the full list
+		$html .= views_embed_view('sirius_feeds', 'block_2', $wizard_name, $domain_nid);
+	} else {
+		// Non-admins see a filtered list
+		$employer_node = sirius_employer_get();
+		if (!$employer_node) { return 'No employer set for this user.'; }
+		$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain_nid, $employer_node->nid);
+	}
 
 	return $html;
 }
@@ -85,20 +136,46 @@ function sirius_feed_page_list($wizard_name) {
  * Landing page
  ************************************************************************************************/
 
+/**
+ * You have access to the feed landing page if you have access to at least one feed.
+ * @todo: This is pretty expensive. We should probably just create a permission of some kind.
+ */
+
 function sirius_feed_page_landing_access() {
-	return user_access('sirius domain admin');
+	$all_info = sirius_wizard_info_all();
+	foreach ($all_info as $key => $info) {
+		if (!$info['feed']) { continue; }
+		$path = "sirius/feeds/$key";
+		if (drupal_valid_path($path)) { return TRUE; }
+	}
+
+	return FALSE;
 }
 
 function sirius_feed_page_landing() {
 	$all_info = sirius_wizard_info_all();
 	$html = '<h2>Available Feeds</h2>';
+	$found = FALSE;
+	$html .= '<dl>';
 	foreach ($all_info as $key => $info) {
 		if (!$info['feed']) { continue; }
-		$html .= "<li>";
-		$html .= l($info['title'], "sirius/feeds/$key");
-		$html .= '</li>';
+		$path = "sirius/feeds/$key";
+		if (drupal_valid_path($path)) {
+			$html .= "<dt>";
+			$html .= l($info['title'], "sirius/feeds/$key");
+			$html .= '</dt>';
+			$html .= "<dd>";
+			$html .= $info['description'];
+			$html .= '<br /><br />';
+			$html .= '</dd>';
+			$found = TRUE;
+		}
 	}
-	$html .= '</ul>';
+	$html .= '</dl>';
+
+	if (!$found) {
+		return 'You do not have access to any feeds.';
+	}
 
 	return $html;
 }
@@ -225,11 +302,7 @@ function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header)
  ************************************************************************************************/
 
 function sirius_feed_page_launch_access($wizard_name) {
-	$info = sirius_wizard_info($wizard_name);
-	if (!$info) { return FALSE; }
-
-	// @todo
-	return user_access('sirius domain admin');
+	return sirius_feed_page_list_access($wizard_name);
 }
 
 function sirius_feed_page_launch($wizard_name) {
@@ -272,6 +345,16 @@ function sirius_feed_wizard_launch($wizard_name) {
   if ($domain) { $feed_node->field_sirius_domain['und'][0]['target_id'] = $domain->nid; }
   $feed_node->field_sirius_type['und'][0]['value'] = $wizard_name;
   $feed_node->field_sirius_feed_status['und'][0]['value'] = 'draft';
+
+  if (!user_access('sirius admin') && !user_access('sirius domain admin')) {
+  	$employer_node = sirius_employer_get();
+  	if (!$employer_node) {
+  		drupal_set_message("No employer.", 'error');
+  		return;
+  	}
+  	$feed_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
+  }
+
   $feed_node = node_submit($feed_node);
   node_object_prepare($feed_node);
   node_save($feed_node);
@@ -291,12 +374,17 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 	$form_state['feed_node'] = $feed_node;
 	$form_state['current_step'] = $current_step;
 	$steps = sirius_wizard_steps($info, $data, $feed_node);
+	$last_data = sirius_feed_lastdata($info, $feed_node);
 
 	if ($feed_node->field_sirius_attachments['und'][0]) {
 		$mode = 'full';
 		$renderable = field_view_field('node', $feed_node, 'field_sirius_attachments', 'full');
 		$renderable['#title'] = 'Currently Processing';
 		$form['current'] = array('#markup' => render($renderable));
+		if ($data['origname']) {
+
+			$form['origname'] = array('#markup' => sirius_fakerender_field('Uploaded Filename:', $data['origname']));
+		}
 		$title = "Replace with";
 	} else {
 		$title = "Upload";
@@ -305,7 +393,6 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 	$form['file'] = array(
 		'#type' => 'file',
 		'#title' => $title,
-		'#default_value' => $data['steps'][$current_step]['data']['a_random_variable'],
 	);
 
 	$default = $data['source'];
@@ -321,9 +408,23 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 		$form['pk'] = array(
 			'#type' => 'select',
 			'#title' => 'Primary Key',
-			'#options' => $pks,
+			'#options' => array(NULL => t('-- Select --')) + $pks,
 			'#default_value' => $data['pk'],
+			'#required' => TRUE,
 		);
+	}
+
+	if ($info['feed']['employer_access']) {
+		$employer_node = sirius_employer_get();
+		if (!$employer_node) {
+			$employers = array(NULL => t('-- Select --')) + sirius_employer_list();
+			$form['employer_nid'] = array(
+				'#type' => 'select',
+				'#options' => $employers,
+				'#title' => t('Employer'),
+				'#default_value' => $feed_node->field_grievance_shop['und'][0]['target_id'],
+			);
+		}
 	}
 
 	$tag_taxonomy = $info['feed']['tag_taxonomy'];
@@ -336,6 +437,17 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 			'#default_value' => $data['tag'],
 		);
 	}
+
+
+	$default = $data['header_row'];
+	if (!$default) { $default = $last_data['header_row']; }
+	$form['header_row'] = array(
+		'#title' => t('First row contains column headers?'),
+		'#type' => 'select',
+		'#options' => array('Yes' => 'Yes', 'No' => 'No'),
+		'#default_value' => $default,
+		'#required' => TRUE,
+	);
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -377,6 +489,7 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
   $file = $form_state['storage']["file"];
   if ($file) {
 		$file = (array) $file;
+  	$data['origname'] = $file['origname'];
 		$file['display'] = 1;
 		unset($form_state['storage']["attach_$delta"]);
 		unset($file['destination']);
@@ -386,6 +499,15 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
   $data['source'] = $form_state['values']['source'];
   $data['pk'] = $form_state['values']['pk'];
   $data['tag'] = $form_state['values']['tag'];
+	$data['worksheet'] = 0;
+	$data['header_row'] = $form_state['values']['header_row'];
+
+	if ($info['feed']['employer_access']) {
+		$employer_node = sirius_employer_get();
+		if (!$employer_node) {
+			$feed_node->field_grievance_shop['und'][0]['target_id'] = $form_state['values']['employer_nid'];
+		}
+	}
 
 	sirius_wizard_submit($info, $data, $feed_node, $current_step, "File uploaded.");
 }
@@ -431,6 +553,10 @@ function sirius_feed_wizard_sheet_form($form, &$form_state, $info, $data, $feed_
 		'#default_value' => $default,
 		'#required' => TRUE,
 	);
+	if (count($names) == 1) { 
+		$form['worksheet']['#type'] = 'hidden';
+		$form['worksheet']['#value'] = $names[0];
+	}
 
 	$default = $data['header_row'];
 	if (!$default) { $default = $last_data['header_row']; }
@@ -602,8 +728,54 @@ function sirius_feed_wizard_verify($info, $data, $feed_node, $current_step) { re
 
 function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
 	$form_state['info'] = $info;
+	$form_state['data'] = $data;
 	$form_state['feed_node'] = $feed_node;
 	$form_state['current_step'] = $current_step;
+
+	$form['verify_limit'] = array(
+		'#type' => 'textfield',
+		'#size' => 5,
+		'#title' => t('Records to Verify'),
+		'#description' => t('For very large imports, it may take too long to verify all records. Select the maximum number of records which should be verified.'),
+		'#required' => TRUE,
+		'#default_value' => 1000,
+	);
+
+	$form['precompute'] = array(
+		'#type' => 'select',
+		'#title' => t('Precompute?'),
+		'#options' => array(
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#description' => t('"Precompute" performs a more in-depth verification. For example, it will ensure that referenced taxonomy terms exist or that IDs are unique. However, it is computationally expensive, so for large imports it may be better to omit this option.'),
+		'#required' => TRUE,
+		'#default_value' => 'No',
+	);
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'Submit',
+	);
+
+	if ($data['verify_html']) {
+		$form['verify_html'] = array('#markup' => $data['verify_html']);
+	}
+
+	return $form;
+}
+
+function sirius_feed_wizard_verify_form_validate($form, &$form_state) {
+	if (! ($form_state['values']['verify_limit'] > 0)) {
+		form_set_error('verify_limit', 'Please make sure that at least one row is verified.');
+	}
+}
+
+function sirius_feed_wizard_verify_form_submit($form, &$form_state) {
+	$info = $form_state['info'];
+	$data = $form_state['data'];
+	$feed_node = $form_state['feed_node'];
+	$current_step = $form_state['current_step'];
 
 	// Preview
 	$reader = sirius_feed_spout_get_reader($feed_node);
@@ -629,52 +801,37 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$import_data = array();
 	$counts = array();
 	$callback = $info['feed']['callback_row_verify'];
+	$verify_limit = $form_state['values']['verify_limit'];
+	$precompute = ($form_state['values']['precompute'] == 'Yes');
 	foreach ($sheet->getRowIterator() as $row) {
-		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
+		++$count;
+		if ($count > $verify_limit+2) { continue; }
+		if ($count == 1 && $data['header_row'] == 'Yes') { ++$count; continue; }
 		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 
-		$result = $callback($feed_node, $info, $data, $import_data_row, FALSE);
-
-		if ($result['success']) { $import_data_row['xxxsuccsssxxx'] = 'Yes'; } else { $import_data_row['xxxsuccsssxxx'] = 'No'; }
-		$import_data_row['xxxmsgxxx'] = $result['msg'];
-		foreach ($fields as $field_name => $field_info) {
-			$col = $data["map_$field_name"];
-			if ($col === NULL || $col === '') { 
-				unset($import_data_row[$field_name]);
-			}
+		$preview_data_row = array();
+		foreach ($import_header as $field_name => $field_info) {
+			$preview_data_row[$field_name] = $import_data_row[$field_name];
 		}
-		unset($import_data_row['xxxrawxxx']);
+
+		$result = $callback($feed_node, $info, $data, $import_data_row, $precompute);
+
+		if ($result['success']) { $preview_data_row['xxxsuccessxxx'] = 'Yes'; } else { $preview_data_row['xxxsuccessxxx'] = 'No'; }
+		$preview_data_row['xxxmsgxxx'] = $result['msg'];
 
 		++$counts[$result['msg']];
-		if ($counts[$result['msg']] == 6) { $import_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
-		if ($counts[$result['msg']] <= 6) { $import_data[] = $import_data_row; }
-
-		++$count;
+		if ($counts[$result['msg']] == 6) { $preview_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
+		if ($counts[$result['msg']] <= 6) { $import_data[] = $preview_data_row; }
 	}
 	$data['rows'] = $count + 1;
-	$form_state['data'] = $data;
 
-	$html = "<h2>Summary</h2>";
+	$html = "<h2>Verification Summary</h2>";
 	$summary_rows = array();
 	foreach ($counts as $key => $value) { $summary_rows[] = array($key, $value); }
 	$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => array()));
-	$html .= "<h2>Preview</h2>";
+	$html .= "<h2>Records to Import</h2>";
 	$html .= theme_table(array('rows' => $import_data, 'header' => $import_header, 'attributes' => array()));
-	$form["preview"] = array('#markup' => $html);
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => 'Submit',
-	);
-
-	return $form;
-}
-
-function sirius_feed_wizard_verify_form_submit($form, &$form_state) {
-	$info = $form_state['info'];
-	$data = $form_state['data'];
-	$feed_node = $form_state['feed_node'];
-	$current_step = $form_state['current_step'];
+	$data['verify_html'] = $html;
 	sirius_wizard_submit($info, $data, $feed_node, $current_step, "Ready to Process.");
 }
 
@@ -702,6 +859,10 @@ function sirius_feed_wizard_process_form($form, &$form_state, $info, $data, $fee
 		'#value' => 'Import Now',
 	);
 
+	if ($data['verify_html']) {
+		$form['verify_html'] = array('#markup' => $data['verify_html']);
+	}
+
 	return $form;
 }
 
@@ -712,16 +873,26 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 	$current_step = $form_state['current_step'];
 	$limit = $form_state['values']['limit'];
 
-	$batch_size = $info['feed']['batch_size'];
-	if (!$batch_size) { $batch_size = 10; }
+	$batch_size = sirius_feed_batch_size($info['name']);
 	$idx = 0;
 	$rows = $data['rows'];
 	$batch_count = 0;
+	$data['process_ts'] = time();
+	$operations = array();
+
+	$callback_preprocess = $info['feed']['callback_preprocess'];
+	if ($callback_preprocess) { 
+		$operations[] = array($callback_preprocess, array($feed_node, $info, $data));
+	}
 	while ($idx < $rows) {
 		$operations[] = array('sirius_feed_wizard_process_batch', array($feed_node, $info, $data, $idx));
-		$idx += $batch_size;
+		$idx += $batch_size + 1;
 		++$batch_count;
 		if ($limit && $batch_count >= $limit) { break; }
+	}
+	$callback_postprocess = $info['feed']['callback_postprocess'];
+	if ($callback_postprocess) { 
+		$operations[] = array($callback_postprocess, array($feed_node, $info, $data));
 	}
 	$operations[] = array('sirius_feed_wizard_process_finish', array($feed_node, $info, $data, $idx));
 	$batch = array('operations' => $operations);
@@ -814,6 +985,31 @@ function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed
 	$form['attachments_intro'] = array('#markup' => '<div>' . t('The first file below contains the original upload data. The second contains the full set of results.') . '</div>');
 	$form['attachments'] = array('#markup' => drupal_render($renderable));
 
-
 	return $form;
+}
+
+function sirius_feed_batch_size($key) {
+	$size = variable_get('sirius_feed_batch_size_' . $key);
+	if (!$size) { 
+		$info = sirius_wizard_info($key);
+		$size = $info['feed']['batch_size'];
+	}
+	if (!$size) { $size = 10; }
+	return $size;
+}
+
+function sirius_feed_admin() {
+	$info_all = sirius_wizard_info_all();
+	foreach ($info_all as $key => $info) {
+		if (!$info['feed']) { continue; }
+		$variable_name = 'sirius_feed_batch_size_' . $key;
+		$form[$variable_name] = array(
+			'#type' => 'textfield',
+			'#default_value' => sirius_feed_batch_size($key),
+			'#title' => $info['title'],
+			'#description' => $info['description'],
+		);
+	}
+
+  return system_settings_form($form);
 }

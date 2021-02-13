@@ -79,13 +79,13 @@ function sirius_dispatch_worker_recompute_from_dispatch($dispatch_node, $is_dele
 		if ($new_employer_nid) {
 			$new_employer_node = node_load($new_employer_nid);
 			$worker_node->field_grievance_shop['und'][0]['target_id'] = $new_employer_nid;
-			$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|employed_not_available');
+			$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|employed');
 
 			sirius_log('worker:employer', 'set', $worker_node->title . "'s employer has been set to " . $new_employer_node->title, '', '', array($worker_node->nid));
 		} else {
 			unset($worker_node->field_grievance_shop['und']);
 
-			if ($worker_node->field_sirius_worker_dispstatus['und'][0]['tid'] == sirius_get_special_tid('sirius_worker_dispatch_status|employed_not_available')) {
+			if ($worker_node->field_sirius_worker_dispstatus['und'][0]['tid'] == sirius_get_special_tid('sirius_worker_dispatch_status|employed')) {
 				$asi = $worker_node->field_sirius_dispatch_asi['und'][0]['value'];
 				if ($asi == 'Yes') {
 					$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');

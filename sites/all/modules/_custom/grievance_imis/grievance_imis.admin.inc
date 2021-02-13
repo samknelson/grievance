@@ -9,7 +9,7 @@ function grievance_imis_test() {
 function grievance_imis_test_form($form, &$form_state) {
   $form['intro'] = array(
     '#type' => 'markup',
-    '#markup' => '<div>' . t('Use the form below to test your IMIS connection settings.') . '<br><br></div>',
+    '#markup' => '<div>' . t('Use the form below to test your SePuede connection settings.') . '<br><br></div>',
   );
 
   $broughtby_options = sirius_taxonomy_load('grievance_broughtby', 'tid', 'name', TRUE);
@@ -17,7 +17,7 @@ function grievance_imis_test_form($form, &$form_state) {
 
   $form['broughtby_tid'] = array(
     '#type' => 'select',
-    '#title' => t('IMIS Connection (Brought By)'),
+    '#title' => t('SePuede Connection (Brought By)'),
     '#options' => $broughtby_options,
     '#required' => TRUE,
   );
@@ -37,7 +37,7 @@ function grievance_imis_test_form($form, &$form_state) {
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Submit IMIS Test',
+    '#value' => 'Submit SePuede Test',
   );
 
   return $form;
@@ -46,11 +46,11 @@ function grievance_imis_test_form($form, &$form_state) {
 function grievance_imis_test_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 
-  drupal_set_message("About to test IMIS connection.");
+  drupal_set_message("About to test SePuede connection.");
   $broughtby_tid = $form_state['values']['broughtby_tid'];
   $str = $form_state['values']['str'];
   $which = $form_state['values']['which'];
-  drupal_set_message("Using connection for \"Brough By\" TID = $broughtby_tid");
+  drupal_set_message("Using connection for \"Brought By\" TID = $broughtby_tid");
 
   drupal_set_message("URL = " . variable_get('grievance_imis_broughtby_' . $broughtby_tid . '_url'));
   drupal_set_message("API Key = " . variable_get('grievance_imis_broughtby_' . $broughtby_tid . '_apikey'));
@@ -87,13 +87,13 @@ function grievance_imis_admin() {
     $form[$prefix]["${prefix}_url"] = array(
       '#type' => 'textfield',
       '#default_value' => variable_get("${prefix}_url", ''),
-      '#title' => t('IMIS URL'),
+      '#title' => t('SePuede URL'),
       '#description' => t('This will be something like: https://unite-test3.burstingsilver.com/BSi.iMIS.WebServices/api/member/grievance'),
     );
 
     $form[$prefix]["${prefix}_apikey"] = array(
       '#type' => 'textarea',
-      '#title' => t('IMIS API Key'),
+      '#title' => t('SePuede API Key'),
       '#description'   => t('IMIS API Key. If you have already entered your password before, you should leave this field blank, unless you want to change the stored key.'),
     );
   }

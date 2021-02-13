@@ -52,6 +52,7 @@ function report_cache_form_prepare($report_type, &$form, &$form_state) {
 
 function report_cache_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = 1;
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 
 	$report_type = $form_state['values']['report_type'];
 	$report_id = $form_state['values']['report_id'];
@@ -72,6 +73,7 @@ function report_cache_form_submit($form, &$form_state) {
 		$stmt = db_delete('report_cache');
 		$stmt->condition('report_id', $report_id);
 		$stmt->condition('report_type', $report_type);
+		$stmt->condition('report_domain_nid', $domain_nid);
 		$stmt->execute();
 	}
 
@@ -102,6 +104,7 @@ function report_cache_form_submit($form, &$form_state) {
 			'report_row_pk' => 'PARAMETERS',
 			'report_type' => $report_type . ' :: PARAMETERS',
 			'report_data' => serialize($form_state['values']),
+			'report_domain_nid' => $domain_nid,
 		)
 	);
 	$stmt->execute();
@@ -130,6 +133,8 @@ function report_cache_form_submit($form, &$form_state) {
 }
 
 function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$context) {
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
+
 	$report_type = $values['report_type'];
 	$report_id = $values['report_id'];
 	$report_action = $values['report_action'];
@@ -139,8 +144,8 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 
 	if ($report_action == 'continue') {
 		$stmt = db_query(
-			'select count(*) as c from report_cache where report_id = :report_id and report_row_pk = :pk',
-			array(':report_id' => $report_id, ':pk' => $pk)
+			'select count(*) as c from report_cache where report_id = :report_id and report_row_pk = :pk and report_domain_nid = :domain_nid',
+			array(':report_id' => $report_id, ':pk' => $pk, ':domain_nid' => $domain_nid)
 		);
 		$hr = $stmt->fetchAssoc();
 		$count = $hr['c'];
@@ -178,7 +183,8 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 					'report_id' => $report_id,
 					'report_row_pk' => $sub_row_pk,
 					'report_type' => $report_type,
-					'report_data' => serialize($sub_row)
+					'report_data' => serialize($sub_row),
+					'report_domain_nid' => $domain_nid,
 				)
 			);
 			$stmt->execute();
@@ -190,7 +196,8 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 				'report_id' => $report_id,
 				'report_row_pk' => $pk,
 				'report_type' => $report_type,
-				'report_data' => serialize($row)
+				'report_data' => serialize($row),
+				'report_domain_nid' => $domain_nid,
 			)
 		);
 		$stmt->execute();

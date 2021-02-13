@@ -7,6 +7,18 @@
  * Because of public / private issues and HTTP_X_FORWARDED_FOR, this is harder than it sounds.
  */
 
+function sirius_loopback_url() {
+	global $is_https;
+	if ($is_https ||
+		(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) {
+		$url = 'https://';
+	} else { 
+		$url = 'http://';
+	}
+	$url .= $_SERVER['SERVER_NAME'];
+	return $url;
+}
+
 function sirius_loopback_access() {
   if (user_access('sirius admin')) { return TRUE; }
 
@@ -18,6 +30,7 @@ function sirius_loopback_access() {
   global $base_url;
   $url = $base_url . '/sirius/loopback/remote-ip';
   $server_ip = file_get_contents($url);
+
   if ($server_ip == $remote_ip) { return TRUE; }
 
   return FALSE;
@@ -30,6 +43,7 @@ function sirius_loopback_remote_ip() {
 }
 
 function sirius_loopback_remote_ip_print() {
+	drupal_add_http_header('Content-Type', 'text/plain');
   print sirius_loopback_remote_ip(); 
   exit();
 }
@@ -39,13 +53,18 @@ function sirius_loopback_sample_html($letterhead_node = NULL, $paragraph_count =
 
 	$paragraphs = array();
 
-	$paragraphs[] = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Commodo nulla facilisi nullam vehicula ipsum a. Consectetur a erat nam at lectus. Blandit volutpat maecenas volutpat blandit aliquam etiam erat velit scelerisque. Nullam vehicula ipsum a arcu cursus vitae. Ac feugiat sed lectus vestibulum. Suspendisse faucibus interdum posuere lorem. Euismod quis viverra nibh cras pulvinar. Vel facilisis volutpat est velit egestas dui. Sapien et ligula ullamcorper malesuada proin. Blandit turpis cursus in hac habitasse. Aenean vel elit scelerisque mauris pellentesque. Amet cursus sit amet dictum. Nec nam aliquam sem et tortor consequat id porta nibh. Commodo quis imperdiet massa tincidunt nunc pulvinar. In egestas erat imperdiet sed euismod nisi porta lorem mollis. Ante metus dictum at tempor commodo ullamcorper a lacus vestibulum. Sodales ut eu sem integer vitae justo eget.';
+	$paragraphs[] = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Commodo nulla facilisi nullam vehicula ipsum a. Consectetur a erat nam at lectus. Blandit volutpat maecenas volutpat blandit aliquam etiam erat velit scelerisque. Nullam vehicula ipsum a arcu cursus vitae. <strong>Ac feugiat sed lectus vestibulum. Suspendisse faucibus interdum posuere lorem.</strong> Euismod quis viverra nibh cras pulvinar. Vel facilisis volutpat est velit egestas dui. Sapien et ligula ullamcorper malesuada proin. Blandit turpis cursus in hac habitasse. Aenean vel elit scelerisque mauris pellentesque. Amet cursus sit amet dictum. Nec nam aliquam sem et tortor consequat id porta nibh. Commodo quis imperdiet massa tincidunt nunc pulvinar. In egestas erat imperdiet sed euismod nisi porta lorem mollis. Ante metus dictum at tempor commodo ullamcorper a lacus vestibulum. Sodales ut eu sem integer vitae justo eget.';
 
-	$paragraphs[] = 'Id neque aliquam vestibulum morbi blandit. Diam volutpat commodo sed egestas egestas. Aliquet sagittis id consectetur purus. Etiam non quam lacus suspendisse faucibus interdum posuere lorem. Congue eu consequat ac felis donec et odio pellentesque diam. Malesuada fames ac turpis egestas maecenas pharetra convallis. Eleifend donec pretium vulputate sapien nec sagittis aliquam malesuada. Ultrices tincidunt arcu non sodales neque sodales. Ipsum dolor sit amet consectetur adipiscing elit duis tristique sollicitudin. A pellentesque sit amet porttitor eget. Risus quis varius quam quisque id. Dictum varius duis at consectetur lorem donec massa. Amet dictum sit amet justo donec. Ultrices neque ornare aenean euismod elementum nisi. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames.';
+	$paragraphs[] = '<em>Id neque aliquam vestibulum morbi blandit.</em> <a href="#">Diam volutpat commodo sed</a> egestas egestas. Aliquet sagittis id consectetur purus. Etiam non quam lacus suspendisse faucibus interdum posuere lorem. Congue eu consequat ac felis donec et odio pellentesque diam. Malesuada fames ac turpis egestas maecenas pharetra convallis. Eleifend donec pretium vulputate sapien nec sagittis aliquam malesuada. Ultrices<ol><li>tincidunt</li><li>arcu</li><li>non</li><li>sodales</li><li>neque</li></ol>sodales. Ipsum dolor sit amet consectetur adipiscing elit duis tristique sollicitudin. A pellentesque sit amet porttitor eget. Risus quis varius quam quisque id. Dictum varius duis at consectetur lorem donec massa. Amet dictum sit amet justo donec. Ultrices neque ornare aenean euismod elementum nisi. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames.';
 
-	$paragraphs[] = 'Sed id semper risus in hendrerit gravida rutrum quisque non. Massa massa ultricies mi quis hendrerit dolor magna. Iaculis eu non diam phasellus vestibulum lorem. Aliquam nulla facilisi cras fermentum odio eu feugiat pretium. Ut ornare lectus sit amet est placerat in. Dolor sed viverra ipsum nunc aliquet bibendum. Diam phasellus vestibulum lorem sed risus ultricies tristique. Urna neque viverra justo nec ultrices. Laoreet id donec ultrices tincidunt arcu non sodales neque sodales. Phasellus faucibus scelerisque eleifend donec pretium. Risus at ultrices mi tempus imperdiet nulla malesuada pellentesque elit.';
+	$paragraphs[] = 'Sed id semper risus<pre>in hendrerit gravida rutrum quisque non.
+Massa massa ultricies mi quis hendrerit dolor magna.
+Iaculis eu non diam phasellus vestibulum lorem.
+Aliquam nulla facilisi cras fermentum odio eu feugiat pretium.
+                      Ut ornare lectus sit amet est placerat in.</pre>
+	Dolor sed viverra ipsum nunc aliquet bibendum. Diam phasellus vestibulum lorem sed risus ultricies tristique. Urna neque viverra justo nec ultrices. Laoreet id donec ultrices tincidunt arcu non sodales neque sodales. Phasellus faucibus scelerisque eleifend donec pretium. Risus at ultrices mi tempus imperdiet nulla malesuada pellentesque elit.';
 
-	$paragraphs[] = 'Tincidunt id aliquet risus feugiat in ante metus. Vulputate dignissim suspendisse in est ante. Enim eu turpis egestas pretium aenean pharetra magna ac placerat. Enim eu turpis egestas pretium aenean pharetra magna ac. Aliquet nibh praesent tristique magna. Nascetur ridiculus mus mauris vitae ultricies leo integer. Sit amet commodo nulla facilisi nullam vehicula ipsum. Eu sem integer vitae justo eget. Nam libero justo laoreet sit amet cursus. Lacinia at quis risus sed vulputate odio ut enim. Porttitor leo a diam sollicitudin tempor id eu nisl nunc. Nam libero justo laoreet sit. Diam volutpat commodo sed egestas egestas fringilla phasellus faucibus. Vulputate odio ut enim blandit. Amet massa vitae tortor condimentum.';
+	$paragraphs[] = '<ul><li>Tincidunt id aliquet risus feugiat in ante metus.</li><li>Vulputate dignissim suspendisse in est ante.</li><li>Enim eu turpis egestas pretium aenean pharetra magna ac placerat.</li><li>Enim eu turpis egestas pretium aenean pharetra magna ac.</li><li>Aliquet nibh praesent tristique magna.</li><li>Nascetur ridiculus mus mauris vitae ultricies leo integer.</li><li>Sit amet commodo nulla facilisi nullam vehicula ipsum.</li><li>Eu sem integer vitae justo eget.</li><li>Nam libero justo laoreet sit amet cursus.</li><li>Lacinia at quis risus sed vulputate odio ut enim.</li><li>Porttitor leo a diam sollicitudin tempor id eu nisl nunc.</li></ul>Amet massa vitae tortor condimentum.';
 
 	$paragraphs[] = 'Adipiscing at in tellus integer feugiat scelerisque. Est ante in nibh mauris. Donec adipiscing tristique risus nec feugiat in fermentum posuere. Amet purus gravida quis blandit turpis cursus in. Tincidunt praesent semper feugiat nibh sed pulvinar. Nullam vehicula ipsum a arcu cursus vitae congue mauris. Egestas purus viverra accumsan in nisl nisi scelerisque eu. Faucibus et molestie ac feugiat. Volutpat blandit aliquam etiam erat velit scelerisque in dictum. In nibh mauris cursus mattis.';
 
@@ -69,4 +88,21 @@ function sirius_loopback_sample_html($letterhead_node = NULL, $paragraph_count =
 		$html .= '</p>';
 	}
 	return $html;
+}
+
+function sirius_loopback_echo() {
+	grievance_classes_array('loopback');
+
+	$body = '';
+	
+	if ($_REQUEST['css_paths']) {
+		$css_paths = explode('|', $_REQUEST['css_paths']);
+		foreach ($css_paths as $css_path) {
+			drupal_add_css($css_path);
+		}
+	}
+
+	$body .= $_REQUEST['body'];
+	if (!$body) { $body = 'No body.'; }
+	return $body;
 }

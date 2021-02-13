@@ -106,10 +106,31 @@ function sirius_twilio_outgoing_voice($phone, $context) {
 	}
 
 	$context['phone'] = $phone;
+
+	$callerid_nid = $context['callerid_nid'];
+	if ($callerid_nid) { 
+		$callerid_node = node_load($callerid_nid);
+		$callerid_phone = $callerid_node->field_sirius_phone['und'][0]['value'];
+	}
+	if (!$callerid_phone) { $callerid_phone = sirius_domain_variable_get('sirius_twilio_phone', ''); }
+
 	$msg = "Outgoing call initiated to $phone";
+
 	try {
 		$client = sirius_twilio_client_get();
-		$call = $client->calls->create($phone, sirius_domain_variable_get('sirius_twilio_phone', ''), array("url" => $base_url . '/sirius/twilio/incoming/voice'));
+		$call_params = array("url" => $base_url . '/sirius/twilio/incoming/voice');
+		if ($context['amd']['MachineDetection']) { 
+			$call_params['machineDetection'] = $context['amd']['MachineDetection'];
+			$names = sirius_twilio_amd_setting_names();
+			foreach ($names as $name) {
+				$value = sirius_domain_variable_get($name);
+				if ($value) { $call_params[$name] = $value; }
+			}
+			dpm($call_params);
+		}
+
+		$call = $client->calls->create($phone, $callerid_phone, $call_params);
+
 		$call_sid = sirius_twilio_call_sid($call);
 		$result = array('success' => TRUE, 'msg' => 'Initiated call to ' . $phone);
 	} catch (Exception $e) {
@@ -179,3 +200,47 @@ function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone) {
 function sirius_twilio_outgoing_voice_clean($msg) {
 	return substr(htmlspecialchars($msg), 0, 3000);
 }
+
+function sirius_twilio_outgoing_voice_play($call_sid, $context, $url) {
+	header('Content-Type: text/xml');
+	print "<Response><Play>" . htmlspecialchars($url, ENT_XML1 | ENT_QUOTES) . "</Play></Response>";
+	sirius_twilio_set_context($call_sid, $context, 'play', $msg);
+	exit();
+}
+
+/*
+function sirius_twilio_outgoing_voice_stream() {
+	$call_sid = $_REQUEST['call_sid'];
+	if (!$call_sid) { sirius_twilio_browserphone_twiml_dial_error("Missing call_sid."); }
+	$context = sirius_twilio_get_context($call_sid);
+	$omg_key = $context['omg_key'];
+	list($audio_nid, $delta) = explode('-', $omg_key);
+	watchdog("whatever", "Here with $call_sid and $omg_key = $audio_nid and $delta");
+
+	// @todo: Security is a little sketch here.
+	//        We assume that if the URL has a call_sid, it's ok to stream the file associated with the context of that call_sid.
+	//        That's not a univerally good assumption. We should at the very least ensure that the call is active. We should also probably authenticate callbacks from Twilio.
+	//        But ... the client code is responsible for only setting the NID of an audio message uploaded as it should be, which means it's probably just a bulk message.
+	//        So if somebody can guess the call sid, they can play somebody else's outgoing bulk message. Oh well.
+
+	if (!$audio_nid > 0) { sirius_twilio_browserphone_twiml_dial_error('Invalid omg key'); }
+	$audio_node = node_load($audio_nid);
+	$audio_item = $audio_node->field_sirius_audio_public['und'][$delta];
+	sirius_become_superuser(TRUE);
+	$uri = $audio_item['uri'];
+  $headers = array();
+  foreach (module_implements('file_download') as $module) {
+    $function = $module . '_file_download';
+    $result = $function($uri);
+    if ($result == -1) {
+      return drupal_access_denied();
+    }
+    if (isset($result) && is_array($result)) {
+      $headers = array_merge($headers, $result);
+    }
+  }
+  if (count($headers)) {
+    file_transfer($uri, $headers);
+  }	
+}
+*/

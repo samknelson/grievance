@@ -26,10 +26,14 @@ function sirius_event_class_ts($event_node) {
 }
 
 function sirius_event_get_class_types() {
-	$event_type_terms = sirius_taxonomy_load('sirius_event_type', 'tid', 'full');
-	$class_type_terms = array();
-	foreach ($event_type_terms as $event_type_tid => $event_type_term) {
-		if (sirius_event_class_enabled_type($event_type_term)) { $class_type_terms[$event_type_tid] = $event_type_term; }
+	$class_type_terms = &drupal_static(__FUNCTION__);
+
+	if (!isset($class_type_terms)) {
+		$event_type_terms = sirius_taxonomy_load('sirius_event_type', 'tid', 'full');
+		$class_type_terms = array();
+		foreach ($event_type_terms as $event_type_tid => $event_type_term) {
+			if (sirius_event_class_enabled_type($event_type_term)) { $class_type_terms[$event_type_tid] = $event_type_term; }
+		}
 	}
 
 	return $class_type_terms;

@@ -8,10 +8,10 @@ thead tr, thead th {
 	font-weight: 400;
 }
 th {
-	padding: 22px 0 22px 22px;
+	padding: 15px 0 15px 15px;
 }
 td {
-	padding: 22px 0 22px 22px;
+	padding: 15px 0 15px 15px;
 }
 
 thead tr {
@@ -23,6 +23,10 @@ tbody tr {
 	border-bottom: 1px solid #5984be;	
 	background-color: #ffffff;
 }
+
+tbody tr.no_bottom {
+	border-bottom: none;
+}
 tbody td {
 	background-color: #ffffff;
 }
@@ -31,6 +35,9 @@ a.tool-button {
 	border: 1px solid #a0bbf5;
 	display: inline-block;
 	margin-right: 10px;
+	background-color: #ffffff;
+	min-width: 75px;
+	text-align: center;
 }
 a.tool-button:hover {
 	color: #1b4784;

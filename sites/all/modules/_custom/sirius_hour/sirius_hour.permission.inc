@@ -23,8 +23,23 @@ function sirius_hour_permission() {
 
 function sirius_hour_node_access($node, $op, $account) {
   // Specific checks by node type
-	// if ($node->type == 'sirius_log') { return sirius_node_access_log($node, $op, $account); }
+  if (is_object($node)) { $type = $node->type; } else { $type = $node; }
+
+  // Specific checks by node type
+  if ($type == 'sirius_payperiod') { return sirius_hour_node_access_payperiod($node, $op, $account); }
+  if ($type == 'sirius_employer_payperiod') { return sirius_hour_node_access_employer_payperiod($node, $op, $account); }
 
   // We know nothing.
+  return NODE_ACCESS_IGNORE;
+}
+
+
+function sirius_hour_node_access_payperiod($node, $op, $account) {
+  if (!user_access('sirius hour admin')) { return NODE_ACCESS_DENY; }
+  return NODE_ACCESS_IGNORE;
+}
+
+function sirius_hour_node_access_employer_payperiod($node, $op, $account) {
+  if (!user_access('sirius hour admin')) { return NODE_ACCESS_DENY; }
   return NODE_ACCESS_IGNORE;
 }

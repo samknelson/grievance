@@ -1,6 +1,5 @@
 <?php
 
-
 function sirius_node_tab_wizard($node, $wizard_name) {
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/wizard.css');
 
@@ -41,14 +40,27 @@ function sirius_wizard_render_steps($steps, $current_step) {
 }
 
 function sirius_wizard_info($wizard_name) {
-	$wizard_infos = module_invoke_all('sirius_wizard_info');
+  $wizard_infos = &drupal_static(__FUNCTION__); 
+  if (!isset($wizard_infos)) { 
+  	$wizard_infos = sirius_wizard_info_all();
+  }
+
+	// @todo: This is a terrible kludge, put in place to avoid touching lots of feeds
+	//        Sinze we're no longer supporting XLSX files, there's no need to have a sheet-selection step.
+	//        The right thing to do is to remove it from the configuration for each feed.
+	//        But I'm lazy and scared to touch every feed, so I'm doing this atrocious thing here.
+	unset($wizard_infos[$wizard_name]['steps']['sheet']);
+
 	return $wizard_infos[$wizard_name];
 }
 
 function sirius_wizard_info_all() {
-	$all = module_invoke_all('sirius_wizard_info');
-	ksort($all);
-	return $all;
+  $wizard_infos = &drupal_static(__FUNCTION__);
+  if (!isset($wizard_infos)) {
+  	$wizard_infos = module_invoke_all('sirius_wizard_info');
+		ksort($wizard_infos);
+  }
+	return $wizard_infos;
 }
 
 function sirius_wizard_steps($info, $data = NULL, $node = NULL) {
@@ -99,15 +111,15 @@ function sirius_wizard_content_default($info, $data, $node, $current_step) {
 
 function sirius_wizard_data($info, $node) {
 	$wizard_name = $info['name'];
-	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_jsonfield_util_node_json_get($node);
 	return $json['wizard'][$wizard_name];
 }
 
-function sirius_wizard_data_set($info, $node, $data) {
+function sirius_wizard_data_set($info, &$node, $data) {
 	$wizard_name = $info['name'];
-	$json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_jsonfield_util_node_json_get($node);
 	$json['wizard'][$wizard_name] = $data;
-	$node->field_sirius_json['und'][0]['value'] = json_encode($json);
+	sirius_jsonfield_util_node_json_set($node, $json);
   node_object_prepare($node);
   $node = node_submit($node);
 	return node_save($node);
@@ -140,103 +152,10 @@ function sirius_sirius_wizard_info() {
     ),
   );
 
-  $items['feed_wws'] = array(
-    'name' => 'feed_wws',
-    'title' => 'Worker Work Status',
-    'description' => 'Upload a new list of worker work statuses.',
-    'steps' => array(
-			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
-			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
-			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
-			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
-			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
-			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
-    ),
-    'feed' => array(
-    	'fields' => array(
-    		'ssn' => array(
-    			'title' => 'SSN',
-    			'required' => TRUE,
-    		),
-    		'work_status_id' => array(
-    			'title' => 'Work Status ID',
-    			'required' => TRUE,
-    		),
-    	),
-    	'batch_size' => 500,
-	    'callback_row_verify' => 'sirius_feed_wws_row_verify',
-	    'callback_row_process' =>'sirius_feed_wws_row_process',
-    ),
-    'callback_launch' => 'sirius_feed_wizard_launch',
-    'callback_launch_args' => array('feed_wws'),
-  );
-
-  $items['feed_hours'] = array(
-    'name' => 'feed_hours',
-    'title' => 'Hours',
-    'description' => 'Upload a new list of hours.',
-    'steps' => array(
-			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
-			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
-			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
-			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
-			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
-			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
-    ),
-    'feed' => array(
-	    'pks' => array(
-	    	'id' => 'ID',
-	    	'id3' => 'ID3',
-	    	'ssn' => 'SSN',
-	    ),
-    	'fields' => array(
-    		'id' => array('title' => 'ID'),
-    		'ssn' => array('title' => 'SSN'),
-    		'id3' => array('title' => 'ID3'),
-    		'hour_type' => array('title' => 'Hour Type'),
-    		'employer' => array('title' => 'Employer'),
-    		'date' => array('title' => 'Date'),
-    		'hours' => array('title' => 'Hours'),
-    		'department' => array('title' => 'Department'),
-    		'notes1' => array('title' => 'Notes 1'),
-    		'notes2' => array('title' => 'Notes 2'),
-    		'notes3' => array('title' => 'Notes 3'),
-    	),
-    	'batch_size' => 500,
-	    'callback_row_verify' => 'sirius_feed_hours_row_verify',
-	    'callback_row_process' =>'sirius_feed_hours_row_process',
-    ),
-    'callback_launch' => 'sirius_feed_wizard_launch',
-    'callback_launch_args' => array('feed_hours'),
-  );
-
-  $items['feed_contact'] = array(
-    'name' => 'feed_contact',
-    'title' => 'Contacts',
-    'description' => 'Upload a new list of contacts.',
-    'steps' => array(
-			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
-			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
-			// 'tag' 			=> array('label' => 'Tag', 				'callback' => 'sirius_feed_wizard_tag'),
-			'map' 			=> array('label' => 'Mapping', 		'callback' => 'sirius_feed_wizard_map'),
-			'verify' 		=> array('label' => 'Verify', 		'callback' => 'sirius_feed_wizard_verify'),
-			'process' 	=> array('label' => 'Process', 		'callback' => 'sirius_feed_wizard_process'),
-			'review' 		=> array('label' => 'Review', 		'callback' => 'sirius_feed_wizard_review'),
-    ),
-    'feed' => array(
-    	'batch_size' => 500,
-	    'callback_row_verify' => 'sirius_feed_contact_row_verify',
-	    'callback_row_process' =>'sirius_feed_contact_row_process',
-			'callback_fields' => 'sirius_feed_contact_fields',
-    ),
-    'callback_launch' => 'sirius_feed_wizard_launch',
-    'callback_launch_args' => array('feed_contact'),
-  );
-
   $items['feed_worker_skill'] = array(
     'name' => 'feed_worker_skill',
     'title' => 'Worker Skills',
-    'description' => 'Upload worker skills and expiration dates.',
+    'description' => 'Create or upload worker skills and expiration dates.',
     'steps' => array(
 			'upload' 		=> array('label' => 'Upload', 		'callback' => 'sirius_feed_wizard_upload'),
 			'sheet' 		=> array('label' => 'Worksheet', 	'callback' => 'sirius_feed_wizard_sheet'),
@@ -266,15 +185,20 @@ function sirius_sirius_wizard_info() {
     'callback_launch_args' => array('feed_worker_skill'),
   );
 
+  $items += sirius_feed_contact_info();
   $items += sirius_feed_grievance_info();
   $items += sirius_feed_grievance_log_info();
   $items += sirius_letter_wizard_info();
   $items += sirius_feed_worker_info();
+  $items += sirius_feed_wws_info();
+  $items += sirius_feed_employee_info();
+  $items += sirius_feed_hours_info();
+  $items += sirius_feed_user_info();
 
   return $items;
 }
 
-function sirius_wizard_submit($info, $data, $node, $current_step, $msg = NULL) {
+function sirius_wizard_submit($info, $data, &$node, $current_step, $msg = NULL) {
 	// Mark this step as complete
 	$data['steps'][$current_step]['complete'] = TRUE;
 

@@ -8,29 +8,27 @@ function sirius_dispatch_page_job_create_intro() {
 	return drupal_get_form('sirius_dispatch_page_job_create_intro_form');
 }
 
+function sirius_dispatch_page_job_create_intro_form_ajax($form, $form_state) {
+  $commands = array();
+  $commands[] = ajax_command_replace("#sirius_dispatch_page_job_create_intro_form_ajax_industry", render($form['industry_tid']));
+
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands
+  );
+}
+
 function sirius_dispatch_page_job_create_intro_form($form, &$form_state) {
-
 	if (user_access("sirius dispatch staff")) {
-		// Get the list of shops.  Use SQL to avoid loading the full node
-		$sql = "select title, nid from node ";
-		$sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
-		$sql .= "where type = 'grievance_shop' ";
-		$sql .= "and field_sirius_active_value = 'Yes' ";
-		$sql .= "order by title ";
-		$stmt = db_query($sql, array());
-		$options = array(
-			NULL => t('-- Select --'),
-		);
-		while ($hr = $stmt->fetchAssoc()) {
-			$options[$hr['nid']] = $hr['title'];
-		}
-
+		$employer_options = array(NULL => t('-- Select --')) + sirius_employer_list();
 		$form['employer_nid'] = array(
 			'#title' => t('Employer'),
 			'#type' => 'select',
-			'#options' => $options,
+			'#options' => $employer_options,
 			'#required' => TRUE,
-		);
+			'#ajax' => array('callback' => 'sirius_dispatch_page_job_create_intro_form_ajax',
+  	  ),
+    );
 	} else {
 		$employer_node = sirius_employer_get();
 		if (!$employer_node) { 
@@ -51,10 +49,9 @@ function sirius_dispatch_page_job_create_intro_form($form, &$form_state) {
 	} else {
 		$job_types = array();
 		if ($employer_node->field_sirius_dispatch_job_types['und']) {
-			foreach ($employer_node->field_sirius_dispatch_job_types['und'] as $tmp) {
-				if ($tmp['tid']) {
-					$job_types[$tmp['tid']] = $job_types_all[$tmp['tid']];
-				}
+			$job_type_tids = sirius_fieldvals($employer_node, 'field_sirius_dispatch_job_types', 'tid');
+			foreach ($job_type_tids as $job_type_tid) {
+				$job_types[$job_type_tid] = $job_types_all[$job_type_tid];
 			}
 		}
 	}
@@ -72,6 +69,32 @@ function sirius_dispatch_page_job_create_intro_form($form, &$form_state) {
 		'#required' => TRUE,
 	);
 
+	if (!$employer_node && $form_state['values']['employer_nid']) {
+		$employer_node = node_load($form_state['values']['employer_nid']);
+	}
+
+	if ($employer_node) {
+		$industry_names = sirius_taxonomy_load('sirius_industry', 'tid', 'name');
+		$industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
+		$industry_options = array(NULL => t('-- Select --'));
+		foreach ($industry_tids as $industry_tid) { $industry_options[$industry_tid] = $industry_names[$industry_tid]; }
+	} else {
+		$industry_options = array();
+	}
+
+	if (count($industry_options) > 2) {
+		$form['industry_tid'] = array(
+			'#type' => 'select',
+			'#options' => $industry_options,
+			'#title' => t('Industry'),
+			'#required' => TRUE,
+			'#prefix' => '<div id="sirius_dispatch_page_job_create_intro_form_ajax_industry">',
+			'#suffix' => '</div>',
+		);
+	} else {
+		$form['industry_tid'] = array('#markup' => '<div id="sirius_dispatch_page_job_create_intro_form_ajax_industry"></div>');
+	}
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Go',
@@ -83,14 +106,17 @@ function sirius_dispatch_page_job_create_intro_form($form, &$form_state) {
 function sirius_dispatch_page_job_create_intro_form_submit($form, &$form_state) {
 	$employer_nid = $form_state['values']['employer_nid'];
 	$job_type_tid = $form_state['values']['job_type_tid'];
-	drupal_goto(current_path() . '/' . $employer_nid . '/' . $job_type_tid);
+	$industry_tid = $form_state['values']['industry_tid'];
+	$path = current_path() . '/' . $employer_nid . '/' . $job_type_tid;
+	if ($industry_tid) { $path .= '/' . $industry_tid; }
+	drupal_goto($path);
 }
 
 /***********************************************************
  * Main form - assumes an employer and job type
  ***********************************************************/
 
-function sirius_dispatch_page_job_create_access($employer_node, $job_type_tid) {
+function sirius_dispatch_page_job_create_access($employer_node, $job_type_tid, $industry_tid = NULL) {
 	// Staff can create jobs.
 	if (user_access('sirius dispatch staff')) { return TRUE; }
 
@@ -102,6 +128,11 @@ function sirius_dispatch_page_job_create_access($employer_node, $job_type_tid) {
 	if (!$check_employer_node->nid) { return FALSE; }
 	if ($check_employer_node->nid != $employer_node->nid) { return FALSE;}
 
+	// If there's an industry, must be one of the employer's industries.
+	if ($industry_tid) {
+		if (!in_array($industry_tid, sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid'))) { return FALSE; }
+	}
+
 	// Employer must have access to this job type
 	foreach ($employer_node->field_sirius_dispatch_job_types['und'] as $tmp) {
 		if ($tmp['tid'] == $job_type_tid) {
@@ -111,7 +142,7 @@ function sirius_dispatch_page_job_create_access($employer_node, $job_type_tid) {
 	return FALSE;
 }
 
-function sirius_dispatch_page_job_create($employer_node, $job_type_tid) {
+function sirius_dispatch_page_job_create($employer_node, $job_type_tid, $industry_tid = NULL) {
 	// Check for pending VLRIs
 	if (!user_access('sirius dispatch staff')) {
 		// Must not have any pending VLRIs
@@ -126,13 +157,18 @@ function sirius_dispatch_page_job_create($employer_node, $job_type_tid) {
 		}
 	}
 
-	return drupal_get_form('sirius_dispatch_page_job_create_form', $employer_node, $job_type_tid);
+	return drupal_get_form('sirius_dispatch_page_job_create_form', $employer_node, $job_type_tid, $industry_tid);
 }
 
 
-function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_node, $job_type_tid) {
+function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_node, $job_type_tid, $industry_tid = NULL) {
+	if (!$industry_tid) { $industry_tid = $employer_node->field_sirius_industry['und'][0]['tid']; }
+	$industry_term = taxonomy_term_load($industry_tid);
+	$form_state['industry_tid'] = $industry_tid;
+
 	global $user;
 	$job_policy = sirius_dispatch_job_policy_from_tid($job_type_tid);
+
 
 	// Do we need a "workers" region?
 	$workers_visible = ($job_policy['workers']['cbn'] == 'Yes');
@@ -164,8 +200,6 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 	$form_state['employer_node'] = $employer_node;
 	$form_state['job_type_tid'] = $job_type_tid;
-	$industry_tid = $employer_node->field_sirius_industry['und'][0]['tid'];
-	$industry_term = taxonomy_term_load($industry_tid);
 
 	$employer_json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
 	$industry_json = json_decode($industry_term->field_sirius_json['und'][0]['value'], TRUE);
@@ -680,6 +714,8 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 	$job_node->status = 1;
 	$job_node->promote = 0;
 	$job_node->comment = 0;
+	$domain_nid = sirius_domain_nid();
+	if ($domain_nid) { $job_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
 
 	$job_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
 	$job_node->field_sirius_dispatch_job_type['und'][0]['tid'] = $job_type_term->tid;
@@ -716,7 +752,7 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 	if ($form_state['values']['hall']) {
 		$job_node->field_sirius_dispatch_hall['und'][0]['target_id'] = $form_state['values']['hall'];
 	}
-	$job_node->field_sirius_industry = $employer_node->field_sirius_industry;
+	if ($form_state['industry_tid']) { $job_node->field_sirius_industry['und'][0]['tid'] = $form_state['industry_tid']; }
 
 	$address_notes_type = $form_state['values']['address_notes_type'];
 	if ($address_notes_type == 'booth') {
@@ -834,6 +870,8 @@ function sirius_dispatch_page_job_create_get_event_node($form_state, $job_node) 
 	}
 	$event_node->field_sirius_active['und'][0]['value'] = 'Yes';
 	$event_node->type = 'sirius_event';
+	$domain_nid = sirius_domain_nid();
+	if ($domain_nid) { $event_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
 	node_object_prepare($event_node);
 	$event_node->language = LANGUAGE_NONE;
 	$event_node->uid = $user->uid;

@@ -43,7 +43,6 @@
 			$('#sirius_browserphone_button_hangup').show();
 			$('#sirius_browserphone_button_omg').show();
 			$('#sirius_browserphone_omg').show();
-			// $('#sirius_browserphone_volume').show();
 			$('#sirius_browserphone_button_conference').show();
 			sirius_browserphone_volume_bind(conn);
 		});
@@ -54,7 +53,6 @@
 			$('#sirius_browserphone_button_hangup').hide();
 			$('#sirius_browserphone_button_omg').hide();
 			$('#sirius_browserphone_omg').hide();
-			// $('#sirius_browserphone_volume').hide();
 			$('#sirius_browserphone_button_conference').hide();
 			$('#sirius_browserphone_button_conference_add').hide();
 			$('#sirius_browserphone_button_conference_remove').hide();

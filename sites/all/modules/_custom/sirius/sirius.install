@@ -1,0 +1,126 @@
+<?php
+
+/**
+ * Create the quickhash table
+ */
+
+/*
+function sirius_update_7001() {
+
+  $sqls = array(
+    'CREATE TABLE sirius_quickhash (
+    hash_key varchar(1024) primary key,
+    hash_json json,
+    hash_type varchar(255),
+    hash_domain integer,
+    hash_uid integer,
+    hash_ts integer
+    )',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
+*/
+
+/**
+ * Enable geocoding modules
+ */
+
+function sirius_update_7002() {
+  // Enable some modules
+  $modules = array('geocoder', 'geophp', 'geofield');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
+
+/**
+ * Enable leaflet modules
+ */
+
+function sirius_update_7003() {
+  // Enable some modules
+  $modules = array('leaflet', 'leaflet_markercluster', 'leaflet_more_maps');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
+
+/**
+ * Enable form_options_attributes modules
+ */
+
+function sirius_update_7004() {
+  // Enable some modules
+  $modules = array('form_options_attributes');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
+
+/**
+ * Move all signatures from private files to public files
+ */
+
+function sirius_update_7005() {
+  // Enable some modules
+  $sql = 'select * from field_data_field_sirius_signature order by entity_id';
+  $stmt = sirius_sql_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    $file = file_load($hr['field_sirius_signature_fid']);
+    $dest = $file->uri;
+    if (!preg_match('/private/', $dest)) { continue; }
+    $dest = preg_replace('/private:/', 'public:', $dest);
+    file_move($file, $dest);
+    print "Moved: $dest\n";
+  }
+}
+
+/**
+ * Disable table_trash
+ * Disable login_destination
+ * Enable logintoboggan
+ */
+
+function sirius_update_7006() {
+  // Enable some modules
+  $modules = array('table_trash', 'login_destination');
+  foreach ($modules as $module) {
+    print "Disabling $module\n";
+    module_disable(array($module), TRUE);
+  }
+  $modules = array('logintoboggan');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
+
+/**
+ * Rename mailattach variables
+ */
+
+function sirius_update_7007() {
+  $keys = array(
+    'grievance_mailattach_user' => 'sirius_mailattach_user', 
+    'grievance_mailattach_pass' => 'sirius_mailattach_pass',
+    'grievance_mailattach_imapstr' => 'sirius_mailattach_imapstr',
+    'grievance_mailattach_type' => 'sirius_mailattach_grievance_type', 
+  );
+  foreach ($keys as $old_key => $new_key) {
+    print "Setting: $old_key => $new_key\n";
+    variable_set($new_key, variable_get($old_key, ''));
+  }
+  if (!variable_get('sirius_mailattach_mode', '')) {
+    variable_set('sirius_mailattach_mode', 'live');
+  }
+}

@@ -31,15 +31,6 @@ function report_cache_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
-	$items['admin/config/system/report-cache'] = array(
-		'title' => 'Report Cache',
-		'description' => 'Settings for the Report Cache',
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('report_cache_admin'),
-		'access arguments' => array('access site reports'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-
 	// Create menu items for the form for each report type
 	$report_type_infos = module_invoke_all('report_cache_info');
 	foreach ($report_type_infos as $report_type => $info) {
@@ -57,22 +48,6 @@ function report_cache_menu() {
 	}
 
   return $items;
-}
-
-function report_cache_admin() {
-  $form = array();
-	
-	/*
-  $form['trustfund_cron_denormalize_max_rows'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Denormalize Max Rows'),
-    '#default_value' => variable_get('trustfund_cron_denormalize_max_rows', 20),
-    '#description' => t("Maximum number of members to recompute for a given cron run."),
-    '#required' => FALSE,
-  );
-  */
-
-  return system_settings_form($form);
 }
 
 function report_cache_access($report_type) {
@@ -100,14 +75,37 @@ function report_cache_purge($report_type, $report_id) {
 	return $count;
 }
 
+function report_cache_parameters($report_type, $report_id) {
+ 	$cache = &drupal_static(__FUNCTION__);
+
+ 	if ($cache[$report_type][$report_id]) { return $cache[$report_type][$report_id]; }
+
+  $query = db_select('report_cache');
+  $query->fields('report_cache');
+  $query->condition('report_id', $report_id);
+  $query->condition('report_type', $report_type . ' :: PARAMETERS');
+  $stmt = $query->execute();
+  $hr = $stmt->fetchAssoc();
+	$parameters = unserialize($hr['report_data']);
+
+	// Quick sloppy caching. 
+	// - Since we're doing a database query, we want to store the results in memory
+	// - But we might be called thousands of times for different report IDs.
+	// - So we only keep the first 100 results in memory.
+	if (!$cache[$report_type] || (count($cache[$report_type]) < 100)) { $cache[$report_type][$report_id] = $parameters; }
+
+	return $parameters;
+}
+
 function report_cache_purge_date($report_type, $start_ts = NULL, $end_ts = NULL) {
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 	if (!$start_ts) { $start_ts = strtotime('1970-1-1'); }
 	if (!$end_ts) { $end_ts = strtotime('-30 days'); }
 
 	watchdog('report-cache', "Purge $report_type - Purging old reports from $from_ts to $end_ts.");
 
-	$sql = "select distinct report_id from report_cache where report_type = :report_type";
-	$stmt = db_query($sql, array(':report_type' => $report_type));
+	$sql = "select distinct report_id from report_cache where report_type = :report_type and report_domain_nid = :domain_nid";
+	$stmt = db_query($sql, array(':report_type' => $report_type, ':domain_nid' => $domain_nid));
 	while ($hr = $stmt->fetchAssoc()) {
 		$report_id = $hr['report_id'];
 

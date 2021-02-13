@@ -792,6 +792,29 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'sirius_payment_type' => array(
+      'name' => 'Sirius Payment Type',
+      'machine_name' => 'sirius_payment_type',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'sirius_skill' => array(
       'name' => 'Sirius Skill',
       'machine_name' => 'sirius_skill',

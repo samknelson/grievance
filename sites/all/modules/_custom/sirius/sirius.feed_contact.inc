@@ -1,11 +1,49 @@
 <?php
 
+function sirius_feed_contact_info() {
+
+  $items = array();
+
+  $items['feed_contact'] = array(
+    'name' => 'feed_contact',
+    'title' => 'Contacts',
+    'description' => 'Create or update contacts. This feed should not be used for members or workers.',
+    'steps' => array(
+      'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
+      'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),
+      // 'tag'      => array('label' => 'Tag',        'callback' => 'sirius_feed_wizard_tag'),
+      'map'       => array('label' => 'Mapping',    'callback' => 'sirius_feed_wizard_map'),
+      'verify'    => array('label' => 'Verify',     'callback' => 'sirius_feed_wizard_verify'),
+      'process'   => array('label' => 'Process',    'callback' => 'sirius_feed_wizard_process'),
+      'review'    => array('label' => 'Review',     'callback' => 'sirius_feed_wizard_review'),
+    ),
+    'feed' => array(
+      'pks' => array(
+        'id' => 'ID',
+        'nid' => 'NID',
+      ),
+      'batch_size' => 2000,
+      'callback_row_verify' => 'sirius_feed_contact_row_verify',
+      'callback_row_process' =>'sirius_feed_contact_row_process',
+      'callback_fields' => 'sirius_feed_contact_fields',
+    ),
+    'callback_launch' => 'sirius_feed_wizard_launch',
+    'callback_launch_args' => array('feed_contact'),
+  );
+
+  return $items;
+}
+
 function sirius_feed_contact_fields($info, $data, $feed_node, $current_step) {
   // Core fields
   $fields = array(
     'id' => array(
       'title' => 'ID',
-      'required' => TRUE,
+      'required' => FALSE,
+    ),
+    'nid' => array(
+      'title' => 'NID',
+      'required' => FALSE,
     ),
     'name_given' => array(
       'title' => 'First Name',
@@ -85,31 +123,58 @@ function sirius_feed_contact_row_verify($feed_node, $info, $data, &$row, $precom
 
   $domain_nid = $feed_node->field_sirius_domain['und'][0]['target_id'];
 
+  $pk = $data['pk'];
+  if (!$pk) { $pk = 'id'; }
+  if ($pk == 'nid') {
+   if (!preg_match('/^[0-9]+$/', $row['nid'])) { return array('success' => FALSE, 'msg' => 'Invalid NID'); }
+  }
+
   // Contact
   if ($precompute) {
-    $args = array();
-    $args[':id'] = $row['id'];
+    if ($pk == 'id') {
+      $args = array();
+      $args[':id'] = $row['id'];
 
-  	$sql = "select max(field_data_field_sirius_id.entity_id) as a, min(field_data_field_sirius_id.entity_id) as b from field_data_field_sirius_id ";
-    if ($domain_nid) {
-      $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = field_data_field_sirius_id.entity_id ";
-    }
-  	$sql .= "where field_data_field_sirius_id.entity_type = 'node' ";
-  	$sql .= "and field_data_field_sirius_id.bundle = 'sirius_contact' ";
-  	$sql .= "and field_data_field_sirius_id.field_sirius_id_value = :id ";
-    if ($domain_nid) {
-      $sql .= "and field_sirius_domain_target_id = :domain_nid";
-      $args[':domain_nid'] = $domain_nid;
-    }
+    	$sql = "select max(field_data_field_sirius_id.entity_id) as a, min(field_data_field_sirius_id.entity_id) as b from field_data_field_sirius_id ";
+      if ($domain_nid) {
+        $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = field_data_field_sirius_id.entity_id ";
+      }
+    	$sql .= "where field_data_field_sirius_id.entity_type = 'node' ";
+    	$sql .= "and field_data_field_sirius_id.bundle = 'sirius_contact' ";
+    	$sql .= "and field_data_field_sirius_id.field_sirius_id_value = :id ";
+      if ($domain_nid) {
+        $sql .= "and field_sirius_domain_target_id = :domain_nid";
+        $args[':domain_nid'] = $domain_nid;
+      }
 
-  	$stmt = db_query($sql, $args);
-  	$hr = $stmt->fetchAssoc();
-  	$nid = $hr['a'];
-  	$other_nid = $hr['b'];
-  	if ($nid != $other_nid) {
-  		return array('success' => FALSE, 'msg' => 'Multiple contacts found with this ID.');
-  	}
-  	$row['contact_nid'] = $nid;
+    	$stmt = sirius_sql_query($sql, $args);
+    	$hr = $stmt->fetchAssoc();
+    	$nid = $hr['a'];
+    	$other_nid = $hr['b'];
+    	if ($nid != $other_nid) {
+    		return array('success' => FALSE, 'msg' => 'Multiple contacts found with this ID.');
+    	}
+      $row['contact_nid'] = $nid;
+    } else {
+      $args = array();
+      $args[':nid'] = $row['nid'];
+      $sql = "select nid from node ";
+      if ($domain_nid) {
+        $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+      }
+      $sql .= "where node.type = 'sirius_contact' ";
+      if ($domain_nid) {
+        $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+        $args[':domain_nid'] = $domain_nid;
+      }
+      $sql .= "and node.nid = :nid ";
+
+      $stmt = sirius_sql_query($sql, $args);
+      $hr = $stmt->fetchAssoc();
+      $nid = $hr['nid'];
+      if (!$nid) { return array('success' => FALSE, 'msg' => 'Contact not found in this domain.'); }
+      $row['contact_nid'] = $nid;
+    }
   }
 
   return array('success' => TRUE, 'msg' => 'Looks good.');
@@ -135,9 +200,11 @@ function sirius_feed_contact_row_process($feed_node, $info, $data, $row) {
     $contact_node->field_sirius_id['und'][0]['value'] = $row['id'];
   }
 
-  $contact_node->field_sirius_name['und'][0]['given'] = $row['name_given'];
-  $contact_node->field_sirius_name['und'][0]['middle'] = $row['name_middle'];
-  $contact_node->field_sirius_name['und'][0]['family'] = $row['name_family'];
+  if ($row['name_given'] || $row['name_middle'] || $row['name_family']) {
+    $contact_node->field_sirius_name['und'][0]['given'] = $row['name_given'];
+    $contact_node->field_sirius_name['und'][0]['middle'] = $row['name_middle'];
+    $contact_node->field_sirius_name['und'][0]['family'] = $row['name_family'];
+  }
   $contact_node->field_sirius_source['und'][0]['value'] = $data['source'];
 
   $phone1 = $row['phone'];
@@ -161,7 +228,7 @@ function sirius_feed_contact_row_process($feed_node, $info, $data, $row) {
   }
 
   $json = sirius_jsonfield_util_node_json_get($contact_node);
-  $results_json = array();
+  $results_json = sirius_jsonfield_util_results_get($json, 'default');
   foreach ($row as $key => $value) {
     if (preg_match('/JSON:/', $key)) {
       sirius_jsonfield_util_set_from_path($results_json, preg_replace('/JSON:/', '', $key), $value);

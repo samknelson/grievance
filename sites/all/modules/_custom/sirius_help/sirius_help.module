@@ -19,7 +19,60 @@ function sirius_help_menu() {
     'modal'            => TRUE,
   );
 
+  $items['sirius/help/publish'] = array(
+    'title' => 'Publish Help to Sirius Code',
+    'page callback'    => 'sirius_help_publish',
+    'page arguments'   => array(),
+    'access arguments' => array('sirius admin'),
+    'type'             => MENU_NORMAL_ITEM,
+  );
+
   return $items;
+}
+
+function sirius_help_publish() {
+  return drupal_get_form('sirius_help_publish_form');
+}
+
+function sirius_help_publish_form($form, &$form_state) {
+  $form['confirm'] = array(
+    '#type' => 'checkbox',
+    '#required' => TRUE,
+    '#title' => t('Yes, please export all the help text on this site into the Sirius software repository.'),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  return $form;
+}
+
+function sirius_help_publish_form_submit($form, &$form_state) {
+  require_once drupal_get_path('module', 'features') . '/features.drush.inc';
+  $sql = "select uuid, title from node where type = 'sirius_help' order by nid";
+  $stmt = sirius_sql_query($sql, array());
+  $components = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $components[$hr['uuid']] = $hr['title'];
+  }
+
+  $chunks = array_chunk($components, 30, TRUE);
+  foreach ($chunks as $chunk) {
+    $cmd = 'cd ' . DRUPAL_ROOT;
+    $cmd .= '; /usr/bin/drush -y --ignore-conflicts fe grievance_content_types ';
+
+    foreach ($chunk as $uuid => $title) {
+      drupal_set_message("Exporting: $uuid ($title) ...");
+      $cmd .= "uuid_node:$uuid ";
+    }
+    $cmd .= ' 2>&1';
+    drupal_set_message("Executing: $cmd");
+    $lines = array();
+    exec($cmd, $lines);
+    drupal_set_message("Result:<br />" . join('<br />', $lines));
+  }
 }
 
 /**

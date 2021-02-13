@@ -163,37 +163,6 @@ function sirius_sms_already_sent($id) {
   return FALSE;
 }
 
-function sirius_sms_admin() {
-
-  $name = sirius_domain_variable_name('sirius_sms_global_disable');
-  $form[$name] = array(
-    '#type' => 'select',
-    '#title' => t('Global Disable'),
-    '#options' => array(
-      'No' => t('No'),
-      'Yes' => t('Yes'),
-    ),
-    '#description' => t('Select "Yes" to globally disable SMS on this server.'),
-    '#default_value' => variable_get($name, ''),
-  );
-
-  $name = sirius_domain_variable_name('sirius_sms_global_disable_whitelist');
-  $form[$name] = array(
-    '#type' => 'textarea',
-    '#title' => t('Whitelist'),
-    '#description' => t('When global disable is on, use the whitelist to indicate which phone numbers <strong>can</strong> receive SMS. Phone numbers must be in the format (xxx) xxx-xxxx.'),
-    '#default_value' => variable_get($name, ''),
-    '#states' => array(
-      'visible' => array(
-        array(':input[name="sirius_sms_global_disable"]' => array('value' => 'Yes')),
-      )
-    ),
-  );
-
-  return system_settings_form($form);
-}
-
-
 function sirius_voice_send($params) {
   // Allow callers to set the X-Sirius-Id, and don't resent with the same ID. This allows callers to set unique keys.
   $id = $params['X-Sirius-Id'];
@@ -204,6 +173,10 @@ function sirius_voice_send($params) {
   }
 
   $phone = $params['to'];
+
+  $possible = sirius_phonenumber_voice_possible($phone);
+  if (!$possible) { return array('success' => FALSE, 'msg' => "$phone does not appear to have a valid voice carrier."); }
+
   $msg = $params['voice'];
   $handler_nids = $params['handler_nids'];
   if (is_array($handler_nids)) {
@@ -216,9 +189,11 @@ function sirius_voice_send($params) {
   $context['outgoing_msg'] = $msg;
   $context['handler_nid'] = $handler_nid;
   $context['worker_nid'] = $params['worker_nid'];
+  $context['callerid_nid'] = $params['callerid_nid'];
+  $context['phonetree'] = $params['phonetree'];
+  $context['amd'] = $params['amd'];
 
-
-  sirius_twilio_outgoing_voice($phone, $context);
+  $result = sirius_twilio_outgoing_voice($phone, $context);
 
   sirius_log(
     'voice', 
@@ -229,7 +204,7 @@ function sirius_voice_send($params) {
     $handler_nids
   );
 
-  return array('success' => TRUE, 'msg' => 'Voice message sent.');
+  return $result; 
 }
 
 function sirius_voice_already_sent($id) {
@@ -279,7 +254,7 @@ function sirius_phonenumber_lookup($phonenumber) {
   $nid = $hr['entity_id'];
   if ($nid) {
     $node = node_load($nid);
-    sirius_minilog("Existing record found.");
+    sirius_minilog("Existing record found for $phonenumber.");
   } else {
     global $user;
     $node = new stdClass();
@@ -292,7 +267,7 @@ function sirius_phonenumber_lookup($phonenumber) {
     $node->comment = 0;
     $node->field_sirius_id['und'][0]['value'] = $phonenumber;
     if ($domain_nid) { $node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
-    sirius_minilog("Existing record not found, creating a new one.");
+    sirius_minilog("Existing record not found for $phonenumber, creating a new one.");
   }
 
   return $node;
@@ -314,10 +289,16 @@ function sirius_phonenumber_check($phonenumber, $force_refresh = FALSE) {
   $node->field_sirius_datetime['und'][0]['value'] = date('Y-m-d H:i:s');
   $node->field_sirius_json['und'][0]['value'] = json_encode($json);
   if ($json['result']['carrier']['mobile_network_code']) { $node->field_sirius_sms_possible['und'][0]['value'] = 'Yes'; } else { $node->field_sirius_sms_possible['und'][0]['value'] = 'No'; }
+  if ($json['result']['carrier']['name']) { $node->field_sirius_voice_possible['und'][0]['value'] = 'Yes'; } else { $node->field_sirius_voice_possible['und'][0]['value'] = 'No'; }
   node_object_prepare($node);
   $node = node_submit($node);
   node_save($node);
   return $node;
+}
+
+function sirius_phonenumber_voice_possible($phonenumber) {
+  $node = sirius_phonenumber_check($phonenumber);
+  return $node->field_sirius_voice_possible['und'][0]['value'] != 'No';
 }
 
 function sirius_phonenumber_sms_possible($phonenumber) {
@@ -368,13 +349,62 @@ function sirius_page_phonenumber_check_form_validate($form, &$form_state) {
   }
 }
 
-
 function sirius_page_phonenumber_check_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   $phonenumber = $form_state['values']['phonenumber'];
   if ($form_state['values']['force'] == 'yes') { $force = TRUE; } else { $force = FALSE; }
-
   $node = sirius_phonenumber_check($phonenumber, $force);
   sirius_minilog("SMS Possible: " . $node->field_sirius_sms_possible['und'][0]['value']);
+  sirius_minilog("Voice Possible: " . $node->field_sirius_voice_possible['und'][0]['value']);
   sirius_minilog("Details: " . l("Node " . $node->nid, 'node/' . $node->nid));
 }
+
+function sirius_sms_segment_count($html_id) {
+  drupal_add_js(array('sirius_sms_segment_count' => array('html_id' => $html_id)), array('type' => 'setting'));
+  drupal_add_js('sites/all/modules/_custom/sirius/js/sms_segment_count.js');
+  drupal_add_css('sites/all/modules/_custom/sirius/css/sms_segment_count.css');
+
+  $html = '<div class="sirius_sms_segment_count" id="' . $html_id . '_count">';
+  $html .= t('SMS Segments:') . '<span class="stat messages"></span>';
+  $html .= ' / ';
+  $html .= t('Remaining in segment:') . '<span class="stat remaining"></span>';
+  $html .= ' / ';
+  $html .= t('Total length:') . '<span class="stat length"></span>';
+  $html .= ' / ';
+  // $html .= t('Per segment:') . '<span class="stat per_message"></span>';
+  // $html .= ' / ';
+  $html .= t('Encoding:') . '<span class="stat encoding"></span>';
+  $html .= '</div>';
+
+  return $html;
+}
+
+function sirius_sms_admin() {
+  $name = sirius_domain_variable_name('sirius_sms_global_disable');
+  $form[$name] = array(
+    '#type' => 'select',
+    '#title' => t('Global Disable'),
+    '#options' => array(
+      'No' => t('No'),
+      'Yes' => t('Yes'),
+    ),
+    '#description' => t('Select "Yes" to globally disable SMS on this server.'),
+    '#default_value' => variable_get($name, ''),
+  );
+
+  $name = sirius_domain_variable_name('sirius_sms_global_disable_whitelist');
+  $form[$name] = array(
+    '#type' => 'textarea',
+    '#title' => t('Whitelist'),
+    '#description' => t('When global disable is on, use the whitelist to indicate which phone numbers <strong>can</strong> receive SMS. Phone numbers must be in the format (xxx) xxx-xxxx.'),
+    '#default_value' => variable_get($name, ''),
+    '#states' => array(
+      'visible' => array(
+        array(':input[name="sirius_sms_global_disable"]' => array('value' => 'Yes')),
+      )
+    ),
+  );
+
+  return system_settings_form($form);
+}
+

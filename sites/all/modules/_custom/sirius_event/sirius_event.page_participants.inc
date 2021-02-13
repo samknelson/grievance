@@ -12,6 +12,7 @@ function sirius_node_tab_event_participants_current_access($event_node) {
 }
 
 function sirius_node_tab_event_participants_current($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
 	$all_rules = $json['participants']['rules'];
@@ -93,26 +94,39 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 	}
 }
 
-function sirius_event_participant_role_status_tids($participant_role_tid) {
+function sirius_event_participant_role_status_tids($participant_role_tid, $options = array()) {
 	if (!$participant_role_tid) { return array(); }
-	$args = array();
-	$sql = "select tid, name from taxonomy_term_data, field_data_field_sirius_event_proles ";
-	$sql .= "where taxonomy_term_data.tid = entity_id ";
-	$sql .= "and entity_type = 'taxonomy_term' ";
-	$sql .= "and bundle = 'sirius_event_participant_status' ";
+	$sql_args = array();
+	$sql = "select tid, name from taxonomy_term_data ";
+	$sql .= "left join field_data_field_sirius_event_proles on field_data_field_sirius_event_proles.entity_type = 'taxonomy_term' and field_data_field_sirius_event_proles.bundle = 'sirius_event_participant_status' and field_data_field_sirius_event_proles.entity_id = tid ";
+	if ($options['phonebank']['during_call']) {
+		$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'taxonomy_term' and field_data_field_sirius_json.entity_id = tid ";
+	}
 	if (is_array($participant_role_tid)) {
-		$sql .= "and field_sirius_event_proles_tid in (:participant_role_tid) ";
-		$args[':participant_role_tid'] = $participant_role_tid;
+		$sql .= "where field_sirius_event_proles_tid in (:participant_role_tid) ";
+		$sql_args[':participant_role_tid'] = $participant_role_tid;
 	} else {
-		$sql .= "and field_sirius_event_proles_tid = :participant_role_tid ";
-		$args[':participant_role_tid'] = $participant_role_tid;
+		$sql .= "where field_sirius_event_proles_tid = :participant_role_tid ";
+		$sql_args[':participant_role_tid'] = $participant_role_tid;
+	}
+	if ($options['phonebank']['during_call']) {
+		$sql .= "and ("; 
+		$sql .= "  field_sirius_json_value IS NULL ";
+		$sql .= "  or lower(json_unquote(json_extract(field_sirius_json_value, '\$.phonebank.conceal_during_call'))) != 'yes' ";
+		$sql .= "  or lower(json_unquote(json_extract(field_sirius_json_value, '\$.phonebank.conceal_during_call'))) is null ";
+		if ($options['phonebank']['current_pstatus']) {
+			$sql .= "   or tid = :current_pstatus ";
+			$sql_args[':current_pstatus'] = $options['phonebank']['current_pstatus'];
+		}
+		$sql .= ") ";
 	}
 	$sql .= "order by weight, name ";
-	$stmt = db_query($sql, $args);
+	$stmt = sirius_sql_query($sql, $sql_args);
 	$statuses = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		$statuses[$hr['tid']] = $hr['name'];
 	}
+
 	return $statuses;
 }
 
@@ -182,7 +196,7 @@ function sirius_node_tab_event_participants_reports_form_submit($form, &$form_st
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$is_phonebank = sirius_event_phonebank_enabled_type($event_type_term);
 
-	$participant_definition_node = node_load($event_node->field_sirius_json_definition['und'][0]['target_id']);
+	$participant_definition_node = sirius_event_survey_get($event_node);
 	if (!$participant_definition_node) { drupal_set_message("No survey!"); return array(); }
 	$participant_definition_json = sirius_jsonfield_util_node_json_get($participant_definition_node);
 	$participant_definition_form = sirius_jsonfield_util_form_get($participant_definition_json, 'default');
@@ -302,28 +316,13 @@ function sirius_node_tab_event_participants_summary($event_nid, $prole_tid = NUL
 	static $pstatus_names;
 	if (!$pstatus_names) { $pstatus_names = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name'); }
 
-	$sql_args = array();
-	$sql_args[':event_nid'] = $event_nid;
-	$sql_args[':prole_tid'] = $prole_tid;
-	$sql = "select field_sirius_event_pstatus_tid, count(distinct node.nid) as c ";
-	$sql .= "from node ";
-	$sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
-	$sql .= "left join node contact_node on field_sirius_contact_target_id = contact_node.nid ";
-	$sql .= "where node.type = 'sirius_event_participant' ";
-	$sql .= "and field_sirius_event_target_id = :event_nid ";
-	$sql .= "and field_sirius_event_prole_tid = :prole_tid ";
-	$sql .= "group by field_sirius_event_pstatus_tid ";
+	$summary = sirius_event_participant_summary($event_nid, $prole_tid);
 
 	$rows = array();
-	$stmt = db_query($sql, $sql_args);
-	$rows = array();
-	while ($hr = $stmt->fetchAssoc()) {
+	foreach ($pstatus_names as $pstatus_tid => $pstatus_name) {
 		$row = array();
-		$row[] = $pstatus_names[$hr['field_sirius_event_pstatus_tid']];
-		$row[] = $hr['c'];
+		$row[] = $pstatus_name;
+		$row[] = number_format($summary[$pstatus_tid], 0);
 		$rows[] = $row;
 	}
 

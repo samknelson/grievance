@@ -16,33 +16,33 @@ function sirius_worker_report_multiple_member_status_fields() {
   $fields = array();
   $fields['worker_nid'] = 'Worker NID';
   $fields['worker_title'] = 'Name';
-
-  for ($i=0; $i<=5; ++$i) {
-    $fields["ms_tid_$i"] = "Member Status $i TID";
-    $fields["ms_name_$i"] = "Member Status $i Name";
-  }
+  $fields['worker_id'] = 'Worker ID';
+  $fields["ms_tid_1"] = "Member Status 1 TID";
+  $fields["ms_name_1"] = "Member Status 1 Name";
+  $fields["ms_tid_2"] = "Member Status 2 TID";
+  $fields["ms_name_2"] = "Member Status 2 Name";
 
   return $fields;
 }
 
 function sirius_worker_report_multiple_member_status_pks(&$form_state) {
+  $domain_nid = sirius_domain_nid();
+  $sql_args = array();
 
-  /*
-  $sql = "select distinct field_data_field_sirius_member_status.entity_id ";
-  $sql .= "from field_data_field_sirius_member_status ";
-  $sql .= "join field_data_field_sirius_industry on field_data_field_sirius_industry.entity_type = 'taxonomy_term' and field_data_field_sirius_industry.bundle = 'sirius_member_status' and field_data_field_sirius_industry.entity_id = field_sirius_member_status_tid ";
-  $sql .= "where count(distinct field_sirius_member_status_tid) > count(distinct field_data_field_sirius_industry.entity_id) ";
-  $sql .= "group by field_data_field_sirius_member_status.entity_id ";
-  $sql .= "order by field_data_field_sirius_member_status.entity_id ";
-  */
-  /*
-  $sql = "select distinct entity_id as nid from field_data_field_sirius_member_status ";
-  $sql .= "where entity_type = 'node' ";
-  $sql .= "and bundle = 'sirius_worker' ";
-  $sql .= "and delta > 0 ";
-  $sql .= "order by entity_id ";
-  */
-  $stmt = db_query($sql, array());
+  $sql = "select distinct nid from node ";
+  $sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "where node.type = 'sirius_worker' ";
+  $sql .= "and field_data_field_sirius_member_status.delta > 0 ";
+  if ($domain_nid) { 
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id is NULL ";
+  }
+  $sql .= "order by nid ";
+
+  $stmt = sirius_sql_query($sql, $sql_args);
   $worker_nids = array();
   while ($hr = $stmt->fetchAssoc()) {
     $worker_nids[] = $hr['nid'];
@@ -51,30 +51,69 @@ function sirius_worker_report_multiple_member_status_pks(&$form_state) {
 }
 
 function sirius_worker_report_multiple_member_status_batch($worker_nids, $values, $report_id, $report_action, &$context) {
-  $rows = array('is_multiple' => TRUE, 'rows' => array());
-  foreach ($worker_nids as $worker_nid) {
-    $row = array();
-    $row['worker_nid'] = $worker_nid;
-    $rows['rows'][$worker_nid] = $row;
-
-    /*
-    $sql = "select * from node, $table where node.nid = $table.entity_id and bundle = 'sirius_worker' and $col = :identifier";
-    $stmt = db_query($sql, array(':identifier' => $identifier));
-    while ($hr = $stmt->fetchAssoc()) {
-      $row = array();
-      $row['worker_nid'] = $hr['nid'];
-      $row['worker_title'] = $hr['title'];
-      if (!$row['worker_title']) { $row['worker_title'] = '(no name)'; }
-      $row['identifier'] = $identifier;
-      $rows['rows'][$identifier . '/' . $hr["nid"]] = $row;
+  // Map member statuses to industries
+  $ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+  $industry_terms = sirius_taxonomy_load('sirius_industry', 'tid', 'name');
+  foreach ($ms_terms as $ms_tid => $ms_term) {
+    if (!$ms_term->field_sirius_industry['und'][0]) { continue; }
+    foreach ($ms_term->field_sirius_industry['und'] as $tmp) {
+      $industry_tid = $tmp['tid'];
+      $ms_industry_map[$ms_tid][] = $industry_tid;
     }
-    */
   }
+
+  $rows = array('is_multiple' => TRUE, 'rows' => array());
+  $worker_nids_with_multiple = array();
+  foreach ($worker_nids as $worker_nid) {
+    $sql = "select distinct field_sirius_member_status_tid as ms_tid from field_data_field_sirius_member_status ";
+    $sql .= "where entity_type = 'node' ";
+    $sql .= "and entity_id = :worker_nid ";
+    $stmt = db_query($sql, array(':worker_nid' => $worker_nid));
+    $found_industries = array();
+    $is_multiple = FALSE;
+    while ($hr = $stmt->fetchAssoc()) {
+      $ms_tid = $hr['ms_tid'];
+      if ($ms_industry_map[$ms_tid]) {
+        foreach ($ms_industry_map[$ms_tid] as $industry_tid) {
+          if ($found_industries[$industry_tid]) { 
+            $worker_nids_with_multiple[$worker_nid][] = array($found_industries[$industry_tid], $ms_tid);
+            $is_multiple = TRUE;
+          }
+          $found_industries[$industry_tid] = $ms_tid; 
+        }
+      }
+    }
+    if ($is_multiple) { $worker_nids_with_multiple[] = $worker_nid; }
+  }
+
+  foreach ($worker_nids_with_multiple as $worker_nid => $pairs) {
+    $sql = "select title from node where nid = :worker_nid";
+    $stmt = db_query($sql, array(':worker_nid' => $worker_nid));
+    $hr = $stmt->fetchAssoc();
+    $worker_title = $hr['title'];
+
+    $sql = "select field_sirius_id_value as id from field_data_field_sirius_id where entity_type = 'node' and entity_id = :worker_nid";
+    $stmt = db_query($sql, array(':worker_nid' => $worker_nid));
+    $hr = $stmt->fetchAssoc();
+    $worker_id = $hr['id'];
+
+    foreach ($pairs as $delta => $pair) {
+      $row = array();
+      $row['worker_nid'] = $worker_nid;
+      $row['worker_title'] = $worker_title;
+      $row['worker_id'] = $worker_id;
+      $row['ms_tid_1'] = $pair[0];
+      $row['ms_name_1'] = $ms_terms[$pair[0]]->name;
+      $row['ms_tid_2'] = $pair[1];
+      $row['ms_name_2'] = $ms_terms[$pair[1]]->name;
+      $rows['rows']["$worker_nid|$delta"] = $row;
+    }
+  }
+
   return $rows;
 }
 
-/*
-function sirius_worker_report_duplicate_id_view($report_type, $report_id) {
+function sirius_worker_report_multiple_member_status_view($report_type, $report_id) {
   // Load the parameters
   $query = db_select('report_cache');
   $query->fields('report_cache');
@@ -90,7 +129,7 @@ function sirius_worker_report_duplicate_id_view($report_type, $report_id) {
 
   $html = '';
   $html .= '<h2>';
-  $html .= 'Duplicate workers by ' . $parameters['key'];
+  $html .= t('Workers with multiple member statuses');
   $html .= '</h2>';
 
   $query = db_select('report_cache');
@@ -101,48 +140,21 @@ function sirius_worker_report_duplicate_id_view($report_type, $report_id) {
   $data = array();
   while ($hr = $stmt->fetchAssoc()) {
     $hr = unserialize($hr['report_data']);
-    $identifier = $hr['identifier'];
-    $data[$identifier][] = $hr;
+    $data[] = $hr;
   }
 
-  ksort($data);
+  $fields = sirius_worker_report_multiple_member_status_fields();
+  $fields['tools'] = t('Tools');
 
   $rows = array();
   foreach ($data as $identifier => $subdata) {
-    $is_first = TRUE;
-    foreach ($subdata as $delta => $hr) {
-      $prev_worker_nid = $subdata[$delta-1]['worker_nid'];
-      $next_worker_nid = $subdata[$delta+1]['worker_nid'];
-
-      $tools = l('View', 'node/' . $hr['worker_nid'], array('attributes' => array('class' => 'tool-button', 'target' => '_blank')));
-      if ($prev_worker_nid) { 
-        $tools .= ' ' . l('Merge from Above', 'node/' . $hr['worker_nid'] . '/sirius_worker_merge', array('attributes' => array('class' => 'tool-button', 'target' => '_blank'), 'query' => array('from_worker_nid' => $prev_worker_nid)));
-      }
-      if ($next_worker_nid) { 
-        $tools .= ' ' . l('Merge from Below', 'node/' . $hr['worker_nid'] . '/sirius_worker_merge', array('attributes' => array('class' => 'tool-button', 'target' => '_blank'), 'query' => array('from_worker_nid' => $next_worker_nid)));
-      }
-
-      $row = array(); 
-      if ($is_first) {
-        $is_first = FALSE;
-        $row[] = '<strong>' . $identifier . '</strong>';
-      } else { 
-        $row[] = '';
-      }
-      $row[] = $hr['worker_title'];
-      $row[] = $tools;
-      $rows[] = $row;
-    }
+    $subdata['tools'] = l('Edit', 'node/' . $subdata['worker_nid'] . '/sirius_worker_industry', array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+    $rows[] = $subdata;
   }
 
-  $header = array(
-    'Identifier',
-    'Worker Name',
-    'Tools',
-  );
+  $header = array_values($fields);
 
   $attributes = array();
   $html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => $attributes));
   return $html;
 }
-*/

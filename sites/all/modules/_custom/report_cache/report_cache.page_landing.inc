@@ -4,19 +4,29 @@ function report_cache_page_landing() {
 	// Get all the report types
 	$report_type_infos = module_invoke_all('report_cache_info');
 
-	$result .= t('The following report types are available.');
-	$result .= '<ul>';
+	$rows = array();
 	foreach ($report_type_infos as $report_type => $report_type_info) {
-		$result .= '<li>';
-		$result .= l($report_type_info['name'], "admin/reports/report-cache/$report_type");
-		if ($report_type_info['description']) {
-			$result .= ' (';
-			$result .= $report_type_info['description'];
-			$result .= ')';
+		$tools = l('List', "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button'))));
+
+		$path = $report_type_info['path'];
+		if (!$path) { 
+			$path = 'sirius/report-cache/' . $report_type . '/form';
 		}
-		$result .= '</li>';
+		$tools .= l(t('Generate'), $path, array('attributes' => array('class' => array('tool-button'))));
+
+		$name = $report_type_info['name'];
+		if ($report_type_info['description']) { $name .= '<br />' . $report_type_info['description']; }
+
+		$row = array();
+		$row[] = $name;
+		$row[] = $tools;
+		$rows[] = $row;
 	}
-	$result .= '</ul>';
-		
+
+	$header = array(
+		'Report Type',
+		'Tools'
+	);
+	$result .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
 	return $result;
 }

@@ -175,3 +175,36 @@ function sirius_contact_tag_remove($contact_node, $tid) {
 	node_save($contact_node);
 	return array('success' => TRUE, 'msg' => 'Contact saved.');
 }
+
+/**
+ * Prevent deletion of a contact if it is referenced by a user or a worker, unless $node->no_recurse
+ */
+
+function sirius_contact_can_delete($contact_node) {
+	if ($contact_node->type != 'sirius_contact') {
+		return array('success' => FALSE, 'msg' => 'Not a contact node.');
+	}
+
+	$sql = "select 1 from field_data_field_sirius_contact ";
+	$sql .= "where entity_type = 'user' ";
+	$sql .= "and field_sirius_contact_target_id = :contact_nid ";
+	$sql_args = array(':contact_nid' => $contact_node->nid);
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$hr = $stmt->fetchAssoc();
+	if ($hr) {
+		return array('success' => FALSE, 'msg' => 'This contact is still referenced by a user. The user must be deleted before the contact.');
+	}
+
+	$sql = "select 1 from field_data_field_sirius_contact ";
+	$sql .= "where entity_type = 'node' ";
+	$sql .= "and bundle = 'sirius_worker' ";
+	$sql .= "and field_sirius_contact_target_id = :contact_nid ";
+	$sql_args = array(':contact_nid' => $contact_node->nid);
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$hr = $stmt->fetchAssoc();
+	if ($hr) { 
+		return array('success' => FALSE, 'msg' => 'This contact is still referenced by a worker. The worker must be deleted before the contact.');
+	}
+
+	return array('success' => TRUE);
+}

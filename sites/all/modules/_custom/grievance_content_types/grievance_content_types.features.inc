@@ -268,6 +268,22 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'sirius_employee' => array(
+      'name' => t('Sirius Employee'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_employer_payperiod' => array(
+      'name' => t('Sirius Employer Payperiod'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'sirius_event' => array(
       'name' => t('Sirius Event'),
       'base' => 'node_content',
@@ -308,6 +324,14 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'sirius_ledger_account' => array(
+      'name' => t('Sirius Ledger Account'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'sirius_letterhead' => array(
       'name' => t('Sirius Letterhead'),
       'base' => 'node_content',
@@ -326,6 +350,14 @@ function grievance_content_types_node_info() {
     ),
     'sirius_news' => array(
       'name' => t('Sirius News'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_payment' => array(
+      'name' => t('Sirius Payment'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',

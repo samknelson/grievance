@@ -10,6 +10,6 @@ function sirius_twilio_lookup($phone) {
 		return array('success' => TRUE, 'msg' => 'Lookup succesful', 'carrier' => $details->carrier);
 	} catch (Exception $e) {
 		$msg =  $e->getCode() . ' - ' . $e->getMessage();
-		$result = array('success' => FALSE, 'msg' => "Lookup failure: $msg");
+		return array('success' => FALSE, 'msg' => "Lookup failure: $msg");
 	}
 }

@@ -3,6 +3,14 @@
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.menu.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.permission.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.iprestrict.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.timeoff.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.operator.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.chapter.inc';
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.page_operator.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.page_operator_users.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.page_operator_calls.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_office.page_operator_status.inc';
 
 /**
  * Implements hook_user_login
@@ -10,4 +18,19 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_office/sirius_offi
 
 function sirius_office_user_login(&$edit, $account) {
   sirius_office_iprestrict_user_login($edit, $account); 
+}
+
+/**
+ * Implements hook_form_alter
+ */
+
+function sirius_office_form_alter(&$form, &$form_state, $form_id) {
+	if ($form_id == 'sirius_office_timeoff_request_node_form') {
+		sirius_office_form_alter_timeoff_request_node_form($form, $form_state, $form_id);
+	}
+
+	if ($form_id == 'sirius_operator_node_form') {
+		sirius_office_form_alter_operator_node_form($form, $form_state, $form_id);
+	}
+
 }

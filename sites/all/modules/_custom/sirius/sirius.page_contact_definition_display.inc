@@ -1,5 +1,18 @@
 <?php
 
+function sirius_page_contact_definition_display_types() {
+	return array(
+		'phonebank-default' => array(
+			'title' => 'Phone Bank: Default',
+			'description' => 'Select the default set of fields that should be displayed to somebody using the phone bank; for example, if a volunteer is calling a voter, they might display "Age" and "Party Affiliation".',
+		),
+		'dispatch-default' => array(
+			'title' => 'Dispatch: Default',
+			'description' => 'Select the default set of fields that should be displayed on dispatches.',
+		),
+	);
+}
+
 function sirius_page_contact_definition_display() {
 	return drupal_get_form('sirius_page_contact_definition_display_form');
 }
@@ -20,14 +33,20 @@ function sirius_page_contact_definition_display_form($form, &$form_state) {
 
 	$form['#tree'] = TRUE;
 
-	$form['display']['phonebank-default'] = array(
-		'#type' => 'select',
-		'#multiple' => TRUE,
-		'#title' => 'Display: Phone Bank: Default',
-		'#options' => $options,
-		'#default_value' => $contact_definition_json['display']['phonebank-default'],
-		'#size' => 10,
-	);
+	$types = sirius_page_contact_definition_display_types();
+
+	foreach ($types as $type_id => $type_info) {
+		$form['display'][$type_id] = array(
+			'#type' => 'select',
+			'#multiple' => TRUE,
+			'#title' => $type_info['title'],
+			'#description' => $type_info['description'],
+			'#options' => $options,
+			'#default_value' => $contact_definition_json['display'][$type_id],
+			'#size' => 10,
+		);
+	}
+
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -47,7 +66,7 @@ function sirius_page_contact_definition_display_form_submit($form, &$form_state)
 }
 
 function sirius_contact_definition_display_get($contact_definition, $which) {
-	$unsorted_display_fields = $contact_definition['display']['phonebank-default'];
+	$unsorted_display_fields = $contact_definition['display'][$which];
 	if (!$unsorted_display_fields) { $unsorted_display_fields = array(); }
 	$display_fields = array();
 	foreach ($unsorted_display_fields as $path_with_weight) {

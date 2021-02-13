@@ -17,6 +17,14 @@ function sirius_employer_node_tabs() {
 		'permissions' => array('sirius employer user manager'),
 	);
 
+  $node_tabs['grievance_shop']['employer_taxonomy_mappings'] = array(
+    'title' => 'Drop-Down Mappings',
+    'description' => '',
+    'callback' => 'sirius_employer_node_tab_taxonomy_mappings',
+    'permissions' => array('sirius employer user manager'),
+  );
+
+
 	return $node_tabs;
 }
 
@@ -26,6 +34,13 @@ function sirius_employer_node_tabs() {
 
 function sirius_employer_menu() {
   $items = array();
+
+  $items['sirius/employer/list'] = array(
+    'title' => 'Employers',
+    'access callback' => 'sirius_employer_page_list_access',
+    'page callback' => 'sirius_employer_page_list',
+    'type' => MENU_NORMAL_ITEM,
+  );
 
   $items['sirius/employer/me'] = array(
     'title' => 'Sirius: Employer: Me',

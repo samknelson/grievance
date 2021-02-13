@@ -207,6 +207,7 @@ function sirius_node_tab_domain_users_add_form_submit($form, &$form_state) {
 		}
 	}
 	$new_user->status = $form_state['values']['status'];
+	if ($domain_node->field_sirius_tz['und'][0]['value']) { $new_user->timezone = $domain_node->field_sirius_tz['und'][0]['value']; }
 
 	$new_user = user_save($new_user, $edit);
 	//dpm($new_user);
@@ -239,4 +240,18 @@ function sirius_domain_usermanage_admin() {
   }
 
   return system_settings_form($form);
+}
+
+/**
+ * Modify the user view to show only the roles that we have access to within the domain user manager
+ */
+
+function sirius_domain_users_view_form_alter(&$form, &$form_state) {
+	$roles = user_roles();
+	foreach ($roles as $rid => $role) {
+		$avail = variable_get("sirius_domain_userrmanage_$rid", 'omit');
+		if ($avail == 'omit') { 
+			unset($form['rid']['#options'][$rid]);
+		}
+	}
 }

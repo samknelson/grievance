@@ -1,0 +1,36 @@
+.map_list_item {
+	width: 220px;
+	float: left;
+	height: 90px;
+	border: 1px solid #cccccc;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	padding: 5px;
+	background-color: #ffffff;
+}
+
+.inactive .map_list_item {
+	background-color: #cccccc;
+}
+
+a .map_list_item {
+	color: #333333;
+}
+
+a .map_list_item:hover {
+	border: 1px solid #0000ff;
+}
+
+.map_list_item .icon_wrap {
+	float: left;
+	width: 60px;
+}
+
+.map_list_item .body_wrap {
+	float: left;
+	width: 150px;
+}
+
+.map_legend_item {
+	height: 50px;
+}

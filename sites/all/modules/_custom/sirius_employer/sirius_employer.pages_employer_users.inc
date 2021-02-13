@@ -118,8 +118,10 @@ function sirius_employer_node_tab_employer_users_add_form($form, &$form_state, $
 			'#type' => 'checkboxes',
 			'#title' => 'Roles',
 			'#options' => $roles,
-			'#default_value' => array_intersect(array_keys($roles), array_keys($new_user->roles)),
 		);
+		if ($roles && $new_user) {
+			$form['roles']['#default_value'] = array_intersect(array_keys($roles), array_keys($new_user->roles));
+		}
 	}
 
 	if ($new_uid) {

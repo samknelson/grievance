@@ -7,11 +7,13 @@ function sirius_page_voice_forward_to_operator() {
     $html = '<h2>The Office Is Closed</h2>';
     $which = variable_get('sirius_voice_forward_to_operator_disabled_which', 1);
     $text = variable_get("sirius_voice_forward_to_operator_disabled_$which", "We're sorry, the office is closed right now.");
-    $html .= '<div><em>' . $text . '</em></div>';
+    $html .= '<div><strong>Incoming calls will be answered with the message:</strong> <em>' . $text . '</em></div>';
    }
 
   // Find any recent forwarded calls
-  $cutoff = strtotime('-4 hours');
+  $hours = $_REQUEST['hours'];
+  if (!$hours) { $hours = 4; }
+  $cutoff = strtotime("-$hours hours");
 	$query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_log');
@@ -38,11 +40,11 @@ function sirius_page_voice_forward_to_operator() {
   	if ($json['worker_nid']) {
   		$worker_nid = $json['worker_nid'];
   		$worker_node = node_load($worker_nid);
-      $html .= '<div style="float: left;">';
+      $html .= '<div style="float: left; width: 275px;">';
       $html .= sirius_dispatch_view_render_field($worker_node, 'field_sirius_headshot');
       $html .= '</div>';
       $html .= date('Y-m-d h:i A', $log_node->created) . ' / ';
-      $html .= sirius_phone_format($json['from']);
+      $html .= sirius_phone_format($from);
       $html .= '<br />';
       $html .= '<strong>' . $worker_node->title . '</strong><br />';
       $html .= l('View', "node/$worker_nid", array('attributes' => array('class' => array('tool-button'))));
@@ -64,7 +66,7 @@ function sirius_page_voice_forward_to_operator() {
 		  $stmt = $query->execute();
 		  if (!$stmt['node']) {
         $html .= date('Y-m-d h:i A', $log_node->created) . ' / ';
-        $html .= sirius_phone_format($json['from']);
+        $html .= sirius_phone_format($from);
         $html .= '<br />';
 		  	$html .= 'No matching worker found.<br />';
 		  } else {
@@ -74,11 +76,11 @@ function sirius_page_voice_forward_to_operator() {
 		  	foreach ($worker_nodes as $worker_nid => $worker_node) {
           $count++;
           if ($count > 1) { $html .= '<hr>'; }
-          $html .= '<div style="float: left;">';
+          $html .= '<div style="float: left; width: 275px;">';
           $html .= sirius_dispatch_view_render_field($worker_node, 'field_sirius_headshot');
           $html .= '</div>';
           $html .= date('Y-m-d h:i A', $log_node->created) . ' / ';
-          $html .= sirius_phone_format($json['from']);
+          $html .= sirius_phone_format($from);
           $html .= '<br />';
           $html .= '<strong>' . $worker_node->title . '</strong><br />';
 		  		$html .= l('View', "node/$worker_nid", array('attributes' => array('class' => array('tool-button'))));

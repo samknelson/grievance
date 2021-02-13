@@ -59,41 +59,6 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_field_sirius_callerid'.
-  $field_bases['field_field_sirius_callerid'] = array(
-    'active' => 1,
-    'cardinality' => 1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_field_sirius_callerid',
-    'indexes' => array(
-      'target_id' => array(
-        0 => 'target_id',
-      ),
-    ),
-    'locked' => 0,
-    'module' => 'entityreference',
-    'settings' => array(
-      'handler' => 'base',
-      'handler_settings' => array(
-        'behaviors' => array(
-          'views-select-list' => array(
-            'status' => 0,
-          ),
-        ),
-        'sort' => array(
-          'type' => 'none',
-        ),
-        'target_bundles' => array(
-          'sirius_callerid' => 'sirius_callerid',
-        ),
-      ),
-      'target_type' => 'node',
-    ),
-    'translatable' => 0,
-    'type' => 'entityreference',
-  );
-
   // Exported field_base: 'field_grievance'.
   $field_bases['field_grievance'] = array(
     'active' => 1,
@@ -4211,6 +4176,29 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'file',
   );
 
+  // Exported field_base: 'field_sirius_audio_public'.
+  $field_bases['field_sirius_audio_public'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_audio_public',
+    'indexes' => array(
+      'fid' => array(
+        0 => 'fid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'file',
+    'settings' => array(
+      'display_default' => 0,
+      'display_field' => 0,
+      'uri_scheme' => 'public',
+    ),
+    'translatable' => 0,
+    'type' => 'file',
+  );
+
   // Exported field_base: 'field_sirius_badge'.
   $field_bases['field_sirius_badge'] = array(
     'active' => 1,
@@ -4374,9 +4362,9 @@ function grievance_content_types_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
-        'draft' => 'draft',
-        'pending' => 'pending',
-        'sent' => 'sent',
+        'draft' => 'Draft',
+        'pending' => 'Sending',
+        'sent' => 'Sent',
       ),
       'allowed_values_function' => '',
     ),
@@ -4429,6 +4417,27 @@ function grievance_content_types_field_default_field_bases() {
     'field_permissions' => array(
       'type' => 0,
     ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_sirius_check_number'.
+  $field_bases['field_sirius_check_number'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_check_number',
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -4504,6 +4513,32 @@ function grievance_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
+  );
+
+  // Exported field_base: 'field_sirius_content_types'.
+  $field_bases['field_sirius_content_types'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_content_types',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'grievance' => 'Grievance',
+        'sirius_worker' => 'Worker',
+        'sirius_employer' => 'Employer',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
   );
 
   // Exported field_base: 'field_sirius_count'.
@@ -5555,6 +5590,25 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'list_text',
   );
 
+  // Exported field_base: 'field_sirius_dollar_amt'.
+  $field_bases['field_sirius_dollar_amt'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_dollar_amt',
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'number',
+    'settings' => array(
+      'decimal_separator' => '.',
+      'precision' => 10,
+      'scale' => 2,
+    ),
+    'translatable' => 0,
+    'type' => 'number_decimal',
+  );
+
   // Exported field_base: 'field_sirius_domain'.
   $field_bases['field_sirius_domain'] = array(
     'active' => 1,
@@ -6063,6 +6117,66 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
+  // Exported field_base: 'field_sirius_ledger_account'.
+  $field_bases['field_sirius_ledger_account'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_ledger_account',
+    'indexes' => array(
+      'target_id' => array(
+        0 => 'target_id',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'entityreference',
+    'settings' => array(
+      'handler' => 'base',
+      'handler_settings' => array(
+        'behaviors' => array(
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'target_bundles' => array(
+          'sirius_ledger_account' => 'sirius_ledger_account',
+        ),
+      ),
+      'target_type' => 'node',
+    ),
+    'translatable' => 0,
+    'type' => 'entityreference',
+  );
+
+  // Exported field_base: 'field_sirius_ledger_allocated'.
+  $field_bases['field_sirius_ledger_allocated'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_ledger_allocated',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'No' => 'No',
+        'Yes' => 'Yes',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_sirius_letter_content_type'.
   $field_bases['field_sirius_letter_content_type'] = array(
     'active' => 1,
@@ -6079,6 +6193,8 @@ function grievance_content_types_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
+        'sirius_contact' => 'Contact',
+        'grievance_shop' => 'Employer',
         'grievance' => 'Grievance',
         'sirius_worker' => 'Worker',
       ),
@@ -6121,6 +6237,7 @@ function grievance_content_types_field_default_field_bases() {
           'grievance_shop' => 'grievance_shop',
           'grievance_shop_contact' => 'grievance_shop_contact',
           'sirius_bulk' => 'sirius_bulk',
+          'sirius_contact' => 'sirius_contact',
           'sirius_dispatch' => 'sirius_dispatch',
           'sirius_dispatch_facility' => 'sirius_dispatch_facility',
           'sirius_dispatch_facility_hall' => 'sirius_dispatch_facility_hall',
@@ -6196,6 +6313,27 @@ function grievance_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
+  );
+
+  // Exported field_base: 'field_sirius_merchant_name'.
+  $field_bases['field_sirius_merchant_name'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_merchant_name',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
   );
 
   // Exported field_base: 'field_sirius_message'.
@@ -6520,6 +6658,96 @@ Prof.',
     'type' => 'text',
   );
 
+  // Exported field_base: 'field_sirius_payer'.
+  $field_bases['field_sirius_payer'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_payer',
+    'indexes' => array(
+      'target_id' => array(
+        0 => 'target_id',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'entityreference',
+    'settings' => array(
+      'handler' => 'base',
+      'handler_settings' => array(
+        'behaviors' => array(
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'target_bundles' => array(
+          'grievance_shop' => 'grievance_shop',
+          'sirius_contact' => 'sirius_contact',
+        ),
+      ),
+      'target_type' => 'node',
+    ),
+    'translatable' => 0,
+    'type' => 'entityreference',
+  );
+
+  // Exported field_base: 'field_sirius_payment_status'.
+  $field_bases['field_sirius_payment_status'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_payment_status',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Received' => 'Received',
+        'Cleared' => 'Cleared',
+        'Canceled' => 'Canceled',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
+  // Exported field_base: 'field_sirius_payment_type'.
+  $field_bases['field_sirius_payment_type'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_payment_type',
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'sirius_payment_type',
+          'parent' => 0,
+          'depth' => '',
+        ),
+      ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
+  );
+
   // Exported field_base: 'field_sirius_payperiod_type'.
   $field_bases['field_sirius_payperiod_type'] = array(
     'active' => 1,
@@ -6757,7 +6985,7 @@ Prof.',
     'module' => 'image',
     'settings' => array(
       'default_image' => 0,
-      'uri_scheme' => 'private',
+      'uri_scheme' => 'public',
     ),
     'translatable' => 0,
     'type' => 'image',
@@ -7140,6 +7368,27 @@ Prof.',
     'type' => 'text',
   );
 
+  // Exported field_base: 'field_sirius_tz'.
+  $field_bases['field_sirius_tz'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_tz',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'tzfield',
+    'settings' => array(
+      'exclude' => array(),
+    ),
+    'translatable' => 0,
+    'type' => 'tzfield',
+  );
+
   // Exported field_base: 'field_sirius_voice'.
   $field_bases['field_sirius_voice'] = array(
     'active' => 1,
@@ -7157,6 +7406,31 @@ Prof.',
     'settings' => array(),
     'translatable' => 0,
     'type' => 'text_long',
+  );
+
+  // Exported field_base: 'field_sirius_voice_possible'.
+  $field_bases['field_sirius_voice_possible'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_voice_possible',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Yes' => 'Yes',
+        'No' => 'No',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
   );
 
   // Exported field_base: 'field_sirius_work_status'.

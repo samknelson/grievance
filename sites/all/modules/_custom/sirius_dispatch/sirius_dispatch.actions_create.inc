@@ -42,6 +42,7 @@ function sirius_dispatch_actions_create($job_node, $worker_nid, $cbn = 'No', $st
 	$dispatch_node->field_sirius_worker['und'][0]['target_id'] = $worker_nid;
 	$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = $status;
 	$dispatch_node->field_sirius_dispatch_cbn['und'][0]['value'] = $cbn;
+	$dispatch_node->field_sirius_domain = $job_node->field_sirius_domain;
 	$dispatch_node = node_submit($dispatch_node);
 	node_object_prepare($dispatch_node);
 	node_save($dispatch_node);

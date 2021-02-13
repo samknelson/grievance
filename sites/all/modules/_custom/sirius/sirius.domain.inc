@@ -13,16 +13,50 @@ function sirius_node_access_domain($node, $op, $account) {
   return NODE_ACCESS_DENY;
 }
 
+function sirius_domain_node_validate($node, $form, &$form_state) {
+  if ($node->nid && ($node->field_sirius_domain['und'][0]['target_id'] == $node->nid)) {
+    form_set_error('field_sirius_domain', t('Parent cannot be self.'));
+  }
+}
+
 /**
  * Fetch the root domain for the current user
  */
 
-function sirius_domain_root() {
+function sirius_domain_root_nid() {
+  $cache =& drupal_static(__FUNCTION__, array());
+
 	global $user;
 	if (!$user) { return NULL; }
 	if (!$user->uid) { return NULL; }
-	$user_full = user_load($user->uid);
-	return node_load($user_full->field_sirius_domain['und'][0]['target_id']);
+
+  $uid = $user->uid;
+  if (!array_key_exists($uid, $cache)) {
+    // $sql for speed
+    $sql = "select field_sirius_domain_target_id ";
+    $sql .= "from field_data_field_sirius_domain ";
+    $sql .= "where entity_type = 'user' and entity_id = :uid ";
+    $stmt = sirius_sql_query($sql, array(':uid' => $uid));
+    $hr = $stmt->fetchAssoc();
+    $cache[$uid] = $hr['field_sirius_domain_target_id'];
+  }
+
+  return $cache[$uid];
+
+	// $user_full = user_load($user->uid);
+	// return node_load($user_full->field_sirius_domain['und'][0]['target_id']);
+}
+
+function sirius_domain_nid() {
+  $domain_nid = $_SESSION['domain_nid'];
+  if (!$domain_nid) { $domain_nid = sirius_domain_root_nid(); }
+  return $domain_nid;
+}
+
+function sirius_domain_root() {
+  $domain_nid = sirius_domain_root_nid();
+  if (!$domain_nid) { return NULL; }
+  return node_load($domain_nid);
 }
 
 /**
@@ -33,17 +67,45 @@ function sirius_domain($new_domain_nid = NULL) {
 	// Set if necessary
 	if ($new_domain_nid) { $_SESSION['domain_nid'] = $new_domain_nid; }
 
-	// Look up from the session
-	if ($_SESSION['domain_nid']) { return node_load($_SESSION['domain_nid']); }
-
-	// Fetch the root domain for the current user.
-	return sirius_domain_root();
+  $domain_nid = sirius_domain_nid();
+  if (!$domain_nid) { return NULL; }
+  return node_load($domain_nid);
 }
 
-function sirius_domain_nid() {
-  $domain_node = sirius_domain();
-  if (!$domain_node) { return NULL; }
-  return $domain_node->nid;
+function sirius_domain_component_info_all() {
+  // @todo: Implement a complicate and hard to follow system of callbacks so that each module defines its own components.
+  return array(
+    'worker' => array(
+      'title' => 'Worker',
+      'description' => 'Use the worker database',
+    ),
+    'employer' => array(
+      'title' => 'Employer',
+      'description' => 'Use the employer database',
+    ),
+    'activist:phonebank:prescan' => array(
+      'title' => 'Activist - Phonebank - Prescan',
+      'description' => 'For a given phonebank, enable the "prescan" function, allowing phonebank admins to remove invalid phone numbers.',
+    ),
+    'mapping' => array(
+      'title' => 'Mapping',
+      'description' => 'Enable geocoding and map generation.'
+    ),
+    'mapping:checkin' => array(
+      'title' => 'Mapping - Checkin',
+      'description' => 'Enable users to "check in" with their current location, so that domain admins can follow their movements on maps.',
+    ),
+  );
+}
+
+function sirius_domain_component_enabled($key, $domain_node = NULL) {
+  if (!$domain_node) { $domain_node = sirius_domain(); }
+  if (!$domain_node) { return FALSE; }
+
+  $json = sirius_jsonfield_util_node_json_get($domain_node);
+
+  if ($json['component'][$key]['enabled'] == 'Yes') { return TRUE; }
+  return FALSE; 
 }
 
 function sirius_domain_active($domain_nid) {
@@ -79,7 +141,7 @@ function sirius_domain_user_login(&$edit, $account) {
 }
 
 function sirius_domain_uids($domain_nid, $depth = 0) {
-  if ($depth > 100) { return; }
+  if ($depth > 100) { return array(); }
   // Users in this domain.
   $sql = "select entity_id from field_data_field_sirius_domain ";
   $sql .= "where entity_type = 'user' ";
@@ -104,6 +166,7 @@ function sirius_domain_uids($domain_nid, $depth = 0) {
     $uids = array_merge($uids, sirius_domain_uids($child_domain_nid, $depth+1));
   }
 
+  if (!$uids) { $uids = array(); }
   return $uids;
 }
 
@@ -349,7 +412,7 @@ function sirius_domain_variable_set($name, $value) {
 
 function sirius_domain_variable_name($name) {
   $domain_nid = sirius_domain_nid();
-  if ($domain_nid) { return $domain_nid . '/' . $name; } else { return $name; }
+  if ($domain_nid > 0) { return $domain_nid . '/' . $name; } else { return $name; }
 }
 
 
@@ -359,9 +422,8 @@ function sirius_domain_restrict_taxonomy_fields(&$form, $form_id) {
   } else {
     $domain_nid = sirius_domain_nid();
   }
-  if (!$domain_nid) { 
-    return;
-  }
+
+  if (!$domain_nid) { return; }
 
   foreach ($form as $field_name => &$form_field) {
     if (!preg_match('/^field_/', $field_name)) { continue; }
@@ -369,12 +431,21 @@ function sirius_domain_restrict_taxonomy_fields(&$form, $form_id) {
     if ($info['type'] != 'taxonomy_term_reference') { continue; }
     $vocabulary_machine_name = $info['settings']['allowed_values'][0]['vocabulary'];
     if (!$vocabulary_machine_name) { continue; }
-    $options = sirius_taxonomy_load($vocabulary_machine_name, 'tid', 'name');
+    $options = sirius_taxonomy_load($vocabulary_machine_name, 'tid', 'name') + array('_none' => '- None -');
+
+    // @todo there has to be an easier way.
     if ($form_field['und']['#options']) {
       $form_field['und']['#options'] = array_intersect($form_field['und']['#options'], $options);
     }
+    if ($form_field['und'][0]['tid']['#options']) {
+      $form_field['und'][0]['tid']['#options'] = array_intersect($form_field['und'][0]['tid']['#options'], $options);
+    }
+    if ($form_field['und'][1]['tid']['#options']) {
+      $form_field['und'][1]['tid']['#options'] = array_intersect($form_field['und'][1]['tid']['#options'], $options);
+    }
   }
 }
+
 function sirius_domain_form_alter_node(&$form, &$form_state, $form_id) {
   // We only care about nodes with a domain field.
   if (!$form['field_sirius_domain']) { return; }
@@ -418,4 +489,192 @@ function sirius_domain_form_alter_node(&$form, &$form_state, $form_id) {
 
   // And, finally ... hide this field from anybody without domain admin permission
   if (!user_access('sirius domain admin')) { $form['field_sirius_domain']['#access'] = FALSE; }
+}
+
+function sirius_domain_form_restrict(&$form) {
+  $field_names = array(
+    'field_grievance_shop_target_id' => NULL,
+    'field_grievance_settlement_tags_tid' => 'grievance_settlement_tags',
+    'field_sirius_member_status_tid' => 'sirius_member_status',
+    'field_sirius_industry_tid' => 'sirius_industry',
+    'field_sirius_skill_tid' => 'sirius_skill',
+    'field_sirius_dispatch_sib_status_tid' => 'sirius_dispatch_sib_status',
+    'field_sirius_worker_dispstatus_tid' => 'sirius_worker_dispatch_status',
+    'field_sirius_work_status_tid' => 'sirius_work_status',
+  );
+
+  foreach ($field_names as $field_name => $taxonomy) {
+    if (!$form[$field_name]['#options']) { continue; }
+    $keys = array_keys($form[$field_name]['#options']);
+
+    if ($field_name == 'field_grievance_shop_target_id') { $good_options = sirius_employer_list(FALSE); } 
+    else { $good_options = sirius_taxonomy_load($taxonomy, 'tid', 'name'); }
+
+    foreach ($keys as $key) {
+      if ($key == NULL) { continue; }
+      if ($key == 'All') { continue; }
+      if ($good_options[$key]) { continue; }
+      unset($form[$field_name]['#options'][$key]);
+    }
+  }
+}
+
+function sirius_domain_activity_ts_ranges() {
+	return array(
+    'hour'      => array('label' => 'Last Hour',      'ts' => strtotime('-1 hour')),
+		'day' 			=> array('label' => 'Last 24 Hours', 	'ts' => strtotime('-1 day')),
+		'week' 			=> array('label' => 'Last 7 days', 		'ts' => strtotime('-7 days')),
+		'month' 		=> array('label' => 'Last 30 days', 	'ts' => strtotime('-30 days')),
+		'all_time' 	=> array('label' => 'All Time', 			'ts' => 0),
+	);
+}
+function sirius_domain_activity_render($domain_nids) {
+	// Get the node types
+	$sql = "select type, name from node_type";
+	$stmt = sirius_sql_query($sql, array());
+	while ($hr = $stmt->fetchAssoc()) {
+		$type = $hr['type'];
+		$name = $hr['name'];
+		$name = preg_replace('/Sirius /', '', $name);
+		$name = preg_replace('/Grievance /', '', $name);
+		$type_names[$type] = $name;
+	}
+	asort($type_names);
+
+	// New nodes
+	$ts_ranges = sirius_domain_activity_ts_ranges();
+
+	$node_counts = array();
+	$found_node_types = array();
+	foreach ($ts_ranges as $range_id => $range) {
+		$sql_args = array();
+		$sql = "select type, count(*) as c from node ";
+		$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+		$sql .= "where field_sirius_domain_target_id in (:domain_nids) ";
+		$sql_args[':domain_nids'] = $domain_nids;
+		$sql .= "and created > :ts ";
+		$sql_args[':ts'] = $range['ts'];
+		$sql .= "group by node.type order by node.type ";
+		$stmt = sirius_sql_query($sql, $sql_args);
+		while ($hr = $stmt->fetchAssoc()) {
+			$node_counts[$range_id][$hr['type']] = $hr['c'];
+			$found_node_types[$hr['type']] = TRUE;
+		}
+	}
+
+	$header = array('Type');
+	foreach ($ts_ranges as $range_id => $range) { $header[] = $range['label']; }
+
+	$rows = array();
+	foreach ($type_names as $type => $type_name) {
+		if (!$found_node_types[$type]) { continue; }
+		$row = array();
+		$row[] = $type_name;
+		foreach ($ts_ranges as $range_id => $range) {
+			$row[] = $node_counts[$range_id][$type];
+		}
+		$rows[] = $row;
+	}
+
+	$html = '<h2>Content</h2>';
+	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+
+	return $html;
+}
+
+function sirius_domain_util_migrate_root_to_domain($domain_nid) {
+  $domain_node = node_load($domain_nid);
+  if (!$domain_node) { die("Domain not found: $domain_nid"); }
+  if (!$domain_node->type == 'sirius_domain') { die("Not a domain node: $domain_nid [" . $domain_node->title . "]"); }
+
+  // Get the list of node types that have a domain.
+  $info = field_info_field('field_sirius_domain');
+  $taxonomies = $info['bundles']['taxonomy_term'];
+  $content_types = $info['bundles']['node'];
+
+  // Get this list of nodes
+  $node_counts = array();
+  foreach ($content_types as $bundle) {
+    if ($bundle == 'sirius_domain') { continue; }
+    $sql_args = array(':bundle' => $bundle);
+    $sql = "select type, nid, title from node ";
+    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+    $sql .= "where field_sirius_domain_target_id is null ";
+    $sql .= "and type = :bundle ";
+    $sql .= "order by nid ";
+    $sql .= "limit 1000 ";
+    $types = array();
+    $stmt = sirius_sql_query($sql, $sql_args);
+    $count = 0;
+    while ($hr = $stmt->fetchAssoc()) {
+      $node = node_load($hr['nid']);
+      $node->field_sirius_domain['und'][0]['target_id'] = $domain_nid;
+      node_save($node);
+      print "Saved: $hr[nid] - " . $node->title . "\n";
+      ++$count;
+    }
+    $node_counts[$bundle] = $count;
+  }
+
+  // Get this list of nodes
+  $term_counts = array();
+  foreach ($taxonomies as $bundle) {
+    $sql_args = array(':bundle' => $bundle);
+    $sql = "select tid, taxonomy_term_data.name from taxonomy_term_data ";
+    $sql .= "left join taxonomy_vocabulary on taxonomy_vocabulary.vid = taxonomy_term_data.vid ";
+    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'taxonomy_term' and field_data_field_sirius_domain.entity_id = tid ";
+    $sql .= "where field_sirius_domain_target_id is null ";
+    $sql .= "and taxonomy_vocabulary.machine_name = :bundle ";
+    $sql .= "order by tid ";
+    $sql .= "limit 1000 ";
+    $types = array();
+    $stmt = db_query($sql, $sql_args);
+    $count = 0;
+    while ($hr = $stmt->fetchAssoc()) {
+      $term = taxonomy_term_load($hr['tid']);
+      $term->field_sirius_domain['und'][0]['target_id'] = $domain_nid;
+      taxonomy_term_save($term);
+      print "Saved: $hr[tid] - " . $term->title . "\n";
+      ++$count;
+    }
+    $term_counts[$bundle] = $count;
+  }
+
+  // Get this list of users
+  $sql_args = array(':bundle' => $bundle);
+  $sql = "select uid, name from users ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'user' and field_data_field_sirius_domain.entity_id = uid ";
+  $sql .= "where field_sirius_domain_target_id is null ";
+  $sql .= 'and uid > 1 ';
+  $sql .= "order by uid ";
+  $sql .= "limit 1000 ";
+  $types = array();
+  $stmt = db_query($sql, $sql_args);
+  $count = 0;
+  while ($hr = $stmt->fetchAssoc()) {
+    $u = user_load($hr['uid']);
+    print "Saving: " . $u->uid . " / " . $u->name . "\n";
+    user_save($u, array('field_sirius_domain' => array('und' => array(0 => array('target_id' => $domain_nid)))));
+    print "Saved: $hr[uid] - " . $u->name . "\n";
+    ++$user_count;
+  }
+
+  // Get the settings
+  $sql = "select name from variable where name like 'sirius%' or name like 'grievance%' ";
+  $stmt = db_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    $name = $hr['name'];
+    $val = variable_get($name);
+    sirius_domain_variable_set("$name/$domain_nid", $val);
+    print "Set: $name\n";
+    ++$variable_count;
+  }
+  print "Node counts: ";
+  print_r($node_counts);
+
+  print "Term counts: ";
+  print_r($term_counts);
+
+  print "User count: $user_count\n";
+  print "Variable count: $variable_count\n";
 }

@@ -1,5 +1,6 @@
 <?php
 
+/*
 function sirius_hour_payperiod_definition() {
 	$form = array();
 
@@ -7,6 +8,7 @@ function sirius_hour_payperiod_definition() {
 
 	return $form;
 }
+*/
 
 function sirius_hour_payperiod_list_requested() {
 	$html .= views_embed_view('sirius_payperiods', 'block_1');
@@ -33,49 +35,81 @@ function sirius_hour_payperiod_list_mine() {
 	return $html;
 }
 
+function sirius_hour_payperiod_sources($json) {
+	$sources = array();
+	if ($json['entries']) {
+		foreach ($json['entries'] as $source_key => $entry) {
+			$sources[$source_key] = $entry['source_name'];
+		}
+	}
+	if (!$sources['manual']) { $sources['manual'] = 'Manual'; }
+	return $sources;
+}
+
 function sirius_hour_payperiod_compute(&$json) {
-	$totals_payperiod = array();
-	$totals_monthly = array();
-	$totals_daily = array();
+	if (!$json['entries']) { $json['entries'] = array(); }
+	$json['totals'] = array();
 
-	$horus_payperiod = array();
-	$hours_monthly = array();
-	$hours_daily = array();
+	// First pass: data cleanup, compute totals
+	$live_count = 0;
+	$live_source_key = '';
+	$note = '';
+	foreach ($json['entries'] as $source_key => $entry) {
+		// Walk the rows
+		$totals = array();
+		if (!$entry['rows']) { $entry['rows'] = array(); }
+		foreach ($entry['rows'] as $delta => $row) {
+			// Remove empty or deleted rows
+			if (!array_filter(array_values($row)) || $row['delete']) { 
+				unset($json['entries'][$source_key]['rows'][$delta]);
+				continue; 
+			}
 
-	if ($json['entries']) { 
+			$qty = $row['qty'];
+			if (!is_numeric($qty)) { $qty = 0; }
+			$department_tid = $row['department'];
+			$hour_type_tid = $row['hour_type'];
+			$day = $row['day'];
+			if (!$department_tid || !$hour_type_tid || !$day) { 
+				$json['entries'][$source_key]['rows'][$delta]['note'] = "Incomplete";
+				continue;
+			}
 
-		usort($json['entries'], function($a, $b) {
-			return $a['start_ts'] <=> $b['start_ts'];
-		});
-		
-		foreach ($json['entries'] as $entry) {
-			$day = date('Y-m-d', $entry['start_ts']);
-			$month = date('Y-m', $entry['start_ts']);
-			$duration = round( ($entry['end_ts'] - $entry['start_ts']) / (60*60), 2);
-			$rate = $entry['rate'];
-			$hour_type_tid = $entry['hour_type_tid'];
-			$department_tid = $entry['department_tid'];
+			$ms_level = $row['ms_level'];
 
-			$hours_payperiod[$hour_type_tid][$department_tid] += $duration;
-			$hours_monthly[$month][$hour_type_tid][$department_tid] += $duration;
-			$hours_daily[$day][$hour_type_tid][$department_tid] += $duration;
+			$totals['hours']['total'] += $qty;
+			$totals['hours']['by_type'][$hour_type_tid] += $qty;
+			$totals['hours']['by_dept'][$department_tid] += $qty;
+			$totals['hours']['by_type_dept'][$hour_type_tid][$department_tid] += $qty;
+			$totals['hours']['by_dept_type'][$department_tid][$hour_type_tid] += $qty;
+			if ($ms_level) { $totals['hours']['by_ms_level'][$ms_level] += $qty; }
 
-			$totals_payperiod[$hour_type_tid][$department_tid] += $rate * $duration;
-			$totals_monthly[$month][$hour_type_tid][$department_tid] += $rate * $duration;
-			$totals_daily[$day][$hour_type_tid][$department_tid] += $rate * $duration;
+			$totals['hours']['by_day'][$day]['total'] += $qty;
+			$totals['hours']['by_day'][$day]['by_type'][$hour_type_tid] += $qty;
+			$totals['hours']['by_day'][$day]['by_dept'][$department_tid] += $qty;
+			$totals['hours']['by_day'][$day]['by_type_dept'][$hour_type_tid][$department_tid] += $qty;
+			$totals['hours']['by_day'][$day]['by_dept_type'][$department_tid][$hour_type_tid] += $qty;
+		}
+		$json['entries'][$source_key]['totals'] = $totals;
+		if (!$entry['rows']) { continue; }
+
+		// First live entry generates the actual totals.
+		if ($entry['status'] == 'live') {
+			++$live_count;
+			$live_source_key = $source_key;
+			$json['totals'] = $totals;
 		}
 	}
 
-	$json['hours']['payperiod'] = $hours_payperiod;
-	$json['hours']['monthly'] = $hours_monthly;
-	$json['hours']['daily'] = $hours_daily;
+	// Set some warnings
+	if ($live_count > 1) { $note .= "There are $live_count sets of entries marked as \"live\"."; }
+	if ($live_count < 1) { $note .= "No entries are marked as \"live\"."; }
 
-	$json['totals']['payperiod'] = $totals_payperiod;
-	$json['totals']['monthly'] = $totals_monthly;
-	$json['totals']['daily'] = $totals_daily;
+	$json['reconcile']['msg'] = $note;
+	if ($note && $json['reconcile']['status'] != 'reconciled') { $json['reconcile']['status'] = 'warning'; }
 }
 
-function sirius_hour_payperiod_load($worker_nid, $employer_nid, $year, $month, $day, $create_active = FALSE) {
+function sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $year, $month, $day, $create_active = FALSE) {
 	// Search for an existing payperiod node
 	$date = "$year-$month-$day 00:00:00";
 	$date_db = gmdate('Y-m-d H:i:s', strtotime($date));
@@ -86,6 +120,7 @@ function sirius_hour_payperiod_load($worker_nid, $employer_nid, $year, $month, $
   $query->fieldCondition('field_grievance_shop', 'target_id', $employer_nid);
   $query->fieldCondition('field_sirius_datetime', 'value', $date_db, '<=');
   $query->fieldCondition('field_sirius_datetime_completed', 'value', $date_db, '>');
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
   $query->propertyOrderBy('nid');
   $stmt = $query->execute();
   if ($stmt['node']) { return node_load(array_keys($stmt['node'])[0]); }
@@ -111,8 +146,13 @@ function sirius_hour_payperiod_load($worker_nid, $employer_nid, $year, $month, $
   $payperiod_node->field_sirius_active['und'][0]['value'] = $create_active;
   $payperiod_node->field_sirius_worker['und'][0]['target_id'] = $worker_nid;
   $payperiod_node->field_grievance_shop['und'][0]['target_id'] = $employer_nid;
+  if ($domain_nid) { $payperiod_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
   $payperiod_node = node_submit($payperiod_node);
   node_object_prepare($payperiod_node);
   node_save($payperiod_node);
+
+  // Create the employer payperiod as a side effect
+  sirius_hour_epayperiod_load($domain_nid, $employer_nid, $year, $month, $day, $create_active);
+
   return $payperiod_node;
 }

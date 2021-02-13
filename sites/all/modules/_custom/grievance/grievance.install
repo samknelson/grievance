@@ -848,3 +848,165 @@ function grievance_update_7038() {
 
   variable_set('configurable_timezones', 1);
 }
+
+/**
+ * - Default content type for all existing document types is "grievance"
+ */
+
+function grievance_update_7039() {
+  $terms = sirius_taxonomy_load('grievance_document_types', 'tid', 'full');
+
+  foreach ($terms as $tid => $term) {
+    if ($term->field_sirius_content_types['und'][0]['value']) { continue; }
+    $term->field_sirius_content_types['und'][0]['value'] = 'grievance';
+    taxonomy_term_save($term);
+    print "Updated: " . $term->name . "\n";
+  }
+}
+
+/**
+ * - Add JSON field to users
+ * - Make sure that the SMTP module allows HTML
+ */
+
+function grievance_update_7040() {
+  try {
+    $instance = field_info_instance('node', 'field_sirius_json', 'sirius_json_definition');
+    $instance['entity_type'] = 'user';
+    $instance['bundle'] = 'user';
+    field_create_instance($instance);
+  } catch (exception $ignore) {
+    // print_r($ignore);
+  }
+
+  variable_set('smtp_allowhtml', 1);
+}
+
+/**
+ * Add domain field to report cache
+ */
+
+function grievance_update_7041() {
+
+  $sqls = array(
+    'alter table report_cache add report_domain_nid integer',
+    'alter table report_cache drop primary key',
+    'alter table report_cache add primary key (report_domain_nid, report_type, report_id, report_row_pk)',
+    'alter table report_cache add index(report_id)',
+    'alter table report_cache add index(report_row_pk)',
+    'alter table report_cache add index(report_type)',
+    'alter table report_cache add index(report_domain_nid)',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { }
+  }
+}
+
+/**
+ * Add index to field_sirius_notes (ick)
+ */
+
+function grievance_update_7042() {
+
+  $sqls = array(
+    'create index sirius_notes_idx1 on field_data_field_sirius_notes (field_sirius_notes_value)',
+    'create index sirius_phone_idx1 on field_data_field_sirius_phone (field_sirius_phone_value)',
+    'CREATE TABLE sirius_ledger_ar (
+    ledger_id integer primary key AUTO_INCREMENT,
+    ledger_amount numeric(10,2),
+    ledger_status varchar(100),
+    ledger_account integer,
+    ledger_participant integer,
+    ledger_reference integer,
+    ledger_ts integer,
+    ledger_memo varchar(255),
+    ledger_key varchar(255)
+    )',
+    'CREATE INDEX sirius_ledger_ar_account on sirius_ledger_ar (ledger_account)', 
+    'CREATE INDEX sirius_ledger_ar_participant on sirius_ledger_ar (ledger_participant)',
+    'CREATE INDEX sirius_ledger_ar_reference on sirius_ledger_ar (ledger_reference)', 
+    'CREATE INDEX sirius_ledger_ar_key on sirius_ledger_ar (ledger_key)', 
+    'CREATE TABLE sirius_ledger_balance (
+    balance_participant integer,
+    balance_account integer,
+    balance_amount numeric(10,2),
+    PRIMARY KEY (balance_participant, balance_account)
+    )'
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+
+  if (function_exists('sirius_ledger_balance_update_all')) {
+    print "Updating all balances...\n";
+    sirius_ledger_balance_update_all();
+    print "... Done updating all balances.\n";
+  }
+}
+
+/**
+ * Delete field instance for private audio file from bulk node
+ */
+
+function grievance_update_7043() {
+  $content_type = 'sirius_bulk';
+  $field_name = 'field_sirius_audio';
+  print "Deleting $field_name from $content_type\n";
+  if ($instance = field_info_instance('node', $field_name, $content_type)) {
+    field_delete_instance($instance);
+  }
+}
+
+/**
+ * Enable the "shorten" module
+ */
+
+function grievance_update_7044() {
+  // Enable FPA
+  print "Enabling shorten modules\n";
+  module_enable(array('shorten', 'shortener'), TRUE);
+}
+
+/**
+ * Create index on sirius_notes
+ */
+
+function grievance_update_7045() {
+  $sqls = array(
+    'create index sirius_notes_idx1 on field_data_field_sirius_notes (field_sirius_notes_value(512))',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
+
+/**
+ * Grant permission on use text format sirius_form_editor
+ */
+
+function grievance_update_7046() {
+
+  // Grant "grievance contract view" for anybody with 
+  print "Granting new permission [use text format sirius_form_editor] to anybody with permission [sirius] ...\n";
+  $roles = user_roles(FALSE, 'sirius');
+  foreach ($roles as $rid => $name) {
+    print "... granting [use text format sirius_form_editor] to [$name]\n";
+    user_role_grant_permissions($rid, array('use text format sirius_form_editor'));
+  }
+}
+

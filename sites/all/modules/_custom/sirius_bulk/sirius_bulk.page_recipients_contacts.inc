@@ -15,15 +15,11 @@ function sirius_bulk_node_tab_recipients_contacts_form($form, &$form_state, $bul
 		$form_state, 
 		$event_node->nid,
 		'Bulk Registration', 
-		array('sirius_contact' => 
-			array(
-				'default' => $contact_definition_form
-			)
+		array(
+			'sirius_contact' => array('default' => $contact_definition_form),
+			'sirius_worker' => array('default' => array()),
 		),
 		array(
-			'search' => array(
-				'title' => 'Search',
-			),
 			'bulk_recipient_add' => array(
 				'title' => 'Add Bulk Recipient',
 				'bulk_nid' => $bulk_node->nid,
@@ -32,6 +28,9 @@ function sirius_bulk_node_tab_recipients_contacts_form($form, &$form_state, $bul
 				'title' => 'Remove Bulk Recipient',
 				'bulk_nid' => $bulk_node->nid,
 			),
+			'export' => array('title' => 'Export'),
+			'tag_add' => array('title' => 'Add a Tag'),
+			'tag_remove' => array('title' => 'Remove a Tag'),
 		)
 	);
 

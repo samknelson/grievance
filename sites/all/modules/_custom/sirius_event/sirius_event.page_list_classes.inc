@@ -20,6 +20,9 @@ function sirius_event_page_list_classes() {
 		return t('There are no event types configured as classes.');
 	}
 
+	$html = t('The following upcoming classes are available.') . '<br /><br />';
+
+
 	$query = new EntityFieldQuery;
 	$query->entityCondition('entity_type', 'node');
 	$query->entityCondition('bundle', 'sirius_event');
@@ -29,7 +32,7 @@ function sirius_event_page_list_classes() {
 	$query->fieldOrderBy('field_sirius_daterepeat', 'value');
 	$stmt = $query->execute();
 	if (!$stmt['node']) { 
-		$html .= t('There are no upcoming @titles.', array('@title' => $event_types[$event_type_tid]->name));
+		$html .= t('There are no upcoming classes.');
 	} else {
 		$event_nodes = node_load_multiple(array_keys($stmt['node']));
 
@@ -58,6 +61,7 @@ function sirius_event_page_list_classes() {
 		  $html .= sirius_dispatch_view_render_field($event_node, 'body');
 
 			// Register
+			$participant_nid = sirius_event_participant_nid_from_user($event_node->nid);
 			$tools = '';
 			$widgets = sirius_event_register_widgets();
 			$all_rules = $event_type_json['register']['rules'];
@@ -66,12 +70,16 @@ function sirius_event_page_list_classes() {
 			if ($rules) {
 				foreach ($rules as $delta => $rule) {
 					foreach ($rule['widget'] as $widget) {
+						if (($widget == 'user_self') && $participant_nid) { continue; }
 						$widget_settings = $event_type_json['widget_settings']['register'][$rule['delta']][$widget];
-						$name = $widget_settings['name'];
+						$name = $rule['name'];
 						if (!$name) { $name = $rule['name'] . ': ' . $widgets[$widget]; }
 						$tools .= l($name, 'node/' . $event_node->nid . '/sirius_event_participants_register', array('attributes' => array('class' => array('tool-button')), 'query' => array('delta' => $delta, 'widget' => $widget))); 
 					}
 				}
+			}
+			if (drupal_valid_path('node/' . $event_node->nid . '/sirius_event_info')) {
+				$tools .= l('Info', 'node/' . $event_node->nid . '/sirius_event_info', array('attributes' => array('class' => array('tool-button'))));
 			}
 			$html .= $tools;
 

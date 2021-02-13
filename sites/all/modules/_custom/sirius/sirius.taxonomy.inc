@@ -48,7 +48,7 @@ function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include
   $domain_nid = sirius_domain_nid();
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
   if ($value_type == 'name') { $load_entities = FALSE; } else { $load_entities = TRUE; }
-  $terms = sirius_domain_taxonomy_get_tree($vocabulary->vid, 0, NULL, $load_entities, sirius_domain_nid());
+  $terms = sirius_domain_taxonomy_get_tree($vocabulary->vid, 0, NULL, $load_entities, $domain_nid);
 
   $map = array();
   if ($include_null) {
@@ -79,10 +79,11 @@ function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include
   return $map;
 }
 
-function sirius_taxonomy_lookup_by_anything($vocabulary_name, $value) {
+function sirius_taxonomy_lookup_by_anything($vocabulary_name, $value, $employer_nid = NULL) {
   static $preload;
 
-  if (!$preload[$vocabulary_name]) {
+  if (!$preload[$vocabulary_name]['global']) {
+    // drupal_set_message("Preloading $vocabulary_name");
     $tmp = sirius_taxonomy_load($vocabulary_name, 'tid', 'full');
     foreach ($tmp as $tid => $term) {
       $keys = array();
@@ -94,13 +95,34 @@ function sirius_taxonomy_lookup_by_anything($vocabulary_name, $value) {
       $keys[] = $term->tid;
       foreach ($keys as $key) {
         if ($key) {
-          $preload[$vocabulary_name][$key] = $tid;
+          $preload[$vocabulary_name]['global'][$key] = $tid;
         }
       }
     }
   }
 
-  return $preload[$vocabulary_name][trim(strtolower($value))];
+  if ($employer_nid) {
+    if (!isset($preload[$vocabulary_name][$employer_nid])) {
+      // drupal_set_message("Preloading $vocabulary_name / $employer_nid");
+      $employer_node = node_load($employer_nid); 
+      $preload[$vocabulary_name][$employer_nid] = array();
+      $json = sirius_jsonfield_util_node_json_get($employer_node);
+      if ($json['taxonomy_mappings'][$vocabulary_name]['mappings']) {
+        foreach ($json['taxonomy_mappings'][$vocabulary_name]['mappings'] as $record) {
+          if ($record['from'] && $record['to']) {
+            $preload[$vocabulary_name][$employer_nid][trim(strtolower($record['from']))] = $record['to'];
+          }
+        }
+      }
+    }
+  }
+
+  $value = trim(strtolower($value));
+  $tid = NULL;
+  if ($employer_nid) { $tid = $preload[$vocabulary_name][$employer_nid][$value]; }
+  if (!$tid) { $tid = $preload[$vocabulary_name]['global'][$value]; }
+
+  return $tid;
 }
 
 /**
@@ -193,10 +215,11 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['grievance_delivery']['multidomain'] = 'No';
     $settings['grievance_department']['view'] = 'sirius_taxonomy';
     $settings['grievance_department']['display'] = 'block_4';
-    $settings['grievance_department']['multidomain'] = 'No';
+    $settings['grievance_department']['multidomain'] = 'Yes';
+    $settings['grievance_department']['employer_map'] = 'Yes';
     $settings['grievance_document_types']['view'] = 'sirius_taxonomy';
     $settings['grievance_document_types']['display'] = 'block_5';
-    $settings['grievance_document_types']['multidomain'] = 'No';
+    $settings['grievance_document_types']['multidomain'] = 'Yes';
     $settings['grievance_job_classification']['view'] = 'sirius_taxonomy';
     $settings['grievance_job_classification']['display'] = 'block_4';
     $settings['grievance_job_classification']['multidomain'] = 'No';
@@ -217,7 +240,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['grievance_resproc']['multidomain'] = 'No';
     $settings['grievance_settlement_tags']['view'] = 'sirius_taxonomy';
     $settings['grievance_settlement_tags']['display'] = 'block_3';
-    $settings['grievance_settlement_tags']['multidomain'] = 'No';
+    $settings['grievance_settlement_tags']['multidomain'] = 'Yes';
     $settings['grievance_shift']['view'] = 'sirius_taxonomy';
     $settings['grievance_shift']['display'] = 'block';
     $settings['grievance_shift']['multidomain'] = 'No';
@@ -232,7 +255,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['grievance_types']['multidomain'] = 'No';
     $settings['grievance_work_status']['view'] = 'sirius_taxonomy';
     $settings['grievance_work_status']['display'] = 'block';
-    $settings['grievance_work_status']['multidomain'] = 'No';
+    $settings['grievance_work_status']['multidomain'] = 'Yes';
     $settings['sirius_contact_tags']['view'] = 'sirius_taxonomy';
     $settings['sirius_contact_tags']['display'] = 'block';
     $settings['sirius_contact_tags']['multidomain'] = 'Yes';
@@ -241,7 +264,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_dispatch_job_tags']['multidomain'] = 'No';
     $settings['sirius_dispatch_job_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_dispatch_job_type']['display'] = 'block';
-    $settings['sirius_dispatch_job_type']['multidomain'] = 'No';
+    $settings['sirius_dispatch_job_type']['multidomain'] = 'Yes';
     $settings['sirius_dispatch_sib']['view'] = '';
     $settings['sirius_dispatch_sib']['display'] = '';
     $settings['sirius_dispatch_sib']['multidomain'] = '';
@@ -260,24 +283,28 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_hour_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_hour_type']['display'] = 'block';
     $settings['sirius_hour_type']['multidomain'] = 'Yes';
+    $settings['sirius_hour_type']['employer_map'] = 'Yes';
     $settings['sirius_industry']['view'] = 'sirius_taxonomy';
     $settings['sirius_industry']['display'] = 'block_7';
-    $settings['sirius_industry']['multidomain'] = 'No';
+    $settings['sirius_industry']['multidomain'] = 'Yes';
     $settings['sirius_member_status']['view'] = 'sirius_member_status';
     $settings['sirius_member_status']['display'] = 'page';
     $settings['sirius_member_status']['multidomain'] = 'Yes';
     $settings['sirius_skill']['view'] = 'sirius_taxonomy';
     $settings['sirius_skill']['display'] = 'block_1';
-    $settings['sirius_skill']['multidomain'] = 'No';
+    $settings['sirius_skill']['multidomain'] = 'Yes';
     $settings['sirius_worker_dispatch_status']['view'] = 'sirius_taxonomy';
     $settings['sirius_worker_dispatch_status']['display'] = 'block';
-    $settings['sirius_worker_dispatch_status']['multidomain'] = 'No';
+    $settings['sirius_worker_dispatch_status']['multidomain'] = 'Yes';
     $settings['sirius_work_status']['view'] = 'sirius_taxonomy';
     $settings['sirius_work_status']['display'] = 'block_8';
-    $settings['sirius_work_status']['multidomain'] = 'No';
+    $settings['sirius_work_status']['multidomain'] = 'Yes';
     $settings['sirius_ledger_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_ledger_type']['display'] = 'block';
     $settings['sirius_ledger_type']['multidomain'] = 'Yes';
+    $settings['sirius_payment_type']['view'] = 'sirius_taxonomy';
+    $settings['sirius_payment_type']['display'] = 'block_10';
+    $settings['sirius_payment_type']['multidomain'] = 'Yes';
   }
 
   if ($vocabulary_machine_name == 'all') { return $settings; }

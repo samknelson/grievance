@@ -16,6 +16,7 @@ function sirius_node_tab_event_phonebank_settings_access($event_node) {
 }
 
 function sirius_node_tab_event_phonebank_settings($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	return drupal_get_form('sirius_node_tab_event_phonebank_settings_form', $event_node->nid);
 }
 
@@ -77,10 +78,12 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 	);
 
 	$form['phonebank']['caller_intro'] = array(
-		'#type' => 'textarea',
+		'#type' => 'text_format',
 		'#title' => 'Introduction for callers',
 		'#default_value' => $json['phonebank']['caller_intro'],
 		'#description' => t('Callers will receive this message on the landing page of the phonebank.'),
+		'#format' => 'sirius_form_editor',
+		'#allowed_formats' => array('sirius_form_editor'),
 	);
 
 	$form['phonebank']['conference'] = array(
@@ -106,7 +109,36 @@ function sirius_node_tab_event_phonebank_settings_form($form, &$form_state, $eve
 		'#default_value' => $json['phonebank']['conference_number'],
 	);
 
+	$form['phonebank']['do_not_disturb'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Do Not Disturb',
+	);
+	$options = array(NULL => '-- Select --') + sirius_do_not_disturb_list();
+	$form['phonebank']['do_not_disturb']['id'] = array(
+		'#type' => 'select',
+		'#options' => $options,
+		'#title' => t('Which Do Not Disturb schedule should be used?'),
+		'#default_value' => $json['phonebank']['do_not_disturb']['id'],
+	);
 
+	if ($json['phonebank']['do_not_disturb']['id']) {
+		$form['phonebank']['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disurb_render($json['phonebank']['do_not_disturb']['id']));
+	}
+
+	$form['phonebank']['autosave'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Auto Save',
+	);
+	$options = array(NULL => '-- Select --');
+	$options['Yes'] = t('Yes, save after every field is edited');
+	$options['No'] = t('No, only save when the user clicks the "Save" button');
+	$form['phonebank']['autosave']['field'] = array(
+		'#type' => 'select',
+		'#options' => $options,
+		'#title' => t('Save Each Field?'),
+		'#default_value' => $json['phonebank']['autosave']['field'],
+		'#description' => 'Autosave ensures that data is not lost if the browser is closed without saving. However, it slows down the user interface.',
+	);
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -121,6 +153,7 @@ function sirius_node_tab_event_phonebank_settings_form_submit($form, &$form_stat
 	$event_node = node_load($event_nid);
 	$json = sirius_jsonfield_util_node_json_get($event_node);
 	$json['phonebank'] = $form_state['values']['phonebank'];
+	$json['phonebank']['caller_intro'] = sirius_richtext_handle_input($form_state['values']['phonebank']['caller_intro']);
 	sirius_jsonfield_util_node_json_set($event_node, $json);
 	node_save($event_node);
 	drupal_set_message(t('Settings saved.'));

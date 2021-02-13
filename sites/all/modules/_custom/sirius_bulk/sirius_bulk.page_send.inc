@@ -7,6 +7,12 @@ function sirius_bulk_node_tab_send($bulk_node) {
 function sirius_bulk_node_tab_send_form($form, &$form_state, $bulk_node) {
 	drupal_add_css(drupal_get_path('module', 'sirius_bulk') . '/css/bulk.css');
 
+
+	$dnd_options = sirius_do_not_disturb_list();
+	if (!$dnd_options) {
+		drupal_set_message("Warning: Do Not Disturb settings have not yet been configured. This message cannot be delivered automatically, and must be sent using the manual poll tool under Config.", 'warning');
+	}
+
 	$form_state['bulk_nid'] = $bulk_node->nid;
 
 	$form['summary'] = array('#markup' => sirius_bulk_queue_summary_render($bulk_node));

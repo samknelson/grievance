@@ -11,20 +11,6 @@ body.section-admin {
   padding: 0;
 }
 
-/* If gutters are set in theme settings they will override these
-   values: see Extensions > Modify Output > Design */
-#main-content,
-.block-inner,
-.pane-inner,
-.menu-wrapper,
-.branding-elements,
-.breadcrumb-wrapper,
-.attribution,
-.at-panel .rounded-corner,
-.banner-wrapper,
-div.messages {
-}
-
 /* Panel pages need negative margin equal to the gutter width applied to #content,
   this is taken care of in theme settings as per above for normal gutters */
 .page-panels #content {
@@ -2374,13 +2360,15 @@ table.trustfund-payperiod tr.error {
 	background-color: #F2B6BA;
 }
 
-#content h2 {
+#content h2,
+#modal-content h2 {
 	padding-top: 15px;
 	padding-bottom: 5px;
 	font-size: 1.1em;
 }
 
-#content h2.field-label {
+#content h2.field-label,
+#modal-content h2.field-label {
 	font-size: 1em;
 	padding-top: 0;
 	padding-bottom: 0;
@@ -2509,7 +2497,8 @@ input.teaser-button {
 
 }
 
-input.form-button-disabled {
+input.form-button-disabled,
+input.form-submit:disabled {
   background-color: #666666;
 }
 
@@ -2902,15 +2891,26 @@ fieldset legend a:visited {
 .loopback #page-banner, 
 .loopback #page-footer, 
 .loopback #header,
-.loopback .banner-menu-outer-wrapper { 
+.loopback .banner-menu-outer-wrapper,
+.loopback #primary-tasks,
+.loopback #secondary-tasks,
+.loopback .primary-local-tasks-wrapper,
+.loopback .secondary-tasks-wrapper,
+.loopback .banner-menu-outer-wrapper,
+.loopback #block-user-login,
+.loopback #environment-indicator {
   display: none;
 }
 
 body.loopback {
   background: none;
   color: #000000;
+  margin-top: 0 !important;
 }
 
+body.loopback.admin-menu {
+  margin-top: 0 !important;
+}
 
 .gform_body h3 {
   font-size: 18px;
@@ -3728,7 +3728,7 @@ fieldset.date-combo .container-inline-date .date-padding {
 div.sirius_help {
   background: url(images/help.png) no-repeat 8px 5px #f0f8ff;
   border: 0;
-  margin: 10px 10px 0;
+  margin: 10px;''
   padding: 0;
   border-radius: 2px;
 }
@@ -3889,23 +3889,6 @@ tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: l
 tr.sirius_bg_azure,         tr.sirius_bg_azure          td { background-color: azure; }
 tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
 tr.sirius_bg_linen,         tr.sirius_bg_linen          td { background-color: linen; }
-
-/*
-snow  #FFFAFA
-mintcream #F5FFFA
-ivory #FFFFF0
-honeydew  #F0FFF0
-azure #F0FFFF 
-aliceblue #F0F8FF
-seashell  #FFF5EE
-beige #F5F5DC
-oldlace #FDF5E6
-floralwhite #FFFAF0
-antiquewhite  #FAEBD7
-linen #FAF0E6
-lavenderblush #FFF0F5
-mistyrose #FFE4E1
-*/
 
 div.sirius-view-multitable table {
   table-layout: fixed;
@@ -4122,10 +4105,12 @@ input.ajax-processed:hover {
   font-style: italic;
   font-family: roboto, arial, helvetica, san-serif;  
 }
-.sirius_signature_wrapper img {
-  height: 90px;
-}
 
+/*
+.sirius_signature_wrapper img {
+  height: 55px;
+}
+*/
 
 div.sirius_quicknav {
   padding-bottom: 10px;
@@ -4154,4 +4139,26 @@ div.sirius_quicknav {
 
 .accordion_highlighted {
   background-color: #ffc;
+}
+
+table.sirius_data_table {
+  width: auto;
+}
+
+table.sirius_data_table_wide {
+  width: 100%;
+}
+
+table.sirius_data_table td {
+  border: 1px solid;
+  padding: 5px;
+}
+
+table.sirius_data_table th {
+  padding: 5px;
+  vertical-align: top;
+}
+
+body.cke_editable_themed {
+  background-color: #ffffff;
 }

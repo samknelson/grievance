@@ -77,9 +77,9 @@ function sirius_pdf_generate($url, $params) {
 	file_put_contents($input_html_path, $html);
 
 	// Convert the HTML to a PDF.
-	$cmd = '/usr/bin/xvfb-run -a ';
+	$cmd = sirius_server_paths('xvfb-run') . ' -a ';
 	$cmd .= '--server-args="-screen 0 1024x768x24" ';
-	$cmd .= '/usr/local/bin/wkhtmltopdf ';
+	$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
 	$cmd .= $margin_args;
 	$cmd .= '-s letter ';
 	$cmd .= '--print-media-type ';
@@ -96,7 +96,7 @@ function sirius_pdf_generate($url, $params) {
 		file_copy($letterhead_source, $letterhead_pdf_uri, FILE_EXISTS_REPLACE);
 
 		// Combine the letterhead with the source
-		$cmd = "/usr/bin/pdftk $input_pdf_path multibackground $letterhead_pdf_path output $output_pdf_path";
+		$cmd = sirius_server_paths('pdftk') . " $input_pdf_path multibackground $letterhead_pdf_path output $output_pdf_path";
 		exec($cmd);
 	} else {
 		rename($input_pdf_path, $output_pdf_path);

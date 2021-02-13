@@ -5,6 +5,7 @@ function sirius_node_tab_event_bullpen_view_access($event_node) {
 }
 
 function sirius_node_tab_event_bullpen_view($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	$ts = sirius_event_bullpen_ts($event_node);
 	$datestr = 'g:i A, l, F j';
 
