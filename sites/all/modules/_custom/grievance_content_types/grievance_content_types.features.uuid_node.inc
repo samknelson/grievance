@@ -12,7 +12,7 @@ function grievance_content_types_uuid_features_default_content() {
   $nodes = array();
 
   $nodes[] = array(
-  'title' => 'sirius/config/ledger/test-monthly',
+  'title' => 'Ledger - Monthly Tester',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -102,7 +102,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'taxonomy/term/%/sirius_event_type_session',
+  'title' => 'Event - Sections',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -119,7 +119,7 @@ function grievance_content_types_uuid_features_default_content() {
   'field_sirius_paths' => array(
     'und' => array(
       0 => array(
-        'value' => 'taxonomy/term/%/sirius_event_type_session',
+        'value' => 'taxonomy/term/%/sirius_event_type_section',
         'format' => NULL,
       ),
     ),
@@ -127,9 +127,9 @@ function grievance_content_types_uuid_features_default_content() {
   'field_sirius_summary' => array(
     'und' => array(
       0 => array(
-        'value' => '<p>A single event may have multiple "sessions", which participants are required to sign up for indendently. For example, a lab class might require students to sign up for a specific lab day or time; a multi-day volunteer activity might have volunteers signing up only for specific dates.</p>
+        'value' => '<p>A single event may have multiple "sections", which participants are required to sign up for indendently. For example, a lab class might require students to sign up for a specific lab day or time; a multi-day volunteer activity might have volunteers signing up only for specific dates.</p>
 
-<p>Use the form below to indicate whether this event type supports sessions which can be individual signed up for, and which particpant roles have access to sign up for or administer sessions.</p>
+<p>Use the form below to indicate whether this event type supports sections which can be individual signed up for, and which particpant roles have access to sign up for or administer sections.</p>
 ',
         'format' => 'full_html',
       ),
@@ -194,7 +194,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'node/%/sirius_event_participant_definition_followup',
+  'title' => 'Event - Phonebank - Followup',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -374,7 +374,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '4840e21c-6ce8-4fb7-84cb-fa178e20b95b',
 );
   $nodes[] = array(
-  'title' => 'sirius/ledger/delinquency',
+  'title' => 'Ledger - Delinquency Letters',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -468,7 +468,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'sirius/contact/definition/display',
+  'title' => 'Custom Contact Fields - Display',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -558,7 +558,145 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'sirius/config/feed',
+  'title' => 'Mailattach',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1612788133,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '36cd607a-6331-4a08-8978-81a1b1d79cc2',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The Sirius "mailattach" system allows users to add attachments by sending emails to a specific address. The body of the email, as well as any attachments, are added to the requested record.</p>
+
+<p><strong>Usage</strong></p>
+
+<p>Your site administrator will configure an email mailbox to use fo the mailattach system. Contact your administrator to find out what address has been configured. To use the system, simply send an email to this address. Your email will be attached to the record that you specify, and you will receive an email response indicating that your attachment has been accepted.</p>
+
+<p><strong>Sender</strong></p>
+
+<p>The email address used to send the message must be associated with a Sirius user with appropriate permissions. If you send the message from an email address that is not associated with a Sirius user, or is associated with a user without adequate permissions, your email will not be accepted, and you will receive a response indicating the reason.</p>
+
+<p><strong>Subject</strong></p>
+
+<p>The subject of the email must be formatted specifically, so that mailattach knows which record to attach the message to. Here are some examples:</p>
+
+<ul>
+	<li>Subject: <strong>Worker 12345</strong><br />
+	(Attach the message to the record for Worker with ID 12345)<br />
+	&nbsp;</li>
+	<li>Subject: <strong>Worker 12345: Personal documents</strong><br />
+	(Attach the message to the record for Worker with ID 12345, and add the additional subject "Personal documents" to the log entry.)<br />
+	&nbsp;</li>
+	<li>Subject: <strong>Grievance 20200229: Company information request response</strong><br />
+	(Attach the mesage to grievance with ID 20200229, with the additional subject specified)<br />
+	&nbsp;</li>
+	<li>Subject:&nbsp;<strong>20200229</strong><br />
+	Subject: <strong>20200229: Grievant\'s initial documents</strong><br />
+	(The site administrator will specify a "default" record type. In this case, if mailattach just sees an ID number, it assumes it\'s a grievance.)<br />
+	&nbsp;</li>
+	<li>Subject:&nbsp;<strong>Worker 2125551212: Disciplinary report</strong><br />
+	Subject:&nbsp;<strong>Worker 001-22-1234: Disciplinary report</strong><br />
+	Subject:&nbsp;<strong>Worker sam@siriussoftware.com: Disciplinary report</strong><br />
+	(You can attach documents to a worker record by phone, email, or social security number.&nbsp;<em>Important: we do not recommend sending emails with social security numbers.</em>)</li>
+</ul>
+
+<p>&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/mailattach',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'sirius/mailattach/test',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use these pages to manage the Sirius "mailattach" system.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-02-08 04:42:13 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Feeds - Configuration',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -648,7 +786,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'ASI Disclaimer',
+  'title' => 'Dispatch - Auto Sign-In - Disclaimer',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -863,7 +1001,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'taxonomy/term/%/sirius_event_type_disclaimer',
+  'title' => 'Disclaimer',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -876,7 +1014,26 @@ function grievance_content_types_uuid_features_default_content() {
   'tnid' => 0,
   'translate' => 0,
   'uuid' => '3dc4f868-0e7e-40f6-aab4-3166be7135a8',
-  'body' => array(),
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>"Disclaimers" are legal statements which must be accepted by all event participants. Examples might include</p>
+
+<ul>
+	<li>an agreement to engage in acceptable behavior and treat others with respect</li>
+	<li>a waiver of liability</li>
+	<li>an agreement to assume reasonable charges in the event of negligence</li>
+	<li>a specific and timely agreement, such as to wear a mask and practice social distancing during a pandemic</li>
+</ul>
+
+<p>For users with appropriate privileges, the available disclaimers can be managed <a href="/sirius/disclaimer/list">here.</a></p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
   'field_sirius_paths' => array(
     'und' => array(
       0 => array(
@@ -892,16 +1049,7 @@ function grievance_content_types_uuid_features_default_content() {
   'field_sirius_summary' => array(
     'und' => array(
       0 => array(
-        'value' => '<p>"Disclaimers" are legal statements which must be accepted by all event participants. Examples might include</p>
-
-<ul>
-	<li>an agreement to engage in acceptable behavior and treat others with respect</li>
-	<li>a waiver of liability</li>
-	<li>an agreement to assume reasonable charges in the event of negligence</li>
-	<li>a specific and timely agreement, such as to wear a mask and practice social distancing during a pandemic</li>
-</ul>
-
-<p>For users with appropriate privileges, the available disclaimers can be managed <a href="/sirius/disclaimer/list">here.</a></p>
+        'value' => '<p>Use these tools to manage "Disclaimers" for an event or event type.</p>
 ',
         'format' => 'full_html',
       ),
@@ -1061,7 +1209,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '4840e21c-6ce8-4fb7-84cb-fa178e20b95b',
 );
   $nodes[] = array(
-  'title' => 'sirius/admin/do_not_disturb',
+  'title' => 'Do Not Disturb',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -1341,7 +1489,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'Dispatch - Dispatch - SMS',
+  'title' => 'Dispatch - SMS',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -1434,7 +1582,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'node/%/sirius_event_clone/exim',
+  'title' => 'Event - Export / Import',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -1526,13 +1674,13 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'Create a Job - begin here',
+  'title' => 'Dispatch - Create a Job',
   'log' => '',
   'status' => 1,
   'comment' => 0,
   'promote' => 0,
   'sticky' => 0,
-  'ds_switch' => '',
+  'ds_switch' => 'default',
   'type' => 'sirius_help',
   'language' => 'en',
   'created' => 1604083463,
@@ -1616,7 +1764,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '4840e21c-6ce8-4fb7-84cb-fa178e20b95b',
 );
   $nodes[] = array(
-  'title' => 'sirius/config/phone/twilio/amd',
+  'title' => 'Phone - Answering Machine Detection',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -1890,7 +2038,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'admin/config/content/geofield_map',
+  'title' => 'Mapping',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -1903,20 +2051,7 @@ function grievance_content_types_uuid_features_default_content() {
   'tnid' => 0,
   'translate' => 0,
   'uuid' => '7db5a52f-7c87-4c83-817f-48c888416958',
-  'body' => array(),
-  'field_sirius_paths' => array(
-    'und' => array(
-      0 => array(
-        'value' => 'admin/config/content/geofield_map',
-        'format' => NULL,
-      ),
-      1 => array(
-        'value' => 'admin/config/content/geocoder',
-        'format' => NULL,
-      ),
-    ),
-  ),
-  'field_sirius_summary' => array(
+  'body' => array(
     'und' => array(
       0 => array(
         'value' => '<p>There are a number of steps required to configure geocoding and mapping for Sirius.&nbsp;</p>
@@ -1935,8 +2070,29 @@ function grievance_content_types_uuid_features_default_content() {
 	<li>Go to the "components" page of any domain that should have mapping enabled, and enable the mapping component.</li>
 	<li>Within that domain, create a new contact or edit an existing one. Ensure that when viewing the contact, a map of their address appears.</li>
 </ol>
-
-<p>&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'admin/config/content/geofield_map',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'admin/config/content/geocoder',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use these pages to configure the mapping interface for Sirius.</p>
 ',
         'format' => 'full_html',
       ),
@@ -2091,7 +2247,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'sirius/twilio/network-test',
+  'title' => 'Phone - Network Test',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -2279,7 +2435,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'node/%/sirius_event_clone',
+  'title' => 'Event - Clone',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -2573,7 +2729,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'sirius/dispatch/config/view',
+  'title' => 'Dispatch - Configuration - Display',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -2663,7 +2819,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'node/%/sirius_bulk_body',
+  'title' => 'Bulk Message - Body',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -2773,7 +2929,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'taxonomy/term/%/sirius_member_status_tos',
+  'title' => 'Worker - Member Status Notifications',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -2967,7 +3123,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'sirius/bulk/config',
+  'title' => 'Bulk Messaging - Configuration',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -3057,7 +3213,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'node/%/sirius_ledger_account_ar',
+  'title' => 'Ledger - Account A/R',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -3147,7 +3303,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'sirius/dispatch/job/stub',
+  'title' => 'Dispatch - Configuration - Stub Jobs',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -3239,7 +3395,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'node/%/sirius_payperiod_ledger_test',
+  'title' => 'Ledger - Payperiod Test',
   'log' => '',
   'status' => 1,
   'comment' => 0,
