@@ -155,6 +155,15 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius worker admin'),
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_grievances'] = array(
+    'title' => 'Grievances',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_grievances',
+    'permissions' => array('grievance view'),
+    'file' => 'sirius_worker.page_grievances.inc',
+  );
+
+  sirius_node_tab_set_module('sirius_worker', $node_tabs);
 	return $node_tabs;
 }
 
