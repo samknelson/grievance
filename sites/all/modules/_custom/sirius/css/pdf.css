@@ -1,0 +1,21 @@
+/*
+ * Genric CSS settings for generated PDFs
+ */
+
+.sirius_pdf_body table.sirius_data_table, 
+.sirius_pdf_body table.sirius_data_table tr,
+.sirius_pdf_body table.sirius_data_table td {
+	border: 1px solid #666666;
+	border-collapse: collapse;
+}
+
+.sirius_pdf_body table.sirius_data_table td {
+	padding: 5px;
+	margin: 0;
+}
+
+.sirius_pdf_body table.sirius_data_table th {
+	color: #000000;
+	font-weight: bold;
+	text-align: center;
+}

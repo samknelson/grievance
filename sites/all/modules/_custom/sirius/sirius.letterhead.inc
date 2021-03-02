@@ -1,8 +1,18 @@
 <?php
 
 function sirius_letterhead_list() {
-	$sql = "select nid, title from node where type = 'sirius_letterhead' order by title ";
-	$stmt = db_query($sql, array());
+	$domain_nid = sirius_domain_nid();
+	$sql_args = array();
+	$sql = "select nid, title ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "where type = 'sirius_letterhead' ";
+	if ($domain_nid) { 
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	}
+	$sql .= "order by title ";
+	$stmt = sirius_sql_query($sql, $sql_args);
 	$results = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		$results[$hr['nid']] = $hr['title'];

@@ -208,3 +208,51 @@ function sirius_contact_can_delete($contact_node) {
 
 	return array('success' => TRUE);
 }
+
+function sirius_contact_autocomplete($string, $s2 = NULL, $s3 = NULL, $s4 = NULL) {
+	// If the string has a slash, it's not passed by the autocomplete function.
+	// See https://www.drupal.org/project/drupal/issues/93854
+	// So we use this monstrosity.
+	if (isset($s2)) { $string .= "/$s2"; }
+	if (isset($s3)) { $string .= "/$s3"; }
+	if (isset($s4)) { $string .= "/$s4"; }
+
+  $matches = array();
+	if (strlen($string) < 3) { 
+		drupal_json_output($matches);
+		return;
+	}
+
+	$domain_nid = sirius_domain_nid();
+	$sql_args = array();
+	$sql_args[':match'] = '%' . $string . '%';
+	$sql = "select nid, title from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_contact' ";
+	if ($domain_nid) {
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	}
+	$sql .= "and title like :match ";
+	$sql .= "order by title limit 10 ";
+	$stmt = sirius_sql_query($sql, $sql_args);
+	while ($hr = $stmt->fetchAssoc()) {
+		$label = check_plain($hr['title']) . ' (' . $hr['nid'] . ')';
+		$matches[$label] = $hr['title'];
+	}
+  drupal_json_output($matches);
+}
+
+function sirius_contact_entity_add($entity_node, $contact_nid, $type_tids) {
+	$entity_json = sirius_jsonfield_util_node_json_get($entity_node);
+	$entity_json['contacts'][$contact_nid]['type_tids'] = $type_tids;
+	sirius_jsonfield_util_node_json_set($entity_node, $entity_json);
+	node_save($entity_node);
+}
+
+function sirius_contact_entity_remove($entity_node, $contact_nid) {
+	$entity_json = sirius_jsonfield_util_node_json_get($entity_node);
+	unset($entity_json['contacts'][$contact_nid]); 
+	sirius_jsonfield_util_node_json_set($entity_node, $entity_json);
+	node_save($entity_node);
+}

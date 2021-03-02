@@ -146,9 +146,31 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 
 	$tokens = array('node' => $entity_node);
 	$tokens['other_tokens']['delivery_tid'] = $data['tokens']['delivery'];
-	$subject = token_replace($subject, $tokens, array('clear' => TRUE));
-	$body = token_replace($body, $tokens, array('clear' => TRUE));
-	$pdf_body = token_replace($pdf_body, $tokens, array('clear' => TRUE));
+
+	$aliases = array();
+
+	if ($entity_node->type == 'sirius_log') {
+		if ($entity_node->field_sirius_log_handler['und']) {
+			$deltas = array();
+			foreach ($entity_node->field_sirius_log_handler['und'] as $tmp) {
+				$handler_node = node_load($tmp['target_id']);
+				$type = $handler_node->type;
+				$delta = $deltas[$type];
+				if (!$delta) { $delta = 0; }
+				++$deltas[$type];
+				$alias = "${type}_${delta}_node";
+				$aliases[$alias] = 'node';
+				$tokens[$alias] = $handler_node;
+			}
+		}
+	}
+	$tokens['my_node'] = $entity_node;
+
+	$aliases['my_node'] = 'node';
+
+	$subject = token_replace($subject, $tokens, array('clear' => TRUE, 'aliases' => $aliases));
+	$body = token_replace($body, $tokens, array('clear' => TRUE, 'aliases' => $aliases));
+	$pdf_body = token_replace($pdf_body, $tokens, array('clear' => TRUE, 'aliases' => $aliases));
 	$data['subject'] = $subject;
 	$data['body'] = $body;
 	$data['pdf_body'] = $pdf_body;

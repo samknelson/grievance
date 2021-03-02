@@ -1,8 +1,11 @@
 <?php
 
 function sirius_page_voice_forward_to_operator() {
+  $hours = $_REQUEST['hours'];
+  if (!$hours) { $hours = 4; }
+
   if (variable_get('sirius_voice_forward_to_operator_status', 'open') == 'open') {
-	  $html = '<h2>Calls forwarded to operator in the last 4 hours (max 50)</h2>';
+	  $html = '<h2>' . t('Calls forwarded to operator in the last @hours hours (max 50)', array('@hours' => $hours)) . '</h2>';
    } else {
     $html = '<h2>The Office Is Closed</h2>';
     $which = variable_get('sirius_voice_forward_to_operator_disabled_which', 1);
@@ -11,8 +14,6 @@ function sirius_page_voice_forward_to_operator() {
    }
 
   // Find any recent forwarded calls
-  $hours = $_REQUEST['hours'];
-  if (!$hours) { $hours = 4; }
   $cutoff = strtotime("-$hours hours");
 	$query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
@@ -29,6 +30,24 @@ function sirius_page_voice_forward_to_operator() {
   }
   $log_nids = array_keys($stmt['node']);
   $log_nodes = node_load_multiple($log_nids);
+
+  foreach ($log_nodes as $log_nid => $log_node) {
+    $call_sid = sirius_twilio_get_call_sid_from_node($log_node);
+    if ($call_sid) {
+      $result = sirius_twilio_call_fetch($call_sid);
+      if ($result['success']) {
+        $call = $result['call'];
+        drupal_set_message("Call: $call_sid");
+        dpm($call->toArray());
+      }
+      if ($result['recording']) {
+        $recording = $result['recording'];
+        drupal_set_message("Recording: ");
+        dpm($recording->toArray());
+      }
+    }
+  }
+
   foreach ($log_nodes as $log_nid => $log_node) {
   	$json = json_decode($log_node->field_sirius_json['und'][0]['value'], TRUE);
   	$from = sirius_phone_format($json['context']['from']);
@@ -76,7 +95,7 @@ function sirius_page_voice_forward_to_operator() {
 		  	foreach ($worker_nodes as $worker_nid => $worker_node) {
           $count++;
           if ($count > 1) { $html .= '<hr>'; }
-          $html .= '<div style="float: left; width: 275px;">';
+          $html .= '<div style="float: left; width: 275px; min-height: 165px;">';
           $html .= sirius_dispatch_view_render_field($worker_node, 'field_sirius_headshot');
           $html .= '</div>';
           $html .= date('Y-m-d h:i A', $log_node->created) . ' / ';

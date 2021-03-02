@@ -17,29 +17,114 @@ function sirius_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
-  $node_tabs['sirius_event']['sirius_event_materials'] = array(
-    'title' => 'Materials',
+  $content_types = array('sirius_event', 'sirius_worker', 'grievance_shop', 'sirius_ledger_account');
+  foreach ($content_types as $content_type) {
+    $node_tabs[$content_type][$content_type . '_materials'] = array(
+      'title' => 'Materials',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_materials',
+      'permissions' => array('sirius'),
+      'weight' => 20,
+    );
+  }
+
+  $content_types = array('sirius_json_definition');
+  foreach ($content_types as $content_type) {
+    $node_tabs[$content_type][$content_type . '_machine_name'] = array(
+      'title' => 'Machine Name',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_machine_name',
+      'permissions' => array('sirius domain admin'),
+      'weight' => 20,
+      'file' => 'sirius.page_entity_machine_name.inc',
+    );
+  }
+
+  $entity_contact_files = array('sirius.page_entity_contacts_list.inc', 'sirius.page_entity_contacts_add_existing.inc', 'sirius.page_entity_contacts_add_new.inc');
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_contacts'] = array(
+    'title' => 'Contacts',
     'description' => '',
-    'callback' => 'sirius_node_tab_entity_materials',
-    'permissions' => array('sirius'),
-    'weight' => 20,
+    'callback' => 'sirius_node_tab_entity_contacts_list',
+    'permissions' => array('sirius domain admin'),
+    'file' => $entity_contact_files,
+    'weight' => 5,
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_materials'] = array(
-    'title' => 'Materials',
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_contacts/list'] = array(
+    'title' => 'List',
     'description' => '',
-    'callback' => 'sirius_node_tab_entity_materials',
-    'permissions' => array('sirius'),
-    'weight' => 20,
+    'callback' => 'sirius_node_tab_entity_contacts_list',
+    'permissions' => array('sirius domain admin'),
+    'file' => $entity_contact_files,
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
-  $node_tabs['grievance_shop']['grievance_shop_materials'] = array(
-    'title' => 'Materials',
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_contacts/add-existing'] = array(
+    'title' => 'Add Existing Contact',
     'description' => '',
-    'callback' => 'sirius_node_tab_entity_materials',
-    'permissions' => array('sirius'),
-    'weight' => 20,
+    'callback' => 'sirius_node_tab_entity_contacts_add_existing',
+    'permissions' => array('sirius domain admin'),
+    'file' => $entity_contact_files,
+    'weight' => 5,
+    'type' => MENU_LOCAL_TASK,
   );
+
+  $node_tabs['sirius_ledger_account']['sirius_ledger_account_contacts/add-new'] = array(
+    'title' => 'Create New Contact',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_contacts_add_new',
+    'permissions' => array('sirius domain admin'),
+    'file' => $entity_contact_files,
+    'weight' => 5,
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $content_types = array('sirius_log');
+  foreach ($content_types as $content_type) {
+    $node_tabs[$content_type][$content_type . '_signatures'] = array(
+      'title' => 'Signatures',
+      'callback' => 'sirius_node_tab_entity_signatures',
+      'permissions' => array('sirius domain admin'),
+      'file' => 'sirius.page_entity_signatures.inc',
+      'weight' => 5,
+    );
+  }
+
+  $customfield_files = array(
+    'sirius.page_entity_customfield.inc', 
+    'sirius.page_entity_customfield_settings.inc', 
+  );
+  foreach (array('sirius_event', 'sirius_ledger_account') as $content_type) {
+    $node_tabs[$content_type][$content_type . '_customfield'] = array(
+      'title' => 'Custom Fields',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_customfield',
+      'permissions' => array('sirius'),
+      'weight' => 20,
+      'file' => $customfield_files,
+    );
+
+    $node_tabs[$content_type][$content_type . '_customfield/edit'] = array(
+      'title' => 'Edit',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_customfield',
+      'permissions' => array('sirius'),
+      'weight' => 1,
+      'file' => $customfield_files,
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    );
+
+    $node_tabs[$content_type][$content_type . '_customfield/settings'] = array(
+      'title' => 'Settings',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_customfield_settings',
+      'permissions' => array('sirius event admin'),
+      'weight' => 1,
+      'file' => $customfield_files,
+      'type' => MENU_LOCAL_TASK,
+    );
+  }
 
   // 
   // Entity Log
@@ -208,14 +293,17 @@ function sirius_node_tabs() {
     'weight' => 1,
   );
 
-  $node_tabs['sirius_log']['sirius_log_json'] = array(
-    'title' => 'Details',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_json',
-    'permissions' => array('sirius domain admin'),
-    'weight' => 3,
-    'file' => 'sirius.page_entity_json.inc',
-  );
+  $content_types = array('sirius_log', 'sirius_letterhead');
+  foreach ($content_types as $content_type) {
+    $node_tabs[$content_type][$content_type . '_json'] = array(
+      'title' => 'JSON',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_json',
+      'permissions' => array('sirius admin'),
+      'weight' => 999,
+      'file' => 'sirius.page_entity_json.inc',
+    );
+  }
 
   sirius_node_tab_set_module('sirius', $node_tabs);
   return $node_tabs;
@@ -990,6 +1078,14 @@ function sirius_menu() {
     'file' => 'sirius.page_customfield_definitions.inc',
   );
 
+  $items['sirius/esignature/admin'] = array(
+    'title' => 'eSignature Settings',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_esignature_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
 
   $items['sirius/esignature/test'] = array(
     'title' => 'Sirius eSignature Test',
@@ -1011,7 +1107,7 @@ function sirius_menu() {
     'title' => 'Sirius eSignature Stream',
     'page callback' => 'sirius_esignature_stream',
     'page arguments' => array(3,4),
-    'access arguments' => array('sirius'),
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   ); 
 
@@ -1050,6 +1146,16 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['user/%/esig'] = array(
+    'title' => 'Signature Preferences',
+    'page callback' => 'sirius_user_tab_esignature',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_user_tab_esignature_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 8,
+  );
+
   $items['user/%/current_location'] = array(
     'title' => 'Current Location',
     'page callback' => 'sirius_user_tab_map_current_location',
@@ -1067,7 +1173,12 @@ function sirius_menu() {
     'type'             => MENU_CALLBACK,
   );
 
-
+  $items['sirius/ajax/contact-autocomplete'] = array(
+    'page callback' => 'sirius_contact_autocomplete',
+    'page arguments' => array(),
+    'access arguments' => array('sirius'),
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 }
