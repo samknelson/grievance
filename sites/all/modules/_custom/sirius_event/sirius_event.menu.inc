@@ -613,6 +613,15 @@ function sirius_event_term_tabs() {
     'weight' => 6,
   );
 
+  $term_tabs['sirius_event_type']['sirius_event_type_customfield'] = array(
+    'title' => 'Custom Fields',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_customfield',
+    'permissions' => array('sirius event admin'),
+    'weight' => 1,
+    'file' => array('sirius_event.term_tab_customfield.inc'),
+  );
+
   $term_tabs['sirius_event_participant_status']['sirius_event_pstatus'] = array(
     'title' => 'Settings',
     'description' => '',

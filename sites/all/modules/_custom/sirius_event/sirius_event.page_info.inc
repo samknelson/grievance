@@ -74,7 +74,7 @@ function sirius_node_tab_event_mypstatus_form($form, &$form_state, $event_node, 
   $counts = sirius_event_section_counts($event_node);
   $options_attributes = array();
   $options = sirius_event_section_options($event_node, $counts, $options_attributes);
-  if ($options && !$participant_json['section']['uuid']) {
+  if (sirius_event_section_enabled($event_node) && !$participant_json['section']['uuid']) {
     unset($options_attributes[$participant_json['section']['uuid']]);
     $form['section']['uuid'] = array(
       '#type' => 'select',

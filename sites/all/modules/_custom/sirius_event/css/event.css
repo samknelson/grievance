@@ -31,3 +31,7 @@
 	padding: 0;
 }
 
+#content .columns_table td h2 {
+	margin-top: 0;
+	padding-top: 0;
+}
