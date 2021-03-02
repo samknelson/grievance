@@ -83,8 +83,12 @@ div.region-help {
 }
 
 .banner-wrapper .inner {
+	/*
   margin-left: 36px;
   margin-right: 36px;
+  */
+  margin: 0;
+  padding: 0;
 }
 
 .banner-menu-outer-wrapper {
@@ -137,14 +141,16 @@ div.region-help {
 
 @media only print {
 	.banner-name-wrapper {
-		font-size:20px;
+		font-size:12px;
 		color: #000000;
-		letter-spacing: 0px;
-		text-transform: none;
+		font-weight: bolt;
 		float: none;
 		width: 100%;
-		text-align: center;
+		text-align: left;
 		display: block;
+		margin-bottom: 10px;
+		padding-bottom: 10px;
+		border-bottom: 2px solid #666666;
 	}
 	img.banner-logo:visited,
 	img.banner-logo:active,
@@ -164,10 +170,11 @@ div.region-help {
 	    border: none;
 	}
 	.banner-logo-wrapper {
-		float: none;
-		width: 100%;
+		float: left;
+		max-height: 100px;
 		text-align: center;
 		display: block; 
+		display: none;
 	}
 	#page-banner {
 		height: auto;
@@ -184,8 +191,8 @@ div.region-help {
 	    margin: 0px;
 	}
 	#header {
-	    margin: 24px 0 24px 0;
-	    padding: 0px 0 24px 0;
+	    margin: 0;
+	    padding: 0;
 	}
 	#toolbar {
 		display: none;

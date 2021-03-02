@@ -1032,6 +1032,9 @@ td div.description,
   padding: 4px 0;
   color: #666;
 }
+.form-item .description p {
+  margin: 0;
+}
 #user-admin-settings fieldset .fieldset-description {
   font-size: 1em;
   padding-bottom: 5px;
@@ -3281,7 +3284,10 @@ table.grievance-timeline tr.pending {
   #admin-menu-wrapper,
   .block-superfish,
   .block-grievance-timeleft,
-  div.views-exposed-form {
+  div.views-exposed-form,
+  .view-id-grievances .view-header,
+  .view-id-grievances .view-filters,
+  .view-id-grievances .attachment-before {
     display: none;
   }
 
@@ -3292,8 +3298,8 @@ table.grievance-timeline tr.pending {
   #header {
     background-color: #ffffff;
     border-bottom: none;
-    margin: 28px 0 28px 0;
   }
+
   #page-banner {
 
   }
@@ -4157,6 +4163,10 @@ table.sirius_data_table td {
 table.sirius_data_table th {
   padding: 5px;
   vertical-align: top;
+}
+
+table.sirius_data_table td div.form-item {
+  margin: 0;
 }
 
 body.cke_editable_themed {
