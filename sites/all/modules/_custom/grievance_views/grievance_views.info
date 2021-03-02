@@ -97,6 +97,7 @@ features[views_view][] = sirius_taxonomy
 features[views_view][] = sirius_twilio_sms_conversations
 features[views_view][] = sirius_work_status
 features[views_view][] = sirius_worker_dispatches
+features[views_view][] = sirius_worker_grievances
 features[views_view][] = sirius_workers
 features[views_view][] = worker_skills
 features_exclude[dependencies][ctools] = ctools
