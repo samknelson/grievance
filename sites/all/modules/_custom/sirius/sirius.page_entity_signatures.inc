@@ -13,7 +13,9 @@ function sirius_node_tab_entity_signatures_defs_form($form, &$form_state, $entit
 	$defs = sirius_esignature_defs();
 	if (!$defs) {
 		$form['intro'] = array('#markup' => '<p>' . t('There are no signatures configured. Go to the ') . l('configuration page', 'sirius/esignature/admin') . t(' to create them.') . '</p>');
+		return $form;
 	}
+	$options = array();
 	foreach ($defs as $def) {
 		$options[$def['code']] = $def['title'];
 	}
