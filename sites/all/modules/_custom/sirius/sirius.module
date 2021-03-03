@@ -349,6 +349,12 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'sirius_domain_users') {
     sirius_domain_users_view_form_alter($form, $form_state); 
   }
+
+  // Log some searches. @todo this should be a general-purpose thing, not a harcoded view name
+  if ($form_id == 'views_exposed_form') {
+    sirius_log_views_exposed_form_alter($form, $form_state); 
+  }
+
 }
 
 /**
