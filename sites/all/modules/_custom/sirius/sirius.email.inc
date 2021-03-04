@@ -103,7 +103,15 @@ function sirius_email_admin() {
     '#default_value' => variable_get("sirius_ses_configuration_set", ''),
   );
 
+  $form['#submit'][] = 'sirius_email_admin_submit';
+
   return system_settings_form($form);
+}
+
+function sirius_email_admin_submit($form, &$form_state) {
+  foreach (array('site_mail', 'mimemail_mail', 'smtp_from') as $variable) {
+    variable_set($variable, $form_state['values']['sirius_email_default_from_address']);
+  }
 }
 
 function sirius_email_format($email) {

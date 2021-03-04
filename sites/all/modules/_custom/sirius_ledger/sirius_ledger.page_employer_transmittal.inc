@@ -1,17 +1,5 @@
 <?php
 
-function sirius_ledger_node_tab_employer_transmittal_access($employer_node) {
-	return TRUE;
-}
-
-/*
-function sirius_ledger_node_tab_employer_transmittal_quicknav($employer_node) {
-	$links = array();
-	$links['enter'] = array('path' => 'node/' . $employer_node->nid . '/sirius_employer_ledger/transmittal', 'title' => 'List');
-	$links['print'] = array('path' => 'node/' . $employer_node->nid . '/sirius_employer_ledger/transmittal/print', 'title' => 'Print');
-	return sirius_quicknav($links);
-}
-*/
 function sirius_ledger_node_tab_employer_transmittal($employer_node) {
 	$domain_nid = sirius_domain_nid();
 
@@ -368,7 +356,6 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form_validate($form
 		}
 	}
 }
-
 
 function sirius_ledger_node_tab_employer_transmittal_addedit_form_submit($form, &$form_state) {
 	$employer_node = node_load($form_state['employer_nid']);

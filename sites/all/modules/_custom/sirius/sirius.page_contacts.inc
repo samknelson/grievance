@@ -18,10 +18,10 @@ function sirius_page_contacts_form($form, &$form_state) {
 			'sirius_worker' => array('default' => array()),
 		),
 		array(
-			'search' => array('title' => 'Search'),
 			'export' => array('title' => 'Export'),
 			'report' => array('title' => 'Report'),
-			'tag' => array('title' => 'Add / Remove Tags'),
+			'tag_add' => array('title' => 'Add a Tag'),
+			'tag_remove' => array('title' => 'Remove a Tag'),
 			'geocode' => array('title' => 'Geocode'),
 			'delete' => array('title' => 'Delete'),
 		)

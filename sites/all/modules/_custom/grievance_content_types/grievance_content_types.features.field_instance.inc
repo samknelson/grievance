@@ -371,7 +371,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 1,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 8,
@@ -549,7 +548,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 9,
@@ -3683,7 +3681,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => 0,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 43,
@@ -5200,7 +5197,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'date',
         'settings' => array(
           'custom_date_format' => '',
@@ -5211,7 +5208,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 60,
@@ -5449,7 +5445,7 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'date',
         'settings' => array(
           'custom_date_format' => '',
@@ -5460,7 +5456,6 @@ function grievance_content_types_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 59,
@@ -7085,13 +7080,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 71,
       ),
       'grievance_arbitrationform' => array(
@@ -7159,11 +7149,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 72,
       ),
       'grievance_arbitrationform' => array(
@@ -14491,11 +14478,11 @@ function grievance_content_types_field_default_field_instances() {
         'default_country' => 'site_default',
         'format_handlers' => array(
           'address' => 'address',
+          'address-hide-country' => 'address-hide-country',
           'address-hide-postal-code' => 0,
           'address-hide-street' => 0,
           'address-hide-administrative-area' => 0,
           'address-hide-locality' => 0,
-          'address-hide-country' => 0,
           'organisation' => 0,
           'name-full' => 0,
           'name-oneline' => 0,
@@ -19540,7 +19527,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -19582,12 +19569,9 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'list',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'list_default',
-        'weight' => 3,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19732,14 +19716,9 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => 1,
-          'field_delimiter' => '',
-          'link' => 0,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 4,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19827,7 +19806,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19862,14 +19841,9 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 2,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -21081,13 +21055,13 @@ If the file has multiple pages, then each page in the input document will use th
 (For example, if a two-page letterhead is uploaded, then the first page of the letterhead will be used as the first page of the generated document, and the second page will be repeated as many times as necessary.)',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'file',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'file_default',
-        'weight' => 2,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -21141,6 +21115,50 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'node-sirius_letterhead-field_sirius_domain'.
+  $field_instances['node-sirius_letterhead-field_sirius_domain'] = array(
+    'bundle' => 'sirius_letterhead',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'field_delimiter' => '',
+          'link' => 0,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Domain',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 5,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_letterhead-field_sirius_json'.
   $field_instances['node-sirius_letterhead-field_sirius_json'] = array(
     'bundle' => 'sirius_letterhead',
@@ -21150,12 +21168,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
-        'weight' => 1,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -29655,7 +29670,7 @@ If the file has multiple pages, then each page in the input document will use th
         'active_updating' => 1,
         'file_name' => array(
           'options' => array(
-            'pathauto' => 0,
+            'pathauto' => FALSE,
             'slashes' => 0,
             'transliterate' => 0,
           ),
@@ -29663,7 +29678,7 @@ If the file has multiple pages, then each page in the input document will use th
         ),
         'file_path' => array(
           'options' => array(
-            'pathauto' => 0,
+            'pathauto' => FALSE,
             'slashes' => 0,
             'transliterate' => 0,
           ),
@@ -29686,10 +29701,10 @@ If the file has multiple pages, then each page in the input document will use th
         'collapsible' => 1,
         'croparea' => '1000x1000',
         'enforce_minimum' => 0,
-        'enforce_ratio' => 0,
+        'enforce_ratio' => 1,
         'preview_image_style' => 'thumbnail',
         'progress_indicator' => 'throbber',
-        'resolution' => '',
+        'resolution' => '1000x200',
       ),
       'type' => 'imagefield_crop_widget',
       'weight' => 13,

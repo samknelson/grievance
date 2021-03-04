@@ -320,17 +320,15 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 	$count = $form_state['results']['count'];
 	$count_total = $form_state['results']['count_total'];
 
+	$action_info_all = sirius_mgihtysearch_action_info_all();
 	$action_options = array(NULL => t('Search'));
-	if ($actions['register']) 					{ $action_options['register'] = $actions['register']['title']; }
-	if ($actions['export']) 						{ $action_options['export'] = $actions['export']['title']; }
-	if ($actions['tag']) 								{ $action_options['tag_add'] = 'Add Tag'; $action_options['tag_remove'] = 'Remove Tag'; }
-	if ($actions['bulk_recipient_add']) { $action_options['bulk_recipient_add'] = $actions['bulk_recipient_add']['title']; }
-	if ($actions['bulk_recipient_remove']) { $action_options['bulk_recipient_remove'] = $actions['bulk_recipient_remove']['title']; }
-	if ($actions['delete']) 						{ $action_options['delete'] = $actions['delete']['title']; }
-	if ($actions['delete_participant']) { $action_options['delete_participant'] = $actions['delete_participant']['title']; }
-	if ($actions['report']) 						{ $action_options['report'] = $actions['report']['title']; }
-	if ($actions['geocode']) 						{ $action_options['geocode'] = $actions['geocode']['title']; }
-	if (user_access('sirius admin')) 		{ $action_options['sql'] = 'Display SQL Query'; }
+	$selectall = FALSE;
+	foreach ($action_info_all as $key => $action_info) {
+		if (!$action_info['universal'] && !$actions[$key]) { continue; }
+		if ($action_info['permission'] && !user_access($action_info['permission'])) { continue; }
+		$action_options[$key] = $action_info['title'];
+		if ($action_info['selectall']) { $selectall = TRUE; }
+	}
 
 	$form['mightysearch_results']['action'] = array(
 		'#type' => 'select',
@@ -341,16 +339,19 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 
 	// @todo: Actions should be callbacks
 
-	if ($action_options['register']) {
-		$pstatus_options = $actions['register']['pstatus_options'];
-		if (!$pstatus_options) { drupal_set_message("No participant status options for this role. Registration is not possible.", 'error'); }
-		else {
-			$form['mightysearch_results']['pstatus_tid'] = array(
-				'#title' => 'Register With Status',
-				'#options' => $pstatus_options,
-				'#type' => 'select',
-				'#states' => array('visible' => array(array(":input[name=\"mightysearch_results[action]\"]" => array('value' => 'register')))),
-			);
+	// @todo: this is clumsy
+	foreach (array('register', 'change_pstatus') as $a) {
+		if ($action_options[$a]) {
+			$pstatus_options = $actions[$a]['pstatus_options'];
+			if (!$pstatus_options) { drupal_set_message("No participant status options for this role. " . $action_info_all[$a]['title'] . " is not possible.", 'error'); }
+			else {
+				$form['mightysearch_results']['pstatus_tid'] = array(
+					'#title' => 'Participant Status',
+					'#options' => $pstatus_options,
+					'#type' => 'select',
+					'#states' => array('visible' => array(array(":input[name=\"mightysearch_results[action]\"]" => array('value' => $a)))),
+				);
+			}
 		}
 	}
 
@@ -388,27 +389,25 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		}
 	}
 
-	if ($action_options['register'] || $action_options['tag_add'] || $action_options['tag_remove'] || $action_options['delete'] || $action_options['delete_participant'] || $action_options['bulk_recipient_add'] || $action_options['bulk_recipient_remove'] || $action_options['geocode']) {
-		if ($count_total > $count) {
-			$form['mightysearch_results']['results_select_allxyz'] = array(
-				'#type' => 'checkbox', 
-				'#title' => t("Apply to ALL matching contacts, including any not listed below."),
-				'#states' => array(
-					'visible' => array(
-						":input[name=\"mightysearch_results[action]\"]" => array(
-							array('value' => 'register'), 
-							array('value' => 'tag_add'), 
-							array('value' => 'tag_remove'),
-							array('value' => 'delete'),
-							array('value' => 'delete_participant'),
-							array('value' => 'bulk_recipient_add'),
-							array('value' => 'bulk_recipient_remove'),
-							array('value' => 'geocode'),
-						),
+	if ($selectall && ($count_total > $count)) {
+		$form['mightysearch_results']['results_select_allxyz'] = array(
+			'#type' => 'checkbox', 
+			'#title' => t("Apply to ALL matching contacts, including any not listed below."),
+			'#states' => array(
+				'visible' => array(
+					":input[name=\"mightysearch_results[action]\"]" => array(
+						array('value' => 'register'), 
+						array('value' => 'tag_add'), 
+						array('value' => 'tag_remove'),
+						array('value' => 'delete'),
+						array('value' => 'delete_participant'),
+						array('value' => 'bulk_recipient_add'),
+						array('value' => 'bulk_recipient_remove'),
+						array('value' => 'geocode'),
 					),
 				),
-			);
-		}
+			),
+		);
 	}
 
 	if ($action_options['export']) {
@@ -831,6 +830,9 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	// Search
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	$action_info_all = sirius_mgihtysearch_action_info_all();
+	$action_info = $action_info_all[$action];
+
 	if ($action == 'search') {
 		$sql = $sql_parts['select_fields'] . $sql_parts['joins'] . $sql_parts['where'] . $sql_parts['group'] . $sql_parts['limit']; 
 		$stmt = sirius_sql_query($sql, $sql_args);
@@ -981,7 +983,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	// Batch
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if ($action == 'register' || $action == 'tag_add' || $action == 'tag_remove' || $action == 'delete' || $action == 'delete_participant' || $action == 'bulk_recipient_add' || $action == 'bulk_recipient_remove' || $action == 'geocode') {
+	if ($action_info['batch']) {
 
 		if ($action == 'delete' && !$form_state['values']['mightysearch_results']['delete_confirm']) {
 			drupal_set_message("Please check the confirmation box.", 'error');
@@ -1103,54 +1105,70 @@ function sirius_mightysearch_batch($chunk, $params, &$context) {
 
 		// @todo: actions should be callbacks
 
-		if ($action_name == 'register') {
-			$prole_tid = $action['prole_tid'];
-			$pstatus_tid = $values['mightysearch_results']['pstatus_tid'];
-			$event_nid = $action['event_nid'];
-			$result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
-		}
+		try {
+			if ($action_name == 'register') {
+				$prole_tid = $action['prole_tid'];
+				$pstatus_tid = $values['mightysearch_results']['pstatus_tid'];
+				$event_nid = $action['event_nid'];
+				$result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
+			}
 
-		if ($action_name == 'tag_add' || $action_name == 'tag_remove') {
-			$tag_tid = $values['mightysearch_results']['tag_tid'];
-			$contact_node = node_load($contact_nid);
-			if ($action_name == 'tag_add') 	{ $result = sirius_contact_tag_add($contact_node, $tag_tid); }
- 			else 														{ $result = sirius_contact_tag_remove($contact_node, $tag_tid); }
-		}
+			if ($action_name == 'tag_add' || $action_name == 'tag_remove') {
+				$tag_tid = $values['mightysearch_results']['tag_tid'];
+				$contact_node = node_load($contact_nid);
+				if ($action_name == 'tag_add') 	{ $result = sirius_contact_tag_add($contact_node, $tag_tid); }
+	 			else 														{ $result = sirius_contact_tag_remove($contact_node, $tag_tid); }
+			}
 
-		if ($action_name == 'delete') {
-			node_delete($contact_nid);
-			$result = array('success' => TRUE, 'msg' => 'Contact deleted.');
-		}
-
-		if ($action_name == 'delete_participant') {
-			$result = sirius_event_participant_delete_from_contact($action['event_nid'], $contact_nid);
-		}
-
-		if ($action_name == 'bulk_recipient_add')  {
-			$bulk_nid = $action['bulk_nid'];
-			$result = sirius_bulk_recipient_add($bulk_nid, $contact_nid, $values['mightysearch_results']['bulk_recipient_add']);
-		}
-
-		if ($action_name == 'bulk_recipient_remove')  {
-			$bulk_nid = $action['bulk_nid'];
-			$result = sirius_bulk_recipient_remove($bulk_nid, $contact_nid);
-		}
-
-		if ($action_name == 'geocode') {
-			$contact_node = node_load($contact_nid);
-			if ($contact_node->field_sirius_address_geo['und'][0]['lat']) {
-				$result = array('success' => FALSE, 'msg' => 'Already geocoded.');
-			} else if (!$contact_node->field_sirius_address['und'][0]['thoroughfare']) {
-				$result = array('success' => FALSE, 'msg' => 'Address is incomplete.');
-			} else {
-				$contact_node->field_sirius_address['und'][0]['data']++;
-				node_save($contact_node);
-				if ($contact_node->field_sirius_address_geo['und'][0]['lat']) {
-					$result = array('success' => TRUE);
-				} else {
-					$result = array('success' => FALSE, 'msg' => 'Geocoding failed.');
+			if ($action_name == 'delete') {
+				try {
+					$result = sirius_node_careful_delete($contact_nid);
+				} catch (exception $e) { 
+					$result = array('success' => FALSE, 'msg' => 'Contact deletion failed: ' . $e->getMessage());
 				}
 			}
+
+			if ($action_name == 'delete_participant') {
+				$result = sirius_event_participant_delete_from_contact($action['event_nid'], $contact_nid);
+			}
+
+			if ($action_name == 'bulk_recipient_add')  {
+				$bulk_nid = $action['bulk_nid'];
+				$result = sirius_bulk_recipient_add($bulk_nid, $contact_nid, $values['mightysearch_results']['bulk_recipient_add']);
+			}
+
+			if ($action_name == 'bulk_recipient_remove')  {
+				$bulk_nid = $action['bulk_nid'];
+				$result = sirius_bulk_recipient_remove($bulk_nid, $contact_nid);
+			}
+
+			if ($action_name == 'geocode') {
+				$contact_node = node_load($contact_nid);
+				if ($contact_node->field_sirius_address_geo['und'][0]['lat']) {
+					$result = array('success' => FALSE, 'msg' => 'Already geocoded.');
+				} else if (!$contact_node->field_sirius_address['und'][0]['thoroughfare']) {
+					$result = array('success' => FALSE, 'msg' => 'Address is incomplete.');
+				} else {
+					$contact_node->field_sirius_address['und'][0]['data']++;
+					node_save($contact_node);
+					if ($contact_node->field_sirius_address_geo['und'][0]['lat']) {
+						$result = array('success' => TRUE);
+					} else {
+						$result = array('success' => FALSE, 'msg' => 'Geocoding failed.');
+					}
+				}
+			}
+
+			if ($action_name == 'change_pstatus') {
+				$prole_tid = $action['prole_tid'];
+				$pstatus_tid = $values['mightysearch_results']['pstatus_tid'];
+				$event_nid = $action['event_nid'];
+				$participant_nid = sirius_event_participant_nid_from_contact($event_nid, $contact_nid);
+				$participant_node = node_load($participant_nid);
+				$result = sirius_event_participant_pstatus_set($participant_node, $prole_tid, $pstatus_tid);
+			}
+		} catch (Exception $e) {
+			$result = array('success' => FALSE, 'msg' => 'Operation failed: ' . $e->getMessage());
 		}
 
 		if ($result['success']) {

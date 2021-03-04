@@ -67,6 +67,25 @@ function sirius_tokens($type, $tokens, array $data = array(), array $options = a
     }
   }
 
+  if ($type == 'node') {
+    foreach ($tokens as $name => $original) {
+      list ($a, $b, $c, $d) = explode(':', $name);
+      if ($a == 'sirius' && $b == 'esignature') {
+        $which = $c;
+        $format = $d;
+        $json = sirius_jsonfield_util_node_json_get($data['node']);
+        $esignature = sirius_jsonfield_util_esignature_get($json, $which);
+        $replacements[$original] = sirius_esignature_render($esignature, $format, $data['node']->nid, $which);
+      }
+
+      if ($a == 'sirius' && $b == 'customfield') {
+        $machine_name = $c;
+        $path = preg_replace("/^$a:$b:$c/", '', $name);
+        $replacements[$original] = sirius_customfield_value($data['node'], $machine_name, $path);
+      }
+    }
+  }
+
   return $replacements;
 }
 

@@ -130,3 +130,36 @@ function sirius_log_render_form($param1, $param2 = NULL) {
 
   return $form;
 }
+
+function sirius_log_views_exposed_form_alter(&$form, &$form_state) {
+  if (isset($form_state['view']) && $form_state['view']->name == 'sirius_provider_worker_lookup') {
+    $form['#submit'][] = 'sirius_log_views_exposed_form_track';
+  }
+}
+
+function sirius_log_views_exposed_form_track($form, &$form_state) {
+  $msg = '';
+  if ($form_state['values']) {
+    foreach ($form_state['values'] as $key => $value) {
+      if (!preg_match('/^field_/', $key)) { continue; }
+      if (!$value) { continue; }
+      if (is_object($value) || is_array($value)) { continue; }
+
+      $title = $key;
+      $title = preg_replace('/field_/', '', $title);
+      if ($msg) { $msg .= ', '; }
+      $msg .= "$title=$value";
+    }
+  }
+
+  sirius_log(
+    'views_exposed_form', 
+    $form_state['view']->name, 
+    $msg, 
+    NULL, 
+    NULL, 
+    array(), 
+    NULL,
+    $form_state['values']
+  );
+}

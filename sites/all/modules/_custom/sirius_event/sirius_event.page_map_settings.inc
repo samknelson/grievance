@@ -1,14 +1,15 @@
 <?php
 function sirius_node_tab_event_map_settings_access($event_node) {
-	// if (!sirius_node_tab_event_map_access($event_node)) { return FALSE; } 
+	if (!sirius_node_tab_event_map_access($event_node)) { return FALSE; } 
+	
 	if (user_access('sirius admin') || user_access('sirius domain admin') || user_access('sirius event admin')) { return TRUE; }
 
 	$participant_nid = sirius_event_participant_nid_from_user($event_node->nid);
 	if (!$participant_nid) { return FALSE; }
 	$participant_node = node_load($participant_nid);
 	$type_json = sirius_event_type_json($event_node);
-	$prole_tid = $participant_node->field_sirius_event_prole['und'][0]['tid'];
 	if (!$type_json['map']['admin_prole_tids']) { return FALSE; }
+	$prole_tid = $participant_node->field_sirius_event_prole['und'][0]['tid'];
 	$admin_prole_tids = array_values($type_json['map']['admin_prole_tids']);
 	if (!in_array($prole_tid, $admin_prole_tids)) { return FALSE; }
 
@@ -16,6 +17,7 @@ function sirius_node_tab_event_map_settings_access($event_node) {
 }
 
 function sirius_node_tab_event_map_settings($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	return drupal_get_form('sirius_node_tab_event_map_settings_form', $event_node->nid);
 }
 

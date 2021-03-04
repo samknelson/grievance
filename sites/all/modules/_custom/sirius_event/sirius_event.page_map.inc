@@ -3,7 +3,7 @@
 function sirius_node_tab_event_map_access($event_node) {
 	if (!sirius_event_map_enabled($event_node)) { return FALSE; } 
 
-	if (user_access('sirius admin') || user_access('sirius event admin')) { return TRUE; }
+	if (user_access('sirius admin') || user_access('sirius domain admin') || user_access('sirius event admin')) { return TRUE; }
 
 	$participant_nid = sirius_event_participant_nid_from_user($event_node->nid);
 	if (!$participant_nid) { return FALSE; }
@@ -19,6 +19,7 @@ function sirius_node_tab_event_map_access($event_node) {
 }
 
 function sirius_node_tab_event_map($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	$active = sirius_map_active($event_node);
 
 	if (!$active['success']) { drupal_set_message($active['msg']); }

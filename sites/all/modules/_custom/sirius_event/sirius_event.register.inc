@@ -42,7 +42,31 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
 	sirius_jsonfield_log($participant_node, 'registered', 'Participant registered.');
 	node_save($participant_node);
 
-	return array('success' => TRUE, 'msg' => 'Participant created.', 'nid' => $participant_node->nid);
+	$msg = "Participant created.";
+	if ($json['notification']['medium']) {
+		$contact_node = node_load($contact_nid);
+		$contact_email = $contact_node->field_sirius_email['und'][0]['value'];
+		$contact_phone = $contact_node->field_sirius_phone['und'][0]['value'];
+
+		if (in_array($json['notification']['medium'], array('sms', 'both')) && $contact_phone) {
+			$params = array();
+      $params['sms'] = $json['notification']['sms'];
+      $params['to'] = $contact_phone;
+      $result = sirius_sms_send($params);
+      if ($result['success']) { $msg .= " SMS sent to: $contact_phone."; } else { $msg .= " SMS to $contact_phone failed: " . $result['msg']; }
+    }
+
+		if (in_array($json['notification']['medium'], array('email', 'both')) && $contact_email) {
+			$params = array();
+      $params['body'] = $json['notification']['email_body'];
+      $params['subject'] = $json['notification']['email_subject'];
+      $params['to'] = $contact_email;
+      $result = sirius_email_send($params);
+      if ($result['success']) { $msg .= " Email sent to: $contact_email."; } else { $msg .= " Email to $contact_email failed: " . $result['msg']; }
+    }
+	}
+
+	return array('success' => TRUE, 'msg' => $msg, 'nid' => $participant_node->nid);
 }
 
 function sirius_event_participant_get($event_nid, $contact_nid) {

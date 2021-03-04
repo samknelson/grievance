@@ -14,10 +14,13 @@ function grievance_forward_loopback($node) {
 }
 
 function grievance_forward_loopback_access($node) {
+	return sirius_loopback_access();
+
 	if ($_SERVER['SERVER_ADDR'] == $_SERVER['REMOTE_ADDR'] ||
 		  $_SERVER['SERVER_ADDR'] == $_SERVER['HTTP_X_FORWARDED_FOR'] ||
 		  variable_get('grievance_loopback_ip', '') == $_SERVER['REMOTE_ADDR'] || 
 		  variable_get('grievance_loopback_ip', '') == $_SERVER['HTTP_X_FORWARDED_FOR'] ||
+		  '52.43.112.81' == $_SERVER['REMOTE_ADDR'] ||
 		  '35.161.76.142' == $_SERVER['REMOTE_ADDR'] ||
 		  '35.161.76.142' == $_SERVER['HTTP_X_FORWARDED_FOR']) {
 		return TRUE; 

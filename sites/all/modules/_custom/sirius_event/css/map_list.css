@@ -1,5 +1,5 @@
 .map_list_item {
-	width: 210px;
+	width: 220px;
 	float: left;
 	height: 90px;
 	border: 1px solid #cccccc;
@@ -23,12 +23,12 @@ a .map_list_item:hover {
 
 .map_list_item .icon_wrap {
 	float: left;
-	width: 30px;
+	width: 60px;
 }
 
 .map_list_item .body_wrap {
 	float: left;
-	width: 170px;
+	width: 150px;
 }
 
 .map_legend_item {

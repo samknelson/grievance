@@ -13,7 +13,7 @@ function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $ps
 
 	if ($prole_tid == $participant_node->field_sirius_event_prole['und'][0]['tid'] && 
 			$pstatus_tid == $participant_node->field_sirius_event_pstatus['und'][0]['tid']) {
-		// return array('success' => TRUE, 'msg' => 'No changes.');
+		return array('success' => TRUE, 'msg' => 'No changes.');
 	}
 
 	$participant_node->field_sirius_event_prole['und'][0]['tid'] = $prole_tid;
@@ -25,6 +25,7 @@ function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $ps
 	if (!$term_cache[$pstatus_tid]) { $term_cache[$pstatus_tid] = taxonomy_term_load($pstatus_tid); }
 	sirius_jsonfield_log($participant_node, 'status', "Set prole = " . $term_cache[$prole_tid]->name . ", pstatus = " . $term_cache[$pstatus_tid]->name);
 	node_save($participant_node);
+	return array('success' => TRUE, 'msg' => 'Participant status changed.');
 }
 
 /**
@@ -147,3 +148,15 @@ function sirius_event_participant_delete_from_contact($event_nid, $contact_nid) 
   return array('success' => TRUE, 'msg' => 'Participant record deleted.');
 }
 
+function sirius_event_participant_mypstatus_options($pstatus_json) {
+	if (!$pstatus_json['mypstatus']['options']) { return array(); }
+	$pstatus_tids = array_filter(array_values($pstatus_json['mypstatus']['options']));
+	if (!$pstatus_tids) { return array(); }
+	$sql = "select tid, name from taxonomy_term_data where tid in (:pstatus_tids) order by name";
+	$stmt = sirius_sql_query($sql, array(':pstatus_tids' => $pstatus_tids));
+	$options = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$options[$hr['tid']] = $hr['name'];
+	}
+	return $options;
+}

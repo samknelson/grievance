@@ -163,37 +163,6 @@ function sirius_sms_already_sent($id) {
   return FALSE;
 }
 
-function sirius_sms_admin() {
-
-  $name = sirius_domain_variable_name('sirius_sms_global_disable');
-  $form[$name] = array(
-    '#type' => 'select',
-    '#title' => t('Global Disable'),
-    '#options' => array(
-      'No' => t('No'),
-      'Yes' => t('Yes'),
-    ),
-    '#description' => t('Select "Yes" to globally disable SMS on this server.'),
-    '#default_value' => variable_get($name, ''),
-  );
-
-  $name = sirius_domain_variable_name('sirius_sms_global_disable_whitelist');
-  $form[$name] = array(
-    '#type' => 'textarea',
-    '#title' => t('Whitelist'),
-    '#description' => t('When global disable is on, use the whitelist to indicate which phone numbers <strong>can</strong> receive SMS. Phone numbers must be in the format (xxx) xxx-xxxx.'),
-    '#default_value' => variable_get($name, ''),
-    '#states' => array(
-      'visible' => array(
-        array(':input[name="sirius_sms_global_disable"]' => array('value' => 'Yes')),
-      )
-    ),
-  );
-
-  return system_settings_form($form);
-}
-
-
 function sirius_voice_send($params) {
   // Allow callers to set the X-Sirius-Id, and don't resent with the same ID. This allows callers to set unique keys.
   $id = $params['X-Sirius-Id'];
@@ -409,3 +378,33 @@ function sirius_sms_segment_count($html_id) {
 
   return $html;
 }
+
+function sirius_sms_admin() {
+  $name = sirius_domain_variable_name('sirius_sms_global_disable');
+  $form[$name] = array(
+    '#type' => 'select',
+    '#title' => t('Global Disable'),
+    '#options' => array(
+      'No' => t('No'),
+      'Yes' => t('Yes'),
+    ),
+    '#description' => t('Select "Yes" to globally disable SMS on this server.'),
+    '#default_value' => variable_get($name, ''),
+  );
+
+  $name = sirius_domain_variable_name('sirius_sms_global_disable_whitelist');
+  $form[$name] = array(
+    '#type' => 'textarea',
+    '#title' => t('Whitelist'),
+    '#description' => t('When global disable is on, use the whitelist to indicate which phone numbers <strong>can</strong> receive SMS. Phone numbers must be in the format (xxx) xxx-xxxx.'),
+    '#default_value' => variable_get($name, ''),
+    '#states' => array(
+      'visible' => array(
+        array(':input[name="sirius_sms_global_disable"]' => array('value' => 'Yes')),
+      )
+    ),
+  );
+
+  return system_settings_form($form);
+}
+

@@ -1,31 +1,204 @@
 <?php
 
 function sirius_event_register_worker_byname_form($form, &$form_state, $event_node, $rule) {
+  drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/event.css', 'file');
+  $form['#after_build'][] = 'sirius_event_register_worker_byname_worker_remove_format';
+
+  // Handle worker NIDs passed as a query
+  $workers = array();
+  if ($_REQUEST['worker_nids']) {
+    $worker_nids = explode(',', $_REQUEST['worker_nids']);
+    // Load worker titles. SQL for speed and we also verify the domain
+    $domain_nid = sirius_domain_nid();
+    $sql_args = array();
+    $sql_args[':worker_nids'] = $worker_nids;
+    $sql = "select nid, title ";
+    $sql .= "from node ";
+    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+    $sql .= "where node.type = 'sirius_worker' ";
+    $sql .= "and nid in (:worker_nids) ";
+    if ($domain_nid) {
+      $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+      $sql_args[':domain_nid'] = $domain_nid;
+    }
+    $stmt = sirius_sql_query($sql, $sql_args);
+    while ($hr = $stmt->fetchAssoc()) {
+      $workers[$hr['nid']] = $hr['title'];
+    }
+  }
+  $worker_nids = array_keys($workers);
+  
   $form_state['event_nid'] = $event_node->nid;
   $form_state['rule'] = $rule;
+
+  $event_type_tid = $event_node->field_sirius_event_type['und'][0]['tid'];
+  $event_type_term = taxonomy_term_load($event_type_tid);
+  $event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
 
   // $open = sirius_dispatch_bullpen_signin_open($job_node, FALSE);
   $form['#tree'] = TRUE; 
 
-  $form['table_open'] = array('#markup' => '<table>');
+  $form['table_open'] = array('#markup' => '<table class="columns_table">');
   $form['col1_open'] = array('#markup' => '<tr><td style="width: 66%; vertical-align: top;">');
-  $form['worker'] = array(
-    '#title' => t('Register a Worker'),
-    '#type' => 'textfield',
-    '#autocomplete_path' => 'sirius/ajax/bullpen-quicksearch',
-    '#description' => t('Enter or scan the worker\'s dispatch ID, SSN, or name.'),
+
+  $ajax_params = $form_state['triggering_element']['#sirius_ajax'];
+  $worker_count = $form_state['worker_count'];
+  $worker_count += $ajax_params['qty'];
+  if ($worker_count < 1) { $worker_count = 1; }
+  if ($worker_count < count($workers)) { $worker_count = count($workers); }
+  $form_state['worker_count'] = $worker_count;
+
+  $form['workers']['prefix'] = array('#markup' => '<div id="workers">');
+  for ($i=0; $i<$worker_count; ++$i) {
+    $form['workers'][$i] = array(
+      '#type' => 'textfield',
+      '#autocomplete_path' => 'sirius/ajax/bullpen-quicksearch',
+      '#ajax' => array(
+        'callback' => 'sirius_event_register_worker_byname_form_ajax_preview',
+        'wrapper' => 'sirius_worker_preview',
+        'method' => 'replace',
+        'effect' => 'fade',
+      ),
+      '#sirius_ajax' => array(
+        'delta' => $i,
+      ),
+    );
+    if ($i == 0) { 
+      $form['workers'][$i]['#title'] = t('Register a Worker');
+      $form['workers'][$i]['#description'] = t('Enter or scan the worker\'s dispatch ID, SSN, or name.');
+    }
+    $worker_nid = $worker_nids[$i];
+    if ($worker_nid) {
+      $form['workers'][$i]['#default_value'] = $workers[$worker_nid] . ' (' . $worker_nid . ')';
+    }
+  }
+  $form['workers']['suffix'] = array('#markup' => '</div>');
+
+  $form['add_one'] = array(
+    '#type' => 'button',
+    '#value' => t('Add one'),
     '#ajax' => array(
-      'callback' => 'sirius_event_register_worker_byname_form_ajax_preview',
-      'wrapper' => 'sirius_worker_preview',
-      'method' => 'replace',
-      'effect' => 'fade',
-    )
+      'callback' => 'sirius_ajax_generic_replace',
+    ),
+    '#sirius_ajax' => array(
+      'qty' => 1,
+      'wrapper' => '#workers',
+      'element' => 'workers',
+    ),
   );
+
+
+
+  if (!$rule['register_as']) {
+    drupal_set_message(t('The event is misconfigured; no prole or pstatus set.'), 'warning');
+    return array();
+  }
+  $pstatus_name_lookup = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
+  $prole_name_lookup = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'name');
+  $paccess_options = array();
+  foreach ($rule['register_as'] as $key) {
+    list ($prole_tid, $pstatus_tid) = explode('|', $key);
+    $paccess_options[$key] = $prole_name_lookup[$prole_tid] . ': ' . $pstatus_name_lookup[$pstatus_tid];
+  }
+  $form['paccess'] = array(
+    '#title' => t('Participant Status'),
+    '#type' => 'select',
+    '#options' => $paccess_options,
+    '#ajax' => array('callback' => 'sirius_ajax_generic_replace'),
+    '#sirius_ajax' => array(
+      'wrapper' => '#sirius_ajax_generic_replace_notification',
+      'element' => 'notification',
+    ),
+  );
+
+  $medium_options = array(
+    NULL => t('No notification'),
+    'email' => t('Notify by Email'),
+    'sms' => t('Notify by SMS'),
+    'both' => t('Notify by both Email and SMS'),
+  );
+
+  list($prole_tid, $pstatus_tid) = explode('|', $form_state['values']['paccess']);
+
+  if ($pstatus_tid) {
+    $pstatus_term = taxonomy_term_load($pstatus_tid);
+    $pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
+
+    if ($form_state['triggering_element']['#name'] == 'paccess') {
+      // If we changed the paccess, update the default notification text
+      $keys = array('medium', 'email_subject', 'email_body', 'sms');
+      $tokens = array('node' => $event_node);
+      $tokenized = array();
+      foreach ($keys as $key) {
+        $tokenized[$key] = token_replace($pstatus_json['notification']['register'][$key], $tokens, array('clear' => TRUE));
+      }
+
+      foreach ($keys as $key) {
+        if ($pstatus_json['notification']['register'][$key]) {
+          $form_state['input']['notification'][$key] = $tokenized[$key];
+        }
+      }
+    }
+  }
+
+  $form['notification']['prefix'] = array('#markup' => '<div id="sirius_ajax_generic_replace_notification">');
+  $form['notification']['medium'] = array(
+    '#title' => t('Send a Notification?'),
+    '#type' => 'select',
+    '#options' => $medium_options,
+    '#default_value' => $tokenized['medium'],
+  );
+
+  $form['notification']['email_subject'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email Subject'),
+    '#default_value' => $tokenized['email_subject'],
+    '#states' => array(
+      'visible' => array(
+        ":input[name=\"notification[medium]\"]" => array(
+          array('value' => 'email'), 
+          array('value' => 'both')
+        )
+      )
+    ),
+  );
+
+  $form['notification']['email_body'] = array(
+    '#type' => 'text_format',
+    '#title' => 'Email Body',
+    '#default_value' => $tokenized['email_body'],
+    '#format' => 'sirius_form_editor',
+    '#allowed_formats' => array('sirius_form_editor'),
+    '#states' => array(
+      'visible' => array(
+        ":input[name=\"notification[medium]\"]" => array(
+          array('value' => 'email'), 
+          array('value' => 'both')
+        )
+      )
+    ),
+  );
+
+  $form['notification']['sms'] = array(
+    '#type' => 'textarea',
+    '#title' => t('SMS'),
+    '#default_value' => $tokenized['sms'],
+    '#states' => array(
+      'visible' => array(
+        ":input[name=\"notification[medium]\"]" => array(
+          array('value' => 'sms'), 
+          array('value' => 'both')
+        )
+      )
+    ),
+  );
+  $form['notification']['suffix'] = array('#markup' => '</div>');
 
   $form['participant']['comments'] = array(
     '#title' => t('Comments'),
     '#type' => 'textarea',
   );
+
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -34,7 +207,9 @@ function sirius_event_register_worker_byname_form($form, &$form_state, $event_no
   $form['col1_close'] = array('#markup' => '</td>');
 
   $form['col2_open'] = array('#markup' => '<td style="width: 33%; vertical-align: top;">');
-  $worker_str = $form_state['input']['worker'];
+  $delta = $ajax_params['delta'];
+  if (!$delta) { $delta = 0; }
+  $worker_str = $form_state['input']['workers'][$delta];
   if ($worker_str) {
     $result = sirius_event_register_worker_byname_worker($worker_str);
     $preview = '<h2>' . t('Worker Selected') . '</h2>';
@@ -71,24 +246,41 @@ function sirius_event_register_worker_byname_form_submit($form, &$form_state) {
   $event_nid = $form_state['event_nid'];
   $rule = $form_state['rule'];
 
-  $result = sirius_event_register_worker_byname_worker($form_state['values']['worker']);
-  if (!$result['success']) {
-    drupal_set_message($result['msg'], 'warning');
-    return;
+  $count = 0;
+  $count_success = 0;
+  $count_failure = 0;
+  foreach ($form_state['values']['workers'] as $worker_str) { 
+    if (!$worker_str) { continue; }
+    ++$count;
+    $result = sirius_event_register_worker_byname_worker($worker_str);
+    if (!$result['success']) {
+      ++$count_failure;
+      drupal_set_message($result['msg'], 'warning');
+    } else {
+      $paccess = $form_state['values']['paccess'];
+      list ($prole_tid, $pstatus_tid) = explode('|', $paccess);
+      $contact_nid = $result['contact_nid'];
+
+      $register_json = $form_state['values']['participant'];
+      $register_json['notification'] = $form_state['values']['notification'];
+      $register_json['notification']['email_body'] = sirius_richtext_handle_input($form_state['values']['notification']['email_body']);
+      $result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid, $register_json);
+      if ($result['success']) {
+        ++$count_success;
+        drupal_set_message(t($result['msg']));
+      } else {
+        ++$count_failure;
+         drupal_set_message($result['msg'], 'error');
+      }
+    }
   }
   
-  $contact_nid = $result['contact_nid'];
+  drupal_set_message("Registered $count_success workers with $count_failure failures.");
 
-  foreach ($rule['register_as'] as $key) {
-    list ($prole_tid, $pstatus_tid) = explode('|', $key);
-    break;
+  if ($_REQUEST['worker_nids']) {
+    // If we were passwed worker NIDs on the query string, redirect to a page without it to reset the form.
+    drupal_goto(current_path(), array('query' => array('delta' => $_REQUEST['delta'], 'widget' => $_REQUEST['widget'])));
   }
-  if (!$prole_tid || !$pstatus_tid) {
-    drupal_set_messge(t('The event is misconfigured; no prole or pstatus set.'), 'warning');
-  }
-
-  $result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid, $form_state['values']['participant']);
-  if ($result['success']) { drupal_set_message(t('The worker has been registered.')); } else { drupal_set_message($result['msg'], 'error'); }
 }
 
 function sirius_event_register_worker_byname_worker($worker_str) {
@@ -113,5 +305,15 @@ function sirius_event_register_worker_byname_worker($worker_str) {
     'worker_nid' => $worker_nid,
     'worker_node' => $worker_node,
     'contact_nid' => $contact_nid,
+    'msg' => 'Registered: ' . $worker_node->title,
   );
 }
+
+
+function sirius_event_register_worker_byname_worker_remove_format(&$form) {
+  $fields = array('xprefix', 'xsuffix', 'markup', 'description');
+  if ($form['notification']['email_body']['format']) {
+    $form['notification']['email_body']['format']['#access'] = FALSE;
+  }
+  return $form;
+} 

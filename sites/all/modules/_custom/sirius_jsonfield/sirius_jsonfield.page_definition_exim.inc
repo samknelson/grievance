@@ -18,6 +18,29 @@ function sirius_json_definition_exim_form($form, &$form_state, $entity_id, $whic
 		$json_form = sirius_jsonfield_util_form_get($json, $which_form);
 	}
 
+  $json = sirius_jsonfield_util_node_json_get($entity);
+  $html_id = 'sirius_jqtree_' . $entity->nid;
+	drupal_add_js('sites/all/libraries/jquery_json_viewer/json-viewer/jquery.json-viewer.js');
+	drupal_add_css('sites/all/libraries/jquery_json_viewer/json-viewer/jquery.json-viewer.css');
+	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/json_viewer.js');
+	drupal_add_js(
+		array(
+			'json_viewer' => array(
+				'options' => array(
+					'collapsed' => TRUE, 
+					'rootCollapsable' => TRUE					
+				),
+				'data' => array(
+					$html_id => $json_form
+				),
+			)
+		), 
+		array('type' => 'setting')
+	);
+
+	$html .= "<div id=\"$html_id\">Loading JSON data ...</div>";
+	$form['json_view'] = array('#markup' => $html);
+
 	$form['json'] = array(
 		'#type' => 'textarea',
 		'#default_value' => json_encode($json_form, TRUE),

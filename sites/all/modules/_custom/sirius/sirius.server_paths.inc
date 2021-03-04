@@ -21,8 +21,22 @@ function sirius_server_paths_info_all() {
 			'description' => 'PDFTk utility for combining multiple PDF entries.',
 			'default_value' => '/usr/bin/pdftk',
 		),
+		'pdfunite' => array(
+			'title' => 'pdfunite',
+			'description' => 'PDFUnite utility for combining multiple PDF entries.',
+			'default_value' => '/usr/bin/pdfunite',
+		),
+		'cp' => array(
+			'title' => 'cp',
+			'description' => 'Linux file copy',
+			'default_value' => '/bin/cp',
+		),
+		'drush' => array(
+			'title' => 'Drush',
+			'description' => 'Drush command-line Drupal utility',
+			'default_value' => '/usr/bin/drush',
+		),
 	);
-
 
 	return $info_all;
 }
@@ -53,5 +67,20 @@ function sirius_server_paths_admin() {
 		);
 	}
 
+	$form['#submit'][] = 'sirius_server_paths_admin_submit';
+
   return system_settings_form($form);
+}
+
+function sirius_server_paths_admin_submit($form, &$form_state) {
+	$info_all = sirius_server_paths_info_all();
+	foreach ($info_all as $key => $info) {
+		$variable_name = 'sirius_server_paths_' . $key;
+		$path = $form_state['values'][$variable_name];
+		if (!file_exists($path)) {
+			drupal_set_message($info['title'] . ": File not found at $path", 'error');
+		} else {
+			drupal_set_message($info['title'] . ': Ok.');
+		}
+	}
 }

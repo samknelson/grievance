@@ -18,6 +18,7 @@ function sirius_node_tab_event_class_settings_access($event_node) {
 }
 
 function sirius_node_tab_event_class_settings($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	return drupal_get_form('sirius_node_tab_event_class_settings_form', $event_node->nid);
 }
 

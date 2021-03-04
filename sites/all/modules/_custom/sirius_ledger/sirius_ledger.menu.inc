@@ -223,6 +223,57 @@ function sirius_ledger_node_tabs() {
     'weight' => 11,
   );
 
+  foreach (array('sirius_ledger_account', 'sirius_event') as $content_type) {
+    $node_tabs[$content_type][$content_type . '_auths'] = array(
+      'title' => 'Authorizations',
+      'callback' => 'sirius_ledger_node_tab_entity_auths',
+      'permissions' => array('sirius ledger admin'),
+      'weight' => 10,
+      'file' => 'sirius_ledger.page_entity_auths.inc',
+    );
+  }
+
+  $node_tabs['sirius_log']['sirius_log_auth'] = array(
+    'title' => 'Authorization',
+    'callback' => 'sirius_ledger_node_tab_auth',
+    'permissions' => array('sirius ledger admin'),
+    'file' => 'sirius_ledger.page_auth.inc',
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_log']['sirius_log_auth_settings'] = array(
+    'title' => 'Settings',
+    'callback' => 'sirius_ledger_node_tab_auth_settings',
+    'permissions' => array('sirius ledger admin'),
+    'file' => 'sirius_ledger.page_auth_settings.inc',
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_log']['sirius_log_auth_accounts'] = array(
+    'title' => 'Accounts',
+    'callback' => 'sirius_ledger_node_tab_auth_accounts',
+    'permissions' => array('sirius ledger admin'),
+    'file' => 'sirius_ledger.page_auth_accounts.inc',
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_log']['sirius_log_auth_events'] = array(
+    'title' => 'Events',
+    'callback' => 'sirius_ledger_node_tab_auth_events',
+    'permissions' => array('sirius ledger admin'),
+    'file' => 'sirius_ledger.page_auth_events.inc',
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_log']['sirius_log_auth_items'] = array(
+    'title' => 'Items',
+    'callback' => 'sirius_ledger_node_tab_auth_items',
+    'permissions' => array('sirius ledger admin'),
+    'file' => 'sirius_ledger.page_auth_items.inc',
+    'weight' => 4,
+  );
+
+  sirius_node_tab_set_module('sirius_ledger', $node_tabs);
   return $node_tabs;
 }
 
@@ -325,21 +376,30 @@ function sirius_ledger_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
- $items['sirius/ledger/transmittal'] = array(
-    'title' => 'Manage',
+ $items['sirius/ledger/delinquency'] = array(
+    'title' => 'Delinquency Letters',
     'description' => '',
     'access arguments' => array('sirius ledger admin'),
-    'page callback' => 'sirius_ledger_page_transmittal',
+    'page callback' => 'sirius_ledger_page_delinquency_employer',
     'page arguments' => array(),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 1,
+    'type' => MENU_NORMAL_ITEM,
   );
 
- $items['sirius/ledger/transmittal/print'] = array(
-    'title' => 'Print',
+ $items['sirius/ledger/delinquency/employer'] = array(
+    'title' => 'Employers',
     'description' => '',
     'access arguments' => array('sirius ledger admin'),
-    'page callback' => 'sirius_ledger_page_transmittal',
+    'page callback' => 'sirius_ledger_page_delinquency_employer',
+    'page arguments' => array(),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+ $items['sirius/ledger/delinquency/worker'] = array(
+    'title' => 'Workers',
+    'description' => '',
+    'access arguments' => array('sirius ledger admin'),
+    'page callback' => 'sirius_ledger_page_delinquency_worker',
     'page arguments' => array(),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,

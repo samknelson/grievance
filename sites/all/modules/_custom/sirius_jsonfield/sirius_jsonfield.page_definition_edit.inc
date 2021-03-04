@@ -480,14 +480,11 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 	$which_form = $form_state['which_form'];
 	$node = node_load($nid);
 	$json = sirius_jsonfield_util_node_json_get($node);
-
-
 	$json_form = sirius_jsonfield_util_form_get($json, $which_form);
 
+	$json_path = $_REQUEST['json_path'];
 	$old_field_name =  sirius_json_definition_canonical_field_name($_REQUEST['field_name']);
 	$field_name = sirius_json_definition_canonical_field_name($form_state['values']['name']);
-
-	$json_path = $_REQUEST['json_path'];
 
 	// Find the ref for our current fieldset
 	$parts = explode(':', $json_path);
@@ -498,6 +495,7 @@ function sirius_json_definition_edit_form_submit($form, &$form_state) {
 		}
 	}
 
+	// Deal with changing field name
 	if ($old_field_name != $field_name) { 
 		$ref[$field_name] = $ref[$old_field_name];
 		unset($ref[$old_field_name]);

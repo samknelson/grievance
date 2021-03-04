@@ -8,7 +8,7 @@ function sirius_twilio_config() {
     '#type' => 'textfield',
     '#title' => t('Phone Number'),
     '#default_value' => variable_get($name, ''),
-    '#description' => t('Phone number in E164 format (i.e. "+15551234567".'),
+    '#description' => t('Phone number in E164 format (i.e. "+15551234567". This must be a phone number provisioned at Twilio. It will be the default phone number used for outgoing calls (when no caller ID is selected) and will be used for all outgoing SMS messages.'),
   );
 
   $name = sirius_domain_variable_name('sirius_twilio_account_sid');
@@ -30,14 +30,6 @@ function sirius_twilio_config() {
     '#type' => 'textfield',
     '#title' => t('App SID'),
     '#default_value' => variable_get($name, ''),
-  );
-
-  $name = sirius_domain_variable_name('sirius_twilio_operator');
-  $form[$name] = array(
-    '#type' => 'textfield',
-    '#title' => t('Operator Phone Number'),
-    '#default_value' => variable_get($name, ''),
-    '#description' => t('Phone number in E164 format (i.e. "+15551234567".'),
   );
 
   $name = sirius_domain_variable_name('sirius_twilio_site_name_tts');

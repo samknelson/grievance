@@ -5,6 +5,7 @@ function sirius_node_tab_event_map_list_access($event_node) {
 }
 
 function sirius_node_tab_event_map_list($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	global $user;
 	$event_nid = $event_node->nid;
 	$event_json = sirius_jsonfield_util_node_json_get($event_node);
@@ -36,15 +37,14 @@ function sirius_node_tab_event_map_list($event_node) {
 	foreach ($pstatus_terms as $pstatus_tid => $pstatus_term) {
 		if (!$counts[$pstatus_tid]) { continue; }
 		$pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
-		$icon = $pstatus_json['map']['icon'];
-		if (!$icon) { $icon = sirius_map_icon_default(); }
+		$pin = sirius_map_pin($pstatus_json['map']['pin']);
 
 		$class = "map_list_item map_legend_item";
 
 		$chunk = '';
 		$chunk .= "<div class=\"$class\">";
 		$chunk .= '<div class="icon_wrap">';
-		$chunk .= sirius_map_icon_render($icon);
+		$chunk .= sirius_map_pin_render($pin);
 		$chunk .= '</div>';
 		$chunk .= '<div class="body_wrap">';
 		$chunk .= $pstatus_term->name;

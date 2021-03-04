@@ -1,5 +1,10 @@
 <?php
 
+function sirius_event_term_tab_map_access($event_type_term) {
+	if (!sirius_domain_component_enabled('mapping')) { return FALSE; }
+	return TRUE;
+}
+
 function sirius_event_term_tab_map($event_type_term) {
 	return drupal_get_form('sirius_event_term_tab_map_form', $event_type_term);
 }

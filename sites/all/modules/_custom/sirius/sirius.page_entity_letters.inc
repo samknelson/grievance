@@ -2,8 +2,14 @@
 
 function sirius_node_tab_entity_letter_access($entity) {
 	$enabled_types = sirius_domain_variable_get('sirius_letter_content_types');
-	if (!$entity->type) { return TRUE; }
-	return $enabled_types[$entity->type];
+	if (!$entity->type) { return FALSE; }
+	if (!$enabled_types[$entity->type]) { return FALSE; }
+
+	if ($entity->type == 'sirius_log') {
+		if (!in_array($entity->field_sirius_category['und'][0]['value'], array('ledger:auth'))) { return FALSE; }
+	}
+	
+	return TRUE;
 }
 
 

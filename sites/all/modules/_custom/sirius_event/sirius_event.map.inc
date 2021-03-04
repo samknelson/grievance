@@ -7,6 +7,8 @@ function sirius_event_map_enabled($event_node) { return sirius_event_map_enabled
 function sirius_event_map_enabled_tid($event_type_tid) { return sirius_event_map_enabled_type(taxonomy_term_load($event_type_tid)); }
 
 function sirius_event_map_enabled_type($event_type_term) {
+  if (!sirius_domain_component_enabled('mapping')) { return FALSE; }
+
   $json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
   return $json['map']['map_enabled'] == 'Yes';
 }
@@ -83,10 +85,10 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
   $map_features = array();
 
   $pstatus_terms = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'full');
-  $pstatus_makers = array();
+  $pstatus_pins = array();
   foreach ($pstatus_terms as $pstatus_tid => $pstatus_term) {
     $pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
-    $pstatus_markers[$pstatus_tid] = $pstatus_json['map']['icon'];
+    $pstatus_pins[$pstatus_tid] = sirius_map_pin($pstatus_json['map']['pin']);
   }
 
   // Fetch all the relevant data about our participants
@@ -115,6 +117,8 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
   $sql .= "where field_sirius_event_target_id = :event_nid ";
   $sql .= "and field_sirius_event_prole_tid = :prole_tid ";
   $sql .= "and field_sirius_address_geo_lat is not null ";
+  $sql .= "and field_sirius_address_thoroughfare is not null ";
+  $sql .= "and field_sirius_address_thoroughfare != '' ";
   if ($cutoff_ts) { 
     $sql .= "and node.changed > :cutoff_ts ";
     $sql_args[':cutoff_ts'] = $cutoff_ts;
@@ -124,17 +128,9 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
   $stmt = sirius_sql_query($sql, $sql_args);
   while ($hr = $stmt->fetchAssoc()) {
     $pstatus_tid = $hr['field_sirius_event_pstatus_tid'];
+    $pin = $pstatus_pins[$pstatus_tid];
 
-    $map_feature = array();
-    if ($pstatus_markers[$pstatus_tid]) {
-      $map_feature['icon'] = array('iconUrl' => '/sites/all/modules/_custom/sirius/images/map/' . $pstatus_markers[$pstatus_tid]);
-      $map_feature['icon_name'] = sirius_map_icon_name($pstatus_markers[$pstatus_tid]);
-    } else {
-      $map_feature['icon'] = array('iconUrl' => '/sites/all/modules/_custom/sirius/images/map/marker-icon-blue.png');
-      $map_feature['icon_name'] = 'Blue'; 
-    }
-
-    $map_feature += array(
+    $map_feature = array(
       'type' => 'point',
       'lat' => $hr['field_sirius_address_geo_lat'],
       'lon' => $hr['field_sirius_address_geo_lon'],
@@ -156,12 +152,14 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
           $hr['participant_nid'], 
           $pstatus_terms[$pstatus_tid]->name,
           $pstatus_tid,
-          $map_feature['icon']['iconUrl']
+          $pin['path']
         ),
         'type' => 'contact',
         'pstatus_tid' => $hr['field_sirius_event_pstatus_tid'],
         'pstatus_name' => $pstatus_terms[$hr['field_sirius_event_pstatus_tid']]->name,
       ),
+      'icon' => sirius_map_pin_render_leaflet($pin),
+      'pin_key' => $pin['key'],
     );
 
     $map_features[] = $map_feature;
@@ -218,11 +216,14 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
       if ($json_checkin['ts'] < $ts_cutoff) { continue; }
 
       $pstatus_tid = $hr['field_sirius_event_pstatus_tid'];
+      $pin = $pstatus_pins[$pstatus_tid];
+
       $popup_html = '<strong>Name:</strong> ' . $hr['user_name'];
       $popup_html .= "<br /><strong>Checkin:</strong> " . date('g:i:s A l', $json_checkin['ts']);
       $popup_html .= "<br /><strong>Checkin:</strong> " . format_interval(time() - $json_checkin['ts']) . ' ago';
       $popup_html .= "<br /><strong>Email:</strong> <a href=\"mailto:$hr[user_mail]\">$hr[user_mail]</a>";
       if ($hr['user_phone']) { $popup_html .= "<br /><strong>Phone:</strong> <a href=\"tel:$hr[user_phone]\">$hr[user_phone]</a>"; }
+
       $map_feature = array(
         'type' => 'point',
         'lat' => $json_checkin['lat'],
@@ -238,20 +239,13 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
         'tooltip_options' => array(
           'permanent' => TRUE, 
           'direction' => 'right',
-          'offset' => array(20,20),
+          // 'offset' => array($pin['tooltipAnchor']['x'], $pin['tooltipAnchor']['y']),
         ),
+        'icon' => sirius_map_pin_render_leaflet($pin),
+        'pin_key' => $pin['key'],
       );
-
-      if ($pstatus_markers[$pstatus_tid]) {
-        $map_feature['icon'] = array('iconUrl' => '/sites/all/modules/_custom/sirius/images/map/' . $pstatus_markers[$pstatus_tid]);
-        $map_feature['icon_name'] = sirius_map_icon_name($pstatus_markers[$pstatus_tid]);
-      } else {
-        $map_feature['icon'] = array('iconUrl' => '/sites/all/modules/_custom/sirius/images/map/marker-icon-blue.png');
-        $map_feature['icon_name'] = 'Blue'; 
-      }
       $map_features[] = $map_feature;
     }
-
   }
 
   return $map_features;

@@ -412,7 +412,7 @@ function sirius_domain_variable_set($name, $value) {
 
 function sirius_domain_variable_name($name) {
   $domain_nid = sirius_domain_nid();
-  if ($domain_nid) { return $domain_nid . '/' . $name; } else { return $name; }
+  if ($domain_nid > 0) { return $domain_nid . '/' . $name; } else { return $name; }
 }
 
 
@@ -580,4 +580,101 @@ function sirius_domain_activity_render($domain_nids) {
 	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
 
 	return $html;
+}
+
+function sirius_domain_util_migrate_root_to_domain($domain_nid) {
+  $domain_node = node_load($domain_nid);
+  if (!$domain_node) { die("Domain not found: $domain_nid"); }
+  if (!$domain_node->type == 'sirius_domain') { die("Not a domain node: $domain_nid [" . $domain_node->title . "]"); }
+
+  // Get the list of node types that have a domain.
+  $info = field_info_field('field_sirius_domain');
+  $taxonomies = $info['bundles']['taxonomy_term'];
+  $content_types = $info['bundles']['node'];
+
+  // Get this list of nodes
+  $node_counts = array();
+  foreach ($content_types as $bundle) {
+    if ($bundle == 'sirius_domain') { continue; }
+    $sql_args = array(':bundle' => $bundle);
+    $sql = "select type, nid, title from node ";
+    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+    $sql .= "where field_sirius_domain_target_id is null ";
+    $sql .= "and type = :bundle ";
+    $sql .= "order by nid ";
+    $sql .= "limit 1000 ";
+    $types = array();
+    $stmt = sirius_sql_query($sql, $sql_args);
+    $count = 0;
+    while ($hr = $stmt->fetchAssoc()) {
+      $node = node_load($hr['nid']);
+      $node->field_sirius_domain['und'][0]['target_id'] = $domain_nid;
+      node_save($node);
+      print "Saved: $hr[nid] - " . $node->title . "\n";
+      ++$count;
+    }
+    $node_counts[$bundle] = $count;
+  }
+
+  // Get this list of nodes
+  $term_counts = array();
+  foreach ($taxonomies as $bundle) {
+    $sql_args = array(':bundle' => $bundle);
+    $sql = "select tid, taxonomy_term_data.name from taxonomy_term_data ";
+    $sql .= "left join taxonomy_vocabulary on taxonomy_vocabulary.vid = taxonomy_term_data.vid ";
+    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'taxonomy_term' and field_data_field_sirius_domain.entity_id = tid ";
+    $sql .= "where field_sirius_domain_target_id is null ";
+    $sql .= "and taxonomy_vocabulary.machine_name = :bundle ";
+    $sql .= "order by tid ";
+    $sql .= "limit 1000 ";
+    $types = array();
+    $stmt = db_query($sql, $sql_args);
+    $count = 0;
+    while ($hr = $stmt->fetchAssoc()) {
+      $term = taxonomy_term_load($hr['tid']);
+      $term->field_sirius_domain['und'][0]['target_id'] = $domain_nid;
+      taxonomy_term_save($term);
+      print "Saved: $hr[tid] - " . $term->title . "\n";
+      ++$count;
+    }
+    $term_counts[$bundle] = $count;
+  }
+
+  // Get this list of users
+  $sql_args = array(':bundle' => $bundle);
+  $sql = "select uid, name from users ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'user' and field_data_field_sirius_domain.entity_id = uid ";
+  $sql .= "where field_sirius_domain_target_id is null ";
+  $sql .= 'and uid > 1 ';
+  $sql .= "order by uid ";
+  $sql .= "limit 1000 ";
+  $types = array();
+  $stmt = db_query($sql, $sql_args);
+  $count = 0;
+  while ($hr = $stmt->fetchAssoc()) {
+    $u = user_load($hr['uid']);
+    print "Saving: " . $u->uid . " / " . $u->name . "\n";
+    user_save($u, array('field_sirius_domain' => array('und' => array(0 => array('target_id' => $domain_nid)))));
+    print "Saved: $hr[uid] - " . $u->name . "\n";
+    ++$user_count;
+  }
+
+  // Get the settings
+  $sql = "select name from variable where name like 'sirius%' or name like 'grievance%' ";
+  $stmt = db_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    $name = $hr['name'];
+    $val = variable_get($name);
+    sirius_domain_variable_set("$name/$domain_nid", $val);
+    print "Set: $name\n";
+    ++$variable_count;
+  }
+  print "Node counts: ";
+  print_r($node_counts);
+
+  print "Term counts: ";
+  print_r($term_counts);
+
+  print "User count: $user_count\n";
+  print "Variable count: $variable_count\n";
 }

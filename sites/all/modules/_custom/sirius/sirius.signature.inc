@@ -4,20 +4,34 @@
 // look for the prefix "esginature".  Sorry about that.
 
 function sirius_signature_render($account) {
-	$html = '<div class="sirius_signature_wrapper">';
+	$height = sirius_domain_variable_get('sirius_signature_height', 90);
+	$html = '<div class="sirius_signature_wrapper" style="height: ' . $height . 'px; ">';
 
   $name = $account->name;
   $fid = $account->field_sirius_signature['und'][0]['fid'];
   if ($fid) { $file = file_load($fid); }
   if ($file) {
   	$url = file_create_url($file->uri);
-  	$html .= '<img src="' . $url . '?loopback=1" alt="' . htmlspecialchars($name) . '" />';
+  	$html .= '<img src="' . $url . '?loopback=1" alt="' . htmlspecialchars($name) . '" style="height: ' . $height . 'px; " />';
   } else {
 	  $html .= htmlspecialchars($name);
 	}
 	$html .= '</div>';
 
 	return $html;
+}
+
+
+function sirius_signature_admin($form, &$form_state) {
+  $name = sirius_domain_variable_name('sirius_signature_height');
+  $form[$name] = array(
+    '#type' => 'textfield',
+    '#title' => t('Height (in pixels)'),
+    '#default_value' => variable_get($name, 90),
+    '#size' => 5,
+  );
+
+  return system_settings_form($form);
 }
 
 /**
@@ -35,6 +49,7 @@ function sirius_signature_render($account) {
  * It means we won’t be storing the original file; the crop will have to happen during the upload. But since imagefield_crop doesn’t work with private files anyway, we already don’t have the ability to re-crop. So I think we’re good enough.
  */
 
+/*
 function sirius_signature_cleanup() {
 	$last_ts = variable_get('sirius_signature_cleanup_last_ts', 0);
 	$now_ts = time();
@@ -62,3 +77,4 @@ function sirius_signature_cleanup() {
 	}
 	watchdog('sirius_signature_cleanup', "Signature cleanup complete. Deleted $count files.");
 }
+*/

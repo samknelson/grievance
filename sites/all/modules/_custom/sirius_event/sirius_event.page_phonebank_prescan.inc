@@ -8,6 +8,7 @@ function sirius_node_tab_event_phonebank_prescan_access($event_node) {
 }
 
 function sirius_node_tab_event_phonebank_prescan($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	return drupal_get_form('sirius_node_tab_event_phonebank_prescan_form', $event_node);
 }
 

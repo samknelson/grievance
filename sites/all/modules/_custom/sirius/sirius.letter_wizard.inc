@@ -146,9 +146,31 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 
 	$tokens = array('node' => $entity_node);
 	$tokens['other_tokens']['delivery_tid'] = $data['tokens']['delivery'];
-	$subject = token_replace($subject, $tokens, array('clear' => TRUE));
-	$body = token_replace($body, $tokens, array('clear' => TRUE));
-	$pdf_body = token_replace($pdf_body, $tokens, array('clear' => TRUE));
+
+	$aliases = array();
+
+	if ($entity_node->type == 'sirius_log') {
+		if ($entity_node->field_sirius_log_handler['und']) {
+			$deltas = array();
+			foreach ($entity_node->field_sirius_log_handler['und'] as $tmp) {
+				$handler_node = node_load($tmp['target_id']);
+				$type = $handler_node->type;
+				$delta = $deltas[$type];
+				if (!$delta) { $delta = 0; }
+				++$deltas[$type];
+				$alias = "${type}_${delta}_node";
+				$aliases[$alias] = 'node';
+				$tokens[$alias] = $handler_node;
+			}
+		}
+	}
+	$tokens['my_node'] = $entity_node;
+
+	$aliases['my_node'] = 'node';
+
+	$subject = token_replace($subject, $tokens, array('clear' => TRUE, 'aliases' => $aliases));
+	$body = token_replace($body, $tokens, array('clear' => TRUE, 'aliases' => $aliases));
+	$pdf_body = token_replace($pdf_body, $tokens, array('clear' => TRUE, 'aliases' => $aliases));
 	$data['subject'] = $subject;
 	$data['body'] = $body;
 	$data['pdf_body'] = $pdf_body;
@@ -306,6 +328,24 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
 	$steps = sirius_wizard_steps($info, $data, $entity_node);
 
+	if ($data['format'] == 'sms') {
+		// Add a link shortener
+	  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/sirius.popup.js');
+	  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.popup.css');
+	  $html .= '<br /><a href="#" class="sirius_popup_trigger tool-button">' . t('Link Shortener') . '</a>';
+	  $html .= '<div style="display:none" class="sirius_popup_overlay"></div>';
+	  $html .= '<div style="display:none" class="sirius_popup_wrap">';
+	  $html .= '<div class="sirius_popup_contents">';
+	  $shorten_block = block_load('shorten', 'shorten');
+		$shorten_build = module_invoke('shorten', 'block_view', 'shorten');
+		drupal_alter(array('block_view', "block_view_shorten_shorten"), $shorten_build, $shorten_block);
+		$html .= $shorten_build['content'];
+	  $html .= '</div>';
+	  $html .= '<div class="sirius_popup_close"></div>';
+	  $html .= '</div>';
+	  $form['#prefix'] = $html;
+	}
+
 	if ($data['format'] == 'email') {
 		$form['subject'] = array(
 			'#type' => 'textfield',
@@ -320,6 +360,8 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 			'#title' => t('Body'),
 			'#default_value' => $data['body'],
 			'#rows' => 20,
+			'#format' => 'sirius_form_editor',
+			'#allowed_formats' => array('full_html'),
 		);
 	}
 
@@ -329,6 +371,8 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 			'#title' => 'Body',
 			'#default_value' => $data['body'],
 			'#rows' => 10,
+			'#id' => 'sms_body',
+			'#description' => sirius_sms_segment_count('sms_body'),
 		);
 	}
 
@@ -338,6 +382,8 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 			'#title' => 'PDF Body',
 			'#default_value' => $data['pdf_body'],
 			'#rows' => 20,
+			'#format' => 'sirius_form_editor',
+			'#allowed_formats' => array('full_html'),
 		);
 
 		if (user_access('grievance letter variable letterhead')) {
@@ -351,6 +397,8 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 		    '#options' => $options,
 		    '#title' => t('Letterhead'),
 				'#default_value' => $data['pdf_letterhead'],
+				'#format' => 'sirius_form_editor',
+				'#allowed_formats' => array('full_html'),
 		  );
 		}
 	}
@@ -776,7 +824,7 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 	// Log the letter
 	if ($form_state['values']['logging']) {
 
-		$log_title = "Letter :" . $data['format'] . ': ';
+		$log_title = "Letter: " . $data['format'] . ': ';
 		$is_first = TRUE;
 		for ($i=0; $i<100; ++$i) {
 			if ($template_nid = $data['letter_template_nid_' . $i]) {
@@ -791,11 +839,18 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		if ($data['recipients']) {
 			foreach ($data['recipients'] as $recipient) {
 				if ($recipient['disposition'] == 'skip') { continue; }
-				$log_body .= $recipient['disposition'] . ': ' . sirius_email_rfc822_format($recipient['name'], $recipient['email']) . "\n";
+				if (preg_match('/\@/', $recipient_email)) {
+					$log_body .= $recipient['disposition'] . ': ' . sirius_email_rfc822_format($recipient['name'], $recipient['email']) . "\n";
+				} else {
+					$log_body .= $recipient['disposition'] . ': ' . $recipient['name'] . ' ' . sirius_phone_format($recipient['phone']) . "\n";
+				}
 			}
 		}
 		if ($data['subject']) {
 			$log_body .= "Subject: " . $data['subject'] . "\n";
+		}
+		if ($data['format'] == 'sms') {
+			$log_body .= "Message: " . $data['body'] . "\n";
 		}
 
 	  global $user;

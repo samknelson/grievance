@@ -5,29 +5,35 @@
 	  	// Event NID
 	  	var event_nid = Drupal.settings.sirius_map.event_nid;
 
-	  	// Set a bunch of icons
-	  	icons = new Array();
-	  	icons['current_location'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/circle-24.png'});
-	  	icons['Blue'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/marker-icon-blue.png'});
-	  	icons['Black'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/marker-icon-black.png'});
-	  	icons['Gold'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/marker-icon-gold.png'});
-	  	icons['Green'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/marker-icon-green.png'});
-	  	icons['Grey'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/marker-icon-grey.png'});
-	  	icons['Orange'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/marker-icon-orange.png'});
-	  	icons['Red'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/marker-icon-red.png'});
-	  	icons['Violet'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/marker-icon-violet.png'});
-	  	icons['Yellow'] = L.icon({iconUrl: '/sites/all/modules/_custom/sirius/images/map/marker-icon-yellow.png'});
+	  	// Our pin library
+	  	pins = new Array();
+	  	if (Drupal.settings.sirius_map.pins) {
+				for (const pin_key in Drupal.settings.sirius_map.pins) { 
+					pin = Drupal.settings.sirius_map.pins[pin_key];
+					pins[pin_key] = L.icon(
+						{
+							iconUrl: pin.path,
+							iconAnchor: [pin.iconAnchor.x,pin.iconAnchor.y],
+							popupAnchor: [pin.popupAnchor.x,pin.popupAnchor.y],
+							tooltipAnchor: [pin.tooltipAnchor.x,pin.tooltipAnchor.y],
+						}
+					);
+				}
+			}
 
 	  	// React when a feature is added.
-	  	var markers = new Array();
+	  	var markers = {};
 			$(document).on('leaflet.feature', function (e, lfeature, feature) {
 				if (feature.sirius && feature.sirius.marker.id) {
 					markers[feature.sirius.marker.id] = lfeature;
+					// For some reason, the feature doesn't set all the pin options correctly. So screw it will do it again here.
+					markers[feature.sirius.marker.id].setIcon(pins[feature.pin_key]);
 					if (feature.tooltip) { 
 						lfeature.bindTooltip(feature.tooltip, feature.tooltip_options);
 					}
 				}
 			});
+
 
 			// React whena  map is added
 			$(document).on('leaflet.map', function (e, map_settings, map, map_id) {
@@ -41,6 +47,18 @@
 					position: 'topleft',
 					sizeModes: ['A4Portrait', 'A4Landscape']
 				}).addTo(map);
+				*/
+
+				/*
+				console.log(markers);
+				console.log(map);
+				var aLayerGroup = L.layerGroup(markers[2411531], markers[2412025], markers[2412536]);
+				var overlays = {
+					"My Markers": aLayerGroup,
+				}
+				aLayerGroup.addTo(map);
+				layerControl = L.control.layers(null, overlays);
+				layerControl.addTo(map);
 				*/
 
 				// Handle modal links within marker popups. Normally we wouldn't bother, Drupal does this for free. 
@@ -63,7 +81,7 @@
         		.on('locationfound', function(e){
         			// Mark current location
         			if (current_location_marker) { map.removeLayer(current_location_marker); }
-            	current_location_marker = L.marker([e.latitude, e.longitude], {icon: icons['current_location']});
+            	current_location_marker = L.marker([e.latitude, e.longitude], {icon: pins[Drupal.settings.sirius_map.current_location.pin_key]});
             	map.addLayer(current_location_marker);
 
             	// Checkin
@@ -104,18 +122,6 @@
 				});
 			}
 
-			// A stupid utility function to make a random change in a marker.
-	  	function jiggle(marker) {
-	  		which = Math.random();
-	  		if (which < 0.2) { icon = icons['Blue']; }
-	  		else if (which < 0.4) { icon = icons['Black']; }
-	  		else if (which < 0.6) { icon = icons['Gold']; }
-	  		else if (which < 0.8) { icon = icons['Green']; }
-	  		else  { icon = icons['grey']; }
-	  		marker.setIcon(icon);
-	  		marker._popup.setContent('I was jiggled by ' + which);
-	  	}
-
 	  	// Do an ajax refresh poll of the map
 	  	function sirius_map_poll() {
 	  		$('#sirius_map_poll_message').html('... refreshing the map ...');
@@ -132,7 +138,7 @@
 								record = data['updates'][i];
 					    	marker = markers[record.participant_nid];
 					    	if (!marker) { continue; }
-					    	marker.setIcon(icons[record.icon_name]);
+					    	marker.setIcon(pins[record.pin_key]);
 					    	marker._popup.setContent(record.popup);
     						marker.setLatLng(new L.LatLng(record.lat, record.lon));
 							}
@@ -164,7 +170,7 @@
 		    Drupal.ajax.prototype.commands.sirius_command_map_update = function(ajax, response, status) {
 		    	marker = markers[response.participant_nid];
 		    	if (!marker) { return; }
-		    	marker.setIcon(icons[response.icon_name]);
+		    	marker.setIcon(pins[response.pin_key]);
 		    	marker._popup.setContent(response.popup);
 		    }
 		  }

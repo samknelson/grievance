@@ -6,8 +6,8 @@ function sirius_event_page_create_access($event_type_tid) {
 
   // Check our creation rules
   $event_type_term = taxonomy_term_load($event_type_tid);
-  $json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
-	$rule = sirius_event_paccess_rule_match(NULL, $json['create']['rules']);
+  $event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
+	$rule = sirius_event_paccess_rule_match(NULL, $event_type_json['create']['rules']);
 	if ($rule) { return TRUE; }
 
   // Oh well
@@ -82,7 +82,7 @@ function sirius_event_page_create_form_submit($form, &$form_state) {
 	$domain_nid = sirius_domain_nid();
 
   $event_type_term = taxonomy_term_load($event_type_tid);
-  $json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+  $event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
 
 	// Create the event node
 	$event_node = new stdClass();
@@ -104,12 +104,23 @@ function sirius_event_page_create_form_submit($form, &$form_state) {
 	$event_node->body['und'][0]['value'] = $form_state['values']['description']['value'];
 	$event_node->body['und'][0]['format'] = $form_state['values']['description']['format'];
 	$event_node->field_sirius_active['und'][0]['value'] = 'Yes';
+
+	// Some things get set at the type level and are copied into the event.
+	$event_json = array();
+	foreach (array('disclaimer', 'session', 'customfield') as $key) {
+		if ($event_type_json[$key]) { 
+			$event_json[$key] = $event_type_json[$key];
+		}
+	}
+	if ($event_json) {
+		sirius_jsonfield_util_node_json_set($event_node, $event_json);
+	}
 	node_save($event_node);
 	drupal_set_message(t("Created a new event: ") . $event_type_term->name);
 
 	// Register the user
-  $rules = $json['create']['rules'];
-	$rule = sirius_event_paccess_rule_match(NULL, $json['create']['rules']);
+  $rules = $event_type_json['create']['rules'];
+	$rule = sirius_event_paccess_rule_match(NULL, $event_type_json['create']['rules']);
 	if ($rule['register_as']) {
 		list ($prole, $pstatus) = explode('|', $rule['register_as']);
 		$result = sirius_event_participant_register_user($event_node->nid, $user->uid, $prole, $pstatus);

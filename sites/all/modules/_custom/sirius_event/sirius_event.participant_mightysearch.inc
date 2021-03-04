@@ -27,14 +27,19 @@ function sirius_event_page_participant_mightysearch_form($form, &$form_state, $e
 	}
 
 	$actions = array();
-	$actions['search'] = array('title' => 'Search');
 	if (!$lite) {
-		$actions['tag'] = array('title' => 'Add or Remove Tags');
+		$actions['tag_add'] = array('title' => 'Add a Tag');
+		$actions['tag_remove'] = array('title' => 'Remove a Tag');
 		$actions['export'] = array('title' => 'Export');
 		$actions['report'] = array('title' => 'Report');
+		$actions['change_pstatus'] = array(
+			'title' => 'Change Participant Status',
+			'event_nid' => $event_node->nid,
+			'prole_tid' => $prole_tid,
+			'pstatus_options' => sirius_event_participant_role_status_tids($prole_tid),
+		);
 		$actions['delete_participant'] = array(
 			'title' => 'Delete Participant Record',
-			'event_nid' => $event_node->nid,
 		);
 	}
 

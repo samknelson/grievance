@@ -6,6 +6,7 @@ function sirius_node_tab_event_participant_definition_followup_access($definitio
 }
 
 function sirius_node_tab_event_participant_definition_followup($definition_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	return drupal_get_form('sirius_node_tab_event_participant_definition_followup_form', $definition_node->nid);
 }
 

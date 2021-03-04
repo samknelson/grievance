@@ -5,6 +5,7 @@ function sirius_node_tab_event_phonebank_status_access($event_node) {
 }
 
 function sirius_node_tab_event_phonebank_status($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
   $json = json_decode($event_node->field_sirius_json['und'][0]['value'], TRUE);
   $type_json = sirius_event_type_json($event_node);
   $prole_tid = $type_json['phonebank']['prole_tid'];

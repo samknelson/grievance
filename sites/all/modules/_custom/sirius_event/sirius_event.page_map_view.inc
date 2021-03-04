@@ -25,6 +25,10 @@ function sirius_node_tab_event_map_view_access($event_node) {
 }
 
 function sirius_node_tab_event_map_view($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
+	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/survey.css', 'file');
+	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/map.js', array('type' => 'file', 'weight' => -5));
+
 	global $user;
 	$event_nid = $event_node->nid;
 	$event_json = sirius_jsonfield_util_node_json_get($event_node);
@@ -38,12 +42,12 @@ function sirius_node_tab_event_map_view($event_node) {
 		$html = '<div><em>' . t('Map is closed. Admin access only is allowed.') . '</em></div>';
 	}
 	
-	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/survey.css', 'file');
-	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/map.js', array('type' => 'file', 'weight' => -5));
 	$js_settings = array();
 	$js_settings['current_location'] = array(
 		'show' => TRUE,
+		'pin_key' => sirius_domain_variable_get('sirius_map_current_location_pin', 'dot-blue'),
 	);
+	$js_settings['pins'] = sirius_map_pins();
 
 	if (sirius_domain_component_enabled('mapping:checkin') && ($event_json['map']['checkin']['active'] == 'Yes')) {
 		$js_settings['current_location']['checkin'] = array(
@@ -55,7 +59,6 @@ function sirius_node_tab_event_map_view($event_node) {
 	$js_settings['poll'] = array('active' => TRUE, 'timeout' => 1000 * 60 * 3);
 	drupal_add_js(array('sirius_map' => $js_settings), 'setting');
 
-
 	$map_features = sirius_event_map_list($event_node);
 	if (!$map_features) {
 		drupal_set_message("No geocoded participants for this event have been found.", 'warning');
@@ -64,7 +67,6 @@ function sirius_node_tab_event_map_view($event_node) {
 
 	// Get map implementation provided by http://drupal.org/project/leaflet_googlemaps.
 	$map = sirius_map_leaflet_create();
-	// $map['center'] = array('lon' => 0, 'lat' => 0);
   $map_build = leaflet_build_map($map, $map_features, sirius_domain_variable_get('sirius_map_height', '600px'));
 	$html .= render($map_build);
 	$html .= l('Legend', 'sirius/modal/event/map-legend/' . $event_node->nid, array('attributes' => array('class' => array('tool-button'))));
@@ -84,7 +86,6 @@ function sirius_event_map_ajax_poll($event_nid) {
 	$event_node = node_load($event_nid);
 	$cutoff_ts = time() - 60*60;
 	$map_features = sirius_event_map_list($event_node, $cutoff_ts);
-
 	drupal_json_output(array('updates' => $map_features));
 	exit();
 }
@@ -120,22 +121,19 @@ function sirius_event_map_modal_form($form, &$form_state, $event_nid, $participa
     // Dismiss the modal
     $commands[] = ctools_modal_command_dismiss();
 
-    // Find the icon
+    // Find the pin
     $pstatus_term = taxonomy_term_load($pstatus_tid);
   	$pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
-  	$icon = $pstatus_json['map']['icon'];
-  	if (!$icon) { $icon = sirius_map_icon_default(); }
-  	$markers = sirius_map_icons();
-  	$icon_name = $markers[$icon];
+  	$pin = sirius_map_pin($pstatus_json['map']['pin']);
 
   	// Update the map
     $commands[] = array(
 	    'command' => 'sirius_command_map_update',
 	    'participant_nid' => $participant_nid,
-	    'icon_name' => $icon_name,
+	    'pin_name' => $pin['title'],
 	    'popup' => sirius_map_popup_html($event_nid, $contact_node->nid, $contact_node->title, $contact_node->field_sirius_address['und'][0]['thoroughfare'], $contact_node->field_sirius_address['und'][0]['premise'], $participant_nid, $pstatus_term->name),
 	    'pstatus_tid' => $pstatus_tid,
-	    'icon_url' => sirius_map_icon_url($icon),
+	    'pin_key' => $pin['key'],
     );
 
     // Show any messages
@@ -345,11 +343,10 @@ function sirius_event_map_legend_render($event_nid) {
 	$rows = array();
 	foreach ($pstatus_terms as $pstatus_tid => $pstatus_term) {
 		$pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
-		$icon = $pstatus_json['map']['icon'];
-		if (!$icon) { $icon = sirius_map_icon_default(); }
+		$pin = sirius_map_pin($pstatus_json['map']['pin']);
 
 		$row = array();
-		$row[] = sirius_map_icon_render($icon);
+		$row[] = sirius_map_pin_render($pin);
 		$row[] = $pstatus_term->name;
 		$row[] = number_format($counts[$pstatus_tid], 0);
 		$row[] = $pstatus_term->description;

@@ -49,7 +49,7 @@ function sirius_domain_page_list_impl($options) {
 			$html .= l($domain_root->title, current_path(), array('query' => array('switch' => $domain_root->nid)));
 		}
 		$html .= '<br /><br />';
-	} 
+	}
 
 	if ($options['stats']) {
 		global $user;
@@ -65,6 +65,11 @@ function sirius_domain_page_list_impl($options) {
 	}
 
 	$html .= sirius_domain_page_list_render($tree, NULL, $options);
+
+	$path = 'node/add/sirius-domain';
+	if (drupal_valid_path($path)) {
+		$html .= l('Add a Domain', $path, array('attributes' => array('class' => array('tool-button'))));
+	}
 
 	return $html;
 }

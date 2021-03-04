@@ -36,8 +36,8 @@ function grievance_content_types_image_default_styles() {
       2 => array(
         'name' => 'image_scale_and_crop',
         'data' => array(
-          'width' => 400,
-          'height' => 100,
+          'width' => 450,
+          'height' => 90,
         ),
         'weight' => 1,
       ),

@@ -16,6 +16,7 @@ function sirius_node_tab_event_schedule_access($event_node) {
 }
 
 function sirius_node_tab_event_schedule($event_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	return drupal_get_form('sirius_node_tab_event_schedule_form', $event_node->nid);
 }
 

@@ -11,6 +11,7 @@ function sirius_node_tab_event_participant_definition_audio_access($definition_n
 }
 
 function sirius_node_tab_event_participant_definition_audio($definition_node) {
+  sirius_event_disclaimer_redirect($event_node);
 	return drupal_get_form('sirius_node_tab_event_participant_definition_audio_form', $definition_node->nid);
 }
 
