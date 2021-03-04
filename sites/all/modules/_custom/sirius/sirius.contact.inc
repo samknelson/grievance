@@ -171,7 +171,7 @@ function sirius_contact_tag_remove($contact_node, $tid) {
 	}
 
 	if ($new_value) 	{ $contact_node->field_sirius_contact_tags['und'] = $new_value; } 
-	else 							{ unset($contact_node->field_sirius_contact_tags); } 
+	else 							{ unset($contact_node->field_sirius_contact_tags['und']); } 
 	node_save($contact_node);
 	return array('success' => TRUE, 'msg' => 'Contact saved.');
 }
