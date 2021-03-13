@@ -26,7 +26,7 @@ function sirius_dispatch_actions_create_possible($job_node, $worker_nid) {
 	return array('success' => TRUE);
 }
 
-function sirius_dispatch_actions_create($job_node, $worker_nid, $cbn = 'No', $status = 'requested') {
+function sirius_dispatch_actions_create($job_node, $worker_nid, $cbn = 'No', $status = 'requested', $completed_ts = NULL) {
 	$possible = sirius_dispatch_actions_create_possible($job_node, $worker_nid);
 	if (!$possible['success']) { return $possible; }
 
@@ -43,6 +43,11 @@ function sirius_dispatch_actions_create($job_node, $worker_nid, $cbn = 'No', $st
 	$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = $status;
 	$dispatch_node->field_sirius_dispatch_cbn['und'][0]['value'] = $cbn;
 	$dispatch_node->field_sirius_domain = $job_node->field_sirius_domain;
+	if ($completed_ts) {
+		$dispatch_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s', $completed_ts);
+		$dispatch_node->field_sirius_datetime_created['und'][0]['value'] = gmdate('Y-m-d H:i:s', $completed_ts);
+		$dispatch_node->field_sirius_datetime_completed['und'][0]['value'] = gmdate('Y-m-d H:i:s', $completed_ts);
+	}
 	$dispatch_node = node_submit($dispatch_node);
 	node_object_prepare($dispatch_node);
 	node_save($dispatch_node);
