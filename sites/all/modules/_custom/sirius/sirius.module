@@ -470,21 +470,21 @@ function sirius_menu_alter(&$items) {
   $items['user/%user/edit']['access callback'] = 'sirius_user_edit_access';
 
   $items['taxonomy/term/%taxonomy_term']['page callback'] = 'sirius_no_more_term_listings';
-  $items['taxonomy/term/%taxonomy_term']['page arguments'] = array();
+  $items['taxonomy/term/%taxonomy_term']['page arguments'] = array(2);
   $items['taxonomy/term/%taxonomy_term']['access arguments'] = array('access content');
 
 
   $items['taxonomy/term/%taxonomy_term/view']['page callback'] = 'sirius_no_more_term_listings';
-  $items['taxonomy/term/%taxonomy_term/view']['page arguments'] = array();
+  $items['taxonomy/term/%taxonomy_term/view']['page arguments'] = array(2);
   $items['taxonomy/term/%taxonomy_term/view']['access arguments'] = array('access content');
 
   $items['taxonomy/term/%taxonomy_term/feed']['page callback'] = 'sirius_no_more_term_listings';
-  $items['taxonomy/term/%taxonomy_term/feed']['page arguments'] = array();
+  $items['taxonomy/term/%taxonomy_term/feed']['page arguments'] = array(2);
   $items['taxonomy/term/%taxonomy_term/feed']['access arguments'] = array('access content');
 }
 
-function sirius_no_more_term_listings() {
-  return '(taxonomy term listings disabled.)';
+function sirius_no_more_term_listings($taxonomy_term) {
+  return taxonomy_term_view($taxonomy_term);
 }
 
 function sirius_user_view_access($account) {
