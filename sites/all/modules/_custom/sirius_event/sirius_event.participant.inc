@@ -25,6 +25,11 @@ function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $ps
 	if (!$term_cache[$pstatus_tid]) { $term_cache[$pstatus_tid] = taxonomy_term_load($pstatus_tid); }
 	sirius_jsonfield_log($participant_node, 'status', "Set prole = " . $term_cache[$prole_tid]->name . ", pstatus = " . $term_cache[$pstatus_tid]->name);
 	node_save($participant_node);
+
+	$event_node = node_load($participant_node->field_sirius_event['und'][0]['target_id']);
+	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+	sirius_interestlist_auto_cancel($event_type_term, $participant_node);
+
 	return array('success' => TRUE, 'msg' => 'Participant status changed.');
 }
 
