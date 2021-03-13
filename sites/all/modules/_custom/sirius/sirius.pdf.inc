@@ -82,7 +82,7 @@ function sirius_pdf_generate($url, $params) {
 	$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
 	$cmd .= $margin_args;
 	$cmd .= '-s letter ';
-	$cmd .= '--print-media-type ';
+	$cmd .= '--print-media-type --disable-smart-shrinking ';
 	$cmd .= '-q ';
 	$cmd .= $input_html_path;
 	$cmd .= ' ';
