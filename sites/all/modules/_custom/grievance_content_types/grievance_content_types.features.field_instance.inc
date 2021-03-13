@@ -14478,11 +14478,11 @@ function grievance_content_types_field_default_field_instances() {
         'default_country' => 'site_default',
         'format_handlers' => array(
           'address' => 'address',
+          'address-hide-country' => 'address-hide-country',
           'address-hide-postal-code' => 0,
           'address-hide-street' => 0,
           'address-hide-administrative-area' => 0,
           'address-hide-locality' => 0,
-          'address-hide-country' => 0,
           'organisation' => 0,
           'name-full' => 0,
           'name-oneline' => 0,
@@ -21055,13 +21055,13 @@ If the file has multiple pages, then each page in the input document will use th
 (For example, if a two-page letterhead is uploaded, then the first page of the letterhead will be used as the first page of the generated document, and the second page will be repeated as many times as necessary.)',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'file',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'file_default',
-        'weight' => 2,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -21123,15 +21123,15 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
+          'bypass_access' => 0,
           'field_delimiter' => '',
-          'link' => FALSE,
+          'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 3,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -21168,12 +21168,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
-        'weight' => 1,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -27839,14 +27836,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => 1,
-          'field_delimiter' => '',
-          'link' => 0,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 4,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -27878,12 +27870,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'taxonomy',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'taxonomy_term_reference_plain',
-        'weight' => 0,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -27931,12 +27920,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
-        'weight' => 3,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -27965,13 +27951,13 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 0,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -28004,12 +27990,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'text',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'text_default',
-        'weight' => 5,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
     ),
     'entity_type' => 'taxonomy_term',
@@ -29704,10 +29687,10 @@ If the file has multiple pages, then each page in the input document will use th
         'collapsible' => 1,
         'croparea' => '1000x1000',
         'enforce_minimum' => 0,
-        'enforce_ratio' => 0,
+        'enforce_ratio' => 1,
         'preview_image_style' => 'thumbnail',
         'progress_indicator' => 'throbber',
-        'resolution' => '',
+        'resolution' => '1000x200',
       ),
       'type' => 'imagefield_crop_widget',
       'weight' => 13,

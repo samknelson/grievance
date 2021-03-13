@@ -107,7 +107,7 @@ function sirius_event_page_create_form_submit($form, &$form_state) {
 
 	// Some things get set at the type level and are copied into the event.
 	$event_json = array();
-	foreach (array('disclaimer', 'session') as $key) {
+	foreach (array('disclaimer', 'session', 'customfield') as $key) {
 		if ($event_type_json[$key]) { 
 			$event_json[$key] = $event_type_json[$key];
 		}

@@ -17,10 +17,6 @@ function sirius_event_register_user_self_form($form, &$form_state, $event_node, 
 	$contact_nid = 	sirius_contact_nid_get_from_user();
 	$participant_node = sirius_event_participant_get($event_node->nid, $contact_nid);
 
-	$html = '<div class="sirius_form_intro">';
-	$html .= sirius_node_tab_event_info($event_node); 
-  $html .= '</div>';
-
   $form['#tree'] = TRUE;
 	$form['intro'] = array('#markup' => $html);
 
@@ -37,7 +33,12 @@ function sirius_event_register_user_self_form($form, &$form_state, $event_node, 
 	}
 
 	if ($participant_node) {
-		$form['participant_intro'] = array('#markup' => '<strong>' . t('You are registered for this event.') . '</strong>');
+		$html = '<strong>' . t('You are registered for this event.') . '</strong>';
+		$html .= '<div class="sirius_form_intro">';
+		$html .= sirius_node_tab_event_info($event_node); 
+	  $html .= '</div>';
+
+		$form['participant_intro'] = array('#markup' => $html);
 	} else {
 		$form['register_as'] = array(
 			'#title' => 'Register as',

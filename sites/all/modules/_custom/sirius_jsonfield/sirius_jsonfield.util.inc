@@ -19,6 +19,7 @@ function sirius_jsonfield_util_unset_from_path(&$json, $path) {
 }
 
 function sirius_jsonfield_util_get_from_path($json, $path) {
+	if (!$json || !is_array($json)) { return NULL; }
 	$path = preg_replace('/^:/', '', $path);
 	$parts = explode(':', $path);
 	$current = array_shift($parts);
@@ -148,7 +149,9 @@ function sirius_jsonfield_util_set_defaults(&$form, $defaults) {
 				}
 			}
 		} else {
-			sirius_jsonfield_util_set_defaults($form[$key], $defaults[$key]);
+			if (!preg_match('/^#/', $key)) {
+				sirius_jsonfield_util_set_defaults($form[$key], $defaults[$key]);
+			}
 		}
 	}
 }

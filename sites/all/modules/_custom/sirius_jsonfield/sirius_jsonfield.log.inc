@@ -28,7 +28,13 @@ function sirius_jsonfield_log($node, $type, $msg, $extra = array()) {
 	sirius_jsonfield_util_node_json_set($node, $json);
 }
 
-function sirius_jsonfield_log_render($node) {
+function sirius_jsonfield_node_tab_entity_sublog_access($node) {
+	$json = sirius_jsonfield_util_node_json_get($node);
+	if (!$json['log']) { return FALSE; }
+	return TRUE;
+}
+
+function sirius_jsonfield_node_tab_entity_sublog($node) {
 	$json = sirius_jsonfield_util_node_json_get($node);
 	$log = $json['log'];
 	if (!$log) { return array('no log entries.'); }
@@ -37,8 +43,7 @@ function sirius_jsonfield_log_render($node) {
 		'Date / Time',
 		'User',
 		'Type',
-		'Message',
-		'Extra'
+		'Message'
 	);
 
 	$rows = array();
@@ -50,11 +55,6 @@ function sirius_jsonfield_log_render($node) {
 		$row[] = $account->name . ' [' . $account->mail . ']';
 		$row[] = $entry['type'];
 		$row[] = $entry['msg'];
-		if ($row['extra']) {
-			$row[] = '<pre>' . print_r($extra, 1) . '</pre>';
-		} else {
-			$row[] = '';
-		}
 		$rows[] = $row;
 	}
 

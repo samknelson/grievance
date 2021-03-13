@@ -130,3 +130,54 @@ function sirius_log_render_form($param1, $param2 = NULL) {
 
   return $form;
 }
+
+function sirius_log_views_exposed_form_alter(&$form, &$form_state) {
+  if (isset($form_state['view']) && $form_state['view']->name == 'sirius_provider_worker_lookup') {
+    $form['#submit'][] = 'sirius_log_views_exposed_form_track';
+  }
+}
+
+function sirius_log_views_exposed_form_track($form, &$form_state) {
+  $msg = '';
+  if ($form_state['values']) {
+    foreach ($form_state['values'] as $key => $value) {
+      if (!preg_match('/^field_/', $key)) { continue; }
+      if (!$value) { continue; }
+      if (is_object($value) || is_array($value)) { continue; }
+
+      $title = $key;
+      $title = preg_replace('/field_/', '', $title);
+      if ($msg) { $msg .= ', '; }
+      $msg .= "$title=$value";
+    }
+  }
+
+  sirius_log(
+    'views_exposed_form', 
+    $form_state['view']->name, 
+    $msg, 
+    NULL, 
+    NULL, 
+    array(), 
+    NULL,
+    $form_state['values']
+  );
+}
+
+
+function sirius_log_handlers($log_node, $content_type = NULL) {
+  $handlers = node_load_multiple(sirius_fieldvals($log_node, 'field_sirius_log_handler', 'target_id'));
+  if ($content_type) {
+    $handlers = array_filter($handlers, function($handler_node) use ($content_type) {
+      return $handler_node->type == $content_type;
+    });
+  }
+
+  return $handlers;
+}
+
+function sirius_log_handler($log_node, $content_type) {
+  $handlers = sirius_log_handlers($log_node, $content_type);
+  if (!$handlers) { return NULL; }
+  return reset($handlers); 
+}

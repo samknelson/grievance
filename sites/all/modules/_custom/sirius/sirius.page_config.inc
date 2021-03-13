@@ -25,6 +25,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/disclaimer']						= array('title' => 'Disclaimers', 'description' => 'Configure dislcaimers -- text which can be attached to events or event types, and which must be accepted by the user.');
 	$links['core']['links']['sirius/config/feed']								= array('title' => 'Feeds', 'description' => 'Configure the feeds system.');
 	$links['core']['links']['sirius/mailattach']								= array('title' => 'Mailattach', 'description' => 'Configure the attach-by-email system.');
+	$links['core']['links']['sirius/customfield/definition/list']								= array('title' => 'Custom Field Sets', 'description' => 'Define custom field sets which can be attached to events or other entity types.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
@@ -46,6 +47,9 @@ function sirius_page_config() {
 	$links['dispatch']['links']['sirius/dispatch/config/view'] 	= array('title' => 'Dispatch Display', 'description' => 'Configure the header, footer, and style for the dispatch page.');
 	$links['dispatch']['links']['sirius/dispatch/config/vlri'] 	= array('title' => 'VLRI', 'description' => 'VLRI - Voluntary layoff with a request to convert to an involuntary configuration.');
 	$links['dispatch']['links']['sirius/dispatch/job/stub'] 		= array('title' => 'Stub Jobs', 'description' => 'Create or manage "stub" jobs, for generic dispatches or for importing legacy data.');
+
+	$links['event'] = array('title' => 'Events');
+	$links['event']['links']['sirius/event/interestlist/settings'] 	= array('title' => 'Interest List Settings', 'description' => 'Configure settings for "interest lists" for event types.');
 
 	$links['bulk'] = array('title' => 'Bulk Messenger');
 	$links['bulk']['links']['sirius/bulk/config'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
@@ -80,6 +84,7 @@ function sirius_page_config() {
 	$links['systems']['links']['sirius/map/admin']['sub_paths']['admin/config/system/leaflet_more_maps'] = array('title' => 'Leaflet "More Maps" Service');
 	$links['systems']['links']['sirius/sns/config'] 						= array('title' => 'SNS', 'description' => 'Settings for Amazon Simple Notification Service (SNS)');
 	$links['systems']['links']['sirius/signature/admin'] 				= array('title' => 'Signatures', 'description' => 'User signature settings (image)');
+	$links['systems']['links']['sirius/esignature/admin'] 			= array('title' => 'Signatures', 'description' => 'eSignature settings (signature lines, etc.)');
 	$links['systems']['links']['admin/config/grievance/phaxio'] = array('title' => 'Phaxio', 'description' => 'Configure the Phaxio fax service.');
 	$links['systems']['links']['admin/config/services/shorten'] = array('title' => 'Shorten', 'description' => 'Configure the link shortening services such as blt.ly.');
 	$links['systems']['links']['admin/config'] 									= array('title' => 'Drupal Configuration', 'description' => 'Enter the system-wide Drupal configuration screens.');

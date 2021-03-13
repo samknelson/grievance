@@ -40,6 +40,24 @@ function sirius_dispatch_node_tabs() {
     'weight' => 5,
   );
 
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_dispatches/list'] = array(
+    'title' => 'List',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_job_dispatches',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_dispatches/create'] = array(
+    'title' => 'Create',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_job_dispatches_create',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 2,
+    'file' => 'sirius_dispatch.page_job_dispatches_create.inc',
+  );
+
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_bullpen'] = array(
     'title' => 'Bullpen',
     'description' => '',
@@ -183,6 +201,8 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
     'weight' => 3,
   );
+
+  sirius_node_tab_set_module('sirius_dispatch', $node_tabs);
 
   return $node_tabs;
 }

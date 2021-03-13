@@ -53,6 +53,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.richtext.in
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.map.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.disclaimer.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mailattach.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.customfield.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
@@ -348,6 +349,12 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'sirius_domain_users') {
     sirius_domain_users_view_form_alter($form, $form_state); 
   }
+
+  // Log some searches. @todo this should be a general-purpose thing, not a harcoded view name
+  if ($form_id == 'views_exposed_form') {
+    sirius_log_views_exposed_form_alter($form, $form_state); 
+  }
+
 }
 
 /**
@@ -463,21 +470,21 @@ function sirius_menu_alter(&$items) {
   $items['user/%user/edit']['access callback'] = 'sirius_user_edit_access';
 
   $items['taxonomy/term/%taxonomy_term']['page callback'] = 'sirius_no_more_term_listings';
-  $items['taxonomy/term/%taxonomy_term']['page arguments'] = array();
+  $items['taxonomy/term/%taxonomy_term']['page arguments'] = array(2);
   $items['taxonomy/term/%taxonomy_term']['access arguments'] = array('access content');
 
 
   $items['taxonomy/term/%taxonomy_term/view']['page callback'] = 'sirius_no_more_term_listings';
-  $items['taxonomy/term/%taxonomy_term/view']['page arguments'] = array();
+  $items['taxonomy/term/%taxonomy_term/view']['page arguments'] = array(2);
   $items['taxonomy/term/%taxonomy_term/view']['access arguments'] = array('access content');
 
   $items['taxonomy/term/%taxonomy_term/feed']['page callback'] = 'sirius_no_more_term_listings';
-  $items['taxonomy/term/%taxonomy_term/feed']['page arguments'] = array();
+  $items['taxonomy/term/%taxonomy_term/feed']['page arguments'] = array(2);
   $items['taxonomy/term/%taxonomy_term/feed']['access arguments'] = array('access content');
 }
 
-function sirius_no_more_term_listings() {
-  return '(taxonomy term listings disabled.)';
+function sirius_no_more_term_listings($taxonomy_term) {
+  return taxonomy_term_view($taxonomy_term);
 }
 
 function sirius_user_view_access($account) {
@@ -898,4 +905,13 @@ function sirius_ajax_generic_replace($form, $form_state) {
     '#type' => 'ajax',
     '#commands' => $commands
   );
+}
+
+/**
+ * Just a stupid wrapper around number_format() that doesn't throw an error when it's not passed a number.
+ */
+
+function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $thousands_separator = ",") {
+  if (!is_numeric($str)) { return $str; }
+  if (is_numeric($str)) { return number_format($str, $decimals, $decimal_separator, $thousands_separator); }
 }

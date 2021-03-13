@@ -138,7 +138,15 @@ function sirius_worker_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_worker_contact_customfields',
     'permissions' => array('sirius worker admin'),
-    'weight' => 2,
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_contact/merge'] = array(
+    'title' => 'Merge',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_merge',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 4
   );
 
   $node_tabs['sirius_worker']['sirius_worker_industry'] = array(
@@ -148,13 +156,15 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_merge'] = array(
-    'title' => 'Merge',
+  $node_tabs['sirius_worker']['sirius_worker_grievances'] = array(
+    'title' => 'Grievances',
     'description' => '',
-    'callback' => 'sirius_node_tab_worker_merge',
-    'permissions' => array('sirius worker admin'),
+    'callback' => 'sirius_node_tab_worker_grievances',
+    'permissions' => array('grievance view'),
+    'file' => 'sirius_worker.page_grievances.inc',
   );
 
+  sirius_node_tab_set_module('sirius_worker', $node_tabs);
 	return $node_tabs;
 }
 

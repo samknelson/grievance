@@ -10,18 +10,18 @@
 	width: 100%;
 	height: 100%;
 	background-color: #ffffff;
-	border-bottom: 3px dashed #000000;
+	border-bottom: 2px dashed #000000;
 	-ms-touch-action: none;
 	position: absolute;
 	left;
 }
 
 .sirius_esignature_pane_accepted {
-	border-bottom: 3px dashed #116b23;
+	border-bottom: 2px dashed #116b23;
 }
 
 .sirius_esignature_statement_body {
-	height: 400px;
+	height: 450px;
 	overflow: scroll;
 	border: 1px solid #000000;
 	padding: 10px;
@@ -31,24 +31,45 @@
 }
 
 
+
+
+
+
+
+
+
+
+
 .sirius_esignature_render {
 	position: relative;
 }
 
-.sirius_esignature_render_img {
-	width: 200px;
-	border-bottom: 3px dashed #000000;
-}
-
 .sirius_esignature_render_missing {
-	width: 200px;
-	height: 40px;
-	border-bottom: 3px dashed #aaaaaa;
 }
 
-.sirius_esignature_render_img_full {
-	width: 400px;
-	border-bottom: 3px dashed #000000;
+.sirius_esignature_render_full {
+	position: relative;
+}
+
+
+
+.sirius_esignature_canvas {
+	width: 225px;
+	height: 45px;
+	border-bottom: 2px dashed #000000;
+}
+
+.sirius_esignature_render_full .sirius_esignature_canvas {
+	width: 450px;
+	height: 90px;
+}
+
+img.sirius_esignature_img {
+	width: 225px;
+}
+
+.sirius_esignature_render_full img.sirius_esignature_img {
+	width: 450px;
 }
 
 .sirius_esignature_render_date {
@@ -64,6 +85,36 @@
 	color: #000000;
 }
 
+.sirius_esignature_render_full .sirius_esignature_col_name {
+	width: 225px;
+}
+
+.sirius_esignature_render_full .sirius_esignature_col_name {
+	float: left;
+	width: 450px;
+	display: inline-block;
+}
+
+.sirius_esignature_render_full .sirius_esignature_col_date {
+	float: left;
+	width: 300px;
+	padding-left: 50px;
+	display: inline-block;
+}
+
+
+
+
+.sirius_esignature_render_full .sirius_esignature_datecanvas {
+	width: 280px;
+	height: 70px;
+	border-bottom: 2px dashed #000000;
+	font-size: 16px;
+	font-style: italic;
+	font-weight: bold;
+	color: #042963;
+	padding: 10px;
+}
 
 
 
@@ -106,4 +157,8 @@
 .sirius_esignature_popup_close:hover {
   background: url('../images/popup-announcement-icons.png') 0 -28px;
   cursor: pointer;
+}
+
+.sirius_esignature_statement {
+	font-weight: bold;
 }

@@ -73,17 +73,71 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 
 	$form['submit'] = array(
 		'#type' => 'submit',
-		'#value' => 'Submit',
+		'#value' => t('Submit'),
 	);
 
 	if ($form_state['result']) {
-		$form['result'] = array('#markup' => $form_state['result']);
+		if ($form_state['result']['rows']) {
+
+			$form['worker_action'] = array(
+				'#type' => 'select',
+				'#title' => t('Action for Selected Workers'),
+				'#options' => array(
+					NULL => t('-- Select --'),
+					'event_register' => t('Register for an Event'),
+				),
+			);
+
+			// Upcoming events
+			$event_options = sirius_event_upcoming();
+			$form['class_nid'] = array(
+				'#type' => 'select',
+				'#title' => 'Event',
+				'#options' => $event_options,
+				'#states' => array('visible' => array(':input[name="worker_action"]' => array('value' => 'event_register'))),
+			);
+
+			$form['worker_nids'] = array(
+				'#type' => 'tableselect',
+				'#title' => 'Results',
+				'#header' => $form_state['result']['header'],
+				'#options' => $form_state['result']['rows'],
+			);
+
+		} else {
+			drupal_set_message("No workers match your search criteria.");
+		}
 	}
 
 	return $form;
 }
 
 function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
+	// Handle redirect to register
+	if ($form_state['values']['worker_action'] == 'event_register') {
+		$worker_nids = array_filter(array_values($form_state['values']['worker_nids']));
+		$event_nid = $form_state['values']['class_nid'];
+		if (!$event_nid) { 
+			drupal_set_message("Please select a class.", 'error');
+		} else if (!$worker_nids) { 
+			drupal_set_message("Please select at least one worker", 'error');
+		} else {
+			$widget = 'worker_byname';
+			$result = sirius_worker_stupid_event_widget_finder($event_nid, $widget);
+			if (!$result['success']) {
+				drupal_set_message($result['msg'], 'error');
+			} else {
+				$path = 'node/' . $event_nid . '/sirius_event_participants_register';
+				$query = array(
+					'delta' => $result['delta'],
+					'widget' => $widget,
+					'worker_nids' => join(',', $worker_nids),
+				);
+				drupal_goto($path, array('query' => $query));
+			}
+		}
+	}
+
 	$form_state['rebuild'] = TRUE;
 	$days = $form_state['values']['days'];
 	$days2 = $form_state['values']['days2'];
@@ -159,6 +213,20 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 	$limit = 1000;
 	if ($output == 'csv') { $limit = 100000; }
 
+	$header = array(t('Worker'), t('Badge #'), t('Skill'), t('Phone'), t('Email'), t('Expiration'), t('Tools'));
+
+	if ($output == 'csv') {
+		$filename = "skill_expiration_report_" . date('YmdHis') . '_' . $days . '_' . $days2 . '.csv';
+		drupal_add_http_header('Content-Type', 'text/csv');
+		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		$fp = fopen('php://output', 'w');
+		fputcsv($fp, $header);
+		foreach ($rows as $row) {
+			fputcsv($fp, $row);
+		}
+	}
+
+
 	$stmt = db_query($sql, $args);
 	$rows = array();
 	$count = 0;
@@ -176,24 +244,58 @@ function sirius_worker_page_skill_expiring_form_submit($form, &$form_state) {
 		} else {
 			$row[] = l(t('Manage Skills'), 'node/' . $hr['nid'] . '/sirius_worker_skill', array('attributes' => array('class' => 'tool-button')));
 		}
-		$rows[] = $row;
+
+		if ($output == 'csv') {
+			fputcsv($row);
+		} else {
+			$rows[$hr['nid']] = $row;
+		}
+	}
+
+	if ($output == 'csv') {
+		drupal_exit();
 	}
 
 	if ($count >= $limit-1) { drupal_set_message("Only showing the first $limit records. Select a CSV export to download the full list."); }
 
-	$header = array(t('Worker'), t('Badge #'), t('Skill'), t('Phone'), t('Email'), t('Expiration'), t('NID'));
+	$form_state['result'] = array('header' => $header, 'rows' => $rows);
+}
 
-	if ($output == 'csv') {
-		$filename = "skill_expiration_report_" . date('YmdHis') . '_' . $days . '_' . $days2 . '.csv';
-		drupal_add_http_header('Content-Type', 'text/csv');
-		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
-		$fp = fopen('php://output', 'w');
-		fputcsv($fp, $header);
-		foreach ($rows as $row) {
-			fputcsv($fp, $row);
-		}
-		drupal_exit();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function sirius_worker_stupid_event_widget_finder($event_nid, $widget_name) {
+	$event_node = node_load($event_nid);
+	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+	$all_rules = $json['register']['rules'];
+	if (user_access('sirius event admin')) {
+		$rules = $all_rules;
+	} else {
+		$rules = sirius_event_paccess_rule_match($event_node->nid, $all_rules, TRUE);
 	}
-
-	$form_state['result'] = theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
+	$widgets = sirius_event_register_widgets();
+	if (!$rules) {
+		return array('success' => FALSE, 'msg' => 'You do not have access to any registration rules for this event type.');
+	}
+	foreach ($rules as $delta => $rule) {
+		if ($rule['widget'][$widget_name]) {
+			return array('success' => TRUE, 'delta' => $delta);
+		}
+	}
+	return array('success' => FALSE, 'msg' => "You do not have access to use the registration tool [$widget_name] in the specied event.");
 }

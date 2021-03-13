@@ -93,6 +93,7 @@ function sirius_letter_content_types_all() {
 		'sirius_contact' => 'Contact',
 		'grievance_shop' => 'Employer',
 		'grievance' => 'Grievance',
+		'sirius_log' => 'Log (Authorizations, etc.)',
 		'sirius_worker' => 'Worker',
 	);
 }
@@ -209,7 +210,8 @@ function sirius_letter_pdf_contents($letter_node) {
 
 	$url .= sirius_loopback_url() . '/sirius/loopback/echo';
 	$params = array();
-	$params['post']['body'] = '<div id="grievance-letter-body">' . $data['pdf_body'] . '</div>';
+	$params['post']['body'] = '<div id="grievance-letter-body" class="sirius_pdf_body">' . $data['pdf_body'] . '</div>';
+	$params['post']['css_paths'] = 'sites/all/modules/_custom/sirius/css/pdf.css';
 	$params['letterhead'] = $data['pdf_letterhead'];
 	return sirius_pdf_generate($url, $params);
 

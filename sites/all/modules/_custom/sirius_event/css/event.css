@@ -31,3 +31,12 @@
 	padding: 0;
 }
 
+#content .columns_table td h2 {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+#content .columns_table .date-padding .form-type-textfield {
+	margin-top: 0;
+	margin-bottom: 0;
+}

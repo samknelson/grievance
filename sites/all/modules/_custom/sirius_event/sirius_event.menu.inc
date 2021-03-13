@@ -482,6 +482,61 @@ function sirius_event_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['sirius_contact']['sirius_contact_events'] = array(
+    'title' => 'Events',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_contact_events',
+    'permissions' => array('sirius event admin'),
+    'file' => 'sirius_event.page_contact_events.inc',
+  );
+
+  $node_tabs['sirius_contact']['sirius_contact_events/list'] = array(
+    'title' => 'Events',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_contact_events',
+    'permissions' => array('sirius event admin'),
+    'file' => 'sirius_event.page_contact_events.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_contact']['sirius_contact_events/interestlist'] = array(
+    'title' => 'Interest Lists',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_contact_interestlists',
+    'permissions' => array('sirius event admin'),
+    'file' => 'sirius_event.page_contact_interestlists.inc',
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_events'] = array(
+    'title' => 'Events',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_worker_events',
+    'permissions' => array('sirius event admin'),
+    'file' => 'sirius_event.page_worker_events.inc',
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_events/list'] = array(
+    'title' => 'Events',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_worker_events',
+    'permissions' => array('sirius event admin'),
+    'file' => 'sirius_event.page_worker_events.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_events/interestlist'] = array(
+    'title' => 'Interest Lists',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_worker_interestlists',
+    'permissions' => array('sirius event admin'),
+    'file' => 'sirius_event.page_worker_interestlists.inc',
+    'weight' => 2,
+  );
+
+
   sirius_node_tab_set_module('sirius_event', $node_tabs);
 	return $node_tabs;
 }
@@ -612,6 +667,69 @@ function sirius_event_term_tabs() {
     'permissions' => array('sirius event admin'),
     'weight' => 6,
   );
+
+  $term_tabs['sirius_event_type']['sirius_event_type_customfield'] = array(
+    'title' => 'Custom Fields',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_customfield',
+    'permissions' => array('sirius event admin'),
+    'weight' => 1,
+    'file' => array('sirius_event.term_tab_customfield.inc'),
+  );
+
+
+
+  $term_tabs['sirius_event_type']['sirius_event_type_interestlist'] = array(
+    'title' => 'Interest List',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_interestlist_self',
+    'permissions' => array('sirius'),
+    'weight' => 6,
+    'file' => 'sirius_event.term_tab_interestlist_self.inc',
+  );
+
+  $term_tabs['sirius_event_type']['sirius_event_type_interestlist/self'] = array(
+    'title' => 'Sign Up Self',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_interestlist_self',
+    'permissions' => array('sirius'),
+    'weight' => 6,
+    'file' => 'sirius_event.term_tab_interestlist_self.inc',
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $term_tabs['sirius_event_type']['sirius_event_type_interestlist/worker'] = array(
+    'title' => 'Sign Up Worker',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_interestlist_worker',
+    'permissions' => array('sirius event admin'),
+    'weight' => 6,
+    'file' => 'sirius_event.term_tab_interestlist_worker.inc',
+    'weight' => 2,
+  );
+
+  $term_tabs['sirius_event_type']['sirius_event_type_interestlist/list'] = array(
+    'title' => 'List',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_interestlist_list',
+    'permissions' => array('sirius event admin'),
+    'weight' => 6,
+    'file' => 'sirius_event.term_tab_interestlist_list.inc',
+    'weight' => 3,
+  );
+
+  $term_tabs['sirius_event_type']['sirius_event_type_interestlist/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_interestlist_settings',
+    'permissions' => array('sirius event admin'),
+    'weight' => 10,
+    'file' => 'sirius_event.term_tab_interestlist_settings.inc',
+  );
+
+
+
 
   $term_tabs['sirius_event_participant_status']['sirius_event_pstatus'] = array(
     'title' => 'Settings',
@@ -781,6 +899,24 @@ function sirius_event_menu() {
     'access arguments' => array(5),
     'type'             => MENU_CALLBACK,
     'weight' => 20,
+  );
+
+
+  $items['sirius/event/interestlist/settings'] = array(
+    'title' => 'Interest List Settings',
+    'description' => '',
+    'access arguments' => array('sirius event admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_event_interestlist_settings_form'),
+  );
+
+  $items['sirius/event/interestlists'] = array(
+    'title' => 'Interest Lists',
+    'description' => '',
+    'access arguments' => array('sirius'),
+    'page callback' => 'sirius_event_page_interestlists',
+    'page arguments' => array(),
+    'file' => 'sirius_event.page_interestlists.inc',
   );
 
   return $items;

@@ -7,17 +7,19 @@ function sirius_node_tab_worker_user($worker_node) {
 function sirius_worker_user_create_form($form, &$form_state, $worker_node) {
 	$worker_user = sirius_worker_get_user($worker_node->nid);
 	if ($worker_user) {
-		$intro_html = 'This worker is currently associated with the user <strong>#' . 
-			$worker_user->uid . ' - ' . $worker_user->name . ' (' . $worker_user->mail . ')' . '.</strong> ' .
-			l('Edit', 'user/' . $worker_user->uid . '/edit') . 
-			'. Use the button below to update the worker with the latest information from the user.';
+
+  	$html .= t('This worker is currently associated with: ');
+  	$html .= '<strong>';
+		$html .= 'User #' . $worker_user->uid . ' - ' . $worker_user->name . ' (' . $worker_user->mail . ')';
+  	$html .= '</strong>';
+  	$html .= l('Edit', 'user/' . $worker_user->uid . '/edit', ['attributes' => ['class' => ['tool-button']]]);
 	} else {
-		$intro_html = 'There is no user currently associated with this worker. Use the button below to create one.';
+		$html = 'There is no user currently associated with this worker. Use the button below to create one.';
 	}
 
 	$form['intro'] = array(
 		'#type' => 'markup',
-		'#markup' => '<div class="sirius_form_intro">' . $intro_html . '</div>'
+		'#markup' => '<div class="sirius_form_intro">' . $html . '</div>'
 	);
 
 	$form_state['worker_node'] = $worker_node;
