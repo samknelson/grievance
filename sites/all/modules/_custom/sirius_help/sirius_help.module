@@ -83,7 +83,7 @@ function sirius_help_modal_paths() {
   $paths = array();
 
   $paths['sirius/modal/help-text-view/%node'] = array(
-    'style' => 'ac-modal-style',
+    'style' => 'sirius-help-modal-style',
   );
 
   return $paths;
@@ -92,11 +92,11 @@ function sirius_help_modal_paths() {
 function sirius_help_modal_styles() {
   $styles = array();
 
-  $styles['sirius-modal-style'] = array(
+  $styles['sirius-help-modal-style'] = array(
     'modalSize' => array(
       'type' => 'fixed',
-      'width' => 500,
-      'height' => 350,
+      'width' => 600,
+      'height' => 600,
     ),
   );
 
@@ -186,19 +186,20 @@ function sirius_help_get($path) {
 }
 
 function sirius_help_render($help_node) {
-  $html = '<div class="sirius_help"><div class="inner">';
+  drupal_add_css(drupal_get_path('module', 'sirius_help') . '/css/help.css');
 
+  $html = '<div class="sirius_help"><div class="inner">';
   $html .= $help_node->field_sirius_summary['und'][0]['value'];
 
   if (strlen($help_node->body['und'][0]['value']) > 10) {
     $html .= '<span class="sirius_help_morelink">';
-    $html .= l('Read more.', 'sirius/modal/help-text-view/' . $help_node->nid);
+    $html .= l('Read more.', 'sirius/modal/help-text-view/' . $help_node->nid, array('attributes' => array('class' => array('tool-button'))));
     $html .= '</span>';
   }
 
   if (user_access('sirius help admin')) {
     $html .= '<span class="sirius_help_editlink">';
-    $html .= l('[Edit]', 'node/' . $help_node->nid . '/edit', array('query' => array('destination' => current_path())));
+    $html .= l('Edit', 'node/' . $help_node->nid . '/edit', array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
     $html .= '</span>';
   }
 
@@ -214,6 +215,11 @@ function sirius_help_modal_view_access($help_node) {
 }
 
 function sirius_help_modal_view($help_node) {
+  drupal_add_css(drupal_get_path('module', 'sirius_help') . '/css/help.css');
   drupal_set_title($help_node->title);
-  return $help_node->body['und'][0]['value'];
+  $html = '<div class="sirius_help_full">';
+  $html .= $help_node->body['und'][0]['value'];
+  $html .= '</div>';
+
+  return $html;
 }
