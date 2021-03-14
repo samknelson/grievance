@@ -461,3 +461,9 @@ function sirius_emailaddress_lookup($emailaddress) {
   return $node;
 }
 
+function sirius_email_render($email) {
+  if (!$email) { return ''; }
+  $email = htmlspecialchars($email);
+
+  return "<a href=\"mailto:$email\">$email</a>";
+}

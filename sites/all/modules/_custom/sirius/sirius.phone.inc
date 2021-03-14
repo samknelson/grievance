@@ -408,3 +408,10 @@ function sirius_sms_admin() {
   return system_settings_form($form);
 }
 
+
+function sirius_phone_render($phone) {
+  if (!$phone) { return ''; }
+  $phone = sirius_phone_format($phone);
+  $phone = htmlspecialchars($phone);
+  return "<a href=\"tel:$phone\">$phone</a>";
+}

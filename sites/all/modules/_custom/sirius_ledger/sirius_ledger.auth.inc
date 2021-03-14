@@ -11,7 +11,6 @@ function sirius_ledger_auth_entities($auth_node, $content_type = NULL) {
 	return $handlers;
 }
 
-
 function sirius_ledger_auth_entities_set($auth_node, $content_type, $new) {
 	$current_all = sirius_fieldvals($auth_node, 'field_sirius_log_handler', 'target_id');
 	$current_bytype = array_keys(sirius_ledger_auth_entities($auth_node, $content_type));

@@ -337,7 +337,7 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 			$cmd .= '--server-args="-screen 0 1024x768x24" ';
 			$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
 			$cmd .= $wkhtmltopdfargs . ' ';
-			$cmd .= '--print-media-type ';
+			$cmd .= '--print-media-type --disable-smart-shrinking ';
 			$cmd .= '-q ';
 			$cmd .= $txt_path;
 			$cmd .= ' ';
@@ -396,7 +396,7 @@ function grievance_bundle_batch_pdf($grievance_node, $drupal_path, &$context) {
 	$cmd .= '-a ';
 	$cmd .= '--server-args="-screen 0 1024x768x24" ';
 	$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
-	$cmd .= '--print-media-type ';
+	$cmd .= '--print-media-type --disable-smart-shrinking ';
 	$cmd .= '--disable-javascript ';
 	$cmd .= '-q ';
 	$cmd .= grievance_bundle_output_path($grievance_node, $drupal_path) . '.html ';

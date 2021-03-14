@@ -166,3 +166,21 @@ function sirius_log_views_exposed_form_track($form, &$form_state) {
     $form_state['values']
   );
 }
+
+
+function sirius_log_handlers($log_node, $content_type = NULL) {
+  $handlers = node_load_multiple(sirius_fieldvals($log_node, 'field_sirius_log_handler', 'target_id'));
+  if ($content_type) {
+    $handlers = array_filter($handlers, function($handler_node) use ($content_type) {
+      return $handler_node->type == $content_type;
+    });
+  }
+
+  return $handlers;
+}
+
+function sirius_log_handler($log_node, $content_type) {
+  $handlers = sirius_log_handlers($log_node, $content_type);
+  if (!$handlers) { return NULL; }
+  return reset($handlers); 
+}

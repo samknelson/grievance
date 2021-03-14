@@ -90,6 +90,7 @@ function grievance_xnode_tabs() {
 	);
 
 	// These will be obsolete any minute, as soon as Local 100 moves over to letters.
+	/*
 	$node_tabs['grievance']['gform'] = array(
 		'title' => 'Forms',
 		'description' => '',
@@ -110,7 +111,7 @@ function grievance_xnode_tabs() {
 		'callback' => 'grievance_node_tab_arbitrationform',
 		'permissions' => array('grievance form'),
 	);
-	
+	*/
 
 	$node_tabs['grievance']['bundle'] = array(
 		'title' => 'Bundle',

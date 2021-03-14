@@ -89,27 +89,7 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 			);
 
 			// Upcoming events
-			$domain_nid = sirius_domain_nid();
-			$sql_args = array();
-			$sql_args['cutoff'] = date("Y-m-d 00:00:00", strtotime('-3 days'));
-			$sql = "select * from node ";
-			$sql .= "left join field_data_field_sirius_daterepeat on field_data_field_sirius_daterepeat.entity_type = 'node' and field_data_field_sirius_daterepeat.entity_id = node.nid and field_data_field_sirius_daterepeat.delta = 0 ";
-			$sql .= "left join field_data_field_sirius_event_type on field_data_field_sirius_event_type.entity_type = 'node' and field_data_field_sirius_event_type.entity_id = node.nid ";
-			$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
-			$sql .= "left join taxonomy_term_data on taxonomy_term_data.tid = field_sirius_event_type_tid ";
-			$sql .= "where node.type = 'sirius_event' ";
-			$sql .= "and field_sirius_daterepeat_value >= :cutoff ";
-			if ($domain_nid) {
-				$sql_args['domain_nid'] = $domain_nid;
-				$sql .= "and field_sirius_domain_target_id = :domain_nid ";
-			}
-			$sql .= "order by field_sirius_daterepeat_value, name, title limit 100 ";
-			$stmt = sirius_sql_query($sql, $sql_args);
-			$event_options = array(NULL => t('-- Select --'));
-			while ($hr = $stmt->fetchAssoc()) {
-				$event_options[$hr['nid']] = $hr['title'] . ' [' . date('Y-m-d', strtotime($hr['field_sirius_daterepeat_value'] . ' GMT')) . ']';
-			}
-
+			$event_options = sirius_event_upcoming();
 			$form['class_nid'] = array(
 				'#type' => 'select',
 				'#title' => 'Event',

@@ -52,10 +52,13 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 	global $user;
 	$user_roles = array_keys($user->roles);
 	$can_run = FALSE;
-	foreach ($user_roles as $rid) {
-		if (!$rid) { continue; }
-		if (!$policy['run']['role'][$rid]) { continue; }
-		$can_run = TRUE;
+	if (user_access('sirius admin') || user_access('sirius domain admin') || user_access('sirius dispatch admin')) { $can_run = TRUE; }
+	if (!$can_run) {
+		foreach ($user_roles as $rid) {
+			if (!$rid) { continue; }
+			if (!$policy['run']['role'][$rid]) { continue; }
+			$can_run = TRUE;
+		}
 	}
 
 	$is_staff = user_access('sirius dispatch staff');

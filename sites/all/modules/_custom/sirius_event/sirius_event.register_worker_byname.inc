@@ -1,31 +1,35 @@
 <?php
 
+function sirius_event_register_worker_byname_workers_from_query() {
+  if (!$_REQUEST['worker_nids']) { return array(); }
+
+  $workers = array();
+  $worker_nids = explode(',', $_REQUEST['worker_nids']);
+  // Load worker titles. SQL for speed and we also verify the domain
+  $domain_nid = sirius_domain_nid();
+  $sql_args = array();
+  $sql_args[':worker_nids'] = $worker_nids;
+  $sql = "select nid, title ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "where node.type = 'sirius_worker' ";
+  $sql .= "and nid in (:worker_nids) ";
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  }
+  $stmt = sirius_sql_query($sql, $sql_args);
+  while ($hr = $stmt->fetchAssoc()) {
+    $workers[$hr['nid']] = $hr['title'];
+  }
+  return $workers;
+}
+
 function sirius_event_register_worker_byname_form($form, &$form_state, $event_node, $rule) {
   drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/event.css', 'file');
   $form['#after_build'][] = 'sirius_event_register_worker_byname_worker_remove_format';
 
-  // Handle worker NIDs passed as a query
-  $workers = array();
-  if ($_REQUEST['worker_nids']) {
-    $worker_nids = explode(',', $_REQUEST['worker_nids']);
-    // Load worker titles. SQL for speed and we also verify the domain
-    $domain_nid = sirius_domain_nid();
-    $sql_args = array();
-    $sql_args[':worker_nids'] = $worker_nids;
-    $sql = "select nid, title ";
-    $sql .= "from node ";
-    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
-    $sql .= "where node.type = 'sirius_worker' ";
-    $sql .= "and nid in (:worker_nids) ";
-    if ($domain_nid) {
-      $sql .= "and field_sirius_domain_target_id = :domain_nid ";
-      $sql_args[':domain_nid'] = $domain_nid;
-    }
-    $stmt = sirius_sql_query($sql, $sql_args);
-    while ($hr = $stmt->fetchAssoc()) {
-      $workers[$hr['nid']] = $hr['title'];
-    }
-  }
+  $workers = sirius_event_register_worker_byname_workers_from_query();
   $worker_nids = array_keys($workers);
   
   $form_state['event_nid'] = $event_node->nid;
@@ -210,9 +214,21 @@ function sirius_event_register_worker_byname_form($form, &$form_state, $event_no
   $delta = $ajax_params['delta'];
   if (!$delta) { $delta = 0; }
   $worker_str = $form_state['input']['workers'][$delta];
+  $form['worker_preview'] = array(
+    '#type' => 'markup',
+    '#markup' => sirius_event_register_worker_byname_render_preview($worker_str),
+  );
+  $form['col2_close'] = array('#markup' => '</td></tr></table>');
+
+  return $form;
+}
+
+function sirius_event_register_worker_byname_render_preview($worker_str) {
+  $preview = '<div id="sirius_worker_preview">';
+
   if ($worker_str) {
     $result = sirius_event_register_worker_byname_worker($worker_str);
-    $preview = '<h2>' . t('Worker Selected') . '</h2>';
+    $preview .= '<h2>' . t('Worker Selected') . '</h2>';
     if (!$result['success']) {
       $preview .= '<em>' . $result['msg'] . '</em>';
     } else {
@@ -228,15 +244,12 @@ function sirius_event_register_worker_byname_form($form, &$form_state, $event_no
       }
     }
   }
-  $form['worker_preview'] = array(
-    '#type' => 'markup',
-    '#markup' => '<div id="sirius_worker_preview">' . $preview . '</pre>' . '</div>',
-  );
- 
-  $form['col2_close'] = array('#markup' => '</td></tr></table>');
 
-  return $form;
+  $preview .= '</div>';
+
+  return $preview;
 }
+
 
 function sirius_event_register_worker_byname_form_ajax_preview($form, $form_state) {
   return $form['worker_preview'];

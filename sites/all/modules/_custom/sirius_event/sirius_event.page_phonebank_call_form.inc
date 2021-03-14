@@ -6,6 +6,7 @@ function sirius_node_tab_event_phonebank_call_form_submit_ajax_change_recipient(
   $commands[] = ajax_command_replace("#pstatus_wrap", render($form['pstatus']));
   $commands[] = ajax_command_replace("#intro_wrap", render($form['intro']));
   $commands[] = ajax_command_replace("#submit_wrap", render($form['submit']));
+  $commands[] = ajax_command_replace("#caller_wrap", render($form['caller']));
 	return array('#type' => 'ajax', '#commands' => $commands);
 }
 
@@ -281,34 +282,32 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		}
 
 		$caller_uid = $participant_json['phonebank']['caller']['uid'];
-		global $user;
+		$caller_name = $participant_json['phonebank']['caller']['name'];
 		$my_uid = $user->uid;
-		if (!$caller_uid || ($caller_uid == $my_uid)) {
-			$form['caller'] = array(
-				'#type' => 'hidden',
-				'#name' => 'caller',
-				'#value' => $my_uid,
+		$my_name = $user->name;
+
+		$caller_options = array();
+		$caller_options[$my_uid] = $my_name;
+		if ($caller_uid) { $caller_options[$caller_uid] = $caller_name; }
+		$form['caller'] = array(
+			'#type' => 'select',
+			'#options' => $caller_options,
+			'#title' => 'Called by',
+			'#ajax' => array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax'),
+			'#default_value' => $caller_uid,
+			'#prefix' => '<div id="caller_wrap">',
+			'#suffix' => '</div>',
+		);
+		if (!$caller_uid || ($caller_uid == $my_uid)) { 
+			$form['caller']['#type'] = 'hidden';
+			unset($form['caller']['#options']);
+			$form['caller']['#value'] = $my_uid;
+		}
+		if ($event_json['phonebank']['autosave']['field'] == 'Yes') {
+			$form['caller']['#ajax'] = array(
+				'callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax',
+				'event' => 'blur'
 			);
-		} else {
-			$caller_user = user_load($caller_uid);
-			$form['caller'] = array(
-				'#type' => 'select',
-				'#options' => array(
-					$user->uid => $user->name,
-					$caller_uid => $caller_user->name,
-				),
-				'#title' => 'Called by',
-				'#prefix' => '<div id="caller_wrap">',
-				'#suffix' => '</div>',
-				'#ajax' => array('callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax'),
-				'#default_value' => $caller_uid,
-			);
-			if ($event_json['phonebank']['autosave']['field'] == 'Yes') {
-				$form['caller']['#ajax'] = array(
-					'callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax',
-					'event' => 'blur'
-				);
-			}
 		}
 	}
 

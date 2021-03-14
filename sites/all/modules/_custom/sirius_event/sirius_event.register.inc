@@ -8,6 +8,9 @@ function sirius_event_participant_register_user($event_nid, $uid, $participant_r
 }
 
 function sirius_event_participant_register($event_nid, $contact_nid, $participant_role_tid, $participant_status_tid, $json = NULL) {
+	$event_node = node_load($event_nid);
+	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+
 	$participant_node = sirius_event_participant_get($event_nid, $contact_nid);
 	if ($participant_node) {
 		return array('success' => FALSE, 'msg' => 'That contact is already registered for the event.', 'code' => 1, 'participant_node' => $participant_node);
@@ -65,6 +68,8 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
       if ($result['success']) { $msg .= " Email sent to: $contact_email."; } else { $msg .= " Email to $contact_email failed: " . $result['msg']; }
     }
 	}
+
+	sirius_interestlist_auto_cancel($event_type_term, $participant_node);
 
 	return array('success' => TRUE, 'msg' => $msg, 'nid' => $participant_node->nid);
 }

@@ -78,7 +78,7 @@ function sirius_event_page_participant_certifications_form($form, &$form_state, 
 
 	$form['participant_nids'] = array(
 		'#type' => 'tableselect',
-		'#title' => 'Particicipants',
+		'#title' => 'Participants',
 		'#header' => $header,
 		'#options' => $options,
 		'#required' => TRUE,

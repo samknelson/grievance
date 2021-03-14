@@ -52,7 +52,9 @@ function sirius_contact_sync_from_user($account) {
 		$need_save = FALSE;
 		if ($account->field_sirius_contact['und'][0]['target_id']) {
 			$contact_node = node_load($account->field_sirius_contact['und'][0]['target_id']);
-		} else {
+		}
+
+		if (!$contact_node) {
 			$contact_node = new stdClass();
 			$contact_node->type = 'sirius_contact';
 			$contact_node->no_recurse = TRUE;
@@ -171,7 +173,7 @@ function sirius_contact_tag_remove($contact_node, $tid) {
 	}
 
 	if ($new_value) 	{ $contact_node->field_sirius_contact_tags['und'] = $new_value; } 
-	else 							{ unset($contact_node->field_sirius_contact_tags); } 
+	else 							{ unset($contact_node->field_sirius_contact_tags['und']); } 
 	node_save($contact_node);
 	return array('success' => TRUE, 'msg' => 'Contact saved.');
 }

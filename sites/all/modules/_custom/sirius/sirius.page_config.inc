@@ -48,6 +48,9 @@ function sirius_page_config() {
 	$links['dispatch']['links']['sirius/dispatch/config/vlri'] 	= array('title' => 'VLRI', 'description' => 'VLRI - Voluntary layoff with a request to convert to an involuntary configuration.');
 	$links['dispatch']['links']['sirius/dispatch/job/stub'] 		= array('title' => 'Stub Jobs', 'description' => 'Create or manage "stub" jobs, for generic dispatches or for importing legacy data.');
 
+	$links['event'] = array('title' => 'Events');
+	$links['event']['links']['sirius/event/interestlist/settings'] 	= array('title' => 'Interest List Settings', 'description' => 'Configure settings for "interest lists" for event types.');
+
 	$links['bulk'] = array('title' => 'Bulk Messenger');
 	$links['bulk']['links']['sirius/bulk/config'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
 

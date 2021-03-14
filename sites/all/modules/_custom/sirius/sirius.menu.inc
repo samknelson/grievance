@@ -293,9 +293,9 @@ function sirius_node_tabs() {
     'weight' => 1,
   );
 
-  $content_types = array('sirius_log', 'sirius_letterhead');
+  $content_types = array('sirius_log', 'sirius_letterhead', 'sirius_contact');
   foreach ($content_types as $content_type) {
-    $node_tabs[$content_type][$content_type . '_json'] = array(
+    $node_tabs[$content_type][$content_type . '_rawjson'] = array(
       'title' => 'JSON',
       'description' => '',
       'callback' => 'sirius_node_tab_entity_json',
