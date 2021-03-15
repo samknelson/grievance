@@ -12,9 +12,10 @@ Employers {"url":"grievance\/admin\/shops","weight":"-47"}
 --Add a Contact {"url":"node\/add\/grievance-shop-contact","weight":"-50"}
 -Companies {"url":"grievance\/admin\/shops\/companies","weight":"-49"}
 --Add a Company {"url":"node\/add\/grievance-company","weight":"0"}
--Bulk-Reassign Organizers {"url":"grievance\/admin\/shops\/bulk-reassign","weight":"0"}
--Chapters {"url":"grievance\/admin\/chapters","weight":"0"}
--Grievance Reassign {"url":"admin\/grievance\/reassign","weight":"0"}
+-Chapters {"url":"grievance\/admin\/chapters","weight":"-47"}
+-Grievance Shop Assignments {"url":"grievance\/admin\/shops\/assignments","weight":"-46"}
+--Bulk-Reassign Organizers {"url":"grievance\/admin\/shops\/bulk-reassign","weight":"-49"}
+--Grievance Reassign {"url":"admin\/grievance\/reassign","weight":"-50"}
 Config {"url":"sirius\/config","weight":"-43"}
 File a Grievance {"url":"node\/add\/grievance","weight":"-50"}
 My Grievances {"url":"grievances","weight":"-49"}
