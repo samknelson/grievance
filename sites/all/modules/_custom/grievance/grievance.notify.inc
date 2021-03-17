@@ -16,6 +16,8 @@ function grievance_notify_company_contacts($params = array()) {
 	$include_contact_type_tid = $params['include_contact_type_tid'];
 	$exclude_contact_type_tid = $params['exclude_contact_type_tid'];
 
+	$contact_type_lookup = sirius_taxonomy_load('grievance_contact_types', 'tid', 'name');
+
 	// Find shop contacts associated with the shop
 	$recipients = array();
 	$shop_node = node_load($shop_nid);
@@ -33,19 +35,15 @@ function grievance_notify_company_contacts($params = array()) {
 			$contact_nids = array_keys($stmt['node']);
 			$contact_nodes = node_load_multiple($contact_nids);
 			foreach ($contact_nodes as $contact_nid => $contact_node) {
-				if ($exclude_contact_type_tid) {
-					$found = FALSE;
-					if ($contact_node->field_grievance_contact_types) {
-						foreach ($contact_node->field_grievance_contact_types['und'] as $tmp) {
-							if ($tmp['tid'] == $exclude_contact_type_tid) {
-								$found = TRUE;
-							}
-						}
-					}
-					if ($found) { continue; }
-				}
+				$contact_type_tids = sirius_fieldvals($contact_node, 'field_grievance_contact_types', 'tid');
+				if ($exclude_contact_type_tid && in_array($exclude_contact_type_tid, $contact_type_tids)) { continue; }
 
 				$recipient = array();
+
+				$recipient['contact_type_names'] = array();
+				foreach ($contact_type_tids as $contact_type_tid) {
+					$recipient['contact_type_names'][] = $contact_type_lookup[$contact_type_tid];
+				}
 
 				$role = $contact_node->field_grievance_co_role['und'][0]['value'];
 				if ($role) {
