@@ -160,7 +160,7 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
 
 			if (preg_match('/^article-tag:/', $name)) {
 				list ($ignore, $tag_name, $format) = explode(':', $name);
-				if (!$format) { $format = full; }
+				if (!$format) { $format = 'full'; }
 
 				$replacement = '';
 				// Find the contract template

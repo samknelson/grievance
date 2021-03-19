@@ -111,15 +111,15 @@ function grievance_letter_pdf_contents($node, $letter_nids, $values) {
 		file_copy($letterhead_source, $letterhead_pdf_uri, FILE_EXISTS_REPLACE);
 	}
 
-	$cmd = sirius_server_paths('xvfb-run') . ' -a ';
-	$cmd .= '--server-args="-screen 0 1024x768x24" ';
+	// $cmd = sirius_server_paths('xvfb-run') . ' -a ';
+	// $cmd .= '--server-args="-screen 0 1024x768x24" ';
 	$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
 	if ($wkhtmltopdfargs) {
 		$cmd .= $wkhtmltopdfargs . ' ';
 	}
 	$cmd .= $margin_args;
 	$cmd .= '-s letter ';
-	$cmd .= '--print-media-type ';
+	$cmd .= '--print-media-type --disable-smart-shrinking ';
 	$cmd .= '-q ';
 	$cmd .= $html_path;
 	$cmd .= ' ';
