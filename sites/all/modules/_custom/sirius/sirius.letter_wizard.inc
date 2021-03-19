@@ -299,7 +299,7 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 					'name' => $candidate['name'],
 					'email' => $candidate['email'],
 					'description' => $candidate['type'],
-					'disposition' => 'cc',
+					'disposition' => 'skip',
 					'delta' => $delta++,
 				);
 			}
