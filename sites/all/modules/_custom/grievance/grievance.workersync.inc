@@ -344,6 +344,12 @@ function grievance_workersync_sync_form($form, &$form_state) {
     '#required' => TRUE,
   );
 
+  $form['nid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Grievance NID'),
+    '#description' => t('Enter the node ID of an individual record to sync. If left blank, the sync will run across all records.'),
+  );
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -357,7 +363,8 @@ function grievance_workersync_sync_form($form, &$form_state) {
 }
 
 function grievance_workersync_sync_form_submit($form, &$form_state) {
-	grievance_workersync_sync();
+	$nid = $form_state['values']['nid'];
+	grievance_workersync_sync(array($nid));
 	$form_state['rebuild'] = TRUE;
 }
 
@@ -384,12 +391,12 @@ function grievance_workersync_cron($force = FALSE) {
 	}
 }
 
-function grievance_workersync_sync() {
-	grievance_workersync_sync_grievances();
-	grievance_workersync_sync_stewards();
+function grievance_workersync_sync($nids = NULL) {
+	grievance_workersync_sync_grievances($nids);
+	grievance_workersync_sync_stewards($nids);
 }
 
-function grievance_workersync_sync_grievances() {
+function grievance_workersync_sync_grievances($grievance_nids = NULL) {
 	if (sirius_domain_variable_get('grievance_workersync_sync_grievances_enabled', 'yes') != 'yes') { return sirius_minilog("Grievance sync is not enabled."); }
 	$plugin = grievance_workersync_plugin_fetch();
 	if (!$plugin) { return sirius_minilog("No plugin has been selected.", 'error'); }
@@ -418,24 +425,27 @@ function grievance_workersync_sync_grievances() {
   $updated_count = 0;
 
   // Find all open grievances where the data hasn't been changed manually.
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance');
-  $query->fieldCondition('field_grievance_status', 'tid', $status_tids, 'in');
-  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
-  // The following would be nice, but doesn't handle nulls.  So we check manually later.
-  // $query->fieldCondition('field_grievance_corrected', 'value', 'Pending', '!=');
-  $stmt = $query->execute();
-  if (!$stmt['node']) { 
-  	sirius_minilog("No open grievances found.");
-  	return;
-  }
+  if (!$grievance_nids) {
+	  $query = new EntityFieldQuery();
+	  $query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'grievance');
+	  $query->fieldCondition('field_grievance_status', 'tid', $status_tids, 'in');
+	  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+	  // The following would be nice, but doesn't handle nulls.  So we check manually later.
+	  // $query->fieldCondition('field_grievance_corrected', 'value', 'Pending', '!=');
+	  $stmt = $query->execute();
+	  if (!$stmt['node']) { 
+	  	sirius_minilog("No open grievances found.");
+	  	return;
+	  }
 
-	$grievance_nids = array_keys($stmt['node']);
+		$grievance_nids = array_keys($stmt['node']);
+	}
 
+	$total = count($grievance_nids);
   foreach ($grievance_nids as $grievance_nid) {
     ++$examined_count;
-    sirius_minilog("Grievance NID $grievance_nid: Starting");
+    sirius_minilog("Grievance NID $grievance_nid ($examined_count/$total): Starting");
 
     // Load the grievance
     $grievance_node = node_load($grievance_nid);
@@ -467,6 +477,7 @@ function grievance_workersync_sync_grievances() {
     $fields['field_grievance_city']           = 'city';
     $fields['field_grievance_state']          = 'state';
     $fields['field_grievance_address']        = 'street';
+    $fields['field_grievance_address_2']      = 'street2';
     $fields['field_grievance_zip']           	= 'zip';
     $fields['field_grievance_phone']          = 'phone';
     $fields['field_grievance_email']          = 'email';
@@ -479,6 +490,7 @@ function grievance_workersync_sync_grievances() {
     $columns['field_grievance_city']           = 'value';
     $columns['field_grievance_state']          = 'value';
     $columns['field_grievance_address']        = 'value';
+    $columns['field_grievance_address_2']      = 'value';
     $columns['field_grievance_zip']            = 'value';
     $columns['field_grievance_phone']          = 'value';
     $columns['field_grievance_email']          = 'email';
@@ -515,7 +527,7 @@ function grievance_workersync_sync_grievances() {
   sirius_minilog("Grievance sync complete. Examined $examined_count nodes, updated $updated_count");
 }
 
-function grievance_workersync_sync_stewards() {
+function grievance_workersync_sync_stewards($contact_nids = NULL) {
 	if (sirius_domain_variable_get('grievance_workersync_sync_stewards_enabled', 'yes') != 'yes') { return sirius_minilog("Steward sync is not enabled."); }
 	$plugin = grievance_workersync_plugin_fetch();
 	if (!$plugin) { return sirius_minilog("No plugin has been selected.", 'error'); }
@@ -527,15 +539,17 @@ function grievance_workersync_sync_stewards() {
 	if (!$steward_type_tid) { return sirius_minilog("There is no grievance contact type term configured for shop stewards. Go to the 'Sirius Special TIDs' page to select one.", 'error'); }
 
   // Find all shop stewards
-  $domain_nid = sirius_domain_nid();
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->entityCondition('bundle', 'grievance_shop_contact');
-  $query->fieldCondition('field_grievance_contact_types', 'tid', $steward_type_tid);
-  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
-  $stmt = $query->execute();
-  if (!$stmt['node']) { return sirius_minilog("There are no contacts to sync."); }
-  $contact_nids = array_keys($stmt['node']);
+  if (!$contact_nids) {
+	  $domain_nid = sirius_domain_nid();
+	  $query = new EntityFieldQuery();
+	  $query->entityCondition('entity_type', 'node');
+	  $query->entityCondition('bundle', 'grievance_shop_contact');
+	  $query->fieldCondition('field_grievance_contact_types', 'tid', $steward_type_tid);
+	  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+	  $stmt = $query->execute();
+	  if (!$stmt['node']) { return sirius_minilog("There are no contacts to sync."); }
+	  $contact_nids = array_keys($stmt['node']);
+	}
 
   foreach ($contact_nids as $contact_nid) {
     ++$examined_count;
