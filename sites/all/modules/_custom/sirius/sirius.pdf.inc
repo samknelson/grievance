@@ -1,5 +1,37 @@
 <?php
 
+function sirius_pdf_admin($form, &$form_state) {
+  $name = sirius_domain_variable_name('sirius_pdf_margin_left');
+	$form[$name] = array(
+		'#type' => 'textfield',
+		'#title' => 'Left Margin',
+		'#default_value' => sirius_domain_variable_get($name, '15mm'),
+	);
+
+  $name = sirius_domain_variable_name('sirius_pdf_margin_right');
+	$form[$name] = array(
+		'#type' => 'textfield',
+		'#title' => 'Right Margin',
+		'#default_value' => sirius_domain_variable_get($name, '15mm'),
+	);
+
+  $name = sirius_domain_variable_name('sirius_pdf_margin_top');
+	$form[$name] = array(
+		'#type' => 'textfield',
+		'#title' => 'Top Margin',
+		'#default_value' => sirius_domain_variable_get($name, '15mm'),
+	);
+
+  $name = sirius_domain_variable_name('sirius_pdf_margin_bottom');
+	$form[$name] = array(
+		'#type' => 'textfield',
+		'#title' => 'Bottom Margin',
+		'#default_value' => sirius_domain_variable_get($name, '15mm'),
+	);
+
+  return system_settings_form($form);
+}
+
 function sirius_pdf_loopback($html, $letterhead_node = NULL) {
 	sirius_become_superuser(TRUE);
 
@@ -44,7 +76,7 @@ function sirius_pdf_generate($url, $params) {
 		if ($json['page']["margin_$which"]) {
 			$arg = escapeshellarg($json['page']["margin_$which"]);
 		} else {
-			$arg = "'15mm'";
+			$arg = escapeshellarg(sirius_domain_variable_get("sirius_pdf_margin_$which", '15mm'));
 		}
 		$margin_args .= "--margin-$which $arg ";
 	}
@@ -82,7 +114,7 @@ function sirius_pdf_generate($url, $params) {
 	$cmd .= sirius_server_paths('wkhtmltopdf') . ' ';
 	$cmd .= $margin_args;
 	$cmd .= '-s letter ';
-	$cmd .= '--print-media-type ';
+	$cmd .= '--print-media-type --disable-smart-shrinking ';
 	$cmd .= '-q ';
 	$cmd .= $input_html_path;
 	$cmd .= ' ';

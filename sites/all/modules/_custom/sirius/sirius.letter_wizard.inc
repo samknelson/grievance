@@ -245,7 +245,6 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 		}
 
 		if ($entity_node->type == 'grievance') {
-
 		 	// Grievant
 			if ($entity_node->field_grievance_email['und'][0]['email'] && !$recipients[$entity_node->field_grievance_email['und'][0]['email']]) {
 				$recipient = array();
@@ -295,11 +294,18 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 			foreach ($candidates as $candidate) {
 				if (!$candidate['email']) { continue; }
 				if ($recipients[$candidate['email']]) { continue; }
+				$candidate_name = $candidate['name'];
+
+				$candidate_description = $candidate['type'];
+				if ($candidate['contact_type_names']) {
+					if ($candidate_description) { $candidate_description .= '<br />'; }
+					$candidate_description .= join('<br />', $candidate['contact_type_names']);
+				}
 				$recipients[$candidate['email']] = array(
 					'name' => $candidate['name'],
 					'email' => $candidate['email'],
-					'description' => $candidate['type'],
-					'disposition' => 'cc',
+					'description' => $candidate_description,
+					'disposition' => 'skip',
 					'delta' => $delta++,
 				);
 			}

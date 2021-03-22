@@ -132,9 +132,12 @@ function sirius_log_render_form($param1, $param2 = NULL) {
 }
 
 function sirius_log_views_exposed_form_alter(&$form, &$form_state) {
+  // We decided not to do this, beause it might be HIPAA triggeing.
+  /*
   if (isset($form_state['view']) && $form_state['view']->name == 'sirius_provider_worker_lookup') {
     $form['#submit'][] = 'sirius_log_views_exposed_form_track';
   }
+  */
 }
 
 function sirius_log_views_exposed_form_track($form, &$form_state) {

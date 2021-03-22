@@ -18,6 +18,7 @@ function sirius_page_config() {
 	$links['core']['links']['grievance/admin/holidays'] 				= array('title' => 'Holidays', 'description' => 'Global holidays settings.');
 	$links['core']['links']['sirius/admin/help'] 								= array('title' => 'Help Text', 'description' => 'Put explanatory text on any page on the site.');
 	$links['core']['links']['grievance/admin/basic-pages'] 			= array('title' => 'Basic Pages', 'description' => 'Manage basic pages.');
+	$links['core']['links']['sirius/pdf/settings'] 							= array('title' => 'PDF Settings', 'description' => 'Global settings for PDF generation for the site.');
 	$links['core']['links']['sirius/admin/letterhead'] 					= array('title' => 'Letterhead', 'description' => 'Manage letterheads and watermarks for the site.');
 	$links['core']['links']['sirius/contact/definition'] 				= array('title' => 'Contact Definition', 'description' => 'Set additional domain-specific fields for contacts.');
 	$links['core']['links']['sirius/contact/resync/all']				= array('title' => 'Contact Resync', 'description' => 'A data integrity utility to re-connect all worker and user accounts with contacts.');
