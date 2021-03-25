@@ -74,7 +74,7 @@ function sirius_training_node_tab_certification_grant_form($form, &$form_state, 
 
 					$expires_ts = strtotime($worker_node->field_sirius_skill_expire['und'][$delta]['value']);
 					if (!$expires_ts || $expires_ts > time() + 60*60*24*365*50) {
-						$expires = t('Never Expires');
+						$expires = sirius_domain_variable_get('sirius_worker_skill_never_expires_text', 'Never Expires');
 					} else {
 						$expires = t('Expires: @date', array('@date' => date('m/d/Y', $expires_ts)));
 						$expires .= ' (' . format_interval($expires_ts - time(), 2) . t(' remaining') . ')';
