@@ -23,6 +23,7 @@
 					$('.form-item-field-grievance-state-und-0-value input').val(data.responseJSON.state);
 					$('.form-item-field-grievance-zip-und-0-value input').val(data.responseJSON.zip);
 					$('.form-item-field-grievance-address-und-0-value input').val(data.responseJSON.street);
+					$('.form-item-field-grievance-address-2-und-0-value input').val(data.responseJSON.street2);
 					$('.form-item-field-grievance-gender-und select').val(data.responseJSON.gender);
 					$('.form-item-field-grievance-phone-und-0-value input').val(data.responseJSON.phone);
 					$('.form-item-field-grievance-email-und-0-email input').val(data.responseJSON.email);

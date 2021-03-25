@@ -961,6 +961,16 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/pdf/settings'] = array(
+    'title' => 'PDF Settings',
+    'description' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_pdf_admin'),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 1,
+  );
+
   $items['sirius/mailattach'] = array(
     'title' => 'Mailattach',
     'description' => '',
