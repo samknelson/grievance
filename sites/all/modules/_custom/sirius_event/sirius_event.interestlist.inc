@@ -1,16 +1,21 @@
 <?php
 
-function sirius_event_interestlist_cancel_impl($interestlist_node) {
+function sirius_event_interestlist_cancel_impl($interestlist_node, $cancel_json = NULL) {
 	$interestlist_node->field_sirius_type['und'][0]['value'] = 'canceled';
 	sirius_jsonfield_log($interestlist_node, 'interestlist_cancel', 'Interest List Canceled');
+	if ($cancel_json) {
+		$json = sirius_jsonfield_util_node_json_get($interestlist_node);
+		$json = array_merge_recursive($json, $cancel_json);
+		sirius_jsonfield_util_node_json_set($interestlist_node, $json);
+	}
 	node_save($interestlist_node);
 	return array('success' => TRUE, 'msg' => 'Interest list signup canceled.');
 }
 
-function sirius_event_interestlist_cancel($event_type_term, $contact_nid) {
+function sirius_event_interestlist_cancel($event_type_term, $contact_nid, $cancel_json = NULL) {
 	$interestlist_node = sirius_event_interestlist_lookup($event_type_term, $contact_nid);
 	if (!$interestlist_node) { return array('success' => TRUE, 'msg' => t('No signup found.')); }
-	return sirius_event_interestlist_cancel_impl($interestlist_node);
+	return sirius_event_interestlist_cancel_impl($interestlist_node, $cancel_json);
 }
 
 function sirius_event_interestlist_signup($event_type_term, $contact_nid, $json) {
@@ -226,7 +231,7 @@ function sirius_interestlist_auto_cancel($event_type_term, $participant_node) {
 
 	foreach ($auto_cancel as $key) {
 		if ($my_key == $key) {
-			sirius_event_interestlist_cancel($event_type_term, $contact_nid);
+			sirius_event_interestlist_cancel($event_type_term, $contact_nid, array('interestlist' => array('cancel' => array('comments' => 'Signed up for an event, participant nid ' . $participant_node->nid))));
 			// drupal_set_message("Canceling: $contact_nid because $my_key == $key");
 			return;
 		}

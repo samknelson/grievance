@@ -45,6 +45,11 @@ function sirius_event_term_tab_interestlist_self_form($form, &$form_state, $even
 			'#required' => TRUE,
 		);
 
+		$form['interestlist']['comments'] = array(
+			'#type' => 'textarea',
+			'#title' => t('Comments'),
+		);
+
 		$form['submit'] = array(
 			'#type' => 'submit',
 			'#value' => t('Remove me from the interest list'),
@@ -82,7 +87,8 @@ function sirius_event_term_tab_interestlist_self_form_submit($form, &$form_state
 
 	$action = $form_state['values']['action'];
 	if ($action == 'cancel') {
-		$result = sirius_event_interestlist_cancel($event_type_term, $contact_nid);
+		$params = array('interestlist' => array('cancel' => $form_state['values']['interestlist']));
+		$result = sirius_event_interestlist_cancel($event_type_term, $contact_nid, $params);
 	} else {
 		$params = array('interestlist' => array('signup' => $form_state['values']['interestlist']));
 		$result = sirius_event_interestlist_signup($event_type_term, $contact_nid, $params);

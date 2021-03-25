@@ -93,6 +93,12 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 		'#states' => array('visible' => array(':input[name="action"]' => array('value' => 'event'))),
 	);
 
+	$form['comments'] = array(
+		'#type' => 'textarea',
+		'#title' => 'Comments',
+		'#states' => array('visible' => array(':input[name="action"]' => array('value' => 'cancel'))),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -194,6 +200,7 @@ function sirius_event_term_tab_interestlist_list_form_submit($form, &$form_state
 		$batch_params['bulk_nid'] = $bulk_node->nid;
 		drupal_set_message("Bulk message created. " . l('Manage', 'node/' . $bulk_node->nid . '/sirius_bulk_body', array('attributes' => array('class' => array('tool-button')))));
 	}
+	$batch_params['comments'] = $form_state['values']['comments'];
 
 	$interestlist_nids = array_filter(array_values($form_state['values']['interestlist']));
 	$interestlist_chunks = array_chunk($interestlist_nids, 100);
@@ -221,7 +228,7 @@ function sirius_event_term_tab_interestlist_list_batch($interestlist_nids, $acti
 		++$context['results']['count'];
 
 		if ($action == 'cancel') {
-			$result = sirius_event_interestlist_cancel_impl($interestlist_node);
+			$result = sirius_event_interestlist_cancel_impl($interestlist_node, array('interestlist' => array('cancel' => array('comments' => $batch_params['comments']))));
 		} else if ($action == 'bulk') {
 			$contact_node = sirius_log_handler($interestlist_node, 'sirius_contact');
 			$result = sirius_bulk_recipient_add($batch_params['bulk_nid'], $contact_node->nid);
