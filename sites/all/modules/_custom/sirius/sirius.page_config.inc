@@ -29,6 +29,7 @@ function sirius_page_config() {
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
+	$links['worker']['links']['sirius/skill/settings'] = array('title' => 'Skill Settings', 'description' => 'Configure settings for skill management and display.');
 
 	$links['employer'] = array('title' => 'Employer');
 	$links['employer']['links']['sirius/employer/config/usermanage'] = array('title' => 'Employer User Manager', 'description' => 'Configure tools for allowing employers to manage their own users.');

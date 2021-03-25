@@ -20,7 +20,10 @@ function sirius_node_tab_sirius_domain_subdomains($domain_node) {
 	return $html;
 }
 
+
 function sirius_page_domains() {
+	drupal_goto('sirius/domain/switch');
+	/*
 	if (user_access('sirius admin')) {
 		drupal_set_title('Root Domains');
 		return views_embed_view('sirius_domains', 'block_2');
@@ -30,4 +33,5 @@ function sirius_page_domains() {
 		drupal_set_title('Root Domains: ' . $root_domain_node->title);
 		return views_embed_view('sirius_domains', 'block_1', $root_domain_node->nid);
 	}
+	*/
 }
