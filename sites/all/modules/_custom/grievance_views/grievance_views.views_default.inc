@@ -9251,12 +9251,12 @@ Grievance Form',
     'group-field_grievance_first_name_value' => array(
       'group' => '4',
       'filter_name' => 'field_grievance_first_name_value',
-      'weight' => '-22',
+      'weight' => '-28',
     ),
     'group-field_grievance_last_name_value' => array(
       'group' => '4',
       'filter_name' => 'field_grievance_last_name_value',
-      'weight' => '-20',
+      'weight' => '-27',
     ),
     'group-field_grievance_status_tid' => array(
       'group' => '1',
@@ -9266,12 +9266,12 @@ Grievance Form',
     'group-uid' => array(
       'group' => '3',
       'filter_name' => 'uid',
-      'weight' => '-22',
+      'weight' => '-26',
     ),
     'group-uid_1' => array(
       'group' => '3',
       'filter_name' => 'uid_1',
-      'weight' => '-20',
+      'weight' => '-25',
     ),
     'group-title' => array(
       'group' => '2',
@@ -9331,7 +9331,7 @@ Grievance Form',
     'group-uid_2' => array(
       'group' => '3',
       'filter_name' => 'uid_2',
-      'weight' => '-19',
+      'weight' => '-24',
     ),
     'group-field_grievance_broughtby_tid' => array(
       'group' => '0',
@@ -9341,7 +9341,7 @@ Grievance Form',
     'group-field_grievance_min_value' => array(
       'group' => '4',
       'filter_name' => 'field_grievance_min_value',
-      'weight' => '-19',
+      'weight' => '-26',
     ),
     'group-field_grievance_comments_value' => array(
       'group' => '0',
@@ -9367,6 +9367,16 @@ Grievance Form',
       'group' => '5',
       'filter_name' => 'field_grievance_category_tid',
       'weight' => '-26',
+    ),
+    'group-field_grievance_class_tid_tid' => array(
+      'group' => '4',
+      'filter_name' => 'field_grievance_class_tid_tid',
+      'weight' => '-25',
+    ),
+    'group-field_grievance_classification_value' => array(
+      'group' => '4',
+      'filter_name' => 'field_grievance_classification_value',
+      'weight' => '-24',
     ),
   );
   $handler->display->display_options['pager']['type'] = 'full';
@@ -10183,6 +10193,33 @@ Grievance Form',
   );
   $handler->display->display_options['filters']['field_grievance_category_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_grievance_category_tid']['vocabulary'] = 'grievance_category';
+  /* Filter criterion: Content: Classification (field_grievance_class_tid) */
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['id'] = 'field_grievance_class_tid_tid';
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['table'] = 'field_data_field_grievance_class_tid';
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['field'] = 'field_grievance_class_tid_tid';
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['value'] = '';
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['expose']['operator_id'] = 'field_grievance_class_tid_tid_op';
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['expose']['label'] = 'Classification (dropdown)';
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['expose']['operator'] = 'field_grievance_class_tid_tid_op';
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['expose']['identifier'] = 'field_grievance_class_tid_tid';
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  $handler->display->display_options['filters']['field_grievance_class_tid_tid']['vocabulary'] = 'grievance_job_classification';
+  /* Filter criterion: Content: Classification (field_grievance_classification) */
+  $handler->display->display_options['filters']['field_grievance_classification_value']['id'] = 'field_grievance_classification_value';
+  $handler->display->display_options['filters']['field_grievance_classification_value']['table'] = 'field_data_field_grievance_classification';
+  $handler->display->display_options['filters']['field_grievance_classification_value']['field'] = 'field_grievance_classification_value';
+  $handler->display->display_options['filters']['field_grievance_classification_value']['operator'] = 'allwords';
+  $handler->display->display_options['filters']['field_grievance_classification_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_classification_value']['expose']['operator_id'] = 'field_grievance_classification_value_op';
+  $handler->display->display_options['filters']['field_grievance_classification_value']['expose']['label'] = 'Classification (text field)';
+  $handler->display->display_options['filters']['field_grievance_classification_value']['expose']['operator'] = 'field_grievance_classification_value_op';
+  $handler->display->display_options['filters']['field_grievance_classification_value']['expose']['identifier'] = 'field_grievance_classification_value';
+  $handler->display->display_options['filters']['field_grievance_classification_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
 
   /* Display: Data export */
   $handler = $view->new_display('views_data_export', 'Data export', 'views_data_export_1');
@@ -10481,6 +10518,8 @@ Grievance Form',
     t('Complaint'),
     t('Intake Date (including time)'),
     t('Category'),
+    t('Classification (dropdown)'),
+    t('Classification (text field)'),
     t('Data export'),
     t('Page'),
   );
@@ -22224,14 +22263,67 @@ Grievance Form',
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Sirius Employer Users';
+  $handler->display->display_options['use_ajax'] = TRUE;
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'sirius employer user manager';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['type'] = 'better_exposed_filters';
+  $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
+  $handler->display->display_options['exposed_form']['options']['bef'] = array(
+    'general' => array(
+      'input_required' => 0,
+      'text_input_required' => array(
+        'text_input_required' => array(
+          'value' => 'Select any filter and click on Apply to see results',
+          'format' => 'full_html',
+        ),
+      ),
+      'allow_secondary' => 0,
+      'secondary_label' => 'Advanced options',
+      'secondary_collapse_override' => '0',
+    ),
+    'name' => array(
+      'bef_format' => 'default',
+      'more_options' => array(
+        'autosubmit' => 0,
+        'is_secondary' => 0,
+        'any_label' => '',
+        'bef_filter_description' => '',
+        'tokens' => array(
+          'available' => array(
+            0 => 'global_types',
+          ),
+        ),
+        'rewrite' => array(
+          'filter_rewrite_values' => '',
+        ),
+      ),
+    ),
+    'mail' => array(
+      'bef_format' => 'default',
+      'more_options' => array(
+        'autosubmit' => 0,
+        'is_secondary' => 0,
+        'any_label' => '',
+        'bef_filter_description' => '',
+        'tokens' => array(
+          'available' => array(
+            0 => 'global_types',
+          ),
+        ),
+        'rewrite' => array(
+          'filter_rewrite_values' => '',
+        ),
+      ),
+    ),
+  );
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '100';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
   $handler->display->display_options['style_plugin'] = 'views_aggregator';
   $handler->display->display_options['style_options']['columns'] = array(
     'uid' => 'uid',
@@ -22461,6 +22553,34 @@ Grievance Form',
   $handler->display->display_options['arguments']['rid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['rid']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['arguments']['rid']['break_phrase'] = TRUE;
+  /* Filter criterion: User: Name (raw) */
+  $handler->display->display_options['filters']['name']['id'] = 'name';
+  $handler->display->display_options['filters']['name']['table'] = 'users';
+  $handler->display->display_options['filters']['name']['field'] = 'name';
+  $handler->display->display_options['filters']['name']['operator'] = 'contains';
+  $handler->display->display_options['filters']['name']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['name']['expose']['operator_id'] = 'name_op';
+  $handler->display->display_options['filters']['name']['expose']['label'] = 'Name';
+  $handler->display->display_options['filters']['name']['expose']['description'] = '(substring ok)';
+  $handler->display->display_options['filters']['name']['expose']['operator'] = 'name_op';
+  $handler->display->display_options['filters']['name']['expose']['identifier'] = 'name';
+  $handler->display->display_options['filters']['name']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  /* Filter criterion: User: E-mail */
+  $handler->display->display_options['filters']['mail']['id'] = 'mail';
+  $handler->display->display_options['filters']['mail']['table'] = 'users';
+  $handler->display->display_options['filters']['mail']['field'] = 'mail';
+  $handler->display->display_options['filters']['mail']['operator'] = 'contains';
+  $handler->display->display_options['filters']['mail']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['mail']['expose']['operator_id'] = 'mail_op';
+  $handler->display->display_options['filters']['mail']['expose']['label'] = 'E-mail';
+  $handler->display->display_options['filters']['mail']['expose']['description'] = '(substring ok)';
+  $handler->display->display_options['filters']['mail']['expose']['operator'] = 'mail_op';
+  $handler->display->display_options['filters']['mail']['expose']['identifier'] = 'mail';
+  $handler->display->display_options['filters']['mail']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block');
@@ -22473,6 +22593,8 @@ Grievance Form',
     t('Sort by'),
     t('Asc'),
     t('Desc'),
+    t('Select any filter and click on Apply to see results'),
+    t('Advanced options'),
     t('Items per page'),
     t('- All -'),
     t('Offset'),
@@ -22491,6 +22613,7 @@ Grievance Form',
     t('Tools'),
     t('<a href="/node/!1/employer_users?action=edit&uid=[uid]" class="tool-button">Edit</a>'),
     t('All'),
+    t('(substring ok)'),
     t('Block'),
   );
   $export['sirius_employer_users'] = $view;
