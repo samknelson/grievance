@@ -262,6 +262,16 @@ function sirius_worker_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+$items['sirius/skill/settings'] = array(
+    'title' => 'Skill Settings',
+    'description' => '',
+    'access arguments' => array('sirius worker admin'),
+    'page callback' => 'sirius_worker_page_skill_settings',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_worker.page_skill_settings.inc',
+  );
+
   $items['sirius/skill/expiring/%'] = array(
     'title' => 'Skill Expiration Report',
     'description' => '',
