@@ -38,7 +38,7 @@ function sirius_ledger_feed_allocate_info() {
       'callback_preprocess' => 'sirius_ledger_feed_allocate_preprocess',
       'callback_postprocess' => 'sirius_ledger_feed_allocate_postprocess',
       'callback_list' => 'sirius_ledger_feed_allocate_list',
-      'employer_access' => TRUE,
+      // 'employer_access' => TRUE,
     ),
     'callback_launch' => 'sirius_feed_wizard_launch',
     'callback_launch_args' => array('ledger_feed_allocate'),
