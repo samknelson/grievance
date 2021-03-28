@@ -312,6 +312,126 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 		}
 	}
 
+
+  // /////////////////////////////////////////////////////////////////
+	// Generate the default list of recipients
+  // /////////////////////////////////////////////////////////////////
+  //
+  // A lot of logic here. At some point this probably could happily become a set of callbacks. But for now,
+  // we're just building it all in one place.
+  //
+  
+  if ($data['format'] == 'sms') {
+		$recipients = array();
+
+   	// Template recipients
+		$json = json_decode($main_letter_template_node->field_sirius_json['und'][0]['value'], TRUE);
+		if ($json['recipients']) {
+			foreach ($json['recipients'] as $recipient) {
+				if ($recipients[$recipient['phone']]) { continue; }
+				$delta = $recipient['delta'];
+				$recipients[$recipient['phone']] = $recipient;
+			}
+			++$delta;
+		}
+
+  	// Current user
+		global $user;
+		$user_full = user_load($user->uid);
+		$phone = $user_full->field_grievance_phone['und'][0]['value'];
+		if ($phone && !$recipients[$phone]) {
+			$recipients[$phone] = array(
+				'name' => $user->name,
+				'phone' => $phone,
+				'description' => 'Self',
+				'disposition' => 'Reply-To',
+				'delta' => $delta++,
+			);
+		}
+
+		if ($entity_node->type == 'sirius_worker') {
+			$phone = $entity_node->field_sirius_phone['und'][0]['value'];
+			if ($phone && !$recipients[$phone]) {
+				$recipient = array();
+				$recipient['description'] = 'Worker';
+				$recipient['name'] = $entity_node->title;
+				$recipient['phone'] = $phone;
+				$recipient['delta'] = $delta++;
+				$recipient['disposition'] = 'skip';
+				$recipients[$phone] = $recipient;
+			}
+		}
+
+		if ($entity_node->type == 'grievance') {
+		 	// Grievant
+		 	$phone = $entity_node->field_grievance_phone['und'][0]['value'];
+			if ($phone && !$recipients[$phone]) {
+				$recipient = array();
+				$recipient['description'] = 'Grievant';
+				$recipient['name'] = $entity_node->field_grievance_first_name['und'][0]['value'] . ' ' . $entity_node->field_grievance_last_name['und'][0]['value'];
+				$recipient['phone'] = $phone;
+				$recipient['delta'] = $delta++;
+				$recipient['disposition'] = 'skip';
+				$recipients[$phone] = $recipient;
+			}
+
+			// Union contacts
+			$fields = array(
+				'field_grievance_rep_filed',
+				'field_grievance_rep_organizer',
+				'field_grievance_rep_lead',
+				'field_grievance_rep_manager',
+				'field_grievance_rep_watching',
+				'field_grievance_rep_assignee',
+			);
+
+			foreach ($fields as $field) {
+				if (isset($entity_node->{$field}['und'])) {
+					$label = sirius_field_overrides_label('node', $entity_node->type, $field);
+
+					foreach ($entity_node->{$field}['und'] as $tmp) {
+						$rep_user = user_load($tmp['target_id']);
+						if (!$rep_user) { continue; }
+						$phone = $rep_user->field_grievance_phone['und'][0]['value'];
+						if ($phone) { continue; }
+
+						$recipient = array();
+						$recipient['delta'] = $delta++;
+						$recipient['description'] = $label;
+						$recipient['uid'] = $rep_user->uid;
+						$recipient['name'] = $rep_user->name;
+						$recipient['email'] = $rep_user->mail;
+						$recipient['disposition'] = 'skip';
+						$recipients[$phone] = $recipient;
+					}
+				}
+			}
+
+			// Shop contacts
+			$status_tid = $entity_node->field_grievance_status['und'][0]['tid'];
+			$shop_nid = $entity_node->field_grievance_shop['und'][0]['target_id'];
+			$candidates = grievance_notify_company_contacts(array('shop_nid' => $shop_nid, 'status_nid' => $status_tid));
+			foreach ($candidates as $candidate) {
+				$phone = $candidate['phone'];
+				if (!$phone) { continue; }
+				if ($recipients[$phone]) { continue; }
+				$candidate_name = $candidate['name'];
+				$candidate_description = $candidate['type'];
+				if ($candidate['contact_type_names']) {
+					if ($candidate_description) { $candidate_description .= '<br />'; }
+					$candidate_description .= join('<br />', $candidate['contact_type_names']);
+				}
+				$recipients[$phone] = array(
+					'name' => $candidate['name'],
+					'phone' => $phone,
+					'description' => $candidate_description,
+					'disposition' => 'skip',
+					'delta' => $delta++,
+				);
+			}
+		}
+	}
+
 	$data['recipients'] = $recipients;
 
 	sirius_letter_set_title($letter_node);
