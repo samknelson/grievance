@@ -941,12 +941,17 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		if ($letter_node->field_sirius_attachments) {
 			foreach ($letter_node->field_sirius_attachments['und'] as $delta => $record) {
 				$uri = $record['uri'];
-			  $fhandle = fopen($uri, 'r');
-  			$upload_contents = fread($fhandle, filesize($uri));
+				$ext = pathinfo($uri, PATHINFO_EXTENSION);
+				$tmp_uri = 'temporary://letter_' . rand() . ".$ext";
+				file_unmanaged_copy($uri, $tmp_uri);
+				$tmp_path = drupal_realpath($tmp_uri);
+			  $fhandle = fopen($tmp_path, 'r');
+  			$upload_contents = fread($fhandle, filesize($tmp_path));
 			  fclose($fhandle);
+			  file_unmanaged_delete($tmp_uri);
 				$params['attachments'][] = array(
 					'filecontent' => $upload_contents,
-					'filename' => $entity_node->type . '_' . $entity_node->nid . '_' . $delta . '_' . time() . '.pdf',
+					'filename' => $entity_node->type . '_' . $entity_node->nid . '_' . $delta . '_' . time() . ".$ext",
 					'filemime' => $record['filemime'],
 				);
 			}
@@ -958,9 +963,14 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 				$record = $other_node->field_grievance_attachments['und'][0];
 				if ($record) {
 					$uri = $record['uri'];
-				  $fhandle = fopen($uri, 'r');
-	  			$upload_contents = fread($fhandle, filesize($uri));
+					$ext = pathinfo($uri, PATHINFO_EXTENSION);
+					$tmp_uri = 'temporary://letter_' . rand() . ".$ext";
+					file_unmanaged_copy($uri, $tmp_uri);
+					$tmp_path = drupal_realpath($tmp_uri);
+				  $fhandle = fopen($tmp_path, 'r');
+	  			$upload_contents = fread($fhandle, filesize($tmp_path));
 				  fclose($fhandle);
+				  file_unmanaged_delete($tmp_uri);
 					$params['attachments'][] = array(
 						'filecontent' => $upload_contents,
 						'filename' => $entity_node->type . '_' . $entity_node->nid . '_' . $other_nid . '_' . time() . '.pdf',
