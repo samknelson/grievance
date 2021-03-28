@@ -23,7 +23,7 @@ function sirius_feed_grievance_info() {
         'nid' => array('title' => 'NID'),
         'id' => array('title' => 'ID'),
         'ssn' => array('title' => 'SSN'),
-        'grievance_status_str' => array('title' => 'Status', 'description' => 'Status lookup by name, TID, or ID', 'required' => TRUE),
+        'grievance_status_str' => array('title' => 'Status', 'description' => 'Status lookup by name, TID, or ID'),
         'grievance_shop_str' => array('title' => 'Employer', 'description' => 'Enter the employer name exactly as it appears, or enter the id or external ID or the node ID (nid).', 'required' => TRUE),
         'grievance_first_name' => array('title' => 'First Name'),
         'grievance_last_name' => array('title' => 'Last Name'),
@@ -39,10 +39,24 @@ function sirius_feed_grievance_info() {
         'grievance_classification' => array('title' => 'Classification (Text)', 'description' => 'Plain-text version of the classification'),
         'grievance_class_tid_str' => array('title' => 'Classification (Lookup)', 'description' => 'Classification lookup by name, TID, or ID'),
         'grievance_category_str' => array('title' => 'Category', 'description' => 'Category lookup by name, TID, or ID'),
+        'grievance_shift_str' => array('title' => 'Shift', 'description' => 'Shift lookup by name, TID, or ID'),
         'grievance_violation' => array('title' => 'Violation', 'description' => 'Full-text CBA clause violated.'),
+        'grievance_rep_filed' => array('title' => 'Intake User'),
+        'grievance_rep_organizer' => array('title' => 'Organizer / Grievance Specialist'),
+        'grievance_st_name' => array('title' => 'Shop Steward Name'),
+        'grievance_supervisor_name' => array('title' => 'Supervisor Name'),
+        'grievance_department' => array('title' => 'Department'),
+        'grievance_type_str' => array('title' => 'Complaint', 'description' => 'Complaint lookup by name, TID, or ID'),
+        'grievance_type_other' => array('title' => 'Complaint (text)'),
+        'grievance_remedy_other' => array('title' => 'Remedy (text)'),
+        'grievance_daysoff_1' => array('title' => 'Days Off 1'),
+        'grievance_daysoff_2' => array('title' => 'Days Off 2'),
+        'grievance_daysoff_3' => array('title' => 'Days Off 3'),
+        'grievance_work_status_str' => array('title' => 'Work Status', 'description' => 'Lookup by name, TID, or ID'),
+        'grievance_status_date' => array('title' => 'Status Change Date', 'description' => 'Date the grievance entered the imported status'),
         'created' => array('title' => 'Created', 'description' => 'Date the record was created'),
       ),
-      'batch_size' => 50,
+      'batch_size' => 25,
       'callback_row_verify' => 'sirius_feed_grievance_row_verify',
       'callback_row_process' =>'sirius_feed_grievance_row_process',
     ),
@@ -80,6 +94,9 @@ function sirius_feed_grievance_row_verify($feed_node, $info, $data, &$row, $prec
     'grievance_class_tid' => 'grievance_job_classification',
     'grievance_category' => 'grievance_category',
     'grievance_status' => 'grievance_status',
+    'grievance_shift' => 'grievance_shift',
+    'grievance_type' => 'grievance_types',
+    'grievance_work_status' => 'grievance_work_status',
   );
   foreach ($lookups as $field => $taxonomy) {
     if ($row["${field}_str"]) {
@@ -87,6 +104,29 @@ function sirius_feed_grievance_row_verify($feed_node, $info, $data, &$row, $prec
       if (!$tid) { return array('success' => FALSE, 'msg' => "Match not found for $taxonomy, $field"); }
       if ($precompute) { $row[$field] = $tid; }
     }
+  }
+
+  // Days off
+  $patterns = array(
+    '/sun/i' => 'Sunday',
+    '/mon/i' => 'Monday',
+    '/tue/i' => 'Tuesday',
+    '/wed/i' => 'Wednesday',
+    '/thu/i' => 'Thursday',
+    '/fri/i' => 'Friday',
+    '/sat/i' => 'Saturday',
+  );
+  for ($i=1; $i<=3; ++$i) {
+    if (!$row["grievance_daysoff_$i"]) { continue; }
+    $match = '';
+    foreach ($patterns as $pattern => $result) {
+      if (preg_match($pattern, $row["grievance_daysoff_$i"])) {
+        $match = $result;
+      }
+    }
+    if (!$match) { return array('success' => FALSE, 'msg' => "No matching day found for grievance_daysoff_$i"); }
+    $row["grievance_daysoff_$i"] = $match;
+    // drupal_set_message("Set $i = " . $row["grievance_daysoff_$i"]);
   }
 
   // Dates
@@ -113,6 +153,17 @@ function sirius_feed_grievance_row_verify($feed_node, $info, $data, &$row, $prec
     $result = sirius_feed_node_search($grievance_shop_str, 'grievance_shop', array('title', 'sirius_id', 'grievance_external_id', 'nid'));
     if (!$result['nid']) { return array('success' => FALSE, 'msg' => 'Employer not found.'); }
     $row['grievance_shop'] = $result['nid'];
+
+    // Various UID fields
+    $uid_fields = array(
+      'grievance_rep_filed', 'grievance_rep_organizer'
+    );
+    foreach ($uid_fields as $uid_field) {
+      if (!$row[$uid_field]) { continue; }
+      $result = sirius_feed_user_search($row[$uid_field]);
+      // if (!$result['success']) { return array('success' => FALSE, 'msg' => "User not found for $uid_field"); }
+      if ($result['success']) { $row[$uid_field . '_uid'] = $result['uid']; }
+    }
 
     // Raw row
     $row['raw'] = "Imported record\n" . print_r($row['xxxrawxxx'], 1);
@@ -155,21 +206,55 @@ function sirius_feed_grievance_row_process($feed_node, $info, $data, $row) {
     'grievance_address',
     'grievance_address_2',
     'grievance_city',
-    'grievance_state',
     'grievance_zip',
     'grievance_first_name',
     'grievance_last_name',
     'grievance_ein',
     'grievance_min',
+    'grievance_st_name',
+    'grievance_supervisor_name',
+    'grievance_department',
+    'grievance_type_other',
+    'grievance_remedy_other',
   );
   foreach ($fields as $field) {
-    if ($row[$field]) { $grievance_node->{"field_$field"}['und'][0]['value'] = $row[$field]; }
+    if ($row[$field]) { $grievance_node->{"field_$field"}['und'][0]['value'] = substr($row[$field], 0, 255); }
+  }
+  if ($row['grievance_state']) {
+    $grievance_node->{"field_grievance_state"}['und'][0]['value'] = substr($row['grievance_state'], 0, 2);
+  }
+
+  if ($row['grievance_status_date']) {
+    $grievance_node->field_grievance_status_date['und'][0]['value'] = gmdate('Y-m-d', strtotime($row['grievance_status_date']));
+  }
+
+  if ($row['created']) {
+    $grievance_node->field_grievance_date_1['und'][0]['value'] = gmdate('Y-m-d', strtotime($row['created']));
   }
 
   // Term reference fields
   if ($row['grievance_class_tid'])          { $grievance_node->field_grievance_class_tid['und'][0]['tid']             = $row['grievance_class_tid']; }
   if ($row['grievance_category'])           { $grievance_node->field_grievance_category['und'][0]['tid']              = $row['grievance_category']; }
-  if ($row['grievance_status'])             { $grievance_node->field_grievance_status['und'][0]['tid']                 = $row['grievance_status']; }
+  if ($row['grievance_status'])             { $grievance_node->field_grievance_status['und'][0]['tid']                = $row['grievance_status']; }
+  if ($row['grievance_shift'])              { $grievance_node->field_grievance_shift['und'][0]['tid']                 = $row['grievance_shift']; }
+  if ($row['grievance_type'])               { $grievance_node->field_grievance_type['und'][0]['tid']                  = $row['grievance_type']; }
+  if ($row['grievance_work_status'])        { $grievance_node->field_grievance_work_status['und'][0]['tid']           = $row['grievance_work_status']; }
+
+  // Days Off
+  for ($i=1; $i<=3; ++$i) {
+    if (!$row["grievance_daysoff_$i"]) { continue; }
+    $grievance_node->field_grievance_daysoff['und'][($i-1)]['value'] = $row["grievance_daysoff_$i"];
+  }
+
+  $uid_fields = array(
+    'grievance_rep_filed', 'grievance_rep_organizer'
+  );
+  foreach ($uid_fields as $uid_field) {
+    $uid = $row[$uid_field . '_uid'];
+    if ($uid) { 
+      $grievance_node->{"field_$uid_field"}['und'][0]['target_id'] = $uid; 
+    }
+  }
 
   $comments = $row['raw'];
   $grievance_node->field_grievance_comments['und'][0]['value'] = $comments;
@@ -181,7 +266,23 @@ function sirius_feed_grievance_row_process($feed_node, $info, $data, $row) {
     $ts = strtotime($row['created']);
     $sql = "update node set created = :ts where nid = :nid";
     $stmt = db_query($sql, array(':ts' => $ts, ':nid' => $grievance_node->nid));
+    for ($i=1; $i<=5; ++$i) {
+      $grievance_node->{"grievance_intake_log_$i"} = gmdate('Y-m-d', $ts);
+    }
   }
+
+  // Oneoff: delete all log entries of type "Event", "Created", "Assigned", "Updated without status change"
+  /*
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_log');
+  $query->fieldCondition('field_grievance', 'target_id', $grievance_node->nid);
+  $query->fieldCondition('field_grievance_log_type', 'tid', array(120, 175, 179, 178), 'in');
+  $stmt = $query->execute();
+  $log_nids = array_keys($stmt['node']);
+  node_delete_multiple($log_nids);
+  grievance_log_update($grievance_node, 'insert');
+  */
 
   if ($is_new) {
     return array('success' => TRUE, 'msg' => 'Created a new grievance.');
