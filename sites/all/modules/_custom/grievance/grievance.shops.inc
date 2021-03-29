@@ -12,7 +12,7 @@ function grievance_shop_bulk_reassign_form($form, &$form_state) {
 		'#markup' => '<strong>' . 
 			t('Please read the following carefully before proceeding') . 
 			'</strong><br><br>' .
-			t('The tool below will update the organizer (sometimes called "specialist") field in every <em>open</em> grievance.  It will give that field the same value as the "default organizer (specialist)" field in the shop that the grievance is associated with.') .
+			t('The tool below will update the organizer (sometimes called "specialist") field in every <em>open</em> grievance.  It will give that field the same value as the "default organizer (specialist)" field in the shop that the grievance is associated with. It will do the same with the fields "lead", "admin", and "watching".') .
 			'<br><br>' .
 			t('This action cannot be undone, and may potentially update every grievance on the system.  Do not proceed unless you are sure that this is what you want to do.'),
 	);
@@ -91,21 +91,26 @@ function grievance_shop_bulk_reassign_batch($grievance_nid, &$context) {
 	if (!$shop_node->field_grievance_rep_organizer['und'][0]) { return; }
 
 	// check for changes
-	$assignments = array();
-	foreach ($shop_node->field_grievance_rep_organizer['und'] as $tmp) {
-		$assignments[$tmp['target_id']]++;
-	}
-	foreach ($grievance_node->field_grievance_rep_organizer['und'] as $tmp) {
-		$assignments[$tmp['target_id']]++;
-	}
+	$fields = array('field_grievance_rep_organizer', 'field_grievance_rep_lead', 'field_grievance_rep_manager', 'field_grievance_rep_watching');
+
 	$need_update = FALSE;
-	foreach ($assignments as $count) {
-		if ($count < 2) { $need_update = TRUE; }
+	foreach ($fields as $field) {
+		$assignments = array();
+		foreach ($shop_node->{$field}['und'] as $tmp) {
+			$assignments[$tmp['target_id']]++;
+		}
+		foreach ($grievance_node->{$field}['und'] as $tmp) {
+			$assignments[$tmp['target_id']]++;
+		}
+		foreach ($assignments as $count) {
+			if ($count < 2) { $need_update = TRUE; }
+		}
+		$grievance_node->{$field} = $shop_node->{$field};
 	}
+
 	if (!$need_update) { return; }
 
 	// Ok, update the grievance
-	$grievance_node->field_grievance_rep_organizer = $shop_node->field_grievance_rep_organizer;
 	node_save($grievance_node);
 	$context['results']['changed']++;
 }
