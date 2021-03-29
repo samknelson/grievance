@@ -16,8 +16,10 @@ function sirius_letter_wizard_steps($data, $entity_node) {
   $steps['which'] = array('label' => 'Select Letter', 'callback' => 'sirius_letter_wizard_which');
   if ($data['format'] == 'email') {
   	$steps['recipients'] = array('label' => 'Recipients', 'callback' => 'sirius_letter_wizard_recipients_email');
-  } else if ($data['format'] == 'fax' || $data['format'] == 'sms') {
+  } else if ($data['format'] == 'sms') {
   	$steps['recipients'] = array('label' => 'Recipients', 'callback' => 'sirius_letter_wizard_recipients_phone');
+  } else if ($data['format'] == 'fax') {
+  	$steps['recipients'] = array('label' => 'Recipients', 'callback' => 'sirius_letter_wizard_recipients_fax');
   }
   $steps['body'] = array('label' => 'Subject and Body', 'callback' => 'sirius_letter_wizard_body');
   $steps['send'] = array('label' => 'Send', 'callback' => 'sirius_letter_wizard_send');
@@ -769,8 +771,9 @@ function sirius_letter_wizard_recipients_email_form_submit($form, &$form_state) 
 	sirius_wizard_submit($info, $data, $letter_node, $current_step, "Recipients saved.");
 }
 
+
 /************************************************************************************************
- * Step 3: Recipients
+ * Step 3: Recipients (Phone)
  ************************************************************************************************/
 
 function sirius_letter_wizard_recipients_phone($info, $data, $letter_node, $current_step) { return drupal_get_form('sirius_letter_wizard_recipients_phone_form', $info, $data, $letter_node, $current_step); }
@@ -896,6 +899,134 @@ function sirius_letter_wizard_recipients_phone_form_submit($form, &$form_state) 
 }
 
 /************************************************************************************************
+ * Step 3: Recipients (Fax)
+ ************************************************************************************************/
+
+function sirius_letter_wizard_recipients_fax($info, $data, $letter_node, $current_step) { return drupal_get_form('sirius_letter_wizard_recipients_fax_form', $info, $data, $letter_node, $current_step); }
+
+function sirius_letter_wizard_recipients_fax_form($form, &$form_state, $info, $data, $letter_node, $current_step) {
+	$form_state['info'] = $info;
+	$form_state['data'] = $data;
+	$form_state['letter_nid'] = $letter_node->nid;
+	$form_state['current_step'] = $current_step;
+
+	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
+	$steps = sirius_wizard_steps($info, $data, $entity_node);
+
+	$recipients = $data['recipients'];
+	if ($recipients) { usort($recipients, function($a, $b) { 
+			if ($a['delta'] < $b['delta']) { return -1; }
+			if ($a['delta'] > $b['delta']) { return 1; }
+			return 0;
+		});
+	}
+	for ($i=0; $i<5; ++$i) {
+		$recipients[] = array('description' => t('Additional Recipient #@i', array('@i' => ($i+1))));
+	}
+
+	$form['intro'] = array('#markup' => '<table><tr><th>Description</th><th>Name</th><th>Phone</th><th>Disposition</th></tr>');
+
+	$delta = 0;
+	foreach ($recipients as $recipient) {
+		$form["tr_$delta"] = array('#markup' => '<tr>');
+
+		$form["description_markup_$delta"] = array('#markup' => '<td>' . $recipient['description'] . '</td>');
+		$form["description_$delta"] = array('#type' => 'hidden', '#value' => $recipient['description']);
+
+		$form["name_$delta"] = array(
+			'#prefix' => '<td>',
+			'#suffix' => '</td>',
+			'#type' => 'textfield',
+			'#default_value' => $recipient['name'],
+		);
+
+		$form["phone_$delta"] = array(
+			'#prefix' => '<td>',
+			'#suffix' => '</td>',
+			'#type' => 'textfield',
+			'#default_value' => $recipient['phone'],
+		);
+
+		$form["disposition_$delta"] = array(
+			'#prefix' => '<td>',
+			'#suffix' => '</td>',
+			'#type' => 'select',
+			'#default_value' => $recipient['disposition'],
+			'#options' => array('skip' => t('Skip'), 'send' => t('Send'))
+		);
+
+
+		$form["tr2_$delta"] = array('#markup' => '<tr>');
+		++$delta;
+		if ($delta >= 1) { break; }
+	}
+
+	$form['outro'] = array('#markup' => '</table>');
+	$form_state['recipient_count'] = count($recipients);
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
+
+	return $form;
+}
+
+function sirius_letter_wizard_recipients_fax_form_validate($form, &$form_state) {
+	$info = $form_state['info'];
+	$data = $form_state['data'];
+	$letter_node = node_load($form_state['letter_nid']);
+	$current_step = $form_state['current_step'];
+	$recipient_count = $form_state['recipient_count'];
+
+	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
+
+	// Verify at least one "Send"
+	$found_send = 0;
+	for ($delta = 0; $delta < $recipient_count; ++$delta) {
+		if ($form_state['values']["disposition_$delta"] == 'send') {
+			++$found_send;
+		}
+	}
+	if (!$found_send) { form_set_error("disposition_0", 'Select at least one recipient to send to'); }
+
+	// Verify all email addresses
+	for ($delta = 0; $delta < $recipient_count; ++$delta) {
+		if ($delta >= 1) { break; }
+		if ($form_state['values']["disposition_$delta"] == 'skip') { continue; }
+		$phone = $form_state['values']["phone_$delta"];
+		if (!sirius_phone_validate($phone)) { form_set_error("phone_$delta", "Please enter a valid phone address for recipient #$delta (" . $phone . ")"); }
+	}
+}
+
+function sirius_letter_wizard_recipients_fax_form_submit($form, &$form_state) {
+	$info = $form_state['info'];
+	$data = $form_state['data'];
+	$letter_node = node_load($form_state['letter_nid']);
+	$current_step = $form_state['current_step'];
+	$recipient_count = $form_state['recipient_count'];
+
+	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
+
+	$recipients = array();
+	for ($delta = 0; $delta < $recipient_count; ++$delta) {
+		$recipient = array(
+			'delta' => $delta,
+			'disposition' => $form_state['values']["disposition_$delta"],
+			'name' => $form_state['values']["name_$delta"],
+			'description' => $form_state['values']["description_$delta"],
+			'phone' => $form_state['values']["phone_$delta"],
+		);
+		if (!$recipient['phone'] && !$recipient['name']) { continue; }
+		$recipients[] = $recipient;
+	}
+	$data['recipients'] = $recipients;
+
+	sirius_letter_set_title($letter_node);
+	sirius_wizard_submit($info, $data, $letter_node, $current_step, "Recipients saved.");
+}
+
+/************************************************************************************************
  * Step 3: Review and Send
  ************************************************************************************************/
 
@@ -921,6 +1052,7 @@ function sirius_letter_wizard_send_form($form, &$form_state, $info, $data, $lett
 
 	if ($data['format'] == 'pdf') { $submit_label = t('Download PDF'); }
 	else if ($data['format'] == 'sms') { $submit_label = t('Send SMS Now'); }
+	else if ($data['format'] == 'fax') { $submit_label = t('Send Fax Now'); }
 	else { $submit_label = t("Send Email Now"); }
 
 	$form['submit'] = array(
@@ -942,7 +1074,7 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 	$format = $data['format'];
 
 	// Generate PDF if necessary
-	if ($format == 'pdf' || $format == 'email') {
+	if ($format == 'pdf' || $format == 'email' || $format == 'fax') {
 		$pdf_basename = sirius_letter_pdf_basename($letter_node);
 		$pdf_contents = sirius_letter_pdf_contents($letter_node);
 	}
@@ -1024,6 +1156,46 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		$data['sent_ts'] = time();
 		sirius_letter_set_title($letter_node, 'sent', $data['sent_ts']);
 		sirius_wizard_data_set($info, $letter_node, $data);
+	}
+
+	// If format is "fax", send a fax
+	if ($format == 'fax') {
+		$fax_number = $data['recipients'][0]['phone'];
+
+		require_once DRUPAL_ROOT . '/sites/all/libraries/phaxio/lib/Phaxio/PhaxioException.php';
+		require_once DRUPAL_ROOT . '/sites/all/libraries/phaxio/lib/Phaxio/PhaxioOperationResult.php';
+		require_once DRUPAL_ROOT . '/sites/all/libraries/phaxio/lib/Phaxio/Phaxio.php';
+		// use Phaxio\Phaxio;
+		$phaxio = new \Phaxio\Phaxio(
+			sirius_domain_variable_get('grievance_phaxio_api_key', ''), 
+			sirius_domain_variable_get('grievance_phaxio_api_secret', ''), 
+			sirius_domain_variable_get('grievance_phaxio_api_host', 'https://api.phaxio.com/v1/')
+		);
+
+		$path = '/tmp/' . $pdf_basename . '.pdf';
+		file_put_contents($path, $pdf_contents);
+		$callback_url = 'https://';
+		$callback_url .= $_SERVER['SERVER_NAME'];
+		$callback_url .= '/grievances/phaxio/callback-sent';
+		$callback_url .= '/' . variable_get('grievance_phaxio_callback_token', '');
+		$fax_result = $phaxio->sendFax(
+			$fax_number, 
+			array($path), 
+			array('callback_url' => $callback_url)
+		);
+		unlink($path);
+
+		if (!$fax_result->succeeded()) {
+			drupal_set_message("Fax failed: " . $fax_result->getMessage(), 'error');
+		} else {
+			$fax_id = $fax_result->getData()['faxId'];
+			drupal_set_message("Fax sent to " . $fax_number);
+		}
+
+		if ($log_node) {
+			$log_node->field_grievance_external_id['und'][0]['value'] = 'phaxio_id_sent_' . $fax_id;
+			node_save($log_node);
+		}
 	}
 
 	// If format is "email", send
