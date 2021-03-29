@@ -5,6 +5,6 @@
  */
 
 function sirius_fax_enabled() {
-	return variable_get('grievance_phaxio_api_key', '');
+	return sirius_domain_variable_get('grievance_phaxio_api_key', '');
 }
 
