@@ -61,7 +61,7 @@ function sirius_worker_get_by_id($id) {
 	return node_load(array_keys($stmt['node'])[0]);
 }
 
-function sirius_worker_get_by_contact_nid($contact_nid) {
+function sirius_worker_get_by_contact_nid($contact_nid, $nid_only = FALSE) {
   if (!$contact_nid) { return NULL; }
 
   $query = new EntityFieldQuery;
@@ -72,7 +72,9 @@ function sirius_worker_get_by_contact_nid($contact_nid) {
   $stmt = $query->execute();
   if (!$stmt['node']) { return NULL; }
 
-  return node_load(array_keys($stmt['node'])[0]);
+  $worker_nid = array_keys($stmt['node'])[0];
+  if ($nid_only) { return $worker_nid; }
+  return node_load($worker_nid);
 }
 
 function sirius_worker_get_by_ssn($id) {
