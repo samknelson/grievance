@@ -96,6 +96,16 @@ function sirius_node_tab_event_section_manage_form($form, &$form_state, $event_n
     	'#title' => t('Comments'),
     	'#default_value' => $section['comments'],
     );
+
+    $form['section_list'][$delta]['delete'] = array(
+      '#type' => 'select',
+      '#title' => t('Delete this section'),
+      '#options' => array(
+        NULL => t('No, keep this section'),
+        'Yes' => t('Yes, delete this section.')
+      ),
+      '#description' => t('The section will be removed, and any students assigned to it will be unassigned.'),
+    );
   }
 
 	$form['section_list']['suffix'] = array('#markup' => '</div>');
@@ -151,6 +161,7 @@ function sirius_node_tab_event_section_manage_form_submit($form, &$form_state) {
 
 	foreach ($section_list_input as $section) {
 		if (!$section['date'] && !$section['title']) { continue; }
+    if ($section['delete']) { continue; }
 		$uuid = $section['uuid'];
 		if (!$uuid) { 
 			$uuid = uuid_generate();
