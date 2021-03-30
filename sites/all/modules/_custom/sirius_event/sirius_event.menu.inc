@@ -919,6 +919,15 @@ function sirius_event_menu() {
     'file' => 'sirius_event.page_interestlists.inc',
   );
 
+  $items['sirius/event/duplicate_participants'] = array(
+    'title' => 'Duplicate Participants',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'sirius_event_page_duplicate_participants',
+    'page arguments' => array(),
+    'file' => 'sirius_event.page_duplicate_participants.inc',
+  );
+
   return $items;
 }
 
