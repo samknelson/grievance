@@ -27811,7 +27811,6 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" class="tool-button">View</a>
 <a href="/node/[nid]/sirius_payment_allocate" class="tool-button">Allocate</a>
-<a href="/node/[nid]/sirius_payment_post" class="tool-button">Post</a>
 <a href="/node/[nid]/sirius_payment_update" class="tool-button">Update</a>';
   /* Sort criterion: Content: Created (field_sirius_datetime_created) */
   $handler->display->display_options['sorts']['field_sirius_datetime_created_value']['id'] = 'field_sirius_datetime_created_value';
@@ -27925,7 +27924,6 @@ Grievance Form',
     t('Tools'),
     t('<a href="/node/[nid]" class="tool-button">View</a>
 <a href="/node/[nid]/sirius_payment_allocate" class="tool-button">Allocate</a>
-<a href="/node/[nid]/sirius_payment_post" class="tool-button">Post</a>
 <a href="/node/[nid]/sirius_payment_update" class="tool-button">Update</a>'),
     t('All'),
     t('All Payments'),

@@ -22658,6 +22658,73 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'node-sirius_payperiod-field_sirius_attachments'.
+  $field_instances['node-sirius_payperiod-field_sirius_attachments'] = array(
+    'bundle' => 'sirius_payperiod',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'file',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'file_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_attachments',
+    'label' => 'Attachments',
+    'required' => 0,
+    'settings' => array(
+      'description_field' => 0,
+      'file_directory' => '',
+      'file_extensions' => 'txt pdf png gif jpg jpeg xls xlsx doc docx rtf zip csv',
+      'filefield_paths' => array(
+        'active_updating' => 1,
+        'file_name' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => '[node:nid]_[file:fid].[file:ffp-extension-original]',
+        ),
+        'file_path' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => 'sirius_attachments',
+        ),
+        'redirect' => FALSE,
+        'retroactive_update' => 0,
+      ),
+      'filefield_paths_enabled' => 1,
+      'max_filesize' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'file',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+      ),
+      'type' => 'file_generic',
+      'weight' => 11,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_payperiod-field_sirius_datetime'.
   $field_instances['node-sirius_payperiod-field_sirius_datetime'] = array(
     'bundle' => 'sirius_payperiod',
@@ -22862,14 +22929,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 6,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22908,7 +22970,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22948,7 +23010,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
