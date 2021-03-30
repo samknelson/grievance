@@ -232,9 +232,10 @@ function sirius_interestlist_auto_cancel($event_type_term, $participant_node) {
 	foreach ($auto_cancel as $key) {
 		if ($my_key == $key) {
 			sirius_event_interestlist_cancel($event_type_term, $contact_nid, array('interestlist' => array('cancel' => array('comments' => 'Signed up for an event, participant nid ' . $participant_node->nid))));
+			sirius_jsonfield_log($participant_node, 'interestlist_cancel', 'Interest list entry canceled');
+			node_save($participant_node);
 			// drupal_set_message("Canceling: $contact_nid because $my_key == $key");
 			return;
 		}
 	}
 }
-

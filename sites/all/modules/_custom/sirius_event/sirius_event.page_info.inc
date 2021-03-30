@@ -21,6 +21,7 @@ function sirius_node_tab_event_info($event_node) {
     return sirius_node_tab_event_bullpen_view($event_node);
   }
 
+  $section_enabled = sirius_event_section_enabled($event_node);
   $participant_nid = sirius_event_participant_nid_from_user($event_node->nid);
   $participant_node = node_load($participant_nid);
   if ($participant_node) {
@@ -32,12 +33,17 @@ function sirius_node_tab_event_info($event_node) {
       $section_title = sirius_event_section_title($section);
       if ($section['comments']) { $section_title .= '<br />' . $section['comments']; }
       $html .= sirius_fakerender_field('Section: ', $section_title);
+    } else if ($section_enabled) {
+      $html .= sirius_fakerender_field('Section: ', '<strong>No section chosen</strong>');
     }
 
     $html .= '<br />';
   }
 
   $renderable = node_view($event_node, 'full');
+  if ($section_enabled) {
+    unset($renderable['field_sirius_daterepeat']);
+  }
   $html .= drupal_render($renderable);
 
   if ($participant_node) {
@@ -103,10 +109,39 @@ function sirius_node_tab_event_mypstatus_form($form, &$form_state, $event_node, 
   return $form;
 }
 
+function sirius_node_tab_event_mypstatus_form_validate($form, &$form_state) {
+  $participant_node = node_load($form_state['participant_nid']);
+  $event_node = node_load($participant_node->field_sirius_event['und'][0]['target_id']);
+  $event_json = sirius_jsonfield_util_node_json_get($event_node);
+  $event_section_json = $event_json['section'];
+  if (!$event_section_json['prole_tids']) { return; }
+  $prole_tids = array_filter(array_values($event_section_json['prole_tids']));
+  if (!$prole_tids) { return; }
+  $pstatus_tids = sirius_event_section_pstatus_tids($prole_tids);
+  if (!$pstatus_tids) { return; }
+
+  $new_pstatus_tid = $form_state['values']['pstatus_tid'];
+  if (in_array($new_pstatus_tid, $pstatus_tids) && !$form_state['values']['section']['uuid']) {
+    form_set_error('section][uuid', 'Please select a section.');
+  }
+}
+
 function sirius_node_tab_event_mypstatus_form_submit($form, &$form_state) {
   $participant_node = node_load($form_state['participant_nid']);
   $participant_nid = $participant_node->nid;
   $pstatus_tid = $form_state['values']['pstatus_tid'];
+
+  $uuid = $form_state['values']['section']['uuid'];
+  if ($uuid) {
+    $result = sirius_event_section_assign($participant_nid, $uuid);
+    if ($result['success']) {
+      drupal_set_message($result['msg']);
+    } else {
+      drupal_set_message($result['msg'], 'warning');
+      return;
+    }
+  }
+
   if ($pstatus_tid) {
     $prole_tid = $participant_node->field_sirius_event_prole['und'][0]['tid'];
     $result = sirius_event_participant_pstatus_set($participant_node, $prole_tid, $pstatus_tid);
@@ -117,15 +152,6 @@ function sirius_node_tab_event_mypstatus_form_submit($form, &$form_state) {
     }
   }
 
-  $uuid = $form_state['values']['section']['uuid'];
-  if ($uuid) {
-    $result = sirius_event_section_assign($participant_nid, $uuid);
-    if ($result['success']) {
-      drupal_set_message($result['msg']);
-    } else {
-      drupal_set_message($result['msg'], 'warning');
-    }
-  }
 }
 
 /**

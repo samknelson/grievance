@@ -42,8 +42,11 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
 	$stmt = sirius_sql_query($sql, array(':nid' => $contact_nid));
 	$hr = $stmt->fetchAssoc();
 	$participant_node->title .= ': ' . $hr['title'];
-	sirius_jsonfield_log($participant_node, 'registered', 'Participant registered.');
-	node_save($participant_node);
+
+	$prole_term = taxonomy_term_load($participant_role_tid);
+	$pstatus_term = taxonomy_term_load($participant_status_tid);
+	$log_msg = "Participant record created with role " . $prole_term->name . " and status " . $pstatus_term->name;
+	sirius_jsonfield_log($participant_node, 'registered', $log_msg, $json);
 
 	$msg = "Participant created.";
 	if ($json['notification']['medium']) {
@@ -67,7 +70,12 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
       $result = sirius_email_send($params);
       if ($result['success']) { $msg .= " Email sent to: $contact_email."; } else { $msg .= " Email to $contact_email failed: " . $result['msg']; }
     }
+
+		sirius_jsonfield_log($participant_node, 'notification', $msg);
+		node_save($participant_node);
 	}
+
+	node_save($participant_node);
 
 	sirius_interestlist_auto_cancel($event_type_term, $participant_node);
 

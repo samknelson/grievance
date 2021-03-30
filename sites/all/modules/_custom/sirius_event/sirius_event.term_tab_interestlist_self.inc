@@ -8,6 +8,7 @@ function sirius_event_term_tab_interestlist_self_access($event_type_term) {
 }
 
 function sirius_event_term_tab_interestlist_self($event_type_term) {
+	sirius_backlink_add('sirius/event/interestlists', array('name' => 'All Interest Lists'));
 	return drupal_get_form('sirius_event_term_tab_interestlist_self_form', $event_type_term);
 }
 
@@ -23,7 +24,6 @@ function sirius_event_term_tab_interestlist_self_form($form, &$form_state, $even
 	$interestlist_node = sirius_event_interestlist_lookup($event_type_term, $contact_nid);
 
   $form['#tree'] = TRUE;
-  $form['backlink'] = array('#markup' => '<div class="sirius_form_intro">' . l('[All Interest Lists]', '/sirius/event/interestlists', array('attributes' => array('class' => array('tool-button')))) . '</div>');
 
   $form['intro'] = array('#markup' => drupal_render(taxonomy_term_view($event_type_term)) . '<hr>');
 

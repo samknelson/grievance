@@ -105,6 +105,7 @@ function sirius_node_tab_event_section_assign_form_submit($form, &$form_state) {
 	$event_node = node_load($form_state['event_nid']);
 
 	$options = array();
+	$options['allow_oversubscribe'] = TRUE;
 	if ($form_state['values']['notify'] == 'Yes') {
 		$options['notify'] = array('comments' => $form_state['values']['comments']);
 	}

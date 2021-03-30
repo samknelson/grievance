@@ -8,13 +8,12 @@ function sirius_event_term_tab_interestlist_list_access($event_type_term) {
 }
 
 function sirius_event_term_tab_interestlist_list($event_type_term) {
+	sirius_backlink_add('sirius/event/interestlists', array('name' => 'All Interest Lists'));
 	return drupal_get_form('sirius_event_term_tab_interestlist_list_form', $event_type_term);
 }
 
 function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $event_type_term) {
 	$form_state['event_type_tid'] = $event_type_term->tid;
-
-  $form['backlink'] = array('#markup' => '<div class="sirius_form_intro">' . l('[All Interest Lists]', '/sirius/event/interestlists', array('attributes' => array('class' => array('tool-button')))) . '</div>');
 
 	$interestlist = sirius_event_interestlist_list($event_type_term, array());
 

@@ -214,6 +214,18 @@ function sirius_event_section_assign($participant_nid, $uuid, $options = array()
 	if (!$participant_json['section']) { $participant_json['section'] = array(); }
 	$old_uuid = $participant_json['section']['uuid'];
 	if ($uuid == $old_uuid) { return array('success' => TRUE, 'msg' => 'Section assignment was not changed', 'changed' => FALSE); }
+
+	if (!$options['allow_oversubscribe']) {
+		$event_node = node_load($participant_node->field_sirius_event['und'][0]['target_id']);
+		$event_json = sirius_jsonfield_util_node_json_get($event_node);
+		$counts = sirius_event_section_counts($event_node);
+		$count = $counts[$uuid];
+		$section_limit = $event_json['section_list'][$uuid]['limit'];
+		if (($section_limit > 0) && ($count >= $section_limit)) {
+			return array('success' => FALSE, 'msg' => 'The requested section is full.');
+		}
+	}
+
 	$participant_json['section']['uuid'] = $uuid;
 	sirius_jsonfield_util_node_json_set($participant_node, $participant_json);
 

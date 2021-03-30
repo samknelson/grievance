@@ -8,6 +8,7 @@ function sirius_event_term_tab_interestlist_worker_access($event_type_term) {
 }
 
 function sirius_event_term_tab_interestlist_worker($event_type_term) {
+  sirius_backlink_add('sirius/event/interestlists', array('name' => 'All Interest Lists'));
 	return drupal_get_form('sirius_event_term_tab_interestlist_worker_form', $event_type_term);
 }
 
@@ -27,8 +28,6 @@ function sirius_event_term_tab_interestlist_worker_form($form, &$form_state, $ev
 
   $form['table_open'] = array('#markup' => '<table class="columns_table">');
   $form['col1_open'] = array('#markup' => '<tr><td style="width: 66%; vertical-align: top;">');
-
-  $form['backlink'] = array('#markup' => '<div class="sirius_form_intro">' . l('[All Interest Lists]', '/sirius/event/interestlists', array('attributes' => array('class' => array('tool-button')))) . '</div>');
 
   $ajax_params = $form_state['triggering_element']['#sirius_ajax'];
   $worker_count = $form_state['worker_count'];
