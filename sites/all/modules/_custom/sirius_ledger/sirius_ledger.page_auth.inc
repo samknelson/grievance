@@ -22,7 +22,7 @@ function sirius_ledger_node_tab_auth($auth_node) {
 
 	$accounts = sirius_ledger_auth_entities($auth_node, 'sirius_ledger_account');
 	$events = sirius_ledger_auth_entities($auth_node, 'sirius_event');
-	if ($accounts || $event) {
+	if ($accounts || $events) {
 		// $html .= '<div class="sirius_ledger_auth_accounts_events_wrapper">';
 		if ($accounts) {
 			// $html .= '<div class="sirius_ledger_auth_accounts">';
@@ -67,6 +67,10 @@ function sirius_ledger_node_tab_auth($auth_node) {
 			$html .= sirius_esignature_render($esignature, 'full', $auth_node->nid, $code);
 			$html .= '<br />';
 		}
+	}
+
+	if (!$html) {
+		$html = '<p>' . t('(Empty authorization -- no items, no funds, no events.)') . '</p>';
 	}
 
 	return $html;

@@ -302,14 +302,19 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 
 	$form['transmittal']['table_close'] = array('#markup' => '</table>');
 
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Submit'),
+	$form['dispatch_status'] = array(
+		'#title' => t('Create Dispatches?'),
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('Do not create dispatches'),
+			'accepted' => t('Create a dispatch for all workers'),
+			'accepted_secondary' => t('Create a secondary dispatch for all workers'),
+		),
 	);
 
 	$form['submit'] = array(
 		'#type' => 'submit',
-		'#value' => 'Submit',
+		'#value' => t('Submit'),
 	);
 
 	return $form;
@@ -378,6 +383,46 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form_submit($form, 
 		}
 	}
 
+	// Create any missing dispatches
+	$dispatch_status = $form_state['values']['dispatch_status'];
+	if ($dispatch_status && $transmittal_json['transmittal']['dispatches']) {
+		$industry_tid = $employer_node->field_sirius_industry['und'][0]['tid'];
+		$employer_nid = $employer_node->nid;
+		$existing_dispatches = sirius_ledger_transmittal_dispatches($employer_node->nid);
+		$already_dispatched_workers = array();
+		foreach ($existing_dispatches as $existing_dispatch) { $already_dispatched_workers[$existing_dispatch['worker_nid']] = TRUE; }
+
+		foreach ($transmittal_json['transmittal']['dispatches'] as $dispatch_nid => $record) {
+			// Is the worker already dispatched?
+			$worker_nid = $record['worker_nid'];
+			if (!$worker_nid) { continue; }
+			if ($already_dispatched_workers[$worker_nid]) { continue; }
+
+			// Need the industry. We get this from the member status.
+			$ms_level = $record['ms_level'];
+			list ($ms_tid, $level_code) = explode('|', $ms_level);
+			if (!$ms_tid) { continue; }
+			$ms_term = taxonomy_term_load($ms_tid);
+			$industry_tid = $ms_term->field_sirius_industry['und'][0]['tid'];
+			if (!$industry_tid) { continue; }
+
+			// Need a stub job
+			$stub_job_node = sirius_dispatch_job_stub_fetch($employer_nid, $industry_tid);
+			if (!$stub_job_node) {
+				drupal_set_message("Unable to create a dispatch for $record[worker_name]; there is no stub job for this employer and industry.");
+				continue; 
+			}
+
+			// Dispatch this worker to this job
+			$result = sirius_dispatch_actions_create($stub_job_node, $worker_nid, 'No', $dispatch_status);
+			if ($result['success']) {
+				drupal_set_message("Dispatched $record[worker_name] with status $dispatch_status");
+			} else {
+				drupal_set_message("Failed to Dispatched $record[worker_name] with status $dispatch_status: $result[msg]", 'warning');
+			}
+		}
+	}
+
 	// Create the payments
 	$accounts = sirius_ledger_account_list();
 
@@ -438,7 +483,6 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form_submit($form, 
 	}
 
 	// Create the epayperiod, if any, and link the transmittal NID
-
 	if ($form_state['values']['transmittal']['hours']['active'] == 'Yes') {
 		$year = $form_state['values']['transmittal']['year'];
 		$month = $form_state['values']['transmittal']['month'];
@@ -453,9 +497,6 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form_submit($form, 
 		} 
 	}
 }
-
-
-
 
 function sirius_ledger_node_tab_employer_transmittal_delete_form($form, &$form_state, $employer_node, $transmittal_node) {
 	$form_state['transmittal_nid'] = $transmittal_node->nid;

@@ -1,6 +1,6 @@
 <?php
 
-function sirius_ledger_node_tab_auth_event_access($auth_node) {
+function sirius_ledger_node_tab_auth_events_access($auth_node) {
 	if ($auth_node->field_sirius_category['und'][0]['value'] != 'ledger:auth') { return FALSE; }
 	return TRUE;
 }

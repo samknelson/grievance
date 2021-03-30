@@ -37,7 +37,7 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 	if (!$transmittal_node) { drupal_set_message("No transmittal form associated with this payment."); return array(); }
 	$form['backlink'] = array('#markup' => l('Back to Transmittal Form', 'node/' . $employer_node->nid . '/sirius_employer_ledger/transmittal', array('attributes' => array('class' => array('tool-button')))));
 
-	// Fetch the indsutries
+	// Fetch the inddustries
 	$industries = sirius_taxonomy_load('sirius_industry', 'tid', 'full');
 	$ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
 
