@@ -130,47 +130,24 @@ function sirius_node_tabs() {
   // Entity Log
   //
 
-  $node_tabs['sirius_dispatch']['sirius_dispatch_log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_log',
-    'permissions' => array('sirius dispatch staff'),
+  $content_types = array(
+    'sirius_dispatch' => 'sirius dispatch staff',
+    'sirius_dispatch_job' => 'sirius dispatch staff',
+    'sirius_dispatch_facility' => 'sirius dispatch staff',
+    'sirius_dispatch_facility_hall' => 'sirius dispatch staff',
+    'grievance_shop' => 'sirius dispatch staff',
+    'sirius_payment' => 'sirius ledger admin',
+    'sirius_payperiod' => 'sirius hour admin',
   );
-
-  $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_log',
-    'permissions' => array('sirius dispatch staff'),
-  );
-
-  $node_tabs['sirius_dispatch_facility']['sirius_dispatch_facility_log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_log',
-    'permissions' => array('sirius dispatch staff'),
-  );
-
-  $node_tabs['sirius_dispatch_facility_hall']['sirius_dispatch_facility_hall_log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_log',
-    'permissions' => array('sirius dispatch staff'),
-  );
-
-  $node_tabs['grievance_shop']['grievance_shop_log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_log',
-    'permissions' => array('sirius dispatch staff'),
-  );
-
-  $node_tabs['sirius_payment']['sirius_payment_log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_log',
-    'permissions' => array('sirius ledger admin'),
-  );
+  foreach ($content_types as $content_type => $permission) {
+    $node_tabs[$content_type][$content_type . '_log'] = array(
+      'title' => 'Log',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_log',
+      'permissions' => array($permission),
+      'weight' => 20,
+    );
+  }
 
   foreach (sirius_letter_content_types_all() as $content_type => $content_type_name) {
     $node_tabs[$content_type][$content_type . '_letter'] = array(
