@@ -37,6 +37,8 @@ function at_sirius_preprocess_page(&$vars) {
   }
 
 	drupal_add_js('sites/all/themes/at_sirius/js/main.js');
+
+  $vars['backlinks'] = sirius_backlinks_render();
 }
 
 function at_sirius_preprocess_html(&$vars) {

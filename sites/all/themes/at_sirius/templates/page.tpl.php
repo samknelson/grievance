@@ -195,7 +195,9 @@ if (at_sirius_is_popup()) {
     <div class="primary-local-tasks-wrapper">
       <div class="container">
           <nav id="primary-tasks" class="clearfix<?php print $secondary_local_tasks ? ' with-secondary' : '' ?>" role="navigation">
-            <ul class="tabs primary"><?php print render($primary_local_tasks); ?></ul>
+            <ul class="tabs primary">
+              <?php print render($primary_local_tasks); ?>
+            </ul>
           </nav>
       </div>
     </div>
@@ -236,6 +238,13 @@ if (at_sirius_is_popup()) {
             <?php if ($content = render($page['content'])): ?>
               <div id="content">
                 <?php print $content; ?>
+
+              <?php if ($backlinks) { ?>
+                <div class="backlink-wrapper">
+                  <?php print $backlinks; ?>
+                </div>
+              <?php } ?>
+
               </div>
             <?php endif; ?>
 
@@ -244,6 +253,7 @@ if (at_sirius_is_popup()) {
             
           </<?php print $tag; ?>><!-- /end #main-content -->
 
+  
         </div><!-- /end .content-inner -->
       </div><!-- /end #content-column -->
 

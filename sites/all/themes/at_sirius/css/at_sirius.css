@@ -4172,3 +4172,28 @@ table.sirius_data_table td div.form-item {
 body.cke_editable_themed {
   background-color: #ffffff;
 }
+
+.backlink-wrapper {
+  float: right;
+  margin-top: 10px;
+}
+
+.backlink-wrapper a, .backlink-wrapper a:visited {
+  padding: 5px; 
+  font-size: 12px;
+  /* background-color: #cad2db; */
+  border: 1px solid #a4b1bf;
+  color: #333333;
+  margin-left: 10px;
+}
+
+.backlink-wrapper a:hover {
+  color: #e37c07;
+  border: 1px solid #e37c07;
+}
+
+@media only print { 
+  .backlink-wrapper {
+    display: none;
+  }
+}
