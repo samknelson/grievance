@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This is basically a oneoff, though somebody else might find it useful some day.
+ */
+
 function sirius_event_page_duplicate_participants() {
   $sql = "select field_sirius_event_target_id as event_nid, ";
   $sql .= "group_concat(distinct nid order by nid separator ',') as participant_nids, ";
@@ -12,10 +16,24 @@ function sirius_event_page_duplicate_participants() {
   $sql .= "having count(nid) > 1 ";
   $sql .= "order by nid ";
 
+  $rows = array();
   $stmt = sirius_sql_query($sql, array());
   while ($hr = $stmt->fetchAssoc()) {
-    dpm($hr);
+    $participant_nids = explode(',', $hr['participant_nids']);
+    $participant_tools = '';
+    foreach ($participant_nids as $participant_nid) {
+      $participant_tools .= l($participant_nid, "node/$participant_nid/edit", array('attributes' => array('class' => 'tool-button')));
+    }
+    $row = array();
+    $row[] = l($hr['event_nid'], 'node/' . $hr['event_nid']);
+    $row[] = $participant_tools;
+    $rows[] = $row;
   }
 
-  return 'Boo';
+  $header = array(
+    'Event',
+    'Participants'
+  );
+
+  return theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
 }
