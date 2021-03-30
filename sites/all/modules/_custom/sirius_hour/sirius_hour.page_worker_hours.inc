@@ -59,7 +59,8 @@ function sirius_hour_node_tab_worker_hours_form($form, &$form_state, $worker_nod
 	);
 
 	$html = '<h2>' . t('Current Hours Entries') . '</h2>';
-	$sql = "select * from sirius_hours_cache ";
+	$sql = "select sirius_hours_cache.*, field_data_field_sirius_attachments.entity_id as attachment_entity_id from sirius_hours_cache ";
+	$sql .= "left join field_data_field_sirius_attachments on field_data_field_sirius_attachments.entity_type = 'node' and field_data_field_sirius_attachments.entity_id = sirius_hours_cache.payperiod_nid and field_data_field_sirius_attachments.delta = 0 ";
 	$sql .= "where worker_nid = :worker_nid ";
 	$sql .= "order by year desc, month desc, day desc, hours_type_name, department_name ";
 	$stmt = db_query($sql, array(':worker_nid' => $worker_node->nid));
@@ -67,9 +68,12 @@ function sirius_hour_node_tab_worker_hours_form($form, &$form_state, $worker_nod
 	$totals = array();
 	$grand_total = 0;
 	while ($hr = $stmt->fetchAssoc()) {
-		$tools = l(t('Edit'), 'node/' . $hr['payperiod_nid'] . '/sirius_payperiod_entries/edit', array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button'))));
+		$tools = l(t('View'), 'node/' . $hr['payperiod_nid'] . '/sirius_payperiod_entries_view', array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button'))));
+		$tools .= l(t('Edit'), 'node/' . $hr['payperiod_nid'] . '/sirius_payperiod_entries_edit', array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button'))));
 		$rate = 0;
 		if ($hr['hours'] > 0) { $rate = round($hr['total'] / $hr['hours'], 2); } else { $rate = 0; }
+
+
 
 		$row = array();
 		$row[] = $hr['year'];
@@ -135,6 +139,6 @@ function sirius_hour_node_tab_worker_hours_form_submit($form, &$form_state) {
 	// Get the payperiod node
 	$domain_nid = sirius_domain_nid();
 	$payperiod_node = sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $year, $month, $day, 'Yes');
-	drupal_goto('node/' . $payperiod_node->nid . '/sirius_payperiod_entries/edit');
+	drupal_goto('node/' . $payperiod_node->nid . '/sirius_payperiod_entries_edit');
 }
 

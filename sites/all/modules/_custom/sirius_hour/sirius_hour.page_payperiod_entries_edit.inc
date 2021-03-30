@@ -8,7 +8,6 @@ function sirius_hour_node_tab_payperiod_entries_edit_form($form, &$form_state, $
 	drupal_add_css(drupal_get_path('module', 'sirius_hour') . '/css/hours.css', 'file');
 	drupal_add_js(drupal_get_path('module', 'sirius_hour') . '/js/entry_form.js', 'file');
 
-
 	$form_state['payperiod_nid'] = $payperiod_node->nid;
 	$json = json_decode($payperiod_node->field_sirius_json['und'][0]['value'], TRUE);
 	$hour_types = sirius_taxonomy_load('sirius_hour_type', 'tid', 'name', TRUE);
@@ -225,6 +224,21 @@ function sirius_hour_node_tab_payperiod_entries_edit_form($form, &$form_state, $
     '#suffix' => '<br />',
   );
 
+	if ($payperiod_node->field_sirius_attachments['und'][0]) {
+		$form['attach_iintro'] = array('#markup' => drupal_render(field_view_field('node', $payperiod_node, 'field_sirius_attachments', 'full')));
+	}
+	for ($delta=0; $delta<3; ++$delta) {
+		if ($payperiod_node->field_sirius_attachments['und'][$delta]) {
+			$title = "Replace attachment #" . ($delta+1);
+		} else {
+			$title = "Upload attachment #" . ($delta+1);
+		}
+		$form["attach_$delta"] = array(
+			'#type' => 'file',
+			'#title' => $title,
+		);
+	}
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -235,6 +249,26 @@ function sirius_hour_node_tab_payperiod_entries_edit_form($form, &$form_state, $
 	return $form;
 }
 
+function sirius_hour_node_tab_payperiod_entries_edit_form_validate($form, &$form_state) {
+	$info = field_info_instance('node', 'field_sirius_attachments', 'sirius_payperiod');
+	$extensions = $info['settings']['file_extensions'];
+	for ($delta = 0; $delta < 3; ++$delta) {
+	  $file = file_save_upload("attach_$delta", array(
+	    'file_validate_extensions' => array($extensions),
+	  ));
+	  if ($file) {
+	    $name = rand();
+	    if ($file = file_move($file, 'private://attach_' . rand())) {
+	      $form_state['storage']["attach_$delta"] = $file;
+	    }
+	    else {
+	      form_set_error("attach_$delta", t("Failed to write the uploaded file to the site's file folder."));
+	    }
+	  }
+	}
+}
+
+
 function sirius_hour_node_tab_payperiod_entries_edit_form_submit($form, &$form_state) {
 	$payperiod_nid = $form_state['payperiod_nid'];
 	$payperiod_node = node_load($payperiod_nid);
@@ -243,7 +277,26 @@ function sirius_hour_node_tab_payperiod_entries_edit_form_submit($form, &$form_s
 	$json['entries'] = $form_state['values']['entries'];
 	sirius_hour_payperiod_compute($json);
 	$payperiod_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+
+	$files = array();
+	for ($delta = 0; $delta < 3; ++$delta) {
+	  $file = $form_state['storage']["attach_$delta"];
+	  if ($file) {
+  		$file = (array) $file;
+  		$file['display'] = 1;
+			unset($form_state['storage']["attach_$delta"]);
+  		unset($file['destination']);
+  		unset($file['uri']);
+  		$files[$delta] = $file;
+  	}
+  }
+  foreach ($files as $delta => $file) {
+  	$payperiod_node->field_sirius_attachments['und'][$delta] = $file;
+  }
+
+  $payperiod_node = node_submit($payperiod_node);
 	node_save($payperiod_node);
+	sirius_log('payperiod:entries', 'manual_edit', 'Payperiod manually edited', '', '', array($payperiod_nid), NULL, $json);
 }
 
 function sirius_generic_entries_addone($form, $form_state) {

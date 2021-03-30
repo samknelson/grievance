@@ -36,5 +36,7 @@ function sirius_hour_node_tab_payperiod_entries_view($payperiod_node) {
   	}
   }
 
+	$html .= drupal_render(field_view_field('node', $payperiod_node, 'field_sirius_attachments', 'full'));
+
   return $html;
 }

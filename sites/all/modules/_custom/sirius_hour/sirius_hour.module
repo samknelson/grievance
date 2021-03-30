@@ -53,3 +53,28 @@ function sirius_hour_node_update($node) {
 function sirius_hour_node_delete($node) {
 	if ($node->type == 'sirius_payperiod') { sirius_hour_cache_clear($node); }
 }
+
+/**
+ * Implements hook_node_presave()
+ */
+
+function sirius_hour_node_presave($node) {
+	if ($node->type == 'sirius_payperiod') { sirius_hour_payperiod_set_title($node); }
+}
+
+function sirius_hour_payperiod_set_title($node) {
+	$title = "Payperiod: "; 
+
+	$worker_nid = $node->field_sirius_worker['und'][0]['target_id'];
+	if ($worker_nid) { $title .= substr(sirius_node_title($worker_nid), 0, 55); } else { $title .= '[no employer]'; }
+
+	$title .= ' / '; 
+
+	$employer_nid = $node->field_grievance_shop['und'][0]['target_id'];
+	if ($employer_nid) { $title .= substr(sirius_node_title($employer_nid), 0, 55); } else { $title .= '[no worker]'; }
+
+	$title .= ' / ';
+	if ($node->field_sirius_datetime['und']) { $title .= sirius_date_date($node, 'field_sirius_datetime', $format = 'Y-m-d'); } else { $title .= '[no date]'; }
+
+	$node->title = $title;
+}
