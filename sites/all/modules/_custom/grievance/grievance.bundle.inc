@@ -288,9 +288,10 @@ function grievance_bundle_batch_add($grievance_node, $drupal_path, &$context) {
 	$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
 
 	if (file_exists($bundled_file)) {
-		$cmd = sirius_server_paths('pdfunite') . ' ';
+		$cmd = sirius_server_paths('pdftk') . ' ';
 		$cmd .= $bundled_file . ' ';
 		$cmd .= grievance_bundle_output_path($grievance_node, $drupal_path) . '.pdf ';
+		$cmd .= "cat output ";
 		$cmd .= $tmp_file . ' ';
 	} else {
 		$cmd = sirius_server_paths('cp') . ' ';
@@ -355,9 +356,10 @@ function grievance_bundle_batch_add_attachments($grievance_node, $target_nid, &$
 		$tmp_file = grievance_bundle_working_directory($source_node) . '/bundled_' . $grievance_node->nid . '_tmp.pdf';
 
 		if (file_exists($bundled_file)) {
-			$cmd = sirius_server_paths('pdfunite') . ' ';
+			$cmd = sirius_server_paths('pdftk') . ' ';
 			$cmd .= $bundled_file . ' ';		
 			$cmd .= $dest . ' ';
+			$cmd .= "cat output ";
 			$cmd .= $tmp_file . ' ';
 		} else {
 			$cmd = sirius_server_paths('cp') . ' ';
