@@ -5,6 +5,7 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATE
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.auditlog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.aat.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log.inc';
@@ -914,4 +915,35 @@ function sirius_ajax_generic_replace($form, $form_state) {
 function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $thousands_separator = ",") {
   if (!is_numeric($str)) { return $str; }
   if (is_numeric($str)) { return number_format($str, $decimals, $decimal_separator, $thousands_separator); }
+}
+
+/**
+ * Return a user-friendly name for a content type. For instance, if the machine name is "sirius_worker", the internal name is "Sirius Worker". But we just return "Worker".
+ */
+
+function sirius_content_type_name($machine_name) {
+  $lookup = &drupal_static(__FUNCTION__);
+  if (!isset($lookup)) {
+    $sql = "select type, name from node_type";
+    $stmt = sirius_sql_query($sql, array());
+    while ($hr = $stmt->fetchAssoc()) {
+      $name = $hr['name'];
+      $name = preg_replace('/sirius/i', '', $name);
+      $name = preg_replace('/grievance/i', '', $name);
+      $name = preg_replace('/ledger/i', '', $name);
+      $name = trim($name);
+
+      if ($name == 'Shop') { $name = 'Employer'; }
+      $lookup[$hr['type']] = $name;
+    }
+  }
+
+  return $lookup[$machine_name];
+}
+
+function sirius_node_title($nid) {
+  $sql = "select title from node where nid = :nid";
+  $stmt = sirius_sql_query($sql, array(':nid' => $nid));
+  $hr = $stmt->fetchAssoc();
+  return $hr['title'];
 }
