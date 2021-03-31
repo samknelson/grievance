@@ -1,9 +1,28 @@
 <?php
 
 function sirius_event_term_tab_interestlist_self_access($event_type_term) {
+	// Are interest lists globally enabled?
 	if (!sirius_event_interestlist_enabled()) { return FALSE; }
+
+	// Admins can always access, even if interest lists are disabled for this term
 	if (user_access('sirius admin') || user_access('sirius domain admin') || user_access('sirius event admin')) { return TRUE; }
+
+	// Nobody else can access if interest lists are disabled for this term.
 	if (!sirius_event_interestlist_enabled_byterm($event_type_term)) { return FALSE; }
+
+	// Check that the worker has a suitable member status
+	$interestlist_json = sirius_jsonfield_util_term_json_get($event_type_term);
+	if ($interestlist_json['interestlist']['settings']['self_register']['ms_tids']) {
+		$interestlist_ms_tids = array_filter(array_values($interestlist_json['interestlist']['settings']['self_register']['ms_tids']));
+		if ($interestlist_ms_tids) {
+			$worker_node = sirius_worker_get();
+			if (!$worker_node) { return FALSE; }
+			$my_ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+			if (!array_intersect($my_ms_tids, $interestlist_ms_tids)) { return FALSE; }
+		}
+	}
+
+
 	return TRUE;
 }
 

@@ -40,6 +40,21 @@ function sirius_event_term_tab_interestlist_settings_form($form, &$form_state, $
 		);
 		if ($event_type_json['interestlist']['settings']['auto_cancel']) { $form['interestlist']['settings']['auto_cancel']['#default_value'] = $event_type_json['interestlist']['settings']['auto_cancel']; }
 	}
+
+	$ms_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+	if ($ms_options) {
+		$form['interestlist']['settings']['self_register']['ms_tids'] = array(
+			'#type' => 'checkboxes',
+			'#title' => t('Self-Registration Member Statuses'),
+			'#description' => t('Restrict self-registration to the following member statuses. If no member statuses are selected, than any worker with appropriate permissions can sign up for the interest list.'),
+			'#options' => $ms_options,
+		);
+		if ($event_type_json['interestlist']['settings']['self_register']['ms_tids']) {
+			$form['interestlist']['settings']['self_register']['ms_tids']['#default_value'] = $event_type_json['interestlist']['settings']['self_register']['ms_tids'];
+		}
+	}
+
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),

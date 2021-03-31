@@ -15,6 +15,8 @@ function sirius_event_page_interestlists() {
 	foreach ($event_type_terms as $event_type_tid => $event_type_term) {
 		$enabled = sirius_event_interestlist_enabled_byterm($event_type_term);
 		if (!$enabled && !$is_admin) { continue; }
+		if (!drupal_valid_path("taxonomy/term/$event_type_tid/sirius_event_type_interestlist")) { continue; }
+
 		if ($contact_nid) { $my_signup = sirius_event_interestlist_lookup($event_type_term, $contact_nid); }
 
 		$tools = '';
