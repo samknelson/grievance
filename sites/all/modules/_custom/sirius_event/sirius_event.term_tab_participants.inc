@@ -5,7 +5,7 @@ function sirius_event_participants_widgets() {
 		//'view' => t('View Worker Participant List'),
 		//'status' => t('Manage Worker Participant List'),
 		//'contact' => t('Manage Contact Participant List'),
-		'list' => t('Manage Participant List'),
+		'list' => t('Roster'),
 		'reports' => t('Download reports'),
 		'summary' => t('View a Summary'),
 		'attendance' => t('Attendance Sheets'),

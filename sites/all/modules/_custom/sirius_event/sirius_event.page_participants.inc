@@ -25,6 +25,7 @@ function sirius_node_tab_event_participants_current($event_node) {
 	$delta = $_REQUEST['delta'];
 	if (!isset($delta)) {
 		$widgets = sirius_event_participants_widgets();
+		$widgets['view'] = $widgets['status'] = $widgets['contact'] = 'Roster';
 
 		if (!$rules) {
 			return t('You do not have access to any participant rules for this event type.');
