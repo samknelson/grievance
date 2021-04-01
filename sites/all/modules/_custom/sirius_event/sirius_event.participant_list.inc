@@ -9,32 +9,36 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 	$form_state['prole_tid'] = $prole_tid;
 	$form_state['rule'] = $rule;
 
-	/*
-	$form['filters'] = array(
-		'#title' => t('Filters'),
-		'#type' => 'fieldset',
-		'#collapsible' => TRUE,
-		'#collapsed' => TRUE,
-	);
-	$form['filters']['sort'] = array(
-		'#type' => 'select',
-		'#options' => array(
-			'register_date' => t('Registration Date'),
-		),
-		'#default_value' => 'register_date',
-	);
-	*/
+	// Sections enabled?
+	$section_enabled = sirius_event_section_enabled($event_node);
 
-	// Get the list of pstatuses that we care about
+	if ($section_enabled) {
+		$form['filters'] = array(
+			'#title' => t('Filters'),
+			'#type' => 'fieldset',
+			'#collapsible' => TRUE,
+			'#collapsed' => TRUE,
+		);
+
+		$section_options = sirius_event_section_options($event_node);
+		if (sirius_event_section_enabled($event_node)) {
+			$form['filters']['section_uuid'] = array(
+				'#title' => t('Section'),
+				'#type' => 'select',
+				'#options' => $section_options + array('NONE' => t('No Section')),
+			);
+		}
+	}
+
+	// Preform our search.
+	// @todo: We're filtering by loading all the records and looking at them, rather than querying
+	//        individually. Why? Because it would be a LOT of SQL.
 	$participant_nids = sirius_event_participant_list_by_rule($event_node->nid, $rule, 100000, 0);
 	if (count($participant_nids) > 1000) {
 		drupal_set_message("Limiting output to the first 1000 records.", 'warning');
 		$participant_nids = array_slice($participant_nids, 0, 1000);
 	}
 	$participant_nodes = node_load_multiple($participant_nids);
-
-	// Sections enabled?
-	$section_enabled = sirius_event_section_enabled($event_node);
 
 	// Lookup prole and pstatus names
 	$prole_lookup = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'name');
@@ -90,12 +94,30 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 		),
 	);
 
+	// $html .= views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
 
 	foreach ($participant_nodes as $participant_nid => $participant_node) {
 		$contact_nid = $participant_node->field_sirius_contact['und'][0]['target_id'];
 		$contact_node = node_load($contact_nid);
 		$worker_node = sirius_worker_get_by_contact_nid($contact_nid);
 		$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
+
+		if ($section_enabled) {
+			$section = sirius_event_section_get_from_participant($event_node, $participant_node);
+			$filter_section_uuid = $form_state['values']['filters']['section_uuid'];
+			if ($filter_section_uuid) {
+				if ($filter_section_uuid == 'NONE') {
+					if ($section['uuid']) { continue; }
+				} else {
+					if ($filter_section_uuid != $section['uuid']) { continue; }
+				}
+			}
+		}
 
 		// Name of the contact
 		$title = $contact_node->title;
@@ -134,10 +156,7 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 		$row = array();
 		$row[] = $title;
 		$row[] = $status;
-		if ($section_enabled) {
-			$section = sirius_event_section_get_from_participant($event_node, $participant_node);
-			$row[] = $section['title'];
-		}
+		if ($section_enabled) { $row[] = sirius_event_section_title($section, '(no section)'); }
 		$row[] = $participant_json['comments'];
 		$row[] = $details;
 		$row[] = $tools;
@@ -147,28 +166,21 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 	$header = array();
 	$header[] = t('Title');
 	$header[] = t('Status');
-	if ($section_enabled) { 
-		$header[] = t('Section');
-	} 
+	if ($section_enabled) { $header[] = t('Section'); } 
 	$header[] = t('Comments');
 	$header[] = t('Details');
 	$header[] = t('Tools');
 
-	$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
-
-  $form['participants'] = array(
-    '#type' => 'tableselect',
-    '#title' => 'Current Locks',
-    '#header' => $header,
-    '#options' => $rows,
-  );
-
-	// $html .= views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Submit'),
-	);
+	if ($rows) {
+	  $form['participants'] = array(
+	    '#type' => 'tableselect',
+	    '#title' => 'Current Locks',
+	    '#header' => $header,
+	    '#options' => $rows,
+	  );
+	} else {
+		$form['participants'] = array('#markup' => '<p>' . t('There are no matching participants') . '</p>'); 
+	}
 
 	return $form;
 }
