@@ -66,6 +66,9 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 
 		// Name of the contact
 		$title = $contact_node->title;
+		if ($worker_node->field_sirius_id['und'][0]['value']) {
+			$title .= '<br />' . $worker_node->field_sirius_id['und'][0]['value'];
+		}
 
 		// Registration date
 		$date = '';
@@ -88,12 +91,6 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 		if ($ms_names) {
 			if ($details) { $details .= '<br />'; }
 			$details .= join('<br />', $ms_names);
-		}
-
-		// Details - Worker ID
-		if ($worker_node->field_sirius_id['und'][0]['value']) {
-			if ($details) { $details .= '<br />'; }
-			$details .= 'ID: ' . $worker_node->field_sirius_id['und'][0]['value'];
 		}
 
 		// Tools
