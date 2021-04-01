@@ -36,7 +36,8 @@ function sirius_backlinks_from_term($term) {
 function sirius_backlinks_from_node($node) {
 	$links = array();
 
-	$contact_nid = $node->field_sirius_contact['und'][0]['target_id'];
+	if ($node->type == 'sirius_contact') { $contact_nid = $node->nid; }
+	if (!$contact_nid) { $contact_nid = $node->field_sirius_contact['und'][0]['target_id']; }
 	if ($contact_nid) { $worker_nid = sirius_worker_get_by_contact_nid($contact_nid, TRUE); }
 	if ($contact_nid && !$worker_nid) {
 		if ($node->type == 'sirius_event_participant') 			{ $path = "node/$contact_nid"; }
