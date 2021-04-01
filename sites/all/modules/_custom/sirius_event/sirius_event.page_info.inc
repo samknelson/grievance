@@ -111,6 +111,7 @@ function sirius_node_tab_event_mypstatus_form($form, &$form_state, $event_node, 
 
 function sirius_node_tab_event_mypstatus_form_validate($form, &$form_state) {
   $participant_node = node_load($form_state['participant_nid']);
+  $participant_json = sirius_jsonfield_util_node_json_get($participant_node);
   $event_node = node_load($participant_node->field_sirius_event['und'][0]['target_id']);
   $event_json = sirius_jsonfield_util_node_json_get($event_node);
   $event_section_json = $event_json['section'];
@@ -121,7 +122,10 @@ function sirius_node_tab_event_mypstatus_form_validate($form, &$form_state) {
   if (!$pstatus_tids) { return; }
 
   $new_pstatus_tid = $form_state['values']['pstatus_tid'];
-  if (in_array($new_pstatus_tid, $pstatus_tids) && !$form_state['values']['section']['uuid']) {
+  if (sirius_event_section_enabled($event_node) && 
+    !$participant_json['section']['uuid'] && 
+    in_array($new_pstatus_tid, $pstatus_tids) && 
+    !$form_state['values']['section']['uuid']) {
     form_set_error('section][uuid', 'Please select a section.');
   }
 }
