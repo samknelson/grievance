@@ -100,7 +100,6 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 
 		$row = array();
 		$row[] = $title;
-		$row[] = $date;
 		$row[] = $status;
 		if ($section_enabled) {
 			$section = sirius_event_section_get_from_participant($event_node, $participant_node);
