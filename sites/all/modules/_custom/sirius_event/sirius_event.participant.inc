@@ -4,7 +4,7 @@ function sirius_event_participant_pstatus_set_possible($participant_node, $prole
 	return array('success' => TRUE);	
 }
 
-function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $pstatus_tid) {
+function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $pstatus_tid, $notify = array()) {
 	$possible = sirius_event_participant_pstatus_set_possible($participant_node, $prole_tid, $pstatus_tid);
 	if (!$possible['success']) { return $possible; }
 
@@ -16,6 +16,9 @@ function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $ps
 		return array('success' => TRUE, 'msg' => 'No changes.');
 	}
 
+	$event_node = node_load($participant_node->field_sirius_event['und'][0]['target_id']);
+	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+
 	$participant_node->field_sirius_event_prole['und'][0]['tid'] = $prole_tid;
 	$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $pstatus_tid;
 
@@ -26,11 +29,73 @@ function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $ps
 	sirius_jsonfield_log($participant_node, 'status', "Set prole = " . $term_cache[$prole_tid]->name . ", pstatus = " . $term_cache[$pstatus_tid]->name);
 	node_save($participant_node);
 
-	$event_node = node_load($participant_node->field_sirius_event['und'][0]['target_id']);
-	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+	$msg = 'Participant status changed. ';
+
+	$notify_medium = $notify['medium'];
+	if ($notify_medium) {
+		$contact_node = node_load($participant_node->field_sirius_contact['und'][0]['target_id']);
+		$pstatus_term = taxonomy_term_load($pstatus_tid);
+		$prole_term = taxonomy_term_load($prole_tid);
+		$notify_body = $notify['body'];
+	  global $base_url;
+	  $url = $base_url . '/node/' . $event_node->nid . '/sirius_event_info';
+
+	  if ($notify_medium == 'sms' || $notify_medium == 'both') {
+			$phone = $contact_node->field_sirius_phone['und'][0]['value'];
+			if (!$phone) { 
+				$msg .= "Unable to notify by SMS: the contact has no phone number listed.";
+			} else {
+		    $params = array();
+		    $params['sms'] = "Status update for " . $event_node->title . ": Role is " . $prole_term->name . " and status is " . $pstatus_term->name;
+		    $params['sms'] .= "\n";
+		    $params['sms'] .= $url;
+		    if ($notify_body) {
+		    	$params['sms'] .= "\n" . $notify_body;
+		    }
+
+	      $params['to'] = $phone;
+	      $result = sirius_sms_send($params);
+				if ($result['success']) { 
+					$msg .= " Notified by SMS: $phone.";
+					sirius_jsonfield_log($participant_node, "notify", "Notified by SMS: $phone: $params[sms]");
+				} else {
+					sirius_jsonfield_log($participant_node, "notify_fail", "Failed to notify by SMS: $phone: $result[msg]");
+					$msg .= " " . $result['msg'];
+				}
+	    }
+	  }
+
+	  if ($notify_medium == 'email' || $notify_medium == 'both') {
+			$email = $contact_node->field_sirius_email['und'][0]['value'];
+			if (!$email) { 
+				$msg .= "Unable to notify by Email: the contact has no email address listed.";
+			} else {
+		    $params = array();
+		    $params['subject'] = "Status update for: " . $event_node->title;
+		    $params['body'] = "Status update for " . $event_node->title . ": Role is " . $prole_term->name . " and status is " . $pstatus_term->name;
+		    $params['body'] .= "<br /><br />";
+		    $params['body'] .= "<a href=\"$url\">$url</a>";
+		    if ($notify_body) {
+		    	$params['body'] .= "<br /><br />" . $notify_body;
+		    }
+
+	      $params['to'] = $email;
+	      $result = sirius_email_send($params);
+				if ($result['success']) { 
+					$msg .= " Notified by email: $email.";
+					sirius_jsonfield_log($participant_node, "notify", "Notified by email: $email: $params[subject] $params[body]");
+				} else {
+					sirius_jsonfield_log($participant_node, "notify_fail", "Failed to notify by email: $email: $params[subject] $params[body]");
+					$msg .= " " . $result['msg'];
+				}
+	    }
+	    node_save($participant_node);
+	  }
+	}
+
 	sirius_interestlist_auto_cancel($event_type_term, $participant_node);
 
-	return array('success' => TRUE, 'msg' => 'Participant status changed.');
+	return array('success' => TRUE, 'msg' => $msg);
 }
 
 /**

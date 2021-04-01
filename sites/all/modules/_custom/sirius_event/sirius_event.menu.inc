@@ -33,7 +33,7 @@ function sirius_event_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_event_participant_json_view_intake',
     'permissions' => array('sirius'),
-    'weight' => 2,
+    'weight' => 6,
   );
 
   $node_tabs['sirius_event_participant']['sirius_event_participant_intake/view'] = array(
@@ -355,12 +355,22 @@ function sirius_event_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_event_participant']['sirius_event_participant_status'] = array(
+    'title' => 'Status',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_participant_status',
+    'permissions' => array('sirius event admin'),
+    'weight' => 2,
+    'file' => 'sirius_event.page_participant_status.inc',
+  );
+
   $node_tabs['sirius_event_participant']['sirius_event_participant_comments'] = array(
     'title' => 'Comments',
     'description' => '',
     'callback' => 'sirius_event_node_tab_participant_comments',
     'permissions' => array('sirius event admin'),
-    'weight' => 2,
+    'weight' => 3,
+    'file' => 'sirius_event.page_participant_comments.inc',
   );
 
   $node_tabs['sirius_event_participant']['sirius_event_participant_disclaimer'] = array(
@@ -368,7 +378,7 @@ function sirius_event_node_tabs() {
     'description' => '',
     'callback' => 'sirius_event_node_tab_participant_disclaimer',
     'permissions' => array('sirius event admin'),
-    'weight' => 2,
+    'weight' => 4,
     'file' => 'sirius_event.page_participant_disclaimer.inc',
   );
 
@@ -397,7 +407,7 @@ function sirius_event_node_tabs() {
     'description' => '',
     'callback' => 'sirius_jsonfield_node_tab_entity_sublog',
     'permissions' => array('sirius event admin'),
-    'weight' => 3,
+    'weight' => 5,
   );
 
   /*

@@ -42,6 +42,7 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 	$ms_lookup = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
 	$level_lookup = sirius_training_levels_fetch_all();
 
+	$form['#tree'] = TRUE; 
   $form['action'] = array(
   	'#title' => t('Action'),
   	'#type' => 'select',
@@ -57,6 +58,38 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
   	'#options' => array(NULL => t('-- Select --')) + sirius_event_participant_role_status_tids($prole_tid),
 		'#states' => array('visible' => array(":input[name=\"action\"]" => array('value' => 'pstatus'))),
   );
+
+  $form['notify'] = array(
+  	'#type' => 'fieldset',
+		'#states' => array('visible' => array(":input[name=\"action\"]" => array('value' => 'pstatus'))),
+		'collapsible' => FALSE,
+  );
+
+	$form['notify']['medium'] = array(
+		'#title' => 'Notify by',
+		'#type' => 'select',
+		'#options' => array(
+			'NULL' => t('No notification'),
+			'sms' => t('Text message'),
+			'email' => t('Email message'),
+			'both' => t('Both text and email messages'),
+		),
+	);
+
+	$form['notify']['body'] = array(
+		'#type' => 'textarea',
+		'#title' => t('Add a message'),
+		'#states' => array(
+			'visible' => array(
+				':input[name="notify"]' => array(
+					array('value' => 'sms'),
+					array('value' => 'email'),
+					array('value' => 'both')
+				),
+			),
+		),
+	);
+
 
 	foreach ($participant_nodes as $participant_nid => $participant_node) {
 		$contact_nid = $participant_node->field_sirius_contact['und'][0]['target_id'];
@@ -165,9 +198,10 @@ function sirius_event_page_participant_list_form_submit($form, &$form_state) {
 			++$count;
 			$participant_node = node_load($participant_nid);
 			$prole_tid = $participant_node->field_sirius_event_prole['und'][0]['tid'];
-			$result = sirius_event_participant_pstatus_set($participant_node, $prole_tid, $pstatus_tid);
+			$result = sirius_event_participant_pstatus_set($participant_node, $prole_tid, $pstatus_tid, $form_state['values']['notify']);
 			if ($result['success']) { 
 				++$count_success;
+				drupal_set_message($result['msg']);
 			} else {
 				++$count_failure;
 				drupal_set_message($result['msg'], 'warning');
