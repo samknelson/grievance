@@ -71,7 +71,7 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 	$prole_term = taxonomy_term_load($prole);
 
 	$all_widgets = sirius_event_participants_widgets();
-	$widgets['view'] = $widgets['status'] = $widgets['contact'] = 'Roster';
+	$all_widgets['view'] = $all_widgets['status'] = $all_widgets['contact'] = 'Roster';
 
 	drupal_set_title(drupal_get_title() . ': ' . $rule['name'] . ' - ' . $all_widgets[$widget]);
 	if ($widget == 'view' || $widget == 'status' || $widget == 'contact' || $widget == 'list') {
