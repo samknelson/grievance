@@ -128,9 +128,6 @@ function sirius_event_participant_summary($event_nid, $prole_tid = NULL) {
 	return $data;
 }
 
-
-
-
 function sirius_event_participant_nid_from_contact($event_nid, $contact_nid) {
   if (!$event_nid || !$contact_nid) { return NULL; }
 
@@ -165,3 +162,44 @@ function sirius_event_participant_mypstatus_options($pstatus_json) {
 	}
 	return $options;
 }
+
+/*
+function sirius_event_participant_search($event_nid, $params = array(), $limit = 0, $offset = 0) {
+	$prole_lookup = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'name');
+	$pstatus_lookup = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
+
+	$sql_args = array();
+	$sql_args[':event_nid'] = $event_nid;
+	$sql = "select node.nid as participant_nid, ";
+	$sql .= "field_sirius_json_value as participant_json, ";
+	$sql .= "node.created as participant_ts, ";
+	$sql .= "field_sirius_event_prole_tid as prole_tid, ";
+	$sql .= "field_sirius_event_pstatus_tid as pstatus_tid, ";
+	$sql .= "contact_node.nid as contact_nid, ";
+	$sql .= "contact_node.title as contact_title, ";
+	$sql .= "worker_node.nid as worker_nid, ";
+	$sql .= "worker_id.field_sirius_id_value as worker_id ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
+	$sql .= "left join node contact_node on contact_node.nid = field_data_field_sirius_contact.field_sirius_contact_target_id ";
+	$sql .= "left join field_data_field_sirius_contact worker_contact on worker_contact.entity_type = 'node' and worker_contact.bundle = 'sirius_worker' and worker_contact.field_sirius_contact_target_id = contact_node.nid ";
+	$sql .= "left join node worker_node on worker_node.type = 'sirius_worker' and worker_node.nid = worker_contact.entity_id ";
+	$sql .= "left join field_data_field_sirius_id worker_id on worker_id.entity_type = 'node' and worker_id.entity_id = worker_node.nid ";;
+	$sql .= "where node.type = 'sirius_event_participant' ";
+	$sql .= "and field_sirius_event_target_id = :event_nid ";
+	if ($limit) { $sql .= "limit $limit offset $offset "; }
+
+	$stmt = db_query($sql, $sql_args);
+	$participants = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$hr['prole_name'] = $prole_lookup[$hr['prole_tid']];
+		$hr['pstatus_name'] = $pstatus_lookup[$hr['pstatus_tid']];
+		$participants[$hr['participant_nid']] = $hr;
+	}
+	return $participants;
+}
+*/

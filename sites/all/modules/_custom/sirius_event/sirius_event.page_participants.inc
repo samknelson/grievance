@@ -71,12 +71,13 @@ function sirius_node_tab_event_participants_current_rule($event_node, $rule, $wi
 
 	$all_widgets = sirius_event_participants_widgets();
 	drupal_set_title(drupal_get_title() . ': ' . $rule['name'] . ' - ' . $all_widgets[$widget]);
-	if ($widget == 'view') {
-		return views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
-	} else if ($widget == 'status') {
+	if ($widget == 'view' || $widget == 'status' || $widget == 'contact' || $widget == 'list') {
+		return sirius_event_page_participant_list($event_node, $prole, $rule);
+		//return views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
+	/*} else if ($widget == 'status') {
 		return views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
 	} else if ($widget == 'contact') {
-		return views_embed_view('sirius_event_participants', 'block', $event_node->nid, $prole);
+		return views_embed_view('sirius_event_participants', 'block', $event_node->nid, $prole); */
 	} else if ($widget == 'reports') {
 		return sirius_node_tab_event_participants_reports($event_node->nid, $prole);
 	} else if ($widget == 'summary') { 

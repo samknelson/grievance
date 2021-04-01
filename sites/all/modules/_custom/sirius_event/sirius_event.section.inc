@@ -262,7 +262,7 @@ function sirius_event_section_assign($participant_nid, $uuid, $options = array()
 
 function sirius_event_section_get_from_participant($event_node, $participant_node) {
 	$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
-	if (!$participant_json) { return NULL; }
+	if (!$participant_json || !$participant_json['section']) { return NULL; }
 	$uuid = $participant_json['section']['uuid'];
 	if (!$uuid) { return NULL; }
 

@@ -2,9 +2,10 @@
 
 function sirius_event_participants_widgets() {
 	return array(
-		'view' => t('View Worker Participant List'),
-		'status' => t('Manage Worker Participant List'),
-		'contact' => t('Manage Contact Participant List'),
+		//'view' => t('View Worker Participant List'),
+		//'status' => t('Manage Worker Participant List'),
+		//'contact' => t('Manage Contact Participant List'),
+		'list' => t('Manage Participant List'),
 		'reports' => t('Download reports'),
 		'summary' => t('View a Summary'),
 		'attendance' => t('Attendance Sheets'),
@@ -78,6 +79,13 @@ function sirius_event_term_tab_policy_participants_form($form, &$form_state, $ev
 			'#options' => sirius_event_participants_widgets(),
 			'#multiple' => TRUE,
 		);
+		// @todo: Cleanup legacy
+		foreach (array('view', 'status', 'contact') as $legacy_widget) {
+			if ($json['participants']['rules'][$i]['widget'][$legacy_widget]) {
+				unset($json['participants']['rules'][$i]['widget'][$legacy_widget]);
+				$json['participants']['rules'][$i]['widget']['list'] = 'list';
+			}
+		}
 		if ($json['participants']['rules'][$i]['widget']) { $form["participants_$i"]['widget']['#default_value'] = $json['participants']['rules'][$i]['widget']; }
 
 		//
