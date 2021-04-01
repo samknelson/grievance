@@ -67,7 +67,7 @@ function sirius_training_node_tab_worker_classes($worker_node) {
 
 			$tools = l('Event', 'node/' . $event_node->nid, array('attributes' => array('class' => array('tool-button'))));
 			$tools .= ' ';
-			$tools .= l('Participant', 'node/' . $participant_node->nid . '/edit', array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button'))));
+			$tools .= l('Participant', 'node/' . $participant_node->nid . '/sirius_event_participant_comments', array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button'))));
 
 			$name_render = $event_type_term->name;
 			if ($event_node->title != $event_type_term->name) { $name_render .= '<br />' . $event_node->title; }
