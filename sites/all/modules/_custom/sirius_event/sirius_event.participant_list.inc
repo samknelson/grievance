@@ -73,7 +73,7 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 		// Registration date
 		$status = $pstatus_lookup[$participant_node->field_sirius_event_pstatus['und'][0]['tid']];
 		if ($participant_node->field_sirius_datetime['und'][0]['value']) {
-			$status .= '<br />' . sirius_date_date($participant_node, 'field_sirius_datetime', 'Y-m-d H:i');
+			$status .= '<br />' . sirius_date_date($participant_node, 'field_sirius_datetime', 'm/d H:i');
 		}
 
 		// Details - Member Status
