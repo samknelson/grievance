@@ -76,6 +76,7 @@ function sirius_event_register_user_self_form($form, &$form_state, $event_node, 
 				'#title' => t('Section'),
 				'#default_value' => $participant_json['section']['uuid'],
 				'#options_attributes' => $options_attributes,
+				'#required' => TRUE,
 			);
 
 			foreach ($options as $uuid => $title) {
@@ -87,7 +88,6 @@ function sirius_event_register_user_self_form($form, &$form_state, $event_node, 
 					'#states' => array('visible' => array(":input[name=\"section[uuid]\"]" => array('value' => $uuid))),
 				);
 			}
-
 		}
 
 		$form['participant']['comments'] = array(
