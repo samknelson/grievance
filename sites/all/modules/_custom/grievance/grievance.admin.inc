@@ -276,40 +276,6 @@ function grievance_admin() {
     '#description' => t('Enter a suffix to be appended to each grievance ID.'),
   );
 
-
-  $form['grievance_mailattach'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Emailed Attachments'),
-  );
-
-  $form['grievance_mailattach']['grievance_mailattach_user'] = array(
-    '#type' => 'textfield',
-    '#title' => t('IMAP User'),
-    '#default_value' => variable_get('grievance_mailattach_user', ''),
-    '#description' => t("Enter the IMAP user to be used for mail attachment fetching."),
-  );
-
-  $form['grievance_mailattach']['grievance_mailattach_pass'] = array(
-    '#type' => 'textfield',
-    '#title' => t('IMAP Password'),
-    '#default_value' => variable_get('grievance_mailattach_pass', ''),
-    '#description' => t("Enter the IMAP password to be used for mail attachment fetching."),
-  );
-
-  $form['grievance_mailattach']['grievance_mailattach_imapstr'] = array(
-    '#type' => 'textfield',
-    '#title' => t('IMAP Connection String'),
-    '#default_value' => variable_get('grievance_mailattach_imapstr', ''),
-    '#description' => t("Enter the IMAP connection string to be used.  Here's an example: <strong>{mail.myorg.org:993/imap/ssl}INBOX</strong>"),
-  );
-
-  $form['grievance_mailattach']['grievance_mailattach_type'] = array(
-    '#type' => 'select',
-    '#options' => taxonomy_allowed_values(field_info_field('field_grievance_document_type')),
-    '#title' => t('Emailed attachments should have this type'),
-    '#default_value' => variable_get('grievance_mailattach_type', ''),
-  );
- 
   return system_settings_form($form);
 }
 

@@ -44,7 +44,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.lette
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.phone.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.mine.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.prior.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.mailattach.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.assignee.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.phaxio.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.classification.inc";
@@ -75,7 +74,6 @@ function grievance_views_pre_view(&$view, &$display_id, &$args) {
 
 function grievance_cron() {
   grievance_alert_all();
-  grievance_mailattach_fetch();
   grievance_bundle_cleanup();
   grievance_workersync_cron();
 }
@@ -706,7 +704,7 @@ function grievance_report_cache_info() {
 
 function grievance_views_pre_render(&$view) {
   // Highlight my assignments in the main grievances view
-  if ($view->name == 'grievances' && $view->current_display == 'page_1' ||
+  if ( ($view->name == 'grievances' || $view->name == 'sirius_worker_grievances') && $view->current_display == 'page_1' ||
     $view->name == 'grievances_mine') {
     global $user; 
     if (!$user || !$user->uid) { return; }

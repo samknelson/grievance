@@ -167,7 +167,101 @@ function sirius_twilio_menu() {
     'weight' => 3,
   );
 
+  $items['sirius/twilio/recordings'] = array(
+    'title' => 'Twilio Recordings',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_recordings',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius_twilio.page_recordings.inc',
+  );
 
+  $items['sirius/twilio/recordings/remote'] = array(
+    'title' => 'Remote',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_recordings',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius_twilio.page_recordings.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/twilio/recordings/local'] = array(
+    'title' => 'Local',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_recordings_local',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius_twilio.page_recordings_local.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/twilio/recordings/numbers'] = array(
+    'title' => 'Numbers',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_recordings_numbers_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius_twilio.page_recordings_numbers_list.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
+  $items['sirius/twilio/recordings/numbers/list'] = array(
+    'title' => 'List',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_recordings_numbers_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius_twilio.page_recordings_numbers_list.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/twilio/recordings/numbers/add'] = array(
+    'title' => 'Add',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_recordings_numbers_add',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius_twilio.page_recordings_numbers_add.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['sirius/twilio/recordings/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_recordings_settings',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius_twilio.page_recordings_settings.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+  );
+
+  $items['sirius/twilio/recordings/scan'] = array(
+    'title' => 'Scan',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_recordings_scan',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius_twilio.page_recordings_scan.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+  );
+
+  $items['sirius/twilio/recording/stream/%'] = array(
+    'title' => '',
+    'description' => '',
+    'page callback' => 'sirius_twilio_page_recording_stream',
+    'page arguments' => array(4),
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius_twilio.page_recording_stream.inc',
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 }

@@ -5,20 +5,14 @@ function grievance_node_tab_attachments($node) {
 
   if ($_REQUEST['mailattach_fetch']) {
     drupal_set_message("Fetching messages ...");
-    watchdog_queue_watchdog('grievance_mailattach');
-    grievance_mailattach_fetch();
-    $entries = watchdog_queue_watchdog();
-    if ($entries) {
-      foreach ($entries as $entry) {
-        drupal_set_message($entry['message']);
-      }
-    }
+    sirius_mailattach_fetch();
+    drupal_set_message(sirius_minilog_render_html());
     drupal_set_message("... Done.");
   }
 
   $result = '';
 
-  $grievance_mailattach_user = variable_get('grievance_mailattach_user', '');
+  $grievance_mailattach_user = sirius_domain_variable_get('sirius_mailattach_user', '');
   $grievance_id = $node->field_grievance_id['und'][0]['value'];
   if ($grievance_id && $grievance_mailattach_user) {
   	$result .= '<p>';

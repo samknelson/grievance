@@ -13,3 +13,4 @@ function sirius_twilio_lookup($phone) {
 		return array('success' => FALSE, 'msg' => "Lookup failure: $msg");
 	}
 }
+

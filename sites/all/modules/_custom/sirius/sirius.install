@@ -124,3 +124,25 @@ function sirius_update_7007() {
     variable_set('sirius_mailattach_mode', 'live');
   }
 }
+
+
+/**
+ * Enable the fieldset helper module
+ */
+
+function sirius_update_7008() {
+  // Enable some modules
+  $modules = array('fieldset_helper');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+
+  // Grant permission to use it to everybody
+  $permission = 'save fieldset state';
+  $roles = user_roles();
+  foreach ($roles as $rid => $name) {
+    print "... granting [$permission] to [$name]\n";
+    user_role_grant_permissions($rid, array($permission));
+  }
+}

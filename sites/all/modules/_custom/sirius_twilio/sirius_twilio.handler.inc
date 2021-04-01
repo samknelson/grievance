@@ -100,7 +100,7 @@ function sirius_twilio_set_context($call_sid, $context, $type = 'context_set', $
     $json = json_decode($log_node->field_sirius_json['und'][0]['value'], TRUE);
     $json['context'] = array_merge($json['context'], $context);
     $log_node->field_sirius_json['und'][0]['value'] = json_encode($json);
-    sirius_jsonfield_log($log_node, 'context_set', $msg, array('old_type' => $old_type, 'old_msg' => $old_msg, 'old_summary' => $old_summary, 'old_handler' => $old_handler));
+    sirius_jsonfield_log($log_node, $type, $msg, array('old_type' => $old_type, 'old_msg' => $old_msg, 'old_summary' => $old_summary, 'old_handler' => $old_handler));
     node_save($log_node);
   }
 }
