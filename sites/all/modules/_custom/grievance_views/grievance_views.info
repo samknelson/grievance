@@ -66,6 +66,7 @@ features[views_view][] = sirius_dispatch_facility_halls
 features[views_view][] = sirius_dispatch_filled_jobs
 features[views_view][] = sirius_dispatch_job_groups
 features[views_view][] = sirius_dispatch_jobs
+features[views_view][] = sirius_dispatch_jobs_all
 features[views_view][] = sirius_dispatch_sib
 features[views_view][] = sirius_dispatch_vlri
 features[views_view][] = sirius_dispatches
