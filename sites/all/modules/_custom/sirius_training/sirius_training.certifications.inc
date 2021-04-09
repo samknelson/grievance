@@ -164,8 +164,7 @@ function sirius_training_certification_grant($certification_node, $values = arra
 				if ($participant_node->field_sirius_event_pstatus['und'][0]['tid'] == $pstatus_tid) {
 					sirius_minilog("$title: Participant already had status " . $pstatus_term->name);
 				} else {
-					$participant_node->field_sirius_event_pstatus['und'][0]['tid'] = $pstatus_tid;
-					node_save($participant_node);
+					sirius_event_participant_pstatus_set($participant_node, $participant_node->field_sirius_event_prole['und'][0]['tid'], $pstatus_tid);
 					sirius_minilog("$title: Set participant status to \"" . $pstatus_term->name . "\"");
 				}
 			}

@@ -13,6 +13,13 @@ function sirius_training_node_tab_worker_classes($worker_node) {
 
 	$prole_terms = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'full');
 	$pstatus_terms = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'full');
+	$pstatus_exclude = array();
+	foreach ($pstatus_terms as $tid => $term) {
+		$term_json = sirius_jsonfield_util_term_json_get($term);
+		if ($term_json['attendance']['exclude'] == 'Yes') {
+			$pstatus_exclude[$tid] = TRUE;
+		}
+	}
 
 	// Get the contact node
 	$events_by_type = sirius_event_participants_by_contact($worker_node->field_sirius_contact['und'][0]['target_id'], array_keys($event_type_terms));
@@ -26,8 +33,12 @@ function sirius_training_node_tab_worker_classes($worker_node) {
 		$total_hours[$event_type_tid]['status'] = array();
 		foreach ($records as $record) {
 			$event_node = $record['event_node'];
+			$event_json = sirius_jsonfield_util_node_json_get($event_node);
+			$sections = $event_json['section_list'];
+
 			$participant_node = $record['participant_node'];
 			$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
+			$section_uuid = $participant_json['section']['uuid'];
 
 			$prole_tid = $participant_node->field_sirius_event_prole['und'][0]['tid'];
 			$pstatus_tid = $participant_node->field_sirius_event_pstatus['und'][0]['tid'];
@@ -36,13 +47,26 @@ function sirius_training_node_tab_worker_classes($worker_node) {
 
 			$total_hours[$event_type_tid]['status'][] = $pstatus_term->name;
 
+			if ($pstatus_exclude[$pstatus_tid]) { continue; }
+
 			$dates = sirius_fieldvals($event_node, 'field_sirius_daterepeat', 'date', 'Y-m-d');
 
 			$sub_rows = array();
 			$subtotal_hours = array();
 			foreach ($dates as $delta => $date) {
+				// If the participant has a section, and the section isn't for this day, then don't show the attendance sheet
+				if ( (count($dates) > 1) && $section_uuid) {
+					if (!$sections[$section_uuid]['event_dates']["delta_$delta"]) { 
+						continue;
+					}
+				}
+
+				// Default or "estimated" duration
+				$duration_default = 0;
 				$which = 'attendance_' . $delta;
-				$duration_default = strtotime($event_node->field_sirius_daterepeat['und'][$delta]['value2']) - strtotime($event_node->field_sirius_daterepeat['und'][$delta]['value']);
+				if ($sections[$section_uuid]['duration']) { $duration_default = $sections[$section_uuid]['duration'];  }
+				if (!$duration_default) { $duration_default = strtotime($event_node->field_sirius_daterepeat['und'][$delta]['value2']) - strtotime($event_node->field_sirius_daterepeat['und'][$delta]['value']); }
+
 				$duration = $participant_json[$which]['data']['hours'];
 				if (!isset($duration)) {
 					$duration_render = sirius_event_duration_format_hours($duration_default) . ' (est.)';
