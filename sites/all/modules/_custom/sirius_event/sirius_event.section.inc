@@ -269,3 +269,18 @@ function sirius_event_section_get_from_participant($event_node, $participant_nod
 	$event_json = sirius_jsonfield_util_node_json_get($event_node);
 	return $event_json['section_list'][$uuid];
 }
+
+function sirius_event_section_alias($event_node) {
+	$cache = &drupal_static(__FUNCTION__);
+	if (!isset($cache)) { $cache = array(); }
+
+	if (!$cache[$event_node->nid]) {
+		$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+		$event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
+		$alias = $event_type_json['section']['section_alias'];
+		if (!$alias) { $alias = 'Section'; }
+		$cache[$event_node->nid] = $alias;
+	}
+
+	return $cache[$event_node->nid];
+}

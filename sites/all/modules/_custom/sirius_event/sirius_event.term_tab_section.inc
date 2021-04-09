@@ -27,6 +27,21 @@ function sirius_event_term_tab_section_form($form, &$form_state, $event_type_ter
 		'#default_value' => $section_json['enabled'],
 	);
 
+	$form['section']['section_alias'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Section Alias'),
+		'#description' => t('Sometimes it is useful to refer to sections by an alternative name, such as "Appointment Time".'),
+		'#default_value' => $section_json['section_alias'],
+	);
+
+	$form['section']['intro'] = array(
+		'#type' => 'text_format',
+		'#title' => t('Introductory Text'),
+		'#description' => t('Enter any introductory text that should appear to non-administrative users before the section select box.'),
+		'#default_value' => $section_json['intro'],
+		'#format' => 'sirius_form_editor',
+	);
+
 	$form['section']['prole_tids'] = array(
 		'#type' => 'checkboxes',
 		'#title' => t('Partipant Roles'),
@@ -56,6 +71,7 @@ function sirius_event_term_tab_section_form_submit($form, &$form_state) {
 	$event_type_term = taxonomy_term_load($event_type_tid);
 	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
 	$json['section'] = $form_state['values']['section'];
+	$json['section']['intro'] = sirius_richtext_handle_input($form_state['values']['section']['intro']);
 	$event_type_term->field_sirius_json['und'][0]['value'] = json_encode($json);
 	taxonomy_term_save($event_type_term);
 	drupal_set_message("Settings saved.");

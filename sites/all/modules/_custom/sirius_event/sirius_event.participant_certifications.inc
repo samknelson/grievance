@@ -29,6 +29,7 @@ function sirius_event_page_participant_certifications_form($form, &$form_state, 
 	foreach ($participant_nodes as $participant_nid => $participant_node) {
 		$contact_node = node_load($participant_node->field_sirius_contact['und'][0]['target_id']);
 		$worker_node = sirius_worker_get_by_contact_nid($participant_node->field_sirius_contact['und'][0]['target_id']);
+		if (!$worker_node) { continue; }
 		$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
 		$esignature = sirius_jsonfield_util_esignature_get($participant_json, $which);
 		$row = array();
@@ -88,7 +89,7 @@ function sirius_event_page_participant_certifications_form($form, &$form_state, 
 	$confirm_html = '<p>';
 	$confirm_html .= t('When the button below is clicked, the following actions will be taken on all the selected participants:');
 	$confirm_html .= '<ul>';
-	$confirm_html .= '<li>' . t('All participants will be set to the status: ') . '<strong>' . 'Passed' . '</strong>' . '</li>';
+	$confirm_html .= '<li>' . t('All participants will be set to the status for granted certifications (usually "Passed")') . '</li>';
 	$confirm_html .= '<li>' . t('All certifications for each selected participant will be granted') . '</li>';
 	$confirm_html .= '<li>' . t('All the skill associated with the granted certifications will be added or renewed') . '</li>';
 	$confirm_html .= '</ul>';

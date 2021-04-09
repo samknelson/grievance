@@ -52,7 +52,7 @@ function sirius_node_tab_event_info($event_node) {
     $pstatus_options = sirius_event_participant_mypstatus_options($pstatus_json);
     if ($pstatus_options) {
       $html .= '<hr>';
-      $html .= '<h2>' . t('Change Registration Status') . '</h2>';
+      $html .= '<h2>' . t('Update your registration') . '</h2>';
       $html .= drupal_render(drupal_get_form('sirius_node_tab_event_mypstatus_form', $event_node, $participant_node, $pstatus_options));
     }
   }
@@ -64,11 +64,14 @@ function sirius_node_tab_event_mypstatus_form($form, &$form_state, $event_node, 
   $form_state['event_nid'] = $event_node->nid;
   $form_state['participant_nid'] = $participant_node->nid;
 
+  $event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+  $event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
+
   $form['#tree'] = TRUE;
 
   $form['pstatus_tid'] = array(
     '#type' => 'select',
-    '#title' => 'Change registration status to:',
+    '#title' => 'Change status to:',
     '#options' => array(NULL => t('-- Select --')) + $pstatus_options,
   );
 
@@ -81,11 +84,15 @@ function sirius_node_tab_event_mypstatus_form($form, &$form_state, $event_node, 
   $options_attributes = array();
   $options = sirius_event_section_options($event_node, $counts, $options_attributes);
   if (sirius_event_section_enabled($event_node) && !$participant_json['section']['uuid']) {
+    if ($event_type_json['section']['intro']) {
+      $form['section']['uuid_intro'] = array('#markup' => $event_type_json['section']['intro']);
+    }
+
     unset($options_attributes[$participant_json['section']['uuid']]);
     $form['section']['uuid'] = array(
       '#type' => 'select',
       '#options' => $options,
-      '#title' => t('Section'),
+      '#title' => sirius_event_section_alias($event_node),
       '#default_value' => $participant_json['section']['uuid'],
       '#options_attributes' => $options_attributes,
     );

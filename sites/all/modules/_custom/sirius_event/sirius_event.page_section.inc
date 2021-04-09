@@ -37,6 +37,9 @@ function sirius_node_tab_event_section_form($form, &$form_state, $event_node) {
 	$participant_node = node_load($participant_nid);
 	$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
 
+  $event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
+  $event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
+
 	$counts = sirius_event_section_counts($event_node);
 	$options_attributes = array();
 	$options = sirius_event_section_options($event_node, $counts, $options_attributes);
@@ -44,10 +47,14 @@ function sirius_node_tab_event_section_form($form, &$form_state, $event_node) {
 
 	$form['#tree'] = TRUE;
 
+  if ($event_type_json['section']['intro']) {
+    $form['section']['uuid_intro'] = array('#markup' => $event_type_json['section']['intro']);
+  }
+
 	$form['section']['uuid'] = array(
 		'#type' => 'select',
 		'#options' => $options,
-		'#title' => t('Section'),
+		'#title' => sirius_event_section_alias($event_node),
 		'#default_value' => $participant_json['section']['uuid'],
 		'#options_attributes' => $options_attributes,
 	);

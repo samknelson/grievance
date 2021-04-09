@@ -29,7 +29,7 @@ function sirius_node_tab_event_section_assign_form($form, &$form_state, $event_n
 		'<th>' . t('Name') . '</th>' .
 		'<th>' . t('Role') . '</th>' . 
 		'<th>' . t('Status') . '</th>' .
-		'<th>' . t('Section Assignment') . '</th>' .
+		'<th>' . sirius_event_section_alias($event_node) . '</th>' .
 		'<th>' . t('Counts') . '</th>' .
 		'<th>' . t('Tools') . '</th>' .
 		'</tr>'

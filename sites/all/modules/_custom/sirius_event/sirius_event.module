@@ -15,6 +15,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.bullpen.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.class.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.interestlist.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.intake.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.vbo.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_user_select.inc";

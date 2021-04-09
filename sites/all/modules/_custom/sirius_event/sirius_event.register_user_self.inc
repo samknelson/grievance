@@ -70,10 +70,14 @@ function sirius_event_register_user_self_form($form, &$form_state, $event_node, 
 
 			$form['#tree'] = TRUE;
 
+		  if ($event_type_json['section']['intro']) {
+		    $form['section']['uuid_intro'] = array('#markup' => $event_type_json['section']['intro']);
+		  }
+		  
 			$form['section']['uuid'] = array(
 				'#type' => 'select',
 				'#options' => $options,
-				'#title' => t('Section'),
+				'#title' => sirius_event_section_alias($event_node),
 				'#default_value' => $participant_json['section']['uuid'],
 				'#options_attributes' => $options_attributes,
 				'#required' => TRUE,

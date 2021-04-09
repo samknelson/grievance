@@ -77,6 +77,14 @@ function sirius_event_node_tabs() {
     'weight' => 3,
   );
 
+  $node_tabs['sirius_event']['sirius_event_info/survey'] = array(
+    'title' => 'Survey',
+    'description' => '',
+    'callback' => 'sirius_event_instance_participant_definition_select',
+    'permissions' => array('sirius event admin'),
+    'weight' => 5,
+  );
+
   $node_tabs['sirius_event']['sirius_event_participants_current'] = array(
     'title' => 'Participants',
     'description' => '',
@@ -90,14 +98,6 @@ function sirius_event_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_event_participants_register',
     'permissions' => array('sirius'),
-    'weight' => 4,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_instance_participant_definition'] = array(
-    'title' => 'Survey',
-    'description' => '',
-    'callback' => 'sirius_event_instance_participant_definition_select',
-    'permissions' => array('sirius event admin'),
     'weight' => 4,
   );
 
@@ -156,6 +156,34 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_phonebank_network_test',
     'permissions' => array('sirius'),
     'weight' => 6,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_intake'] = array(
+    'title' => 'Intake',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake',
+    'permissions' => array('sirius'),
+    'weight' => 5,
+    'file' => 'sirius_event.page_intake.inc',
+  );
+
+  $node_tabs['sirius_event']['sirius_event_intake/info'] = array(
+    'title' => 'Info',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_intake/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_settings',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_settings.inc',
+    'weight' => 10,
   );
 
   // $map_files = array('sirius_event.page_map.inc','sirius_event.page_map_list.inc','sirius_event.page_map_view.inc','sirius_event.page_map_settings.inc');
@@ -279,16 +307,18 @@ function sirius_event_node_tabs() {
     'sirius_event.page_section.inc', 
     'sirius_event.page_section_assign.inc',
     'sirius_event.page_section_manage.inc',
+    // 'sirius_event.page_section_sort.inc',
     'sirius_event.page_section_settings.inc', 
   );
 
   $node_tabs['sirius_event']['sirius_event_section'] = array(
     'title' => 'Sections',
-    'description' => '',
     'callback' => 'sirius_node_tab_event_section',
     'permissions' => array('sirius'),
     'weight' => 2,
     'file' => $section_files,
+    'title callback' => 'sirius_event_section_alias',
+    'title arguments' => array(1),
   );
 
   $node_tabs['sirius_event']['sirius_event_section/view'] = array(
@@ -319,6 +349,15 @@ function sirius_event_node_tabs() {
     'file' => $section_files,
   );
 
+  /*
+  $node_tabs['sirius_event']['sirius_event_section/sort'] = array(
+    'title' => 'Sort',
+    'callback' => 'sirius_node_tab_event_section_sort',
+    'permissions' => array('sirius'),
+    'weight' => 3,
+    'file' => $section_files,
+  );
+  */
 
   $node_tabs['sirius_event']['sirius_event_section/settings'] = array(
     'title' => 'Settings',
@@ -687,7 +726,14 @@ function sirius_event_term_tabs() {
     'file' => array('sirius_event.term_tab_customfield.inc'),
   );
 
-
+  $term_tabs['sirius_event_type']['sirius_event_type_intake'] = array(
+    'title' => 'Intake',
+    'description' => '',
+    'callback' => 'sirius_event_term_tab_intake',
+    'permissions' => array('sirius event admin'),
+    'weight' => 1,
+    'file' => array('sirius_event.term_tab_intake.inc'),
+  );
 
   $term_tabs['sirius_event_type']['sirius_event_type_interestlist'] = array(
     'title' => 'Interest List',
@@ -936,6 +982,22 @@ function sirius_event_menu() {
     'page callback' => 'sirius_event_page_duplicate_participants',
     'page arguments' => array(),
     'file' => 'sirius_event.page_duplicate_participants.inc',
+  );
+
+  $items['intake'] = array(
+    'title' => 'Intake',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_event_page_intake_anonymous',
+    'page arguments' => array(),
+    'file' => 'sirius_event.page_intake_anonymous.inc',
+  );
+
+  $items['intake/%'] = array(
+    'title' => 'Intake',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_event_page_intake_anonymous',
+    'page arguments' => array(1),
+    'file' => 'sirius_event.page_intake_anonymous.inc',
   );
 
   return $items;

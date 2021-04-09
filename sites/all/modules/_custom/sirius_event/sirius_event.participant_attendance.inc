@@ -75,7 +75,20 @@ function sirius_event_page_participant_attendance_form($form, &$form_state, $eve
 	$dates = sirius_fieldvals($event_node, 'field_sirius_daterepeat', 'date');
 	$form['#tree'] = TRUE;
 
+	$pstatus_terms = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'full');
+	$pstatus_exclude = array();
+	foreach ($pstatus_terms as $tid => $term) {
+		$term_json = sirius_jsonfield_util_term_json_get($term);
+		if ($term_json['attendance']['exclude'] == 'Yes') {
+			$pstatus_exclude[$tid] = TRUE;
+		}
+	}
+
 	if (!$can_edit) { $form['#disabled'] = TRUE; }
+	$dates = sirius_fieldvals($event_node, 'field_sirius_daterepeat', 'date');
+	$event_json = sirius_jsonfield_util_node_json_get($event_node);
+	$section_list = $event_json['section_list'];
+	if ($section_list) { uksort($section_list, function($a, $b) use ($section_list) { return $section_list[$a]['weight'] <=> $section_list[$b]['weight']; }); }
 
 	$participant_nodes = node_load_multiple($participant_nids);
 
@@ -87,6 +100,8 @@ function sirius_event_page_participant_attendance_form($form, &$form_state, $eve
 	$duration_options = sirius_event_duration_options();
 	$duration_default = strtotime($event_node->field_sirius_daterepeat['und'][$which]['value2']) - strtotime($event_node->field_sirius_daterepeat['und'][$which]['value']);
 	foreach ($participant_nodes as $participant_nid => $participant_node) {
+		$pstatus_tid = $participant_node->field_sirius_event_pstatus['und'][0]['tid'];
+		if ($pstatus_exclude[$pstatus_tid]) { continue; }
 
 		$contact_node = node_load($participant_node->field_sirius_contact['und'][0]['target_id']);
 		$worker_node = sirius_worker_get_by_contact_nid($participant_node->field_sirius_contact['und'][0]['target_id']);
@@ -94,6 +109,15 @@ function sirius_event_page_participant_attendance_form($form, &$form_state, $eve
 
 		$participant_json = sirius_jsonfield_util_node_json_get($participant_node);
 		$signature = sirius_jsonfield_util_esignature_get($participant_json, "attendance_$which");
+
+		// If the participant has a section, and the section isn't for this day, then don't show the attendance sheet
+		$section_uuid = $participant_json['section']['uuid'];
+		if ( (count($dates) > 1) && $section_uuid) {
+			if (!$section_list[$section_uuid]['event_dates']["delta_$which"]) { 
+				continue;
+			}
+		}
+		$form['participants'][$participant_nid]['section_weight'] = array('#type' => 'value', '#value' => $section_list[$section_uuid]['weight']);
 
 		$tools = '';
 		if ($can_edit) {
@@ -116,6 +140,7 @@ function sirius_event_page_participant_attendance_form($form, &$form_state, $eve
 
 		if ($can_edit) {
 			$my_duration_default = $participant_json["attendance_$which"]['data']['hours'];
+			if (!isset($my_duration_default) && $section_uuid) { $my_duration_default = $section_list[$section_uuid]['duration']; }
 			if (!isset($my_duration_default)) { $my_duration_default = $duration_default; }
 			$form['participants'][$participant_nid]['hours'] = array(
 				'#type' => 'select',
@@ -145,9 +170,24 @@ function sirius_event_page_participant_attendance_form($form, &$form_state, $eve
 
 		$form['participants'][$participant_nid]['tr_close'] = array('#markup' => '</tr>');
 
-		if ($participant_json['comments']) {
-			$form['participants'][$participant_nid]['participant_comments'] = array('#markup' => '<tr><td colspan="6">' . 'Participant notes for  ' . $worker_node->title . ': <strong>' . sirius_text_to_html($participant_json['comments']) . '</strong></td></tr>');
+		$comments = '';
+		if ($section_uuid) {
+			$comments .= t('Section: ') . sirius_event_section_title($section_list[$section_uuid]);
 		}
+		if ($participant_json['comments']) {
+			if ($comments) { $comments .= '<br />'; }
+			$comments .= 'Participant notes: ' . '<strong>' . sirius_text_to_html($participant_json['comments']) . '</strong>';
+		}
+
+		if ($comments) {
+			$form['participants'][$participant_nid]['participant_comments'] = array('#markup' => "<tr><td colspan=\"6\">$comments</strong></td></tr>");
+		}
+	}
+
+	if ($form['participants']) {
+		uksort($form['participants'], function($a, $b) use ($form) {
+			return $form['participants'][$a]['section_weight']['#value'] <=> $form['participants'][$b]['section_weight']['#value'];
+		});
 	}
 
 	$form['table_close'] =  array('#markup' => '</table>');

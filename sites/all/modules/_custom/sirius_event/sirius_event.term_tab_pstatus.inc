@@ -90,6 +90,26 @@ function sirius_event_term_tab_pstatus_form($form, &$form_state, $pstatus_term) 
 		'#description' => t('Certain statuses should not be included in the count of participants registered for a section. For example, if a particular class has a section that can hold up to 5 participants, then participants with the status "withdrawn" should not be included in this count.'),
 	);
 
+	$form['attendance'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Attendance Settings'),
+		'#description' => t('Indicate how participants with the status <strong>@name</strong> should interact with the the attendance page for a given event.', array('@name' => $pstatus_term->name)),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
+
+	$form['attendance']['exclude'] = array(
+		'#title' => t('Exclude?'),
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $json['attendance']['exclude'],
+		'#description' => t('Certain statuses should not be included in the attendance sheets. For example, we might not want to count attendance for students who are "Invited", "Withdrawn", or "Audit".'),
+	);
+
 
 	$form['schedule']['display'] = array(
 		'#type' => 'fieldset',
@@ -180,7 +200,7 @@ function sirius_event_term_tab_pstatus_form_submit($form, &$form_state) {
 	$pstatus_term = taxonomy_term_load($form_state['pstatus_tid']);
 	$json = sirius_jsonfield_util_term_json_get($pstatus_term);
 
-	$keys = array('schedule', 'phonebank', 'map', 'mypstatus', 'notification', 'section');
+	$keys = array('schedule', 'phonebank', 'map', 'mypstatus', 'notification', 'section', 'attendance');
 	foreach ($keys as $key) {
 		$json[$key] = $form_state['values'][$key];
 	}

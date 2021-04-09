@@ -40,3 +40,10 @@
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
+
+.sirius_event_weight_indicator {
+	float: right;
+	padding-right: 10px;
+	font-size: 10px;
+}

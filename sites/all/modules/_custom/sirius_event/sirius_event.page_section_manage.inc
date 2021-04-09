@@ -10,7 +10,9 @@ function sirius_node_tab_event_section_manage($event_node) {
 }
 
 function sirius_node_tab_event_section_manage_form($form, &$form_state, $event_node) {
-	$form_state['event_nid'] = $event_node->nid; 
+  drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/event.css', 'file');
+
+ 	$form_state['event_nid'] = $event_node->nid; 
 	$json = sirius_jsonfield_util_node_json_get($event_node);
 	
 	// $json['section_list'] = NULL;
@@ -37,13 +39,28 @@ function sirius_node_tab_event_section_manage_form($form, &$form_state, $event_n
   	$section_list[] = array();
   }
 
+  $event_date_options = array();
+  if ($event_node->field_sirius_daterepeat) {
+    foreach ($event_node->field_sirius_daterepeat['und'] as $delta => $ignore) {
+      $ts = sirius_date_ts($event_node, 'field_sirius_daterepeat', $delta, 'value');
+      if ($ts > 0) {
+        $event_date_options["delta_$delta"] = date('l, F j, Y h:i A', $ts);
+      }
+    }
+  }
+
+  $duration_options = sirius_event_duration_options();
+
   $form['#tree'] = TRUE;
 
 	$form['section_list']['prefix'] = array('#markup' => '<div id="section_list">');
 	foreach ($section_list as $delta => $section) {
 		$uuid = $section['uuid'];
+    $default_weight = $section['weight'];
+    if (!$default_weight) { $default_weight = 10 * ($delta+1); }
 
 		$title = sirius_event_section_title($section);
+    $title .= "<span class=\"sirius_event_weight_indicator\">Sort Order: $default_weight</span>";
 
     $form['section_list'][$delta] = array(
     	'#type' => 'fieldset',
@@ -56,15 +73,12 @@ function sirius_node_tab_event_section_manage_form($form, &$form_state, $event_n
     	'#type' => 'value',
     	'#value' => $section['uuid'],
     );
-    $form['section_list'][$delta]['weight'] = array(
-    	'#type' => 'value',
-    	'#value' => $delta,
-    );
     $form['section_list'][$delta]['title'] = array(
     	'#type' => 'textfield',
     	'#title' => t('Title'),
     	'#default_value' => $section['title'],
     );
+    /*
     $form['section_list'][$delta]['date'] = array(
       '#title' => t('Date'),
 			'#type' => 'date_popup',
@@ -82,6 +96,7 @@ function sirius_node_tab_event_section_manage_form($form, &$form_state, $event_n
 			),
     );
     if ($section['date']) { $form['section_list'][$delta]['date']['#default_value'] = $section['date']; }
+    */
 
     $form['section_list'][$delta]['limit'] = array(
     	'#type' => 'textfield',
@@ -97,6 +112,30 @@ function sirius_node_tab_event_section_manage_form($form, &$form_state, $event_n
     	'#default_value' => $section['comments'],
     );
 
+    if (count($event_date_options) > 1) {
+      $form['section_list'][$delta]['event_dates'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Which Days?'),
+        '#options' => $event_date_options,
+      );
+      if ($section['event_dates']) { $form['section_list'][$delta]['event_dates']['#default_value'] = $section['event_dates']; }
+    }
+
+    $form['section_list'][$delta]['duration'] = array(
+      '#title' => t('Duration'),
+      '#type' => 'select',
+      '#options' => $duration_options,
+    );
+    if ($section['duration']) { $form['section_list'][$delta]['duration']['#default_value'] = $section['duration']; }
+
+    $form['section_list'][$delta]['weight'] = array(
+      '#title' => t('Sort Order'),
+      '#type' => 'textfield',
+      '#size' => 4,
+    );
+    if ($section['weight']) { $form['section_list'][$delta]['weight']['#default_value'] = $section['duration']; }
+
+
     $form['section_list'][$delta]['delete'] = array(
       '#type' => 'select',
       '#title' => t('Delete this section'),
@@ -105,6 +144,13 @@ function sirius_node_tab_event_section_manage_form($form, &$form_state, $event_n
         'Yes' => t('Yes, delete this section.')
       ),
       '#description' => t('The section will be removed, and any students assigned to it will be unassigned.'),
+    );
+
+    $form['section_list'][$delta]['weight'] = array(
+      '#type' => 'textfield',
+      '#title' => 'Sort Order',
+      '#default_value' => $default_weight,
+      '#size' => 4,
     );
   }
 
@@ -167,7 +213,7 @@ function sirius_node_tab_event_section_manage_form_submit($form, &$form_state) {
 			$uuid = uuid_generate();
 			$section['uuid'] = $uuid;
 		}
-		$section['ts'] = strtotime($section['date']);
+		// $section['ts'] = strtotime($section['date']);
 		$section_list[$uuid] = $section;
 	}
 

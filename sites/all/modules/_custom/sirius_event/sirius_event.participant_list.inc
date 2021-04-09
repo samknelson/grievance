@@ -19,6 +19,12 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 		'#collapsed' => TRUE,
 	);
 
+	$form['filters']['name'] = array(
+		'#title' => t('Name'),
+		'#type' => 'textfield',
+		'#description' => t('Enter all or part of the participant\'s name.'),
+	);
+
 	$section_options = sirius_event_section_options($event_node);
 	if ($section_enabled) {
 		$form['filters']['section_uuid'] = array(
@@ -31,8 +37,10 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 	$pstatus_options = sirius_event_participant_role_status_tids($prole_tid);
 	$form['filters']['pstatus_tid'] = array(
 		'#title' => t('Status'),
-		'#type' => 'select',
-		'#options' => array(NULL => t('-- Select --')) + $pstatus_options,
+		'#type' => 'checkboxes',
+		'#options' => $pstatus_options,
+		'#prefix' => "<div class=\"checkboxes-inline\">",
+		'#suffix' => "</div><br clear=\"left\" />",
 	);
 
 	// Preform our search.
@@ -106,6 +114,11 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 		'#value' => t('Submit'),
 	);
 
+	$filter_name = $form_state['values']['filters']['name'];
+	$filter_pstatus_tid = array();
+	if ($form_state['values']['filters']['pstatus_tid']) { $filter_pstatus_tid = array_filter(array_values($form_state['values']['filters']['pstatus_tid'])); }
+	$filter_section_uuid = $form_state['values']['filters']['section_uuid'];
+
 	foreach ($participant_nodes as $participant_nid => $participant_node) {
 		$contact_nid = $participant_node->field_sirius_contact['und'][0]['target_id'];
 		$contact_node = node_load($contact_nid);
@@ -114,7 +127,6 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 
 		if ($section_enabled) {
 			$section = sirius_event_section_get_from_participant($event_node, $participant_node);
-			$filter_section_uuid = $form_state['values']['filters']['section_uuid'];
 			if ($filter_section_uuid) {
 				if ($filter_section_uuid == 'NONE') {
 					if ($section['uuid']) { continue; }
@@ -125,9 +137,12 @@ function sirius_event_page_participant_list_form($form, &$form_state, $event_nod
 		}
 
 		$pstatus_tid = $participant_node->field_sirius_event_pstatus['und'][0]['tid'];
-		$filter_pstatus_tid = $form_state['values']['filters']['pstatus_tid'];
 		if ($filter_pstatus_tid) {
-			if ($filter_pstatus_tid != $pstatus_tid) { continue; }
+			if (!in_array($pstatus_tid, $filter_pstatus_tid)) { continue; }
+		}
+
+		if ($filter_name) {
+			if (stripos($contact_node->title, $filter_name) === FALSE) { continue; }
 		}
 
 		// Name of the contact
