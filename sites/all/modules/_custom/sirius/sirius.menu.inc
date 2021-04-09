@@ -327,6 +327,13 @@ function sirius_menu() {
       if ($tab_record['page arguments']) {
         $items['node/%node/' . $tab_name]['page_arguments'] = array_merge($items['node/%node/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
       }
+      if ($tab_record['title callback']) {
+        $items['node/%node/' . $tab_name]['title callback'] = $tab_record['title callback'];
+        unset($items['node/%node/' . $tab_name]['title']);
+      }
+      if ($tab_record['title arguments']) {
+        $items['node/%node/' . $tab_name]['title arguments'] = $tab_record['title arguments'];
+      }
     }
   }
 
