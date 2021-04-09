@@ -292,3 +292,11 @@ function sirius_jsonfield_util_user_json_set(&$user, $json) {
 	$user->field_sirius_json['und'][0]['value'] = json_encode($json);
 }
 
+function sirius_jsonfield_util_entity_json_get($entity) {
+	return json_decode($entity->field_sirius_json['und'][0]['value'], TRUE);
+}
+
+function sirius_jsonfield_util_entity_json_set(&$entity, $json) {
+	$entity->field_sirius_json['und'][0]['value'] = json_encode($json);
+}
+
