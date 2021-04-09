@@ -47,3 +47,24 @@ function sirius_aat_check($node) {
 	if ($_SESSION['aat'][$aat]) { return TRUE; }
 	return FALSE;
 }
+
+function sirius_aat_generate($len, $type = 'number') {
+  // Use digits so this is phone-friendly.
+  if ($type == 'both') {
+  	$characters = $characters_first = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // Leave off 0/O, 1/I.
+  } else if ($type == 'letter') {
+  	$characters = $characters_first = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // Leave off 0/O, 1/I.
+  } else {
+	  $characters_first = '123456789';
+	  $characters = '0123456789';
+	}
+	$aat = '';
+	for ($i = 0; $i < $len; $i++) {
+		if ($i == 0) {
+  		$aat .= $characters_first[rand(0, strlen($characters))];
+  	} else {
+  		$aat .= $characters[rand(0, strlen($characters))];
+  	}
+	}
+	return $aat;
+}
