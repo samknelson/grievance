@@ -11,6 +11,7 @@ function sirius_twilio_page_test_form($form, &$form_state) {
 			t('Use the form below to verify that the Twilio library is properly configured by sending an SMS message.') .
 			'</div>'
 	);
+
 	$form['to'] = array(
 		'#type' => 'textfield',
 		'#title' => t('To'),
@@ -18,9 +19,34 @@ function sirius_twilio_page_test_form($form, &$form_state) {
 		'#required' => TRUE,
 	);
 
+	$form['medium'] = array(
+		'#type' => 'select',
+		'#title' => t('Medium'),
+		'#required' => TRUE,
+		'#options' => array(
+			'sms' => t('SMS (Text Message)'),
+			'voice' => t('Voice'),
+		),
+	);
+
+	$form['callerid'] = array(
+		'#type' => 'select',
+		'#title' => t('Caller ID'),
+		'#options' => array(NULL => t('-- Select --')) + sirius_callerid_options(),
+		'#description' => t('Caller ID to use. Applies only for voice calls.'),
+		'#states' => array('visible' => array(":input[name=\"medium\"]" => array('value' => 'voice'))),
+	);
+
+	$form['msg'] = array(
+		'#type' => 'textarea',
+		'#title' => t('Message'),
+		'#required' => TRUE,
+		'#default_value' => 'This is a test message from the Sirius system. If you are receiving this, then Sirius Twilio is properly configured.',
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
-		'#value' => 'Send SMS message now'
+		'#value' => t('Send Test Message'),
 	);
 
 	return $form;
@@ -29,14 +55,32 @@ function sirius_twilio_page_test_form($form, &$form_state) {
 function sirius_twilio_page_test_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 	$to = $form_state['values']['to'];
+	$medium = $form_state['values']['medium'];
+	$outgoing_msg = $form_state['values']['msg'];
+	$callerid_nid = $form_state['values']['callerid'];
 
-	$result = sirius_twilio_outgoing_sms($to, 'This is a test SMS message. If you are receiving this, then Sirius Twilio is properly configured.');
-	if ($result['success']) {
-		drupal_set_message(t('Message sent. Twilio is properly configured.'));
+	$params = array();
+	$params['handler_nids'] = array();
+	$params['to'] = $to;
+	// $params['subject'] = $bulk_node->title;
+	// $params['body'] = $bulk_node->body['und'][0]['value'];
+	$params['sms'] = $outgoing_msg;
+	$params['voice'] = $outgoing_msg;
+	$params['callerid_nid'] = $callerid_nid;
+	// $params['phonetree']['play']['url'] = file_create_url($bulk_node->field_sirius_audio_public['und'][0]['uri']);
+	$params['phonetree']['disable'] = TRUE;
+	$params['amd']['MachineDetection'] = 'DetectMessageEnd';
+
+	if ($medium == 'voice') {
+		$result = sirius_voice_send($params);
 	} else {
-		drupal_set_message(t('There was a problem sending the message by SMS: @msg Please check your settings and try again.', array('@msg' => $result['msg'])), 'warning');
-		if ($result['details']) {
-			drupal_set_message($result['details'], 'warning');
-		}
+		$result = sirius_sms_send($params);
+	}
+
+	if ($result['success']) {
+		drupal_set_message("Message sent successfully.");
+		if ($result['msg']) { drupal_set_message($result['msg']); }
+	} else {
+		drupal_set_message("Message failed: " . $result['msg'], 'warning');
 	}
 }
