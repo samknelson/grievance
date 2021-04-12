@@ -32241,6 +32241,10 @@ Accepted'),
   $handler->display->display_options['relationships']['field_sirius_work_status_tid']['id'] = 'field_sirius_work_status_tid';
   $handler->display->display_options['relationships']['field_sirius_work_status_tid']['table'] = 'field_data_field_sirius_work_status';
   $handler->display->display_options['relationships']['field_sirius_work_status_tid']['field'] = 'field_sirius_work_status_tid';
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['relationships']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
+  $handler->display->display_options['relationships']['field_grievance_shop_target_id']['field'] = 'field_grievance_shop_target_id';
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
   $handler->display->display_options['fields']['nid']['table'] = 'node';
@@ -32572,6 +32576,27 @@ Accepted'),
   $handler->display->display_options['filters']['field_sirius_ssn_value']['expose']['remember_roles'] = array(
     2 => '2',
   );
+  /* Filter criterion: Field: Industry (field_sirius_industry) */
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['id'] = 'field_sirius_industry_tid_1';
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['table'] = 'field_data_field_sirius_industry';
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['field'] = 'field_sirius_industry_tid';
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['relationship'] = 'field_grievance_shop_target_id';
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['expose']['operator_id'] = 'field_sirius_industry_tid_1_op';
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['expose']['label'] = 'Currently Employed Industry';
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['expose']['use_operator'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['expose']['operator'] = 'field_sirius_industry_tid_1_op';
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['expose']['limit_operators'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['expose']['available_operators'] = array(
+    'or' => 'or',
+    'not' => 'not',
+  );
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['expose']['identifier'] = 'field_sirius_industry_tid_1';
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['type'] = 'select';
+  $handler->display->display_options['filters']['field_sirius_industry_tid_1']['vocabulary'] = 'sirius_industry';
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -32845,6 +32870,7 @@ Accepted'),
     t('<a href="/node/add/sirius-worker?destination=[current_path]" class="action-button">Add a new worker</a>'),
     t('term from field_sirius_member_status'),
     t('term from field_sirius_work_status'),
+    t('Content entity referenced from field_grievance_shop'),
     t('Nid'),
     t('Name'),
     t('Member Status'),
@@ -32867,6 +32893,7 @@ Accepted'),
     t('Titan ID'),
     t('Apprentice ID'),
     t('SSN'),
+    t('Currently Employed Industry'),
     t('Page'),
     t('<div /><a href="/node/add/sirius-worker?destination=[current_path]" class="action-button">Add a new worker</a></div>'),
     t('Content'),
