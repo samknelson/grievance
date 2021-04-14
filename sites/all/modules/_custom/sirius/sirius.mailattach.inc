@@ -631,7 +631,7 @@ function sirius_mailattach_parse_subject($subject) {
     $query->propertyCondition('status', 1);
     $query->propertyOrderBy('created', 'desc');
     $query->fieldCondition('field_sirius_ssn', 'value', $ssn);
-    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+    if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->range(0, 1);
     $stmt = $query->execute();
     if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
@@ -646,7 +646,7 @@ function sirius_mailattach_parse_subject($subject) {
     $query->propertyCondition('status', 1);
     $query->propertyOrderBy('created', 'desc');
     $query->fieldCondition('field_sirius_phone', 'value', $phone);
-    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+    if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->range(0, 1);
     $stmt = $query->execute();
     if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
@@ -661,7 +661,7 @@ function sirius_mailattach_parse_subject($subject) {
     $query->propertyCondition('status', 1);
     $query->propertyOrderBy('created', 'desc');
     $query->fieldCondition('field_sirius_email', 'value', $email);
-    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+    if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->range(0, 1);
     $stmt = $query->execute();
     if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
@@ -676,7 +676,7 @@ function sirius_mailattach_parse_subject($subject) {
       $query->propertyCondition('status', 1);
       $query->propertyOrderBy('created', 'desc');
       $query->fieldCondition('field_' . $field, 'value', $code);
-      if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+      if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
       $query->range(0, 1);
       $stmt = $query->execute();
       if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
