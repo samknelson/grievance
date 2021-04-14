@@ -110,7 +110,7 @@ function sirius_cron() {
   sirius_auditlog();
   // sirius_signature_cleanup();
   sirius_domain_stats_cron();
-  sirius_mailattach_fetch();
+  sirius_mailattach_fetch_all();
 }
 
 /**

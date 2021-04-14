@@ -132,6 +132,7 @@ function sirius_mailattach_page_test_all_form_submit($form, &$form_state) {
 }
 
 function sirius_mailattach_fetch_all() {
+  sirius_become_superuser(TRUE);
   $sql = "select nid, title from node ";
   $sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
   $sql .= "where node.type = 'sirius_domain' ";
@@ -433,7 +434,7 @@ function sirius_mailattach_fetch_accept($from_mail, $msg, $subject = NULL) {
 }
 
 function sirius_imap_tmp_uri($msgno, $msgpath, $filename) {
-  $directory = 'temporary://mailattach';
+  $directory = 'temporary://';
   $directory_realpath = drupal_realpath($directory);
   if (!file_exists($directory_realpath)) {
     mkdir($directory_realpath);
@@ -441,7 +442,7 @@ function sirius_imap_tmp_uri($msgno, $msgpath, $filename) {
   $domain_nid = sirius_domain_nid();
   $filename = trim(strtolower($filename));
   $filename = preg_replace('/[^a-z0-9_\.]/', '_', $filename);
-  $uri = $directory . '/' . $domain_nid . '.' . $msgno . '.' . $msgpath . '.' . $filename;
+  $uri = $directory . 'mailattach_' . $domain_nid . '.' . $msgno . '.' . $msgpath . '.' . $filename;
   return $uri;
 }
 
