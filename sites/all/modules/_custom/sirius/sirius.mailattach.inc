@@ -283,6 +283,10 @@ function sirius_mailattach_fetch() {
     {
       $can_send = TRUE;
     }
+    if ($domain_nid <= 0 && 
+    	(user_access('sirius domain admin', $mail_user) || user_access('grievance user', $mail_user))) {
+    	$can_send = TRUE; 
+    }
     if (!$can_send) {
       $msg = "The sender's email, $from_mail, is in the wrong domain or does not have permission to attach messages. This message was NOT attached.";
       sirius_minilog($msg, 'warning');
