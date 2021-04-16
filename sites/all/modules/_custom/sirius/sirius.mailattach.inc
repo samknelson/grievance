@@ -132,6 +132,7 @@ function sirius_mailattach_page_test_all_form_submit($form, &$form_state) {
 }
 
 function sirius_mailattach_fetch_all() {
+  sirius_become_superuser(TRUE);
   $sql = "select nid, title from node ";
   $sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
   $sql .= "where node.type = 'sirius_domain' ";
@@ -281,6 +282,10 @@ function sirius_mailattach_fetch() {
       )
     {
       $can_send = TRUE;
+    }
+    if ($domain_nid <= 0 && 
+    	(user_access('sirius domain admin', $mail_user) || user_access('grievance user', $mail_user))) {
+    	$can_send = TRUE; 
     }
     if (!$can_send) {
       $msg = "The sender's email, $from_mail, is in the wrong domain or does not have permission to attach messages. This message was NOT attached.";
@@ -433,7 +438,7 @@ function sirius_mailattach_fetch_accept($from_mail, $msg, $subject = NULL) {
 }
 
 function sirius_imap_tmp_uri($msgno, $msgpath, $filename) {
-  $directory = 'temporary://mailattach';
+  $directory = 'temporary://';
   $directory_realpath = drupal_realpath($directory);
   if (!file_exists($directory_realpath)) {
     mkdir($directory_realpath);
@@ -441,7 +446,7 @@ function sirius_imap_tmp_uri($msgno, $msgpath, $filename) {
   $domain_nid = sirius_domain_nid();
   $filename = trim(strtolower($filename));
   $filename = preg_replace('/[^a-z0-9_\.]/', '_', $filename);
-  $uri = $directory . '/' . $domain_nid . '.' . $msgno . '.' . $msgpath . '.' . $filename;
+  $uri = $directory . 'mailattach_' . $domain_nid . '.' . $msgno . '.' . $msgpath . '.' . $filename;
   return $uri;
 }
 
@@ -631,7 +636,7 @@ function sirius_mailattach_parse_subject($subject) {
     $query->propertyCondition('status', 1);
     $query->propertyOrderBy('created', 'desc');
     $query->fieldCondition('field_sirius_ssn', 'value', $ssn);
-    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+    if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->range(0, 1);
     $stmt = $query->execute();
     if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
@@ -646,7 +651,7 @@ function sirius_mailattach_parse_subject($subject) {
     $query->propertyCondition('status', 1);
     $query->propertyOrderBy('created', 'desc');
     $query->fieldCondition('field_sirius_phone', 'value', $phone);
-    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+    if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->range(0, 1);
     $stmt = $query->execute();
     if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
@@ -661,7 +666,7 @@ function sirius_mailattach_parse_subject($subject) {
     $query->propertyCondition('status', 1);
     $query->propertyOrderBy('created', 'desc');
     $query->fieldCondition('field_sirius_email', 'value', $email);
-    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+    if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->range(0, 1);
     $stmt = $query->execute();
     if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
@@ -676,7 +681,7 @@ function sirius_mailattach_parse_subject($subject) {
       $query->propertyCondition('status', 1);
       $query->propertyOrderBy('created', 'desc');
       $query->fieldCondition('field_' . $field, 'value', $code);
-      if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+      if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
       $query->range(0, 1);
       $stmt = $query->execute();
       if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }

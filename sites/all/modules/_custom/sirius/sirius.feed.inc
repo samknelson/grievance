@@ -106,6 +106,8 @@ function sirius_feed_page_list_access($wizard_name) {
 }
 
 function sirius_feed_page_list($wizard_name) {
+ sirius_backlink_add('sirius/feeds', array('name' => 'All Feeds'));
+
 	$domain_nid = sirius_domain_nid();
 	$info = sirius_wizard_info($wizard_name);
 	if (!$info) { return "No such wizard."; }
@@ -132,52 +134,32 @@ function sirius_feed_page_list($wizard_name) {
 	return $html;
 }
 
-/************************************************************************************************
- * Landing page
- ************************************************************************************************/
+function sirius_feed_latest_entry($wizard_name) {
+	$domain_nid = sirius_domain_nid();
+	$info = sirius_wizard_info($wizard_name);
+	if (!$info) { return NULL; }
 
-/**
- * You have access to the feed landing page if you have access to at least one feed.
- * @todo: This is pretty expensive. We should probably just create a permission of some kind.
- */
-
-function sirius_feed_page_landing_access() {
-	$all_info = sirius_wizard_info_all();
-	foreach ($all_info as $key => $info) {
-		if (!$info['feed']) { continue; }
-		$path = "sirius/feeds/$key";
-		if (drupal_valid_path($path)) { return TRUE; }
+	// Oh well, no callback. In that case we just hardcode some view.
+	if (user_access('sirius admin') || user_access('sirius domain admin')) {
+		// admins see the full list
+	} else {
+		// Non-admins see a filtered list
+		$employer_node = sirius_employer_get();
+		$employer_nid = $employer_node->nid;
 	}
 
-	return FALSE;
-}
-
-function sirius_feed_page_landing() {
-	$all_info = sirius_wizard_info_all();
-	$html = '<h2>Available Feeds</h2>';
-	$found = FALSE;
-	$html .= '<dl>';
-	foreach ($all_info as $key => $info) {
-		if (!$info['feed']) { continue; }
-		$path = "sirius/feeds/$key";
-		if (drupal_valid_path($path)) {
-			$html .= "<dt>";
-			$html .= l($info['title'], "sirius/feeds/$key");
-			$html .= '</dt>';
-			$html .= "<dd>";
-			$html .= $info['description'];
-			$html .= '<br /><br />';
-			$html .= '</dd>';
-			$found = TRUE;
-		}
-	}
-	$html .= '</dl>';
-
-	if (!$found) {
-		return 'You do not have access to any feeds.';
-	}
-
-	return $html;
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_feed');
+	$query->fieldCondition('field_sirius_type', 'value', $wizard_name);
+  if ($employer_nid) { $query->fieldCondition('field_grievance_shop', 'target_id', $employer_nid); };
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); };
+  $query->propertyOrderBy('created', 'desc');
+  $query->range(0,1);
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+  $last_feed_node = node_load(array_keys($stmt['node'])[0]);
+  return $last_feed_node;
 }
 
 /************************************************************************************************
