@@ -17726,7 +17726,12 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" target="_blank" class="tool-button">Manage</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_bulk_medium" target="_blank" class="tool-button">Medium</a>
+<a href="/node/[nid]/sirius_bulk_body" target="_blank" class="tool-button">Message</a>
+<a href="/node/[nid]/sirius_bulk_test" target="_blank" class="tool-button">Test</a>
+<a href="/node/[nid]/sirius_bulk_send" target="_blank" class="tool-button">Send</a>
+<a href="/node/[nid]/sirius_bulk_queue" target="_blank" class="tool-button">Results</a>
+';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -17853,7 +17858,12 @@ Grievance Form',
     t('Send Date'),
     t('Nid'),
     t('Tools'),
-    t('<a href="/node/[nid]" target="_blank" class="tool-button">Manage</a>'),
+    t('<a href="/node/[nid]/sirius_bulk_medium" target="_blank" class="tool-button">Medium</a>
+<a href="/node/[nid]/sirius_bulk_body" target="_blank" class="tool-button">Message</a>
+<a href="/node/[nid]/sirius_bulk_test" target="_blank" class="tool-button">Test</a>
+<a href="/node/[nid]/sirius_bulk_send" target="_blank" class="tool-button">Send</a>
+<a href="/node/[nid]/sirius_bulk_queue" target="_blank" class="tool-button">Results</a>
+'),
     t('All'),
     t('Page'),
   );
@@ -32453,26 +32463,18 @@ Accepted'),
   $handler->display->display_options['filters']['field_sirius_skill_tid']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['operator_id'] = 'field_sirius_skill_tid_op';
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['label'] = 'Skill';
+  $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['use_operator'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['operator'] = 'field_sirius_skill_tid_op';
+  $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['limit_operators'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['available_operators'] = array(
+    'or' => 'or',
+    'and' => 'and',
+    'not' => 'not',
+  );
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['identifier'] = 'field_sirius_skill_tid';
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['multiple'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['remember_roles'] = array(
     2 => '2',
-    1 => 0,
-    3 => 0,
-    12 => 0,
-    16 => 0,
-    20 => 0,
-    23 => 0,
-    18 => 0,
-    24 => 0,
-    21 => 0,
-    25 => 0,
-    14 => 0,
-    22 => 0,
-    15 => 0,
-    17 => 0,
-    19 => 0,
   );
   $handler->display->display_options['filters']['field_sirius_skill_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_sirius_skill_tid']['vocabulary'] = 'sirius_skill';
