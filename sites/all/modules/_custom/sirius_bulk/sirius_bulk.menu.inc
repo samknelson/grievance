@@ -35,7 +35,7 @@ function sirius_bulk_node_tabs() {
   );
 
 	$node_tabs['sirius_bulk']['sirius_bulk_recipients'] = array(
-		'title' => 'Recipients',
+		'title' => 'Add Recipients',
 		'description' => '',
 		'callback' => 'sirius_bulk_node_tab_recipients_contacts',
 		'permissions' => array('sirius bulk send'),
@@ -83,6 +83,16 @@ function sirius_bulk_node_tabs() {
 		'weight' => 7,
 	);
 
+  $node_tabs['sirius_bulk']['sirius_bulk_delete'] = array(
+    'title' => 'Delete',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_delete',
+    'permissions' => array('sirius bulk admin'),
+    'weight' => 7,
+    'file' => 'sirius_bulk.page_delete.inc',
+  );
+
+  sirius_node_tab_set_module('sirius_bulk', $node_tabs);
 	return $node_tabs;
 }
 
