@@ -217,7 +217,8 @@ function sirius_mailattach_fetch() {
   $count = $count_accept = $count_reject = 0;
   foreach ($messages as $message) {
     ++$count;
-    sirius_minilog('Processing message - From: ' . htmlspecialchars($message->from) . ' / Subject: ' . htmlspecialchars($message->subject));
+    $subject = imap_utf8($message->subject);
+    sirius_minilog('Processing message - From: ' . htmlspecialchars($message->from) . ' / Subject: ' . htmlspecialchars($subject));
 
     if ($mode != 'live') {
       sirius_minilog("(operating in test mode, so moving to the next message without processing.)");
@@ -269,7 +270,7 @@ function sirius_mailattach_fetch() {
     if (!$mail_user) {
       $msg = "The sender's email, $from_mail, does not correspond to a valid Sirius user. This message was NOT attached.";
       sirius_minilog($msg, 'warning');
-      sirius_mailattach_fetch_reject($from_mail, "$msg  - Subject: " . $message->subject . "]");
+      sirius_mailattach_fetch_reject($from_mail, "$msg  - Subject: " . $subject);
       ++$count_reject;
       continue;
     }
@@ -290,7 +291,7 @@ function sirius_mailattach_fetch() {
     if (!$can_send) {
       $msg = "The sender's email, $from_mail, is in the wrong domain or does not have permission to attach messages. This message was NOT attached.";
       sirius_minilog($msg, 'warning');
-      sirius_mailattach_fetch_reject($from_mail, "$msg  - Subject: " . $message->subject . "]");
+      sirius_mailattach_fetch_reject($from_mail, "$msg  - Subject: " . $subject);
       ++$count_reject;
       continue;
     }
@@ -299,7 +300,6 @@ function sirius_mailattach_fetch() {
     // Parse the subject
     //
 
-    $subject = imap_utf8($message->subject);
     if (!$subject) {
       $msg = "The subject of the email was not found.";
       sirius_minilog($msg, 'warning');
@@ -308,7 +308,7 @@ function sirius_mailattach_fetch() {
       continue;
     }
 
-    $parsed = sirius_mailattach_parse_subject($message->subject);
+    $parsed = sirius_mailattach_parse_subject($subject);
     if (!$parsed['success']) {
       $msg = "Subject parse failed: " . $parsed['msg'];
       sirius_minilog($msg, 'warning');
