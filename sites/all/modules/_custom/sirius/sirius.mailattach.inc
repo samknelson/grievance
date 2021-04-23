@@ -379,6 +379,7 @@ function sirius_mailattach_fetch() {
     sirius_jsonfield_util_node_json_set($attachment_node, $json);
     node_object_prepare($attachment_node);
     $attachment_node = node_submit($attachment_node);
+    $attachment_node->uid = $mail_user->uid; 
     node_save($attachment_node);
     sirius_minilog("Attachment node saved: "  . l($attachment_node->title, 'node/' . $attachment_node->nid) . " (" . $attachment_node->nid . ")");
 
