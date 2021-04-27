@@ -68,7 +68,7 @@ function sirius_event_register_worker_byname_form($form, &$form_state, $event_no
       ),
     );
     if ($i == 0) { 
-      $form['workers'][$i]['#title'] = t('Register a Worker');
+      $form['workers'][$i]['#title'] = t('Add a Worker to the Event');
       $form['workers'][$i]['#description'] = t('Enter or scan the worker\'s dispatch ID, SSN, or name.');
     }
     $worker_nid = $worker_nids[$i];
@@ -206,7 +206,7 @@ function sirius_event_register_worker_byname_form($form, &$form_state, $event_no
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Register',
+    '#value' => 'Add Worker(s)',
   );
   $form['col1_close'] = array('#markup' => '</td>');
 
@@ -288,7 +288,9 @@ function sirius_event_register_worker_byname_form_submit($form, &$form_state) {
     }
   }
   
-  drupal_set_message("Registered $count_success workers with $count_failure failures.");
+  list ($prole_tid, $pstatus_tid) = explode('|', $paccess);
+  $pstatus_term = taxonomy_term_load($pstatus_tid);
+  drupal_set_message("Added $count_success workers with $count_failure failures to this event with status " . $pstatus_term->name);
 
   if ($_REQUEST['worker_nids']) {
     // If we were passwed worker NIDs on the query string, redirect to a page without it to reset the form.

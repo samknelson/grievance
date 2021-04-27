@@ -71,7 +71,7 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 			'csv' => t('Export to Spreadsheet'),
 			'cancel' => t('Cancel interestlist signups'),
 			'bulk' => t('Create a bulk message'),
-			'event' => t('Register for an event'),
+			'event' => t('Register or invite to an event'),
 		),
 		'#required' => TRUE,
 	);
