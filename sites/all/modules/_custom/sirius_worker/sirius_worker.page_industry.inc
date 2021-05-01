@@ -171,7 +171,7 @@ function sirius_node_tab_worker_industry_form_validate($form, &$form_state) {
 	  ));
 	  if ($file) {
 	    $name = rand();
-	    if ($file = file_move($file, 'private://tmp/' . rand())) {
+	    if ($file = file_move($file, 'private://industry_' . rand())) {
 	      $form_state['storage']["attach_$delta"] = $file;
 	    }
 	    else {
