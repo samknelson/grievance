@@ -146,3 +146,28 @@ function sirius_update_7008() {
     user_role_grant_permissions($rid, array($permission));
   }
 }
+
+/**
+ * Default mailattach settings
+ */
+
+function sirius_update_7009() {
+  if (variable_get('sirius_mailattach_bundles', NULL)) { return; }
+  if (!preg_match('/UNITE/', variable_get('sirius_banner_name', ''))) { return; }
+  print "Setting default mailattachment settings\n";
+  variable_set('sirius_mailattach_bundles', array('grievance' => 'grievance'));
+  variable_set('sirius_mailattach_bundle_default', 'grievance');
+}
+
+/**
+ * Disable the fieldset helper module
+ */
+
+function sirius_update_7010() {
+  $modules = array('fieldset_helper');
+  foreach ($modules as $module) {
+    print "Disabling $module\n";
+    module_disable(array($module), TRUE);
+  }
+}
+

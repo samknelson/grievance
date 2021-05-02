@@ -373,3 +373,14 @@ function sirius_callerid_list() {
   if (!$stmt['node']) { return array(); }
   return node_load_multiple(array_keys($stmt['node']));
 }
+
+function sirius_callerid_options() {
+	$callerid_nodes = sirius_callerid_list();
+	$callerid_options = array();
+	foreach ($callerid_nodes as $callerid_nid => $callerid_node) {
+		if ($callerid_node->field_sirius_active['und'][0]['value'] == 'Yes') {
+			$callerid_options[$callerid_nid] = $callerid_node->title . ' (' . $callerid_node->field_sirius_phone['und'][0]['value'] . ')';
+		}
+	}
+	return $callerid_options;
+}

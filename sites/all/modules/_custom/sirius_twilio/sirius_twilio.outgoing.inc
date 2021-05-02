@@ -113,6 +113,11 @@ function sirius_twilio_outgoing_voice($phone, $context) {
 		$callerid_phone = $callerid_node->field_sirius_phone['und'][0]['value'];
 	}
 	if (!$callerid_phone) { $callerid_phone = sirius_domain_variable_get('sirius_twilio_phone', ''); }
+	$callerid_phone = sirius_phone_format_e164($callerid_phone);
+
+	if ($callerid_phone == $phone) {
+		return array('success' => FALSE, 'msg' => "Caller ID is the same as the recipient ($callerid_phone)");
+	}
 
 	$msg = "Outgoing call initiated to $phone";
 
@@ -126,7 +131,6 @@ function sirius_twilio_outgoing_voice($phone, $context) {
 				$value = sirius_domain_variable_get($name);
 				if ($value) { $call_params[$name] = $value; }
 			}
-			dpm($call_params);
 		}
 
 		$call = $client->calls->create($phone, $callerid_phone, $call_params);

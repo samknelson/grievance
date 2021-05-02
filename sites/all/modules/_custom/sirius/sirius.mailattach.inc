@@ -132,6 +132,7 @@ function sirius_mailattach_page_test_all_form_submit($form, &$form_state) {
 }
 
 function sirius_mailattach_fetch_all() {
+  sirius_become_superuser(TRUE);
   $sql = "select nid, title from node ";
   $sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
   $sql .= "where node.type = 'sirius_domain' ";
@@ -216,7 +217,8 @@ function sirius_mailattach_fetch() {
   $count = $count_accept = $count_reject = 0;
   foreach ($messages as $message) {
     ++$count;
-    sirius_minilog('Processing message - From: ' . htmlspecialchars($message->from) . ' / Subject: ' . htmlspecialchars($message->subject));
+    $subject = imap_utf8($message->subject);
+    sirius_minilog('Processing message - From: ' . htmlspecialchars($message->from) . ' / Subject: ' . htmlspecialchars($subject));
 
     if ($mode != 'live') {
       sirius_minilog("(operating in test mode, so moving to the next message without processing.)");
@@ -268,7 +270,7 @@ function sirius_mailattach_fetch() {
     if (!$mail_user) {
       $msg = "The sender's email, $from_mail, does not correspond to a valid Sirius user. This message was NOT attached.";
       sirius_minilog($msg, 'warning');
-      sirius_mailattach_fetch_reject($from_mail, "$msg  - Subject: " . $message->subject . "]");
+      sirius_mailattach_fetch_reject($from_mail, "$msg  - Subject: " . $subject);
       ++$count_reject;
       continue;
     }
@@ -282,10 +284,14 @@ function sirius_mailattach_fetch() {
     {
       $can_send = TRUE;
     }
+    if ($domain_nid <= 0 && 
+    	(user_access('sirius domain admin', $mail_user) || user_access('grievance user', $mail_user))) {
+    	$can_send = TRUE; 
+    }
     if (!$can_send) {
       $msg = "The sender's email, $from_mail, is in the wrong domain or does not have permission to attach messages. This message was NOT attached.";
       sirius_minilog($msg, 'warning');
-      sirius_mailattach_fetch_reject($from_mail, "$msg  - Subject: " . $message->subject . "]");
+      sirius_mailattach_fetch_reject($from_mail, "$msg  - Subject: " . $subject);
       ++$count_reject;
       continue;
     }
@@ -294,7 +300,6 @@ function sirius_mailattach_fetch() {
     // Parse the subject
     //
 
-    $subject = imap_utf8($message->subject);
     if (!$subject) {
       $msg = "The subject of the email was not found.";
       sirius_minilog($msg, 'warning');
@@ -303,7 +308,7 @@ function sirius_mailattach_fetch() {
       continue;
     }
 
-    $parsed = sirius_mailattach_parse_subject($message->subject);
+    $parsed = sirius_mailattach_parse_subject($subject);
     if (!$parsed['success']) {
       $msg = "Subject parse failed: " . $parsed['msg'];
       sirius_minilog($msg, 'warning');
@@ -374,6 +379,7 @@ function sirius_mailattach_fetch() {
     sirius_jsonfield_util_node_json_set($attachment_node, $json);
     node_object_prepare($attachment_node);
     $attachment_node = node_submit($attachment_node);
+    $attachment_node->uid = $mail_user->uid; 
     node_save($attachment_node);
     sirius_minilog("Attachment node saved: "  . l($attachment_node->title, 'node/' . $attachment_node->nid) . " (" . $attachment_node->nid . ")");
 
@@ -433,7 +439,7 @@ function sirius_mailattach_fetch_accept($from_mail, $msg, $subject = NULL) {
 }
 
 function sirius_imap_tmp_uri($msgno, $msgpath, $filename) {
-  $directory = 'temporary://mailattach';
+  $directory = 'temporary://';
   $directory_realpath = drupal_realpath($directory);
   if (!file_exists($directory_realpath)) {
     mkdir($directory_realpath);
@@ -441,7 +447,7 @@ function sirius_imap_tmp_uri($msgno, $msgpath, $filename) {
   $domain_nid = sirius_domain_nid();
   $filename = trim(strtolower($filename));
   $filename = preg_replace('/[^a-z0-9_\.]/', '_', $filename);
-  $uri = $directory . '/' . $domain_nid . '.' . $msgno . '.' . $msgpath . '.' . $filename;
+  $uri = $directory . 'mailattach_' . $domain_nid . '.' . $msgno . '.' . $msgpath . '.' . $filename;
   return $uri;
 }
 
@@ -631,7 +637,7 @@ function sirius_mailattach_parse_subject($subject) {
     $query->propertyCondition('status', 1);
     $query->propertyOrderBy('created', 'desc');
     $query->fieldCondition('field_sirius_ssn', 'value', $ssn);
-    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+    if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->range(0, 1);
     $stmt = $query->execute();
     if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
@@ -646,7 +652,7 @@ function sirius_mailattach_parse_subject($subject) {
     $query->propertyCondition('status', 1);
     $query->propertyOrderBy('created', 'desc');
     $query->fieldCondition('field_sirius_phone', 'value', $phone);
-    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+    if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->range(0, 1);
     $stmt = $query->execute();
     if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
@@ -661,7 +667,7 @@ function sirius_mailattach_parse_subject($subject) {
     $query->propertyCondition('status', 1);
     $query->propertyOrderBy('created', 'desc');
     $query->fieldCondition('field_sirius_email', 'value', $email);
-    if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+    if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
     $query->range(0, 1);
     $stmt = $query->execute();
     if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }
@@ -676,7 +682,7 @@ function sirius_mailattach_parse_subject($subject) {
       $query->propertyCondition('status', 1);
       $query->propertyOrderBy('created', 'desc');
       $query->fieldCondition('field_' . $field, 'value', $code);
-      if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+      if ($domain_nid > 0) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
       $query->range(0, 1);
       $stmt = $query->execute();
       if (isset($stmt['node'])) { $nid = array_keys($stmt['node'])[0]; }

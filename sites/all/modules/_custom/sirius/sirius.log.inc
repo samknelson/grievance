@@ -57,7 +57,7 @@ function sirius_log(
   $log_node->field_sirius_notes['und'][0]['value'] = $notes;
 
   $domain_nid = sirius_domain_nid();
-  if ($domain_nid) { $log_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; } 
+  if ($domain_nid > 0) { $log_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; } 
 
   if ($files) {
     $log_node->field_sirius_attachments['und'] = $files;
