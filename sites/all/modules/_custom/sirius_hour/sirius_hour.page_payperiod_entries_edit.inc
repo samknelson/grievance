@@ -24,6 +24,30 @@ function sirius_hour_node_tab_payperiod_entries_edit_form($form, &$form_state, $
   if (!$extra_entries) { $extra_entries = 2; }
   $form_state['extra_entries'] = $extra_entries;
 
+  //////////////////////////////////////
+  // One-off: support for legacy data.
+  // - In the olden days, we didn't have sources, so "entries" was just a list of entries.
+  if ($json['entries'][0] && !$json['entries'][0]['rows']) {
+  	drupal_set_message("Legacy hours with no source detected. Placing the legacy enties into a source called \"import\"", 'warning');
+  	$manual = $json['entries']['manual'];
+  	$rows = $json['entries'];
+  	foreach ($rows as $delta => $row) {
+  		$rows[$delta]['hour_type'] = $row['hour_type_tid'];
+  		$rows[$delta]['department'] = $row['department_tid'];
+  		$rows[$delta]['day'] = 1;
+  	}
+  	unset($json['entries']);
+  	$json['entries']['import'] = array(
+  		'source_name' => 'Import',
+  		'comment' => 'Original data upload',
+  		'status' => 'live',
+  		'rows' => $rows,
+  	);
+  	$json['entries']['manual'] = $manual;
+  }
+  // End one-off
+	//////////////////////////////////////
+
   $sources = sirius_hour_payperiod_sources($json);
 
   $start_ts = sirius_date_ts($payperiod_node, 'field_sirius_datetime');
