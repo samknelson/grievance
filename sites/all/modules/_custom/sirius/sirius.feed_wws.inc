@@ -96,6 +96,8 @@ function sirius_feed_wws_row_verify($feed_node, $info, $data, &$row, $precompute
     } else {
       return array('success' => FALSE, 'msg' => 'Please select a primary key.');
     }
+
+
   } 
 
 	// Find the work status
@@ -113,7 +115,10 @@ function sirius_feed_wws_row_process($feed_node, $info, $data, $row) {
 	$result = sirius_feed_wws_row_verify($feed_node, $info, $data, $row, TRUE);
 	if (!$result['success']) { return $result; }
 
-  $worker_node = node_load($row['worker_nid']);
+  $worker_nid = $row['worker_nid'];
+  $worker_node = node_load($worker_nid);
   if (!$worker_node) { return array('success' => FALSE, 'msg' => t('Unable to load the worker node: ' . $row['worker_nid'])); }
-	return sirius_worker_work_status_set($worker_node, $row['work_status_tid'], 'import', array());
+	$result = sirius_worker_work_status_set($worker_node, $row['work_status_tid'], 'import', array(), array('feed' => TRUE));
+
+  return $result;
 }
