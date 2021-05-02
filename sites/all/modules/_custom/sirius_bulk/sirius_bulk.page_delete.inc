@@ -20,7 +20,7 @@ function sirius_bulk_node_tab_delete_form($form, &$form_state, $bulk_node) {
 		'#options' => array(
 			NULL => t('-- Select --'),
 			'test' => t('Test - nothing will be deleted'),
-			'live' => t('Live - Domain will be deleted')
+			'live' => t('Live - record will be deleted')
 		),
 		'#required' => TRUE,
 	);
