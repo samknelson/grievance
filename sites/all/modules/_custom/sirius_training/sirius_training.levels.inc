@@ -31,7 +31,6 @@ function sirius_training_levels_fetch($ms_term_or_tid) {
 	if ($json['training']['levels_enabled'] != 'Yes') { return array(); }
 
 	$levels = $json['training']['levels'];
-
 	uasort($levels, function($a,$b) { return $a['weight'] <=> $b['weight']; });
 	return $levels;
 }
