@@ -2,7 +2,7 @@ ul.sirius_wizard {
 	margin: 0;
 	padding: 0;
 	list-style: none;
-	margin: 0 0 32px 0;
+	margin: 0 0 8px 0;
 }
 
 ul.sirius_wizard li { 
@@ -10,6 +10,7 @@ ul.sirius_wizard li {
 	padding: 0 14px 0 0;
 	overflow: visible;
 	height: 18px;
+	margin-bottom: 24px;
   border-bottom: 1px solid #5984be;
 }
 ul.sirius_wizard li:last-child { 

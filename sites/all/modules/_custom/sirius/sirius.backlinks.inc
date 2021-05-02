@@ -57,6 +57,14 @@ function sirius_backlinks_from_node($node) {
 		if ($path) { $links[$path] = array('name' => 'Worker', 'title' => sirius_backlink_title($worker_nid)); }
 	}
 
+	if ($node->type == 'sirius_feed') {
+		$feed_type = $node->field_sirius_type['und'][0]['value'];
+		if ($feed_type) {
+			$path = "sirius/feeds/$feed_type";
+			$links[$path] = array('name' => 'Feed List', 'title' => '');
+		}
+	}
+
 	$job_nid = $node->field_sirius_dispatch_job['und'][0]['target_id'];
 	if ($job_nid) {
 		$path = "node/$job_nid/sirius_dispatch_job_dispatches";
@@ -94,21 +102,24 @@ function sirius_backlinks_from_node($node) {
 
 	if ($node->type == 'sirius_log') {
 		$handler_nids = sirius_fieldvals($node, 'field_sirius_log_handler', 'target_id');
-		$sql = 'select nid, type, title from node where nid in (:handler_nids)';
-		$sql_args = array(':handler_nids' => $handler_nids);
-		$stmt = sirius_sql_query($sql, $sql_args);
-		$log_type = $node->field_sirius_type['und'][0]['value'];
-		$log_category = $node->field_sirius_category['und'][0]['value'];
-		while ($hr = $stmt->fetchAssoc()) {
-			$handler_type = $hr['type'];
-			$handler_nid = $hr['nid'];
-			if ($handler_type == 'sirius_event' && $log_category == 'ledger:auth')									{ $path = "node/$handler_nid/sirius_event_auths"; }
-			else if ($handler_type == 'sirius_event') 																							{ $path = "node/$handler_nid/sirius_event_info"; }
-			else if ($handler_type == 'sirius_worker' && $log_category == 'worker:certification') 	{ $path = "node/$handler_nid/sirius_worker_tc/certifications"; }
-			else if ($handler_type == 'sirius_json_definition') 																		{ $path = ''; }
-			else 																																										{ $path = "node/$handler_nid/${handler_type}_log"; }
-			$name = sirius_content_type_name($handler_type);
-			$links[$path] = array('name' => $name, 'title' => $hr['title']);
+		if ($handler_nids) {
+			$sql = 'select nid, type, title from node where nid in (:handler_nids)';
+			$sql_args = array(':handler_nids' => $handler_nids);
+			$stmt = sirius_sql_query($sql, $sql_args);
+			$log_type = $node->field_sirius_type['und'][0]['value'];
+			$log_category = $node->field_sirius_category['und'][0]['value'];
+			while ($hr = $stmt->fetchAssoc()) {
+				$handler_type = $hr['type'];
+				$handler_nid = $hr['nid'];
+				if ($handler_type == 'sirius_event' && $log_category == 'ledger:auth')									{ $path = "node/$handler_nid/sirius_event_auths"; }
+				else if ($handler_type == 'sirius_event' && $log_category == 'event:intake_application'){ $path = "node/$handler_nid/sirius_event_intake/applications"; }
+				else if ($handler_type == 'sirius_event') 																							{ $path = "node/$handler_nid/sirius_event_info"; }
+				else if ($handler_type == 'sirius_worker' && $log_category == 'worker:certification') 	{ $path = "node/$handler_nid/sirius_worker_tc/certifications"; }
+				else if ($handler_type == 'sirius_json_definition') 																		{ $path = ''; }
+				else 																																										{ $path = "node/$handler_nid/${handler_type}_log"; }
+				$name = sirius_content_type_name($handler_type);
+				$links[$path] = array('name' => $name, 'title' => $hr['title']);
+			}
 		}
 	}
 

@@ -29,6 +29,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/customfield/definition/list']								= array('title' => 'Custom Field Sets', 'description' => 'Define custom field sets which can be attached to events or other entity types.');
 
 	$links['worker'] = array('title' => 'Worker');
+	$links['worker']['links']['sirius/worker/config/user'] = array('title' => 'Worker / User Sync', 'description' => 'Configure how users are created from workers.');
 	$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
 	$links['worker']['links']['sirius/skill/settings'] = array('title' => 'Skill Settings', 'description' => 'Configure settings for skill management and display.');
 
@@ -38,7 +39,6 @@ function sirius_page_config() {
 
 	$links['grievance'] = array('title' => 'Grievance');
 	$links['grievance']['links']['admin/config/grievance/core'] 	= array('title' => 'Grievance Settings', 'description' => 'Configure the grievance module.');
-	$links['grievance']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
 	$links['grievance']['links']['grievance/admin/statuses/sequences'] = array('title' => 'Status Sequences', 'description' => 'Configure the sequences of statuses that constrain timelines.');
 	$links['grievance']['links']['admin/config/grievance/intake-log'] = array('title' => 'Intake Log', 'description' => 'Allow grievance intake to request specific log dates, such as the date of a discipline or termiantion.');
 	$links['grievance']['links']['grievances/irsets'] = array('title' => 'Information Request Sets', 'description' => 'Group multiple attachment types into an easily accessible "information request set".');

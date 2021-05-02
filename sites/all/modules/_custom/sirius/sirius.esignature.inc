@@ -164,7 +164,10 @@ function sirius_esignature_form_prepare(&$form, $field_name, $title, $statement,
 	$form[$field_name]['#suffix'] = $suffix;
 	$form[$field_name]['#id'] = "sirius_esig_data";
 	$form[$field_name]['#required'] = TRUE;
-	$form[$field_name]['#title'] = $title;
+
+	if ($title) {
+		$form[$field_name]['#title'] = $title;
+	}
 
 	$form[$field_name . '_statement'] = array();
 	$form[$field_name . '_statement']['#type'] = 'value';
@@ -179,7 +182,9 @@ function sirius_esignature_form_prepare(&$form, $field_name, $title, $statement,
 			$form[$field_name . '_name']['#default_value'] = $user_json['esignature']['settings']['name'];
 		} else {
 			$form[$field_name . '_name']['#default_value'] = $def['name'];
-			$form[$field_name . '_name']['#description'] = 'You can set your default esignature name on the ' . l('account settings page.', 'user/' . $user->uid . '/esig');
+			if ($user && $user->uid) {
+				$form[$field_name . '_name']['#description'] = 'You can set your default esignature name on the ' . l('account settings page.', 'user/' . $user->uid . '/esig');
+			}
 		}
 	}
 
@@ -280,7 +285,7 @@ function sirius_esignature_defs_set($defs) {
 }
 
 function sirius_esignature_entity_status($entity_node) {
-	$defs = sirius_esignature_defs();
+	$defs = sirius_esignature_defs($entity_node);
 	$count = $count_complete = $count_incomplete = 0;
 	$json = sirius_jsonfield_util_node_json_get($entity_node);
 	foreach ($defs as $def) {

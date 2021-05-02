@@ -16,6 +16,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.permission.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.news.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.banner.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.footer.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.addr.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phonetree.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.email.inc';
@@ -894,7 +895,13 @@ function sirius_node_careful_delete($node) {
 function sirius_ajax_generic_replace($form, $form_state) {
   $params = $form_state['triggering_element']['#sirius_ajax'];
   $wrapper = $params['wrapper'];
-  $element = $params['element'];
+
+  $element_path = explode(':', $params['element']);
+  $element = $form;
+  foreach ($element_path as $item_name) {
+    if (is_array($element)) { $element = $element[$item_name]; }
+  }
+
   if ($params['files']) {
     $module = $params['module'];
     foreach ($params['files'] as $file) {
@@ -902,7 +909,7 @@ function sirius_ajax_generic_replace($form, $form_state) {
     }
   }
   $commands = array();
-  $commands[] = ajax_command_replace($wrapper, render($form[$element]));
+  $commands[] = ajax_command_replace($wrapper, render($element));
   return array(
     '#type' => 'ajax',
     '#commands' => $commands

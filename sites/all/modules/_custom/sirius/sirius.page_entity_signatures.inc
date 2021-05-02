@@ -87,7 +87,7 @@ function sirius_node_tab_entity_signatures($entity_node) {
 		$esignature = sirius_jsonfield_util_esignature_get($json, $code);
 		$tools = '';
 		if ($esignature) {
-			$tools = l('Clear', current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => array('action' => 'clear', 'which' => $code)));
+			$tools = l('Revoke', current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => array('action' => 'clear', 'which' => $code)));
 		} else {
 			$tools = l('Sign Now', current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => array('action' => 'sign', 'which' => $code)));
 		}
