@@ -6,6 +6,7 @@ function sirius_worker_merge($worker_nid, $from_worker_nid) {
 
 	if (!$worker_node) { return array('success' => FALSE, 'msg' => t('Target is not a node.')); }
 	if (!$from_worker_node) { return array('success' => FALSE, 'msg' => t('Source is not a node.')); }
+	if ($from_worker_node->field_sirius_domain['und'][0]['target_id'] != $worker_node->field_sirius_domain['und'][0]['target_id']) { return array('success' => FALSE, 'msg' => t('Cannot merge records from different domains.')); }
 	if ($worker_node->type != 'sirius_worker') { return array('success' => FALSE, 'msg' => t('Target is not a worker node.')); }
 	if ($from_worker_node->type != 'sirius_worker') { return array('success' => FALSE, 'msg' => t('Source is not a worker node.')); }
 	if ($from_worker_nid == $worker_nid) { return array('success' => FALSE, 'msg' => t('Cannot merge a worker with themself.')); }

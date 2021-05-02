@@ -204,6 +204,17 @@ function sirius_worker_term_tabs() {
     'weight' => 5,
   );
 
+  $term_tabs['sirius_work_status']['sirius_work_status_settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_worker_term_tab_work_status_settings',
+    'permissions' => array('sirius worker admin'),
+    'file' => 'sirius_worker.term_tab_work_status.inc',
+    'weight' => 1,
+  );
+
+  sirius_node_tab_set_module('sirius_worker', $term_tabs);
+
   return $term_tabs;
 }
 
