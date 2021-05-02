@@ -16,6 +16,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.class.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.interestlist.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.intake.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.intake_wizard.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.vbo.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.register_user_select.inc";
@@ -333,4 +334,66 @@ function sirius_event_upcoming() {
   }
 
   return $event_options;
+}
+
+
+/***
+ * Implements hook_sirius_wizard_info() 
+ */
+
+function sirius_event_sirius_wizard_info() {
+  $items = array();
+  $items += sirius_event_intake_wizard_info();
+  return $items;
+}
+
+
+
+
+function sirius_event_notify($main_node, $email, $phone, $msg, $tokens) {
+  if (!$tokens['node']) { $tokens['node'] = $main_node; }
+
+  $medium         = sirius_text_render($msg['medium'], $tokens);
+  $email_subject  = sirius_text_render($msg['email_subject'], $tokens);
+  $email_body     = sirius_text_render(sirius_richtext_handle_input($msg['email_body']), $tokens);
+  $sms            = sirius_text_render($msg['sms'], $tokens);
+
+  $success_msg = '';
+  $failure_msg = '';
+  if (in_array($medium, array('sms', 'both')) && $phone) {
+    $params = array();
+    $params['sms'] = $sms;
+    $params['to'] = $phone;
+    $result = sirius_sms_send($params);
+    if ($result['success']) { $success_msg .= "SMS message sent to $phone."; }
+    else { $failure_msg .= "SMS message to $phone failed: $result[msg]"; }
+  }
+
+  if (in_array($medium, array('email', 'both')) && $phone) {
+    $params = array();
+    $params['subject'] = $email_subject;
+    $params['body'] = $email_body;
+    $params['to'] = $email;
+    $result = sirius_email_send($params);
+    if ($result['success']) { $success_msg .= "Email message sent to $email."; }
+    else { $failure_msg .= "Email message to $email failed: $result[msg]"; }
+  }
+
+  if ($success_msg) {
+    sirius_jsonfield_log($main_node, 'notification', $success_msg);
+    drupal_set_message($success_msg);
+  }
+
+  if ($failure_msg) {
+    sirius_jsonfield_log($main_node, 'notification_failued', $failure_msg);
+    drupal_set_message($failure_msg, 'warning');
+  }
+
+  node_save($main_node);
+
+  if ($failure_msg) { 
+    return array('success' => FALSE, 'msg' => $failure_msg);
+  } else {
+    return array('success' => TRUE, 'msg' => $success_msg);
+  }
 }

@@ -27,14 +27,25 @@ function sirius_node_tab_event_intake($event_node) {
 
 	global $base_url;
 	$url = $base_url;
-	$url .= '/node/' . $event_node->nid;
-	$url .= '/sirius_event_intake/anonymous';
-	$url .= "?access_code=$code";
+	$url .= '/intake';
 
-	$html = '';
+	$html = "Application URL: <strong><a href=\"$url\">$url</a></strong><br /><br />";
+	$html .= "Access code: <strong>$code</strong><br /><br />";
 
-	$html .= "<strong>$url</strong>";
-	$html .= sirius_qr_url($url);
+	$current_status = sirius_event_intake_active($event_node);
+	if ($current_status['success']) {
+		$current_status_msg = 'Open';
+  	$closes_in = sirius_event_intake_closes_in($event_node);
+  	if ($closes_in) { 
+	  	$current_status_msg .= " / " . $closes_in . '';
+  	}
+	} else {
+		$current_status_msg = 'Closed: ' . $current_status['msg'];
+	}
+
+	$html .= 'Current status: <strong>' . $current_status_msg . '</strong><br /><br />';
+
+	$html .= sirius_qr_url("$url/$code");
 
 	return $html;
 }

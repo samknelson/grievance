@@ -61,10 +61,12 @@ function sirius_event_instance_participant_definition_select_form($form, &$form_
 
 	$surveys = array('default');
 
+	/*
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
 	if (sirius_event_rule_widget_exists($event_type_json['register']['rules'], 'intake')) { $surveys[] = 'intake'; }
-
+	*/
+	
 	$form['#tree'] = TRUE;
 
 	foreach ($surveys as $which) {

@@ -236,21 +236,36 @@ function sirius_event_section_assign($participant_nid, $uuid, $options = array()
 		$event_node = node_load($participant_node->field_sirius_event['und'][0]['target_id']);
 		$event_json = sirius_jsonfield_util_node_json_get($event_node);
 		$email = $contact_node->field_sirius_email['und'][0]['value'];
+		$phone = $contact_node->field_sirius_phone['und'][0]['value'];
+		$section_alias = sirius_event_section_alias($event_node);
 
 		$old_section = $event_json['section_list'][$old_uuid];
 		$new_section = $event_json['section_list'][$uuid];
 
     $params = array();
-    $params['subject'] = "Section Assignment Changed: " . $event_node->title;
-    $params['body'] .= "Your section assignment for " . $event_node->title . " has been changed.<br /><br />";
+    $params['subject'] = "$section_alias Assignment Changed: " . $event_node->title;
+    $params['body'] .= "Your $section_alias assignment for " . $event_node->title . " has been changed.<br /><br />";
     $params['body'] .= $options['notify']['comments'];
     $params['body'] .= "<br /><br />";
-    $params['body'] .= 'Old section: ' . sirius_event_section_title($old_section, '(no section)') . '<br />';
-    $params['body'] .= 'New section: <strong>' . sirius_event_section_title($new_section, '(no section)') . '</strong><br />';
-    $params['to'] = $email;
-    $result = sirius_email_send($params);
+    $params['body'] .= "Old $section_alias: " . sirius_event_section_title($old_section, '(no section)') . '<br />';
+    $params['body'] .= "New $section_alias: <strong>" . sirius_event_section_title($new_section, '(no section)') . '</strong><br />';
+    $params['sms'] .= "Your $section_alias assignment for " . $event_node->title . " has been changed.\n";
+    $params['sms'] .= $options['notify']['comments'];
+    $params['sms'] .= "\n\n";
+    $params['sms'] .= "Old $section_alias: " . sirius_event_section_title($old_section, '(no section)') . "\n\n";
+    $params['sms'] .= "New $section_alias: " . sirius_event_section_title($new_section, '(no section)');
 
-		if ($result['success']) { $msg .= " Notified by email: $email."; } else { $msg .= " Email notification failed: $result[msg]"; }
+    if ($options['notify']['medium'] == 'email' || $options['notify']['medium'] == 'both') {
+	    $params['to'] = $email;
+    	$result = sirius_email_send($params);
+    	if ($result['success']) { $msg .= " Notified by email: $email."; } else { $msg .= " Email notification failed: $result[msg]"; }
+    }
+
+    if ($options['notify']['medium'] == 'sms' || $options['notify']['medium'] == 'both') {
+	    $params['to'] = $phone;
+    	$result = sirius_sms_send($params);
+    	if ($result['success']) { $msg .= " Notified by SMS: $phone."; } else { $msg .= " SMS notification failed: $result[msg]"; }
+    }
 	}
 
 	node_save($participant_node);

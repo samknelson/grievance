@@ -20,10 +20,18 @@ function sirius_node_tab_event_section_access($event_node) {
 	$prole_tids = array_filter(array_values($event_json['section']['prole_tids']));
 
 	// Are we one of the available participant roles?
-	if (in_array($prole_tid, $prole_tids)) { return TRUE; }
+	if (!in_array($prole_tid, $prole_tids)) { return FALSE; }
 
-	// Oh well
-	return FALSE;
+	// Is our current status one of the "section enabled" ones? e.g. don't allow "invited" students to change their section
+	$pstatus_tid = $participant_node->field_sirius_event_pstatus['und'][0]['tid'];
+	$pstatus_term = taxonomy_term_load($pstatus_tid);
+	if (!$pstatus_tid) { return FALSE; }
+	$enabled_pstatus_tids = sirius_event_section_pstatus_tids(array($prole_tid));
+	if (!in_array($pstatus_tid, $enabled_pstatus_tids)) { return FALSE; }
+
+
+	// Phew
+	return TRUE;
 }
 
 function sirius_node_tab_event_section($event_node) {

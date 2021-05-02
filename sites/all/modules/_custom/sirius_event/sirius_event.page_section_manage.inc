@@ -133,7 +133,7 @@ function sirius_node_tab_event_section_manage_form($form, &$form_state, $event_n
       '#type' => 'textfield',
       '#size' => 4,
     );
-    if ($section['weight']) { $form['section_list'][$delta]['weight']['#default_value'] = $section['duration']; }
+    if ($section['weight']) { $form['section_list'][$delta]['weight']['#default_value'] = $section['weight']; }
 
 
     $form['section_list'][$delta]['delete'] = array(

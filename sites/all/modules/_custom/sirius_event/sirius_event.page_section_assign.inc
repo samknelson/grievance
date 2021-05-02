@@ -81,8 +81,10 @@ function sirius_node_tab_event_section_assign_form($form, &$form_state, $event_n
 		'#title' => t('Send Notifications'),
 		'#description' => t('Send notifications by email to all participants when their section assignment has been changed.'),
 		'#options' => array(
-			'No' => t('No'),
-			'Yes' => t('Yes'),
+			NULL => t('No Notification'),
+			'email' => t('Notify by Email'),
+			'sms' => t('Notify by SMS'),
+			'both' => t('Notify by both email and SMS')
 		),
 	);
 
@@ -90,7 +92,11 @@ function sirius_node_tab_event_section_assign_form($form, &$form_state, $event_n
 		'#type' => 'textarea',
 		'#title' => t('Comments'),
 		'#description' => t('Add a note that will be sent to any participants who are notified that their section assignment has been changed.'),
- 		'#states' => array('visible' => array(":input[name=\"notify\"]" => array('value' => 'Yes'))),
+ 		'#states' => array('visible' => array(":input[name=\"notify\"]" => array(
+ 			array('value' => 'email'),
+ 			array('value' => 'sms'),
+ 			array('value' => 'both'),
+ 		))),
  	);
 
 	$form['submit'] = array(
@@ -106,8 +112,11 @@ function sirius_node_tab_event_section_assign_form_submit($form, &$form_state) {
 
 	$options = array();
 	$options['allow_oversubscribe'] = TRUE;
-	if ($form_state['values']['notify'] == 'Yes') {
-		$options['notify'] = array('comments' => $form_state['values']['comments']);
+	if ($form_state['values']['notify']) {
+		$options['notify'] = array(
+			'comments' => $form_state['values']['comments'],
+			'medium' => $form_state['values']['notify'],
+		);
 	}
 
 	$participants = sirius_event_section_participants($event_node);

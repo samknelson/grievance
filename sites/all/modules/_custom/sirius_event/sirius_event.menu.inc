@@ -177,6 +177,24 @@ function sirius_event_node_tabs() {
     'weight' => 1,
   );
 
+  $node_tabs['sirius_event']['sirius_event_intake/applications'] = array(
+    'title' => 'Applications',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_applications',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_applications.inc',
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_intake/status'] = array(
+    'title' => 'Status',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_status',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_status.inc',
+    'weight' => 3,
+  );
+
   $node_tabs['sirius_event']['sirius_event_intake/settings'] = array(
     'title' => 'Settings',
     'description' => '',
@@ -585,6 +603,43 @@ function sirius_event_node_tabs() {
     'weight' => 2,
   );
 
+  /*
+  $node_tabs['sirius_log']['sirius_event_intake_application'] = array(
+    'title' => 'Application',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_application',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_application.inc',
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_log']['sirius_event_intake_application_disclaimers'] = array(
+    'title' => 'Disclaimers',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_application_disclaimers',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_application_disclaimers.inc',
+    'weight' => 1,
+  );
+  */
+
+  $node_tabs['sirius_log']['sirius_event_intake_application_wizard'] = array(
+    'title' => 'Wizard',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_application_wizard',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_application_wizard.inc',
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_log']['sirius_event_intake_application_manage'] = array(
+    'title' => 'Manage',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_application_manage',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_application_manage.inc',
+    'weight' => 4,
+  );
 
   sirius_node_tab_set_module('sirius_event', $node_tabs);
 	return $node_tabs;
@@ -987,9 +1042,9 @@ function sirius_event_menu() {
   $items['intake'] = array(
     'title' => 'Intake',
     'access callback' => TRUE,
-    'page callback' => 'sirius_event_page_intake_anonymous',
+    'page callback' => 'sirius_event_page_intake_anonymous_landing',
     'page arguments' => array(),
-    'file' => 'sirius_event.page_intake_anonymous.inc',
+    'file' => 'sirius_event.page_intake_anonymous_landing.inc',
   );
 
   $items['intake/%'] = array(
@@ -998,6 +1053,14 @@ function sirius_event_menu() {
     'page callback' => 'sirius_event_page_intake_anonymous',
     'page arguments' => array(1),
     'file' => 'sirius_event.page_intake_anonymous.inc',
+  );
+
+  $items['intake/%/wizard'] = array(
+    'title' => 'Intake',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_event_page_intake_anonymous_wizard',
+    'page arguments' => array(1),
+    'file' => 'sirius_event.page_intake_anonymous_wizard.inc',
   );
 
   return $items;

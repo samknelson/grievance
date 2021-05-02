@@ -24,6 +24,13 @@ function sirius_node_tab_event_body_form($form, &$form_state, $event_nid) {
 	$form_state['event_nid'] = $event_nid;
 	$event_node = node_load($event_nid);
 
+  $form["title"] = array(
+    '#title' => t('Title'),
+		'#type' => 'textfield',
+		'#required' => TRUE,
+		'#default_value' => $event_node->title,
+  );
+
   $form["description"] = array(
     '#title' => t('Description'),
 		'#type' => 'text_format',
@@ -56,6 +63,7 @@ function sirius_node_tab_event_body_form($form, &$form_state, $event_nid) {
 function sirius_node_tab_event_body_form_submit($form, &$form_state) {
 	$event_nid = $form_state['event_nid'];
 	$event_node = node_load($event_nid);
+	$event_node->title = $form_state['values']['title'];
 	$event_node->body['und'][0]['value'] = $form_state['values']['description']['value'];
 	$event_node->body['und'][0]['format'] = $form_state['values']['description']['format'];
 	$event_node->field_sirius_active['und'][0]['value'] = $form_state['values']['active'];
