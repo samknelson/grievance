@@ -92,6 +92,8 @@ function sirius_feed_wws_row_verify($feed_node, $info, $data, &$row, $precompute
       if ($nid != $other_nid) { return array('success' => FALSE, 'msg' => 'Multiple workers found with this SSN.'); }
       $row['worker_nid'] = $nid;
     }
+
+
   } 
 
 	// Find the work status
@@ -108,5 +110,10 @@ function sirius_feed_wws_row_verify($feed_node, $info, $data, &$row, $precompute
 function sirius_feed_wws_row_process($feed_node, $info, $data, $row) {
 	$result = sirius_feed_wws_row_verify($feed_node, $info, $data, $row, TRUE);
 	if (!$result['success']) { return $result; }
-	return sirius_worker_work_status_set(node_load($row['worker_nid']), $row['work_status_tid'], 'import', array());
+
+  $worker_nid = $row['worker_nid'];
+  $worker_node = node_load($worker_nid);
+	$result = sirius_worker_work_status_set($worker_node, $row['work_status_tid'], 'import', array(), array('feed' => TRUE));
+
+  return $result;
 }

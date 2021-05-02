@@ -101,8 +101,13 @@ function sirius_wizard_current_step($steps) {
 function sirius_wizard_content($info, $data, $node, $current_step) {
 	$steps = sirius_wizard_steps($info, $data, $node);
 	$callback = $steps[$current_step]['callback'];
+	$args = $steps[$current_step]['callback_args'];
 	if (!$callback) { $callback = 'sirius_wizard_content_default'; }
-	return call_user_func($callback, $info, $data, $node, $current_step);	
+	if ($args) {
+		return call_user_func($callback, $info, $data, $node, $current_step, $args);	
+	} else {
+		return call_user_func($callback, $info, $data, $node, $current_step);	
+	}
 }
 
 function sirius_wizard_content_default($info, $data, $node, $current_step) {
@@ -198,9 +203,9 @@ function sirius_sirius_wizard_info() {
   return $items;
 }
 
-function sirius_wizard_submit($info, $data, &$node, $current_step, $msg = NULL) {
+function sirius_wizard_submit($info, $data, &$node, $current_step, $msg = NULL, $options = array()) {
 	// Mark this step as complete
-	$data['steps'][$current_step]['complete'] = TRUE;
+	if ($options['incomplete']) { $data['steps'][$current_step]['complete'] = FALSE; } else { $data['steps'][$current_step]['complete'] = TRUE;	}
 
 	// Mark all subsequent steps as incomplete
 	$steps = sirius_wizard_steps($info, $data, $node);
@@ -208,6 +213,7 @@ function sirius_wizard_submit($info, $data, &$node, $current_step, $msg = NULL) 
 	foreach ($steps as $step_name => $ignore) {
 		if ($step_name == $current_step) { $found = TRUE; continue; }
 		if (!$found) { continue; }
+		if ($options['nonsequential']) { continue; }
 		$data['steps'][$step_name]['complete'] = FALSE;
 	}
 
