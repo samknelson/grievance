@@ -29565,6 +29565,38 @@ If the file has multiple pages, then each page in the input document will use th
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-sirius_work_status-field_sirius_json'.
+  $field_instances['taxonomy_term-sirius_work_status-field_sirius_json'] = array(
+    'bundle' => 'sirius_work_status',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_json',
+    'label' => 'JSON',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 10,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-sirius_work_status-field_sirius_member_active'.
   $field_instances['taxonomy_term-sirius_work_status-field_sirius_member_active'] = array(
     'bundle' => 'sirius_work_status',
