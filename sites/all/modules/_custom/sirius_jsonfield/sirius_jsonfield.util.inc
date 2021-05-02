@@ -300,3 +300,10 @@ function sirius_jsonfield_util_entity_json_set(&$entity, $json) {
 	$entity->field_sirius_json['und'][0]['value'] = json_encode($json);
 }
 
+function sirius_json_get($entity) {
+	return sirius_jsonfield_util_entity_json_get($entity);
+}
+
+function sirius_json_set(&$entity, $json) {
+	return sirius_jsonfield_util_entity_json_set($entity, $json);
+}
