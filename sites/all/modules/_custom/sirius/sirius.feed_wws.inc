@@ -39,6 +39,8 @@ function sirius_feed_wws_row_verify($feed_node, $info, $data, &$row, $precompute
   $pk = $data['pk'];
   if (!$pk) { $pk = 'id'; }
 
+  foreach ($row as $key => $value) { if (is_string($value)) { $row[$key] = trim($value); } }
+
   $row['ssn'] = sirius_ssn_format($row['ssn']);
   if ($pk == 'id') {
    if (!preg_match('/^[a-zA-Z0-9_]+$/', $row['id'])) { return array('success' => FALSE, 'msg' => 'Invalid Member ID'); }
@@ -91,6 +93,8 @@ function sirius_feed_wws_row_verify($feed_node, $info, $data, &$row, $precompute
       if (!$nid) { return array('success' => FALSE, 'msg' => 'No worker found with this SSN.'); }
       if ($nid != $other_nid) { return array('success' => FALSE, 'msg' => 'Multiple workers found with this SSN.'); }
       $row['worker_nid'] = $nid;
+    } else {
+      return array('success' => FALSE, 'msg' => 'Please select a primary key.');
     }
   } 
 
@@ -108,5 +112,8 @@ function sirius_feed_wws_row_verify($feed_node, $info, $data, &$row, $precompute
 function sirius_feed_wws_row_process($feed_node, $info, $data, $row) {
 	$result = sirius_feed_wws_row_verify($feed_node, $info, $data, $row, TRUE);
 	if (!$result['success']) { return $result; }
-	return sirius_worker_work_status_set(node_load($row['worker_nid']), $row['work_status_tid'], 'import', array());
+
+  $worker_node = node_load($row['worker_nid']);
+  if (!$worker_node) { return array('success' => FALSE, 'msg' => t('Unable to load the worker node: ' . $row['worker_nid'])); }
+	return sirius_worker_work_status_set($worker_node, $row['work_status_tid'], 'import', array());
 }
