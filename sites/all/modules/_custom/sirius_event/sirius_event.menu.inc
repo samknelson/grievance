@@ -86,7 +86,7 @@ function sirius_event_node_tabs() {
   );
 
   $node_tabs['sirius_event']['sirius_event_participants_current'] = array(
-    'title' => 'Participants',
+    'title' => 'Current Participants',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participants_current',
     'permissions' => array('sirius'),
@@ -94,7 +94,7 @@ function sirius_event_node_tabs() {
   );
 
   $node_tabs['sirius_event']['sirius_event_participants_register'] = array(
-    'title' => 'Register',
+    'title' => 'Add New Participants',
     'description' => '',
     'callback' => 'sirius_node_tab_event_participants_register',
     'permissions' => array('sirius'),
