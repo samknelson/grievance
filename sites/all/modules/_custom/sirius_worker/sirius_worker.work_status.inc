@@ -19,7 +19,11 @@ function sirius_worker_work_status_set($worker_node, $work_status_tid, $reason, 
 	$handler_nids = array($worker_node->nid);
 	sirius_log($category, $type, $message, $summary, $notes, $handler_nids, $attachments);
 
-	node_save($worker_node);
+	try {
+		node_save($worker_node);
+	} catch (exception $e) {
+		return array('success' => FALSE, 'msg' => "Save failed: " . $e->getMessage());
+	}
 
 	return array('success' => TRUE, 'msg' => 'Work status updated.');
 }
