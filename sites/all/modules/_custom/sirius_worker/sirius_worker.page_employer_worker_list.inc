@@ -23,7 +23,7 @@ function sirius_worker_page_employer_worker_list($member_status_tid = NULL) {
 	} else {
 		$member_status_term = taxonomy_term_load($member_status_tid);
 		$title = t('Out of Work List') . ' - ' . $member_status_term->name;
-		$result .= views_embed_view('sirius_employer_workers', 'block', $member_status_tid, sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available'));
+		$result .= views_embed_view('sirius_employer_workers', 'block', $member_status_tid);
 	}
 
 	drupal_set_title($title);

@@ -35,7 +35,7 @@ function sirius_event_term_tab_interestlist_settings_form($form, &$form_state, $
 		$form['interestlist']['settings']['auto_cancel'] = array(
 			'#type' => 'checkboxes',
 			'#title' => t('Auto-Cancel'),
-			'#description' => t('When a contact is registered for an event of this type with one of the selected participant roles and statuses, then they are automatically removed from the interest list.'),
+			'#description' => t('When a contact is added to for an event of this type with one of the selected participant roles and statuses, then they are automatically removed from the interest list.'),
 			'#options' => $paccess_options,
 		);
 		if ($event_type_json['interestlist']['settings']['auto_cancel']) { $form['interestlist']['settings']['auto_cancel']['#default_value'] = $event_type_json['interestlist']['settings']['auto_cancel']; }
@@ -45,7 +45,7 @@ function sirius_event_term_tab_interestlist_settings_form($form, &$form_state, $
 	if ($ms_options) {
 		$form['interestlist']['settings']['self_register']['ms_tids'] = array(
 			'#type' => 'checkboxes',
-			'#title' => t('Self-Registration Member Statuses'),
+			'#title' => t('Self-Sign-Up Member Statuses'),
 			'#description' => t('Restrict self-registration to the following member statuses. If no member statuses are selected, than any worker with appropriate permissions can sign up for the interest list.'),
 			'#options' => $ms_options,
 		);

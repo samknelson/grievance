@@ -13,7 +13,7 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
 
 	$participant_node = sirius_event_participant_get($event_nid, $contact_nid);
 	if ($participant_node) {
-		return array('success' => FALSE, 'msg' => 'That contact is already registered for the event.', 'code' => 1, 'participant_node' => $participant_node);
+		return array('success' => FALSE, 'msg' => 'That contact already has a participant record for the event.', 'code' => 1, 'participant_node' => $participant_node);
   }
 
 	$domain_nid = sirius_domain_nid();
