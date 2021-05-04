@@ -223,3 +223,21 @@ function sirius_help_modal_view($help_node) {
 
   return $html;
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ */
+
+function sirius_help_form_sirius_help_node_form_alter(&$form, &$form_state, $form_id) {
+  if ($form['#node'] && $form['#node']->uuid) {
+    sirius_require('grievance_content_types', 'grievance_content_types.features.uuid_node.inc');
+    $uuid = $form['#node']->uuid;
+    $feature_content = grievance_content_types_uuid_features_default_content();
+    foreach ($feature_content as $entry) {
+      if ($entry['uuid'] == $uuid) {
+        drupal_set_message("Warning: This help text entry is part of the Sirius system. Any changes that you make will be overwritten the next time the system is upgraded. If you wish to add help text specific to your installation, please create a new help text entry with the same path(s).", 'warning');
+        break;
+      }
+    }
+  }
+}
