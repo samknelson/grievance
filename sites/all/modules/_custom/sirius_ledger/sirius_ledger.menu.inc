@@ -407,6 +407,7 @@ function sirius_ledger_menu() {
     'file' => 'sirius_ledger.page_transmittal_byemployer.inc',
   );
 
+  /*
   $items['sirius/ledger/transmittal/balances'] = array(
     'title' => 'Balances',
     'description' => '',
@@ -417,6 +418,7 @@ function sirius_ledger_menu() {
     'weight' => 3,
     'file' => 'sirius_ledger.page_transmittal_balances.inc',
   );
+  */
 
   $items['sirius/ledger/delinquency'] = array(
     'title' => 'Delinquency Letters',
