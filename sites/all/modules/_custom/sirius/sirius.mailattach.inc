@@ -161,7 +161,7 @@ function sirius_mailattach_fetch_all() {
   }
   $msg = "Mailattach complete. Ran mailattach for $count domains with $count_success successes and $count_failure failures.";
   sirius_minilog($msg);
-  sirius_domain($my_domain_nid);
+  if ($my_domain_nid) { sirius_domain($my_domain_nid); } else { $_SESSION['domain_nid'] = NULL; }
   return array('success' => TRUE, 'msg' => $msg);
 }
 
