@@ -29,7 +29,7 @@ function sirius_node_tab_worker_contact_form($form, &$form_state, $worker_node) 
 	);
 
 	$form['phone'] = array(
-		'#title' => t('Primary Phone Number'),
+		'#title' => t('Mobile Phone Number'),
 		'#type' => 'textfield',
 		'#size' => 15,
 		'#default_value' => $worker_node->field_sirius_phone['und'][0]['value'],

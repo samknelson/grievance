@@ -3,8 +3,8 @@
 function sirius_dispatch_notify_medium_options($worker_node = NULL) {
 	$options = array(
 		'none' => t('None'),
-		'sms' => t('Text message to the primary phone number'),
-		'voice' => t('Voice call to the primary phone number'),
+		'sms' => t('Text message to the mobile phone number'),
+		'voice' => t('Voice call to the mobile phone number'),
 		'sms_alt' => t('Text message to the secondary phone number'),
 		'voice_alt' => t('Voice call to the secondary phone number'),
 		'email' => t('Email'),
