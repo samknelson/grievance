@@ -50,6 +50,7 @@ function sirius_domain_root_nid() {
 function sirius_domain_nid() {
   $domain_nid = $_SESSION['domain_nid'];
   if (!$domain_nid) { $domain_nid = sirius_domain_root_nid(); }
+  if ($domain_nid < 0) { return NULL; }
   return $domain_nid;
 }
 
