@@ -33,7 +33,7 @@ function report_cache_page_report($report_type) {
 	}
 
 	if ($render) {
-		$html = '<div class="report-cache-backlink">' . '[' . l(t('Back to report list'), "admin/reports/report-cache/$report_type") . ']' . '</div>';
+ 		sirius_backlink_add("admin/reports/report-cache/$report_type", array('name' => 'Report List'));
 		$html .= $render;
 		return $html;
 	}
@@ -110,7 +110,8 @@ function report_cache_page_report($report_type) {
 		$path = 'sirius/report-cache/' . $report_type . '/form';
 	}
 	$result .= l(t('Generate a new report'), $path);
-	
+
+	sirius_backlink_add('admin/reports/report-cache', array('name' => 'All Reports'));
 	return $result;
 }
 

@@ -12,7 +12,7 @@ function report_cache_menu() {
   $items = array();
 
 	$items['admin/reports/report-cache'] = array(
-		'title' => 'Report Cache',
+		'title' => 'Reports',
 		'description' => '',
 		'page callback' => 'report_cache_page_landing',
 		'page arguments' => array(3),
@@ -22,7 +22,7 @@ function report_cache_menu() {
 
 
 	$items['admin/reports/report-cache/%'] = array(
-		'title' => 'Report Cache',
+		'title' => 'Reports',
 		'description' => '',
 		'page callback' => 'report_cache_page_report',
 		'page arguments' => array(3),
