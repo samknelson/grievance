@@ -46,6 +46,7 @@ function sirius_taxonomy_checkboxes(&$form, &$form_state, $field_name, $vocabula
 
 function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE) {
   $domain_nid = sirius_domain_nid();
+  if ($domain_nid < 0) { $domain_nid = NULL; }
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
   if ($value_type == 'name') { $load_entities = FALSE; } else { $load_entities = TRUE; }
   $terms = sirius_domain_taxonomy_get_tree($vocabulary->vid, 0, NULL, $load_entities, $domain_nid);
