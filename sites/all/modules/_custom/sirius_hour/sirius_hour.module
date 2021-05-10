@@ -18,6 +18,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.p
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.page_employer_hours.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.page_config.inc';
 
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_hour/sirius_hour.report_by_ms.inc';
+
 
 /**
  * Implements hook_sirius_jsonfield_form_definitions 
@@ -78,3 +80,15 @@ function sirius_hour_payperiod_set_title($node) {
 
 	$node->title = $title;
 }
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+/*
+function sirius_hour_report_cache_info() {
+  $items = array();
+  $items += sirius_hour_report_by_ms_info();
+  return $items;
+}
+*/
