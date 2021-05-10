@@ -1,0 +1,4 @@
+name = Sirius BAC 1
+description = Implements custom reporting and other features for Masons and Bricklayers Local 1
+package = sirius
+core = 7.x

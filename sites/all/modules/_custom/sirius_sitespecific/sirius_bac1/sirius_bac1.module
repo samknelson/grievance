@@ -1,0 +1,25 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
+
+sirius_require('sirius_bac1', 'sirius_bac1.hours_by_employer.inc');
+
+/**
+ * Implements hook_menu
+ */
+
+function sirius_bac1_menu() {
+  $items = array();
+
+  $items['bac1/hours-by-employer'] = array(
+    'title' => 'Hours by Employer',
+    'description' => '',
+    'access arguments' => array('sirius hour admin'),
+    'page callback' => 'sirius_bac1_hours_by_employer',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
