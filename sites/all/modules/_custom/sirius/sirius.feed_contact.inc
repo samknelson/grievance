@@ -8,15 +8,6 @@ function sirius_feed_contact_info() {
     'name' => 'feed_contact',
     'title' => 'Contacts',
     'description' => 'Create or update contacts. This feed should not be used for members or workers.',
-    'steps' => array(
-      'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
-      'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),
-      // 'tag'      => array('label' => 'Tag',        'callback' => 'sirius_feed_wizard_tag'),
-      'map'       => array('label' => 'Mapping',    'callback' => 'sirius_feed_wizard_map'),
-      'verify'    => array('label' => 'Verify',     'callback' => 'sirius_feed_wizard_verify'),
-      'process'   => array('label' => 'Process',    'callback' => 'sirius_feed_wizard_process'),
-      'review'    => array('label' => 'Review',     'callback' => 'sirius_feed_wizard_review'),
-    ),
     'feed' => array(
       'pks' => array(
         'id' => 'ID',
@@ -27,12 +18,93 @@ function sirius_feed_contact_info() {
       'callback_row_process' =>'sirius_feed_contact_row_process',
       'callback_fields' => 'sirius_feed_contact_fields',
     ),
+    'callback_step_list' => 'sirius_feed_contact_steps',
     'callback_launch' => 'sirius_feed_wizard_launch',
     'callback_launch_args' => array('feed_contact'),
   );
 
   return $items;
 }
+
+function sirius_feed_contact_upcoming_bulk_nids() {
+  $sql_args = array();
+  $sql_args[':cutoff'] = time() - 60*60*24*90;
+  $sql = "select nid, title from node ";
+  $sql .= "left join field_data_field_sirius_bulk_status on field_data_field_sirius_bulk_status.entity_type = 'node' and field_data_field_sirius_bulk_status.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "where field_sirius_bulk_status_value in ('draft', 'pending') ";
+  $sql .= "and node.created >= :cutoff ";
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  }
+  $sql .= "order by node.title ";
+  $stmt = sirius_sql_query($sql, $sql_args);
+
+  $bulk_nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $bulk_nids[$hr['nid']] = $hr['title'];
+  }
+
+  return $bulk_nids;
+}
+
+function sirius_feed_contact_steps($data, $node) {
+  $bulk_nids = sirius_feed_contact_upcoming_bulk_nids();
+  $steps = array();
+  $steps['upload'] = array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload');
+  $steps['sheet'] = array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet');
+  $steps['map'] = array('label' => 'Mapping',    'callback' => 'sirius_feed_wizard_map');
+  if ($bulk_nids) {
+    $steps['bulk'] = array('label' => 'Bulk Message',    'callback' => 'sirius_feed_contact_bulk');
+  }
+  $steps['verify'] = array('label' => 'Verify',     'callback' => 'sirius_feed_wizard_verify');
+  $steps['process'] = array('label' => 'Process',    'callback' => 'sirius_feed_wizard_process');
+  $steps['review'] = array('label' => 'Review',     'callback' => 'sirius_feed_wizard_review');
+
+
+  return $steps;
+}
+
+function sirius_feed_contact_bulk($info, $data, $application_node, $current_step) { return drupal_get_form('sirius_feed_contact_bulk_form', $info, $data, $application_node, $current_step); }
+
+function sirius_feed_contact_bulk_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
+  $form_state['info'] = $info;
+  $form_state['data'] = $data;
+  $form_state['feed_node'] = $feed_node;
+  $form_state['current_step'] = $current_step;
+
+  $form['#tree'] = TRUE;
+
+  $form['bulk']['bulk_nid'] = array(
+    '#type' => 'select',
+    '#title' => t('Bulk Message'),
+    '#options' => array(NULL => t('NONE')) + sirius_feed_contact_upcoming_bulk_nids(),
+    '#description' => t('All contacts will be added to the specified bulk message.'),
+    '#default_value' => $data['bulk']['bulk_nid'],
+  );
+
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  return $form;
+}
+
+function sirius_feed_contact_bulk_form_submit($form, &$form_state) {
+  $info = $form_state['info'];
+  $data = $form_state['data'];
+  $feed_node = $form_state['feed_node'];
+  $current_step = $form_state['current_step'];
+
+  $data['bulk'] = $form_state['values']['bulk'];
+
+  sirius_wizard_submit($info, $data, $feed_node, $current_step, "Bulk Message Selection Saved");
+}
+
 
 function sirius_feed_contact_fields($info, $data, $feed_node, $current_step) {
   // Core fields
@@ -130,7 +202,7 @@ function sirius_feed_contact_row_verify($feed_node, $info, $data, &$row, $precom
   }
 
   if (!$precompute) {
-    return array('success' => TRUE, 'msg' => 'An existing contact will be updated.');
+    return array('success' => TRUE, 'msg' => 'Looks good.');
   }
 
   // Contact
@@ -248,8 +320,22 @@ function sirius_feed_contact_row_process($feed_node, $info, $data, $row) {
   node_save($contact_node);
 
   if ($is_new) {
-  	return array('success' => TRUE, 'msg' => 'Created a new contact.');
+    $msg = 'Created a new contact.';
   } else {
-  	return array('success' => TRUE, 'msg' => 'Updated an existing contact.');
+    $msg = 'Updated an existing contact.';
   }
+  $success = TRUE;
+
+  $bulk_nid = $data['bulk']['bulk_nid'];
+  if ($bulk_nid) {
+    $result = sirius_bulk_recipient_add($bulk_nid, $contact_node->nid);
+    if ($result['success']) {
+      $msg .= " Added to the bulk message.";
+    } else {
+      $msg .= " Failed to add to the bulk message: " . $result['msg'];
+      $success = FALSE;
+    }
+  }
+
+  return array('success' => $success, 'msg' => $msg);
 }
