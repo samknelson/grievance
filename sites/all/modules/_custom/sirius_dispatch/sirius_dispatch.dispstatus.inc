@@ -31,7 +31,7 @@ function sirius_dispatch_worker_dispstatus_set_possible($worker_node, $dispstatu
 	if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
 		$work_status_term = taxonomy_term_load($worker_node->field_sirius_work_status['und'][0]['tid']);
 		if ($work_status_term->field_sirius_dispatch_available['und'][0]['value'] != 'Yes') {
-			return array('success' => FALSE, 'msg' => 'The work status is not available for dispatch.');
+			return array('success' => FALSE, 'msg' => 'The work status ' . $work_status_term->name . ' is not available for dispatch.');
 		}
 	}
 
@@ -51,7 +51,7 @@ function sirius_dispatch_worker_dispstatus_set_possible($worker_node, $dispstatu
 	return array('success' => TRUE);
 }
 
-function sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid = NULL, $account = NULL, $reason = NULL, $attachments = NULL) {
+function sirius_dispatch_worker_dispstatus_set(&$worker_node, $dispstatus_tid = NULL, $account = NULL, $reason = NULL, $attachments = NULL) {
 	global $user;
 	if (!$account) { $account = $user; }
 	if (is_numeric($account)) { $account = user_load($account); }
@@ -148,7 +148,7 @@ function sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid = N
 	return array('success' => TRUE, 'msg' => $msg);
 }
 
-function sirius_dispatch_worker_dispstatus_block_set($worker_node, $block_tid, $reason = NULL, $attachments = NULL) {
+function sirius_dispatch_worker_dispstatus_block_set(&$worker_node, $block_tid, $reason = NULL, $attachments = NULL) {
 	if ($block_tid == $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']) { 
 		return array('success' => TRUE, 'msg' => 'Block status unchanged.');
 	}
