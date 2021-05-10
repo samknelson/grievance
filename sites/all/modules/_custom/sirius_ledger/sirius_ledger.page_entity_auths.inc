@@ -1,6 +1,11 @@
 <?php
 
 function sirius_ledger_node_tab_entity_auths_access($entity_node) {
+	if ($entity_node->type == 'sirius_event') {
+		$event_type_term = taxonomy_term_load($entity_node->field_sirius_event_type['und'][0]['tid']);
+		$event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
+		if ($event_type_json['auths']['settings']['enabled'] != 'Yes') { return FALSE; }
+	}
 	return TRUE;
 }
 

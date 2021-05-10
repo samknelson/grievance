@@ -288,6 +288,16 @@ function sirius_ledger_term_tabs() {
     'weight' => 1,
   );
 
+  $term_tabs['sirius_event_type']['sirius_ledger_event_type_auths'] = array(
+    'title' => 'Authorizations',
+    'description' => '',
+    'callback' => 'sirius_ledger_term_tab_entity_type_auths',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 20,
+    'file' => 'sirius_ledger.term_tab_entity_type_auths.inc',
+  );
+
+  sirius_node_tab_set_module('sirius_ledger', $term_tabs);
   return $term_tabs;
 }
 
@@ -376,7 +386,39 @@ function sirius_ledger_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
- $items['sirius/ledger/delinquency'] = array(
+ $items['sirius/ledger/transmittal/generate'] = array(
+    'title' => 'Generate PDFs',
+    'description' => '',
+    'access arguments' => array('sirius ledger admin'),
+    'page callback' => 'sirius_ledger_page_transmittal',
+    'page arguments' => array(),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/ledger/transmittal/byemployer'] = array(
+    'title' => 'List By Month / Employer',
+    'description' => '',
+    'access arguments' => array('sirius ledger admin'),
+    'page callback' => 'sirius_ledger_page_transmittal_byemployer',
+    'page arguments' => array(),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'sirius_ledger.page_transmittal_byemployer.inc',
+  );
+
+  $items['sirius/ledger/transmittal/balances'] = array(
+    'title' => 'Balances',
+    'description' => '',
+    'access arguments' => array('sirius ledger admin'),
+    'page callback' => 'sirius_ledger_page_transmittal_balances',
+    'page arguments' => array(),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+    'file' => 'sirius_ledger.page_transmittal_balances.inc',
+  );
+
+  $items['sirius/ledger/delinquency'] = array(
     'title' => 'Delinquency Letters',
     'description' => '',
     'access arguments' => array('sirius ledger admin'),

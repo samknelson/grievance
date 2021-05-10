@@ -108,3 +108,53 @@ function sirius_ledger_transmittal_dispatches($employer_nid) {
 	}
 	return $dispatches;
 }
+
+function sirius_ledger_transmittal_list($params = array()) {
+  $domain_nid = sirius_domain_nid();
+
+  $sql_args = array();
+  $sql = "select node.nid as transmittal_nid, ";
+  $sql .= "field_sirius_type_value as status, ";
+  $sql .= "json_unquote(json_extract(field_sirius_json_value, '\$.transmittal.year')) as year, ";
+  $sql .= "json_unquote(json_extract(field_sirius_json_value, '\$.transmittal.month')) as month, ";
+  if ($params['account_nid']) {
+    $sql .= "json_unquote(json_extract(field_sirius_json_value, '\$.transmittal.accounts.\"" . $params['account_nid'] . "\".payment_nid')) as payment_nid, ";
+    $sql .= "json_unquote(json_extract(field_sirius_json_value, '\$.transmittal.accounts.\"" . $params['account_nid'] . "\".dollar_amt')) as dollar_amt, ";
+  } 
+  $sql .= "employer_node.nid as employer_nid ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
+  $sql .= "left join node employer_node on employer_node.nid = field_sirius_log_handler_target_id ";
+   if ($domain_nid) {
+    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  }
+  $sql .= "where node.type = 'sirius_log' ";
+  $sql .= "and employer_node.type = 'grievance_shop' ";
+  $sql .= "and field_sirius_category_value = 'ledger:transmittal' ";
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  }
+  if ($params['year']) { 
+    $sql .= "and json_unquote(json_extract(field_sirius_json_value, '\$.transmittal.year')) = :year ";
+    $sql_args[':year'] = $params['year'];
+  }
+  if ($params['month']) { 
+    $sql .= "and json_unquote(json_extract(field_sirius_json_value, '\$.transmittal.month')) = :month ";
+    $sql_args[':month'] = $params['month'];
+  }
+  if ($params['account_nid']) {
+    $path = '$.transmittal.accounts."' . $params['account_nid'] . '".active';
+    $sql .= "and json_unquote(json_extract(field_sirius_json_value, '$path')) = 'Yes' ";
+  }
+  $sql .= "order by node.nid desc limit 1000";
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $transmittal_nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $transmittal_nids[$hr['nid']] = $hr;
+  }
+  return $transmittal_nids;
+}
