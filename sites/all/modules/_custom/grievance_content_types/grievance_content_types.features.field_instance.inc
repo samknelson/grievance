@@ -24344,7 +24344,7 @@ If the file has multiple pages, then each page in the input document will use th
     'bundle' => 'sirius_worker',
     'default_value' => array(
       0 => array(
-        'value' => 'voice',
+        'value' => 'sms',
       ),
     ),
     'deleted' => 0,

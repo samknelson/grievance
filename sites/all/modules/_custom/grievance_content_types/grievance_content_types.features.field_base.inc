@@ -5489,8 +5489,8 @@ function grievance_content_types_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         'none' => 'None',
-        'sms' => 'Text message to the primary phone number',
-        'voice' => 'Voice call to the primary phone number',
+        'sms' => 'Text message to the mobile phone number',
+        'voice' => 'Voice call to the mobile phone number',
         'sms_alt' => 'Text message to the secondary phone number',
         'voice_alt' => 'Voice call to the secondary phone number',
         'email' => 'Email',
