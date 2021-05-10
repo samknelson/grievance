@@ -47,3 +47,34 @@
 	padding-right: 10px;
 	font-size: 10px;
 }
+
+#content .columns_table td h2.big {
+	font-size: 18px;
+}
+
+#content .columns_table td table.sirius_data_table {
+  width: auto;
+}
+
+#content .columns_table td table.sirius_data_table_wide {
+  width: 100%;
+}
+
+#content .columns_table td table.sirius_data_table td {
+  border: 1px solid;
+  padding: 5px;
+  text-align: left;
+}
+
+#content .columns_table td table.sirius_data_table th {
+  border: 1px solid;
+  padding: 5px;
+  padding: 5px;
+  vertical-align: top;
+  font-weight: bold;
+  text-align: left;
+}
+
+#content .columns_table td table.sirius_data_table td div.form-item {
+  margin: 0;
+}

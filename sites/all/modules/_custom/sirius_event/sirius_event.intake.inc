@@ -56,7 +56,7 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 		$json = sirius_jsonfield_util_term_json_get($entity);
 		$event_type_term = $entity;
 	}
-	$intake_json = $json['intake'];
+	$domain_nid = sirius_domain_nid();
 
 	$prole_tids = sirius_fieldvals($event_type_term, 'field_sirius_event_proles', 'tid');
 	$prole_terms = taxonomy_term_load_multiple($prole_tids);
@@ -75,46 +75,9 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 		'#title' => t('Intake Enabled?'),
 		'#options' => array('No' => t('No'), 'Yes' => t('Yes')),
 		'#description' => t('Does this event type support intake?'),
-		'#default_value' => $intake_json['enabled'],
+		'#default_value' => $json['intake']['enabled'],
 	);
 
-	$domain_nid = sirius_domain_nid();
-	$type = 'node:sirius_event_participant:field_sirius_json';
-	$survey_options = array(NULL => t('-- Select --'));
-	$avail = views_get_view_result('sirius_json_definitions', 'entityreference_1', $domain_nid, $type);
-	if ($avail) {
-		foreach ($avail as $hr) {
-			$survey_options[$hr->nid] = $hr->node_title;
-		}
-	}
-
-	$surveys = array('default');
-
-	$survey_nid = $intake_json['survey'];
-	$form['intake']['survey'] = array(
-		'#type' => 'select',
-		'#title' => 'Survey',
-		'#options' => $survey_options,
-		'#default_value' => $survey_nid,
-		'#prefix' => $html,
-	);
-	if ($survey_nid) {
-		$html = '<div class="sirius_form_intro">';
-		if ($survey_nid) {
-			$survey_node = node_load($survey_nid);
-			$html = 'See details for <strong>' . $survey_node->title . '</strong>: ';
-			$paths = array(
-				"node/$survey_nid/sirius_event_participant_definition_form/preview" => 'Preview', 
-				"node/$survey_nid/sirius_event_participant_definition_form" => 'Edit Fields', 
-			);
-			foreach ($paths as $path => $title) {
-				if (!drupal_valid_path($path)) { continue; }
-				$html .= l($title, $path, array('attributes' => array('class' => array('tool-button'))));
-			}
-		}
-		$html .= '</div><br />';
-		$form['intake']['survey_details'] = array('#markup' => $html);
-	}
 
   $form['intake']['register']['paccess'] = array(
   	'#type' => 'select',
@@ -133,14 +96,113 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 		'#default_value' => $json['intake']['work_status'],
 	);
 
-  $ms_level_options = array(NULL => t('-- Select --')) + sirius_ledger_ms_level_options();
-	$form['intake']['member_status_level'] = array(
-		'#type' => 'select',
-		'#title' => t('Member Status'),
+	$type = 'node:sirius_event_participant:field_sirius_json';
+	$survey_options = array(NULL => t('-- Select --'));
+	$avail = views_get_view_result('sirius_json_definitions', 'entityreference_1', $domain_nid, $type);
+	if ($avail) {
+		foreach ($avail as $hr) {
+			$survey_options[$hr->nid] = $hr->node_title;
+		}
+	}
+
+  $ajax_params = $form_state['triggering_element']['#sirius_ajax'];
+  $survey_count = $form_state['survey_count'];
+  $survey_count += $ajax_params['qty'];
+  if ($survey_count < 1) { $survey_count = 1; }
+  if ($survey_count < count($json['intake']['survey']['list'])) { $survey_count = count($json['intake']['survey']['list']); }
+  $form_state['survey_count'] = $survey_count;
+
+  $form['intake']['survey'] = array(
+  	'#type' => 'fieldset',
+  	'#title' => t('Surveys'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+		'#description' => 'Select the survey form(s) that the applicant must complete. Each form will be presented as a separate step in the intake wizard.' . l('Manage Surveys', 'sirius/event/participant_definitions', array('attributes' => array('class' => array('tool-button')))) . '<br /><br />',
+  );
+
+	$form['intake']['survey']['list']['prefix'] = array('#markup' => '<div id="survey_list">');
+
+  for ($i=0; $i<$survey_count; ++$i) {
+  	$title = "Survey #" . ($i+1);
+  	if ($json['intake']['survey']['list'][$i]['title']) { $title .= ': ' . $json['intake']['survey']['list'][$i]['title']; }
+
+  	$form['intake']['survey']['list'][$i] = array(
+  		'#type' => 'fieldset',
+  		'#title' => $title,
+  	);
+
+  	$survey_nid = $json['intake']['survey']['list'][$i]['survey_nid'];
+		if ($survey_nid) {
+			if ($survey_nid) {
+				$html = '<div class="sirius_form_intro">';
+				$survey_node = node_load($survey_nid);
+				$html .= 'See details for <strong>' . $survey_node->title . '</strong>: ';
+				$paths = array(
+					"node/$survey_nid/sirius_event_participant_definition_form/preview" => 'Preview', 
+					"node/$survey_nid/sirius_event_participant_definition_form" => 'Edit Fields', 
+				);
+				foreach ($paths as $path => $title) {
+					if (!drupal_valid_path($path)) { continue; }
+					$html .= l($title, $path, array('attributes' => array('class' => array('tool-button'))));
+				}
+				$html .= '</div><br />';
+				$form['intake']['survey']['list'][$i]['survey_details'] = array('#markup' => $html);
+			}
+		}
+
+  	$form['intake']['survey']['list'][$i]['title'] = array(
+  		'#title' => t('Title'),
+  		'#type' => 'textfield',
+  		'#default_value' => $json['intake']['survey']['list'][$i]['title'],
+  	);
+
+  	$form['intake']['survey']['list'][$i]['survey_nid'] = array(
+  		'#title' => t('Survey'),
+  		'#type' => 'select',
+  		'#options' => $survey_options,
+  		'#default_value' => $json['intake']['survey']['list'][$i]['survey_nid'],
+  	);
+  }
+
+	$form['intake']['survey']['list']['suffix'] = array('#markup' => '</div>');
+
+  $form['intake']['survey']['add_one'] = array(
+    '#type' => 'button',
+    '#value' => t('Add one'),
+    '#ajax' => array(
+      'callback' => 'sirius_ajax_generic_replace',
+    ),
+    '#sirius_ajax' => array(
+      'qty' => 1,
+      'wrapper' => '#survey_list',
+      'element' => 'intake:survey:list',
+    ),
+  );
+
+  $form['intake']['ms'] = array(
+  	'#type' => 'fieldset',
+  	'#title' => t('Member Status / Industries'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+		'#description' => t('Select the member status / industry and apprenticeship level that newly created workers will have '),
+  );
+
+  $ms_level_options = sirius_ledger_ms_level_options();
+	$form['intake']['ms']['required'] = array(
+		'#type' => 'checkboxes',
+		'#title' => t('Required'),
 		'#options' => $ms_level_options,
-		'#description' => t('What member status (and level) should newly created workers have?'),
-		'#default_value' => $json['intake']['member_status_level'],
+		'#description' => t('All newly created workers will have these member statuses'),
 	);
+	if ($json['intake']['ms']['required']) { $form['intake']['ms']['required']['#default_value'] = $json['intake']['ms']['required']; }
+
+	$form['intake']['ms']['optional'] = array(
+		'#type' => 'checkboxes',
+		'#title' => t('Optional'),
+		'#options' => $ms_level_options,
+		'#description' => t('Newly created workers may optionally be assigned these member status.'),
+	);
+	if ($json['intake']['ms']['optional']) { $form['intake']['ms']['optional']['#default_value'] = $json['intake']['ms']['optional']; }
 
 	$form['intake']['anonymous'] = array(
 		'#type' => 'fieldset',
@@ -156,7 +218,7 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 		'#title' => t('Intake Enabled?'),
 		'#options' => array('No' => t('No'), 'Yes' => t('Yes')),
 		'#description' => t('Does this event type support intake?'),
-		'#default_value' => $intake_json['anonymous']['enabled'],
+		'#default_value' => $json['intake']['anonymous']['enabled'],
 	);
 
 	if ($entity_type == 'node') {
@@ -164,7 +226,7 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 			'#type' => 'textfield',
 			'#title' => t('Access Code'),
 			'#description' => t('Enter the access code to allow anonymous intake. Leave blank to generate automatically.'),
-			'#default_value' => $intake_json['anonymous']['access_code'],
+			'#default_value' => $json['intake']['anonymous']['access_code'],
 		);
 	}
 
@@ -172,7 +234,7 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 		'#type' => 'textfield',
 		'#title' => t('Title'),
 		'#description' => t('What page title should be shown to anonymous users?'),
-		'#default_value' => $intake_json['anonymous']['title'],
+		'#default_value' => $json['intake']['anonymous']['title'],
 	);
 
   $form['intake']['anonymous']['intro'] = array(
@@ -307,7 +369,7 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 		'#options' => $prole_options,
 		'#description' => t('These roles have permission to use the intake tools.'),
 	);
-	if ($intake_json['admin_prole_tids']) { $form['intake']['admin_prole_tids']['#default_value'] = $intake_json['admin_prole_tids']; }
+	if ($json['intake']['admin_prole_tids']) { $form['intake']['admin_prole_tids']['#default_value'] = $json['intake']['admin_prole_tids']; }
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -332,6 +394,13 @@ function sirius_event_intake_settings_form_submit($form, &$form_state) {
 	$json['intake']['anonymous']['access_code'] = sirius_event_intake_access_code_anonicalize($form_state['values']['intake']['anonymous']['access_code']);
 	if (!$json['intake']['anonymous']['access_code']) {
 		$json['intake']['anonymous']['access_code'] = sirius_aat_generate(8, 'letter');
+	}
+	if ($json['intake']['survey']['list']) {
+		foreach ($json['intake']['survey']['list'] as $delta => $item) {
+			if (!$item['survey_nid']) {
+				unset($json['intake']['survey']['list'][$delta]);
+			}
+		}
 	}
 
 	sirius_jsonfield_util_entity_json_set($entity, $json);
@@ -477,4 +546,58 @@ function sirius_event_intake_closes_in($event_node) {
   if ($closes_in > 1) {
     return t('Closes in: @interval', array('@interval' => format_interval($closes_in)));
   }
+}
+
+function sirius_event_intake_application_render($application_node) {
+	return drupal_render(drupal_get_form('sirius_event_intake_application_render_form', $application_node));
+}
+
+function sirius_event_intake_application_render_form($form, &$form_state, $application_node) {
+	$application_json = sirius_json_get($application_node);
+	$data = $application_json['wizard']['intake'];
+
+	$event_node = sirius_log_handler($application_node, 'sirius_event');
+	$event_json = sirius_json_get($event_node);
+
+	$form['#tree'] = TRUE;
+
+	$submitted_ts = $data['submitted_ts'];
+	if ($submitted_ts) {
+		$form['status'] = array('#markup' => '<p>Application submitted on <strong>' . date('l, F d Y - g:ia', $submitted_ts) . '</strong></p>');
+	}
+
+	$form['surveys'] = $survey_form;
+
+  if ($event_json['intake']['survey']['list']) {
+  	foreach ($event_json['intake']['survey']['list'] as $delta => $element) {
+  		$title = $element['title'];
+  		if (!$title) { 
+  			$title = 'Form';
+  			if ($delta) { $title .= ' ' . ($delta+1); }
+  		}
+
+  		$survey_nid = $element['survey_nid'];
+			$survey_node = node_load($survey_nid);
+			$survey_json = sirius_json_get($survey_node);
+			$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
+
+			$application_json = sirius_json_get($application_node);
+			$application_results = sirius_jsonfield_util_results_get($application_json, "survey_" . $survey_nid);
+
+			$prep_settings = $event_json;
+			$prep_settings['skip_required'] = TRUE;
+			$prep_settings['hide_instructions'] = TRUE;
+			sirius_event_phonebank_prep_survey($survey_form, $application_results, $prep_settings);
+			drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/survey.css', 'file');
+
+			$form['surveys'][$survey_nid]['title'] = array('#markup' => '<h2>' . $title . '</h2>');
+			$form['surveys'][$survey_nid]['open'] = array('#markup' => '<div id="survey_wrap" class="survey_wrap_inpage sirius-form">');
+			$form['surveys'][$survey_nid]['form'] = $survey_form;
+			$form['surveys'][$survey_nid]['close'] = array('#markup' => '</div>');
+  	}
+  }
+
+	$form['#disabled'] = TRUE;
+
+	return $form;
 }

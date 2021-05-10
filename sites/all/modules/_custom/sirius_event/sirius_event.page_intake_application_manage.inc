@@ -80,6 +80,24 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 			'#required' => TRUE,
 		);
 
+
+		$status_options = array(NULL => t('-- Select --'));
+
+		$signed_out_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
+		$status_options[$signed_out_tid] = 'Not Available (SIGNED OUT)';
+		$signed_in_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
+		$status_options[$signed_in_tid] = 'Available (SIGNED IN)';
+
+		if ($status_options) {
+			$form['dispstatus_tid'] = array(
+				'#type' => 'select',
+				'#title' => t('Sign in?'),
+				'#options' => $status_options,
+				'#default_value' => $signed_in_tid,
+				'#states' => array('visible' => array(":input[name=\"action\"]" => array('value' => 'accept'))),
+			);
+		}
+
 	  $medium_options = array(
 	    NULL => t('No notification'),
 	    'email' => t('Notify by Email'),
@@ -320,34 +338,50 @@ function sirius_node_tab_event_intake_application_manage_form_submit($form, &$fo
 	  }
 
 		// ////////////////////////////////////
-		// Set the member status
+		// Set the member statuses and levels
 		// ////////////////////////////////////
 
-	  $ms_tid_level = $event_json['intake']['member_status_level'];
-	  list ($ms_tid, $level_code) = explode('|', $ms_tid_level);
-  	$ms_term = taxonomy_term_load($ms_tid);
-	  if ($ms_tid) {
-	  	$result = sirius_worker_member_status_set($worker_node, $ms_term, TRUE, 'intake');
-	  	if ($result['success']) {
-	  		drupal_set_message("Set member status to: " . $ms_term->name);
-	  	} else {
-	  		drupal_set_message("Unable to set member status to " . $ms_term->name . ': ' . $result['msg'], 'warning');
-	  	}
-	  }
+		$ms_tid_levels = array();
+		if ($event_json['intake']['ms']['required']) {
+			$ms_tid_levels = array_filter(array_values($event_json['intake']['ms']['required']));
+		}
+		foreach ($ms_tid_levels as $ms_tid_level) {
+		  list ($ms_tid, $level_code) = explode('|', $ms_tid_level);
+	  	$ms_term = taxonomy_term_load($ms_tid);
+		  if ($ms_tid) {
+		  	$result = sirius_worker_member_status_set($worker_node, $ms_term, TRUE, 'intake');
+		  	if ($result['success']) {
+		  		drupal_set_message("Added member status: " . $ms_term->name);
+		  	} else {
+		  		drupal_set_message("Unable to add member status " . $ms_term->name . ': ' . $result['msg'], 'warning');
+		  	}
+		  }
+
+		  if ($level_code) {
+		  	$level = sirius_training_levels_fetch_record($ms_tid, $level_code);
+		  	$result = sirius_training_level_graduate($worker_node, $ms_term, $level, array());
+		  	if ($result['success']) {
+		  		drupal_set_message("Set level to: " . $level['title']);
+		  	} else {
+		  		drupal_set_message("Unable to set level to " . $level['title'] . ': ' . $result['msg'], 'warning');
+		  	}
+		  }
+		}
 
 		// ////////////////////////////////////
-		// Set the level
+		// Set Dispatch Status
 		// ////////////////////////////////////
 
-	  if ($level_code) {
-	  	$level = sirius_training_levels_fetch_record($ms_tid, $level_code);
-	  	$result = sirius_training_level_graduate($worker_node, $ms_term, $level, array());
-	  	if ($result['success']) {
-	  		drupal_set_message("Set level to: " . $level['title']);
-	  	} else {
-	  		drupal_set_message("Unable to set level to " . $level['title'] . ': ' . $result['msg'], 'warning');
-	  	}
-	  }
+		$dispstatus_tid = $form_state['values']['dispstatus_tid'];
+		if ($dispstatus_tid) {
+			$dispstatus_term = taxonomy_term_load($dispstatus_tid);
+			$result = sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid, NULL, 'Signed in during intake');
+			if ($result['success']) {
+				drupal_set_message("Dispatch status set to " . $dispstatus_term->name);
+			} else {
+				drupal_set_message("Failed to set dispatch status to " . $dispstatus_term->name . ': ' . $result['msg'], 'warning');
+			}
+		}
 
 		// ////////////////////////////////////
 		// Create the materials

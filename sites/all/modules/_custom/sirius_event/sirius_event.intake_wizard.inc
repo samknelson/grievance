@@ -26,8 +26,17 @@ function sirius_event_intake_wizard_steps($data, $application_node) {
   $steps['phone'] = array('label' => 'Phone', 'callback' => 'sirius_event_intake_wizard_phone');
   $steps['email'] = array('label' => 'Email', 'callback' => 'sirius_event_intake_wizard_email');
   if ($disclaimer_nodes) { $steps['disclaimer'] = array('label' => 'Disclaimers', 'callback' => 'sirius_event_intake_wizard_disclaimers'); }
-  $steps['survey'] = array('label' => 'Intake Form', 'callback' => 'sirius_event_intake_wizard_survey');
 
+  if ($event_json['intake']['survey']['list']) {
+  	foreach ($event_json['intake']['survey']['list'] as $delta => $element) {
+  		$title = $element['title'];
+  		if (!$title) { 
+  			$title = 'Form';
+  			if ($delta) { $title .= ' ' . ($delta+1); }
+  		}
+		  $steps["survey_$delta"] = array('label' => $title, 'callback' => 'sirius_event_intake_wizard_survey', 'callback_args' => array('survey_nid' => $element['survey_nid']));
+  	}
+  }
   $required_attachments = $event_json['intake']['attachments']['required'];
   if ($required_attachments) {
   	$required_attachments = array_filter(array_values($required_attachments));
@@ -612,9 +621,9 @@ function sirius_event_intake_wizard_disclaimers_form_submit($form, &$form_state)
  * SURVEY
  ************************************************************************************************/
 
-function sirius_event_intake_wizard_survey($info, $data, $application_node, $current_step) { return drupal_get_form('sirius_event_intake_wizard_survey_form', $info, $data, $application_node, $current_step); }
+function sirius_event_intake_wizard_survey($info, $data, $application_node, $current_step, $args) { return drupal_get_form('sirius_event_intake_wizard_survey_form', $info, $data, $application_node, $current_step, $args); }
 
-function sirius_event_intake_wizard_survey_form($form, &$form_state, $info, $data, $application_node, $current_step) {
+function sirius_event_intake_wizard_survey_form($form, &$form_state, $info, $data, $application_node, $current_step, $args) {
 	$form_state['info'] = $info;
 	$form_state['data'] = $data;
 	$form_state['application_node'] = $application_node;
@@ -624,12 +633,14 @@ function sirius_event_intake_wizard_survey_form($form, &$form_state, $info, $dat
 	$event_json = sirius_json_get($event_node);
 	$steps = sirius_wizard_steps($info, $data, $event_node);
 
-	$survey_node = node_load($event_json['intake']['survey']);
+	$survey_nid = $args['survey_nid'];
+	$form_state['survey_nid'] = $survey_nid;
+	$survey_node = node_load($survey_nid);
 	$survey_json = sirius_json_get($survey_node);
 	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
 
 	$application_json = sirius_json_get($application_node);
-	$application_results = sirius_jsonfield_util_results_get($application_json, 'survey');
+	$application_results = sirius_jsonfield_util_results_get($application_json, "survey_" . $survey_nid);
 
 	$prep_settings = array();
 	$prep_settings['skip_required'] = TRUE;
@@ -665,12 +676,13 @@ function sirius_event_intake_wizard_survey_form_submit($form, &$form_state) {
 	$event_json = sirius_json_get($event_node);
 	$current_step = $form_state['current_step'];
 
-	$survey_node = node_load($event_json['intake']['survey']);
+	$survey_nid = $form_state['survey_nid'];
+	$survey_node = node_load($survey_nid);
 	$survey_json = sirius_json_get($survey_node);
 	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
 
   // Set the results
-	sirius_jsonfield_util_results_set($application_json, 'survey', $form_state['values']['survey']);
+	sirius_jsonfield_util_results_set($application_json, "survey_" . $survey_nid, $form_state['values']['survey']);
 	sirius_json_set($application_node, $application_json);
 	node_save($application_node);
 
@@ -1037,40 +1049,6 @@ function sirius_event_intake_wizard_deliver_form_submit($form, &$form_state) {
 function sirius_event_intake_wizard_review($info, $data, $application_node, $current_step) { return drupal_get_form('sirius_event_intake_wizard_review_form', $info, $data, $application_node, $current_step); }
 
 function sirius_event_intake_wizard_review_form($form, &$form_state, $info, $data, $application_node, $current_step) {
-	$form_state['info'] = $info;
-	$form_state['data'] = $data;
-	$form_state['application_node'] = $application_node;
-	$form_state['current_step'] = $current_step;
-
-	$event_node = sirius_log_handler($application_node, 'sirius_event');
-	$event_json = sirius_json_get($event_node);
-	$steps = sirius_wizard_steps($info, $data, $event_node);
-
-	$survey_node = node_load($event_json['intake']['survey']);
-	$survey_json = sirius_json_get($survey_node);
-	$survey_form = sirius_jsonfield_util_form_get($survey_json, 'default');
-
-	$application_json = sirius_json_get($application_node);
-	$application_results = sirius_jsonfield_util_results_get($application_json, 'survey');
-
-	$prep_settings = $event_json;
-	$prep_settings['skip_required'] = TRUE;
-	sirius_event_phonebank_prep_survey($survey_form, $application_results, $prep_settings);
-	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/survey.css', 'file');
-
-	$form['#tree'] = TRUE;
-
-	$submitted_ts = $data['submitted_ts'];
-	if ($submitted_ts) {
-		$form['status'] = array('#markup' => '<p>Application submitted on <strong>' . date('l, F d Y - g:ia', $submitted_ts) . '</strong></p>');
-	}
-
-	$form['survey_wrap_open'] = array('#markup' => '<div id="survey_wrap" class="survey_wrap_inpage sirius-form">');
-
-	$form['survey'] = $survey_form;
-
-	$form['survey_wrap_close'] = array('#markup' => '</div>');
-	$form['#disabled'] = TRUE;
-
+	$form['review'] = array('#markup' => sirius_event_intake_application_render($application_node));
 	return $form;
 }

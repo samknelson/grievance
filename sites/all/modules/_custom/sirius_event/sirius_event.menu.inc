@@ -641,6 +641,34 @@ function sirius_event_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['sirius_log']['sirius_event_intake_application_manage/status'] = array(
+    'title' => 'Status',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_application_manage',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_application_manage.inc',
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_log']['sirius_event_intake_application_manage/ms'] = array(
+    'title' => 'Industries',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_application_manage_ms',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_application_manage_ms.inc',
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_log']['sirius_event_intake_application_manage/skill'] = array(
+    'title' => 'Skills',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_application_manage_skill',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_application_manage_skill.inc',
+    'weight' => 3,
+  );
+
   sirius_node_tab_set_module('sirius_event', $node_tabs);
 	return $node_tabs;
 }

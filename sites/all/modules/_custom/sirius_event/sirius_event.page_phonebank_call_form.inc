@@ -375,7 +375,11 @@ function sirius_event_phonebank_prep_survey(&$form, $defaults, $settings) {
 					$form[$key]['#title'] = '<span class="title_wrap">' . $form[$key]['#title'] . '</span>';
 				}
 				if ($form[$key]['#description']) {
-					$form[$key]['#description'] = '<div class="sirius_ckstyles_script_instructions">' . $form[$key]['#description'] . '</div>';	
+					if ($settings['hide_instructions']) {
+						unset($form[$key]['#description']);
+					} else {
+						$form[$key]['#description'] = '<div class="sirius_ckstyles_script_instructions">' . $form[$key]['#description'] . '</div>';	
+					}
 				}
 
 				if ($settings['phonebank']['autosave']['field'] == 'Yes') {
