@@ -1107,8 +1107,8 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		if ($data['subject']) {
 			$log_body .= "Subject: " . $data['subject'] . "\n";
 		}
-		if ($data['format'] == 'sms') {
-			$log_body .= "Message: " . $data['body'] . "\n";
+		if ($data['body']) {
+			$log_body .= "Message: " . drupal_html_to_text($data['body']) . "\n";
 		}
 
 	  global $user;
