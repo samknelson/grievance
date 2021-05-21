@@ -46,12 +46,23 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 	if ($participant_node) {
 		$html .= sirius_fakerender_field('Participant', l($participant_node->title, 'node/' . $participant_node->nid . '/sirius_event_participant_comments'));
 	}
+	$assignment = sirius_event_intake_application_assignment_get($application_node);
+	if ($assignment && $assignment['name']) {
+		$html .= sirius_fakerender_field('Assigned To', $assignment['name'] . ' (' . date('l, F d Y - g:ia', $assignment['ts']) . ')');
+	}
+
 
 	$form['intro'] = array('#markup' => $html);
 
 	$status = $application_node->field_sirius_type['und'][0]['value'];
 
 	$actions = array(NULL => t('-- Select --'));
+
+	$assignment_options = sirius_event_intake_application_assignment_options($event_node);
+	if ($assignment_options) { 
+		$actions['assign'] = t('Assign');
+	}
+
 	if ($status == 'draft' || $status == 'rejected') {
 		$actions['submit'] = t('Submit');
 	}
@@ -70,6 +81,7 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 
 	if ($status == 'accepted') {
 		$actions['resend'] = t('Resend Accepted Notification');
+		$actions['complete'] = t('Mark application as "Complete"');
 	}
 
 	if ($actions) {
@@ -79,7 +91,13 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 			'#options' => $actions,
 			'#required' => TRUE,
 		);
-
+	  $form['assign'] = array(
+	  	'#type' => 'select',
+	  	'#title' => t('Assign To'),
+	  	'#options' => array(NULL => t('-- Select --')) + $assignment_options,
+	  	'#default_value' => $assignment['name'],
+			'#states' => array('visible' => array(":input[name=\"action\"]" => array('value' => 'assign'))),
+	  );
 
 		$status_options = array(NULL => t('-- Select --'));
 
@@ -264,10 +282,8 @@ function sirius_node_tab_event_intake_application_manage_form_submit($form, &$fo
 	}
 
 	if ($action == 'submit') {
-		$application_node->field_sirius_type['und'][0]['value'] = 'submitted';
-		sirius_jsonfield_log($application_node, "status_set", "Changed status to submitted");
-		node_save($application_node);
-		drupal_set_message("Status set to \"submitted\".");
+		$result = sirius_event_intake_application_submit($application_node);
+		if ($result['success']) { drupal_set_message($result['msg']); } else { drupal_set_message($result['msg'], 'warning'); }
 	}
 
 	if ($action == 'reject') {
@@ -476,4 +492,23 @@ function sirius_node_tab_event_intake_application_manage_form_submit($form, &$fo
 			array('application_node' => $application_node, 'worker_node' => $worker_node, 'participant_node' => $participant_node, 'event_node' => $event_node)
 		);
 	}
+
+	if ($action == 'assign') {
+		$assignment_name = $form_state['values']['assign'];
+		$result = sirius_event_intake_application_assignment_set($application_node, $assignment_name);
+		if ($result['success']) {
+			drupal_set_message($result['msg']); 
+		} else {
+			drupal_set_message($result['msg'], 'warning');
+		}
+	}
+
+	if ($action == 'complete') {
+		$result = sirius_event_intake_application_complete($application_node);
+		if ($result['success']) {
+			drupal_set_message($result['msg']); 
+		} else {
+			drupal_set_message($result['msg'], 'warning');
+		}
+	}	
 }

@@ -660,14 +660,26 @@ function sirius_event_node_tabs() {
     'weight' => 2,
   );
 
-  $node_tabs['sirius_log']['sirius_event_intake_application_manage/skill'] = array(
-    'title' => 'Skills',
+  $node_tabs['sirius_log']['sirius_event_intake_application_manage/skills-unverified'] = array(
+    'title' => 'Unverified Skills',
     'description' => '',
     'callback' => 'sirius_node_tab_event_intake_application_manage_skill',
     'permissions' => array('sirius'),
     'file' => 'sirius_event.page_intake_application_manage_skill.inc',
     'weight' => 3,
+    'callback arguments' => array('unverified'),
   );
+
+  $node_tabs['sirius_log']['sirius_event_intake_application_manage/skills-verified'] = array(
+    'title' => 'Verified Skills',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake_application_manage_skill',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake_application_manage_skill.inc',
+    'weight' => 4,
+    'callback arguments' => array('verified'),
+  );
+
 
   sirius_node_tab_set_module('sirius_event', $node_tabs);
 	return $node_tabs;

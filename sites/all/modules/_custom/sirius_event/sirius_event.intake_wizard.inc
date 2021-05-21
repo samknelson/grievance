@@ -1036,10 +1036,12 @@ function sirius_event_intake_wizard_deliver_form_submit($form, &$form_state) {
 
 	$data['submitted_ts'] = time();
 
-	$application_node->field_sirius_type['und'][0]['value'] = 'submitted';
-	sirius_jsonfield_log($application_node, "submitted", "Application submitted.");
-	sirius_event_intake_set_title($application_node);
-	sirius_wizard_submit($info, $data, $application_node, $current_step, "Response saved.", array('nonsequential' => TRUE));
+	$result = sirius_event_intake_application_submit($application_node);
+	if ($result['success']) { 
+		sirius_wizard_submit($info, $data, $application_node, $current_step, "Response saved.", array('nonsequential' => TRUE));
+	} else {
+		drupal_set_message($result['msg'], 'warning');
+	}
 }
 
 /************************************************************************************************

@@ -51,6 +51,22 @@ function sirius_node_tab_event_intake_applications_list_form($form, &$form_state
 		'#options' => array(NULL => t('-- All Statuses --')) + $intake_status_options,
 	);
 
+	$form['filters']['status'] = array(
+		'#type' => 'select',
+		'#title' => t('Status'),
+		'#options' => array(NULL => t('-- All Statuses --')) + $intake_status_options,
+	);
+
+	$assignment_options = sirius_event_intake_application_assignment_options($event_node);
+	if ($assignment_options) {
+		$form['filters']['assignment_name'] = array(
+			'#type' => 'select',
+			'#title' => t('Assignment'),
+			'#options' => array(NULL => t('-- All Assignments --')) + $assignment_options,
+		);
+		if ($_GET['assignment_name']) { $form['filters']['assignment_name']['#default_value'] = $_GET['assignment_name']; }
+	}
+
 	$form['filters']['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Filter'),
@@ -77,7 +93,6 @@ function sirius_node_tab_event_intake_applications_list_form($form, &$form_state
 			$worker_node = sirius_log_handler($application_node, 'sirius_worker');
 			$participant_node = sirius_log_handler($application_node, 'sirius_event_participant');
 
-
 			$application_json = sirius_jsonfield_util_node_json_get($application_node);
 			$submitted_ts = $application_json['wizard']['intake']['submitted_ts'];
 			if ($submitted_ts) {
@@ -86,6 +101,8 @@ function sirius_node_tab_event_intake_applications_list_form($form, &$form_state
 				$datestr = '';
 			}
 
+			$assignment = sirius_event_intake_application_assignment_get($application_node);
+
 			$name = $application_json['wizard']['intake']['identity']['name_first'] . ' ' . $application_json['wizard']['intake']['identity']['name_last'];
 			$filter_name = $form_state['values']['filters']['name'];
 			if ($filter_name) {
@@ -93,6 +110,12 @@ function sirius_node_tab_event_intake_applications_list_form($form, &$form_state
 				$filter_name = strtolower($filter_name);
 				$filter_name = trim($filter_name);
 				if (!preg_match('/' . $filter_name . '/i', $name)) { continue; }
+			}
+
+			$filter_assignment_name = $form_state['values']['filters']['assignment_name'];
+			if (!isset($filter_assignment_name)) { $filter_assignment_name = $_GET['assignment_name']; }
+			if ($filter_assignment_name) {
+				if ($filter_assignment_name != $assignment['name']) { continue; }
 			}
 
 			$status = $application_node->field_sirius_type['und'][0]['value'];
@@ -107,13 +130,20 @@ function sirius_node_tab_event_intake_applications_list_form($form, &$form_state
 			$row[] = $intake_status_options[$status];
 			$row[] = $datestr;
 			$row[] = $name;
-			$row[] = sirius_phone_render($application_json['wizard']['intake']['phone']);
-			$row[] = sirius_email_render($application_json['wizard']['intake']['email']);
+			$row[] = sirius_phone_render($application_json['wizard']['intake']['phone']) . '<br />' . sirius_email_render($application_json['wizard']['intake']['email']);
+			if ($assignment_options) { $row[] = $assignment['name']; }
 			$row[] = $tools;
 			$rows[] = $row;
 		}
 
-		$header = array('Status', 'Date', 'Name', 'Phone', 'Email', 'Tools');
+		$header = array();
+		$header[] = 'Status';
+		$header[] = 'Date';
+		$header[] = 'Name';
+		$header[] = 'Contact';
+		if ($assignment_options) { $header[] = 'Assignment'; }
+		$header[] = 'Tools';
+
 		$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => array('sirius_materials'))));
   }
 

@@ -16,6 +16,8 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.class.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.interestlist.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.intake.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.intake_settings.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.intake_assignment.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.intake_wizard.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.vbo.inc";
 
@@ -360,7 +362,7 @@ function sirius_event_notify($main_node, $email, $phone, $msg, $tokens) {
 
   $success_msg = '';
   $failure_msg = '';
-  if (in_array($medium, array('sms', 'both')) && $phone) {
+  if (in_array($medium, array('sms', 'both')) && $phone && $sms) {
     $params = array();
     $params['sms'] = $sms;
     $params['to'] = $phone;
@@ -369,7 +371,7 @@ function sirius_event_notify($main_node, $email, $phone, $msg, $tokens) {
     else { $failure_msg .= "SMS message to $phone failed: $result[msg]"; }
   }
 
-  if (in_array($medium, array('email', 'both')) && $phone) {
+  if (in_array($medium, array('email', 'both')) && $email && $email_subject) {
     $params = array();
     $params['subject'] = $email_subject;
     $params['body'] = $email_body;

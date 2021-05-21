@@ -43,6 +43,28 @@ function sirius_node_tab_event_intake_application_manage_ms_form($form, &$form_s
   	'#title' => t('Add These Member Status / Industries'),
   );
 
+ 	$assignment_options = sirius_event_intake_application_assignment_options($event_node);
+	if ($assignment_options) { 
+		$assignment = sirius_event_intake_application_assignment_get($application_node);
+	  $form['assign'] = array(
+	  	'#type' => 'select',
+	  	'#title' => t('Assign To'),
+	  	'#options' => array(NULL => t('-- Select --')) + $assignment_options,
+	  	'#default_value' => $assignment['name'],
+	  );
+	}
+
+	if ($application_node->field_sirius_type['und'][0]['value'] != 'complete') { 
+	  $form['complete'] = array(
+	  	'#type' => 'select',
+	  	'#title' => t('Mark application as "Complete"'),
+	  	'#options' => array('No' => t('No'), 'Yes' => t('Yes')),
+	  	'#default_value' => 'No',
+	  	'#description' => t('Marking an application as "complete" will clear any assignments, and remove it from the queue of entries needing to be reviewed.'),
+	  );
+	}
+
+
   $form['submit'] = array(
   	'#type' => 'submit',
   	'#value' => t('Submit'),
@@ -96,6 +118,24 @@ function sirius_node_tab_event_intake_application_manage_ms_form_submit($form, &
 		  }
 		}
 	}
+
+	if (isset($form_state['values']['assign'])) {
+		$result = sirius_event_intake_application_assignment_set($application_node, $form_state['values']['assign']);
+		if ($result['success']) {
+			drupal_set_message($result['msg']); 
+		} else {
+			drupal_set_message($result['msg'], 'warning');
+		}
+	}
+
+	if ($form_state['values']['complete'] == 'Yes') {
+		$result = sirius_event_intake_application_complete($application_node);
+		if ($result['success']) {
+			drupal_set_message($result['msg']); 
+		} else {
+			drupal_set_message($result['msg'], 'warning');
+		}
+	}	
 }
 
 function sirius_node_tab_event_intake_application_manage_ms_options($event_json) {
