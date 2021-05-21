@@ -293,6 +293,9 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 
       $classes = 'grievance-recipient ';
 
+      if ($nodupes[$recipient['email']]) { continue; }
+      $nodupes[$recipient['email']] = TRUE;
+
 			$type_text = '';
 			if ($recipient['contact_types']) {
 				$type_text = '<div class="field-name-field-grievance-contact-types">';
