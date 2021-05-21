@@ -66,7 +66,11 @@ function sirius_node_tab_access($node, $in_tab_name) {
   sirius_node_tab_handle_requires($tab_record);
   $access_function_name = $tab_record['callback'] . '_access';
   if (function_exists($access_function_name)) {
-    if (!$access_function_name($node)) { return FALSE; }
+    $args = array($node);
+    if ($tab_record['callback arguments']) {
+      $args = array_merge($args, $tab_record['callback arguments']);
+    }
+    if (!call_user_func_array($access_function_name, $args)) { return FALSE; }
   }
   
   return TRUE;
