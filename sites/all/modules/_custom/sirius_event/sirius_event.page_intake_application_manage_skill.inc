@@ -1,6 +1,7 @@
 <?php
 
-function sirius_node_tab_event_intake_application_manage_skill_access($application_node, $skill_category) {
+function sirius_node_tab_event_intake_application_manage_skill_access($application_node, $skill_category = NULL) {
+	if (!$skill_category) { return FALSE; }
 	// Must be an application-type log entry
 	if ($application_node->field_sirius_category['und'][0]['value'] != 'event:intake_application') { return FALSE; }
 
