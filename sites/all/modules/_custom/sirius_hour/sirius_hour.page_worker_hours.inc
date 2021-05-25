@@ -73,8 +73,6 @@ function sirius_hour_node_tab_worker_hours_form($form, &$form_state, $worker_nod
 		$rate = 0;
 		if ($hr['hours'] > 0) { $rate = round($hr['total'] / $hr['hours'], 2); } else { $rate = 0; }
 
-
-
 		$row = array();
 		$row[] = $hr['year'];
 		$row[] = $hr['month'];
@@ -89,19 +87,20 @@ function sirius_hour_node_tab_worker_hours_form($form, &$form_state, $worker_nod
 
 		$rows[] = $row;
 
-		$totals[$hr['department_name']] += round($hr['hours'], 2);
-		$grand_total += round($hr['hours'], 2);
+		$totals[$hr['hours_type_name']][$hr['department_name']] += round($hr['hours'], 2);
+		$grand_totals[$hr['hours_type_name']] += round($hr['hours'], 2);
 	}
 
-	$html = '<h2>' . t('Summary') . '</h2>';
-	$html .= '<ul>';
-	foreach ($totals as $key => $value) {
-		$html .= '<li>';
-		$html .= "$key: $value";
-		$html .= '</li>';
+	foreach ($grand_totals as $hours_type_name => $total) {
+		$html .= "<strong>$hours_type_name: $total</strong>";
+		$html .= '<ul>';
+		foreach ($totals[$hours_type_name] as $department_name => $subtotal) {
+			$html .= '<li>';
+			$html .= "$department_name: $subtotal";
+			$html .= '</li>';
+		}
+		$html .= '</ul>';
 	}
-	$html .= "<li>Grand Total: $grand_total</li>";
-	$html .= '</ul>';
 	$form['hours_summary'] = array('#markup' => $html);
 
 	$header = array(
