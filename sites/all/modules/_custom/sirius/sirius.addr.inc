@@ -97,10 +97,24 @@ function sirius_addr_validate($addr) {
 
 function sirius_addr_format_oneline($addr) {
 	// 123 Fake St., Apt 11, Beacon, NY 12508	
+	if (!$addr) { return ''; }
 	$txt = $addr['thoroughfare'] . ', ';
 	if ($addr['premise']) { $txt .= $addr['premise'] . ', '; }
 	$txt .= $addr['locality'] . ', ';
 	$txt .= $addr['administrative_area'] . ' ' . $addr['postal_code'];
+	return $txt;
+}
+
+
+function sirius_addr_format_html($addr) {
+	// 123 Fake St.<br />Apt 11<br />Beacon, NY 12508	
+	if (!$addr) { return ''; }
+	$txt = '<div class="sirius_addr">';
+	if ($addr['thoroughfare']) 				{ $txt = '<span class="sirius_addr_thoroughfare">' . $addr['thoroughfare'] . '</span><br />'; }
+	if ($addr['premise']) 						{ $txt .= '<span class="sirius_addr_premise">' . $addr['premise'] . '</span>' . '<br />'; }
+	if ($addr['locality']) 						{ $txt .= '<span class="sirius_addr_locality">' . $addr['locality'] . '</span>, '; }
+	if ($addr['administrative_area']) { $txt .= '<span class="sirius_addr_administrative_area">' . $addr['administrative_area'] . '</span> '; }
+	if ($addr['postal_code'])					{ $txt .= '<span class="sirius_addr_postal_code">' . $addr['postal_code'] . '</span>'; }
 	return $txt;
 }
 
