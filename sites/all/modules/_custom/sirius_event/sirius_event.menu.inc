@@ -161,20 +161,10 @@ function sirius_event_node_tabs() {
   $node_tabs['sirius_event']['sirius_event_intake'] = array(
     'title' => 'Intake',
     'description' => '',
-    'callback' => 'sirius_node_tab_event_intake',
+    'callback' => 'sirius_node_tab_event_intake_applications',
     'permissions' => array('sirius'),
     'weight' => 5,
-    'file' => 'sirius_event.page_intake.inc',
-  );
-
-  $node_tabs['sirius_event']['sirius_event_intake/info'] = array(
-    'title' => 'Info',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_intake',
-    'permissions' => array('sirius'),
-    'file' => 'sirius_event.page_intake.inc',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 1,
+    'file' => 'sirius_event.page_intake_applications.inc',
   );
 
   $node_tabs['sirius_event']['sirius_event_intake/applications'] = array(
@@ -183,6 +173,16 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_intake_applications',
     'permissions' => array('sirius'),
     'file' => 'sirius_event.page_intake_applications.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_event']['sirius_event_intake/info'] = array(
+    'title' => 'Info',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_intake',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_intake.inc',
     'weight' => 2,
   );
 

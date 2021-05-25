@@ -111,6 +111,7 @@ function sirius_event_page_landing_render($event_nodes, $participant_nodes = arr
 		$paths['node/' . $event_nid . '/sirius_event_participants_current'] = t('Participants');
 		$paths['node/' . $event_nid . '/sirius_event_phonebank/call'] = t('Phone Bank');
 		$paths['node/' . $event_nid . '/sirius_event_map'] = t('Map');
+		$paths['node/' . $event_nid . '/sirius_event_intake'] = t('Intake');
 
 
 		foreach ($paths as $path => $name) {
