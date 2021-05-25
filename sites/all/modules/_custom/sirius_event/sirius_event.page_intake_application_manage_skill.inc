@@ -217,6 +217,24 @@ function sirius_node_tab_event_intake_application_manage_skill_form_submit($form
 		}
   	++$delta;
   }
+
+	if (isset($form_state['values']['assign'])) {
+		$result = sirius_event_intake_application_assignment_set($application_node, $form_state['values']['assign']);
+		if ($result['success']) {
+			drupal_set_message($result['msg']); 
+		} else {
+			drupal_set_message($result['msg'], 'warning');
+		}
+	}
+
+	if ($form_state['values']['complete'] == 'Yes') {
+		$result = sirius_event_intake_application_complete($application_node);
+		if ($result['success']) {
+			drupal_set_message($result['msg']); 
+		} else {
+			drupal_set_message($result['msg'], 'warning');
+		}
+	}	
 }
 
 function sirius_node_tab_event_intake_application_manage_skill_options($event_json, $skill_category) {

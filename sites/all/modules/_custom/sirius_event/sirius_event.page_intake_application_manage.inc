@@ -51,7 +51,6 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 		$html .= sirius_fakerender_field('Assigned To', $assignment['name'] . ' (' . date('l, F d Y - g:ia', $assignment['ts']) . ')');
 	}
 
-
 	$form['intro'] = array('#markup' => $html);
 
 	$status = $application_node->field_sirius_type['und'][0]['value'];
@@ -99,8 +98,16 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 			'#states' => array('visible' => array(":input[name=\"action\"]" => array('value' => 'assign'))),
 	  );
 
-		$status_options = array(NULL => t('-- Select --'));
 
+ 		$id2_info = field_info_instance('node', 'field_sirius_id2', 'sirius_worker');
+ 		$id2_label = $id2_info['label'];
+		$form['id2'] = array(
+			'#type' => 'textfield',
+			'#title' => $id2_label,
+			'#states' => array('visible' => array(":input[name=\"action\"]" => array('value' => 'accept'))),
+		);
+
+		$status_options = array(NULL => t('-- Select --'));
 		$signed_out_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
 		$status_options[$signed_out_tid] = 'Not Available (SIGNED OUT)';
 		$signed_in_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available');
@@ -261,6 +268,13 @@ function sirius_node_tab_event_intake_application_manage_form_validate($form, &$
 		if (sirius_worker_get_by_ssn($ssn)) {
 			form_set_error('action', 'There is an existing worker with the same SSN as this application.');
 		}
+
+		$id2 = trim($form_state['values']['id2']);
+		if (!$id2) {
+			form_set_error('id2', 'Please enter an ID.');
+		} else if	(sirius_worker_get_by_id2($id2)) {
+			form_set_error('id2', 'There is already a worker with this ID.');
+		}
 	}
 
 }
@@ -327,6 +341,9 @@ function sirius_node_tab_event_intake_application_manage_form_submit($form, &$fo
 	  $worker_node->field_sirius_phone['und'][0]['value'] = $application_json['wizard']['intake']['phone'];
 	  $worker_node->field_sirius_email['und'][0]['value'] = $application_json['wizard']['intake']['email'];
 	  $worker_node->field_sirius_ssn['und'][0]['value'] = $application_json['wizard']['intake']['identity']['ssn'];
+
+		$id2 = trim($form_state['values']['id2']);
+		if ($id2) { $worker_node->field_sirius_id2['und'][0]['value'] = $id2; }
 
 	  $addr = $application_json['wizard']['intake']['addr'];
 	  $addr['country'] = 'US';

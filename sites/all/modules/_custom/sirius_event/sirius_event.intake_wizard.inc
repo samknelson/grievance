@@ -136,6 +136,16 @@ function sirius_event_intake_wizard_intro_form($form, &$form_state, $info, $data
 		'#size' => 14,
 	);
 
+	$form['identity']['dob'] = array(
+		'#type' => 'date_popup',
+		'#title' => t('Date of Birth'),
+		'#default_value' => $data['identity']['ssn'],
+		'#required' => TRUE,
+    '#attributes' => array('autocomplete' => 'off'),
+		'#date_format' => 'm/d/Y',
+		'#default_value' => $data['identity']['dob'],
+	);
+
 	$form['survey_wrap_close'] = array('#markup' => '</div>');
 
 	if (sirius_event_intake_wizard_locked($event_node, $application_node)) {
