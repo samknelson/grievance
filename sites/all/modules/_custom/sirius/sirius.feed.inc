@@ -943,7 +943,10 @@ function sirius_feed_wizard_process_finish($feed_node, $info, $data, $idx, &$con
   $file = file_move($file, 'private://attach_' . rand() . '.csv');
   $feed_node->field_sirius_attachments['und'][1] = (array) $file;
 
-	sirius_wizard_submit($info, $data, $feed_node, 'process', "Import complete");
+  $ts = time();
+  $elapsed = $ts - $data['process_ts'];
+
+	sirius_wizard_submit($info, $data, $feed_node, 'process', "Import complete. Elapsed time: " .  format_interval($elapsed));
 }
 
 /************************************************************************************************
