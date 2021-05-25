@@ -22,7 +22,7 @@ function sirius_node_tab_event_participant_json_access($participant_node, $which
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
 	$all_rules = $json['participants']['rules'];
-	if (user_access('sirius_event_admin')) {
+	if (user_access('sirius event admin')) {
 		$rules = $all_rules;
 	} else {
 		$rules = sirius_event_paccess_rule_match($event_node->nid, $all_rules, TRUE);
