@@ -61,6 +61,20 @@ function sirius_worker_get_by_id($id) {
 	return node_load(array_keys($stmt['node'])[0]);
 }
 
+function sirius_worker_get_by_id2($id) {
+  if (!$id) { return NULL; }
+
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_worker');
+  $query->fieldCondition('field_sirius_id2', 'value', $id);
+  $query->propertyOrderBy('nid', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
 function sirius_worker_get_by_contact_nid($contact_nid, $nid_only = FALSE) {
   if (!$contact_nid) { return NULL; }
 
