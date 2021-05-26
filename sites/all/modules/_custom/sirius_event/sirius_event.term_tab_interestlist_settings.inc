@@ -60,18 +60,14 @@ function sirius_event_term_tab_interestlist_settings_form($form, &$form_state, $
 		// field_sirius_member_active
 
 		$ws_terms = sirius_taxonomy_load('sirius_work_status', 'tid', 'full');
-		$dispatch_available_names = array();
-		$active_member_names = array();
 		$ws_options = array();
 		foreach ($ws_terms as $ws_tid => $ws_term) {
 			$ws_options[$ws_tid] = $ws_term->name;
 			if ($ws_term->field_sirius_dispatch_available['und'][0]['value'] == 'Yes') {
 				$ws_options[$ws_tid] .= ' [dispatch available]';
-				$dispatch_available_names[] = $ws_term->name;
 			}
 			if ($ws_term->field_sirius_member_active['und'][0]['value'] == 'Yes') {
 				$ws_options[$ws_tid] .= ' [active member]';
-				$active_member_names[] = $ws_term->name;
 			}
 		}
 
@@ -83,8 +79,7 @@ function sirius_event_term_tab_interestlist_settings_form($form, &$form_state, $
 				NULL => t('No'),
 				'Yes' => ('Yes'),
 			),
-			'#default_value' => $form['interestlist']['settings']['self_register']['ws_dispatch_available'],
-			'#prefix' => "<p>The following work statuses \"Dispatch Available\": <strong>$dispatch_available_name</strong></p>",
+			'#default_value' => $event_type_json['interestlist']['settings']['self_register']['ws_dispatch_available'],
 		);
 
 		$form['interestlist']['settings']['self_register']['ws_member_active'] = array(
@@ -95,8 +90,7 @@ function sirius_event_term_tab_interestlist_settings_form($form, &$form_state, $
 				NULL => t('No'),
 				'Yes' => ('Yes'),
 			),
-			'#default_value' => $form['interestlist']['settings']['self_register']['ws_dispatch_available'],
-			'#prefix' => "<p>The following work stauses are flagged \"Active Member\": <strong>$active_member_name</strong></p>",
+			'#default_value' => $event_type_json['interestlist']['settings']['self_register']['ws_member_active'],
 		);
 
 		$form['interestlist']['settings']['self_register']['ws_tids'] = array(

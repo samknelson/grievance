@@ -22,6 +22,34 @@ function sirius_event_term_tab_interestlist_self_access($event_type_term) {
 		}
 	}
 
+	// Check that the worker has a suitable work status
+	if ($interestlist_json['interestlist']['settings']['self_register']['ws_tids']) {
+		$interestlist_ws_tids = array_filter(array_values($interestlist_json['interestlist']['settings']['self_register']['ws_tids']));
+		if ($interestlist_ws_tids) {
+			$worker_node = sirius_worker_get();
+			if (!$worker_node) { return FALSE; }
+			$my_ws_tids = sirius_fieldvals($worker_node, 'field_sirius_work_status', 'tid');
+			if (!array_intersect($my_ws_tids, $interestlist_ws_tids)) { return FALSE; }
+		}
+	}
+
+	if ($interestlist_json['interestlist']['settings']['self_register']['ws_dispatch_available']) {
+		$worker_node = sirius_worker_get();
+		if (!$worker_node) { return FALSE; }
+		$my_ws_tid = $worker_node->field_sirius_work_status['und'][0]['tid'];
+		$my_ws_term = taxonomy_term_load($my_ws_tid);
+		if (!$my_ws_term) { return FALSE; }
+		if ($my_ws_term->field_sirius_dispatch_available['und'][0]['value'] != 'Yes') { return FALSE; }
+	}
+
+	if ($interestlist_json['interestlist']['settings']['self_register']['ws_member_active']) {
+		$worker_node = sirius_worker_get();
+		if (!$worker_node) { return FALSE; }
+		$my_ws_tid = $worker_node->field_sirius_work_status['und'][0]['tid'];
+		$my_ws_term = taxonomy_term_load($my_ws_tid);
+		if (!$my_ws_term) { return FALSE; }
+		if ($my_ws_term->field_sirius_member_active['und'][0]['value'] != 'Yes') { return FALSE; }
+	}
 
 	return TRUE;
 }

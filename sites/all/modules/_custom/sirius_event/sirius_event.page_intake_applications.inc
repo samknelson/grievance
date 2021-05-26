@@ -49,6 +49,9 @@ function sirius_node_tab_event_intake_applications_list_form($form, &$form_state
 		'#type' => 'checkboxes',
 		'#title' => t('Status'),
 		'#options' => $intake_status_options,
+		'#prefix' => "<div class=\"checkboxes-inline\">",
+		'#suffix' => '</div><br clear="left" />',
+		// '#multiple' => TRUE,
 	);
 
 	$assignment_options = sirius_event_intake_application_assignment_options($event_node);
@@ -89,8 +92,13 @@ function sirius_node_tab_event_intake_applications_list_form($form, &$form_state
 	$form['filters']['display_fields'] = array(
 		'#title' => 'Display Fields',
 		'#type' => 'checkboxes',
+		'#multiple' => TRUE,
 		'#options' => $display_field_options,
 		'#default_value' => $display_fields,
+		'#prefix' => "<div class=\"checkboxes-inline\">",
+		'#suffix' => '</div><br clear="left" />',
+		// '#multiple' => TRUE,
+		// '#attributes' => array('class' => array('sirius_twocol_select')),
 	);
 
 	$form['filters']['output'] = array(
