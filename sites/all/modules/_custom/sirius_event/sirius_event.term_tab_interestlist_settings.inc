@@ -67,10 +67,10 @@ function sirius_event_term_tab_interestlist_settings_form($form, &$form_state, $
 			if ($ws_term->field_sirius_member_active['und'][0]['value'] == 'Yes') { $active_member_names[] = $ws_term->name; }
 		}
 
-		$dispatch_available_name = join(' / ', $dispatch_available_names);
+		$dispatch_available_name = join(', ', $dispatch_available_names);
 		if (!$dispatch_available_name) { $dispatch_available_name = '[no work statuses]'; }
 
-		$active_member_name = join(' / , $active_member_names);
+		$active_member_name = join(', ', $active_member_names);
 		if (!$active_member_name) { $active_member_name = '[no work statuses]'; }
 
 		$form['interestlist']['settings']['self_register']['ws_dispatch_available'] = array(
