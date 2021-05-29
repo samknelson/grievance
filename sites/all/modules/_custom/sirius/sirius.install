@@ -171,3 +171,14 @@ function sirius_update_7010() {
   }
 }
 
+/**
+ * Enable dashboard
+ */
+
+function sirius_update_7011() {
+  $modules = array('sirius_dashboard');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
