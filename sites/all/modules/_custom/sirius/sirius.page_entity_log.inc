@@ -33,7 +33,12 @@ function sirius_node_tab_entity_log_form($form, &$form_state, $node) {
 		'#value' => 'Submit',
 	);
 
-	$form += sirius_log_render_form($node->nid);
+	$nids = array($node->nid);
+	if ($node->type == 'sirius_worker') {
+		if ($node->field_sirius_contact['und'][0]['target_id']) { $nids[] = $node->field_sirius_contact['und'][0]['target_id']; }
+	}
+
+	$form += sirius_log_render_form(join('+', $nids));
 
 	return $form;
 }
