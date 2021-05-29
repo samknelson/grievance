@@ -82,6 +82,32 @@ function sirius_dispatch_policy_sirius_jsonfield_form_definitions() {
 		'#description' => t('(This setting is ignored unless the worker count is set to "Fixed")'),
 	);
 
+	$form['workers']['ignore_prefs_skill'] = array(
+		'#type' => 'select', 
+		'#title' => 'Ignore Worker Preferences - Skill',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+	);
+	$form['workers']['ignore_prefs_dept'] = array(
+		'#type' => 'select', 
+		'#title' => 'Ignore Worker Preferences - Department',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+	);
+	$form['workers']['ignore_prefs_dnc'] = array(
+		'#type' => 'select', 
+		'#title' => 'Ignore Worker Preferences - Worker-Initiated DNC',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+	);
+	$form['workers']['ignore_prefs_cbn'] = array(
+		'#type' => 'select', 
+		'#title' => 'Ignore Worker Preferences - Call-by-Name Only',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+	);
+	$form['workers']['ignore_prefs_hfe'] = array(
+		'#type' => 'select', 
+		'#title' => 'Ignore Worker Preferences - Hold for Employer',
+		'#options' => array('No' => 'No', 'Yes' => 'Yes'),
+	);
+
 	$form['run'] = array(
 		'#type' => 'fieldset',
 		'#title' => 'Run Settings',

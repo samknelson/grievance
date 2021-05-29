@@ -218,15 +218,16 @@ function sirius_dispatch_term_tabs() {
     'weight' => 4,
   );
 
-  /*
-  $term_tabs['sirius_dispatch_job_type']['sirius_dispatch_job_type'] = array(
-    'title' => 'Policy',
+  $term_tabs['sirius_skill']['sirius_skill_dispatch'] = array(
+    'title' => 'Dispatch',
     'description' => '',
-    'callback' => 'sirius_dispatch_term_tab_job_type',
+    'callback' => 'sirius_dispatch_term_tab_skill',
     'permissions' => array('sirius dispatch admin'),
     'weight' => 4,
+    'file' => array('sirius_dispatch.term_tab_skill.inc'),
   );
-  */
+
+  sirius_node_tab_set_module('sirius_dispatch', $term_tabs);
 
   return $term_tabs;
 }

@@ -359,8 +359,8 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	$args[':industry_tid'] = $industry_tid;
 
 	// limit by skill
+	$skill_tid = $job_node->field_sirius_skill['und'][0]['tid'];
 	if (!$filters['ignore_skill']) {
-		$skill_tid = $job_node->field_sirius_skill['und'][0]['tid'];
 		if ($skill_tid) {
 			$sql .= "and exists (";
 			$sql .= "  select 1 from field_data_field_sirius_skill ";
@@ -369,8 +369,10 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 			$sql .= "  and field_sirius_skill_tid = :skill_tid ";
 			$sql .= ") ";
 			$args[':skill_tid'] = $skill_tid;
-		} 
+		}
+	}
 
+	if (!$filters['ignore_skill'] && ($job_policy['workers']['ignore_prefs_skill'] != 'Yes')) {
 		// Limit by skill avail -- which could be null, meaning all skills
 		if ($skill_tid) {
 			$sql .= "and ( ";
@@ -394,7 +396,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	}
 
 	// Limit by department avail -- which could be null, meaning all departments
-	if (!$filters['ignore_department']) {
+	if (!$filters['ignore_department'] && ($job_policy['workers']['ignore_prefs_dept'] != 'Yes')) {
 		$department_tid = $job_node->field_grievance_departments['und'][0]['tid'];
 		if ($department_tid) {
 			$sql .= "and not exists ( ";
@@ -459,13 +461,15 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	$sql .= ") ";
 
 	// Exclude employee-initiated DNCs
-	$sql .= "and not exists (";
-	$sql .= "  select 1 from field_revision_field_sirius_dispatch_dncs2 ";
-	$sql .= "  where field_revision_field_sirius_dispatch_dncs2.entity_type = 'node' ";
-	$sql .= "  and field_revision_field_sirius_dispatch_dncs2.entity_id = node.nid ";
-	$sql .= "  and field_sirius_dispatch_dncs2_target_id = :employer_nid2 ";
-	$sql .= ") ";
-	$args[':employer_nid2'] = $employer_nid;
+	if ($job_policy['workers']['ignore_prefs_dnc'] != 'Yes') {
+		$sql .= "and not exists (";
+		$sql .= "  select 1 from field_revision_field_sirius_dispatch_dncs2 ";
+		$sql .= "  where field_revision_field_sirius_dispatch_dncs2.entity_type = 'node' ";
+		$sql .= "  and field_revision_field_sirius_dispatch_dncs2.entity_id = node.nid ";
+		$sql .= "  and field_sirius_dispatch_dncs2_target_id = :employer_nid2 ";
+		$sql .= ") ";
+		$args[':employer_nid2'] = $employer_nid;
+	}
 
 	// Worker NID
 	if ($filters['worker_nid']) {
@@ -474,7 +478,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	}
 
 	// CBN
-	if (!$filters['ignore_cbn']) {
+	if (!$filters['ignore_cbn'] && ($job_policy['workers']['ignore_prefs_cbn'] != 'Yes')) {
 		if ($filters['cbn'] == 'No') {
 			$sql .= "and ( ";
 			$sql .= "  field_sirius_dispatch_cbn_value IS NULL ";
@@ -484,7 +488,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	}
 
 	// HFE
-	if (!$filters['ignore_hfe']) {
+	if (!$filters['ignore_hfe'] && ($job_policy['workers']['ignore_prefs_hfe'] != 'Yes')) {
 		if ($employer_nid) {
 			$sql .= "and ( ";
 			$sql .= "  field_sirius_dispatch_hfe_target_id = :hfe ";
@@ -709,16 +713,17 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 		return array('success' => FALSE, 'msg' => t('This worker is not able to work in the industry for this job.'));
 	}
 
+	$skill_tid = $job_node->field_sirius_skill['und'][0]['tid'];
 	if (!$filters['ignore_skill']) {
-		$skill_tid = $job_node->field_sirius_skill['und'][0]['tid'];
-
 		// limit by skill
 		if ($skill_tid) {
 			if (!in_array($skill_tid, sirius_fieldvals($worker_node, 'field_sirius_skill', 'tid'))) {
 				return array('success' => FALSE, 'msg' => t('The worker does not have the skill required by this job.'));
 			}
-		} 
+		}
+	}
 
+	if (!$filters['ignore_skill'] && ($job_policy['workers']['ignore_prefs_skill'] != 'Yes')) {
 		// Limit by skill avail -- which could be null, meaning all skills
 		$skills_avail = sirius_fieldvals($worker_node, 'field_sirius_skills_avail', 'tid');
 		if ($skill_tid && $skills_avail && !in_array($skill_tid, $skills_avail)) {
@@ -731,7 +736,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	}
 
 	// Limit by department avail -- which could be null, meaning all departments
-	if (!$filters['ignore_department']) {
+	if (!$filters['ignore_department'] && ($job_policy['workers']['ignore_prefs_dept'] != 'Yes')) {
 		$department_tid = $job_node->field_grievance_departments['und'][0]['tid'];
 		if ($department_tid) {
 			$department_tids = sirius_fieldvals($worker_node, 'field_grievance_departments', 'tid');
@@ -830,13 +835,14 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	}
 
 	// Exclude employee-initiated DNCs
-	$sql .= "and not exists (";
-	if ($employer_nid && in_array($employer_nid, sirius_fieldvals($worker_node, 'field_sirius_dispatch_dncs2', 'target_id'))) {
-		return array('success' => FALSE, 'msg' => t('The worker has placed a worker-initiated do-not-call on this employer.'));
+	if ($job_policy['workers']['ignore_prefs_dnc'] != 'Yes') {
+		if ($employer_nid && in_array($employer_nid, sirius_fieldvals($worker_node, 'field_sirius_dispatch_dncs2', 'target_id'))) {
+			return array('success' => FALSE, 'msg' => t('The worker has placed a worker-initiated do-not-call on this employer.'));
+		}
 	}
 
 	// CBN
-	if (!$filters['ignore_cbn']) {
+	if (!$filters['ignore_cbn'] && ($job_policy['workers']['ignore_prefs_cbn'] != 'Yes')) {
 		if ($filters['cbn'] == 'No') {
 			if (sirius_fieldval($worker_node, 'field_sirius_dispatch_cbn', 'value') == 'Yes') {
 				return array('success' => FALSE, 'msg' => t('The worker has requested to only receive call-by-names.'));
@@ -845,7 +851,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	}
 
 	// HFE
-	if (!$filters['ignore_hfe']) {
+	if (!$filters['ignore_hfe'] && ($job_policy['workers']['ignore_prefs_hfe'] != 'Yes')) {
 		$hfe = sirius_fieldval($worker_node, 'field_sirius_dispatch_hfe', 'target_id');
 		$hfe_ts = sirius_fieldval($worker_node, 'field_sirius_dispatch_hfe_until', 'ts');
 		if ($employer_nid && $hfe && $hfe != $employer_nid && $hfe_ts > time()) {

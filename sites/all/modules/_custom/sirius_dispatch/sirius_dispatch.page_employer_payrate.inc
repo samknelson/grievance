@@ -6,7 +6,7 @@ function sirius_node_tab_employer_dispatch_payrate($employer_node) {
 
 function sirius_node_tab_employer_dispatch_payrate_form($form, &$form_state, $employer_node) {
 	$form_state['employer_nid'] = $employer_node->nid;
-	$skills = sirius_taxonomy_load('sirius_skill', 'tid', 'name');
+	$skills = sirius_dispatch_skill_options();
 	$member_statuses = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
 	$json = json_decode($employer_node->field_sirius_json['und'][0]['value'], TRUE);
 
