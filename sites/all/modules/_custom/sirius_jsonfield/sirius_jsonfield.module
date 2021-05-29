@@ -182,12 +182,8 @@ function sirius_jsonfield_field_formatter_view($entity_type, $entity, $field, $i
     } else if ($display['type'] == 'sirius_jsonfield_formatter_raw') {
       $markup = $items[$delta]['value'];
     } else if ($display['type'] == 'sirius_jsonfield_formatter_single') {
-      list ($part1, $part2) = explode(':', $display['settings']['sub_name']);
-      if ($part2) {
-        $markup = $value[$part1][$part2];
-      } else {
-        $markup = $value[$part1];
-      }
+      $path = $display['settings']['sub_name'];
+      $markup = sirius_jsonfield_util_get_from_path($value, $path);
     }
     $result[] = array('#markup' => $markup);
   }
