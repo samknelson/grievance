@@ -27225,6 +27225,7 @@ Grievance Form',
   $handler->display->display_options['arguments']['field_sirius_log_handler_target_id']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['field_sirius_log_handler_target_id']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['field_sirius_log_handler_target_id']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['field_sirius_log_handler_target_id']['break_phrase'] = TRUE;
   /* Contextual filter: Content: Category (field_sirius_category) */
   $handler->display->display_options['arguments']['field_sirius_category_value']['id'] = 'field_sirius_category_value';
   $handler->display->display_options['arguments']['field_sirius_category_value']['table'] = 'field_data_field_sirius_category';
@@ -30044,6 +30045,15 @@ Grievance Form',
     'thousand_separator' => '',
     'prefix_suffix' => 1,
   );
+  /* Field: Field: JSON */
+  $handler->display->display_options['fields']['field_sirius_json']['id'] = 'field_sirius_json';
+  $handler->display->display_options['fields']['field_sirius_json']['table'] = 'field_data_field_sirius_json';
+  $handler->display->display_options['fields']['field_sirius_json']['field'] = 'field_sirius_json';
+  $handler->display->display_options['fields']['field_sirius_json']['label'] = 'Show on Job Creation?';
+  $handler->display->display_options['fields']['field_sirius_json']['type'] = 'sirius_jsonfield_formatter_single';
+  $handler->display->display_options['fields']['field_sirius_json']['settings'] = array(
+    'sub_name' => 'dispatch:job:available',
+  );
   /* Field: Taxonomy term: Term description */
   $handler->display->display_options['fields']['description']['id'] = 'description';
   $handler->display->display_options['fields']['description']['table'] = 'taxonomy_term_data';
@@ -30087,7 +30097,8 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Actions';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>
+<a href="/taxonomy/term/[tid]/sirius_skill_dispatch?destination=sirius/taxonomy/!1" class="tool-button">Dispatch Setitings</a>';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
   /* Filter criterion: Field: Industry (field_sirius_industry) */
@@ -30544,7 +30555,6 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_dispatch_available']['id'] = 'field_sirius_dispatch_available';
   $handler->display->display_options['fields']['field_sirius_dispatch_available']['table'] = 'field_data_field_sirius_dispatch_available';
   $handler->display->display_options['fields']['field_sirius_dispatch_available']['field'] = 'field_sirius_dispatch_available';
-  $handler->display->display_options['fields']['field_sirius_dispatch_available']['label'] = 'Available for Dispatch?';
   /* Field: Taxonomy term: Member? */
   $handler->display->display_options['fields']['field_sirius_member_active']['id'] = 'field_sirius_member_active';
   $handler->display->display_options['fields']['field_sirius_member_active']['table'] = 'field_data_field_sirius_member_active';
@@ -30832,6 +30842,30 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['label'] = 'Actions';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>
 <a href="/taxonomy/term/[tid]/sirius_ledger_payment_type_settings?destination=sirius/taxonomy/!1" class="tool-button">Settings</a>';
+
+  /* Display: Generic Export */
+  $handler = $view->new_display('views_data_export', 'Generic Export', 'views_data_export_2');
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
+  $handler->display->display_options['defaults']['footer'] = FALSE;
+  $handler->display->display_options['path'] = 'sirius/admin/taxonomy/generic/csv';
+  $handler->display->display_options['displays'] = array(
+    'block' => 'block',
+    'default' => 0,
+    'block_1' => 0,
+    'block_2' => 0,
+    'block_3' => 0,
+    'block_4' => 0,
+    'block_5' => 0,
+    'block_6' => 0,
+    'block_7' => 0,
+    'block_8' => 0,
+    'block_9' => 0,
+    'block_10' => 0,
+  );
+  $handler->display->display_options['use_batch'] = 'batch';
+  $handler->display->display_options['segment_size'] = '100';
   $translatables['sirius_taxonomy'] = array(
     t('Master'),
     t('Sirius Taxonomy'),
@@ -30871,6 +30905,9 @@ Grievance Form',
     t('External ID'),
     t('ID'),
     t('Certification Duration'),
+    t('Show on Job Creation?'),
+    t('<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>
+<a href="/taxonomy/term/[tid]/sirius_skill_dispatch?destination=sirius/taxonomy/!1" class="tool-button">Dispatch Setitings</a>'),
     t('Alert Types'),
     t('Actor'),
     t('Tags'),
@@ -30888,7 +30925,7 @@ Grievance Form',
     t('Days to Retain Position'),
     t('Threestrikes Enable'),
     t('Work Status'),
-    t('Available for Dispatch?'),
+    t('Use for Dispatch?'),
     t('Member?'),
     t('Participant Statuses'),
     t('Participant Roles'),
@@ -30901,6 +30938,7 @@ Grievance Form',
     t('Payment Types'),
     t('<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>
 <a href="/taxonomy/term/[tid]/sirius_ledger_payment_type_settings?destination=sirius/taxonomy/!1" class="tool-button">Settings</a>'),
+    t('Generic Export'),
   );
   $export['sirius_taxonomy'] = $view;
 
@@ -32619,6 +32657,20 @@ Accepted'),
   );
   $handler->display->display_options['filters']['field_sirius_industry_tid_1']['type'] = 'select';
   $handler->display->display_options['filters']['field_sirius_industry_tid_1']['vocabulary'] = 'sirius_industry';
+  /* Filter criterion: Field: JSON (field_sirius_json) */
+  $handler->display->display_options['filters']['field_sirius_json_value']['id'] = 'field_sirius_json_value';
+  $handler->display->display_options['filters']['field_sirius_json_value']['table'] = 'field_data_field_sirius_json';
+  $handler->display->display_options['filters']['field_sirius_json_value']['field'] = 'field_sirius_json_value';
+  $handler->display->display_options['filters']['field_sirius_json_value']['relationship'] = 'field_sirius_member_status_tid';
+  $handler->display->display_options['filters']['field_sirius_json_value']['operator'] = 'allwords';
+  $handler->display->display_options['filters']['field_sirius_json_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['operator_id'] = 'field_sirius_json_value_op';
+  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['label'] = 'Level?';
+  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['operator'] = 'field_sirius_json_value_op';
+  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['identifier'] = 'field_sirius_json_value';
+  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -32636,6 +32688,13 @@ Accepted'),
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
   $handler->display->display_options['footer']['area']['tokenize'] = TRUE;
   $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Global: View result counter */
+  $handler->display->display_options['fields']['counter']['id'] = 'counter';
+  $handler->display->display_options['fields']['counter']['table'] = 'views';
+  $handler->display->display_options['fields']['counter']['field'] = 'counter';
+  $handler->display->display_options['fields']['counter']['label'] = 'Position';
+  $handler->display->display_options['fields']['counter']['counter_start'] = '1';
+  $handler->display->display_options['fields']['counter']['reverse'] = 0;
   /* Field: Bulk operations: Content */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
   $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'views_entity_node';
@@ -32763,7 +32822,7 @@ Accepted'),
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/sirius_worker_contact" target="_blank" class="tool-button">Contact Info</a> <a href="/node/[nid]/sirius_worker_dispatches" target="_blank" class="tool-button">Dispatches</a> <a href="/node/[nid]/sirius_worker_ledger" target="_blank" class="tool-button">A/R</a>  <a href="/node/[nid]/sirius_worker_industry" target="_blank" class="tool-button">Industries</a> <a href="/node/[nid]/sirius_worker_work_status" target="_blank" class="tool-button">Work Status</a> <a href="/node/[nid]/sirius_worker_materials" target="_blank" class="tool-button">Materials</a> ';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/sirius_worker_contact" target="_blank" class="tool-button">Contact Info</a> <a href="/node/[nid]/sirius_worker_dispatches" target="_blank" class="tool-button">Dispatches</a> <a href="/node/[nid]/sirius_worker_ledger" target="_blank" class="tool-button">A/R</a>  <a href="/node/[nid]/sirius_worker_industry" target="_blank" class="tool-button">Industries</a> <a href="/node/[nid]/sirius_worker_work_status" target="_blank" class="tool-button">Work Status</a> <a href="/node/[nid]/sirius_worker_materials" target="_blank" class="tool-button">Materials</a>  <a href="/node/[nid]/sirius_worker_tc/certifications" target="_blank" class="tool-button">Certifications</a> ';
   $handler->display->display_options['path'] = 'sirius/staff/worker/list';
 
   /* Display: Data export */
@@ -32916,8 +32975,10 @@ Accepted'),
     t('Apprentice ID'),
     t('SSN'),
     t('Currently Employed Industry'),
+    t('Level?'),
     t('Page'),
     t('<div /><a href="/node/add/sirius-worker?destination=[current_path]" class="action-button">Add a new worker</a></div>'),
+    t('Position'),
     t('Content'),
     t('- Choose an operation -'),
     t('Re-Sync Worker\'s User'),
@@ -32925,7 +32986,7 @@ Accepted'),
     t('Last Sign in'),
     t('Work Status / Dispatch Status'),
     t('[field_sirius_work_status]<br><a href="/node/[nid]/sirius_worker_dispatches/status" target="_blank">[field_sirius_worker_dispstatus]</a>'),
-    t('<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/sirius_worker_contact" target="_blank" class="tool-button">Contact Info</a> <a href="/node/[nid]/sirius_worker_dispatches" target="_blank" class="tool-button">Dispatches</a> <a href="/node/[nid]/sirius_worker_ledger" target="_blank" class="tool-button">A/R</a>  <a href="/node/[nid]/sirius_worker_industry" target="_blank" class="tool-button">Industries</a> <a href="/node/[nid]/sirius_worker_work_status" target="_blank" class="tool-button">Work Status</a> <a href="/node/[nid]/sirius_worker_materials" target="_blank" class="tool-button">Materials</a> '),
+    t('<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/sirius_worker_contact" target="_blank" class="tool-button">Contact Info</a> <a href="/node/[nid]/sirius_worker_dispatches" target="_blank" class="tool-button">Dispatches</a> <a href="/node/[nid]/sirius_worker_ledger" target="_blank" class="tool-button">A/R</a>  <a href="/node/[nid]/sirius_worker_industry" target="_blank" class="tool-button">Industries</a> <a href="/node/[nid]/sirius_worker_work_status" target="_blank" class="tool-button">Work Status</a> <a href="/node/[nid]/sirius_worker_materials" target="_blank" class="tool-button">Materials</a>  <a href="/node/[nid]/sirius_worker_tc/certifications" target="_blank" class="tool-button">Certifications</a> '),
     t('Data export'),
     t('Address'),
     t('Apt/Suite #'),

@@ -5876,6 +5876,31 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
+  // Exported field_base: 'field_sirius_fastload_status'.
+  $field_bases['field_sirius_fastload_status'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_fastload_status',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'available' => 'available',
+        'used' => 'used',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_sirius_feed_status'.
   $field_bases['field_sirius_feed_status'] = array(
     'active' => 1,

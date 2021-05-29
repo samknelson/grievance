@@ -14713,6 +14713,49 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'node-sirius_contact-field_sirius_fastload_status'.
+  $field_instances['node-sirius_contact-field_sirius_fastload_status'] = array(
+    'bundle' => 'sirius_contact',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 26,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_fastload_status',
+    'label' => 'Fastload Status',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 13,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_contact-field_sirius_id'.
   $field_instances['node-sirius_contact-field_sirius_id'] = array(
     'bundle' => 'sirius_contact',
@@ -21345,6 +21388,48 @@ If the file has multiple pages, then each page in the input document will use th
       ),
       'type' => 'options_select',
       'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_log-field_sirius_fastload_status'.
+  $field_instances['node-sirius_log-field_sirius_fastload_status'] = array(
+    'bundle' => 'sirius_log',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 12,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_fastload_status',
+    'label' => 'Fastload Status',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 13,
     ),
   );
 
@@ -29111,7 +29196,7 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => 'Enter the default number of days before this skill expires. The default is for a skill to never expire.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'number',
         'settings' => array(
           'decimal_separator' => '.',
@@ -29157,7 +29242,7 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => 'Select "Yes" if this should be printed on the badge.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'list',
         'settings' => array(
           'field_delimiter' => '',
@@ -29193,7 +29278,7 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
           'bypass_access' => FALSE,
@@ -29306,7 +29391,7 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'taxonomy',
         'settings' => array(
           'field_delimiter' => '',
@@ -29344,6 +29429,37 @@ If the file has multiple pages, then each page in the input document will use th
       'settings' => array(),
       'type' => 'multiple_selects',
       'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance: 'taxonomy_term-sirius_skill-field_sirius_json'.
+  $field_instances['taxonomy_term-sirius_skill-field_sirius_json'] = array(
+    'bundle' => 'sirius_skill',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 10,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_json',
+    'label' => 'JSON',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 14,
     ),
   );
 
@@ -29393,7 +29509,7 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'role_field',
         'settings' => array(
           'field_delimiter' => '',
@@ -29939,6 +30055,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Expire After');
   t('External ID');
   t('Facility');
+  t('Fastload Status');
   t('Fax');
   t('Feed Status');
   t('Field Name');

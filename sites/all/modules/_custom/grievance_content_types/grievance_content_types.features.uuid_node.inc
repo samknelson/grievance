@@ -2264,6 +2264,142 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Fastload',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1621426936,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '76325793-5702-4387-a3ad-b3e1e7ab596e',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>In Drupal, loading large numbers of records ("nodes") can be a slow process. The Sirius FastLoad tool is designed to speed this process up. It operates by pre-generating and saving large numbers of nodes. These "stub" nodes can then be quickly reserved and updated.</p>
+
+<p><strong>Content Types</strong></p>
+
+<p>The FastLoad system pre-generates nodes of type "Contact" and "Log". For Contact nodes, the available fields include Name, Phone, Email, and JSON.</p>
+
+<p><strong>Domains</strong></p>
+
+<p>FastLoad is a server-wide tool. It is configured once, and the pool of available FastLoad nodes is shared across all domains.&nbsp;</p>
+
+<p><strong>Configuration</strong></p>
+
+<p>On the configuration page, FastLoad can be enabled or disabled for the server. It is also necessary to set two important variables:&nbsp;</p>
+
+<p>- The&nbsp;"Buffer Size". This is the number of available FastLoad nodes which the system attempts to maintain. The buffer size should generally be larger than the largest likely upload; in other words, if a typical upload might inlude 100,000 contacts, a typical buffer size might be 250,000 or 500,000.&nbsp;</p>
+
+<p>- The "Batch Size". This is the number of FastLoad nodes which are created in each "batch" run. Batches typically run once an hour, so a good estimate might be to set the batch size at 10% of the buffer size.</p>
+
+<p><strong>Status</strong></p>
+
+<p>The status page shows, for each content type, the current number of "available" FastLoad nodes, as well as the number which have been used historically. If the generation process is complete, then the number of available nodes should equal the buffer size. If many FastLoad nodes have recently been used, the buffer may be depleted, but it should fill back up over time.</p>
+
+<p><strong>Generate</strong></p>
+
+<p>FastLoad node generation happens automatically in the background. It is also possible to run a generation batch manually, from the "generate" page.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/fastload',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'sirius/fastload/config',
+        'format' => NULL,
+      ),
+      2 => array(
+        'value' => 'sirius/fastload/generate',
+        'format' => NULL,
+      ),
+      3 => array(
+        'value' => 'sirius/fastload/status',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use these pages to manage the Sirius FastLoad system.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-05-19 05:22:16 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Create a payment',
   'log' => '',
   'status' => 1,
