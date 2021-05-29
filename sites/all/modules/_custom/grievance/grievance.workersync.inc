@@ -176,7 +176,7 @@ function grievance_workersync_admin($form, &$form_state) {
 	}
 	$variable_name = sirius_domain_variable_name('grievance_workersync_source');
 	$plugin_source = $form_state['values'][$variable_name];
-	if (!$plugin_source) { $plugin_source = variable_get($variable_name, 'local'); }
+	if (!$plugin_source) { $plugin_source = variable_get($variable_name, 'none'); }
 	$plugin_info = $plugins[$plugin_source];
 	$form[$variable_name] = array(
 		'#title' => t('Worker Source'),
