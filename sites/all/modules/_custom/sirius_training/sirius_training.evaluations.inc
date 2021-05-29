@@ -30,9 +30,7 @@ function sirius_training_evaluations_fetch_by_type($type) {
   return node_load_multiple(array_keys($stmt['node']));
 }
 
-
-function sirius_training_evaluations_render($evaluation_node, $options = array()) {
-	drupal_add_css('sites/all/modules/_custom/sirius_training/css/evaluation.css');
+function sirius_training_evaluations_title($evaluation_node) {
 	$worker_nid = $evaluation_node->field_sirius_log_handler['und'][0]['target_id'];
 	$worker_node = node_load($worker_nid);
 
@@ -44,13 +42,24 @@ function sirius_training_evaluations_render($evaluation_node, $options = array()
 		$author_name = $author_user->name;
 	}
 
+	$title = "Evaluation by "; 
+	$title .= $author_name;
+	$title .= " of ";
+	$title .= $worker_node->title;
+
+	return $title;
+}
+
+
+function sirius_training_evaluations_render($evaluation_node, $options = array()) {
+	drupal_add_css('sites/all/modules/_custom/sirius_training/css/evaluation.css');
+	$worker_nid = $evaluation_node->field_sirius_log_handler['und'][0]['target_id'];
+	$worker_node = node_load($worker_nid);
+
 	$status = $evaluation_node->field_sirius_type['und'][0]['value'];
 	$html .= "<div class=\"sirius_training_evaluation sirius_training_evaluation_{$status}\">";
 	$html .= '<h2>';
-	$html .= "Evaluation by "; 
-	$html .= $author_name;
-	$html .= " of ";
-	$html .= $worker_node->title;
+	$html .= sirius_training_evaluations_title($evaluation_node);
 	$html .= '</h2>';
 	$html .= sirius_fakerender_field('Status:', $evaluation_node->field_sirius_type['und'][0]['value']);
 	if (!$options['hide_worker']) {
