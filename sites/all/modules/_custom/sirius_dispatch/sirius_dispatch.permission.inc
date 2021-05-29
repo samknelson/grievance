@@ -60,6 +60,9 @@ function sirius_dispatch_node_access($node, $op, $account) {
 }
 
 function sirius_dispatch_node_access_dispatch($node, $op, $account) {
+  // Nobody can delete
+  if ($op == 'delete') { return NODE_ACCESS_DENY; }
+
   // Admins can access
   if (user_access('sirius dispatch staff', $account)) { return NODE_ACCESS_ALLOW; }
 
@@ -68,6 +71,9 @@ function sirius_dispatch_node_access_dispatch($node, $op, $account) {
 }
 
 function sirius_dispatch_node_access_job($node, $op, $account) {
+  // Nobody can delete
+  if ($op == 'delete') { return NODE_ACCESS_DENY; }
+
   // Admins can access
   if (user_access('sirius dispatch staff', $account)) { return NODE_ACCESS_ALLOW; }
 
