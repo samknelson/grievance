@@ -25,6 +25,13 @@ function sirius_worker_skill_term_delete_form($form, &$form_state) {
 		'#required' => TRUE,
 	);
 
+	$form['reason'] = array(
+		'#type' => 'textarea',
+		'#title' => 'Reason',
+		'#required' => TRUE,
+		'#default_value' => 'Skill was deleted',
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Submit',
@@ -51,7 +58,7 @@ function sirius_worker_skill_term_delete_form_submit($form, &$form_state) {
 
 	$count = 0;
 	foreach ($worker_nids as $worker_nid) {
-		$operations[] = array('sirius_worker_skill_set', array($worker_nid, array($tid), NULL, 'remove', 'Skill was deleted', array()));
+		$operations[] = array('sirius_worker_skill_set', array($worker_nid, array($tid), NULL, 'remove', $form_state['values']['reason'], array(), NULL));
 		++$count;
 		// if ($count > 5) { break; }
 	}
