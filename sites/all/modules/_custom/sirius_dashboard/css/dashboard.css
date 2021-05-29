@@ -1,0 +1,32 @@
+.sirius_dashboard_item {
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid #cccccc;
+}
+
+.sirius_dashboard_item_title {
+	font-weight: bold;
+	padding-bottom: 5px;
+}
+
+.sirius_dashboard_priority {
+	font-weight: bold;
+	font-variant: small-caps;
+	font-family: arial, helvetica, sans-serif;
+}
+
+.sirius_dashboard_priority_0 {
+	color: #333333;
+}
+
+.sirius_dashboard_priority_1 {
+	color: #060469;
+}
+
+.sirius_dashboard_priority_2 {
+	color: #025e11;
+}
+
+.sirius_dashboard_priority_3 {
+	color: #b31307;
+}

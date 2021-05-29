@@ -1,0 +1,4 @@
+name = Sirius Dashboard
+description = Implements dashboard functionality
+package = sirius
+core = 7.x

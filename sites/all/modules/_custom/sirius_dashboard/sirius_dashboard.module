@@ -1,0 +1,28 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_dashboard/sirius_dashboard.permission.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_dashboard/sirius_dashboard.menu.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_dashboard/sirius_dashboard.plugins.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_dashboard/sirius_dashboard.items.inc";
+
+function sirius_dashboard_priority_options() {
+	return array(
+		0 => 'No Action',
+		1 => 'Low', 
+		2 => 'Normal',
+		3 => 'High',
+	);
+}
+
+function sirius_dashboard_priority_render($priority) {
+	if (!$priority) { return ''; }
+
+	$priority_options = sirius_dashboard_priority_options();
+	$html = '<span class="sirius_dashboard_priority sirius_dashboard_priority_' . $priority . '">';
+	$html .= $priority_options[$priority];
+	$html .= '</span>';
+	return $html;
+}
