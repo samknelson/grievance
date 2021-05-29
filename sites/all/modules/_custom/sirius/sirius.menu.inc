@@ -10,13 +10,6 @@
 function sirius_node_tabs() {
   $node_tabs = array();
 
-  $node_tabs['sirius_worker']['sirius_worker_log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_node_tab_entity_log',
-    'permissions' => array('sirius dispatch staff'),
-  );
-
   $content_types = array('sirius_event', 'sirius_worker', 'grievance_shop', 'sirius_ledger_account');
   foreach ($content_types as $content_type) {
     $node_tabs[$content_type][$content_type . '_materials'] = array(
@@ -138,6 +131,8 @@ function sirius_node_tabs() {
     'grievance_shop' => 'sirius dispatch staff',
     'sirius_payment' => 'sirius ledger admin',
     'sirius_payperiod' => 'sirius hour admin',
+    'sirius_worker' => 'sirius dispatch staff',
+    'sirius_contact' => 'sirius dispatch staff',
   );
   foreach ($content_types as $content_type => $permission) {
     $node_tabs[$content_type][$content_type . '_log'] = array(
