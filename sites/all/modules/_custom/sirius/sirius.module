@@ -955,3 +955,15 @@ function sirius_node_title($nid) {
   $hr = $stmt->fetchAssoc();
   return $hr['title'];
 }
+
+/**
+ * Implements hook_user_cancel_methods_alter
+ *
+ * Nobody should ever have access to "cancel account and delete all its content."
+ */
+
+function sirius_user_cancel_methods_alter(&$methods) {
+  if ($methods && $methods['user_cancel_delete']) {
+    unset($methods['user_cancel_delete']);
+  }
+}
