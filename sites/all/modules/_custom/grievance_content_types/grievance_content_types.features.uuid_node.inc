@@ -3561,6 +3561,112 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Bulk Message - Body - Voice',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1622454492,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'b361fd53-8ddd-44c7-902e-f2158c2d3aca',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p><strong>Caller ID</strong></p>
+
+<p>For outgoing voice messages, a caller ID can be selected. Caller IDs must be configured and validated. The valid caller IDs can be managed <a href="/sirius/config/phone/callerid">here.</a></p>
+
+<p><strong>Answering Machine Detection</strong></p>
+
+<p>It is possible to specify different messages to be delivered if an answering machine does and does not pick up. Answering machine detection settings can be configured <a href="/sirius/config/phone/twilio/amd">here.</a></p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_bulk_body_voice',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this tool to specify the voice message that should be played when this bulk message is delivered.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-05-31 02:48:12 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Worker - Member Status Notifications',
   'log' => '',
   'status' => 1,

@@ -17727,7 +17727,6 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_bulk_medium" target="_blank" class="tool-button">Medium</a>
-<a href="/node/[nid]/sirius_bulk_body" target="_blank" class="tool-button">Message</a>
 <a href="/node/[nid]/sirius_bulk_test" target="_blank" class="tool-button">Test</a>
 <a href="/node/[nid]/sirius_bulk_send" target="_blank" class="tool-button">Send</a>
 <a href="/node/[nid]/sirius_bulk_queue" target="_blank" class="tool-button">Results</a>
@@ -17859,7 +17858,6 @@ Grievance Form',
     t('Nid'),
     t('Tools'),
     t('<a href="/node/[nid]/sirius_bulk_medium" target="_blank" class="tool-button">Medium</a>
-<a href="/node/[nid]/sirius_bulk_body" target="_blank" class="tool-button">Message</a>
 <a href="/node/[nid]/sirius_bulk_test" target="_blank" class="tool-button">Test</a>
 <a href="/node/[nid]/sirius_bulk_send" target="_blank" class="tool-button">Send</a>
 <a href="/node/[nid]/sirius_bulk_queue" target="_blank" class="tool-button">Results</a>
