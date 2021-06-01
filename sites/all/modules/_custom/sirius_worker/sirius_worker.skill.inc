@@ -121,7 +121,10 @@ function sirius_worker_skills_cron($force = FALSE) {
 	foreach ($to_remove as $worker_nid => $tids) {
 		++$worker_count;
 		$worker_node = node_load($worker_nid);
-		sirius_worker_skill_set($worker_node, $tids, NULL, 'remove', 'Expiration date for the skills has passed.', array());
+
+		foreach ($tids as $tid) {
+			sirius_worker_skill_set($worker_node, array($tid), NULL, 'remove', 'Expiration date for the skill has passed.', array());
+		}
 
 		$terms = taxonomy_term_load_multiple($tids);
 		$subject = "Dispatch system notification: skills expired";
@@ -160,6 +163,10 @@ function sirius_worker_skills_cron($force = FALSE) {
  */
 
 function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason, $files, $certification_nid = NULL) {
+	if (is_array($tids) && $tids[1]) {
+		return array('success' => FALSE, 'msg' => 'System error: sirius_worker_skill_set() must be called with just a single skill TID.');
+	}
+
 	if (is_numeric($worker_node)) { $worker_node = node_load($worker_node); }
 	if ($expires) {
 		$expires_display = date('m/d/Y', sirius_strtotime($expires));
@@ -172,11 +179,10 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 	if ($action == 'add' && (sirius_strtotime($expires) < time())) {
 		$msg = 'Skipping add for skills, because they expired on ' . $expires . ': ';
 		foreach ($tids as $tid) {
-			$term = taxonomy_term_load($tid);
 			$msg .= $term->name;
 		}
 		sirius_log('worker:skill', 'add_expired', $msg, $reason, '', array($worker_node->nid), $files);
-		return;
+		return array('success' => TRUE, 'msg' => $msg);
 	}
 
 	$orig = array();
@@ -221,6 +227,11 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 	node_save($worker_node);
 	$handlers = array($worker_node->nid);
 	if ($certification_nid) { $handlers[] = $certification_nid; }
+	foreach ($tids as $tid) {
+		$proxy = sirius_taxonomy_proxy($tid);
+		$handlers[] = $proxy->nid;
+	}
+
 	sirius_log('worker:skill', $action, $msg, $reason, '', $handlers, $files);
 
 	return array('success' => TRUE, 'msg' => $msg);
