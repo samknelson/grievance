@@ -328,10 +328,13 @@ function sirius_taxonomy_proxy($tid) {
   $stmt = $query->execute();
   if ($stmt['node']) { return node_load(array_keys($stmt['node'])[0]); }
 
+  $term = taxonomy_term_load($tid);
+  if (!$term) { return NULL; }
+
   global $user;
   $node = new stdClass();
   $node->type = 'sirius_term_proxy';
-  $node->title = 'Proxy: ' . $tid;
+  $node->title = 'Proxy: ' . $term->name . ' (' . $tid . ')';
   $node->no_recurse = TRUE;
   $node->language = LANGUAGE_NONE;
   $node->uid = $user->uid;
