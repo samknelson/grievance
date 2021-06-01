@@ -273,7 +273,7 @@ function sirius_teamsters631_oneoff_skill_log_link($reset = NULL, $limit = 100) 
 
 	$found = $unfound = array();
 
-	$sql = "select nid, field_sirius_message_value from node ";
+	$sql = "select nid, created, field_sirius_message_value from node ";
 	$sql .= "left join field_data_field_sirius_message on field_data_field_sirius_message.entity_type = 'node' and field_data_field_sirius_message.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
 	$sql .= "where node.type = 'sirius_log' ";
@@ -287,8 +287,8 @@ function sirius_teamsters631_oneoff_skill_log_link($reset = NULL, $limit = 100) 
 		$nid = $hr['nid'];
 		$msg = $hr['field_sirius_message_value'];
 		if (!$msg) { continue; }
-		print "== Log node $nid ==\n"; 
-		print "Msg: $msg\n";
+		$date = date('Y-m-d H:i:s', $hr['created']);
+		print "==== Log node $nid / $date / $msg \n"; 
 
 		$msg = preg_replace('/Add or renew/', '', $msg);
 		$msg = preg_replace('/^Remove /', '', $msg);
