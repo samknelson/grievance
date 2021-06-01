@@ -18,6 +18,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_duplicate_id.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_multiple_member_status.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_skill_log.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_list.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_user.inc";
@@ -298,6 +299,20 @@ function sirius_worker_report_cache_info() {
     'batch_callback' => 'sirius_worker_report_multiple_member_status_batch',
     'render_callbacks' => array(
       'View' => 'sirius_worker_report_multiple_member_status_view',
+    ),
+  );
+
+  $items['sirius-worker-skill-log'] = array(
+    'name' => t('Skill log report'),
+    'description' => '',
+    'access' => 'sirius worker view',
+    'fields' => sirius_worker_report_skill_log_fields(),
+    'form_callback' => 'sirius_worker_report_skill_log_form',
+    'pk_list_callback' => 'sirius_worker_report_skill_log_pks',
+    'batch_callback' => 'sirius_worker_report_skill_log_batch',
+    'render_callbacks' => array(
+      'Summary' => 'sirius_worker_report_skill_log_view_summary',
+      'Details' => 'sirius_worker_report_skill_log_view_detail',
     ),
   );
 
