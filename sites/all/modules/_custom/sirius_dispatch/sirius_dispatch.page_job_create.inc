@@ -246,7 +246,7 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 	// Skill
 	if ($job_policy['form']['hide_skill'] != 'Yes') {
-		$skill_options = array(NULL => t('-- No specific skill required --')) + sirius_dispatch_skill_options();
+		$skill_options = array(NULL => t('-- No specific skill required --')) + sirius_dispatch_skill_options($industry_tid);
 		$form['skill'] = array(
 			'#type' => 'select',
 			'#options' => $skill_options,
