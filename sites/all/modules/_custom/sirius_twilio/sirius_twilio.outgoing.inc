@@ -248,3 +248,56 @@ function sirius_twilio_outgoing_voice_stream() {
   }	
 }
 */
+
+
+function sirius_twilio_outgoing_flow($flow_sid, $phone, $callerid_nid, $flow_params = array(), $handler_nid = NULL) {
+  // Are we in a global disable mode?
+  $disable = sirius_domain_variable_get("sirius_sms_global_disable", '');
+  if ($disable == 'Yes') { 
+	  $whitelist = sirius_domain_variable_get("sirius_sms_global_disable_whitelist", '');
+	  $probe = sirius_phone_format($phone);
+	  if (strpos($whitelist, $probe) === FALSE) { return array('success' => FALSE, 'msg' => "Global SMS disable is on and $probe is not whitelisted."); }
+	}
+
+	// Validate the recipient phone
+	$phone = sirius_phone_format_e164($phone);
+  if (!$phone)                        { return array('success' => FALSE, 'msg' => "No phone number"); }
+  if (!sirius_phone_validate($phone)) { return array('success' => FALSE, 'msg' => "[$phone] is not a valid phone number."); }
+
+  $possible = sirius_phonenumber_voice_possible($phone);
+  if (!$possible) 										{ return array('success' => FALSE, 'msg' => "[$phone] does not appear to be a mobile-enabled number."); }
+
+  if (!$callerid_nid) 								{ return array('success' => FALSE, 'msg' => "No Caller ID specified."); }
+	$callerid_node = node_load($callerid_nid);
+	if (!$callerid_node) 								{  return array('success' => FALSE, 'msg' => "Unable to find the caller ID node."); }
+	$callerid_phone = $callerid_node->field_sirius_phone['und'][0]['value'];
+	if (!$callerid_phone) { $callerid_phone = sirius_domain_variable_get('sirius_twilio_phone', ''); }
+	$callerid_phone = sirius_phone_format_e164($callerid_phone);
+
+	$handlers = array();
+	if ($handler_nid) { $handlers[] = $handler_nid; }
+
+
+	try {
+		$client = sirius_twilio_client_get();
+		$client->studio->v2->flows($flow_sid)->executions->create($phone, $callerid_phone, $flow_params);
+	} catch (Exception $e) {
+		$result = array('success' => FALSE, 'msg' => "Flow message failed.", 'details' => "Failed to send to Twilio Flow: " . $e->getCode() . ' - ' . $e->getMessage());
+		$msg =  $e->getCode() . ' - ' . $e->getMessage() . ": " . $msg;
+		sirius_log('twilio:conversation', 'error', $msg, $msg, $phone, $handlers);
+		return array('success' => FALSE, 'msg' => $msg);
+	}
+
+	$msg = "Transferred $phone to flow $flow_sid (callerId $callerid_phone)";
+
+	sirius_log(
+		'twilio:flow', 
+		'outgoing_flow', 
+		$msg,
+		$msg,
+		$phone, 
+		$handlers
+	);
+
+	return array('success' => TRUE, 'msg' => $msg);	
+}
