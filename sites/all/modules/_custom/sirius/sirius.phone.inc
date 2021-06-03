@@ -187,6 +187,7 @@ function sirius_voice_send($params) {
 
   $context = array();
   $context['outgoing_msg'] = $msg;
+  $context['outgoing_msg_machine'] = $params['voice_machine'];
   $context['handler_nid'] = $handler_nid;
   $context['worker_nid'] = $params['worker_nid'];
   $context['callerid_nid'] = $params['callerid_nid'];
