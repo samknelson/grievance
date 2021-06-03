@@ -321,6 +321,11 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     if (!user_access('sirius admin')) { $form['field_sirius_json']['#access'] = FALSE; }
   }
 
+  // Remove access to denormalized fields
+  if ($form_id == 'sirius_worker_node_form') {
+    if (!user_access('sirius admin')) { $form['field_sirius_denorm_level']['#access'] = FALSE; }
+  }
+
   // Can't change the "type" of a JSON Definition
   if ($form_id == 'sirius_json_definition_node_form') {
     if (!user_access('sirius admin')) { $form['field_sirius_type']['#access'] = FALSE; }
