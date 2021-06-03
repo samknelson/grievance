@@ -23524,12 +23524,12 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
+          'bypass_access' => 1,
           'field_delimiter' => '',
-          'link' => FALSE,
+          'link' => 0,
         ),
         'type' => 'entityreference_label',
         'weight' => 0,
@@ -23645,7 +23645,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 8,
+        'weight' => 15,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -23905,6 +23905,55 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'node-sirius_worker-field_sirius_denorm_level'.
+  $field_instances['node-sirius_worker-field_sirius_denorm_level'] = array(
+    'bundle' => 'sirius_worker',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Contains copies of the worker\'s level, for ease of querying.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 11,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_denorm_level',
+    'label' => 'Denormalize: Level',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 59,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_worker-field_sirius_dispatch_asi'.
   $field_instances['node-sirius_worker-field_sirius_dispatch_asi'] = array(
     'bundle' => 'sirius_worker',
@@ -23974,7 +24023,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 7,
+        'weight' => 14,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -24085,7 +24134,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 11,
+        'weight' => 16,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -24943,7 +24992,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 12,
+        'weight' => 17,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -25047,7 +25096,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 4,
+        'weight' => 10,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -25440,11 +25489,8 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'hidden',
-        'module' => 'taxonomy',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'taxonomy_term_reference_plain',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 9,
       ),
       'sirius_worker' => array(
@@ -25729,7 +25775,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 5,
+        'weight' => 12,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -25785,7 +25831,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 6,
+        'weight' => 13,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29989,6 +30035,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Completed');
   t('Contact');
   t('Contact Type');
+  t('Contains copies of the worker\'s level, for ease of querying.');
   t('Content Types');
   t('Contract');
   t('Contract Template');
@@ -30010,6 +30057,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Default Value');
   t('Default number of days');
   t('Definition');
+  t('Denormalize: Level');
   t('Department');
   t('Departments');
   t('Description');

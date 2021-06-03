@@ -3128,6 +3128,7 @@ function grievance_content_types_field_group_info() {
       4 => 'field_sirius_worker_dispstatus',
       5 => 'field_sirius_dispatch_availdate',
       6 => 'field_sirius_industry',
+      7 => 'field_sirius_denorm_level',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -3191,9 +3192,7 @@ function grievance_content_types_field_group_info() {
   $field_group->data = array(
     'label' => 'Skills',
     'weight' => '50',
-    'children' => array(
-      0 => 'field_sirius_skill',
-    ),
+    'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(
       'label' => 'Skills',

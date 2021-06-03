@@ -1313,6 +1313,108 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Bulk Message - Body - SMS',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1622469964,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '40f9e76f-3b69-4a80-8785-d3e97715fdeb',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The cost of an SMS message is dependent on the number of "segments" required. A segment count is displayed below the "SMS Body" field. Generally speaking, the best practice is to try to keep the message to just one segment.</p>
+
+<p>If your message includes a link, you may want to use a "link shortener" to reduce the number of characters.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_bulk_body_sms',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Enter the text of the SMS message.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-05-31 07:06:04 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Custom Field Sets - Event Type',
   'log' => '',
   'status' => 1,
@@ -1517,6 +1619,106 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2021-04-28 06:23:18 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Bulk Message - Body - Email',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1622469874,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '51ebac7c-d4cf-4cb2-8126-8249370986bb',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Email messages may be entered in HTML format. However, be careful to test your message carefully, since not all email clients can render all HTML tags.&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_bulk_body_email',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Enter the subject and the body of the bulk email.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-05-31 07:04:34 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -1985,6 +2187,116 @@ function grievance_content_types_uuid_features_default_content() {
     'alias' => 'sirius/node/sirius-help/8958',
   ),
   'date' => '2018-11-06 03:32:42 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Dispatch - Config - VLRI',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1622660941,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '607717d3-ec77-4f9f-8ce7-e7df61a8ea00',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>A VLRI, or "Voluntary Layoff with a request to convert into an Involuntary Layoff", is a special dispatch status.</p>
+
+<p>A worker on a dispatch may select a VLRI. They are immediately laid off, making them available to be dispatched to another job. However, their layoff is considered "voluntary" until it is resolved by the employer, who must either accept or decline the request. Accepting the request converts the dispatch into an involuntary layoff.</p>
+
+<ul>
+	<li><strong>Enable: </strong>Set to "Yes" to enable this dispatch status.<br />
+	&nbsp;</li>
+	<li><strong>Window: </strong>Employers are expected to resolve VLRI\'s within this window. The window is in seconds, so it\'s a good idea to enter a fairly large number, i.e. 43,200 seconds = 60*60*12, or 12 hours.<br />
+	&nbsp;</li>
+	<li><strong>Limit:</strong> Emloyers who fail to resolve VLRI\'s in a timely manner will be blocked from the dispatch system, and unable to create new jobs. Use this field to enter the number of unresolved VLRI\'s (older than the window) before the Employer\'s access to the dispatch system is blcoked.</li>
+</ul>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/dispatch/config/vlri',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this page to configure the "Voluntary Layoff, Request that to convert to Involuntary Layoff".</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-02 12:09:01 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -3451,116 +3763,6 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'Bulk Message - Body',
-  'log' => '',
-  'status' => 1,
-  'comment' => 0,
-  'promote' => 0,
-  'sticky' => 0,
-  'ds_switch' => 'default',
-  'type' => 'sirius_help',
-  'language' => 'en',
-  'created' => 1603968551,
-  'tnid' => 0,
-  'translate' => 0,
-  'uuid' => 'ad4183ab-d3a5-41f5-834b-55c51a255b9b',
-  'body' => array(
-    'und' => array(
-      0 => array(
-        'value' => '<p><strong>SMS (Text) Messages</strong></p>
-
-<p>The cost of an SMS message is dependent on the number of "segments" required. A segment count is displayed below the "SMS Body" field. Generally speaking, the best practice is to try to keep the message to just one segment.</p>
-
-<p><strong>Voice (Robocall) Messages</strong></p>
-
-<p>For robocalls, the message can be entered in text or as an uploaded audio file. If both are provided, the uploaded audio file will be used.&nbsp;</p>
-
-<p><strong>Email Messages</strong></p>
-
-<p>Email messages may be entered in HTML format. However, be careful to test your message carefully, since not all email clients can render all HTML tags.</p>
-',
-        'summary' => '',
-        'format' => 'full_html',
-        'safe_summary' => '',
-      ),
-    ),
-  ),
-  'field_sirius_paths' => array(
-    'und' => array(
-      0 => array(
-        'value' => 'node/%/sirius_bulk_body',
-        'format' => NULL,
-      ),
-    ),
-  ),
-  'field_sirius_summary' => array(
-    'und' => array(
-      0 => array(
-        'value' => '<p>Enter the subject and / or body of the message.</p>
-',
-        'format' => 'full_html',
-      ),
-    ),
-  ),
-  'rdf_mapping' => array(
-    'rdftype' => array(
-      0 => 'sioc:Item',
-      1 => 'foaf:Document',
-    ),
-    'title' => array(
-      'predicates' => array(
-        0 => 'dc:title',
-      ),
-    ),
-    'created' => array(
-      'predicates' => array(
-        0 => 'dc:date',
-        1 => 'dc:created',
-      ),
-      'datatype' => 'xsd:dateTime',
-      'callback' => 'date_iso8601',
-    ),
-    'changed' => array(
-      'predicates' => array(
-        0 => 'dc:modified',
-      ),
-      'datatype' => 'xsd:dateTime',
-      'callback' => 'date_iso8601',
-    ),
-    'body' => array(
-      'predicates' => array(
-        0 => 'content:encoded',
-      ),
-    ),
-    'uid' => array(
-      'predicates' => array(
-        0 => 'sioc:has_creator',
-      ),
-      'type' => 'rel',
-    ),
-    'name' => array(
-      'predicates' => array(
-        0 => 'foaf:name',
-      ),
-    ),
-    'comment_count' => array(
-      'predicates' => array(
-        0 => 'sioc:num_replies',
-      ),
-      'datatype' => 'xsd:integer',
-    ),
-    'last_activity' => array(
-      'predicates' => array(
-        0 => 'sioc:last_activity_date',
-      ),
-      'datatype' => 'xsd:dateTime',
-      'callback' => 'date_iso8601',
-    ),
-  ),
-  'date' => '2020-10-29 03:49:11 -0700',
-  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
-);
-  $nodes[] = array(
   'title' => 'Bulk Message - Body - Voice',
   'log' => '',
   'status' => 1,
@@ -3584,6 +3786,18 @@ function grievance_content_types_uuid_features_default_content() {
 <p><strong>Answering Machine Detection</strong></p>
 
 <p>It is possible to specify different messages to be delivered if an answering machine does and does not pick up. Answering machine detection settings can be configured <a href="/sirius/config/phone/twilio/amd">here.</a></p>
+
+<p><strong>Message Content</strong></p>
+
+<p>The message may be provided either as an uploaded file, text, or a "Twilio Flow".</p>
+
+<ul>
+	<li>If the message is uploaded, a file should be provided in WAV or MP3 format.&nbsp;You may want to use a service such as <a href="https://online-voice-recorder.com/" target="_blank">online-voice-recorder.com</a>. You may upload separate messages for human and answering machine recipients.<br />
+	&nbsp;</li>
+	<li>If text-to-speech is selected, then text can be entered which will be converted into an audio and played for the recipient. Separate messages are available for human and answering machine recipients.<br />
+	&nbsp;</li>
+	<li>If a "Twilio Flow" is selected, then a Flow must be created using Twilio Studio. The Flow should start with a "Rest API" trigger, and the first action should be "Make Outgoing Call". It may be useful to add a widget to split based on the "AnsweredBy" field, so that the Flow can provide different responses to human and answering machine recipients.</li>
+</ul>
 ',
         'summary' => '',
         'format' => 'full_html',
