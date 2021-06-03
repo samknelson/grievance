@@ -198,7 +198,7 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $is_test = FALSE) {
 		if ($json['voice']['type'] == 'flow') {
 			// @todo: Wrap in a sirius() function, rather than bypassing sirius and handing directly to Twilio
 			$flow_sid = $json['voice']['flow']['sid'];
-			sirius_twilio_outgoing_flow(
+			return sirius_twilio_outgoing_flow(
 				$flow_sid, 
 				$to, 
 				$bulk_node->field_sirius_callerids['und'][0]['target_id'], 
