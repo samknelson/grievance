@@ -285,7 +285,7 @@ function sirius_twilio_outgoing_flow($flow_sid, $phone, $callerid_nid, $flow_par
 		$result = array('success' => FALSE, 'msg' => "Flow message failed.", 'details' => "Failed to send to Twilio Flow: " . $e->getCode() . ' - ' . $e->getMessage());
 		$msg =  $e->getCode() . ' - ' . $e->getMessage() . ": " . $msg;
 		sirius_log('twilio:conversation', 'error', $msg, $msg, $phone, $handlers);
-		return array('success' => FALSE, 'msg' => $msg);
+		return $result;
 	}
 
 	$msg = "Transferred $phone to flow $flow_sid (callerId $callerid_phone)";
