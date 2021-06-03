@@ -31,6 +31,6 @@ function sirius_bulk_page_create_form($form, &$form_state) {
 function sirius_bulk_page_create_form_submit($form, &$form_state) {
 	$bulk_node = sirius_bulk_create($form_state['values']['title'], $form_state['values']['medium']);
 	drupal_set_message(t("Created a new bulk message: ") . $bulk_node->title);
-	drupal_goto('node/' . $bulk_node->nid . '/sirius_bulk_body');
+	drupal_goto('node/' . $bulk_node->nid . '/sirius_bulk_medium');
 }
 

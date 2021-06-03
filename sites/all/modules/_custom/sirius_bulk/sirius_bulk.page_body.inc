@@ -9,56 +9,7 @@ function sirius_bulk_node_tab_body_form($form, &$form_state, $bulk_node) {
 	$media = sirius_bulk_media();
 	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
 
-
-	// Add a link shortener
-  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/sirius.popup.js');
-  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.popup.css');
-  $html .= '<a href="#" class="sirius_popup_trigger tool-button">' . t('Link Shortener') . '</a>';
-  $html .= '<div style="display:none" class="sirius_popup_overlay"></div>';
-  $html .= '<div style="display:none" class="sirius_popup_wrap">';
-  $html .= '<div class="sirius_popup_contents">';
-  $shorten_block = block_load('shorten', 'shorten');
-	$shorten_build = module_invoke('shorten', 'block_view', 'shorten');
-	drupal_alter(array('block_view', "block_view_shorten_shorten"), $shorten_build, $shorten_block);
-	$html .= $shorten_build['content'];
-  $html .= '</div>';
-  $html .= '<div class="sirius_popup_close"></div>';
-  $html .= '</div>';
-  $form['#prefix'] = $html;
-
-	$form['intro'] = array('#markup' => '<div class="sirius_form_intro">' . t('Message type: ') . '<strong>' . $media[$medium] . '</strong></div>');
-
-	$form['title'] = array(
-		'#title' => t('Subject'),
-		'#type' => 'textfield',
-		'#default_value' => $bulk_node->title,
-		'#description' => t('Will be used as the subject for an email. The subject is <strong>not used</strong> for SMS (text messages) or audio messages (robocalls).'),
-		'#required' => TRUE,
-	);
-
-	if (in_array($medium, array('email', 'choice'))) {
-		$form['body'] = array(
-			'#title' => t('Email Body'),
-			'#type' => 'text_format',
-			'#default_value' => $bulk_node->body['und'][0]['value'],
-			'#format' => $bulk_node->body['und'][0]['text_format'],
-			'#required' => TRUE,
-		);
-	}
-
-	if (in_array($medium, array('sms', 'choice'))) {
-		$form['sms'] = array(
-			'#title' => t('SMS Body'),
-			'#type' => 'textarea',
-			'#default_value' => $bulk_node->field_sirius_sms['und'][0]['value'],
-			'#required' => TRUE,
-			'#id' => 'sms_body',
-			'#description' => sirius_sms_segment_count('sms_body'),
-		);
-	}
-
 	if (in_array($medium, array('voice', 'choice'))) {
-
 		$form['intro'] = array('#markup' => '<div class="sirius_form_intro">' . t('The voice message may be entered either as <ul><li>A text string. In this case, the system will use text-to-speech to synthesize the voice call</li><li>An uploaded recording in WAV or MP3 format. You may want to use a service such as <a href="https://online-voice-recorder.com/" target="_blank">online-voice-recorder.com</a></li></ul>') . '</div>');
 
 		$form['voice'] = array(

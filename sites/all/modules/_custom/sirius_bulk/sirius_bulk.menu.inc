@@ -18,12 +18,31 @@ function sirius_bulk_node_tabs() {
     'weight' => 1,
   );
 
-  $node_tabs['sirius_bulk']['sirius_bulk_body'] = array(
-    'title' => 'Body',
+  $node_tabs['sirius_bulk']['sirius_bulk_body_voice'] = array(
+    'title' => 'Voice Message',
     'description' => '',
-    'callback' => 'sirius_bulk_node_tab_body',
+    'callback' => 'sirius_bulk_node_tab_body_voice',
     'permissions' => array('sirius bulk send'),
     'weight' => 2,
+    'file' => 'sirius_bulk.page_body_voice.inc',
+  );
+
+  $node_tabs['sirius_bulk']['sirius_bulk_body_sms'] = array(
+    'title' => 'SMS Message',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_body_sms',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 2,
+    'file' => 'sirius_bulk.page_body_sms.inc',
+  );
+
+  $node_tabs['sirius_bulk']['sirius_bulk_body_email'] = array(
+    'title' => 'Email Message',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_body_email',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 2,
+    'file' => 'sirius_bulk.page_body_email.inc',
   );
 
   $node_tabs['sirius_bulk']['sirius_bulk_test'] = array(
