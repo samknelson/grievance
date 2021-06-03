@@ -143,6 +143,12 @@ function sirius_worker_report_skill_log_view_summary($report_type, $report_id) {
   $parameters = unserialize($hr['report_data']);
 
   $html = '';
+  $html .= '<h2>';
+  $html .= "Summary Report: ";
+  if ($parameters['start_date']) { $html .= $parameters['start_date']; } else { $html .= '[no start date]'; }
+  $html .= " to ";
+  if ($parameters['end_date']) { $html .= $parameters['end_date']; } else { $html .= '[no end date]'; }
+  $html .= '</h2>';
 
   $query = db_select('report_cache');
   $query->fields('report_cache');
@@ -220,6 +226,13 @@ function sirius_worker_report_skill_log_view_detail($report_type, $report_id) {
   $parameters = unserialize($hr['report_data']);
 
   $html = '';
+  $html = '';
+  $html .= '<h2>';
+  $html .= "Detail Report: ";
+  if ($parameters['start_date']) { $html .= $parameters['start_date']; } else { $html .= '[no start date]'; }
+  $html .= " to ";
+  if ($parameters['end_date']) { $html .= $parameters['end_date']; } else { $html .= '[no end date]'; }
+  $html .= '</h2>';
 
   $query = db_select('report_cache');
   $query->fields('report_cache');
