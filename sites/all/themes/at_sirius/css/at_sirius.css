@@ -4036,7 +4036,7 @@ input.ajax-processed:hover {
 }
 .sirius_dispatch_view_worker_section section {
   float: left;
-  width: 51%;
+  width: 95%;
 }
 .sirius_dispatch_view_dispatch_section .field,
 .sirius_dispatch_view_worker_section .field {
