@@ -154,7 +154,7 @@ function sirius_ledger_transmittal_list($params = array()) {
   $stmt = sirius_sql_query($sql, $sql_args);
   $transmittal_nids = array();
   while ($hr = $stmt->fetchAssoc()) {
-    $transmittal_nids[$hr['nid']] = $hr;
+    $transmittal_nids[$hr['transmittal_nid']] = $hr;
   }
   return $transmittal_nids;
 }
