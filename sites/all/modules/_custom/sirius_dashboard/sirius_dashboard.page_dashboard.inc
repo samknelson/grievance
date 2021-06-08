@@ -38,10 +38,11 @@ function sirius_dashboard_page_dashboard_content($print_and_exit = TRUE) {
 					if (isset($row_assoc['priority'])) { $priority = $row_assoc['priority']; }
 
 					$title = $item['title'];
-					if (isset($row_assoc['title'])) { $title = $row_assoc['title']; }
-					
+					if (isset($row_assoc['title'])) { $title .= ': ' . $row_assoc['title']; }
+
+
 					$row = array();
-					$row[] = $item['title'];
+					$row[] = $title;
 					$row[] = sirius_dashboard_priority_render($priority);
 					$row[] = $row_assoc['count'];
 					$row[] = $row_assoc['tools'];

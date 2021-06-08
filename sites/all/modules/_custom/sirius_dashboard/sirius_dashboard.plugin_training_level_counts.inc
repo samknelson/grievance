@@ -41,7 +41,7 @@ function sirius_dashboard_plugin_training_level_counts_data($prefs, $options = a
 		$count = $query->execute();
 		if (!$count) { continue; }
 
-		$title = "Count: " . $ms_term->name . ' ' . $level_record['title'];
+		$title = $ms_term->name . ' ' . $level_record['title'];
 
 		$tools = l(
 			'List', 
