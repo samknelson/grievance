@@ -32655,18 +32655,30 @@ Accepted'),
   );
   $handler->display->display_options['filters']['field_sirius_industry_tid_1']['type'] = 'select';
   $handler->display->display_options['filters']['field_sirius_industry_tid_1']['vocabulary'] = 'sirius_industry';
-  /* Filter criterion: Field: JSON (field_sirius_json) */
-  $handler->display->display_options['filters']['field_sirius_json_value']['id'] = 'field_sirius_json_value';
-  $handler->display->display_options['filters']['field_sirius_json_value']['table'] = 'field_data_field_sirius_json';
-  $handler->display->display_options['filters']['field_sirius_json_value']['field'] = 'field_sirius_json_value';
-  $handler->display->display_options['filters']['field_sirius_json_value']['relationship'] = 'field_sirius_member_status_tid';
-  $handler->display->display_options['filters']['field_sirius_json_value']['operator'] = 'allwords';
-  $handler->display->display_options['filters']['field_sirius_json_value']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['operator_id'] = 'field_sirius_json_value_op';
-  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['label'] = 'Level?';
-  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['operator'] = 'field_sirius_json_value_op';
-  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['identifier'] = 'field_sirius_json_value';
-  $handler->display->display_options['filters']['field_sirius_json_value']['expose']['remember_roles'] = array(
+  /* Filter criterion: Content: Denormalize: Level (field_sirius_denorm_level) */
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['id'] = 'field_sirius_denorm_level_value';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['table'] = 'field_data_field_sirius_denorm_level';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['field'] = 'field_sirius_denorm_level_value';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['expose']['operator_id'] = 'field_sirius_denorm_level_value_op';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['expose']['label'] = 'Level';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['expose']['operator'] = 'field_sirius_denorm_level_value_op';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['expose']['identifier'] = 'field_sirius_denorm_level_value';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  /* Filter criterion: Content: Denormalize: Level (field_sirius_denorm_level) */
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['id'] = 'field_sirius_denorm_level_value_1';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['table'] = 'field_data_field_sirius_denorm_level';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['field'] = 'field_sirius_denorm_level_value';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['operator'] = 'contains';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['operator_id'] = 'field_sirius_denorm_level_value_1_op';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['label'] = 'Level';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['description'] = 'contains';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['operator'] = 'field_sirius_denorm_level_value_1_op';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['identifier'] = 'field_sirius_denorm_level_value_1';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['remember_roles'] = array(
     2 => '2',
   );
 
@@ -32782,11 +32794,27 @@ Accepted'),
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
+  /* Field: Content: Denormalize: Level */
+  $handler->display->display_options['fields']['field_sirius_denorm_level']['id'] = 'field_sirius_denorm_level';
+  $handler->display->display_options['fields']['field_sirius_denorm_level']['table'] = 'field_data_field_sirius_denorm_level';
+  $handler->display->display_options['fields']['field_sirius_denorm_level']['field'] = 'field_sirius_denorm_level';
+  $handler->display->display_options['fields']['field_sirius_denorm_level']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_sirius_denorm_level']['settings'] = array(
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_sirius_denorm_level']['delta_offset'] = '0';
   /* Field: Content: Member Status */
   $handler->display->display_options['fields']['field_sirius_member_status']['id'] = 'field_sirius_member_status';
   $handler->display->display_options['fields']['field_sirius_member_status']['table'] = 'field_data_field_sirius_member_status';
   $handler->display->display_options['fields']['field_sirius_member_status']['field'] = 'field_sirius_member_status';
+  $handler->display->display_options['fields']['field_sirius_member_status']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['field_sirius_member_status']['alter']['text'] = '[field_sirius_member_status]</ br>
+[field_sirius_denorm_level]';
   $handler->display->display_options['fields']['field_sirius_member_status']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_sirius_member_status']['settings'] = array(
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_sirius_member_status']['delta_offset'] = '0';
   /* Field: Content: Work Status */
   $handler->display->display_options['fields']['field_sirius_work_status']['id'] = 'field_sirius_work_status';
   $handler->display->display_options['fields']['field_sirius_work_status']['table'] = 'field_data_field_sirius_work_status';
@@ -32973,7 +33001,8 @@ Accepted'),
     t('Apprentice ID'),
     t('SSN'),
     t('Currently Employed Industry'),
-    t('Level?'),
+    t('Level'),
+    t('contains'),
     t('Page'),
     t('<div /><a href="/node/add/sirius-worker?destination=[current_path]" class="action-button">Add a new worker</a></div>'),
     t('Position'),
@@ -32982,6 +33011,9 @@ Accepted'),
     t('Re-Sync Worker\'s User'),
     t('ID'),
     t('Last Sign in'),
+    t('Denormalize: Level'),
+    t('[field_sirius_member_status]</ br>
+[field_sirius_denorm_level]'),
     t('Work Status / Dispatch Status'),
     t('[field_sirius_work_status]<br><a href="/node/[nid]/sirius_worker_dispatches/status" target="_blank">[field_sirius_worker_dispstatus]</a>'),
     t('<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/sirius_worker_contact" target="_blank" class="tool-button">Contact Info</a> <a href="/node/[nid]/sirius_worker_dispatches" target="_blank" class="tool-button">Dispatches</a> <a href="/node/[nid]/sirius_worker_ledger" target="_blank" class="tool-button">A/R</a>  <a href="/node/[nid]/sirius_worker_industry" target="_blank" class="tool-button">Industries</a> <a href="/node/[nid]/sirius_worker_work_status" target="_blank" class="tool-button">Work Status</a> <a href="/node/[nid]/sirius_worker_materials" target="_blank" class="tool-button">Materials</a>  <a href="/node/[nid]/sirius_worker_tc/certifications" target="_blank" class="tool-button">Certifications</a> <a href="/node/[nid]/sirius_worker_skill/view" target="_blank" class="tool-button">Skills</a>'),

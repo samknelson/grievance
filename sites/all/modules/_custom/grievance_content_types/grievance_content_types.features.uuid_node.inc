@@ -3199,6 +3199,114 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Training Center - Levels - Denormalize / Resync',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1622808216,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '93f7b12f-5566-4b04-9b9a-fefbf2d73876',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The level settings for each worker are stored in structured data. (Technically, they\'re stored in a "JSON" field attached to the worker record.) When the worker\'s levels need to be rendered or modified, this structured data is decoded.</p>
+
+<p>Unfortunately, many standard reports and queries are unable to retrieve this type of structured data. In particular, Drupal Views cannot fetch these values directly. This makes it challenging to add the worker\'s levels to a standard search form.</p>
+
+<p>The solution is to "denormalize" the level -- storing a copy of it in a standard, easy-to-access Drupal field.</p>
+
+<p>This process of denormalization happens automatically whenever a worker\'s level is set. However, occasionally the internal representation and the denormalized copy might get out of sync; for example, if the worker is updated directly within the database, or if there is a software change. In that case, the denormalized copies of the data need to be recomputed. This utility is designed to do that.</p>
+
+<p>The system begins with the most recent worker (highest NID) and re-denormalizes a "batch". Batch sizes should be selected so that the system doesn\'t run out of memory and so that the process finishes in a reasonable amount of time. It will probably be necessary to run the utility several times until all workers are recomputed.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/config/training/level-denorm-resync',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this form to re-denormalize levels for all workers.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-04 05:03:36 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Grievance Arbitration Form Settings',
   'log' => '',
   'status' => 1,
