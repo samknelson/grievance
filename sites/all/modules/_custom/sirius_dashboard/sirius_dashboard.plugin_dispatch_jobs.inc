@@ -21,14 +21,14 @@ function sirius_dispatch_plugin_dispatch_jobs_prefs($json) {
 	$form['link_path'] = array(
 		'#type' => 'textfield',
 		'#title' => 'Link Path',
-		'#default_value' => $json['markup']['link_path'],
+		'#default_value' => $json['link_path'],
 		'#description' => t('Enter the system path that this dashboard item should link to. The pathshould not begin with a slash (/). For example, "sirius/config".'),
 	);
 
 	$form['link_text'] = array(
 		'#type' => 'textfield',
 		'#title' => 'Link Text',
-		'#default_value' => $json['markup']['link_text'],
+		'#default_value' => $json['link_text'],
 		'#description' => t('Enter the text that should appear in the link button.'),
 	);
 
