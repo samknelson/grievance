@@ -193,6 +193,16 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	}
 	$form['worker_section_h'] = array('#markup' => sirius_fakerender_field('Member Status:', $ms_term->name));
 
+	// Find the level
+	$levels = sirius_training_levels_fetch_worker($worker_node);
+	if ($levels && $levels[$ms_tid]) {
+		$level_code = $levels[$ms_tid]['code'];
+		$level_info = sirius_training_levels_fetch_record($ms_tid, $level_code);
+		if ($level_info) {
+			$form['worker_section_h1'] = array('#markup' => sirius_fakerender_field('Level:', $level_info['title']));
+		}
+	}
+
 	$contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
 	$contact_json = sirius_jsonfield_util_node_json_get($contact_node);
 	$contact_results = sirius_jsonfield_util_results_get($contact_json, 'default');
