@@ -72,8 +72,17 @@ function sirius_phonetree($call_sid, $context) {
 	// Enter 9 to be connected with an operator.
 	if ($digits == 9 || $handler == 'operator') {
 		// sirius_phonetree_operator($call_sid, $context); 
-		sirius_twilio_outgoing_voice_dial($call_sid, $context, "Please wait while we connect you with an operator.", variable_get('sirius_twilio_operator', ''));
+		// sirius_twilio_outgoing_voice_dial($call_sid, $context, "Please wait while we connect you with an operator.", variable_get('sirius_twilio_operator', ''));
+	  if (variable_get('sirius_voice_forward_to_operator_status', 'open') == 'open') {
+	  	sirius_twilio_outgoing_voice_dial($call_sid, $context, "Please wait while we connect you with an operator.", variable_get('sirius_twilio_operator', ''));
+	   } else {
+	    $which = variable_get('sirius_voice_forward_to_operator_disabled_which', 1);
+	    $msg = variable_get("sirius_voice_forward_to_operator_disabled_$which", "We're sorry, the office is closed right now.");
+			sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, 0);
+	   }
 	} 
+	// sirius_twilio_outgoing_voice_dial($call_sid, $context, "Please wait while we connect you with an operator.", variable_get('sirius_twilio_operator', ''));
+
 
 	// Enter * to hear this message again.
 	if ($digits == '*') {
