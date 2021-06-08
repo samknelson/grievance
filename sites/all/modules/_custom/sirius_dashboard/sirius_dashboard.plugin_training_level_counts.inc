@@ -17,7 +17,7 @@ function sirius_dashboard_plugin_training_level_counts_data($prefs, $options = a
 	if (!$ms_tid) { return array(); }
 	$levels = sirius_training_levels_fetch($ms_tid);
 
-	$ms_term = sirius_taxonomy_term_load($ms_tid);
+	$ms_term = taxonomy_term_load($ms_tid);
 
 	$ws_terms = sirius_taxonomy_load('sirius_work_status', 'tid', 'full');
 	$ws_member_active_tids = array();
