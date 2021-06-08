@@ -51,7 +51,7 @@ function sirius_dashboard_plugin_info_all() {
 		),
 	);
 
-	$plugins['training'] = array(
+	$plugins['training_evaluations'] = array(
 		'title' => 'Training: Evaluations',
 		'description' => '',
 		'file' => 'sirius_dashboard.plugin_training_evaluations.inc',
@@ -61,15 +61,26 @@ function sirius_dashboard_plugin_info_all() {
 		),
 	);
 
+	$plugins['training_level_counts'] = array(
+		'title' => 'Training: Level Counts',
+		'description' => '',
+		'file' => 'sirius_dashboard.plugin_training_level_counts.inc',
+		'module' => 'sirius_dashboard',
+		'callbacks' => array(
+			'data' => 'sirius_dashboard_plugin_training_level_counts_data',
+			'prefs' => 'sirius_dashboard_plugin_training_level_counts_prefs',
+		),
+	);
+
 	$plugins['markup'] = array(
 		'title' => 'Raw Markup',
 		'description' => '',
 		'file' => 'sirius_dashboard.plugin_markup.inc',
 		'module' => 'sirius_dashboard',
 		'callbacks' => array(
-			'data' => 'sirius_dispatch_plugin_markup_data',
-			'config' => 'sirius_dispatch_plugin_markup_config',
-			'prefs' => 'sirius_dispatch_plugin_markup_prefs',
+			'data' => 'sirius_dashboard_plugin_markup_data',
+			'config' => 'sirius_dashboard_plugin_markup_config',
+			'prefs' => 'sirius_dashboard_plugin_markup_prefs',
 		),
 	);
 

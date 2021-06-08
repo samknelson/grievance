@@ -1,6 +1,6 @@
 <?php
 
-function sirius_dispatch_plugin_markup_prefs($prefs) {
+function sirius_dashboard_plugin_markup_prefs($prefs) {
 	$form['markup'] = array(
 		'#type' => 'text_format',
 		'#title' => 'Markup',
@@ -26,7 +26,7 @@ function sirius_dispatch_plugin_markup_prefs($prefs) {
 	return $form;
 }
 
-function sirius_dispatch_plugin_markup_data($prefs, $options = array()) {
+function sirius_dashboard_plugin_markup_data($prefs, $options = array()) {
 	$tools = '';
 	if ($prefs['link_path']) {
 		$tools = l($prefs['link_text'], $prefs['link_path'], array('attributes' => array('class' => array('tool-button'))));
