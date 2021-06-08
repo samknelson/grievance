@@ -170,8 +170,6 @@ function sirius_training_menu() {
     'weight' => 1,
   );
 
-
-
   $items['sirius/config/training/customfields'] = array(
     'title' => 'Custom Fields',
     'page callback' => 'sirius_training_config_customfields_edit',
@@ -203,8 +201,6 @@ function sirius_training_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 3,
   );
-
-
 
   $items['sirius/config/training/evaluations'] = array(
     'title' => 'Evaluations',
@@ -273,6 +269,17 @@ function sirius_training_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
   );
+
+  $items['sirius/config/training/level-denorm-resync'] = array(
+    'title' => 'Re-Denormalize Levels',
+    'page callback' => 'sirius_training_page_level_denorm_resync',
+    'page arguments' => array(),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 20,
+    'file' => 'sirius_training.page_level_denorm_resync.inc',
+  );
+
 
   $items['sirius/training/evaluation'] = array(
     'title' => 'Submit an Evaluation',

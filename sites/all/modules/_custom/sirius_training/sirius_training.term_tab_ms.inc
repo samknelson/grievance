@@ -158,22 +158,20 @@ function sirius_term_tab_ms_form_validate($form, &$form_state) {
 function sirius_term_tab_ms_form_submit($form, &$form_state) {
 	$ms_tid = $form_state['ms_tid'];
 	$ms_term = taxonomy_term_load($ms_tid);
-	$json = json_decode($ms_term->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_json_get($ms_term);
 
-	$values = $form_state['values'];
+	$json['training'] = $form_state['values']['training'];
+	$json['training']['evaluations_enabled'] = $form_state['values']['evaluations_enabled'];
+	$json['training']['levels_enabled'] = $form_state['values']['levels_enabled'];
+	$levels = array();
+	foreach ($form_state['values']['levels'] as $old_level_code => $record) {
+		$new_level_code = $record['code'];
+		if (!$new_level_code) { continue; }
+		$levels[$new_level_code] = $record;
+	}
+	$json['training']['levels'] = $levels;
 
-	unset($values['op']);
-	unset($values['submit']);
-	unset($values['form_id']);
-	unset($values['form_token']);
-	unset($values['form_build_id']);
-
-	$new_code = $values['levels']['new']['code'];
-	if ($new_code) { $values['levels'][$new_code] = $values['levels']['new']; }
-	unset($values['levels']['new']);
-
-	$json['training'] = $values;
-	$ms_term->field_sirius_json['und'][0]['value'] = json_encode($json);
+	sirius_json_set($ms_term, $json);
 	taxonomy_term_save($ms_term);
 	drupal_set_message(t('Settings saved.'));
 }

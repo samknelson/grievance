@@ -35,23 +35,29 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_tr
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_training/sirius_training.term_tab_ms.inc';
 
-/*
-function sirius_training_file_download_access($file_item, $entity_type, $entity) {
-	// Workers can access their own evaluations.
-  if ($entity_type == 'node' && $entity->type == 'sirius_log') {
-  	$category = $entity->field_sirius_category['und'][0]['value'];
-  	if ($category != 'worker:training') { return; }
+function sirius_training_field_attach_view_alter(&$output, $context) {
+ 	$ms_level_options = &drupal_static(__FUNCTION__);
 
-		$type = $entity->field_sirius_type['und'][0]['value'];
-  	if ($type != 'evaluation') { return; }
-  	
-  	$worker_node = sirius_worker_get();
-  	if (!$worker_node) { return; }
+ 	if (!$output) { return; }
+	if ($context['entity_type'] != 'node') { return; }
+	if (!$output['field_sirius_denorm_level']) { return; }
 
-  	$handlers = sirius_fieldvals($entity, 'field_sirius_log_handler', 'target_id');
-  	if (!in_array($worker_node->nid, $handlers)) { return; }
+	if (!isset($ms_level_options)) { $ms_level_options = sirius_training_ms_level_options_short(FALSE); }
 
-  	return TRUE; 
-  }
+	foreach ($output['field_sirius_denorm_level'] as $key => $render_array) {
+		if (preg_match('/^#/', $key)) { continue; }
+		$ms_level = $render_array['#markup'];
+		$ms_level_name = $ms_level_options[$ms_level];
+		if ($ms_level_name) {
+			$output['field_sirius_denorm_level'][$key]['#markup'] = $ms_level_name;
+		}
+	}
+
 }
-*/
+
+function sirius_training_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
+	if (!$form['field_sirius_denorm_level_value']) { return; }
+	$form['field_sirius_denorm_level_value']['#type'] = 'select';
+	$form['field_sirius_denorm_level_value']['#options'] = array(NULL => t('-- Select --')) + sirius_training_ms_level_options_short(FALSE);
+	unset($form['field_sirius_denorm_level_value']['#size']);
+}

@@ -1,5 +1,20 @@
 <?php
 
+/*
+function sirius_training_levels_node_view_alter(&$build) {
+	if (!$build['field_sirius_denorm_level']) { return; }
+	$ms_level_options = sirius_training_ms_level_options_short();
+	foreach ($build['field_sirius_denorm_level'] as $key => $render_array) {
+		if (preg_match('/^#/', $key)) { continue; }
+		$ms_level = $render_array['#markup'];
+		$ms_level_name = $ms_level_options[$ms_level];
+		if ($ms_level_name) {
+			$build['field_sirius_denorm_level'][$key]['#markup'] = $ms_level_name;
+		}
+	}
+}
+*/
+
 function sirius_training_levels_fetch_all() {
 	$all_levels = &drupal_static(__FUNCTION__);
 	if (!$all_levels) {
@@ -33,6 +48,34 @@ function sirius_training_levels_fetch($ms_term_or_tid) {
 	$levels = $json['training']['levels'];
 	uasort($levels, function($a,$b) { return $a['weight'] <=> $b['weight']; });
 	return $levels;
+}
+
+function sirius_training_ms_level_options() {
+	$ms_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+	$ms_level_options = array();
+	foreach ($ms_options as $ms_tid => $ms_name) {
+		$levels = sirius_training_levels_fetch($ms_tid);
+		$ms_level_options[$ms_tid] = $ms_name;
+		foreach ($levels as $level_code => $level) {
+			$ms_level_options["$ms_tid|$level_code"] = $ms_name . ': ' . $level['title'];
+		}
+	}
+	return $ms_level_options;
+}
+
+function sirius_training_ms_level_options_short($include_term = TRUE) {
+	$ms_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+	$ms_level_options = array();
+	foreach ($ms_options as $ms_tid => $ms_name) {
+		$levels = sirius_training_levels_fetch($ms_tid);
+		if ($include_term) {
+			$ms_level_options[$ms_tid] = $ms_name;
+		}
+		foreach ($levels as $level_code => $level) {
+			$ms_level_options["$ms_tid|$level_code"] = $level['title'];
+		}
+	}
+	return $ms_level_options;
 }
 
 function sirius_training_levels_fetch_worker($worker_node) {
@@ -122,18 +165,29 @@ function sirius_training_level_graduate_possible($worker_node, $ms_term, $level,
 function sirius_training_level_graduate($worker_node, $ms_term, $level, $params) {
 	// Possible?
 	$possible = sirius_training_level_graduate_possible($worker_node, $ms_term, $level, $params);
-	if (!$possible['success']) {
-		return $possible;
-	}
+	if (!$possible['success']) { return $possible; }
 
 	// Set the level
-	$json = json_decode($worker_node->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_json_get($worker_node);
 	$level_code = $level['code'];
 	$json['training']['levels'][$ms_term->tid] = array(
 		'code' => $level_code,
 		'ts' => time(),
 	);
-	$worker_node->field_sirius_json['und'][0]['value'] = json_encode($json);
+	sirius_json_set($worker_node, $json);
+
+	// Denormalize for easier querying
+	$ms_tid = $ms_term->tid;
+	if ($worker_node->field_sirius_denorm_level['und']) {
+		foreach ($worker_node->field_sirius_denorm_level['und'] as $delta => $record) {
+			if (preg_match("/^$ms_tid\|/", $record['value'])) {
+				unset($worker_node->field_sirius_denorm_level['und'][$delta]);
+			}
+		}
+	}
+	$worker_node->field_sirius_denorm_level['und'] = array_values($worker_node->field_sirius_denorm_level['und']);
+	$worker_node->field_sirius_denorm_level['und'][] = array('value' => $ms_term->tid . '|' . $level_code);
+
 	node_save($worker_node);
 
 	// Log
@@ -147,9 +201,6 @@ function sirius_training_level_graduate($worker_node, $ms_term, $level, $params)
 		array(),
 		array('ms_tid' => $ms_term->tid, 'level' => $level, 'params' => $params)
 	);
-
-	// Email
-	
 
 	// Return
 	return array('success' => TRUE);

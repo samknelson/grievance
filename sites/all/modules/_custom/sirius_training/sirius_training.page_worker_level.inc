@@ -23,6 +23,5 @@ function sirius_training_node_tab_worker_level($worker_node) {
 	}
 
 	return sirius_training_render_levels($worker_node, array('is_admin' => $is_admin));
-
 }
 
