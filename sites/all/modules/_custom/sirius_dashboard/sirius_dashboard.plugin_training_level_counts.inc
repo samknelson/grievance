@@ -46,7 +46,8 @@ function sirius_dashboard_plugin_training_level_counts_data($prefs, $options = a
 				'query' => array(
 					'field_sirius_denorm_level_value' => "$ms_tid|$level_code",
 					'field_sirius_member_active_value' => 'Yes',
-					'field_sirius_member_status' => $ms_tid,
+					'field_sirius_member_status_tid[]' => $ms_tid,
+					'field_sirius_member_status_tid_op' => 'or',
 				),
 			)
 		);
