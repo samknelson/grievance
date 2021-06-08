@@ -17,6 +17,8 @@ function sirius_dashboard_plugin_training_level_counts_data($prefs, $options = a
 	if (!$ms_tid) { return array(); }
 	$levels = sirius_training_levels_fetch($ms_tid);
 
+	$ms_term = sirius_taxonomy_load($ms_tid);
+
 	$ws_terms = sirius_taxonomy_load('sirius_work_status', 'tid', 'full');
 	$ws_member_active_tids = array();
 	$ws_dispatch_available_tids = array();
@@ -37,6 +39,9 @@ function sirius_dashboard_plugin_training_level_counts_data($prefs, $options = a
 		if ($ws_member_active_tids) { $query->fieldCondition('field_sirius_work_status', 'tid', $ws_member_active_tids, 'in'); }
 		$query->count();
 		$count = $query->execute();
+		if (!$count) { continue; }
+
+		$title = "Count: " . $ms_term->name . ' ' . $level_record['title'];
 
 		$tools = l(
 			'List', 
@@ -53,7 +58,7 @@ function sirius_dashboard_plugin_training_level_counts_data($prefs, $options = a
 		);
 
 		$row = array(
-			'details' => $level_record['title'],
+			'title' => $title,
 			'count' => $count,
 			'tools' => $tools,
 		);
