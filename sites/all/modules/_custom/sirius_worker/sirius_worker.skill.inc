@@ -162,7 +162,7 @@ function sirius_worker_skills_cron($force = FALSE) {
  *        "It Would Be A Good Thing" to consolidate.
  */
 
-function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason, $files, $certification_nid = NULL) {
+function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason, $files, $certification_nid = NULL, $participant_nid = NULL) {
 	if (is_array($tids) && $tids[1]) {
 		return array('success' => FALSE, 'msg' => 'System error: sirius_worker_skill_set() must be called with just a single skill TID.');
 	}
@@ -227,6 +227,8 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 	node_save($worker_node);
 	$handlers = array($worker_node->nid);
 	if ($certification_nid) { $handlers[] = $certification_nid; }
+	if ($participant_nid) { $handlers[] = $participant_nid; }
+	
 	foreach ($tids as $tid) {
 		$proxy = sirius_taxonomy_proxy($tid);
 		$handlers[] = $proxy->nid;
