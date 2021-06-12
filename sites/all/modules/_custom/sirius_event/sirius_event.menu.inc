@@ -680,8 +680,8 @@ function sirius_event_node_tabs() {
     'callback arguments' => array('verified'),
   );
 
-
   sirius_node_tab_set_module('sirius_event', $node_tabs);
+
 	return $node_tabs;
 }
 
