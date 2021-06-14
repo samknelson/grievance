@@ -182,3 +182,14 @@ function sirius_update_7011() {
     module_enable(array($module), TRUE);
   }
 }
+
+/**
+ * Set SMTP module to allow HTML
+ */
+
+function sirius_update_7012() {
+  if (variable_get('smtp_allowhtml', 1) == 1) { return; }
+  print "Setting smtp_allowhtml = 1\n";
+  variable_set('smtp_allowhtml', 1);
+}
+
