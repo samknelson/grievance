@@ -1048,6 +1048,17 @@ function sirius_letter_wizard_send_form($form, &$form_state, $info, $data, $lett
 	    '#options' => $log_type_options,
 	    '#title' => t('Save to the grievance log as'),
 	  );
+
+		$letter_template_node = node_load($data['letter_template_nid_0']);
+
+		if ($letter_template_node) {
+			if ($letter_template_node->field_grievance_log_type['und'][0]['tid']) {
+				$form['logging']['#default_value'] = $letter_template_node->field_grievance_log_type['und'][0]['tid'];
+			}
+			if ($letter_template_node->field_sirius_mustlog['und'][0]['value'] == 'Yes') {
+				$form['logging']['#required'] = TRUE;
+			}
+		}
 	}
 
 	if ($data['format'] == 'pdf') { $submit_label = t('Download PDF'); }
