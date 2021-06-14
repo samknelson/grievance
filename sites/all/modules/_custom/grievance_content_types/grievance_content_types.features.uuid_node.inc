@@ -194,6 +194,96 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Twilio - Recordings - Local',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1623420264,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '138724d3-0c8a-4292-9b58-7f84f5090359',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/twilio/local',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Local...</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-11 07:04:24 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Event - Phonebank - Followup',
   'log' => '',
   'status' => 1,
@@ -2004,6 +2094,124 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2018-11-19 09:03:09 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Twilio - Recordings - Remote',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1623420249,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '590d277a-3a4b-4883-9b43-cc6d03ec763d',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This page lists remote recordings stored at the telephony provider. Some of these recordings may have been "pulled" to the local repository.</p>
+
+<p>The "Filters" tool to may be used to search for a specific recording. At the bottom of the page, there are options to delete selected recordings from the remote telephony provider, or to pull selected recordings and create local copies.</p>
+
+<p><strong>Columns</strong></p>
+
+<ul>
+	<li>From, To: The phone numbers associated with the call that this recording is connected to.&nbsp;</li>
+	<li>Date: The date that the recording started</li>
+	<li>Duration: The length of the recording. This may not be the same as the duration of the call.</li>
+	<li>Play: Play or download the recording directly from the remote telephony provider.</li>
+	<li>Local?: Indicates whether this recording has been "pulled" so that a local copy exists.</li>
+</ul>
+
+<p>&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/twilio/recordings',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'sirius/twilio/recordings/remote',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This page lists remote recordings stored at the telephony provider.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-11 07:04:09 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -3871,6 +4079,137 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Office - Operator - Settings',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1623238832,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'b1984832-95c7-472e-a827-0e28215a92fc',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p><strong>Incoming Phone Number</strong></p>
+
+<p>This is the public-facing phone number for the office.</p>
+
+<ul>
+	<li>This must be a phone number that is fully hosted at Twilio (not a caller ID) and able to accept incoming voice calls.</li>
+	<li>The number must be set so that incoming voice calls to this number use a "Webhook" pointing to https://[domain name]/sirius/twilio/incoming/voice</li>
+	<li>Calls to this number will appear on the "Incoming Calls" tab for the operator.&nbsp;</li>
+	<li>Multiple operators may share the same incoming phone number.</li>
+</ul>
+
+<p><strong>Outgoing Phone&nbsp;Number</strong></p>
+
+<p>This is a private phone number for forwarding calls to the office.</p>
+
+<ul>
+	<li>This number in general should&nbsp;<strong>not</strong>&nbsp;be hosted at Twilio. It should be an external number.</li>
+	<li>If an incoming call is forwared to the operator, this is the number that will be dialed.</li>
+</ul>
+
+<p><strong>Recording Calls</strong></p>
+
+<p>A call which is forwarded to the operator may, optionally, be recorded.</p>
+
+<ul>
+	<li>Set Record = "Active" to indicate that these calls should be recorded.</li>
+	<li>For recorded calls, select a suitable "recording mode", i.e. "record-from-answer-dual".&nbsp;</li>
+	<li>See <a href="/sirius/twilio/recordings">the main recordings page</a>&nbsp;for a list of recordings and to set recording retention policies.</li>
+	<li>For more information about audio recording, consult the Twilio documentation.</li>
+</ul>
+
+<p><em>The user of this system is responsible for complying with all applicable laws regarding call recording.</em></p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_operator_settings',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this page to define the settings for this operator.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-09 04:40:32 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Bulk Message - Body - Voice',
   'log' => '',
   'status' => 1,
@@ -4736,6 +5075,124 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2019-10-07 12:52:25 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Twilio - Recording',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1623346779,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'f95f6f62-df09-42d2-9e4c-dc932721e865',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This page shows the local, or downloaded, copy of a call recording.</p>
+
+<p><strong>Recording Information</strong></p>
+
+<ul>
+	<li>SID: The unique (remote) identifier for the recording record at the telelphony provider.</li>
+	<li>Date: The date that the recording started. This may not be identical to the date that the call started. For example, recording might not begin until a call is forwarded to an operator.</li>
+	<li>Duration: The duration of the recording.</li>
+</ul>
+
+<p><strong>Call Information</strong></p>
+
+<ul>
+	<li>SID: The unique (remote) identifier for the call instance at the telephony provider.</li>
+	<li>From, To: The phone numbers associated with the call. Note that for certain call instances (conference calls or forwarded calls, for example) these numbers might not be available.</li>
+	<li>Date: The date that the call started.</li>
+</ul>
+
+<p>&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_twilio_recording',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This page shows the local (downloaded) copy of a call recording.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-10 10:39:39 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   return $nodes;

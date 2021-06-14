@@ -32185,100 +32185,104 @@ Accepted'),
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['query']['options']['distinct'] = TRUE;
-  $handler->display->display_options['exposed_form']['type'] = 'better_exposed_filters';
+  $handler->display->display_options['exposed_form']['type'] = 'views_exposed_groups';
   $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
-  $handler->display->display_options['exposed_form']['options']['bef'] = array(
-    'general' => array(
-      'input_required' => 0,
-      'text_input_required' => array(
-        'text_input_required' => array(
-          'value' => 'Select any filter and click on Apply to see results',
-          'format' => 'full_html',
-        ),
-      ),
-      'allow_secondary' => 0,
-      'secondary_label' => 'Advanced options',
-      'secondary_collapse_override' => '0',
+  $handler->display->display_options['exposed_form']['options']['views_exposed_groups'] = array(
+    'format_groups' => 'vertical_tabs',
+    'groups' => 'Name & IDs
+Industry & Employers
+Status & Levels
+Skills
+Dispatch Info',
+    'group-field_sirius_member_status_tid' => array(
+      'group' => '2',
+      'filter_name' => 'field_sirius_member_status_tid',
+      'weight' => '-20',
     ),
-    'field_sirius_work_status_tid' => array(
-      'bef_format' => 'default',
-      'more_options' => array(
-        'bef_select_all_none' => FALSE,
-        'bef_collapsible' => 0,
-        'autosubmit' => 0,
-        'is_secondary' => 0,
-        'any_label' => '',
-        'bef_filter_description' => '',
-        'tokens' => array(
-          'available' => array(
-            0 => 'global_types',
-            1 => 'vocabulary',
-          ),
-        ),
-        'rewrite' => array(
-          'filter_rewrite_values' => '',
-        ),
-      ),
+    'group-field_sirius_industry_tid' => array(
+      'group' => '1',
+      'filter_name' => 'field_sirius_industry_tid',
+      'weight' => '-18',
     ),
-    'field_sirius_member_status_tid' => array(
-      'bef_format' => 'default',
-      'more_options' => array(
-        'bef_select_all_none' => FALSE,
-        'bef_collapsible' => 0,
-        'autosubmit' => 0,
-        'is_secondary' => 0,
-        'any_label' => '',
-        'bef_filter_description' => '',
-        'tokens' => array(
-          'available' => array(
-            0 => 'global_types',
-            1 => 'vocabulary',
-          ),
-        ),
-        'rewrite' => array(
-          'filter_rewrite_values' => '',
-        ),
-      ),
+    'group-field_grievance_shop_target_id' => array(
+      'group' => '1',
+      'filter_name' => 'field_grievance_shop_target_id',
+      'weight' => '-18',
     ),
-    'field_sirius_industry_tid' => array(
-      'bef_format' => 'default',
-      'more_options' => array(
-        'bef_select_all_none' => FALSE,
-        'bef_collapsible' => 0,
-        'autosubmit' => 0,
-        'is_secondary' => 0,
-        'any_label' => '',
-        'bef_filter_description' => '',
-        'tokens' => array(
-          'available' => array(
-            0 => 'global_types',
-            1 => 'vocabulary',
-          ),
-        ),
-        'rewrite' => array(
-          'filter_rewrite_values' => '',
-        ),
-      ),
+    'group-field_sirius_work_status_tid' => array(
+      'group' => '2',
+      'filter_name' => 'field_sirius_work_status_tid',
+      'weight' => '-18',
     ),
-    'field_sirius_skill_tid' => array(
-      'bef_format' => 'default',
-      'more_options' => array(
-        'bef_select_all_none' => FALSE,
-        'bef_collapsible' => 0,
-        'autosubmit' => 0,
-        'is_secondary' => 0,
-        'any_label' => '',
-        'bef_filter_description' => '',
-        'tokens' => array(
-          'available' => array(
-            0 => 'global_types',
-            1 => 'vocabulary',
-          ),
-        ),
-        'rewrite' => array(
-          'filter_rewrite_values' => '',
-        ),
-      ),
+    'group-field_sirius_worker_dispstatus_tid' => array(
+      'group' => '4',
+      'filter_name' => 'field_sirius_worker_dispstatus_tid',
+      'weight' => '-20',
+    ),
+    'group-field_sirius_skill_tid' => array(
+      'group' => '3',
+      'filter_name' => 'field_sirius_skill_tid',
+      'weight' => '-20',
+    ),
+    'group-field_sirius_dispatch_sib_status_tid' => array(
+      'group' => '4',
+      'filter_name' => 'field_sirius_dispatch_sib_status_tid',
+      'weight' => '-18',
+    ),
+    'group-field_sirius_dispatch_available_value' => array(
+      'group' => '4',
+      'filter_name' => 'field_sirius_dispatch_available_value',
+      'weight' => '-19',
+    ),
+    'group-field_sirius_name' => array(
+      'group' => '0',
+      'filter_name' => 'field_sirius_name',
+      'weight' => '-18',
+    ),
+    'group-field_sirius_id_value' => array(
+      'group' => '0',
+      'filter_name' => 'field_sirius_id_value',
+      'weight' => '-18',
+    ),
+    'group-field_sirius_id2_value' => array(
+      'group' => '0',
+      'filter_name' => 'field_sirius_id2_value',
+      'weight' => '-18',
+    ),
+    'group-field_sirius_id3_value' => array(
+      'group' => '0',
+      'filter_name' => 'field_sirius_id3_value',
+      'weight' => '-18',
+    ),
+    'group-field_sirius_ssn_value' => array(
+      'group' => '0',
+      'filter_name' => 'field_sirius_ssn_value',
+      'weight' => '-18',
+    ),
+    'group-field_sirius_industry_tid_1' => array(
+      'group' => '1',
+      'filter_name' => 'field_sirius_industry_tid_1',
+      'weight' => '-18',
+    ),
+    'group-field_sirius_member_active_value' => array(
+      'group' => '2',
+      'filter_name' => 'field_sirius_member_active_value',
+      'weight' => '-17',
+    ),
+    'group-field_sirius_skills_avail_tid' => array(
+      'group' => '3',
+      'filter_name' => 'field_sirius_skills_avail_tid',
+      'weight' => '-18',
+    ),
+    'group-field_sirius_skill_tid_1' => array(
+      'group' => '3',
+      'filter_name' => 'field_sirius_skill_tid_1',
+      'weight' => '-19',
+    ),
+    'group-field_sirius_denorm_level_value' => array(
+      'group' => '2',
+      'filter_name' => 'field_sirius_denorm_level_value',
+      'weight' => '-19',
     ),
   );
   $handler->display->display_options['pager']['type'] = 'full';
@@ -32518,7 +32522,7 @@ Accepted'),
   $handler->display->display_options['filters']['field_sirius_skill_tid']['group'] = 1;
   $handler->display->display_options['filters']['field_sirius_skill_tid']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['operator_id'] = 'field_sirius_skill_tid_op';
-  $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['label'] = 'Skill';
+  $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['label'] = 'Skills 1';
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['use_operator'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['operator'] = 'field_sirius_skill_tid_op';
   $handler->display->display_options['filters']['field_sirius_skill_tid']['expose']['limit_operators'] = TRUE;
@@ -32655,6 +32659,64 @@ Accepted'),
   );
   $handler->display->display_options['filters']['field_sirius_industry_tid_1']['type'] = 'select';
   $handler->display->display_options['filters']['field_sirius_industry_tid_1']['vocabulary'] = 'sirius_industry';
+  /* Filter criterion: Taxonomy term: Member? (field_sirius_member_active) */
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['id'] = 'field_sirius_member_active_value';
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['table'] = 'field_data_field_sirius_member_active';
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['field'] = 'field_sirius_member_active_value';
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['relationship'] = 'field_sirius_work_status_tid';
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['expose']['operator_id'] = 'field_sirius_member_active_value_op';
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['expose']['label'] = 'Active Member?';
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['expose']['operator'] = 'field_sirius_member_active_value_op';
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['expose']['identifier'] = 'field_sirius_member_active_value';
+  $handler->display->display_options['filters']['field_sirius_member_active_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  /* Filter criterion: Content: Available For Skills (field_sirius_skills_avail) */
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['id'] = 'field_sirius_skills_avail_tid';
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['table'] = 'field_data_field_sirius_skills_avail';
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['field'] = 'field_sirius_skills_avail_tid';
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['expose']['operator_id'] = 'field_sirius_skills_avail_tid_op';
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['expose']['label'] = 'Available For Skills';
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['expose']['use_operator'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['expose']['operator'] = 'field_sirius_skills_avail_tid_op';
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['expose']['limit_operators'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['expose']['available_operators'] = array(
+    'or' => 'or',
+    'and' => 'and',
+    'not' => 'not',
+  );
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['expose']['identifier'] = 'field_sirius_skills_avail_tid';
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['expose']['multiple'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_sirius_skills_avail_tid']['vocabulary'] = 'sirius_skill';
+  /* Filter criterion: Content: Skills (field_sirius_skill) */
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['id'] = 'field_sirius_skill_tid_1';
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['table'] = 'field_data_field_sirius_skill';
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['field'] = 'field_sirius_skill_tid';
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['operator'] = 'and';
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['expose']['operator_id'] = 'field_sirius_skill_tid_1_op';
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['expose']['label'] = 'Skills 2';
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['expose']['use_operator'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['expose']['operator'] = 'field_sirius_skill_tid_1_op';
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['expose']['limit_operators'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['expose']['available_operators'] = array(
+    'or' => 'or',
+    'and' => 'and',
+    'not' => 'not',
+  );
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['expose']['identifier'] = 'field_sirius_skill_tid_1';
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['expose']['multiple'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['type'] = 'select';
+  $handler->display->display_options['filters']['field_sirius_skill_tid_1']['vocabulary'] = 'sirius_skill';
   /* Filter criterion: Content: Denormalize: Level (field_sirius_denorm_level) */
   $handler->display->display_options['filters']['field_sirius_denorm_level_value']['id'] = 'field_sirius_denorm_level_value';
   $handler->display->display_options['filters']['field_sirius_denorm_level_value']['table'] = 'field_data_field_sirius_denorm_level';
@@ -32667,19 +32729,13 @@ Accepted'),
   $handler->display->display_options['filters']['field_sirius_denorm_level_value']['expose']['remember_roles'] = array(
     2 => '2',
   );
-  /* Filter criterion: Content: Denormalize: Level (field_sirius_denorm_level) */
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['id'] = 'field_sirius_denorm_level_value_1';
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['table'] = 'field_data_field_sirius_denorm_level';
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['field'] = 'field_sirius_denorm_level_value';
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['operator'] = 'contains';
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['operator_id'] = 'field_sirius_denorm_level_value_1_op';
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['label'] = 'Level';
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['description'] = 'contains';
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['operator'] = 'field_sirius_denorm_level_value_1_op';
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['identifier'] = 'field_sirius_denorm_level_value_1';
-  $handler->display->display_options['filters']['field_sirius_denorm_level_value_1']['expose']['remember_roles'] = array(
-    2 => '2',
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['group_info']['label'] = 'Denormalize: Level (field_sirius_denorm_level)';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['group_info']['identifier'] = 'field_sirius_denorm_level_value';
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['group_info']['remember'] = FALSE;
+  $handler->display->display_options['filters']['field_sirius_denorm_level_value']['group_info']['group_items'] = array(
+    1 => array(),
+    2 => array(),
+    3 => array(),
   );
 
   /* Display: Page */
@@ -32807,14 +32863,19 @@ Accepted'),
   $handler->display->display_options['fields']['field_sirius_member_status']['id'] = 'field_sirius_member_status';
   $handler->display->display_options['fields']['field_sirius_member_status']['table'] = 'field_data_field_sirius_member_status';
   $handler->display->display_options['fields']['field_sirius_member_status']['field'] = 'field_sirius_member_status';
-  $handler->display->display_options['fields']['field_sirius_member_status']['alter']['alter_text'] = TRUE;
-  $handler->display->display_options['fields']['field_sirius_member_status']['alter']['text'] = '[field_sirius_member_status]</ br>
-[field_sirius_denorm_level]';
+  $handler->display->display_options['fields']['field_sirius_member_status']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_sirius_member_status']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_sirius_member_status']['settings'] = array(
     'field_delimiter' => '',
   );
   $handler->display->display_options['fields']['field_sirius_member_status']['delta_offset'] = '0';
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing_2']['id'] = 'nothing_2';
+  $handler->display->display_options['fields']['nothing_2']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing_2']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing_2']['label'] = 'Member Status / Level';
+  $handler->display->display_options['fields']['nothing_2']['alter']['text'] = '[field_sirius_member_status]</br>
+[field_sirius_denorm_level]';
   /* Field: Content: Work Status */
   $handler->display->display_options['fields']['field_sirius_work_status']['id'] = 'field_sirius_work_status';
   $handler->display->display_options['fields']['field_sirius_work_status']['table'] = 'field_data_field_sirius_work_status';
@@ -32964,8 +33025,6 @@ Accepted'),
     t('Sort by'),
     t('Asc'),
     t('Desc'),
-    t('Select any filter and click on Apply to see results'),
-    t('Advanced options'),
     t('Items per page'),
     t('- All -'),
     t('Offset'),
@@ -32992,7 +33051,7 @@ Accepted'),
     t('Industry'),
     t('Work Status'),
     t('Dispatch Status'),
-    t('Skill'),
+    t('Skills 1'),
     t('Sign-in Block?'),
     t('Available for Dispatch?'),
     t('based on current work status'),
@@ -33001,8 +33060,11 @@ Accepted'),
     t('Apprentice ID'),
     t('SSN'),
     t('Currently Employed Industry'),
+    t('Active Member?'),
+    t('Available For Skills'),
+    t('Skills 2'),
     t('Level'),
-    t('contains'),
+    t('Denormalize: Level (field_sirius_denorm_level)'),
     t('Page'),
     t('<div /><a href="/node/add/sirius-worker?destination=[current_path]" class="action-button">Add a new worker</a></div>'),
     t('Position'),
@@ -33012,7 +33074,8 @@ Accepted'),
     t('ID'),
     t('Last Sign in'),
     t('Denormalize: Level'),
-    t('[field_sirius_member_status]</ br>
+    t('Member Status / Level'),
+    t('[field_sirius_member_status]</br>
 [field_sirius_denorm_level]'),
     t('Work Status / Dispatch Status'),
     t('[field_sirius_work_status]<br><a href="/node/[nid]/sirius_worker_dispatches/status" target="_blank">[field_sirius_worker_dispstatus]</a>'),
