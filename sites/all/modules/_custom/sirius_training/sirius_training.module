@@ -56,8 +56,16 @@ function sirius_training_field_attach_view_alter(&$output, $context) {
 }
 
 function sirius_training_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
-	if (!$form['field_sirius_denorm_level_value']) { return; }
-	$form['field_sirius_denorm_level_value']['#type'] = 'select';
-	$form['field_sirius_denorm_level_value']['#options'] = array(NULL => t('-- Select --')) + sirius_training_ms_level_options_short(FALSE);
-	unset($form['field_sirius_denorm_level_value']['#size']);
+	if ($form['field_sirius_denorm_level_value']) {
+		$form['field_sirius_denorm_level_value']['#type'] = 'select';
+		$form['field_sirius_denorm_level_value']['#options'] = array(NULL => t('-- Select --')) + sirius_training_ms_level_options_short(FALSE);
+		unset($form['field_sirius_denorm_level_value']['#size']);
+	}
+	for ($i=0; $i<10; ++$i) {
+		if ($form['filters'][$i]['field_sirius_denorm_level_value']) {
+			$form['filters'][$i]['field_sirius_denorm_level_value']['#type'] = 'select';
+			$form['filters'][$i]['field_sirius_denorm_level_value']['#options'] = array(NULL => t('-- Select --')) + sirius_training_ms_level_options_short(FALSE);
+			unset($form['filters'][$i]['field_sirius_denorm_level_value']['#size']);
+		}
+	}
 }
