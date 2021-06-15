@@ -78,6 +78,7 @@ function sirius_event_participant_register($event_nid, $contact_nid, $participan
 	node_save($participant_node);
 
 	sirius_interestlist_auto_cancel($event_type_term, $participant_node);
+	sirius_event_class_auto_skill($participant_node);
 
 	return array('success' => TRUE, 'msg' => $msg, 'nid' => $participant_node->nid);
 }

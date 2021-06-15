@@ -94,6 +94,7 @@ function sirius_event_participant_pstatus_set($participant_node, $prole_tid, $ps
 	}
 
 	sirius_interestlist_auto_cancel($event_type_term, $participant_node);
+	sirius_event_class_auto_skill($participant_node);
 
 	return array('success' => TRUE, 'msg' => $msg);
 }
