@@ -1,0 +1,13 @@
+diff --git a/sites/all/modules/geofield/geofield.module b/sites/all/modules/geofield/geofield.module
+index c592bd0..96aa6c9 100644
+--- a/sites/all/modules/geofield/geofield.module
++++ b/sites/all/modules/geofield/geofield.module
+@@ -282,6 +282,8 @@ function geofield_field_presave($entity_type, $entity, $field, $instance, $langc
+       }
+     }
+ 
++    if (!sirius_geofield_enabled($entity_type, $entity, $field, $instance)) { return; }
++
+     ctools_include('plugins');
+ 
+     $backend = ctools_get_plugins('geofield', 'geofield_backend', $field['settings']['backend']);
