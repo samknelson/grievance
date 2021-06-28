@@ -1,0 +1,14 @@
+diff --git a/sites/all/modules/geocoder/geocoder.widget.inc b/sites/all/modules/geocoder/geocoder.widget.inc
+index 7e958cd..9bc0190 100644
+--- a/sites/all/modules/geocoder/geocoder.widget.inc
++++ b/sites/all/modules/geocoder/geocoder.widget.inc
+@@ -292,6 +292,9 @@ function geocoder_field_attach_load($entity_type, $entities, $age, $options) {
+  * and fully processed fields values are accessed.
+  */
+ function geocoder_field_attach_presave($entity_type, $entity) {
++  // Conditionally disable geocoding on a per-entity basis
++  if (!sirius_geofield_enabled($entity_type, $entity)) { return; }
++
+   list(,, $bundle) = entity_extract_ids($entity_type, $entity);
+   // Loop over any geofield using our geocode widget.
+   foreach (field_info_instances($entity_type, $bundle) as $field_name => $instance) {
