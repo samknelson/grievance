@@ -118,3 +118,10 @@ function sirius_addr_format_html($addr) {
 	return $txt;
 }
 
+function sirius_geofield_enabled($entity_type, $entity, $field = NULL, $instance = NULL) {
+	if ($entity_type != 'node') { return TRUE; }
+	$domain_nid = $entity->field_sirius_domain['und'][0]['target_id'];
+	if (!$domain_nid) { return TRUE; }
+	return sirius_domain_component_enabled('mapping', $domain_nid);
+}
+
