@@ -99,14 +99,26 @@ function sirius_domain_component_info_all() {
   );
 }
 
-function sirius_domain_component_enabled($key, $domain_node = NULL) {
-  if (!$domain_node) { $domain_node = sirius_domain(); }
-  if (!$domain_node) { return FALSE; }
+function sirius_domain_component_enabled($key, $domain_nid_or_node = NULL) {
+  if (!$domain_nid_or_node) {
+    $domain_nid = sirius_domain_nid(); 
+  } else if (is_numeric($domain_nid_or_node)) {
+    $domain_nid = $domain_nid_or_node;
+  } else if (is_object($domain_nid_or_node)) {
+    $domain_nid = $domain_nid_or_node->nid;
+    $domain_node = $domain_nid_or_node;
+  }
 
-  $json = sirius_jsonfield_util_node_json_get($domain_node);
+  $cache = &drupal_static(__FUNCTION__);
+  if (!isset($cache)) { $cache = array(); }
 
-  if ($json['component'][$key]['enabled'] == 'Yes') { return TRUE; }
-  return FALSE; 
+  if (!isset($cache[$domain_nid][$key])) {
+    if (!$domain_node) { $domain_node = node_load($domain_nid); }
+    $json = sirius_json_get($domain_node);
+    $cache[$domain_nid][$key] = ($json['component'][$key]['enabled'] == 'Yes');
+  }
+
+  return $cache[$domain_nid][$key];
 }
 
 function sirius_domain_active($domain_nid) {
