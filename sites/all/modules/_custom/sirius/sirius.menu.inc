@@ -265,7 +265,7 @@ function sirius_node_tabs() {
     'weight' => 1,
   );
 
-  $content_types = array('sirius_log', 'sirius_letterhead', 'sirius_contact', 'sirius_phonenumber', 'sirius_payperiod');
+  $content_types = array('sirius_log', 'sirius_letterhead', 'sirius_contact', 'sirius_phonenumber', 'sirius_payperiod', 'sirius_dispatch');
   foreach ($content_types as $content_type) {
     $node_tabs[$content_type][$content_type . '_rawjson'] = array(
       'title' => 'JSON',
