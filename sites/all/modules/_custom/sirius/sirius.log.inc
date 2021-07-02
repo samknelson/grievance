@@ -184,3 +184,21 @@ function sirius_log_handler($log_node, $content_type) {
   if (!$handlers) { return NULL; }
   return reset($handlers); 
 }
+
+function sirius_log_handler_set($log_node, $handler_nid) {
+  $current_handlers = sirius_fieldvals($log_node, 'field_sirius_log_handler', 'target_id');
+  if (!in_array($handler_nid, $current_handlers)) {
+    $log_node->field_sirius_log_handler['und'][] = array('target_id' => $handler_nid);
+  }
+}
+
+function sirius_log_handler_clear($log_node, $handler_nid) {
+  $new_handlers = array();
+  if ($log_node->field_sirius_log_handler['und']) {
+    foreach ($log_node->field_sirius_log_handler['und'] as $delta => $item) {
+      if ($item['target_id'] == $handler_nid) { continue; }
+      $new_handlers[] = $item;
+    }
+  }
+  $log_node->field_sirius_log_handler['und'] = $new_handlers;
+}
