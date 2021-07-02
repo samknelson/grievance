@@ -27,6 +27,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/config/feed']								= array('title' => 'Feeds', 'description' => 'Configure the feeds system.');
 	$links['core']['links']['sirius/mailattach']								= array('title' => 'Mailattach', 'description' => 'Configure the attach-by-email system.');
 	$links['core']['links']['sirius/customfield/definition/list']								= array('title' => 'Custom Field Sets', 'description' => 'Define custom field sets which can be attached to events or other entity types.');
+	$links['core']['links']['sirius/dashboard/items_by_role']								= array('title' => 'Dashboard', 'description' => 'Configure dashboard items.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['sirius/worker/config/user'] = array('title' => 'Worker / User Sync', 'description' => 'Configure how users are created from workers.');
@@ -78,7 +79,8 @@ function sirius_page_config() {
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/email'] 					= array('title' => 'Email', 'description' => 'Oubound email settings');
 	$links['systems']['links']['sirius/config/phone'] 					= array('title' => 'Phone', 'description' => 'Phone settings, including caller IDs, SMS and Twilio');
-	$links['systems']['links']['sirius/twilio/network-test'] 					= array('title' => 'Twilio Network Test', 'description' => 'Use the Twilio network test tool to verify if the client computer has sufficient connectivity to run a VoIP call.');
+	$links['systems']['links']['sirius/office/operator/list'] 	= array('title' => 'Operators', 'description' => 'List of operators available to the phone tree.');
+	$links['systems']['links']['sirius/twilio/network-test'] 		= array('title' => 'Twilio Network Test', 'description' => 'Use the Twilio network test tool to verify if the client computer has sufficient connectivity to run a VoIP call.');
 	$links['systems']['links']['sirius/phonenumber'] 						= array('title' => 'Phone Number Cache', 'description' => 'Search and review the cache of phone numbers and deliverability metrics (i.e. SMS-enabled).');
 	$links['systems']['links']['sirius/map/admin'] 							= array('title' => 'Map Settings', 'description' => 'Sirius map settings.');
 	$links['systems']['links']['sirius/map/admin']['sub_paths']['admin/config/content/geocoder'] = array('title' => 'Geocode Service');
