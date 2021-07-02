@@ -14,7 +14,6 @@ function sirius_bulk_node_tab_recipients_contacts_form($form, &$form_state, $bul
 		$form, 
 		$form_state, 
 		$event_node->nid,
-		'Bulk Registration', 
 		array(
 			'sirius_contact' => array('default' => $contact_definition_form),
 			'sirius_worker' => array('default' => array()),
