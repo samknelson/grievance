@@ -57,6 +57,8 @@ function sirius_backlinks_from_node($node) {
 		if ($path) { $links[$path] = array('name' => 'Worker', 'title' => sirius_backlink_title($worker_nid)); }
 	}
 
+	if ($node->type == 'sirius_operator') { $links['sirius/office/operator/list'] = array('name' => 'Operator List'); }
+
 	if ($node->type == 'sirius_feed') {
 		$feed_type = $node->field_sirius_type['und'][0]['value'];
 		if ($feed_type) {
@@ -103,7 +105,9 @@ function sirius_backlinks_from_node($node) {
 	if ($node->type == 'sirius_log') {
 		$handler_nids = sirius_fieldvals($node, 'field_sirius_log_handler', 'target_id');
 		if ($handler_nids) {
-			$sql = 'select nid, type, title from node where nid in (:handler_nids)';
+			$sql = "select nid, type, title, field_sirius_category_value from node ";
+			$sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+			$sql .= "where nid in (:handler_nids)";
 			$sql_args = array(':handler_nids' => $handler_nids);
 			$stmt = sirius_sql_query($sql, $sql_args);
 			$log_type = $node->field_sirius_type['und'][0]['value'];
@@ -111,13 +115,27 @@ function sirius_backlinks_from_node($node) {
 			while ($hr = $stmt->fetchAssoc()) {
 				$handler_type = $hr['type'];
 				$handler_nid = $hr['nid'];
+				$handler_category = $hr['field_sirius_category_value'];
+
+				$name = sirius_content_type_name($handler_type);
 				if ($handler_type == 'sirius_event' && $log_category == 'ledger:auth')									{ $path = "node/$handler_nid/sirius_event_auths"; }
 				else if ($handler_type == 'sirius_event' && $log_category == 'event:intake_application'){ $path = "node/$handler_nid/sirius_event_intake/applications"; }
 				else if ($handler_type == 'sirius_event') 																							{ $path = "node/$handler_nid/sirius_event_info"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'worker:certification') 	{ $path = "node/$handler_nid/sirius_worker_tc/certifications"; }
+				else if ($handler_type == 'sirius_log') {
+					if ($handler_category == 'twilio:recording') { 
+						$path = "node/$handler_nid/sirius_twilio_recording";
+						$name = "Recording";
+					} else if ($handler_category == 'twilio:call') { 
+						$path = "node/$handler_nid/sirius_twilio_call";
+						$name = "Call";
+					} else {
+						$path = "node/$handler_nid";
+					}
+				}
 				else if ($handler_type == 'sirius_json_definition') 																		{ $path = ''; }
 				else 																																										{ $path = "node/$handler_nid/${handler_type}_log"; }
-				$name = sirius_content_type_name($handler_type);
+
 				$links[$path] = array('name' => $name, 'title' => $hr['title']);
 			}
 		}
