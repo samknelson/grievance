@@ -307,6 +307,7 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   // Remove access to some JSON fields
   if ($form_id == 'sirius_worker_node_form' ||
       $form_id == 'grievance_shop_node_form' ||
+      $form_id == 'sirius_dispatch_node_form' ||
       $form_id == 'sirius_dispatch_job_node_form' ||
       $form_id == 'grievance_node_form' ||
       $form_id == 'sirius_contact_node_form' || 
