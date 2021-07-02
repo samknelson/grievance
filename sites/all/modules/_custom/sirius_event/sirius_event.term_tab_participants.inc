@@ -1,20 +1,5 @@
 <?php
 
-function sirius_event_participants_widgets() {
-	return array(
-		//'view' => t('View Worker Participant List'),
-		//'status' => t('Manage Worker Participant List'),
-		//'contact' => t('Manage Contact Participant List'),
-		'list' => t('Roster'),
-		'reports' => t('Download reports'),
-		'summary' => t('View a Summary'),
-		'attendance' => t('Attendance Sheets'),
-		'certifications' => t('Certifications'),
-		'mightysearch_lite' => t('Advanced Search'),
-		'mightysearch' => t('Advanced Search and Tag'),
-	);
-}
-
 function sirius_event_term_tab_policy_participants($event_type_term) {
 	return drupal_get_form('sirius_event_term_tab_policy_participants_form', $event_type_term);
 }
@@ -37,6 +22,9 @@ function sirius_event_term_tab_policy_participants_form($form, &$form_state, $ev
 	} else {
 		$max = 2;
 	}
+
+	$widget_options = sirius_event_participants_widgets();
+	unset($widget_options['mightysearch_lite']); // Legacy
 
 	$form['#tree'] = TRUE;
 
@@ -76,7 +64,7 @@ function sirius_event_term_tab_policy_participants_form($form, &$form_state, $ev
 		$form["participants_$i"]["widget"] = array(
 			'#title' => t('Participants list may be accessed as:'),
 			'#type' => 'select',
-			'#options' => sirius_event_participants_widgets(),
+			'#options' => $widget_options,
 			'#multiple' => TRUE,
 		);
 		// @todo: Cleanup legacy

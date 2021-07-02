@@ -211,6 +211,32 @@ function sirius_event_interestlist_list($event_type_term, $params = array()) {
 		$result[] = $hr;
 	}
 
+	if ($params['include_event_registrations']) {
+		foreach ($result as $delta => $record) {
+			$contact_nid = $record['contact_nid'];
+
+			$sql_args = array();
+			$sql_args[':contact_nid'] = $contact_nid;
+			$sql_args[':event_type_tid'] = $event_type_term->tid;
+			$sql = "select field_sirius_event_prole_tid as prole_tid, field_sirius_event_pstatus_tid as pstatus_tid, count(*) as count, max(node.created) as last_ts ";
+			$sql .= "from node ";
+			$sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
+			$sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
+			$sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
+			$sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
+			$sql .= "left join node event_node on event_node.nid = field_sirius_event_target_id ";
+			$sql .= "left join field_data_field_sirius_event_type on field_data_field_sirius_event_type.entity_type = 'node' and field_data_field_sirius_event_type.entity_id = event_node.nid ";
+			$sql .= "where node.type = 'sirius_event_participant' ";
+			$sql .= "and field_sirius_contact_target_id = :contact_nid ";
+			$sql .= "and field_sirius_event_type_tid = :event_type_tid ";
+			$sql .= "group by field_sirius_event_prole_tid, field_sirius_event_pstatus_tid ";
+			$stmt = sirius_sql_query($sql, $sql_args);
+			while ($hr = $stmt->fetchAssoc()) {
+				$result[$delta]["register"][$hr['prole_tid'] . '|' . $hr['pstatus_tid']] = $hr;
+			}
+		}
+	}
+
 	return $result;
 }
 

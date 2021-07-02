@@ -11,6 +11,16 @@ function sirius_node_tab_event_participants_current_access($event_node) {
 	return FALSE; 
 }
 
+//
+// @todo: I made a mess of deltas.
+// Delta on the query means "which of the rules that I have available"
+// Detla within the rule means "which of all the possible rules for the term"
+// For example: Say that a term has 4 rules, and one of the widgets in rule #2 has some settings. Say a user only has access to rules #0 and #2.
+// - In the query, we want rule delta=1, i.e. the second of the rules that we have access to.
+// - But we need to fetch settings for widget delta=2, i.e. the third of all the rules, where the settings are stored.
+// ICK!!!!
+// 
+
 function sirius_node_tab_event_participants_current($event_node) {
   sirius_event_disclaimer_redirect($event_node);
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
@@ -18,21 +28,28 @@ function sirius_node_tab_event_participants_current($event_node) {
 	$all_rules = $json['participants']['rules'];
 	if (user_access('sirius event admin')) {
 		$rules = $all_rules;
+		foreach ($rules as $i => $rule) { $rules[$i]['delta'] = $i; }
 	} else {
 		$rules = sirius_event_paccess_rule_match($event_node->nid, $all_rules, TRUE);
 	}
 
 	$delta = $_REQUEST['delta'];
+	$widget = $_REQUEST['widget'];
+	$prole = preg_replace('/[^\d]/', '', $_REQUEST['prole']);
+
 	if (!isset($delta)) {
+
 		$widgets = sirius_event_participants_widgets();
 		$widgets['view'] = $widgets['status'] = $widgets['contact'] = 'Roster';
 
 		if (!$rules) {
 			return t('You do not have access to any participant rules for this event type.');
 		}
-		$html = '';
-		foreach ($rules as $delta => $rule) {
-			$html .= '<strong>' . $rule['name'] . '</strong><br />';
+
+		$link_groups = array();
+		$link_count = 0;
+		$last_link = array();
+		foreach ($rules as $i => $rule) {
 
 			$proles = array();
 			foreach ($rule['participants'] as $key) {
@@ -43,44 +60,64 @@ function sirius_node_tab_event_participants_current($event_node) {
 			foreach (array_keys($proles) as $prole) {
 				$prole_term = taxonomy_term_load($prole);
 				$is_first = TRUE;
-				foreach ($rule['widget'] as $widget) {
-					$html .= l($widgets[$widget] . ': ' . $prole_term->name, current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => array('delta' => $delta, 'widget' => $widget, 'prole' => $prole))); 
+				foreach ($rule['widget'] as $j => $widget) {
+					$link = array(
+						'title' => $widgets[$widget] . ': ' . $prole_term->name,
+						'delta' => $i, 
+						'widget' => $widget,
+						'prole' => $prole_term->tid,
+					);
+					$link_groups[$i]['links'][$j] = $link;
+					$last_link = $link;
+					++$link_count;
 				}
 			}
 
-			$html .= '<br /><br />';
+			if ($link_groups[$i]['links']) {
+				$link_groups[$i]['title'] = $rule['name'];
+			}
 		}
-		return $html;
-	} else {
-		$rule = $rules[$delta];
-		$widget = $_REQUEST['widget'];
-		$prole = preg_replace('/[^\d]/', '', $_REQUEST['prole']);
-		if (!$rule) { return t('No such rule.'); }
-		if (!in_array($widget, $rule['widget'])) { return t('No such widget.'); }
-		$found = FALSE;
-		foreach ($rule['participants'] as $key) {
-			if (preg_match("/^$prole/", $key)) { $found = TRUE; }
-		}
-		if (!$found) { return t('No access to that prole.'); }
 
-		return sirius_node_tab_event_participants_current_rule($event_node, $rule, $widget, $prole);
+		if ($link_count == 0) {
+			// No links
+			return t('You do not have access to any participant widgets for this event type.');
+		} else if ($link_count == 1) {
+			// 1 link; just redirect to it, skipping the landing page
+			drupal_goto(current_path(), array('query' => $link));
+		} else {
+			// Multiple links, render the options
+			foreach ($link_groups as $i => $link_group) {
+				$html .= '<strong>' . $link_group['title'] . '</strong><br />';
+				foreach ($link_group['links'] as $j => $link) {
+					$html .= l($link['title'], current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => $link));
+				}
+				$html .= '<br /><br />';
+			}
+			return $html;
+		}
+	} 
+
+	$rule = $rules[$delta];
+	if (!$rule) { return t('No such rule.'); }
+	if (!in_array($widget, $rule['widget'])) { return t('No such widget.'); }
+	$found = FALSE;
+	foreach ($rule['participants'] as $key) {
+		if (preg_match("/^$prole/", $key)) { $found = TRUE; }
 	}
+	if (!$found) { return t('No access to that prole.'); }
+
+	return sirius_node_tab_event_participants_current_rule($event_node, $rule, $widget, $prole, $delta);
 }
 
-function sirius_node_tab_event_participants_current_rule($event_node, $rule, $widget, $prole) {
+function sirius_node_tab_event_participants_current_rule($event_node, $rule, $widget, $prole, $delta) {
 	$prole_term = taxonomy_term_load($prole);
 
 	$all_widgets = sirius_event_participants_widgets();
 	$all_widgets['view'] = $all_widgets['status'] = $all_widgets['contact'] = 'Roster';
 
-	drupal_set_title(drupal_get_title() . ': ' . $rule['name'] . ' - ' . $all_widgets[$widget]);
+	// drupal_set_title(drupal_get_title() . ': ' . $rule['name'] . ' - ' . $all_widgets[$widget]);
 	if ($widget == 'view' || $widget == 'status' || $widget == 'contact' || $widget == 'list') {
 		return sirius_event_page_participant_list($event_node, $prole, $rule);
-		//return views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
-	/*} else if ($widget == 'status') {
-		return views_embed_view('sirius_event_participants', 'block_1', $event_node->nid, $prole);
-	} else if ($widget == 'contact') {
-		return views_embed_view('sirius_event_participants', 'block', $event_node->nid, $prole); */
 	} else if ($widget == 'reports') {
 		return sirius_node_tab_event_participants_reports($event_node->nid, $prole);
 	} else if ($widget == 'summary') { 

@@ -23,7 +23,6 @@ function sirius_node_tab_event_participants_register_bulk_form($form, &$form_sta
 		$form, 
 		$form_state, 
 		$event_node->nid,
-		'Bulk Registration', 
 		array('sirius_contact' => 
 			array(
 				'default' => $contact_definition_form

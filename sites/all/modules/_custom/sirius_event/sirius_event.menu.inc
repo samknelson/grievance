@@ -61,12 +61,21 @@ function sirius_event_node_tabs() {
     'weight' => 1,
   );
 
+  $node_tabs['sirius_event']['sirius_event_info/info'] = array(
+    'title' => 'Info',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_info',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
   $node_tabs['sirius_event']['sirius_event_info/schedule'] = array(
     'title' => 'Schedule',
     'description' => '',
     'callback' => 'sirius_node_tab_event_schedule',
     'permissions' => array('sirius'),
-    'weight' => 1,
+    'weight' => 2,
   );
 
   $node_tabs['sirius_event']['sirius_event_info/body'] = array(
@@ -387,7 +396,7 @@ function sirius_event_node_tabs() {
   );
 
 
-  $node_tabs['sirius_event']['sirius_event_clone'] = array(
+  $node_tabs['sirius_event']['sirius_event_info/clone'] = array(
     'title' => 'Clone',
     'description' => '',
     'callback' => 'sirius_node_tab_event_clone',
@@ -395,21 +404,12 @@ function sirius_event_node_tabs() {
     'weight' => 10,
   );
 
-  $node_tabs['sirius_event']['sirius_event_clone/clone'] = array(
-    'title' => 'Clone',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_clone',
-    'permissions' => array('sirius domain admin'),
-    'weight' => 1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_clone/exim'] = array(
+  $node_tabs['sirius_event']['sirius_event_info/exim'] = array(
     'title' => 'Export / Import',
     'description' => '',
     'callback' => 'sirius_node_tab_event_exim',
     'permissions' => array('sirius domain admin'),
-    'weight' => 2,
+    'weight' => 11,
   );
 
   $node_tabs['sirius_event_participant']['sirius_event_participant_status'] = array(

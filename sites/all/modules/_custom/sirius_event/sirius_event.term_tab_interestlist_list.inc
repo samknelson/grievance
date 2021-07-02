@@ -15,15 +15,30 @@ function sirius_event_term_tab_interestlist_list($event_type_term) {
 function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $event_type_term) {
 	$form_state['event_type_tid'] = $event_type_term->tid;
 
-	$interestlist = sirius_event_interestlist_list($event_type_term, array());
+	$interestlist = sirius_event_interestlist_list($event_type_term, array('include_event_registrations' => TRUE));
+	$pkeys = array();
+	foreach ($interestlist as $record) {
+		if ($record['register']) {
+			foreach ($record['register'] as $pkey => $ignore) { 
+				$pkeys[$pkey]++;
+			}
+		}
+	}
+	$pkeys = array_keys($pkeys);
 
-	$header = array(
-		t('Signup Date'), 
-		t('Name'),
-		t('Contact'),
-		t('Comments'),
-		t('Tools'),
-	);
+	$pstatus_lookup = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
+	$prole_lookup = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'name');
+
+	$header = array();
+	$header[] = t('Signup Date');
+	$header[] = t('Name');
+	$header[] = t('Contact');
+	foreach ($pkeys as $pkey) {
+		list ($prole_tid, $pstatus_tid) = explode('|', $pkey);
+		$header[] = $prole_lookup[$prole_tid] . ': ' . $pstatus_lookup[$pstatus_tid];
+	}
+	$header[] = t('Comments');
+	$header[] = t('Tools');
 
 	$options = array();
 	foreach ($interestlist as $record) {
@@ -45,6 +60,14 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 		$row[] = date('Y-m-d\<\b\r \/\>h:i a', $record['interestlist_signup_ts']);
 		$row[] = $title;
 		$row[] = $contact_info;
+		foreach ($pkeys as $pkey) {
+			$count = $record['register'][$pkey]['count'];
+			if (!$count) { $count = 0; }
+			$last_ts = $record['register'][$pkey]['last_ts'];
+			$register_string = "$count records";
+			if ($last_ts) { $register_string .= '<br />' . date('Y-m-d', $last_ts); }
+			$row[] = $register_string;
+		}
 		$row[] = $comments;
 		$row[] = $tools;
 
@@ -56,9 +79,41 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 		return $form;
 	}
 
+	$form['filters'] = array(
+		'#title' => t('Filters'),
+		'#type' => 'fieldset',
+		'#collapsible' => TRUE,
+		// '#collapsed' => TRUE,
+	);
+
+	$ms_level_options = sirius_ledger_ms_level_options();
+	if ($ms_level_options) {
+		$form['filters']['ms_level'] = array(
+			'#title' => t('Member Status'),
+			'#options' => $ms_level_options,
+			'#type' => 'checkboxes',
+			// '#prefix' => "<div class=\"checkboxes-inline\">",
+			// '#suffix' => '</div><br clear="left" />',
+			// '#multiple' => TRUE,
+			// '#attributes' => array('class' => array('sirius_twocol_select')),
+			// '#multiple' => TRUE,
+			// '#type' => 'select',
+			// '#type' => 'multiselect',
+	    // '#multiple' => TRUE,
+	    // '#size' => 15,
+	    // '#required' => TRUE,
+	    // '#name' => 'ms_level',
+		);
+	}
+
+	$form['filters']['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Filter'),
+	);
+
 	$form['interestlist'] = array(
 		'#type' => 'tableselect',
-		'#title' => 'Current Locks',
+		'#title' => 'Signups',
 		'#header' => $header,
 		'#options' => $options,
 	);
@@ -73,7 +128,6 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 			'bulk' => t('Create a bulk message'),
 			'event' => t('Register or invite to an event'),
 		),
-		'#required' => TRUE,
 	);
 
 	$media = sirius_bulk_media();
@@ -109,6 +163,11 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 function sirius_event_term_tab_interestlist_list_form_submit($form, &$form_state) {
 	$event_type_term = taxonomy_term_load($form_state['event_type_tid']);
 	$action = $form_state['values']['action'];
+
+	if (!$action) { 
+		$form_state['rebuild'] = TRUE;
+		return;
+	}
 
 	// Handle redirect to register
 	if ($action == 'event') {
@@ -197,7 +256,7 @@ function sirius_event_term_tab_interestlist_list_form_submit($form, &$form_state
 	if ($action == 'bulk') {
 		$bulk_node = sirius_bulk_create('Interest List Announcement - ' . $event_type_term->name, $form_state['values']['medium']);
 		$batch_params['bulk_nid'] = $bulk_node->nid;
-		drupal_set_message("Bulk message created. " . l('Manage', 'node/' . $bulk_node->nid . '/sirius_bulk_body', array('attributes' => array('class' => array('tool-button')))));
+		drupal_set_message("Bulk message created. " . l('Manage', 'node/' . $bulk_node->nid . '/sirius_bulk_medium', array('attributes' => array('class' => array('tool-button')))));
 	}
 	$batch_params['comments'] = $form_state['values']['comments'];
 

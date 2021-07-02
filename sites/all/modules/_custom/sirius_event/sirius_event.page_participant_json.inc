@@ -57,7 +57,6 @@ function sirius_node_tab_event_participant_json_backlinks($participant_node, $ev
 	return l('Back to participant list', "node/" . $event_node->nid . "/sirius_event_participants_current", array('attributes' => array('class' => 'tool-button')));
 }
 
-
 function sirius_node_tab_event_participant_json_view($participant_node, $which = 'default') {
 	drupal_add_css('sites/all/modules/_custom/sirius_event/css/event.css');
 
