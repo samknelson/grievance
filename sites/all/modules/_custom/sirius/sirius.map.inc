@@ -8,10 +8,44 @@ function sirius_map_leaflet_create($settings = array()) {
 		// settings['fullscreenControlOptions'] = array('positio' => 'topleft');
 		// $settings['layerControl'] = TRUE;
 	}
+
 	drupal_add_css('sites/all/libraries/leaflet_fullscreen/dist/leaflet.fullscreen.css');
  	drupal_add_js('sites/all/libraries/leaflet_fullscreen/dist/Leaflet.fullscreen.min.js');
  	// drupal_add_js('sites/all/libraries/leaflet_print/dist/bundle.js');
+
+ 	// Fetch our map
 	$map = leaflet_map_get_info(sirius_domain_variable_get('sirius_map_provider', 'OSM Mapnik'));
+
+ 	// Set "maxNativeZoom" and "maxZoom".
+ 	// Drupal makes this oddly weird. The variables are represented in different places in different map types
+ 	// - see leaflet_more_maps.js line 5. Weird.
+ 	// We also don't know which layer contains the tile, so we're guessing it's the one that contains a "urlTemplate".
+ 	// HACKY.
+
+ 	$max_native_zoom = sirius_domain_variable_get('sirius_map_max_native_zoom', 19);
+ 	$max_zoom = sirius_domain_variable_get('sirius_map_max_zoom', 22);
+	foreach ($map['layers'] as $key => $value) {
+		if (!$map['layers'][$key]['urlTemplate']) { continue; }
+
+		if (!$map['layers'][$key]['options']['maxNativeZoom']) { $map['layers'][$key]['options']['maxNativeZoom'] = $max_native_zoom; }
+		if (!$map['layers'][$key]['options']['maxZoom']) { $map['layers'][$key]['options']['maxZoom'] = $max_zoom; }
+
+		// if (!$map['layers'][$key]['maxNativeZoom']) { $map['layers'][$key]['maxNativeZoom'] = $max_native_zoom; }
+		// if (!$map['layers'][$key]['maxZoom']) { $map['layers'][$key]['maxZoom'] = $max_zoom; }
+
+		/*
+		if ($map['layers'][$key]['type'] == 'google' || true) {
+			if (!$map['layers'][$key]['options']['maxNativeZoom']) { $map['layers'][$key]['options']['maxNativeZoom'] = $max_native_zoom; }
+			if (!$map['layers'][$key]['options']['maxZoom']) { $map['layers'][$key]['options']['maxZoom'] = $max_zoom; }
+		} else {
+			if (!$map['layers'][$key]['maxNativeZoom']) { $map['layers'][$key]['maxNativeZoom'] = $max_native_zoom; }
+			if (!$map['layers'][$key]['maxZoom']) { $map['layers'][$key]['maxZoom'] = $max_zoom; }
+		}
+		*/
+	}
+	if (!$settings['maxZoom']) { $settings['maxZoom'] = $max_zoom; }
+	if (!$settings['maxNativeZoom']) { $settings['maxNativeZoom'] = $max_native_zoom; }
+
 	$map['settings'] = $settings;
 	return $map;
 }
