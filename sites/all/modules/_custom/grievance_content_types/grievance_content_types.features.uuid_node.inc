@@ -102,6 +102,110 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Twilio - Call - Recording',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1623775460,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '09babc30-3dfb-4b06-8254-89b59d8aba95',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This page allows the recording for a call to be "pulled" from the telephony provider.</p>
+
+<p>If this call record is associated with a record at the telephony provider, and if the call came in to a recorded line, then the recording may be "pulled". This process will create a separate recording record, and link it to the call record.</p>
+
+<p>Note that recordings stored at the telephony provider may be deleted periodically. Recordings which have been "pulled" and which are stored locally are never deleted.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_twilio_call/recording',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This page allows the recording for a call to be "pulled" from the telephony provider.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-15 09:44:20 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Event - Sections',
   'log' => '',
   'status' => 1,
@@ -1595,6 +1699,122 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Twilio - Call',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1623775329,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '48d73be1-cac4-4f08-8183-bf19ff5524ac',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This page shows information about a call which was made into the Sirius system.</p>
+
+<p><strong>SID</strong></p>
+
+<p>The "SID" is the identifier of the call used by&nbsp;the telephony provider.</p>
+
+<p><strong>From, To</strong></p>
+
+<p>"From" is the phone number that originated the call, and "To" is the receiving phone number. In the case of incoming calls, the "To" number is typically the public-facing phone number, sometimes associated with a particular operator. The call may also have been forwarded to an office number, but the forwarded number is never the "To" nubmer.</p>
+
+<p><strong>Date</strong></p>
+
+<p>The date and time when the call started</p>
+
+<p><strong>Log</strong></p>
+
+<p>The log shows the interactions that the caller had with the phone tree.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_twilio_call',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This page shows information about a call which was made into the Sirius system.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-15 09:42:09 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Event - Intake - Application - Manage',
   'log' => '',
   'status' => 1,
@@ -2302,6 +2522,126 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2020-12-04 11:12:50 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Office - Operators',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1623776385,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '5bb36063-9680-4b3e-85af-11af320d177c',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>"Operators" are destinations for incoming calls. A user calling the main number may be routed to any selected operator.</p>
+
+<p><strong>Name</strong></p>
+
+<p>The name of the operator. Operators may be offices, individuals, or functions. For example, some common operators might include "Finance Department", "Dispatch Office", or "Training Center".</p>
+
+<p><strong>Status</strong></p>
+
+<p>Indicates whether the operator is "open". Open operators can receive incoming calls. Closed offices respond to incoming calls with a simple message, and then disconnect.</p>
+
+<p><strong>Incoming (Public) Phone</strong></p>
+
+<p>The phone number that is used for incoming calls. Many operators might share the same incoming number, in which case the caller is requested to select which operator they want.</p>
+
+<p><strong>Outgoing (Private) Phone</strong></p>
+
+<p>When an incoming call is forwarded to an operator, it is done by dialing the private, or "outgoing", phone number. Many operators might share the same private number.</p>
+
+<p><strong>Tools</strong></p>
+
+<p>Use the tools to manage the the settings for the operator, the status (open or closed), or to see the list of incoming calls.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/office/operator/list',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this page to manage the list of operators.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-15 09:59:45 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -3989,6 +4329,114 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Twilio - Call - Worker',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1623775600,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'a9d8a51f-dc22-4326-9d3c-331090c171fd',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this page to associate a call or a recording with a worker record. When the call or recording is linked to the worker record, then it will appear in the Worker\'s log.</p>
+
+<p>If the call came from a number that is associated with a worker, then that worker is suggested as the default link.</p>
+
+<p>Note that linking a call automatically also links any associated recording, and linking any recording also links any associated call.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_twilio_call/worker',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'node/%/sirius_twilio_recording/worker',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this page to associate a call or a recording with a worker record.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-06-15 09:46:40 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Dispatch - Configuration - Display',
   'log' => '',
   'status' => 1,
@@ -4114,6 +4562,10 @@ function grievance_content_types_uuid_features_default_content() {
 	<li>This number in general should&nbsp;<strong>not</strong>&nbsp;be hosted at Twilio. It should be an external number.</li>
 	<li>If an incoming call is forwared to the operator, this is the number that will be dialed.</li>
 </ul>
+
+<p><strong>Bypass Phonetree</strong></p>
+
+<p>If set to "Yes", calls to this number will bypass the dispatch phonetree. Callers will not be asked to enter their dispatch ID and will not have an opportunity to hear their current dispatches. Instead, immediately upon calling, they will be connected with the office.</p>
 
 <p><strong>Recording Calls</strong></p>
 
