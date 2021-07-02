@@ -514,7 +514,7 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 			'#allowed_formats' => array('full_html'),
 		);
 
-		if (user_access('grievance letter variable letterhead')) {
+		if (user_access('sirius letterhead use') || user_access('grievance letter variable letterhead')) {
 			$options = array(NULL => t('No Letterhead'));
 			$letterheads = sirius_letterhead_list();
 			foreach ($letterheads as $nid => $title) {
