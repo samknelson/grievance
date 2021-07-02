@@ -55,6 +55,8 @@ function sirius_worker_get_by_id($id) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_worker');
 	$query->fieldCondition('field_sirius_id', 'value', $id);
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
 	$query->propertyOrderBy('nid', 'desc');
 	$stmt = $query->execute();
 	if (!$stmt['node']) { return NULL; }
@@ -69,6 +71,8 @@ function sirius_worker_get_by_id2($id) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_worker');
   $query->fieldCondition('field_sirius_id2', 'value', $id);
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
   $query->propertyOrderBy('nid', 'desc');
   $stmt = $query->execute();
   if (!$stmt['node']) { return NULL; }
@@ -83,6 +87,8 @@ function sirius_worker_get_by_contact_nid($contact_nid, $nid_only = FALSE) {
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_worker');
   $query->fieldCondition('field_sirius_contact', 'target_id', $contact_nid);
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
   $query->propertyOrderBy('nid', 'desc');
   $stmt = $query->execute();
   if (!$stmt['node']) { return NULL; }
@@ -95,11 +101,27 @@ function sirius_worker_get_by_contact_nid($contact_nid, $nid_only = FALSE) {
 function sirius_worker_get_by_ssn($id) {
   if (!$id) { return NULL; }
 
-  $domain_nid = sirius_domain_nid();
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_worker');
   $query->fieldCondition('field_sirius_ssn', 'value', $id);
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+  $query->propertyOrderBy('nid', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
+function sirius_worker_get_by_phone($phone) {
+  if (!$phone) { return NULL; }
+
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_worker');
+  $query->fieldCondition('field_sirius_phone', 'value', sirius_phone_format($phone));
+  $domain_nid = sirius_domain_nid();
   if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
   $query->propertyOrderBy('nid', 'desc');
   $stmt = $query->execute();
