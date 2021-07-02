@@ -12,7 +12,6 @@ function sirius_page_contacts_form($form, &$form_state) {
 		$form, 
 		$form_state, 
 		'main_contact_search',
-		'Contact Search', 
 		array(
 			'sirius_contact' => array('default' => $contact_definition_form),
 			'sirius_worker' => array('default' => array()),
