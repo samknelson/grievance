@@ -18,9 +18,13 @@ function sirius_mightysearch_clause_count($form_state) {
 	return $count;
 }
 
-function sirius_mightysearch_form_prepare_valuefield($form_state, $json_forms, $my_saved_mightysearch, $i) {
+function sirius_mightysearch_form_prepare_valuefield($form_state, $json_forms, $my_saved_mightysearch, $i, $include_null = FALSE) {
 	$full_path = $form_state['values']['mightysearch'][$i]['field'];
 	$criterion = $form_state['values']['mightysearch'][$i]['criterion'];
+	return sirius_mightysearch_form_prepare_valuefield_from_path($form_state, $json_forms, $my_saved_mightysearch, $i, $include_null, $full_path, $criterion);
+}
+
+function sirius_mightysearch_form_prepare_valuefield_from_path($form_state, $json_forms, $my_saved_mightysearch, $i, $include_null, $full_path, $criterion) {
 	if ($full_path) {
 		if ($criterion == 'empty' || $criterion == 'not empty') {
 			$element = array('#type' => 'hidden');
@@ -96,7 +100,9 @@ function sirius_mightysearch_form_prepare_valuefield($form_state, $json_forms, $
 
 	$element['#prefix'] = "<div class=\"sirius_mightsearch_clausepart sirius_mightsearch_clausepart_value\" id=\"sirius_mightysearch_valuefield_$i\">";
 	$element['#suffix'] = '</div>';
-	$element['#default_value'] = $my_saved_mightysearch[$i]['value'];
+	if (isset($my_saved_mightysearch[$i]['value']) && !($my_saved_mightysearch[$i]['value'] === '')) {
+		$element['#default_value'] = $my_saved_mightysearch[$i]['value'];
+	}
 
 	unset($element['#sirius']);
 	unset($element['#title']);
@@ -112,48 +118,38 @@ function sirius_mightysearch_form_prepare_valuefield($form_state, $json_forms, $
 		}
 	}
 
+
+	if ($include_null && ($element['#type'] == 'select')) {
+		if (!$element['#options'][NULL]) {
+			$element['#options'] = array(NULL => t('-- Select --')) + $element['#options'];
+		}
+	}
+
 	return $element;
 }
 
-
-function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id, $title, $json_forms, $actions) {
-  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/mightysearch.js');
-  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/mightysearch.css');
-  drupal_add_library('system', 'ui.accordion');
-  drupal_add_js('jQuery(document).ready(function () { jQuery("#sirius_accordion").accordion({collapsible: true, autoehight: true, heightStyle: "content"}); });', 'inline');
-
-  $tag_options = sirius_taxonomy_load('sirius_contact_tags', 'tid', 'name');
-
-  if (!user_access('sirius worker view')) { unset($json_forms['sirius_worker']); }
-	$form_state['json_forms'] = $json_forms;
-	$form_state['actions'] = $actions;
-	$form_state['mightysearch_id'] = $mightysearch_id;
-
-	if (!$form_state['values']) { 
-		$form_state['values']['mightysearch'] = $my_saved_mightysearch = $_SESSION['my_saved_mightysearch'][$mightysearch_id];
-	}
-
-  $form['#tree'] = TRUE;
-
-
+function sirius_mightysearch_paths($json_forms) {
   $paths = array();
-  $paths[NULL] = t('-- Select --');
   $paths[':sirius_contact:core:tags'] = ':sirius_contact:core:tags';
 
-  foreach ($json_forms as $node_type => $node_type_forms) {
-  	foreach ($node_type_forms as $which => $json_form) {
-	  	$new_paths = array_keys(sirius_jsonfield_util_list_node_fields($node_type));
-	  	foreach ($new_paths as $path) { 
-	  		$path = preg_replace("/\:$node_type/", ":$node_type:core", $path);
-	  		$paths[$path] = $path;
-	  	}
+  if ($json_forms) {
+	  foreach ($json_forms as $node_type => $node_type_forms) {
+	  	if ($node_type_forms) {
+		  	foreach ($node_type_forms as $which => $json_form) {
+			  	$new_paths = array_keys(sirius_jsonfield_util_list_node_fields($node_type));
+			  	foreach ($new_paths as $path) { 
+			  		$path = preg_replace("/\:$node_type/", ":$node_type:core", $path);
+			  		$paths[$path] = $path;
+			  	}
 
-	  	$new_paths = array_values(sirius_jsonfield_util_form_list_paths($json_form, TRUE, $node_type));
-	  	foreach ($new_paths as $path) {
-	  		$paths[":$node_type:$which$path"] = ":$node_type:$which$path";
-	  	}
+			  	$new_paths = array_values(sirius_jsonfield_util_form_list_paths($json_form, TRUE, $node_type));
+			  	foreach ($new_paths as $path) {
+			  		$paths[":$node_type:$which$path"] = ":$node_type:$which$path";
+			  	}
+			  }
+			}
 	  }
-  }
+	}
   if ($json_forms['sirius_event_participant']) {
   	$paths[':sirius_event_participant:core:status'] = ':sirius_event_participant:core:status';
   	$pstatuses = sirius_event_participant_role_status_tids($json_forms['sirius_event_participant']['prole_tid']);
@@ -193,149 +189,228 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
   	$label = preg_replace('/:field_sirius_/', ':', $label);
   	$paths[$key] = $label;
   }
+
+  return $paths;
+}
+
+function sirius_mightysearch_criterion_options() {
+	return array(
+		'=' => '=',
+		'!=' => '!=',
+		'in' => 'one of',
+		'not in' => 'none of',
+		'like' => 'contains',
+		'not like' => 'does not contain',
+		'starts' => 'starts with',
+		'ends' => 'ends with',
+		'empty' => 'empty',
+		'not empty' => 'not empty',
+		'>=' => '>=',
+		'>' => '>',
+		'<' => '<',
+		'<=' => '<=',
+	);
+}
+
+function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id, $json_forms, $actions) {
+  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/mightysearch.js');
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/mightysearch.css');
+  drupal_add_library('system', 'ui.accordion');
+  drupal_add_js('jQuery(document).ready(function () { jQuery("#sirius_accordion").accordion({collapsible: true, autoehight: true, heightStyle: "content"}); });', 'inline');
+
+  $widget_settings = $json_forms['widget_settings'];
+
+  $tag_options = sirius_taxonomy_load('sirius_contact_tags', 'tid', 'name');
+
+  if (!user_access('sirius worker view')) { unset($json_forms['sirius_worker']); }
+	$form_state['json_forms'] = $json_forms;
+	$form_state['actions'] = $actions;
+	$form_state['mightysearch_id'] = $mightysearch_id;
+
+	if (!$form_state['values']) { 
+		$form_state['values']['mightysearch'] = $my_saved_mightysearch = $_SESSION['my_saved_mightysearch'][$mightysearch_id];
+	}
+
+  $form['#tree'] = TRUE;
+
+  $paths = sirius_mightysearch_paths($json_forms);
   $form_state['all_paths'] = $paths;
 
 	$clause_count = sirius_mightysearch_clause_count($form_state);
 
-	$form['#tree'] = TRUE;
+	$class = "mightysearch ";
+	if ($widget_settings['form']['lock_clauses']) { $class .= "mightysearch_lock_clauses "; }
+	if ($widget_settings['form']['lock_display']) { $class .= "mightysearch_lock_display "; }
+  $form['mightysearch']['open'] = array('#markup' => "<div id=\"mightysearch\" class=\"$class\">");
 
-  $form['mightysearch']['open'] = array('#markup' => '<div id="mightysearch"><h2>' . $title . '</h2>');
-  $form['mightysearch']['accordion_open'] = array('#markup' => '<div id="sirius_accordion">');
-  $form['mightysearch']['accordion_open_clauses'] = array('#markup' => '<div class="sirius_accordion_label">' . t('Query') . '</div><div class="sirius_accordion_body">');
+	//////////////////////////////////////////////////////////////////////////////////////
+	// Clauses 
+	//////////////////////////////////////////////////////////////////////////////////////
 
-	for ($i=0; $i<$clause_count; ++$i) {
-		$form['mightysearch'][$i] = array(
-			'#type' => 'fieldset',
-			'#prefix' => '<div class="sirius_mightysearch_clause">',
-			'#suffix' => '</div>',
-		);
 
-		$form['mightysearch'][$i]['andor'] = array(
-			'#type' => 'select',
-			'#options' => array(
-				'and' => 'AND',
-				'or' => 'OR',
-			),
-			'#prefix' => '<div class="sirius_mightsearch_clausepart sirius_mightsearch_clausepart_andor">',
-			'#suffix' => '</div>',
-			'#default_value' => $my_saved_mightysearch[$i]['andor'],
-		);
-		if ($i == 0) { $form['mightysearch'][$i]['andor']['#options'] = array(NULL => 'WHERE'); }
+	if ($widget_settings['form']['lock_clauses'] == 'Yes') {
+		if ($widget_settings['fields']['field_list']) {
+			$form['mightysearch']['clauses_open'] = array('#markup' => '<div class="sirius_mightysearch_clauses_open">');
+			foreach ($widget_settings['fields']['field_list'] as $i => $record) {
+				if (!$record['path'] || !$record['criterion']) { continue; }
+				$form['mightysearch'][$i]['skip_if_empty'] = array('#type' => 'value', '#value' => TRUE);
+				$form['mightysearch'][$i]['andor'] = array('#type' => 'value', '#value' => 'and');
+				$form['mightysearch'][$i]['field'] = array('#type' => 'value', '#value' => $record['path']);
+				$form['mightysearch'][$i]['criterion'] = array('#type' => 'value', '#value' => $record['criterion']);
+				$form['mightysearch'][$i]['value'] = sirius_mightysearch_form_prepare_valuefield_from_path($form_state, $json_forms, $my_saved_mightysearch, $i, TRUE, $record['path'], $record['criterion']);
+				$form['mightysearch'][$i]['value']['#title'] = $record['label'];
+				if ($record['description']) { $form['mightysearch'][$i]['value']['#description'] = $record['description']; }
+				// $form['mightysearch'][$i]['value']['#suffix'] = '<br />';
+			}
+			$form['mightysearch']['clauses_close'] = array('#markup' => '</div><br clear="all">');
+		}
+	} else {
+	  $form['mightysearch']['accordion_open'] = array('#markup' => '<div id="sirius_accordion">');
+	  $form['mightysearch']['accordion_open_clauses'] = array('#markup' => '<div class="sirius_accordion_label">' . t('Query') . '</div><div class="sirius_accordion_body">');
 
-		$form['mightysearch'][$i]['open'] = array(
-			'#type' => 'select',
-			'#options' => array(
-				NULL => '',
-				'(' => '(',
-				'((' => '((',
-				'(((' => '(((',
-				'((((' => '((((',
-			),
-			'#prefix' => '<div class="sirius_mightsearch_clausepart">',
-			'#suffix' => '</div>',
-			'#default_value' => $my_saved_mightysearch[$i]['open'],
-		);
+		for ($i=0; $i<$clause_count; ++$i) {
+			$form['mightysearch'][$i] = array(
+				'#type' => 'fieldset',
+				'#prefix' => '<div class="sirius_mightysearch_clause">',
+				'#suffix' => '</div>',
+			);
 
-		$form['mightysearch'][$i]['field'] = array(
-			'#type' => 'select',
-			'#options' => $paths,
-			'#prefix' => '<div class="sirius_mightsearch_clausepart sirius_mightsearch_clausepart_field">',
-			'#suffix' => '</div>',
-	    '#ajax' => array('callback' => 'sirius_mightysearch_ajax_valuefield'),
-	    '#ajax_args' => array('clause_number' => $i),
-			'#default_value' => $my_saved_mightysearch[$i]['field'],
-		);
+			$form['mightysearch'][$i]['andor'] = array(
+				'#type' => 'select',
+				'#options' => array(
+					'and' => 'AND',
+					'or' => 'OR',
+				),
+				'#prefix' => '<div class="sirius_mightsearch_clausepart sirius_mightsearch_clausepart_andor">',
+				'#suffix' => '</div>',
+				'#default_value' => $my_saved_mightysearch[$i]['andor'],
+			);
+			if ($i == 0) { $form['mightysearch'][$i]['andor']['#options'] = array(NULL => 'WHERE'); }
 
-		$form['mightysearch'][$i]['criterion'] = array(
-			'#type' => 'select',
-			'#options' => array(
-				'=' => '=',
-				'!=' => '!=',
-				'in' => 'one of',
-				'not in' => 'none of',
-				'like' => 'contains',
-				'not like' => 'does not contain',
-				'starts' => 'starts with',
-				'ends' => 'ends with',
-				'empty' => 'empty',
-				'not empty' => 'not empty',
-				'>=' => '>=',
-				'>' => '>',
-				'<' => '<',
-				'<=' => '<=',
-			),
-			'#prefix' => '<div class="sirius_mightsearch_clausepart">',
-			'#suffix' => '</div>',
-			'#default_value' => $my_saved_mightysearch[$i]['criterion'],
-	    '#ajax' => array('callback' => 'sirius_mightysearch_ajax_valuefield'),
-	    '#ajax_args' => array('clause_number' => $i),
-		);
+			$form['mightysearch'][$i]['open'] = array(
+				'#type' => 'select',
+				'#options' => array(
+					NULL => '',
+					'(' => '(',
+					'((' => '((',
+					'(((' => '(((',
+					'((((' => '((((',
+				),
+				'#prefix' => '<div class="sirius_mightsearch_clausepart">',
+				'#suffix' => '</div>',
+				'#default_value' => $my_saved_mightysearch[$i]['open'],
+			);
 
-		$form['mightysearch'][$i]['value'] = sirius_mightysearch_form_prepare_valuefield($form_state, $json_forms, $my_saved_mightysearch, $i);
+			$form['mightysearch'][$i]['field'] = array(
+				'#type' => 'select',
+				'#options' => array(NULL => t('-- Select --')) + $paths,
+				'#prefix' => '<div class="sirius_mightsearch_clausepart sirius_mightsearch_clausepart_field">',
+				'#suffix' => '</div>',
+		    '#ajax' => array('callback' => 'sirius_mightysearch_ajax_valuefield'),
+		    '#ajax_args' => array('clause_number' => $i),
+				'#default_value' => $my_saved_mightysearch[$i]['field'],
+			);
 
-		$form['mightysearch'][$i]['close'] = array(
-			'#type' => 'select',
-			'#options' => array(
-				NULL => '',
-				')' => ')',
-				'))' => '))',
-				')))' => ')))',
-				'))))' => '))))',
-			),
-			'#prefix' => '<div class="sirius_mightsearch_clausepart">',
-			'#suffix' => '</div>',
-			'#default_value' => $my_saved_mightysearch[$i]['close'],
-		);
+			$form['mightysearch'][$i]['criterion'] = array(
+				'#type' => 'select',
+				'#options' => sirius_mightysearch_criterion_options(),
+				'#prefix' => '<div class="sirius_mightsearch_clausepart">',
+				'#suffix' => '</div>',
+				'#default_value' => $my_saved_mightysearch[$i]['criterion'],
+		    '#ajax' => array('callback' => 'sirius_mightysearch_ajax_valuefield'),
+		    '#ajax_args' => array('clause_number' => $i),
+			);
 
-		$form['mightysearch'][$i]['clear'] = array(
-			'#markup' => "<div class=\"sirius_mightsearch_clausepart sirius_mightsearch_clausepart_clearlink\"><div><a href=\"\">Clear</a></div></div>"
-		);
+			$form['mightysearch'][$i]['value'] = sirius_mightysearch_form_prepare_valuefield($form_state, $json_forms, $my_saved_mightysearch, $i);
+
+			$form['mightysearch'][$i]['close'] = array(
+				'#type' => 'select',
+				'#options' => array(
+					NULL => '',
+					')' => ')',
+					'))' => '))',
+					')))' => ')))',
+					'))))' => '))))',
+				),
+				'#prefix' => '<div class="sirius_mightsearch_clausepart">',
+				'#suffix' => '</div>',
+				'#default_value' => $my_saved_mightysearch[$i]['close'],
+			);
+
+			$form['mightysearch'][$i]['clear'] = array(
+				'#markup' => "<div class=\"sirius_mightsearch_clausepart sirius_mightsearch_clausepart_clearlink\"><div><a href=\"\">Clear</a></div></div>"
+			);
+		}
+
+	  $form['mightysearch']['accordion_close_clauses'] = array('#markup' => '</div>');
 	}
 
-  $form['mightysearch']['accordion_close_clauses'] = array('#markup' => '</div>');
-  $form['mightysearch']['accordion_open_display'] = array('#markup' => '<div class="sirius_accordion_label">' . t('Display') . '</div><div class="sirius_accordion_body">');
+	//////////////////////////////////////////////////////////////////////////////////////
+	// Display Fields
+	//////////////////////////////////////////////////////////////////////////////////////
 
-  $options = $paths;
-  unset($options[NULL]);
-  $form['mightysearch']['additional_fields']['display'] = array(
-  	'#type' => 'checkboxes',
-  	'#options' => $options,
-  );
-  if ($my_saved_mightysearch['additional_fields']['display']) { $form['mightysearch']['additional_fields']['display']['#default_value'] = $my_saved_mightysearch['additional_fields']['display']; }
+  $widget_display_default_value = array();
+  if ($widget_settings['fields']['field_list']) {
+  	foreach ($widget_settings['fields']['field_list'] as $field_delta => $record) {
+  		if (!$record['path']) { continue; }
+  		$widget_display_default_value[$record['path']] = $record['path'];
+  	}
+  }
 
-  $form['mightysearch']['accordion_close_display'] = array('#markup' => '</div>');
-  $form['mightysearch']['accordion_close'] = array('#markup' => '</div>');
+  if ($widget_settings['form']['lock_display'] == 'Yes') {
+	  $form['mightysearch']['additional_fields']['display'] = array(
+	  	'#type' => 'value',
+	  	'#value' => $widget_display_default_value,
+	  );
+  } else {
+	  $form['mightysearch']['accordion_open_display'] = array('#markup' => '<div class="sirius_accordion_label">' . t('Display') . '</div><div class="sirius_accordion_body">');
 
-  /*
-	$form['mightysearch']['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Search'),
-	);
-	*/
+	  $my_saved_display_default_value = array();
+		if ($my_saved_mightysearch['additional_fields']['display']) {
+			$tmp = array_filter(array_values($my_saved_mightysearch['additional_fields']['display']));
+			$my_saved_display_default_value = array_combine($tmp, $tmp);
+		}
+		if ($my_saved_display_default_value) { $display_default_value = $my_saved_display_default_value; } else { $display_default_value = $widget_display_default_value; }
+
+	  $form['mightysearch']['additional_fields']['display'] = array(
+	  	'#type' => 'checkboxes',
+	  	'#options' => $paths,
+	  	'#default_value' => $display_default_value,
+	  );
+
+	  $form['mightysearch']['accordion_close_display'] = array('#markup' => '</div>');
+	  $form['mightysearch']['accordion_close'] = array('#markup' => '</div>');
+	}
 
   $form['mightysearch']['close'] = array('#markup' => '</div>');
 
-	$form['suffix'] = array('#markup' => '</div>');
+	//////////////////////////////////////////////////////////////////////////////////////
+	// Actions
+	//////////////////////////////////////////////////////////////////////////////////////
 
 	$count = $form_state['results']['count'];
 	$count_total = $form_state['results']['count_total'];
 
-	$action_info_all = sirius_mgihtysearch_action_info_all();
+	$action_info_all = sirius_mightysearch_action_info_all();
 	$action_options = array(NULL => t('Search'));
 	$selectall = FALSE;
+	$select = FALSE;
 	foreach ($action_info_all as $key => $action_info) {
 		if (!$action_info['universal'] && !$actions[$key]) { continue; }
 		if ($action_info['permission'] && !user_access($action_info['permission'])) { continue; }
 		$action_options[$key] = $action_info['title'];
 		if ($action_info['selectall']) { $selectall = TRUE; }
+		if ($action_info['select']) { $select = TRUE; }
 	}
 
-	$form['mightysearch_results']['action'] = array(
-		'#type' => 'select',
-		'#title' => t('Action'),
-		'#options' => $action_options,
-		'#default_value' => 'search',
-	);
+	if (count($action_options) > 1) {
+		$form['mightysearch_results']['action'] = array(
+			'#type' => 'select',
+			'#title' => t('Action'),
+			'#options' => $action_options,
+			'#default_value' => 'search',
+		);
+	}
 
 	// @todo: Actions should be callbacks
 
@@ -410,7 +485,7 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		);
 	}
 
-	if ($action_options['export']) {
+	if ($action_options['export'] && ($widget_settings['form']['lock_display'] != 'Yes')) {
 		$form['mightysearch_results']['results_all_fields'] = array(
 			'#type' => 'checkbox',
 			'#title' => t("Export ALL fields"),
@@ -457,9 +532,17 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		);
 	}
 
+	$submit_title = $widget_settings['form']['submit_title'];
+	if (!$submit_title) {
+		if (count($action_options) == 1) {
+			$submit_title = 'Search';
+		} else {
+			$submit_title = 'Submit';
+		}
+	}
 	$form['mightysearch_results']['submit'] = array(
 		'#type' => 'submit',
-		'#value' => t('Submit'),
+		'#value' => $submit_title,
 	);
 
 	if ($form_state['results']) {
@@ -477,17 +560,22 @@ function sirius_mightysearch_form_prepare(&$form, &$form_state, $mightysearch_id
 		$form['mightysearch_results']['summary'] = array('#markup' => '<hr><h2>' . $results_summary . '</h2>');
 
 		if ($count > 0) {
-			$form['mightysearch_results']['results_select'] = array(
-				'#type' => 'tableselect',
-				'#header' => $form_state['results']['header'],
-				'#options' => $form_state['results']['rows'],
-			);
+			if ($select) {
+				$form['mightysearch_results']['results_select'] = array(
+					'#type' => 'tableselect',
+					'#header' => $form_state['results']['header'],
+					'#options' => $form_state['results']['rows'],
+				);
+			} else {
+				$form['mightysearch_results']['results_select'] = array('#markup' => theme_table(array('header' => $form_state['results']['header'], 'rows' => $form_state['results']['rows'], 'attributes' => array())));
+			}
 		}
 
 		if ($form_state['results']['rendered']) {
 			$form['mightysearch_results']['results_rendered'] = array('#markup' => '<div class="sirius_mightysearch_results_rendered">' . $form_state['results']['rendered'] . '</div>');
 		}
 	}
+
 }
 
 function sirius_mightysearch_parse_path($path) {
@@ -505,6 +593,11 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 	$value = $values['value'];
 	if (!is_array($value)) { $value = strtolower(trim($value)); } 
 	$criterion = $values['criterion'];
+
+	if ($criterion && $values['skip_if_empty']) {
+		if (!is_array($value) && ($value === '')) { return NULL; }
+		if (is_array($value) && !array_filter(array_values($value))) { return NULL; }
+	}
 
 	$sql_parts['headers'][$full_path] = TRUE;
 
@@ -693,10 +786,11 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 		} else if ($criterion == 'in' || $criterion == 'not in') {
 			if (is_array($value)) { 
 				$value = array_values($value);
-			} else {
+			} else if (isset($value)) {
 				$value = explode("\n", $value);
-			}
+			} 
 			$value = array_filter($value);
+			if (!$value) { $value = array(''); }
 			$value = array_map('trim', $value);
 			$value = array_map('strtolower', $value);
 		}
@@ -724,6 +818,36 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 	return TRUE;
 }
 
+function sirius_mightysearch_display_fields($sql_parts, $widget_settings) {
+	$display_fields = array();
+
+	// Always show the name first
+	$display_fields['title'] = 'Name';
+
+	if ($widget_settings['form']['lock_display'] == 'Yes') {
+		// Locked display. Just show list from setings
+		if ($widget_settings['fields']['field_list']) {
+			foreach ($widget_settings['fields']['field_list'] as $field_delta => $record) {
+				$display_fields[$record['path']] = $record['label'];
+			}
+		}
+	} else {
+		// Unlocked display. Show whatever is in the "headers" sql
+		$display_fields += array_combine(array_keys($sql_parts['headers']), array_keys($sql_parts['headers']));
+
+		// We might still set some user-friendly labels.
+		if ($widget_settings['fields']['field_list']) {
+			foreach ($widget_settings['fields']['field_list'] as $field_delta => $record) {
+				$path = $record['path'];
+				if ($display_fields[$record['path']]) {
+					$display_fields[$record['path']] = $record['label'];
+				}
+			}
+		}
+	}
+	return $display_fields;
+}
+
 function sirius_mightysearch_form_submit($form, &$form_state) {
 	// Don't lock the database
 	db_query('SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED');
@@ -734,6 +858,8 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	$actions = $form_state['actions'];
 	$mightysearch_id = $form_state['mightysearch_id'];
 	$all_paths = $form_state['all_paths'];
+
+  $widget_settings = $json_forms['widget_settings'];
 
 	$_SESSION['my_saved_mightysearch'] = array($mightysearch_id => $form_state['values']['mightysearch']);
 
@@ -830,43 +956,54 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 	// Search
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	$action_info_all = sirius_mgihtysearch_action_info_all();
+	$action_info_all = sirius_mightysearch_action_info_all();
 	$action_info = $action_info_all[$action];
+
+	$tools_info_all = sirius_mightysearch_tools_info_all();
+	if ($widget_settings['form']['tools']) {
+		$tool_keys = array_filter(array_values($widget_settings['form']['tools']));
+	}  else {
+		$tool_keys = array(
+			'contact_view',
+			'participant_view',
+			'bulk_view',
+			'worker_view',
+		);
+	}
 
 	if ($action == 'search') {
 		$sql = $sql_parts['select_fields'] . $sql_parts['joins'] . $sql_parts['where'] . $sql_parts['group'] . $sql_parts['limit']; 
 		$stmt = sirius_sql_query($sql, $sql_args);
 
+		$display_fields = sirius_mightysearch_display_fields($sql_parts, $widget_settings);
+
 		$rows = array();
 		$count = 0;
 		while ($hr = $stmt->fetchAssoc()) {
 			$row = array();
-			$row[] = $hr['nid'];
-			$row[] = $hr['title'];
-			foreach (array_keys($sql_parts['headers']) as $full_path) {
-				$row[] = sirius_mightysearch_render_result($json_forms, $hr, $full_path);
+			foreach ($display_fields as $path => $label) {
+				$row[] = sirius_mightysearch_render_result($json_forms, $hr, $path);
 			}
 
-			$tools = '';
-			$tools .= l('View', 'node/' . $hr['nid'], array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-			$tools .= l('Custom Fields', 'node/' . $hr['nid'] . '/sirius_contact_json', array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-			if ($hr['participant_nid']) {
-				$tools .= l('Participant', 'node/' . $hr['participant_nid'] . '/sirius_event_participant_json', array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+			if ($tool_keys) {
+				$tools = array();
+				foreach ($tool_keys as $tool_key) {
+					$record = $tools_info_all[$tool_key];
+					$id = $hr[$record['variable']];
+					if (!$id) { continue; }
+					$path = preg_replace('/\%/', $id, $record['path']);
+					$tools[] = l($record['title'], $path, array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+				}
+
+				$row[] = join('', $tools);
 			}
-			if ($hr['bulk_nid']) {
-				$tools .= l('Bulk', 'node/' . $hr['bulk_nid'] . '', array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-			}
-			if ($hr['worker_nid']) {
-				$tools .= l('Worker', 'node/' . $hr['worker_nid'] . '', array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-			}
-			$row[] = $tools;
+
 			$rows[$hr['nid']] = $row;
 			++$count;
 		}
 
-		$header = array('Internal ID', 'Name');
-		foreach (array_keys($sql_parts['headers']) as $full_path) { $header[] = $all_paths[$full_path]; }
-		$header[] = t('Tools');
+		$header = array_values($display_fields);
+		if ($tool_keys) { $header[] = t('Tools'); }
 
 		$count_total = $count;
 		if ($count >= $limit) {
@@ -1055,9 +1192,9 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 		drupal_add_http_header('Content-Type', 'text/csv');
 		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
 
-		$header = array('Internal ID', 'Name');
-		foreach (array_keys($sql_parts['headers']) as $full_path) { $header[] = $all_paths[$full_path]; }
-		fputcsv($fp, $header);
+		$display_fields = array('nid' => t('Internal ID')) + sirius_mightysearch_display_fields($sql_parts, $widget_settings);
+
+		fputcsv($fp, array_values($display_fields));
 
 		$offset = 0;
 		$limit = 10000;
@@ -1067,9 +1204,7 @@ function sirius_mightysearch_form_submit($form, &$form_state) {
 
 			while ($hr = $stmt->fetchAssoc()) {
 				$row = array();
-				$row[] = $hr['nid'];
-				$row[] = $hr['title'];
-				foreach (array_keys($sql_parts['headers']) as $full_path) {
+				foreach (array_keys($display_fields) as $full_path) {
 					$row[] = sirius_mightysearch_render_result($json_forms, $hr, $full_path);
 				}
 				fputcsv($fp, $row);
@@ -1198,6 +1333,9 @@ function sirius_mightysearch_batch_finished($success, $results, $operations) {
 }
 
 function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
+	if ($full_path == 'nid') { return $hr['nid']; }
+	if ($full_path == 'title') { return $hr['title']; }
+
 	list ($node_type, $which_form, $path) = sirius_mightysearch_parse_path($full_path);
 	if ($node_type == 'sirius_event_participant') {
 		$json = json_decode($hr['participant_json_value'], TRUE);
@@ -1281,4 +1419,46 @@ function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
 			return sirius_jsonfield_util_render_values($json_form, $json_results, array($path), array('raw' => TRUE));
 		}
 	}
+}
+
+function sirius_mightysearch_tools_info_all() {
+	$tools = array();
+
+	$tools['contact_view'] = array(
+		'title' => 'Contact',
+		'path' => 'node/%',
+		'variable' => 'nid',
+	);
+
+	$tools['participant_view'] = array(
+		'title' => 'Participant',
+		'path' => 'node/%/sirius_event_participant_status',
+		'variable' => 'participant_nid',
+	);
+
+	$tools['participant_survey_view'] = array(
+		'title' => 'View Survey',
+		'path' => 'node/%/sirius_event_participant_json',
+		'variable' => 'participant_nid',
+	);
+
+	$tools['participant_survey_edit'] = array(
+		'title' => 'Edit Survey',
+		'path' => 'node/%/sirius_event_participant_json/edit',
+		'variable' => 'participant_nid',
+	);
+
+	$tools['bulk_view'] = array(
+		'title' => 'Bulk',
+		'path' => 'node/%',
+		'variable' => 'bulk_nid',
+	);
+
+	$tools['worker_view'] = array(
+		'title' => 'Worker',
+		'path' => 'node/%',
+		'variable' => 'worker_nid',
+	);
+
+	return $tools;
 }
