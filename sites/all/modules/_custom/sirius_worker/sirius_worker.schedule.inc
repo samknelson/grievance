@@ -31,7 +31,7 @@ function sirius_worker_schedule($worker_nid) {
 					$ts1 = sirius_date_ts($record['event_node'], 'field_sirius_daterepeat', $delta, 'value');
 					$ts2 =  sirius_date_ts($record['event_node'], 'field_sirius_daterepeat', $delta, 'value2');
 
-					$is_good = ($ts1 >= $ts_now || $tw2 >= $ts_now);
+					$is_good = ($ts1 >= $ts_now || $ts2 >= $ts_now);
 					if (!$is_good) { continue; }
 
 					$schedule_entry = array();
@@ -69,7 +69,7 @@ function sirius_worker_schedule($worker_nid) {
 			$json = sirius_jsonfield_util_term_json_get($tor_node);
 			$ts1 = strtotime($json['tor']['start_date']);
 			$ts2 = strtotime($json['tor']['end_date']);
-			$is_good = ($ts1 >= $ts_now || $tw2 >= $ts_now);
+			$is_good = ($ts1 >= $ts_now || $ts2 >= $ts_now);
 			if (!$is_good) { continue; }
 
 			$schedule_entry = array();
