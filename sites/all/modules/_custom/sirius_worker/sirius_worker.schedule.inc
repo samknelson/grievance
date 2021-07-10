@@ -1,17 +1,15 @@
 <?php
 
-function sirius_worker_schedule($worker_nid, $start_ts = NULL, $end_ts = NULL) {
-	if (!$start_ts) { $start_ts = time() - 60*60*24; }
-	if (!$end_ts) { $end_ts = time() + 60*60*24*30; }
-
+function sirius_worker_schedule($worker_nid) {
 	// Lots of lookups. Let's cache them.
 	$lookups = &drupal_static(__FUNCTION__);
+	$ts_now = time();
 
 	// Get the contact
 	$contact_nid = sirius_contact_get_nid_from_worker($worker_nid);
 	if (!$contact_nid) { return array(); }
 
-	// Results arra
+	// Results array
 	$schedule = array();
 
 	// Event Schedule. 
@@ -25,15 +23,15 @@ function sirius_worker_schedule($worker_nid, $start_ts = NULL, $end_ts = NULL) {
 		foreach ($events_by_type as $event_type_tid => $records) {
 			foreach ($records as $delta => $record) {
 				$pstatus_tid = $record['participant_node']->field_sirius_event_pstatus['und'][0]['tid'];
-				$json = sirius_jsonfield_util_term_json_get($lookups['pstatus_terms'][$pstatus_tid]);
+				$json = sirius_json_get($lookups['pstatus_terms'][$pstatus_tid]);
 				if ($json['schedule']['display']['active'] != 'Yes') { continue; }
 
 				if (!$record['event_node']->field_sirius_daterepeat['und'][0]) { continue; }
 				foreach ($record['event_node']->field_sirius_daterepeat['und'] as $delta => $d) {
-					$ts1 =  sirius_date_ts($record['event_node'], 'field_sirius_daterepeat', $delta, 'value');
+					$ts1 = sirius_date_ts($record['event_node'], 'field_sirius_daterepeat', $delta, 'value');
 					$ts2 =  sirius_date_ts($record['event_node'], 'field_sirius_daterepeat', $delta, 'value2');
 
-					$is_good = ($ts1 >= $start_ts && $ts1 <= $end_ts) || ($ts2 >= $start_ts && $ts2 <= $end_ts);
+					$is_good = ($ts1 >= $ts_now || $tw2 >= $ts_now);
 					if (!$is_good) { continue; }
 
 					$schedule_entry = array();
@@ -71,7 +69,7 @@ function sirius_worker_schedule($worker_nid, $start_ts = NULL, $end_ts = NULL) {
 			$json = sirius_jsonfield_util_term_json_get($tor_node);
 			$ts1 = strtotime($json['tor']['start_date']);
 			$ts2 = strtotime($json['tor']['end_date']);
-			$is_good = ($ts1 >= $start_ts && $ts1 <= $end_ts) || ($ts2 >= $start_ts && $ts2 <= $end_ts);
+			$is_good = ($ts1 >= $ts_now || $tw2 >= $ts_now);
 			if (!$is_good) { continue; }
 
 			$schedule_entry = array();
@@ -84,6 +82,7 @@ function sirius_worker_schedule($worker_nid, $start_ts = NULL, $end_ts = NULL) {
 			$schedule_entry['start_date'] = date('Y-m-d H:i:s', $ts1);
 			$schedule_entry['end_ts'] = $ts2; 
 			$schedule_entry['end_date'] = date('Y-m-d H:i:s', $ts2);
+			$schedule_entry['path'] = "node/$worker_nid/sirius_worker_schedule/tor/view/" . $tor_node->nid;
 			$schedule[$ts1] = $schedule_entry;
 		}
 	}
@@ -127,20 +126,20 @@ function sirius_worker_schedule_render_full($schedule) {
 	$rows = array();
 	foreach ($schedule as $ts => $schedule_entry) {
 		$tools = '';
-		$path = 'node/' . $schedule_entry['handler_nid'];
+		$path = $schedule_entry['path'];
+		if (!$path) { $path = 'node/' . $schedule_entry['handler_nid']; }
 		if (drupal_valid_path($path)) { $tools .= l('View', $path, array('attributes' => array('class' => array('tool-button')))); }
 
 		$start_ts = $schedule_entry['start_ts'];
 		$end_ts = $schedule_entry['end_ts'];
-		$datestr = date('D, F j, Y g:i A', $start_ts);
-		if ($end_ts) {
-			$d1 = date('Y-m-d', $start_ts);
-			$d2 = date('Y-m-d', $end_ts);
-			if ($d1 == $d2) {
-				$datestr .= ' - ' . date('g:i A', $end_ts);
-			} else {
-				$datestr .= ' - ' . date('D, F j, Y g:i A', $end_ts);
-			}
+
+		$start_date = date('Y-m-d', $start_ts);
+		$end_date = date('Y-m-d', $end_ts);
+
+		if ($start_date == $end_date) {
+			$datestr = $start_date;
+		} else {
+			$datestr .= "$start_date - $end_date";
 		}
 
 		$row = array();
