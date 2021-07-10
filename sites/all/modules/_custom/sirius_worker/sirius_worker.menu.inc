@@ -45,9 +45,6 @@ function sirius_worker_node_tabs() {
     'weight' => 2,
   );
 
-
-
-
   $node_tabs['sirius_worker']['sirius_worker_skill'] = array(
     'title' => 'Skills',
     'description' => '',
@@ -102,12 +99,6 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
     'weight' => 7,
   );
-
-
-
-
-
-
 
   $node_tabs['sirius_worker']['sirius_worker_contact'] = array(
     'title' => 'Contact',
