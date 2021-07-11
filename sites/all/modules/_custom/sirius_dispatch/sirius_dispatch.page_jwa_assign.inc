@@ -167,7 +167,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 		$args[':work_status'] = array_values($prefs['work_status']);
 	}
 	$sql .= "group by node.nid ";
-	$sql .= "order by field_sirius_dispatch_availdate_value desc limit $worker_max ";
+	$sql .= "order by field_sirius_dispatch_availdate_value limit $worker_max ";
 	$stmt = db_query($sql, $args);
 	$workers = array();
 	while ($hr = $stmt->fetchAssoc()) {
@@ -212,13 +212,80 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	drupal_add_js(drupal_get_path('module', 'sirius_dispatch') . '/js/sirius_dispatch.jwa.js', 'file');
 
   //
-  // LEFT COLUMN
+  // RIGHT COLUMN
   //
 
-  //$form['table_open'] = array('#markup' => '<table style="border: none; background: none;">');
-  //$form['tr_open'] = array('#markup' => '<tr style="border: none; background: none;">');
-  //$form['td_1_open'] = array('#markup' => '<td style="vertical-align: top; width: 50%; border: none; background: none; margin-right: 20;">');
+  //$form['td_2_open'] = array('#markup' => '<td style="vertical-align: top; border: none; background: none; margin-right: 20;">');
 
+	$html = '<div id="sirius_accordion">';
+
+	$skill_lookup = sirius_taxonomy_load('sirius_skill', 'tid', 'name');
+
+	foreach ($job_nodes as $job_nid => $job_node) {
+		$count = $job_node->field_sirius_count['und'][0]['value']; if (!$count) { $count = 0; }
+		$notified = $job_node->field_sirius_count_notified['und'][0]['value']; if (!$notified) { $notified = 0; }
+		$yes = $job_node->field_sirius_count_yes['und'][0]['value']; if (!$yes) { $yes = 0; }
+		$no = $job_node->field_sirius_count_no['und'][0]['value']; if (!$no) { $no = 0; }
+		$tools = l(t('Manage'), "node/$job_nid/sirius_dispatch_job_manage", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+
+		$title = '<strong>' . $employers[$job_node->field_grievance_shop['und'][0]['target_id']] . '</strong><br />';
+		$title .= sirius_date_date($job_node, 'field_sirius_datetime') . ', ';
+		$title .= $job_node->field_sirius_dispatch_job_status['und'][0]['value'];
+
+
+		$facility_title = sirius_node_title($job_node->field_sirius_dispatch_facility['und'][0]['target_id']);
+		$hall_title = sirius_node_title($job_node->field_sirius_dispatch_hall['und'][0]['target_id']);
+		$notes_title = $job_node->field_sirius_address_notes['und'][0]['value'];
+
+		$skill_titles = array();
+		if ($job_node->field_sirius_skill['und']) {
+			foreach ($job_node->field_sirius_skill['und'] as $delta => $record) {
+				$skill_titles[] = $skill_lookup[$record['tid']];
+			}
+		}
+		if ($facility_title || $hall_title || $notes_title || $skill_titles) {
+			if ($facility_title) { $title .= " / $facility_title"; }
+			if ($hall_title) { $title .= " $hall_title"; }
+			if ($notes_title) { $title .= " $notes_title"; }
+			if ($skill_titles) { $title .= ' / ' . join(' / ', $skill_titles); }
+		}
+
+		$title .= '<br />';
+		$title .= "Need: <strong>$count</strong> / Notified: <strong>$notified</strong> / Yes: <strong>$yes</strong> / No: $no";
+
+		$html .= '<div class="sirius_accordion_label">' . $title . '</div><div class="sirius_accordion_body">';
+
+		$html .= l(t("Select"), "<front>", array('attributes' => array('target' => '_blank', 'data-job-nid' => $job_nid, 'class' => array('tool-button', 'sirius_job_nid_set'))));
+		$html .= ' ';
+		$html .= l(t("Manage"), "node/$job_nid/sirius_dispatch_job_manage", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+
+		if ($roster[$job_nid]) {
+			$header = array(t('Worker'), t('Status'), t('Tools'));
+			$rows = array();
+			foreach ($roster[$job_nid] as $hr) {
+				$tools = l(t('Dispatch'), "node/$hr[dispatch_nid]/sirius_dispatch_manage", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+				$tools .= ' ';
+				$tools .= l(t('Worker'), "node/$hr[worker_nid]", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+				$row = array();
+				$row[] = $hr['worker_name'] . '<br />' . $hr['sirius_id'];
+				$row[] = $hr['dispatch_status'];
+				$row[] = $tools;
+				$rows[] = $row;
+			}
+			$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
+		} else {
+			$html .= '<br /><br /><em>' . t('No workers dispatched.') . '</em>';
+		}
+		$html .= '</div>';
+	}
+
+	$html .= '</div>';
+
+	$form['td_2_body'] = array('#markup' => $html);
+
+	//
+  // LEFT COLUMN
+  //
 
   $header = array(
   	t('Worker'),
@@ -295,84 +362,6 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
   	'#header' => $header,
   	'#options' => $rows,
   );
-
-  //$form['td_1_close'] = array('#markup' => '</td>');
-
-  //
-  // RIGHT COLUMN
-  //
-
-  //$form['td_2_open'] = array('#markup' => '<td style="vertical-align: top; border: none; background: none; margin-right: 20;">');
-
-	$html = '<div id="sirius_accordion">';
-
-	$skill_lookup = sirius_taxonomy_load('sirius_skill', 'tid', 'name');
-
-	foreach ($job_nodes as $job_nid => $job_node) {
-		$count = $job_node->field_sirius_count['und'][0]['value']; if (!$count) { $count = 0; }
-		$notified = $job_node->field_sirius_count_notified['und'][0]['value']; if (!$notified) { $notified = 0; }
-		$yes = $job_node->field_sirius_count_yes['und'][0]['value']; if (!$yes) { $yes = 0; }
-		$no = $job_node->field_sirius_count_no['und'][0]['value']; if (!$no) { $no = 0; }
-		$tools = l(t('Manage'), "node/$job_nid/sirius_dispatch_job_manage", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-
-		$title = '<strong>' . $employers[$job_node->field_grievance_shop['und'][0]['target_id']] . '</strong><br />';
-		$title .= sirius_date_date($job_node, 'field_sirius_datetime') . ', ';
-		$title .= $job_node->field_sirius_dispatch_job_status['und'][0]['value'];
-
-
-		$facility_title = sirius_node_title($job_node->field_sirius_dispatch_facility['und'][0]['target_id']);
-		$hall_title = sirius_node_title($job_node->field_sirius_dispatch_hall['und'][0]['target_id']);
-		$notes_title = $job_node->field_sirius_address_notes['und'][0]['value'];
-
-		$skill_titles = array();
-		if ($job_node->field_sirius_skill['und']) {
-			foreach ($job_node->field_sirius_skill['und'] as $delta => $record) {
-				$skill_titles[] = $skill_lookup[$record['tid']];
-			}
-		}
-		if ($facility_title || $hall_title || $notes_title || $skill_titles) {
-			if ($facility_title) { $title .= " / $facility_title"; }
-			if ($hall_title) { $title .= " $hall_title"; }
-			if ($notes_title) { $title .= " $notes_title"; }
-			if ($skill_titles) { $title .= ' / ' . join(' / ', $skill_titles); }
-		}
-
-		$title .= '<br />';
-		$title .= "Need: <strong>$count</strong> / Notified: <strong>$notified</strong> / Yes: <strong>$yes</strong> / No: $no";
-
-		$html .= '<div class="sirius_accordion_label">' . $title . '</div><div class="sirius_accordion_body">';
-
-		$html .= l(t("Select"), "<front>", array('attributes' => array('target' => '_blank', 'data-job-nid' => $job_nid, 'class' => array('tool-button', 'sirius_job_nid_set'))));
-		$html .= ' ';
-		$html .= l(t("Manage"), "node/$job_nid/sirius_dispatch_job_manage", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-
-		if ($roster[$job_nid]) {
-			$header = array(t('Worker'), t('Status'), t('Tools'));
-			$rows = array();
-			foreach ($roster[$job_nid] as $hr) {
-				$tools = l(t('Dispatch'), "node/$hr[dispatch_nid]/sirius_dispatch_manage", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-				$tools .= ' ';
-				$tools .= l(t('Worker'), "node/$hr[worker_nid]", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-				$row = array();
-				$row[] = $hr['worker_name'] . '<br />' . $hr['sirius_id'];
-				$row[] = $hr['dispatch_status'];
-				$row[] = $tools;
-				$rows[] = $row;
-			}
-			$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array()));
-		} else {
-			$html .= '<br /><br /><em>' . t('No workers dispatched.') . '</em>';
-		}
-		$html .= '</div>';
-	}
-
-	$html .= '</div>';
-
-	$form['td_2_body'] = array('#markup' => $html);
-
-  //$form['td_2_close'] = array('#markup' => '</td>');
-  //$form['tr_close'] = array('#markup' => '</tr>');
-  //$form['table_close'] = array('#markup' => '</table>');
 
   $form['job_nid'] = array('#required' => TRUE, '#type' => 'hidden', '#attributes' => array('id' => 'sirius_job_nid'));
 
