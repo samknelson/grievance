@@ -32387,7 +32387,7 @@ Accepted'),
   $handler->display->display_options['exposed_form']['type'] = 'views_exposed_groups';
   $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
   $handler->display->display_options['exposed_form']['options']['views_exposed_groups'] = array(
-    'format_groups' => 'vertical_tabs',
+    'format_groups' => 'fieldsets_collapsed',
     'groups' => 'Name & IDs
 Industry & Employers
 Status & Levels
