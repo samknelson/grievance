@@ -24,13 +24,18 @@ function sirius_dashboard_page_dashboard() {
 
 function sirius_dashboard_page_dashboard_content($print_and_exit = TRUE) {
 	global $user;
+
 	$rows = array();
 	$roles = $user->roles;
 	if (!$roles) { $roles = array(); }
 	foreach ($roles as $rid => $role) {
 		$json = sirius_dashboard_items_by_role($rid);
 		if (!$json['item_list']) { continue; }
-		foreach ($json['item_list'] as $uuid => $item) {
+
+		$item_list = $json['item_list'];
+		uksort($item_list, function($a, $b) use ($item_list) { return $item_list[$a]['weight'] <=> $item_list[$b]['weight']; });
+
+		foreach ($item_list as $uuid => $item) {
 			$new_rows = sirius_dashboard_item_data($json, $uuid);
 			if (is_array($new_rows)) {
 				foreach ($new_rows as $row_assoc) {
@@ -39,7 +44,6 @@ function sirius_dashboard_page_dashboard_content($print_and_exit = TRUE) {
 
 					$title = $item['title'];
 					if (isset($row_assoc['title'])) { $title .= ': ' . $row_assoc['title']; }
-
 
 					$row = array();
 					$row[] = $title;
