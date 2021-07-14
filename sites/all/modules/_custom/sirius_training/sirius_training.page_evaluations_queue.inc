@@ -1,27 +1,30 @@
 <?php
 
-function sirius_training_page_evaluations_queue() {
-	return drupal_get_form('sirius_training_page_evaluations_queue_form');
+function sirius_training_page_evaluations_queue($status = 'draft') {
+	return drupal_get_form('sirius_training_page_evaluations_queue_form', $status);
 }
 
-function sirius_training_page_evaluations_queue_form($form, &$form_state) {
-	$evaluation_nodes = sirius_training_evaluations_fetch_by_type('draft');
+function sirius_training_page_evaluations_queue_form($form, &$form_state, $status) {
+  $status_options = sirius_training_evaluation_status_options();
+	$evaluation_nodes = sirius_training_evaluations_fetch_by_type($status);
 
 	$form['#tree'] = TRUE;
-	if ($evaluation_nodes) {
-		foreach ($evaluation_nodes as $evaluation_nid => $evaluation_node) {
-			$html = sirius_training_evaluations_render($evaluation_node, array());
-			$form['evaluations'][$evaluation_nid]['intro'] = array('#markup' => $html);
-			$form['evaluations'][$evaluation_nid]['status'] = array(
-				'#type' => 'select',
-				'#options' => sirius_training_evaluation_status_options(),
-				'#title' => 'Change Status To',
-				'#prefix' => '<div class="container-inline">',
-				'#suffix' => '</div>',
-			);
-		}
-	} else {
-		$html .= '<p>There are no draft evaluations.</p>';
+
+  if (!$evaluation_nodes) {
+		$form['markup'] = array('#markup' => '<p>' . t('There are no evaluations with status <strong>@status</strong>', array('@status' => $status_options[$status])) . '</p>');
+		return $form;
+	}
+
+	foreach ($evaluation_nodes as $evaluation_nid => $evaluation_node) {
+		$html = sirius_training_evaluations_render($evaluation_node, array());
+		$form['evaluations'][$evaluation_nid]['intro'] = array('#markup' => $html);
+		$form['evaluations'][$evaluation_nid]['status'] = array(
+			'#type' => 'select',
+			'#options' => sirius_training_evaluation_status_options(),
+			'#title' => 'Change Status To',
+			'#prefix' => '<div class="container-inline">',
+			'#suffix' => '</div>',
+		);
 	}
 
 	$form['submit'] = array(

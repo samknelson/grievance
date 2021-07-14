@@ -316,22 +316,27 @@ function sirius_training_menu() {
   );
 
   $items['sirius/training/evaluations/queue'] = array(
-    'title' => 'Evaluations Queue',
+    'title' => 'Evaluations',
     'page callback' => 'sirius_training_page_evaluations_queue',
+    'page arguments' => array('draft'),
     'access arguments' => array('sirius training admin'),
     'type' => MENU_NORMAL_ITEM,
   );
 
-  /*
-  $items['sirius/office/operator'] = array(
-    'title' => 'Operators',
-    'description' => '',
-    'page callback' => 'sirius_office_page_operator',
-    'page arguments' => array(),
-    'access arguments' => array('sirius'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-  */
+  $options = sirius_training_evaluation_status_options();
+  $weight = 0;
+  foreach ($options as $key => $name) { 
+    $items["sirius/training/evaluations/queue/$key"] = array(
+      'title' => $name,
+      'page callback' => 'sirius_training_page_evaluations_queue',
+      'page arguments' => array($key),
+      'access arguments' => array('sirius training admin'),
+      'type' => ($weight==0) ? MENU_DEFAULT_LOCAL_TASK : MENU_LOCAL_TASK,
+      'weight' => $weight,
+    );
 
+    ++$weight;
+  }
+  
   return $items;
 }
