@@ -15,15 +15,12 @@ function sirius_dashboard_plugin_info($plugin_key) {
 function sirius_dashboard_plugin_info_all() {
 	$plugins = array();
 
-	$plugins['event_intake'] = array(
-		'title' => 'Event: Intake Applications',
-		'description' => '',
-		'file' => 'sirius_dashboard.plugin_event_intake.inc',
+	$plugins['worker_schedule_tor'] = array(
+		'title' => 'Worker: Schedule: Time-Off Requests',
+		'file' => 'sirius_dashboard.plugin_worker_schedule_tor.inc',
 		'module' => 'sirius_dashboard',
 		'callbacks' => array(
-			'data' => 'sirius_dispatch_plugin_event_intake_data',
-			'config' => 'sirius_dispatch_plugin_event_intake_config',
-			'prefs' => 'sirius_dispatch_plugin_event_intake_prefs',
+			'data' => 'sirius_dispatch_plugin_worker_schedule_tor_data',
 		),
 	);
 
@@ -36,6 +33,18 @@ function sirius_dashboard_plugin_info_all() {
 			'data' => 'sirius_dispatch_plugin_events_data',
 			'config' => 'sirius_dispatch_plugin_events_config',
 			'prefs' => 'sirius_dispatch_plugin_events_prefs',
+		),
+	);
+
+	$plugins['event_intake'] = array(
+		'title' => 'Event: Intake Applications',
+		'description' => '',
+		'file' => 'sirius_dashboard.plugin_event_intake.inc',
+		'module' => 'sirius_dashboard',
+		'callbacks' => array(
+			'data' => 'sirius_dispatch_plugin_event_intake_data',
+			'config' => 'sirius_dispatch_plugin_event_intake_config',
+			'prefs' => 'sirius_dispatch_plugin_event_intake_prefs',
 		),
 	);
 
