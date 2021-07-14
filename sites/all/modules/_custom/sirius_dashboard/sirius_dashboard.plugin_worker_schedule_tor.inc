@@ -10,7 +10,7 @@ function sirius_dispatch_plugin_worker_schedule_tor_data($prefs, $options = arra
 	$row = array(
 		'count' => count($tor_nodes),
 		'tools' => $tools,
-		'details' => 'E.g. ' . sirius_training_evaluations_title($first_tor_node),
+		'details' => 'E.g. ' . $first_tor_node->title,
 	);
 
 	return array($row);
