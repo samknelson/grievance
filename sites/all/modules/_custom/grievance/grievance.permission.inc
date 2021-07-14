@@ -38,10 +38,6 @@ function grievance_permission() {
     	'title' => t('Grievance Arbitration Form'),
     	'description' => t('Permission to view or edit the arbitration form for a grievance.')
     ),
-    'grievance notification' => array(
-    	'title' => t('Grievance Notification'),
-    	'description' => t('DEPRECATED - Permission to use the Notification tab.')
-    ),
     'grievance form' => array(
         'title' => t('Grievance Form'),
         'description' => t('DEPRECATED - Permission to use the Forms tab.')
