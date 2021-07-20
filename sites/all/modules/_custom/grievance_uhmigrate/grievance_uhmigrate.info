@@ -1,4 +1,0 @@
-name = Grievance UH Migrate
-description = Implements the functionality for migrating from the "Virginia" database
-package = grievance
-core = 7.x
