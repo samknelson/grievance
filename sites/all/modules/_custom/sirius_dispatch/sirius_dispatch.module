@@ -89,7 +89,7 @@ function sirius_dispatch_node_presave($node) {
   }
 
   if ($node->type == 'sirius_dispatch') {
-    sirius_dispatch_compute_payrate($node);
+    sirius_dispatch_payrate_compute($node);
   }
 }
 
