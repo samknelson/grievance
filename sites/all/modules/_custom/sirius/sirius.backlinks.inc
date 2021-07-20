@@ -30,7 +30,12 @@ function sirius_backlinks_render() {
 }
 
 function sirius_backlinks_from_term($term) {
-	return array();
+	$links = array();
+	$vid = $term->vid;
+	$vocabulary = taxonomy_vocabulary_load($vid);
+	$path = 'sirius/taxonomy/' . $term->vocabulary_machine_name;
+	$links[$path] = array('name' => 'All Options', 'title' => $vocabulary->name);
+	return $links;
 }
 
 function sirius_backlinks_from_node($node) {
@@ -122,6 +127,7 @@ function sirius_backlinks_from_node($node) {
 				else if ($handler_type == 'sirius_event' && $log_category == 'event:intake_application'){ $path = "node/$handler_nid/sirius_event_intake/applications"; }
 				else if ($handler_type == 'sirius_event') 																							{ $path = "node/$handler_nid/sirius_event_info"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'worker:certification') 	{ $path = "node/$handler_nid/sirius_worker_tc/certifications"; }
+				else if ($handler_type == 'sirius_worker' && $log_category == 'tor') 										{ $path = "node/$handler_nid/sirius_worker_schedule/tor"; }
 				else if ($handler_type == 'sirius_log') {
 					if ($handler_category == 'twilio:recording') { 
 						$path = "node/$handler_nid/sirius_twilio_recording";
