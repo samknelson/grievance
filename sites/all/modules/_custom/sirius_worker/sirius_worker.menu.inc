@@ -32,17 +32,19 @@ function sirius_worker_node_tabs() {
   );
 
   $node_tabs['sirius_worker']['sirius_worker_schedule/tor'] = array(
-    'title' => 'Time-Off Requests',
-    'callback' => 'sirius_worker_node_tab_schedule_tor',
+    'title' => 'Time Off',
+    'callback' => 'sirius_worker_node_tab_schedule_tor_worker_list',
     'permissions' => array('sirius'),
     'weight' => 2,
+    'file' => 'sirius_worker.page_schedule_tor_worker_list.inc',
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_schedule/tos'] = array(
-    'title' => 'Time-Off Sick',
-    'callback' => 'sirius_worker_node_tab_schedule_tos',
+  $node_tabs['sirius_worker']['sirius_worker_schedule/tor/add'] = array(
+    'title' => 'Add',
+    'callback' => 'sirius_worker_node_tab_schedule_tor_add',
     'permissions' => array('sirius'),
     'weight' => 2,
+    'file' => 'sirius_worker.page_schedule_tor_add.inc',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_skill'] = array(
@@ -155,6 +157,36 @@ function sirius_worker_node_tabs() {
     'file' => 'sirius_worker.page_grievances.inc',
   );
 
+
+
+  $node_tabs['sirius_log']['sirius_worker_schedule_tor'] = array(
+    'title' => 'Time-Off',
+    'description' => '',
+    'callback' => 'sirius_worker_node_tab_schedule_tor_view',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_worker.page_schedule_tor_view.inc',
+  );
+
+  $node_tabs['sirius_log']['sirius_worker_schedule_tor/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_worker_node_tab_schedule_tor_view',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_worker.page_schedule_tor_view.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_log']['sirius_worker_schedule_tor/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_worker_node_tab_schedule_tor_edit',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_worker.page_schedule_tor_edit.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
   sirius_node_tab_set_module('sirius_worker', $node_tabs);
 	return $node_tabs;
 }
@@ -179,28 +211,21 @@ function sirius_worker_term_tabs() {
     'weight' => 4,
   );
 
-  $term_tabs['sirius_member_status']['sirius_member_status_tos'] = array(
-    'title' => 'Time-Off Sick',
-    'description' => '',
-    'callback' => 'sirius_worker_term_tab_member_status_tos',
-    'permissions' => array('sirius worker admin'),
-    'weight' => 4,
-  );
-
-  $term_tabs['sirius_member_status']['sirius_member_status_tos'] = array(
-    'title' => 'Subscriptions',
-    'description' => '',
-    'callback' => 'sirius_worker_term_tab_member_status_subscribe',
-    'permissions' => array('sirius worker admin'),
-    'weight' => 5,
-  );
-
   $term_tabs['sirius_work_status']['sirius_work_status_settings'] = array(
     'title' => 'Settings',
     'description' => '',
     'callback' => 'sirius_worker_term_tab_work_status_settings',
     'permissions' => array('sirius worker admin'),
     'file' => 'sirius_worker.term_tab_work_status.inc',
+    'weight' => 1,
+  );
+
+  $term_tabs['sirius_worker_tor_type']['sirius_worker_tor_type_settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_worker_term_tab_tor_settings',
+    'permissions' => array('sirius worker admin'),
+    'file' => 'sirius_worker.term_tab_tor_settings.inc',
     'weight' => 1,
   );
 
@@ -368,17 +393,11 @@ $items['sirius/skill/settings'] = array(
   );
 
   $items['sirius/worker/schedule/tor'] = array(
-    'title' => 'Time-Off Requests',
-    'access callback' => 'sirius_worker_page_schedule_tor_access',
-    'page callback' => 'sirius_worker_page_schedule_tor',
+    'title' => 'Time-Off Entries',
+    'access arguments' => array('sirius worker admin'),
+    'page callback' => 'sirius_worker_page_schedule_tor_list',
     'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['sirius/worker/schedule/tos'] = array(
-    'title' => 'Time-Off Sick',
-    'access callback' => 'sirius_worker_page_schedule_tos_access',
-    'page callback' => 'sirius_worker_page_schedule_tos',
-    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_worker.page_schedule_tor_list.inc'
   );
 
   $items['sirius/worker/list'] = array(
