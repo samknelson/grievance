@@ -457,6 +457,14 @@ function sirius_ledger_menu() {
     'page arguments' => array(),
   );
 
+ $items['sirius/ledger/ar/search'] = array(
+    'title' => 'AR Search',
+    'description' => '',
+    'access arguments' => array('sirius ledger admin'),
+    'page callback' => 'sirius_ledger_page_ar_search',
+    'page arguments' => array(),
+    'file' => 'sirius_ledger.page_ar_search.inc',
+  );
 
   return $items;
 }
