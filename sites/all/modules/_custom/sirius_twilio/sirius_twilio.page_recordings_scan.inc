@@ -37,11 +37,11 @@ function sirius_twilio_recordings_scan($mode) {
 
 	sirius_minilog("== Starting recording scan. Mode = $mode, Delete = $delete_enabled / $delete_days days");
 
-	sirius_minilog("Pass 1: Searching for conversations to archive.");
-	sirius_minilog("[not yet implemented]");
+	// sirius_minilog("Pass 1: Searching for conversations to archive.");
+	// sirius_minilog("[not yet implemented]");
 
-	sirius_minilog("Pass 2: Searching for conversations to delete.");
-	drupal_set_message("Here with $delete_enabled, $delete_days");
+	// sirius_minilog("Pass 2: Searching for conversations to delete.");
+
 	if ($delete_enabled != 'Yes') {
 		sirius_minilog("Deletions are not enabled. No recordings will be deleted.");
 	} else if (!is_numeric($delete_days) || ($delete_days < 1)) {

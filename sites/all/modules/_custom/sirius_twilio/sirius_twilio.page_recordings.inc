@@ -5,17 +5,34 @@ function sirius_twilio_page_recordings() {
 }
 
 function sirius_twilio_page_recordings_form($form, &$form_state) {
-	$result = sirius_twilio_recording_search($form_state['values']['search']);
+	/*
+	drupal_set_message("Exists");
+	dpm(sirius_twilio_recording_fetch_from_call('CA245355f9a79656f242638436087fd3d1'));
+	drupal_set_message("Not");
+	dpm(sirius_twilio_recording_fetch_from_call('CA245355f9a79656f242638436087fd3d3'));
+	dpm(sirius_twilio_recording_fetch_from_call('CA245355f9a79656f242638436087fd3d333'));
+	return array();
+	*/
+
+	$result = sirius_twilio_recording_search($form_state['values']['filters']);
 	if (!$result['success']) {
 		drupal_set_message($result['msg'], 'error');
 	}
 
+	$records = $result['records'];
+	if (!$records) { $records = array(); }
+
 	$form['#tree'] = TRUE;
 
-	$form['search']['wrap_open'] = array('#markup' => '<div class="container-inline">');
+	$form['filters'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Filters',
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+	);
 
-	$form['search']['dateCreatedAfter'] = array(
-		'#title' => t('From:'),
+	$form['filters']['dateCreatedAfter'] = array(
+		'#title' => t('Start Date:'),
     '#type' => 'date_popup',
     '#timepicker' => 'timepicker',
     '#timepicker_options' => array(
@@ -31,8 +48,8 @@ function sirius_twilio_page_recordings_form($form, &$form_state) {
     ),
   );
 
-	$form['search']['dateCreatedBefore'] = array(
-		'#title' => t('To:'),
+	$form['filters']['dateCreatedBefore'] = array(
+		'#title' => t('End Date:'),
     '#type' => 'date_popup',
     '#timepicker' => 'timepicker',
     '#timepicker_options' => array(
@@ -48,38 +65,85 @@ function sirius_twilio_page_recordings_form($form, &$form_state) {
     ),
   );
 
-	$form['search']['search'] = array(
+	$form['filters']['from'] = array(
+		'#type' => 'textfield',
+		'#title' => 'From Phone',
+	);
+
+	$form['filters']['to'] = array(
+		'#type' => 'textfield',
+		'#title' => 'To Phone',
+	);
+
+	$form['filters']['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Search'),
 	);
 
-	$form['search']['wrap_close'] = array('#markup' => '</div>');
+	$filter_from = sirius_phone_format($form_state['values']['filters']['from']);
+	$filter_to = sirius_phone_format($form_state['values']['filters']['to']);
 
-	if (!$result['records']) {
-		$form['rec_sids'] = array('#markup' => t('No recordings found.'));
-	} else { 
-		foreach ($result['records'] as $record) {
-			$rec_sid = $record['sid'];
-			$ts = $record['startTime']->getTimestamp();
-			$datestr = date('Y-m-d h:i:s a', $ts);
-			$datestr .= '<br />';
-			$datestr .= '(' . format_interval(time() - $ts) . ' ago' . ')';
+	foreach ($records as $recording_sid => $recording) {
 
-			$row = array();
-			$row[] = $rec_sid;
-			$row[] = $datestr;
-			$row[] = format_interval($record['duration']);
-			$row[] = theme('audiofield_html5_audio', array('audio_file' => "/sirius/twilio/recording/stream/$rec_sid", 'download_access' => TRUE));
-			$rows[$rec_sid] = $row;
+		$result = sirius_twilio_call_fetch($recording['callSid']);
+		if ($result['success']) { $call = $result['call']; } else { $call = array(); }
+		$call_sid = $call['sid'];
+
+		$recording_nid = sirius_twilio_recording_fetch_local_nid($recording_sid);
+		$call_node = sirius_twilio_call_fetch_local($call_sid);
+		if ($call_node) { $call_nid = $call_node->nid; } else { $call_nid = NULL; }
+
+		$tools = '';
+		if ($recording_nid) {
+			$local = 'Yes';
+			$tools .= l('Recording', "node/$recording_nid/sirius_twilio_recording", array('attributes' => array('class' => array('tool-button'))));
+		} else {
+			$local = '';
 		}
+
+		if ($call_nid) {
+			$tools .= l('Call', "node/$call_nid/sirius_twilio_call", array('attributes' => array('class' => array('tool-button'))));
+		} 
+
+		// $recording_nid = sirius_twilio_recording_fetch_local_nid($recording_sid);
+
+		$from = sirius_phone_format($call['from']);
+		$to = sirius_phone_format($call['to']);
+
+		if ($filter_from && ($filter_from != $from)) { continue; }
+		if ($filter_to && ($filter_to != $to)) { continue; }
+
+		$ts = $recording['startTime']->getTimestamp();
+		$datestr = date('Y-m-d h:i:s a', $ts);
+		$datestr .= '<br />';
+		$datestr .= '(' . format_interval(time() - $ts) . ' ago' . ')';
+
+		$row = array();
+		$row[] = $from;
+		$row[] = $to;
+		$row[] = $datestr;
+		$row[] = format_interval($recording['duration']);
+		$row[] = theme('audiofield_html5_audio', array('audio_file' => "/sirius/twilio/recording/stream/$recording_sid", 'download_access' => TRUE));
+		$row[] = $local;
+		$row[] = $tools;
+
+		$rows[$recording_sid] = $row;
+	}
+
+	if (!$rows) { 
+		$form['recording_sid'] = array('#markup' => t('No recordings found.'));
+	} else {
 		$header = array(
-			t('SID'),
+			t('From'),
+			t('To'),
 			t('Date'),
 			t('Duration'),
 			t('Play'),
+			t('Local?'),
 			t('Tools')
 		);
-    $form['rec_sids'] = array(
+
+    $form['recording_sids'] = array(
 	    '#type' => 'tableselect',
 	    '#title' => 'Recordings',
 	    '#header' => $header,
@@ -90,9 +154,16 @@ function sirius_twilio_page_recordings_form($form, &$form_state) {
     	'#type' => 'select',
     	'#options' => array(
     		NULL => t('-- Select --'),
-    		'delete' => t('Delete selected messages from Twilio'),
+    		'delete' => t('Delete selected recordings from Twilio'),
+    		'pull' => t('Pull selected recordings from Twilio to the local database'),
     	),
     );
+
+		$form['comments'] = array(
+			'#type' => 'textarea',
+			'#title' => 'Comments',
+			'#states' => array('visible' => array(":input[name=\"action\"]" => array('value' => 'pull'))),
+		);
 
     $form['submit'] = array(
     	'#type' => 'submit',
@@ -131,11 +202,11 @@ function sirius_twilio_page_recordings_form_submit($form, &$form_state) {
 	unset($form_state['input']['action']);
 
 	if ($action == 'delete') {
-		$rec_sids = array_filter(array_values($form_state['values']['rec_sids']));
-		$count = $count_succss = $count_failure = 0;
-		foreach ($rec_sids as $rec_sid) {
+		$recording_sids = array_filter(array_values($form_state['values']['recording_sids']));
+		$count = $count_success = $count_failure = 0;
+		foreach ($recording_sids as $recording_sid) {
 			++$count;
-			$result = sirius_twilio_recording_delete($rec_sid);
+			$result = sirius_twilio_recording_delete($recording_sid);
 			if ($result['success']) {
 				++$count_success;
 			} else {
@@ -146,4 +217,20 @@ function sirius_twilio_page_recordings_form_submit($form, &$form_state) {
 		drupal_set_message("Attempted to delete $count records. Deleted $count_success with $count_failure failures.");
 	}
 
+
+	if ($action == 'pull') {
+		$recording_sids = array_filter(array_values($form_state['values']['recording_sids']));
+		$count = $count_success = $count_failure = 0;
+		foreach ($recording_sids as $recording_sid) {
+			++$count;
+			$result = sirius_twilio_recording_pull($recording_sid, array('comments' => $form_state['values']['comments']));
+			if ($result['success']) {
+				++$count_success;
+			} else {
+				++$count_failure;
+				drupal_set_message($result['msg'], 'warning');
+			}
+		}
+		drupal_set_message("Attempted to pull $count records. Pulled $count_success with $count_failure failures.");
+	}
 }
