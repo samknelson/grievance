@@ -94,6 +94,24 @@ function sirius_bulk_node_tabs() {
     'weight' => 6,
   );
 
+  $node_tabs['sirius_bulk']['sirius_bulk_send/send'] = array(
+    'title' => 'Send',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_send',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_bulk']['sirius_bulk_send/throttle'] = array(
+    'title' => 'Throttle',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_throttle',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 2,
+    'file' => 'sirius_bulk.page_throttle.inc',
+  );
+
 	$node_tabs['sirius_bulk']['sirius_bulk_queue'] = array(
 		'title' => 'Results',
 		'description' => '',

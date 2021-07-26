@@ -67,7 +67,7 @@ function sirius_bulk_node_tab_test_form_submit($form, &$form_state) {
 	}
 
 	drupal_set_message("Sending via $medium to $to");
-	$result = sirius_bulk_deliver_impl($bulk_node, $medium, $to, TRUE);
+	$result = sirius_bulk_deliver_impl($bulk_node, $medium, $to, array('contact_node' => $contact_node), TRUE);
 	if ($result['success']) {
 		drupal_set_message($result['msg']);
 	} else {

@@ -105,6 +105,12 @@ function sirius_bulk_deliver_batch($bulk_node, $force = FALSE) {
 
   $count_success = $count_error = $count = 0;
   foreach ($queue['add'] as $log_nid) {
+  	$result = sirius_bulk_deliver_throttle($bulk_node, $force);
+  	if (!$throttle['success']) {
+  		sirius_minilog("Batch interrupted by throttle: " . $result['msg']);
+  		break;
+  	}
+
   	$result = sirius_bulk_deliver_entry($log_nid);
   	++$count; 
   	if ($result['success']) { ++$count_success; } else { ++$count_error; }
@@ -148,7 +154,7 @@ function sirius_bulk_deliver_entry($log_nid) {
 		if ($medium == 'email') { $to = sirius_email_format($contact_node->field_sirius_email['und'][0]['value']); }
 		else { $to = sirius_phone_format($contact_node->field_sirius_phone['und'][0]['value']); }
 
-		$result = sirius_bulk_deliver_impl($bulk_node, $medium, $to);
+		$result = sirius_bulk_deliver_impl($bulk_node, $medium, $to, array('contact_node' => $contact_node));
 		$result['to'] = $to;
 		$result['medium'] = $medium;
 	}
@@ -164,7 +170,7 @@ function sirius_bulk_deliver_entry($log_nid) {
 	return $result;
 }
 
-function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $is_test = FALSE) {
+function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $deliver_args = array(), $is_test = FALSE) {
 	$json = sirius_json_get($bulk_node); 
 
 	if (!$to) { return array('success' => FALSE, 'msg' => 'No recipient.'); }
@@ -197,12 +203,42 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $is_test = FALSE) {
 	} else if ($medium == 'voice') {
 		if ($json['voice']['type'] == 'flow') {
 			// @todo: Wrap in a sirius() function, rather than bypassing sirius and handing directly to Twilio
+
+			$contact_variables = $json['voice']['flow']['contact_variables'];
+			if (!$contact_variables) { $contact_variables = array(); } else { $contact_variables = array_filter(array_values($contact_variables)); }
+
+			$flow_params = array();
+			$contact_node = $deliver_args['contact_node'];
+			if ($contact_node && $contact_variables) {
+				$contact_definition_json = sirius_contact_definition();
+				$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
+				$contact_json = sirius_json_get($contact_node);
+				$contact_results = sirius_jsonfield_util_results_get($contact_json, 'default');
+
+				foreach ($contact_variables as $path) {
+					$path = preg_replace('/^:/', '', $path);
+					$twilio_path = preg_replace('/\:/', '__', $path);
+					list ($content_type, $which_form, $field_name, $column, $rest) = explode(':', $path);
+
+					if ($content_type == 'sirius_contact') {
+						if ($which_form == 'core') {
+							if ($field_name == 'title') { $flow_params[$twilio_path] = $contact_node->title; }
+							else if ($field_name == 'nid') { $flow_params[$twilio_path] = $contact_node->nid; }
+							else { $flow_params[$twilio_path] = $contact_node->{$field_name}['und'][0][$column]; }
+						} else {
+							$sub_path = preg_replace('/\:?sirius_contact\:default\:/', '', $path);
+							$flow_params[$twilio_path] = sirius_jsonfield_util_render_values($contact_definition_form, $contact_results, array($sub_path), array('raw' => TRUE));
+						}
+					}
+				}
+			}
+
 			$flow_sid = $json['voice']['flow']['sid'];
 			return sirius_twilio_outgoing_flow(
 				$flow_sid, 
 				$to, 
 				$bulk_node->field_sirius_callerids['und'][0]['target_id'], 
-				array(), 
+				$flow_params, 
 				$bulk_node->nid
 			);
 		} else {
@@ -211,4 +247,55 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $is_test = FALSE) {
 	} else {
 		return sirius_sms_send($params);
 	}
+}
+
+function sirius_bulk_deliver_throttle($bulk_node) {
+	$bulk_json = sirius_json_get($bulk_node);
+
+	if (!$bulk_json['throttle']) { return array('success' => TRUE); }
+
+	//
+	// Throttle by batch size
+	//
+
+	$counts = &drupal_static(__FUNCTION__);
+	$batch_size = $bulk_json['throttle']['batch_size'];
+	if ($batch_size) {
+		$counts[$bulk_node->nid]++;
+		if ($counts[$bulk_node->nid] > $batch_size) {
+			return array('success' => FALSE, 'msg' => "Throttling to at most $batch_size messages per batch.");
+		}
+	}
+
+
+
+	//
+	// Throttle by "number of active lines". Thre might be various line throttles.
+	//
+
+	if ($bulk_json['throttle']['lines']) {
+		foreach ($bulk_json['throttle']['lines'] as $delta => $record) {
+			if (!$record['count']) { continue; }
+
+			$params = array();
+			if ($record['from']) { $params['from'] = $record['from']; }
+			if ($record['to']) { $params['to'] = $record['to']; }
+
+			$active_call_count = 0;
+			foreach (array('queued', 'ringing', 'in-progress') as $status) {
+				$params['status'] = $status;
+				$result = sirius_twilio_call_count_yucky($params, $record['count'] + 5);
+				if (!$result['success']) { return $result; }
+				$active_call_count += $result['count'];
+			}
+
+			if ($active_call_count >= $record['count']) {
+				$msg = "Throttling to " . $record['count'] . " active calls; there are already $active_call_count calls.";
+				return array('success' => FALSE, 'msg' => $msg);
+			}
+		}
+	}
+
+	// return array('success' => FALSE, 'msg' => "Throttle all messages so I don't have to keep re-creating my bulk node.");
+	return array('success' => TRUE);
 }

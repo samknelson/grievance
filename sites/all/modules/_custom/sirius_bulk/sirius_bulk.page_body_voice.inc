@@ -55,6 +55,29 @@ function sirius_bulk_node_tab_body_voice_form($form, &$form_state, $bulk_node) {
 	);
 
 
+	$contact_definition_json = sirius_contact_definition();
+	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
+	if (!$contact_definition_form) { $contact_definition_form = array(); }
+	$new_paths = array_keys(sirius_jsonfield_util_list_node_fields('sirius_contact'));
+	foreach ($new_paths as $path) { 
+		$path = preg_replace("/\:sirius_contact/", ":sirius_contact:core", $path);
+		$paths[$path] = $path;
+	}
+
+	$new_paths = array_values(sirius_jsonfield_util_form_list_paths($contact_definition_form, TRUE, 'sirius_contact'));
+	foreach ($new_paths as $path) {
+		$paths[":sirius_contact:default$path"] = ":sirius_contact:default$path";
+	}
+
+	$form['voice']['flow']['contact_variables'] = array(
+		'#type' => 'checkboxes',
+		'#title' => 'Contact Variables',
+		'#states' => array('visible' => array(":input[id=\"voice_type\"]" => array('value' => 'flow'))),
+		'#description' => t('Select any contact variables which should be passed to the Twilio Flow.'),
+		'#options' => $paths,
+	);
+	if ($json['voice']['flow']['contact_variables']) { $form['voice']['flow']['contact_variables']['#default_value'] = $json['voice']['flow']['contact_variables']; }
+
 	$form['voice']['text']['human'] = array(
 		'#type' => 'textarea',
 		'#title' => 'Text-to-Speech if a human answers',
