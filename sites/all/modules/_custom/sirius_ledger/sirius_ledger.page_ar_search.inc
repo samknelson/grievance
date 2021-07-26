@@ -105,7 +105,11 @@ function sirius_ledger_page_ar_search_form_submit($form, &$form_state) {
 	if ($form_state['values']['display'] == 'csv') {
 		sirius_ledger_ar_render($entries, array('display' => 'csv'));
 	} else {
-		$html = sirius_ledger_ar_render($entries);
+		$html = '';
+		if (count($entries) >= 1000) {
+			$html = '<p>' . t('<em>Displaying the most recent 1000 entries.</em>');
+		}
+		$html .= sirius_ledger_ar_render($entries);
 		$form_state['results'] = $html;
 	}
 }
