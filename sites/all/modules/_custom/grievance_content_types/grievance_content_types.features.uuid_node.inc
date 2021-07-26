@@ -877,7 +877,7 @@ function grievance_content_types_uuid_features_default_content() {
   'body' => array(
     'und' => array(
       0 => array(
-        'value' => '<p>Use the form below to search the A/R ledger.</p>
+        'value' => '<p>Use the form below to search the A/R ledger. The most recent 1,000 entries will be displayed.</p>
 
 <p><strong>Account</strong></p>
 
