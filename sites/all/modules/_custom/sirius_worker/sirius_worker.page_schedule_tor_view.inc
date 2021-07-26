@@ -1,6 +1,6 @@
 <?php
 
-function sirius_worker_term_tab_schedule_tor_view_access($tor_node) {
+function sirius_worker_node_tab_schedule_tor_view_access($tor_node) {
 	if ($tor_node->field_sirius_category['und'][0]['value'] != 'tor') { return FALSE; }
 
 	return sirius_worker_schedule_tor_access('view', NULL, $tor_node);
