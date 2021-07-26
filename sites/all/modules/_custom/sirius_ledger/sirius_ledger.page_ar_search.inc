@@ -13,15 +13,6 @@ function sirius_ledger_page_ar_search_form($form, &$form_state) {
 		'#options' => array(NULL => t('-- Select --')) + sirius_ledger_account_list(),
 	);
 
-	$form['display'] = array(
-		'#title' => t('Display'),
-		'#type' => 'select',
-		'#options' => array(
-			'screen' => t('Show results on the screen'),
-			'csv' => t('Output results to a CSV file'),
-		),
-	);
-
 	$form['ledger_date_min'] = array(
 		'#title' => t('Start Date'),
 		'#type' => 'date_popup',
@@ -51,6 +42,15 @@ function sirius_ledger_page_ar_search_form($form, &$form_state) {
 	$form['ledger_memo'] = array(
 		'#title' => t('Memo'),
 		'#type' => 'textfield',
+	);
+
+	$form['display'] = array(
+		'#title' => t('Display'),
+		'#type' => 'select',
+		'#options' => array(
+			'screen' => t('Show results on the screen'),
+			'csv' => t('Output results to a CSV file'),
+		),
 	);
 
 	$form['submit'] = array(
