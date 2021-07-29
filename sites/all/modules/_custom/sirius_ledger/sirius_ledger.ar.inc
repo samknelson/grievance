@@ -270,7 +270,10 @@ function sirius_ledger_ar_delete_by_reference($ledger_reference) {
 }
 
 function sirius_ledger_ar_format_balance($balance) {
-	if ($balance < 0) { 
+	if (!$balance) { $balance = 0; }
+	if (!is_numeric($balance)) {
+		return '<span class="sirius_ledger_balance>' . $balance . '</span>';
+	} else if ($balance < 0) { 
 		return '<span class="sirius_ledger_balance sirius_ledger_balance_negative">' . '($' . number_format(-1 * $balance, 2) . ')' . '</span>';
 	} else {
 		return '<span class="sirius_ledger_balance">' . '$' . number_format($balance, 2) . '</span>';
