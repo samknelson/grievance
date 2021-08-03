@@ -37,6 +37,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate'
 // require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_owl.inc";
 // require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_workers_block.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.l665_apprentice.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uhmigrate') . "/grievance_uhmigrate.feed_timss_to_sepuede.inc";
 
 function grievance_uhmigrate_base_dir() {
   $dir = DRUPAL_ROOT;
@@ -264,3 +265,15 @@ function grievance_uhmigrate_skiprow_set($val = -1) {
   variable_set('grievance_uhmigrate_skiprow', $val);
 }
 
+/***
+ * Implements hook_sirius_wizard_info()
+ */
+
+function grievance_uhmigrate_sirius_wizard_info() {
+  $items = array();
+
+  // $items += sirius_ledger_feed_charges_info();
+  $items += grievance_uhmigrate_feed_timss_to_sepuede_info();
+
+  return $items;
+}
