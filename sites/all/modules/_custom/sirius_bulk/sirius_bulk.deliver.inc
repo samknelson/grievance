@@ -7,7 +7,7 @@
 function sirius_bulk_deliver($force = FALSE) {
 	// Don't run too often
 	$last_ts = variable_get("sirius_bulk_last_ts", 0);
-	$delay = 60;
+	$delay = 15;
 	if (!$force && time() < $last_ts + $delay) {
 		sirius_minilog("sirius_bulk_deliver: too soon to run.");
 		return array('success' => FALSE, 'msg' => 'Too soon to run.');
@@ -251,7 +251,6 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $deliver_args = arra
 
 function sirius_bulk_deliver_throttle($bulk_node) {
 	$bulk_json = sirius_json_get($bulk_node);
-
 	if (!$bulk_json['throttle']) { return array('success' => TRUE); }
 
 	//
@@ -266,8 +265,6 @@ function sirius_bulk_deliver_throttle($bulk_node) {
 			return array('success' => FALSE, 'msg' => "Throttling to at most $batch_size messages per batch.");
 		}
 	}
-
-
 
 	//
 	// Throttle by "number of active lines". Thre might be various line throttles.
