@@ -190,7 +190,7 @@ function sirius_bulk_queue_summary_render($bulk_node) {
 		$dnd_id = $json['do_not_disturb']['id'];
 		if (!$dnd_id) { $dnd_id = 'default'; }
 		$dnd_name = $dnd_options[$dnd_id];
-		$dnd_check = sirius_do_not_disturb_check();
+		$dnd_check = sirius_do_not_disturb_check($dnd_id);
 		$dnd_text = '';
 		if ($dnd_name) { $dnd_text .= $dnd_name; } else { $dnd_text .= $dnd_id; }
 		if (drupal_valid_path('sirius/admin/do_not_disturb')) { 
