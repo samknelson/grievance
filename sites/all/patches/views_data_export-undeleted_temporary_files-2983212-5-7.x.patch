@@ -1,0 +1,34 @@
+diff --git a/views_data_export.module b/views_data_export.module
+index 0a8c90b5d..118bfbe03 100644
+--- a/views_data_export.module
++++ b/views_data_export.module
+@@ -93,6 +93,29 @@ function views_data_export_theme() {
+  */
+ function views_data_export_cron() {
+   views_data_export_garbage_collect();
++  views_data_export_temporary_files_clean();
++}
++
++/**
++ * Clean expired temporary files.
++ */
++function views_data_export_temporary_files_clean() {
++  $expires = variable_get('views_data_export_gc_expires', DRUPAL_MAXIMUM_TEMP_FILE_AGE);
++  // This query is not using views_data_export because that table can be empty,
++  // just expired files.
++  $result = db_query("SELECT fm.fid FROM {file_managed} fm LEFT JOIN {file_usage} fu ON fm.fid = fu.fid WHERE fm.status <> :permanent AND fm.timestamp < :timestamp AND fu.module = :module", [
++    ':permanent' => FILE_STATUS_PERMANENT,
++    ':timestamp' => REQUEST_TIME - $expires,
++    ':module' => 'views_data_export',
++  ]);
++
++  foreach ($result as $row) {
++    if ($file = file_load($row->fid)) {
++      if (!file_delete($file, TRUE)) {
++        watchdog('file system', 'Could not delete temporary file "%path" during garbage collection', array('%path' => $file->uri), WATCHDOG_ERROR);
++      }
++    }
++  }
+ }
+ 
+ /**
