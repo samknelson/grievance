@@ -1,0 +1,75 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_fastload/sirius_fastload.permission.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_fastload/sirius_fastload.menu.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_fastload/sirius_fastload.generate.inc";
+
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_fastload/sirius_fastload.feed_contact.inc";
+
+function sirius_fastload_content_types() {
+	return array('sirius_contact', 'sirius_log');
+}
+
+function sirius_fastload_buffer_count($content_type, $status = 'available') {
+	$sql = "select count(*) as c from node, field_data_field_sirius_fastload_status ";
+	$sql .= "where field_data_field_sirius_fastload_status.entity_type = 'node' ";
+	$sql .= "and field_data_field_sirius_fastload_status.entity_id = node.nid ";
+	$sql .= "and node.type = :content_type ";
+	$sql .= "and field_sirius_fastload_status_value = :status ";
+	$stmt = sirius_sql_query($sql, array(':content_type' => $content_type, ':status' => $status));
+	$hr = $stmt->fetchAssoc();
+	return $hr['c'];
+}
+
+function sirius_fastload_reserve($content_type) {
+	$transaction = db_transaction();
+	try {
+		$sql = "select node.nid from node, field_data_field_sirius_fastload_status ";
+		$sql .= "where field_data_field_sirius_fastload_status.entity_type = 'node' ";
+		$sql .= "and field_data_field_sirius_fastload_status.entity_id = node.nid ";
+		$sql .= "and node.type = :content_type ";
+		$sql .= "and field_sirius_fastload_status_value = 'available' ";
+		$sql .= "order by node.nid limit 1 ";
+		$sql .= "for update ";
+		$stmt = sirius_sql_query($sql, array(':content_type' => $content_type));
+		$hr = $stmt->fetchAssoc();
+		$nid = $hr['nid'];
+		if (!$nid) { return NULL; }
+
+		$sql = "update field_data_field_sirius_fastload_status ";
+		$sql .= "set field_sirius_fastload_status_value = 'used' ";
+		$sql .= "where entity_type = 'node' ";
+		$sql .= "and entity_id = :nid ";
+		$stmt = sirius_sql_query($sql, array(':nid' => $nid));
+
+		return $nid;
+	} catch (Exception $e) {
+    $transaction->rollback();
+    watchdog('fastload', 'Transaction error: ' . print_r($e, 1));
+  }
+	return NULL;
+}
+
+/**
+ * Implements hook_cron
+ */
+
+function sirius_fastload_cron() {
+	sirius_fastload_generate_cron();
+}
+
+
+/***
+ * Implements hook_sirius_wizard_info() 
+ */
+
+function sirius_fastload_sirius_wizard_info() {
+  $items = array();
+
+  $items += sirius_fastload_feed_contact_info();
+
+  return $items;
+}
