@@ -109,6 +109,7 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 
 	$form['#tree'] = TRUE;
 
+	$form['transmittal']['prefix'] = array('#markup' => '<div id="transmittal">');
 	$form['transmittal']['type'] = array(
 		'#type' => 'select',
 		'#title' => t('Status'),
@@ -241,7 +242,22 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 	$table_open_html .= '</tr>';
 	$form['transmittal']['table_open'] = array('#markup' => $table_open_html);
 
-	$extra_rows = sirius_domain_variable_get('sirius_ledger_transmittal_extra_rows', 5);
+
+
+  $ajax_params = $form_state['triggering_element']['#sirius_ajax'];
+  $extra_rows = $form_state['extra_rows'];
+  $extra_rows += $ajax_params['qty'];
+  if ($extra_rows < 1) { $extra_rows = sirius_domain_variable_get('sirius_ledger_transmittal_extra_rows', 5); }
+  $form_state['extra_rows'] = $extra_rows;
+
+
+  if ($transmittal_json['transmittal']['dispatches']) {
+  	foreach ($transmittal_json['transmittal']['dispatches'] as $dispatch_nid => $record) {
+  		if (!preg_match('/extra_/', $dispatch_nid)) { continue; }
+  		if (!$record['ssn']) { continue; }
+  		++$extra_rows;
+  	}
+  }
 	for ($i=0; $i<$extra_rows; ++$i) {
 		$dispatches["extra_" . $i] = array();
 	}
@@ -296,11 +312,24 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 			'#suffix' => '</td>',
 			'#default_value' => $dispatch_ms_level,
 		);
+
+		$form['transmittal']['dispatches'][$dispatch_nid]['tr_close'] = array('#markup' => '</tr>');
 	}
+	$form['transmittal']['table_close'] = array('#markup' => '</table></div>');
 
-	$form['transmittal']['dispatches'][$dispatch_nid]['tr_close'] = array('#markup' => '</tr>');
-
-	$form['transmittal']['table_close'] = array('#markup' => '</table>');
+  $form['add_one'] = array(
+    '#type' => 'button',
+    '#value' => t('Add Rows'),
+    '#ajax' => array(
+      'callback' => 'sirius_ajax_generic_replace',
+    ),
+    '#sirius_ajax' => array(
+      'qty' => sirius_domain_variable_get('sirius_ledger_transmittal_extra_rows', 5),
+      'wrapper' => '#transmittal',
+      'element' => 'transmittal',
+    ),
+    '#limit_validation_errors' => array(array('add_one')),
+  );
 
 	$form['dispatch_status'] = array(
 		'#title' => t('Create Dispatches?'),
