@@ -2893,7 +2893,8 @@ function grievance_content_types_field_group_info() {
       4 => 'field_sirius_id2',
       5 => 'field_sirius_gender',
       6 => 'field_sirius_id3',
-      7 => 'eins',
+      7 => 'field_sirius_dob',
+      8 => 'eins',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2928,6 +2929,7 @@ function grievance_content_types_field_group_info() {
       4 => 'field_sirius_id2',
       5 => 'field_sirius_gender',
       6 => 'field_sirius_id3',
+      7 => 'field_sirius_dob',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
