@@ -210,6 +210,7 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 			":$node_type:field_sirius_phone:value" => 'Phone',
 			":$node_type:field_sirius_email:value" => 'Email',
 			":$node_type:field_sirius_address:country" => 'Country',
+			":$node_type:field_sirius_dob:value" => 'Date of Birth',
 			":$node_type:field_sirius_address:administrative_area" => 'State',
 			":$node_type:field_sirius_address:locality" => 'City',
 			":$node_type:field_sirius_address:thoroughfare" => 'Address',
