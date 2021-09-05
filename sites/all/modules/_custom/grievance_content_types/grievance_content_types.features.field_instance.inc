@@ -24630,6 +24630,109 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'node-sirius_worker-field_sirius_dob'.
+  $field_instances['node-sirius_worker-field_sirius_dob'] = array(
+    'bundle' => 'sirius_worker',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'date',
+        'settings' => array(
+          'custom_date_format' => 'm/d/Y',
+          'field_delimiter' => '',
+          'format_type' => 'short',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => 0,
+        ),
+        'type' => 'date_default',
+        'weight' => 10,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_dob',
+    'label' => 'Date of Birth',
+    'required' => 0,
+    'settings' => array(
+      'date_popup_timepicker' => array(
+        'timepicker' => array(
+          'timepicker_options' => array(
+            'amPmText' => array(
+              0 => 'AM',
+              1 => 'PM',
+            ),
+            'closeButtonText' => 'Done',
+            'defaultTime' => 'now',
+            'deselectButtonText' => 'Deselect',
+            'hourText' => 'Hour',
+            'hours' => array(
+              'ends' => 23,
+              'starts' => 0,
+            ),
+            'minuteText' => 'Minute',
+            'minutes' => array(
+              'ends' => 55,
+              'interval' => 5,
+              'starts' => 0,
+            ),
+            'nowButtonText' => 'Now',
+            'periodSeparator' => ' ',
+            'rows' => 4,
+            'showCloseButton' => FALSE,
+            'showDeselectButton' => FALSE,
+            'showHours' => TRUE,
+            'showLeadingZero' => TRUE,
+            'showMinutes' => TRUE,
+            'showMinutesLeadingZero' => TRUE,
+            'showNowButton' => FALSE,
+            'showOn' => 'focus',
+            'showPeriod' => FALSE,
+            'showPeriodLabels' => TRUE,
+            'timeSeparator' => ':',
+          ),
+        ),
+      ),
+      'default_value' => 'now',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'date_single_day' => array(),
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'no_fieldset' => 0,
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_popup',
+      'weight' => 9,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_worker-field_sirius_domain'.
   $field_instances['node-sirius_worker-field_sirius_domain'] = array(
     'bundle' => 'sirius_worker',
@@ -30088,6 +30191,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Data Corrected');
   t('Date');
   t('Date Received');
+  t('Date of Birth');
   t('Date of Hire');
   t('Days');
   t('Days Off');
