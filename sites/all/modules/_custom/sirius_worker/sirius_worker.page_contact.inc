@@ -210,17 +210,18 @@ function sirius_node_tab_worker_contact_form_submit($form, &$form_state) {
 	}
 
 	$addr_changed = FALSE;
-	$keys = array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code');
-	foreach ($keys as $key) {
-		$val = $form_state['values'][$key];
-		if ($val != $worker_node->field_sirius_address['und'][0][$key]) {
-			$worker_node->field_sirius_address['und'][0][$key] = $val;
-			$addr_changed = TRUE;
+
+	$val = sirius_addr_format_oneline($form_state['values']);
+	$oldval = sirius_addr_format_oneline($worker_node->field_sirius_address['und'][0]);
+	if ($val != $oldval) {
+		$keys = array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code');
+		foreach ($keys as $key) {
+			$worker_node->field_sirius_address['und'][0][$key] = $form_state['values'][$key];
 		}
-	}
-	if ($addr_changed) {
 		$need_save = TRUE;
-		drupal_set_message("Address has been updated.");
+		$msg = t('Changed address from @oldval to @val', array('@oldval' => ($oldval?$oldval:"[NULL]"), '@val' => ($val?$val:"[NULL]")));
+		sirius_log('worker:contact', 'update', $msg, '', '', array($worker_node->nid), array());
+		drupal_set_message($msg);
 	}
 
 	if ($need_save) {
