@@ -60,7 +60,6 @@ function sirius_hour_report_by_ms_pks(&$form_state) {
 
 function sirius_hour_report_by_ms_batch($ms_tid, $values, $report_id, $report_action, &$context) {
   $ms_name_lookup = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
-  drupal_set_message("Here with $ms_name_lookup[$ms_tid]");
 
   $month = $values['month'];
   $year = $values['year'];
