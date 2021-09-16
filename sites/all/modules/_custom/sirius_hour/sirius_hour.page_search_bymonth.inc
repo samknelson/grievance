@@ -146,7 +146,7 @@ function sirius_hour_page_search_month_form_submit($form, &$form_state) {
 	$sql .= "field_sirius_work_status_tid, ";
 	$sql .= "group_concat(distinct field_sirius_member_status_tid order by field_sirius_member_status_tid separator ',') as ms_tids, ";
 	$sql .= "year, month, ";
-	$sql .= "sum(hours) as s from sirius_hours_cache ";
+	$sql .= "sum(hours) / count(*) as s from sirius_hours_cache ";
 	$sql .= "left join node worker_node on worker_node.nid = worker_nid ";
 	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = payperiod_nid ";
 	$sql .= "left join field_data_field_sirius_work_status on field_data_field_sirius_work_status.entity_type = 'node' and field_data_field_sirius_work_status.entity_id = worker_node.nid ";
