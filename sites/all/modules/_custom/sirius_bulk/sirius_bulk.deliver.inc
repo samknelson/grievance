@@ -106,7 +106,7 @@ function sirius_bulk_deliver_batch($bulk_node, $force = FALSE) {
   $count_success = $count_error = $count = 0;
   foreach ($queue['add'] as $log_nid) {
   	$result = sirius_bulk_deliver_throttle($bulk_node, $force);
-  	if (!$throttle['success']) {
+  	if (!$result['success']) {
   		sirius_minilog("Batch interrupted by throttle: " . $result['msg']);
   		break;
   	}
