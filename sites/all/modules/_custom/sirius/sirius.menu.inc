@@ -594,7 +594,7 @@ function sirius_menu() {
   $items['sirius/loopback/sample-html'] = array(
     'title' => 'Sample HTML Content',
     'description' => '',
-    'access callback' => 'sirius_loopback_access',
+    'access callback' => TRUE,
     'page callback' => 'sirius_loopback_sample_html',
     'type' => MENU_LOCAL_TASK,
   );
@@ -610,7 +610,7 @@ function sirius_menu() {
   $items['sirius/letterhead/sample-html/%node'] = array(
     'title' => 'Sample HTML for Letterhead',
     'description' => '',
-    'access callback' => 'sirius_loopback_access',
+    'access callback' => TRUE,
     'page callback' => 'sirius_letterhead_preview_loopback',
     'page arguments' => array(3),
     'type' => MENU_LOCAL_TASK,
@@ -619,7 +619,7 @@ function sirius_menu() {
   $items['sirius/letterhead/sample-html/%node'] = array(
     'title' => 'Sample HTML for Letterhead',
     'description' => '',
-    'access callback' => 'sirius_loopback_access',
+    'access callback' => TRUE,
     'page callback' => 'sirius_letterhead_preview_loopback',
     'page arguments' => array(3),
     'type' => MENU_LOCAL_TASK,
