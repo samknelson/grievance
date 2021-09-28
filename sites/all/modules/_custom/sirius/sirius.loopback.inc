@@ -29,6 +29,9 @@ function sirius_loopback_access() {
 	// If we happen to be signed in as an admin, we can do anything.
   if (user_access('sirius admin')) { return TRUE; }
 
+  // Sometimes se get the HTTP_SEC_FETCH_SITE variable set
+  if ($_SERVER['HTTP_SEC_FETCH_SITE'] == 'same-origin' || $_SERVER['HTTP_SEC_FETCH_SITE'] == 'same-site') { return TRUE; }
+
   // Get the remote IP. This might be REMOTE_ADDR or X_FORWARDED_WHATEVER
   $remote_ip = sirius_loopback_remote_ip();
   if (!$remote_ip) { return FALSE; }
@@ -40,7 +43,7 @@ function sirius_loopback_access() {
   $cached_ip = variable_get('sirius_loopback_ip', '');
   $cached_ts = variable_get('sirius_loopback_ts', '');
   if ($cached_ts > time() - 60*60*24) {
-  	if ($cached_ip == $remote_ip) { return TRUE; }
+  	return ($cached_ip == $remote_ip);
   }
 
   // The only way to find out what the remote IP "really" is, is to make a request to a "what is my IP" service. We'll run that ourselves.
