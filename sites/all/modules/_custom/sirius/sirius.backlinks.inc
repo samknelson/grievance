@@ -1,5 +1,47 @@
 <?php
 
+/**
+ * @todo: Rather than messing about with themeing, I'm just sticking the markup in #markup. Lazy.
+ */
+
+function sirius_quickactions_add($link = array()) {
+	$links = &drupal_static(__FUNCTION__);
+  if (!isset($links)) { $links = array(); }
+  if ($link) { $links[] = $link; }
+  return $links;
+}
+
+function sirius_quickactions_render() {
+	$node = menu_get_object('node');
+	if ($node && is_object($node)) {
+		if ($node->type == 'sirius_worker') {
+			sirius_quickactions_add(
+				array(
+					'path' => 'sirius/modal/' . $node->nid . '/quicklog',
+					'title' => 'Quick Log',
+				)
+			);
+		}
+	}
+
+	$links = sirius_quickactions_add();
+	if (!$links) { return array(); }
+
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/quickactions.css');
+
+	foreach ($links as $delta => $link) {
+		$links[$delta] = array('#markup' => sirius_sirius_quickaction_render($link));
+	}
+	return $links;
+}
+
+function sirius_sirius_quickaction_render($link) {
+  $markup = '<li><span class="sirius_quickaction_link_wrapper">';
+  $markup .= l('<span class="sirius_quickaction_link_inner">&neArr; ' . $link['title'] . '</span>', $link['path'], array('html' => TRUE, 'attributes' => array('class' => array('sirius_quickaction_link'))));
+  $markup .= '</span></li>';
+  return $markup;
+}
+
 function sirius_backlink_add($path = NULL, $link = NULL) {
 	$links = &drupal_static(__FUNCTION__);
   if (!isset($links)) { $links = array(); }
@@ -137,6 +179,12 @@ function sirius_backlinks_from_node($node) {
 						$name = "Call";
 					} else {
 						$path = "node/$handler_nid";
+					}
+				}
+				else if ($handler_type == 'grievance_shop') {
+					if ($log_category == 'labproj') {
+						$path = "node/$handler_nid/employer_labproj";
+						$name = 'Employer Labor Projections';
 					}
 				}
 				else if ($handler_type == 'sirius_json_definition') 																		{ $path = ''; }
