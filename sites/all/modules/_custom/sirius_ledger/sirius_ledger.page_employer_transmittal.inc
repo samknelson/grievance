@@ -105,10 +105,23 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 	} else { 
 		drupal_set_title(drupal_get_title() . ' - ' . 'New Transmittal Sheet');
 	}
+
+	sirius_backlink_add('sirius/ledger/transmittal/byemployer', array('name' => 'All Transmittal Sheets'));
+	sirius_backlink_add('node/' . $employer_node->nid . '/sirius_employer_ledger/transmittal', array('name' => 'Employer Trasmittal Sheets'));
+	$accounts = sirius_ledger_account_list();
+	foreach ($accounts as $account_nid => $account_name) {
+		$payment_nid = $transmittal_json['transmittal']['accounts'][$account_nid]['payment_nid'];
+		if ($payment_nid) { 
+			sirius_backlink_add("node/$payment_nid/sirius_payment_allocate/transmittal", array('name' => 'Payment: ' . $account_name));
+		}
+	}
+
+
 	$form_state['employer_nid'] = $employer_node->nid;
 
 	$form['#tree'] = TRUE;
 
+	$form['transmittal']['prefix'] = array('#markup' => '<div id="transmittal">');
 	$form['transmittal']['type'] = array(
 		'#type' => 'select',
 		'#title' => t('Status'),
@@ -156,7 +169,6 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 	if ($transmittal_json['transmittal']['hours']['active']) { $form['transmittal']['hours']['active']['#default_value'] = $transmittal_json['transmittal']['hours']['active']; }
 
 
-	$accounts = sirius_ledger_account_list();
 	foreach ($accounts as $account_nid => $account_name) {
 		$form['transmittal']['accounts'][$account_nid] = array('#type' => 'fieldset', '#title' => $account_name);
 		$form['transmittal']['accounts'][$account_nid]['active'] = array(
@@ -199,6 +211,28 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 			'#type' => 'hidden',
 			'#value' => $transmittal_json['transmittal']['accounts'][$account_nid]['payment_nid'],
 		);
+
+	  $form['transmittal']['accounts'][$account_nid]['merchant_name'] = array(
+	    '#title' => t('Merchant'),
+			'#type' => 'textfield',
+			'#default_value' => $transmittal_json['transmittal']['accounts'][$account_nid]['merchant_name'],
+			'#states' => array(
+				'visible' => array(
+					":input[id=\"transmittal_accounts_${account_nid}_active\"]" => array('value' => 'Yes')
+				),
+			),
+	  );
+
+	  $form['transmittal']['accounts'][$account_nid]['check_number'] = array(
+	    '#title' => t('Check / Txn #'),
+			'#type' => 'textfield',
+			'#default_value' => $transmittal_json['transmittal']['accounts'][$account_nid]['check_number'],
+			'#states' => array(
+				'visible' => array(
+					":input[id=\"transmittal_accounts_${account_nid}_active\"]" => array('value' => 'Yes')
+				),
+			),
+	  );
 	}
 
 	/*
@@ -241,7 +275,22 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 	$table_open_html .= '</tr>';
 	$form['transmittal']['table_open'] = array('#markup' => $table_open_html);
 
-	$extra_rows = sirius_domain_variable_get('sirius_ledger_transmittal_extra_rows', 5);
+
+
+  $ajax_params = $form_state['triggering_element']['#sirius_ajax'];
+  $extra_rows = $form_state['extra_rows'];
+  $extra_rows += $ajax_params['qty'];
+  if ($extra_rows < 1) { $extra_rows = sirius_domain_variable_get('sirius_ledger_transmittal_extra_rows', 5); }
+  $form_state['extra_rows'] = $extra_rows;
+
+
+  if ($transmittal_json['transmittal']['dispatches']) {
+  	foreach ($transmittal_json['transmittal']['dispatches'] as $dispatch_nid => $record) {
+  		if (!preg_match('/extra_/', $dispatch_nid)) { continue; }
+  		if (!$record['ssn']) { continue; }
+  		++$extra_rows;
+  	}
+  }
 	for ($i=0; $i<$extra_rows; ++$i) {
 		$dispatches["extra_" . $i] = array();
 	}
@@ -296,11 +345,24 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form($form, &$form_
 			'#suffix' => '</td>',
 			'#default_value' => $dispatch_ms_level,
 		);
+
+		$form['transmittal']['dispatches'][$dispatch_nid]['tr_close'] = array('#markup' => '</tr>');
 	}
+	$form['transmittal']['table_close'] = array('#markup' => '</table></div>');
 
-	$form['transmittal']['dispatches'][$dispatch_nid]['tr_close'] = array('#markup' => '</tr>');
-
-	$form['transmittal']['table_close'] = array('#markup' => '</table>');
+  $form['add_one'] = array(
+    '#type' => 'button',
+    '#value' => t('Add Rows'),
+    '#ajax' => array(
+      'callback' => 'sirius_ajax_generic_replace',
+    ),
+    '#sirius_ajax' => array(
+      'qty' => sirius_domain_variable_get('sirius_ledger_transmittal_extra_rows', 5),
+      'wrapper' => '#transmittal',
+      'element' => 'transmittal',
+    ),
+    '#limit_validation_errors' => array(array('add_one')),
+  );
 
 	$form['dispatch_status'] = array(
 		'#title' => t('Create Dispatches?'),
@@ -451,6 +513,8 @@ function sirius_ledger_node_tab_employer_transmittal_addedit_form_submit($form, 
 
 		$payment_node->field_sirius_dollar_amt['und'][0]['value'] = -1 * $record['dollar_amt'];
 		if ($record['payment_type']) { $payment_node->field_sirius_payment_type['und'][0]['tid'] = $record['payment_type']; }
+		if ($record['check_number']) { $payment_node->field_sirius_check_number['und'][0]['value'] = $record['check_number']; }
+		if ($record['merchant_name']) { $payment_node->field_sirius_merchant_name['und'][0]['value'] = $record['merchant_name']; }
 		sirius_ledger_payment_set_title($payment_node);
 		node_object_prepare($payment_node);
 		$payment_node = node_submit($payment_node);

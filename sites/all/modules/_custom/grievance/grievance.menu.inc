@@ -16,37 +16,6 @@ function grievance_xnode_tabs() {
 		'permissions' => array('grievance user'),
 	);
 
-	$node_tabs['grievance']['notification'] = array(
-		'title' => 'Notification',
-		'description' => '',
-		'callback' => 'grievance_node_tab_notification_base',
-		'permissions' => array('grievance notification'),
-	);
-
-	$node_tabs['grievance']['notification/notification'] = array(
-		'title' => 'Notification',
-		'description' => '',
-		'callback' => 'grievance_node_tab_notification',
-		'permissions' => array('grievance notification'),
-		'weight' => -1,
-	);
-
-	$node_tabs['grievance']['notification/member-forward'] = array(
-		'title' => 'Forward to the Employee',
-		'description' => '',
-		'callback' => 'grievance_node_tab_member_forward',
-		'permissions' => array('grievance forward'),
-		'weight' => 1,
-	);
-
-	$node_tabs['grievance']['notification/forward'] = array(
-		'title' => 'Forward to an email address',
-		'description' => '',
-		'callback' => 'grievance_node_tab_forward',
-		'permissions' => array('grievance forward'),
-		'weight' => 2,
-	);
-
 	$node_tabs['grievance']['statuslog'] = array(
 		'title' => 'Log',
 		'description' => '',

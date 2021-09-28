@@ -80,7 +80,9 @@ function grievance_contacts_create_selector($shop_nid, $status_tid, $which, $is_
     'shop_nid' => $shop_nid,
     'status_tid' => $status_tid
   );
-  $steward_type_tid = variable_get('grievance_contacts_st_type', '');
+  $steward_type_tid = sirius_get_special_tid('grievance_contact_types|steward');
+  if (!$steward_type_tid) { $steward_type_tid = variable_get('grievance_contacts_st_type', ''); } // legacy
+
   if ($is_stewards) {
     $params['include_contact_type_tid'] = $steward_type_tid;
   } else {

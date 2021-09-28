@@ -7,7 +7,7 @@ function sirius_jsonfield_field_schema($field) {
   return array(                  
     'columns' => array(           
       'value' => array(          
-        'type' => 'json',
+        'mysql_type' => 'longtext',
         'size' => 'big',
 	      'not null' => FALSE,
       ), 

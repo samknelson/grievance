@@ -24,6 +24,44 @@ function sirius_employer_node_tabs() {
     'permissions' => array('sirius employer user manager'),
   );
 
+  $node_tabs['grievance_shop']['employer_labproj'] = array(
+    'title' => 'Labor Projections',
+    'description' => '',
+    'callback' => 'sirius_employer_node_tab_labproj_list',
+    'permissions' => array('sirius employer labor projection manager'),
+    'file' => 'sirius_employer.page_labproj_list.inc',
+  );
+
+
+  $node_tabs['sirius_log']['employer_labproj_view'] = array(
+    'title' => 'Labor Projection View',
+    'description' => '',
+    'callback' => 'sirius_employer_node_tab_labproj_view',
+    'permissions' => array('sirius employer labor projection manager'),
+    'file' => 'sirius_employer.page_labproj_view.inc',
+    'weight' => 5,
+  );
+
+  $node_tabs['sirius_log']['employer_labproj_status'] = array(
+    'title' => 'Labor Projection Status',
+    'description' => '',
+    'callback' => 'sirius_employer_node_tab_labproj_status',
+    'permissions' => array('sirius employer labor projection manager'),
+    'file' => 'sirius_employer.page_labproj_status.inc',
+    'weight' => 6,
+  );
+
+  $node_tabs['sirius_log']['employer_labproj_edit'] = array(
+    'title' => 'Labor Projection Edit',
+    'description' => '',
+    'callback' => 'sirius_employer_node_tab_labproj_edit',
+    'permissions' => array('sirius employer labor projection manager'),
+    'file' => 'sirius_employer.page_labproj_edit.inc',
+    'weight' => 7,
+  );
+
+
+  sirius_node_tab_set_module('sirius_employer', $node_tabs);
 
 	return $node_tabs;
 }
@@ -57,6 +95,32 @@ function sirius_employer_menu() {
     'page arguments' => array('sirius_employer_usermanage_admin'),
     'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/employer/labproj'] = array(
+    'title' => 'Labor Projections',
+    'page callback' => 'sirius_employer_page_labproj_all',
+    'file' => 'sirius_employer.page_labproj_all.inc',
+    'access arguments' => array('sirius employer admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/employer/labproj/all'] = array(
+    'title' => 'Query',
+    'page callback' => 'sirius_employer_page_labproj_all',
+    'file' => 'sirius_employer.page_labproj_all.inc',
+    'access arguments' => array('sirius employer admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['sirius/employer/labproj/enforce'] = array(
+    'title' => 'Submitted Reports',
+    'page callback' => 'sirius_employer_page_labproj_enforce',
+    'file' => 'sirius_employer.page_labproj_enforce.inc',
+    'access arguments' => array('sirius employer admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
   );
 
 	return $items;

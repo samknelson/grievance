@@ -56,6 +56,7 @@ function sirius_feed_worker_fields($info, $data, $feed_node, $current_step) {
     'member_status' => array('title' => 'Member Status'),
     'dispatch_job_nid' => array('title' => 'Dispatch to Job (NID)'),
     'level' => array('title' => 'Training Center Level Code'),
+    'dob' => array('title' => 'Date of Birth'),
   );
 
   // Json fields
@@ -99,6 +100,11 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
   if ($row['phone_mobile'] && !sirius_phone_validate($row['phone_mobile'])) { return array('success' => FALSE, 'msg' => 'Invalid Phone (Mobile)'); } else { $row['phone_mobile'] = sirius_phone_format($row['phone_mobile']); }
 
   if ($row['email'] && !sirius_email_validate($row['email'])) { return array('success' => FALSE, 'msg' => 'Invalid Email'); }
+
+  if ($row['dob']) {
+    $dob_ts = strtotime($row['dob']);
+    if ($dob_ts === FALSE) { return array('success' => FALSE, 'msg' => 'Invalid date of birth'); }
+  }
 
   $domain_nid = $feed_node->field_sirius_domain['und'][0]['target_id'];
 
@@ -251,6 +257,7 @@ function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
   if ($row['name_given'])  { $worker_node->field_sirius_name['und'][0]['given'] = $row['name_given']; }
   if ($row['name_middle']) { $worker_node->field_sirius_name['und'][0]['middle'] = $row['name_middle']; }
   if ($row['name_family']) { $worker_node->field_sirius_name['und'][0]['family'] = $row['name_family']; }
+  if ($row['dob']) { $worker_node->field_sirius_dob['und'][0]['value'] = date('Y-m-d 00:00:00', strtotime($row['dob'])); }
 
   $phone1 = $row['phone'];
   $phone2 = $row['phone_alt'];

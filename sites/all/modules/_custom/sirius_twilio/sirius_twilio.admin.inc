@@ -67,6 +67,34 @@ function sirius_twilio_config() {
     '#description' => t('Sometimes multiple SMS messages are sent within the same page load (i.e. "you have been laid off" and "you have been signed out". Select "Yes" to consolidate these into a single SMS messages.'),
   );
 
+  $form['sirius_twilio_lookup'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Lookups'),
+    '#description' => t('Lookups perform a line test before sending to each phone number. (Results are cached and only re-checked once a month.) They involve a certain amount of computational overhead, and there is a small charge from the service provider. However, they can prevent messages from being sent to invalid phone numbers.'),
+  );
+
+  $name = sirius_domain_variable_name('sirius_twilio_lookup_enable_sms');
+  $form['sirius_twilio_lookup'][$name] = array(
+    '#type' => 'select',
+    '#title' => t('Enable Lookups for SMS?'),
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get($name, FALSE),
+  );
+
+  $name = sirius_domain_variable_name('sirius_twilio_lookup_enable_voice');
+  $form['sirius_twilio_lookup'][$name] = array(
+    '#type' => 'select',
+    '#title' => t('Enable Lookups for Voice?'),
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get($name, FALSE),
+  );
+
   return system_settings_form($form);
 }
 

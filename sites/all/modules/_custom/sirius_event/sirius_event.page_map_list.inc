@@ -48,7 +48,7 @@ function sirius_node_tab_event_map_list($event_node) {
 		$chunk .= '</div>';
 		$chunk .= '<div class="body_wrap">';
 		$chunk .= $pstatus_term->name;
-		$chunk .= ' (' . number_format($counts[$pstatus_tid], 0) . ')';
+		// $chunk .= ' (' . number_format($counts[$pstatus_tid], 0) . ')';
 		$chunk .= '</div>';
 		$chunk .= '</div>';
 
@@ -58,7 +58,7 @@ function sirius_node_tab_event_map_list($event_node) {
 	$html .= '<br clear="all" />';
 	$html .= '<hr>';
 
-	$map_features = sirius_event_map_list($event_node);
+	$map_features = sirius_event_map_list($event_node, array('disable_group_by_address' => TRUE));
 
 	$html .= '<div class="map_list_items">';
 	foreach ($map_features as $map_feature) {
@@ -69,13 +69,13 @@ function sirius_node_tab_event_map_list($event_node) {
 
 	$html .= '<br clear="all" />';
 	$html .= l('Legend', 'sirius/modal/event/map-legend/' . $event_node->nid, array('attributes' => array('class' => array('tool-button'))));
-	// $html .= '<a href="/sirius/map" id="sirius_map_poll" class="tool-button">Refresh Now</a>';
+	$html .= '<a href="/sirius/map" id="sirius_map_poll" class="tool-button">Refresh Now</a>';
 	$html .= '<div id="sirius_map_poll_message"></div>';
 
 	return $html;
 }
 
-function sirius_map_list_html($event_nid, $contact_nid, $contact_name, $thoroughfare, $premise, $locality, $administrative_area, $postal_code, $participant_nid, $pstatus_name, $pstatus_tid, $icon_url) {
+function sirius_map_list_html($event_nid, $contact_nid, $contact_name, $thoroughfare, $premise, $locality, $administrative_area, $postal_code, $marker_id, $pstatus_name, $pstatus_tid, $icon_url) {
 	$chunk = '';
 	$chunk .= "<div class=\"map_list_item\">";
 	$chunk .= '<div class="icon_wrap">';
@@ -87,12 +87,12 @@ function sirius_map_list_html($event_nid, $contact_nid, $contact_name, $thorough
 	$chunk .= $thoroughfare;
 	if ($premise) { $chunk .= ' ' . $premise; }
 	if ($locality) { 
-		$chunk .= '<br />' . $locality . ', ' . $administrative_area. ' ' . $postal_code; 
+		$chunk .= '<br />' . $locality . ', ' . $administrative_area . ' ' . $postal_code; 
 	}
 	$chunk .= '</div>';
 	$chunk .= '</div>';
 
-	$html .= l($chunk, 'sirius/modal/event/map/' . $event_nid . '/' . $participant_nid, 
-		array('html' => TRUE, 'attributes' => array('id' => 'participant_' . $participant_nid, 'class' => array('pstatus_' . $pstatus_tid))));
+	$html .= l($chunk, 'sirius/modal/event/map/' . $event_nid . '/' . $marker_id, 
+		array('html' => TRUE, 'attributes' => array('id' => 'marker_' . $marker_id, 'class' => array('pstatus_' . $pstatus_tid))));
 	return $html;
 }

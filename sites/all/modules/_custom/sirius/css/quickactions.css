@@ -1,0 +1,25 @@
+
+ul.primary li a.sirius_quickaction_link {
+}
+
+ul.primary li a.sirius_quickaction_link:hover {
+	border-top:  2px solid #ff0000;
+}
+
+ul.primary li a.sirius_quickaction_link:hover {
+	border-bottom: 3px solid #e8edf3 !important;
+}
+
+ul.primary li a.sirius_quickaction_link span.sirius_quickaction_link_inner {
+	border: 1px solid #a0bbf5;
+	font-size: 80%;
+	padding:  4px;
+	background-color:  #ffffff;
+	color: #5984be;
+}
+
+
+ul.primary li a.sirius_quickaction_link:hover span.sirius_quickaction_link_inner {
+	border-color: #333333;
+	color: #333333;
+}

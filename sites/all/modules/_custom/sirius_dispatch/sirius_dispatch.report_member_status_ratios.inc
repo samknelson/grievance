@@ -17,6 +17,12 @@ function sirius_dispatch_report_member_status_ratios_form($form, &$form_state, $
   	'#options' => $member_status_options,
   );
 
+  $form['industry_tid'] = array(
+    '#title' => t('Industry'),
+    '#type' => 'select',
+    '#options' => array(NULL => t('ALL INDUSTRIES')) + sirius_taxonomy_load('sirius_industry', 'tid', 'name'),
+  );
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Generate',
@@ -58,15 +64,41 @@ function sirius_dispatch_report_member_status_ratios_batch($shop_nid, $values, $
   $row['shop_name'] = $hr['title'];
 
   // Count workers with this employer, grouping by member status.
+  $domain_nid = sirius_domain_nid();
+
   $sql = "select count(distinct node.nid) as worker_count, ";
   $sql .= "field_sirius_member_status_tid as member_status_tid ";
   $sql .= "from node ";
   $sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid ";
-  $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+
+  $sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.field_sirius_worker_target_id = node.nid ";
+  $sql .= "left join node dispatch_node on dispatch_node.nid = field_data_field_sirius_worker.entity_id ";
+
+  $sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = dispatch_node.nid ";
+
+  $sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = dispatch_node.nid ";
+  $sql .= "left join node job_node on job_node.nid = field_data_field_sirius_dispatch_job.field_sirius_dispatch_job_target_id ";
+
+  $sql .= "left join field_data_field_sirius_industry on field_data_field_sirius_industry.entity_type = 'node' and field_data_field_sirius_industry.entity_id = job_node.nid ";
+  $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
+  $sql .= "left join node shop_node on shop_node.nid = field_grievance_shop_target_id ";
+
   $sql .= "where node.type = 'sirius_worker' ";
-  $sql .= "and field_grievance_shop_target_id = :shop_nid ";
+  $sql .= "and field_sirius_dispatch_status_value in ('accepted', 'accepted_secondary') ";
+  $sql .= "and shop_node.nid = :shop_nid ";
+  if ($values['industry_tid']) {
+    $sql .= "and field_sirius_industry_tid = :industry_tid ";
+    $sql_args[':industry_tid'] = $values['industry_tid'];
+  }
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  }
   $sql .= "group by field_sirius_member_status_tid ";
-  $stmt = db_query($sql, array(':shop_nid' => $shop_nid));
+
+  $sql_args[':shop_nid'] = $shop_nid;
+  $stmt = sirius_sql_query($sql, $sql_args);
   while ($hr = $stmt->fetchAssoc()) {
   	$row['status_' . $hr['member_status_tid']] = $hr['worker_count'];
   }
@@ -87,10 +119,16 @@ function sirius_dispatch_report_member_status_ratios_view($report_type, $report_
   $ratio_2_tid = $parameters['ratio_2'];
   $ratio_1_term = taxonomy_term_load($ratio_1_tid);
   $ratio_2_term = taxonomy_term_load($ratio_2_tid);
+  $industry_tid = $parameters['industry_tid'];
 
   $html = '';
   $html .= '<h2>';
   $html .= 'Ratio of employed workers with the member status <strong>' . $ratio_1_term->name . '</strong> to <strong>' . $ratio_2_term->name . '</strong>';
+  if ($industry_tid) {
+    $html .= '<br />';
+    $industry_term = taxonomy_term_load($industry_tid);
+    $html .= 'Industry: ' . $industry_term->name;
+  }
   $html .= '</h2>';
 
   $query = db_select('report_cache');
@@ -122,8 +160,6 @@ function sirius_dispatch_report_member_status_ratios_view($report_type, $report_
     $row[] = (100 *number_format($count_1 / $total, 2)) . ' %';
     $row[] = $count_2;
     $row[] = (100 *number_format($count_2 / $total, 2)) . ' %';
-
-
 
     $data[$key] = $row;
   }

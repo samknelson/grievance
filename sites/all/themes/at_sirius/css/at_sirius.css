@@ -3952,6 +3952,11 @@ input.ajax-processed:hover {
   display: block;
 }
 
+.form-type-date-popup .date-padding .form-item {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 
 /* /sirius-worker/... */
 .ds-below-left,

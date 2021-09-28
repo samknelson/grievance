@@ -115,9 +115,10 @@ function grievance_alert($node) {
 	// Get the deadline and alert term
 	$deadline = $node->field_grievance_alert_date['und'][0]['value'];
 	$alert = '';
-	$alert_tid = $node->field_grievance_alert['und'][0]['tid'];
+	$alert_tid = $node->field_grievance_alert_tid['und'][0]['tid'];
 	$alert_term = taxonomy_term_load($alert_tid);
 	$alert = $alert_term->name;
+	if (!$alert) { $alert = $node->field_grievance_alert['und'][0]['value']; }
 
 	$need_save = FALSE;
 

@@ -94,6 +94,14 @@ function sirius_event_node_tabs() {
     'weight' => 5,
   );
 
+  $node_tabs['sirius_event']['sirius_event_info/class'] = array(
+    'title' => 'Class Listing',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_class_settings',
+    'permissions' => array('sirius'),
+    'weight' => 5,
+  );
+
   $node_tabs['sirius_event']['sirius_event_participants_current'] = array(
     'title' => 'Current Participants',
     'description' => '',
@@ -255,23 +263,6 @@ function sirius_event_node_tabs() {
     'permissions' => array('sirius'),
     'weight' => 4,
     'file' => $map_files,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_class'] = array(
-    'title' => 'Class',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_class_settings',
-    'permissions' => array('sirius'),
-    'weight' => 3,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_class/settings'] = array(
-    'title' => 'Settings',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_class_settings',
-    'permissions' => array('sirius'),
-    'weight' => 1,
-    // 'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   $node_tabs['sirius_event']['sirius_event_bullpen_self'] = array(

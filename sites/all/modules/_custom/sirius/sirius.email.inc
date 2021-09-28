@@ -467,3 +467,11 @@ function sirius_email_render($email) {
 
   return "<a href=\"mailto:$email\">$email</a>";
 }
+
+/**
+ * Implements hook_smtp_mail_settings_alter()
+ */
+
+function sirius_smtp_mail_settings_alter(&$settings) {
+  // $settings['username'] = 'does_not_work';
+}

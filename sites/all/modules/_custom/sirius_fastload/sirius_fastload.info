@@ -1,0 +1,4 @@
+name = Sirius FastLoad
+description = Implements the Sirius FastLoad functionality
+package = sirius
+core = 7.x
