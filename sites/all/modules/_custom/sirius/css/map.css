@@ -1,5 +1,6 @@
 /* Initial styles for the unselected elements */
-.sirius_map_pin_picker .form-radios label {
+.sirius_map_pin_picker .form-radios label,
+.sirius_map_pin_picker .form-checkboxes label {
   display: block;
   border: 1px solid #c5c5c5;
   background-color: #f6f6f6;
@@ -13,37 +14,45 @@
   float: left;
   margin-right: 10px;
   margin-bottom: 10px;
-  vertical-align: center;
+  vertical-align: middle;
 	position: relative;
 }
 
-.sirius_map_pin_picker .form-radios label .wrap {
+.sirius_map_pin_picker .form-radios label .wrap,
+.sirius_map_pin_picker .form-checkboxes label .wrap {
 }
 
 .sirius_map_pin_picker .form-radios label .image,
-.sirius_map_pin_picker .form-radios label .label {
+.sirius_map_pin_picker .form-radios label .label,
+.sirius_map_pin_picker .form-checkboxes label .image,
+.sirius_map_pin_picker .form-checkboxes label .label {
   margin: 0;
   position: absolute;
   top: 50%;
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
 }
-.sirius_map_pin_picker .form-radios label .image {
+.sirius_map_pin_picker .form-radios label .image,
+.sirius_map_pin_picker .form-checkboxes label .image {
 	width: 55px;
 	text-align: center;
 }
-.sirius_map_pin_picker .form-radios label .label {
+
+.sirius_map_pin_picker .form-radios label .label,
+.sirius_map_pin_picker .form-checkboxes label .label {
 	margin-left: 55px;
 }
 
 /* Styles for elements onHover state */
-.sirius_map_pin_picker .form-radios label:hover {
+.sirius_map_pin_picker .form-radios label:hover,
+.sirius_map_pin_picker .form-checkboxes label:hover {
   background-color: #ededed;
   color: #2b2b2b;
 }
 
 /* Styles for elements onChecked state */
-.sirius_map_pin_picker .form-radios input:checked + label {
+.sirius_map_pin_picker .form-radios input:checked + label,
+.sirius_map_pin_picker .form-checkboxes input:checked + label {
   color: #fff;
   background-color: #337ab7;
   border-color: #2e6da4;
@@ -51,6 +60,35 @@
 
 /* Hide default inputs */
 .sirius_map_pin_picker .form-radios input[type="radio"],
-.sirius_map_pin_picker .form-radios input[type="checkbox"] {
+.sirius_map_pin_picker .form-radios input[type="checkbox"],
+.sirius_map_pin_picker .form-checkboxes input[type="radio"],
+.sirius_map_pin_picker .form-checkboxes input[type="checkbox"] {
   display: none;
+}
+
+
+/* Initial styles for the unselected elements */
+.sirius_map_pin_picker_small .form-radios label,
+.sirius_map_pin_picker_small .form-checkboxes label {
+  padding: 2px 4px;
+  width: 120px;
+  height: 30px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  font-size:  90%;
+}
+
+.sirius_map_pin_picker_small .form-radios label .image,
+.sirius_map_pin_picker_small .form-checkboxes label .image {
+  width: 25px;
+  text-align: center;
+}
+
+.sirius_map_pin_picker_small .form-radios label .label,
+.sirius_map_pin_picker_small .form-checkboxes label .label {
+  margin-left: 25px;
+}
+
+.leaflet-popup-content a.tool-button {
+  width: 200px;
 }
