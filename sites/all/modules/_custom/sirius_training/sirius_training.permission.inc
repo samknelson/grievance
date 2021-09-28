@@ -14,6 +14,14 @@ function sirius_training_permission() {
       'title' => t('Sirius Training Staff'), 
       'description' => t('Access to use the training prorram as a staff member'),
     ),
+    'sirius training certification view' => array(
+      'title' => t('Sirius Training Certification View'), 
+      'description' => t('Ability to view any certification'),
+    ),
+    'sirius training certification edit' => array(
+      'title' => t('Sirius Training Certification Edit'), 
+      'description' => t('Ability to edit or grant any certification'),
+    ),
   );
 }
 
