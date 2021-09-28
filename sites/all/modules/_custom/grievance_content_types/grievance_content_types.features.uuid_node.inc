@@ -861,6 +861,220 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'BAC1 - Report - IU Hours',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1629752717,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '23390fbd-591a-4406-8633-a995c41a6537',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/report-cache/sirius-bac1-iu-hours/form',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The classification is a custom field defined <a href="/sirius/contact/definition">here.</a> The rates for each classification are defined <a href="/bac1/iu-classification-rates">here.</a></p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-08-23 14:05:17 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Ledger - A/R - Search',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1627298416,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '299fd3bc-a807-4e5c-8005-decaf6d0535d',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the form below to search the A/R ledger. The most recent 1,000 entries will be displayed.</p>
+
+<p><strong>Account</strong></p>
+
+<p>Select the account. Leave blank to search all accounts.</p>
+
+<p><strong>Start and End Date</strong></p>
+
+<p>Enter a minimum and maximum date for the search.</p>
+
+<p><strong>Minimum and Maximum Amount</strong></p>
+
+<p>The search can be limited to a minimum and maximum amount.&nbsp; Use a minimum of 0 to search for charges only, and a maximum of 0 to search for payments only.</p>
+
+<p><strong>Memo</strong></p>
+
+<p>Enter a string to search the "memo" field of the entry. Substrings are permitted.</p>
+
+<p><strong>Searching by Worker, Contact, or Employer</strong></p>
+
+<p>For searches specific to a worker, contact, or employer, visit the A/R tab for that entity.</p>
+
+<p><strong>Display</strong></p>
+
+<p>Results may be displayed on the screen or exported to a spreadsheet in CSV format.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/ledger/ar/search',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the form below to search the A/R ledger.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-07-26 04:20:16 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Custom Contact Fields - Display',
   'log' => '',
   'status' => 1,
@@ -3969,6 +4183,125 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Bulk Message - Throttle',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1627042317,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '94947d9f-af1b-4d3c-9c22-e6b1258e77ec',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p><strong>Batch Size</strong></p>
+
+<p>A batch size can be specified for this bulk message. If this batch size is greater than the system-wide batch size for the medium, it is ignored.</p>
+
+<p>Batches are run:</p>
+
+<ul>
+	<li>No more often than the server\'s "cron" is set to run , AND&nbsp;</li>
+	<li>No more often than the the system-wide interval between batches for this medium.</li>
+</ul>
+
+<p>Administrative users can run batches manually and examine the results using the <a href="/sirius/bulk/config/poll">bulk message poll</a> tool.</p>
+
+<p><strong>Line Throttle</strong></p>
+
+<p>For voice calls, the "line throttle" limits the number of phone calls that can be active at any given time. If a batch is being processed and the line throttle is exceeded, then the batch is terminated and no more calls are initiated. A throttle can be restricted by the "from" number (i.e. to only throttle calls made from a particular Caller ID) or by "to" number (i.e. to throttle calls forwarded to a particular conference number.</p>
+
+<p>It\'s important to keep batch sizes and delays in mind when setting the line throttle. For example, suppose that the goal is to limit the number of calls to a call center to 10 at a time. If the batch size is 100, then the system will initiate up to 100 calls within a few seconds; the first callers won\'t have had a chance to connect to the call center by the time that the last calls are initiated, so there may be 100 calls active at any given moment. Therefore, it\'s important to make sure that the batch size is not significantly greater than the line throttle.</p>
+
+<p><em>Important: Use of a line throttle is computationally expensive, because it requires a query to the telephony provider before EACH CALL is initiated. </em>Using the line throttle will dramatically reduce the maximum number of calls/hour that can be delivered. The line throttle should only be used when it\'s necessary to reduce the call rate far below what the system is capable of.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_bulk_send/throttle',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the form below to "throttle" this message, or limit the delivery rate. Settings here are in addition to the <a href="/sirius/bulk/config">system-wide settings</a>.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-07-23 05:11:57 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Grievance Arbitration Form Settings',
   'log' => '',
   'status' => 1,
@@ -4811,6 +5144,35 @@ function grievance_content_types_uuid_features_default_content() {
 	&nbsp;</li>
 	<li>If a "Twilio Flow" is selected, then a Flow must be created using Twilio Studio. The Flow should start with a "Rest API" trigger, and the first action should be "Make Outgoing Call". It may be useful to add a widget to split based on the "AnsweredBy" field, so that the Flow can provide different responses to human and answering machine recipients.</li>
 </ul>
+
+<p><strong>Twilio Flow Variables</strong></p>
+
+<p>If control is passed to a Twilio Flow, then contact variables can be included in the Flow. This might be used, for example, to play a different audio file for each contact, or to use text-to-speech to address the call recipients individually by name.</p>
+
+<p>To access the variable in the Flow, use the following synext:</p>
+
+<table border="0" cellpadding="1" cellspacing="1">
+	<tbody>
+		<tr>
+			<td><strong>Sirius Variable Name</strong></td>
+			<td><strong>Twilio Flow Variable Name</strong></td>
+		</tr>
+		<tr>
+			<td>:sirius_contact:core:nid</td>
+			<td>{{flow.data.sirius_contact__core__nid}}</td>
+		</tr>
+		<tr>
+			<td>:sirius_contact:core:field_sirius_phone:value</td>
+			<td>{{flow.data.sirius_contact__core__field_sirius_phone__value}}</td>
+		</tr>
+		<tr>
+			<td>&nbsp;:sirius_contact:default:custom_fieldset:custom_variable_name</td>
+			<td>{{flow.data.sirius_contact__default__custom_fieldset__custom_variable_name}}</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>&nbsp;</p>
 ',
         'summary' => '',
         'format' => 'full_html',
@@ -5085,6 +5447,122 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2019-10-07 13:12:01 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Dispatch - Three Strikes',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1628250867,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'beba50c6-f898-4d53-8cca-488c6da427b3',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The "three strikes" tool signs out workers who decline or ignore dispatches on successive days.</p>
+
+<p>Each day, the tool scans all workers. If the worker has declined or ignored a dispatch on each of the three preceding days, the worker is signed out of the dispatch system. Under some configurations, they also have a sign-in block applied, preventing them from signing back in until the block has been cleared by an administrator.</p>
+
+<p><strong>Tester</strong></p>
+
+<p>The tester can be used to run the three-strikes scan and view detailed output. The scan can be run in "live" mode, or in "test" mode. In "test" mode, no changes are actually made; the system indicates how many workers would be affected by a three-strikes scan, but does not actually change their sign-in status.</p>
+
+<p>The tester can be run on a single worker, or on all workers.</p>
+
+<p><strong>Settings</strong></p>
+
+<p>On the settings page, administrators can turn on or off automatic three-strikes scans. When scans are active, the time of day that they should run can be set, and the notifications that will be sent to workers can be specified.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/dispatch/threestrikes',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'sirius/dispatch/threestrikes/config',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The "Three Strikes" tool signs out workers who decline or ignore dispatches on successive days.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-08-06 04:54:27 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(

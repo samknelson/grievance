@@ -298,11 +298,15 @@ function sirius_phonenumber_check($phonenumber, $force_refresh = FALSE) {
 }
 
 function sirius_phonenumber_voice_possible($phonenumber) {
+  // If lookups aren't enabled, we default to "True"
+  if (!sirius_domain_variable_get('sirius_twilio_lookup_enable_voice', FALSE)) { return TRUE; }
   $node = sirius_phonenumber_check($phonenumber);
   return $node->field_sirius_voice_possible['und'][0]['value'] != 'No';
 }
 
 function sirius_phonenumber_sms_possible($phonenumber) {
+  // If lookups aren't enabled, we default to "True"
+  if (!sirius_domain_variable_get('sirius_twilio_lookup_enable_sms', FALSE)) { return TRUE; }
   $node = sirius_phonenumber_check($phonenumber);
   return $node->field_sirius_sms_possible['und'][0]['value'] != 'No';
 }

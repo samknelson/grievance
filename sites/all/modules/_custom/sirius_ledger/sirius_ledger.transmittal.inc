@@ -7,6 +7,7 @@ function sirius_ledger_config_transmittal($form, &$form_state) {
     '#title' => t('Number of Blank Rows'),
     '#description' => t('Enter the number of blank rows to show on the paper transmittal forms.'),
     '#default_value' => variable_get($name, 5),
+    '#size' => 4,
   );
 
   $name = sirius_domain_variable_name('sirius_ledger_transmittal_header');

@@ -175,9 +175,15 @@ function sirius_twilio_outgoing_voice_say($call_sid, $context, $msg, $gather_dig
 	exit();
 }
 
-function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone) {
+function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone, $dial_attributes = array()) {
 	$phone = sirius_phone_format_e164($phone);
 	$client = sirius_twilio_client_get();
+
+	$dial_verb = '<Dial';
+	foreach ($dial_attributes as $key => $value) {
+		$dial_verb .= " $key=\"$value\"";
+	}
+	$dial_verb .= '>';
 
 	// $response = new TwiML();
 	// $response->say(sirius_twilio_outgoing_voice_clean($msg));
@@ -185,10 +191,12 @@ function sirius_twilio_outgoing_voice_dial($call_sid, $context, $msg, $phone) {
 
 	header('Content-Type: text/xml');
 	print "<Response>";
-	print "<Say>";
-	print sirius_twilio_outgoing_voice_clean($msg);
-	print "</Say>";
-	print "<Dial>";
+	if ($msg) {
+		print "<Say>";
+		print sirius_twilio_outgoing_voice_clean($msg);
+		print "</Say>";
+	}
+	print $dial_verb;
 	print $phone;
 	print "</Dial>";
 	print "</Response>";
@@ -219,7 +227,6 @@ function sirius_twilio_outgoing_voice_stream() {
 	$context = sirius_twilio_get_context($call_sid);
 	$omg_key = $context['omg_key'];
 	list($audio_nid, $delta) = explode('-', $omg_key);
-	watchdog("whatever", "Here with $call_sid and $omg_key = $audio_nid and $delta");
 
 	// @todo: Security is a little sketch here.
 	//        We assume that if the URL has a call_sid, it's ok to stream the file associated with the context of that call_sid.
@@ -277,10 +284,9 @@ function sirius_twilio_outgoing_flow($flow_sid, $phone, $callerid_nid, $flow_par
 	$handlers = array();
 	if ($handler_nid) { $handlers[] = $handler_nid; }
 
-
 	try {
 		$client = sirius_twilio_client_get();
-		$client->studio->v2->flows($flow_sid)->executions->create($phone, $callerid_phone, $flow_params);
+		$client->studio->v2->flows($flow_sid)->executions->create($phone, $callerid_phone, array('parameters' => $flow_params));
 	} catch (Exception $e) {
 		$result = array('success' => FALSE, 'msg' => "Flow message failed.", 'details' => "Failed to send to Twilio Flow: " . $e->getCode() . ' - ' . $e->getMessage());
 		$msg =  $e->getCode() . ' - ' . $e->getMessage() . ": " . $msg;

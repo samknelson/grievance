@@ -33,7 +33,7 @@ function sirius_node_tab_dispatch_payrate_form_submit($form, &$form_state) {
 	$dispatch_node = node_load($form_state['dispatch_nid']);
 
 	$old_payrate = $dispatch_node->field_sirius_payrate['und'][0]['value'];
-	$result = sirius_dispatch_compute_payrate($dispatch_node, TRUE);
+	$result = sirius_dispatch_payrate_compute($dispatch_node, TRUE);
 	sirius_minilog($result['msg']);
 
 	++$count;
@@ -140,7 +140,7 @@ function sirius_node_tab_dispatch_job_payrate_form_submit($form, &$form_state) {
 	foreach ($dispatch_nids as $dispatch_nid) {
 		$dispatch_node = node_load($dispatch_nid);
 		$old_payrate = $dispatch_node->field_sirius_payrate['und'][0]['value'];
-		$result = sirius_dispatch_compute_payrate($dispatch_node, TRUE);
+		$result = sirius_dispatch_payrate_compute($dispatch_node, TRUE);
 		sirius_minilog($result['msg']);
 
 		++$count;
@@ -152,7 +152,10 @@ function sirius_node_tab_dispatch_job_payrate_form_submit($form, &$form_state) {
 	drupal_set_message(t('Updated @count dispatches and changed the payrate for @count_changed', array('@count' => $count, '@count_changed' => $count_changed)));
 }
 
-function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALSE) {
+function sirius_dispatch_payrate_set($dispatch_node, $force_recompute = FALSE, $mode = 'test') {
+}
+
+function sirius_dispatch_payrate_compute($dispatch_node, $force_recompute = FALSE) {
   // The pay rate should only be computed once.
   if (!$force_recompute) {
   	if (isset($dispatch_node->field_sirius_payrate['und'][0]['value'])) { return array('success' => TRUE, 'msg' => 'Payrate already set.'); }
@@ -163,9 +166,8 @@ function sirius_dispatch_compute_payrate($dispatch_node, $force_recompute = FALS
   // Might get the payrate straight from the job, as an override.
   if (isset($job_node->field_sirius_payrate['und'][0])) {
   	$dispatch_node->field_sirius_payrate = $job_node->field_sirius_payrate;
-  	return array('success' => FALSE, 'msg' => 'Using the pay rate override specified in the job.');
+  	return array('success' => TRUE, 'msg' => 'Using the pay rate override specified in the job.');
   }
-
 
   $industry_tid = $job_node->field_sirius_industry['und'][0]['tid'];
   if (!$industry_tid) { return array('success' => FALSE, 'msg' => 'There is no industry specified for the job.'); }

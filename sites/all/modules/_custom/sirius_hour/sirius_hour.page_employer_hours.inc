@@ -70,7 +70,8 @@ function sirius_hour_node_tab_employer_hours_form($form, &$form_state, $employer
 	$transmittal_nid = $epayperiod_json['transmittal_nid'];
 	$transmittal_node = node_load($transmittal_nid);
 	$transmittal_json = sirius_jsonfield_util_node_json_get($transmittal_node);
-	if (!$transmittal_node) { drupal_set_message("No transmittal form associated with this payment."); return array(); }
+	if (!$transmittal_node) { drupal_set_message("There is no transmittal form associated with this month and employer."); return array(); }
+	
 	$form['backlink'] = array('#markup' => l('Back to Transmittal Form', 'node/' . $employer_node->nid . '/sirius_employer_ledger/transmittal', array('attributes' => array('class' => array('tool-button')))));
 
 	$form_state['transmittal_nid'] = $transmittal_nid;
@@ -91,7 +92,8 @@ function sirius_hour_node_tab_employer_hours_form($form, &$form_state, $employer
 		'#title' => t('Hour Type'),
 		'#options' => $hour_types,
 	);
-	if ($epayperiod_json['hour_type']) { $form['hour_type']['#default_value'] = $epayperiod_json['hour_type']; }
+	if ($epayperiod_json['hour_type']) { $form['hour_type']['#default_value'] = $epayperiod_json['hour_type']; } 
+	else { $form['hour_type']['#default_value'] = sirius_domain_variable_get('sirius_hour_default_type', ''); }
 
 	$form['department'] = array(
 		'#type' => 'select',
@@ -99,6 +101,7 @@ function sirius_hour_node_tab_employer_hours_form($form, &$form_state, $employer
 		'#options' => $departments,
 	);
 	if ($epayperiod_json['department']) { $form['department']['#default_value'] = $epayperiod_json['department']; }
+	else {$form['department']['#default_value'] = sirius_domain_variable_get('sirius_hour_default_department', ''); }
 
 	// Get (or create) the employer payperiod entry.
 	$domain_nid = sirius_domain_nid();

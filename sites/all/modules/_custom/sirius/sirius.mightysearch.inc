@@ -746,13 +746,24 @@ function sirius_mightysearch_add_clause(&$sql_parts, &$sql_args, $values) {
 			} else if (in_array($field_name, array('field_sirius_id', 'field_sirius_id2', 'field_sirius_id3'))) {
 				if (!$sql_parts['joins_nodupe']["worker.$field_name"]) {
 					$sql_parts['joins_nodupe']["worker.$field_name"] = TRUE;
-					$sql_parts['joins'] .= "left join field_data_{$field_name} worker_{$field_name} on worker_{$field_name}.entity_type = 'node' and worker_{$field_name}.entity_id = worker_node.nid ";
+					$sql_parts['joins'] .= "left join field_data_${field_name} worker_${field_name} on worker_{$field_name}.entity_type = 'node' and worker_${field_name}.entity_id = worker_node.nid ";
 				}
 				if (!$sql_parts['fields_nodupe']["worker.$field_name"]) {
 					$sql_parts['fields_nodupe']["worker.$field_name"] = TRUE;
 					$sql_parts['select_fields'] .= ", worker_${field_name}.${field_name}_value as worker_$field_name ";
 				}
-				if ($criterion) { $where_name = 'worker_{$field_name}.${field_name}_value'; }
+				if ($criterion) { $where_name = "worker_{$field_name}.${field_name}_value"; }
+			} else if (in_array($field_name, array('field_sirius_dob'))) {
+				if (!$sql_parts['joins_nodupe']["worker.$field_name"]) {
+					$sql_parts['joins_nodupe']["worker.$field_name"] = TRUE;
+					$sql_parts['joins'] .= "left join field_data_${field_name} worker_${field_name} on worker_{$field_name}.entity_type = 'node' and worker_${field_name}.entity_id = worker_node.nid ";
+				}
+				if (!$sql_parts['fields_nodupe']["worker.$field_name"]) {
+					$sql_parts['fields_nodupe']["worker.$field_name"] = TRUE;
+					$sql_parts['select_fields'] .= ", worker_${field_name}.${field_name}_value as worker_$field_name ";
+				}
+				if ($criterion) { $where_name = "worker_{$field_name}.${field_name}_value"; }
+				$value = date('Y-m-d 00:00:00', strtotime($value));
 			} else if ($field_name == 'current_employer') {
 				if (!$sql_parts['joins_nodupe']["$field_name"]) {
 					$sql_parts['joins_nodupe']["$field_name"] = TRUE;
@@ -1408,6 +1419,8 @@ function sirius_mightysearch_render_result($json_forms, $hr, $full_path ) {
 				return $hr['member_status_names'];
 			} else if (in_array($field_name, array('field_sirius_id', 'field_sirius_id2', 'field_sirius_id3'))) {
 				return $hr["worker_$field_name"];
+			} else if (in_array($field_name, array('field_sirius_dob'))) {
+				return date('m/d/Y', strtotime($hr["worker_$field_name"]));
 			} else if ($field_name == 'nid') { 
 				return $hr['worker_nid'];
 			} else if ($field_name == 'current_employer') { 

@@ -56,6 +56,10 @@ function sirius_ledger_ar_fetch($params = array()) {
 		$sql .= "and ledger_account = :ledger_account ";
 		$sql_args[':ledger_account'] = $params['ledger_account'];
 	}
+	if ($params['ledger_accounts']) { 
+		$sql .= "and ledger_account in (:ledger_accounts) ";
+		$sql_args[':ledger_accounts'] = $params['ledger_accounts'];
+	}
 	if ($params['ledger_participant']) { 
 		$sql .= "and ledger_participant = :ledger_participant ";
 		$sql_args[':ledger_participant'] = $params['ledger_participant'];
@@ -75,6 +79,10 @@ function sirius_ledger_ar_fetch($params = array()) {
 	if ($params['ledger_ts_max']) {
 		$sql .= "and ledger_ts <= :ledger_ts_max ";
 		$sql_args[':ledger_ts_max'] = $params['ledger_ts_max'];
+	}
+	if ($params['ledger_memo']) {
+		$sql .= "and ledger_memo like :ledger_memo ";
+		$sql_args[':ledger_memo'] = $params['ledger_memo'];
 	}
 
 	if ($params['balance']) {
@@ -113,7 +121,9 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 			'memo' => 'Memo',
 		);
 	} else {
-		$header = array(
+		$header = array();
+		if ($options['include_account']) { $header['account'] = 'Account'; }
+		$header += array(
 			'id' => 'Id',
 			'date' => 'Date',
 			'amount' => array('data' => 'Amount'),
@@ -260,7 +270,10 @@ function sirius_ledger_ar_delete_by_reference($ledger_reference) {
 }
 
 function sirius_ledger_ar_format_balance($balance) {
-	if ($balance < 0) { 
+	if (!$balance) { $balance = 0; }
+	if (!is_numeric($balance)) {
+		return '<span class="sirius_ledger_balance>' . $balance . '</span>';
+	} else if ($balance < 0) { 
 		return '<span class="sirius_ledger_balance sirius_ledger_balance_negative">' . '($' . number_format(-1 * $balance, 2) . ')' . '</span>';
 	} else {
 		return '<span class="sirius_ledger_balance">' . '$' . number_format($balance, 2) . '</span>';

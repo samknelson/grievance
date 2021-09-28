@@ -4,6 +4,7 @@
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
 
 sirius_require('sirius_bac1', 'sirius_bac1.hours_by_employer.inc');
+sirius_require('sirius_bac1', 'sirius_bac1.report_iu_hours.inc');
 
 /**
  * Implements hook_menu
@@ -21,5 +22,26 @@ function sirius_bac1_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['bac1/iu-classification-rates'] = array(
+    'title' => 'IU Classification Rates',
+    'description' => '',
+    'access arguments' => array('sirius hour admin'),
+    'page callback' => 'sirius_bac1_page_iu_classification_rates',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_bac1.page_iu_classification_rates.inc',
+  );
+
   return $items;
 }
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function sirius_bac1_report_cache_info() {
+  $items = array();
+  $items += sirius_bac1_report_iu_hours_info();
+  return $items;
+}
+

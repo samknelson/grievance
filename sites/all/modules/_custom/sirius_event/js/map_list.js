@@ -21,33 +21,52 @@
 
 	  	// Do an ajax refresh poll of the map
 	  	function sirius_map_poll() {
-	  		$('#sirius_map_poll_message').html('... refreshing the map ...');
+	  		$('#sirius_map_poll_message').html('... refreshing the list ...');
+	  		
 				$.ajax({
 					'url': '/sirius/ajax/event/map/poll/' + event_nid,
+					'data': {
+						'disable_group_by_address': true,
+					},
 					'type': 'GET',
 		  		'dataType': 'json',
 		  		'error': function(jqXHR, textStatus, errorThrown) {
-			  		$('#sirius_map_poll_message').html('Map refreshed failed: ' + textStatus + ': ' + errorThrown);
+			  		$('#sirius_map_poll_message').html('List refresh failed: ' + textStatus + ': ' + errorThrown);
 		  		},
 					'success': function(data) {
 						if (data['updates']) {
 							for (i = 0; i < data['updates'].length; i++) {
 								record = data['updates'][i];
+								sirius_map_list_update(record.marker_id, record.sirius.pstatus_tid, record.sirius.icon_url);
 							}
 						}
-						date = new Date();
-						n = date.toDateString();
-						time = date.toLocaleTimeString();
-			  		$('#sirius_map_poll_message').html('Map refreshed at: ' + time);
+			  		$('#sirius_map_poll_message').html('List refreshed at: ' + new Date().toLocaleTimeString());
 					}
 				});
+	  	}
+
+	  	function sirius_map_list_update(marker_id, pstatus_tid, icon_url) {
+	    	$('#marker_' + marker_id + ' .icon_wrap img').attr('src', icon_url);
+
+	    	new_class = 'pstatus_' + pstatus_tid;
+	    	if ($('#marker_' + marker_id).attr('class')) {
+	    		classes = $('#marker_' + marker_id).attr('class').split(/\s+/);
+					$.each(classes, function(index, value) {
+						if (value == new_class) { return; }
+						if (! (value.startsWith('pstatus_'))) { 
+							return;
+						}
+						$('#marker_' + marker_id).removeClass(value);
+	        });
+				}
+
+	    	$('#marker_' + marker_id).addClass('pstatus_' + pstatus_tid);
 	  	}
 
 	  	// Manual poll
 	  	$('#sirius_map_poll').click(function(event) {
 	  		event.preventDefault();
 	  		sirius_map_poll();
-	  		// jiggle(markers[2313681]);
       });
 
       // Auto poll
@@ -59,22 +78,11 @@
       }
 
       if (Drupal.ajax) {
-		    Drupal.ajax.prototype.commands.sirius_command_map_update = function(ajax, response, status) {
-		    	$('#participant_' + response.participant_nid + ' .icon_wrap img').attr('src', response.icon_url);
-
-		    	new_class = 'pstatus_' + response.pstatus_tid;
-		    	classes = $('#participant_' + response.participant_nid).attr('class').split(/\s+/);
-					$.each(classes, function(index, value) {
-						if (value == new_class) { return; }
-						if (! (value.startsWith('pstatus_'))) { 
-							return;
-						}
-						$('#participant_' + response.participant_nid).removeClass(value);
-	        });
-
-		    	$('#participant_' + response.participant_nid).addClass('pstatus_' + response.pstatus_tid);
+	    	Drupal.ajax.prototype.commands.sirius_command_map_poll = function(ajax, response, status) {
+	    		sirius_map_poll();
 		    }
 		  }
+
 
 	  } }
 	};

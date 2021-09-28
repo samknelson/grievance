@@ -74,33 +74,44 @@ function sirius_twilio_get_context($call_sid) {
   return $json['context'];
 }
 
-function sirius_twilio_set_context($call_sid, $context, $type = 'context_set', $msg = NULL, $summary = NULL) {
+function sirius_twilio_set_context($call_sid, $context, $type = 'context_set', $description = NULL) {
   $log_node = sirius_twilio_get_context_node($call_sid);
+
+  $title = $description;
+  if ($context['request']['From']) {
+    $title = "From: " . sirius_phone_format($context['request']['From']) . " To: " . sirius_phone_format($context['request']['To']);
+  }
+
   if (!$log_node) {
-    sirius_log(
+    $json = array('context' => $context);
+    sirius_jsonfield_log_impl($json, $type, $description);
+
+    $log_node = sirius_log(
       'twilio:call', 
       $type, 
-      $msg, 
-      $summary,
+      $title, 
+      $description,
       $call_sid, 
       $context['handler_nid'],
       NULL,
-      array('context' => $context)
+      $json
     );
+
   } else {
-    $old_type = $log_node->field_sirius_type['und'][0]['value'];
-    $old_msg = $log_node->field_sirius_message['und'][0]['value'];
-    $old_summary = $log_node->field_sirius_notes['und'][0]['value'];
-    $old_handler = $log_node->field_sirius_log_handler['und'][0]['target_id'];
-
     $log_node->field_sirius_type['und'][0]['value'] = $type;
-    $log_node->field_sirius_message['und'][0]['value'] = substr($msg, 0, 254);
-    $log_node->field_sirius_summary['und'][0]['value'] = substr($summary, 0, 254);
+    $log_node->field_sirius_message['und'][0]['value'] = substr($title, 0, 254);
+    $log_node->field_sirius_summary['und'][0]['value'] = substr($description, 0, 254);
 
-    $json = json_decode($log_node->field_sirius_json['und'][0]['value'], TRUE);
+    if ($context['handler_nid']) { sirius_log_handler_set($log_node, $context['handler_nid']); }
+    if ($context['worker_nid']) { sirius_log_handler_set($log_node, $context['worker_nid']); }
+
+    $log_node->title = substr($title, 0, 255);
+
+    $json = sirius_json_get($log_node);
     $json['context'] = array_merge($json['context'], $context);
-    $log_node->field_sirius_json['und'][0]['value'] = json_encode($json);
-    sirius_jsonfield_log($log_node, $type, $msg, array('old_type' => $old_type, 'old_msg' => $old_msg, 'old_summary' => $old_summary, 'old_handler' => $old_handler));
+    sirius_jsonfield_log_impl($json, $type, $description);
+    sirius_json_set($log_node, $json);
+
     node_save($log_node);
   }
 }

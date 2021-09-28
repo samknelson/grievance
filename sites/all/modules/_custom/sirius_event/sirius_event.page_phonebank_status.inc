@@ -22,7 +22,6 @@ function sirius_node_tab_event_phonebank_status($event_node) {
   $sql .= "and field_sirius_event_prole_tid = :prole_tid ";
   $sql .= "group by field_sirius_event_pstatus_tid ";
   $sql .= "order by pstatus_term.name ";
-  $sql .= "limit 10 ";
 
   $rows = array();
   $stmt = db_query($sql, array(':event_nid' => $event_node->nid, ':prole_tid' => $prole_tid));

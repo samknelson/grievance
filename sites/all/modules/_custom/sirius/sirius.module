@@ -956,6 +956,7 @@ function sirius_content_type_name($machine_name) {
 }
 
 function sirius_node_title($nid) {
+  if (!$nid) { return NULL; }
   $sql = "select title from node where nid = :nid";
   $stmt = sirius_sql_query($sql, array(':nid' => $nid));
   $hr = $stmt->fetchAssoc();

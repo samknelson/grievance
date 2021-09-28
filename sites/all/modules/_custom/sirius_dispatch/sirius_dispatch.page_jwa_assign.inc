@@ -283,6 +283,11 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 
 	$form['td_2_body'] = array('#markup' => $html);
 
+  $form['submit'] = array(
+  	'#type' => 'submit',
+  	'#value' => t('Dispatch the selected workers to the selected job'),
+  );
+
 	//
   // LEFT COLUMN
   //
@@ -364,11 +369,6 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
   );
 
   $form['job_nid'] = array('#required' => TRUE, '#type' => 'hidden', '#attributes' => array('id' => 'sirius_job_nid'));
-
-  $form['submit'] = array(
-  	'#type' => 'submit',
-  	'#value' => t('Dispatch the selected workers to the selected job'),
-  );
 
 	return $form;
 }

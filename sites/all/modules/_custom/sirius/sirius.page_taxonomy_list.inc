@@ -11,6 +11,8 @@ function sirius_page_taxonomy($vocabulary_machine_name) {
 }
 
 function sirius_page_taxonomy_list($vocabulary_machine_name) {
+	sirius_backlink_add('sirius/taxonomy', array('name' => 'All Drop-Down Lists'));
+
 	$vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_machine_name);
 	if (!$vocabulary) { return 'Vocabulary not found.'; }
 	drupal_set_title($vocabulary->name);

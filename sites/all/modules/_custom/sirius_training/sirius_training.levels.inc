@@ -185,7 +185,11 @@ function sirius_training_level_graduate($worker_node, $ms_term, $level, $params)
 			}
 		}
 	}
-	$worker_node->field_sirius_denorm_level['und'] = array_values($worker_node->field_sirius_denorm_level['und']);
+	if ($worker_node->field_sirius_denorm_level['und']) {
+		$worker_node->field_sirius_denorm_level['und'] = array_values($worker_node->field_sirius_denorm_level['und']);
+	} else {
+		$worker_node->field_sirius_denorm_level['und'] = array();
+	}
 	$worker_node->field_sirius_denorm_level['und'][] = array('value' => $ms_term->tid . '|' . $level_code);
 
 	node_save($worker_node);

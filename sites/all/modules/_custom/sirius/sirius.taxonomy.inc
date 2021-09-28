@@ -306,6 +306,9 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_payment_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_payment_type']['display'] = 'block_10';
     $settings['sirius_payment_type']['multidomain'] = 'Yes';
+    $settings['sirius_worker_tor_type']['view'] = 'sirius_taxonomy';
+    $settings['sirius_worker_tor_type']['display'] = 'block_11';
+    $settings['sirius_worker_tor_type']['multidomain'] = 'Yes';
   }
 
   if ($vocabulary_machine_name == 'all') { return $settings; }

@@ -1,14 +1,7 @@
 <?php
 
-function sirius_twilio_page_recording_stream($rec_sid, $download = FALSE) {
-	// @todo: I don't understand access control at Twilio. They seem to post their recordings publicly, at a hard-to-guess but insecure URL.
-	//        Oh well, if they're willing to put them there, I'm willing to proxy them, especially since my page is more secure than theirs.
-	$url = 'https://api.twilio.com/2010-04-01/Accounts/';
-	$url .= sirius_domain_variable_get('sirius_twilio_account_sid');
-	$url .= '/Recordings/'; 
-	$url .= $rec_sid;
-	$url .= '.mp3';
-
+function sirius_twilio_page_recording_stream($recording_sid, $download = FALSE) {
+	$url = sirius_twilio_recording_stream_url($recording_sid);
 	$ch = curl_init($url);
 	curl_setopt_array($ch,
 		[
@@ -18,7 +11,7 @@ function sirius_twilio_page_recording_stream($rec_sid, $download = FALSE) {
 	);
 	
 	header("Content-Type: audio/mpeg");
-	if ($download) { header("Content-Disposition: attachment; filename=\"$rec_sid.mp3\""); }
+	if ($download) { header("Content-Disposition: attachment; filename=\"$recording_sid.mp3\""); }
 	
 	// Properly speaking, I ought to echo whatever headers Twilio sends. But this seemed to cause any number of problems. So I'm just setting my own.
 	/*

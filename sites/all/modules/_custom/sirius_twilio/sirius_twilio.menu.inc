@@ -17,6 +17,82 @@ function sirius_twilio_node_tabs() {
     'permissions' => array('sirius log view'),
   );
 
+  $node_tabs['sirius_log']['sirius_twilio_recording'] = array(
+    'title' => 'Recording',
+    'description' => '',
+    'callback' => 'sirius_twilio_node_tab_recording',
+    'permissions' => array('sirius log view'),
+    'file' => 'sirius_twilio.page_recording.inc',
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_log']['sirius_twilio_recording/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_twilio_node_tab_recording',
+    'permissions' => array('sirius log view'),
+    'file' => 'sirius_twilio.page_recording.inc',
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_log']['sirius_twilio_recording/comment'] = array(
+    'title' => 'Comment',
+    'description' => '',
+    'callback' => 'sirius_twilio_node_tab_recording_comment',
+    'permissions' => array('sirius log view'),
+    'file' => 'sirius_twilio.page_recording_comment.inc',
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_log']['sirius_twilio_recording/worker'] = array(
+    'title' => 'Worker',
+    'description' => '',
+    'callback' => 'sirius_twilio_node_tab_recording_worker',
+    'permissions' => array('sirius log view'),
+    'file' => 'sirius_twilio.page_recording_worker.inc',
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_log']['sirius_twilio_call'] = array(
+    'title' => 'Call',
+    'description' => '',
+    'callback' => 'sirius_twilio_node_tab_call',
+    'permissions' => array('sirius log view'),
+    'file' => 'sirius_twilio.page_call.inc',
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_log']['sirius_twilio_call/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_twilio_node_tab_call',
+    'permissions' => array('sirius log view'),
+    'file' => 'sirius_twilio.page_call.inc',
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_log']['sirius_twilio_call/recording'] = array(
+    'title' => 'Recording',
+    'description' => '',
+    'callback' => 'sirius_twilio_node_tab_call_recording',
+    'permissions' => array('sirius log view'),
+    'file' => 'sirius_twilio.page_call_recording.inc',
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_log']['sirius_twilio_call/worker'] = array(
+    'title' => 'Worker',
+    'description' => '',
+    'callback' => 'sirius_twilio_node_tab_call_worker',
+    'permissions' => array('sirius log view'),
+    'file' => 'sirius_twilio.page_call_worker.inc',
+    'weight' => 3,
+  );
+
+  sirius_node_tab_set_module('sirius_twilio', $node_tabs);
+
   return $node_tabs;
 }
 
@@ -194,39 +270,6 @@ function sirius_twilio_menu() {
     'page arguments' => array(),
     'access arguments' => array('sirius domain admin'),
     'file' => 'sirius_twilio.page_recordings_local.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-  );
-
-  $items['sirius/twilio/recordings/numbers'] = array(
-    'title' => 'Numbers',
-    'description' => '',
-    'page callback' => 'sirius_twilio_page_recordings_numbers_list',
-    'page arguments' => array(),
-    'access arguments' => array('sirius domain admin'),
-    'file' => 'sirius_twilio.page_recordings_numbers_list.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
-  );
-
-  $items['sirius/twilio/recordings/numbers/list'] = array(
-    'title' => 'List',
-    'description' => '',
-    'page callback' => 'sirius_twilio_page_recordings_numbers_list',
-    'page arguments' => array(),
-    'access arguments' => array('sirius domain admin'),
-    'file' => 'sirius_twilio.page_recordings_numbers_list.inc',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 1,
-  );
-
-  $items['sirius/twilio/recordings/numbers/add'] = array(
-    'title' => 'Add',
-    'description' => '',
-    'page callback' => 'sirius_twilio_page_recordings_numbers_add',
-    'page arguments' => array(),
-    'access arguments' => array('sirius domain admin'),
-    'file' => 'sirius_twilio.page_recordings_numbers_add.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
   );

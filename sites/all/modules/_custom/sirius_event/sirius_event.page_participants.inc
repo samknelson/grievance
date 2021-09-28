@@ -24,8 +24,9 @@ function sirius_node_tab_event_participants_current_access($event_node) {
 function sirius_node_tab_event_participants_current($event_node) {
   sirius_event_disclaimer_redirect($event_node);
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
-	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
+	$json = sirius_json_get($event_type_term);
 	$all_rules = $json['participants']['rules'];
+	if (!$all_rules) { return t('There are no participant rules defined for this event type.'); }
 	if (user_access('sirius event admin')) {
 		$rules = $all_rules;
 		foreach ($rules as $i => $rule) { $rules[$i]['delta'] = $i; }
@@ -67,7 +68,7 @@ function sirius_node_tab_event_participants_current($event_node) {
 						'widget' => $widget,
 						'prole' => $prole_term->tid,
 					);
-					$link_groups[$i]['links'][$j] = $link;
+					$link_groups[$i]['links'][] = $link;
 					$last_link = $link;
 					++$link_count;
 				}

@@ -19,20 +19,46 @@ function sirius_loopback_url() {
 	return $url;
 }
 
+/**
+ * Do we have "loopback" access -- meaning this is a request initiated from the server.
+ * Need to play some tricks because of edge caching and such, which means that we can't simply 
+ * check whether REMOTE_ADDR == SERVER_ADDR.
+ */
+
 function sirius_loopback_access() {
+	// If we happen to be signed in as an admin, we can do anything.
   if (user_access('sirius admin')) { return TRUE; }
 
+  // Sometimes se get the HTTP_SEC_FETCH_SITE variable set
+  if ($_SERVER['HTTP_SEC_FETCH_SITE'] == 'same-origin' || $_SERVER['HTTP_SEC_FETCH_SITE'] == 'same-site') { return TRUE; }
+
+  // Get the remote IP. This might be REMOTE_ADDR or X_FORWARDED_WHATEVER
   $remote_ip = sirius_loopback_remote_ip();
   if (!$remote_ip) { return FALSE; }
 
+  // If remote_ip == SERVER_ADDR, we're good.
   if ($remote_ip == $_SERVER['SERVER_ADDR']) { return TRUE; }
 
+  // We keep a cache of the "loopback IP". If it's less than 24 hours old and if it matches the remote_ip, then we're good.
+  $cached_ip = variable_get('sirius_loopback_ip', '');
+  $cached_ts = variable_get('sirius_loopback_ts', '');
+  if ($cached_ts > time() - 60*60*24) {
+  	return ($cached_ip == $remote_ip);
+  }
+
+  // The only way to find out what the remote IP "really" is, is to make a request to a "what is my IP" service. We'll run that ourselves.
   global $base_url;
   $url = $base_url . '/sirius/loopback/remote-ip';
   $server_ip = file_get_contents($url);
 
-  if ($server_ip == $remote_ip) { return TRUE; }
+  // If the server IP is the remote IP, cache that value and we're good.
+  if ($server_ip == $remote_ip) { 
+	  variable_set('sirius_loopback_ip', $server_ip);
+	  variable_set('sirius_loopback_ts', time());
+	  return TRUE;
+	}
 
+	// Oh well.
   return FALSE;
 }
 

@@ -112,6 +112,16 @@ function sirius_hour_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/hour/search/month'] = array(
+    'title' => 'Hours - Search - Monthly',
+    'description' => '',
+    'page callback' => 'sirius_hour_page_search_month',
+    'page arguments' => array(),
+    'access arguments' => array('sirius hour admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_hour.page_search_bymonth.inc',
+  );
+
   $items['sirius/hour/config'] = array(
     'title' => 'Hour Configuration',
     'description' => '',
