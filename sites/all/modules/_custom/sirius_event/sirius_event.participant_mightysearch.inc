@@ -277,6 +277,7 @@ function sirius_event_participant_mightsearch_actions_all($event_node = NULL, $p
 	);
 	$actions['delete_participant'] = array(
 		'title' => 'Delete Participant Record',
+		'event_nid' => $event_node->nid,
 	);
 
 	return $actions;
