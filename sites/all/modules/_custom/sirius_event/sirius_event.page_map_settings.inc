@@ -29,7 +29,7 @@ function sirius_node_tab_event_map_settings_form($form, &$form_state, $event_nid
 
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$prole_tids = sirius_fieldvals($event_type_term, 'field_sirius_event_proles', 'tid');
-	$pstatus_options = sirius_event_participant_role_status_tids($prole_tid, array('phonebank' => array('during_call' => TRUE)));
+	$pstatus_options = sirius_event_participant_role_status_tids($prole_tids, array('phonebank' => array('during_call' => TRUE)));
 
 	$form['#tree'] = TRUE;
 
