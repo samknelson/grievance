@@ -24,3 +24,10 @@ function sirius_strtotime($time, $now = NULL) {
 
 	if ($now) { return strtotime($time, $now); } else { return strtotime($time); }
 }
+
+function sirius_dob_format($dob) {
+	if (!$dob) { return ''; }
+
+	$ts = strtotime($dob);
+	return date('m/d/Y') . ' (' . format_interval(time() - $ts, 1) . ')';
+}
