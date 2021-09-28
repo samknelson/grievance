@@ -1,4 +1,5 @@
 <?php
+
 function sirius_node_tab_event_map_settings_access($event_node) {
 	if (!sirius_node_tab_event_map_access($event_node)) { return FALSE; } 
 	
@@ -28,6 +29,7 @@ function sirius_node_tab_event_map_settings_form($form, &$form_state, $event_nid
 
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$prole_tids = sirius_fieldvals($event_type_term, 'field_sirius_event_proles', 'tid');
+	$pstatus_options = sirius_event_participant_role_status_tids($prole_tid, array('phonebank' => array('during_call' => TRUE)));
 
 	$form['#tree'] = TRUE;
 
@@ -81,6 +83,31 @@ function sirius_node_tab_event_map_settings_form($form, &$form_state, $event_nid
 			'#description' => t('Set to "Yes" to enable the "Checkin" feature. This will cause the locations of all map users to be reported back to the server, and will allow administrators to see the locations of other users as they move around the map.'),
 		);
 	}
+
+	$form['map']['group_by_address'] = array(
+		'#type' => 'select',
+		'#title' => t('Group by Address?'),
+		'#options' => array(
+			'No' => t('No'), 
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $json['map']['group_by_address'],
+		'#description' => t('Set to "Yes" to group pins on the map by address, so that multiple participants at a single address will appear as a single pin.'),
+	);
+
+	$form['map']['group_by_address_options'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Group by Address Options'),
+    '#states' => array('visible' => array(":input[name=\"map[group_by_address]\"]" => array('value' => 'Yes'))),
+	);
+
+	$form['map']['group_by_address_options']['mixed_pstatus'] = array(
+		'#type' => 'select',
+		'#title' => t('Show Mixed As'),
+		'#options' => array(NULL => t('-- Select --')) + $pstatus_options,
+		'#default_value' => $json['map']['group_by_address_options']['mixed_pstatus'],
+		'#description' => 'When participants at a single address have different statuses, show this pin.',
+	);
 
 	$form['map']['caller_intro'] = array(
 		'#type' => 'text_format',

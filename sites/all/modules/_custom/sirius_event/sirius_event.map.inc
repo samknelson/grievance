@@ -76,11 +76,69 @@ function sirius_map_active($event_node) {
   return $result;
 }
 
-function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offset = 0) {
+function sirius_event_map_legend_render($event_nid) {
+  $event_node = node_load($event_nid);
+  $event_json = sirius_jsonfield_util_node_json_get($event_node);
+  $type_json = sirius_event_type_json($event_node);
+  $prole_tid = $type_json['map']['prole_tid'];
+  $pstatus_options = sirius_event_participant_role_status_tids($prole_tid, array('phonebank' => array('during_call' => TRUE, 'current_pstatus' => $pstatus_tid)));
+  $pstatus_terms = taxonomy_term_load_multiple(array_keys($pstatus_options));
+
+  $counts = sirius_event_participant_summary($event_nid, $prole_tid);
+
+  $rows = array();
+  foreach ($pstatus_terms as $pstatus_tid => $pstatus_term) {
+    $pstatus_json = sirius_json_get($pstatus_term);
+    $pin = sirius_map_pin($pstatus_json['map']['pin']);
+
+    $row = array();
+    $row[] = sirius_map_pin_render($pin);
+    $row[] = $pstatus_term->name;
+    $row[] = number_format($counts[$pstatus_tid], 0);
+    $row[] = $pstatus_term->description;
+    $rows[] = $row;
+  }
+
+  $group_by_address = ($event_json['map']['group_by_address'] == 'Yes');
+  if ($group_by_address) {
+    $mixed_pstatus_tid = $event_json['map']['group_by_address_options']['mixed_pstatus'];
+    if ($mixed_pstatus_tid) {
+      $pstatus_term = taxonomy_term_load($mixed_pstatus_tid);
+      $pstatus_json = sirius_json_get($pstatus_term);
+      $pin = sirius_map_pin($pstatus_json['map']['pin']);
+
+      $row = array();
+      $row[] = sirius_map_pin_render($pin);
+      $row[] = 'Multiple Statuses';
+      $row[] = '';
+      $row[] = '(This pin is shown when there are multiple residents at an address, and they have different statuses.)';
+      $rows[] = $row;
+    }
+  }
+
+
+  $header = array('Marker', 'Status', 'Count', 'Description');
+  $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+  return $html;
+}
+
+function sirius_event_map_list($event_node, $params = array()) {
+  $cutoff_ts = $params['cutoff_ts'];
+  $limit = $params['limit'];
+  if (!$limit) { $limit = 3000; }
+  $offset = $params['offset'];
+  if (!$offset) { $offset = 0; }
+  $show_pstatus_tids = $params['show_pstatus_tids'];
+
   // Create settings for the map.
   $type_json = sirius_event_type_json($event_node);
   $prole_tid = $type_json['map']['prole_tid'];
   $event_json = sirius_jsonfield_util_node_json_get($event_node);
+
+  $group_by_address = (
+    ($event_json['map']['group_by_address'] == 'Yes') && 
+    (!$params['disable_group_by_address'])
+  );
 
   $map_features = array();
 
@@ -95,10 +153,13 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
   $sql_args = array();
   $sql_args[':event_nid'] = $event_node->nid;
   $sql_args[':prole_tid'] = $prole_tid;
-  $sql = "select contact_node.title, ";
-  $sql .= "contact_node.nid as contact_nid, ";
-  $sql .= "node.nid as participant_nid, ";
-  $sql .= "field_sirius_event_pstatus_tid, ";
+  $sql = "select group_concat(contact_node.title order by node.nid separator '|SEPARATOR|') as contact_titles, ";
+  if ($group_by_address) {
+    $sql .= "count(distinct contact_node.nid) as contact_count, ";
+  }
+  $sql .= "group_concat(contact_node.nid order by node.nid separator '_') as contact_nids, ";
+  $sql .= "group_concat(node.nid order by node.nid separator '_') as marker_id, ";
+  $sql .= "group_concat(field_sirius_event_pstatus_tid order by node.nid separator '_') as pstatus_tids, ";
   $sql .= "field_sirius_address_thoroughfare, ";
   $sql .= "field_sirius_address_premise, ";
   $sql .= "field_sirius_address_locality, ";
@@ -123,37 +184,74 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
     $sql .= "and node.changed > :cutoff_ts ";
     $sql_args[':cutoff_ts'] = $cutoff_ts;
   }
+  if ($show_pstatus_tids) {
+    $sql .= "and field_sirius_event_pstatus_tid in (:show_pstatus_tids) ";
+    $sql_args[':show_pstatus_tids'] = $show_pstatus_tids;
+  }
+  if ($group_by_address) {
+    $sql .= "group by field_sirius_address_thoroughfare, field_sirius_address_premise, field_sirius_address_locality, field_sirius_address_administrative_area, field_sirius_address_postal_code ";
+  } else {
+    $sql .= "group by contact_node.nid ";
+  }
   $sql .= "limit $limit offset $offset ";
 
   $stmt = sirius_sql_query($sql, $sql_args);
   while ($hr = $stmt->fetchAssoc()) {
-    $pstatus_tid = $hr['field_sirius_event_pstatus_tid'];
+    $pstatus_tids = explode('_', $hr['pstatus_tids']);
+    $pstatus_names = array();
+    foreach ($pstatus_tids as $pstatus_tid) {
+      $pstatus_names[] = $pstatus_terms[$pstatus_tid]->name;
+    }
+
+    $distinct_pstatus_tids = array_unique(explode('_', $hr['pstatus_tids']));
+    if (count($distinct_pstatus_tids) > 1) {
+      $pstatus_tid = $event_json['map']['group_by_address_options']['mixed_pstatus'];
+      if (!$pstatus_tid) { $pstatus_tid = $distinct_pstatus_tids[0]; }
+    } else {
+      $pstatus_tid = $distinct_pstatus_tids[0];
+    }
+
     $pin = $pstatus_pins[$pstatus_tid];
+
+    $titles = explode('|SEPARATOR|', $hr['contact_titles']);
+    if ($hr['contact_count'] > 1) {
+      $title = $hr['contact_count'] . ' Contacts';
+    } else {
+      $title = $titles[0];
+    }
 
     $map_feature = array(
       'type' => 'point',
       'lat' => $hr['field_sirius_address_geo_lat'],
       'lon' => $hr['field_sirius_address_geo_lon'],
-      'popup' => sirius_map_popup_html($event_node->nid, $hr['contact_nid'], $hr['title'], $hr['field_sirius_address_thoroughfare'], $hr['field_sirius_address_premise'], $hr['participant_nid'], $pstatus_terms[$pstatus_tid]->name),
-      'participant_nid'  => $hr['participant_nid'],
-      'leaflet_id' => 'participant_' . $hr['participant_nid'],
+      'popup' => sirius_map_popup_html(
+        $event_node->nid, 
+        $titles, 
+        $hr['field_sirius_address_thoroughfare'], 
+        $hr['field_sirius_address_premise'], 
+        $hr['marker_id'], 
+        $pstatus_names
+      ),
+      'marker_id'  => $hr['marker_id'],
+      'leaflet_id' => 'marker_' . $hr['marker_id'],
       'sirius' => array(
-        'marker' => array('id' => $hr['participant_nid']),
-        'contact_name' => $hr['title'],
+        'marker' => array('id' => $hr['marker_id']),
+        'contact_name' => $title,
         'list_html' => sirius_map_list_html(
           $event_node->nid, 
           $hr['contact_nid'], 
-          $hr['title'], 
+          $title, 
           $hr['field_sirius_address_thoroughfare'], 
           $hr['field_sirius_address_premise'], 
           $hr['field_sirius_address_locality'], 
           $hr['field_sirius_address_administrative_area'], 
           $hr['field_sirius_address_postal_code'], 
-          $hr['participant_nid'], 
+          $hr['marker_id'], 
           $pstatus_terms[$pstatus_tid]->name,
           $pstatus_tid,
           $pin['path']
         ),
+        'icon_url' => $pin['path'],
         'type' => 'contact',
         'pstatus_tid' => $hr['field_sirius_event_pstatus_tid'],
         'pstatus_name' => $pstatus_terms[$hr['field_sirius_event_pstatus_tid']]->name,
@@ -229,8 +327,8 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
         'lat' => $json_checkin['lat'],
         'lon' => $json_checkin['lon'],
         'popup' => $popup_html,
-        'participant_nid'  => $hr['participant_nid'],
-        'leaflet_id' => 'participant_' . $hr['participant_nid'],
+        'marker_id'  => $hr['participant_nid'],
+        'leaflet_id' => 'marker_' . $hr['participant_nid'],
         'sirius' => array(
           'type' => 'user',
           'marker' => array('id' => $hr['participant_nid'])
@@ -249,4 +347,108 @@ function sirius_event_map_list($event_node, $cutoff_ts = 0, $limit = 3000, $offs
   }
 
   return $map_features;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function sirius_event_map_removals($event_node, $params = array()) {
+  $cutoff_ts = $params['cutoff_ts'];
+  $limit = $params['limit'];
+  if (!$limit) { $limit = 3000; }
+  $offset = $params['offset'];
+  if (!$offset) { $offset = 0; }
+  $show_pstatus_tids = $params['show_pstatus_tids'];
+  if (!$show_pstatus_tids) { return array(); }
+
+  // Create settings for the map.
+  $type_json = sirius_event_type_json($event_node);
+  $prole_tid = $type_json['map']['prole_tid'];
+  $event_json = sirius_jsonfield_util_node_json_get($event_node);
+
+  $group_by_address = (
+    ($event_json['map']['group_by_address'] == 'Yes') && 
+    (!$params['disable_group_by_address'])
+  );
+
+  $removals = array();
+
+  // Fetch all the relevant data about our participants
+  $sql_args = array();
+  $sql_args[':event_nid'] = $event_node->nid;
+  $sql_args[':prole_tid'] = $prole_tid;
+  $sql = "select group_concat(node.nid order by node.nid separator '_') as marker_id ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_sirius_event on field_data_field_sirius_event.entity_type = 'node' and field_data_field_sirius_event.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_event_prole on field_data_field_sirius_event_prole.entity_type = 'node' and field_data_field_sirius_event_prole.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_event_pstatus on field_data_field_sirius_event_pstatus.entity_type = 'node' and field_data_field_sirius_event_pstatus.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_contact on field_data_field_sirius_contact.entity_type = 'node' and field_data_field_sirius_contact.entity_id = node.nid ";
+  $sql .= "left join node contact_node on contact_node.nid = field_sirius_contact_target_id ";
+  $sql .= "left join field_data_field_sirius_address on field_data_field_sirius_address.entity_type = 'node' and field_data_field_sirius_address.entity_id = contact_node.nid ";
+  $sql .= "left join field_data_field_sirius_address_geo on field_data_field_sirius_address_geo.entity_type = 'node' and field_data_field_sirius_address_geo.entity_id = contact_node.nid ";
+  $sql .= "where field_sirius_event_target_id = :event_nid ";
+  $sql .= "and field_sirius_event_prole_tid = :prole_tid ";
+  $sql .= "and field_sirius_address_geo_lat is not null ";
+  $sql .= "and field_sirius_address_thoroughfare is not null ";
+  $sql .= "and field_sirius_address_thoroughfare != '' ";
+  if ($cutoff_ts) { 
+    $sql .= "and node.changed > :cutoff_ts ";
+    $sql_args[':cutoff_ts'] = $cutoff_ts;
+  }
+  if ($show_pstatus_tids) {
+    $sql .= "and field_sirius_event_pstatus_tid not in (:show_pstatus_tids) ";
+    $sql_args[':show_pstatus_tids'] = $show_pstatus_tids;
+  }
+  if ($group_by_address) {
+    $sql .= "group by field_sirius_address_thoroughfare, field_sirius_address_premise, field_sirius_address_locality, field_sirius_address_administrative_area, field_sirius_address_postal_code ";
+  } else {
+    $sql .= "group by contact_node.nid ";
+  }
+  $sql .= "limit $limit offset $offset ";
+
+  $stmt = sirius_sql_query($sql, $sql_args);
+  while ($hr = $stmt->fetchAssoc()) {
+    $pstatus_tids = explode('_', $hr['pstatus_tids']);
+    $pstatus_names = array();
+    foreach ($pstatus_tids as $pstatus_tid) {
+      $pstatus_names[] = $pstatus_terms[$pstatus_tid]->name;
+    }
+
+    $distinct_pstatus_tids = array_unique(explode('_', $hr['pstatus_tids']));
+    if (count($distinct_pstatus_tids) > 1) {
+      $pstatus_tid = $event_json['map']['group_by_address_options']['mixed_pstatus'];
+      if (!$pstatus_tid) { $pstatus_tid = $distinct_pstatus_tids[0]; }
+    } else {
+      $pstatus_tid = $distinct_pstatus_tids[0];
+    }
+
+    $removals[] = $hr['marker_id'];
+  }
+
+  return $removals;
 }
