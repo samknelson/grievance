@@ -407,6 +407,13 @@ $items['sirius/skill/settings'] = array(
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/worker/search-by-phone-carrier'] = array(
+    'title' => 'Worker Search by Phone Carrier',
+    'access arguments' => array('sirius worker admin'),
+    'page callback' => 'sirius_worker_page_search_by_phone_carrier',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   return $items;
 }
 
