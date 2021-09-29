@@ -18,7 +18,6 @@ function sirius_worker_page_skill_expiring_form($form, &$form_state, $days = NUL
 		'#type' => 'textfield',
 		'#title' => t('Expires After'),
 		'#description' => t('Search for skills expiring AT LEAST this many days out.'),
-		'#size' => 12,
 	);
 
 	$skills = sirius_taxonomy_load('sirius_skill', 'tid', 'name', TRUE);
