@@ -96,11 +96,12 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	if ($prefs['job_type']) { $query->fieldCondition('field_sirius_dispatch_job_type', 'tid', array_values($prefs['job_type']), 'in'); }
 	$query->propertyOrderBy('nid', 'desc');
 	$stmt = $query->execute();
-	if (!$stmt['node']) { 
-		drupal_set_message(t('There are no jobs matching the criteria set in your preferences.'));
-		return array();
+	if ($stmt['node']) { 
+		$job_nids = array_keys($stmt['node']);
+	} else {
+		drupal_set_message(t('There are no jobs matching the criteria set in your preferences.'), 'warning');
+		$job_nids = array();
 	}
-	$job_nids = array_keys($stmt['node']);
 	$job_max = variable_get('sirius_dispatch_jwa_job_max', 25);
 	$job_count = count($job_nids);
 	if ($job_count > $job_max) {
@@ -110,23 +111,26 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	$job_nodes = node_load_multiple($job_nids);
 
 	// Fetch the roster for each job. SQL for speeed
-	$sql = "select node.nid as dispatch_nid, ";
-	$sql .= "worker_node.nid as worker_nid, ";
-	$sql .= "field_sirius_dispatch_job_target_id as job_nid, ";
-	$sql .= "worker_node.title as worker_name, ";
-	$sql .= "field_sirius_dispatch_status_value as dispatch_status ";
-	$sql .= "from node ";
-	$sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
-	$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";
-	$sql .= "left join node worker_node on worker_node.nid = field_sirius_worker_target_id ";
-	$sql .= "where node.type = 'sirius_dispatch' ";
-	$sql .= "and field_sirius_dispatch_job_target_id in (:job_nids) ";
-	$sql .= "order by worker_node.title, node.nid desc limit 5000 ";
-	$stmt = db_query($sql, array(':job_nids' => $job_nids));
 	$roster = array();
-	while ($hr = $stmt->fetchAssoc()) {
-		$roster[$hr['job_nid']][] = $hr;
+	if ($job_nids) {
+		$sql = "select node.nid as dispatch_nid, ";
+		$sql .= "worker_node.nid as worker_nid, ";
+		$sql .= "field_sirius_dispatch_job_target_id as job_nid, ";
+		$sql .= "worker_node.title as worker_name, ";
+		$sql .= "field_sirius_dispatch_status_value as dispatch_status ";
+		$sql .= "from node ";
+		$sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
+		$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+		$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";
+		$sql .= "left join node worker_node on worker_node.nid = field_sirius_worker_target_id ";
+		$sql .= "where node.type = 'sirius_dispatch' ";
+		$sql .= "and field_sirius_dispatch_job_target_id in (:job_nids) ";
+		$sql .= "order by worker_node.title, node.nid desc limit 5000 ";
+		$stmt = db_query($sql, array(':job_nids' => $job_nids));
+		$roster = array();
+		while ($hr = $stmt->fetchAssoc()) {
+			$roster[$hr['job_nid']][] = $hr;
+		}
 	}
 
 	// Fetch the workers. SQL for speed
@@ -283,10 +287,12 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 
 	$form['td_2_body'] = array('#markup' => $html);
 
-  $form['submit'] = array(
-  	'#type' => 'submit',
-  	'#value' => t('Dispatch the selected workers to the selected job'),
-  );
+	if ($job_nids) {
+	  $form['submit'] = array(
+	  	'#type' => 'submit',
+	  	'#value' => t('Dispatch the selected workers to the selected job'),
+	  );
+	}
 
 	//
   // LEFT COLUMN
