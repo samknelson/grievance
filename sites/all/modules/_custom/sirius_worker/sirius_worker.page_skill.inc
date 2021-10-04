@@ -13,7 +13,7 @@ function sirius_node_tab_worker_skill_view($worker_node) {
 
  	if ($worker_node->field_sirius_skill['und']) {
 		$skill_terms = sirius_taxonomy_load('sirius_skill', 'tid', 'full');
-		$rows = array();
+		$rows_by_name = array();
 		$header = array(t('Skill'), t('Expires'));
 		$now_ts = time();
 		foreach ($worker_node->field_sirius_skill['und'] as $delta => $tmp) {
@@ -35,9 +35,10 @@ function sirius_node_tab_worker_skill_view($worker_node) {
 			$row = array();
 			$row[] = $skill_term->name;
 			$row[] = $expires;
-			$rows[] = array('data' => $row, 'class' => $classes);
+			$rows_by_name[$skill_term->name] = array('data' => $row, 'class' => $classes);
 		}
-		$html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => array('class' => array('sirius_data_table'))));
+		ksort($rows_by_name);
+		$html .= theme_table(array('rows' => array_values($rows_by_name), 'header' => $header, 'attributes' => array('class' => array('sirius_data_table'))));
 	} else {
 		$html .= t('@name does not currently have any skills registered.', array('@name' => $worker_node->title));
 	}
