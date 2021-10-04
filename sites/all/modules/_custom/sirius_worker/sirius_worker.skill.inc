@@ -122,9 +122,11 @@ function sirius_worker_skills_cron($force = FALSE) {
 		++$worker_count;
 		$worker_node = node_load($worker_nid);
 
+		/*
 		foreach ($tids as $tid) {
 			sirius_worker_skill_set($worker_node, array($tid), NULL, 'remove', 'Expiration date for the skill has passed.', array());
 		}
+		*/
 
 		$terms = taxonomy_term_load_multiple($tids);
 		$subject = "Dispatch system notification: skills expired";
@@ -152,7 +154,7 @@ function sirius_worker_skills_cron($force = FALSE) {
 		);
 	}
 
-	watchdog('sirius_worker_skills', "Scanned for expired skills; removed $skill_count skills from $worker_count workers. Sent $notification_count notifications of upcoming skill expiration.");
+	watchdog('sirius_worker_skills', "Scanned for expired skills; expired $skill_count skills from $worker_count workers. Sent $notification_count notifications of upcoming skill expiration.");
 }
 
 /**
@@ -175,7 +177,8 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 		$expires_display = 'Never';
 	} 
 
-	// Adding an expired skill does nothing. But we still log the attempt
+	// Adding an expired skll does nothing. But we still log the attempt
+	/*
 	if ($action == 'add' && (sirius_strtotime($expires) < time())) {
 		$msg = 'Skipping add for skills, because they expired on ' . $expires . ': ';
 		foreach ($tids as $tid) {
@@ -184,6 +187,7 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 		sirius_log('worker:skill', 'add_expired', $msg, $reason, '', array($worker_node->nid), $files);
 		return array('success' => TRUE, 'msg' => $msg);
 	}
+	*/
 
 	$orig = array();
 	if ($worker_node->field_sirius_skill['und']) {
