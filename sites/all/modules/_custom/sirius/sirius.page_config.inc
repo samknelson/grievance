@@ -28,6 +28,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/mailattach']								= array('title' => 'Mailattach', 'description' => 'Configure the attach-by-email system.');
 	$links['core']['links']['sirius/customfield/definition/list']								= array('title' => 'Custom Field Sets', 'description' => 'Define custom field sets which can be attached to events or other entity types.');
 	$links['core']['links']['sirius/dashboard/items_by_role']								= array('title' => 'Dashboard', 'description' => 'Configure dashboard items.');
+	$links['core']['links']['sirius/log/quicklog/config']								= array('title' => 'Quicklog', 'description' => 'Settings for the Quicklog tools.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['sirius/worker/config/user'] = array('title' => 'Worker / User Sync', 'description' => 'Configure how users are created from workers.');
