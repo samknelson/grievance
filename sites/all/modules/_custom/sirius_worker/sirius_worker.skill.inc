@@ -32,7 +32,7 @@ function sirius_worker_skills_cron($force = FALSE) {
 	if ($last_run == $today && !$force) { return; }
 
 	// Don't run before a specific time
-	$hour = variable_get('sirius_worker_skills_start_hr', 1);
+	$hour = variable_get('sirius_worker_skills_start_hr', 12);
 	$min = variable_get('sirius_worker_skills_start_min', 30);
 	if (time() < strtotime("$today $hour:$min") && !$force) { return; }
 
