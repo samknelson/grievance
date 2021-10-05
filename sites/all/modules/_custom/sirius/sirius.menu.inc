@@ -1006,6 +1006,25 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/log/quicklog/config'] = array(
+    'title' => 'Quicklog Settings',
+    'description' => '',
+    'page callback' => 'sirius_log_quicklog_config',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/modal/%node/quicklog'] = array(
+    'title'            => 'Add Log Entry',
+    'page callback'    => 'sirius_log_quicklog_page_add',
+    'page arguments'   => array(2),
+    'access arguments' => array('sirius dispatch staff'),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
   $items['sirius/phonenumber'] = array(
     'title' => 'Manage Phone Numbers',
     'page callback' => 'sirius_page_phonenumber_list',
@@ -1215,3 +1234,30 @@ function sirius_menu_admin() {
   return system_settings_form($form);
 }
 
+/**
+ * Implments hook_modal_paths
+ */
+
+function sirius_modal_paths() {
+  $paths = array();
+
+  $paths['sirius/modal/%node/quicklog'] = array(
+    'style' => 'sirius-modal-style',
+  );
+
+  return $paths;
+}
+
+function sirius_modal_styles() {
+  $styles = array();
+
+  $styles['sirius-modal-style'] = array(
+    'modalSize' => array(
+      'type' => 'fixed',
+      'width' => 600,
+      'height' => 500,
+    ),
+  );
+
+  return $styles;
+}
