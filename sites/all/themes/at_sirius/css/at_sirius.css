@@ -3566,6 +3566,7 @@ div.ctools-modal-content .resizable-textarea {
   margin-right: 0;
 }
 
+/*
 div.ctools-modal-content .form-checkboxes {
   float: left;
   clear: none;
@@ -3577,6 +3578,7 @@ div.ctools-modal-content .form-checkboxes {
   width: auto;
   padding-right: 10px;
 }
+*/
 
 .grievance-status-tools {
   float: right;
