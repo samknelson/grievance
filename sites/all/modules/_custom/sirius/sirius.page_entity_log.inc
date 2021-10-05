@@ -7,13 +7,14 @@ function sirius_node_tab_entity_log($node) {
 function sirius_node_tab_entity_log_form($form, &$form_state, $node) {
 	$form_state['node'] = $node;
 
-	$form['intro'] = array(
-		'#type' => 'markup',
-		'#markup' => '<div class="sirius_form_intro">' . 
-			t('Use the form below to add a new comment to the log for this entity.') . 
-			'</div>',
+  $category_type_options = sirius_log_quicklog_category_type_options($node->type);
 
-	);
+  $form['category_type'] = array(
+    '#type' => 'select',
+    '#options' => $category_type_options,
+    '#required' => TRUE,
+    '#title' => t('Type of Log Entry'),
+  );
 
 	$form['reason'] = array(
 		'#type' => 'textarea',
@@ -79,12 +80,8 @@ function sirius_node_tab_entity_log_form_submit($form, &$form_state) {
 	$node = $form_state['node'];
 
 	$comment = $form_state['values']['reason'];
-	$category = 'comment';
 
-	$category = $node->type;
-	$category = preg_replace('/sirius_/', '', $category);
-	$category .= ':manual';
-	$type = 'comment';
+  list ($category, $type) = explode('|', $form_state['values']['category_type']);
 	sirius_log($category, 'comment', $comment, $comment, NULL, array($node->nid), $files);
 	drupal_set_message(t('Comment added.'));
 }
