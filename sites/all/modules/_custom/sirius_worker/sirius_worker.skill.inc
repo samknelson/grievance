@@ -30,16 +30,17 @@ function sirius_worker_skills_cron($force = FALSE) {
 	$today = date('Y-m-d');
 	$last_run = variable_get('sirius_worker_skills_last_date', 0);
 	if ($last_run == $today && !$force) { return; }
-	variable_set('sirius_worker_skills_last_date', $today);
 
 	// Don't run before a specific time
 	$hour = variable_get('sirius_worker_skills_start_hr', 1);
 	$min = variable_get('sirius_worker_skills_start_min', 30);
 	if (time() < strtotime("$today $hour:$min") && !$force) { return; }
 
+	variable_set('sirius_worker_skills_last_date', $today);
+
 	// For skills that will be expiring soon, send workers notifications.
 	$warnings = array(
-		'first' => array(date('Y-m-d', strtotime('26 days')), date('Y-m-d', strtotime('+30 days'))),
+		'first' => array(date('Y-m-d', strtotime('+26 days')), date('Y-m-d', strtotime('+30 days'))),
 		'second' => array(date('Y-m-d', strtotime('+4 days')), date('Y-m-d', strtotime('+7 days'))),
 	);
 	foreach ($warnings as $which => $cutoffs) {
