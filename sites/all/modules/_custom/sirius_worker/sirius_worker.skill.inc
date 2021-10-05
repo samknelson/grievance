@@ -101,6 +101,7 @@ function sirius_worker_skills_cron($force = FALSE) {
 	}
 
 	// For skills that expired yesterday, remove them from the worker record.
+	/*
 	$cutoff = date('Y-m-d', strtotime('-1 day'));
 	$sql = "select * from field_data_field_sirius_skill, field_data_field_sirius_skill_expire  "; 
 	$sql .= "where field_data_field_sirius_skill.entity_type = 'node' and field_data_field_sirius_skill.bundle = 'sirius_worker' ";
@@ -123,11 +124,9 @@ function sirius_worker_skills_cron($force = FALSE) {
 		++$worker_count;
 		$worker_node = node_load($worker_nid);
 
-		/*
 		foreach ($tids as $tid) {
-			sirius_worker_skill_set($worker_node, array($tid), NULL, 'remove', 'Expiration date for the skill has passed.', array());
+			// sirius_worker_skill_set($worker_node, array($tid), NULL, 'remove', 'Expiration date for the skill has passed.', array());
 		}
-		*/
 
 		$terms = taxonomy_term_load_multiple($tids);
 		$subject = "Dispatch system notification: skills expired";
@@ -154,6 +153,7 @@ function sirius_worker_skills_cron($force = FALSE) {
 			)
 		);
 	}
+	*/
 
 	watchdog('sirius_worker_skills', "Scanned for expired skills; expired $skill_count skills from $worker_count workers. Sent $notification_count notifications of upcoming skill expiration.");
 }
