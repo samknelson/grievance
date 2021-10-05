@@ -144,7 +144,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 	$sql .= "field_sirius_json_value as json_value, ";
 	$sql .= "group_concat(distinct field_sirius_member_status_tid separator ',') as ms_tid, ";
 	// $sql .= "group_concat(substr(field_sirius_dispatch_eba_dates_value, 6, 5) order by field_sirius_dispatch_eba_dates_value separator '<br>') as eba_dates ";
-	$sql .= "(select group_concat(substr(field_sirius_dispatch_eba_dates_value, 6, 5) order by field_sirius_dispatch_eba_dates_value separator '<br>') from field_data_field_sirius_dispatch_eba_dates where entity_type = 'node' and entity_id = node.nid) as eba_dates ";
+	$sql .= "(select group_concat(field_sirius_dispatch_eba_dates_value order by field_sirius_dispatch_eba_dates_value separator '|') from field_data_field_sirius_dispatch_eba_dates where entity_type = 'node' and entity_id = node.nid) as eba_dates ";
 	$sql .= "from node ";
 	$sql .= "left join field_data_field_sirius_dispatch_availdate on field_data_field_sirius_dispatch_availdate.entity_type = 'node' and field_data_field_sirius_dispatch_availdate.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = node.nid ";
@@ -264,8 +264,8 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 			$rows = array();
 			foreach ($roster[$job_nid] as $hr) {
 				$tools = l(t('Dispatch'), "node/$hr[dispatch_nid]/sirius_dispatch_manage", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
-				$tools .= ' ';
 				$tools .= l(t('Worker'), "node/$hr[worker_nid]", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+
 				$row = array();
 				$row[] = $hr['worker_name'] . '<br />' . $hr['sirius_id'];
 				$row[] = $hr['dispatch_status'];
@@ -307,6 +307,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
   $rows = array();
   $all_levels = sirius_training_levels_fetch_all();
   $ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+  $today_date = date('Y-m-d 00:00:00', strtotime('yesterday'));
 
 	foreach ($workers as $worker_nid => $hr) {
 		$ms_name = '';
@@ -330,8 +331,8 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
   	$employer_name = $employers[$hr['employer_nid']];
   	if (!$employer_name) { $employer_name = 'AVAILABLE'; }
  		$tools = l(t('Worker'), "node/$worker_nid", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
- 		$tools .= ' ';
  		$tools .= l(t('Hours'), "node/$worker_nid/sirius_worker_hours", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
+		$tools .= l(t('Quick Log'), "sirius/modal/$worker_nid/quicklog", array('attributes' => array('target' => '_blank', 'class' => array('tool-button'))));
 
  		if ($hr['dispatches']) {
  			foreach ($hr['dispatches'] as $dispatch) {
@@ -342,7 +343,18 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 
  		$hours = sirius_dispatch_jwa_hours_render($prefs, $hr);
 
-		if ($hr['eba_name'] == 'Yes') { $eba = $hr['eba_dates']; } else { $eba = ''; }
+		if ($hr['eba_name'] == 'Yes') {	
+			$ebas = explode('|', $hr['eba_dates']);
+			$ebas_render = array();
+			foreach ($ebas as $delta => $eba) {
+				if ($eba >= $today_date) {
+					$ebas_render[] = date('D,\&\n\b\s\p\;M\&\n\b\s\p\;j', strtotime($eba));
+				}
+			}
+			$eba_render = join('<br />', $ebas_render);
+		} else {
+			$eba_render = '';
+		}
 
   	$dispatch_status_render = $hr['dispatch_status_name'];
   	$schedule = sirius_worker_schedule($worker_nid);
@@ -354,7 +366,7 @@ function sirius_dispatch_page_jwa_assign_form($form, &$form_state) {
 		$row[] = $hr['availdate'];
 		$row[] = $ms_name;
 		$row[] = $dispatch_status_render;
-		$row[] = $eba;
+		$row[] = $eba_render;
   	$row[] = $employer_name;
   	$row[] = $hours;
 		$row[] = $tools;
