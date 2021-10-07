@@ -63,6 +63,7 @@ function sirius_pdf_stream($url, $params) {
 }
 
 function sirius_pdf_generate($url, $params) {
+	watchdog('sirius_letters', "Called with $url, <pre>" . print_r($params, 1) . '</pre>');
 	$letterhead = $params['letterhead'];
 	if ($letterhead > 0) {
 		$letterhead_node = node_load($letterhead); 
@@ -96,17 +97,26 @@ function sirius_pdf_generate($url, $params) {
 	$output_pdf_path = drupal_realpath($output_pdf_uri);
 
 	// Post to that URL, fetching our HTML
+	watchdog('sirius_letters', "Curl: $url");
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
   curl_setopt($ch, CURLOPT_HEADER, 0);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
   if ($params['post']) {
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params['post']);
 	}
   $html = curl_exec($ch);
+  if ($html === FALSE) {
+  	$error = curl_error($ch);
+  	watchdog('sirius_letters', "Curl error: $error");
+  	drupal_set_message($errror, 'warning');
+  }
   curl_close($ch);
 	file_put_contents($input_html_path, $html);
+	watchdog('sirius_letters', "Fetched $url to $input_html_path ($input_html_path)");
 
 	// Convert the HTML to a PDF.
 	$cmd = sirius_server_paths('xvfb-run') . ' -a ';
@@ -120,6 +130,7 @@ function sirius_pdf_generate($url, $params) {
 	$cmd .= ' ';
 	$cmd .= $input_pdf_path;
 	exec($cmd);
+	watchdog('sirius_letters', "Executed $cmd");
 
 	// The PDF might live in S3, so we do a stupid file copy to a temporary directory
 	if ($letterhead_node) {
@@ -130,9 +141,12 @@ function sirius_pdf_generate($url, $params) {
 		// Combine the letterhead with the source
 		$cmd = sirius_server_paths('pdftk') . " $input_pdf_path multibackground $letterhead_pdf_path output $output_pdf_path";
 		exec($cmd);
+		watchdog('sirius_letters', "Executed $cmd");
 	} else {
 		rename($input_pdf_path, $output_pdf_path);
+		watchdog('sirius_letters', "Renamed $input_pdf_path to $output_pdf_path");;
 	}
 
+	watchdog('sirius_letters', "Output to $output_pdf_path");;
 	return file_get_contents($output_pdf_path);
 }
