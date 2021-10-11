@@ -365,7 +365,18 @@ function sirius_page_phonenumber_check_form_submit($form, &$form_state) {
 }
 
 function sirius_sms_segment_count($html_id) {
-  drupal_add_js(array('sirius_sms_segment_count' => array('html_id' => $html_id)), array('type' => 'setting'));
+  $settings = array();
+  $settings['html_id'] = $html_id;
+  if (sirius_domain_variable_get('sirius_twilio_sms_unsubscribe', TRUE)) {
+    $settings['suffix'] = sirius_domain_variable_get('sirius_twilio_sms_unsubscribe_msg', "\nReply STOP to unsubscribe.\n");
+  } else {
+    $settings['suffix'] = '';
+  }
+
+  drupal_add_js(
+    array('sirius_sms_segment_count' => $settings),
+    array('type' => 'setting')
+  );
   drupal_add_js('sites/all/modules/_custom/sirius/js/sms_segment_count.js');
   drupal_add_css('sites/all/modules/_custom/sirius/css/sms_segment_count.css');
 
