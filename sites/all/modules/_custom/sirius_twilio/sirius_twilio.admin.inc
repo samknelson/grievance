@@ -67,6 +67,18 @@ function sirius_twilio_config() {
     '#description' => t('Sometimes multiple SMS messages are sent within the same page load (i.e. "you have been laid off" and "you have been signed out". Select "Yes" to consolidate these into a single SMS messages.'),
   );
 
+  $name = sirius_domain_variable_name('sirius_twilio_sms_unsubscribe');
+  $form[$name] = array(
+    '#type' => 'select',
+    '#title' => t('Include unsubscribe instructions in all SMS messages?'),
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get($name, TRUE),
+    '#description' => t('If "Yes", then unsubscribe instructions will be appended to EVERY SMS message sent by the system.'),
+  );
+
   $form['sirius_twilio_lookup'] = array(
     '#type' => 'fieldset',
     '#title' => t('Lookups'),
