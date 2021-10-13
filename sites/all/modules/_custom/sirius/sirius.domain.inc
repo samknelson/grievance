@@ -96,8 +96,20 @@ function sirius_domain_component_info_all() {
       'title' => 'Mapping - Checkin',
       'description' => 'Enable users to "check in" with their current location, so that domain admins can follow their movements on maps.',
     ),
+    'bulk' => array(
+      'title' => 'Bulk',
+      'description' => 'Use the bulk message system',
+    ),
   );
 }
+
+function sirius_domain_component_enable($key, $domain_node) {
+  $json = sirius_json_get($domain_node);
+  $json['component'][$key]['enabled'] = 'Yes';
+  sirius_json_set($domain_node, $json);
+  node_save($domain_node);
+}
+
 
 function sirius_domain_component_enabled($key, $domain_nid_or_node = NULL) {
   if (!$domain_nid_or_node) {
