@@ -231,3 +231,17 @@ function sirius_update_7014() {
   }
 }
 
+/**
+ * Turn on the bulk component for all domains
+ */
+
+function sirius_update_7015() {
+  $sql = "select nid from node where type = 'sirius_domain'";
+  $stmt = sirius_sql_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    $domain_nid = $hr['nid'];
+    $domain_node = node_load($domain_nid);
+    print "Enabling bulk messages for " . $domain_node->title . " ($domain_nid)\n";
+    sirius_domain_component_enable('bulk', $domain_node);
+  }
+}
