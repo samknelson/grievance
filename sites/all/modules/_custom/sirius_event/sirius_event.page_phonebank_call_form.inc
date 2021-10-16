@@ -318,6 +318,26 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		// '#options' => array(NULL => t('-- Select --')) + sirius_event_participant_role_status_tids($prole_tid, array('phonebank' => array('during_call' => TRUE, 'current_pstatus' => $pstatus_tid)))
 	);
 
+	if (sirius_event_followup_enabled_survey($survey_node)) {
+		$path = "sirius/modal/event/followup/$event_nid";
+		if ($participant_nid) { $path .= "/$participant_nid"; } else { $path .= "/0"; }
+		$followup_html = '<br />';
+
+		$followup_html = '<div id="sirius_followup">';
+		$followup_html .= '<strong>Send a text Message</strong>';
+		if ($survey_json['followup']['instructions']) { $followup_html .= '<div class="sirius_followup_instructions">' . $survey_json['followup']['instructions'] . '</div>'; }
+
+		if (sirius_event_followup_enabled_sms_survey($survey_node)) {
+			$followup_html .= l('Send Text Message', $path . '/sms', array('attributes' => array('class' => array('tool-button'))));
+		}
+		if (sirius_event_followup_enabled_email_survey($survey_node)) {
+			$followup_html .= l('Send Email', $path . '/email', array('attributes' => array('class' => array('tool-button'))));
+		}
+		$followup_html .= '<div id="sirius_followup_messages"></div>';
+		$followup_html .= '</div>';
+		$form['followup'] = array('#markup' => $followup_html);
+	}
+
 	$form['set_all_pstatus_submit'] = array(
 		'#id' => 'set_all_pstatus_submit',
 		'#type' => 'button',
