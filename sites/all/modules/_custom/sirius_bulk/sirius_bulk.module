@@ -10,6 +10,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.v
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.deliver.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.oneclick.inc";
 
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_landing.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_create.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_medium.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_body.inc";
