@@ -17865,6 +17865,7 @@ Grievance Form',
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Bulk Message Admin';
+  $handler->display->display_options['use_ajax'] = TRUE;
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'sirius bulk send';
@@ -17872,7 +17873,10 @@ Grievance Form',
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '100';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
   $handler->display->display_options['style_plugin'] = 'table';
   /* Header: Global: Text area */
   $handler->display->display_options['header']['area']['id'] = 'area';
@@ -18029,9 +18033,8 @@ Grievance Form',
   $handler->display->display_options['filters']['field_sirius_datetime_value']['form_type'] = 'date_popup';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['year_range'] = '-10:+1';
 
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'sirius/bulk';
+  /* Display: Block */
+  $handler = $view->new_display('block', 'Block', 'block_1');
   $translatables['sirius_bulk_admin'] = array(
     t('Master'),
     t('Bulk Message Admin'),
@@ -18062,7 +18065,7 @@ Grievance Form',
 <a href="/node/[nid]/sirius_bulk_queue" target="_blank" class="tool-button">Results</a>
 '),
     t('All'),
-    t('Page'),
+    t('Block'),
   );
   $export['sirius_bulk_admin'] = $view;
 
@@ -19941,6 +19944,16 @@ Grievance Form',
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Contextual filter: Field: Domain (field_sirius_domain) */
+  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['id'] = 'field_sirius_domain_target_id';
+  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['table'] = 'field_data_field_sirius_domain';
+  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['field'] = 'field_sirius_domain_target_id';
+  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['default_argument_options']['argument'] = 'CURRENT_DOMAIN';
+  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['summary_options']['items_per_page'] = '25';
   /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -20007,6 +20020,7 @@ Grievance Form',
     t('Industry'),
     t('Tools'),
     t('<a href="/node/[nid]/edit?destination=[current_path]" class="tool-button">Edit</a>'),
+    t('All'),
     t('Page'),
   );
   $export['sirius_dispatch_job_groups'] = $view;
@@ -24780,7 +24794,7 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/edit?destination=[current_path]" class="tool-button">Edit</a> <a href="/node/[nid]/contacts" class="tool-button">Contacts</a> <a href="/node/[nid]/employer_users" class="tool-button">Users</a> <a href="/node/[nid]/sirius_employer_ledger/transmittal" class="tool-button">Transmittals</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/edit?destination=[current_path]" class="tool-button">Edit</a> <a href="/node/[nid]/contacts" class="tool-button">Contacts</a> <a href="/node/[nid]/employer_users" class="tool-button">Users</a> <a href="/node/[nid]/sirius_employer_ledger/transmittal" class="tool-button">Transmittals</a> <a href="/node/[nid]/employer_labproj" class="tool-button">Projections</a>';
   /* Sort criterion: Content: Title */
   $handler->display->display_options['sorts']['title']['id'] = 'title';
   $handler->display->display_options['sorts']['title']['table'] = 'node';
@@ -25095,7 +25109,7 @@ Grievance Form',
     t('Contract Template'),
     t('External ID'),
     t('Tools'),
-    t('<a href="/node/[nid]/edit?destination=[current_path]" class="tool-button">Edit</a> <a href="/node/[nid]/contacts" class="tool-button">Contacts</a> <a href="/node/[nid]/employer_users" class="tool-button">Users</a> <a href="/node/[nid]/sirius_employer_ledger/transmittal" class="tool-button">Transmittals</a>'),
+    t('<a href="/node/[nid]/edit?destination=[current_path]" class="tool-button">Edit</a> <a href="/node/[nid]/contacts" class="tool-button">Contacts</a> <a href="/node/[nid]/employer_users" class="tool-button">Users</a> <a href="/node/[nid]/sirius_employer_ledger/transmittal" class="tool-button">Transmittals</a> <a href="/node/[nid]/employer_labproj" class="tool-button">Projections</a>'),
     t('All'),
     t('Tags'),
     t('Active?'),
@@ -28621,6 +28635,21 @@ Grievance Form',
   $handler->display->display_options['filters']['field_sirius_dollar_amt_value']['expose']['label'] = 'Amount (field_sirius_dollar_amt)';
   $handler->display->display_options['filters']['field_sirius_dollar_amt_value']['expose']['operator'] = 'field_sirius_dollar_amt_value_op';
   $handler->display->display_options['filters']['field_sirius_dollar_amt_value']['expose']['identifier'] = 'field_sirius_dollar_amt_value';
+  /* Filter criterion: Content: Payment Type (field_sirius_payment_type) */
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['id'] = 'field_sirius_payment_type_tid';
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['table'] = 'field_data_field_sirius_payment_type';
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['field'] = 'field_sirius_payment_type_tid';
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['expose']['operator_id'] = 'field_sirius_payment_type_tid_op';
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['expose']['label'] = 'Payment Type';
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['expose']['operator'] = 'field_sirius_payment_type_tid_op';
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['expose']['identifier'] = 'field_sirius_payment_type_tid';
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['expose']['multiple'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_sirius_payment_type_tid']['vocabulary'] = 'sirius_payment_type';
 
   /* Display: All Payments */
   $handler = $view->new_display('page', 'All Payments', 'page');
@@ -28856,6 +28885,7 @@ Grievance Form',
     t('Payment TO'),
     t('account or fund'),
     t('Amount (field_sirius_dollar_amt)'),
+    t('Payment Type'),
     t('All Payments'),
     t('Payments by Account'),
     t('Payments by Payer'),
@@ -32947,6 +32977,21 @@ Dispatch Info',
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
+    'action::views_bulk_operations_modify_action' => array(
+      'selected' => 1,
+      'postpone_processing' => 0,
+      'skip_confirmation' => 0,
+      'skip_permission_check' => 0,
+      'override_label' => 0,
+      'label' => '',
+      'settings' => array(
+        'show_all_tokens' => 1,
+        'display_values' => array(
+          'sirius_worker::field_grievance_shop' => 'sirius_worker::field_grievance_shop',
+          'sirius_worker::field_sirius_worker_dispstatus' => 'sirius_worker::field_sirius_worker_dispstatus',
+        ),
+      ),
+    ),
     'action::sirius_bulk_queue' => array(
       'selected' => 1,
       'postpone_processing' => 0,

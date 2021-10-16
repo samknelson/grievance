@@ -17056,6 +17056,7 @@ function grievance_content_types_field_default_field_instances() {
   // Exported field_instance: 'node-sirius_dispatch_job-field_sirius_datetime'.
   $field_instances['node-sirius_dispatch_job-field_sirius_datetime'] = array(
     'bundle' => 'sirius_dispatch_job',
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -17116,6 +17117,44 @@ function grievance_content_types_field_default_field_instances() {
     'label' => 'Report Date',
     'required' => 0,
     'settings' => array(
+      'date_popup_timepicker' => array(
+        'timepicker' => array(
+          'timepicker_options' => array(
+            'amPmText' => array(
+              0 => 'AM',
+              1 => 'PM',
+            ),
+            'closeButtonText' => 'Done',
+            'defaultTime' => 'now',
+            'deselectButtonText' => 'Deselect',
+            'hourText' => 'Hour',
+            'hours' => array(
+              'ends' => 23,
+              'starts' => 0,
+            ),
+            'minuteText' => 'Minute',
+            'minutes' => array(
+              'ends' => 55,
+              'interval' => 5,
+              'starts' => 0,
+            ),
+            'nowButtonText' => 'Now',
+            'periodSeparator' => ' ',
+            'rows' => 4,
+            'showCloseButton' => FALSE,
+            'showDeselectButton' => FALSE,
+            'showHours' => TRUE,
+            'showLeadingZero' => TRUE,
+            'showMinutes' => TRUE,
+            'showMinutesLeadingZero' => TRUE,
+            'showNowButton' => FALSE,
+            'showOn' => 'focus',
+            'showPeriod' => FALSE,
+            'showPeriodLabels' => TRUE,
+            'timeSeparator' => ':',
+          ),
+        ),
+      ),
       'default_value' => 'now',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -17127,17 +17166,15 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'date',
       'settings' => array(
         'date_single_day' => array(),
-        'display_all_day' => 0,
         'increment' => 15,
-        'input_format' => 'm/d/Y - g:i:sa',
+        'input_format' => 'site-wide',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
-        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
-      'type' => 'date_popup',
+      'type' => 'date_text',
       'weight' => 8,
     ),
   );
