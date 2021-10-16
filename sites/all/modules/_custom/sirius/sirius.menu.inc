@@ -144,6 +144,21 @@ function sirius_node_tabs() {
     );
   }
 
+  /*
+  $buckets = sirius_log_buckets();
+  foreach ($buckets as $bucket_id => $bucket) {
+    $node_tabs[$bucket['content_type']][$bucket['path']] = array(
+      'title' => $bucket['title'],
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_log',
+      'permissions' => $bucket['permissions'],
+      'weight' => $bucket['weight'],
+      'callback arguments' => array($bucket_id),
+      'file' => 'sirius.page_entity_log.inc',
+    );
+  }
+  */
+
   foreach (sirius_letter_content_types_all() as $content_type => $content_type_name) {
     $node_tabs[$content_type][$content_type . '_letter'] = array(
       'title' => 'Letters',
@@ -482,27 +497,40 @@ function sirius_menu() {
   $items['sirius/config/email'] = array(
     'title' => 'Email Configuration',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_email_admin'),
-    'access arguments' => array('sirius admin'),
+    'page arguments' => array('sirius_email_settings_form'),
+    'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius.page_email_settings.inc',
   );
 
   $items['sirius/config/email/config'] = array(
     'title' => 'Settings',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_email_admin'),
-    'access arguments' => array('sirius admin'),
+    'page arguments' => array('sirius_email_settings_form'),
+    'access arguments' => array('sirius domain admin'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
+    'file' => 'sirius.page_email_settings.inc',
   );
 
   $items['sirius/config/email/test'] = array(
     'title' => 'Test',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_email_test_form'),
-    'access arguments' => array('sirius admin'),
+    'access arguments' => array('sirius domain admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
+    'file' => 'sirius.page_email_test.inc',
+  );
+
+  $items['sirius/config/email/global'] = array(
+    'title' => 'Global Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_email_settings_global_form'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+    'file' => 'sirius.page_email_settings_global.inc',
   );
 
   $items['sirius/config/phone'] = array(
