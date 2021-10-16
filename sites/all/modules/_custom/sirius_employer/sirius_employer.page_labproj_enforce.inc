@@ -34,6 +34,13 @@ function sirius_employer_page_labproj_enforce_form($form, &$form_state) {
 		'#required' => TRUE,
 	);
 
+	$industries = sirius_taxonomy_load('sirius_industry', 'tid', 'name');
+	$form['industry_tid'] = array(
+		'#title' => t('Industry'),
+		'#type' => 'select',
+		'#options' => array(NULL => t('ALL INDUSTRIES')) + $industries,
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -50,7 +57,9 @@ function sirius_employer_page_labproj_enforce_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 	$month = $form_state['values']['month'];
 	$year = $form_state['values']['year'];
-	$employers = sirius_employer_list();
+	$industry_tid = $form_state['values']['industry_tid'];
+	
+	$employers = sirius_employer_list(TRUE, $industry_tid);
 	$status_options = sirius_employer_labproj_status_options();
 
 	$delinquent = sirius_employer_labproj_delinquent($year, $month);

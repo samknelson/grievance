@@ -150,15 +150,15 @@ function sirius_employer_page_labproj_all_form_submit($form, &$form_state) {
 
 			$data_by_employermonth["$year-$month"][$employer_nid] = $labproj_json['totals'];
 
-			foreach ($labproj_json['days'] as $day => $day_record) {
-				if ($day_record['groups']) {
-					if ($day_record['total']) { $data_by_day["$year-$month"][$day]['total'] += $day_record['total']; }
-					foreach ($day_record['groups'] as $group_nid => $value) {
-						if ($value) { $data_by_day["$year-$month"][$day]['groups'][$group_nid] += $value; }
+			if ($labproj_json['days']) {
+				foreach ($labproj_json['days'] as $day => $day_record) {
+					if ($day_record['groups']) {
+						if ($day_record['total']) { $data_by_day["$year-$month"][$day]['total'] += $day_record['total']; }
+						foreach ($day_record['groups'] as $group_nid => $value) {
+							if ($value) { $data_by_day["$year-$month"][$day]['groups'][$group_nid] += $value; }
+						}
 					}
 				}
-
-				// $data["$year/$month"][$day][$]
 			}
 		}
 
