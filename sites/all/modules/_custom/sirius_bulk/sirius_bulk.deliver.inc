@@ -59,12 +59,17 @@ function sirius_bulk_deliver_batch($bulk_node, $force = FALSE) {
 	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
 
 	// Don't run too often
-	$last_ts = variable_get("sirius_bulk_last_ts_$medium", 0);
-	$delay = variable_get("sirius_bulk_delay_$medium", 300);
-	if (!$force && time() < $last_ts + $delay) {
-		return array('success' => FALSE, 'msg' => 'Too soon to run the next batch.');
+	static $not_too_soon;
+
+	if (!$not_too_soon[$medium]) {
+		$last_ts = variable_get("sirius_bulk_last_ts_$medium", 0);
+		$delay = variable_get("sirius_bulk_delay_$medium", 300);
+		if (!$force && time() < $last_ts + $delay) {
+			return array('success' => FALSE, 'msg' => "Too soon to run the next batch (medium=$medium); last run at " . date('Y-m-d H:i:s e', $last_ts));
+		}
+		variable_set("sirius_bulk_last_ts_$medium", time());
+		$not_too_soon[$medium] = TRUE;
 	}
-	variable_set("sirius_bulk_last_ts_$medium", time());
 
 	// Don't send messages at night
 	if (!$force) {
