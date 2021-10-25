@@ -25,6 +25,11 @@ function sirius_worker_skills($worker_node) {
   return taxonomy_term_load_multiple(array_keys($skill_tids));
 }
 
+/**
+ * WARNING: NOT DOMAIN ENABLED
+ * @todo: This function is NOT domain-specific. It runs globally without paying attention to domains.
+ */
+
 function sirius_worker_skills_cron($force = FALSE) {
 	// Run once a day
 	$today = date('Y-m-d');
@@ -65,21 +70,21 @@ function sirius_worker_skills_cron($force = FALSE) {
 
 			foreach ($dates as $date => $tids) {
 				$terms = taxonomy_term_load_multiple($tids);
-				$subject = "Dispatch system notification: skills expiring on $date";
+				$subject = "Skill expiration notification: skills expiring on $date";
 				$body = "The following skills will be expiring on $date:<ul>";
 				foreach ($terms as $tid => $term) {
 					$body .= '<li>' . $term->name . '</li>';
 				}
 				$body .= '</ul>';
-				$body .= 'Please contact the dispatch office to find out how to renew your certifications.';
+				$body .= variable_get('sirius_worker_skill_expiration_reminders_suffix', 'Please contact the dispatch office to find out how to renew your certifications.');
 
-				$sms = "Dispatch system notification: skills expiring on $date";
+				$sms = "Skill expiration notification: skills expiring on $date";
 				$sms = "The following skills will be expiring on $date:\n";
 				foreach ($terms as $tid => $term) {
 					$sms .= $term->name . "\n";
 				}
 				$sms .= "\n";
-				$sms .= 'Please contact the dispatch office to find out how to renew your certifications.';
+				$sms .= variable_get('sirius_worker_skill_expiration_reminders_suffix', 'Please contact the dispatch office to find out how to renew your certifications.');
 
 				$unique_id = "UNIQUE/sirius-skill-expire-warning-$which/$worker_nid/$date";
 
