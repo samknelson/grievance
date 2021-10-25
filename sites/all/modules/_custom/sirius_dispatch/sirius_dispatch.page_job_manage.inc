@@ -280,10 +280,6 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 		'#value' => 'Submit',
 	);
 
-	if (user_access('sirius dispatch staff')) {
-		$form += sirius_log_render_form($job_node->nid);
-	}
-
 	return $form;
 }
 
