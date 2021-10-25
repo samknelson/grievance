@@ -123,6 +123,7 @@ function sirius_node_tabs() {
   // Entity Log
   //
 
+  /*
   $content_types = array(
     'sirius_dispatch' => 'sirius dispatch staff',
     'sirius_dispatch_job' => 'sirius dispatch staff',
@@ -143,8 +144,8 @@ function sirius_node_tabs() {
       'weight' => 20,
     );
   }
+  */
 
-  /*
   $buckets = sirius_log_buckets();
   foreach ($buckets as $bucket_id => $bucket) {
     $node_tabs[$bucket['content_type']][$bucket['path']] = array(
@@ -157,7 +158,6 @@ function sirius_node_tabs() {
       'file' => 'sirius.page_entity_log.inc',
     );
   }
-  */
 
   foreach (sirius_letter_content_types_all() as $content_type => $content_type_name) {
     $node_tabs[$content_type][$content_type . '_letter'] = array(
