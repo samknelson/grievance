@@ -12,7 +12,7 @@ function sirius_node_tab_entity_customfield_access($entity_node) {
   }
 
   if ($entity_node->type == 'sirius_ledger_account') {
-   if (user_access('sirius ledgerr admin')) { return TRUE; }
+   if (user_access('sirius ledger admin')) { return TRUE; }
   }
 
 	return FALSE;
