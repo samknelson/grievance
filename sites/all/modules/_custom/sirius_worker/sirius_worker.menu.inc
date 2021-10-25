@@ -16,6 +16,13 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_work_status/ws'] = array(
+    'title' => 'Work Status',
+    'callback' => 'sirius_node_tab_worker_work_status',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
 
   $node_tabs['sirius_worker']['sirius_worker_schedule'] = array(
     'title' => 'Schedule',
@@ -94,14 +101,6 @@ function sirius_worker_node_tabs() {
     'weight' => 5,
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_skill/log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_node_tab_worker_skill_log',
-    'permissions' => array('sirius dispatch staff'),
-    'weight' => 7,
-  );
-
   $node_tabs['sirius_worker']['sirius_worker_contact'] = array(
     'title' => 'Contact',
     'description' => '',
@@ -140,6 +139,15 @@ function sirius_worker_node_tabs() {
     'callback' => 'sirius_node_tab_worker_merge',
     'permissions' => array('sirius worker admin'),
     'weight' => 4
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_industry/ms'] = array(
+    'title' => 'Industries',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_industry',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   $node_tabs['sirius_worker']['sirius_worker_industry'] = array(
