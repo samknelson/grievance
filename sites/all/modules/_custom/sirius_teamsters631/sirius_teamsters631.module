@@ -7,6 +7,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/siriu
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.ebnotify.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.permission.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.badge.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.log.inc';
 
 function sirius_teamsters631_oneoff_russallen() {
 	$content_types = array(
@@ -357,3 +358,5 @@ function sirius_teamsters631_oneoff_skill_log_link($reset = NULL, $limit = 100) 
 	ksort($unfound);
 	print_r($unfound);
 }
+
+
