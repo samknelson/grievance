@@ -714,26 +714,32 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 	$form_state['feed_node'] = $feed_node;
 	$form_state['current_step'] = $current_step;
 
-	$form['verify_limit'] = array(
-		'#type' => 'textfield',
-		'#size' => 5,
-		'#title' => t('Records to Verify'),
-		'#description' => t('For very large imports, it may take too long to verify all records. Select the maximum number of records which should be verified.'),
-		'#required' => TRUE,
-		'#default_value' => 1000,
-	);
+	if (!$info['steps'][$current_step]['hide_limit']) {
+		$form['verify_limit'] = array(
+			'#type' => 'textfield',
+			'#size' => 5,
+			'#title' => t('Records to Verify'),
+			'#description' => t('For very large imports, it may take too long to verify all records. Select the maximum number of records which should be verified.'),
+			'#required' => TRUE,
+			'#default_value' => 1000,
+		);
+	} else {
+		$form['verify_limit'] = array('#type' => 'value', '#value' => 1000);
+	}
 
-	$form['precompute'] = array(
-		'#type' => 'select',
-		'#title' => t('Precompute?'),
-		'#options' => array(
-			'No' => t('No'),
-			'Yes' => t('Yes'),
-		),
-		'#description' => t('"Precompute" performs a more in-depth verification. For example, it will ensure that referenced taxonomy terms exist or that IDs are unique. However, it is computationally expensive, so for large imports it may be better to omit this option.'),
-		'#required' => TRUE,
-		'#default_value' => 'No',
-	);
+	if (!$info['steps'][$current_step]['hide_precompute']) {
+		$form['precompute'] = array(
+			'#type' => 'select',
+			'#title' => t('Precompute?'),
+			'#options' => array(
+				'No' => t('No'),
+				'Yes' => t('Yes'),
+			),
+			'#description' => t('"Precompute" performs a more in-depth verification. For example, it will ensure that referenced taxonomy terms exist or that IDs are unique. However, it is computationally expensive, so for large imports it may be better to omit this option.'),
+			'#required' => TRUE,
+			'#default_value' => 'No',
+		);
+	}
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -829,16 +835,20 @@ function sirius_feed_wizard_process_form($form, &$form_state, $info, $data, $fee
 	$form_state['feed_node'] = $feed_node;
 	$form_state['current_step'] = $current_step;
 
-	$form['limit'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Limit'),
-		'#size' => 5,
-		'#description' => t('Enter a number to process a limited number of batches, i.e. for testing. Leave blank to process the entire file.'),
-	);
+	if (!$info['steps'][$current_step]['hide_limit']) {
+		$form['limit'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Limit'),
+			'#size' => 5,
+			'#description' => t('Enter a number to process a limited number of batches, i.e. for testing. Leave blank to process the entire file.'),
+		);
+	}
 
+	$submit_txt = $info['steps'][$current_step]['submit_txt'];
+	if (!$submit_txt) { $submit_txt = 'Import Now'; }
 	$form['submit'] = array(
 		'#type' => 'submit',
-		'#value' => 'Import Now',
+		'#value' => $submit_txt,
 	);
 
 	if ($data['verify_html']) {
@@ -896,7 +906,18 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 		$cols = array_keys($fields);
 		$cols[] = 'Message';
 		$cols[] = 'Result';
+		if ($info['feed']['results_fields']) {
+			foreach ($info['feed']['results_fields'] as $field => $label) {
+				$cols[] = $label;
+			}
+		}
 		fputcsv($results_fp, $cols);
+
+		if ($info['feed']['results_details']['active']) {
+			$context['results']['details']['header'] = $cols;
+			$context['results']['details']['success'] = array();
+			$context['results']['details']['error'] = array();
+		}
 	} else {
 		$results_fp = fopen(drupal_realpath($context['results']['results_path']), 'a');
 	}
@@ -919,9 +940,35 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 		foreach (array_keys($fields) as $field_name) {
 			$results_row[] = $import_data_row[$field_name];
 		}
-		if ($result['success']) { $results_row[] = 'Success'; } else { $results_row[] = 'Error'; }
+
+		if ($result['success']) { 
+			$results_row[] = 'Success';
+		} else {
+			$results_row[] = 'Error';
+		}
+
 		$results_row[] = $result['msg'];
+
+		if ($info['feed']['results_fields']) {
+			foreach ($info['feed']['results_fields'] as $field => $label) {
+				$results_row[] = $result[$field];
+			}
+		}
+
 		fputcsv($results_fp, $results_row);
+
+		if ($info['feed']['results_details']['active']) {
+			$error_limit = $info['feed']['results_details']['error_limit'];
+			if (!$error_limit) { $error_limit = 1000; }
+			$success_limit = $info['feed']['results_details']['success_limit'];
+			if (!$success_limit) { $success_limit = 1000; }
+
+			if ($result['success'] && count($context['results']['details']['success']) < $success_limit) { 
+				$context['results']['details']['success'][] = $results_row;
+			} else if (count($context['results']['details']['error']) < $error_limit) {
+				$context['results']['details']['error'][] = $results_row;
+			}
+		}
 	}
 	$context['results']['counts'] = $counts;
 
@@ -946,6 +993,8 @@ function sirius_feed_wizard_process_finish($feed_node, $info, $data, $idx, &$con
   $ts = time();
   $elapsed = $ts - $data['process_ts'];
 
+  $data['feed']['results_details'] = $context['results']['details'];
+
 	sirius_wizard_submit($info, $data, $feed_node, 'process', "Import complete. Elapsed time: " .  format_interval($elapsed));
 }
 
@@ -956,6 +1005,8 @@ function sirius_feed_wizard_process_finish($feed_node, $info, $data, $idx, &$con
 function sirius_feed_wizard_review($info, $data, $feed_node, $current_step) { return drupal_get_form('sirius_feed_wizard_review_form', $info, $data, $feed_node, $current_step); }
 
 function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
+	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/table.js', 'file');
+
 	$form_state['info'] = $info;
 	$form_state['data'] = $data;
 	$form_state['feed_node'] = $feed_node;
@@ -963,12 +1014,41 @@ function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed
 
 	$summary_rows = array();
 	foreach ($data['feed']['counts'] as $key => $value) { $summary_rows[] = array($key, $value); }
+	$html = '<h2>' . t('Results Summary') . '</h2>';
 	$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => array()));
 	$form['review'] = array('#markup' => $html);
 
+	if ($info['feed']['results_details']['active']) {
+		$error_limit = $info['feed']['results_details']['error_limit'];
+		if (!$error_limit) { $error_limit = 1000; }
+		$success_limit = $info['feed']['results_details']['success_limit'];
+		if (!$success_limit) { $success_limit = 1000; }
+
+		$attributes = array('class' => array('sirius_table_align'));
+		if ($data['feed']['results_details']['error']) {
+			$html = '<h2>' . t('Error Rows') . '</h2>';
+			$html .= theme_table(array('header' => $data['feed']['results_details']['header'], 'rows' => $data['feed']['results_details']['error'], 'attributes' => $attributes));
+			if (count($data['feed']['results_details']['error']) >= $error_limit - 1) {
+				$html .= '<p><em>' . t('Only the first @limit rows are shown. Donwload the results file to see all rows.', array('@limit' => $error_limit)) . '</em></p>';
+			}
+			$form['error'] = array('#markup' => $html);
+		}
+
+		if ($data['feed']['results_details']['success']) {
+			$html = '<h2>' . t('Success Rows') . '</h2>';
+			$html .= theme_table(array('header' => $data['feed']['results_details']['header'], 'rows' => $data['feed']['results_details']['success'], 'attributes' => $attributes));
+			if (count($data['feed']['results_details']['success']) >= $success_limit - 1) {
+				$html .= '<p><em>' . t('Only the first @limit rows are shown. Donwload the results file to see all rows.', array('@limit' => $success_limit)) . '</em></p>';
+			}
+			$form['success'] = array('#markup' => $html);
+		}
+	}
+
+	$html = '<h2>Download Results</h2>';
+	$html .= '<p>' . t('The first file below contains the original upload data. The second contains the full set of results.') . '</p>';
 	$renderable = field_view_field('node', $feed_node, 'field_sirius_attachments', 'full');
-	$form['attachments_intro'] = array('#markup' => '<div>' . t('The first file below contains the original upload data. The second contains the full set of results.') . '</div>');
-	$form['attachments'] = array('#markup' => drupal_render($renderable));
+	$html .= drupal_render($renderable);
+	$form['attachments'] = array('#markup' => $html);
 
 	return $form;
 }
