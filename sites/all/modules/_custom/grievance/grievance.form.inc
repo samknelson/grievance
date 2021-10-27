@@ -413,13 +413,15 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
       unset($form_state['input'][$field_name]['und']);
       $delta = 0;
       if ($values) {
+        $dedupe = array();
         foreach ($values as $value) {
-          if ($value) {
-            $form[$field_name]['und'][$delta]['target_id']['#default_value'] = "$value->name ($value->uid)";
-            $form_state['input'][$field_name]['und'][$delta]['target_id'] = "$value->name ($value->uid)";
-            $form_state['input'][$field_name]['und'][$delta]['_weight'] = NULL;
-            ++$delta;
-          }
+          if (!$value) { continue; }
+          if ($dedupe[$value->uid]) { continue; }
+          $dedupe[$value->uid] = TRUE; 
+          $form[$field_name]['und'][$delta]['target_id']['#default_value'] = "$value->name ($value->uid)";
+          $form_state['input'][$field_name]['und'][$delta]['target_id'] = "$value->name ($value->uid)";
+          $form_state['input'][$field_name]['und'][$delta]['_weight'] = NULL;
+          ++$delta;
         }
       }
       // $form_state['field'][$field_name]['und']['items_count'] = $delta+1;
