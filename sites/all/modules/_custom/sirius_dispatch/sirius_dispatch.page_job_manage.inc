@@ -30,6 +30,8 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
   // drupal_add_library('system', 'ui.tabs');
   // drupal_add_js(array('sirius_dispatch' => array('job_nid' => $job_node->nid)), array('type' => 'setting'));
 
+	$form['#tree'] = TRUE;
+
   $html .= '<div class="sirius_dispatch_job_intro">';
   $count = $job_node->field_sirius_count['und'][0]['value'];
   if (!$count) { $count = 0; }
@@ -46,6 +48,7 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
   $html .= '</div>';
 	$renderable = node_view($job_node, 'full');
 	$html .= drupal_render($renderable);
+
 	$form['intro'] = array('#markup' => $html);
 
 	$status = $job_node->field_sirius_dispatch_job_status['und'][0]['value'];
