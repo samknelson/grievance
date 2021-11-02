@@ -379,7 +379,7 @@ function sirius_menu() {
   );
 
   $items['sirius/news/admin'] = array(
-    'title' => 'News',
+    'title' => 'News: Admin',
     'description' => '',
     'page callback' => 'sirius_page_news_admin',
     'page arguments' => array(),
