@@ -77,13 +77,6 @@ function sirius_training_node_tabs() {
     'weight' => 6,
   );
 
-$node_tabs['sirius_worker']['sirius_worker_tc/log'] = array(
-    'title' => 'Log',
-    'description' => '',
-    'callback' => 'sirius_training_node_tab_worker_log',
-    'permissions' => array('sirius training admin'),
-    'weight' => 10,
-  );
 
   $node_tabs['sirius_log']['sirius_log_tc/evaluation_edit'] = array(
     'title' => 'Evaluation',
