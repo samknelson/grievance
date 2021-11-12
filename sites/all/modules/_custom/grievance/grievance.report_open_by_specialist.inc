@@ -7,6 +7,8 @@ function grievance_report_open_by_specialist() {
 function grievance_report_open_by_specialist_form($form, &$form_state) {
 	$broughtby_options = sirius_taxonomy_load('grievance_broughtby', 'tid', 'name', TRUE);
 
+	$form['prefix'] = array('#markup' => '<div class="form-start">');
+
 	if (count($broughtby_options) > 1) {
 	  $form['broughtby_tid'] = array(
 	    '#type' => 'select',
@@ -22,7 +24,12 @@ function grievance_report_open_by_specialist_form($form, &$form_state) {
     '#era_bundles' => array(),
     '#era_query_settings' => array(),
     '#description' => t('Leave blank to select all organizers.'),
-    '#prefix' => '<div class="form-start">',
+  );
+
+  $form['company'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Company'),
+    '#description' => t('Enter all or part of the copmany name.  Leave blank to select all companies.'),
   );
 
   $form['shop'] = array(
@@ -62,7 +69,8 @@ function grievance_report_open_by_specialist_form($form, &$form_state) {
 function grievance_report_open_by_specialist_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 
-	$shop = $form_state['values']['shop'];
+	$company = trim($form_state['values']['company']);
+	$shop = trim($form_state['values']['shop']);
 	$shop_match = $form_state['values']['shop_match'];
 	$organizer = $form_state['values']['organizer']['entity_id'];
 
@@ -80,16 +88,39 @@ function grievance_report_open_by_specialist_form_submit($form, &$form_state) {
 		}
 	}
 
+	// Find the copmanies
+	$companies = array();
+	if ($company) {
+		$query = new EntityFieldQuery();
+		$query->entityCondition('entity_type', 'node');
+		$query->entityCondition('bundle', 'grievance_company');
+		$query->propertyCondition('title', $company, 'CONTAINS');
+		$query->propertyOrderBy('title');
+		$stmt = $query->execute();
+		if ($stmt['node']) {
+			$companies = array_keys($stmt['node']);
+		}
+		if (!$companies) {
+			drupal_set_message("No matching companies.");
+			return;
+		}
+	}
+
 	// Find the shops
 	$shops = array();
-	if ($shop || $shop_match) {
+	if ($company || $shop || $shop_match) {
 		$query = new EntityFieldQuery();
 		$query->entityCondition('entity_type', 'node');
 		$query->entityCondition('bundle', 'grievance_shop');
-		if ($shop_match == 'Yes') {
-			$query->propertyCondition('title', $shop);
-		} else {
-			$query->propertyCondition('title', $shop, 'CONTAINS');
+		if ($companies) {
+			$query->fieldCondition('field_grievance_company', 'target_id', $companies, 'in');
+		}
+		if ($shop) {
+			if ($shop_match == 'Yes') {
+				$query->propertyCondition('title', $shop);
+			} else {
+				$query->propertyCondition('title', $shop, 'CONTAINS');
+			}
 		}
 		$query->propertyOrderBy('title');
 		$stmt = $query->execute();
