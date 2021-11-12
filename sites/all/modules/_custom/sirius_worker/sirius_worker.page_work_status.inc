@@ -49,8 +49,6 @@ function sirius_node_tab_worker_work_status_form($form, &$form_state, $worker_no
 		);
 	}
 
-	$form += sirius_log_render_form($worker_node->nid, 'worker:work_status');
-
 	return $form;
 }
 

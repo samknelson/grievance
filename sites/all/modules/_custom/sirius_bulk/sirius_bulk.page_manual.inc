@@ -40,6 +40,11 @@ function sirius_bulk_page_manual() {
   return $html;
 }
 
+function sirius_bulk_node_tab_manual_access($bulk_node) {
+	if (sirius_domain_nid() && !sirius_domain_component_enabled('bulk')) { return FALSE; }
+	return TRUE;
+}
+
 function sirius_bulk_node_tab_manual($bulk_node) {
 	return drupal_get_form('sirius_bulk_node_tab_manual_form', $bulk_node);
 }

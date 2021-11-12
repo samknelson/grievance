@@ -58,3 +58,28 @@
 	padding: 0;
 }
 
+#sirius_followup {
+	margin:  15px 0 15px 0;
+	padding: 5px;
+	border: 1px solid #333333;
+}
+
+#sirius_followup #sirius_followup_messages {
+	padding-top:  10px;
+}
+
+#sirius_followup #sirius_followup_messages div.messages {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	font-size:  14px;
+}
+
+#sirius_followup #sirius_followup_messages div.messages h2 {
+	font-size:  14px;
+}
+
+
+#sirius_followup div.sirius_followup_instructions {
+	padding-bottom:  5px;
+}

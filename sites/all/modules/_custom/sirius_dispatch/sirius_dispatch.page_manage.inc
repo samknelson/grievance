@@ -231,8 +231,6 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 		'#value' => 'Go',
 	);
 
-	$form += sirius_log_render_form($dispatch_node->nid);
-
   return $form;
 }
 

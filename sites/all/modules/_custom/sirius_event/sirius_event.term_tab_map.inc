@@ -55,6 +55,17 @@ function sirius_event_term_tab_map_form($form, &$form_state, $event_type_term) {
 	);
 	if ($json['map']['admin_prole_tids']) { $form['admin_prole_tids']['#default_value'] = $json['map']['admin_prole_tids']; }
 
+	$form['map']['group_by_address'] = array(
+		'#type' => 'select',
+		'#title' => t('Group by Address?'),
+		'#options' => array(
+			'No' => t('No'), 
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $json['map']['group_by_address'],
+		'#description' => t('Set to "Yes" to group pins on the map by address, so that multiple participants at a single address will appear as a single pin.'),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),

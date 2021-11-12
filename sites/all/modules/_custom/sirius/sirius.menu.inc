@@ -123,6 +123,7 @@ function sirius_node_tabs() {
   // Entity Log
   //
 
+  /*
   $content_types = array(
     'sirius_dispatch' => 'sirius dispatch staff',
     'sirius_dispatch_job' => 'sirius dispatch staff',
@@ -141,6 +142,30 @@ function sirius_node_tabs() {
       'callback' => 'sirius_node_tab_entity_log',
       'permissions' => array($permission),
       'weight' => 20,
+    );
+  }
+  */
+
+  $buckets = sirius_log_buckets();
+  $permission_lookup = user_permission_get_modules();
+  foreach ($buckets as $bucket_id => $bucket) {
+    // Hack to prevent adding menu items for modules that don't exist.
+    // @todo: this is an ugly and cumbersome way to do this, and something better should be found.
+    $ok = TRUE;
+    foreach ($bucket['permissions'] as $permission) {
+      if (!$permission_lookup[$permission]) { $ok = FALSE; }
+    }
+    if (!$ok) {
+      continue;
+    }
+    $node_tabs[$bucket['content_type']][$bucket['path']] = array(
+      'title' => $bucket['title'],
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_log',
+      'permissions' => $bucket['permissions'],
+      'weight' => $bucket['weight'],
+      'callback arguments' => array($bucket_id),
+      'file' => 'sirius.page_entity_log.inc',
     );
   }
 
@@ -364,7 +389,7 @@ function sirius_menu() {
   );
 
   $items['sirius/news/admin'] = array(
-    'title' => 'News',
+    'title' => 'News: Admin',
     'description' => '',
     'page callback' => 'sirius_page_news_admin',
     'page arguments' => array(),
@@ -482,27 +507,40 @@ function sirius_menu() {
   $items['sirius/config/email'] = array(
     'title' => 'Email Configuration',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_email_admin'),
-    'access arguments' => array('sirius admin'),
+    'page arguments' => array('sirius_email_settings_form'),
+    'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius.page_email_settings.inc',
   );
 
   $items['sirius/config/email/config'] = array(
     'title' => 'Settings',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_email_admin'),
-    'access arguments' => array('sirius admin'),
+    'page arguments' => array('sirius_email_settings_form'),
+    'access arguments' => array('sirius domain admin'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
+    'file' => 'sirius.page_email_settings.inc',
   );
 
   $items['sirius/config/email/test'] = array(
     'title' => 'Test',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_email_test_form'),
-    'access arguments' => array('sirius admin'),
+    'access arguments' => array('sirius domain admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
+    'file' => 'sirius.page_email_test.inc',
+  );
+
+  $items['sirius/config/email/global'] = array(
+    'title' => 'Global Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_email_settings_global_form'),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+    'file' => 'sirius.page_email_settings_global.inc',
   );
 
   $items['sirius/config/phone'] = array(
@@ -1006,6 +1044,25 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/log/quicklog/config'] = array(
+    'title' => 'Quicklog Settings',
+    'description' => '',
+    'page callback' => 'sirius_log_quicklog_config',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/modal/%node/quicklog'] = array(
+    'title'            => 'Add Log Entry',
+    'page callback'    => 'sirius_log_quicklog_page_add',
+    'page arguments'   => array(2),
+    'access arguments' => array('sirius dispatch staff'),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
   $items['sirius/phonenumber'] = array(
     'title' => 'Manage Phone Numbers',
     'page callback' => 'sirius_page_phonenumber_list',
@@ -1215,3 +1272,30 @@ function sirius_menu_admin() {
   return system_settings_form($form);
 }
 
+/**
+ * Implments hook_modal_paths
+ */
+
+function sirius_modal_paths() {
+  $paths = array();
+
+  $paths['sirius/modal/%node/quicklog'] = array(
+    'style' => 'sirius-modal-style',
+  );
+
+  return $paths;
+}
+
+function sirius_modal_styles() {
+  $styles = array();
+
+  $styles['sirius-modal-style'] = array(
+    'modalSize' => array(
+      'type' => 'fixed',
+      'width' => 600,
+      'height' => 500,
+    ),
+  );
+
+  return $styles;
+}

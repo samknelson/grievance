@@ -1,5 +1,10 @@
 <?php
 
+function sirius_bulk_node_tab_queue_access($bulk_node) {
+	if (sirius_domain_nid() && !sirius_domain_component_enabled('bulk')) { return FALSE; }
+	return TRUE;
+}
+
 function sirius_bulk_node_tab_queue($bulk_node) {
 	return drupal_get_form('sirius_bulk_node_tab_queue_form', $bulk_node);
 }

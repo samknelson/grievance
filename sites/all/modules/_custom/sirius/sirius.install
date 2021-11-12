@@ -193,3 +193,55 @@ function sirius_update_7012() {
   variable_set('smtp_allowhtml', 1);
 }
 
+/**
+ * Grant "certification view / edit" to any training staff or admins
+ */
+
+function sirius_update_7013() {
+  $if_you_have = 'sirius training staff';
+  $then_you_gets = array('sirius training certification view', 'sirius training certification edit');
+
+  foreach ($then_you_gets as $then_you_get) {
+    print "Granting new permission [$then_you_get] to anybody with permission [$if_you_have] ...\n";
+    $roles = user_roles(FALSE, $if_you_have);
+    foreach ($roles as $rid => $name) {
+      print "... granting [$then_you_get] to [$name]\n";
+      user_role_grant_permissions($rid, array($then_you_get));
+    }
+  }
+}
+
+/**
+ * Grant "sirius employer labor projection manager" to anybody with the right role
+ */
+
+function sirius_update_7014() {
+  $if_you_haves = array('sirius employer user manager', 'sirius employer admin');
+  $then_you_gets = array('sirius employer labor projection manager');
+
+  foreach ($if_you_haves as $if_you_have) {
+    foreach ($then_you_gets as $then_you_get) {
+      print "Granting new permission [$then_you_get] to anybody with permission [$if_you_have] ...\n";
+      $roles = user_roles(FALSE, $if_you_have);
+      foreach ($roles as $rid => $name) {
+        print "... granting [$then_you_get] to [$name]\n";
+        user_role_grant_permissions($rid, array($then_you_get));
+      }
+    }
+  }
+}
+
+/**
+ * Turn on the bulk component for all domains
+ */
+
+function sirius_update_7015() {
+  $sql = "select nid from node where type = 'sirius_domain'";
+  $stmt = sirius_sql_query($sql, array());
+  while ($hr = $stmt->fetchAssoc()) {
+    $domain_nid = $hr['nid'];
+    $domain_node = node_load($domain_nid);
+    print "Enabling bulk messages for " . $domain_node->title . " ($domain_nid)\n";
+    sirius_domain_component_enable('bulk', $domain_node);
+  }
+}

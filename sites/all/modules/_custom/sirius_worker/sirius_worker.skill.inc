@@ -25,21 +25,27 @@ function sirius_worker_skills($worker_node) {
   return taxonomy_term_load_multiple(array_keys($skill_tids));
 }
 
+/**
+ * WARNING: NOT DOMAIN ENABLED
+ * @todo: This function is NOT domain-specific. It runs globally without paying attention to domains.
+ */
+
 function sirius_worker_skills_cron($force = FALSE) {
 	// Run once a day
 	$today = date('Y-m-d');
 	$last_run = variable_get('sirius_worker_skills_last_date', 0);
 	if ($last_run == $today && !$force) { return; }
-	variable_set('sirius_worker_skills_last_date', $today);
 
 	// Don't run before a specific time
-	$hour = variable_get('sirius_worker_skills_start_hr', 1);
+	$hour = variable_get('sirius_worker_skills_start_hr', 12);
 	$min = variable_get('sirius_worker_skills_start_min', 30);
 	if (time() < strtotime("$today $hour:$min") && !$force) { return; }
 
+	variable_set('sirius_worker_skills_last_date', $today);
+
 	// For skills that will be expiring soon, send workers notifications.
 	$warnings = array(
-		'first' => array(date('Y-m-d', strtotime('26 days')), date('Y-m-d', strtotime('+30 days'))),
+		'first' => array(date('Y-m-d', strtotime('+26 days')), date('Y-m-d', strtotime('+30 days'))),
 		'second' => array(date('Y-m-d', strtotime('+4 days')), date('Y-m-d', strtotime('+7 days'))),
 	);
 	foreach ($warnings as $which => $cutoffs) {
@@ -64,21 +70,21 @@ function sirius_worker_skills_cron($force = FALSE) {
 
 			foreach ($dates as $date => $tids) {
 				$terms = taxonomy_term_load_multiple($tids);
-				$subject = "Dispatch system notification: skills expiring on $date";
+				$subject = "Skill expiration notification: skills expiring on $date";
 				$body = "The following skills will be expiring on $date:<ul>";
 				foreach ($terms as $tid => $term) {
 					$body .= '<li>' . $term->name . '</li>';
 				}
 				$body .= '</ul>';
-				$body .= 'Please contact the dispatch office to find out how to renew your certifications.';
+				$body .= variable_get('sirius_worker_skill_expiration_reminders_suffix', 'Please contact the dispatch office to find out how to renew your certifications.');
 
-				$sms = "Dispatch system notification: skills expiring on $date";
+				$sms = "Skill expiration notification: skills expiring on $date";
 				$sms = "The following skills will be expiring on $date:\n";
 				foreach ($terms as $tid => $term) {
 					$sms .= $term->name . "\n";
 				}
 				$sms .= "\n";
-				$sms .= 'Please contact the dispatch office to find out how to renew your certifications.';
+				$sms .= variable_get('sirius_worker_skill_expiration_reminders_suffix', 'Please contact the dispatch office to find out how to renew your certifications.');
 
 				$unique_id = "UNIQUE/sirius-skill-expire-warning-$which/$worker_nid/$date";
 
@@ -100,6 +106,7 @@ function sirius_worker_skills_cron($force = FALSE) {
 	}
 
 	// For skills that expired yesterday, remove them from the worker record.
+	/*
 	$cutoff = date('Y-m-d', strtotime('-1 day'));
 	$sql = "select * from field_data_field_sirius_skill, field_data_field_sirius_skill_expire  "; 
 	$sql .= "where field_data_field_sirius_skill.entity_type = 'node' and field_data_field_sirius_skill.bundle = 'sirius_worker' ";
@@ -123,7 +130,7 @@ function sirius_worker_skills_cron($force = FALSE) {
 		$worker_node = node_load($worker_nid);
 
 		foreach ($tids as $tid) {
-			sirius_worker_skill_set($worker_node, array($tid), NULL, 'remove', 'Expiration date for the skill has passed.', array());
+			// sirius_worker_skill_set($worker_node, array($tid), NULL, 'remove', 'Expiration date for the skill has passed.', array());
 		}
 
 		$terms = taxonomy_term_load_multiple($tids);
@@ -151,8 +158,9 @@ function sirius_worker_skills_cron($force = FALSE) {
 			)
 		);
 	}
+	*/
 
-	watchdog('sirius_worker_skills', "Scanned for expired skills; removed $skill_count skills from $worker_count workers. Sent $notification_count notifications of upcoming skill expiration.");
+	watchdog('sirius_worker_skills', "Scanned for expired skills; expired $skill_count skills from $worker_count workers. Sent $notification_count notifications of upcoming skill expiration.");
 }
 
 /**
@@ -175,7 +183,8 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 		$expires_display = 'Never';
 	} 
 
-	// Adding an expired skill does nothing. But we still log the attempt
+	// Adding an expired skll does nothing. But we still log the attempt
+	/*
 	if ($action == 'add' && (sirius_strtotime($expires) < time())) {
 		$msg = 'Skipping add for skills, because they expired on ' . $expires . ': ';
 		foreach ($tids as $tid) {
@@ -184,6 +193,7 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 		sirius_log('worker:skill', 'add_expired', $msg, $reason, '', array($worker_node->nid), $files);
 		return array('success' => TRUE, 'msg' => $msg);
 	}
+	*/
 
 	$orig = array();
 	if ($worker_node->field_sirius_skill['und']) {

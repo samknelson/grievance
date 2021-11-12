@@ -9,6 +9,10 @@ use Twilio\TwiML;
 
 function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
 
+	if (sirius_domain_variable_get('sirius_twilio_sms_unsubscribe', TRUE)) {
+		$msg .= sirius_domain_variable_get('sirius_twilio_sms_unsubscribe_msg', "\nReply STOP to unsubscribe.\n");
+	}
+
 	if (strlen($msg) > 1595) {
 		return array('success' => FALSE, 'msg' => 'SMS sending failed: the outoing message length exceeded 1600 characters.');
 	}

@@ -1737,9 +1737,17 @@ function grievance_content_types_uuid_features_default_content() {
   'body' => array(
     'und' => array(
       0 => array(
-        'value' => '<p>The cost of an SMS message is dependent on the number of "segments" required. A segment count is displayed below the "SMS Body" field. Generally speaking, the best practice is to try to keep the message to just one segment.</p>
+        'value' => '<p>The cost of an SMS message is dependent on the number of "segments" required. A segment count is displayed below the "SMS Body" field. Generally speaking, the best practice is to try to keep the message to just one segment.&nbsp;</p>
 
-<p>If your message includes a link, you may want to use a "link shortener" to reduce the number of characters.</p>
+<p><strong>Why does it start with 28 characters?</strong></p>
+
+<p>Often, Sirius is configured to automatically append an "unsubscribe" message to each outgoing SMS. If this is the case, the length of that message is included in the segment count; this explains why even an empty message might have a nonzero number of characters.</p>
+
+<p>(Including an unsubscribe message helps improve deliverability, and protects the reputation of the sending phone number.)</p>
+
+<p><strong>Link Shorteners</strong></p>
+
+<p>In the past, it was common practice to send SMS messages with links which had been "shortened" with a service such as TinyUrl or Bitly. However, more recently, <strong>carrier policies forbid the use of shared public URL shorteners</strong>. For more information, please see <a href="https://support.twilio.com/hc/en-us/articles/1260804572090-How-can-I-send-shortened-URLs-links-in-my-messages-" target="_blank">the relevant Help Center page at Twilio</a>.</p>
 ',
         'summary' => '',
         'format' => 'full_html',
@@ -4776,6 +4784,114 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Labor Projection - Edit',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1630420702,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'a91ac14f-d4fa-47e8-9d57-919376f83630',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the form below to enter the labor projection for the month.</p>
+
+<p><strong>Groups&nbsp;or Shows</strong></p>
+
+<p>If groups or shows have been selected, enter the number of anticipated workers for each group / show for each day.</p>
+
+<p><strong>Total</strong></p>
+
+<p>Enter the total number of anticipated workers for each day. If groups or shows are used, it is not necessary for the total number of workers to be equal to the sum of the workers at each show.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/employer_labproj_edit',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the form below to enter the labor projection for the month.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-08-31 07:38:22 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Twilio - Call - Worker',
   'log' => '',
   'status' => 1,
@@ -5566,6 +5682,116 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Labor Projection - Status',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1630416763,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'c3e86e0b-b543-49ca-ad56-93c7ef79591e',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p><strong>Status</strong></p>
+
+<p>Use this tool to set the status for the labor projection. Incomplete labor projections should have their status set to "draft". Complete labor projections should be set to "submitted".</p>
+
+<p><strong>Comments</strong></p>
+
+<p>Use this field to indicate any comments or special information about this labor projection.</p>
+
+<p><strong>Job Groups / Shows</strong></p>
+
+<p>If your labor projection includes job groups or shows, you must select which ones will be included. Projections can only be submitted for the groups or shows that are selected here.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/employer_labproj_status',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this tool to set the labor projection status, and select the job groups or shows that will be included.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-08-31 06:32:43 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Bulk Messaging - Configuration',
   'log' => '',
   'status' => 1,
@@ -5847,6 +6073,143 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2021-03-29 06:08:01 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Email - Settings',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1633959834,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'cdcb4b41-962c-441f-8deb-61ecce6adb19',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p><strong>Settings</strong></p>
+
+<p>Use this page to configure settings for outgoing emails for the current domain. If any values on this page are left blank, the global settings will be used.</p>
+
+<ul>
+	<li><strong>Username:</strong>&nbsp;The user name for the SMTP service. With SendGrid / Twilio, this should generally be "apikey".</li>
+	<li><strong>Password:</strong>&nbsp;The SMTP password. With SendGrid / Twilio, this should generally be the API key configured for this site or domain.</li>
+	<li><strong>Host, Backup Host:</strong>&nbsp;The SMTP host to use. With SendGrid / Twilio, this should be "smtp.sendgrid.net". The backup host is not required.</li>
+	<li><strong>Port:&nbsp;</strong>The port expected by the SMTP provider. With SendGrid / Twilio, this should be 587</li>
+	<li><strong>From Address:</strong>&nbsp;The email address that ALL messages from this site or domain originate from.&nbsp;<em>This must be a properly configured sender at the SMTP provider.</em></li>
+	<li><strong>From Name:</strong>&nbsp;The name that will appear as the sender of all messages from this site or domain.&nbsp;</li>
+</ul>
+
+<p><strong>Test</strong></p>
+
+<p>Use the "test" page to validate the email configuration by sending a test message.</p>
+
+<p><strong>Global Settings</strong></p>
+
+<p><em>The "Global Settings" page is only available to site administrators (users with the "sirius admin" permission.)</em></p>
+
+<p>If any variable is not set for a given domain, the corresponding global settings are used. Global settings also have additonal options, including:</p>
+
+<ul>
+	<li><strong>Global Disable</strong><strong>:&nbsp;</strong>If "Global Disable" is on, then ALL emails will fail unless the recipients appear on the whitelist</li>
+</ul>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/config/email',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'sirius/config/email/config',
+        'format' => NULL,
+      ),
+      2 => array(
+        'value' => 'sirius/config/email/test',
+        'format' => NULL,
+      ),
+      3 => array(
+        'value' => 'sirius/config/email/global',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use these tools to set up email for the domain or the site.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-10-11 06:43:54 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(

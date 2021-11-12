@@ -9,6 +9,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.i
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.auditlog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.aat.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log_quicklog.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log_buckets.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.menu.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.ssn.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.date.inc';
@@ -69,7 +71,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grieva
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_employee.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_user.inc';
 
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_materials.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_letters.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
@@ -360,10 +361,11 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   }
 
   // Log some searches. @todo this should be a general-purpose thing, not a harcoded view name
+  /*
   if ($form_id == 'views_exposed_form') {
     sirius_log_views_exposed_form_alter($form, $form_state); 
   }
-
+  */
 }
 
 /**
@@ -691,6 +693,9 @@ function sirius_sirius_jsonfield_form_definitions() {
  */
 
 function sirius_file_download_access($file_item, $entity_type, $entity) {
+  // God damn signatures
+  // if ($file_item['uri'] && preg_match('/^private\:\/\/sirius_signature\//', $file_item['uri'])) { return TRUE; }
+
   // Allow loopback requests (from the originating server)
   if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
 

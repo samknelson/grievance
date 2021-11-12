@@ -10,6 +10,7 @@ function at_sirius_is_popup() {
 /**
  * Override or insert variables into page templates.
  */
+
 function at_sirius_preprocess_page(&$vars) {
   // RFC2822 date format
   if ($rfc = date("r" , time())) {
@@ -39,6 +40,14 @@ function at_sirius_preprocess_page(&$vars) {
 	drupal_add_js('sites/all/themes/at_sirius/js/main.js');
 
   $vars['backlinks'] = sirius_backlinks_render();
+
+
+  $quickactions = sirius_quickactions_render();
+  if ($quickactions) {
+    foreach ($quickactions as $quickaction) {
+      $vars['primary_local_tasks'][] = $quickaction;
+    }
+  }
 }
 
 function at_sirius_preprocess_html(&$vars) {

@@ -1,6 +1,7 @@
 <?php
 
 function sirius_bulk_page_create() {
+	if (sirius_domain_nid() && !sirius_domain_component_enabled('bulk')) { return 'The bulk message component is not enabled.'; }
 	return drupal_get_form('sirius_bulk_page_create_form');
 }
 

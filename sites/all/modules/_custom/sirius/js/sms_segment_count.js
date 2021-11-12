@@ -36,9 +36,12 @@ Drupal.behaviors.sirius_sms_segment_count = {
       };
 
       SmsCounter.count = function(text) {
+        text += Drupal.settings.sirius_sms_segment_count.suffix;
         var count, encoding, length, messages, per_message, remaining;
         encoding = this.detectEncoding(text);
         length = text.length;
+
+
         if (encoding === this.GSM_7BIT_EX) {
           length += this.countGsm7bitEx(text);
         }
@@ -113,7 +116,6 @@ Drupal.behaviors.sirius_sms_segment_count = {
     }
 
     html_id = Drupal.settings.sirius_sms_segment_count.html_id;
-    console.log(html_id);
 
     $('#' + html_id).countSms('#' + html_id + '_count');
   }

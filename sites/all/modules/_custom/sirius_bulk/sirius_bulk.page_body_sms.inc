@@ -1,6 +1,7 @@
 <?php
 
 function sirius_bulk_node_tab_body_sms_access($bulk_node) {
+	if (sirius_domain_nid() && !sirius_domain_component_enabled('bulk')) { return FALSE; }
 	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
 	return in_array($medium, array('sms', 'choice'));
 }
@@ -16,6 +17,7 @@ function sirius_bulk_node_tab_body_sms_form($form, &$form_state, $bulk_node) {
 	$form['#tree'] = TRUE;
 
 	// Add a link shortener
+	/*
   drupal_add_js(drupal_get_path('module', 'sirius') . '/js/sirius.popup.js');
   drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.popup.css');
   $html .= '<a href="#" class="sirius_popup_trigger tool-button">' . t('Link Shortener') . '</a>';
@@ -29,6 +31,7 @@ function sirius_bulk_node_tab_body_sms_form($form, &$form_state, $bulk_node) {
   $html .= '</div>';
   $html .= '<div class="sirius_popup_close"></div>';
   $html .= '</div>';
+  */
   $form['#prefix'] = $html;
 
 	$form['sms'] = array(

@@ -6,7 +6,11 @@ function sirius_dispatch_group_list_active($industry_tid = NULL) {
   $query->entityCondition('bundle', 'sirius_dispatch_job_group');
   $query->fieldCondition('field_sirius_datetime', 'value', date('Y-m-d H:i:s'), '<=');
   $query->fieldCondition('field_sirius_datetime_completed', 'value', date('Y-m-d H:i:s'), '>=');
-  $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid);
+  if (is_array($industry_tid)) {
+    $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid, 'in');
+  } else {
+    $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid);
+  }
   $query->propertyOrderBy('title');
   $stmt = $query->execute();
   if (!$stmt['node']) { return NULL; }

@@ -61,23 +61,6 @@ function sirius_bulk_node_tabs() {
 		'weight' => 4,
 	);
 
-  $node_tabs['sirius_bulk']['sirius_bulk_recipients/contacts'] = array(
-    'title' => 'Contacts',
-    'description' => '',
-    'callback' => 'sirius_bulk_node_tab_recipients_contacts',
-    'permissions' => array('sirius bulk send'),
-    'weight' => 1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  $node_tabs['sirius_bulk']['sirius_bulk_recipients/workers'] = array(
-    'title' => 'Workers',
-    'description' => '',
-    'callback' => 'sirius_bulk_node_tab_recipients_workers',
-    'permissions' => array('sirius bulk send'),
-    'weight' => 2,
-  );
-
   $node_tabs['sirius_bulk']['sirius_bulk_manual'] = array(
     'title' => 'Manual Confirmation',
     'description' => '',
@@ -139,6 +122,17 @@ function sirius_bulk_node_tabs() {
 
 function sirius_bulk_menu() {
   $items = array();
+
+  $items['sirius/bulk'] = array(
+    'title' => 'Bulk Messages',
+    'description' => '',
+    'access callback' => 'sirius_bulk_page_landing_access',
+    'access arguments' => array(),
+    'page callback' => 'sirius_bulk_page_landing',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 1,
+  );
 
   $items['sirius/bulk/config'] = array(
     'title' => 'Bulk Message Configuration',

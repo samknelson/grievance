@@ -28,6 +28,7 @@ function sirius_page_config() {
 	$links['core']['links']['sirius/mailattach']								= array('title' => 'Mailattach', 'description' => 'Configure the attach-by-email system.');
 	$links['core']['links']['sirius/customfield/definition/list']								= array('title' => 'Custom Field Sets', 'description' => 'Define custom field sets which can be attached to events or other entity types.');
 	$links['core']['links']['sirius/dashboard/items_by_role']								= array('title' => 'Dashboard', 'description' => 'Configure dashboard items.');
+	$links['core']['links']['sirius/log/quicklog/config']								= array('title' => 'Quicklog', 'description' => 'Settings for the Quicklog tools.');
 
 	$links['worker'] = array('title' => 'Worker');
 	$links['worker']['links']['sirius/worker/config/user'] = array('title' => 'Worker / User Sync', 'description' => 'Configure how users are created from workers.');
@@ -92,6 +93,9 @@ function sirius_page_config() {
 	$links['systems']['links']['admin/config/grievance/phaxio'] = array('title' => 'Phaxio', 'description' => 'Configure the Phaxio fax service.');
 	$links['systems']['links']['admin/config/services/shorten'] = array('title' => 'Shorten', 'description' => 'Configure the link shortening services such as blt.ly.');
 	$links['systems']['links']['admin/config'] 									= array('title' => 'Drupal Configuration', 'description' => 'Enter the system-wide Drupal configuration screens.');
+
+	drupal_alter('sirius_config_links', $links);
+
 	$html .= '<table>';
 
 	$html .= '<tr>';

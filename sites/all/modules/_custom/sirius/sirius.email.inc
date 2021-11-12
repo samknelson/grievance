@@ -1,119 +1,5 @@
 <?php
 
-function sirius_email_test_form($form, &$form_state) {
-  $form['#tree'] = TRUE; 
-
-  $form['message']['to'] = array(
-    '#type' => 'textfield',
-    '#title' => 'To',
-  );
-
-  $form['message']['headers']['cc'] = array(
-    '#type' => 'textfield',
-    '#title' => 'Cc',
-  );
-
-  $form['message']['headers']['bcc'] = array(
-    '#type' => 'textfield',
-    '#title' => 'Bcc',
-  );
-
-  $form['message']['headers']['reply-to'] = array(
-    '#type' => 'textfield',
-    '#title' => 'Reply-To',
-  );
-
-  $form['message']['subject'] = array(
-    '#type' => 'textfield',
-    '#title' => 'Subject',
-  );
-
-  $form['message']['body'] = array(
-    '#type' => 'textarea',
-    '#title' => 'Body',
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Submit',
-  );
-
-  return $form;
-}
-
-function sirius_email_test_form_submit($form, &$form_state) {
-  $form_state['rebuild'] = TRUE;
-  $params = $form_state['values']['message'];
-  $result = sirius_email_send($params);
-  $msg = htmlspecialchars($result['msg']);
-  if ($result['success']) {
-    drupal_set_message($msg);
-  } else {
-    drupal_set_message($msg, 'error');
-  }
-}
-
-function sirius_email_admin() {
-	$form["sirius_email_default_from_address"] = array(
-		'#type' => 'textfield',
-		'#title' => t('Default FROM Email Address'),
-		'#description' => t('Must be an address that has been validated as a sender on the system.'),
-		'#default_value' => variable_get("sirius_email_default_from_address", ''),
-	);
-
-  $form["sirius_email_global_disable"] = array(
-    '#type' => 'select',
-    '#title' => t('Global Disable'),
-    '#options' => array(
-      'No' => t('No'),
-      'Yes' => t('Yes'),
-    ),
-    '#description' => t('Select "Yes" to globally disable email on this server.'),
-    '#default_value' => variable_get("sirius_email_global_disable", ''),
-  );
-
-  $form["sirius_email_global_disable_whitelist"] = array(
-    '#type' => 'textarea',
-    '#title' => t('Whitelist'),
-    '#description' => t('When global disable is on, use the whitelist to indicate which email address <strong>can</strong> receive emails. Enter patters one per line. Regular expressions are permitted, such as ".*@domain.com"'),
-    '#default_value' => variable_get("sirius_email_global_disable_whitelist", ''),
-    '#states' => array(
-      'visible' => array(
-        array(':input[name="sirius_email_global_disable"]' => array('value' => 'Yes')),
-      )
-    ),
-  );
-
-	$form["sirius_email_replyto_address"] = array(
-		'#type' => 'textfield',
-		'#title' => 'Global Reply-To Email',
-		'#default_value' => variable_get("sirius_email_replyto_address", ''),
-    '#description' => t('If set, ALL emails sent from the system will use this reply-to addres. If left blank, the reply-to address will be the name of the current user.')
-	);
-
-	$form["sirius_email_replyto_name"] = array(
-		'#type' => 'textfield',
-		'#title' => 'Global Reply-To Name',
-		'#default_value' => variable_get("sirius_email_replyto_name", ''),
-	);
-
-  $form["sirius_ses_configuration_set"] = array(
-    '#type' => 'textfield',
-    '#title' => 'Amazon SES Configuration Set Name',
-    '#default_value' => variable_get("sirius_ses_configuration_set", ''),
-  );
-
-  $form['#submit'][] = 'sirius_email_admin_submit';
-
-  return system_settings_form($form);
-}
-
-function sirius_email_admin_submit($form, &$form_state) {
-  foreach (array('site_mail', 'mimemail_mail', 'smtp_from') as $variable) {
-    variable_set($variable, $form_state['values']['sirius_email_default_from_address']);
-  }
-}
-
 function sirius_email_format($email) {
 	$email = trim($email);
 	$email = strtolower($email);
@@ -302,8 +188,8 @@ function sirius_mail($key, &$message, $params) {
   if ($params['headers']['bcc']) { $message['headers']['Bcc'] = $params['headers']['bcc']; } 
 
   // See comment from Takirimi https://api.drupal.org/api/drupal/includes%21mail.inc/function/drupal_mail/7.x
-  $message['headers']['Cc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Cc']);
-  $message['headers']['Bcc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Bcc']);
+  if ($message['headers']['Cc']) { $message['headers']['Cc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Cc']); }
+  if ($message['headers']['Bcc']) { $message['headers']['Bcc'] = preg_replace('/\s*,\s*/', ',', $message['headers']['Bcc']); }
 
   $message['subject'] = $params['subject'];
   $message['body'][] = $params['body'];
@@ -314,6 +200,8 @@ function sirius_mail($key, &$message, $params) {
   // Reply-to is either set, or it's the current user.
   if (variable_get("sirius_email_replyto_address", '')) {
     $message['headers']['Reply-To'] = variable_get("sirius_email_replyto_name", '') . '<' . variable_get("sirius_email_replyto_address", '') . '>';
+  } else if ($params['headers']['reply-to']) {
+    $message['headers']['Reply-To'] = $params['headers']['reply-to'];
   } else if ($params['reply-to']) {
     $message['headers']['Reply-To'] = $params['reply-to'];
   } else {
@@ -327,7 +215,6 @@ function sirius_mail($key, &$message, $params) {
     $id =  uuid_generate();
   }
   $message['headers']['X-Sirius-Id'] = $id;
-
 
   // "From" 
   $from_email = $params['from'];
@@ -466,4 +353,17 @@ function sirius_email_render($email) {
   $email = htmlspecialchars($email);
 
   return "<a href=\"mailto:$email\">$email</a>";
+}
+
+/**
+ * Implements hook_smtp_mail_settings_alter()
+ */
+
+function sirius_smtp_mail_settings_alter(&$settings) {
+  foreach (array_keys($settings) as $key) {
+    $value = sirius_domain_variable_get("smtp_$key");
+    if ($value) {
+      $settings[$key] = $value;
+    }
+  }
 }

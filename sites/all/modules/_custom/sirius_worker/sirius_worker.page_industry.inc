@@ -88,8 +88,6 @@ function sirius_node_tab_worker_industry_form($form, &$form_state, $worker_node)
 		);
 	}
 
-	$form += sirius_log_render_form($worker_node->nid, 'worker:member_status');
-
 	return $form;
 }
 

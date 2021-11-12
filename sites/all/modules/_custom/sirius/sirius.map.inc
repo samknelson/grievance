@@ -213,6 +213,7 @@ function sirius_map_pins() {
 	$pins['kernel-teal'] = array('title' => 'kernel-teal', 'file' => 'kernel-teal.png', 'path' => '/sites/all/modules/_custom/sirius/images/map/pins/kernel-teal.png');
 	$pins['kernel-white'] = array('title' => 'kernel-white', 'file' => 'kernel-white.png', 'path' => '/sites/all/modules/_custom/sirius/images/map/pins/kernel-white.png');
 	$pins['kernel-yellow'] = array('title' => 'kernel-yellow', 'file' => 'kernel-yellow.png', 'path' => '/sites/all/modules/_custom/sirius/images/map/pins/kernel-yellow.png');
+	// $pins['pixel-black'] = array('title' => 'pixel-black', 'file' => 'pixel-black.png', 'path' => '/sites/all/modules/_custom/sirius/images/map/pins/pixel-black.png');
 
 	foreach ($pins as $key => $ignore) {
 		$pins[$key]['key'] = $key;
@@ -238,6 +239,11 @@ function sirius_map_pins() {
 			$pins[$key]['iconAnchor'] = array('x' => 7, 'y' => 35);
 			$pins[$key]['popupAnchor'] = array('x' => 0, 'y' => -37);
 			$pins[$key]['tooltipAnchor'] = array('x' => 9, 'y' => -18);
+		} else if (preg_match('/^pixel/', $key))  {
+			$pins[$key]['iconSize'] = array('x' => 30, 'y' => 30);
+			$pins[$key]['iconAnchor'] = array('x' => 15, 'y' => 5);
+			$pins[$key]['popupAnchor'] = array('x' => 15, 'y' => -24);
+			$pins[$key]['tooltipAnchor'] = array('x' => 1, 'y' => 1);
 		}
 	}
 
@@ -276,8 +282,14 @@ function sirius_map_pin_picker($default_value = NULL) {
 	return $form_element;
 }
 
-function sirius_map_pin_render($pin) {
-	$html = "<img src=\"$pin[path]\" alt=\"$pin[title]\" width=\"$pin[iconSize][x]\" height=\"$pin[iconSize][y]\">";
+function sirius_map_pin_render($pin, $options = array()) {
+	$width = $pin['iconSize']['x'];
+	$height = $pin['iconSize']['y'];
+	if ($options['scale']) {
+		$width = $width * $options['scale'];
+		$height = $height * $options['scale'];
+	}
+	$html = "<img src=\"$pin[path]\" alt=\"$pin[title]\" width=\"$width\" height=\"$height\">";
 	return $html;
 }
 

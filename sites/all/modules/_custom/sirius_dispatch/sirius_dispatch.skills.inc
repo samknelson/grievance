@@ -1,7 +1,6 @@
 <?php
 
 function sirius_dispatch_skill_options($industry_tid = NULL) {
-	drupal_set_message("Here with $industry_tid");
 	$skill_options = &drupal_static(__FUNCTION__);
   if (!isset($skill_options)) {
   	$skill_options = array();

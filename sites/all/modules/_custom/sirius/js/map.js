@@ -1,6 +1,8 @@
 (function ($) {
 	Drupal.behaviors.sirius_map = {
-	  attach: function (context) { if (context === document) {
+	  attach: function (context) { 
+
+			if (context !== document) { return; }
 
 	  	// Event NID
 	  	var event_nid = Drupal.settings.sirius_map.event_nid;
@@ -35,31 +37,13 @@
 			});
 
 
-			// React whena  map is added
-			$(document).on('leaflet.map', function (e, map_settings, map, map_id) {
+			// React when a map is added
+			var map;
+			$(document).on('leaflet.map', function (e, map_settings, the_map, map_id) {
+				map = the_map;
+
 				// Don't know why this doesn't get passed in
 				map_id = map._container.id;
-
-				// Add the print control
-				/*
-				L.easyPrint({
-					title: 'Print',
-					position: 'topleft',
-					sizeModes: ['A4Portrait', 'A4Landscape']
-				}).addTo(map);
-				*/
-
-				/*
-				console.log(markers);
-				console.log(map);
-				var aLayerGroup = L.layerGroup(markers[2411531], markers[2412025], markers[2412536]);
-				var overlays = {
-					"My Markers": aLayerGroup,
-				}
-				aLayerGroup.addTo(map);
-				layerControl = L.control.layers(null, overlays);
-				layerControl.addTo(map);
-				*/
 
 				// Handle modal links within marker popups. Normally we wouldn't bother, Drupal does this for free. 
 				// But the HTML for the popup is rendered dynamically, so Drupal doesn't get a chance to handle it. So we
@@ -117,7 +101,7 @@
 		  			console.log('Current location checkin failed: ' + textStatus + ': ' + errorThrown);
 		  		},
 					'success': function(data) {
-		  			console.log('Current location complete: ' + data['msg']);
+		  			console.log('Current location checkin complete: ' + data['msg']);
 					}
 				});
 			}
@@ -125,28 +109,39 @@
 	  	// Do an ajax refresh poll of the map
 	  	function sirius_map_poll() {
 	  		$('#sirius_map_poll_message').html('... refreshing the map ...');
+
 				$.ajax({
 					'url': '/sirius/ajax/event/map/poll/' + event_nid,
 					'type': 'GET',
 		  		'dataType': 'json',
+		  		'data': {
+		  			'query': window.location.search,
+		  		}, 
 		  		'error': function(jqXHR, textStatus, errorThrown) {
-			  		$('#sirius_map_poll_message').html('Map refreshed failed: ' + textStatus + ': ' + errorThrown);
+			  		$('#sirius_map_poll_message').html('Map refresh failed: ' + textStatus + ': ' + errorThrown);
 		  		},
 					'success': function(data) {
 						if (data['updates']) {
 							for (i = 0; i < data['updates'].length; i++) {
 								record = data['updates'][i];
-					    	marker = markers[record.participant_nid];
+					    	marker = markers[record.marker_id];
 					    	if (!marker) { continue; }
 					    	marker.setIcon(pins[record.pin_key]);
 					    	marker._popup.setContent(record.popup);
     						marker.setLatLng(new L.LatLng(record.lat, record.lon));
 							}
 						}
-						date = new Date();
-						n = date.toDateString();
-						time = date.toLocaleTimeString();
-			  		$('#sirius_map_poll_message').html('Map refreshed at: ' + time);
+						if (data['removals']) {
+							for (i = 0; i < data['removals'].length; i++) {
+								marker_id = data['removals'][i];
+					    	marker = markers[marker_id];
+					    	if (!marker) { continue; }
+								map.removeLayer(marker);
+								// console.log("Removed: " + marker_id);
+							}
+						}
+						// console.log(data['debug']);
+			  		$('#sirius_map_poll_message').html('Map refreshed at: ' + new Date().toLocaleTimeString());
 					}
 				});
 	  	}
@@ -155,7 +150,6 @@
 	  	$('#sirius_map_poll').click(function(event) {
 	  		event.preventDefault();
 	  		sirius_map_poll();
-	  		// jiggle(markers[2313681]);
       });
 
       // Auto poll
@@ -166,15 +160,12 @@
       	setInterval(sirius_map_poll, timeout);
       }
 
+      // Allow poll on ajax callback
       if (Drupal.ajax) {
-		    Drupal.ajax.prototype.commands.sirius_command_map_update = function(ajax, response, status) {
-		    	marker = markers[response.participant_nid];
-		    	if (!marker) { return; }
-		    	marker.setIcon(pins[response.pin_key]);
-		    	marker._popup.setContent(response.popup);
+		    Drupal.ajax.prototype.commands.sirius_command_map_poll = function(ajax, response, status) {
+		    	sirius_map_poll();
 		    }
 		  }
-
-	  } }
+	  }
 	};
 })(jQuery);

@@ -3566,6 +3566,7 @@ div.ctools-modal-content .resizable-textarea {
   margin-right: 0;
 }
 
+/*
 div.ctools-modal-content .form-checkboxes {
   float: left;
   clear: none;
@@ -3577,6 +3578,7 @@ div.ctools-modal-content .form-checkboxes {
   width: auto;
   padding-right: 10px;
 }
+*/
 
 .grievance-status-tools {
   float: right;
@@ -3733,10 +3735,9 @@ fieldset.date-combo .container-inline-date .date-padding {
 
 div.sirius_help {
   background: url(images/help.png) no-repeat 8px 5px #f0f8ff;
-  border: 0;
-  margin: 10px;''
-  padding: 0;
-  border-radius: 2px;
+  margin: 0 0 28px 0;
+  padding: 0 15px 0 0;
+  border: 1px solid #5984be;
 }
 
 

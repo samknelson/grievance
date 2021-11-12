@@ -92,10 +92,12 @@ function sirius_node_access_log($log_node, $op, $account) {
   // Get the category
   $category = $log_node->field_sirius_category['und'][0]['value'];
 
-  // @todo: The logic below should be delegated to modules.  But we're hardcoding it here for the time being.
 
   // "material"-type log entries can never be  seen or edited directly.
   if ($category == 'material') { return NODE_ACCESS_DENY; }
+
+  // I may be excluded from certain log categories
+  if (in_array($category, sirius_log_my_excluded_categories())) { return NODE_ACCESS_DENY; }
 
   // Check admin permissions
   if ($op == 'view' && user_access('sirius log view', $account)) { return NODE_ACCESS_ALLOW; }
@@ -113,31 +115,24 @@ function sirius_node_access_log($log_node, $op, $account) {
   return NODE_ACCESS_DENY;
 }
 
-function sirius_log_render_form($param1, $param2 = NULL) {
-  $form = array();
-
-  $form['log_wrapper'] = array(
-    '#type' => 'fieldset',
-    // '#collapsible' => TRUE,
-    // '#collapsed' => TRUE,
-    '#title' => '',
-  );
-
-  $form['log_wrapper']['log'] = array(
-    '#type' => 'markup',
-    '#markup' => views_embed_view('sirius_log', 'block', $param1, $param2),
-  );
-
-  return $form;
+function sirius_log_my_excluded_categories() {
+  $my_excluded_categories = &drupal_static(__FUNCTION__);
+  if (!isset($my_excluded_categories)) {
+    $my_excluded_categories = module_invoke_all('sirius_log_my_excluded_categories');
+  }
+  return $my_excluded_categories;
 }
 
+
+// The functions below can be used to log all inquiries made to a Views Exposed Form.
+// It was originally implement to track provide lookups.
+// We decided not to do this, beause it might be HIPAA triggering.
+/*
+
 function sirius_log_views_exposed_form_alter(&$form, &$form_state) {
-  // We decided not to do this, beause it might be HIPAA triggeing.
-  /*
   if (isset($form_state['view']) && $form_state['view']->name == 'sirius_provider_worker_lookup') {
     $form['#submit'][] = 'sirius_log_views_exposed_form_track';
   }
-  */
 }
 
 function sirius_log_views_exposed_form_track($form, &$form_state) {
@@ -166,7 +161,7 @@ function sirius_log_views_exposed_form_track($form, &$form_state) {
     $form_state['values']
   );
 }
-
+*/
 
 function sirius_log_handlers($log_node, $content_type = NULL) {
   $handlers = node_load_multiple(sirius_fieldvals($log_node, 'field_sirius_log_handler', 'target_id'));
@@ -202,3 +197,4 @@ function sirius_log_handler_clear($log_node, $handler_nid) {
   }
   $log_node->field_sirius_log_handler['und'] = $new_handlers;
 }
+

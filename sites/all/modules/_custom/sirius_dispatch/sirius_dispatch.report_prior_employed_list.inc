@@ -4,12 +4,19 @@ function sirius_dispatch_report_prior_employed_list_form($form, &$form_state, $r
   report_cache_form_prepare($report_type, $form, $form_state);
 
   $employers = sirius_employer_list();
+  $job_types = sirius_taxonomy_load('sirius_dispatch_job_type', 'tid', 'name');
 
   $form['employer'] = array(
-  	'#title' => t('Employer'),
-  	'#type' => 'select',
-  	'#options' => $employers,
+    '#title' => t('Employer'),
+    '#type' => 'select',
+    '#options' => $employers,
     '#required' => TRUE,
+  );
+
+  $form['job_type_tid'] = array(
+    '#type' => 'select',
+    '#options' => array(NULL => t('-- Select --')) + $job_types,
+    '#title' => t('Job Type'),
   );
 
   $form['date'] = array(
@@ -47,11 +54,16 @@ function sirius_dispatch_report_prior_employed_list_pks(&$form_state) {
   $sql_args[':shop_nid'] = $form_state['values']['employer'];
   $sql_args[':ts'] = strtotime($form_state['values']['date']);
   $sql = "select nid from node ";
-  $sql .= "join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
-  $sql .= "join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = field_sirius_dispatch_job_target_id ";
+  $sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
+  $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = field_sirius_dispatch_job_target_id ";
+  $sql .= "left join field_data_field_sirius_dispatch_job_type on field_data_field_sirius_dispatch_job_type.entity_type = 'node' and field_data_field_sirius_dispatch_job_type.entity_id = field_sirius_dispatch_job_target_id ";
   $sql .= "where node.type = 'sirius_dispatch' ";
   $sql .= "and field_grievance_shop_target_id = :shop_nid ";
   $sql .= "and created <= :ts ";
+  if ($form_state['values']['job_type_tid']) {
+    $sql .= "and field_sirius_dispatch_job_type_tid = :job_type_tid ";
+    $sql_args[':job_type_tid'] = $form_state['values']['job_type_tid'];
+  }
   $sql .= "order by nid desc ";
   // $sql .= "limit 300 ";
   $stmt = db_query($sql, $sql_args);

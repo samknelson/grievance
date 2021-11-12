@@ -18,5 +18,9 @@ function sirius_employer_permission() {
       'title' => t('Sirius Employer Contact Manager'), 
       'description' => t('Administer shop contacts.'),
     ),
+    'sirius employer labor projection manager' => array(
+      'title' => t('Sirius Employer Labor Projection Manager'), 
+      'description' => t('View and edit labor projections in your own shop.'),
+    ),
   );
 }

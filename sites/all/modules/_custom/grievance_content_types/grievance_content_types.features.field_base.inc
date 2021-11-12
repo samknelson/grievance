@@ -4988,7 +4988,7 @@ function grievance_content_types_field_default_field_bases() {
       'handler_settings' => array(
         'behaviors' => array(
           'views-select-list' => array(
-            'status' => 0,
+            'status' => 1,
           ),
         ),
         'sort' => array(
@@ -6328,6 +6328,7 @@ function grievance_content_types_field_default_field_bases() {
           'sirius_json_definition' => 'sirius_json_definition',
           'sirius_ledger_account' => 'sirius_ledger_account',
           'sirius_news' => 'sirius_news',
+          'sirius_term_proxy' => 'sirius_term_proxy',
           'sirius_worker' => 'sirius_worker',
         ),
       ),

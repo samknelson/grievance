@@ -10,7 +10,15 @@ function sirius_event_page_participant_certifications_form($form, &$form_state, 
 
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
-	if (!$event_type_json['class']['certifications']['available']) { drupal_set_message('No certifications have been configured for this event type.', 'error'); return;; }
+	if (!$event_type_json['class']['certifications']['available']) { 
+		$msg = 'No certifications have been configured for this event type.';
+		$path = 'taxonomy/term/' . $event_type_term->tid . '/sirius_event_type_class';
+		if (drupal_valid_path($path)) {
+			$msg .= ' ' . t('Certification for this event type can be assigned ') . l('here.', $path);
+		}
+		drupal_set_message($msg, 'error'); 
+		return;
+	}
 	$certification_definition_nodes = node_load_multiple(array_values($event_type_json['class']['certifications']['available']));
 	if (!$certification_definition_nodes) { drupal_set_message('No certifications found for this event type.', 'error'); }
 

@@ -1,6 +1,7 @@
 <?php
 
 function sirius_bulk_node_tab_body_voice_access($bulk_node) {
+	if (sirius_domain_nid() && !sirius_domain_component_enabled('bulk')) { return FALSE; }
 	$medium = $bulk_node->field_sirius_bulk_medium['und'][0]['value'];
 	return in_array($medium, array('voice', 'choice'));
 }

@@ -1,0 +1,61 @@
+diff --git a/sites/all/modules/smtp/smtp.mail.inc b/sites/all/modules/smtp/smtp.mail.inc
+index 4887ddc..793feac 100644
+--- a/sites/all/modules/smtp/smtp.mail.inc
++++ b/sites/all/modules/smtp/smtp.mail.inc
+@@ -75,6 +75,7 @@ class SmtpMailSystem implements MailSystemInterface {
+       unset($headers['bcc']);
+     }
+ 
++
+     // Create a new PHPMailer object - autoloaded from registry.
+     $mailer = new PHPMailer();
+ 
+@@ -134,6 +135,26 @@ class SmtpMailSystem implements MailSystemInterface {
+       $headers['Reply-To'] = $reply;
+     }
+     $properfrom = variable_get('smtp_from', '');
++
++    // Set the authentication settings.
++    $username = variable_get('smtp_username', '');
++    $password = variable_get('smtp_password', '');
++    $host = variable_get('smtp_host', '');
++    $hostbackup = variable_get('smtp_hostbackup', '');
++    $port = variable_get('smtp_port', '25');
++
++    $settings = array(
++      'username' => &$username,
++      'password' => &$password,
++      'host' => &$host,
++      'hostbackup' => &$hostbackup,
++      'port' => &$port,
++      'from' => &$properfrom,
++      'fromname' => &$from_name,
++    );
++    drupal_alter('smtp_mail_settings', $settings);
++
++
+     if (!empty($properfrom)) {
+       $headers['From'] = $properfrom;
+       $from = $properfrom;
+@@ -494,10 +515,6 @@ class SmtpMailSystem implements MailSystemInterface {
+       }
+     }
+ 
+-    // Set the authentication settings.
+-    $username = variable_get('smtp_username', '');
+-    $password = variable_get('smtp_password', '');
+-
+     // If username and password are given, use SMTP authentication.
+     if ($username != '' && $password != '') {
+       $mailer->SMTPAuth = TRUE;
+@@ -522,8 +539,8 @@ class SmtpMailSystem implements MailSystemInterface {
+ 
+ 
+     // Set other connection settings.
+-    $mailer->Host = variable_get('smtp_host', '') . ';' . variable_get('smtp_hostbackup', '');
+-    $mailer->Port = variable_get('smtp_port', '25');
++    $mailer->Host = $host . ';' . $hostbackup;
++    $mailer->Port = $port;
+     $mailer->Mailer = 'smtp';
+ 
+     // Integration with the Maillog module.

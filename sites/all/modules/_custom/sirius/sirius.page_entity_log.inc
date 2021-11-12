@@ -1,90 +1,36 @@
 <?php
 
-function sirius_node_tab_entity_log($node) {
-	return drupal_get_form('sirius_node_tab_entity_log_form', $node);
+function sirius_node_tab_entity_log_quicknav($log_bucket) {
+	if (!$log_bucket['can_add']) { return ''; }
+	
+	$item = menu_get_item();
+	$href = $item['href'];
+
+	$links = array(
+		array('path' => $href, 'title' => 'View'),
+		array('path' => "$href/add", 'title' => 'Add'),
+	);
+
+	return sirius_quicknav($links);
+
 }
 
-function sirius_node_tab_entity_log_form($form, &$form_state, $node) {
-	$form_state['node'] = $node;
-
-	$form['intro'] = array(
-		'#type' => 'markup',
-		'#markup' => '<div class="sirius_form_intro">' . 
-			t('Use the form below to add a new comment to the log for this entity.') . 
-			'</div>',
-
-	);
-
-	$form['reason'] = array(
-		'#type' => 'textarea',
-		'#title' => t('Comment'),
-		'#required' => TRUE,
-	);
-
-	for ($delta=0; $delta<3; ++$delta) {
-		$form["attach_$delta"] = array(
-			'#type' => 'file',
-			'#title' => t('Attachment #') . ($delta + 1),
-		);
-	}
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => 'Submit',
-	);
-
-	$nids = array($node->nid);
-	if ($node->type == 'sirius_worker') {
-		if ($node->field_sirius_contact['und'][0]['target_id']) { $nids[] = $node->field_sirius_contact['und'][0]['target_id']; }
-	}
-
-	$form += sirius_log_render_form(join('+', $nids));
-
-	return $form;
+function sirius_node_tab_entity_log_access($node, $log_bucket_id) {
+	return TRUE;
 }
 
-function sirius_node_tab_entity_log_form_validate($form, &$form_state) {
-	$info = field_info_instance('node', 'field_sirius_attachments', 'sirius_log');
-	$extensions = $info['settings']['file_extensions'];
-	for ($delta = 0; $delta < 3; ++$delta) {
-	  $file = file_save_upload("attach_$delta", array(
-	    'file_validate_extensions' => array($extensions),
-	  ));
-	  if ($file) {
-	    $name = rand();
-	    if ($file = file_move($file, 'private://attach_' . rand())) {
-	      $form_state['storage']["attach_$delta"] = $file;
-	    }
-	    else {
-	      form_set_error("attach_$delta", t("Failed to write the uploaded file to the site's file folder."));
-	    }
-	  }
+function sirius_node_tab_entity_log($node, $log_bucket_id) {
+	sirius_require('sirius', 'sirius.page_entity_log_add.inc');
+	sirius_require('sirius', 'sirius.page_entity_log_view.inc');
+
+	$log_bucket = sirius_log_bucket($log_bucket_id);
+
+	$action = sirius_node_tab_arg(0);
+
+	if (($action == 'add') && $log_bucket['can_add']) {
+		return drupal_get_form('sirius_node_tab_entity_log_add_form', $node, $log_bucket_id);
+	} else {
+		return drupal_get_form('sirius_node_tab_entity_log_view_form', $node, $log_bucket_id);
 	}
 }
 
-function sirius_node_tab_entity_log_form_submit($form, &$form_state) {
-	$files = array();
-	for ($delta = 0; $delta < 3; ++$delta) {
-	  $file = $form_state['storage']["attach_$delta"];
-	  if ($file) {
-  		$file = (array) $file;
-  		$file['display'] = 1;
-			unset($form_state['storage']["attach_$delta"]);
-  		unset($file['destination']);
-  		unset($file['uri']);
-  		$files[] = $file;
-  	}
-  }
-
-	$node = $form_state['node'];
-
-	$comment = $form_state['values']['reason'];
-	$category = 'comment';
-
-	$category = $node->type;
-	$category = preg_replace('/sirius_/', '', $category);
-	$category .= ':manual';
-	$type = 'comment';
-	sirius_log($category, 'comment', $comment, $comment, NULL, array($node->nid), $files);
-	drupal_set_message(t('Comment added.'));
-}

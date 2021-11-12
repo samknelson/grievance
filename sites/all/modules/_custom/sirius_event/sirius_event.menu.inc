@@ -94,6 +94,14 @@ function sirius_event_node_tabs() {
     'weight' => 5,
   );
 
+  $node_tabs['sirius_event']['sirius_event_info/class'] = array(
+    'title' => 'Class Listing',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_class_settings',
+    'permissions' => array('sirius'),
+    'weight' => 5,
+  );
+
   $node_tabs['sirius_event']['sirius_event_participants_current'] = array(
     'title' => 'Current Participants',
     'description' => '',
@@ -255,23 +263,6 @@ function sirius_event_node_tabs() {
     'permissions' => array('sirius'),
     'weight' => 4,
     'file' => $map_files,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_class'] = array(
-    'title' => 'Class',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_class_settings',
-    'permissions' => array('sirius'),
-    'weight' => 3,
-  );
-
-  $node_tabs['sirius_event']['sirius_event_class/settings'] = array(
-    'title' => 'Settings',
-    'description' => '',
-    'callback' => 'sirius_node_tab_event_class_settings',
-    'permissions' => array('sirius'),
-    'weight' => 1,
-    // 'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   $node_tabs['sirius_event']['sirius_event_bullpen_self'] = array(
@@ -547,6 +538,34 @@ function sirius_event_node_tabs() {
     'callback' => 'sirius_node_tab_event_participant_definition_followup',
     'permissions' => array('sirius domain admin'),
     'weight' => 4,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_followup/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_followup',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'sirius_event.page_participant_definition_followup.inc',
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_followup/sms'] = array(
+    'title' => 'SMS',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_followup_sms',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 2,
+    'file' => 'sirius_event.page_participant_definition_followup_items.inc',
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_participant_definition_followup/email'] = array(
+    'title' => 'Email',
+    'description' => '',
+    'callback' => 'sirius_node_tab_event_participant_definition_followup_email',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 3,
+    'file' => 'sirius_event.page_participant_definition_followup_items.inc',
   );
 
   $node_tabs['sirius_contact']['sirius_contact_events'] = array(
@@ -1043,6 +1062,17 @@ function sirius_event_menu() {
     'modal'            => TRUE,
   );
 
+  $items['sirius/modal/event/followup/%/%/%'] = array(
+    'title'            => 'Follow Up',
+    'page callback'    => 'sirius_event_followup_modal',
+    'page arguments'   => array(4,5,6),
+    'access callback'   => 'sirius_event_followup_modal_access',
+    'access arguments' => array(4,5,6),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
   $items['sirius/ajax/event/map/poll/%'] = array(
     'page callback'    => 'sirius_event_map_ajax_poll',
     'page arguments'   => array(5),
@@ -1113,13 +1143,9 @@ function sirius_event_menu() {
 function sirius_event_modal_paths() {
   $paths = array();
 
-  $paths['sirius/modal/event/map/%/%'] = array(
-    'style' => 'sirius-event-modal-style',
-  );
-
-  $paths['sirius/modal/event/map-legend/%'] = array(
-    'style' => 'sirius-event-modal-style',
-  );
+  $paths['sirius/modal/event/map/%/%'] = array('style' => 'sirius-event-modal-style');
+  $paths['sirius/modal/event/map-legend/%'] = array('style' => 'sirius-event-modal-style');
+  $paths['sirius/modal/event/followup/%/%/%'] = array('style' => 'sirius-event-modal-style');
 
   return $paths;
 }
