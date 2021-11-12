@@ -195,6 +195,8 @@ function sirius_backlinks_from_node($node) {
 		}
 	}
 
+	drupal_alter('sirius_backlinks_from_node', $links, $node);
+
 	return $links;
 }
 

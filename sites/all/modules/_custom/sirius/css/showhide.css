@@ -1,0 +1,26 @@
+.sirius_showhide_toggle {
+	padding: 2px 4px;
+	border: 1px solid #a0bbf5;
+	display: inline-block;
+	background-color: #ffffff;
+	text-align: center;
+	font-size:  12px;
+	font-weight:  normal;
+	min-width: 35px;
+	font-variant: small-caps;
+}
+
+.sirius_showhide_toggle:hover {
+	color: #1b4784;
+	border-color: #1b4784;
+}
+
+.sirius_showhide_target_hidden {
+	display: none;
+}
+
+@media print {
+	.sirius_showhide_toggle {
+		display: none;
+	}
+}

@@ -147,7 +147,17 @@ function sirius_node_tabs() {
   */
 
   $buckets = sirius_log_buckets();
+  $permission_lookup = user_permission_get_modules();
   foreach ($buckets as $bucket_id => $bucket) {
+    // Hack to prevent adding menu items for modules that don't exist.
+    // @todo: this is an ugly and cumbersome way to do this, and something better should be found.
+    $ok = TRUE;
+    foreach ($bucket['permissions'] as $permission) {
+      if (!$permission_lookup[$permission]) { $ok = FALSE; }
+    }
+    if (!$ok) {
+      continue;
+    }
     $node_tabs[$bucket['content_type']][$bucket['path']] = array(
       'title' => $bucket['title'],
       'description' => '',
@@ -379,7 +389,7 @@ function sirius_menu() {
   );
 
   $items['sirius/news/admin'] = array(
-    'title' => 'News',
+    'title' => 'News: Admin',
     'description' => '',
     'page callback' => 'sirius_page_news_admin',
     'page arguments' => array(),
