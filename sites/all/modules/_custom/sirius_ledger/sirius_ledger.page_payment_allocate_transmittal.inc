@@ -102,7 +102,7 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 		if (!$worker_nid) { continue; }
 		$form['transmittal']['dispatches'][$dispatch_nid]['tr_open'] = array('#markup' => '<tr>');
 
-		$form['transmittal']['dispatches'][$dispatch_nid]['name'] = array('#markup' => '<td>' . $dispatch['worker_name'] . '</td>');
+		$form['transmittal']['dispatches'][$dispatch_nid]['name'] = array('#markup' => '<td>' . l($dispatch['worker_name'], "node/$worker_nid", array('attributes' => array('target' => '_blank'))) . '</td>');
 		$form['transmittal']['dispatches'][$dispatch_nid]['ms_name'] = array('#markup' => '<td>' . $ms_level_options[$dispatch['ms_level']] . '</td>');
 
 		$form['transmittal']['dispatches'][$dispatch_nid]['payment'] = array(
