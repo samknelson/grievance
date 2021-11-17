@@ -60,6 +60,15 @@ function grievance_report_open_summary_with_log_form($form, &$form_state) {
     '#options' => array(NULL => t('Both Individual and General'), 'No' => t('Individual Grievnaces Only'), 'Yes' => t('General / Class Action Grievances Only')),
   );
 
+  $broughtby = sirius_taxonomy_load('grievance_broughtby', 'tid', 'name');
+  if ($broughtby) {
+    $form['broughtby'] = array(
+      '#type' => 'select',
+      '#title' => 'Brought By',
+      '#options' => array(NULL => t('Any')) + $broughtby,
+    );
+  }
+
   $form['col_1'] = array(
     '#type' => 'select',
     '#title' => 'First Column',
@@ -105,6 +114,7 @@ function grievance_report_open_summary_with_log_fields() {
     'col_1_date' => t('Col 1 First Date'),
     'col_2_count' => t('Col 2 Count'),
     'col_2_date' => t('Col 2 First Date'),
+    'current_status' => t('Current Status'),
   );
 }
 
@@ -131,6 +141,7 @@ function grievance_report_open_summary_with_log_pks($form_state, $report_type, $
   $shop_match = $form_state['values']['shop_match'];
   $organizer_nid = $form_state['values']['organizer']['entity_id'];
   $classaction = $form_state['values']['classaction'];
+  $broughtby = $form_state['values']['broughtby'];
 
   $args = array();
   $args[':open_status_tids'] = $open_status_tids;
@@ -141,6 +152,7 @@ function grievance_report_open_summary_with_log_pks($form_state, $report_type, $
   $sql .= "left join field_data_field_grievance_shop on (field_data_field_grievance_shop.entity_type = 'node' and node.nid = field_data_field_grievance_shop.entity_id) ";
   $sql .= "left join field_data_field_grievance_status on (field_data_field_grievance_status.entity_type = 'node' and node.nid = field_data_field_grievance_status.entity_id) ";
   $sql .= "left join field_data_field_grievance_classaction on (field_data_field_grievance_classaction.entity_type = 'node' and node.nid = field_data_field_grievance_classaction.entity_id) ";
+  $sql .= "left join field_data_field_grievance_broughtby on (field_data_field_grievance_broughtby.entity_type = 'node' and node.nid = field_data_field_grievance_broughtby.entity_id) ";
   $sql .= "left join node shop_node on shop_node.nid = field_grievance_shop_target_id ";
   $sql .= "where node.type = 'grievance' ";
   $sql .= "and field_data_field_grievance_status.field_grievance_status_tid in (:open_status_tids) ";
@@ -160,6 +172,10 @@ function grievance_report_open_summary_with_log_pks($form_state, $report_type, $
   if ($classaction) {
     $sql .= "and field_grievance_classaction_value = :classaction ";
     $args[':classaction'] = $classaction;
+  }
+  if ($broughtby) {
+    $sql .= "and field_grievance_broughtby_tid = :broughtby ";
+    $args[':broughtby'] = $broughtby;
   }
   $sql .= "order by node.nid ";
 
@@ -198,7 +214,8 @@ function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $value
   $sql .= "field_grievance_id_value as id, ";
   $sql .= "field_grievance_first_name_value as first_name, "; 
   $sql .= "field_grievance_last_name_value as last_name, "; 
-  $sql .= "class_term.name as classification ";
+  $sql .= "class_term.name as classification, ";
+  $sql .= "status_term.name as current_status_name ";
   $sql .= "from node ";
   $sql .= "left join field_data_field_grievance_rep_organizer on (field_data_field_grievance_rep_organizer.entity_type = 'node' and field_data_field_grievance_rep_organizer.entity_id = node.nid) ";
   $sql .= "left join field_data_field_grievance_shop on (field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid) ";
@@ -206,9 +223,11 @@ function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $value
   $sql .= "left join field_data_field_grievance_last_name on (field_data_field_grievance_last_name.entity_type = 'node' and field_data_field_grievance_last_name.entity_id = node.nid) ";
   $sql .= "left join field_data_field_grievance_id on (field_data_field_grievance_id.entity_type = 'node' and field_data_field_grievance_id.entity_id = node.nid) ";
   $sql .= "left join field_data_field_grievance_class_tid on (field_data_field_grievance_class_tid.entity_type = 'node' and field_data_field_grievance_class_tid.entity_id = node.nid) ";
+  $sql .= "left join field_data_field_grievance_status on (field_data_field_grievance_status.entity_type = 'node' and field_data_field_grievance_status.entity_id = node.nid) ";
   $sql .= "left join users on field_grievance_rep_organizer_target_id = users.uid ";
   $sql .= "left join node shop_node on field_grievance_shop_target_id = shop_node.nid ";
   $sql .= "left join taxonomy_term_data class_term on field_grievance_class_tid_tid = class_term.tid ";
+  $sql .= "left join taxonomy_term_data status_term on field_grievance_status_tid = status_term.tid ";
   $sql .= "where node.nid = :nid ";
   $stmt = db_query($sql, array(':nid' => $grievance_nid));
   $hr = $stmt->fetchAssoc();
@@ -218,6 +237,7 @@ function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $value
   $row[] = $hr['first_name'];
   $row[] = $hr['last_name'];
   $row[] = $hr['classification'];
+  $current_status_name = $hr['current_status_name'];
 
   // Violations
   $sql = "select clause_node.title as clause_title ";
@@ -262,6 +282,8 @@ function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $value
     }
   }
 
+  $row[] = $current_status_name;
+
   return $row;
 }
 
@@ -289,6 +311,8 @@ function grievance_report_open_summary_with_log_render_employer($report_type, $r
 }
 
 function grievance_report_open_summary_with_log_render($report_type, $report_id, $which) {
+  $csv = $_REQUEST['csv'];
+
   // Load the parameters
   $query = db_select('report_cache');
   $query->fields('report_cache');
@@ -325,7 +349,7 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
         if ($col_str) { $col_str .= ', '; }
         $col_str .= $term->name;
       }
-      $html .= '<strong>' . "Milestone #$i: " . '</strong>' . $col_str . '<br />';
+      $html .= '<strong>' . "Milestone #" . $i . ':</strong>' . $col_str . '<br />';
     }
   }
 
@@ -410,15 +434,42 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
   if ($parameters['col_2']) { $row[] = '<strong>' . number_format($totals['col_2_no']) . '</strong>'; }
   $rows[] = $row;
 
+  if ($csv) {
+    $filename = "open_grievances_summary_${which}_";
+
+    $r = $report_id;
+    $r = preg_replace('/[^a-zA-Z0-9_ ]/', '', $r);
+    $r = preg_replace('/ +/', '_', $r);
+    $filename .= $r;
+    $filename .= ".csv";
+
+    drupal_add_http_header('Content-Type', 'text/csv');
+    drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+    $fp = fopen('php://output', 'w');
+    fputcsv($fp, $header);
+    foreach ($rows as $row) { 
+      foreach ($row as $delta => $val) { $row[$delta] = strip_tags($val); }
+      fputcsv($fp, $row);
+    }
+    drupal_exit();
+  }
+
   $attributes = array();
 
   $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
   $html .= '</div>';
 
+  $query = $_GET;
+  unset($query['q']);
+  $query['csv'] = 1;
+  $html .= l('CSV', current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => $query));
+
   return $html;
 }
 
 function grievance_report_open_summary_with_log_render_detail($report_type, $report_id, $which) {
+  $csv = $_REQUEST['csv'];
+
   // Load the parameters
   $query = db_select('report_cache');
   $query->fields('report_cache');
@@ -455,7 +506,7 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
         if ($col_str) { $col_str .= ', '; }
         $col_str .= $term->name;
       }
-      $html .= '<strong>' . "Milestone #$i: " . '</strong>' . $col_str . '<br />';
+      $html .= '<strong>' . "Milestone #" . $i . '</strong>' . $col_str . '<br />';
     }
   }
 
@@ -499,17 +550,22 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
   $header[] = 'First Name';
   $header[] = 'Last Name';
   $header[] = 'Classification';
+  $header[] = 'Current Status';
   $header[] = 'CBA Provision(s) Violated';
   for ($i=1; $i<=2; ++$i) {
     if ($parameters["col_$i"]) {
-      $header[] = "Milestone #i Date";
+      $header[] = "Milestone #$i Date";
     }
   }
 
   $rows = array();
   foreach ($data as $key => $sub_data) {
     $row = array();
-    $row[] = array('data' => "<strong>$key</strong>", 'colspan' => count($header));
+    if ($csv) {
+      $row[] = $key;
+    } else {
+      $row[] = array('data' => "<strong>$key</strong>", 'colspan' => count($header));
+    }
     $rows[] = $row;
 
     foreach ($sub_data as $hr) {
@@ -520,7 +576,12 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
       $row[] = $hr['first_name'];
       $row[] = $hr['last_name'];
       $row[] = $hr['classification'];
-      $row[] = $hr['cba'];
+      $row[] = $hr['current_status'];
+      if ($csv) {
+        $row[] = preg_replace('/\<br \/\>/', ', ', $hr['cba']);
+      } else {
+        $row[] = $hr['cba'];
+      }
       for ($i=1; $i<=2; ++$i) {
         if ($parameters["col_$i"]) {
           if ($hr["col_${i}_date"]) { $row[] = date('Y-m-d', strtotime($hr["col_${i}_date"])); } 
@@ -531,10 +592,32 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
     }
   }
 
+  if ($csv) {
+    $filename = "open_grievances_detail_${which}_";
+
+    $r = $report_id;
+    $r = preg_replace('/[^a-zA-Z0-9_ ]/', '', $r);
+    $r = preg_replace('/ +/', '_', $r);
+    $filename .= $r;
+    $filename .= ".csv";
+
+    drupal_add_http_header('Content-Type', 'text/csv');
+    drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+    $fp = fopen('php://output', 'w');
+    fputcsv($fp, $header);
+    foreach ($rows as $row) { fputcsv($fp, $row); }
+    drupal_exit();
+  }
+
   $attributes = array();
 
   $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
   $html .= '</div>';
+
+  $query = $_GET;
+  unset($query['q']);
+  $query['csv'] = 1;
+  $html .= l('CSV', current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => $query));
 
   return $html;
 }

@@ -693,6 +693,9 @@ function sirius_sirius_jsonfield_form_definitions() {
  */
 
 function sirius_file_download_access($file_item, $entity_type, $entity) {
+  // God damn signatures
+  // if ($file_item['uri'] && preg_match('/^private\:\/\/sirius_signature\//', $file_item['uri'])) { return TRUE; }
+
   // Allow loopback requests (from the originating server)
   if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
 
