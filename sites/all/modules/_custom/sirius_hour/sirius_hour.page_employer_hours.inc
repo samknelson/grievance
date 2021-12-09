@@ -72,7 +72,7 @@ function sirius_hour_node_tab_employer_hours_form($form, &$form_state, $employer
 	$transmittal_json = sirius_jsonfield_util_node_json_get($transmittal_node);
 	if (!$transmittal_node) { drupal_set_message("There is no transmittal form associated with this month and employer."); return array(); }
 	
-	$form['backlink'] = array('#markup' => l('Back to Transmittal Form', 'node/' . $employer_node->nid . '/sirius_employer_ledger/transmittal', array('attributes' => array('class' => array('tool-button')))));
+	sirius_backlink_add('node/' . $employer_node->nid . '/sirius_employer_ledger/transmittal', array('name' => 'Transmittal Form'));
 
 	$form_state['transmittal_nid'] = $transmittal_nid;
 	$form_state['employer_nid'] = $employer_node->nid;
