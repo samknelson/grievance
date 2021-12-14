@@ -28,4 +28,5 @@ function mightysearch_permission() {
     ),
   );	
 	*/
+  return array();
 }
