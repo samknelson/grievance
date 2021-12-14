@@ -1,0 +1,3 @@
+name = UNITE HERE Graphs
+description = "Generates graphs of relationships for nodes."
+core = 7.x
