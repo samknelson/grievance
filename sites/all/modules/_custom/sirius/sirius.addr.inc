@@ -157,7 +157,7 @@ function sirius_addr_node_presave($node) {
 	    $json = sirius_json_get($node);
 	    $json['addr'][$field_name]['geometry'] = $geometry;
 	    sirius_json_set($node, $json);
-	    dpm($json);
+	    // dpm($json);
 	  }
 	}
 }
