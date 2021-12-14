@@ -656,7 +656,7 @@ function grievance_report_cache_info() {
   $items['grievance-report-open-summary-with-log'] = array(
     'name' => t('Open Grievance Summary With Log'),
     'description' => '',
-    'access' => 'grievance report',
+    'access' => 'grievance report open summary with log',
     'path' => 'grievance/report/open-summary-log',
     'fields' => grievance_report_open_summary_with_log_fields(),
     'pk_list_callback' => 'grievance_report_open_summary_with_log_pks',

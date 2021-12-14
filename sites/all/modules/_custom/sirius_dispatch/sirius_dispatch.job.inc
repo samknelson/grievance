@@ -125,8 +125,8 @@ function sirius_dispatch_job_workerform($form, &$form_state, $states = NULL) {
 
 	// We've selected these workers
 	$selected_workers = array();
-	if ($form_state['values']['fieldset_workers']['workers']) {
-		foreach ($form_state['values']['fieldset_workers']['workers'] as $nid => $value) { 
+	if ($form_state['values']['fieldset_workers']['ajax']['workers']) {
+		foreach ($form_state['values']['fieldset_workers']['ajax']['workers'] as $nid => $value) { 
 			if ($value) { 
 				$selected_workers[$nid] = TRUE;
 			}

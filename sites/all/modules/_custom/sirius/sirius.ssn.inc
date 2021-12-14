@@ -11,3 +11,15 @@ function sirius_ssn_validate($string) {
 
 	return preg_match('/^\d\d\d\-\d\d\-\d\d\d\d$/', $string);
 }
+
+function sirius_ssn_format_masked($string) {
+  return 'xxx-xx-' . substr($string, -4);
+}
+
+function sirius_ssn_format_conditional($string) {
+	if (user_access('sirius ssn')) {
+		return sirius_ssn_format($string);
+	} else {
+		return sirius_ssn_format_masked($string);
+	}
+}
