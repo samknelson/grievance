@@ -30,7 +30,7 @@
 	$('#sirius_browserphone_button_conference_add').hide();
 	$('#sirius_browserphone_button_conference_remove').hide();
 
-	device.on('ready',function (device) {
+	device.on('registered',function (device) {
 		sirius_browserphone_log('Sirius Phone Ready.');
 	});
 
@@ -38,17 +38,18 @@
 		sirius_browserphone_log('Sirius Phone Error: ' + error.message);
 	});
 
-	device.on('connect', function (conn) {
+	function sirius_browserphone_call_accept(connection) {
+		Drupal.settings.sirius_twilio_browserphone.connection = connection;
 		sirius_browserphone_log('Call established.');
 		$('#sirius_browserphone_button_call').hide();
 		$('#sirius_browserphone_button_hangup').show();
 		$('#sirius_browserphone_button_omg').show();
 		$('#sirius_browserphone_omg').show();
 		$('#sirius_browserphone_button_conference').show();
-		sirius_browserphone_volume_bind(conn);
-	});
+		// sirius_browserphone_volume_bind(connection);
+	}
 
-	device.on('disconnect', function (conn) {
+	function sirius_browserphone_call_disconnect(connection) {
 		sirius_browserphone_log('Call ended.');
 		$('#sirius_browserphone_button_call').show();
 		$('#sirius_browserphone_button_hangup').hide();
@@ -58,12 +59,7 @@
 		$('#sirius_browserphone_button_conference_add').hide();
 		$('#sirius_browserphone_button_conference_remove').hide();
 		Drupal.settings.sirius_twilio_browserphone.connection = null;
-	});
-
-	device.on('incoming', function (conn) {
-		sirius_browserphone_log('Incoming connection from ' + conn.parameters.From);
-		conn.accept();
-	});
+	};
 
 	device.audio.on('deviceChange', sirius_browserphone_devices_refresh);
 
@@ -106,14 +102,23 @@
 	// 
 
 	$('#sirius_browserphone_button_call').click(function() {
-		var params = {
-	  	To: $('#sirius_browserphone_number').val(),
-	  	token: token,
-	  	callerid_nid: $('#sirius_browserphone_callerid').val(),
-		};
-		Drupal.settings.sirius_twilio_browserphone.connection = device.connect(params);
+		sirius_browserphone_call_connect();
 		return false;
 	});
+
+	async function sirius_browserphone_call_connect() {
+		var params = {
+			params: {
+				To: $('#sirius_browserphone_number').val(),
+	  		token: token,
+	  		callerid_nid: $('#sirius_browserphone_callerid').val(),
+	  	},
+		};
+		const connection = await device.connect(params);
+    connection.addListener("accept", sirius_browserphone_call_accept);
+    connection.addListener("disconnect", sirius_browserphone_call_disconnect);
+		return false;
+	}	
 
 	// Bind button to hangup call
 	$('#sirius_browserphone_button_hangup').click(function() {
@@ -229,6 +234,7 @@
 	// Utility functions
 	//
 
+	/*
 	function sirius_browserphone_volume_bind(connection) {
 		connection.volume(function(inputVolume, outputVolume) {
 			var inputColor = 'red';
@@ -246,6 +252,7 @@
 			$('#sirius_browserphone_volume_output').css('background-color', outputColor);
 		});
 	}
+	*/
 
 	function sirius_browserphone_devices_refresh() {
 		$('#sirius_browserphone_devices').empty();
