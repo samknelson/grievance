@@ -52,6 +52,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.do_not_disturb.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.server_paths.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.shortlink.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.showhide.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.quickhash.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.richtext.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.map.inc';
@@ -161,6 +162,8 @@ function sirius_node_presave($node) {
 
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_presave($node); }
   if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_presave($node); }
+
+  sirius_addr_node_presave($node);
 }
 
 
@@ -300,6 +303,11 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     sirius_domain_form_alter_node($form, $form_state, $form_id);
   }
 
+  // Remove canonical addresses
+  if (preg_match('/_node_form/', $form_id)) {
+    sirius_addr_form_alter_node($form, $form_state, $form_id);
+  }
+
   // Filter the taxonomy by domain
   if ($form_id == 'taxonomy_form_term' || preg_match('/_node_form/', $form_id)) {
     sirius_domain_restrict_taxonomy_fields($form, $form_id);
@@ -319,7 +327,8 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
       $form_id == 'sirius_bulk_node_form' ||
       $form_id == 'sirius_ledger_account_node_form' ||
       $form_id == 'sirius_employee_node_form' ||
-      $form_id == 'grievance_letter_template_node_form') {
+      $form_id == 'grievance_letter_template_node_form' ||
+      $form_id == 'property_node_form') {
     if (!user_access('sirius admin')) { $form['field_sirius_json']['#access'] = FALSE; }
   }
 
@@ -693,6 +702,9 @@ function sirius_sirius_jsonfield_form_definitions() {
  */
 
 function sirius_file_download_access($file_item, $entity_type, $entity) {
+  // God damn signatures
+  // if ($file_item['uri'] && preg_match('/^private\:\/\/sirius_signature\//', $file_item['uri'])) { return TRUE; }
+
   // Allow loopback requests (from the originating server)
   if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
 

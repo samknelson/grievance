@@ -1,0 +1,4 @@
+name = Field Group Page
+description = For a node add or edit form, allow editing of just a single field group.
+package = UNITE
+core = 7.x

@@ -1,0 +1,4 @@
+name = Might Search
+description = Core functionality for the UNITE HERE suite of modules
+package = UNITE
+core = 7.x

@@ -9,11 +9,19 @@ function grievance_report_aged_summary_form($form, &$form_state) {
     '#type' => 'select',
     '#title' => 'Report on:',
     '#options' => array(
-    	'specialist' => 'Specialist',
-    	'shop' => 'Employer',
+    	'specialist' => t('Specialist'),
+    	'shop' => t('Employer'),
     ),
   );
 
+  $form['output'] = array(
+    '#type' => 'select',
+    '#title' => 'Output:',
+    '#options' => array(
+      'screen' => t('Screen'),
+      'csv' => t('CSV Spreadsheet Export'),
+    ),
+  );
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -32,6 +40,8 @@ function grievance_report_aged_summary_form($form, &$form_state) {
 
 function grievance_report_aged_summary_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
+
+  $output = $form_state['values']['output'];
 
 	// Get the list of open and closed statuses
   $status_vocabulary = taxonomy_vocabulary_machine_name_load('grievance_status');
@@ -75,7 +85,8 @@ function grievance_report_aged_summary_form_submit($form, &$form_state) {
   	'>2 years',
   	'>3 years',
   	'>4 years',
-  	'>5 years'
+  	'>5 years',
+    'Total',
   );
   $attributes = array();
 
@@ -137,21 +148,56 @@ function grievance_report_aged_summary_form_submit($form, &$form_state) {
 	});
 
   $rows = array();
+  $grand_total = 0;
   foreach ($count_by_which as $id => &$counts) {
   	$row = array();
   	$row[] = $counts['name'];
+    $row_total = 0;
   	foreach ($breakpoints as $breakpoint) {
-  		$row[] = number_format($counts[$breakpoint]);
+      if ($output == 'csv') {
+        $row[] = $counts[$breakpoint];
+      } else {
+        $row[] = number_format($counts[$breakpoint]);
+      }
+      $row_total += $counts[$breakpoint];
+      $grand_total += $counts[$breakpoint];
   	}
+
+    if ($output == 'csv') { 
+      $row[] = $row_total;
+    } else {
+      $row[] = '<strong>' . number_format($row_total) . '</strong>';
+    }
   	$rows[] = $row;
   }
 
   $row = array();
   $row[] = '<strong>Total</strong>';
 	foreach ($breakpoints as $breakpoint) {
-		$row[] = '<strong>' . number_format($count_total[$breakpoint], 0) . '</strong>';
+    if ($output == 'csv') { 
+      $row[] = $count_total[$breakpoint];
+    } else {
+      $row[] = '<strong>' . number_format($count_total[$breakpoint], 0) . '</strong>';
+    }
 	}
+  if ($output == 'csv') {
+    $row[] = $grand_total;
+  } else {
+    $row[] = '<strong>' . number_format($grand_total, 0) . '</strong>';
+  }
 	$rows[] = $row;
+
+  if ($output == 'csv') {
+    $filename = 'aged_summary_' . $which . '.csv';
+    drupal_add_http_header('Content-Type', 'text/csv');
+    drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+    $fp = fopen('php://output', 'w');
+    fputcsv($fp, $header);
+    foreach ($rows as $row) { 
+      fputcsv($fp, $row);
+    }
+    drupal_exit();
+  }
 
 
 	$form_state['results'] = theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => $attributes));

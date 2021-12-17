@@ -15,6 +15,7 @@
       		$('#' + target_id).removeClass('sirius_showhide_target_hidden');
       		$(this).html('hide');
       	}
+      	return false;
       });
 	  } }
 	};

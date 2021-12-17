@@ -1,0 +1,67 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'field_group_page') . "/field_group_page.menu.inc";
+
+function field_group_page_form_alter(&$form, &$form_state, $form_id) {
+	// We're only doing the node forms
+	if (!preg_match('/_node_form$/', $form_id)) { return; }
+	
+	// No field groups!
+	if (!$form['#fieldgroups']) { return; }
+	
+	// Which group to show?
+	$path = current_path();
+	$parts = explode('/', $path);
+	$last_part = array_pop($parts);
+	if (!preg_match('/^group_/', $last_part)) { return; }
+	$group_to_show = $last_part;
+
+	// Ok, we're ready to show just the one group.
+	foreach (array_keys($form['#fieldgroups']) as $group_name) {
+		if ($group_name == $group_to_show) { 
+			// Change the format so that it's not, like, closed or anything; basically convert complex groups like htabs into simple divs.
+			$form['#fieldgroups'][$group_name]->format_type = 'fieldset';
+		} else {
+			// Hide the field group.
+			$form['#fieldgroups'][$group_name]->format_type = 'hidden';
+			
+			// Hide the elements inside the field group.
+			foreach (array_keys($form['#group_children'], $group_name) as $field_name) {
+				$form[$field_name]['#access'] = FALSE;
+			}
+		}
+	}
+}
+
+
+function field_group_page_admin() {
+  $form = array();
+	
+	// List all the field groups
+	$sql = "select * from field_group where entity_type = 'node' order by bundle, group_name";
+	$stmt = db_query($sql, array());
+	$groups = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$hr['data_unserialized'] = unserialize($hr['data']);
+		$groups[] = $hr;
+	}
+	
+	$options = array();
+	foreach ($groups as $group) {
+		$options[$group[id]] = $group['bundle'] . ': ' . $group['data_unserialized']['label'];
+	}
+
+	$form['field_group_page_groups'] = array(
+		'#type' => 'checkboxes',
+		'#options' => $options,
+		'#title' => t('Groups'),
+		'#default_value' => variable_get('field_group_page_groups', ''),
+		'#description' => t("The selected groups should be used as tabs."),
+		'#required' => FALSE,
+		'#multiple' => TRUE,
+	);
+
+
+  return system_settings_form($form);
+}
+
