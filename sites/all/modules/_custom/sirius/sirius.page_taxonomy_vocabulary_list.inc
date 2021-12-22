@@ -10,14 +10,14 @@ function sirius_page_taxonomy_vocabulary_list() {
 	$domain_node = sirius_domain();
 
 	if ($domain_node) {
-		$html .= t('Use the links below to manage drop-down lists (taxonomies) for <strong>@title.</strong>', array('@title' => $domain_node->title));
+		drupal_set_title(drupal_get_title() . ' - ' . $domain_node->title);
 	} else {
-		$html .= t('Use the links below to manage the drop-down lists (taxonomies) for this site.');
+		drupal_set_title(drupal_get_title() . ' - ' . t('No Domain'));
 	}
 
   $all_settings = sirius_taxonomy_settings('all');
 
-	$html .= '<ul>';
+  $rows = array();
 	while ($hr = $stmt->fetchAssoc()) {
 		// This taxonomy must be configured for Sirius access
 		if (!$all_settings[$hr['machine_name']]) { continue; }
@@ -25,25 +25,17 @@ function sirius_page_taxonomy_vocabulary_list() {
 		// The user must have access to these terms
 		if (!user_access('edit terms in ' . $hr['vid']) && !user_access('sirius admin')) { continue; }
 
-		$html .= '<dl>';
+		$row = array();
+		$row[] = $hr['name'];
+		$row[] = $hr['description'];
+		$row[] = l(t('List'), 'sirius/taxonomy/' . $hr['machine_name'], array('attributes' => array('class' => array('tool-button')))) . 
+			l(t('Sort'), 'sirius/taxonomy/' . $hr['machine_name'] . '/sort', array('attributes' => array('class' => array('tool-button'))));
 
-		$html .= '<dt>';
-		$html .= '<strong>' . $hr['name'] . '</strong>';
-		$html .= '</dt>';
-
-		$html .= '<dd>';
-		if ($hr['description']){
-			$html .= $hr['description'];
-			$html .= '<br />';
-		}
-		$html .= l(t('List'), 'sirius/taxonomy/' . $hr['machine_name'], array('attributes' => array('class' => array('tool-button'))));
-		$html .= '&nbsp;';
-		$html .= l(t('Sort'), 'sirius/taxonomy/' . $hr['machine_name'] . '/sort', array('attributes' => array('class' => array('tool-button'))));
-		$html .= '</dd>';
-
-		$html .= '</li>';
+		$rows[] = $row;
 	}
-	$html .= '</ul>';
 
+	$header = array('List Name', 'Description', 'Tools');
+
+	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
 	return $html;
 }

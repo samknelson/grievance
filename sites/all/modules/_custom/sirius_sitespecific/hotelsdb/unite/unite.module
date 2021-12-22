@@ -1,0 +1,289 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.menu.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.relationships.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.blocks.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.quicksearch.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire_local.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.import.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.export.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.fairhotel.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.casino.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.report_changed_status.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.oneoffs.inc";
+
+function unite_node_presave($node) {
+	if ($node->type == 'property') { unite_zip_to_msa($node); }
+}
+
+function unite_zip_to_msa($node) {
+	$zip = $node->field_address['und'][0]['postal_code'];
+	$msa = $node->field_msa['und'][0]['tid'];
+	
+	if ($msa) { return; }
+	if (!$zip) { return; }
+	
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'node');
+	$query->entityCondition('bundle', 'zip_to_msa');
+	$query->fieldCondition('field_zip', 'value', $zip);
+	$result = $query->execute();
+	if (!$result['node']) { return; }
+	
+	$tmp = array_keys($result['node']);
+	$lookup_nid = array_shift($tmp);
+	$lookup_node = node_load($lookup_nid);
+	
+	$msa = $lookup_node->field_msa['und'][0]['tid'];
+	$node->field_msa['und'][0]['tid'] = $msa;
+}
+
+
+function unite_views_query_alter(&$view, &$query) {
+	// Force "input required" even if the widget doesn't support it.
+	if (preg_match('/' . $view->name . '/', variable_get('unite_views_input_required', ''))) {
+		if (!$view->exposed_input) {
+			$view->built = TRUE;
+			$view->executed = TRUE;
+			$view->result = array();
+		}
+	} 
+	
+	// Change the prompts on columns to indicate the relationship searched for.
+	if ($view->name == 'properties_search_20140727') {
+		$changed = 0;
+		foreach ($query->where as $where_group) {
+			foreach ($where_group['conditions'] as $condition) {
+				if ($condition['field'] == 'field_collection_item_field_data_field_relationships__field_data_field_relationship_type.field_relationship_type_value') {
+					$view->field['title_1']->options['label'] = $condition['value'];
+				}
+
+				if ($condition['field'] == 'field_collection_item_field_data_field_relationships_1__field_data_field_relationship_type.field_relationship_type_value') {
+					$view->field['title_2']->options['label'] = $condition['value'];
+				}
+
+				if ($condition['field'] == 'field_collection_item_field_data_field_relationships_2__field_data_field_relationship_type.field_relationship_type_value') {
+					$view->field['title_3']->options['label'] = $condition['value'];
+				}
+
+				if ($condition['field'] == 'field_collection_item_field_data_field_relationships_3__field_data_field_relationship_type.field_relationship_type_value') {
+					$view->field['title_4']->options['label'] = $condition['value'];
+				}
+
+				if ($condition['field'] == 'field_collection_item_field_data_field_relationships_4__field_data_field_relationship_type.field_relationship_type_value') {
+					$view->field['title_5']->options['label'] = $condition['value'];
+				}
+			}
+		}
+	}
+
+	// Our app export needs some nested ands and ors rearranged
+	if ($view->name == 'properties_export') {
+		if (preg_match('/node_changed_fulldate/', $query->where[0]['conditions'][0]['field'])) {
+			// dpm($query->where[0]['conditions'][0]['field']);
+			// dpm(preg_replace('/=/', '<=', $query->where[0]['conditions'][0]['field']));
+			$query->where[0]['conditions'][0]['field'] = preg_replace('/=/', '>=', $query->where[0]['conditions'][0]['field']);
+		}
+		/*
+		if (isset($query->where[3])) {
+
+			$new_where = array();
+
+			$new_where[1] = array();
+			$new_where[1]['args'] = array();
+			$new_where[1]['type'] = 'AND';
+			$new_where[1]['conditions'] = array();
+			$new_where[1]['conditions'][0] = $query->where[1];
+			$new_where[1]['conditions'][0]['type'] = 'OR';
+			$new_where[1]['conditions'][1] = $query->where[2];
+			$new_where[1]['conditions'][1]['type'] = 'OR';
+
+			$new_where[2] = $query->where[3];
+			$new_where[2]['type'] = 'AND';
+
+			dpm($query->where);
+			dpm($new_where);
+
+			$query->where = $new_where;
+		}
+		*/
+		// dpm($query->where);
+	}
+}
+
+function unite_admin() {
+  $form = array();
+	
+  $form['unite_views_input_required'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Views with Input Required'),
+    '#default_value' => variable_get('unite_views_input_required', ''),
+    '#description' => t("Enter the machine names of views (one per row) that require input before running."),
+    '#required' => FALSE,
+  );
+
+  return system_settings_form($form);
+}
+
+function unite_node_tab_local_properties($node) {
+	drupal_set_title($node->title . ': ' . t('Properties'));
+	$result = views_embed_view('properties_search_local','block', $node->nid);
+	return $result;
+}
+
+function unite_node_tab_local_contracts($node) {
+	drupal_set_title($node->title . ': ' . t('Contracts'));
+	$result = views_embed_view('contract_search_local','block', $node->nid);
+	return $result;
+}
+function unite_node_tab_property_contracts($node) {
+	drupal_set_title($node->title . ': ' . t('Contracts'));
+	$result = views_embed_view('contract_search_property','block', $node->nid);
+	return $result;
+}
+
+/***
+ * Implements hook_form_alter
+ */
+
+function unite_form_alter(&$form, &$form_state, $form_id) {
+	if (preg_match('/node_form$/', $form_id)) {
+	  // Set default values for entity fields with autocomplete widgets
+	  $defaultable_fields = array('property', 'actor');
+	  foreach ($defaultable_fields as $field) {
+	    if (isset($_GET[$field]) && isset($form['field_' . $field])) {
+	      $nid = $_GET[$field];
+	      $entity_title = sirius_node_title($nid);
+	      if ($entity_title) {
+	        $form['field_' . $field]["und"][0]['target_id']['#default_value'] = "$entity_title ($nid)";
+	      }
+	    }
+	  }
+	}
+
+
+
+	//
+	// Put a copy of buttons at the top
+	//
+	// Incredible kludge note here.  This works in general, but NOT for display-suite-managed forms, which get run after this.
+	// And sometimes put the bottons in a different region, not accessible through hook_form_alter.
+	// So...
+	// For display-suite-managed forms, add a markup field with the contents
+	// <div id="button-copy-destination">&nbsp;</div>
+	// at the top, and run the JavaScript which I put in the theme.  Good lord.
+	//
+	// (We're not using ds-managed forms on this site, so the above is not necessary, but I'm including it in case I ever need to
+	// come back and figure out what's going on.  See the WV theme for the JS.)
+	// 
+	
+	if (preg_match('/node_form$/', $form_id)) {
+		
+		$form["button-copy-wrapper-start"] = array(
+			'#type' => 'markup',
+			'#markup' => '<div class="button-copy-wrapper">',
+			'#weight' => -1100
+		);
+		
+    foreach($form['actions'] as $name => $button) {
+			if (!is_array($button)) { continue; }
+			$form["$name-copy"] = $button;
+			if (isset($button['#weight'])) {
+				$form["$name-copy"]['#weight'] = $button['#weight']-1000;
+			} else {
+				$form["$name-copy"]['#weight'] = -1000;
+			}
+		}
+
+		$form["button-copy-wrapper-end"] = array(
+			'#type' => 'markup',
+			'#markup' => '</div>',
+			'#weight' => -900
+		);
+  }	
+
+	$form['field_relationships']['#access'] = FALSE;
+}
+
+function unite_cron() {
+	unite_export_feed_cache();
+}
+
+/**
+ * Implements hook_node_view()
+ */
+
+function unite_node_view($node, $view_mode, $langcode) {
+  // Render the "Relationships" field
+  if ($node->type == 'property' || $node->type == 'actor') {
+  	$node->content['unite_relationships'][0]['#markup'] = unite_relationships_render($node);
+  }
+
+  // Render the "Brand" field
+  if ($node->type == 'property' && $node->content['field_brand']) {
+  	$weight = $node->content['field_brand']['#weight'];
+
+  	$html = '';
+  	$term = taxonomy_term_load($node->field_brand['und'][0]['tid']);
+  	if ($term) {
+			$html .= sirius_fakerender_field('Brand:', $term->name);
+      $renderable = field_view_field('taxonomy_term', $term, 'field_service_level', 'full');
+			$html .= render($renderable);
+  		$parents = taxonomy_get_parents($term->tid);
+	  	if ($parents) {
+	  		foreach ($parents as $parent_tid => $parent_term) {
+	  			$html .= sirius_fakerender_field('Brand Parent:', $parent_term->name);
+	  		}
+	  	}
+	  }
+  	$node->content['field_brand'] = array('#weight' => $weight, '#markup' => $html);
+  }
+
+  // Hide FairHotel fields
+  if ($node->type == 'property') {
+	  $hide_fields = unite_fairhotel_fields() + unite_casino_fields();
+	  foreach ($hide_fields as $hide_field) { unset($node->content[$hide_field]); }
+	}
+}
+
+
+/**
+ * Implements hook_sirius_backlinks_from_node()
+ */
+
+function unite_sirius_backlinks_from_node_alter(&$links, $node) {
+	if ($node->type == 'property_actor') {
+		$actor_nid = $node->field_actor['und'][0]['target_id'];
+		if ($actor_nid) {
+			$path = "node/$actor_nid";
+			$links[$path] = array('name' => 'Actor', 'title' => sirius_backlink_title($actor_nid));
+		}
+		$property_nid = $node->field_property['und'][0]['target_id'];
+		if ($property_nid) {
+			$path = "node/$property_nid";
+			$links[$path] = array('name' => 'Property', 'title' => sirius_backlink_title($property_nid));
+		}
+	}
+}
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function unite_sirius_config_links_alter(&$links) {
+	$links = array_merge(array('unite' => array('title' => 'Hotels Database')), $links);
+	$links['unite']['links']['admin/structure/taxonomy/brand'] = array('title' => 'Brands', 'description' => 'Manage brands, parents and service levels.');
+}
+
+function unite_submitted_empty($form_state, $field_name) {
+	$value = $form_state['values'][$field_name]['und'];
+
+	if (!isset($value[0]['value'])) { return TRUE; }
+	if ($value[0]['value'] === '') { return TRUE; }
+
+	return FALSE;
+}
