@@ -1,0 +1,43 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+/**
+ * Implements hook_sirius_letter_recipients_email_alter
+ * 
+ * Shop stewards must CC their organizers
+ */
+
+function grievance_uh100_sirius_letter_recipients_email_alter(&$recipients, $context) {
+  // With suitable permission, don't have to cc organizer
+  if (user_access('grievance uh100 skip organizer cc')) { return; }
+
+  $grievance_node = $context['entity_node'];
+  if ($grievance_node->type != 'grievance') { return; }
+
+  $organizer_uid = $grievance_node->field_grievance_rep_organizer['und'][0]['target_id'];
+  if (!$organizer_uid) { return; }
+
+  $rep_user = user_load($organizer_uid);
+  $email = $rep_user->mail;
+  if (!$email) { return; }
+
+  $recipients[$email]['description'] = 'Assigned Organizer';
+  $recipients[$email]['uid'] = $rep_user->uid;
+  $recipients[$email]['name'] = $rep_user->name;
+  $recipients[$email]['email'] = $rep_user->mail;
+  $recipients[$email]['disposition'] = 'cc';
+  $recipients[$email]['locked'] = 'yes';
+}
+
+
+function grievance_uh100_permission() {
+  return array(
+    'grievance uh100 skip organizer cc' => array(
+      'title' => t('Grievance UH100 Skip Organizer CC'), 
+      'description' => t('Permission to skip CC of organizer when sending letters'),
+    ),
+  );
+}
+ 
