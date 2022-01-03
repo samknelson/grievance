@@ -321,7 +321,7 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 				}
 				$recipients[$candidate_email]['disposition'] = 'to';
 				if (!$recipients[$candidate_email]['delta']) {
-					$recipient[$candidate_email['delta']] = $delta++;
+					$recipient[$candidate_email]['delta'] = $delta++;
 				}
 				if (!$recipients[$candidate_email]['description']) {
 					$recipients[$candidate_email]['description'] = 'Assigned Shop Contact';
