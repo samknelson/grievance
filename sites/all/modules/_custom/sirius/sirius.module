@@ -44,7 +44,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.masquerade.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.letter_wizard.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.fax.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overrides.inc';
+// require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.field_overrides.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.esignature.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mightysearch_actions.inc';
@@ -95,7 +95,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxono
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_sort.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_vocabulary_list.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_taxonomy_list.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_field_overrides.inc';
+// require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_field_overrides.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_letter_template_recipients.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_config.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_esignature_test.inc';
@@ -357,7 +357,7 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
   }
 
   // Field overrides
-  sirius_field_overrides_form_alter($form, $form_state, $form_id);
+  // sirius_field_overrides_form_alter($form, $form_state, $form_id);
 
   // Restrict views exposed filters
   if ($form_id == 'views_exposed_form') {
@@ -550,9 +550,11 @@ function sirius_user_edit_access($account) {
  * Implements hook_node_view
  */
 
+/*
 function sirius_node_view($node, $view_mode, $langcode) {
   return sirius_field_overrides_node_view($node, $view_mode, $langcode);
 }
+*/
 
 /**
  * Implements hook_node_validate
