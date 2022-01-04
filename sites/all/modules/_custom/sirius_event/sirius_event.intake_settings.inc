@@ -278,6 +278,30 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 	 	);
 	}
 
+  $form['intake']['worker'] = array(
+  	'#type' => 'fieldset',
+  	'#title' => t('Workers'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+		'#description' => t('Settings for the Worker record which is created as part of the intake process.'),
+  );
+
+
+	$id2_info = field_info_instance('node', 'field_sirius_id2', 'sirius_worker');
+	$id2_label = $id2_info['label'];
+
+  $form['intake']['worker']['id2_required'] = array(
+  	'#type' => 'select',
+  	'#title' => $id2_label . ' Required',
+  	'#description' => "Should the field <strong>$id2_label</strong> be required for all newly created workers?",
+  	'#options' => array(
+  		NULL => t('-- Select --'),
+  		'No' => t('No'),
+  		'Yes' => t('Yes'),
+  	),
+  	'#default_value' => $json['intake']['worker']['id2_required'],
+  );
+
   $attachment_types = sirius_materials_document_types('sirius_worker');
   $attachment_options = array();
   foreach ($attachment_types as $tid => $term) { $attachment_options[$tid] = $term->name; }

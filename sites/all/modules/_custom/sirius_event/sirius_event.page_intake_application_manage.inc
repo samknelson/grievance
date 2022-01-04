@@ -256,6 +256,8 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 function sirius_node_tab_event_intake_application_manage_form_validate($form, &$form_state) {
 	$application_node = node_load($form_state['application_nid']);
 	$application_json = sirius_json_get($application_node);
+	$event_node = sirius_log_handler($application_node, 'sirius_event');
+	$event_json = sirius_json_get($event_node);
 
 	$action = $form_state['values']['action'];
 	if ($action == 'accept') {
@@ -271,12 +273,13 @@ function sirius_node_tab_event_intake_application_manage_form_validate($form, &$
 
 		$id2 = trim($form_state['values']['id2']);
 		if (!$id2) {
-			form_set_error('id2', 'Please enter an ID.');
+			if ($event_json['intake']['worker']['id2_required'] != 'No') {
+				form_set_error('id2', 'Please enter an ID.');
+			}
 		} else if	(sirius_worker_get_by_id2($id2)) {
 			form_set_error('id2', 'There is already a worker with this ID.');
 		}
 	}
-
 }
 
 function sirius_node_tab_event_intake_application_manage_form_submit($form, &$form_state) {
