@@ -128,13 +128,15 @@ function sirius_event_intake_wizard_intro_form($form, &$form_state, $info, $data
 		'#required' => TRUE,
 	);
 
-	$form['identity']['ssn'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Social Security Number'),
-		'#default_value' => $data['identity']['ssn'],
-		'#required' => TRUE,
-		'#size' => 14,
-	);
+	if ($event_json['intake']['anonymous']['require_ssn'] != 'No') {
+		$form['identity']['ssn'] = array(
+			'#type' => 'textfield',
+			'#title' => t('Social Security Number'),
+			'#default_value' => $data['identity']['ssn'],
+			'#required' => TRUE,
+			'#size' => 14,
+		);
+	}
 
 	$form['identity']['dob'] = array(
 		'#type' => 'date_popup',
@@ -165,12 +167,20 @@ function sirius_event_intake_wizard_intro_form($form, &$form_state, $info, $data
 }
 
 function sirius_event_intake_wizard_intro_form_validate($form, &$form_state) {
-	$ssn = sirius_ssn_format($form_state['values']['identity']['ssn']);
-	if (!sirius_ssn_validate($ssn)) {
-		form_set_error('identity][ssn', 'Please enter a valid social security number.');
-	}
-	if (sirius_worker_get_by_ssn($ssn)) {
-		form_set_error('identity][ssn', 'There is aleady a worker with that social security number.');
+	$info = $form_state['info'];
+	$data = $form_state['data'];
+	$application_node = $form_state['application_node'];
+	$event_node = sirius_log_handler($application_node, 'sirius_event');
+	$event_json = sirius_json_get($event_node);
+
+	if ($event_json['intake']['anonymous']['require_ssn'] != 'No') {
+		$ssn = sirius_ssn_format($form_state['values']['identity']['ssn']);
+		if (!sirius_ssn_validate($ssn)) {
+			form_set_error('identity][ssn', 'Please enter a valid social security number.');
+		}
+		if (sirius_worker_get_by_ssn($ssn)) {
+			form_set_error('identity][ssn', 'There is aleady a worker with that social security number.');
+		}
 	}
 }
 
@@ -185,7 +195,9 @@ function sirius_event_intake_wizard_intro_form_submit($form, &$form_state) {
 	$current_step = $form_state['current_step'];
 
 	$data['identity'] = $form_state['values']['identity'];
-	$data['identity']['ssn'] = sirius_ssn_format($data['identity']['ssn']);
+	if ($event_json['intake']['anonymous']['require_ssn'] != 'No') {
+		$data['identity']['ssn'] = sirius_ssn_format($data['identity']['ssn']);
+	}
 
 	sirius_event_intake_set_title($application_node);
 	sirius_wizard_submit($info, $data, $application_node, $current_step, "Response saved.", array('nonsequential' => TRUE));
