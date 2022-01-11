@@ -25138,7 +25138,7 @@ If the file has multiple pages, then each page in the input document will use th
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_sirius_id2',
-    'label' => 'Titan ID',
+    'label' => 'ID2',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
