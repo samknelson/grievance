@@ -3806,8 +3806,8 @@ Section',
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
   $handler->display->display_options['footer']['area']['empty'] = TRUE;
-  $handler->display->display_options['footer']['area']['content'] = '[<a href="/node/add/grievance-field-overrides">Add an override</a>]
-[<a href="/admin/config/grievances/fieldoverrides/apply">Apply Overrides</a>]';
+  $handler->display->display_options['footer']['area']['content'] = '<a href="/node/add/grievance-field-overrides?destination=admin/config/grievances/fieldoverrides" class="tool-button">Add an override</a>
+<a href="/admin/config/grievances/fieldoverrides/apply" class="tool-button">Apply Overrides</a>';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
   /* Field: Content: Entity Type */
   $handler->display->display_options['fields']['field_grievance_entity_type']['id'] = 'field_grievance_entity_type';
@@ -3875,8 +3875,8 @@ Section',
     t('Asc'),
     t('Desc'),
     t('The list below shows "field overrides".  Sometimes the grievance system uses a field label which is not appropriate to your installation.  For example, the grievance software refers to the union staff person assigned to a grievance as the "Organizer", whereas a particular installation might refer to them as a "Steward".  The list below can be used to override field labels or descriptions.'),
-    t('[<a href="/node/add/grievance-field-overrides">Add an override</a>]
-[<a href="/admin/config/grievances/fieldoverrides/apply">Apply Overrides</a>]'),
+    t('<a href="/node/add/grievance-field-overrides?destination=admin/config/grievances/fieldoverrides" class="tool-button">Add an override</a>
+<a href="/admin/config/grievances/fieldoverrides/apply" class="tool-button">Apply Overrides</a>'),
     t('Entity Type'),
     t('Bundle'),
     t('Field Name'),
@@ -26237,7 +26237,7 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/edit?destination=sirius/admin/help" target="_blank" class="tool-button">Edit</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a>';
   /* Sort criterion: Content: Title */
   $handler->display->display_options['sorts']['title']['id'] = 'title';
   $handler->display->display_options['sorts']['title']['table'] = 'node';
@@ -26343,7 +26343,7 @@ Grievance Form',
     t('Summary'),
     t('Nid'),
     t('Tools'),
-    t('<a href="/node/[nid]/edit?destination=sirius/admin/help" target="_blank" class="tool-button">Edit</a>'),
+    t('<a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a>'),
     t('(substring ok)'),
     t('Body'),
     t('Page'),
@@ -29209,6 +29209,7 @@ Grievance Form',
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
   $handler->display->display_options['fields']['nid']['table'] = 'node';
   $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
   /* Field: Field: ID */
   $handler->display->display_options['fields']['field_sirius_id']['id'] = 'field_sirius_id';
   $handler->display->display_options['fields']['field_sirius_id']['table'] = 'field_data_field_sirius_id';
@@ -29241,8 +29242,8 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" class="tool-button" target="_blank">View</a>
-<a href="/node/[nid]/edit" class="tool-button" target="_blank">Edit</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" class="tool-button">Info</a>
+';
   /* Sort criterion: Field: ID (field_sirius_id) */
   $handler->display->display_options['sorts']['field_sirius_id_value']['id'] = 'field_sirius_id_value';
   $handler->display->display_options['sorts']['field_sirius_id_value']['table'] = 'field_data_field_sirius_id';
@@ -29310,8 +29311,8 @@ Grievance Form',
     t('Can SMS'),
     t('Refreshed At'),
     t('Tools'),
-    t('<a href="/node/[nid]" class="tool-button" target="_blank">View</a>
-<a href="/node/[nid]/edit" class="tool-button" target="_blank">Edit</a>'),
+    t('<a href="/node/[nid]" class="tool-button">Info</a>
+'),
     t('All'),
     t('Substring ok'),
     t('Block'),
@@ -29467,7 +29468,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_id']['id'] = 'field_sirius_id';
   $handler->display->display_options['fields']['field_sirius_id']['table'] = 'field_data_field_sirius_id';
   $handler->display->display_options['fields']['field_sirius_id']['field'] = 'field_sirius_id';
-  /* Field: Field: Titan ID */
+  /* Field: Field: ID2 */
   $handler->display->display_options['fields']['field_sirius_id2']['id'] = 'field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['table'] = 'field_data_field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['field'] = 'field_sirius_id2';
@@ -29541,7 +29542,7 @@ Grievance Form',
   $handler->display->display_options['filters']['field_sirius_id_value']['expose']['remember_roles'] = array(
     2 => '2',
   );
-  /* Filter criterion: Field: Titan ID (field_sirius_id2) */
+  /* Filter criterion: Field: ID2 (field_sirius_id2) */
   $handler->display->display_options['filters']['field_sirius_id2_value']['id'] = 'field_sirius_id2_value';
   $handler->display->display_options['filters']['field_sirius_id2_value']['table'] = 'field_data_field_sirius_id2';
   $handler->display->display_options['filters']['field_sirius_id2_value']['field'] = 'field_sirius_id2_value';
@@ -29608,13 +29609,14 @@ Grievance Form',
     t('Name'),
     t('SSN'),
     t('ID'),
-    t('Titan ID'),
+    t('ID2'),
     t('Work Status'),
     t('Use for Dispatch?'),
     t('All'),
     t('xxx-xx-xxxx, substring ok'),
     t('Badge ID'),
     t('(substring ok)'),
+    t('Titan ID'),
     t('Last Name'),
     t('First Name'),
     t('Page'),
@@ -30902,7 +30904,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_grievance_external_id']['id'] = 'field_grievance_external_id';
   $handler->display->display_options['fields']['field_grievance_external_id']['table'] = 'field_data_field_grievance_external_id';
   $handler->display->display_options['fields']['field_grievance_external_id']['field'] = 'field_grievance_external_id';
-  /* Field: Field: Titan ID */
+  /* Field: Field: ID2 */
   $handler->display->display_options['fields']['field_sirius_id2']['id'] = 'field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['table'] = 'field_data_field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['field'] = 'field_sirius_id2';
@@ -31139,7 +31141,7 @@ Grievance Form',
 '),
     t('Skill Export'),
     t('Number of Days'),
-    t('Titan ID'),
+    t('ID2'),
     t('Payment Types'),
     t('<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>
 <a href="/taxonomy/term/[tid]/sirius_ledger_payment_type_settings?destination=sirius/taxonomy/!1" class="tool-button">Settings</a>'),
@@ -31348,7 +31350,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_id']['table'] = 'field_data_field_sirius_id';
   $handler->display->display_options['fields']['field_sirius_id']['field'] = 'field_sirius_id';
   $handler->display->display_options['fields']['field_sirius_id']['label'] = 'External ID';
-  /* Field: Field: Titan ID */
+  /* Field: Field: ID2 */
   $handler->display->display_options['fields']['field_sirius_id2']['id'] = 'field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['table'] = 'field_data_field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['field'] = 'field_sirius_id2';
@@ -31390,7 +31392,7 @@ Grievance Form',
     t('.'),
     t('Name'),
     t('External ID'),
-    t('Titan ID'),
+    t('ID2'),
     t('Use for Dispatch?'),
     t('Member?'),
     t('Tools'),
@@ -32827,7 +32829,7 @@ Dispatch Info',
   $handler->display->display_options['filters']['field_sirius_id_value']['expose']['remember_roles'] = array(
     2 => '2',
   );
-  /* Filter criterion: Field: Titan ID (field_sirius_id2) */
+  /* Filter criterion: Field: ID2 (field_sirius_id2) */
   $handler->display->display_options['filters']['field_sirius_id2_value']['id'] = 'field_sirius_id2_value';
   $handler->display->display_options['filters']['field_sirius_id2_value']['table'] = 'field_data_field_sirius_id2';
   $handler->display->display_options['filters']['field_sirius_id2_value']['field'] = 'field_sirius_id2_value';
@@ -33250,7 +33252,7 @@ Dispatch Info',
   $handler->display->display_options['fields']['field_sirius_id']['table'] = 'field_data_field_sirius_id';
   $handler->display->display_options['fields']['field_sirius_id']['field'] = 'field_sirius_id';
   $handler->display->display_options['fields']['field_sirius_id']['label'] = 'ID/Badge #';
-  /* Field: Field: Titan ID */
+  /* Field: Field: ID2 */
   $handler->display->display_options['fields']['field_sirius_id2']['id'] = 'field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['table'] = 'field_data_field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['field'] = 'field_sirius_id2';
@@ -33371,6 +33373,7 @@ Dispatch Info',
     t('[field_sirius_work_status]<br><a href="/node/[nid]/sirius_worker_dispatches/status" target="_blank">[field_sirius_worker_dispstatus]</a>'),
     t('<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/sirius_worker_contact" target="_blank" class="tool-button">Contact Info</a> <a href="/node/[nid]/sirius_worker_dispatches" target="_blank" class="tool-button">Dispatches</a> <a href="/node/[nid]/sirius_worker_ledger" target="_blank" class="tool-button">A/R</a>  <a href="/node/[nid]/sirius_worker_industry" target="_blank" class="tool-button">Industries</a> <a href="/node/[nid]/sirius_worker_work_status" target="_blank" class="tool-button">Work Status</a> <a href="/node/[nid]/sirius_worker_materials" target="_blank" class="tool-button">Materials</a>  <a href="/node/[nid]/sirius_worker_tc/certifications" target="_blank" class="tool-button">Certifications</a> <a href="/node/[nid]/sirius_worker_skill/view" target="_blank" class="tool-button">Skills</a>'),
     t('Data export'),
+    t('ID2'),
     t('Address'),
     t('Apt/Suite #'),
     t('State'),
@@ -33426,10 +33429,11 @@ Dispatch Info',
   $handler->display->display_options['fields']['field_sirius_id3']['table'] = 'field_data_field_sirius_id3';
   $handler->display->display_options['fields']['field_sirius_id3']['field'] = 'field_sirius_id3';
   $handler->display->display_options['fields']['field_sirius_id3']['label'] = 'Apprentice ID';
-  /* Field: Field: Titan ID */
+  /* Field: Field: ID2 */
   $handler->display->display_options['fields']['field_sirius_id2']['id'] = 'field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['table'] = 'field_data_field_sirius_id2';
   $handler->display->display_options['fields']['field_sirius_id2']['field'] = 'field_sirius_id2';
+  $handler->display->display_options['fields']['field_sirius_id2']['label'] = 'Titan ID';
   /* Field: Content: Skills */
   $handler->display->display_options['fields']['field_sirius_skill']['id'] = 'field_sirius_skill';
   $handler->display->display_options['fields']['field_sirius_skill']['table'] = 'field_data_field_sirius_skill';
