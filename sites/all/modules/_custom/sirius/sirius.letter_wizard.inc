@@ -311,7 +311,26 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 					'delta' => $delta++,
 				);
 			}
+
+			// Contact from the grievance
+			$candidate_email = $entity_node->field_grievance_co_email['und'][0]['email'];
+			if ($candidate_email) {
+				$recipients[$candidate_email]['email'] = $candidate_email;
+				if ($entity_node->field_grievance_co_name['und'][0]['value']) {
+					$recipients[$candidate_email]['name'] = $entity_node->field_grievance_co_name['und'][0]['value'];
+				}
+				$recipients[$candidate_email]['disposition'] = 'to';
+				if (!$recipients[$candidate_email]['delta']) {
+					$recipient[$candidate_email]['delta'] = $delta++;
+				}
+				if (!$recipients[$candidate_email]['description']) {
+					$recipients[$candidate_email]['description'] = 'Assigned Shop Contact';
+				}
+			}
 		}
+
+		$context = array('entity_node' => $entity_node);
+		drupal_alter('sirius_letter_recipients_email', $recipients, $context);
 	}
 
 
@@ -547,7 +566,13 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 	  $other_material_options = array();
 	  foreach ($other_material_nodes as $other_material_nid => $other_material_node) {
 	  	if (!$other_material_node->field_grievance_attachments['und'][0]['fid']) { continue; }
-	  	$other_material_options[$other_material_nid] = $other_material_node->title;
+	  	foreach ($other_material_node->field_grievance_attachments['und'] as $delta => $file) { 
+	  		$name = $other_material_node->title;
+	  		$name .= ': '; 
+	  		if ($file['origname']) { $name .= $file['origname']; } else { $name .= $file['filename']; }
+	  		if ($file['filesize']) { $name .= ' (' . format_size($file['filesize']) . ')'; }
+		  	$other_material_options["$other_material_nid|$delta"] = $name;
+		  }
 	  }
 	  if ($other_material_options) {
 	  	$form['upload_others'] = array(
@@ -1261,9 +1286,12 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		}
 
 		if ($data['upload_others']) {
-			foreach ($data['upload_others'] as $other_nid) {
+			$keys = array_filter(array_values($data['upload_others']));
+			foreach ($keys as $key) {
+				list ($other_nid, $delta) = explode('|', $key);
+				if (!$delta) { $delta = 0; }
 				$other_node = node_load($other_nid);
-				$record = $other_node->field_grievance_attachments['und'][0];
+				$record = $other_node->field_grievance_attachments['und'][$delta];
 				if ($record) {
 					$uri = $record['uri'];
 					$ext = pathinfo($uri, PATHINFO_EXTENSION);
@@ -1276,7 +1304,7 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 				  file_unmanaged_delete($tmp_uri);
 					$params['attachments'][] = array(
 						'filecontent' => $upload_contents,
-						'filename' => $entity_node->type . '_' . $entity_node->nid . '_' . $other_nid . '_' . time() . '.pdf',
+						'filename' => $entity_node->type . '_' . $entity_node->nid . '_' . $other_nid . '_' . time() . ".$ext",
 						'filemime' => $record['filemime'],
 					);
 				}
@@ -1355,9 +1383,23 @@ function sirius_letter_wizard_review($info, $data, $letter_node, $current_step) 
 	$html .= drupal_render($renderable);
 
 	if ($data['upload_others']) {
-		foreach ($data['upload_others'] as $other_nid) {
-			$other_node = node_load($other_nid);
-			$html .= sirius_fakerender_field("Attachment:", l($other_node->title, 'node/' . $other_node->nid));
+		$keys = array_filter(array_values($data['upload_others']));
+		if ($keys) {
+			foreach ($keys as $key) {
+				list ($other_material_nid, $delta) = explode('|', $key);
+				$other_material_node = node_load($other_material_nid);
+				$file = $other_material_node->field_grievance_attachments['und'][$delta];
+	  		$name = $other_material_node->title;
+	  		$name .= ': '; 
+	  		if ($file['origname']) { $name .= $file['origname']; } else { $name .= $file['filename']; }
+	  		if ($file['filesize']) { $name .= ' (' . format_size($file['filesize']) . ')'; }
+
+	  		$url = '';
+	  		if ($file['uri']) {
+	  			$url = file_create_url($file['uri']);
+	  		}
+				$html .= sirius_fakerender_field("Attachment:", "<a href=\"$url\">$name</a>");
+			}
 		}
 	}
 

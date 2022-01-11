@@ -134,8 +134,6 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 		);
 	} 
 
-	$form += sirius_log_render_form($worker_node->nid, join('+', array('worker:employer', 'dispatch:status', 'worker:dispstatus', 'worker:availdate', 'worker:dispstatus_block')));
-
 	return $form;
 }
 

@@ -123,6 +123,7 @@ function sirius_node_tabs() {
   // Entity Log
   //
 
+  /*
   $content_types = array(
     'sirius_dispatch' => 'sirius dispatch staff',
     'sirius_dispatch_job' => 'sirius dispatch staff',
@@ -143,10 +144,20 @@ function sirius_node_tabs() {
       'weight' => 20,
     );
   }
+  */
 
-  /*
   $buckets = sirius_log_buckets();
+  $permission_lookup = user_permission_get_modules();
   foreach ($buckets as $bucket_id => $bucket) {
+    // Hack to prevent adding menu items for modules that don't exist.
+    // @todo: this is an ugly and cumbersome way to do this, and something better should be found.
+    $ok = TRUE;
+    foreach ($bucket['permissions'] as $permission) {
+      if (!$permission_lookup[$permission]) { $ok = FALSE; }
+    }
+    if (!$ok) {
+      continue;
+    }
     $node_tabs[$bucket['content_type']][$bucket['path']] = array(
       'title' => $bucket['title'],
       'description' => '',
@@ -157,7 +168,6 @@ function sirius_node_tabs() {
       'file' => 'sirius.page_entity_log.inc',
     );
   }
-  */
 
   foreach (sirius_letter_content_types_all() as $content_type => $content_type_name) {
     $node_tabs[$content_type][$content_type . '_letter'] = array(
@@ -280,6 +290,36 @@ function sirius_node_tabs() {
     'weight' => 1,
   );
 
+  $node_tabs['sirius_phonenumber']['sirius_phonenumber_info'] = array(
+    'title' => 'Info',
+    'description' => '',
+    'callback' => 'sirius_node_tab_phonenumber_info',
+    'permissions' => array('sirius domain admin'),
+    'file' => 'sirius.page_phonenumber_info.inc',
+    'weight' => 1,
+    'landing' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $node_tabs['sirius_phonenumber']['sirius_phonenumber_manual_block'] = array(
+    'title' => 'Administrative Block',
+    'description' => '',
+    'callback' => 'sirius_node_tab_phonenumber_manual_block',
+    'permissions' => array('sirius domain admin'),
+    'file' => 'sirius.page_phonenumber_manual_block.inc',
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_phonenumber']['sirius_phonenumber_scan'] = array(
+    'title' => 'Scan',
+    'description' => '',
+    'callback' => 'sirius_node_tab_phonenumber_scan',
+    'permissions' => array('sirius domain admin'),
+    'file' => 'sirius.page_phonenumber_scan.inc',
+    'weight' => 3,
+  );
+
+
   $content_types = array('sirius_log', 'sirius_letterhead', 'sirius_contact', 'sirius_phonenumber', 'sirius_payperiod', 'sirius_dispatch');
   foreach ($content_types as $content_type) {
     $node_tabs[$content_type][$content_type . '_rawjson'] = array(
@@ -306,6 +346,42 @@ function sirius_term_tabs() {
     'permissions' => array('sirius'),
   );
 
+  $customfield_files = array(
+    'sirius.page_entity_customfield.inc', 
+    'sirius.page_entity_customfield_settings.inc', 
+  );
+  foreach (array('sirius_event_type') as $vocabulary) {
+    $term_tabs[$vocabulary][$vocabulary . '_customfield'] = array(
+      'title' => 'Custom Fields',
+      'description' => '',
+      'callback' => 'sirius_term_tab_entity_customfield',
+      'permissions' => array('sirius'),
+      'weight' => 20,
+      'file' => $customfield_files,
+    );
+
+    $term_tabs[$vocabulary][$vocabulary . '_customfield/edit'] = array(
+      'title' => 'Edit',
+      'description' => '',
+      'callback' => 'sirius_term_tab_entity_customfield',
+      'permissions' => array('sirius'),
+      'weight' => 1,
+      'file' => $customfield_files,
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    );
+
+    $term_tabs[$vocabulary][$vocabulary . '_customfield/settings'] = array(
+      'title' => 'Settings',
+      'description' => '',
+      'callback' => 'sirius_term_tab_entity_customfield_settings',
+      'permissions' => array('sirius event admin'),
+      'weight' => 1,
+      'file' => $customfield_files,
+      'type' => MENU_LOCAL_TASK,
+    );
+  }
+
+  sirius_node_tab_set_module('sirius', $term_tabs);
   return $term_tabs;
 
 }
@@ -319,7 +395,11 @@ function sirius_menu() {
   $node_tabs = sirius_node_tab_all('node_tabs');
   foreach ($node_tabs as $node_type => $node_record) {
     foreach ($node_record as $tab_name => $tab_record) {
-      if ($tab_record['type']) { $type = $tab_record['type']; } else { $type = MENU_LOCAL_TASK; }
+      if (isset($tab_record['type'])) { 
+        $type = $tab_record['type'];
+      } else {
+        $type = MENU_LOCAL_TASK;
+      }
       $items['node/%node/' . $tab_name] = array(
         'title' => $tab_record['title'],
         'page callback' => 'sirius_node_tab_content',
@@ -379,7 +459,7 @@ function sirius_menu() {
   );
 
   $items['sirius/news/admin'] = array(
-    'title' => 'News',
+    'title' => 'News: Admin',
     'description' => '',
     'page callback' => 'sirius_page_news_admin',
     'page arguments' => array(),

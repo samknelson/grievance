@@ -5,12 +5,30 @@ function sirius_twilio_page_test() {
 }
 
 function sirius_twilio_page_test_form($form, &$form_state) {
-	$form['intro'] = array(
-		'#type' => 'markup',
-		'#markup' => '<div class="sirius_form_intro">' .
-			t('Use the form below to verify that the Twilio library is properly configured by sending an SMS message.') .
-			'</div>'
-	);
+	$intro_html = '<div class="sirius_form_intro">';
+
+	$result = sirius_twilio_account_fetch();
+	if (!$result['success']) {
+		$account_render = "<em>Twilio account not found: " . $result['msg'] . "</em>";
+	} else {
+		$account_arr = $result['account']->toArray();
+		$account_render = $account_arr['friendlyName'];
+	}
+	$intro_html .= sirius_fakerender_field('Twilio Account:', $account_render);
+
+	$result = sirius_twilio_app_fetch();
+	if (!$result['success']) {
+		$app_render = "<em>Twilio app not found: " . $result['msg'] . "</em>";
+	} else {
+		$app_arr = $result['app']->toArray();
+		$app_render = $app_arr['friendlyName'];
+	}
+	$intro_html .= sirius_fakerender_field('Twilio App:', $app_render);
+
+
+	$intro_html .= '</div>';
+
+	$form['intro'] = array('#markup' => $intro_html);
 
 	$form['to'] = array(
 		'#type' => 'textfield',

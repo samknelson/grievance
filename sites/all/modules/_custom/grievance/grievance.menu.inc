@@ -642,7 +642,7 @@ function grievance_menu() {
 		'description' => '',
 		'page callback' => 'grievance_report_open_summary_with_log',
 		'page arguments' => array(),
-		'access arguments' => array('grievance report'),
+		'access arguments' => array('grievance report open summary with log'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 

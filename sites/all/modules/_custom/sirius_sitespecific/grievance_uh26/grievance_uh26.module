@@ -1,0 +1,32 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+/**
+ * When a new grievance is created, add a notification to remind stewards to send any notifiations.
+ */
+
+function grievance_uh26_form_grievance_node_form_alter(&$form, &$form_state, $form_id) {
+  $classaction = grievance_form_current_value('field_grievance_classaction', 'value', $form, $form_state);
+
+  $keys = array('grievance_workersync_search', 'grievance_workersync_search_submit', 'grievance_workersync_search_result');
+  foreach ($keys as $key) {
+    if ($form[$key]) {
+      if ($classaction == 'Yes') { $form[$key]['#access'] = FALSE; } else { $form[$key]['#access'] = TRUE; }
+    }
+  }
+
+  if (($classaction == 'Yes') && (!grievance_form_current_value('field_grievance_first_name', 'value', $form, $form_state))) {
+    $form_state['input']['field_grievance_first_name']['und'][0]['value'] = 'All Affected';
+  }
+
+  if ($form_state['node'] && $form_state['node']->nid) { return; }
+  if (!is_array($form['actions']['submit']['#submit'])) { return; }
+  if (in_array('grievance_uh26_grievance_node_form_submit', $form['actions']['submit']['#submit'])) { return; }
+  $form['actions']['submit']['#submit'][] = 'grievance_uh26_grievance_node_form_submit';
+}
+
+function grievance_uh26_grievance_node_form_submit($form, &$form_state) {
+  drupal_set_message("Please don't forget to send any appropriate letters to the company.");
+}

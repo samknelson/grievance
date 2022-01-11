@@ -24,6 +24,10 @@ tbody tr {
 	background-color: #ffffff;
 }
 
+tbody tr:hover td {
+	background-color: #eeeeee;
+}
+
 tbody tr.no_bottom {
 	border-bottom: none;
 }

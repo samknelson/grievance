@@ -8979,8 +8979,9 @@ This tool will bulk-update existing grievances, changing their statuses <strong>
   $handler->display->display_options['arguments']['machine_name']['id'] = 'machine_name';
   $handler->display->display_options['arguments']['machine_name']['table'] = 'taxonomy_vocabulary';
   $handler->display->display_options['arguments']['machine_name']['field'] = 'machine_name';
-  $handler->display->display_options['arguments']['machine_name']['default_action'] = 'access denied';
+  $handler->display->display_options['arguments']['machine_name']['default_action'] = 'default';
   $handler->display->display_options['arguments']['machine_name']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['machine_name']['default_argument_options']['argument'] = 'grievance_status';
   $handler->display->display_options['arguments']['machine_name']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['machine_name']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['machine_name']['summary_options']['items_per_page'] = '25';
@@ -9485,12 +9486,12 @@ Grievance Form',
     'group-field_grievance_alert_date_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_alert_date_value',
-      'weight' => '-21',
+      'weight' => '-29',
     ),
     'group-field_grievance_open_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_open_value',
-      'weight' => '-20',
+      'weight' => '-28',
     ),
     'group-field_grievance_chapter_target_id' => array(
       'group' => '2',
@@ -9515,7 +9516,7 @@ Grievance Form',
     'group-field_grievance_id_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_id_value',
-      'weight' => '-19',
+      'weight' => '-27',
     ),
     'group-field_grievance_tags_tid' => array(
       'group' => '2',
@@ -9525,7 +9526,7 @@ Grievance Form',
     'group-field_grievance_classaction_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_classaction_value',
-      'weight' => '-18',
+      'weight' => '-25',
     ),
     'group-uid_2' => array(
       'group' => '3',
@@ -9535,7 +9536,7 @@ Grievance Form',
     'group-field_grievance_broughtby_tid' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_broughtby_tid',
-      'weight' => '-17',
+      'weight' => '-24',
     ),
     'group-field_grievance_min_value' => array(
       'group' => '4',
@@ -9545,7 +9546,7 @@ Grievance Form',
     'group-field_grievance_comments_value' => array(
       'group' => '0',
       'filter_name' => 'field_grievance_comments_value',
-      'weight' => '-16',
+      'weight' => '-23',
     ),
     'group-field_grievance_type_other_value' => array(
       'group' => '5',
@@ -9576,6 +9577,11 @@ Grievance Form',
       'group' => '4',
       'filter_name' => 'field_grievance_classification_value',
       'weight' => '-24',
+    ),
+    'group-field_grievance_external_id_value' => array(
+      'group' => '0',
+      'filter_name' => 'field_grievance_external_id_value',
+      'weight' => '-26',
     ),
   );
   $handler->display->display_options['pager']['type'] = 'full';
@@ -10419,6 +10425,19 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_classification_value']['expose']['remember_roles'] = array(
     2 => '2',
   );
+  /* Filter criterion: Field: External ID (field_grievance_external_id) */
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['id'] = 'field_grievance_external_id_value';
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['table'] = 'field_data_field_grievance_external_id';
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['field'] = 'field_grievance_external_id_value';
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['operator'] = 'contains';
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['expose']['operator_id'] = 'field_grievance_external_id_value_op';
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['expose']['label'] = 'External ID';
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['expose']['operator'] = 'field_grievance_external_id_value_op';
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['expose']['identifier'] = 'field_grievance_external_id_value';
+  $handler->display->display_options['filters']['field_grievance_external_id_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
 
   /* Display: Data export */
   $handler = $view->new_display('views_data_export', 'Data export', 'views_data_export_1');
@@ -10719,6 +10738,7 @@ Grievance Form',
     t('Category'),
     t('Classification (dropdown)'),
     t('Classification (text field)'),
+    t('External ID'),
     t('Data export'),
     t('Page'),
     t('<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a><br>
@@ -26110,6 +26130,8 @@ Grievance Form',
     'page' => 'page',
     'default' => 0,
   );
+  $handler->display->display_options['use_batch'] = 'batch';
+  $handler->display->display_options['segment_size'] = '100';
   $translatables['sirius_grievance_quick_export'] = array(
     t('Master'),
     t('Grievance Quick Export'),
@@ -32378,104 +32400,120 @@ Accepted'),
   $handler->display->display_options['exposed_form']['options']['views_exposed_groups'] = array(
     'format_groups' => 'fieldsets_collapsed',
     'groups' => 'Name & IDs
+Contact Info
 Industry & Employers
 Status & Levels
 Skills
 Dispatch Info',
     'group-field_sirius_member_status_tid' => array(
-      'group' => '2',
+      'group' => '3',
       'filter_name' => 'field_sirius_member_status_tid',
-      'weight' => '-20',
+      'weight' => '-24',
     ),
     'group-field_sirius_industry_tid' => array(
-      'group' => '1',
+      'group' => '2',
       'filter_name' => 'field_sirius_industry_tid',
-      'weight' => '-18',
+      'weight' => '-24',
     ),
     'group-field_grievance_shop_target_id' => array(
-      'group' => '1',
+      'group' => '2',
       'filter_name' => 'field_grievance_shop_target_id',
-      'weight' => '-18',
+      'weight' => '-23',
     ),
     'group-field_sirius_work_status_tid' => array(
-      'group' => '2',
+      'group' => '3',
       'filter_name' => 'field_sirius_work_status_tid',
-      'weight' => '-18',
+      'weight' => '-23',
     ),
     'group-field_sirius_worker_dispstatus_tid' => array(
-      'group' => '4',
+      'group' => '5',
       'filter_name' => 'field_sirius_worker_dispstatus_tid',
-      'weight' => '-20',
+      'weight' => '-24',
     ),
     'group-field_sirius_skill_tid' => array(
-      'group' => '3',
+      'group' => '4',
       'filter_name' => 'field_sirius_skill_tid',
-      'weight' => '-20',
+      'weight' => '-24',
     ),
     'group-field_sirius_dispatch_sib_status_tid' => array(
-      'group' => '4',
+      'group' => '5',
       'filter_name' => 'field_sirius_dispatch_sib_status_tid',
-      'weight' => '-18',
+      'weight' => '-23',
     ),
     'group-field_sirius_dispatch_available_value' => array(
-      'group' => '4',
+      'group' => '5',
       'filter_name' => 'field_sirius_dispatch_available_value',
-      'weight' => '-19',
+      'weight' => '-22',
     ),
     'group-field_sirius_name' => array(
       'group' => '0',
       'filter_name' => 'field_sirius_name',
-      'weight' => '-18',
+      'weight' => '-24',
     ),
     'group-field_sirius_id_value' => array(
       'group' => '0',
       'filter_name' => 'field_sirius_id_value',
-      'weight' => '-18',
+      'weight' => '-23',
     ),
     'group-field_sirius_id2_value' => array(
       'group' => '0',
       'filter_name' => 'field_sirius_id2_value',
-      'weight' => '-18',
+      'weight' => '-22',
     ),
     'group-field_sirius_id3_value' => array(
       'group' => '0',
       'filter_name' => 'field_sirius_id3_value',
-      'weight' => '-18',
+      'weight' => '-21',
     ),
     'group-field_sirius_ssn_value' => array(
       'group' => '0',
       'filter_name' => 'field_sirius_ssn_value',
-      'weight' => '-18',
+      'weight' => '-20',
     ),
     'group-field_sirius_industry_tid_1' => array(
-      'group' => '1',
+      'group' => '2',
       'filter_name' => 'field_sirius_industry_tid_1',
-      'weight' => '-18',
+      'weight' => '-22',
     ),
     'group-field_sirius_member_active_value' => array(
-      'group' => '2',
+      'group' => '3',
       'filter_name' => 'field_sirius_member_active_value',
-      'weight' => '-17',
+      'weight' => '-22',
     ),
     'group-field_sirius_skills_avail_tid' => array(
-      'group' => '3',
+      'group' => '4',
       'filter_name' => 'field_sirius_skills_avail_tid',
-      'weight' => '-18',
+      'weight' => '-23',
     ),
     'group-field_sirius_skill_tid_1' => array(
-      'group' => '3',
+      'group' => '4',
       'filter_name' => 'field_sirius_skill_tid_1',
-      'weight' => '-19',
+      'weight' => '-22',
     ),
     'group-field_sirius_denorm_level_value' => array(
-      'group' => '2',
+      'group' => '3',
       'filter_name' => 'field_sirius_denorm_level_value',
-      'weight' => '-19',
+      'weight' => '-21',
     ),
     'group-field_sirius_dob_value' => array(
       'group' => '0',
       'filter_name' => 'field_sirius_dob_value',
-      'weight' => '-21',
+      'weight' => '-19',
+    ),
+    'group-field_sirius_phone_value' => array(
+      'group' => '1',
+      'filter_name' => 'field_sirius_phone_value',
+      'weight' => '-18',
+    ),
+    'group-field_sirius_address_locality' => array(
+      'group' => '1',
+      'filter_name' => 'field_sirius_address_locality',
+      'weight' => '-16',
+    ),
+    'group-field_sirius_address_thoroughfare' => array(
+      'group' => '1',
+      'filter_name' => 'field_sirius_address_thoroughfare',
+      'weight' => '-17',
     ),
   );
   $handler->display->display_options['pager']['type'] = 'full';
@@ -32943,6 +32981,46 @@ Dispatch Info',
     2 => '2',
   );
   $handler->display->display_options['filters']['field_sirius_dob_value']['year_range'] = '1900:+0';
+  /* Filter criterion: Content: Phone (field_sirius_phone) */
+  $handler->display->display_options['filters']['field_sirius_phone_value']['id'] = 'field_sirius_phone_value';
+  $handler->display->display_options['filters']['field_sirius_phone_value']['table'] = 'field_data_field_sirius_phone';
+  $handler->display->display_options['filters']['field_sirius_phone_value']['field'] = 'field_sirius_phone_value';
+  $handler->display->display_options['filters']['field_sirius_phone_value']['operator'] = 'contains';
+  $handler->display->display_options['filters']['field_sirius_phone_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['operator_id'] = 'field_sirius_phone_value_op';
+  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['label'] = 'Phone';
+  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['description'] = 'use (xxx) xxx-xxxx format.';
+  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['operator'] = 'field_sirius_phone_value_op';
+  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['identifier'] = 'field_sirius_phone_value';
+  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  /* Filter criterion: Content: Address - Locality (i.e. City) */
+  $handler->display->display_options['filters']['field_sirius_address_locality']['id'] = 'field_sirius_address_locality';
+  $handler->display->display_options['filters']['field_sirius_address_locality']['table'] = 'field_data_field_sirius_address';
+  $handler->display->display_options['filters']['field_sirius_address_locality']['field'] = 'field_sirius_address_locality';
+  $handler->display->display_options['filters']['field_sirius_address_locality']['operator'] = 'contains';
+  $handler->display->display_options['filters']['field_sirius_address_locality']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_address_locality']['expose']['operator_id'] = 'field_sirius_address_locality_op';
+  $handler->display->display_options['filters']['field_sirius_address_locality']['expose']['label'] = 'City';
+  $handler->display->display_options['filters']['field_sirius_address_locality']['expose']['operator'] = 'field_sirius_address_locality_op';
+  $handler->display->display_options['filters']['field_sirius_address_locality']['expose']['identifier'] = 'field_sirius_address_locality';
+  $handler->display->display_options['filters']['field_sirius_address_locality']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  /* Filter criterion: Content: Address - Thoroughfare (i.e. Street address) */
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['id'] = 'field_sirius_address_thoroughfare';
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['table'] = 'field_data_field_sirius_address';
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['field'] = 'field_sirius_address_thoroughfare';
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['operator'] = 'contains';
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['expose']['operator_id'] = 'field_sirius_address_thoroughfare_op';
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['expose']['label'] = 'Street address';
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['expose']['operator'] = 'field_sirius_address_thoroughfare_op';
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['expose']['identifier'] = 'field_sirius_address_thoroughfare';
+  $handler->display->display_options['filters']['field_sirius_address_thoroughfare']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -33272,6 +33350,10 @@ Dispatch Info',
     t('Level'),
     t('Denormalize: Level (field_sirius_denorm_level)'),
     t('Date of Birth'),
+    t('Phone'),
+    t('use (xxx) xxx-xxxx format.'),
+    t('City'),
+    t('Street address'),
     t('Page'),
     t('<div /><a href="/node/add/sirius-worker?destination=[current_path]" class="action-button">Add a new worker</a></div>'),
     t('Position'),
@@ -33291,10 +33373,8 @@ Dispatch Info',
     t('Data export'),
     t('Address'),
     t('Apt/Suite #'),
-    t('City'),
     t('State'),
     t('Zip'),
-    t('Phone'),
   );
   $export['sirius_workers'] = $view;
 

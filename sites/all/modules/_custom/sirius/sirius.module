@@ -9,6 +9,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.i
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.auditlog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.aat.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log_quicklog.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log_buckets.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.menu.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.ssn.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.date.inc';
@@ -50,12 +52,14 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sql.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.do_not_disturb.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.server_paths.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.shortlink.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.showhide.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.quickhash.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.richtext.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.map.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.disclaimer.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mailattach.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.customfield.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.bookmark.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
@@ -69,7 +73,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_grieva
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_employee.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_user.inc';
 
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_materials.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_entity_letters.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_news.inc';
@@ -160,6 +163,8 @@ function sirius_node_presave($node) {
 
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_presave($node); }
   if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_presave($node); }
+
+  sirius_addr_node_presave($node);
 }
 
 
@@ -299,6 +304,11 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     sirius_domain_form_alter_node($form, $form_state, $form_id);
   }
 
+  // Remove canonical addresses
+  if (preg_match('/_node_form/', $form_id)) {
+    sirius_addr_form_alter_node($form, $form_state, $form_id);
+  }
+
   // Filter the taxonomy by domain
   if ($form_id == 'taxonomy_form_term' || preg_match('/_node_form/', $form_id)) {
     sirius_domain_restrict_taxonomy_fields($form, $form_id);
@@ -318,7 +328,8 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
       $form_id == 'sirius_bulk_node_form' ||
       $form_id == 'sirius_ledger_account_node_form' ||
       $form_id == 'sirius_employee_node_form' ||
-      $form_id == 'grievance_letter_template_node_form') {
+      $form_id == 'grievance_letter_template_node_form' ||
+      $form_id == 'property_node_form') {
     if (!user_access('sirius admin')) { $form['field_sirius_json']['#access'] = FALSE; }
   }
 
@@ -359,11 +370,16 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     sirius_domain_users_view_form_alter($form, $form_state); 
   }
 
+  if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'sirius_bookmarks') {
+    sirius_bookmark_view_form_alter($form, $form_state); 
+  }
+
   // Log some searches. @todo this should be a general-purpose thing, not a harcoded view name
+  /*
   if ($form_id == 'views_exposed_form') {
     sirius_log_views_exposed_form_alter($form, $form_state); 
   }
-
+  */
 }
 
 /**
@@ -471,6 +487,44 @@ function sirius_block_view($delta = '') {
 }
 
 /**
+ * Implements hook_menu_local_tasks_alter()
+ * Unused at the moment. The idea is that we might want to hide the "View" link for certain content types,
+ * and instead rediret to a sub-tab. But it turns out to be problematic. Nobody likes drupal_goto in node_view,
+ * among other things because it screws with search indexing.
+ */
+
+/*
+function sirius_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  $node = menu_get_object();
+  if ($node && $node->type == 'sirius_phonenumber') {
+    if ($data['tabs'][0]) {
+      foreach ($data['tabs'][0]['output'] as $delta => $item) {
+        if ($item['#link']['path'] == 'node/%/view') {
+          $data['tabs'][0]['output'][$delta]['#theme'] = NULL;
+        }
+      }
+    }
+  }
+}
+*/
+
+function sirius_emptytheme() {
+  return NULL;
+}
+
+function sirius_emptytheme_theme() {
+  return NULL;
+}
+
+function sirius_sirius_emptytheme_theme() {
+  return NULL;
+}
+
+function sirius_sirius_emptytheme() {
+  return NULL;
+}
+
+/**
  * Implements hook_menu_alter()
  */
 
@@ -540,6 +594,14 @@ function sirius_user_edit_access($account) {
  */
 
 function sirius_node_view($node, $view_mode, $langcode) {
+  $landing_tabs = array(
+    'sirius_phonenumber' => 'sirius_phonenumber_info'
+  );
+
+  if ($landing_tabs[$node->type]) {
+    $node->content = array('body' => array('#markup' => sirius_node_tab_content($node, $landing_tabs[$node->type])));
+  }
+
   return sirius_field_overrides_node_view($node, $view_mode, $langcode);
 }
 
@@ -691,6 +753,9 @@ function sirius_sirius_jsonfield_form_definitions() {
  */
 
 function sirius_file_download_access($file_item, $entity_type, $entity) {
+  // God damn signatures
+  // if ($file_item['uri'] && preg_match('/^private\:\/\/sirius_signature\//', $file_item['uri'])) { return TRUE; }
+
   // Allow loopback requests (from the originating server)
   if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
 
@@ -972,5 +1037,15 @@ function sirius_node_title($nid) {
 function sirius_user_cancel_methods_alter(&$methods) {
   if ($methods && $methods['user_cancel_delete']) {
     unset($methods['user_cancel_delete']);
+  }
+}
+
+/**
+ * Implements hook_views_pre_render()
+ */
+
+function sirius_views_pre_render(&$view) {
+  if ($view->name == 'sirius_bookmarks') {
+    return sirius_bookmark_view_pre_render($view);
   }
 }

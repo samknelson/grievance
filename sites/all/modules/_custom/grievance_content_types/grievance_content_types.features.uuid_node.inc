@@ -1844,11 +1844,27 @@ function grievance_content_types_uuid_features_default_content() {
   'tnid' => 0,
   'translate' => 0,
   'uuid' => '4724429e-b5d1-4299-9324-b397bd7f423b',
-  'body' => array(),
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use these pages to assign custom fields sets and values to event types. For example, for classes, an organization might want to keep tracker of the grant name, the location, the required materials, and so forth.</p>
+
+<p>When a new event is created, it will inherit the custom field settings from the event type.&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
   'field_sirius_paths' => array(
     'und' => array(
       0 => array(
-        'value' => 'taxonomy/term/%/sirius_event_type_customfield',
+        'value' => 'taxonomy/term/%/sirius_event_type_customfield/settings',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'taxonomy/term/%/sirius_event_type_customfield/edit',
         'format' => NULL,
       ),
     ),
@@ -4310,6 +4326,116 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Config - Drop-Down List Management',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1638200241,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '962380f5-1892-4c99-ba50-d40cf70e5d75',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The tools below can be used to manage drop-down lists on the site. Many of the lists are domain-specific; others are global across the entire system.</p>
+
+<p>For each list, we show:</p>
+
+<ul>
+	<li>The name of the list (e.g. "Grievance Status" or "Sirius Event Type")</li>
+	<li>A brief description of the list</li>
+	<li>Tools to edit the list, or re-arrange the order of the elements on the list</li>
+</ul>
+
+<p>&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/taxonomy',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the tools below to manage drop-down lists.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-11-29 07:37:21 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Grievance Arbitration Form Settings',
   'log' => '',
   'status' => 1,
@@ -5879,6 +6005,116 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2020-10-23 04:25:52 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Config - Employer User Manager',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1638204158,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'c9163e11-2cd2-42b2-a5f9-f085fe6c6569',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The Employer User Manager is the tool that employers use to manage their own users. Users connected with an employer (if they have the correct permissions) can add additional users, remove users, or reset users\' passwords. To access the employer user manager, go to the <a href="/sirius/admin/shops">employer list page</a> and click on "Users" for any employer.</p>
+
+<p>This page is used to configure the tool. For each of the user roles on the system, select whether that role should be:</p>
+
+<ul>
+	<li><strong>Required:</strong> EVERY user created through the employer user manager must have this role. For example, a role such as "Employer User" might be required.</li>
+	<li><strong>Optional:</strong> Users created through the tool may optionally have this role. For example, there might be a role such as "Employer Dispatch Manager", which would be granted only to certain employer users.</li>
+	<li><strong>Omit:</strong> NO user created through this tool will have this role. For example, administrative roles such as "Sirius Admin" would probably be omitted.</li>
+</ul>
+
+<p>&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/employer/config/usermanage',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Configure roles for the employer user manager.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-11-29 08:42:38 -0800',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(

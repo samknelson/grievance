@@ -22,6 +22,17 @@ function sirius_quickactions_render() {
 				)
 			);
 		}
+
+		if (user_access('sirius bookmark')) {
+			if (in_array($node->type, sirius_bookmark_types())) {
+				sirius_quickactions_add(
+					array(
+						'flag' => 'bookmarks',
+						'nid' => $node->nid,
+					)
+				);
+			}
+		}
 	}
 
 	$links = sirius_quickactions_add();
@@ -37,7 +48,11 @@ function sirius_quickactions_render() {
 
 function sirius_sirius_quickaction_render($link) {
   $markup = '<li><span class="sirius_quickaction_link_wrapper">';
-  $markup .= l('<span class="sirius_quickaction_link_inner">&neArr; ' . $link['title'] . '</span>', $link['path'], array('html' => TRUE, 'attributes' => array('class' => array('sirius_quickaction_link'))));
+	if ($link['flag']) {
+		$markup .= flag_create_link($link['flag'], $link['nid']);
+	} else {
+	  $markup .= l('<span class="sirius_quickaction_link_inner">&neArr; ' . $link['title'] . '</span>', $link['path'], array('html' => TRUE, 'attributes' => array('class' => array('sirius_quickaction_link'))));
+	}
   $markup .= '</span></li>';
   return $markup;
 }
@@ -105,6 +120,8 @@ function sirius_backlinks_from_node($node) {
 	}
 
 	if ($node->type == 'sirius_operator') { $links['sirius/office/operator/list'] = array('name' => 'Operator List'); }
+
+	if ($node->type == 'sirius_phonenumber') { $links['sirius/phonenumber'] = array('name' => 'Phone Number List'); }
 
 	if ($node->type == 'sirius_feed') {
 		$feed_type = $node->field_sirius_type['und'][0]['value'];
@@ -194,6 +211,8 @@ function sirius_backlinks_from_node($node) {
 			}
 		}
 	}
+
+	drupal_alter('sirius_backlinks_from_node', $links, $node);
 
 	return $links;
 }

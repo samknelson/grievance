@@ -1,0 +1,6 @@
+name = UNITE Core
+description = Core functionality for the UNITE HERE suite of modules
+package = UNITE
+core = 7.x
+; configure = admin/config/unite
+; stylesheets[all][] = css/unite.css

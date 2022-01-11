@@ -47,6 +47,36 @@ function grievance_tokens($type, $tokens, array $data = array(), array $options 
     foreach ($tokens as $name => $original) {
 
     	//
+    	// Add "remedy" to fetch names, long descriptions, or full text, whatever is available.
+    	//
+
+    	if ($name == 'remedy') {
+    		// Get the various remedy terms, if any
+    		$remedies = array();
+    		if ($data['node']->field_grievance_remedy['und']) {
+    			foreach ($data['node']->field_grievance_remedy['und'] as $tmp) {
+    				$tid = $tmp['tid'];
+    				$term = taxonomy_term_load($tid);
+    				if (strlen($term->description) > 10) { $remedies[] = $term->description; }
+    				else { $remedies[] = '<p>' . $term->name . '</p>'; }
+    			}
+    		}
+    		if (strlen($data['node']->field_grievance_remedy_other['und'][0]['value']) > 3) {
+    			$remedies[] = '<p>' . $data['node']->field_grievance_remedy_other['und'][0]['value'] . '</p>';
+    		}
+    		if ($remedies) { 
+	    		$remedy_render = '<ul>';
+	    		foreach ($remedies as $remedy) {
+	    			$remedy_render .= '<li>' . $remedy . '</li>';
+	    		}
+	    		$remedy_render .= '</ul>';
+	    	} else {
+	    		$remedy_render = '';
+	    	}
+				$replacements[$original] = $remedy_render;
+			}
+
+    	//
     	// Add "Delivery" as a siml=ple replacement token
     	//
 

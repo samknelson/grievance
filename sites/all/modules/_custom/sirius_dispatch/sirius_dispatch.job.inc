@@ -121,12 +121,12 @@ function sirius_dispatch_job_workerform($form, &$form_state, $states = NULL) {
 	// 
 
 	// We're searching for this worker
-	$search_worker_id = $form_state['values']['worker_id'];
+	$search_worker_id = $form_state['values']['fieldset_workers']['worker_id'];
 
 	// We've selected these workers
 	$selected_workers = array();
-	if ($form_state['values']['workers']) {
-		foreach ($form_state['values']['workers'] as $nid => $value) { 
+	if ($form_state['values']['fieldset_workers']['ajax']['workers']) {
+		foreach ($form_state['values']['fieldset_workers']['ajax']['workers'] as $nid => $value) { 
 			if ($value) { 
 				$selected_workers[$nid] = TRUE;
 			}
@@ -359,16 +359,18 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	$args[':industry_tid'] = $industry_tid;
 
 	// limit by skill
-	$skill_tid = $job_node->field_sirius_skill['und'][0]['tid'];
-	if (!$filters['ignore_skill']) {
-		if ($skill_tid) {
-			$sql .= "and exists (";
-			$sql .= "  select 1 from field_data_field_sirius_skill ";
-			$sql .= "  where field_data_field_sirius_skill.entity_type = 'node' ";
-			$sql .= "  and field_data_field_sirius_skill.entity_id = node.nid ";
-			$sql .= "  and field_sirius_skill_tid = :skill_tid ";
-			$sql .= ") ";
-			$args[':skill_tid'] = $skill_tid;
+	$skill_tids = sirius_fieldvals($job_node, 'field_sirius_skill', 'tid');
+	if (!$filters['ignore_skill'] && $skill_tids) {
+		foreach ($skill_tids as $delta => $skill_tid) {
+			if ($skill_tid) {
+				$sql .= "and exists (";
+				$sql .= "  select 1 from field_data_field_sirius_skill ";
+				$sql .= "  where field_data_field_sirius_skill.entity_type = 'node' ";
+				$sql .= "  and field_data_field_sirius_skill.entity_id = node.nid ";
+				$sql .= "  and field_sirius_skill_tid = :skill_tid_$delta ";
+				$sql .= ") ";
+				$args[":skill_tid_$delta"] = $skill_tid;
+			}
 		}
 	}
 
@@ -703,22 +705,19 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	}
 
 	// Limit by industry.  All jobs need an industry
-	$sql .= "and exists (";
-	$sql .= "  select 1 from field_data_field_sirius_industry ";
-	$sql .= "  where field_data_field_sirius_industry.entity_type = 'node' ";
-	$sql .= "  and field_data_field_sirius_industry.entity_id = node.nid ";
-	$sql .= "  and field_sirius_industry_tid = :industry_tid ";
-	$sql .= ") ";
 	if (!in_array($job_node->field_sirius_industry['und'][0]['tid'], sirius_fieldvals($worker_node, 'field_sirius_industry', 'tid'))) {
 		return array('success' => FALSE, 'msg' => t('This worker is not able to work in the industry for this job.'));
 	}
 
 	$skill_tid = $job_node->field_sirius_skill['und'][0]['tid'];
 	if (!$filters['ignore_skill']) {
-		// limit by skill
-		if ($skill_tid) {
-			if (!in_array($skill_tid, sirius_fieldvals($worker_node, 'field_sirius_skill', 'tid'))) {
-				return array('success' => FALSE, 'msg' => t('The worker does not have the skill required by this job.'));
+		$skill_tids = sirius_fieldvals($job_node, 'field_sirius_skill', 'tid');
+		if ($skill_tids) {
+			foreach ($skill_tids as $delta => $skill_tid) {
+				if (!in_array($skill_tid, sirius_fieldvals($worker_node, 'field_sirius_skill', 'tid'))) {
+					$skill_term = taxonomy_term_load($skill_tid);
+					return array('success' => FALSE, 'msg' => t('The worker does not have the skill @skill_name.', array('@skill_name' => $skill_term->name)));
+				}
 			}
 		}
 	}

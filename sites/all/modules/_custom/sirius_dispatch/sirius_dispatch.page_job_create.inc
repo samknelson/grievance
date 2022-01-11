@@ -1,121 +1,5 @@
 <?php
 
-/***********************************************************
- * Intro - select an employer and job type
- ***********************************************************/
-
-function sirius_dispatch_page_job_create_intro() {
-	return drupal_get_form('sirius_dispatch_page_job_create_intro_form');
-}
-
-function sirius_dispatch_page_job_create_intro_form_ajax($form, $form_state) {
-  $commands = array();
-  $commands[] = ajax_command_replace("#sirius_dispatch_page_job_create_intro_form_ajax_industry", render($form['industry_tid']));
-
-  return array(
-    '#type' => 'ajax',
-    '#commands' => $commands
-  );
-}
-
-function sirius_dispatch_page_job_create_intro_form($form, &$form_state) {
-	if (user_access("sirius dispatch staff")) {
-		$employer_options = array(NULL => t('-- Select --')) + sirius_employer_list();
-		$form['employer_nid'] = array(
-			'#title' => t('Employer'),
-			'#type' => 'select',
-			'#options' => $employer_options,
-			'#required' => TRUE,
-			'#ajax' => array('callback' => 'sirius_dispatch_page_job_create_intro_form_ajax',
-  	  ),
-    );
-	} else {
-		$employer_node = sirius_employer_get();
-		if (!$employer_node) { 
-			drupal_set_message('No employer found for this user', 'error');
-			return array();
-		}
-		$form['employer_nid'] = array(
-			'#type' => 'value',
-			'#value' => $employer_node->nid,
-		);
-		$form['employer_markup'] = array('#markup' => '<div class="sirius_form_intro">Creating a job for <strong>' . $employer_node->title . '</strong></div>');
-	}
-
-	// Job Type
-	$job_types_all = sirius_taxonomy_load('sirius_dispatch_job_type', 'tid', 'field_sirius_name_display');
-	if (user_access('sirius dispatch staff')) {
-		$job_types = $job_types_all;		
-	} else {
-		$job_types = array();
-		if ($employer_node->field_sirius_dispatch_job_types['und']) {
-			$job_type_tids = sirius_fieldvals($employer_node, 'field_sirius_dispatch_job_types', 'tid');
-			foreach ($job_type_tids as $job_type_tid) {
-				$job_types[$job_type_tid] = $job_types_all[$job_type_tid];
-			}
-		}
-	}
-
-	if (!$job_types) {
-		$msg = "This employer is misconfigured. Please make sure that at least one job type is enabled. ";
-		drupal_set_message($msg, 'error');
-		return array();
-	}
-
-	$form['job_type_tid'] = array(
-		'#type' => 'select',
-		'#options' => $job_types,
-		'#title' => t('Request Type'),
-		'#required' => TRUE,
-	);
-
-	if (!$employer_node && $form_state['values']['employer_nid']) {
-		$employer_node = node_load($form_state['values']['employer_nid']);
-	}
-
-	if ($employer_node) {
-		$industry_names = sirius_taxonomy_load('sirius_industry', 'tid', 'name');
-		$industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
-		$industry_options = array(NULL => t('-- Select --'));
-		foreach ($industry_tids as $industry_tid) { $industry_options[$industry_tid] = $industry_names[$industry_tid]; }
-	} else {
-		$industry_options = array();
-	}
-
-	if (count($industry_options) > 2) {
-		$form['industry_tid'] = array(
-			'#type' => 'select',
-			'#options' => $industry_options,
-			'#title' => t('Industry'),
-			'#required' => TRUE,
-			'#prefix' => '<div id="sirius_dispatch_page_job_create_intro_form_ajax_industry">',
-			'#suffix' => '</div>',
-		);
-	} else {
-		$form['industry_tid'] = array('#markup' => '<div id="sirius_dispatch_page_job_create_intro_form_ajax_industry"></div>');
-	}
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => 'Go',
-	);
-
-	return $form;
-}
-
-function sirius_dispatch_page_job_create_intro_form_submit($form, &$form_state) {
-	$employer_nid = $form_state['values']['employer_nid'];
-	$job_type_tid = $form_state['values']['job_type_tid'];
-	$industry_tid = $form_state['values']['industry_tid'];
-	$path = current_path() . '/' . $employer_nid . '/' . $job_type_tid;
-	if ($industry_tid) { $path .= '/' . $industry_tid; }
-	drupal_goto($path);
-}
-
-/***********************************************************
- * Main form - assumes an employer and job type
- ***********************************************************/
-
 function sirius_dispatch_page_job_create_access($employer_node, $job_type_tid, $industry_tid = NULL) {
 	// Staff can create jobs.
 	if (user_access('sirius dispatch staff')) { return TRUE; }
@@ -165,6 +49,8 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 	if (!$industry_tid) { $industry_tid = $employer_node->field_sirius_industry['und'][0]['tid']; }
 	$industry_term = taxonomy_term_load($industry_tid);
 	$form_state['industry_tid'] = $industry_tid;
+
+	$form['#tree'] = TRUE;
 
 	global $user;
 	$job_policy = sirius_dispatch_job_policy_from_tid($job_type_tid);
@@ -246,13 +132,39 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 	// Skill
 	if ($job_policy['form']['hide_skill'] != 'Yes') {
+
 		$skill_options = array(NULL => t('-- No specific skill required --')) + sirius_dispatch_skill_options($industry_tid);
-		$form['skill'] = array(
-			'#type' => 'select',
-			'#options' => $skill_options,
-			'#title' => 'Skill',
-	    '#ajax' => $workers_ajax,
-		);
+
+	  $ajax_params = $form_state['triggering_element']['#sirius_ajax'];
+	  $skill_count = $form_state['skill_count'];
+	  $skill_count += $ajax_params['qty'];
+	  if ($skill_count < 1) { $skill_count = 1; }
+	  $form_state['skill_count'] = $skill_count;
+
+	  $form['skills']['prefix'] = array('#markup' => '<div id="skills">');
+	  for ($i=0; $i<$skill_count; ++$i) {
+			$form['skills'][$i] = array(
+				'#type' => 'select',
+				'#options' => $skill_options,
+				'#title' => 'Skill',
+		    '#ajax' => $workers_ajax,
+			);
+	  }
+	  $form['skills']['suffix'] = array('#markup' => '</div>');
+
+	  $form['add_one'] = array(
+	    '#type' => 'button',
+	    '#value' => t('Add Another Skill'),
+	    '#ajax' => array(
+	      'callback' => 'sirius_ajax_generic_replace',
+	    ),
+	    '#sirius_ajax' => array(
+	      'qty' => 1,
+	      'wrapper' => '#skills',
+	      'element' => 'skills',
+	    ),
+	    '#limit_validation_errors' => array(array('add_one')),
+	  );
 	}
 
 	// Department
@@ -611,8 +523,8 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	}
 
 	for ($i=0; $i<10; ++$i) {
-		if ($form_state['values']["email_$i"] && !sirius_email_validate($form_state['values']["email_$i"])) {
-			form_set_error("email_$i", 'Please enter a valid email addresss.');
+		if ($form_state['values']['notify_details']["email_$i"] && !sirius_email_validate($form_state['values']['notify_details']["email_$i"])) {
+			form_set_error("notify_details][email_$i", 'Please enter a valid email addresss.');
 		}
 	}
 
@@ -780,8 +692,13 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 		$job_node->field_sirius_notes['und'][0]['value'] = $form_state['values']['notes'];
 	}
 
-	if ($form_state['values']['skill']) {
-		$job_node->field_sirius_skill['und'][0]['tid'] = $form_state['values']['skill'];
+	if ($form_state['values']['skills']) {
+		$skill_tids = array_filter(array_values($form_state['values']['skills']));
+		if ($skill_tids) {
+			foreach ($skill_tids as $skill_tid) {
+				$job_node->field_sirius_skill['und'][] = array('tid' => $skill_tid);
+			}
+		}
 	}
 
 	if ($form_state['values']['department']) {
@@ -805,13 +722,13 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 		$job_node->field_sirius_notify['und'][0]['value'] = $form_state['values']['notify'];
 
 		for ($i=0; $i<10; ++$i) {
-			$email = sirius_email_format($form_state['values']["email_$i"]);
+			$email = sirius_email_format($form_state['values']['notify_details']["email_$i"]);
 			$job_node->field_sirius_emails['und'][$i]['value'] = $email;
 		}
 
-		if ($form_state['values']['dispatch_job_nfcns']) {
+		if ($form_state['values']['notify_details']['dispatch_job_nfcns']) {
 			$values = array();
-			foreach ($form_state['values']['dispatch_job_nfcns'] as $name => $value) {
+			foreach ($form_state['values']['notify_details']['dispatch_job_nfcns'] as $name => $value) {
 				if ($value) {
 					$values[] = array('value' => $value);
 				}

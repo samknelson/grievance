@@ -41,6 +41,17 @@ function sirius_node_tab_content($node, $in_tab_name) {
     $args = array_merge($args, $tab_record['callback arguments']);
   }
   sirius_node_tab_handle_requires($tab_record);
+
+  /*
+  // Make landing page redirect to the main view page. Not sure why we bother, though. 
+  if ($tab_record['landing']) {
+    $pattern = preg_replace('/[^a-zA-Z0-9_\/]/', '', $in_tab_name);
+    if (preg_match("/$pattern/", current_path())) {
+      drupal_goto('node/' . $node->nid);
+    }
+  }
+  */
+  
   return call_user_func_array($callback, $args);
 }
 

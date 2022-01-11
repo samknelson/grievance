@@ -1,0 +1,37 @@
+#mightysearch-search-form .clause .form-item {
+	width: auto;
+	float: left;
+	padding-right: 20px;
+	display: table-cell;
+	vertical-align: top;
+}
+
+#mightysearch-search-form .clause .connector-spacer {
+	width: 52px;
+	float: left;
+	padding-right: 20px;
+	display: table-cell;
+	vertical-align: top;
+}
+
+#mightysearch-search-form .clearfix {
+	clear: left;
+	height: 1px;
+}
+
+
+#mightysearch-search-form .clause .form-item label {
+	display: none;
+}
+
+#mightysearch-search-form .clause .form-item input.clause-value {
+	width: 200px;
+}
+
+#mightysearch-search-form .sort .form-item {
+	width: auto;
+	float: left;
+	padding-right: 20px;
+	display: table-cell;
+	vertical-align: top;
+}

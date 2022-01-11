@@ -223,6 +223,18 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 		'#default_value' => $json['intake']['anonymous']['title'],
 	);
 
+	$form['intake']['anonymous']['require_ssn'] = array(
+		'#type' => 'select',
+		'#title' => t('Require SSN?'),
+		'#description' => t('Should anonymous users be required to submit a valid, unique SSN? Default is "Yes".'),
+		'#default_value' => $json['intake']['anonymous']['require_ssn'],
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+	);
+
   $form['intake']['anonymous']['intro'] = array(
     '#type' => 'text_format',
     '#title' => 'Introductory Text',

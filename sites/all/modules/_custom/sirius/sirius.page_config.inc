@@ -93,6 +93,9 @@ function sirius_page_config() {
 	$links['systems']['links']['admin/config/grievance/phaxio'] = array('title' => 'Phaxio', 'description' => 'Configure the Phaxio fax service.');
 	$links['systems']['links']['admin/config/services/shorten'] = array('title' => 'Shorten', 'description' => 'Configure the link shortening services such as blt.ly.');
 	$links['systems']['links']['admin/config'] 									= array('title' => 'Drupal Configuration', 'description' => 'Enter the system-wide Drupal configuration screens.');
+
+	drupal_alter('sirius_config_links', $links);
+
 	$html .= '<table>';
 
 	$html .= '<tr>';

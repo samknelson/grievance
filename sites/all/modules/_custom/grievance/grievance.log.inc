@@ -702,22 +702,35 @@ function grievance_log_views_pre_render($view) {
       if (!$results[$row->nid]) { continue; }
       $html = '<br /><strong>' . t('Events') . '</strong>';
       $count = 0;
+      $counts = array();
       foreach ($results[$row->nid] as $result) {
+
+        $category = $result['field_sirius_category_value'];
+        $type = $result['field_sirius_type_value'];
+
+        ++$counts[$type];
+        if ($counts[$type] > 5) {
+          continue;
+        }
+
         ++$count;
         if ($count > 20) {
-          $html .= "<br />";
-          $html .= "(Subsequent events for this entry are suppressed.)";
+          $html .= " (Display limited to 20 total records)";
           break;
         }
+
         $html .= '<br />';
         $html .= date('Y-m-d H:i:s', $result['created']);
         $html .= ' / ';
-        $html .= $result['field_sirius_category_value'];
+        $html .= $category;
         $html .= ' / ';
-        $html .= l($result['field_sirius_type_value'], 'node/' . $result['nid'], array('attributes' => array('target' => '_blank')));
-        if (($result['field_sirius_type_value'] == 'Bounce' || $result['field_sirius_type_value'] == 'Delivery') && $result['field_sirius_summary_value']) {
+        $html .= l($type, 'node/' . $result['nid'], array('attributes' => array('target' => '_blank')));
+        if (($type == 'Bounce' || $type == 'Delivery') && $result['field_sirius_summary_value']) {
           $html .= ' / ';
           $html .= $result['field_sirius_summary_value'];
+        }
+        if ($counts[$type] == 5) {
+          $html .= " (Display limited to 5 records)";
         }
       }
       $row->field_body[0]['rendered']['#markup'] .= $html;
