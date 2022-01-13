@@ -1383,9 +1383,23 @@ function sirius_letter_wizard_review($info, $data, $letter_node, $current_step) 
 	$html .= drupal_render($renderable);
 
 	if ($data['upload_others']) {
-		foreach ($data['upload_others'] as $other_nid) {
-			$other_node = node_load($other_nid);
-			$html .= sirius_fakerender_field("Attachment:", l($other_node->title, 'node/' . $other_node->nid));
+		$keys = array_filter(array_values($data['upload_others']));
+		if ($keys) {
+			foreach ($keys as $key) {
+				list ($other_material_nid, $delta) = explode('|', $key);
+				$other_material_node = node_load($other_material_nid);
+				$file = $other_material_node->field_grievance_attachments['und'][$delta];
+	  		$name = $other_material_node->title;
+	  		$name .= ': '; 
+	  		if ($file['origname']) { $name .= $file['origname']; } else { $name .= $file['filename']; }
+	  		if ($file['filesize']) { $name .= ' (' . format_size($file['filesize']) . ')'; }
+
+	  		$url = '';
+	  		if ($file['uri']) {
+	  			$url = file_create_url($file['uri']);
+	  		}
+				$html .= sirius_fakerender_field("Attachment:", "<a href=\"$url\">$name</a>");
+			}
 		}
 	}
 

@@ -120,7 +120,11 @@ function sirius_sms_send($params) {
   }
 
   $possible = sirius_phonenumber_sms_possible($phone);
-  if (!$possible) { return array('success' => FALSE, 'msg' => "$phone does not appear to be a mobile-enabled number."); }
+  if (!$possible) { return array('success' => FALSE, 'msg' => "SMS messaging to $phone is not possible because the number is flagged as non-deliverable. Possible causes include a user STOP message, an administrative block, or a detected landline."); }
+
+  $phonenumber_node = sirius_phonenumber_lookup($phone);
+  if (!$phonenumber_node->nid) { node_save($phonenumber_node); }
+  $handler_nids[] = $phonenumber_node->nid;
 
   $result = sirius_twilio_outgoing_sms($phone, $msg, $handler_nid);
 
@@ -143,6 +147,15 @@ function sirius_sms_send($params) {
       $handler_nids
     );
   }
+
+  $phonenumber_json = sirius_json_get($phonenumber_node);
+  $phonenumber_json['last_sms'] = array(
+    'ts' => time(),
+    'params' => $params,
+    'result' => $result,
+  );
+  sirius_json_set($phonenumber_node, $phonenumber_json);
+  node_save($phonenumber_node);
 
   return $result;
 }
@@ -231,8 +244,70 @@ function sirius_phonenumber_node_validate($node, $form, &$form_state) {
 }
 
 function sirius_phonenumber_node_presave($node) {
+  $phonenumber = sirius_phone_format($node->field_sirius_id['und'][0]['value']);
   $node->field_sirius_id['und'][0]['value'] = sirius_phone_format($node->field_sirius_id['und'][0]['value']);
   $node->title = $node->field_sirius_id['und'][0]['value'];
+
+  $sms_possible = $voice_possible = 'Yes';
+
+  $json = sirius_json_get($node);
+  if ($json) {
+    // Clean up legacy
+    if ($json['result']) {
+      if (!$json['scan']) { 
+        $json['scan']['result'] = $json['result'];
+      }
+      unset($json['result']);
+      sirius_json_set($node, $json);
+    }
+
+    // Check scan for carriers, to see if SMS or voice is possible.
+    if ($json['scan']) {
+      if (!$json['scan']['result']['carrier']['mobile_network_code']) {
+        sirius_minilog("$phonenumber: No carrier code found, setting sms_possible = No");
+        $sms_possible = 'No';
+      }
+      if (!$json['scan']['result']['carrier']['name']) {
+        sirius_minilog("$phonenumber: No carrier name found, setting voice_possible = No");
+        $voice_possible = 'No';
+      }
+    }
+
+    // Check for manual block
+    if ($json['manual_block']) {
+      if ($json['manual_block']['sms'] == 'Yes') {
+        sirius_minilog("$phonenumber: Manual SMS block found, setting sms_possible = No");
+        $sms_possible = 'No';
+      }
+      if ($json['manual_block']['voice'] == 'Yes') {
+        sirius_minilog("$phonenumber: Manual voice block found, setting voice_possible = No");
+        $voice_possible = 'No';
+      }
+    }
+
+    // Check for user block
+    if ($json['user_block']) {
+      if ($json['user_block']['sms'] == 'Yes') {
+        sirius_minilog("$phonenumber: User SMS block found, setting sms_possible = No");
+        $sms_possible = 'No';
+      }
+      if ($json['user_block']['voice'] == 'Yes') {
+        sirius_minilog("$phonenumber: User voice block found, setting voice_possible = No");
+        $voice_possible = 'No';
+      }
+    }
+
+    // Check for STOP error code
+    if ($json['last_sms'] && !$json['last_sms']['result']['success']) {
+      if ($json['last_sms']['result']['code'] == 21610) {
+        sirius_minilog("$phonenumber: Last SMS had a result code of 21610, setting sms_possible = No");
+        $sms_possible = 'No';
+      }
+    }
+  }
+
+  $node->field_sirius_sms_possible['und'][0]['value'] = $sms_possible;
+  $node->field_sirius_voice_possible['und'][0]['value'] = $voice_possible;
 }
 
 function sirius_phonenumber_lookup($phonenumber) {
@@ -274,23 +349,22 @@ function sirius_phonenumber_lookup($phonenumber) {
   return $node;
 }
 
-function sirius_phonenumber_check($phonenumber, $force_refresh = FALSE) {
-  $node = sirius_phonenumber_lookup($phonenumber);
-  $json = json_decode($node->field_sirius_json['und'][0]['value'], TRUE);
+function sirius_phonenumber_scan(&$node, $force_refresh = FALSE) {
+  $phonenumber = $node->field_sirius_id['und'][0]['value'];
+  $json = sirius_json_get($node);
 
   if (!$force_refresh && (strtotime($node->field_sirius_datetime['und'][0]['value']) > time() - 60*60*24*30) ) {
     sirius_minilog("Returning cached value, last refreshed " . $node->field_sirius_datetime['und'][0]['value']);
     return $node;
   }
 
-  sirius_minilog("Scanning ...");
+  sirius_minilog("$phonenumber: Scanning ...");
   $result = sirius_twilio_lookup($phonenumber);
-  $json['result'] = $result;
-  sirius_minilog($result['msg']);
+  $json['scan']['result'] = $result;
+  $json['scan']['ts'] = time();
+  sirius_minilog("$phonenumber: " . $result['msg']);
   $node->field_sirius_datetime['und'][0]['value'] = date('Y-m-d H:i:s');
-  $node->field_sirius_json['und'][0]['value'] = json_encode($json);
-  if ($json['result']['carrier']['mobile_network_code']) { $node->field_sirius_sms_possible['und'][0]['value'] = 'Yes'; } else { $node->field_sirius_sms_possible['und'][0]['value'] = 'No'; }
-  if ($json['result']['carrier']['name']) { $node->field_sirius_voice_possible['und'][0]['value'] = 'Yes'; } else { $node->field_sirius_voice_possible['und'][0]['value'] = 'No'; }
+  sirius_json_set($node, $json);
   node_object_prepare($node);
   $node = node_submit($node);
   node_save($node);
@@ -298,16 +372,18 @@ function sirius_phonenumber_check($phonenumber, $force_refresh = FALSE) {
 }
 
 function sirius_phonenumber_voice_possible($phonenumber) {
-  // If lookups aren't enabled, we default to "True"
-  if (!sirius_domain_variable_get('sirius_twilio_lookup_enable_voice', FALSE)) { return TRUE; }
-  $node = sirius_phonenumber_check($phonenumber);
+  $node = sirius_phonenumber_lookup($phonenumber);
+  if (sirius_domain_variable_get('sirius_twilio_lookup_enable_voice', FALSE)) {
+    sirius_phonenumber_scan($node);
+  }
   return $node->field_sirius_voice_possible['und'][0]['value'] != 'No';
 }
 
 function sirius_phonenumber_sms_possible($phonenumber) {
-  // If lookups aren't enabled, we default to "True"
-  if (!sirius_domain_variable_get('sirius_twilio_lookup_enable_sms', FALSE)) { return TRUE; }
-  $node = sirius_phonenumber_check($phonenumber);
+  $node = sirius_phonenumber_lookup($phonenumber);
+  if (sirius_domain_variable_get('sirius_twilio_lookup_enable_sms', FALSE)) {
+    sirius_phonenumber_scan($node);
+  }
   return $node->field_sirius_sms_possible['und'][0]['value'] != 'No';
 }
 
@@ -319,12 +395,19 @@ function sirius_page_phonenumber_check() {
   return drupal_get_form('sirius_page_phonenumber_check_form');
 }
 
-function sirius_page_phonenumber_check_form($form, &$form_state) {
-  $form['phonenumber'] = array(
-    '#type' => 'textfield', 
-    '#title' => t('Phone Number'),
-    '#required' => TRUE,
-  );
+function sirius_page_phonenumber_check_form($form, &$form_state, $phonenumber_node = NULL) {
+  if ($phonenumber_node) { 
+    $form['phonenumber'] = array('#type' => 'value', '#value' => $phonenumber_node->field_sirius_id['und'][0]['value']);
+    // damn form rebuild
+    $phonenumber_node_latest = node_load($phonenumber_node->nid);
+    $form['scan'] = array('#markup' => sirius_phonenumber_render_scan($phonenumber_node_latest));
+  } else {
+    $form['phonenumber'] = array(
+      '#type' => 'textfield', 
+      '#title' => t('Phone Number'),
+      '#required' => TRUE,
+    );
+  }
 
   $form['force'] = array(
     '#type' => 'select', 
@@ -358,7 +441,9 @@ function sirius_page_phonenumber_check_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   $phonenumber = $form_state['values']['phonenumber'];
   if ($form_state['values']['force'] == 'yes') { $force = TRUE; } else { $force = FALSE; }
-  $node = sirius_phonenumber_check($phonenumber, $force);
+
+  $node = sirius_phonenumber_lookup($phonenumber);
+  sirius_phonenumber_scan($node, $force);
   sirius_minilog("SMS Possible: " . $node->field_sirius_sms_possible['und'][0]['value']);
   sirius_minilog("Voice Possible: " . $node->field_sirius_voice_possible['und'][0]['value']);
   sirius_minilog("Details: " . l("Node " . $node->nid, 'node/' . $node->nid));
@@ -430,4 +515,113 @@ function sirius_phone_render($phone) {
   $phone = sirius_phone_format($phone);
   $phone = htmlspecialchars($phone);
   return "<a href=\"tel:$phone\">$phone</a>";
+}
+
+function sirius_phonenumber_render_scan($node) {
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/phone.css');
+
+  $json = sirius_json_get($node);
+
+  if (!$json['scan']) {
+    $html .= t('Scan results are not available.');
+  } else {
+    
+    if ($json['scan']['result']['carrier']) {
+      $carrier_name = $json['scan']['result']['carrier']['name'];
+      if (!$carrier_name) { $carrier_name = 'No carrier'; }
+
+      $carrier_type = $json['scan']['result']['carrier']['type'];
+      if (!$carrier_type) { $carrier_type = 'No type'; }
+
+      $html .= " Carrier: $carrier_name / $carrier_type";
+
+      if ($json['scan']['result']['carrier']['error_code']) {
+        $html .= '<br />' . t('Error code: ') . sirius_twilio_render_error($json['scan']['result']['carrier']['error_code']);
+      }
+    }
+    $html .= '<br />' . t('Scanned ') . date('r', $json['scan']['ts']);
+    $html .= '<br />' . $json['scan']['result']['msg'];
+  }
+
+  $html = '<div class="sirius_phonenumber_scan">' . '<strong>' . t('Last Scan') . '</strong><br />' . $html . '</div>';
+
+  return $html;
+}
+
+function sirius_phonenumber_render_last_sms($node) {
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/phone.css');
+
+  $json = sirius_json_get($node);
+
+  if (!$json['last_sms']) {
+    $html .= t('Last SMS not available.');
+  } else {
+    $html .= $json['last_sms']['params']['sms'];
+    $html .= '<br />' . t('Sent ') . date('r', $json['last_sms']['ts']);
+    if (!$json['last_sms']['result']['success']) {
+      $html .= '<br />' . $json['last_sms']['result']['msg'];
+      if ($json['last_sms']['result']['details']) {
+        $html .= '<br />' . $json['last_sms']['result']['details'];
+      }
+    }
+  }
+
+  $html = '<div class="sirius_phonenumber_last_sms">' . '<strong>' . t('Last Outgoing SMS') . '</strong><br />' . $html . '</div>';
+
+  return $html;
+}
+
+function sirius_phonenumber_render_last_sms_incoming($node) {
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/phone.css');
+
+  $json = sirius_json_get($node);
+
+  if (!$json['last_sms_incoming']) {
+    $html .= t('Last incoming SMS not available.');
+  } else {
+    $html .= $json['last_sms_incoming']['msg'];
+    $html .= '<br />' . t('Sent ') . date('r', $json['last_sms_incoming']['ts']);
+  }
+
+  $html = '<div class="sirius_phonenumber_last_sms">' . '<strong>' . t('Last Incoming SMS') . '</strong><br />' . $html . '</div>';
+
+  return $html;
+}
+
+function sirius_phonenumber_render_user_block($node) {
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/phone.css');
+
+  $json = sirius_json_get($node);
+
+  if (!$json['user_block']) {
+    $html .= t('No user block.');
+  } else {
+    $html .= "SMS block: " . $json['user_block']['sms'];
+    if ($json['user_block']['voice']) { $html .= "<br />Voice block: " . $json['user_block']['voice']; }
+    $html .= "<br />Comments: " . $json['user_block']['comments'];
+    $html .= '<br />' . t('Set on ') . date('r', $json['user_block']['ts']);
+  }
+
+  $html = '<div class="sirius_phonenumber_last_sms">' . '<strong>' . t('User Block') . '</strong><br />' . $html . '</div>';
+
+  return $html;
+}
+
+function sirius_phonenumber_render_manual_block($node) {
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/phone.css');
+
+  $json = sirius_json_get($node);
+
+  if (!$json['manual_block']) {
+    $html .= t('No administrative block.');
+  } else {
+    $html .= "SMS block: " . $json['manual_block']['sms'];
+    $html .= "<br />Voice block: " . $json['manual_block']['voice'];
+    $html .= "<br />Comments: " . $json['manual_block']['comments'];
+    $html .= '<br />' . t('Set on ') . date('r', $json['manual_block']['ts']);
+  }
+
+  $html = '<div class="sirius_phonenumber_last_sms">' . '<strong>' . t('Administrative Block') . '</strong><br />' . $html . '</div>';
+
+  return $html;
 }

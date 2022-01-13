@@ -151,7 +151,14 @@ function sirius_help_block_view($delta = '') {
     $paths[] = current_path();
     $paths[] = drupal_get_path_alias();
     $menu_item = menu_get_item();
-    if ($menu_item['path']) { $paths[] = $menu_item['path']; }
+    if ($menu_item['path']) {
+      $paths[] = $menu_item['path'];
+
+      if ($menu_item['path'] == 'node/%') {
+        $node = menu_get_object();
+        if ($node) { $paths[] = 'node/%|' . $node->type; }
+      }
+    }
 
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node');

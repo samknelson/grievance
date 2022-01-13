@@ -59,6 +59,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.map.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.disclaimer.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mailattach.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.customfield.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.bookmark.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
@@ -369,6 +370,10 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     sirius_domain_users_view_form_alter($form, $form_state); 
   }
 
+  if ($form_id == 'views_exposed_form' && isset($form_state['view']) && $form_state['view']->name == 'sirius_bookmarks') {
+    sirius_bookmark_view_form_alter($form, $form_state); 
+  }
+
   // Log some searches. @todo this should be a general-purpose thing, not a harcoded view name
   /*
   if ($form_id == 'views_exposed_form') {
@@ -482,6 +487,44 @@ function sirius_block_view($delta = '') {
 }
 
 /**
+ * Implements hook_menu_local_tasks_alter()
+ * Unused at the moment. The idea is that we might want to hide the "View" link for certain content types,
+ * and instead rediret to a sub-tab. But it turns out to be problematic. Nobody likes drupal_goto in node_view,
+ * among other things because it screws with search indexing.
+ */
+
+/*
+function sirius_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  $node = menu_get_object();
+  if ($node && $node->type == 'sirius_phonenumber') {
+    if ($data['tabs'][0]) {
+      foreach ($data['tabs'][0]['output'] as $delta => $item) {
+        if ($item['#link']['path'] == 'node/%/view') {
+          $data['tabs'][0]['output'][$delta]['#theme'] = NULL;
+        }
+      }
+    }
+  }
+}
+*/
+
+function sirius_emptytheme() {
+  return NULL;
+}
+
+function sirius_emptytheme_theme() {
+  return NULL;
+}
+
+function sirius_sirius_emptytheme_theme() {
+  return NULL;
+}
+
+function sirius_sirius_emptytheme() {
+  return NULL;
+}
+
+/**
  * Implements hook_menu_alter()
  */
 
@@ -552,6 +595,14 @@ function sirius_user_edit_access($account) {
 
 /*
 function sirius_node_view($node, $view_mode, $langcode) {
+  $landing_tabs = array(
+    'sirius_phonenumber' => 'sirius_phonenumber_info'
+  );
+
+  if ($landing_tabs[$node->type]) {
+    $node->content = array('body' => array('#markup' => sirius_node_tab_content($node, $landing_tabs[$node->type])));
+  }
+
   return sirius_field_overrides_node_view($node, $view_mode, $langcode);
 }
 */
@@ -988,5 +1039,15 @@ function sirius_node_title($nid) {
 function sirius_user_cancel_methods_alter(&$methods) {
   if ($methods && $methods['user_cancel_delete']) {
     unset($methods['user_cancel_delete']);
+  }
+}
+
+/**
+ * Implements hook_views_pre_render()
+ */
+
+function sirius_views_pre_render(&$view) {
+  if ($view->name == 'sirius_bookmarks') {
+    return sirius_bookmark_view_pre_render($view);
   }
 }
