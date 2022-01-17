@@ -2541,35 +2541,6 @@ Section',
 
   /* Display: Actions */
   $handler = $view->new_display('block', 'Actions', 'block');
-
-  /* Display: Notifications */
-  $handler = $view->new_display('block', 'Notifications', 'block_1');
-  $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Field: Content: Nid */
-  $handler->display->display_options['fields']['nid']['id'] = 'nid';
-  $handler->display->display_options['fields']['nid']['table'] = 'node';
-  $handler->display->display_options['fields']['nid']['field'] = 'nid';
-  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
-  /* Field: Content: Status */
-  $handler->display->display_options['fields']['field_grievance_status']['id'] = 'field_grievance_status';
-  $handler->display->display_options['fields']['field_grievance_status']['table'] = 'field_data_field_grievance_status';
-  $handler->display->display_options['fields']['field_grievance_status']['field'] = 'field_grievance_status';
-  $handler->display->display_options['fields']['field_grievance_status']['label'] = 'When a grievance has this status';
-  $handler->display->display_options['fields']['field_grievance_status']['type'] = 'taxonomy_term_reference_plain';
-  /* Field: Field: Subject */
-  $handler->display->display_options['fields']['field_grievance_notify_subject']['id'] = 'field_grievance_notify_subject';
-  $handler->display->display_options['fields']['field_grievance_notify_subject']['table'] = 'field_data_field_grievance_notify_subject';
-  $handler->display->display_options['fields']['field_grievance_notify_subject']['field'] = 'field_grievance_notify_subject';
-  /* Field: Field: Body (Email) */
-  $handler->display->display_options['fields']['field_grievance_notify_body']['id'] = 'field_grievance_notify_body';
-  $handler->display->display_options['fields']['field_grievance_notify_body']['table'] = 'field_data_field_grievance_notify_body';
-  $handler->display->display_options['fields']['field_grievance_notify_body']['field'] = 'field_grievance_notify_body';
-  /* Field: Content: Link to edit content */
-  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
-  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
-  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
-  $handler->display->display_options['fields']['edit_node']['label'] = 'Edit';
-  $handler->display->display_options['fields']['edit_node']['alter']['make_link'] = TRUE;
   $translatables['grievance_contract_rules'] = array(
     t('Master'),
     t('Grievance Contract Rules'),
@@ -2600,9 +2571,6 @@ Section',
     t('Edit'),
     t('All'),
     t('Actions'),
-    t('Notifications'),
-    t('Subject'),
-    t('Body (Email)'),
   );
   $export['grievance_contract_rules'] = $view;
 
@@ -3217,57 +3185,16 @@ Section',
   $handler->display->display_options['fields']['field_grievance_contract']['settings'] = array(
     'filefield_target' => '_blank',
   );
-  /* Field: Sirius: Sirius LinkField */
-  $handler->display->display_options['fields']['linkfield']['id'] = 'linkfield';
-  $handler->display->display_options['fields']['linkfield']['table'] = 'sirius';
-  $handler->display->display_options['fields']['linkfield']['field'] = 'linkfield';
-  $handler->display->display_options['fields']['linkfield']['label'] = 'View';
-  $handler->display->display_options['fields']['linkfield']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['linkfield']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['linkfield']['sirius_linkfield_text'] = 'View';
-  $handler->display->display_options['fields']['linkfield']['sirius_linkfield_path'] = 'node/[nid]';
-  /* Field: Sirius: Sirius LinkField */
-  $handler->display->display_options['fields']['linkfield_1']['id'] = 'linkfield_1';
-  $handler->display->display_options['fields']['linkfield_1']['table'] = 'sirius';
-  $handler->display->display_options['fields']['linkfield_1']['field'] = 'linkfield';
-  $handler->display->display_options['fields']['linkfield_1']['label'] = 'Edit';
-  $handler->display->display_options['fields']['linkfield_1']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['linkfield_1']['alter']['text'] = ' / [linkfield_1]';
-  $handler->display->display_options['fields']['linkfield_1']['sirius_linkfield_text'] = 'Edit';
-  $handler->display->display_options['fields']['linkfield_1']['sirius_linkfield_path'] = 'node/[nid]/edit';
-  /* Field: Sirius: Sirius LinkField */
-  $handler->display->display_options['fields']['linkfield_2']['id'] = 'linkfield_2';
-  $handler->display->display_options['fields']['linkfield_2']['table'] = 'sirius';
-  $handler->display->display_options['fields']['linkfield_2']['field'] = 'linkfield';
-  $handler->display->display_options['fields']['linkfield_2']['label'] = 'Articles';
-  $handler->display->display_options['fields']['linkfield_2']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['linkfield_2']['sirius_linkfield_text'] = 'Articles';
-  $handler->display->display_options['fields']['linkfield_2']['sirius_linkfield_path'] = 'node/[nid]/sections';
-  /* Field: Sirius: Sirius LinkField */
-  $handler->display->display_options['fields']['linkfield_3']['id'] = 'linkfield_3';
-  $handler->display->display_options['fields']['linkfield_3']['table'] = 'sirius';
-  $handler->display->display_options['fields']['linkfield_3']['field'] = 'linkfield';
-  $handler->display->display_options['fields']['linkfield_3']['label'] = 'Sections';
-  $handler->display->display_options['fields']['linkfield_3']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['linkfield_3']['alter']['text'] = ' / [linkfield_3]';
-  $handler->display->display_options['fields']['linkfield_3']['sirius_linkfield_text'] = 'Sections';
-  $handler->display->display_options['fields']['linkfield_3']['sirius_linkfield_path'] = 'node/[nid]/clauses';
-  /* Field: Sirius: Sirius LinkField */
-  $handler->display->display_options['fields']['linkfield_4']['id'] = 'linkfield_4';
-  $handler->display->display_options['fields']['linkfield_4']['table'] = 'sirius';
-  $handler->display->display_options['fields']['linkfield_4']['field'] = 'linkfield';
-  $handler->display->display_options['fields']['linkfield_4']['label'] = 'Rules';
-  $handler->display->display_options['fields']['linkfield_4']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['linkfield_4']['sirius_linkfield_text'] = 'Rules';
-  $handler->display->display_options['fields']['linkfield_4']['sirius_linkfield_path'] = 'node/[nid]/rules';
   /* Field: Global: Custom text */
   $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Actions';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '[linkfield][linkfield_1]<br>
-[linkfield_2][linkfield_3]<br>
-[linkfield_4] ';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" class="tool-button">View</a>
+<a href="/node/[nid]/edit" class="tool-button">Edit</a>
+<a href="/node/[nid]/sections/list" class="tool-button">Articles</a>
+<a href="/node/[nid]/clauses/list" class="tool-button">Sections</a>
+<a href="/node/[nid]/rules" class="tool-button">Rules</a>';
   /* Sort criterion: Content: Title */
   $handler->display->display_options['sorts']['title']['id'] = 'title';
   $handler->display->display_options['sorts']['title']['table'] = 'node';
@@ -3354,17 +3281,12 @@ Section',
     t('Title'),
     t('Notes'),
     t('Contract'),
-    t('View'),
-    t('Edit'),
-    t(' / [linkfield_1]'),
-    t('Articles'),
-    t('Sections'),
-    t(' / [linkfield_3]'),
-    t('Rules'),
     t('Actions'),
-    t('[linkfield][linkfield_1]<br>
-[linkfield_2][linkfield_3]<br>
-[linkfield_4] '),
+    t('<a href="/node/[nid]" class="tool-button">View</a>
+<a href="/node/[nid]/edit" class="tool-button">Edit</a>
+<a href="/node/[nid]/sections/list" class="tool-button">Articles</a>
+<a href="/node/[nid]/clauses/list" class="tool-button">Sections</a>
+<a href="/node/[nid]/rules" class="tool-button">Rules</a>'),
     t('All'),
     t('Active?'),
     t('Page'),
