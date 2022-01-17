@@ -354,7 +354,7 @@ function sirius_node_tab_event_intake_application_manage_form_submit($form, &$fo
 
 	  node_object_prepare($worker_node);
 	  $worker_node = node_submit($worker_node);
-		// node_save($worker_node);
+		node_save($worker_node);
 	  drupal_set_message("Created worker: " . l($worker_node->title . ' (' . $worker_node->field_sirius_id['und'][0]['value'] . ')', 'node/' . $worker_node->nid));
 	  $contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
 
