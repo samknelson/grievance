@@ -1106,6 +1106,7 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  /*
   $items['sirius/field_overrides'] = array(
     'title' => 'Field Overrides',
     'page callback' => 'sirius_page_field_overrides',
@@ -1113,6 +1114,7 @@ function sirius_menu() {
     'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
   );
+  */
 
   $items['sirius/log/quicklog/config'] = array(
     'title' => 'Quicklog Settings',
