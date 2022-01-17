@@ -119,9 +119,15 @@ function sirius_backlinks_from_node($node) {
 		if ($path) { $links[$path] = array('name' => 'Worker', 'title' => sirius_backlink_title($worker_nid)); }
 	}
 
-	if ($node->type == 'sirius_operator') { $links['sirius/office/operator/list'] = array('name' => 'Operator List'); }
+	$subscriber_nid = $node->field_sirius_trust_subscriber['und'][0]['target_id'];
+	if ($subscriber_nid) {
+		$links["node/$subscriber_nid"] = array('name' => 'Subscriber', 'title' => sirius_backlink_title($subscriber_nid));
+	}
 
+	if ($node->type == 'sirius_operator') { $links['sirius/office/operator/list'] = array('name' => 'Operator List'); }
 	if ($node->type == 'sirius_phonenumber') { $links['sirius/phonenumber'] = array('name' => 'Phone Number List'); }
+	if ($node->type == 'sirius_trust_benefit') { $links['sirius/trust/benefits'] = array('name' => 'Benefit List'); }
+	if ($node->type == 'grievance_contract_template') { $links['grievance/admin/contract-templates'] = array('name' => 'Contract List'); }
 
 	if ($node->type == 'sirius_feed') {
 		$feed_type = $node->field_sirius_type['und'][0]['value'];
