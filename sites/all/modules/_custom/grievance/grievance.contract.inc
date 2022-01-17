@@ -24,18 +24,6 @@ function grievance_contract_template_node_tab_rules($contract_template_node) {
   return $result;
 }
 
-function grievance_contract_template_node_tab_notifications($contract_template_node) {
-  $entity_nid = $contract_template_node->nid;
-
-  $result .= grievance_node_tab_get_addlink("grievance-contract-rule", array("grievance_contract_tplt" => $entity_nid));
-
-  $result = views_embed_view('grievance_contract_rules', 'block_1', $entity_nid);
-
-  $result .= grievance_node_tab_get_addlink("grievance-contract-rule", array("grievance_contract_tplt" => $entity_nid));
-
-  return $result;
-}
-
 function grievance_contract_template_node_tab_clauses($contract_template_node) {
   drupal_goto('/node/' . $contract_template_node->nid . '/clauses/list');
 }
