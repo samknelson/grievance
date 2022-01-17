@@ -88,7 +88,7 @@ function sirius_node_tabs() {
     'sirius.page_entity_customfield.inc', 
     'sirius.page_entity_customfield_settings.inc', 
   );
-  foreach (array('sirius_event', 'sirius_ledger_account') as $content_type) {
+  foreach (array('sirius_event', 'sirius_ledger_account', 'sirius_trust_benefit') as $content_type) {
     $node_tabs[$content_type][$content_type . '_customfield'] = array(
       'title' => 'Custom Fields',
       'description' => '',
@@ -112,7 +112,7 @@ function sirius_node_tabs() {
       'title' => 'Settings',
       'description' => '',
       'callback' => 'sirius_node_tab_entity_customfield_settings',
-      'permissions' => array('sirius event admin'),
+      'permissions' => array('sirius'),
       'weight' => 1,
       'file' => $customfield_files,
       'type' => MENU_LOCAL_TASK,
@@ -1127,7 +1127,8 @@ function sirius_menu() {
     'title'            => 'Add Log Entry',
     'page callback'    => 'sirius_log_quicklog_page_add',
     'page arguments'   => array(2),
-    'access arguments' => array('sirius dispatch staff'),
+    'access callback' => 'sirius_menu_access_multiple_permissions',
+    'access arguments' => array('sirius dispatch staff', 'sirius trust staff'),
     'type'             => MENU_LOCAL_ACTION,
     'context'          => MENU_CONTEXT_INLINE,
     'modal'            => TRUE,
@@ -1369,3 +1370,16 @@ function sirius_modal_styles() {
 
   return $styles;
 }
+
+/**
+ * Utility function to allow a menu item to accept any one of multiple permissions
+ */
+
+function sirius_menu_access_multiple_permissions() {
+  $permissions = func_get_args();
+  foreach ($permissions as $permission) {
+    if (user_access($permission)) { return TRUE; }
+  }
+  return FALSE;
+}
+
