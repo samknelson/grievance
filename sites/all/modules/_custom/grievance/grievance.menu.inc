@@ -124,13 +124,6 @@ function grievance_xnode_tabs() {
 		'permissions' => array('grievance contract'),
 	);
 
-	$node_tabs['grievance_contract_template']['notifications'] = array(
-		'title' => 'Notifications',
-		'description' => '',
-		'callback' => 'grievance_contract_template_node_tab_notifications',
-		'permissions' => array('grievance contract'),
-	);
-
 	$node_tabs['grievance_contract_template']['sections'] = array(
 		'title' => 'Articles',
 		'description' => '',

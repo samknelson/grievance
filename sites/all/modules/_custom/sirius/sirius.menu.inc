@@ -88,7 +88,7 @@ function sirius_node_tabs() {
     'sirius.page_entity_customfield.inc', 
     'sirius.page_entity_customfield_settings.inc', 
   );
-  foreach (array('sirius_event', 'sirius_ledger_account') as $content_type) {
+  foreach (array('sirius_event', 'sirius_ledger_account', 'sirius_trust_benefit') as $content_type) {
     $node_tabs[$content_type][$content_type . '_customfield'] = array(
       'title' => 'Custom Fields',
       'description' => '',
@@ -112,7 +112,7 @@ function sirius_node_tabs() {
       'title' => 'Settings',
       'description' => '',
       'callback' => 'sirius_node_tab_entity_customfield_settings',
-      'permissions' => array('sirius event admin'),
+      'permissions' => array('sirius'),
       'weight' => 1,
       'file' => $customfield_files,
       'type' => MENU_LOCAL_TASK,
@@ -290,6 +290,36 @@ function sirius_node_tabs() {
     'weight' => 1,
   );
 
+  $node_tabs['sirius_phonenumber']['sirius_phonenumber_info'] = array(
+    'title' => 'Info',
+    'description' => '',
+    'callback' => 'sirius_node_tab_phonenumber_info',
+    'permissions' => array('sirius domain admin'),
+    'file' => 'sirius.page_phonenumber_info.inc',
+    'weight' => 1,
+    'landing' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $node_tabs['sirius_phonenumber']['sirius_phonenumber_manual_block'] = array(
+    'title' => 'Administrative Block',
+    'description' => '',
+    'callback' => 'sirius_node_tab_phonenumber_manual_block',
+    'permissions' => array('sirius domain admin'),
+    'file' => 'sirius.page_phonenumber_manual_block.inc',
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_phonenumber']['sirius_phonenumber_scan'] = array(
+    'title' => 'Scan',
+    'description' => '',
+    'callback' => 'sirius_node_tab_phonenumber_scan',
+    'permissions' => array('sirius domain admin'),
+    'file' => 'sirius.page_phonenumber_scan.inc',
+    'weight' => 3,
+  );
+
+
   $content_types = array('sirius_log', 'sirius_letterhead', 'sirius_contact', 'sirius_phonenumber', 'sirius_payperiod', 'sirius_dispatch');
   foreach ($content_types as $content_type) {
     $node_tabs[$content_type][$content_type . '_rawjson'] = array(
@@ -316,6 +346,42 @@ function sirius_term_tabs() {
     'permissions' => array('sirius'),
   );
 
+  $customfield_files = array(
+    'sirius.page_entity_customfield.inc', 
+    'sirius.page_entity_customfield_settings.inc', 
+  );
+  foreach (array('sirius_event_type') as $vocabulary) {
+    $term_tabs[$vocabulary][$vocabulary . '_customfield'] = array(
+      'title' => 'Custom Fields',
+      'description' => '',
+      'callback' => 'sirius_term_tab_entity_customfield',
+      'permissions' => array('sirius'),
+      'weight' => 20,
+      'file' => $customfield_files,
+    );
+
+    $term_tabs[$vocabulary][$vocabulary . '_customfield/edit'] = array(
+      'title' => 'Edit',
+      'description' => '',
+      'callback' => 'sirius_term_tab_entity_customfield',
+      'permissions' => array('sirius'),
+      'weight' => 1,
+      'file' => $customfield_files,
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    );
+
+    $term_tabs[$vocabulary][$vocabulary . '_customfield/settings'] = array(
+      'title' => 'Settings',
+      'description' => '',
+      'callback' => 'sirius_term_tab_entity_customfield_settings',
+      'permissions' => array('sirius event admin'),
+      'weight' => 1,
+      'file' => $customfield_files,
+      'type' => MENU_LOCAL_TASK,
+    );
+  }
+
+  sirius_node_tab_set_module('sirius', $term_tabs);
   return $term_tabs;
 
 }
@@ -329,7 +395,11 @@ function sirius_menu() {
   $node_tabs = sirius_node_tab_all('node_tabs');
   foreach ($node_tabs as $node_type => $node_record) {
     foreach ($node_record as $tab_name => $tab_record) {
-      if ($tab_record['type']) { $type = $tab_record['type']; } else { $type = MENU_LOCAL_TASK; }
+      if (isset($tab_record['type'])) { 
+        $type = $tab_record['type'];
+      } else {
+        $type = MENU_LOCAL_TASK;
+      }
       $items['node/%node/' . $tab_name] = array(
         'title' => $tab_record['title'],
         'page callback' => 'sirius_node_tab_content',
@@ -1036,6 +1106,7 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  /*
   $items['sirius/field_overrides'] = array(
     'title' => 'Field Overrides',
     'page callback' => 'sirius_page_field_overrides',
@@ -1043,6 +1114,7 @@ function sirius_menu() {
     'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
   );
+  */
 
   $items['sirius/log/quicklog/config'] = array(
     'title' => 'Quicklog Settings',
@@ -1057,7 +1129,8 @@ function sirius_menu() {
     'title'            => 'Add Log Entry',
     'page callback'    => 'sirius_log_quicklog_page_add',
     'page arguments'   => array(2),
-    'access arguments' => array('sirius dispatch staff'),
+    'access callback' => 'sirius_menu_access_multiple_permissions',
+    'access arguments' => array('sirius dispatch staff', 'sirius trust staff'),
     'type'             => MENU_LOCAL_ACTION,
     'context'          => MENU_CONTEXT_INLINE,
     'modal'            => TRUE,
@@ -1299,3 +1372,16 @@ function sirius_modal_styles() {
 
   return $styles;
 }
+
+/**
+ * Utility function to allow a menu item to accept any one of multiple permissions
+ */
+
+function sirius_menu_access_multiple_permissions() {
+  $permissions = func_get_args();
+  foreach ($permissions as $permission) {
+    if (user_access($permission)) { return TRUE; }
+  }
+  return FALSE;
+}
+

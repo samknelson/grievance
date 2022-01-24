@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @todo: I think everything about this is now deprecated, but it's still referenced by letter_wizard, so I can't remove it yet.
+ */
+
 function sirius_field_overrides_list() {
 	$list = &drupal_static(__FUNCTION__);
 	if (!isset($list)) { 

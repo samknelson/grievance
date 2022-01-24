@@ -74,6 +74,11 @@ if (at_sirius_is_popup()) {
               print ' / ';
             }
 
+            if (user_access('sirius bookmark')) {
+              print l('bookmarks','sirius/bookmarked');
+              print ' / ';
+            }
+
             $user_full = user_load($user->uid);
             if ($user_full->field_grievance_shops['und'][0]['target_id'] && !$user_full->field_grievance_shops['und'][1]['target_id']) {
               $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];

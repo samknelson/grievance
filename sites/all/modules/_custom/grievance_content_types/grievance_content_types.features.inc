@@ -31,6 +31,63 @@ function grievance_content_types_views_api($module = NULL, $api = NULL) {
 }
 
 /**
+ * Implements hook_flag_default_flags().
+ */
+function grievance_content_types_flag_default_flags() {
+  $flags = array();
+  // Exported flag: "Bookmarks".
+  $flags['bookmarks'] = array(
+    'entity_type' => 'node',
+    'title' => 'Bookmarks',
+    'global' => 0,
+    'types' => array(
+      0 => 'grievance',
+      1 => 'grievance_shop',
+      2 => 'sirius_contact',
+      3 => 'sirius_dispatch_job',
+      4 => 'sirius_event',
+      5 => 'sirius_payment',
+      6 => 'sirius_phonenumber',
+      7 => 'sirius_worker',
+    ),
+    'flag_short' => '<span class="unicode_checkbox">&#9744;</span> Bookmark',
+    'flag_long' => 'Add a bookmark to this item.',
+    'flag_message' => '',
+    'unflag_short' => '<span class="unicode_checkbox">&#9745;</span> Bookmark',
+    'unflag_long' => 'Remove the bookmark for this item.',
+    'unflag_message' => '',
+    'unflag_denied_text' => '',
+    'link_type' => 'toggle',
+    'weight' => 0,
+    'show_in_links' => array(
+      'full' => 0,
+      'teaser' => 0,
+      'rss' => 0,
+      'diff_standard' => 0,
+      'token' => 0,
+      'sirius_worker' => 0,
+      'grievance_arbitrationform' => 0,
+      'grievance_form_226' => 0,
+      'grievance_gform' => 0,
+      'grievance_gform_a' => 0,
+      'revision' => 0,
+    ),
+    'show_as_field' => 0,
+    'show_on_form' => 0,
+    'access_author' => '',
+    'show_contextual_link' => 0,
+    'i18n' => 0,
+    'module' => 'grievance_content_types',
+    'locked' => array(
+      0 => 'name',
+    ),
+    'api_version' => 3,
+  );
+  return $flags;
+
+}
+
+/**
  * Implements hook_image_default_styles().
  */
 function grievance_content_types_image_default_styles() {

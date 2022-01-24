@@ -245,3 +245,35 @@ function sirius_update_7015() {
     sirius_domain_component_enable('bulk', $domain_node);
   }
 }
+
+/**
+ * Turn on the Flag module
+ */
+
+function sirius_update_7016() {
+  $modules = array('shortcut');
+  foreach ($modules as $module) {
+    print "Disabling $module\n";
+    module_disable(array($module), TRUE);
+  }
+
+  $modules = array('flag');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+
+  $if_you_haves = array('sirius admin', 'sirius domain admin');
+  $then_you_gets = array('sirius bookmark');
+
+  foreach ($if_you_haves as $if_you_have) {
+    foreach ($then_you_gets as $then_you_get) {
+      print "Granting new permission [$then_you_get] to anybody with permission [$if_you_have] ...\n";
+      $roles = user_roles(FALSE, $if_you_have);
+      foreach ($roles as $rid => $name) {
+        print "... granting [$then_you_get] to [$name]\n";
+        user_role_grant_permissions($rid, array($then_you_get));
+      }
+    }
+  }
+}

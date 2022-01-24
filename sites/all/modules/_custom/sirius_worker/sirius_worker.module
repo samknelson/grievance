@@ -357,3 +357,53 @@ function sirius_worker_file_download_access($file_item, $entity_type, $entity) {
   }
 }
 
+function sirius_worker_schedule_tor_list_all($params) {
+  $domain_nid = sirius_domain_nid();
+  $sql_args = array();
+  $sql = "select  distinct node.nid from node ";
+  // $sql = "select job_node.* from node ";
+  $sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
+
+  $sql .= "left join node dispatch_node on dispatch_node.type = 'sirius_dispatch' and dispatch_node.nid = field_sirius_log_handler_target_id ";
+  $sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = dispatch_node.nid ";
+
+  $sql .= "left join node job_node on job_node.type = 'sirius_dispatch_job' and job_node.nid = field_sirius_dispatch_job_target_id ";
+  $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
+
+  $sql .= "where node.type = 'sirius_log' ";
+  $sql .= "and field_sirius_category_value = 'tor' ";
+  if ($params['status']) {
+    $sql .= "and field_sirius_type_value = :type ";
+    $sql_args[':type'] = $params['status']; 
+  }
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id IS NULL ";
+  }
+  if ($params['employer_nid']) {
+    $sql .= 'and field_grievance_shop_target_id = :employer_nid ';
+    $sql_args[':employer_nid'] = $params['employer_nid'];
+  }
+
+  if ($params['start_date']) {
+    $sql .= "and node.created >= :start_ts ";
+    $sql_args[':start_ts'] = strtotime($params['start_date'] . ' GMT');
+  }
+  if ($params['end_date']) {
+    $sql .= "and node.created <= :end_ts ";
+    $sql_args[':end_ts'] = strtotime($params['end_date'] . ' GMT');
+  }
+  $sql .= "order by node.created desc ";
+  $sql .= "limit 500";
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $tor_nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $tor_nids[] = $hr['nid'];
+  }
+  return node_load_multiple($tor_nids);
+}

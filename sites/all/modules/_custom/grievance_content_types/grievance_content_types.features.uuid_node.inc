@@ -2365,6 +2365,108 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '4840e21c-6ce8-4fb7-84cb-fa178e20b95b',
 );
   $nodes[] = array(
+  'title' => 'Phone Number - Administrative Block',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1640947935,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '527b6e8b-a7da-4413-a154-25bf66bde833',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>An administrative block may be applied to a phone number, for example, if the owner of the number contacts the site administrator and requests to stop receiving messages. Administrative blocks can be used to prevent outgiong text messages (SMS) or voice messages. Administrative blocks have no effect on incoming messages.</p>
+
+<p>Note that administrative blocks are <em>in addition </em>to other forms of blocks. For example, if a user opts out of messaging by sending a "STOP" text message, a user block is created. These blocks can only be cleared by the user (for example, by sending a "START" text message.) Site administrators cannot set or clear user blocks.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_phonenumber_manual_block',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this form to set an administrative block for a phone number.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-12-31 02:52:15 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Do Not Disturb',
   'log' => '',
   'status' => 1,
@@ -3675,6 +3777,106 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2018-11-30 09:28:05 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Phone Number - Scan',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1640948582,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '7ad725b4-9de3-4b2b-a0bf-d4b74a6b2ca4',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>"Scanning" a phone number fetches carrier information from the service provider. There is a small fee associated with each scan.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_phonenumber_scan',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the form below to scan a phone number.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-12-31 03:03:02 -0800',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -5213,6 +5415,140 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2020-11-09 04:34:40 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Phone Number - Info',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1640907819,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'ad9a4f3c-ab1c-44cb-ba77-7dc592cc30d9',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p><strong>SMS / Voice Possible</strong></p>
+
+<p>These flags indicate whether the system is permitted to send SMS or Voice messages to the phone number. It is not possible to set these flags directly; they are calculated from the other settings shown below.</p>
+
+<p><strong>Last Scan</strong></p>
+
+<p>This section indicates the results of the last "scan" of the number. Numbers are generally scanned at most once a month. (It is possible to disable scans in the <a href="/sirius/config/phone/twilio">Twilio settings</a>; scans reduce the number of texts sent to invalid numbers, but there is a small fee each time a number is scanned.)&nbsp;If a scan returns no carrier, then both SMS and Voice are both disabled for the number. If the scan returns no mobile carrier, then SMS is disabled.</p>
+
+<p><strong>Last Outgoing SMS</strong></p>
+
+<p>This indicates the last outgoing SMS message sent by the system to this number. Prior messages are recorded in the log.</p>
+
+<p><strong>Last Incoming SMS</strong></p>
+
+<p>This indicates the last incoming SMS sent to the system by this number. Prior messages are stored in the log.</p>
+
+<p><strong>User Block</strong></p>
+
+<p>This indicates whether the owner of this number has blocked text messages sent by this system. Blocks are created when the user sends a message which consists of one of the strings \'STOP\', \'STOPALL\', \'UNSUBSCRIBE\', \'CANCEL\', \'END\', \'QUIT\', or \'SIRIUSSTOP\'. (Case is unimportant, but the message can\'t contain additional text; so for example "Stop!" will work, but "Please Stop" will not.)</p>
+
+<p>Once the user has sent one of these messages, then SMS messaging to this number is disabled until the user sends a subsequent message which consists of one of the strings&nbsp;\'START\', \'YES\', or \'SIRIUSSTART\'.</p>
+
+<p>User blocks cannot be created or removed by administrators. Only the owner of the phone number can create or remove user blocks.</p>
+
+<p><strong>Manual Block</strong></p>
+
+<p>This tool can be used by administrators to manually disable text or voice messaging to the number. For example, if the user contacts the site administrator and asks to stop receiving messages, the administrator might put a manual block on the number.</p>
+
+<p><strong>Contacts and Workers</strong></p>
+
+<p>If the phone number is associated with any contact or worker records, they will be displayed at the bottom of the page.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_phonenumber_info',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'node/%|sirius_phonenumber',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this page to view information about a phone number.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2021-12-30 15:43:39 -0800',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(

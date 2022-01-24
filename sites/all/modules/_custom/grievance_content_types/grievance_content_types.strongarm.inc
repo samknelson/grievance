@@ -721,6 +721,13 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_enable_revisions_page_node_grievance_field_overrides';
+  $strongarm->value = 0;
+  $export['diff_enable_revisions_page_node_grievance_field_overrides'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'diff_enable_revisions_page_node_grievance_irset';
   $strongarm->value = 0;
   $export['diff_enable_revisions_page_node_grievance_irset'] = $strongarm;
@@ -931,6 +938,13 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_show_preview_changes_node_grievance_field_overrides';
+  $strongarm->value = 0;
+  $export['diff_show_preview_changes_node_grievance_field_overrides'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'diff_show_preview_changes_node_grievance_irset';
   $strongarm->value = 0;
   $export['diff_show_preview_changes_node_grievance_irset'] = $strongarm;
@@ -1137,6 +1151,13 @@ function grievance_content_types_strongarm() {
   $strongarm->name = 'diff_view_mode_preview_node_grievance_chapter';
   $strongarm->value = 'full';
   $export['diff_view_mode_preview_node_grievance_chapter'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_view_mode_preview_node_grievance_field_overrides';
+  $strongarm->value = 'full';
+  $export['diff_view_mode_preview_node_grievance_field_overrides'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -1688,6 +1709,12 @@ function grievance_content_types_strongarm() {
         'custom_settings' => FALSE,
       ),
       'grievance_form_226' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'sirius_worker' => array(
         'custom_settings' => FALSE,
       ),
     ),

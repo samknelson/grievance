@@ -43,7 +43,7 @@ function at_sirius_preprocess_page(&$vars) {
 
 
   $quickactions = sirius_quickactions_render();
-  if ($quickactions) {
+  if ($quickactions && $vars['primary_local_tasks']) {
     foreach ($quickactions as $quickaction) {
       $vars['primary_local_tasks'][] = $quickaction;
     }
