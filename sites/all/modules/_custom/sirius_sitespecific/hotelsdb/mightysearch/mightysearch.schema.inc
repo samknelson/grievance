@@ -122,6 +122,16 @@ function mightysearch_mschema() {
 		'type' => 'integer',
 	);
 
+	$schema['property']['fields']['calc_owner_last_updated'] = array(
+		'prompt' => 'Owner Last Updated',
+		'type' => 'date',
+	);
+
+	$schema['property']['fields']['calc_operator_last_updated'] = array(
+		'prompt' => 'Operator Last Updated',
+		'type' => 'date',
+	);
+
 	$schema['property']['fields']['is_casino'] = array(
 		'prompt' => 'Casino?',
 		'type' => 'text',
