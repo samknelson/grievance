@@ -314,7 +314,6 @@ function unite_relationship_node_presave($relationship_node) {
 		if ($is_operator) { $property_node->field_calc_operator_last_updated['und'][0]['value'] = gmdate('Y-m-d H:i'); }
 		node_save($property_node);
 	}
-	drupal_set_message("Updating: " . print_r($property_nids, 1));
 }
 
 /**
