@@ -74,6 +74,10 @@ function sirius_backlinks_render() {
 	$term = menu_get_object('taxonomy_term', 2);
 	if ($term && is_object($term)) { $links += sirius_backlinks_from_term($term); }
 
+	if ($_GET['destination']) {
+		$links[$_GET['destination']] = array('name' => 'Cancel');
+	}
+
 	if (!$links) { return; }
 
 	$html = '';
@@ -216,6 +220,11 @@ function sirius_backlinks_from_node($node) {
 				$links[$path] = array('name' => $name, 'title' => $hr['title']);
 			}
 		}
+	}
+
+	if ($node->type == 'sirius_json_definition') {
+		$definition_type = $node->field_sirius_type['und'][0]['value'];
+		if ($definition_type == 'sirius_event:catalog')	{ $links['sirius/event/catalog/list'] = array('name' => 'All Catalogs'); }
 	}
 
 	drupal_alter('sirius_backlinks_from_node', $links, $node);
