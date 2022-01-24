@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * One-off functions. I believe that this entire file is unreferenced and should be removed.
+ */
+
 function unite_import_development_status() {
 	$stmt = db_query(
 		'SELECT nid FROM {node} WHERE type = :type',
