@@ -828,7 +828,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Operator Last Updated',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -884,7 +884,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Owner Last Updated',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -1178,7 +1178,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Installed Slots As Of',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -1320,7 +1320,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'label' => 'Installed Tables As Of',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
