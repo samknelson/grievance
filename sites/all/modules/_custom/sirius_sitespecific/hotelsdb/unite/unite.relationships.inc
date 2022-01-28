@@ -280,3 +280,75 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
 
 	return $html;
 }
+
+/**
+ * Set owner / operator last updated
+ */
+
+function unite_relationship_node_presave($relationship_node) {
+	$original_node = $relationship_node->original;
+
+	// Are we updating the owner and / or operator?
+	if ($relationship_node->field_relationship_type['und'][0]['value'] == 'Owner') { $is_owner = TRUE; }
+	if ($relationship_node->field_relationship_type['und'][0]['value'] == 'Operator') { $is_operator = TRUE; }
+
+	if ($original_node) {
+		if ($original_node->field_relationship_type['und'][0]['value'] == 'Owner') { $is_owner = TRUE; }
+		if ($original_node->field_relationship_type['und'][0]['value'] == 'Operator') { $is_operator = TRUE; }
+	}
+
+	if (!$is_owner && !$is_operator) { return; }
+
+	// Is this a "real" change?
+	if (!unite_nodes_have_interesting_differences($relationship_node, $original_node)) { return; }
+
+	// Which properties? Might be none, might be two.
+	$property_nids = array();
+	$property_nids[] = $relationship_node->field_property['und'][0]['target_id'];
+	if ($original_node) { $property_nids[] = $original_node->field_property['und'][0]['target_id']; }
+	$property_nids = array_filter(array_unique($property_nids));
+
+	foreach ($property_nids as $property_nid) {
+		$property_node = node_load($property_nid);
+		if ($is_owner) { $property_node->field_calc_owner_last_updated['und'][0]['value'] = gmdate('Y-m-d H:i'); }
+		if ($is_operator) { $property_node->field_calc_operator_last_updated['und'][0]['value'] = gmdate('Y-m-d H:i'); }
+		node_save($property_node);
+	}
+}
+
+/**
+ * A rather hacky way to determine if two nodes have "real" differences.
+ * 
+ * We'd like to do this with a simple recursive comparison, or by serializing the fields, or something like that.
+ * But unfortunately when you save a node with some empty fields, you end up with e.g.
+ * 
+ *   $node->field_whatever['und'][0]['target_id'] = NULL
+ *   $node->original->field_whatever = NULL;
+ * 
+ * Which, of course, serialize very differently.
+ * 
+ * So, short of spending a lot of time extracting actual values and then deciding on the difference between 0 and NULL, I'm 
+ * simply rendering each of the fields and doing a string comparison.
+ * 
+ * Returns the first field name where an interesting difference is found.
+ */ 
+
+function unite_nodes_have_interesting_differences($node1, $node2) {
+	if (!$node1 && !$node2) { return FALSE; }
+	if (!$node1 || !$node2) { return TRUE; }
+
+	$fields = array_merge(array_keys((array) $node1), array_keys((array) $node2));
+	$fields = array_unique($fields);
+
+	foreach ($fields as $field) {
+		if (!preg_match('/^field_/', $field)) { continue; }
+		$renderable1 = field_view_field('node', $node1, $field);
+		$renderable2 = field_view_field('node', $node2, $field);
+		$render1 = drupal_render($renderable1);
+		$render2 = drupal_render($renderable2);
+		if (strcmp($render1, $render2)) { return $field; }
+	}
+
+	return FALSE;
+}
+

@@ -9,15 +9,35 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.bl
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.quicksearch.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire_local.inc";
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.import.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.import.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.export.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.fairhotel.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.casino.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.report_changed_status.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.oneoffs.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_property.inc";
+
+
+/***
+ * Implements hook_sirius_wizard_info()
+ */
+
+function unite_sirius_wizard_info() {
+  $items = array();
+
+  // $items += sirius_ledger_feed_charges_info();
+  $items += unite_feed_property_info();
+
+  return $items;
+}
+
+/**
+ * Implements hook_node_presave()
+ */
 
 function unite_node_presave($node) {
 	if ($node->type == 'property') { unite_zip_to_msa($node); }
+	if ($node->type == 'property_actor') { unite_relationship_node_presave($node); } 
 }
 
 function unite_zip_to_msa($node) {
@@ -42,91 +62,28 @@ function unite_zip_to_msa($node) {
 	$node->field_msa['und'][0]['tid'] = $msa;
 }
 
-
-function unite_views_query_alter(&$view, &$query) {
-	// Force "input required" even if the widget doesn't support it.
-	if (preg_match('/' . $view->name . '/', variable_get('unite_views_input_required', ''))) {
-		if (!$view->exposed_input) {
-			$view->built = TRUE;
-			$view->executed = TRUE;
-			$view->result = array();
-		}
-	} 
-	
-	// Change the prompts on columns to indicate the relationship searched for.
-	if ($view->name == 'properties_search_20140727') {
-		$changed = 0;
-		foreach ($query->where as $where_group) {
-			foreach ($where_group['conditions'] as $condition) {
-				if ($condition['field'] == 'field_collection_item_field_data_field_relationships__field_data_field_relationship_type.field_relationship_type_value') {
-					$view->field['title_1']->options['label'] = $condition['value'];
-				}
-
-				if ($condition['field'] == 'field_collection_item_field_data_field_relationships_1__field_data_field_relationship_type.field_relationship_type_value') {
-					$view->field['title_2']->options['label'] = $condition['value'];
-				}
-
-				if ($condition['field'] == 'field_collection_item_field_data_field_relationships_2__field_data_field_relationship_type.field_relationship_type_value') {
-					$view->field['title_3']->options['label'] = $condition['value'];
-				}
-
-				if ($condition['field'] == 'field_collection_item_field_data_field_relationships_3__field_data_field_relationship_type.field_relationship_type_value') {
-					$view->field['title_4']->options['label'] = $condition['value'];
-				}
-
-				if ($condition['field'] == 'field_collection_item_field_data_field_relationships_4__field_data_field_relationship_type.field_relationship_type_value') {
-					$view->field['title_5']->options['label'] = $condition['value'];
-				}
-			}
-		}
-	}
-
-	// Our app export needs some nested ands and ors rearranged
-	if ($view->name == 'properties_export') {
-		if (preg_match('/node_changed_fulldate/', $query->where[0]['conditions'][0]['field'])) {
-			// dpm($query->where[0]['conditions'][0]['field']);
-			// dpm(preg_replace('/=/', '<=', $query->where[0]['conditions'][0]['field']));
-			$query->where[0]['conditions'][0]['field'] = preg_replace('/=/', '>=', $query->where[0]['conditions'][0]['field']);
-		}
-		/*
-		if (isset($query->where[3])) {
-
-			$new_where = array();
-
-			$new_where[1] = array();
-			$new_where[1]['args'] = array();
-			$new_where[1]['type'] = 'AND';
-			$new_where[1]['conditions'] = array();
-			$new_where[1]['conditions'][0] = $query->where[1];
-			$new_where[1]['conditions'][0]['type'] = 'OR';
-			$new_where[1]['conditions'][1] = $query->where[2];
-			$new_where[1]['conditions'][1]['type'] = 'OR';
-
-			$new_where[2] = $query->where[3];
-			$new_where[2]['type'] = 'AND';
-
-			dpm($query->where);
-			dpm($new_where);
-
-			$query->where = $new_where;
-		}
-		*/
-		// dpm($query->where);
-	}
-}
-
-function unite_admin() {
+function unite_admin($form, &$form_state) {
   $form = array();
 	
-  $form['unite_views_input_required'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Views with Input Required'),
-    '#default_value' => variable_get('unite_views_input_required', ''),
-    '#description' => t("Enter the machine names of views (one per row) that require input before running."),
-    '#required' => FALSE,
+  $html = '<p>';
+  $html .= 'In the field below, indicate which IP addresses should have access to the export feed,  ';
+ 	$html .= l('located here.', 'unite/export/union-hotel-guide', array('attributes' => array('target' => '_blank'), 'query' => array('secs' => 15000, 'onscreen' => TRUE)));
+ 	$html .= '</p>';
+ 	$html .= sirius_ip_rawrange_helptext(variable_get('unite_export_ip_allowlist'));
+ 	$form['unite_export_ip_intro'] = array('#markup' => $html);
+
+  $form['unite_export_ip_allowlist'] = array(
+  	'#title' => t('Export Feed IP Allowlist'),
+  	'#type' => 'textarea',
+    '#default_value' => variable_get('unite_export_ip_allowlist', ''),
   );
 
   return system_settings_form($form);
+}
+
+function unite_admin_validate($form, &$form_state) {
+	$result = sirius_ip_rawrange_validate($form_state['values']['unite_export_ip_allowlist']);
+	if (!$result['success']) { form_set_error('unite_export_ip_allowlist', $result['msg']); }
 }
 
 function unite_node_tab_local_properties($node) {
@@ -164,8 +121,6 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 	    }
 	  }
 	}
-
-
 
 	//
 	// Put a copy of buttons at the top
@@ -206,7 +161,12 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 		);
   }	
 
-	$form['field_relationships']['#access'] = FALSE;
+  // Hide cmoputed fields
+	if ($form_id == 'property_node_form') {
+		$form['field_relationships']['#access'] = FALSE;
+		$form['field_calc_owner_last_updated']['#access'] = FALSE;
+		$form['field_calc_operator_last_updated']['#access'] = FALSE;
+	}
 }
 
 function unite_cron() {
@@ -276,7 +236,10 @@ function unite_sirius_backlinks_from_node_alter(&$links, $node) {
 
 function unite_sirius_config_links_alter(&$links) {
 	$links = array_merge(array('unite' => array('title' => 'Hotels Database')), $links);
+	$links['unite']['links']['admin/config/unite/core'] = array('title' => 'General Settings', 'description' => 'General settings, including IP address restrictions for the FairHotels feed.');
 	$links['unite']['links']['admin/structure/taxonomy/brand'] = array('title' => 'Brands', 'description' => 'Manage brands, parents and service levels.');
+
+
 }
 
 function unite_submitted_empty($form_state, $field_name) {

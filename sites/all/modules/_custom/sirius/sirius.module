@@ -7,6 +7,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.auditlog.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.ip.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.aat.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.log_quicklog.inc';
