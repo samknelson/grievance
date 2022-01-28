@@ -13,9 +13,12 @@ function sirius_node_tab_entity_customfield_settings_access($entity_node) {
    if (user_access('sirius ledgerr admin')) { return TRUE; }
   }
 
+  if ($entity_node->type == 'sirius_trust_benefit') {
+   if (user_access('sirius trust admin')) { return TRUE; }
+  }
+
 	return FALSE;
 }
-
 
 function sirius_node_tab_entity_customfield_settings($entity_node) {
 	return drupal_get_form('sirius_node_tab_entity_customfield_settings_form', $entity_node);
