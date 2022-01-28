@@ -37,7 +37,7 @@ function sirius_event_page_catalog_list() {
 
 	  $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
 	} else { 
-		$html .= '<p>' . t('No custom field sets have been created yet.') . '</p>';
+		$html .= '<p>' . t('No catalogs have been created yet.') . '</p>';
 	}
 
 	$html .= l('Add a New Catalog', 'node/add/sirius-json-definition', array('attributes' => array('class' => array('tool-button')), 'query' => array('sirius_type' => $type)));
