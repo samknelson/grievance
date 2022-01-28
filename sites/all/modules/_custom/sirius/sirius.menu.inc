@@ -1299,6 +1299,16 @@ function sirius_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  /*
+  $items['public'] = array(
+    'page callback' => 'sirius_page_public',
+    'page arguments' => array(),
+    'access callback' => 'sirius_page_public_access',
+    'access arguments' => array(),
+    'type' => MENU_CALLBACK,
+  );
+  */
+
   return $items;
 }
 
