@@ -100,6 +100,10 @@ function sirius_domain_component_info_all() {
       'title' => 'Bulk',
       'description' => 'Use the bulk message system',
     ),
+    'public' => array(
+      'title' => 'Public',
+      'description' => 'Permission to create public pages',
+    ),
   );
 }
 
@@ -250,8 +254,9 @@ function sirius_domain_access($domain_nid, $root = NULL, $depth = 0) {
 
 function sirius_domain_tree($root = NULL) {
 	$args = array();
-	$sql = "select nid, title from node ";
-	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql = "select nid, title, field_sirius_name_short_value from node ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_name_short on field_data_field_sirius_name_short.entity_type = 'node' and field_data_field_sirius_name_short.entity_id = node.nid ";
 	$sql .= "where node.type = 'sirius_domain' ";
 	if ($root) {
 		$sql .= "and field_sirius_domain_target_id = :root ";
@@ -268,7 +273,8 @@ function sirius_domain_tree($root = NULL) {
 		$nid = $hr['nid'];
 		$title = $hr['title'];
 
-		$tree[$nid]['title'] = $title;
+    $tree[$nid]['title'] = $title;
+    $tree[$nid]['name_short'] = $hr['field_sirius_name_short_value'];
 		$tree[$nid]['children'] = sirius_domain_tree($nid);
 	}
 	return $tree;
@@ -702,4 +708,19 @@ function sirius_domain_util_migrate_root_to_domain($domain_nid) {
 
   print "User count: $user_count\n";
   print "Variable count: $variable_count\n";
+}
+
+
+function sirius_domain_usermanage_roles() {
+  $result = array(
+    'all' => user_roles(),
+    'omit' => array(),
+    'optional' => array(),
+    'required' => array()
+  );
+  foreach ($result['all'] as $rid => $role) {
+    $avail = variable_get("sirius_domain_userrmanage_$rid", 'omit');
+    $result[$avail][$rid] = $role;
+  }
+  return $result;
 }
