@@ -54,6 +54,7 @@ function sirius_page_config() {
 
 	$links['event'] = array('title' => 'Events');
 	$links['event']['links']['sirius/event/interestlist/settings'] 	= array('title' => 'Interest List Settings', 'description' => 'Configure settings for "interest lists" for event types.');
+	$links['event']['links']['sirius/event/catalog/list'] 	= array('title' => 'Catalogs', 'description' => 'Configure course catalogs.');
 
 	$links['bulk'] = array('title' => 'Bulk Messenger');
 	$links['bulk']['links']['sirius/bulk/config'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
