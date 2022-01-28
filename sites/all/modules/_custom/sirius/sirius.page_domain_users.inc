@@ -98,24 +98,20 @@ function sirius_node_tab_domain_users_add_form($form, &$form_state, $domain_node
 		'#default_value' => $new_user->status,
 	);
 
-	$roles = user_roles();
-	$roles_avail = array();
-	$roles_default = array();
-	foreach ($roles as $rid => $role) {
-		$avail = variable_get("sirius_domain_userrmanage_$rid", 'omit');
-		if ($avail == 'optional') {
-			$roles_avail[$rid] = $role;
-			if ($new_user->roles[$rid]) {
-				$roles_default[] = $rid;
-			}
+	$roles = sirius_domain_usermanage_roles();
+	$role_options = $roles['optional'];
+	$role_default = array();
+	foreach ($role_options as $rid => $role) {
+		if ($new_user->roles[$rid]) {
+			$role_default[] = $rid;
 		}
 	}
-	if ($roles_avail) {
+	if ($role_options) {
 		$form['roles'] = array(
 			'#type' => 'checkboxes',
 			'#title' => 'Roles',
-			'#options' => $roles_avail,
-			'#default_value' => $roles_default,
+			'#options' => $role_options,
+			'#default_value' => $role_default,
 		);
 	}
 
@@ -191,19 +187,15 @@ function sirius_node_tab_domain_users_add_form_submit($form, &$form_state) {
 	$new_user->name = $name;
 	$new_user->field_sirius_domain['und'][0]['target_id'] = $domain_node->nid;
 	$new_user->field_grievance_phone['und'][0]['value'] = $phone;
-	$roles = user_roles();
-	foreach ($roles as $rid => $role) {
-		$avail = variable_get("sirius_domain_userrmanage_$rid", 'omit');
-		if ($avail == 'required') { 
+	$roles = sirius_domain_usermanage_roles();
+	foreach ($roles['required'] as $rid => $role) {
+		$new_user->roles[$rid] = $role;
+	}
+	foreach ($roles['optional'] as $rid => $role) {
+		if ($form_state['values']['roles'][$rid]) { 
 			$new_user->roles[$rid] = $role;
-		}
-
-		if ($avail == 'optional') {
-			if ($form_state['values']['roles'][$rid]) { 
-				$new_user->roles[$rid] = $role;
-			} else {
-				unset($new_user->roles[$rid]);
-			}
+		} else {
+			unset($new_user->roles[$rid]);
 		}
 	}
 	$new_user->status = $form_state['values']['status'];
