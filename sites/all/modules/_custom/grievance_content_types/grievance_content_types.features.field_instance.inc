@@ -7453,7 +7453,7 @@ function grievance_content_types_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => -4,
+      'weight' => 1,
     ),
   );
 
@@ -7521,7 +7521,153 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => -2,
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-grievance_basic_page-field_grievance_images'.
+  $field_instances['node-grievance_basic_page-field_grievance_images'] = array(
+    'bundle' => 'grievance_basic_page',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_images',
+    'label' => 'Images',
+    'required' => 0,
+    'settings' => array(
+      'description_field' => 0,
+      'file_directory' => '[date:custom:Y]-[date:custom:m]',
+      'file_extensions' => 'jpg png jpeg gif',
+      'filefield_paths' => array(
+        'active_updating' => 0,
+        'file_name' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => '[node:nid]_[file:fid].[file:ffp-extension-original]',
+        ),
+        'file_path' => array(
+          'options' => array(
+            'pathauto' => FALSE,
+            'slashes' => 0,
+            'transliterate' => 0,
+          ),
+          'value' => 'grievance_images',
+        ),
+        'redirect' => FALSE,
+        'retroactive_update' => 0,
+      ),
+      'filefield_paths_enabled' => 1,
+      'max_filesize' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'file',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+      ),
+      'type' => 'file_generic',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance_basic_page-field_sirius_domain'.
+  $field_instances['node-grievance_basic_page-field_sirius_domain'] = array(
+    'bundle' => 'grievance_basic_page',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Domain',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance_basic_page-field_sirius_public'.
+  $field_instances['node-grievance_basic_page-field_sirius_public'] = array(
+    'bundle' => 'grievance_basic_page',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Select "Yes" to make this page publicly available. Anonymous users will have access to this page without signing in.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_public',
+    'label' => 'Public?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 4,
     ),
   );
 
@@ -18935,7 +19081,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -18959,7 +19105,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -18979,7 +19125,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19003,7 +19149,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -19018,7 +19164,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19044,6 +19190,49 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-sirius_domain-field_sirius_name_short'.
+  $field_instances['node-sirius_domain-field_sirius_name_short'] = array(
+    'bundle' => 'sirius_domain',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Abbreviation should be unique to the domain, and should be suitable for use in a URL, i.e. only letters, numbers, hyphens and underscores.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_name_short',
+    'label' => 'Abbreviation',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_domain-field_sirius_tz'.
   $field_instances['node-sirius_domain-field_sirius_tz'] = array(
     'bundle' => 'sirius_domain',
@@ -19059,7 +19248,7 @@ function grievance_content_types_field_default_field_instances() {
           'format' => 'Y-m-d H:i:s T',
         ),
         'type' => 'tzfield_date',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19084,7 +19273,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'options_select',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -20904,7 +21093,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 6,
+      'weight' => 5,
     ),
   );
 
@@ -20986,6 +21175,48 @@ function grievance_content_types_field_default_field_instances() {
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
       'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_json_definition-field_sirius_public'.
+  $field_instances['node-sirius_json_definition-field_sirius_public'] = array(
+    'bundle' => 'sirius_json_definition',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_public',
+    'label' => 'Public?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 6,
     ),
   );
 
@@ -30237,6 +30468,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('A grievance at this status should have available fields for the specified resolution procedure.');
   t('AAT');
   t('Abbreviation');
+  t('Abbreviation should be unique to the domain, and should be suitable for use in a URL, i.e. only letters, numbers, hyphens and underscores.');
   t('Accepted Count');
   t('Active');
   t('Active From');
@@ -30504,6 +30736,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Possible Departments');
   t('Postal Code');
   t('Posted');
+  t('Public?');
   t('Received');
   t('Recommended Remedy');
   t('Recommended Statement of Grievance');
@@ -30523,6 +30756,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Section Tags');
   t('Select "Yes" if this document type should appear as an "Information Request" option.');
   t('Select "Yes" if this should be printed on the badge.');
+  t('Select "Yes" to make this page publicly available. Anonymous users will have access to this page without signing in.');
   t('Select a Contact');
   t('Select a Shop Steward');
   t('Select the date that the status changed.  For example, if the status is "Step 1 Meeting", enter the date that the meeting occurred.  If no date is entered, today\'s date will be used.');

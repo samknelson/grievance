@@ -6993,6 +6993,31 @@ Prof.',
     'type' => 'text',
   );
 
+  // Exported field_base: 'field_sirius_public'.
+  $field_bases['field_sirius_public'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_public',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'No' => 'No',
+        'Yes' => 'Yes',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_sirius_representatives'.
   $field_bases['field_sirius_representatives'] = array(
     'active' => 1,
