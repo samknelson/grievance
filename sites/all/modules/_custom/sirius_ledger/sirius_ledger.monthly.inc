@@ -277,7 +277,6 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 				} else {
 					$entry['ledger_participant'] = $worker_node->field_grievance_shop['und'][0]['target_id'];
 				}
-				$entry['ledger_reference'] = $policy_node->nid;
 
 				if ($schedule == 'month') {
 					$entry['ledger_key'] = $worker_node->nid . '|' . date('Y-m', $ts);
@@ -310,6 +309,7 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 					continue;
 				}
 
+				$entry['ledger_reference'] = $policy_node->nid;
 				$entry['ledger_amount'] = $rate;
 				$entry['ledger_ts'] = $ts;
 
