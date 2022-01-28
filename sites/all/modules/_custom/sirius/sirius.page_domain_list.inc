@@ -44,7 +44,7 @@ function sirius_domain_page_list_impl($options) {
 
 		$html .= '<h2>' . t('Switch To:') . '</h2>';
 		if (user_access('sirius admin')) {
-			$html .= l('[No domain]', current_path(), array('query' => array('switch' => -1)));
+			$html .= l('switch into no domain / root', current_path(), array('attributes' => array('class' => array('tool-button')), 'query' => array('switch' => -1)));
 		} else {
 			$html .= l($domain_root->title, current_path(), array('query' => array('switch' => $domain_root->nid)));
 		}
@@ -116,6 +116,11 @@ function sirius_domain_page_list_render($tree, $depth = NULL, $options) {
 			$html .= '-- ';
 		}
 		$html .= $branch['title'];
+
+		if ($branch['name_short']) {
+			$html .= ' (' . $branch['name_short'] . ')';
+		}
+
 		$html .= '</td>';
 
 		if ($options['switch']) {
