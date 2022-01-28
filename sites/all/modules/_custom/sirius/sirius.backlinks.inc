@@ -227,6 +227,10 @@ function sirius_backlinks_from_node($node) {
 		if ($definition_type == 'sirius_event:catalog')	{ $links['sirius/event/catalog/list'] = array('name' => 'All Catalogs'); }
 	}
 
+	if ($node->type == 'grievance_basic_page') {
+		$links['grievance/admin/basic-pages'] = array('name' => 'All Basic Pages');
+	}
+
 	drupal_alter('sirius_backlinks_from_node', $links, $node);
 
 	return $links;
