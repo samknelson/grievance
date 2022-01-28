@@ -699,6 +699,26 @@ function sirius_event_node_tabs() {
     'callback arguments' => array('verified'),
   );
 
+
+  $node_tabs['sirius_json_definition']['sirius_event_catalog_view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_catalog_view',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_event.page_catalog_view.inc',
+    'weight' => 11,
+    'type' => MENU_CALLBACK,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_event_catalog_settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_event_node_tab_catalog_settings',
+    'permissions' => array('sirius event admin'),
+    'file' => 'sirius_event.page_catalog_settings.inc',
+    'weight' => 12,
+  );
+
   sirius_node_tab_set_module('sirius_event', $node_tabs);
 
 	return $node_tabs;
@@ -888,9 +908,6 @@ function sirius_event_term_tabs() {
     'weight' => 10,
     'file' => 'sirius_event.term_tab_interestlist_settings.inc',
   );
-
-
-
 
   $term_tabs['sirius_event_participant_status']['sirius_event_pstatus'] = array(
     'title' => 'Settings',
@@ -1122,6 +1139,14 @@ function sirius_event_menu() {
     'page callback' => 'sirius_event_page_intake_anonymous_wizard',
     'page arguments' => array(1),
     'file' => 'sirius_event.page_intake_anonymous_wizard.inc',
+  );
+
+  $items['sirius/event/catalog/list'] = array(
+    'title' => 'Catalogs',
+    'access arguments' => array('sirius'),
+    'page callback' => 'sirius_event_page_catalog_list',
+    'page arguments' => array('sirius event admin'),
+    'file' => 'sirius_event.page_catalog_list.inc',
   );
 
   return $items;
