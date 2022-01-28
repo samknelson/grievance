@@ -60,6 +60,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.disclaimer.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mailattach.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.customfield.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.bookmark.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.public.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
@@ -544,6 +545,14 @@ function sirius_menu_alter(&$items) {
   $items['taxonomy/term/%taxonomy_term/feed']['page callback'] = 'sirius_no_more_term_listings';
   $items['taxonomy/term/%taxonomy_term/feed']['page arguments'] = array(2);
   $items['taxonomy/term/%taxonomy_term/feed']['access arguments'] = array('access content');
+
+  $items['node/%node']['access callback'] = 'sirius_public_node_access';
+  $items['node/%node']['access arguments'] = array(1);
+
+  // Need to hide that damn devel tab!
+  if ($items['node/%node/devel']) {
+    $items['node/%node/devel']['access arguments'] = array('sirius admin');
+  }
 }
 
 function sirius_no_more_term_listings($taxonomy_term) {
@@ -593,19 +602,34 @@ function sirius_user_edit_access($account) {
  * Implements hook_node_view
  */
 
-/*
 function sirius_node_view($node, $view_mode, $langcode) {
-  $landing_tabs = array(
-    'sirius_phonenumber' => 'sirius_phonenumber_info'
-  );
-
-  if ($landing_tabs[$node->type]) {
-    $node->content = array('body' => array('#markup' => sirius_node_tab_content($node, $landing_tabs[$node->type])));
+  if ($node->type == 'sirius_phonenumber' && $view_mode == 'full') {
+    $tab = 'sirius_phonenumber_info';
+  } else if ($node->type == 'sirius_json_definition' && $view_mode == 'full' && $node->field_sirius_type['und'][0]['value'] == 'sirius_event:catalog') {
+    $tab = 'sirius_event_catalog_view';
   }
 
+  sirius_public_node_view($node, $view_mode, $langcode);
+
+  if ($tab) {
+    // Can view if we have access to the tab, or if the node is public (because this is the "default" tab)
+    if (sirius_node_tab_access($node, $tab) || ($node->field_sirius_public['und'][0]['value'] == 'Yes')) {
+
+      // Run the tab, in whatever domain the node is in
+      $old_domain_nid = sirius_domain_nid();
+      sirius_domain($node->field_sirius_domain['und'][0]['target_id']);
+      $content = sirius_node_tab_content($node, $tab);
+      sirius_domain($old_domain_nid);
+
+      // Return or render the content
+      if (is_array($content)) { $html = drupal_render($content); } else { $html = $content; }
+      $node->content = array('body' => array('#markup' => $html));
+    } else {
+      $node->content = array('body' => array('#markup' => 'Your user does not have the correct permissions to access this page.'));
+    }
+  }
   return sirius_field_overrides_node_view($node, $view_mode, $langcode);
 }
-*/
 
 /**
  * Implements hook_node_validate
@@ -769,6 +793,11 @@ function sirius_file_download_access($file_item, $entity_type, $entity) {
   // Materials get treated specially
   if ($entity_type == 'node' && $entity->type == 'sirius_log' && $entity->field_sirius_category['und'][0]['value'] == 'material') {
     return sirius_materials_download_access($file_item, $entity_type, $entity);
+  }
+
+  // Attachments to public nodes can be downloaded
+  if ($entity_type == 'node' && sirius_public_node_access($entity)) {
+    return TRUE; 
   }
 }
 
