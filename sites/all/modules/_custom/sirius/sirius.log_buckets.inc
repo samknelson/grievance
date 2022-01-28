@@ -89,7 +89,7 @@ function sirius_log_buckets() {
 			'worker' => array(
 				'title' => 'Log',
 				'content_type' => 'sirius_worker',
-				'permissions' => array('sirius dispatch staff'),
+				'permissions' => array('sirius worker admin'),
 				'path' => 'sirius_worker_log',
 				'weight' => 20,
 				'can_add' => TRUE,
