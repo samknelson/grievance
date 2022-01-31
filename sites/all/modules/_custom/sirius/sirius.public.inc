@@ -6,7 +6,7 @@
 
 function sirius_public_node_access($node) {
 	if ($node->field_sirius_public['und'][0]['value'] == 'Yes') { return TRUE; }
-	return node_access('view', 1);
+	return node_access('view', $node);
 }
 
 /**
