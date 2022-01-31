@@ -113,16 +113,32 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 	$title = $form_element['#title'] . ':';
 
 	if ($form_element['#type'] == 'fieldset') {
-		if ($options['raw']) { return NULL; }
-		else { return '<hr><h2>' . $form_element['#title'] . '</h2>'; }
+		if ($options['raw']) { 
+			return NULL;
+		} else if ($options['fieldsets']) {
+			$html = '<fieldset class="field-group-fieldset form-wrapper"><legend><span class="fieldset-legend">';
+			$html .= $form_element['#title'];
+			$html .= '</span></legend>';
+			$html .= '<div class="fieldset-wrapper">';
+			return $html;
+		} else {
+			return '<hr><h2>' . $form_element['#title'] . '</h2>';
+		}
 	}
+
+	if ($options['skip_empty']) {
+		if (!$value) { return ''; }
+	}
+
+	$separtor = $options['separator'];
+	if (!$separtor) { $separtor = ' / '; }
 
 	if (is_array($value)) {
 		if ($form_element['#type'] == 'date_popup') { $value_rendered = $value['date'] . ' ' . $value['time']; }
 		else if ($form_element['#type'] == 'checkboxes') { 
 			foreach ($value as $a => $b) {
 				if ($b) {
-					if ($value_rendered) { $value_rendered .= ' / '; }
+					if ($value_rendered) { $value_rendered .= $separtor; }
 					$value_rendered .= $b;
 				}
 			}
@@ -133,6 +149,15 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 	if ($options['raw']) { return $value_rendered; }
 
 	return sirius_fakerender_field($title, $value_rendered, $options);
+}
+
+function sirius_jsonfield_util_render_value_close($form_element, $value, $options = array()) {
+	if ($form_element['#type'] == 'fieldset') {
+		if ($options['fieldsets']) {
+			return '</div></fieldset>';
+		}
+	}
+	return '';
 }
 
 
@@ -227,6 +252,28 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 function sirius_jsonfield_util_render_all_values($form, $values, $options = array()) {
 	$paths = drupal_map_assoc(sirius_jsonfield_util_form_list_paths($form));
 	return sirius_jsonfield_util_render_values($form, $values, $paths, $options);
+}
+
+function sirius_jsonfield_util_render_all_values_new($form, $values, $options = array()) {
+	$html = '';
+	foreach ($form as $key => $form_element) {
+		sirius_jsonfield_util_form_sort_by_weight($form);
+		if (substr($key, 0, 1) == '#') { continue; }
+		if (!is_array($form_element)) { continue; }
+
+		if ($form_element['#type'] == 'fieldset') {
+			$inner = sirius_jsonfield_util_render_all_values_new($form_element, $values[$key], $options);
+			if ($inner || !$options['skip_empty']) {
+				$html .= sirius_jsonfield_util_render_value($form_element, $values[$key], $options);
+				$html .= $inner;
+				$html .= sirius_jsonfield_util_render_value_close($form_element, $values[$key], $options);
+			}
+		} else {
+			$html .= sirius_jsonfield_util_render_value($form_element, $values[$key], $options);
+			$html .= sirius_jsonfield_util_render_value_close($form_element, $values[$key], $options);
+		}
+	}
+	return $html;
 }
 
 
