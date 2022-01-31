@@ -20,11 +20,15 @@
 }
 
 .sirius_event_catalog_intereslist_wrapper {
-	font-style:  italic;
+	/* font-style:  italic; */
 	padding-top:  10px;
 }
 
-.sirius_event_catalog_intereslist_wrapper a {
-	margin:  10px;
-	font-style: normal;
+.sirius_event_catalog_intereslist_wrapper a,
+.sirius_event_catalog_upcoming a {
+	margin-left:  10px;
+}
+
+.sirius_event_catalog_upcoming {
+	padding-top:  10px;
 }
