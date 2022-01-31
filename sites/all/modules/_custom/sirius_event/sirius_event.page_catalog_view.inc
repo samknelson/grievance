@@ -162,7 +162,45 @@ function sirius_event_node_tab_catalog_view_form($form, &$form_state, $catalog_n
 				}
 			}
 
+
+			$event_nids = sirius_event_upcoming_by_type($event_type_tid);
+			$event_nodes = node_load_multiple($event_nids);
+
+			$event_nodes = array_filter($event_nodes, 
+				function($event_node, $event_nid) {
+    			return sirius_event_listed($event_node);
+				}, 
+				ARRAY_FILTER_USE_BOTH
+			);
+
+			if ($event_nodes) {
+				$accordion_body .= '<div class="sirius_event_catalog_upcoming">';
+				$accordion_body .= '<strong>Upcoming Events:</strong><br/>';
+				foreach ($event_nodes as $event_nid => $event_node) {
+					$accordion_body .= sirius_event_render_teaser($event_node);
+				}
+				$accordion_body .= '</div>';
+			} else {
+				$accordion_body .= '<div class="sirius_event_catalog_upcoming sirius_event_catalog_upcoming_empty">';
+				$accordion_body .= 'There are no upcoming events of this type.';
+				$accordion_body .= '</div>';
+			}
+
 			$interest_enabled = sirius_event_interestlist_enabled_byterm($event_type_term);
+			$interestlist_path = "taxonomy/term/$event_type_tid/sirius_event_type_interestlist";
+			if ($interest_enabled && $my_contact_nid && drupal_valid_path($interestlist_path)) {
+				$on_interestlist = sirius_event_interestlist_lookup($event_type_term, $my_contact_nid);
+				$accordion_body .= '<div class="sirius_event_catalog_intereslist_wrapper">';
+				$accordion_body .= '<strong>Interest List:</strong><br/>';
+				if ($on_interestlist) {
+					$accordion_body .= t('You are on the interest list.');
+					$accordion_body .= l('Remove me', $interestlist_path, array('attributes' => array('class' => 'tool-button'), 'query' => array('destination' => current_path())));
+				} else {
+					$accordion_body .= t('An interest list is available.');
+					$accordion_body .= l('Add me', $interestlist_path, array('attributes' => array('class' => 'tool-button'), 'query' => array('destination' => current_path())));
+				}
+				$accordion_body .= '</div>';
+			}
 
 
 			$html .= '<div class="sirius_accordion_label">';
@@ -170,22 +208,6 @@ function sirius_event_node_tab_catalog_view_form($form, &$form_state, $catalog_n
 			$html .= '</div>';
 			$html .= '<div class="sirius_accordion_body">';
 			$html .= $accordion_body;
-
-			$interestlist_path = "taxonomy/term/$event_type_tid/sirius_event_type_interestlist";
-			if ($interest_enabled && $my_contact_nid && drupal_valid_path($interestlist_path)) {
-				$on_interestlist = sirius_event_interestlist_lookup($event_type_term, $my_contact_nid);
-
-				$html .= '<div class="sirius_event_catalog_intereslist_wrapper">';
-
-				if ($on_interestlist) {
-					$html .= t('You are on the interest list for this course.');
-					$html .= l('Remove me', $interestlist_path, array('attributes' => array('class' => 'tool-button'), 'query' => array('destination' => current_path())));
-				} else {
-					$html .= t('An interest list is available for this course.');
-					$html .= l('Add me', $interestlist_path, array('attributes' => array('class' => 'tool-button'), 'query' => array('destination' => current_path())));
-				}
-				$html .= '</div>';
-			}
 			$html .= '</div>';
 		}
 		$html .= '</div>';
