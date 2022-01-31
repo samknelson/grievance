@@ -73,6 +73,11 @@ function sirius_node_tab_access($node, $in_tab_name) {
     if (!user_access($permission)) { return FALSE; }
   }
 
+  // Check if the component is enabled
+  if ($tab_record['component'] && !sirius_domain_component_enabled($tab_record['component'])) {
+    return FALSE;
+  }
+
   // Check for a custom access permission
   sirius_node_tab_handle_requires($tab_record);
   $access_function_name = $tab_record['callback'] . '_access';
