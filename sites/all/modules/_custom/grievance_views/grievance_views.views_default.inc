@@ -18015,7 +18015,6 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" class="tool-button">View</a>';
   $handler->display->display_options['path'] = 'sirius/bookmarked';
-  $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Report - Bookmarked By Me';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'main-menu';
