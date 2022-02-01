@@ -1181,6 +1181,7 @@ features[uuid_node][] = cdcb4b41-962c-441f-8deb-61ecce6adb19
 features[uuid_node][] = cddbdd66-1025-4fd8-9cc7-cce96a5a6309
 features[uuid_node][] = d9034b35-4f3c-45c4-bd41-bb0fa72755b5
 features[uuid_node][] = dc6b1584-43e4-4a3f-a722-7b7bcb8a7c55
+features[uuid_node][] = e9d99dcc-24d2-408a-842b-c6c154edd39d
 features[uuid_node][] = f95f6f62-df09-42d2-9e4c-dc932721e865
 features[variable][] = ant_pattern_grievance
 features[variable][] = ant_pattern_grievance_announcement
