@@ -63,6 +63,15 @@ function sirius_addr_validate_full($addr) {
 		return array('success' => FALSE, 'msg' => "Please enter an address, city, state, and zip.");
 	}
 
+	$result = sirius_addr_geocode_enabled();
+	if (!$result['success']) { 
+		return array('success' => TRUE, 'msg' => 'Skipping validation because geocoding is not enabled: ' . $result['msg']);
+	}
+
+	return sirius_addr_geocode_impl(sirius_addr_format_oneline($addr));
+}
+
+function sirius_addr_geocode_enabled() {
 	// 
 	// @todo: We gocode if:
 	// - Either
@@ -74,20 +83,29 @@ function sirius_addr_validate_full($addr) {
 	// 
 
 	$domain_nid = sirius_domain_nid();
-	if (($domain_nid < 1) || sirius_domain_component_enabled('mapping')) {
-		$geocoder_settings = variable_get('geocoder_settings', array());
-		if ($geocoder_settings['geocoder_apikey_google']) {
-			$txt = sirius_addr_format_oneline($addr);
-			$point = geocoder('google', $txt);
-			if ($point) {
-				if (!($point->data['geocoder_formatted_address']) || ($point->data['geocoder_accuracy'] == 'APPROXIMATE')) {
-					return array('success' => FALSE, 'msg' => 'The mapping service was unable to find a location for that address.');
-				}
-			}
-		}
+	if ($domain_nid > 1 && !sirius_domain_component_enabled('mapping')) {
+		return array('success' => FALSE, 'msg' => 'Mapping is not enabled for this domain.');
+	}
+	$geocoder_settings = variable_get('geocoder_settings', array());
+	if (!$geocoder_settings['geocoder_apikey_google']) {
+		return array('success' => FALSE, 'msg' => 'No Google Maps API Key has been set.');
+	}
+	return array('success' => TRUE);
+}
+
+function sirius_addr_geocode_impl($addr_oneline) {
+	$result = sirius_addr_geocode_enabled();
+	if (!$result['success']) { return $result; }
+
+	$point = geocoder('google', $addr_oneline);
+	if (!$point) {
+		return array('success' => FALSE, 'msg' => 'The mapping service was unable to find a location for that address.');
+	}
+	if (!($point->data['geocoder_formatted_address']) || ($point->data['geocoder_accuracy'] == 'APPROXIMATE')) {
+		return array('success' => FALSE, 'msg' => 'The mapping service was unable to find an exact location for that address.', 'point' => $point);
 	}
 
-	return array('success' => TRUE);
+	return array('success' => TRUE, 'point' => $point);
 }
 
 function sirius_addr_validate($addr) {
@@ -165,4 +183,35 @@ function sirius_addr_node_presave($node) {
 function sirius_addr_form_alter_node(&$form, &$form_state, $form_id) {
 	// Hide canonical addresses on the node form. They are always set automatically.
 	if (isset($form['field_address_canon'])) { $form['field_address_canon']['#access'] = FALSE; }
+}
+
+function sirius_addr_get_compponent($point, $type) {
+	if (!$point) { return NULL; }
+	if (!$point->data) { return NULL; }
+	if (!$point->data['geocoder_address_components']) { return NULL; }
+	foreach ($point->data['geocoder_address_components'] as $component) {
+		if (!in_array($type, $component->types)) { continue; }
+		return $component->long_name;
+	}
+}
+
+function sirius_addr_latlon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
+  if (($lat1 == $lat2) && ($lon1 == $lon2)) {
+    return 0;
+  }
+
+  $theta = $lon1 - $lon2;
+  $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+  $dist = acos($dist);
+  $dist = rad2deg($dist);
+  $miles = $dist * 60 * 1.1515;
+  $unit = strtoupper($unit);
+
+  if ($unit == "K") {
+    return ($miles * 1.609344);
+  } else if ($unit == "N") {
+    return ($miles * 0.8684);
+  } else {
+    return $miles;
+  }
 }
