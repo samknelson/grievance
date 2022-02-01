@@ -24,7 +24,15 @@ function sirius_bookmark_view_pre_render(&$view) {
  */
 
 function sirius_bookmark_types() {
-	return array('sirius_worker', 'grievance_shop', 'sirius_contact', 'sirius_phonenumber');
+	return array(
+		'property',
+		'actor',
+		'hdb_airport',
+		'sirius_worker', 
+		'grievance_shop', 
+		'sirius_contact', 
+		'sirius_phonenumber'
+	);
 }
 
 function sirius_bookmark_type_options() {
