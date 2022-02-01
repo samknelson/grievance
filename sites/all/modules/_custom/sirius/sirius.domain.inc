@@ -80,6 +80,14 @@ function sirius_domain_component_info_all() {
       'title' => 'Worker',
       'description' => 'Use the worker database',
     ),
+    'worker:schedule' => array(
+      'title' => 'Worker - Schedule',
+      'description' => 'Use scheduling tools for workers such as time off requests',
+    ),
+    'worker:skill' => array(
+      'title' => 'Worker - Skill',
+      'description' => 'Manage skills for workers',
+    ),
     'employer' => array(
       'title' => 'Employer',
       'description' => 'Use the employer database',
@@ -103,6 +111,10 @@ function sirius_domain_component_info_all() {
     'public' => array(
       'title' => 'Public',
       'description' => 'Permission to create public pages',
+    ),
+    'trust' => array(
+      'title' => 'Trust',
+      'descriptino' => 'Manage Trust Benefits, Dependants, etc.',
     ),
   );
 }
@@ -131,7 +143,14 @@ function sirius_domain_component_enabled($key, $domain_nid_or_node = NULL) {
   if (!isset($cache[$domain_nid][$key])) {
     if (!$domain_node) { $domain_node = node_load($domain_nid); }
     $json = sirius_json_get($domain_node);
-    $cache[$domain_nid][$key] = ($json['component'][$key]['enabled'] == 'Yes');
+
+    if ($domain_nid < 1) {
+      // Legacy support: In the root domain everything is enabled unless explititly removed
+      $cache[$domain_nid][$key] = ($json['component'][$key]['enabled'] != 'No');
+    } else {
+      // Normal domains: Must explicitly enable all components
+      $cache[$domain_nid][$key] = ($json['component'][$key]['enabled'] == 'Yes');
+    }
   }
 
   return $cache[$domain_nid][$key];
