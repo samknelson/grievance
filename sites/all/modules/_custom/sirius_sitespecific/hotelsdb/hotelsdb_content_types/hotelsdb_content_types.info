@@ -1,6 +1,8 @@
 name = hotelsdb_content_types
 core = 7.x
 package = Features
+dependencies[] = ctools
+dependencies[] = ds
 dependencies[] = entityreference
 dependencies[] = field_collection
 dependencies[] = field_group
@@ -14,6 +16,7 @@ features[ctools][] = field_group:field_group:1
 features[ctools][] = strongarm:strongarm:1
 features[ctools][] = views:views_default:3.0
 features[ds_field_settings][] = node|property|default
+features[ds_layout_settings][] = node|hdb_airport|default
 features[ds_layout_settings][] = node|property|default
 features[features_api][] = api:2
 features[field_base][] = field_actor

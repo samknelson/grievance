@@ -47,6 +47,44 @@ function hotelsdb_content_types_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|hdb_airport|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'hdb_airport';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_2col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_sirius_name_short',
+        1 => 'field_address',
+        2 => 'field_address_canon',
+      ),
+      'right' => array(
+        3 => 'field_address_geofield',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_name_short' => 'left',
+      'field_address' => 'left',
+      'field_address_canon' => 'left',
+      'field_address_geofield' => 'right',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['node|hdb_airport|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|property|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'property';
