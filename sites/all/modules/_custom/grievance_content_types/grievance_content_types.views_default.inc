@@ -100,7 +100,7 @@ function grievance_content_types_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_id']['id'] = 'field_grievance_id';
   $handler->display->display_options['fields']['field_grievance_id']['table'] = 'field_data_field_grievance_id';
   $handler->display->display_options['fields']['field_grievance_id']['field'] = 'field_grievance_id';
-  /* Field: Content: Next Deadline Date */
+  /* Field: Content: Next Deadline */
   $handler->display->display_options['fields']['field_grievance_alert_date']['id'] = 'field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['fields']['field_grievance_alert_date']['field'] = 'field_grievance_alert_date';
@@ -134,7 +134,7 @@ function grievance_content_types_views_default_views() {
   $handler->display->display_options['fields']['field_grievance_status']['table'] = 'field_data_field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['field'] = 'field_grievance_status';
   $handler->display->display_options['fields']['field_grievance_status']['type'] = 'taxonomy_term_reference_plain';
-  /* Sort criterion: Content: Next Deadline Date (field_grievance_alert_date) */
+  /* Sort criterion: Content: Next Deadline (field_grievance_alert_date) */
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['id'] = 'field_grievance_alert_date_value';
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['sorts']['field_grievance_alert_date_value']['field'] = 'field_grievance_alert_date_value';
@@ -180,7 +180,7 @@ function grievance_content_types_views_default_views() {
   $handler->display->display_options['filters']['field_grievance_shop_target_id']['expose']['remember_roles'] = array(
     2 => '2',
   );
-  /* Filter criterion: Content: Next Deadline Date (field_grievance_alert_date) */
+  /* Filter criterion: Content: Next Deadline (field_grievance_alert_date) */
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['id'] = 'field_grievance_alert_date_value';
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['table'] = 'field_data_field_grievance_alert_date';
   $handler->display->display_options['filters']['field_grievance_alert_date_value']['field'] = 'field_grievance_alert_date_value';
@@ -248,11 +248,12 @@ function grievance_content_types_views_default_views() {
     t('Content'),
     t('- Choose an operation -'),
     t('ID'),
-    t('Next Deadline Date'),
+    t('Next Deadline'),
     t('Employer'),
     t('Last Name'),
     t('First Name'),
     t('Status'),
+    t('Next Deadline Date'),
     t('between; enter both dates.'),
     t('Page'),
   );
