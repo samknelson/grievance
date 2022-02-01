@@ -12,10 +12,12 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.ac
 // require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.import.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.export.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.fairhotel.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.airports.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.casino.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.report_changed_status.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.oneoffs.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_property.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_airport.inc";
 
 
 /***
@@ -27,6 +29,7 @@ function unite_sirius_wizard_info() {
 
   // $items += sirius_ledger_feed_charges_info();
   $items += unite_feed_property_info();
+  $items += unite_feed_airport_info();
 
   return $items;
 }
@@ -36,8 +39,13 @@ function unite_sirius_wizard_info() {
  */
 
 function unite_node_presave($node) {
-	if ($node->type == 'property') { unite_zip_to_msa($node); }
-	if ($node->type == 'property_actor') { unite_relationship_node_presave($node); } 
+	if ($node->type == 'property') {
+		unite_zip_to_msa($node);
+		unite_airports_node_presave($node);
+	}
+	if ($node->type == 'property_actor') {
+		unite_relationship_node_presave($node);
+	} 
 }
 
 function unite_zip_to_msa($node) {
@@ -166,6 +174,8 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 		$form['field_relationships']['#access'] = FALSE;
 		$form['field_calc_owner_last_updated']['#access'] = FALSE;
 		$form['field_calc_operator_last_updated']['#access'] = FALSE;
+		$form['field_calc_airport_dist']['#access'] = FALSE;
+		$form['field_calc_airport_alt_dist']['#access'] = FALSE;
 	}
 }
 
