@@ -107,6 +107,17 @@ function sirius_twilio_config() {
     '#default_value' => variable_get($name, FALSE),
   );
 
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid < 1) {
+    $name = sirius_domain_variable_name('sirius_twilio_operator');
+    $form[$name] = array(
+      '#type' => 'textfield',
+      '#title' => t('(Legacy) Main Operator Number'),
+      '#default_value' => variable_get($name, FALSE),
+      '#description' => t('The main operator number supports legacy code, and should not be used for new installations. Please use the office list for all new installations.'),
+    );
+  }
+
   return system_settings_form($form);
 }
 
