@@ -465,6 +465,25 @@ function grievance_content_types_ds_custom_fields_info() {
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
+  $ds_field->field = 'custom_fields';
+  $ds_field->label = 'Custom Fields';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'sirius_worker|default';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<p>[replace me]</p>
+',
+      'format' => 'full_html',
+    ),
+    'use_token' => 0,
+  );
+  $export['custom_fields'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
   $ds_field->field = 'edit_link';
   $ds_field->label = 'Edit Link';
   $ds_field->field_type = 5;
@@ -481,6 +500,25 @@ function grievance_content_types_ds_custom_fields_info() {
     'use_token' => 1,
   );
   $export['edit_link'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'eins';
+  $ds_field->label = 'EINs';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'sirius_worker|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<p>[replace me]</p>
+',
+      'format' => 'full_html',
+    ),
+    'use_token' => 0,
+  );
+  $export['eins'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
