@@ -19,10 +19,15 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 	}
 	
 	// 
-	// Joins for Local
+	// Joins for Local, airport
 	//
 	
-	if ($table == 'local') {
+	$simple_joins = array(
+		'local' => 'local', 
+		'airport' => 'hdb_airport',
+		'airport_alt' => 'hdb_airport',
+	);
+	if ($simple_joins[$table]) {
 		if (!$already_joined["field_data_field_${table}"]) {
 			$already_joined["field_data_field_${table}"] = 1;
 
@@ -38,7 +43,7 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 			$query->leftJoin(
 				"node",
 				"${table}_node",
-				"${table}_node.type = '${table}' and ${table}_node.status = 1 and ${table}_node.nid = field_data_field_${table}.field_${table}_target_id"
+				"${table}_node.type = '$simple_joins[$table]' and ${table}_node.status = 1 and ${table}_node.nid = field_data_field_${table}.field_${table}_target_id"
 			);
 		}
 		

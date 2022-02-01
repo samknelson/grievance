@@ -1,6 +1,7 @@
 <?php
 
 function mightysearch_search_form($form, &$form_state) {
+
 	// Include the MultiSelect JS / CSS
 	drupal_add_css(drupal_get_path('module', 'multiselect') . '/multiselect.css');
 	drupal_add_js(drupal_get_path('module', 'multiselect') . '/multiselect.js');
