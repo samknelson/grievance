@@ -52,12 +52,6 @@ function mightysearch_mschema() {
 		),
 	);
 	
-	$schema['property']['fields']['airport'] = array(
-		'prompt' => 'Airport',
-		'type' => 'tid',
-		'vocabulary' => 'airport'
-	);
-	
 	$schema['property']['fields']['msa'] = array(
 		'prompt' => 'MSA',
 		'type' => 'tid',
@@ -177,10 +171,16 @@ function mightysearch_mschema() {
 		'type' => 'text',
 	);
 
-	$schema['property']['fields']['csno_source'] = array(
-		'prompt' => 'Casino - Source',
-		'type' => 'text',
+	$schema['property']['fields']['calc_airport_dist'] = array(
+		'prompt' => 'Airport Distance',
+		'type' => 'integer',
 	);
+
+	$schema['property']['fields']['calc_airport_dist_alt'] = array(
+		'prompt' => 'Airport (Secondary) Distance',
+		'type' => 'integer',
+	);
+
 
 	$relationship_types = array(
 		'owner' => 'Owner',
@@ -364,6 +364,31 @@ function mightysearch_mschema() {
 		'type' => 'text',
 	);
 
+
+	//
+	// Airport Table and fields
+	//
+	
+	foreach (array('airport' => 'Airport', 'airport_alt' => 'Airport (Secondary)') as $table => $label) {
+		$schema[$table] = array();
+		$schema[$table]['table'] = array(
+			'prompt' => $label,
+		);
+
+		$schema[$table]['fields'] = array();
+		$schema[$table]['fields']['nid'] = array(
+			'prompt' => 'ID',
+			'type' => 'text',
+		);
+		$schema[$table]['fields']['title'] = array(
+			'prompt' => 'Name',
+			'type' => 'text',
+		);
+		$schema[$table]['fields']['sirius_name_short'] = array(
+			'prompt' => 'Abbreviation',
+			'type' => 'text',
+		);
+	}
 
 	return $schema;
 }

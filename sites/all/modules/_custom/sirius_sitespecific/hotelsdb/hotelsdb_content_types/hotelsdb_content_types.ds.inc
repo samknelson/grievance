@@ -18,18 +18,13 @@ function hotelsdb_content_types_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'property';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
-    'ds_flag_bookmarks' => array(
-      'weight' => '33',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'unite_relationships' => array(
-      'weight' => '48',
+      'weight' => '51',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'changed_date' => array(
-      'weight' => '38',
+      'weight' => '41',
       'label' => 'inline',
       'format' => 'ds_post_date_long',
     ),
@@ -44,6 +39,44 @@ function hotelsdb_content_types_ds_field_settings_info() {
  */
 function hotelsdb_content_types_ds_layout_settings_info() {
   $export = array();
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|hdb_airport|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'hdb_airport';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_2col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_sirius_name_short',
+        1 => 'field_address',
+        2 => 'field_address_canon',
+      ),
+      'right' => array(
+        3 => 'field_address_geofield',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_name_short' => 'left',
+      'field_address' => 'left',
+      'field_address_canon' => 'left',
+      'field_address_geofield' => 'right',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['node|hdb_airport|default'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -80,36 +113,38 @@ function hotelsdb_content_types_ds_layout_settings_info() {
         20 => 'field_address_canon',
         21 => 'field_msa',
         22 => 'field_meg',
-        23 => 'field_airport',
-        24 => 'field_neighborhood',
-        25 => 'field_owner_of_record',
-        26 => 'field_pin',
-        27 => 'field_county',
-        28 => 'field_on_public_land',
-        29 => 'field_local',
-        30 => 'field_labor_activity_index',
-        31 => 'field_boycott_url',
-        32 => 'field_notes',
-        33 => 'ds_flag_bookmarks',
+        23 => 'field_neighborhood',
+        24 => 'field_owner_of_record',
+        25 => 'field_pin',
+        26 => 'field_county',
+        27 => 'field_on_public_land',
+        28 => 'field_local',
+        29 => 'field_airport',
+        30 => 'field_calc_airport_dist',
+        31 => 'field_airport_alt',
+        32 => 'field_calc_airport_dist_alt',
+        33 => 'field_labor_activity_index',
+        34 => 'field_boycott_url',
+        35 => 'field_notes',
       ),
       'right' => array(
-        34 => 'field_address_geofield',
-        35 => 'field_url',
-        36 => 'field_phone',
-        37 => 'field_fax',
+        36 => 'field_address_geofield',
+        37 => 'field_url',
+        38 => 'field_phone',
+        39 => 'field_fax',
       ),
       'footer' => array(
-        38 => 'changed_date',
-        39 => 'field_calc_owner_last_updated',
-        40 => 'field_calc_operator_last_updated',
-        41 => 'field_hotel_contract_start_date',
-        42 => 'field_hotel_contract_end_date',
-        43 => 'field_hotel_contract_covered',
-        44 => 'field_rest_contract_start_date',
-        45 => 'field_rest_contract_end_date',
-        46 => 'field_rest_contract_covered',
-        47 => 'field_attachments',
-        48 => 'unite_relationships',
+        40 => 'changed_date',
+        41 => 'field_calc_owner_last_updated',
+        42 => 'field_calc_operator_last_updated',
+        43 => 'field_hotel_contract_start_date',
+        44 => 'field_hotel_contract_end_date',
+        45 => 'field_hotel_contract_covered',
+        46 => 'field_rest_contract_start_date',
+        47 => 'field_rest_contract_end_date',
+        48 => 'field_rest_contract_covered',
+        49 => 'field_attachments',
+        50 => 'unite_relationships',
       ),
     ),
     'fields' => array(
@@ -136,17 +171,19 @@ function hotelsdb_content_types_ds_layout_settings_info() {
       'field_address_canon' => 'left',
       'field_msa' => 'left',
       'field_meg' => 'left',
-      'field_airport' => 'left',
       'field_neighborhood' => 'left',
       'field_owner_of_record' => 'left',
       'field_pin' => 'left',
       'field_county' => 'left',
       'field_on_public_land' => 'left',
       'field_local' => 'left',
+      'field_airport' => 'left',
+      'field_calc_airport_dist' => 'left',
+      'field_airport_alt' => 'left',
+      'field_calc_airport_dist_alt' => 'left',
       'field_labor_activity_index' => 'left',
       'field_boycott_url' => 'left',
       'field_notes' => 'left',
-      'ds_flag_bookmarks' => 'left',
       'field_address_geofield' => 'right',
       'field_url' => 'right',
       'field_phone' => 'right',

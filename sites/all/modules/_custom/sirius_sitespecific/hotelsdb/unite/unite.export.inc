@@ -1,5 +1,9 @@
 <?php
 
+function unite_export_union_hotel_guide_access() {
+	return sirius_ip_check(sirius_loopback_remote_ip(), variable_get('unite_export_ip_allowlist'));
+}
+
 function unite_export_union_hotel_guide_old() {
 	$query = new EntityFieldQuery();
 	$query->entityCondition('entity_type', 'node');
@@ -129,7 +133,9 @@ function unite_export_union_hotel_guide_new($secs = 0) {
 	$nodes = $result['node'];
 	if (!$nodes) { $nodes = array(); }
 
-	drupal_add_http_header('Content-Type', 'text/csv');
+	if (!$_REQUEST['onscreen']) {
+		drupal_add_http_header('Content-Type', 'text/csv');
+	}
 	$fp = fopen('php://output', 'w');
 	
 	$fields = array(

@@ -105,6 +105,13 @@ function unite_node_tabs() {
 		'weight' => 2,
 	);
 
+	$node_tabs['hdb_airport']['unite_airport_properties'] = array(
+		'title' => 'Properties',
+		'description' => '',
+		'callback' => 'unite_node_tab_airport_properties',
+		'permissions' => array('unite hotels admin'),
+		'file' => 'unite.page_airport_properties.inc',
+	);
 
 
 
@@ -127,7 +134,7 @@ function unite_menu() {
 	$items['unite/export/union-hotel-guide'] = array(
 		'title' => 'Union Hotel Guide export',
 		'page callback' => 'unite_export_union_hotel_guide_new',
-		'access callback' => 'unite_all_access',		
+		'access callback' => 'unite_export_union_hotel_guide_access',		
 		'access arguments' => array(),
 		'type' => MENU_NORMAL_ITEM,
 	);
