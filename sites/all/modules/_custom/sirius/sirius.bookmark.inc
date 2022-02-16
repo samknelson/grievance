@@ -35,3 +35,51 @@ function sirius_bookmark_type_options() {
 	}
 	return $options;
 }
+
+function sirius_bookmark_flag_id() {
+	$fid = &drupal_static(__FUNCTION__);
+  if (!isset($fid)) {
+		$sql = "select fid from flag where name = 'bookmarks'";
+		$stmt = sirius_sql_query($sql, array());
+		$hr = $stmt->fetchAssoc();
+		$fid = $hr['fid'];
+	}
+	return $fid;
+}
+
+function sirius_bookmark_recent($limit = 0) {
+	global $user;
+	if (!$user || !$user->uid) { return array(); }
+	$fid = sirius_bookmark_flag_id();
+
+	if (!$limit) { $limit = 3; }
+	$fid = sirius_bookmark_flag_id();
+	$sql = "select flagging_id, nid, title from flagging ";
+	$sql .= "left join node on flagging.entity_type = 'node' and flagging.entity_id = node.nid ";
+	$sql .= "where fid = :fid ";
+	$sql .= "and flagging.uid = :user_id ";
+	$sql .= "and node.nid is not null ";
+	$sql .= "order by flagging.timestamp desc limit $limit ";
+	$stmt = sirius_sql_query($sql, array(':fid' => $fid, ':user_id' => $user->uid));
+
+	$result = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$result[] = $hr;
+	}
+	return $result;
+}
+
+function sirius_bookmark_count() {
+	global $user;
+	if (!$user || !$user->uid) { return 0; }
+	$fid = sirius_bookmark_flag_id();
+
+	if (!$limit) { $limit = 3; }
+	$fid = sirius_bookmark_flag_id();
+	$sql = "select count(*) as c from flagging ";
+	$sql .= "where fid = :fid ";
+	$sql .= "and flagging.uid = :user_id ";
+	$stmt = sirius_sql_query($sql, array(':fid' => $fid, ':user_id' => $user->uid));
+	$hr = $stmt->fetchAssoc();
+	return $hr['c'];
+}
