@@ -132,11 +132,11 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 			}
 		}
 		if (strlen($letter_template_node->field_grievance_notify_body['und'][0]['value']) > 10) {
-			if ($body) { $body .= '<hr>'; }
+			if ($body) { $body .= '<div class="grievance-letter-page-break">&nbsp;</div>'; }
 			$body .= $letter_template_node->field_grievance_notify_body['und'][0]['value'];
 		}
 		if (strlen($letter_template_node->body['und'][0]['value']) > 10) {
-			if ($pdf_body) { $pdf_body .= '<hr>'; }
+			if ($pdf_body) { $pdf_body .= '<div class="grievance-letter-page-break">&nbsp;</div>'; }
 			$pdf_body .= $letter_template_node->body['und'][0]['value'];
 		}
 	}
