@@ -3,12 +3,12 @@
 // I hate notice errors
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
 
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.menu.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.ebnotify.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.permission.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.badge.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.log.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.feed_hours_check.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('sirius_teamsters631', 'unite') . '/sirius_teamsters631.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('sirius_teamsters631', 'unite') . '/sirius_teamsters631.ebnotify.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('sirius_teamsters631', 'unite') . '/sirius_teamsters631.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('sirius_teamsters631', 'unite') . '/sirius_teamsters631.badge.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('sirius_teamsters631', 'unite') . '/sirius_teamsters631.log.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('sirius_teamsters631', 'unite') . '/sirius_teamsters631.feed_hours_check.inc';
 
 /**
  * Implements hook_taxonomy_term_update() 

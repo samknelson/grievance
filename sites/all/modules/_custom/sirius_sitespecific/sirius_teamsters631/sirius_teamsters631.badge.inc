@@ -321,7 +321,7 @@ function sirius_teamsters631_badge_contents($worker_node) {
 	print '</div>';
 
 	// Contact
-	print '<div style="text-align: center; background-image: url(\'https://test.dispatch.teamsters631.com/sites/all/modules/_custom/sirius_teamsters631/images/logo_bg.jpg\');  background-repeat: no-repeat;  background-position: top center; background-size: auto 100%; ">';
+	print '<div style="text-align: center; background-image: url(\'https://dispatch.teamsters631.com/sites/all/modules/_custom/sirius_sitespecific/sirius_teamsters631/images/logo_bg.jpg\');  background-repeat: no-repeat;  background-position: top center; background-size: auto 100%; ">';
 
 	// Back text
 	print '<div style="height: 210px; overflow: hidden; white-space: pre; font-size: 85%">';
