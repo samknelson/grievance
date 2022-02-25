@@ -1,0 +1,80 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.ebnotify.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.badge.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.log.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.feed_hours_check.inc';
+
+/**
+ * Implements hook_taxonomy_term_update() 
+ */
+
+function sirius_teamsters631_taxonomy_term_update($term) {
+  $vid = $term->vid;
+  $vocabulary = taxonomy_vocabulary_load($vid);
+  if ($vocabulary->machine_name == 'sirius_member_status') { sirius_teamsters631_taxonomy_term_update_ebnotify($term); }
+}
+ 
+/***
+ * Implements hook_sirius_wizard_info()
+ */
+
+function sirius_teamsters631_sirius_wizard_info() {
+  $items = array();
+
+  // $items += sirius_ledger_feed_charges_info();
+  $items += sirius_teamsters631_feed_hours_check_info();
+
+  return $items;
+}
+
+
+
+
+
+
+
+
+function sirius_teamsters631_oneoff_logclean() {
+	$sql = "select entity_id from field_data_field_sirius_type where field_sirius_type_value in ('raw:main', 'raw:memberstatus', 'raw:phone', 'raw:skill', 'import', 'add', 'add_expired', 'set') ";
+	$sql .= "and bundle = 'sirius_log' ";
+	$sql .= "order by entity_id ";
+	$sql .= "limit 10000 ";
+
+	$stmt = sirius_sql_query($sql, array());
+	$nids = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$nids[] = $hr['entity_id'];
+	}
+
+	foreach ($nids as $nid) { 
+		print "Deleting: $nid\n";
+		node_delete($nid);
+	}
+}
+
+function sirius_teamsters631_oneoff_workerclean() {
+	$sql = "select nid, field_sirius_domain_target_id from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "where field_sirius_domain_target_id is null ";
+	$sql .= "and node.type = 'sirius_dispatch' ";
+	$sql .= "order by node.nid ";
+	$sql .= "limit 10000 "; 
+	$stmt = sirius_sql_query($sql, array());
+	$nids = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$nids[] = $hr['nid'];
+	}
+
+	foreach ($nids as $nid) { 
+		print "Deleting: $nid\n";
+		node_delete($nid);
+	}
+
+	print "Count: " . count($nids) . "\n";
+}

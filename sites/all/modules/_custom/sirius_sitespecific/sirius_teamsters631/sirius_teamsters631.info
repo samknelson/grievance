@@ -1,0 +1,4 @@
+name = Sirius Teamsters 631
+description = Functionality specific to the Teamsters 631 site
+core = 7.x
+package = sirius
