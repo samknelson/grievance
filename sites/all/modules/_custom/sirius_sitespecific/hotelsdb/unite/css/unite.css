@@ -3,3 +3,31 @@
 	margin:  10px;
 	border:  1px solid #999999;
 }
+
+.unite-node-subform div.form-item {
+	margin: 0;
+}
+
+.unite-node-subform fieldset.date-combo .container-inline-date > .form-item {
+	margin:  0;
+}
+
+.unite-node-subform label,
+.unite-node-subform span.fieldset-legend {
+	margin-top:  10px;
+	margin-bottom:  2px;
+}
+
+.unite-node-subform span.fieldset-legend {
+	display:  block;
+}
+
+
+.unite-node-subform legend,
+.unite-node-subform .field-widget-date-popup legend {
+	margin:  0;
+}
+
+.unite-node-subform .field-type-text-long {
+	white-space: normal;
+}

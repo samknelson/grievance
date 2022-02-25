@@ -32,8 +32,24 @@ function hotelsdb_content_types_views_api($module = NULL, $api = NULL) {
  */
 function hotelsdb_content_types_node_info() {
   $items = array(
+    'actor' => array(
+      'name' => t('Actor'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'hdb_airport' => array(
       'name' => t('HDB Airport'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'hdb_convention_center' => array(
+      'name' => t('HDB Convention Center'),
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',

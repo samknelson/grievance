@@ -5,20 +5,7 @@ function unite_node_tab_casino_edit($property_node) {
 }
 
 function unite_node_tab_casino_edit_form($form, &$form_state, $property_node) {
-	$form_state['property_nid'] = $property_node->nid;
-
-	$fields = unite_casino_fields();
-	foreach ($fields as $field) {
-		field_attach_form('node', $property_node, $form, $form_state, NULL, array('field_name' => $field));
-	}
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Submit'),
-		'#weight' => 1000,
-	);
-
-	return $form;
+	return unite_node_subform($form, $form_state, $property_node, unite_casino_fields());
 }
 
 function unite_node_tab_casino_edit_form_submit($form, &$form_state) {
@@ -26,7 +13,7 @@ function unite_node_tab_casino_edit_form_submit($form, &$form_state) {
 
 	$fields = unite_casino_fields();
 	foreach ($fields as $field) {
-		if (!unite_submitted_empty($form_state, $field)) { 
+		if (!unite_submitted_empty($form_state, $field)) {
 			$property_node->{$field} = $form_state['values'][$field];
 		} else {
 			$property_node->{$field}['und'] = NULL;

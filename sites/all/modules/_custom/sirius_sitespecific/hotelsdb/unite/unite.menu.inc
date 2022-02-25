@@ -37,7 +37,7 @@ function unite_node_tabs() {
 			'callback' => 'unite_node_tab_field_revisions',
 			'permissions' => array('unite hotels admin'),
 			'file' => 'unite.page_field_revisions.inc',
-			'weight' => 3,
+			'weight' => 99,
 		);
 	}
 
@@ -54,55 +54,37 @@ function unite_node_tabs() {
 	$node_tabs['property']['unite_fairhotel'] = array(
 		'title' => 'FairHotel',
 		'description' => '',
-		'callback' => 'unite_node_tab_fairhotel_view',
-		'permissions' => array('unite hotels admin'),
-		'file' => 'unite.page_property_fairhotel_view.inc',
-	);
-
-	$node_tabs['property']['unite_fairhotel/view'] = array(
-		'title' => 'View',
-		'description' => '',
-		'callback' => 'unite_node_tab_fairhotel_view',
-		'permissions' => array('unite hotels admin'),
-		'file' => 'unite.page_property_fairhotel_view.inc',
-		'weight' => 1,
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-	);
-
-	$node_tabs['property']['unite_fairhotel/edit'] = array(
-		'title' => 'Edit',
-		'description' => '',
 		'callback' => 'unite_node_tab_fairhotel_edit',
 		'permissions' => array('unite hotels admin'),
 		'file' => 'unite.page_property_fairhotel_edit.inc',
-		'weight' => 2,
+		'weight' => 1,
 	);
 
 	$node_tabs['property']['unite_casino'] = array(
 		'title' => 'Casino',
 		'description' => '',
-		'callback' => 'unite_node_tab_casino_view',
-		'permissions' => array('unite hotels admin'),
-		'file' => 'unite.page_property_casino_view.inc',
-	);
-
-	$node_tabs['property']['unite_casino/view'] = array(
-		'title' => 'View',
-		'description' => '',
-		'callback' => 'unite_node_tab_casino_view',
-		'permissions' => array('unite hotels admin'),
-		'file' => 'unite.page_property_casino_view.inc',
-		'weight' => 1,
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-	);
-
-	$node_tabs['property']['unite_casino/edit'] = array(
-		'title' => 'Edit',
-		'description' => '',
 		'callback' => 'unite_node_tab_casino_edit',
 		'permissions' => array('unite hotels admin'),
 		'file' => 'unite.page_property_casino_edit.inc',
-		'weight' => 2,
+		'weight' => 1,
+	);
+
+	$node_tabs['property']['unite_amenities'] = array(
+		'title' => 'Amenities',
+		'description' => '',
+		'callback' => 'unite_node_tab_amenities_edit',
+		'permissions' => array('unite hotels admin'),
+		'file' => 'unite.page_property_amenities_edit.inc',
+		'weight' => 1,
+	);
+
+	$node_tabs['property']['unite_contract'] = array(
+		'title' => 'Contract',
+		'description' => '',
+		'callback' => 'unite_node_tab_contract_edit',
+		'permissions' => array('unite hotels admin'),
+		'file' => 'unite.page_property_contract_edit.inc',
+		'weight' => 1,
 	);
 
 	$node_tabs['hdb_airport']['unite_airport_properties'] = array(
@@ -113,7 +95,13 @@ function unite_node_tabs() {
 		'file' => 'unite.page_airport_properties.inc',
 	);
 
-
+	$node_tabs['hdb_convention_center']['unite_convention_properties'] = array(
+		'title' => 'Properties',
+		'description' => '',
+		'callback' => 'unite_node_tab_convention_properties',
+		'permissions' => array('unite hotels admin'),
+		'file' => 'unite.page_convention_properties.inc',
+	);
 
   sirius_node_tab_set_module('unite', $node_tabs);
 
