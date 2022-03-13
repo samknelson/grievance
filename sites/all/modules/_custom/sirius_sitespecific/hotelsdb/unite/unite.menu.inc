@@ -119,9 +119,17 @@ function unite_all_access() {
 function unite_menu() {
   $items = array();
 
+	$items['unite/home'] = array(
+		'title' => 'UNITE HERE Hotels Database',
+		'page callback' => 'unite_page_home',
+		'access arguments' => array('unite hotels user'),
+		'type' => MENU_NORMAL_ITEM,
+		'file' => 'unite.page_home.inc',
+	);
+
 	$items['unite/export/union-hotel-guide'] = array(
 		'title' => 'Union Hotel Guide export',
-		'page callback' => 'unite_export_union_hotel_guide_new',
+		'page callback' => 'unite_export_union_hotel_guide',
 		'access callback' => 'unite_export_union_hotel_guide_access',		
 		'access arguments' => array(),
 		'type' => MENU_NORMAL_ITEM,
@@ -129,7 +137,7 @@ function unite_menu() {
 
 	$items['unite/export/union-hotel-guide/%'] = array(
 		'title' => 'Union Hotel Guide export',
-		'page callback' => 'unite_export_union_hotel_guide_new',
+		'page callback' => 'unite_export_union_hotel_guide',
 		'page arguments' => array(3),
 		'access callback' => 'unite_all_access',		
 		'access arguments' => array(),

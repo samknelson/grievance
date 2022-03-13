@@ -22,6 +22,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.on
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_property.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_airport.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_convention.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_actor.inc";
 
 
 /**
@@ -45,6 +46,7 @@ function unite_sirius_wizard_info() {
   $items += unite_feed_property_info();
   $items += unite_feed_airport_info();
   $items += unite_feed_convention_info();
+  $items += unite_feed_actor_info();
 
   return $items;
 }

@@ -4,210 +4,148 @@ function unite_export_union_hotel_guide_access() {
 	return sirius_ip_check(sirius_loopback_remote_ip(), variable_get('unite_export_ip_allowlist'));
 }
 
-function unite_export_union_hotel_guide_old() {
-	$query = new EntityFieldQuery();
-	$query->entityCondition('entity_type', 'node');
-	$query->entityCondition('bundle', 'property');
-	$query->propertyOrderBy('nid');
-	$result = $query->execute();
-
-	db_set_active('sps');
-	$sql = "drop table if exists h_Properties_Incoming";
-	print "$sql\n";
-	$stmt = db_query($sql);
-	$sql = "create table h_Properties_Incoming like h_Properties";
-	print "$sql\n";
-	$stmt = db_query($sql);
-	db_set_active('default');
-
-
-	foreach ($result['node'] as $nid => $ignore) {
-		print "Inserting: $nid\n";
-		$node = node_load($nid);
-		print "... loaded ...\n";
-		$legacy_id = $node->field_legacy_id['und'][0]['value'];
-		$legacy_id = preg_replace('/property_/', '', $legacy_id);
-		if (!$legacy_id) { $legacy_id = $nid + 10000000; }
-		
-		$msa_tid = $node->field_msa['und'][0]['tid'];
-		$$msa_legacy_id = null;
-		if ($msa_tid) {
-			$msa_term = taxonomy_term_load($msa_tid);
-			$msa_legacy_id = $msa_term->field_legacy_id['und'][0]['value'];
-		}
-		
-		$development_status = $node->field_development_status['und'][0]['value'];
-		if (!$development_status) { $development_status = ''; }
-		db_set_active('sps');
-		$sql = "insert into h_Properties_Incoming (";
-		$sql .= "property_id, ";
-		$sql .= "property_name, ";
-		$sql .= "loc_addr1, ";
-		$sql .= "loc_addr2, ";
-		$sql .= "loc_city, ";
-		$sql .= "loc_state, ";
-		$sql .= "loc_zip, ";
-		$sql .= "loc_country, ";
-		$sql .= "loc_phone, ";
-		$sql .= "loc_fax, ";
-		$sql .= "loc_website, ";
-		$sql .= "hla_index_new, ";
-		$sql .= "development_status, ";
-		$sql .= "geo_latitude, ";
-		$sql .= "geo_longitude, ";
-		$sql .= "msa_id, ";
-		$sql .= "mod_date_prop ";
-		$sql .= ") values (";
-		$sql .= ":property_id, ";
-		$sql .= ":property_name, ";
-		$sql .= ":loc_addr1, ";
-		$sql .= ":loc_addr2, ";
-		$sql .= ":loc_city, ";
-		$sql .= ":loc_state, ";
-		$sql .= ":loc_zip, ";
-		$sql .= ":loc_country, ";
-		$sql .= ":loc_phone, ";
-		$sql .= ":loc_fax, ";
-		$sql .= ":loc_website, ";
-		$sql .= ":hla_index_new, ";
-		$sql .= ":development_status,";
-		$sql .= ":geo_latitude, ";
-		$sql .= ":geo_longitude, ";
-		$sql .= ":msa_id, ";
-		$sql .= ":mod_date_prop ";
-		$sql .= ") ";
-		print "... about to save ...\n";
-		$stmt = db_query($sql, array(
-			':property_id' => $legacy_id,
-			':property_name' => $node->title,
-			':loc_addr1' => $node->field_address['und'][0]['thoroughfare'],
-			':loc_addr2' =>  $node->field_address['und'][0]['premise'],
-			':loc_city' =>  $node->field_address['und'][0]['locality'],
-			':loc_state' =>  $node->field_address['und'][0]['administrative_area'],
-			':loc_zip' =>  $node->field_address['und'][0]['postal_code'],
-			':loc_country' =>  $node->field_address['und'][0]['country'],
-			':loc_phone' =>  $node->field_phone['und'][0]['value'],
-			':loc_fax' => $node->field_fax['und'][0]['value'],
-			':loc_website' => substr($node->field_url['und'][0]['url'], 0, 128),
-			':hla_index_new' => $node->field_labor_activity_index['und'][0]['value'],
-			':development_status' => $development_status,
-			':geo_latitude' => $node->field_address_geofield['und'][0]['lat'] * 1000000,
-			':geo_longitude' => $node->field_address_geofield['und'][0]['lon'] * 1000000,
-			':msa_id' => $msa_legacy_id,
-			':mod_date_prop' => date('Y-m-d H:i:s', $node->changed),
-		));
-		print "... saved.\n";
-		
-		db_set_active('default');
-	}
-	
-	db_set_active('sps');
-	$sql = "drop table if exists h_Properties_Outgoing";
-	print "$sql\n";
-	$stmt = db_query($sql);
-	$sql = "alter table h_Properties rename to h_Properties_Outgoing";
-	print "$sql\n";
-	$stmt = db_query($sql);
-	$sql = "alter table h_Properties_Incoming rename to h_Properties";
-	print "$sql\n";
-	$stmt = db_query($sql);
-	db_set_active('default');
-
-	
-}
-
-
 function unite_export_union_hotel_guide_new($secs = 0) {
 	if (!$secs) { $secs = $_REQUEST["secs"]; }
 
-	$query = new EntityFieldQuery();
-	$query->entityCondition('entity_type', 'node');
-	$query->entityCondition('bundle', 'property');
-	$query->propertyOrderBy('nid');
-	if ($secs) {
-		$ts = time() - $secs;
-		$query->propertyCondition('changed', $ts, '>=');
+	$lookup_airports = unite_airports_list();
+	$lookup_convention = unite_conventions_list();
+	$lookup_brand = sirius_taxonomy_load('brand', 'tid', 'name');
+	$lookup_niche = sirius_taxonomy_load('hdb_niche', 'tid', 'name');
+
+	$lookup_brand_full = sirius_taxonomy_load('brand', 'tid', 'full');
+
+	$sql_args = array();
+
+	$fields = array(
+		'nid' => 'nid',
+		'title' => 'title',
+		'field_address_administrative_area' => 'address - state',
+		'field_address_country' => 'address - country',
+		'field_address_locality' => 'address - city',
+		'field_address_postal_code' => 'address - zip',
+		'field_address_premise' => 'address - premise',
+		'field_address_thoroughfare' => 'address - street',
+		'field_development_status_value' => 'development_status',
+		'field_phone_value' => 'phone',
+		'field_fax_value' => 'fax',
+		'field_rooms_value' => 'rooms',
+		'field_union_status_value' => 'union_status',
+		'field_url_url' => 'url',
+		'field_address_geofield_lat' => 'latitude',
+		'field_address_geofield_lon' => 'longitude',
+		'field_labor_activity_index_value' => 'labor_activity_index',
+		'field_boycott_url_url' => 'boycott_url',
+		'field_fh_notes_value' => 'fh_notes',
+		'field_fh_nonunion_value' => 'fh_nonunion',
+		'field_airport_target_id' => 'airport',
+		'field_calc_airport_dist_value' => 'airport_dist',
+		'field_airport_alt_target_id' => 'airport_2',
+		'field_calc_airport_dist_alt_value' => 'airport_2_dist',
+		'field_convention_center_target_id' => 'convention_center',
+		'field_calc_convention_dist_value' => 'convention_center_dist',
+		'field_convention_center_attached_value' => 'convention_center_attached',
+		'field_fh_meeting_room_count_value' => 'meeting_room_count',
+		'field_fh_meeting_room_capacity_value' => 'meeting_room_capacity',
+		'field_fh_meeting_room_largest_value' => 'meeting_room_largest',
+		'field_fh_event_space_value' => 'event_space',
+		'field_fh_ballroom_count_value' => 'ballroom_count',
+		'field_fh_ballroom_capacity_value' => 'ballroom_capacity',
+		'field_fh_outdoor_value' => 'outdoor_space_available',
+		'field_fh_outdoor_area_value' => 'outdoor_space',
+		'field_fh_parking_value' => 'parking_available',
+		'field_fh_parking_capacity_value' => 'parking_capacity',
+		'field_brand_tid' => 'brand',
+		'field_niche_tid' => 'niche',
+	);
+
+	$sql = "select ";
+	$sql .= join(', ', array_keys($fields));
+	$sql .= " from node ";
+
+	$tables = array(
+		'field_labor_activity_index',
+		'field_address',
+		'field_development_status',
+		'field_fax',
+		'field_phone',
+		'field_rooms',
+		'field_union_status',
+		'field_url',
+		'field_address_geofield',
+		'field_boycott_url',
+		'field_fh_notes',
+		'field_fh_nonunion',
+		'field_airport',
+		'field_calc_airport_dist',
+		'field_airport_alt',
+		'field_calc_airport_dist_alt',
+		'field_convention_center',
+		'field_calc_convention_dist',
+		'field_convention_center_attached',
+		'field_fh_meeting_room_count',
+		'field_fh_meeting_room_capacity',
+		'field_fh_meeting_room_largest',
+		'field_fh_event_space',
+		'field_fh_ballroom_count',
+		'field_fh_ballroom_capacity',
+		'field_fh_outdoor',
+		'field_fh_outdoor_area',
+		'field_fh_parking',
+		'field_fh_parking_capacity',
+		'field_brand',
+		'field_niche',
+	);
+	foreach ($tables as $table) {
+		$sql .= "left join field_data_$table on field_data_$table.entity_type = 'node' and field_data_$table.entity_id = node.nid ";
 	}
-	$result = $query->execute();
+	$sql .= "where node.type = 'property' ";
+	$sql .= "and field_labor_activity_index_value is not null ";
+	if ($secs) {
+		$sql .= "and changed >= :ts ";
+		$sql_args[':ts'] = time() - $secs;
+	}
+	// $sql .= "and nid = 37266 ";
+	$sql .= "order by nid ";
+	$stmt = db_query($sql, $sql_args);
 
-	$nodes = $result['node'];
-	if (!$nodes) { $nodes = array(); }
-
-	if (!$_REQUEST['onscreen']) {
+	if ($_REQUEST['onscreen']) {
+		print "<pre>";
+	} else {
 		drupal_add_http_header('Content-Type', 'text/csv');
 	}
 	$fp = fopen('php://output', 'w');
-	
-	$fields = array(
-		'nid',
-		'title',
-		'address - state',
-		'address - country',
-		'address - city',
-		'address - zip',
-		'address - premise',
-		'address - street',
-		'development_status',
-		'fax',
-		'phone',
-		'rooms',
-		'union_status',
-		'url',
-		'latitude',
-		'longitude',
-		'labor_activity_index',
-		'boycott_url'
-	);
-	
-	fputcsv($fp, $fields);
 
-	foreach ($nodes as $nid => $ignore) {
-		$node = node_load($nid);
+	$header = array_values($fields);
+	$header[] = 'brand_parent';
+	fputcsv($fp, array_values($fields));
+
+	$count = 0;
+	while ($hr = $stmt->fetchAssoc()) {
 		$row = array();
-		$row[] = $node->nid;
-		$row[] = $node->title;
-		$row[] = $node->field_address['und'][0]['administrative_area'];
-		$row[] = $node->field_address['und'][0]['country'];
-		$row[] = $node->field_address['und'][0]['locality'];
-		$row[] = $node->field_address['und'][0]['postal_code'];
-		$row[] = $node->field_address['und'][0]['premise'];
-		$row[] = $node->field_address['und'][0]['thoroughfare'];
-		$row[] = $node->field_development_status['und'][0]['value'];
-		$row[] = $node->field_fax['und'][0]['value'];
-		$row[] = $node->field_phone['und'][0]['value'];
-		$row[] = $node->field_rooms['und'][0]['value'];
-		$row[] = $node->field_union_status['und'][0]['value'];
-		$row[] = $node->field_url['und'][0]['url'];
-		$row[] = $node->field_address_geofield['und'][0]['lat'];
-		$row[] = $node->field_address_geofield['und'][0]['lon'];
-		$row[] = $node->field_labor_activity_index['und'][0]['value'];
-		$row[] = $node->field_boycott_url['und'][0]['url'];
-		
-		fputcsv($fp, $row);
+		$delta = 0;
+
+		$hr['field_airport_target_id'] = $lookup_airports[$hr['field_airport_target_id']];
+		$hr['field_airport_alt_target_id'] = $lookup_airports[$hr['field_airport_alt_target_id']];
+		$hr['field_convention_center_target_id'] = $lookup_convention[$hr['field_convention_center_target_id']];
+		$brand_term = $lookup_brand_full[$hr['field_brand_tid']];
+		$hr['field_brand_tid'] = $lookup_brand[$hr['field_brand_tid']];
+		$hr['field_niche_tid'] = $lookup_niche[$hr['field_niche_tid']];
+
+		$brand_parent_name = '';
+		if ($brand_term) {
+			$brand_parent_tid = $brand_term->parents[0];
+			if ($brand_parent_tid) {
+				$brand_parent_name = $lookup_brand[$brand_parent_tid];
+			}
+		}
+		$hr['brand_parent'] = $brand_parent_name;
+
+		// print_r($row);
+		fputcsv($fp, array_values($hr));
+		++$count;
 	}
 
 	fclose($fp);
+	// print "Found: $count\n";
 	exit();
-}
-
-
-function unite_export_feed_cache() {
-	$path = DRUPAL_ROOT . '/sites/default/files/unite_feed_cache';
-	$base_url = 'http://hotelsdb.unitehere.org/unite/export/app';
-	$date = date('Ymd', strtotime('-1 day'));
-
-	$urls = array(
-		'full' => $base_url . '/' . '20010101',
-		'today' => $base_url . '/' . $date,
-	);
-
-
-	$ctx = stream_context_create(array('http' => array('timeout' => 1000)));
-
-	foreach ($urls as $name => $url) {
-		watchdog('unite_export_feed_cache', "Generation starting: $name :: $url :: $path/$name");
-		$data = file_get_contents($url, 0, $ctx);
-		file_put_contents($path . '/' . $name, $data);
-		watchdog('unite_export_feed_cache', "Generation complete: $name :: $url :: $path/$name");
-	}
 }
