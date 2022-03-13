@@ -118,7 +118,7 @@ function unite_export_union_hotel_guide_new($secs = 0) {
 
 	$header = array_values($fields);
 	$header[] = 'brand_parent';
-	fputcsv($fp, array_values($fields));
+	fputcsv($fp, $header);
 
 	$count = 0;
 	while ($hr = $stmt->fetchAssoc()) {
