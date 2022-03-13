@@ -12,6 +12,202 @@ function hotelsdb_content_types_views_default_views() {
   $export = array();
 
   $view = new view();
+  $view->name = 'hdb_actors';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'HDB Actors';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'HDB Actors';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'unite hotels user';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '100';
+  $handler->display->display_options['style_plugin'] = 'table';
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'node';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['label'] = 'Name';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
+  /* Field: Content: Actor Type */
+  $handler->display->display_options['fields']['field_actor_type']['id'] = 'field_actor_type';
+  $handler->display->display_options['fields']['field_actor_type']['table'] = 'field_data_field_actor_type';
+  $handler->display->display_options['fields']['field_actor_type']['field'] = 'field_actor_type';
+  $handler->display->display_options['fields']['field_actor_type']['type'] = 'taxonomy_term_reference_plain';
+  /* Field: Content: Phone */
+  $handler->display->display_options['fields']['field_phone']['id'] = 'field_phone';
+  $handler->display->display_options['fields']['field_phone']['table'] = 'field_data_field_phone';
+  $handler->display->display_options['fields']['field_phone']['field'] = 'field_phone';
+  /* Field: Content: Raw Address - Thoroughfare (i.e. Street address) */
+  $handler->display->display_options['fields']['field_address_thoroughfare']['id'] = 'field_address_thoroughfare';
+  $handler->display->display_options['fields']['field_address_thoroughfare']['table'] = 'field_data_field_address';
+  $handler->display->display_options['fields']['field_address_thoroughfare']['field'] = 'field_address_thoroughfare';
+  $handler->display->display_options['fields']['field_address_thoroughfare']['label'] = 'Address';
+  /* Field: Content: Raw Address - Premise (i.e. Apartment / Suite number) */
+  $handler->display->display_options['fields']['field_address_premise']['id'] = 'field_address_premise';
+  $handler->display->display_options['fields']['field_address_premise']['table'] = 'field_data_field_address';
+  $handler->display->display_options['fields']['field_address_premise']['field'] = 'field_address_premise';
+  $handler->display->display_options['fields']['field_address_premise']['label'] = 'Address 2';
+  /* Field: Content: Raw Address - Locality (i.e. City) */
+  $handler->display->display_options['fields']['field_address_locality']['id'] = 'field_address_locality';
+  $handler->display->display_options['fields']['field_address_locality']['table'] = 'field_data_field_address';
+  $handler->display->display_options['fields']['field_address_locality']['field'] = 'field_address_locality';
+  $handler->display->display_options['fields']['field_address_locality']['label'] = 'City';
+  /* Field: Content: Raw Address - Administrative area (i.e. State / Province) */
+  $handler->display->display_options['fields']['field_address_administrative_area']['id'] = 'field_address_administrative_area';
+  $handler->display->display_options['fields']['field_address_administrative_area']['table'] = 'field_data_field_address';
+  $handler->display->display_options['fields']['field_address_administrative_area']['field'] = 'field_address_administrative_area';
+  $handler->display->display_options['fields']['field_address_administrative_area']['label'] = 'State';
+  $handler->display->display_options['fields']['field_address_administrative_area']['display_name'] = 1;
+  /* Field: Content: Raw Address - Postal code */
+  $handler->display->display_options['fields']['field_address_postal_code']['id'] = 'field_address_postal_code';
+  $handler->display->display_options['fields']['field_address_postal_code']['table'] = 'field_data_field_address';
+  $handler->display->display_options['fields']['field_address_postal_code']['field'] = 'field_address_postal_code';
+  $handler->display->display_options['fields']['field_address_postal_code']['label'] = 'Postal Code';
+  /* Field: Content: Raw Address - Country */
+  $handler->display->display_options['fields']['field_address_country']['id'] = 'field_address_country';
+  $handler->display->display_options['fields']['field_address_country']['table'] = 'field_data_field_address';
+  $handler->display->display_options['fields']['field_address_country']['field'] = 'field_address_country';
+  $handler->display->display_options['fields']['field_address_country']['label'] = 'Country';
+  $handler->display->display_options['fields']['field_address_country']['display_name'] = 0;
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" class="tool-button">View</a>';
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
+  /* Filter criterion: Content: Published status */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'actor' => 'actor',
+  );
+  /* Filter criterion: Content: Actor Type (field_actor_type) */
+  $handler->display->display_options['filters']['field_actor_type_tid']['id'] = 'field_actor_type_tid';
+  $handler->display->display_options['filters']['field_actor_type_tid']['table'] = 'field_data_field_actor_type';
+  $handler->display->display_options['filters']['field_actor_type_tid']['field'] = 'field_actor_type_tid';
+  $handler->display->display_options['filters']['field_actor_type_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_actor_type_tid']['expose']['operator_id'] = 'field_actor_type_tid_op';
+  $handler->display->display_options['filters']['field_actor_type_tid']['expose']['label'] = 'Actor Type';
+  $handler->display->display_options['filters']['field_actor_type_tid']['expose']['operator'] = 'field_actor_type_tid_op';
+  $handler->display->display_options['filters']['field_actor_type_tid']['expose']['identifier'] = 'field_actor_type_tid';
+  $handler->display->display_options['filters']['field_actor_type_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  $handler->display->display_options['filters']['field_actor_type_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_actor_type_tid']['vocabulary'] = 'actor_type';
+  /* Filter criterion: Content: Phone (field_phone) */
+  $handler->display->display_options['filters']['field_phone_value']['id'] = 'field_phone_value';
+  $handler->display->display_options['filters']['field_phone_value']['table'] = 'field_data_field_phone';
+  $handler->display->display_options['filters']['field_phone_value']['field'] = 'field_phone_value';
+  $handler->display->display_options['filters']['field_phone_value']['operator'] = 'contains';
+  $handler->display->display_options['filters']['field_phone_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_phone_value']['expose']['operator_id'] = 'field_phone_value_op';
+  $handler->display->display_options['filters']['field_phone_value']['expose']['label'] = 'Phone';
+  $handler->display->display_options['filters']['field_phone_value']['expose']['description'] = '(substring ok)';
+  $handler->display->display_options['filters']['field_phone_value']['expose']['operator'] = 'field_phone_value_op';
+  $handler->display->display_options['filters']['field_phone_value']['expose']['identifier'] = 'field_phone_value';
+  $handler->display->display_options['filters']['field_phone_value']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  $handler->display->display_options['filters']['field_phone_value']['expose']['autocomplete_items'] = '10';
+  $handler->display->display_options['filters']['field_phone_value']['expose']['autocomplete_min_chars'] = '0';
+  $handler->display->display_options['filters']['field_phone_value']['expose']['autocomplete_raw_suggestion'] = 1;
+  $handler->display->display_options['filters']['field_phone_value']['expose']['autocomplete_raw_dropdown'] = 1;
+  $handler->display->display_options['filters']['field_phone_value']['expose']['autocomplete_dependent'] = 0;
+  /* Filter criterion: Content: Address - Administrative area (i.e. State / Province) */
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['id'] = 'field_sirius_address_administrative_area';
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['table'] = 'field_data_field_sirius_address';
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['field'] = 'field_sirius_address_administrative_area';
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['operator_id'] = 'field_sirius_address_administrative_area_op';
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['label'] = 'State';
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['operator'] = 'field_sirius_address_administrative_area_op';
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['identifier'] = 'field_sirius_address_administrative_area';
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['autocomplete_items'] = '10';
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['autocomplete_min_chars'] = '0';
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['autocomplete_raw_suggestion'] = 1;
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['autocomplete_raw_dropdown'] = 1;
+  $handler->display->display_options['filters']['field_sirius_address_administrative_area']['expose']['autocomplete_dependent'] = 0;
+  /* Filter criterion: Content: Title */
+  $handler->display->display_options['filters']['title']['id'] = 'title';
+  $handler->display->display_options['filters']['title']['table'] = 'node';
+  $handler->display->display_options['filters']['title']['field'] = 'title';
+  $handler->display->display_options['filters']['title']['operator'] = 'contains';
+  $handler->display->display_options['filters']['title']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['title']['expose']['operator_id'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['label'] = 'Name';
+  $handler->display->display_options['filters']['title']['expose']['description'] = '(substring ok)';
+  $handler->display->display_options['filters']['title']['expose']['operator'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['identifier'] = 'title';
+  $handler->display->display_options['filters']['title']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
+  $handler->display->display_options['filters']['title']['expose']['autocomplete_items'] = '10';
+  $handler->display->display_options['filters']['title']['expose']['autocomplete_min_chars'] = '0';
+  $handler->display->display_options['filters']['title']['expose']['autocomplete_field'] = 'title';
+  $handler->display->display_options['filters']['title']['expose']['autocomplete_raw_suggestion'] = 1;
+  $handler->display->display_options['filters']['title']['expose']['autocomplete_raw_dropdown'] = 1;
+  $handler->display->display_options['filters']['title']['expose']['autocomplete_dependent'] = 0;
+
+  /* Display: Page */
+  $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['path'] = 'actors';
+
+  /* Display: Data export */
+  $handler = $view->new_display('views_data_export', 'Data export', 'views_data_export_1');
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
+  $handler->display->display_options['style_options']['provide_file'] = 1;
+  $handler->display->display_options['style_options']['parent_sort'] = 0;
+  $handler->display->display_options['style_options']['quote'] = 1;
+  $handler->display->display_options['style_options']['trim'] = 0;
+  $handler->display->display_options['style_options']['replace_newlines'] = 0;
+  $handler->display->display_options['style_options']['newline_token'] = '1';
+  $handler->display->display_options['style_options']['header'] = 1;
+  $handler->display->display_options['style_options']['keep_html'] = 0;
+  $handler->display->display_options['path'] = 'actors/csv';
+  $handler->display->display_options['displays'] = array(
+    'default' => 'default',
+    'page' => 'page',
+  );
+  $handler->display->display_options['use_batch'] = 'batch';
+  $handler->display->display_options['segment_size'] = '500';
+  $export['hdb_actors'] = $view;
+
+  $view = new view();
   $view->name = 'hdb_airports';
   $view->description = '';
   $view->tag = 'default';
