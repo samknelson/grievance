@@ -234,7 +234,7 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 }
 
 function unite_cron() {
-	unite_export_feed_cache();
+	// unite_export_feed_cache();
 }
 
 /**
