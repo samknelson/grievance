@@ -144,7 +144,6 @@ function sirius_worker_usersync($worker_nid) {
 		return array('success' => FALSE, 'msg' => "There is already an existing user " . $hr['uid'] . " with name $id or mail $mail.");
 	}
 
-
 	$need_save = FALSE;
 	if (!$worker_user) {
 		$need_save = TRUE;
@@ -171,6 +170,10 @@ function sirius_worker_usersync($worker_nid) {
 	if ($worker_user->mail != $email) {
 		$worker_user->mail = $email;
 		$need_save = TRUE;
+	}
+
+	if ($worker_user->field_sirius_domain['und'][0]['target_id'] != $worker_node->field_sirius_domain['und'][0]['target_id']) {
+		$worker_user->field_sirius_domain	= $worker_node->field_sirius_domain;
 	}
 
 	if (array_diff(array_keys($worker_user->roles), array_keys($new_rids)) || 
