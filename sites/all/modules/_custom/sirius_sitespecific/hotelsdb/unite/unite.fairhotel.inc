@@ -2,8 +2,11 @@
 
 function unite_fairhotel_fields() {
 	return array(
-		'field_fh_meeting_room_count',
-		'field_fh_meeting_room_capacity',
-		'field_fh_event_space',
+		'field_labor_activity_index',
+		'field_boycott_url',
+		'field_fh_notes',
+		'field_fh_nonunion',
+		'field_fh_last_updated',
+		'field_fh_sources',
 	);
 }

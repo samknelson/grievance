@@ -1,18 +1,29 @@
 <?php
 
-function unite_airports_node_presave($property_node) {
-	foreach (array('field_airport' => 'field_calc_airport_dist', 'field_airport_alt' => 'field_calc_airport_dist_alt') as $source_field => $target_field) {
-		$airport_node = node_load($property_node->{$source_field}['und'][0]['target_id']);
-		$lat1 = $property_node->field_address_geofield['und'][0]['lat'];
-		$lon1 = $property_node->field_address_geofield['und'][0]['lon'];
-
-		$lat2 = $airport_node->field_address_geofield['und'][0]['lat'];
-		$lon2 = $airport_node->field_address_geofield['und'][0]['lon'];
-
-		if (isset($lat1) && isset($lat2)) {
-			$property_node->{$target_field}['und'][0]['value'] = sirius_addr_latlon_distance($lat1, $lon1, $lat2, $lon2);
-		} else {
-			unset($property_node->{$target_field}['und']);
-		}
+function unite_airports_list() {
+	$sql = "select nid, title, field_sirius_name_short_value ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_name_short on field_data_field_sirius_name_short.entity_type = 'node' and field_data_field_sirius_name_short.entity_id = node.nid ";
+	$sql .= "where type = 'hdb_airport' ";
+	$sql .= "order by field_sirius_name_short_value ";
+	$stmt = sirius_sql_query($sql, array());
+	$result = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$result[$hr['nid']] = $hr['field_sirius_name_short_value'];
 	}
+	return $result;
 }
+
+function unite_conventions_list() {
+	$sql = "select nid, title ";
+	$sql .= "from node ";
+	$sql .= "where type = 'hdb_convention_center' ";
+	$sql .= "order by title ";
+	$stmt = sirius_sql_query($sql, array());
+	$result = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$result[$hr['nid']] = $hr['title'];
+	}
+	return $result;
+}
+

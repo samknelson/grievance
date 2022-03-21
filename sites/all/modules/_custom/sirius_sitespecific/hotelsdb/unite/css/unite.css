@@ -3,3 +3,49 @@
 	margin:  10px;
 	border:  1px solid #999999;
 }
+
+.unite-node-subform div.form-item {
+	margin: 0;
+}
+
+.unite-node-subform fieldset.date-combo .container-inline-date > .form-item {
+	margin:  0;
+}
+
+.unite-node-subform label,
+.unite-node-subform span.fieldset-legend {
+	margin-top:  10px;
+	margin-bottom:  2px;
+}
+
+.unite-node-subform span.fieldset-legend {
+	display:  block;
+}
+
+
+.unite-node-subform legend,
+.unite-node-subform .field-widget-date-popup legend {
+	margin:  0;
+}
+
+.unite-node-subform .field-type-text-long {
+	white-space: normal;
+}
+
+
+#content .unite_home_block {
+	padding:  25px;
+}
+
+#content .unite_home_block h2 {
+	padding-top:  0;
+}
+
+#content .unite_home_col {
+	float:  left;
+	width:  40%;
+}
+
+#content .unite_home_col_left {
+	/* padding-right:  25px; */
+}

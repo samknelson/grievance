@@ -10,7 +10,7 @@ function unite_feed_property_info() {
       'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
       'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),
       'map'       => array('label' => 'Mapping',    'callback' => 'sirius_feed_wizard_map'),
-      'options'   => array('label' => 'Options',    'callback' => 'unite_feed_property_options'),
+      // 'options'   => array('label' => 'Options',    'callback' => 'unite_feed_property_options'),
       'verify'    => array('label' => 'Verify',     'callback' => 'sirius_feed_wizard_verify'),
       'process'   => array('label' => 'Process',    'callback' => 'sirius_feed_wizard_process'),
       'review'    => array('label' => 'Review',     'callback' => 'sirius_feed_wizard_review'),
@@ -19,19 +19,100 @@ function unite_feed_property_info() {
       'pks' => array(
         'nid' => 'Internal ID (NID)',
         // 'id' => 'External ID',
-        'addr' => 'Address',
+        // 'addr' => 'Address',
       ),
       'fields' => array(
-        'nid' => array('title' => 'Internal ID (NID)'),
-        'addr' => array('title' => 'Address'),
-      ),
-      'batch_size' => 50,
+        'nid' => array('group' => 'pk', 'title' => 'Internal ID (NID)'),
+
+        'title' => array('group' => 'core', 'title' => 'Title'),
+        'rooms' => array('group' => 'core', 'type' => 'integer'),
+        'brand' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'brand'),
+        'niche' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'hdb_niche'),
+        'development_status' => array('group' => 'core', 'type' => 'list'),
+        'owner_of_record' => array('group' => 'core', 'type' => 'text'),
+        'notes' => array('group' => 'core', 'type' => 'long'),
+
+        'address_thoroughfare' => array('group' => 'location', 'title' => 'Address 1',),
+        'address_premise' => array('group' => 'location', 'title' => 'Address 2',),
+        'address_locality' => array('group' => 'location', 'title' => 'City',),
+        'address_administrative_area' => array('group' => 'location', 'title' => 'State',),
+        'address_postal_code' => array('group' => 'location', 'title' => 'Zip',),
+        'address_country' => array('group' => 'location', 'title' => 'Country',),
+        'on_public_land' => array('group' => 'location', 'type' => 'list'),
+        'county' => array('group' => 'location', 'type' => 'text'),
+        'neighborhood' => array('group' => 'location', 'type' => 'text'),
+        'pin' => array('group' => 'core', 'location' => 'text'),
+        'phone' => array('group' => 'location', 'type' => 'text'),
+        'fax' => array('group' => 'location', 'type' => 'text'),
+        'msa' => array('group' => 'location', 'type' => 'term_reference', 'taxonomy' => 'msa'),
+
+        'local' => array('group' => 'contract', 'type' => 'entity_reference', 'entity_type' => 'local'),
+        'hotel_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
+        'rest_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
+        'union_status' => array('group' => 'contract', 'type' => 'list'),
+
+        'airport' => array('group' => 'airport', 'type' => 'entity_reference', 'entity_type' => 'hdb_airport'),
+        'airport_alt' => array('group' => 'airport', 'type' => 'entity_reference', 'entity_type' => 'hdb_airport'),
+
+        'convention_center' => array('group' => 'convention', 'type' => 'entity_reference', 'entity_type' => 'hdb_convention_center'),
+        'convention_center_attached' => array('group' => 'convention', 'type' => 'list'),
+
+        'fh_meeting_room_count' => array('group' => 'amenities', 'type' => 'integer'),
+        'fh_meeting_room_capacity' => array('group' => 'amenities', 'type' => 'integer'),
+        'fh_meeting_room_largest' => array('group' => 'amenities', 'type' => 'integer'),
+        'fh_event_space' => array('group' => 'amenities', 'type' => 'integer'),
+        'fh_ballroom_count' => array('group' => 'amenities', 'type' => 'integer'),
+        'fh_ballroom_capacity' => array('group' => 'amenities', 'type' => 'integer'),
+        'fh_outdoor_area' => array('group' => 'amenities', 'type' => 'integer'),
+        'fh_parking_capacity' => array('group' => 'amenities', 'type' => 'integer'),
+        'fh_outdoor' => array('group' => 'amenities', 'type' => 'list'),
+        'fh_parking' => array('group' => 'amenities', 'type' => 'list'),
+
+        'csno_slots_count' => array('group' => 'casino', 'title' => 'Slots count', 'type' => 'integer'),
+        'csno_tables_count' => array('group' => 'casino', 'title' => 'Tables count', 'type' => 'integer'),
+        'is_casino' => array('group' => 'casino', 'type' => 'list'),
+        'csno_book' => array('group' => 'casino', 'type' => 'list'),
+        'csno_horse' => array('group' => 'casino', 'type' => 'list'),
+        'csno_online' => array('group' => 'casino', 'type' => 'list'),
+        'csno_regulator' => array('group' => 'casino', 'type' => 'text'),
+        'csno_source' => array('group' => 'casino', 'type' => 'long'),
+
+        'labor_activity_index' => array('group' => 'fairhotel', 'type' => 'list'),
+        'fh_notes' => array('group' => 'fairhotel', 'type' => 'long'),
+        'fh_nonunion' => array('group' => 'fairhotel', 'type' => 'long'),
+        'fh_sources' => array('group' => 'fairhotel', 'type' => 'long'),
+     ),
+      'batch_size' => 10,
       'callback_row_verify' => 'unite_feed_property_row_verify',
       'callback_row_process' =>'unite_feed_property_row_process',
     ),
     'callback_launch' => 'sirius_feed_wizard_launch',
     'callback_launch_args' => array('unite_feed_property'),
   );
+
+  $groups = array(
+    'pk' => 'Primary Key',
+    'core' => 'Core',
+    'amenities' => 'Amenities',
+    'casino' => 'Casino',
+    'fairhotel' => 'FairHotel',
+    'airport' => 'Airport',
+    'convention' => 'Convention',
+    'location' => 'Location',
+    'contract' => 'Contract',
+
+  );
+  foreach ($items['unite_feed_property']['feed']['fields'] as $field_name => $field_info) {
+    $group = $field_info['group'];
+    $group_name = $groups[$group];
+
+    if (!$field_info['title']) {
+      $structure_info = field_info_instance('node', "field_$field_name", 'property');
+      if ($structure_info) { $items['unite_feed_property']['feed']['fields'][$field_name]['title'] = $structure_info['label']; }
+    }
+
+    $items['unite_feed_property']['feed']['fields'][$field_name]['title'] = $group_name . ': ' . $items['unite_feed_property']['feed']['fields'][$field_name]['title'];
+  }
 
   return $items;
 }
@@ -66,6 +147,43 @@ function unite_feed_property_options_form_submit($form, &$form_state) {
   sirius_wizard_submit($info, $data, $feed_node, $current_step, "Payment selection saved.");
 }
 
+function unite_feed_property_handle_list($field_name, $value) {
+  $structure_info = field_info_field("field_$field_name");
+  $allowed_values = list_allowed_values($structure_info);
+  $allowed_values_flip = array_flip($allowed_values);
+
+  // Match case insensitive
+  foreach ($allowed_values as $a => $b) {
+    if (trim(strtolower($a)) == trim(strtolower($value))) { return $a; }
+    if (trim(strtolower($b)) == trim(strtolower($value))) { return $a; }
+
+    if (trim(strtolower($value)) == 'yes') {
+      if (trim(strtolower($a)) == 'y') { return $a; }
+    }
+
+    if (trim(strtolower($value)) == 'no') {
+      if (trim(strtolower($a)) == 'n') { return $a; }
+    }
+  }
+
+  return NULL;
+}
+
+function unite_feed_property_handle_entity_reference($entity_type, $value) {
+  $sql = "select min(nid) as mn, max(nid) as mx from node ";
+  $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_name_short on field_data_field_sirius_name_short.entity_type = 'node' and field_data_field_sirius_name_short.entity_id = node.nid ";
+  $sql .= "where nid = :v1 ";
+  $sql .= "or title = :v2 ";
+  $sql .= "or field_sirius_id_value = :v3 ";
+  $sql .= "or field_sirius_name_short_value = :v4 ";
+  $stmt = sirius_sql_query($sql, array(':v1' => $value, ':v2' => $value, ':v3' => $value, ':v4' => $value));
+  $hr = $stmt->fetchAssoc();
+  if (!$hr['mn']) { return NULL; }
+  if ($hr['mn'] != $hr['mx']) { return NULL; }
+  return $hr['mn'];
+}
+
 function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precompute) {
   $pk = $data['pk'];
 
@@ -77,98 +195,49 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
     if (!is_array($value)) { $row[$key] = trim($value); }
 	}
 
+  foreach ($info['feed']['fields'] as $field_name => $field_info) {
+    if (!$row[$field_name]) { continue; }
+
+    // Validate integer fields
+    if ($field_info['type'] == 'integer') {
+      $row[$field_name] = preg_replace('/\,/', '', $row[$field_name]);
+      if (!preg_match('/^[0-9]+$/', $row[$field_name])) { return array('success' => FALSE, 'msg' => "$field_name must be an integer."); }
+    }
+
+    // Validate list fields
+    if ($field_info['type'] == 'list') {
+      $value = unite_feed_property_handle_list($field_name, $row[$field_name]);
+      if (!$value) { return array('success' => FALSE, 'msg' => "$field_name must be one of the allowed values."); }
+      $row[$field_name] = $value;
+    }
+
+    // Validate term_reference
+    if ($field_info['type'] == 'term_reference') {
+      $value = sirius_taxonomy_lookup_by_anything($field_info['taxonomy'], $row[$field_name]);
+      if (!$value) { return array('success' => FALSE, 'msg' => "$field_name must be one of the values in the taxonomy: $field_info[taxonomy]."); }
+      $row[$field_name] = $value;
+    }
+  }
+
   if ($precompute) {
-    if ($pk == 'addr') {
-      $addr_oneline = $row['addr'];
-      $result = sirius_addr_geocode_impl($addr_oneline);
-      if (!$result['success']) { return $result; }
-      dpm($result);
-      drupal_set_message("Postal Code: " . sirius_addr_get_compponent($result['point'], 'postal_code'));
-      drupal_set_message("Postal Code Suffix: " . sirius_addr_get_compponent($result['point'], 'postal_code_suffix'));
+    if ($pk == 'nid') {
+      $nid = $row['nid'];
+      if (!$nid) { return array('success' => FALSE, 'msg' => 'If the primary key is NID, all rows must have a node ID.'); }
+      $probe = node_load($nid);
+      if (!$probe) { return array('success' => FALSE, 'msg' => 'No node was found with this NID.'); }
+      if ($probe->type != 'property') { return array('success' => FALSE, 'msg' => 'The node for this NID was found, but it is not a property.'); }
     }
-    return array('success' => FALSE, 'msg' => 'Whatever');
-    $row['employer_nid'] = $employer_nid;
-    $row['payment_ts'] = $payment_ts;
-    $row['charge_ts'] = $charge_ts;
 
-    $domain_nid = $feed_node->field_sirius_domain['und'][0]['target_id'];
+    foreach ($info['feed']['fields'] as $field_name => $field_info) {
+      if (!$row[$field_name]) { continue; }
 
-    if ($pk == 'ein') {
-      $worker_nid = sirius_worker_ein_lookup($employer_nid, $row['ein']);
-      if (!$worker_nid) { return array('success' => FALSE, 'msg' => 'Worker not found with this EIN.'); }
-    } else {
-      if ($pk == 'ssn') { 
-        $table = 'field_data_field_sirius_id';
-        $column = 'field_sirius_id_value';
-        $value = $row['id'];
-      } else if ($pk == 'id') { 
-        $table = 'field_data_field_sirius_id';
-        $column = 'field_sirius_id_value';
-        $value = $row['id'];
-      } else if ($pk == 'id2') { 
-        $table = 'field_data_field_sirius_id2';
-        $column = 'field_sirius_id2_value';
-        $value = $row['id2'];
-      } else if ($pk == 'id3') { 
-        $table = 'field_data_field_sirius_ssn';
-        $column = 'field_sirius_ssn_value';
-        $value = $row['ssn'];
-      } 
-
-      $sql = "select max(nid) as a, min(nid) as b from node ";
-      $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
-      $sql .= "left join $table on $table.entity_type = 'node' and $table.entity_id = node.nid ";
-      $sql .= "where node.type = 'sirius_worker' ";
-      $sql .= "and $column = :value ";
-      if ($domain_nid) {
-        $sql .= "and field_sirius_domain_target_id = :domain_nid ";
-        $sql_args[':domain_nid'] = $domain_nid;
-      } else {
-        $sql .= "and field_sirius_domain_target_id IS NULL ";
+      // Validate entity_reference
+      if ($field_info['type'] == 'entity_reference') {
+        $value = unite_feed_property_handle_entity_reference($field_info['entity_type'], $row[$field_name]);
+        if (!$value) { return array('success' => FALSE, 'msg' => "No value found (or multiple values found) for $field_name in the entity type: $field_info[entity_type]."); }
+        $row[$field_name] = $value;
       }
-      $sql_args[':value'] = $value;
-      $stmt = sirius_sql_query($sql, $sql_args);
-      $hr = $stmt->fetchAssoc();
-      $worker_nid = $hr['a'];
-      $other_nid = $hr['b'];
-      if (!$worker_nid) { return array('success' => FALSE, 'msg' => "Worker not found with this ID ($table, $column)."); }
-      if ($worker_nid != $other_nid) { return array('success' => FALSE, 'msg' => "Multiple workers found with this ID ($table, $column)."); }
     }
-
-    $row['worker_nid'] = $worker_nid;
-
-    // Account NID
-    $sql_args = array();
-    $sql = "select max(nid) as a, min(nid) as b ";
-    $sql .= "from node ";
-    $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_name_short on field_data_field_sirius_name_short.entity_type = 'node' and field_data_field_sirius_name_short.entity_id = node.nid ";
-    $sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
-    $sql .= "where node.type = 'sirius_ledger_account' ";
-    $sql .= "and ( ";
-    $sql .= "  field_sirius_name_short_value = :name_a ";
-    $sql .= "  or title = :name_b ";
-    $sql .= "  or nid = :name_c ";
-    // Not sure why but cannot embed a parameter into json_contains
-    $inline = preg_replace('/[^a-zA-Z0-9_ ]/', '', $row['account']);
-    $sql .= "  or json_contains(field_sirius_json_value, '\"$inline\"', '$.settings.aliases') ";
-    $sql .= ") ";
-    $sql_args[':name_a'] = $sql_args[':name_b'] = $sql_args[':name_c'] = $row['account'];
-    if ($domain_nid) {
-      $sql .= "and field_sirius_domain_target_id = :domain_nid ";
-      $sql_args[':domain_nid'] = $domain_nid;
-    } else {
-      $sql .= "and field_sirius_domain_target_id IS NULL ";
-    }
-    $stmt = sirius_sql_query($sql, $sql_args);
-    $hr = $stmt->fetchAssoc();
-    $account_nid = $hr['a'];
-    $other_nid = $hr['b'];
-    if (!$account_nid) { return array('success' => FALSE, 'msg' => "Account not found."); }
-    if ($account_nid != $other_nid) { return array('success' => FALSE, 'msg' => "Multiple accounts found."); }
-    if (!$account_nid) { return array('success' => FALSE, 'msg' => 'Account not found.'); }
-    $row['account_nid'] = $account_nid;
-
   }
 
   return array('success' => TRUE, 'msg' => 'Looks good.');
@@ -179,11 +248,52 @@ function unite_feed_property_row_process($feed_node, $info, $data, $row) {
 	$result = unite_feed_property_row_verify($feed_node, $info, $data, $row, TRUE);
 	if (!$result['success']) { return $result; }
 
-  return array('success' => FALSE, 'msg' => 'Under Development');
-
-  if ($charged) {
-    return array('success' => TRUE, 'msg' => 'Payment allocated and charge created.');
+  if ($row['nid']) {
+    $is_new = FALSE;
+    $property_node = node_load($row['nid']);
   } else {
-    return array('success' => TRUE, 'msg' => 'Payment allocated.');
+    $is_new = TRUE;
+    global $user;
+    $property_node = new stdClass();
+    $property_node->type = 'property';
+    $property_node->language = LANGUAGE_NONE;
+    $property_node->uid = $user->uid;
+    $property_node->status = 1;
+    $property_node->promote = 0;
+    $property_node->comment = 0;
+  }
+
+  if ($row['title']) { $property_node->title = $row['title']; }
+
+  $need_country = FALSE;
+  foreach (array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code', 'country') as $col) {
+    if ($row["address_$col"]) {
+      $need_country = TRUE;
+      $property_node->field_address['und'][0][$col] = $row["address_$col"];
+    }
+  }
+  if ($need_country && !$row['address_country']) { $property_node->field_address['und'][0]['country'] = 'US'; }
+
+  foreach ($info['feed']['fields'] as $field_name => $field_info) {
+    if ($row[$field_name]) {
+      if (in_array($field_info['type'], array('integer', 'list', 'text', 'long'))) {
+        $property_node->{"field_$field_name"}['und'][0]['value'] = $row[$field_name];
+      }
+      if ($field_info['type'] == 'term_reference') {
+        $property_node->{"field_$field_name"}['und'][0]['tid'] = $row[$field_name];
+      }
+      if ($field_info['type'] == 'entity_reference') {
+        $property_node->{"field_$field_name"}['und'][0]['target_id'] = $row[$field_name];
+      }
+    }
+  }
+
+  $property_node = node_submit($property_node);
+  node_save($property_node);
+
+  if ($is_new) {
+    return array('success' => TRUE, 'msg' => 'Created a new property.');
+  } else {
+    return array('success' => TRUE, 'msg' => 'Updated an existing property.');
   }
 }

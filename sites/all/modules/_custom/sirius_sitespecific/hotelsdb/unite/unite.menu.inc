@@ -13,20 +13,20 @@ function unite_node_tabs() {
 		'title' => 'Properties',
 		'description' => '',
 		'callback' => 'unite_node_tab_local_properties',
-		'permissions' => array('unite hotels admin'),
+		'permissions' => array('unite hotels user'),
 	);
 	$node_tabs['local']['contracts'] = array(
 		'title' => 'Contracts',
 		'description' => '',
 		'callback' => 'unite_node_tab_local_contracts',
-		'permissions' => array('unite hotels admin'),
+		'permissions' => array('unite hotels user'),
 	);
 	/*
 	$node_tabs['property']['contracts'] = array(
 		'title' => 'Contracts',
 		'description' => '',
 		'callback' => 'unite_node_tab_property_contracts',
-		'permissions' => array('unite hotels admin'),
+		'permissions' => array('unite hotels user'),
 	);
 	*/
 
@@ -35,9 +35,9 @@ function unite_node_tabs() {
 			'title' => 'Field Revisions',
 			'description' => '',
 			'callback' => 'unite_node_tab_field_revisions',
-			'permissions' => array('unite hotels admin'),
+			'permissions' => array('unite hotels user'),
 			'file' => 'unite.page_field_revisions.inc',
-			'weight' => 3,
+			'weight' => 99,
 		);
 	}
 
@@ -46,7 +46,7 @@ function unite_node_tabs() {
 		'title' => 'Relationships',
 		'description' => '',
 		'callback' => 'unite_node_tab_property_relationships',
-		'permissions' => array('unite hotels admin'),
+		'permissions' => array('unite hotels user'),
 		'file' => 'unite.page_property_relationships.inc',
 	);
 	*/
@@ -54,66 +54,54 @@ function unite_node_tabs() {
 	$node_tabs['property']['unite_fairhotel'] = array(
 		'title' => 'FairHotel',
 		'description' => '',
-		'callback' => 'unite_node_tab_fairhotel_view',
-		'permissions' => array('unite hotels admin'),
-		'file' => 'unite.page_property_fairhotel_view.inc',
-	);
-
-	$node_tabs['property']['unite_fairhotel/view'] = array(
-		'title' => 'View',
-		'description' => '',
-		'callback' => 'unite_node_tab_fairhotel_view',
-		'permissions' => array('unite hotels admin'),
-		'file' => 'unite.page_property_fairhotel_view.inc',
-		'weight' => 1,
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-	);
-
-	$node_tabs['property']['unite_fairhotel/edit'] = array(
-		'title' => 'Edit',
-		'description' => '',
 		'callback' => 'unite_node_tab_fairhotel_edit',
-		'permissions' => array('unite hotels admin'),
+		'permissions' => array('unite hotels user'),
 		'file' => 'unite.page_property_fairhotel_edit.inc',
-		'weight' => 2,
+		'weight' => 1,
 	);
 
 	$node_tabs['property']['unite_casino'] = array(
 		'title' => 'Casino',
 		'description' => '',
-		'callback' => 'unite_node_tab_casino_view',
-		'permissions' => array('unite hotels admin'),
-		'file' => 'unite.page_property_casino_view.inc',
-	);
-
-	$node_tabs['property']['unite_casino/view'] = array(
-		'title' => 'View',
-		'description' => '',
-		'callback' => 'unite_node_tab_casino_view',
-		'permissions' => array('unite hotels admin'),
-		'file' => 'unite.page_property_casino_view.inc',
-		'weight' => 1,
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-	);
-
-	$node_tabs['property']['unite_casino/edit'] = array(
-		'title' => 'Edit',
-		'description' => '',
 		'callback' => 'unite_node_tab_casino_edit',
-		'permissions' => array('unite hotels admin'),
+		'permissions' => array('unite hotels user'),
 		'file' => 'unite.page_property_casino_edit.inc',
-		'weight' => 2,
+		'weight' => 1,
+	);
+
+	$node_tabs['property']['unite_amenities'] = array(
+		'title' => 'Amenities',
+		'description' => '',
+		'callback' => 'unite_node_tab_amenities_edit',
+		'permissions' => array('unite hotels user'),
+		'file' => 'unite.page_property_amenities_edit.inc',
+		'weight' => 1,
+	);
+
+	$node_tabs['property']['unite_contract'] = array(
+		'title' => 'Contract',
+		'description' => '',
+		'callback' => 'unite_node_tab_contract_edit',
+		'permissions' => array('unite hotels user'),
+		'file' => 'unite.page_property_contract_edit.inc',
+		'weight' => 1,
 	);
 
 	$node_tabs['hdb_airport']['unite_airport_properties'] = array(
 		'title' => 'Properties',
 		'description' => '',
 		'callback' => 'unite_node_tab_airport_properties',
-		'permissions' => array('unite hotels admin'),
+		'permissions' => array('unite hotels user'),
 		'file' => 'unite.page_airport_properties.inc',
 	);
 
-
+	$node_tabs['hdb_convention_center']['unite_convention_properties'] = array(
+		'title' => 'Properties',
+		'description' => '',
+		'callback' => 'unite_node_tab_convention_properties',
+		'permissions' => array('unite hotels user'),
+		'file' => 'unite.page_convention_properties.inc',
+	);
 
   sirius_node_tab_set_module('unite', $node_tabs);
 
@@ -131,9 +119,17 @@ function unite_all_access() {
 function unite_menu() {
   $items = array();
 
+	$items['unite/home'] = array(
+		'title' => 'UNITE HERE Hotels Database',
+		'page callback' => 'unite_page_home',
+		'access arguments' => array('unite hotels user'),
+		'type' => MENU_NORMAL_ITEM,
+		'file' => 'unite.page_home.inc',
+	);
+
 	$items['unite/export/union-hotel-guide'] = array(
 		'title' => 'Union Hotel Guide export',
-		'page callback' => 'unite_export_union_hotel_guide_new',
+		'page callback' => 'unite_export_union_hotel_guide',
 		'access callback' => 'unite_export_union_hotel_guide_access',		
 		'access arguments' => array(),
 		'type' => MENU_NORMAL_ITEM,
@@ -141,7 +137,7 @@ function unite_menu() {
 
 	$items['unite/export/union-hotel-guide/%'] = array(
 		'title' => 'Union Hotel Guide export',
-		'page callback' => 'unite_export_union_hotel_guide_new',
+		'page callback' => 'unite_export_union_hotel_guide',
 		'page arguments' => array(3),
 		'access callback' => 'unite_all_access',		
 		'access arguments' => array(),
@@ -162,7 +158,7 @@ function unite_menu() {
 		'title' => t('UNITE HERE') ,//this section will create  under admin->config
 		'description' => t('Configuration for the unite suite of modules') ,
 		'page callback' => 'system_admin_menu_block_page',
-		'access arguments' => array('unite admin'),
+		'access arguments' => array('unite hotels admin'),
 		'file' => 'system.admin.inc',
 		'file path' => drupal_get_path('module', 'system'),
 		'position' => 'right',
@@ -173,7 +169,7 @@ function unite_menu() {
 		'description' => 'Settings for the unite core',
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('unite_admin'),
-		'access arguments' => array('unite admin'),
+		'access arguments' => array('unite hotels admin'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 
@@ -181,14 +177,14 @@ function unite_menu() {
 	$items['unite/ajax/quicksearch'] = array(
 		'page callback' => 'unite_quicksearch_autocomplete',
 		'page arguments' => array(),
-		'access arguments' => array('unite admin'),
+		'access arguments' => array('unite hotels admin'),
 		'type' => MENU_CALLBACK,
 	);
 
 	$items['unite/admin/quicksearch/%'] = array(
 		'page callback' => 'unite_quicksearch_page',
 		'page arguments' => array(3),
-		'access arguments' => array('unite admin'),
+		'access arguments' => array('unite hotels admin'),
 		'type' => MENU_CALLBACK,
 	);
 
@@ -198,7 +194,7 @@ function unite_menu() {
 		'title' => t('Actor Acquire'),
 		'page callback' => 'unite_actor_acquire',
 		'page arguments' => array(),
-		'access arguments' => array('unite admin'),
+		'access arguments' => array('unite hotels admin'),
 		'type' => MENU_CALLBACK,
 	);
 
@@ -206,7 +202,7 @@ function unite_menu() {
 		'title' => t('Local Acquire'),
 		'page callback' => 'unite_local_acquire',
 		'page arguments' => array(),
-		'access arguments' => array('unite admin'),
+		'access arguments' => array('unite hotels admin'),
 		'type' => MENU_CALLBACK,
 	);
 
@@ -235,17 +231,4 @@ function unite_node_tab_get_addlink($content_type, $query) {
 	$result .= "</div>";
 	
 	return $result;
-}
-
-function unite_permission() {
-  return array(
-    'unite hotels admin' => array(
-      'title' => t('UNITE Hotels Admin'), 
-      'description' => t('Use the hotels database'),
-    ),
-    'unite hotels acquire' => array(
-      'title' => t('UNITE Hotels Acquire'), 
-      'description' => t('Cause one actor to acquire another'),
-    ),
-  );	
 }

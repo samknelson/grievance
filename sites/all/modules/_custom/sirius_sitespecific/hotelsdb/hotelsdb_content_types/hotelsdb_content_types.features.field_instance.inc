@@ -11,28 +11,69 @@
 function hotelsdb_content_types_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_actor'.
-  $field_instances['field_collection_item-field_relationships-field_actor'] = array(
-    'bundle' => 'field_relationships',
+  // Exported field_instance: 'node-actor-field_actor_type'.
+  $field_instances['node-actor-field_actor_type'] = array(
+    'bundle' => 'actor',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
         'label' => 'hidden',
-        'module' => 'entityreference',
+        'module' => 'ds',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => 1,
+          'taxonomy_term_link' => 0,
+          'taxonomy_term_separator' => ', ',
         ),
-        'type' => 'entityreference_label',
+        'type' => 'ds_taxonomy_separator',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 0,
       ),
     ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_actor',
-    'label' => 'Actor',
+    'entity_type' => 'node',
+    'field_name' => 'field_actor_type',
+    'label' => 'Actor Type',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance: 'node-actor-field_actors'.
+  $field_instances['node-actor-field_actors'] = array(
+    'bundle' => 'actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_actors',
+    'label' => 'Actors',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -46,119 +87,196 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 1,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_amount_owned'.
-  $field_instances['field_collection_item-field_relationships-field_amount_owned'] = array(
-    'bundle' => 'field_relationships',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'number',
-        'settings' => array(
-          'decimal_separator' => '.',
-          'prefix_suffix' => TRUE,
-          'scale' => 2,
-          'thousand_separator' => ' ',
-        ),
-        'type' => 'number_decimal',
-        'weight' => 3,
-      ),
-    ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_amount_owned',
-    'label' => 'Amount owned',
-    'required' => 0,
-    'settings' => array(
-      'max' => '',
-      'min' => '',
-      'prefix' => '$',
-      'suffix' => '',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 0,
-      'module' => 'number',
-      'settings' => array(),
-      'type' => 'number',
-      'weight' => 15,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_end_date'.
-  $field_instances['field_collection_item-field_relationships-field_end_date'] = array(
-    'bundle' => 'field_relationships',
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'date',
-        'settings' => array(
-          'custom_date_format' => '',
-          'format_type' => 'long',
-          'fromto' => 'both',
-          'multiple_from' => '',
-          'multiple_number' => '',
-          'multiple_to' => '',
-          'show_remaining_days' => FALSE,
-        ),
-        'type' => 'date_default',
-        'weight' => 6,
-      ),
-    ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_end_date',
-    'label' => 'End date',
-    'required' => 0,
-    'settings' => array(
-      'default_value' => 'blank',
-      'default_value2' => 'same',
-      'default_value_code' => '',
-      'default_value_code2' => '',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'date',
-      'settings' => array(
-        'increment' => 1,
-        'input_format' => 'm/d/Y - H:i:s',
-        'input_format_custom' => '',
-        'label_position' => 'above',
-        'text_parts' => array(),
-        'year_range' => '-3:+3',
-      ),
-      'type' => 'date_text',
       'weight' => 8,
     ),
   );
 
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_legacy_id'.
-  $field_instances['field_collection_item-field_relationships-field_legacy_id'] = array(
-    'bundle' => 'field_relationships',
+  // Exported field_instance: 'node-actor-field_address'.
+  $field_instances['node-actor-field_address'] = array(
+    'bundle' => 'actor',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'hidden',
+        'module' => 'addressfield',
+        'settings' => array(
+          'format_handlers' => array(
+            0 => 'address',
+          ),
+          'use_widget_handlers' => 1,
+        ),
+        'type' => 'addressfield_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'addressfield',
+        'settings' => array(
+          'format_handlers' => array(
+            0 => 'address',
+          ),
+          'use_widget_handlers' => 1,
+        ),
+        'type' => 'addressfield_default',
+        'weight' => 4,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_address',
+    'label' => 'Address',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'addressfield',
+      'settings' => array(
+        'available_countries' => array(
+          'CA' => 'CA',
+          'US' => 'US',
+        ),
+        'default_country' => '',
+        'format_handlers' => array(
+          'address' => 'address',
+          'address-optional' => 'address-optional',
+          'address-hide-postal-code' => 0,
+          'address-hide-street' => 0,
+          'address-hide-country' => 0,
+          'organisation' => 0,
+          'name-full' => 0,
+          'name-oneline' => 0,
+        ),
+      ),
+      'type' => 'addressfield_standard',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-actor-field_address_geofield'.
+  $field_instances['node-actor-field_address_geofield'] = array(
+    'bundle' => 'actor',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'geofield',
+        'settings' => array(
+          'data' => 'full',
+        ),
+        'type' => 'geofield_wkt',
+        'weight' => 5,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_address_geofield',
+    'label' => 'Address Geofield',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'geocoder',
+      'settings' => array(
+        'delta_handling' => 'default',
+        'geocoder_field' => 'field_address',
+        'geocoder_handler' => 'google',
+        'handler_settings' => array(
+          'google' => array(
+            'all_results' => 0,
+            'geometry_type' => 'point',
+            'reject_results' => array(
+              'APPROXIMATE' => 0,
+              'GEOMETRIC_CENTER' => 0,
+              'RANGE_INTERPOLATED' => 0,
+              'ROOFTOP' => 0,
+            ),
+          ),
+        ),
+      ),
+      'type' => 'geocoder',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-actor-field_attachments'.
+  $field_instances['node-actor-field_attachments'] = array(
+    'bundle' => 'actor',
+    'default_value' => array(),
+    'deleted' => 0,
+    'description' => 'Use control- or shift-click to select multiple files.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'file',
+        'settings' => array(),
+        'type' => 'file_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 10,
+        'weight' => 0,
       ),
     ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_legacy_id',
-    'label' => 'Legacy ID',
+    'entity_type' => 'node',
+    'field_name' => 'field_attachments',
+    'label' => 'Attachments',
+    'required' => 0,
+    'settings' => array(
+      'description_field' => 1,
+      'file_directory' => 'actor',
+      'file_extensions' => 'txt pdf jpg png gif doc xls docx xlsx',
+      'max_filesize' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'multiupload_filefield_widget',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+      ),
+      'type' => 'file_mfw',
+      'weight' => 10,
+    ),
+  );
+
+  // Exported field_instance: 'node-actor-field_fax'.
+  $field_instances['node-actor-field_fax'] = array(
+    'bundle' => 'actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fax',
+    'label' => 'Fax',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -171,29 +289,35 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 11,
+      'weight' => 5,
     ),
   );
 
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_notes'.
-  $field_instances['field_collection_item-field_relationships-field_notes'] = array(
-    'bundle' => 'field_relationships',
+  // Exported field_instance: 'node-actor-field_notes'.
+  $field_instances['node-actor-field_notes'] = array(
+    'bundle' => 'actor',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '<strong>DO</strong> include the source of the information.  <strong>DO NOT</strong> enter anything here that could be entered into a specific field.  <strong>DO NOT</strong> enter sales dates, percent owned, etc. into this field.',
+    'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 9,
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
       ),
     ),
-    'entity_type' => 'field_collection_item',
+    'entity_type' => 'node',
     'field_name' => 'field_notes',
-    'label' => 'Sources / Notes',
+    'label' => 'Notes',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -206,169 +330,35 @@ function hotelsdb_content_types_field_default_field_instances() {
         'rows' => 3,
       ),
       'type' => 'text_textarea',
-      'weight' => 12,
+      'weight' => 7,
     ),
   );
 
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_owned_raw'.
-  $field_instances['field_collection_item-field_relationships-field_owned_raw'] = array(
-    'bundle' => 'field_relationships',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 7,
-      ),
-    ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_owned_raw',
-    'label' => 'Owned (raw)',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 16,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_pension'.
-  $field_instances['field_collection_item-field_relationships-field_pension'] = array(
-    'bundle' => 'field_relationships',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'list',
-        'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 4,
-      ),
-    ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_pension',
-    'label' => 'Pension?',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_select',
-      'weight' => 12,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_percent_owned'.
-  $field_instances['field_collection_item-field_relationships-field_percent_owned'] = array(
-    'bundle' => 'field_relationships',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'number',
-        'settings' => array(
-          'decimal_separator' => '.',
-          'prefix_suffix' => TRUE,
-          'scale' => 2,
-          'thousand_separator' => ' ',
-        ),
-        'type' => 'number_decimal',
-        'weight' => 2,
-      ),
-    ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_percent_owned',
-    'label' => 'Percent owned',
-    'required' => 0,
-    'settings' => array(
-      'max' => '',
-      'min' => '',
-      'prefix' => '',
-      'suffix' => '%',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 0,
-      'module' => 'number',
-      'settings' => array(),
-      'type' => 'number',
-      'weight' => 14,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_relationship_type'.
-  $field_instances['field_collection_item-field_relationships-field_relationship_type'] = array(
-    'bundle' => 'field_relationships',
+  // Exported field_instance: 'node-actor-field_phone'.
+  $field_instances['node-actor-field_phone'] = array(
+    'bundle' => 'actor',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
         'label' => 'hidden',
-        'module' => 'list',
+        'module' => 'text',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 1,
+        'type' => 'text_default',
+        'weight' => 3,
       ),
-    ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_relationship_type',
-    'label' => 'Relationship type',
-    'required' => 1,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(),
-      'type' => 'options_select',
-      'weight' => 2,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_sales_price'.
-  $field_instances['field_collection_item-field_relationships-field_sales_price'] = array(
-    'bundle' => 'field_relationships',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
+      'teaser' => array(
         'label' => 'inline',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 8,
+        'weight' => 0,
       ),
     ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_sales_price',
-    'label' => 'Sales price',
+    'entity_type' => 'node',
+    'field_name' => 'field_phone',
+    'label' => 'Phone',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -381,57 +371,64 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 9,
+      'weight' => 4,
     ),
   );
 
-  // Exported field_instance:
-  // 'field_collection_item-field_relationships-field_start_date'.
-  $field_instances['field_collection_item-field_relationships-field_start_date'] = array(
-    'bundle' => 'field_relationships',
+  // Exported field_instance: 'node-actor-field_url'.
+  $field_instances['node-actor-field_url'] = array(
+    'bundle' => 'actor',
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'inline',
-        'module' => 'date',
-        'settings' => array(
-          'custom_date_format' => '',
-          'format_type' => 'long',
-          'fromto' => 'both',
-          'multiple_from' => '',
-          'multiple_number' => '',
-          'multiple_to' => '',
-          'show_remaining_days' => FALSE,
-        ),
-        'type' => 'date_default',
+        'label' => 'hidden',
+        'module' => 'link',
+        'settings' => array(),
+        'type' => 'link_default',
         'weight' => 5,
       ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'link',
+        'settings' => array(),
+        'type' => 'link_default',
+        'weight' => 2,
+      ),
     ),
-    'entity_type' => 'field_collection_item',
-    'field_name' => 'field_start_date',
-    'label' => 'Start date',
+    'entity_type' => 'node',
+    'field_name' => 'field_url',
+    'label' => 'URL',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'blank',
-      'default_value2' => 'same',
-      'default_value_code' => '',
-      'default_value_code2' => '',
+      'absolute_url' => 1,
+      'attributes' => array(
+        'class' => '',
+        'configurable_title' => 0,
+        'rel' => '',
+        'target' => 'default',
+        'title' => '',
+      ),
+      'display' => array(
+        'url_cutoff' => 80,
+      ),
+      'enable_tokens' => 1,
+      'rel_remove' => 'default',
+      'title' => 'none',
+      'title_label_use_field_label' => FALSE,
+      'title_maxlength' => 128,
+      'title_value' => '',
+      'url' => 0,
       'user_register_form' => FALSE,
+      'validate_url' => 1,
     ),
     'widget' => array(
-      'active' => 1,
-      'module' => 'date',
-      'settings' => array(
-        'increment' => 1,
-        'input_format' => 'm/d/Y - H:i:s',
-        'input_format_custom' => '',
-        'label_position' => 'above',
-        'text_parts' => array(),
-        'year_range' => '-3:+3',
-      ),
-      'type' => 'date_text',
-      'weight' => 7,
+      'active' => 0,
+      'module' => 'link',
+      'settings' => array(),
+      'type' => 'link_field',
+      'weight' => 6,
     ),
   );
 
@@ -691,6 +688,351 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-hdb_convention_center-field_address'.
+  $field_instances['node-hdb_convention_center-field_address'] = array(
+    'bundle' => 'hdb_convention_center',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'addressfield',
+        'settings' => array(
+          'format_handlers' => array(
+            0 => 'address',
+          ),
+          'use_widget_handlers' => 1,
+        ),
+        'type' => 'addressfield_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_address',
+    'label' => 'Raw Address',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'addressfield',
+      'settings' => array(
+        'available_countries' => array(),
+        'default_country' => 'site_default',
+        'format_handlers' => array(
+          'address' => 'address',
+          'address-hide-postal-code' => 0,
+          'address-hide-street' => 0,
+          'address-hide-administrative-area' => 0,
+          'address-hide-locality' => 0,
+          'address-hide-country' => 0,
+          'organisation' => 0,
+          'name-full' => 0,
+          'name-oneline' => 0,
+          'address-optional' => 0,
+        ),
+      ),
+      'type' => 'addressfield_standard',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-hdb_convention_center-field_address_canon'.
+  $field_instances['node-hdb_convention_center-field_address_canon'] = array(
+    'bundle' => 'hdb_convention_center',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_address_canon',
+    'label' => 'Canonical Address',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-hdb_convention_center-field_address_geofield'.
+  $field_instances['node-hdb_convention_center-field_address_geofield'] = array(
+    'bundle' => 'hdb_convention_center',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'geofield_map',
+        'settings' => array(
+          'geofield_map_baselayers_hybrid' => 1,
+          'geofield_map_baselayers_map' => 1,
+          'geofield_map_baselayers_physical' => 0,
+          'geofield_map_baselayers_satellite' => 1,
+          'geofield_map_center' => array(
+            'geocode' => 'Find my location',
+            'lat' => 41.5064186,
+            'lon' => -73.9761845,
+          ),
+          'geofield_map_controltype' => 'default',
+          'geofield_map_draggable' => 1,
+          'geofield_map_height' => '300px',
+          'geofield_map_maptype' => 'map',
+          'geofield_map_max_zoom' => 0,
+          'geofield_map_min_zoom' => 0,
+          'geofield_map_mtc' => 'standard',
+          'geofield_map_overview' => 0,
+          'geofield_map_overview_opened' => 0,
+          'geofield_map_pancontrol' => 1,
+          'geofield_map_scale' => 1,
+          'geofield_map_scrollwheel' => 1,
+          'geofield_map_streetview_show' => 0,
+          'geofield_map_width' => '100%',
+          'geofield_map_zoom' => 12,
+        ),
+        'type' => 'geofield_map_map',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_address_geofield',
+    'label' => 'Address Geofield',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'geocoder',
+      'settings' => array(
+        'delta_handling' => 'default',
+        'geocoder_field' => 'field_address',
+        'geocoder_handler' => 'google',
+        'handler_settings' => array(
+          'google' => array(
+            'all_results' => 0,
+            'biasing' => array(
+              'bounds' => '',
+              'components' => '',
+              'region' => '',
+            ),
+            'geometry_type' => 'point',
+            'reject_results' => array(
+              'APPROXIMATE' => 0,
+              'GEOMETRIC_CENTER' => 0,
+              'RANGE_INTERPOLATED' => 0,
+              'ROOFTOP' => 0,
+            ),
+          ),
+        ),
+        'latlng_override' => 0,
+      ),
+      'type' => 'geocoder',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-hdb_convention_center-field_fh_booth_capacity'.
+  $field_instances['node-hdb_convention_center-field_fh_booth_capacity'] = array(
+    'bundle' => 'hdb_convention_center',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_booth_capacity',
+    'label' => 'Booth Capacity',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance: 'node-hdb_convention_center-field_notes'.
+  $field_instances['node-hdb_convention_center-field_notes'] = array(
+    'bundle' => 'hdb_convention_center',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_notes',
+    'label' => 'Notes',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance: 'node-hdb_convention_center-field_sirius_json'.
+  $field_instances['node-hdb_convention_center-field_sirius_json'] = array(
+    'bundle' => 'hdb_convention_center',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_json',
+    'label' => 'JSON',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-hdb_convention_center-field_sirius_name_short'.
+  $field_instances['node-hdb_convention_center-field_sirius_name_short'] = array(
+    'bundle' => 'hdb_convention_center',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_name_short',
+    'label' => 'Abbreviation',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
   // Exported field_instance: 'node-property-field_address'.
   $field_instances['node-property-field_address'] = array(
     'bundle' => 'property',
@@ -708,7 +1050,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 19,
+        'weight' => 13,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -747,7 +1089,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         ),
       ),
       'type' => 'addressfield_standard',
-      'weight' => 6,
+      'weight' => 19,
     ),
   );
 
@@ -763,7 +1105,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 20,
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -828,7 +1170,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'geofield_map_zoom' => 12,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 37,
+        'weight' => 12,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -871,7 +1213,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'latlng_override' => 0,
       ),
       'type' => 'geocoder',
-      'weight' => 7,
+      'weight' => 18,
     ),
   );
 
@@ -890,7 +1232,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 29,
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -911,7 +1253,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 5,
     ),
   );
 
@@ -930,7 +1272,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 31,
+        'weight' => 13,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -951,7 +1293,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 7,
     ),
   );
 
@@ -967,7 +1309,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'file',
         'settings' => array(),
         'type' => 'file_default',
-        'weight' => 50,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -994,7 +1336,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_mfw',
-      'weight' => 25,
+      'weight' => 2,
     ),
   );
 
@@ -1003,14 +1345,14 @@ function hotelsdb_content_types_field_default_field_instances() {
     'bundle' => 'property',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'URL for the boycott website, if any. This will be displayed on the union hotel guide (and elsewhere) if there is a current boycott or other action against the site.',
+    'description' => '',
     'display' => array(
       'default' => array(
         'label' => 'inline',
         'module' => 'link',
         'settings' => array(),
         'type' => 'link_url',
-        'weight' => 34,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1027,6 +1369,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'absolute_url' => 1,
       'attributes' => array(
         'class' => '',
+        'configurable_class' => 0,
         'configurable_title' => 0,
         'rel' => '',
         'target' => 'default',
@@ -1038,7 +1381,8 @@ function hotelsdb_content_types_field_default_field_instances() {
       'enable_tokens' => 1,
       'rel_remove' => 'default',
       'title' => 'none',
-      'title_label_use_field_label' => FALSE,
+      'title_allowed_values' => '',
+      'title_label_use_field_label' => 0,
       'title_maxlength' => 128,
       'title_value' => '',
       'url' => 0,
@@ -1050,7 +1394,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'link',
       'settings' => array(),
       'type' => 'link_field',
-      'weight' => 19,
+      'weight' => 10,
     ),
   );
 
@@ -1066,7 +1410,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 17,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1087,7 +1431,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 14,
     ),
   );
 
@@ -1108,7 +1452,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 30,
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1133,7 +1477,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 24,
+      'weight' => 6,
     ),
   );
 
@@ -1154,7 +1498,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 32,
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1179,7 +1523,53 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 25,
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_calc_convention_dist'.
+  $field_instances['node-property-field_calc_convention_dist'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 14,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_calc_convention_dist',
+    'label' => 'Convention Center Distance',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => ' Miles',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 10,
     ),
   );
 
@@ -1202,7 +1592,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 43,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1235,7 +1625,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 23,
+      'weight' => 11,
     ),
   );
 
@@ -1258,7 +1648,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 42,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1291,7 +1681,84 @@ function hotelsdb_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 22,
+      'weight' => 10,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_convention_center'.
+  $field_instances['node-property-field_convention_center'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 1,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 8,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_convention_center',
+    'label' => 'Convention Center',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 9,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_convention_center_attached'.
+  $field_instances['node-property-field_convention_center_attached'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 15,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_convention_center_attached',
+    'label' => 'Convention Center Attached?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 11,
     ),
   );
 
@@ -1307,7 +1774,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 26,
+        'weight' => 17,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1331,7 +1798,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 10,
+      'weight' => 23,
     ),
   );
 
@@ -1347,7 +1814,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 12,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1368,7 +1835,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 16,
+      'weight' => 15,
     ),
   );
 
@@ -1384,7 +1851,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 13,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1405,7 +1872,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 17,
+      'weight' => 16,
     ),
   );
 
@@ -1421,7 +1888,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 14,
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1442,7 +1909,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 18,
+      'weight' => 17,
     ),
   );
 
@@ -1458,7 +1925,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_plain',
-        'weight' => 11,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1482,7 +1949,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 15,
+      'weight' => 19,
     ),
   );
 
@@ -1503,7 +1970,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 6,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1552,7 +2019,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 7,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1601,7 +2068,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_plain',
-        'weight' => 10,
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1625,7 +2092,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 19,
+      'weight' => 20,
     ),
   );
 
@@ -1646,7 +2113,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 8,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1694,7 +2161,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 9,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1747,7 +2214,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 18,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1768,7 +2235,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 16,
     ),
   );
 
@@ -1784,7 +2251,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 40,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1808,7 +2275,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 12,
       ),
       'type' => 'text_textfield',
-      'weight' => 21,
+      'weight' => 29,
     ),
   );
 
@@ -1820,7 +2287,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'hidden',
+        'label' => 'inline',
         'module' => 'number',
         'settings' => array(
           'decimal_separator' => '.',
@@ -1829,7 +2296,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 4,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1846,7 +2313,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'max' => '',
       'min' => '',
       'prefix' => '',
-      'suffix' => '',
+      'suffix' => ' persons',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1854,7 +2321,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 9,
+      'weight' => 17,
     ),
   );
 
@@ -1875,7 +2342,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 3,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1900,7 +2367,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 8,
+      'weight' => 16,
     ),
   );
 
@@ -1921,7 +2388,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 2,
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1946,7 +2413,63 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 7,
+      'weight' => 15,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fh_last_updated'.
+  $field_instances['node-property-field_fh_last_updated'] = array(
+    'bundle' => 'property',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'date',
+        'settings' => array(
+          'custom_date_format' => '',
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => FALSE,
+        ),
+        'type' => 'date_default',
+        'weight' => 31,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_last_updated',
+    'label' => 'FairHotel Last Updated',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'blank',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 15,
+        'input_format' => 'Y-m-d H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'no_fieldset' => 0,
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_popup',
+      'weight' => 13,
     ),
   );
 
@@ -1967,7 +2490,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 1,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1984,7 +2507,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'max' => '',
       'min' => '',
       'prefix' => '',
-      'suffix' => '',
+      'suffix' => ' persons',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1992,7 +2515,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 6,
+      'weight' => 13,
     ),
   );
 
@@ -2013,7 +2536,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 0,
+        'weight' => 17,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2038,7 +2561,339 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 5,
+      'weight' => 12,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fh_meeting_room_largest'.
+  $field_instances['node-property-field_fh_meeting_room_largest'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 20,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_meeting_room_largest',
+    'label' => 'Meeting Room Largest',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => 'sf',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 14,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fh_nonunion'.
+  $field_instances['node-property-field_fh_nonunion'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 30,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_nonunion',
+    'label' => 'Nonunion Exceptions',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 12,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fh_notes'.
+  $field_instances['node-property-field_fh_notes'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 29,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_notes',
+    'label' => 'FairHotel Notes',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fh_outdoor'.
+  $field_instances['node-property-field_fh_outdoor'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 24,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_outdoor',
+    'label' => 'Outdoor Event Space?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 18,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fh_outdoor_area'.
+  $field_instances['node-property-field_fh_outdoor_area'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 25,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_outdoor_area',
+    'label' => 'Outdoor Event Area (sf)',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => ' sf',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 19,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fh_parking'.
+  $field_instances['node-property-field_fh_parking'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 26,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_parking',
+    'label' => 'Parking Available?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 20,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fh_parking_capacity'.
+  $field_instances['node-property-field_fh_parking_capacity'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 27,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_parking_capacity',
+    'label' => 'Parking Capacity',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => ' vehicles',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 21,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_fh_sources'.
+  $field_instances['node-property-field_fh_sources'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 32,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_fh_sources',
+    'label' => 'FairHotel Sources',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 14,
     ),
   );
 
@@ -2059,7 +2914,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => ',',
         ),
         'type' => 'number_integer',
-        'weight' => 46,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2084,7 +2939,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 3,
+      'weight' => 12,
     ),
   );
 
@@ -2108,7 +2963,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 45,
+        'weight' => 16,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2140,8 +2995,8 @@ function hotelsdb_content_types_field_default_field_instances() {
         'text_parts' => array(),
         'year_range' => '-3:2050',
       ),
-      'type' => 'date_select',
-      'weight' => 2,
+      'type' => 'date_popup',
+      'weight' => 11,
     ),
   );
 
@@ -2165,7 +3020,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 44,
+        'weight' => 15,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2197,8 +3052,8 @@ function hotelsdb_content_types_field_default_field_instances() {
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
-      'type' => 'date_select',
-      'weight' => 1,
+      'type' => 'date_popup',
+      'weight' => 10,
     ),
   );
 
@@ -2214,7 +3069,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 5,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2251,7 +3106,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 33,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2272,7 +3127,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 18,
+      'weight' => 9,
     ),
   );
 
@@ -2287,7 +3142,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 75,
+        'weight' => 53,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2311,7 +3166,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 24,
+      'weight' => 19,
     ),
   );
 
@@ -2330,7 +3185,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 28,
+        'weight' => 13,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2355,7 +3210,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 17,
+      'weight' => 8,
     ),
   );
 
@@ -2371,7 +3226,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 22,
+        'weight' => 16,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2392,7 +3247,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 13,
+      'weight' => 22,
     ),
   );
 
@@ -2408,7 +3263,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 21,
+        'weight' => 15,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2429,7 +3284,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 12,
+      'weight' => 21,
     ),
   );
 
@@ -2445,7 +3300,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 23,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2469,7 +3324,51 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 11,
+      'weight' => 25,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_niche'.
+  $field_instances['node-property-field_niche'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_niche',
+    'label' => 'Niche',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => '',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => '',
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 15,
     ),
   );
 
@@ -2485,7 +3384,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 35,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2509,7 +3408,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'rows' => 3,
       ),
       'type' => 'text_textarea',
-      'weight' => 23,
+      'weight' => 18,
     ),
   );
 
@@ -2525,7 +3424,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 27,
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2546,7 +3445,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 15,
+      'weight' => 27,
     ),
   );
 
@@ -2562,7 +3461,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 24,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2586,7 +3485,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 8,
+      'weight' => 17,
     ),
   );
 
@@ -2602,7 +3501,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 39,
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2626,7 +3525,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 12,
       ),
       'type' => 'text_textfield',
-      'weight' => 20,
+      'weight' => 28,
     ),
   );
 
@@ -2642,7 +3541,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 25,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2653,7 +3552,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_pin',
-    'label' => 'Property ID Number / Assessor’s Parcel Number',
+    'label' => 'Property ID  / Assessor’s Parcel',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -2666,43 +3565,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 9,
-    ),
-  );
-
-  // Exported field_instance: 'node-property-field_relationships'.
-  $field_instances['node-property-field_relationships'] = array(
-    'bundle' => 'property',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 76,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_relationships',
-    'label' => 'Relationships',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 0,
-      'module' => 'field_collection',
-      'settings' => array(),
-      'type' => 'field_collection_embed',
-      'weight' => 1,
+      'weight' => 26,
     ),
   );
 
@@ -2723,7 +3586,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => ',',
         ),
         'type' => 'number_integer',
-        'weight' => 49,
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2748,7 +3611,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 6,
+      'weight' => 15,
     ),
   );
 
@@ -2772,7 +3635,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 48,
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2804,8 +3667,8 @@ function hotelsdb_content_types_field_default_field_instances() {
         'text_parts' => array(),
         'year_range' => '-3:2050',
       ),
-      'type' => 'date_select',
-      'weight' => 5,
+      'type' => 'date_popup',
+      'weight' => 14,
     ),
   );
 
@@ -2829,7 +3692,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 47,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2861,8 +3724,8 @@ function hotelsdb_content_types_field_default_field_instances() {
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
-      'type' => 'date_select',
-      'weight' => 4,
+      'type' => 'date_popup',
+      'weight' => 13,
     ),
   );
 
@@ -2887,7 +3750,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => ',',
         ),
         'type' => 'number_integer',
-        'weight' => 16,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2912,7 +3775,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 3,
+      'weight' => 13,
     ),
   );
 
@@ -2927,7 +3790,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 78,
+        'weight' => 55,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2948,7 +3811,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
-      'weight' => 21,
+      'weight' => 9,
     ),
   );
 
@@ -2964,7 +3827,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 15,
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2985,7 +3848,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 2,
+      'weight' => 9,
     ),
   );
 
@@ -2997,11 +3860,11 @@ function hotelsdb_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'hidden',
+        'label' => 'inline',
         'module' => 'link',
         'settings' => array(),
         'type' => 'link_url',
-        'weight' => 38,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3041,7 +3904,573 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'link',
       'settings' => array(),
       'type' => 'link_field',
-      'weight' => 22,
+      'weight' => 30,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_actor'.
+  $field_instances['node-property_actor-field_actor'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_actor',
+    'label' => 'Actor',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 33,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_amount_owned'.
+  $field_instances['node-property_actor-field_amount_owned'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 2,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_decimal',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_amount_owned',
+    'label' => 'Amount owned',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 43,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_end_date'.
+  $field_instances['node-property_actor-field_end_date'] = array(
+    'bundle' => 'property_actor',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'date',
+        'settings' => array(
+          'custom_date_format' => '',
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => FALSE,
+        ),
+        'type' => 'date_default',
+        'weight' => 9,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_end_date',
+    'label' => 'End date',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'blank',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 1,
+        'input_format' => 'Y-m-d H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'no_fieldset' => 0,
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_text',
+      'weight' => 49,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_legacy_id'.
+  $field_instances['node-property_actor-field_legacy_id'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_legacy_id',
+    'label' => 'Legacy ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 53,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_notes'.
+  $field_instances['node-property_actor-field_notes'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 12,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_notes',
+    'label' => 'Sources / Notes',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 55,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_owned_raw'.
+  $field_instances['node-property_actor-field_owned_raw'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_owned_raw',
+    'label' => 'Owned (raw)',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 45,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_pension'.
+  $field_instances['node-property_actor-field_pension'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_pension',
+    'label' => 'Pension?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 39,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_percent_owned'.
+  $field_instances['node-property_actor-field_percent_owned'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 2,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_decimal',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_percent_owned',
+    'label' => 'Percent owned',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 41,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_property'.
+  $field_instances['node-property_actor-field_property'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_property',
+    'label' => 'Property',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 35,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_relationship_type'.
+  $field_instances['node-property_actor-field_relationship_type'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_relationship_type',
+    'label' => 'Relationship type',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 37,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_sales_price'.
+  $field_instances['node-property_actor-field_sales_price'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 10,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_sales_price',
+    'label' => 'Sales price',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 51,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_start_date'.
+  $field_instances['node-property_actor-field_start_date'] = array(
+    'bundle' => 'property_actor',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'date',
+        'settings' => array(
+          'custom_date_format' => '',
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => FALSE,
+        ),
+        'type' => 'date_default',
+        'weight' => 8,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_start_date',
+    'label' => 'Start date',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'blank',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 1,
+        'input_format' => 'Y-m-d H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'no_fieldset' => 0,
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_text',
+      'weight' => 47,
+    ),
+  );
+
+  // Exported field_instance: 'node-saved_search-field_search_body'.
+  $field_instances['node-saved_search-field_search_body'] = array(
+    'bundle' => 'saved_search',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_search_body',
+    'label' => 'Search Body',
+    'required' => 1,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 31,
     ),
   );
 
@@ -3180,9 +4609,11 @@ function hotelsdb_content_types_field_default_field_instances() {
   // Translatables
   // Included for use with string extractors like potx.
   t('(in square feet)');
-  t('<strong>DO</strong> include the source of the information.  <strong>DO NOT</strong> enter anything here that could be entered into a specific field.  <strong>DO NOT</strong> enter sales dates, percent owned, etc. into this field.');
   t('Abbreviation');
   t('Actor');
+  t('Actor Type');
+  t('Actors');
+  t('Address');
   t('Address Geofield');
   t('Airport');
   t('Airport (Secondary)');
@@ -3190,16 +4621,23 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Attachments');
   t('Ballroom Capacity');
   t('Ballrooms');
+  t('Booth Capacity');
   t('Boycott URL');
   t('Brand');
   t('Canonical Address');
   t('Common Name');
+  t('Convention Center');
+  t('Convention Center Attached?');
+  t('Convention Center Distance');
   t('County');
   t('Development Status');
   t('Distance to Airport');
   t('Distance to Airport (Secondary)');
   t('End date');
   t('Event Space');
+  t('FairHotel Last Updated');
+  t('FairHotel Notes');
+  t('FairHotel Sources');
   t('Fax');
   t('Format as <em>ddd-ddd-dddd</em>');
   t('Format as: <em>ddd-ddd-dddd</em>');
@@ -3220,34 +4658,41 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('MEG');
   t('MSA');
   t('Meeting Room Capacity');
+  t('Meeting Room Largest');
   t('Meeting Rooms');
   t('Neighborhood');
+  t('Niche');
+  t('Nonunion Exceptions');
   t('Notes');
   t('On public land');
   t('Online Betting?');
   t('Operator Last Updated');
+  t('Outdoor Event Area (sf)');
+  t('Outdoor Event Space?');
   t('Owned (raw)');
   t('Owner Last Updated');
   t('Owner of Record');
+  t('Parking Available?');
+  t('Parking Capacity');
   t('Pension?');
   t('Percent owned');
   t('Phone');
-  t('Property ID Number / Assessor’s Parcel Number');
+  t('Property');
+  t('Property ID  / Assessor’s Parcel');
   t('Raw Address');
   t('Regulator');
   t('Relationship type');
-  t('Relationships');
   t('Restaurant Contract Covered Workers');
   t('Restaurant Contract Expiration Date');
   t('Restaurant Contract Start Date');
   t('Rooms');
   t('Sales price');
+  t('Search Body');
   t('Source');
   t('Sources / Notes');
   t('Sports Book?');
   t('Start date');
   t('URL');
-  t('URL for the boycott website, if any. This will be displayed on the union hotel guide (and elsewhere) if there is a current boycott or other action against the site.');
   t('Union Status');
   t('Use control- or shift-click to select multiple files.');
 

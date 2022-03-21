@@ -6,6 +6,7 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.menu.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.relationships.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.blocks.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.permission.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.quicksearch.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire_local.inc";
@@ -14,11 +15,25 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.ex
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.fairhotel.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.airports.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.casino.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.amenities.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.contract.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.report_changed_status.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.oneoffs.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_property.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_airport.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_convention.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_actor.inc";
 
+
+/**
+ * Implements hook_menu_alter
+ */
+
+function unite_menu_alter(&$items) {
+	if ($items['node/%node/revisions']) {
+		$items['node/%node/revisions']['weight'] = 99;
+	}
+}
 
 /***
  * Implements hook_sirius_wizard_info()
@@ -30,6 +45,8 @@ function unite_sirius_wizard_info() {
   // $items += sirius_ledger_feed_charges_info();
   $items += unite_feed_property_info();
   $items += unite_feed_airport_info();
+  $items += unite_feed_convention_info();
+  $items += unite_feed_actor_info();
 
   return $items;
 }
@@ -41,12 +58,36 @@ function unite_sirius_wizard_info() {
 function unite_node_presave($node) {
 	if ($node->type == 'property') {
 		unite_zip_to_msa($node);
-		unite_airports_node_presave($node);
+		unite_calc_distances($node);
 	}
 	if ($node->type == 'property_actor') {
 		unite_relationship_node_presave($node);
 	} 
 }
+
+function unite_calc_distances($property_node) {
+	$calc_fields = array(
+		'field_airport' => 'field_calc_airport_dist', 
+		'field_airport_alt' => 'field_calc_airport_dist_alt',
+		'field_convention_center' => 'field_calc_convention_dist'
+	);
+
+	foreach ($calc_fields as $source_field => $target_field) {
+		$other_node = node_load($property_node->{$source_field}['und'][0]['target_id']);
+		$lat1 = $property_node->field_address_geofield['und'][0]['lat'];
+		$lon1 = $property_node->field_address_geofield['und'][0]['lon'];
+
+		$lat2 = $other_node->field_address_geofield['und'][0]['lat'];
+		$lon2 = $other_node->field_address_geofield['und'][0]['lon'];
+
+		if (isset($lat1) && isset($lat2)) {
+			$property_node->{$target_field}['und'][0]['value'] = sirius_addr_latlon_distance($lat1, $lon1, $lat2, $lon2);
+		} else {
+			unset($property_node->{$target_field}['und']);
+		}
+	}
+}
+
 
 function unite_zip_to_msa($node) {
 	$zip = $node->field_address['und'][0]['postal_code'];
@@ -129,7 +170,7 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 	    }
 	  }
 	}
-
+	
 	//
 	// Put a copy of buttons at the top
 	//
@@ -169,18 +210,31 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 		);
   }	
 
-  // Hide cmoputed fields
-	if ($form_id == 'property_node_form') {
+  // Hide computed fields
+	if (in_array($form_id, array('property_node_form', 'unite_node_tab_amenities_edit_form'))) {
 		$form['field_relationships']['#access'] = FALSE;
 		$form['field_calc_owner_last_updated']['#access'] = FALSE;
 		$form['field_calc_operator_last_updated']['#access'] = FALSE;
 		$form['field_calc_airport_dist']['#access'] = FALSE;
-		$form['field_calc_airport_alt_dist']['#access'] = FALSE;
+		$form['field_calc_airport_dist_alt']['#access'] = FALSE;
+		$form['field_calc_convention_dist']['#access'] = FALSE;
 	}
+
+  // Hide fields from special groups
+	if ($form_id == 'property_node_form') {
+		foreach (unite_casino_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
+		foreach (unite_amenities_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
+		foreach (unite_contract_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
+		foreach (unite_fairhotel_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
+	}
+
+	if (in_array($form_id, array('property_node_form', 'hdb_airport_node_form', 'hdb_convention_center_node_form'))) {
+		$form['field_sirius_json']['#access'] = FALSE;
+  }
 }
 
 function unite_cron() {
-	unite_export_feed_cache();
+	// unite_export_feed_cache();
 }
 
 /**
@@ -215,8 +269,8 @@ function unite_node_view($node, $view_mode, $langcode) {
 
   // Hide FairHotel fields
   if ($node->type == 'property') {
-	  $hide_fields = unite_fairhotel_fields() + unite_casino_fields();
-	  foreach ($hide_fields as $hide_field) { unset($node->content[$hide_field]); }
+	  // $hide_fields = unite_fairhotel_fields() + unite_casino_fields();
+	  // foreach ($hide_fields as $hide_field) { unset($node->content[$hide_field]); }
 	}
 }
 
@@ -248,15 +302,37 @@ function unite_sirius_config_links_alter(&$links) {
 	$links = array_merge(array('unite' => array('title' => 'Hotels Database')), $links);
 	$links['unite']['links']['admin/config/unite/core'] = array('title' => 'General Settings', 'description' => 'General settings, including IP address restrictions for the FairHotels feed.');
 	$links['unite']['links']['admin/structure/taxonomy/brand'] = array('title' => 'Brands', 'description' => 'Manage brands, parents and service levels.');
-
-
+	$links['unite']['links']['admin/structure/taxonomy/hdb_niche'] = array('title' => 'Niches', 'description' => 'Manage niches: convention, resort, ectended stay, etc.');
 }
 
 function unite_submitted_empty($form_state, $field_name) {
 	$value = $form_state['values'][$field_name]['und'];
 
-	if (!isset($value[0]['value'])) { return TRUE; }
-	if ($value[0]['value'] === '') { return TRUE; }
+	foreach (array('value', 'target_id', 'tid', 'url') as $col) {
+		if (isset($value[0][$col]) && $value[0][$col] !== '') { return FALSE; }
+	}
 
-	return FALSE;
+	return TRUE;
+}
+
+function unite_node_subform($form, &$form_state, $property_node, $fields) {
+	$form_state['property_nid'] = $property_node->nid;
+
+	foreach ($fields as $field) {
+		field_attach_form('node', $property_node, $form, $form_state, NULL, array('field_name' => $field));
+	}
+	unset($form['#groups']);
+	unset($form['#fieldgroups']);
+	unset($form['#group_children']);
+
+	$form['#attributes'] = array('class' => array('unite-node-subform'));
+	drupal_add_css(drupal_get_path('module', 'unite') . '/css/unite.css', 'file');
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+		'#weight' => 1000,
+	);
+
+	return $form;
 }
