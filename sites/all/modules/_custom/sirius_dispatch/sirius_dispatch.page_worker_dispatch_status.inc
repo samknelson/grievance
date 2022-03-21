@@ -162,22 +162,24 @@ function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state)
 		}
 	}
 
-	if ($form_state['values']['set_availdate'] && $form_state['values']['availdate']) {
-		$newdate = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['availdate']));
-		$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $newdate;
-		node_save($worker_node);
-		sirius_log('worker:availdate', 'set', "Set worker's availability date to $newdate", $reason, '', array($worker_node->nid));
-	}
+	if (user_access('sirius dispatch staff')) {
+		if ($form_state['values']['set_availdate'] && $form_state['values']['availdate']) {
+			$newdate = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['availdate']));
+			$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $newdate;
+			node_save($worker_node);
+			sirius_log('worker:availdate', 'set', "Set worker's availability date to $newdate", $reason, '', array($worker_node->nid));
+		}
 
-	$block_tid = $form_state['values']['sib'];
-	if ($block_tid != $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']) {
-		if ($block_tid) {
-			$block_term = taxonomy_term_load($block_tid);
-			sirius_dispatch_worker_dispstatus_block_set($worker_node, $block_tid, $reason);
-			drupal_set_message("Sign-in block has been set to " . $block_term->name);
-		} else {
-			sirius_dispatch_worker_dispstatus_block_set($worker_node, NULL, $reason);
-			drupal_set_message("Sign-in block has been cleared.");
+		$block_tid = $form_state['values']['sib'];
+		if ($block_tid != $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']) {
+			if ($block_tid) {
+				$block_term = taxonomy_term_load($block_tid);
+				sirius_dispatch_worker_dispstatus_block_set($worker_node, $block_tid, $reason);
+				drupal_set_message("Sign-in block has been set to " . $block_term->name);
+			} else {
+				sirius_dispatch_worker_dispstatus_block_set($worker_node, NULL, $reason);
+				drupal_set_message("Sign-in block has been cleared.");
+			}
 		}
 	}
 }

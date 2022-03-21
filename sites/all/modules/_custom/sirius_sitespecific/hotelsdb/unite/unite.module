@@ -6,6 +6,7 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.menu.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.relationships.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.blocks.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.permission.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.quicksearch.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire_local.inc";
@@ -21,6 +22,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.on
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_property.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_airport.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_convention.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_actor.inc";
 
 
 /**
@@ -44,6 +46,7 @@ function unite_sirius_wizard_info() {
   $items += unite_feed_property_info();
   $items += unite_feed_airport_info();
   $items += unite_feed_convention_info();
+  $items += unite_feed_actor_info();
 
   return $items;
 }
@@ -231,7 +234,7 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 }
 
 function unite_cron() {
-	unite_export_feed_cache();
+	// unite_export_feed_cache();
 }
 
 /**

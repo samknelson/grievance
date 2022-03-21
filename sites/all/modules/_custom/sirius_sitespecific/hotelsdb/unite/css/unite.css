@@ -31,3 +31,21 @@
 .unite-node-subform .field-type-text-long {
 	white-space: normal;
 }
+
+
+#content .unite_home_block {
+	padding:  25px;
+}
+
+#content .unite_home_block h2 {
+	padding-top:  0;
+}
+
+#content .unite_home_col {
+	float:  left;
+	width:  40%;
+}
+
+#content .unite_home_col_left {
+	/* padding-right:  25px; */
+}
