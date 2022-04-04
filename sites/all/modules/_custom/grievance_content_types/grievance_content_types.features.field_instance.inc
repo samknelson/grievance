@@ -24251,6 +24251,54 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'node-sirius_worker-field_sirius_denorm_benefits'.
+  $field_instances['node-sirius_worker-field_sirius_denorm_benefits'] = array(
+    'bundle' => 'sirius_worker',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 1,
+          'field_delimiter' => '',
+          'link' => 0,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 18,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_denorm_benefits',
+    'label' => 'Denormalize: Benefits',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'multiple_selects',
+      'settings' => array(),
+      'type' => 'multiple_selects',
+      'weight' => 60,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_worker-field_sirius_denorm_level'.
   $field_instances['node-sirius_worker-field_sirius_denorm_level'] = array(
     'bundle' => 'sirius_worker',
@@ -25361,7 +25409,7 @@ If the file has multiple pages, then each page in the input document will use th
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_sirius_id2',
-    'label' => 'ID2',
+    'label' => 'Union ID',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -25410,7 +25458,7 @@ If the file has multiple pages, then each page in the input document will use th
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_sirius_id3',
-    'label' => 'ID3',
+    'label' => 'External ID',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -30574,6 +30622,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Default Value');
   t('Default number of days');
   t('Definition');
+  t('Denormalize: Benefits');
   t('Denormalize: Level');
   t('Department');
   t('Departments');
@@ -30653,7 +30702,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('Holidays');
   t('ID');
   t('ID2');
-  t('ID3');
   t('If "Yes", then letters of this type MUST be logged.');
   t('If "Yes", then the default will be that any letter sent using this template will also set the grievance\'s "company representative" field to be the main recipient of the letter.  Generally this should be "Yes" for notifications to the company -- grievance filings and so forth -- and "No" for notifications to the grievant or letters that are meant to be sent internally.');
   t('If "Yes", this is a department that can be selected when creating a dispatch job.');
@@ -30808,6 +30856,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Type');
   t('Type of Days');
   t('Union Attorney');
+  t('Union ID');
   t('Union Representative');
   t('Unresolved?');
   t('Unskilled Pay Rate');
