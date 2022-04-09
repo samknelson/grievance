@@ -1,6 +1,18 @@
 <?php
 
 function mightysearch_search_form($form, &$form_state) {
+	if (!$form_state['input']) {
+		$saved_nid = $_GET['saved'];
+		if ($saved_nid) {
+			$saved_node = node_load($saved_nid);
+			if ($saved_node && $saved_node->type == 'sirius_json_definition' && $saved_node->field_sirius_type['und'][0]['value'] == 'mightysearch:saved_search') {
+				$saved_json = sirius_json_get($saved_node);
+				$form_state['input'] = $saved_json['search']['values'];
+				unset($form_state['input']['save_as']);
+				drupal_set_message("Loaded saved search: " . $saved_node->title);
+			}
+		}
+	}
 
 	// Include the MultiSelect JS / CSS
 	drupal_add_css(drupal_get_path('module', 'multiselect') . '/multiselect.css');
@@ -402,27 +414,6 @@ function mightysearch_search_form($form, &$form_state) {
 		'#title' => t('Save'),
 		'#type' => 'textfield',
 		'#description' => t('Enter a name to save this search as.  If there is already a search with that name, it will be overwritten.'),
-	);
-
-	$query = new EntityFieldQuery();
-	$query->entityCondition('entity_type', 'node');
-	$query->entityCondition('bundle', 'saved_search');
-	$query->propertyOrderBy('title');
-	$result = $query->execute();
-	$saved_options = array('' => '[select]');
-	if ($result['node']) {
-		$tmp = array_keys($result['node']);
-		foreach ($tmp as $nid) {
-			$node = node_load($nid);
-			$saved_options[$nid] = $node->title;
-		}
-	}
-	
-	$form['load_from'] = array(
-		'#title' => t('Load From'),
-		'#type' => 'select',
-		'#options' => $saved_options,
-		'#description' => t('Discard the current search, and load a new search.'),
 	);
 
 	/////////////////////////////////////////

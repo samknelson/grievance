@@ -18,13 +18,15 @@ function unite_feed_actor_info() {
     'feed' => array(
       'pks' => array(
         'nid' => 'Internal ID (NID)',
+        'title' => 'Canonical Name',
         // 'id' => 'External ID',
         // 'addr' => 'Address',
       ),
+      'create_new_records' => 'optional',
       'fields' => array(
         'nid' => array('group' => 'pk', 'title' => 'Internal ID (NID)'),
+        'title' => array('group' => 'pk', 'title' => 'Title'),
 
-        'title' => array('group' => 'core', 'title' => 'Title'),
         'actor_type' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'actor_type'),
 
         'address_thoroughfare' => array('group' => 'location', 'title' => 'Address 1',),
@@ -33,7 +35,7 @@ function unite_feed_actor_info() {
         'address_administrative_area' => array('group' => 'location', 'title' => 'State',),
         'address_postal_code' => array('group' => 'location', 'title' => 'Zip',),
         'address_country' => array('group' => 'location', 'title' => 'Country',),
-        'phone' => array('group' => 'location',),
+        'phone' => array('group' => 'location', 'type' => 'text'),
         'notes' => array('group' => 'core', 'type' => 'long'),
      ),
       'batch_size' => 10,
@@ -173,6 +175,25 @@ function unite_feed_actor_row_verify($feed_node, $info, $data, &$row, $precomput
       $probe = node_load($nid);
       if (!$probe) { return array('success' => FALSE, 'msg' => 'No node was found with this NID.'); }
       if ($probe->type != 'actor') { return array('success' => FALSE, 'msg' => 'The node for this NID was found, but it is not a actor.'); }
+
+      $msg = "An existing actor will be updated.";
+    } else if ($pk == 'title') {
+      if (!$row[$pk]) { return array('success' => FALSE, 'msg' => "This record has no value for primary key $pk."); }
+      $result = sirius_feed_lookup_by_field('actor', 'field_data_field_title_canon', 'field_title_canon_value', unite_actor_canonicalize_title($row[$pk]));
+
+      if ($result['success']) {
+        // We found exactly one. Use that NID.
+        $row['nid'] = $result['nid'];
+        $msg = "An existing actor will be updated.";
+      } else {
+        if ($result['not_found'] && $data['create_new_records'] == 'Yes') { 
+          // Not found, but we can create new records. Do nothing
+          $msg = "A new actor will be created.";
+        } else {
+          // We can't create new records, or we have a different kind of error
+          return $result;
+        }
+      }
     }
 
     foreach ($info['feed']['fields'] as $field_name => $field_info) {
@@ -187,7 +208,8 @@ function unite_feed_actor_row_verify($feed_node, $info, $data, &$row, $precomput
     }
   }
 
-  return array('success' => TRUE, 'msg' => 'Looks good.');
+  if (!$msg) { $msg = "Looks good."; }
+  return array('success' => TRUE, 'msg' => $msg);
 }
 
 function unite_feed_actor_row_process($feed_node, $info, $data, $row) {
