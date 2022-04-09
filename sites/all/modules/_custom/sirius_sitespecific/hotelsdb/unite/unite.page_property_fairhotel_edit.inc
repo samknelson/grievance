@@ -20,6 +20,7 @@ function unite_node_tab_fairhotel_edit_form_submit($form, &$form_state) {
 		}
 	}
 
+	$property_node->revision = TRUE;
 	node_save($property_node);
 	drupal_set_message("Data saved.");
 }
