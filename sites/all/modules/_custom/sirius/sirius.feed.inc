@@ -394,6 +394,19 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 			'#default_value' => $data['pk'],
 			'#required' => TRUE,
 		);
+
+		if ($info['feed']['create_new_records'] == 'optional') {
+			$form['create_new_records'] = array(
+				'#type' => 'select',
+				'#title' => t('Create New Records?'),
+				'#options' => array(
+					'No' => 'No',
+					'Yes' => 'Yes',
+				),
+				'#description' => t('If the primary key is not found, should a new record be created?'),
+				'#default_value' => $data['create_new_records'],
+			);
+		}
 	}
 
 	if ($info['feed']['employer_access']) {
@@ -483,6 +496,7 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
   $data['tag'] = $form_state['values']['tag'];
 	$data['worksheet'] = 0;
 	$data['header_row'] = $form_state['values']['header_row'];
+	$data['create_new_records'] = $form_state['values']['create_new_records'];
 
 	if ($info['feed']['employer_access']) {
 		$employer_node = sirius_employer_get();
@@ -1078,3 +1092,30 @@ function sirius_feed_admin() {
 
   return system_settings_form($form);
 }
+
+function sirius_feed_lookup_by_field($content_type, $table, $field_name, $value) {
+	$sql_args = array();
+  $sql = "select max(nid) as a, min(nid) as b from node ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "left join $table on $table.entity_type = 'node' and $table.entity_id = node.nid ";
+  $sql .= "where node.type = :content_type ";
+  $sql_args[':content_type'] = $content_type;
+  $sql .= "and $field_name = :value ";
+
+  $domain_nid = sirius_domain_nid(); 
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id IS NULL ";
+  }
+  $sql_args[':value'] = $value;
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $hr = $stmt->fetchAssoc();
+  $nid = $hr['a'];
+  $other_nid = $hr['b'];
+  if (!$nid) { return array('success' => FALSE, 'not_found' => TRUE, 'msg' => "Record not found with this ID ($table, $field_name)."); }
+  if ($nid != $other_nid) { return array('success' => FALSE, 'msg' => "Multiple entities found with this ID ($table, $field_name)."); }
+  return array('success' => TRUE, 'nid' => $nid);
+}
+
