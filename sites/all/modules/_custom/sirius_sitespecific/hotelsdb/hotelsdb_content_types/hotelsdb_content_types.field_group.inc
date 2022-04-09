@@ -370,6 +370,97 @@ function hotelsdb_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_lg|node|property_actor|default';
+  $field_group->group_name = 'group_lg';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property_actor';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Loans and Grants',
+    'weight' => '6',
+    'children' => array(
+      0 => 'field_lg_balance',
+      1 => 'field_lg_servicer_commentary',
+      2 => 'field_lg_date_due',
+      3 => 'field_lg_date_issued',
+      4 => 'field_lg_date_balance',
+      5 => 'field_lg_date_servicer_comment',
+      6 => 'field_lg_sources',
+      7 => 'field_lg_date_sources',
+      8 => 'field_lg_master_servicer',
+      9 => 'field_lg_special_servicer',
+      10 => 'field_lg_multiparty',
+      11 => 'field_lg_amount',
+      12 => 'field_lg_id',
+      13 => 'field_lg_status',
+      14 => 'field_lg_type',
+      15 => 'field_lg_portfolio',
+      16 => 'field_lg_amortization',
+      17 => 'field_lg_employees_claimed',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Loans and Grants',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-lg field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_lg|node|property_actor|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_lg|node|property_actor|form';
+  $field_group->group_name = 'group_lg';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property_actor';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Loans and Grants',
+    'weight' => '8',
+    'children' => array(
+      0 => 'field_lg_balance',
+      1 => 'field_lg_servicer_commentary',
+      2 => 'field_lg_date_due',
+      3 => 'field_lg_date_issued',
+      4 => 'field_lg_date_balance',
+      5 => 'field_lg_date_servicer_comment',
+      6 => 'field_lg_sources',
+      7 => 'field_lg_date_sources',
+      8 => 'field_lg_master_servicer',
+      9 => 'field_lg_special_servicer',
+      10 => 'field_lg_multiparty',
+      11 => 'field_lg_amount',
+      12 => 'field_lg_id',
+      13 => 'field_lg_status',
+      14 => 'field_lg_type',
+      15 => 'field_lg_portfolio',
+      16 => 'field_lg_amortization',
+      17 => 'field_lg_employees_claimed',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Loans and Grants',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-lg field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_lg|node|property_actor|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_location|node|property|form';
   $field_group->group_name = 'group_location';
   $field_group->entity_type = 'node';
@@ -405,6 +496,71 @@ function hotelsdb_content_types_field_group_info() {
     ),
   );
   $field_groups['group_location|node|property|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_ownership|node|property_actor|default';
+  $field_group->group_name = 'group_ownership';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property_actor';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Ownership',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_pension',
+      1 => 'field_percent_owned',
+      2 => 'field_amount_owned',
+      3 => 'field_owned_raw',
+      4 => 'field_sales_price',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Ownership',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-ownership field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_ownership|node|property_actor|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_ownership|node|property_actor|form';
+  $field_group->group_name = 'group_ownership';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property_actor';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Ownership',
+    'weight' => '7',
+    'children' => array(
+      0 => 'field_pension',
+      1 => 'field_percent_owned',
+      2 => 'field_amount_owned',
+      3 => 'field_owned_raw',
+      4 => 'field_sales_price',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Ownership',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-ownership field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_ownership|node|property_actor|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -476,7 +632,9 @@ function hotelsdb_content_types_field_group_info() {
   t('Contracts');
   t('Convention Center');
   t('FairHotels');
+  t('Loans and Grants');
   t('Location');
+  t('Ownership');
   t('Property');
   t('Tabs');
 
