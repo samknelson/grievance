@@ -256,21 +256,23 @@ function sirius_jsonfield_util_render_all_values($form, $values, $options = arra
 
 function sirius_jsonfield_util_render_all_values_new($form, $values, $options = array()) {
 	$html = '';
-	foreach ($form as $key => $form_element) {
-		sirius_jsonfield_util_form_sort_by_weight($form);
-		if (substr($key, 0, 1) == '#') { continue; }
-		if (!is_array($form_element)) { continue; }
+	if ($form) {
+		foreach ($form as $key => $form_element) {
+			sirius_jsonfield_util_form_sort_by_weight($form);
+			if (substr($key, 0, 1) == '#') { continue; }
+			if (!is_array($form_element)) { continue; }
 
-		if ($form_element['#type'] == 'fieldset') {
-			$inner = sirius_jsonfield_util_render_all_values_new($form_element, $values[$key], $options);
-			if ($inner || !$options['skip_empty']) {
+			if ($form_element['#type'] == 'fieldset') {
+				$inner = sirius_jsonfield_util_render_all_values_new($form_element, $values[$key], $options);
+				if ($inner || !$options['skip_empty']) {
+					$html .= sirius_jsonfield_util_render_value($form_element, $values[$key], $options);
+					$html .= $inner;
+					$html .= sirius_jsonfield_util_render_value_close($form_element, $values[$key], $options);
+				}
+			} else {
 				$html .= sirius_jsonfield_util_render_value($form_element, $values[$key], $options);
-				$html .= $inner;
 				$html .= sirius_jsonfield_util_render_value_close($form_element, $values[$key], $options);
 			}
-		} else {
-			$html .= sirius_jsonfield_util_render_value($form_element, $values[$key], $options);
-			$html .= sirius_jsonfield_util_render_value_close($form_element, $values[$key], $options);
 		}
 	}
 	return $html;
