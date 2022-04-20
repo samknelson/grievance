@@ -25,6 +25,15 @@ function unite_report_changed_status_form($form, $form_state) {
 		'#required' => 1,
 	);
 
+	$form['output'] = array(
+		'#type' => 'select', 
+		'#title' => t("Output"),
+		'#options' => array(
+			'screen' => t('Display results on the screen'),
+			'csv' => t('Export to spreadsheet (CSV)'),
+		),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit', 
 		'#value' => t("Generate Report"),
@@ -153,11 +162,27 @@ function unite_report_changed_status_form_submit($form, &$form_state) {
 		'Prev HLA',
 		'Prev HLA Date'
 	);
+
+	$output = $form_state['values']['output'];
+	if ($output == 'csv') {
+		$fp = fopen('php://output', 'w');
+		$filename = 'changed_status_report.csv';
+		drupal_add_http_header('Content-Type', 'text/csv');
+		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		fputcsv($fp, $header);
+	}
+
 	$rows = array();
 	foreach ($data as $nid => $record) {
 		$row = array();
 		$row[] = $nid;
-		$row[] = l($record['title'], "node/$nid");
+
+		if ($output == 'csv') {
+			$row[] = $record['title'];
+		} else {
+			$row[] = l($record['title'], "node/$nid");
+
+		}
 		$row[] = $record['title-ts'];
 		$row[] = $record['title-prev-value'];
 		$row[] = $record['title-prev-ts'];
@@ -172,7 +197,16 @@ function unite_report_changed_status_form_submit($form, &$form_state) {
 		$row[] = $record['labor_activity_index-prev-value'];
 		$row[] = $record['labor_activity_index-prev-ts'];
 
-		$rows[] = $row;
+		if ($output == 'csv') {
+			fputcsv($fp, $row);
+		} else {
+			$rows[] = $row;
+		}
+	}
+
+	if ($output == 'csv') {
+		fclose($fp);
+		drupal_exit();
 	}
 
 	$form_state['results'] = '<hr>' . '<h2>' . t('Results') . '</h2>' . theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
