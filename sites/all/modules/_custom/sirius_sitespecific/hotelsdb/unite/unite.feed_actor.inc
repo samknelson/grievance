@@ -29,6 +29,8 @@ function unite_feed_actor_info() {
 
         'actor_type' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'actor_type'),
 
+        'parent' => array('group' => 'core', 'type' => 'text', 'title' => 'Parent'),
+
         'address_thoroughfare' => array('group' => 'location', 'title' => 'Address 1',),
         'address_premise' => array('group' => 'location', 'title' => 'Address 2',),
         'address_locality' => array('group' => 'location', 'title' => 'City',),
@@ -205,7 +207,20 @@ function unite_feed_actor_row_verify($feed_node, $info, $data, &$row, $precomput
         if (!$value) { return array('success' => FALSE, 'msg' => "No value found (or multiple values found) for $field_name in the entity type: $field_info[entity_type]."); }
         $row[$field_name] = $value;
       }
+
+      // Lookup parent
+      if ($field_name == 'parent') {
+        if ($row['parent']) {
+          $result = sirius_feed_lookup_by_field('actor', 'field_data_field_title_canon', 'field_title_canon_value', unite_actor_canonicalize_title($row['parent']));
+          if (!$result['success']) {
+            return $result;
+          }
+          $row['parent_nid'] = $result['nid'];
+          drupal_set_message("Here with $owner_nid");
+        }
+      }
     }
+
   }
 
   if (!$msg) { $msg = "Looks good."; }
@@ -255,6 +270,10 @@ function unite_feed_actor_row_process($feed_node, $info, $data, $row) {
         $actor_node->{"field_$field_name"}['und'][0]['target_id'] = $row[$field_name];
       }
     }
+  }
+
+  if ($row['parent_nid']) {
+    $actor_node->field_actors['und'][0]['target_id'] = $row['parent_nid'];
   }
 
   $actor_node = node_submit($actor_node);
