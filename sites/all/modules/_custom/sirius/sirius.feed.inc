@@ -628,6 +628,8 @@ function sirius_feed_wizard_map_form($form, &$form_state, $info, $data, $feed_no
 	}
 
 	$fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step);
+
+	$form['table_open'] = array('#markup' => '<table><tr><th>System Field</th><th>Uploaded Field</th></tr>');
 	foreach ($fields as $field_name => $field_info) {
 		if ($data) {
 			$default = $data["map_$field_name"];
@@ -638,17 +640,26 @@ function sirius_feed_wizard_map_form($form, &$form_state, $info, $data, $feed_no
 		if ($field_info['required']) {
 			$options = $header;
 		} else {
-			$options = array(NULL => '-- Select --') + $header;
+			$options = array(NULL => '-- Not Mapped --') + $header;
 		}
-		$form["map_$field_name"] = array(
-			'#title' => $field_info['title'],
+
+		$form["map_${field_name}_open"] = array('#markup' => '<tr>');
+
+		$form["map_${field_name}_label"] = array('#markup' => '<td>' . $field_info['title'] . '</td>');
+
+		$form["map_${field_name}"] = array(
 			'#description' => $field_info['description'],
 			'#type' => 'select',
 			'#options' => $options,
 			'#required' => $field_info['required'],
 			'#default_value' => $default,
+			'#prefix' => '<td>',
+			'#suffix' => '</td>',
 		);
+
+		$form["map_${field_name}_close"] = array('#markup' => '</tr>');
 	}
+	$form['table_close'] = array('#markup' => '</table>');
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -751,7 +762,7 @@ function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed
 			),
 			'#description' => t('"Precompute" performs a more in-depth verification. For example, it will ensure that referenced taxonomy terms exist or that IDs are unique. However, it is computationally expensive, so for large imports it may be better to omit this option.'),
 			'#required' => TRUE,
-			'#default_value' => 'No',
+			'#default_value' => 'Yes',
 		);
 	}
 
