@@ -181,7 +181,10 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 	} else {
 		$expires = date('Y-m-d', strtotime('+100 years'));
 		$expires_display = 'Never';
-	} 
+	}
+
+	$args = array($worker_node, $tids, $expires, $action, $reason, $files, $certification_nid, $participant_nid);
+	drupal_alter('sirius_worker_skill_set', $args);
 
 	// Adding an expired skll does nothing. But we still log the attempt
 	/*
