@@ -18,7 +18,10 @@ function sirius_event_bullpen_ts($event_node) {
 	$ts = sirius_date_ts($event_node, 'field_sirius_daterepeat');
 	$signin_opens_self = $ts - $json['bullpen']['signin_opens_self'];
 	$signin_opens_others = $ts - $json['bullpen']['signin_opens_others'];
-	$signin_closes = $ts + variable_get('sirius_dispatch_bullpen_signin_grace', 60*15);
+
+	$grace = $json['bullpen']['signin_grace'];
+	if (!$grace) { variable_get('sirius_dispatch_bullpen_signin_grace', 60*15); }
+	$signin_closes = $ts + $grace;
 
 	return array(
 		'job_ts' => $ts,

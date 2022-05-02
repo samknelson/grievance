@@ -58,9 +58,16 @@ function sirius_service_page_config_server_form($form, &$form_state) {
 
   $domain = sirius_domain();
 
-  $form['tokens']['account'] = array(
-  	'#markup' => sirius_fakerender_field('Account ID:', $domain->uuid),
-  );
+  if ($domain) {
+	  $form['tokens']['account'] = array(
+	  	'#markup' => sirius_fakerender_field('Account ID:', $domain->uuid),
+	  );
+	} else {
+		$user1 = user_load(1);
+	  $form['tokens']['account'] = array(
+	  	'#markup' => sirius_fakerender_field('Account ID:', $user1->uuid),
+	  );
+	}
 
   $access = sirius_domain_variable_get('sirius_service_server_access');
   if ($access) {
