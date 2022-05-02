@@ -1,0 +1,56 @@
+#page-tophat {
+	position:  relative;
+	top: -37px;
+	float:  right;
+	color:  #000000;
+	text-align: right;
+	font-size:  15px;
+}
+
+.teamsters631-uh #page-tophat a, 
+.teamsters631-uh #page-tophat a:visited {
+	color: #ffffff;
+}
+
+.teamsters631-uh #page-tophat a:hover {
+	color: #000000;
+}
+
+
+
+.teamsters631-tc #page-tophat a, 
+.teamsters631-tc #page-tophat a:visited {
+	color: #ffffff;
+}
+
+.teamsters631-tc #page-tophat a:hover {
+	color: #000000;
+}
+
+
+
+
+#page-banner {
+	padding-top:  0;
+}
+
+.teamsters631-tc #page-banner {
+	background-color: #1b4784 !important;
+	border-top: 25px solid #006600 !important;
+	border-bottom: 10px solid #fdb82f !important;
+}
+
+.teamsters631-uh #page-banner {
+	background-color: #1b4784 !important;
+	border-top: 25px solid #8a430e !important;
+	border-bottom: 10px solid #fdb82f !important;
+}
+
+.user-links {
+	clear: right;
+}
+
+.banner-wrapper {
+	margin-top:  -17px;
+}
+

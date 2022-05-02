@@ -12,9 +12,9 @@ function sirius_ip_rawrange_helptext($range = NULL) {
  	$html .= t("Your current IP address is <strong>@user_ip</strong>.", array('@user_ip' => $user_ip));
  	if (isset($range)) {
 	 	if (sirius_ip_check($user_ip, $range)) {
-	 		$html .= t('Your IP address <strong>IS</strong> allowed.');
+	 		$html .= ' ' . t('Your IP address <strong>IS</strong> allowed.');
 	 	} else {
-	 		$html .= t('Your IP address <strong>IS NOT</strong> allowed.');
+	 		$html .= ' ' . t('Your IP address <strong>IS NOT</strong> allowed.');
 	 	}
 	}
  	$html .= '</p>';
