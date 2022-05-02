@@ -70,6 +70,14 @@ function sirius_permission() {
       'title' => t('Sirius Provider'),
       'description' => t('Base level permission for all service providers, such as fund administrators or clinic operators.'),
     ),
+    'sirius bookmark' => array(
+      'title' => t('Sirius Bookmark'),
+      'description' => t('Permission to bookmark nodes using the "Flag" module.'),
+    ),
+    'sirius public admin' => array(
+      'title' => t('Sirius Public Admin'),
+      'description' => t('Permission to manage public pages for a domain.'),
+    ),
   );
 }
 

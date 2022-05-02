@@ -322,7 +322,8 @@ function sirius_twilio_browserphone_render($parameters = array()) {
 	global $user;
 
   drupal_add_library('system', 'ui.tabs');
-	drupal_add_js('https://media.twiliocdn.com/sdk/js/client/v1.6/twilio.min.js', 'external');
+	// drupal_add_js('https://media.twiliocdn.com/sdk/js/client/v1.6/twilio.min.js', 'external');
+	drupal_add_js('sites/all/modules/_custom/sirius_twilio/js/twilio-voice.js/dist/twilio.js', 'file');
 	drupal_add_js('sites/all/modules/_custom/sirius_twilio/js/sirius_twilio_browserphone_2.js', 'file');
 	drupal_add_css(drupal_get_path('module', 'sirius_twilio') . '/css/sirius_twilio_browserphone.css');
 	

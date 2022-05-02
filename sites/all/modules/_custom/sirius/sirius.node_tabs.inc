@@ -41,6 +41,17 @@ function sirius_node_tab_content($node, $in_tab_name) {
     $args = array_merge($args, $tab_record['callback arguments']);
   }
   sirius_node_tab_handle_requires($tab_record);
+
+  /*
+  // Make landing page redirect to the main view page. Not sure why we bother, though. 
+  if ($tab_record['landing']) {
+    $pattern = preg_replace('/[^a-zA-Z0-9_\/]/', '', $in_tab_name);
+    if (preg_match("/$pattern/", current_path())) {
+      drupal_goto('node/' . $node->nid);
+    }
+  }
+  */
+  
   return call_user_func_array($callback, $args);
 }
 
@@ -60,6 +71,11 @@ function sirius_node_tab_access($node, $in_tab_name) {
   // Check basic permission
   foreach ($tab_record['permissions'] as $permission) {
     if (!user_access($permission)) { return FALSE; }
+  }
+
+  // Check if the component is enabled
+  if ($tab_record['component'] && !sirius_domain_component_enabled($tab_record['component'])) {
+    return FALSE;
   }
 
   // Check for a custom access permission

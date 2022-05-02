@@ -256,6 +256,8 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 function sirius_node_tab_event_intake_application_manage_form_validate($form, &$form_state) {
 	$application_node = node_load($form_state['application_nid']);
 	$application_json = sirius_json_get($application_node);
+	$event_node = sirius_log_handler($application_node, 'sirius_event');
+	$event_json = sirius_json_get($event_node);
 
 	$action = $form_state['values']['action'];
 	if ($action == 'accept') {
@@ -271,12 +273,13 @@ function sirius_node_tab_event_intake_application_manage_form_validate($form, &$
 
 		$id2 = trim($form_state['values']['id2']);
 		if (!$id2) {
-			form_set_error('id2', 'Please enter an ID.');
+			if ($event_json['intake']['worker']['id2_required'] != 'No') {
+				form_set_error('id2', 'Please enter an ID.');
+			}
 		} else if	(sirius_worker_get_by_id2($id2)) {
 			form_set_error('id2', 'There is already a worker with this ID.');
 		}
 	}
-
 }
 
 function sirius_node_tab_event_intake_application_manage_form_submit($form, &$form_state) {
@@ -354,6 +357,32 @@ function sirius_node_tab_event_intake_application_manage_form_submit($form, &$fo
 		node_save($worker_node);
 	  drupal_set_message("Created worker: " . l($worker_node->title . ' (' . $worker_node->field_sirius_id['und'][0]['value'] . ')', 'node/' . $worker_node->nid));
 	  $contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
+
+	 	// ////////////////////////////////////
+		// Set linked JSON fields in the contact record
+		// ////////////////////////////////////
+
+	  if ($event_json['intake']['survey']['list']) {
+		  $contact_node = node_load($contact_nid);
+		  $contact_json = sirius_json_get($contact_node);
+			$contact_results = sirius_jsonfield_util_results_get($contact_json, 'default');
+
+			$link_count = 0;
+  		foreach ($event_json['intake']['survey']['list'] as $delta => $element) {
+  			$survey_nid = $element['survey_nid'];
+  			$survey_node = node_load($survey_nid);
+				$survey_json = sirius_json_get($survey_node);
+				$survey_form = sirius_jsonfield_util_form_get($survey_json,  "default");
+				$survey_results = sirius_jsonfield_util_results_get($application_json, "survey_" . $survey_nid);
+
+				$link_count += sirius_jsonfield_link_set($survey_form, $survey_results, $contact_results);
+  		}
+			if ($link_count) {
+				sirius_jsonfield_util_results_set($contact_json, 'default', $contact_results);
+				sirius_json_set($contact_node, $contact_json);
+				node_save($contact_node);
+			}
+  	}
 
 		// ////////////////////////////////////
 		// Set the work status

@@ -422,6 +422,11 @@ function grievance_content_types_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'sirius_worker';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'custom_fields' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'eins' => array(
       'weight' => '9',
       'label' => 'hidden',
@@ -446,9 +451,11 @@ function grievance_content_types_ds_field_settings_info() {
         ),
       ),
     ),
-    'field_sirius_dob' => array(
+    'field_sirius_denorm_benefits' => array(
       'formatter_settings' => array(
-        'ft' => array(),
+        'ft' => array(
+          'lb' => 'Benefits',
+        ),
       ),
     ),
   );
@@ -462,6 +469,25 @@ function grievance_content_types_ds_field_settings_info() {
  */
 function grievance_content_types_ds_custom_fields_info() {
   $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'custom_fields';
+  $ds_field->label = 'Custom Fields';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'sirius_worker|default';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<p>[replace me]</p>
+',
+      'format' => 'full_html',
+    ),
+    'use_token' => 0,
+  );
+  $export['custom_fields'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -481,6 +507,25 @@ function grievance_content_types_ds_custom_fields_info() {
     'use_token' => 1,
   );
   $export['edit_link'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'eins';
+  $ds_field->label = 'EINs';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'sirius_worker|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<p>[replace me]</p>
+',
+      'format' => 'full_html',
+    ),
+    'use_token' => 0,
+  );
+  $export['eins'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -1973,57 +2018,62 @@ function grievance_content_types_ds_layout_settings_info() {
     'regions' => array(
       'above_left' => array(
         0 => 'grievance_timeline',
-        1 => 'group_sirius_worker_identity',
-        2 => 'field_sirius_name',
-        4 => 'field_sirius_id',
-        5 => 'group_sirius_worker_contact',
-        6 => 'field_sirius_ssn',
-        8 => 'field_sirius_id2',
-        9 => 'field_sirius_id3',
-        10 => 'field_sirius_aat',
-        11 => 'field_sirius_gender',
-        12 => 'eins',
-        13 => 'field_sirius_dob',
-        20 => 'field_sirius_phone',
-        22 => 'field_sirius_phone_alt',
-        24 => 'field_sirius_phone_fax',
-        25 => 'field_sirius_email',
-        26 => 'field_sirius_address',
+        2 => 'group_sirius_worker_identity',
+        4 => 'field_sirius_name',
+        5 => 'field_sirius_id',
+        6 => 'group_sirius_worker_contact',
+        7 => 'field_sirius_ssn',
+        9 => 'field_sirius_id2',
+        10 => 'field_sirius_id3',
+        11 => 'field_sirius_aat',
+        12 => 'field_sirius_gender',
+        13 => 'eins',
+        14 => 'field_sirius_dob',
+        22 => 'field_sirius_phone',
+        24 => 'field_sirius_phone_alt',
+        25 => 'field_sirius_phone_fax',
+        27 => 'field_sirius_email',
+        28 => 'field_sirius_address',
+      ),
+      'middle' => array(
+        1 => 'custom_fields',
       ),
       'above_right' => array(
         3 => 'group_sirius_worker_status',
-        7 => 'group_sirius_worker_preferences',
-        14 => 'field_sirius_member_status',
-        15 => 'field_sirius_denorm_level',
-        16 => 'field_sirius_work_status',
-        17 => 'field_sirius_worker_dispstatus',
-        18 => 'field_sirius_dispatch_availdate',
-        19 => 'field_grievance_shop',
+        8 => 'group_sirius_worker_preferences',
+        15 => 'field_sirius_member_status',
+        16 => 'field_sirius_denorm_level',
+        17 => 'field_sirius_work_status',
+        18 => 'field_sirius_worker_dispstatus',
+        19 => 'field_sirius_dispatch_availdate',
+        20 => 'field_grievance_shop',
         21 => 'field_sirius_dispatch_dncs',
         23 => 'field_sirius_industry',
-        27 => 'field_sirius_dispatch_medium',
-        28 => 'field_sirius_dispatch_asi',
-        30 => 'field_sirius_dispatch_sib_status',
-        31 => 'field_sirius_dispatch_cbn',
-        32 => 'field_sirius_skills_avail',
-        33 => 'field_sirius_skills_availx',
-        34 => 'field_grievance_departments',
-        35 => 'field_sirius_dispatch_dncs2',
-        36 => 'field_sirius_dispatch_hfe',
-        37 => 'field_sirius_dispatch_hfe_until',
-        38 => 'field_sirius_aat_required',
-        39 => 'field_sirius_dispatch_eba',
-        40 => 'field_sirius_dispatch_eba_dates',
+        26 => 'field_sirius_denorm_benefits',
+        29 => 'field_sirius_dispatch_medium',
+        30 => 'field_sirius_dispatch_asi',
+        32 => 'field_sirius_dispatch_sib_status',
+        33 => 'field_sirius_dispatch_cbn',
+        34 => 'field_sirius_skills_avail',
+        35 => 'field_sirius_skills_availx',
+        36 => 'field_grievance_departments',
+        37 => 'field_sirius_dispatch_dncs2',
+        38 => 'field_sirius_dispatch_hfe',
+        39 => 'field_sirius_dispatch_hfe_until',
+        40 => 'field_sirius_aat_required',
+        41 => 'field_sirius_dispatch_eba',
+        42 => 'field_sirius_dispatch_eba_dates',
       ),
       'header' => array(
-        29 => 'field_sirius_headshot',
+        31 => 'field_sirius_headshot',
       ),
     ),
     'fields' => array(
       'grievance_timeline' => 'above_left',
+      'custom_fields' => 'middle',
       'group_sirius_worker_identity' => 'above_left',
-      'field_sirius_name' => 'above_left',
       'group_sirius_worker_status' => 'above_right',
+      'field_sirius_name' => 'above_left',
       'field_sirius_id' => 'above_left',
       'group_sirius_worker_contact' => 'above_left',
       'field_sirius_ssn' => 'above_left',
@@ -2040,11 +2090,12 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_sirius_worker_dispstatus' => 'above_right',
       'field_sirius_dispatch_availdate' => 'above_right',
       'field_grievance_shop' => 'above_right',
-      'field_sirius_phone' => 'above_left',
       'field_sirius_dispatch_dncs' => 'above_right',
-      'field_sirius_phone_alt' => 'above_left',
+      'field_sirius_phone' => 'above_left',
       'field_sirius_industry' => 'above_right',
+      'field_sirius_phone_alt' => 'above_left',
       'field_sirius_phone_fax' => 'above_left',
+      'field_sirius_denorm_benefits' => 'above_right',
       'field_sirius_email' => 'above_left',
       'field_sirius_address' => 'above_left',
       'field_sirius_dispatch_medium' => 'above_right',

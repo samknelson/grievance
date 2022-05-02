@@ -22,6 +22,17 @@ function sirius_quickactions_render() {
 				)
 			);
 		}
+
+		if (user_access('sirius bookmark')) {
+			if (in_array($node->type, sirius_bookmark_types())) {
+				sirius_quickactions_add(
+					array(
+						'flag' => 'bookmarks',
+						'nid' => $node->nid,
+					)
+				);
+			}
+		}
 	}
 
 	$links = sirius_quickactions_add();
@@ -37,7 +48,11 @@ function sirius_quickactions_render() {
 
 function sirius_sirius_quickaction_render($link) {
   $markup = '<li><span class="sirius_quickaction_link_wrapper">';
-  $markup .= l('<span class="sirius_quickaction_link_inner">&neArr; ' . $link['title'] . '</span>', $link['path'], array('html' => TRUE, 'attributes' => array('class' => array('sirius_quickaction_link'))));
+	if ($link['flag']) {
+		$markup .= flag_create_link($link['flag'], $link['nid']);
+	} else {
+	  $markup .= l('<span class="sirius_quickaction_link_inner">&neArr; ' . $link['title'] . '</span>', $link['path'], array('html' => TRUE, 'attributes' => array('class' => array('sirius_quickaction_link'))));
+	}
   $markup .= '</span></li>';
   return $markup;
 }
@@ -58,6 +73,10 @@ function sirius_backlinks_render() {
 
 	$term = menu_get_object('taxonomy_term', 2);
 	if ($term && is_object($term)) { $links += sirius_backlinks_from_term($term); }
+
+	if ($_GET['destination']) {
+		$links[$_GET['destination']] = array('name' => 'Cancel');
+	}
 
 	if (!$links) { return; }
 
@@ -104,7 +123,15 @@ function sirius_backlinks_from_node($node) {
 		if ($path) { $links[$path] = array('name' => 'Worker', 'title' => sirius_backlink_title($worker_nid)); }
 	}
 
+	$subscriber_nid = $node->field_sirius_trust_subscriber['und'][0]['target_id'];
+	if ($subscriber_nid) {
+		$links["node/$subscriber_nid"] = array('name' => 'Subscriber', 'title' => sirius_backlink_title($subscriber_nid));
+	}
+
 	if ($node->type == 'sirius_operator') { $links['sirius/office/operator/list'] = array('name' => 'Operator List'); }
+	if ($node->type == 'sirius_phonenumber') { $links['sirius/phonenumber'] = array('name' => 'Phone Number List'); }
+	if ($node->type == 'sirius_trust_benefit') { $links['sirius/trust/benefits'] = array('name' => 'Benefit List'); }
+	if ($node->type == 'grievance_contract_template') { $links['grievance/admin/contract-templates'] = array('name' => 'Contract List'); }
 
 	if ($node->type == 'sirius_feed') {
 		$feed_type = $node->field_sirius_type['und'][0]['value'];
@@ -193,6 +220,15 @@ function sirius_backlinks_from_node($node) {
 				$links[$path] = array('name' => $name, 'title' => $hr['title']);
 			}
 		}
+	}
+
+	if ($node->type == 'sirius_json_definition') {
+		$definition_type = $node->field_sirius_type['und'][0]['value'];
+		if ($definition_type == 'sirius_event:catalog')	{ $links['sirius/event/catalog/list'] = array('name' => 'All Catalogs'); }
+	}
+
+	if ($node->type == 'grievance_basic_page') {
+		$links['grievance/admin/basic-pages'] = array('name' => 'All Basic Pages');
 	}
 
 	drupal_alter('sirius_backlinks_from_node', $links, $node);

@@ -41,6 +41,15 @@ function sirius_log_buckets() {
 				'can_add' => TRUE,
 			),
 
+			'sirius_phonenumber' => array(
+				'title' => 'Log',
+				'content_type' => 'sirius_phonenumber',
+				'permissions' => array('sirius domain admin'),
+				'path' => 'sirius_phonenumber_log',
+				'weight' => 20,
+				'can_add' => TRUE,
+			),
+
 			'shop' => array(
 				'title' => 'Log',
 				'content_type' => 'grievance_shop',
@@ -80,7 +89,7 @@ function sirius_log_buckets() {
 			'worker' => array(
 				'title' => 'Log',
 				'content_type' => 'sirius_worker',
-				'permissions' => array('sirius dispatch staff'),
+				'permissions' => array('sirius worker admin'),
 				'path' => 'sirius_worker_log',
 				'weight' => 20,
 				'can_add' => TRUE,

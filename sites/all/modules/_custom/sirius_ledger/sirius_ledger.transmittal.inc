@@ -99,6 +99,8 @@ function sirius_ledger_transmittal_dispatches($employer_nid) {
 	$sql .= "and field_grievance_shop_target_id = :employer_nid ";
 	$sql_args[':employer_nid'] = $employer_nid;
 	$sql .= "and field_sirius_dispatch_status_value in ('accepted', 'accepted_secondary') ";
+  $sql .= "and worker_node.nid is not null ";
+  $sql .= "and field_sirius_contact_target_id is not null ";
 	$sql .= "group by worker_node.nid ";
 	$sql .= "order by field_sirius_name_family, field_sirius_name_given ";
 

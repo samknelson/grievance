@@ -78,7 +78,11 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 		    )
 			);
 		} catch (Exception $e) {
-			$result = array('success' => FALSE, 'msg' => "SMS message failed.", 'details' => "Failed to send message [$msg]: " . $e->getCode() . ' - ' . $e->getMessage());
+			$result = array(
+				'success' => FALSE, 
+				'msg' => "SMS message failed.", 'details' => "Failed to send message [$msg]: " . $e->getCode() . ' - ' . $e->getMessage(),
+				'code' => $e->getCode()
+			);
 			$msg =  $e->getCode() . ' - ' . $e->getMessage() . ": " . $msg;
 			sirius_log('twilio:conversation', 'error', $msg, $msg, $phone, array($handler_nid));
 		}

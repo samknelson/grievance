@@ -124,13 +124,6 @@ function grievance_xnode_tabs() {
 		'permissions' => array('grievance contract'),
 	);
 
-	$node_tabs['grievance_contract_template']['notifications'] = array(
-		'title' => 'Notifications',
-		'description' => '',
-		'callback' => 'grievance_contract_template_node_tab_notifications',
-		'permissions' => array('grievance contract'),
-	);
-
 	$node_tabs['grievance_contract_template']['sections'] = array(
 		'title' => 'Articles',
 		'description' => '',
@@ -642,7 +635,7 @@ function grievance_menu() {
 		'description' => '',
 		'page callback' => 'grievance_report_open_summary_with_log',
 		'page arguments' => array(),
-		'access arguments' => array('grievance report'),
+		'access arguments' => array('grievance report open summary with log'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 

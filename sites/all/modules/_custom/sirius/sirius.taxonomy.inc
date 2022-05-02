@@ -260,6 +260,9 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_contact_tags']['view'] = 'sirius_taxonomy';
     $settings['sirius_contact_tags']['display'] = 'block';
     $settings['sirius_contact_tags']['multidomain'] = 'Yes';
+    $settings['sirius_contact_relationship_types']['view'] = 'sirius_taxonomy';
+    $settings['sirius_contact_relationship_types']['display'] = 'block_12';
+    $settings['sirius_contact_relationship_types']['multidomain'] = 'Yes';
     $settings['sirius_dispatch_job_tags']['view'] = 'sirius_taxonomy';
     $settings['sirius_dispatch_job_tags']['display'] = 'block_3';
     $settings['sirius_dispatch_job_tags']['multidomain'] = 'No';
@@ -276,7 +279,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_event_participant_status']['display'] = 'block_9';
     $settings['sirius_event_participant_status']['multidomain'] = 'Yes';
     $settings['sirius_event_type']['view'] = 'sirius_taxonomy';
-    $settings['sirius_event_type']['display'] = 'block';
+    $settings['sirius_event_type']['display'] = 'block_13';
     $settings['sirius_event_type']['multidomain'] = 'Yes';
     $settings['sirius_gender']['view'] = 'sirius_taxonomy';
     $settings['sirius_gender']['display'] = 'block';
@@ -309,6 +312,9 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_worker_tor_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_worker_tor_type']['display'] = 'block_11';
     $settings['sirius_worker_tor_type']['multidomain'] = 'Yes';
+    $settings['sirius_trust_benefit_type']['view'] = 'sirius_taxonomy';
+    $settings['sirius_trust_benefit_type']['display'] = 'block';
+    $settings['sirius_trust_benefit_type']['multidomain'] = 'Yes';
   }
 
   if ($vocabulary_machine_name == 'all') { return $settings; }

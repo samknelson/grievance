@@ -1,0 +1,371 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.install";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.menu.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.relationships.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.actor.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.blocks.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.permission.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.quicksearch.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.acquire_local.inc";
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.import.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.export.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.fairhotel.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.airports.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.casino.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.amenities.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.contract.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.report_changed_status.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.oneoffs.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_property.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_airport.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_convention.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_actor.inc";
+
+
+/**
+ * Implements hook_menu_alter
+ */
+
+function unite_menu_alter(&$items) {
+	if ($items['node/%node/revisions']) {
+		$items['node/%node/revisions']['weight'] = 99;
+	}
+}
+
+/***
+ * Implements hook_sirius_wizard_info()
+ */
+
+function unite_sirius_wizard_info() {
+  $items = array();
+
+  // $items += sirius_ledger_feed_charges_info();
+  $items += unite_feed_property_info();
+  $items += unite_feed_airport_info();
+  $items += unite_feed_convention_info();
+  $items += unite_feed_actor_info();
+
+  return $items;
+}
+
+/**
+ * Implements hook_node_presave()
+ */
+
+function unite_node_presave($node) {
+	if ($node->type == 'property') {
+		unite_zip_to_msa($node);
+		unite_calc_distances($node);
+	}
+	if ($node->type == 'property_actor') {
+		unite_relationship_node_presave($node);
+	}
+	if ($node->type == 'actor') {
+		unite_actor_node_presave($node);
+	}
+}
+
+function unite_calc_distances($property_node) {
+	$calc_fields = array(
+		'field_airport' => 'field_calc_airport_dist', 
+		'field_airport_alt' => 'field_calc_airport_dist_alt',
+		'field_convention_center' => 'field_calc_convention_dist'
+	);
+
+	foreach ($calc_fields as $source_field => $target_field) {
+		$other_node = node_load($property_node->{$source_field}['und'][0]['target_id']);
+		$lat1 = $property_node->field_address_geofield['und'][0]['lat'];
+		$lon1 = $property_node->field_address_geofield['und'][0]['lon'];
+
+		$lat2 = $other_node->field_address_geofield['und'][0]['lat'];
+		$lon2 = $other_node->field_address_geofield['und'][0]['lon'];
+
+		if (isset($lat1) && isset($lat2)) {
+			$property_node->{$target_field}['und'][0]['value'] = sirius_addr_latlon_distance($lat1, $lon1, $lat2, $lon2);
+		} else {
+			unset($property_node->{$target_field}['und']);
+		}
+	}
+}
+
+
+function unite_zip_to_msa($node) {
+	$zip = $node->field_address['und'][0]['postal_code'];
+	$msa = $node->field_msa['und'][0]['tid'];
+	
+	if ($msa) { return; }
+	if (!$zip) { return; }
+	
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'node');
+	$query->entityCondition('bundle', 'zip_to_msa');
+	$query->fieldCondition('field_zip', 'value', $zip);
+	$result = $query->execute();
+	if (!$result['node']) { return; }
+	
+	$tmp = array_keys($result['node']);
+	$lookup_nid = array_shift($tmp);
+	$lookup_node = node_load($lookup_nid);
+	
+	$msa = $lookup_node->field_msa['und'][0]['tid'];
+	$node->field_msa['und'][0]['tid'] = $msa;
+}
+
+function unite_admin($form, &$form_state) {
+  $form = array();
+	
+  $html = '<p>';
+  $html .= 'In the field below, indicate which IP addresses should have access to the export feed,  ';
+ 	$html .= l('located here.', 'unite/export/union-hotel-guide', array('attributes' => array('target' => '_blank'), 'query' => array('secs' => 15000, 'onscreen' => TRUE)));
+ 	$html .= '</p>';
+ 	$html .= sirius_ip_rawrange_helptext(variable_get('unite_export_ip_allowlist'));
+ 	$form['unite_export_ip_intro'] = array('#markup' => $html);
+
+  $form['unite_export_ip_allowlist'] = array(
+  	'#title' => t('Export Feed IP Allowlist'),
+  	'#type' => 'textarea',
+    '#default_value' => variable_get('unite_export_ip_allowlist', ''),
+  );
+
+  return system_settings_form($form);
+}
+
+function unite_admin_validate($form, &$form_state) {
+	$result = sirius_ip_rawrange_validate($form_state['values']['unite_export_ip_allowlist']);
+	if (!$result['success']) { form_set_error('unite_export_ip_allowlist', $result['msg']); }
+}
+
+function unite_node_tab_local_properties($node) {
+	drupal_set_title($node->title . ': ' . t('Properties'));
+	$result = views_embed_view('properties_search_local','block', $node->nid);
+	return $result;
+}
+
+function unite_node_tab_local_contracts($node) {
+	drupal_set_title($node->title . ': ' . t('Contracts'));
+	$result = views_embed_view('contract_search_local','block', $node->nid);
+	return $result;
+}
+function unite_node_tab_property_contracts($node) {
+	drupal_set_title($node->title . ': ' . t('Contracts'));
+	$result = views_embed_view('contract_search_property','block', $node->nid);
+	return $result;
+}
+
+/***
+ * Implements hook_form_alter
+ */
+
+function unite_form_alter(&$form, &$form_state, $form_id) {
+	if (preg_match('/node_form$/', $form_id)) {
+	  // Set default values for entity fields with autocomplete widgets
+	  $defaultable_fields = array('property', 'actor');
+	  foreach ($defaultable_fields as $field) {
+	    if (isset($_GET[$field]) && isset($form['field_' . $field])) {
+	      $nid = $_GET[$field];
+	      $entity_title = sirius_node_title($nid);
+	      if ($entity_title) {
+	        $form['field_' . $field]["und"][0]['target_id']['#default_value'] = "$entity_title ($nid)";
+	      }
+	    }
+	  }
+	}
+
+	//
+	// Put a copy of buttons at the top
+	//
+	// Incredible kludge note here.  This works in general, but NOT for display-suite-managed forms, which get run after this.
+	// And sometimes put the bottons in a different region, not accessible through hook_form_alter.
+	// So...
+	// For display-suite-managed forms, add a markup field with the contents
+	// <div id="button-copy-destination">&nbsp;</div>
+	// at the top, and run the JavaScript which I put in the theme.  Good lord.
+	//
+	// (We're not using ds-managed forms on this site, so the above is not necessary, but I'm including it in case I ever need to
+	// come back and figure out what's going on.  See the WV theme for the JS.)
+	// 
+	
+	if (preg_match('/node_form$/', $form_id)) {
+		
+		$form["button-copy-wrapper-start"] = array(
+			'#type' => 'markup',
+			'#markup' => '<div class="button-copy-wrapper">',
+			'#weight' => -1100
+		);
+		
+    foreach($form['actions'] as $name => $button) {
+			if (!is_array($button)) { continue; }
+			$form["$name-copy"] = $button;
+			if (isset($button['#weight'])) {
+				$form["$name-copy"]['#weight'] = $button['#weight']-1000;
+			} else {
+				$form["$name-copy"]['#weight'] = -1000;
+			}
+		}
+
+		$form["button-copy-wrapper-end"] = array(
+			'#type' => 'markup',
+			'#markup' => '</div>',
+			'#weight' => -900
+		);
+  }	
+
+  // Hide computed fields
+	if (in_array($form_id, array('property_node_form', 'unite_node_tab_amenities_edit_form'))) {
+		$form['field_relationships']['#access'] = FALSE;
+		$form['field_calc_owner_last_updated']['#access'] = FALSE;
+		$form['field_calc_operator_last_updated']['#access'] = FALSE;
+		$form['field_calc_airport_dist']['#access'] = FALSE;
+		$form['field_calc_airport_dist_alt']['#access'] = FALSE;
+		$form['field_calc_convention_dist']['#access'] = FALSE;
+	}
+
+  // Hide fields from special groups
+	if ($form_id == 'property_node_form') {
+		foreach (unite_casino_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
+		foreach (unite_amenities_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
+		foreach (unite_contract_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
+		foreach (unite_fairhotel_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
+	}
+
+	if ($form_id == 'actor_node_form') {
+		if ($form['field_title_canon']) { $form['field_title_canon']['#access'] = FALSE; }
+	}
+}
+
+function unite_field_group_build_pre_render_alter(&$element) {
+	if ($element['type']['#value'] != 'property_actor') { return; }
+
+	$element['group_ownership']['#states'] = array(
+		'visible' => array(
+  		':input[id="edit-field-relationship-type-und"]' => array(
+  			array('value' => 'Owner'),
+  			array('value' => 'Previous Owner'),
+  		),
+		),
+	);
+	$element['group_ownership']['#id'] = 'group_ownership';
+
+	$element['group_lg']['#states'] = array(
+		'visible' => array(
+  		':input[id="edit-field-relationship-type-und"]' => array(
+  			array('value' => 'Lender'),
+  			array('value' => 'CMBS Trust'),
+  		),
+		),
+	);
+	$element['group_lg']['#id'] = 'group_lg';
+
+	// kpr($element);
+}
+	
+
+
+function unite_cron() {
+	// unite_export_feed_cache();
+}
+
+/**
+ * Implements hook_node_view()
+ */
+
+function unite_node_view($node, $view_mode, $langcode) {
+  // Render the "Relationships" field
+  if ($node->type == 'property' || $node->type == 'actor') {
+  	$node->content['unite_relationships'][0]['#markup'] = unite_relationships_render($node);
+  }
+
+  // Render the "Brand" field
+  if ($node->type == 'property' && $node->content['field_brand']) {
+  	$weight = $node->content['field_brand']['#weight'];
+
+  	$html = '';
+  	$term = taxonomy_term_load($node->field_brand['und'][0]['tid']);
+  	if ($term) {
+			$html .= sirius_fakerender_field('Brand:', $term->name);
+      $renderable = field_view_field('taxonomy_term', $term, 'field_service_level', 'full');
+			$html .= render($renderable);
+  		$parents = taxonomy_get_parents($term->tid);
+	  	if ($parents) {
+	  		foreach ($parents as $parent_tid => $parent_term) {
+	  			$html .= sirius_fakerender_field('Brand Parent:', $parent_term->name);
+	  		}
+	  	}
+	  }
+  	$node->content['field_brand'] = array('#weight' => $weight, '#markup' => $html);
+  }
+
+  // Hide FairHotel fields
+  if ($node->type == 'property') {
+	  // $hide_fields = unite_fairhotel_fields() + unite_casino_fields();
+	  // foreach ($hide_fields as $hide_field) { unset($node->content[$hide_field]); }
+	}
+}
+
+
+/**
+ * Implements hook_sirius_backlinks_from_node()
+ */
+
+function unite_sirius_backlinks_from_node_alter(&$links, $node) {
+	if ($node->type == 'property_actor') {
+		$actor_nid = $node->field_actor['und'][0]['target_id'];
+		if ($actor_nid) {
+			$path = "node/$actor_nid";
+			$links[$path] = array('name' => 'Actor', 'title' => sirius_backlink_title($actor_nid));
+		}
+		$property_nid = $node->field_property['und'][0]['target_id'];
+		if ($property_nid) {
+			$path = "node/$property_nid";
+			$links[$path] = array('name' => 'Property', 'title' => sirius_backlink_title($property_nid));
+		}
+	}
+}
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function unite_sirius_config_links_alter(&$links) {
+	$links = array_merge(array('unite' => array('title' => 'Hotels Database')), $links);
+	$links['unite']['links']['admin/config/unite/core'] = array('title' => 'General Settings', 'description' => 'General settings, including IP address restrictions for the FairHotels feed.');
+	$links['unite']['links']['admin/structure/taxonomy/brand'] = array('title' => 'Brands', 'description' => 'Manage brands, parents and service levels.');
+	$links['unite']['links']['admin/structure/taxonomy/hdb_niche'] = array('title' => 'Niches', 'description' => 'Manage niches: convention, resort, ectended stay, etc.');
+}
+
+function unite_submitted_empty($form_state, $field_name) {
+	$value = $form_state['values'][$field_name]['und'];
+
+	foreach (array('value', 'target_id', 'tid', 'url') as $col) {
+		if (isset($value[0][$col]) && $value[0][$col] !== '') { return FALSE; }
+	}
+
+	return TRUE;
+}
+
+function unite_node_subform($form, &$form_state, $property_node, $fields) {
+	$form_state['property_nid'] = $property_node->nid;
+
+	foreach ($fields as $field) {
+		field_attach_form('node', $property_node, $form, $form_state, NULL, array('field_name' => $field));
+	}
+	unset($form['#groups']);
+	unset($form['#fieldgroups']);
+	unset($form['#group_children']);
+
+	$form['#attributes'] = array('class' => array('unite-node-subform'));
+	drupal_add_css(drupal_get_path('module', 'unite') . '/css/unite.css', 'file');
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+		'#weight' => 1000,
+	);
+
+	return $form;
+}

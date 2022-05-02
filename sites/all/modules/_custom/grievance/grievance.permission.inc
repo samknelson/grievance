@@ -66,6 +66,10 @@ function grievance_permission() {
         'title' => t('Grievance Report Missing Member ID'),
         'description' => t('Permission to view the "grievances with missing Member ID" report.')
     ),
+    'grievance report open summary with log' => array(
+        'title' => t('Grievance Report Open Summary with Log'),
+        'description' => t('Permission to view the "grievances open summary with log" report.')
+    ),
     'grievance bundle' => array(
         'title' => t('Grievance Bundle'),
         'description' => t('Permission to generate and download grievance bundles.')

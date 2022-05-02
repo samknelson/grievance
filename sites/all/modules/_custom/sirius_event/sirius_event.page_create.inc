@@ -6,7 +6,7 @@ function sirius_event_page_create_access($event_type_tid) {
 
   // Check our creation rules
   $event_type_term = taxonomy_term_load($event_type_tid);
-  $event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
+  $event_type_json = sirius_json_get($event_type_term);
 	$rule = sirius_event_paccess_rule_match(NULL, $event_type_json['create']['rules']);
 	if ($rule) { return TRUE; }
 
@@ -72,7 +72,7 @@ function sirius_event_page_create_form($form, &$form_state, $event_type_tid) {
 
 function sirius_event_page_create_form_validate($form, &$form_state) {
 	$ts = strtotime($form_state['values']["start_date"]);
-	if ($ts < time()) { form_set_error('start_date', t('Please choose a date in the future.')); }
+	if ($ts < time()) { form_set_error('start_date', t('Please choose a date in the  future.')); }
 }
 
 function sirius_event_page_create_form_submit($form, &$form_state) {
@@ -82,7 +82,7 @@ function sirius_event_page_create_form_submit($form, &$form_state) {
 	$domain_nid = sirius_domain_nid();
 
   $event_type_term = taxonomy_term_load($event_type_tid);
-  $event_type_json = sirius_jsonfield_util_term_json_get($event_type_term);
+  $event_type_json = sirius_json_get($event_type_term);
 
 	// Create the event node
 	$event_node = new stdClass();
@@ -112,8 +112,12 @@ function sirius_event_page_create_form_submit($form, &$form_state) {
 			$event_json[$key] = $event_type_json[$key];
 		}
 	}
+	if ($event_type_json['customfield'] && $event_type_json['customfield']['sets']) {
+		$set_nids = array_filter(array_values($event_type_json['customfield']['sets']));
+		foreach ($set_nids as $set_nid) { $event_json["customfield_$set_nid"] = $event_type_json["customfield_$set_nid"]; }
+	}
 	if ($event_json) {
-		sirius_jsonfield_util_node_json_set($event_node, $event_json);
+		sirius_json_set($event_node, $event_json);
 	}
 	node_save($event_node);
 	drupal_set_message(t("Created a new event: ") . $event_type_term->name);

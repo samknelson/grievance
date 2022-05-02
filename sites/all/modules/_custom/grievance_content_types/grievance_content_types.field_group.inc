@@ -3131,6 +3131,7 @@ function grievance_content_types_field_group_info() {
       5 => 'field_sirius_dispatch_availdate',
       6 => 'field_sirius_industry',
       7 => 'field_sirius_denorm_level',
+      8 => 'field_sirius_denorm_benefits',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

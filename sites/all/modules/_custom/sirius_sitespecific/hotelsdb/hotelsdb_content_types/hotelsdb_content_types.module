@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Code for the hotelsdb_content_types feature.
+ */
+
+include_once 'hotelsdb_content_types.features.inc';

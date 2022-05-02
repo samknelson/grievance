@@ -223,6 +223,18 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 		'#default_value' => $json['intake']['anonymous']['title'],
 	);
 
+	$form['intake']['anonymous']['require_ssn'] = array(
+		'#type' => 'select',
+		'#title' => t('Require SSN?'),
+		'#description' => t('Should anonymous users be required to submit a valid, unique SSN? Default is "Yes".'),
+		'#default_value' => $json['intake']['anonymous']['require_ssn'],
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+	);
+
   $form['intake']['anonymous']['intro'] = array(
     '#type' => 'text_format',
     '#title' => 'Introductory Text',
@@ -265,6 +277,30 @@ function sirius_event_intake_settings_form($form, &$form_state, $entity_type, $e
 			'#description' => t('E.g. "By signing below, I assert that all the information that I have provided in this application is true and accurate."'),
 	 	);
 	}
+
+  $form['intake']['worker'] = array(
+  	'#type' => 'fieldset',
+  	'#title' => t('Workers'),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,
+		'#description' => t('Settings for the Worker record which is created as part of the intake process.'),
+  );
+
+
+	$id2_info = field_info_instance('node', 'field_sirius_id2', 'sirius_worker');
+	$id2_label = $id2_info['label'];
+
+  $form['intake']['worker']['id2_required'] = array(
+  	'#type' => 'select',
+  	'#title' => $id2_label . ' Required',
+  	'#description' => "Should the field <strong>$id2_label</strong> be required for all newly created workers?",
+  	'#options' => array(
+  		NULL => t('-- Select --'),
+  		'No' => t('No'),
+  		'Yes' => t('Yes'),
+  	),
+  	'#default_value' => $json['intake']['worker']['id2_required'],
+  );
 
   $attachment_types = sirius_materials_document_types('sirius_worker');
   $attachment_options = array();

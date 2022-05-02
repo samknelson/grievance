@@ -1,0 +1,436 @@
+<?php
+
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_STRICT);
+
+/**
+ * Implements hook_block_info().
+ */
+function unite_graphs_block_info() {
+
+  $blocks['unite_graph'] = array(
+    'info' => t('Relationship graph'),
+    'cache' => DRUPAL_NO_CACHE
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_init().
+ */
+function unite_graphs_init() {
+  set_time_limit(2400);
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function unite_graphs_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'unite_graph':
+      $block['subject'] = t('Relationships');
+      $block['content'] = unite_graphs_generate(menu_get_object('node'));
+      break;
+
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function unite_graphs_generate($node, $table_only = false) {
+	// Find the depth
+  if(isset($_GET['depth'])) {
+    $depth = $_GET['depth'];
+  } else {
+    $depth = 1;
+  }
+	
+	// CSV?
+	if ($_GET['csv']) {
+		$csv = 1;
+	}
+
+  $main_nid = $node->nid;
+
+	// This will hold all our relationship data
+  $data = array();
+	
+	// Add the current node
+	$entry = array(
+		'depth' => 0,
+		'entity_1_nid' => $node->nid,
+		'entity_1_title' => $node->title,
+		'entity_1_type' => $node->type,
+		'field_owned_raw' => NULL,
+		'field_percent_owned' => NULL,
+		'field_amount_owned' => NULL,
+		'relationship_type' => NULL,
+		'entity_2_nid' => NULL,
+		'entity_2_title' => NULL,
+		'entity_2_type' => NULL,
+	);
+	$entry = array_merge($entry, unite_graphs_node_as_csv($node));
+	$data = array($entry);
+
+	// Add all children (and parents)
+  _unite_graphs_add_entity_relationships($data, $node, $depth, false, 1, 'both', $table_only);
+	
+	if ($csv) {
+		$filename = 'relationships_' . $node->nid . '_' . $node->title;
+		$filename = preg_replace('/[^a-zA-Z0-9_]/', '_', $filename);
+		$filename = preg_replace('/_+/', '_', $filename);
+		$filename .= '.csv';
+		
+		drupal_add_http_header('Content-Type', 'text/csv');
+		drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
+		
+		$fp = fopen('php://output', 'w');
+		
+		fputcsv($fp, array_keys($data[0]));
+		foreach ($data as $hr) {
+			fputcsv($fp, array_values($hr));
+		}
+		fclose($fp);
+		drupal_exit();
+	}
+	
+	
+	// Render the depth toggle
+  $current_path = $_GET['q'];
+	if (!$table_only) {
+		$output = "<p>";
+		
+		$output .= t('Showing relationships to a depth of @depth', array('@depth' => $depth));
+		$output .= '<br/>';
+		
+		$ts = unite_graphs_date_of_last_sale($node);
+		if ($ts) {
+			$output .= '<strong> - ';
+			$output .= t('Date of last sale: ');
+			$output .= date('Y-m-j', $ts);
+			$output .= "</strong><br>";
+		}
+		
+		$output .= l(t('[expand]'), $current_path, array('query' => array('depth' => $depth+1)));
+		if($depth > 1) {
+			$output .= '&nbsp;'.l(t('[shrink]'), $current_path, array('query' => array('depth' => $depth-1)));
+		}
+		$output .= '&nbsp;'.l(t('[csv export]'), $current_path, array('query' => array('depth' => $depth, 'csv' => 1)));
+		
+		$output .= '</p>';
+	} else {
+		$output = '';
+	}
+
+
+	// Render table data 
+	$output .= unite_graphs_render_table($data, $table_only);
+	
+  return $output;
+}
+
+function unite_graphs_render_table($data, $table_only) {
+	if (!$table_only) {
+		$header = array(
+			'depth' => t('Depth'),
+			'entity_1' => t('Entity 1'),
+			'ownership' => t('Ownership'),
+			'relationship_type' => t('Relationship'),
+			'entity_2' => t('Entity 2'),
+			'rooms' => t('Rooms'),
+			'city' => t('City'),
+			'state' => t('State'),
+			'union_status' => t('Union Status')
+		);
+	} else {
+		$header = array(
+			'depth' => t('Depth'),
+			'entity_1' => t('Entity 1'),
+			'ownership' => t('Ownership'),
+			'relationship_type' => t('Relationship'),
+			'entity_2' => t('Entity 2'),
+			'city' => t('City'),
+			'state' => t('State'),
+		);
+	}
+	
+	$rows = array();
+	foreach ($data as $hr) {
+		if ($table_only && $hr['depth'] == 0) { continue; }
+		
+		$row = array();
+		
+		$row['depth'] = '';
+		for ($i=1; $i<$hr['depth']; ++$i) {
+			$row['depth'] .= '&Rarr;&nbsp;';
+		}
+		$row['depth'] .= $hr['depth'];
+		
+		if ($hr['entity_1_nid']) {
+			$row['entity_1'] = l($hr['entity_1_title'], 'node/' . $hr['entity_1_nid']);
+			if (!$table_only) {
+				$row['entity_1'] .=	' (' . $hr['entity_1_type'] . ')';
+			}
+		} else {
+			$row['entity_1'] = '';
+		}
+		$row['ownership'] = $hr['ownership'];
+		
+		if ($hr['relationship_type']) {
+			$row['relationship_type'] = $hr['relationship_type'] . t(' of ');
+		} else {
+			$row['relationship_type'] = '';
+		}
+		
+		$row['ownership'] = '';		
+		if ($hr['field_owned_raw']) {
+			$row['ownership'] .= $hr['field_owned_raw'];
+		}
+		if ($hr['field_percent_owned'] > 0) {
+			if ($row['ownership']) { $row['ownership'] .= ' / '; }
+			$row['ownership'] .= number_format($hr['field_percent_owned'], 2) . "%";
+		}
+		if ($hr['field_amount_owned'] > 0) {
+			if ($row['ownership']) { $row['ownership'] .= ' / '; }
+			$row['ownership'] .= '$' . number_format($hr['field_amount_owned'], 2);
+		}
+		
+		if ($hr['entity_2_nid']) {
+			$row['entity_2'] = l($hr['entity_2_title'], 'node/' . $hr['entity_2_nid']);
+			if (!$table_only) {
+				$row['entity_2'] .= ' (' . $hr['entity_2_type'] . ')';
+			}
+		} else {
+			$row['entity_2'] = '';
+		}
+		
+		if ($hr['rooms']) {
+			$row['rooms'] = number_format($hr['rooms'], 0);
+		} else {
+			$row['rooms'] = '';
+		}
+		
+		$row['city'] = $hr['city'];
+		$row['state'] = $hr['state'];
+		$row['union_status'] = $hr['union_status'];
+		
+		$rows[] = array_values($row);
+	}
+	
+  return theme('table', array('header' => array_values($header), 'rows' => $rows));
+}
+
+function unite_graphs_node_as_csv($new_node) {
+	$entry = array();
+	
+	$entry['rooms'] = $new_node->field_rooms[LANGUAGE_NONE][0]['value'];
+	$entry['city'] = $new_node->field_address[LANGUAGE_NONE][0]['locality'];
+	$entry['state'] = $new_node->field_address[LANGUAGE_NONE][0]['administrative_area'];
+	
+	$entry['union_status_id'] = $new_node->field_union_status[LANGUAGE_NONE][0]['value'];
+	$field = field_info_field('field_union_status');
+	$values = list_allowed_values($field);
+	$entry['union_status'] = $values[$entry['union_status_id']];
+
+	$entry['brand_tid'] = $new_node->field_brand[LANGUAGE_NONE][0]['tid'];
+	if ($entry['brand_tid']) {
+		$brand_term = taxonomy_term_load($entry['brand_tid']);
+		$entry['brand'] = $brand_term->name;
+	} else {
+		$entry['brand'] = '';
+	}
+	
+	$entry['development_status_id'] = $new_node->field_development_status[LANGUAGE_NONE][0]['value'];
+	$field = field_info_field('field_development_status');
+	$values = list_allowed_values($field);
+	$entry['development_status'] = $values[$entry['development_status_id']];
+
+	$entry['address_administrative_area'] = $new_node->field_address[LANGUAGE_NONE][0]['administrative_area'];
+	$entry['address_sub_administrative_area'] = $new_node->field_address[LANGUAGE_NONE][0]['sub_administrative_area'];
+	$entry['address_locality'] = $new_node->field_address[LANGUAGE_NONE][0]['locality'];
+	$entry['address_postal_code'] = $new_node->field_address[LANGUAGE_NONE][0]['postal_code'];
+	$entry['address_thoroughfare'] = $new_node->field_address[LANGUAGE_NONE][0]['thoroughfare'];
+	$entry['address_premise'] = $new_node->field_address[LANGUAGE_NONE][0]['premise'];
+	$entry['county'] = $new_node->field_county[LANGUAGE_NONE][0]['value'];
+	$entry['neighborhood'] = $new_node->field_neighborhood[LANGUAGE_NONE][0]['value'];
+
+	$entry['msa_tid'] = $new_node->field_msa[LANGUAGE_NONE][0]['tid'];
+	$msa_term = taxonomy_term_load($entry['msa_tid']);
+	if ($msa_term) { 
+		$entry['msa'] = $msa_term->name;
+	} else {
+		$entry['msa'] = '';
+	}
+
+	$entry['meg'] = $new_node->field_meg[LANGUAGE_NONE][0]['value'];
+
+	$entry['on_public_land_id'] = $new_node->field_on_public_land[LANGUAGE_NONE][0]['value'];
+	$field = field_info_field('field_on_public_land');
+	$values = list_allowed_values($field);
+	$entry['on_public_land'] = $values[$entry['on_public_land_id']];
+
+	$entry['is_casino_id'] = $new_node->field_is_casino[LANGUAGE_NONE][0]['value'];
+	$field = field_info_field('field_is_casino');
+	$values = list_allowed_values($field);
+	$entry['is_casino'] = $values[$entry['is_casino_id']];
+
+	$entry['local_nid'] = $new_node->field_local[LANGUAGE_NONE][0]['target_id'];
+	if ($entry['local_nid']) {
+		$local_node = node_load($entry['local_nid']);
+		$entry['local'] = $local_node->title;
+	} else {
+		$entry['local'] = '';
+	}
+
+	$entry['labor_activity_index_id'] = $new_node->field_labor_activity_index[LANGUAGE_NONE][0]['value'];
+	$field = field_info_field('field_labor_activity_index');
+	$values = list_allowed_values($field);
+	$entry['labor_activity_index'] = $values[$entry['labor_activity_index_id']];
+	
+	$entry['boycott_url'] = $new_node->field_boycott_url[LANGUAGE_NONE][0]['url'];
+	$entry['phone'] = $new_node->field_phone[LANGUAGE_NONE][0]['value'];
+	$entry['fax'] = $new_node->field_fax[LANGUAGE_NONE][0]['value'];
+	$entry['url'] = $new_node->field_url[LANGUAGE_NONE][0]['url'];
+	$entry['notes'] = $new_node->field_notes[LANGUAGE_NONE][0]['value'];
+
+	return $entry;
+}
+
+function _unite_graphs_add_entity_relationships(&$data, $node, $target_depth, $show_all = FALSE, $current_depth = 1, $direction = 'both', $table_only = false) {
+  $default_styles = _unite_graphs_default_styles();
+  $actor_styles = _unite_graphs_actor_styles();
+
+  // create an array of the parent relationships on the node
+  $relationships = array();
+
+  // add the parent relationships
+  if($direction != 'child') {
+    if(isset($node->field_relationships[LANGUAGE_NONE])) {
+      foreach($node->field_relationships[LANGUAGE_NONE] as $item) {
+        $fc = field_collection_item_load($item['value']);
+        if($fc->field_actor) {
+          $fc->parent = TRUE;
+          if(!isset($fc->field_actor[LANGUAGE_NONE][0]['entity'])) {
+            $fc->field_actor[LANGUAGE_NONE][0]['entity'] = node_load($fc->field_actor[LANGUAGE_NONE][0]['target_id']);
+          }
+          $relationships[] = $fc;
+        }
+      }
+    }
+  }
+
+  // add the child relationships
+  if($direction != 'parent') {
+    $sql = "SELECT a.entity_id AS fc, r.entity_id AS node FROM field_data_field_actor a LEFT JOIN field_data_field_relationships r ON a.entity_id=r.field_relationships_value WHERE a.field_actor_target_id=:nid && a.entity_type='field_collection_item' && r.entity_type='node';";
+    $result = db_query($sql, array(':nid' => $node->nid));
+    foreach($result as $item) {
+      $fc = field_collection_item_load($item->fc);
+      $fc->child = node_load($item->node);
+      $fc->parent = FALSE;
+      $relationships[] = $fc;
+    }
+  }
+
+  usort($relationships, '_unite_graphs_sort_relationships');
+
+	if ($table_only) {
+	  $exclude_types = array();
+	} else {
+	  $exclude_types = array('Previous Operator', 'Previous Owner');
+	}
+
+  foreach($relationships as $relationship) {
+
+    if($relationship->parent) {
+      $new_node = $relationship->field_actor[LANGUAGE_NONE][0]['entity'];
+    } else {
+      $new_node = $relationship->child;
+    }
+    $type = $relationship->field_relationship_type[LANGUAGE_NONE][0]['value'];
+
+    if(in_array($type, $exclude_types)) { continue; }
+
+    $is_new = FALSE;
+
+    // create new gv edge for the relationship
+    if($new_node->nid == $node->nid) {
+      continue;
+    }
+		
+    if($relationship->parent) {
+			$entry = array(
+				'depth' => $current_depth,
+				'entity_2_nid' => $node->nid,
+				'entity_2_title' => $node->title,
+				'entity_2_type' => $node->type,
+				'entity_1_nid' => $new_node->nid,
+				'entity_1_title' => $new_node->title,
+				'entity_1_type' => $new_node->type,
+			);
+		} else {
+			$entry = array(
+				'depth' => $current_depth,
+				'entity_1_nid' => $node->nid,
+				'entity_1_title' => $node->title,
+				'entity_1_type' => $node->type,
+				'entity_2_nid' => $new_node->nid,
+				'entity_2_title' => $new_node->title,
+				'entity_2_type' => $new_node->type,
+			);
+		}
+			
+		$entry['field_owned_raw'] = $relationship->field_owned_raw[LANGUAGE_NONE][0]['value'];
+		$entry['field_percent_owned'] = $relationship->field_percent_owned[LANGUAGE_NONE][0]['value'];
+		$entry['field_amount_owned'] = $relationship->field_amount_owned[LANGUAGE_NONE][0]['value'];
+		$entry['relationship_type'] = $relationship->field_relationship_type[LANGUAGE_NONE][0]['value'];
+		
+		$entry = array_merge($entry, unite_graphs_node_as_csv($new_node));
+		
+		$data[] = $entry;
+		
+    // go deeper if we should
+    if($is_new) {
+      if($current_depth < $target_depth) {
+        if($show_all) {
+          $direction = 'both';
+        } elseif($relationship->parent) {
+          $direction = 'parent';
+        } else {
+          $direction = 'child';
+        }
+				_unite_graphs_add_entity_relationships($gv, $data, $new_node, $target_depth, $show_all, $current_depth+1, $direction, $table_only);
+      }
+    }
+
+  }
+}
+
+function _unite_graphs_sort_relationships($a, $b) {
+  $order = array('Operator', 'Owner', 'Leaseholder', 'Lender', 'Previous Operator', 'Previous Owner', 'Loan Servicer', 'Landowner', 'Land Leaseholder', 'Developer');
+  return array_search($a->field_relationship_type[LANGUAGE_NONE][0]['value'], $order) > array_search($b->field_relationship_type[LANGUAGE_NONE][0]['value'], $order);
+}
+
+// “Date of Last Sale” should be the most recent acquisition date for any owner or previous owner-type relationship
+function unite_graphs_date_of_last_sale($node) {
+	if (!isset($node->field_relationships[LANGUAGE_NONE])) { return; }
+	
+	$relationship_types = array(
+		'Owner', 
+		'Previous Owner'
+	);
+	$most_recent = 0;
+	foreach($node->field_relationships[LANGUAGE_NONE] as $item) {
+		$fc = field_collection_item_load($item['value']);
+		$relationship_type = $fc->field_relationship_type[LANGUAGE_NONE][0]['value'];
+		if (!in_array($relationship_type, $relationship_types)) { continue; }
+		if (!$fc->field_start_date[LANGUAGE_NONE][0]['value']) { continue; }
+		$t = strtotime($fc->field_start_date[LANGUAGE_NONE][0]['value']);
+		if ($t > $most_recent) { $most_recent = $t; }
+	}
+	
+	return $most_recent;
+}

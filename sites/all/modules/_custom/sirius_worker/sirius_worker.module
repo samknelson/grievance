@@ -343,7 +343,35 @@ function sirius_worker_report_cache_info() {
  */
 
 function sirius_worker_node_view($node, $view_mode, $langcode) {
-  return sirius_worker_ein_node_view($node, $view_mode, $langcode);
+  if ($node->type != 'sirius_worker') { return; }
+  sirius_worker_ein_node_view($node, $view_mode, $langcode);
+  sirius_worker_customfields_node_view($node, $view_mode, $langcode);
+}
+
+function sirius_worker_customfields_node_view($worker_node, $view_mode, $langcode) {
+  if ($worker_node->type != 'sirius_worker') { return; }
+  if (!$worker_node->content['custom_fields']) { return; }
+
+  $which = 'default';
+
+  $contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+  if (!$contact_node) { $worker_node->content['custom_fields']['#access'] = FALSE; return; }
+
+  $contact_definition_json = sirius_contact_definition();
+  $contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, $which);
+  $contact_json = sirius_jsonfield_util_node_json_get($contact_node);
+  $contact_results = sirius_jsonfield_util_results_get($contact_json, $which);
+  if (!$contact_results) { $worker_node->content['custom_fields']['#access'] = FALSE; return; }
+
+  sirius_jsonfield_util_set_defaults($contact_definition_form, $contact_results);
+
+  $options = array();
+  $options['fieldsets'] = TRUE;
+  $options['skip_empty'] = TRUE;
+  $html = sirius_jsonfield_util_render_all_values_new($contact_definition_form, $contact_results, $options);
+  if (!$html) { $worker_node->content['custom_fields']['#access'] = FALSE; return; }
+
+  $worker_node->content['custom_fields'][0]['#markup'] = $html;
 }
 
 /**
