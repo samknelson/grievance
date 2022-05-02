@@ -72,7 +72,7 @@ function sirius_service_menu() {
 }
 
 function sirius_service_page_config_access($which) {
-  if (!sirius_domain_nid()) { return FALSE; }
+  // if (!sirius_domain_nid()) { return FALSE; }
   if (!user_access('sirius service admin')) { return FALSE; }
   if (!sirius_domain_component_enabled('service')) { return FALSE; }
 
