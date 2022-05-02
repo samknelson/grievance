@@ -38,7 +38,6 @@ function sirius_page_config() {
 	$links['employer'] = array('title' => 'Employer');
 	$links['employer']['links']['sirius/employer/config/usermanage'] = array('title' => 'Employer User Manager', 'description' => 'Configure tools for allowing employers to manage their own users.');
 
-
 	$links['grievance'] = array('title' => 'Grievance');
 	$links['grievance']['links']['admin/config/grievance/core'] 	= array('title' => 'Grievance Settings', 'description' => 'Configure the grievance module.');
 	$links['grievance']['links']['grievance/admin/statuses/sequences'] = array('title' => 'Status Sequences', 'description' => 'Configure the sequences of statuses that constrain timelines.');
@@ -101,7 +100,7 @@ function sirius_page_config() {
 
 	$html .= '<tr>';
 	$html .= '<th>' . t('Feature') . '</th>';
-	$html .= '<th>' . t('Description') . '</th>';
+	// $html .= '<th>' . t('Description') . '</th>';
 	$html .= '<th colspan="2">' . t('Tools') . '</th>';
 	$html .= '</tr>';
 
@@ -123,8 +122,8 @@ function sirius_page_config() {
 				}
 
 				$category_html .= '<tr>';
-				$category_html .= '<td>' . $link['title'] . '</td>';
-				$category_html .= '<td>' . $link['description'] . '</td>';
+				$category_html .= '<td>' . sirius_tooltip_render($link['description'], $link['title']) . '</td>';
+				// $category_html .= '<td>' . $link['description'] . '</td>';
 				$category_html .= '<td>' . l('Manage', $path, array('attributes' => array('class' => array('tool-button')))) . '</td>';
 				$category_html .= '<td>';
 				if ($category['links'][$path]['sub_paths']) {
