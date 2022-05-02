@@ -56,16 +56,17 @@ function sirius_teamsters631_server_switch_arrive() {
 	global $user;
 
 	// TESTING ONLY: If I'm already logged in but with the wrong domain, log me out.
+	/*
 	$user_full = user_load($user->uid);
 	$user_domain_nid = $user_full->field_sirius_domain['und'][0]['target_id'];
 	if ($user && $user->uid && $user_domain_nid && ($user_domain_nid != $which_new_nid)) {
 	  module_invoke_all('user_logout', $user);
-	  drupal_session_regenerate();
 	  $user = NULL;
 	}
 
 	// TESTING ONLY: Switch into the new domain
 	sirius_domain($which_new_nid);
+	*/
 
 	// If I'm already logged in to the new domain, just continue
 	if ($user && $user->uid) { return sirius_teamsters631_switch_redirect('Already logged in.'); }
@@ -87,6 +88,8 @@ function sirius_teamsters631_server_switch_arrive() {
 	if (!$result['data']) { return sirius_teamsters631_switch_redirect('Login failed.'); }
 
 	// Login as the new worker
+  drupal_session_regenerate();
+  global $user;
 	$new_user = user_load($new_uid);
   $user = $new_user;
   $edit = array(); // Passed by reference.
