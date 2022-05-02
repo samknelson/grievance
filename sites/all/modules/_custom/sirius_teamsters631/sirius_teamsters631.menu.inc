@@ -57,5 +57,57 @@ function sirius_teamsters631_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['teamsters631/skills-correct'] = array(
+    'title' => 'Skill Correction Tool',
+    'description' => '',
+    'access arguments' => array('sirius training admin'),
+    'page callback' => 'sirius_teamsters631_oneoff_skills_correct',
+    'page arguments' => array(''),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_teamsters631.oneoff_skills_correct.inc',
+  );
+
+  $items['teamsters631/skills-correct/muiltiadd'] = array(
+    'title' => 'Multiply-Added Skills',
+    'description' => '',
+    'access arguments' => array('sirius training admin'),
+    'page callback' => 'sirius_teamsters631_oneoff_skills_correct',
+    'page arguments' => array(3),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'sirius_teamsters631.oneoff_skills_correct.inc',
+    'weight' => 1,
+  );
+
+  $items['teamsters631/skills-correct/osha'] = array(
+    'title' => 'OSHA Expiration Date',
+    'description' => '',
+    'access arguments' => array('sirius training admin'),
+    'page callback' => 'sirius_teamsters631_oneoff_skills_correct_osha',
+    'page arguments' => array(),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'sirius_teamsters631.oneoff_skills_correct_osha.inc',
+    'weight' => 2,
+  );
+
+  $items['teamsters631/switch/leave'] = array(
+    'title' => 'Site Switch - Leave',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_teamsters631_server_switch_leave',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_teamsters631.server_switch.inc',
+  );
+
+  $items['teamsters631/switch/arrive'] = array(
+    'title' => 'Site Switch - Arrive',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_teamsters631_server_switch_arrive',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_teamsters631.server_switch.inc',
+  );
+
   return $items;
 }
