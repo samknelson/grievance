@@ -58,9 +58,6 @@ if (at_sirius_is_popup()) {
       <div class="container">
         <?php print sirius_banner_render(); ?>
         <?php print render($page['banner']); ?>
-        <!--
-        <a href="/"><img src="/sites/all/themes/at_tf_admin/images/banner.png" alt="UNITE HERE Local 100 Grievances Database" border="0" style="height: auto; max-width: 960px; width: 100%;" /></a>
-        -->
       </div>
     </div>
 

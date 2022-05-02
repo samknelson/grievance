@@ -540,7 +540,7 @@ function hotelsdb_content_types_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '-5',
+          'weight' => '0',
         ),
         'path' => array(
           'weight' => '30',

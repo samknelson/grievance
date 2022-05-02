@@ -50,6 +50,10 @@ function unite_feed_property_info() {
         'hotel_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
         'rest_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
         'union_status' => array('group' => 'contract', 'type' => 'list'),
+        'hotel_contract_start_date' => array('group' => 'contract', 'type' => 'date'),
+        'hotel_contract_end_date' => array('group' => 'contract', 'type' => 'date'),
+        'rest_contract_start_date' => array('group' => 'contract', 'type' => 'date'),
+        'rest_contract_end_date' => array('group' => 'contract', 'type' => 'date'),
 
         'airport' => array('group' => 'airport', 'type' => 'entity_reference', 'entity_type' => 'hdb_airport'),
         'airport_alt' => array('group' => 'airport', 'type' => 'entity_reference', 'entity_type' => 'hdb_airport'),
@@ -76,11 +80,14 @@ function unite_feed_property_info() {
         'csno_online' => array('group' => 'casino', 'type' => 'list'),
         'csno_regulator' => array('group' => 'casino', 'type' => 'text'),
         'csno_source' => array('group' => 'casino', 'type' => 'long'),
+        'csno_slots_date' => array('group' => 'casino', 'type' => 'date'),
+        'csno_tables_date' => array('group' => 'casino', 'type' => 'date'),
 
         'labor_activity_index' => array('group' => 'fairhotel', 'type' => 'list'),
         'fh_notes' => array('group' => 'fairhotel', 'type' => 'long'),
         'fh_nonunion' => array('group' => 'fairhotel', 'type' => 'long'),
         'fh_sources' => array('group' => 'fairhotel', 'type' => 'long'),
+        'fh_last_updated' => array('group' => 'fairhotel', 'type' => 'date'),
      ),
       'batch_size' => 10,
       'callback_row_verify' => 'unite_feed_property_row_verify',
@@ -169,6 +176,12 @@ function unite_feed_property_handle_list($field_name, $value) {
   return NULL;
 }
 
+function unite_feed_property_handle_date($field_name, $value) {
+  $ts = strtotime($value);
+  if (!$ts) { return NULL; }
+  return gmdate('Y-m-d', $ts);
+}
+
 function unite_feed_property_handle_entity_reference($entity_type, $value) {
   $sql = "select min(nid) as mn, max(nid) as mx from node ";
   $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
@@ -215,6 +228,13 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
     if ($field_info['type'] == 'term_reference') {
       $value = sirius_taxonomy_lookup_by_anything($field_info['taxonomy'], $row[$field_name]);
       if (!$value) { return array('success' => FALSE, 'msg' => "$field_name must be one of the values in the taxonomy: $field_info[taxonomy]."); }
+      $row[$field_name] = $value;
+    }
+
+    // Validate date
+    if ($field_info['type'] == 'date') {
+      $value = unite_feed_property_handle_date($field_name, $row[$field_name]);
+      if (!$value) { return array('success' => FALSE, 'msg' => "$field_name does not look like a valid date."); }
       $row[$field_name] = $value;
     }
   }
@@ -276,7 +296,7 @@ function unite_feed_property_row_process($feed_node, $info, $data, $row) {
 
   foreach ($info['feed']['fields'] as $field_name => $field_info) {
     if ($row[$field_name]) {
-      if (in_array($field_info['type'], array('integer', 'list', 'text', 'long'))) {
+      if (in_array($field_info['type'], array('integer', 'list', 'text', 'long', 'date'))) {
         $property_node->{"field_$field_name"}['und'][0]['value'] = $row[$field_name];
       }
       if ($field_info['type'] == 'term_reference') {

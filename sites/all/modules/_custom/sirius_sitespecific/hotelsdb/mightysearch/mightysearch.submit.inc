@@ -40,9 +40,9 @@ function mightysearch_makecondition_anyactor($op, $value) {
 		if ($op == 'like') {
 			$condition->condition($aliased_field, '%' . $value . '%', $op);
 		} else if ($op == 'starts_with') {
-			$condition->condition($aliased_field, $value . '%', $op);
+			$condition->condition($aliased_field, $value . '%', 'like');
 		} else if ($op == 'ends_with') {
-			$condition->condition($aliased_field, '%' . $value, $op);
+			$condition->condition($aliased_field, '%' . $value, 'like');
 		} else if ($op == 'empty') {
 			$condition->isNull($aliased_field);
 		} else if ($op == 'not_empty') {
@@ -100,9 +100,9 @@ function mightysearch_makecondition($tree, &$query, &$already_joined, $schema) {
 			if ($op == 'like') {
 				$condition->condition($aliased_field, '%' . $value . '%', $op);
 			} else if ($op == 'starts_with') {
-				$condition->condition($aliased_field, $value . '%', $op);
+				$condition->condition($aliased_field, $value . '%', 'like');
 			} else if ($op == 'ends_with') {
-				$condition->condition($aliased_field, '%' . $value, $op);
+				$condition->condition($aliased_field, '%' . $value, 'like');
 			} else if ($op == 'empty') {
 				$condition->isNull($aliased_field);
 			} else if ($op == 'not_empty') {
@@ -124,22 +124,10 @@ function mightysearch_search_form_submit($form, &$form_state) {
 	$output = $form_state['values']['output'];
 
 	/////////////////////////////////////////
-	// Save or Load
+	// Save
 	/////////////////////////////////////////
 	
-	if ($form_state['values']['load_from']) {
-		//
-		// Load
-		//
-		
-		$nid = $form_state['values']['load_from'];
-		$node = node_load($nid);
-		$body = $node->field_search_body['und'][0]['value'];
-		$form_state['values'] = unserialize($body);
-		$form_state['input'] = $form_state['values'];
-		
-		drupal_set_message("Loaded from: " . $node->title);
-	} else if ($form_state['values']['save_as']) {
+	if ($form_state['values']['save_as']) {
 		//
 		// Save
 		//
@@ -149,8 +137,9 @@ function mightysearch_search_form_submit($form, &$form_state) {
 
 		$query = new EntityFieldQuery();
 		$query->entityCondition('entity_type', 'node');
-		$query->entityCondition('bundle', 'saved_search');
+		$query->entityCondition('bundle', 'sirius_json_definition');
 		$query->propertyCondition('title', $title);
+		$query->fieldCondition('field_sirius_type', 'value', 'mightysearch:saved_search');
 		$result = $query->execute();
 		if ($result['node']) { 
 			$tmp = array_keys($result['node']);
@@ -158,13 +147,17 @@ function mightysearch_search_form_submit($form, &$form_state) {
 			$node = node_load($nid);
 		} else {
 			$node = new stdClass();
-			$node->type = "saved_search";
+			$node->type = "sirius_json_definition";
+			$node->field_sirius_type['und'][0]['value'] = 'mightysearch:saved_search';
 			$node->language = LANGUAGE_NONE;
 			node_object_prepare($node);
 		}
 		
 		$node->title = $title;
-		$node->field_search_body['und'][0]['value'] = serialize($form_state['values']);
+
+		$json = sirius_json_get($node);
+		$json['search']['values'] = $form_state['values'];
+		sirius_json_set($node, $json);
 		$node = node_submit($node);
 		node_save($node);
 	}

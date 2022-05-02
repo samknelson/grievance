@@ -49,10 +49,8 @@ function hotelsdb_content_types_ds_layout_settings_info() {
   $ds_layout->layout = 'ds_2col_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'footer' => array(
-        0 => 'unite_relationships',
-      ),
       'left' => array(
+        0 => 'field_title_canon',
         1 => 'field_actor_type',
         2 => 'field_address',
       ),
@@ -63,9 +61,12 @@ function hotelsdb_content_types_ds_layout_settings_info() {
         6 => 'field_notes',
         7 => 'field_attachments',
       ),
+      'footer' => array(
+        8 => 'unite_relationships',
+      ),
     ),
     'fields' => array(
-      'unite_relationships' => 'footer',
+      'field_title_canon' => 'left',
       'field_actor_type' => 'left',
       'field_address' => 'left',
       'field_phone' => 'right',
@@ -73,6 +74,7 @@ function hotelsdb_content_types_ds_layout_settings_info() {
       'field_url' => 'right',
       'field_notes' => 'right',
       'field_attachments' => 'right',
+      'unite_relationships' => 'footer',
     ),
     'classes' => array(),
     'wrappers' => array(
