@@ -6,8 +6,8 @@ function sirius_teamsters631_server_switch_leave() {
 
 	global $base_url;
 
-	if ($which == 'tc') { $url = $base_url; }
-	if ($which == 'uh') { $url = $base_url; }
+	if ($which == 'uh') { $url = 'https://dispatch.631train.com'; }
+	if ($which == 'tc') { $url = 'https://dispatch.teamsters631.com'; }
 	if (!$url) { $url = $base_url; }
 
 	$url .= "/teamsters631/switch/arrive?which=$which";

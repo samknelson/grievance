@@ -12,9 +12,13 @@ function sirius_teamsters631_sirius_banner_render_html_alter(&$html) {
 }
 
 function sirius_teamsters631_banner_which() {
+	if (preg_match('/631train.com/', $_SERVER['SERVER_NAME'])) { return 'tc'; }
+	if (preg_match('/teamsters631.com/', $_SERVER['SERVER_NAME'])) { return 'tc'; }
+
 	$domain = sirius_domain();
 	if ($domain->title == 'Teamsters 631 Training Center') { return 'tc'; }
 	if ($domain->title == 'Teamsters 631 Union Hall') { return 'uh'; }
+
 	return NULL;
 }
 
@@ -33,17 +37,21 @@ function sirius_teamsters631_render_banner($which) {
 		return 'Showing banner: Unknown site';
 	}
 
-	grievance_classes_array("teamsters631-$which");
-	drupal_add_css(drupal_get_path('module', 'sirius_teamsters631') . '/css/banner.css');
 
-	$html = '<div id="page-tophat">';
-	$switch_url = sirius_teamsters631_banner_switch_url();
-	if ($which == 'tc') {
-		$html .= "<a href=\"$switch_url\">Viewing: <strong>Training Center</strong>&nbsp;&nbsp;&nbsp;&nbsp;Switch to: Union Hall</a>";
-	} else {
-		$html .= "<a href=\"$switch_url\">Viewing: <strong>Union Hall</strong>&nbsp;&nbsp;&nbsp;&nbsp;Switch to: Training Center</a>";
+	$html = '';
+
+	if (variable_get('sirius_teamsters631_tophat', '') == 'Yes') {
+		grievance_classes_array("teamsters631-$which");
+		drupal_add_css(drupal_get_path('module', 'sirius_teamsters631') . '/css/banner.css');
+		$html .= '<div id="page-tophat">';
+		$switch_url = sirius_teamsters631_banner_switch_url();
+		if ($which == 'tc') {
+			$html .= "<a href=\"$switch_url\">Viewing: <strong>Training Center</strong>&nbsp;&nbsp;&nbsp;&nbsp;Switch to: Union Hall</a>";
+		} else {
+			$html .= "<a href=\"$switch_url\">Viewing: <strong>Union Hall</strong>&nbsp;&nbsp;&nbsp;&nbsp;Switch to: Training Center</a>";
+		}
+		$html .= '</div>';
 	}
-	$html .= '</div>';
 
 	global $user;
 	$html .= '<div class="user-links">';
@@ -118,10 +126,12 @@ function sirius_teamsters631_render_banner($which) {
 			    $html .= '</span>';
 			  }
 			  $html .= '<span class="banner-name-wrapper">';
-				// $html .= variable_get('sirius_banner_name', ''); 
-			  if ($domain) {
-			    // $html .= ' / ';
-			    $html .= $domain->title;
+			  if ($which == 'tc') {
+			  	$html .= 'Teamsters 631 Training Center'; 
+			  } else if ($which == 'uh') {
+			  	$html .= 'Teamsters 631 Union Hall'; 
+			  } else {
+			  	$html .= 'Teamsters 631';
 			  }
 				$html .= '</span>';
 			$html .= '</a>';
