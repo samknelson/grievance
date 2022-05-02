@@ -241,3 +241,36 @@ function sirius_teamsters631_sirius_worker_member_status_set_remote($args) {
 
 	return sirius_worker_member_status_set($worker_node, $local_term, $tf, $reason);
 }
+
+
+function sirius_teamsters631_node_insert_worker_remote($rnode) {
+	sirius_teamsters631_is_remote(TRUE);
+	if ($rnode->type != 'sirius_worker') { return array('success' => FALSE, 'msg' => 'Not a worker node.'); }
+
+	$rnode = (array) $rnode;
+
+	global $user;
+
+	$node = new stdClass();
+	$node->type = 'sirius_worker';
+	$node->uid = $user->uid;
+	foreach ($rnode as $key => $value) {
+		if (preg_match('/^field_/', $key)) {
+			$node->{$key} = $value;
+		}
+	}
+
+	$domain_nid = sirius_domain_nid();
+	if ($domain_nid) {
+		$node->field_sirius_domain['und'][0]['target_id'] = $domain_nid;
+	}
+	$node->title = $rnode['title'];
+ 	node_object_prepare($node);
+  $node->language = LANGUAGE_NONE;
+  $node->status = 1;
+  $node->promote = 0;
+  $node->comment = 0;
+
+  node_save($node);
+	return array('success' => TRUE);
+}

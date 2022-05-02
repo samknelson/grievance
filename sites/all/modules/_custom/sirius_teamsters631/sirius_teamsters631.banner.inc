@@ -12,12 +12,12 @@ function sirius_teamsters631_sirius_banner_render_html_alter(&$html) {
 }
 
 function sirius_teamsters631_banner_which() {
-	if (preg_match('/631train.com/', $_SERVER['SERVER_NAME'])) { return 'tc'; }
-	if (preg_match('/teamsters631.com/', $_SERVER['SERVER_NAME'])) { return 'tc'; }
-
 	$domain = sirius_domain();
 	if ($domain->title == 'Teamsters 631 Training Center') { return 'tc'; }
 	if ($domain->title == 'Teamsters 631 Union Hall') { return 'uh'; }
+
+	if (preg_match('/631train.com/', $_SERVER['SERVER_NAME'])) { return 'tc'; }
+	if (preg_match('/teamsters631.com/', $_SERVER['SERVER_NAME']) && !preg_match('/test/', $_SERVER['SERVER_NAME'])) { return 'tc'; }
 
 	return NULL;
 }

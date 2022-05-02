@@ -12,6 +12,19 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/siriu
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.banner.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.server_switch.inc';
 
+/**
+ * Implements hook_node_insert()
+ */
+
+function sirius_teamsters631_node_insert($node) {
+	if ($node->type != 'sirius_worker') { return; }
+	if (sirius_teamsters631_is_remote()) { return; }
+	if (!sirius_teamsters631_banner_which()) { return; }
+	$result = sirius_service_client_request('sirius_teamsters631_node_insert_worker_remote', $node);
+	if (!$result['success']) { drupal_set_message("Remote connection failed: " . $result['msg'], 'warning'); }
+	return $result;
+}
+
 /***
  * Implements hook_sirius_wizard_info()
  */
