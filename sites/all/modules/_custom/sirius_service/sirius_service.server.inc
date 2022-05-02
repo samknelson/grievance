@@ -84,14 +84,25 @@ function sirius_service_server_authenticate($settings, $method, $args) {
   if (!$access_token) { return "No access token."; }
 
 	$nids = entity_get_id_by_uuid('node', array($account_id), FALSE);
-	if (!$nids) { return "No node found with that account ID."; }
-	$nids = array_values($nids);
-	$domain_nid = $nids[0];
-	if (!$domain_nid) { return "No node found with that account ID."; }
+  if ($nids) {
+  	$nids = array_values($nids);
+  	$domain_nid = $nids[0];
+  	if (!$domain_nid) { return "No node found with that account ID."; }
+  } else {
+    // Legacy support: if UUID is for user 1, then we can connect without a domain
+    $uids = entity_get_id_by_uuid('user', array($account_id), FALSE);
+    if (!$uids) { return "No node found with that account ID."; }
+    $uids = array_values($uids);
+    $uid = $uids[0];
+    if ($uid != 1) { return "No node found with that account ID, and it's not the UUID for user #1 ($uid)."; }
+    $domain_nid = 0;
+  }
 
-	$domain_node = node_load($domain_nid);
-	if (!$domain_node) { return "No node found with that domain NID."; }
-	if ($domain_node->type != 'sirius_domain') { return "The specified node is not a domain."; }
+  if ($domain_nid) {
+  	$domain_node = node_load($domain_nid);
+  	if (!$domain_node) { return "No node found with that domain NID."; }
+  	if ($domain_node->type != 'sirius_domain') { return "The specified node is not a domain."; }
+  }
 
 	// Check domain components
 	sirius_domain($domain_nid);
