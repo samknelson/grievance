@@ -1,0 +1,209 @@
+<?php
+
+function sirius_service_server_active() {
+  return (sirius_domain_variable_get('sirius_service_server_active') == 'Yes');
+}
+
+/**
+ * Implements hook_services_authentication().
+ */
+
+function sirius_service_services_authentication_info() {
+  return array(
+    'title'            => t('Sirius authentication'),
+    'description'      => t('Username and password are sent in each request; domain access is verified'),
+    'authenticate_call' => 'sirius_service_server_authenticate',
+  );
+}
+
+/**
+ * Implements hook_rest_server_execute_errors_alter().
+ *
+ * HTTP Basic Authentication must add a "WWW-Authenticate" header on
+ * unauthorized requests. Some clients (i.e. lynx) will not work properly
+ * without this.
+ *
+ * This hook was introduced in the services module version 3.3 and will have no
+ * effect on versions prior to this.
+ */
+function sirius_service_rest_server_execute_errors_alter(&$error, $controller, $arguments) {
+  if ($error['code'] == 401) {
+    drupal_add_http_header('WWW-Authenticate', 'Basic realm="' . check_plain(variable_get('site_name'), 'Drupal') . '"');
+  }
+  elseif ($error['code'] == 403 && user_is_anonymous()) {
+    // The user has not yet authenticated, so we should return a 401 status
+    // instead of the default 403 status code.
+    // @see https://www.drupal.org/node/2158563
+    $error['code'] = 401;
+    $error['header_message'] = '401 Unauthorized';
+    drupal_add_http_header('WWW-Authenticate', 'Basic realm="' . check_plain(variable_get('site_name'), 'Drupal') . '"');
+  }
+}
+
+/**
+ * Authenticates a call using HTTP basic authentication to verify the request.
+ * 
+ * Copied from service_basic_auth, modified to support domains
+ *
+ * @param array $settings
+ *   The settings for the authentication module.
+ * @param array $method
+ *   The method that's being called.
+ * @param array $args
+ *   The arguments that are being used to call the method.
+ *
+ * @return void|string
+ *   Returns nothing, or a error message if authentication fails.
+ */
+
+function sirius_service_server_authenticate($settings, $method, $args) {
+  // Disable page caching for any request that requires an authentication
+  // check.
+  drupal_page_is_cacheable(FALSE);
+
+  // PHP FastCGI doesn't support HTTP Basic Authentication out of the box so we
+  // need this workaround. Requires a patch to .htaccess.
+  // @see http://drupal.org/node/1864628.
+  $fastcgi_header = variable_get('services_basic_auth_fastcgi_header', 'HTTP_AUTHORIZATION');
+  if (isset($_SERVER[$fastcgi_header])
+      && !empty($_SERVER[$fastcgi_header])
+      && strtolower(substr($_SERVER[$fastcgi_header], 0, 5)) == 'basic') {
+
+    $credentials = base64_decode(substr($_SERVER[$fastcgi_header], 6));
+    if (empty($credentials)) {
+      // The string is too short or is not correctly Base64 encoded.
+      return 'Malformed HTTP Authorization header.';
+    }
+    list($account_id, $access_token) = explode(':', $credentials, 2);
+  }
+  $account_id = trim($account_id);
+  $access_token = trim($access_token);
+
+  // Which domain? (Account ID is just a UUID.)
+  if (!$account_id) { return "No account id."; }
+  if (!$access_token) { return "No access token."; }
+
+	$nids = entity_get_id_by_uuid('node', array($account_id), FALSE);
+	if (!$nids) { return "No node found with that account ID."; }
+	$nids = array_values($nids);
+	$domain_nid = $nids[0];
+	if (!$domain_nid) { return "No node found with that account ID."; }
+
+	$domain_node = node_load($domain_nid);
+	if (!$domain_node) { return "No node found with that domain NID."; }
+	if ($domain_node->type != 'sirius_domain') { return "The specified node is not a domain."; }
+
+	// Check domain components
+	sirius_domain($domain_nid);
+  if (!sirius_domain_component_enabled('service')) { return "The 'Service' component is not enabled for this domain."; }
+  if (!sirius_domain_component_enabled('service:server')) { return "The 'Service - Server' component is not enabled for this domain."; }
+
+  // Check that the server is turned on
+  if (!sirius_service_server_active()) { return 'The server has not been set to "Active".'; }
+
+  // Check IP allowlist
+	$ip_range = sirius_domain_variable_get('sirius_service_server_ips');
+	if (!$ip_range) { return 'No IP range has been configured for this domain. All access is denied.'; }
+	$remote_ip = sirius_loopback_remote_ip();
+	if (!$remote_ip) { return 'Unable to determine the request IP.'; }
+	if (!sirius_ip_check($remote_ip, $ip_range)) { return 'Your IP, ' . $remote_ip . ', does not have access to this server.'; }
+
+	// Check access token
+  $valid_access_token = sirius_domain_variable_get('sirius_service_server_access');
+  if (!$valid_access_token) { return "No access token has been set up for this domain."; }
+  if ($valid_access_token != $access_token) { return "Invalid access token."; }
+
+  // Switch user
+  $user_name = sirius_domain_variable_get('sirius_service_user_name');
+  if ($user_name) {
+    global $user;
+    $user = user_load_by_name($user_name);
+    if (!$user) {
+      return "Unable to switch to user $user_name.";
+    }
+  }
+}
+
+/**
+ * Implements hook_services_resources()
+ */
+
+function sirius_service_services_resources() {
+  $resource = array(
+    'sirius' => array(
+      'actions' => array(
+        'generic' => array(
+          'callback' => 'sirius_service_generic_action',
+          'args' => array(array('name' => 'args', 'optional' => TRUE, 'source' => 'data', 'type' => 'array')),
+          'access callback' => 'sirius_service_access',
+          'access arguments' => array(),
+          'access arguments append' => TRUE,
+        ),
+      )
+    )
+  );
+
+  return $resource;
+}
+
+function sirius_service_access($args = NULL) {
+  return TRUE;
+}
+
+function sirius_service_ping($arg_0, $arg_1, $arg_2) {
+  return array(
+    'ts' => time(),
+  	'msg' => 'Ping succeeded',
+    'arg_0' => $arg_0,
+    'arg_1' => $arg_1,
+    'arg_2' => $arg_2,
+  );
+}
+
+function sirius_service_func_info_all() {
+  $functions = array(
+    'sirius_service_ping',
+    'sirius_proxy_node_load',
+    'sirius_contact_relationships',
+    'sirius_employer_list',
+    'sirius_worker_get_by_ssn',
+    'sirius_trust_benefits',
+    'sirius_trust_policy_benefits_offered',
+    'sirius_trust_benefit_options',
+    'sirius_ledger_policy_list',
+    'sirius_ledger_policy_lookup',
+    'sirius_teamsters631_switch_authenticate',
+    'sirius_teamsters631_sirius_node_tab_worker_contact_form_submit_remote',
+    'sirius_teamsters631_sirius_worker_skill_set_remote',
+    'sirius_teamsters631_sirius_worker_member_status_set_remote',
+    'sirius_esignature_defs',
+  );
+
+  $info = array();
+  foreach ($functions as $function_name) {
+    $info[$function_name] = array('callback' => $function_name);
+  }
+
+  return $info;
+}
+
+function sirius_service_generic_action($args) {
+  $key = array_shift($args);
+  if (!$key) { return array('success' => FALSE, 'msg' => "The first argument to this service must be a service-enabled function key."); }
+
+  $info_all = sirius_service_func_info_all();
+  $info = $info_all[$key];
+  if (!$info) { return array('success' => FALSE, 'msg' => "$key is not a valid service-enabled function."); }
+
+  $args = _sirius_service_array_to_node($args);
+
+  $callback = $info['callback'];
+  $data = $callback($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8]);
+  return array(
+    'success' => TRUE, 
+    'ts' => time(),
+    'data' => $data,
+    'minilog' => sirius_minilog_render_html(),
+    'is_remote' => TRUE,
+  );
+}
