@@ -13,6 +13,33 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/siriu
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.server_switch.inc';
 
 /**
+ * Implements hook_node_access()
+ */
+
+function sirius_teamsters631_node_access($node, $op, $account) {
+	$type = is_string($node) ? $node : $node->type;
+	if ($type != 'grievance_basic_page') { return NODE_ACCESS_IGNORE; }
+	if ($op != 'view') { return NODE_ACCESS_IGNORE; }
+	if (user_access('sirius dispatch staff')) { return NODE_ACCESS_IGNORE; }
+
+	$json = sirius_json_get($node);
+	if (!$json) { return NODE_ACCESS_IGNORE; }
+	if (!$json['restrict']['ms']) { return NODE_ACCESS_IGNORE; }
+	$ok_ms_tids = array_filter(array_values($json['restrict']['ms']));
+	if (!$ok_ms_tids) { return NODE_ACCESS_IGNORE; }
+
+	$worker_node = sirius_worker_get();
+	if (!$worker_node) { return NODE_ACCESS_IGNORE; }
+	$my_ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+
+	if (!$my_ms_tids) { return NODE_ACCESS_DENY; }
+	if (!array_intersect($my_ms_tids, $ok_ms_tids)) { return NODE_ACCESS_DENY; }
+
+	return NODE_ACCESS_IGNORE;
+}
+
+
+/**
  * Implements hook_node_insert()
  */
 
