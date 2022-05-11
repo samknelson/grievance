@@ -31,6 +31,10 @@ function sirius_worker_skills($worker_node) {
  */
 
 function sirius_worker_skills_cron($force = FALSE) {
+	// Don't run unless reminders are active
+	$active = (variable_get('sirius_worker_skill_reminders_active', '') == 'Yes');
+	if (!$active) { return array('success' => FALSE, 'msg' => 'Skill reminders are not enabled.'); }
+
 	// Run once a day
 	$today = date('Y-m-d');
 	$last_run = variable_get('sirius_worker_skills_last_date', 0);
