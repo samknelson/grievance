@@ -17,7 +17,7 @@ function sirius_teamsters631_banner_which() {
 	if ($domain->title == 'Teamsters 631 Union Hall') { return 'uh'; }
 
 	if (preg_match('/631train.com/', $_SERVER['SERVER_NAME'])) { return 'tc'; }
-	if (preg_match('/teamsters631.com/', $_SERVER['SERVER_NAME']) && !preg_match('/test/', $_SERVER['SERVER_NAME'])) { return 'tc'; }
+	if (preg_match('/teamsters631.com/', $_SERVER['SERVER_NAME']) && !preg_match('/test/', $_SERVER['SERVER_NAME'])) { return 'uh'; }
 
 	return NULL;
 }

@@ -224,7 +224,7 @@ function sirius_teamsters631_sirius_worker_member_status_set_remote($args) {
 
 	list($worker_node_remote, $term_remote, $tf, $reason, $attachments, $ts) = $args;
 
-	$reason .= ' (Imported from Training Center.)';
+	$reason .= ' (Imported from remote server.)';
 
 	$worker_id = $worker_node_remote->field_sirius_id['und'][0]['value'];
 	if (!$worker_id) { return array('success' => FALSE, 'msg' => 'No ID for this worker.'); }
@@ -234,7 +234,7 @@ function sirius_teamsters631_sirius_worker_member_status_set_remote($args) {
 	$term_name_lookup = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
 	$term_name_lookup = array_flip($term_name_lookup);
 
-	$term_name = $term_remote['name'];
+	$term_name = $term_remote->name;
 	$term_tid = $term_name_lookup[$term_name];
 	$local_term = taxonomy_term_load($term_tid);
 	if (!$local_term) { return array('success' => FALSE, 'msg' => "Member status $term_name not found."); }
@@ -242,6 +242,44 @@ function sirius_teamsters631_sirius_worker_member_status_set_remote($args) {
 	return sirius_worker_member_status_set($worker_node, $local_term, $tf, $reason);
 }
 
+
+
+
+
+
+
+
+function sirius_teamsters631_sirius_worker_work_status_set_alter(&$args) {
+	if (sirius_teamsters631_is_remote()) { return; }
+
+	$result = sirius_service_client_request('sirius_teamsters631_sirius_worker_work_status_set_remote', $args);
+	if (!$result['success']) { drupal_set_message("Remote connection failed: " . $result['msg'], 'warning'); }
+	else if (!$result['data']['success']) { drupal_set_message("Remote update failed: " . $result['data']['msg'], 'warning'); }
+	return $result;
+}
+
+function sirius_teamsters631_sirius_worker_work_status_set_remote($args) {
+	sirius_teamsters631_is_remote(TRUE);
+
+	list($worker_node_remote, $term_remote, $reason, $attachments, $json, $ts) = $args;
+
+	$reason .= ' (Imported from remote server.)';
+
+	$worker_id = $worker_node_remote->field_sirius_id['und'][0]['value'];
+	if (!$worker_id) { return array('success' => FALSE, 'msg' => 'No ID for this worker.'); }
+	$worker_node = sirius_worker_get_by_id($worker_id);
+	if (!$worker_node) { return array('success' => FALSE, 'msg' => "No worker found with id $worker_id"); }
+
+	$term_name_lookup = sirius_taxonomy_load('sirius_work_status', 'tid', 'name');
+	$term_name_lookup = array_flip($term_name_lookup);
+
+	$term_name = $term_remote->name;
+	$term_tid = $term_name_lookup[$term_name];
+	$local_term = taxonomy_term_load($term_tid);
+	if (!$local_term) { return array('success' => FALSE, 'msg' => "Work status $term_name not found."); }
+
+	return sirius_worker_work_status_set($worker_node, $local_term->tid, $reason, array());
+}
 
 function sirius_teamsters631_node_insert_worker_remote($rnode) {
 	sirius_teamsters631_is_remote(TRUE);
