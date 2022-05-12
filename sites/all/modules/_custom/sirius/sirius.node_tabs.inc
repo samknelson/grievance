@@ -124,7 +124,7 @@ function sirius_term_tab_content($term, $in_tab_name) {
   sirius_node_tab_handle_requires($tab_record);
   $result = call_user_func_array($callback, $args);
 
-  return "";
+  return $result;
 }
 
 function sirius_term_tab_access($term, $in_tab_name) {
