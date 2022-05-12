@@ -175,6 +175,7 @@ function sirius_service_func_info_all() {
   $functions = array(
     'sirius_service_ping',
     'sirius_proxy_node_load',
+    'sirius_taxonomy_load',
     'sirius_contact_relationships',
     'sirius_employer_list',
     'sirius_worker_get_by_ssn',
@@ -183,11 +184,13 @@ function sirius_service_func_info_all() {
     'sirius_trust_benefit_options',
     'sirius_ledger_policy_list',
     'sirius_ledger_policy_lookup',
+    'sirius_esignature_defs',
     'sirius_teamsters631_switch_authenticate',
     'sirius_teamsters631_sirius_node_tab_worker_contact_form_submit_remote',
     'sirius_teamsters631_sirius_worker_skill_set_remote',
     'sirius_teamsters631_sirius_worker_member_status_set_remote',
-    'sirius_esignature_defs',
+    'sirius_teamsters631_node_insert_worker_remote',
+    'sirius_teamsters631_sirius_worker_work_status_set_remote',
   );
 
   $info = array();

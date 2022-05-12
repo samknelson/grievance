@@ -21,6 +21,10 @@ function _sirius_service_array_to_node(&$result) {
     return (object) $result;
   }
 
+  if (isset($result['tid']) && isset($result['vid']) && isset($result['name'])) {
+    return (object) $result;
+  }
+
   foreach ($result as $key => $value) {
     $result[$key] = _sirius_service_array_to_node($value);
   }
