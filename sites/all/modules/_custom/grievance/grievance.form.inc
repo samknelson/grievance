@@ -50,11 +50,13 @@ function grievance_node_validate($node, $form, &$form_state) {
 
     // For insert only
     if (!$node->nid) {
+      $required_fields = preg_split('/\s+/', variable_get('grievance_requirefields', grievance_admin_default_requirefields()));
 
-      // Require a category
-      $status_tid = $node->field_grievance_status['und'][0]['tid'];
-      if (!$status_tid) {
-        form_set_error('field_grievance_status', 'Please select a status.');
+      foreach ($required_fields as $field_name) {
+        $info = field_info_instance('node', $field_name, 'grievance');
+        if (!$node->{$field_name}['und'][0]['tid'] && !$node->{$field_name}['und'][0]['value'] && !$node->{$field_name}['und'][0]['target_id']) {
+          form_set_error($field_name, t('The field @label is required.', array('@label' => $info['label'])));
+        }
       }
     }
   }
@@ -576,7 +578,9 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   }
   if ($fields_to_hide) {
     foreach ($fields_to_hide as $field_name) {
-      $form[$field_name]['#access'] = FALSE;
+      if ($form[$field_name]) {
+        $form[$field_name]['#access'] = FALSE;
+      }
     }
   }
 

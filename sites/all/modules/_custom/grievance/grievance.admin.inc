@@ -207,6 +207,13 @@ function grievance_admin() {
     '#type' => 'textarea',
   );
 
+  $form['grievance_requirefields'] = array(
+    '#default_value' => variable_get('grievance_requirefields', grievance_admin_default_requirefields()),
+    '#title' => t('Required Fields'),
+    '#description' => t('Which fields should be required on intake?'),
+    '#type' => 'textarea',
+  );
+
   $form['sirius_email_default_from_address'] = array(
     '#default_value' => variable_get('sirius_email_default_from_address', ''),
     '#title' => t('From Email'),
@@ -306,5 +313,11 @@ function grievance_admin_default_classaction_hidefields() {
     'field_grievance_supervisor_name',
     'field_grievance_supervisor_title',
     'field_grievance_supervisor_unit',
+  ));
+}
+
+function grievance_admin_default_requirefields() {
+  return join("\n", array(
+    'field_grievance_status',
   ));
 }
