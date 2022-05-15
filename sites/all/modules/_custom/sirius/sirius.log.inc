@@ -39,7 +39,7 @@ function sirius_log(
     }
   }
 
-  if ($notes && $json && $json['log_once']) {
+  if ($notes && $json && is_array($json) && $json['log_once']) {
     $sql = "select entity_id from field_data_field_sirius_notes where entity_type = 'node' and bundle = 'sirius_log' and field_sirius_notes_value = :notes limit 1";
     $stmt = db_query($sql, array(':notes' => $notes));
     $hr = $stmt->fetchAssoc();
