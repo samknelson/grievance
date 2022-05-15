@@ -200,6 +200,13 @@ function grievance_admin() {
     '#type' => 'textarea',
   );
 
+  $form['grievance_classaction_hidefields'] = array(
+    '#default_value' => variable_get('grievance_classaction_hidefields', grievance_admin_default_classaction_hidefields()),
+    '#title' => t('Class Action Hide Fields'),
+    '#description' => t('Certain fields can be hidden for class action grievances. Enter the fields to hide, one per line.'),
+    '#type' => 'textarea',
+  );
+
   $form['sirius_email_default_from_address'] = array(
     '#default_value' => variable_get('sirius_email_default_from_address', ''),
     '#title' => t('From Email'),
@@ -280,3 +287,24 @@ function grievance_admin() {
 }
 
 
+function grievance_admin_default_classaction_hidefields() {
+  return join("\n", array(
+    'field_grievance_phone',
+    'field_grievance_email',
+    'field_grievance_address',
+    'field_grievance_address_2',
+    'field_grievance_city',
+    'field_grievance_state',
+    'field_grievance_zip',
+    'field_grievance_hire_date',
+    'field_grievance_gender',
+    'field_grievance_work_status',
+    'field_grievance_shift',
+    'field_grievance_daysoff',
+    'field_grievance_ein',
+    'field_grievance_corrected',
+    'field_grievance_supervisor_name',
+    'field_grievance_supervisor_title',
+    'field_grievance_supervisor_unit',
+  ));
+}
