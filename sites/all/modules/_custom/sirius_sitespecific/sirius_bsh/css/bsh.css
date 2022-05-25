@@ -1,0 +1,368 @@
+/* get rid of max-width and margins and borders so we can have full width sections */
+body.sirius-public .container {
+    width: 100%;
+    max-width: none;
+}
+body.sirius-public #main-content {
+	margin: 0;
+}
+
+/* Hide everything but the body */
+/*
+body.sirius-public #page-banner,
+body.sirius-public .banner-menu-outer-wrapper,
+body.sirius-public .topbar-wrapper,
+body.sirius-public #header,
+body.sirius-public #page-footer {
+	display: none;
+}
+*/
+
+body.sirius-public .banner-menu-outer-wrapper,
+body.sirius-public #page-footer,
+body.sirius-public .primary-local-tasks-wrapper {
+	display: none;
+}
+
+body.sirius-public #page-banner {
+	background-color: #ffffff !important;
+	padding-top: 0;
+	padding-bottom:  32px;
+	border-bottom: 15px solid #145DA0 !important;
+	margin-top:  0;
+	margin-bottom:  0;
+}
+
+
+/* inner container for page width content */
+body.sirius-public .page-width {
+    width: 90%;
+    max-width: 1330px;
+    margin: auto;
+    padding: 50px 12px;
+    text-align: center;
+    line-height: 1.6;
+    font-size: 21px;
+}
+body.sirius-public .tallest-row {
+    padding: 80px 12px;
+}
+body.sirius-public .taller-row {
+    padding: 65px 12px;
+}
+body.sirius-public .shorter-row {
+    padding: 35px 12px;
+}
+body.sirius-public .shortest-row {
+    padding: 0 12px;
+}
+
+/* styles for each div-cell */
+body.sirius-public .col-12 {
+	width:  calc(100% - 45px);
+	margin: 10px;
+	padding-right: 10px;
+	padding-left: 10px;
+}
+body.sirius-public .col-6 {
+	width:  calc(50% - 45px);
+	margin: 10px;
+	padding-right: 10px;
+	padding-left: 10px;
+}
+body.sirius-public .col-4 {
+	width:  calc(33% - 45px);
+	margin: 10px;
+	padding-right: 10px;
+	padding-left: 10px;
+}
+body.sirius-public .col-3 {
+	width:  calc(25% - 45px);
+	margin: 10px;
+	padding-right: 10px;
+	padding-left: 10px;
+}
+body.sirius-public .col-2 {
+	width:  calc(16.66% - 45px);
+	margin: 10px;
+	padding-right: 10px;
+	padding-left: 10px;
+}
+body.sirius-public .col-2,
+body.sirius-public .col-3,
+body.sirius-public .col-4,
+body.sirius-public .col-6,
+body.sirius-public .col-12 {
+    display: inline-block;
+    text-align: center;
+    overflow: hidden;
+	background-color: #e8edf3;
+	vertical-align: top;
+}
+body.sirius-public img {
+    max-width: 100%;
+    height: auto;
+}
+body.sirius-public .col-2,
+body.sirius-public .col-3,
+body.sirius-public .col-4,
+body.sirius-public .padded {
+	border-radius: 8px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+body.sirius-public .rounded-top {
+	border-radius: 42px 42px 0 0;
+    padding: 48px 42px 42px 42px;
+	border: transparent 2px solid;
+}
+body.sirius-public .rounded-bottom {
+	border-radius: 0 0 42px 42px;
+    padding: 36px 42px 42px 42px;
+	border: transparent 2px solid;
+	border-top-width: 0;
+}
+
+body.sirius-public .button {
+    display: inline-block;
+	padding: 12px 24px;
+	border-radius: 21px;
+	text-transform: uppercase;
+	line-height: 1.1;
+	border: transparent 2px solid;
+    font-size: 16px;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+body.sirius-public .big-button {
+    display: inline-block;
+	padding: 18px 42px;
+	margin: 0 10px;
+	border-radius: 31px;
+	text-transform: uppercase;
+	line-height: 1.1;
+	border: transparent 2px solid;
+    font-size: 17px;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+body.sirius-public  .col-left {
+	text-align: left;
+}
+body.sirius-public  .col-right {
+	text-align: right;
+}
+body.sirius-public,
+body.sirius-public a {
+	color: #000000;
+}
+body.sirius-public #content .block .node-content p,
+body.sirius-public p {
+	margin-bottom: 21px;
+    line-height: 1.6;
+    font-size: 21px;
+}
+body.sirius-public  p.more-margin{
+	margin-bottom: 32px !important;
+}
+body.sirius-public .page-head .col-6 {
+    vertical-align: middle;
+    margin: 18px 0;
+}
+body.sirius-public .short-row {
+    padding: 0;
+}
+body.sirius-public .footer-row div {
+}
+body.sirius-public .footer-row ul {
+    list-style: none;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+}
+
+body.sirius-public .bg-transparent {background-color: transparent;}
+body.sirius-public .bg-blue {background-color: #145DA0;}
+body.sirius-public .bg-gray {background-color: #e8edf3;}
+body.sirius-public .bg-white {background-color: #ffffff;}
+body.sirius-public .bg-lime {background-color: #b5e352;}
+body.sirius-public .bg-lemon {background-color: #f7da21;}
+body.sirius-public .bg-orange {background-color: #fb9b00;}
+body.sirius-public .bg-teal {background-color: #2E8BC0;}
+body.sirius-public .bg-gfruit {background-color: #f58668;}
+body.sirius-public .bg-lilac {background-color: #7c97dd;}
+body.sirius-public .bg-green {background-color: #15bda2;}
+body.sirius-public .text-transparent {color: transparent;}
+body.sirius-public .text-blue {color: #145DA0;}
+body.sirius-public .text-gray {color: #888888;}
+body.sirius-public .text-gray a {color: #888888;}
+body.sirius-public .text-white {color: #ffffff; font-weight: 700; letter-spacing: 1px;}
+body.sirius-public .text-lime {color: #b5e352;}
+body.sirius-public .text-lemon {color: #f7da21;}
+body.sirius-public .text-orange {color: #fb9b00;}
+body.sirius-public .text-teal {color: #2E8BC0;}
+body.sirius-public .text-gfruit {color: #f58668;}
+body.sirius-public .text-lilac {color: #7c97dd;}
+body.sirius-public .text-green {color: #15bda2;}
+body.sirius-public .border-transparent {border-color: transparent;}
+body.sirius-public .border-blue {border-color: #145DA0;}
+body.sirius-public .border-gray {border-color: #dcdcdc;}
+body.sirius-public .border-white {border-color: #ffffff;}
+body.sirius-public .border-lime {border-color: #b5e352;}
+body.sirius-public .border-lemon {border-color: #f7da21;}
+body.sirius-public .border-orange {border-color: #fb9b00;}
+body.sirius-public .border-teal {border-color: #2E8BC0;}
+body.sirius-public .border-gfruit {border-color: #f58668;}
+body.sirius-public .border-lilac {border-color: #7c97dd;}
+body.sirius-public .border-green {border-color: #15bda2;}
+
+body.sirius-public .gradient-blue {
+	background: #145DA0;
+	background: radial-gradient(circle, #145DA0 80%, #2E8BC0 100%);
+}
+
+body.sirius-public .site-name {
+    font-size: 42px;
+    line-height: 1.1;
+    letter-spacing: 1px;
+}
+body.sirius-public #content .block .node-content p.big-text,
+body.sirius-public .big-text {
+    font-size: 32px;
+    letter-spacing: 1px;
+    line-height: 1.1;
+    margin: 25px 0;
+    font-weight: 700;
+}
+body.sirius-public h1 {
+    font-size: 72px;
+    letter-spacing: 6px;
+    margin: 48px 0;
+    line-height: 1.1;
+}
+body.sirius-public h1.shorter {
+    margin: 18px 0;
+}
+
+body.sirius-public .uppercase {
+    text-transform: uppercase;
+    letter-spacing: 16px;
+}
+body.sirius-public .more-leading {
+    margin: 18px 0;
+}
+
+/* style for catalog accordions */
+body.sirius-public div.view,
+body.sirius-public article.node-sirius-json-definition {
+    width: 90%;
+    max-width: 1330px;
+    margin: auto;
+    padding: 50px 12px;
+    line-height: 1.6;
+    font-size: 21px;
+}
+
+
+body.sirius-public form#sirius-event-node-tab-catalog-view-form {
+	/* col-12 */
+	width:  calc(100% - 45px);
+	margin: 10px;
+	padding-right: 10px;
+	padding-left: 10px;
+    display: inline-block;
+    overflow: hidden;
+	background-color: #ffffff;
+	vertical-align: top;	
+}
+
+body.sirius-public .ui-accordion .sirius_accordion_label {
+	border-radius: 32px 32px 0 0;
+	border: #dcdcdc 2px solid;
+	background-color: #2E8BC0;
+	color: #ffffff;
+	margin-top: 20px;
+	padding: 16px 40px;
+	letter-spacing: 1px;
+}
+
+body.sirius-public .ui-accordion .sirius_accordion_body {
+	border-radius: 0 0 32px 32px;
+	border: #dcdcdc 2px solid;
+	border-top-width: 0;
+	background-color: #ffffff;
+	color: #888888;
+	padding: 16px 40px;
+}
+
+body.sirius-public .ui-widget {
+	font-family: 'Lato';
+}
+
+body.sirius-public fieldset.collapsible {
+}
+
+body.sirius-public fieldset legend a {
+	text-transform: capitalize !important;
+}
+
+body.sirius-public fieldset legend {
+    background-image: none;
+	border-radius: 32px;
+    background-color: #145DA0;
+    width: 200px;
+}
+
+body.sirius-public {
+	background-color: #ffffff;
+}
+
+@media (min-width: 601px) and (max-width: 950px) {
+
+	body.sirius-public .col-4 {
+		width:  calc(50% - 45px);
+	}
+	body.sirius-public .col-3 {
+		width:  calc(50% - 45px);
+	}
+	body.sirius-public .col-2 {
+		width:  calc(33% - 45px);
+	}
+
+}
+
+@media (max-width: 600px) {
+
+	body.sirius-public .col-6 {
+		width:  calc(100% - 45px);
+		text-align: center;
+	}
+	body.sirius-public .col-4 {
+		width:  calc(100% - 45px);
+	}
+	body.sirius-public .col-3 {
+		width:  calc(50% - 45px);
+	}
+	body.sirius-public .col-2 {
+		width:  calc(33% - 45px);
+	}
+	body.sirius-public  .col-left {
+		text-align: center;
+	}
+	body.sirius-public  .col-right {
+		text-align: center;
+	}
+	body.sirius-public .footer-row ul {
+	    text-align: center;
+	}
+	body.sirius-public .hide-mobile {
+	    display: none;
+	}
+}
+
+
+.page-node-304029 .content-header,
+.page-node-304130 .content-header {
+	display:  none;
+}
+
