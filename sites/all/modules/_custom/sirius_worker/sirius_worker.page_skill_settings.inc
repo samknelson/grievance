@@ -5,6 +5,19 @@ function sirius_worker_page_skill_settings() {
 }
 
 function sirius_worker_page_skill_settings_form($form, &$form_state) {
+  $name = sirius_domain_variable_name('sirius_worker_skill_reminders_active');
+  $form[$name] = array(
+    '#type' => 'select',
+    '#title' => t('Send expiration reminders?'),
+    '#default_value' => variable_get($name, ''),
+    '#options' => array(
+      NULL => t('-- Select --'),
+      'No' => t('No'),
+      'Yes' => t('Yes'),
+    ),
+  );
+
+
   $name = sirius_domain_variable_name('sirius_worker_skill_never_expires_text');
   $form[$name] = array(
     '#type' => 'textfield',

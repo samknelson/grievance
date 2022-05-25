@@ -5,4 +5,5 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'mightysearch') . "/m
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'mightysearch') . "/mightysearch.join.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'mightysearch') . "/mightysearch.form.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'mightysearch') . "/mightysearch.submit.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'mightysearch') . "/mightysearch.saved.inc";
 

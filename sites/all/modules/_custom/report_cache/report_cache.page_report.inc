@@ -15,25 +15,25 @@ function report_cache_page_report($report_type) {
 		}
 	}
 
-	$report_type_infos = module_invoke_all('report_cache_info');
-	$report_type_info = $report_type_infos[$report_type];
-	$fields = $report_type_info['fields'];
-	drupal_set_title(t('Report - @report_type', array('@report_type' => $report_type_info['name'])));
+	$info = report_cache_info($report_type);
+	if ($info['file']) { sirius_require($info['module'], $info['file']); }
+	$fields = $info['fields'];
+	drupal_set_title("Reports: " . $info['name']);
 
 
 	if ($action == 'purge') {
 		$count = report_cache_purge($report_type, $report_id);
 		drupal_set_message(t('Purged report [@report_id]; @count records deleted.', array('@report_id' => $report_id, '@count' => $count)));
 	} elseif ($action == 'download') {
-		report_cache_download($report_type, $report_id, $report_type_info);
+		report_cache_download($report_type, $report_id, $info);
 	} elseif ($action == 'preview') {
-		$preview .= report_cache_preview($report_type, $report_id, $report_type_info);
+		$preview .= report_cache_preview($report_type, $report_id, $info);
 	} elseif ($action == 'render') {
-		$render .= report_cache_render($report_type, $report_id, $report_type_info, $_REQUEST['callback-name']);
+		$render .= report_cache_render($report_type, $report_id, $info, $_REQUEST['callback-name']);
 	}
 
 	if ($render) {
- 		sirius_backlink_add("admin/reports/report-cache/$report_type", array('name' => 'Report List'));
+ 		sirius_backlink_add("sirius/reports/$report_type", array('name' => 'Report List'));
 		$html .= $render;
 		return $html;
 	}
@@ -57,7 +57,7 @@ function report_cache_page_report($report_type) {
 
 	$header = array();
 	$header[] = t('Report ID');
-	if ($report_type_info['title_callback']) { $header[] = t('Title'); }
+	if ($info['title_callback']) { $header[] = t('Title'); }
 	$header[] = t('Tools');
 
 	$attributes = array();
@@ -65,13 +65,13 @@ function report_cache_page_report($report_type) {
 	$rows = array();
 	foreach ($report_ids as $tmp_report_id) {
 
-		$tools = l(t('Preview'), "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
-		$tools .= l(t('Download'), "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
-		if ($report_type_info['render_callbacks']) {
-			foreach ($report_type_info['render_callbacks'] as $name => $callback) {
+		$tools = l(t('Preview'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
+		$tools .= l(t('Download'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
+		if ($info['render_callbacks']) {
+			foreach ($info['render_callbacks'] as $name => $callback) {
 				$tools .= l(
 					$name, 
-					"admin/reports/report-cache/$report_type", 
+					"sirius/reports/$report_type", 
 					array(
 						'attributes' => array('class' => array('tool-button')), 
 						'query' => array(
@@ -83,20 +83,20 @@ function report_cache_page_report($report_type) {
 				);
 			}
 		}
-		$tools .= l(t('Purge'), "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
+		$tools .= l(t('Purge'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
 
 		$row = array();
 		$row[] = $tmp_report_id;
-		if ($report_type_info['title_callback']) { 
-			$row[] = $report_type_info['title_callback']($report_type, $tmp_report_id);
+		if ($info['title_callback']) { 
+			$row[] = $info['title_callback']($report_type, $tmp_report_id);
 		}
 
 		$row[] = $tools;
 		$rows[] = $row;
 	}
 
-	// $result .= '<h2>' . $report_type_info['name'] . '</h2>';
-	$result .= $report_type_info['description'];
+	// $result .= '<h2>' . $info['name'] . '</h2>';
+	$result .= $info['description'];
 
 	$result .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
 
@@ -105,26 +105,26 @@ function report_cache_page_report($report_type) {
 		$result .= $preview;
 	}
 
-	$path = $report_type_info['path'];
+	$path = $info['path'];
 	if (!$path) { 
-		$path = 'sirius/report-cache/' . $report_type . '/form';
+		$path = 'sirius/reports/' . $report_type . '/form';
 	}
-	$result .= l(t('Generate a new report'), $path);
+	$result .= l(t('Generate a new report'), $path, array('attributes' => array('class' => array('tool-button'))));
 
-	sirius_backlink_add('admin/reports/report-cache', array('name' => 'All Reports'));
+	sirius_backlink_add('sirius/reports', array('name' => 'All Reports'));
 	return $result;
 }
 
 
-function report_cache_preview($report_type, $report_id, $report_type_info) {
+function report_cache_preview($report_type, $report_id, $info) {
 	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
-	$fields = $report_type_info['fields'];
+	$fields = $info['fields'];
 
 	$result = '';
 
 	$result = '<h2>';
-	if ($report_type_info['title_callback']) {
-		$result .= $report_type_info['title_callback']($report_type, $report_id);
+	if ($info['title_callback']) {
+		$result .= $info['title_callback']($report_type, $report_id);
 	} else {
 		$result .= "$report_id Preview";
 	}
@@ -157,8 +157,8 @@ function report_cache_preview($report_type, $report_id, $report_type_info) {
 	return $result;
 }
 
-function report_cache_render($report_type, $report_id, $report_type_info, $callback_name) {
-	$callback = $report_type_info['render_callbacks'][$callback_name];
+function report_cache_render($report_type, $report_id, $info, $callback_name) {
+	$callback = $info['render_callbacks'][$callback_name];
 	if (!$callback) { 
 		drupal_set_message(t('Unable to find callback named "@name"', array('@name' => $callback_name)), 'error');
 		return NULL;
@@ -170,14 +170,14 @@ function report_cache_render($report_type, $report_id, $report_type_info, $callb
 
 
 
-function report_cache_download($report_type, $report_id, $report_type_info) {
+function report_cache_download($report_type, $report_id, $info) {
 	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
-	if ($report_type_info['download_callback']) {
-		$callback = $report_type_info['download_callback'];
-		return $callback($report_type, $report_id, $report_type_info);
+	if ($info['download_callback']) {
+		$callback = $info['download_callback'];
+		return $callback($report_type, $report_id, $info);
 	}
 
-	$fields = $report_type_info['fields'];
+	$fields = $info['fields'];
 
 	$filename = $report_type . '_' . $report_id;
 	$filename = preg_replace('/[^a-zA-Z0-9_]/', '_', $filename);

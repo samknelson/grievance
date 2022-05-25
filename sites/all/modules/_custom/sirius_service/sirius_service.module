@@ -1,0 +1,33 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_service') . '/sirius_service.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_service') . '/sirius_service.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_service') . '/sirius_service.server.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_service') . '/sirius_service.client.inc';
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function sirius_service_sirius_config_links_alter(&$links) {
+  $links['service'] = array('title' => 'Service');
+  $links['service']['links']['sirius/service/config'] = array('title' => 'Config', 'description' => 'Configure client and server service access.');
+}
+
+function _sirius_service_array_to_node(&$result) {
+  if (!is_array($result)) { return $result; }
+
+  if (isset($result['nid']) && isset($result['status']) && isset($result['created'])) {
+    return (object) $result;
+  }
+
+  if (isset($result['tid']) && isset($result['vid']) && isset($result['name'])) {
+    return (object) $result;
+  }
+
+  foreach ($result as $key => $value) {
+    $result[$key] = _sirius_service_array_to_node($value);
+  }
+
+  return $result;
+}

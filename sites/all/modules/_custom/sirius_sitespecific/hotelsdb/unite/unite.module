@@ -3,8 +3,10 @@
 // I hate notice errors
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.install";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.menu.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.relationships.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.actor.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.blocks.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.permission.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.quicksearch.inc";
@@ -62,7 +64,10 @@ function unite_node_presave($node) {
 	}
 	if ($node->type == 'property_actor') {
 		unite_relationship_node_presave($node);
-	} 
+	}
+	if ($node->type == 'actor') {
+		unite_actor_node_presave($node);
+	}
 }
 
 function unite_calc_distances($property_node) {
@@ -170,7 +175,7 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 	    }
 	  }
 	}
-	
+
 	//
 	// Put a copy of buttons at the top
 	//
@@ -228,10 +233,38 @@ function unite_form_alter(&$form, &$form_state, $form_id) {
 		foreach (unite_fairhotel_fields() as $field) { if ($form[$field]) { $form[$field]['#access'] = FALSE; } }
 	}
 
-	if (in_array($form_id, array('property_node_form', 'hdb_airport_node_form', 'hdb_convention_center_node_form'))) {
-		$form['field_sirius_json']['#access'] = FALSE;
-  }
+	if ($form_id == 'actor_node_form') {
+		if ($form['field_title_canon']) { $form['field_title_canon']['#access'] = FALSE; }
+	}
 }
+
+function unite_field_group_build_pre_render_alter(&$element) {
+	if ($element['type']['#value'] != 'property_actor') { return; }
+
+	$element['group_ownership']['#states'] = array(
+		'visible' => array(
+  		':input[id="edit-field-relationship-type-und"]' => array(
+  			array('value' => 'Owner'),
+  			array('value' => 'Previous Owner'),
+  		),
+		),
+	);
+	$element['group_ownership']['#id'] = 'group_ownership';
+
+	$element['group_lg']['#states'] = array(
+		'visible' => array(
+  		':input[id="edit-field-relationship-type-und"]' => array(
+  			array('value' => 'Lender'),
+  			array('value' => 'CMBS Trust'),
+  		),
+		),
+	);
+	$element['group_lg']['#id'] = 'group_lg';
+
+	// kpr($element);
+}
+	
+
 
 function unite_cron() {
 	// unite_export_feed_cache();

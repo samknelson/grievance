@@ -3075,6 +3075,114 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Service - Server',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1649772149,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '5cc97242-3cc1-42e6-bf17-74f216cc4efd',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Configure this domain as a server. It will allow incoming connections from clients.</p>
+
+<p><strong>Server Active:</strong>&nbsp;Allow incoming connections?</p>
+
+<p><strong>Server IP Allowlist:&nbsp;</strong>Incoming connections are permitted from these IP addresses. Generally this should contain just the IP address of the remote client instance.</p>
+
+<p><strong>Account ID:</strong>&nbsp;The account ID to use when accessing this server.</p>
+
+<p><strong>Access Token:&nbsp;</strong>The access token to use when accessing this server.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/service/config/server',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Configure this domain as a server.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-04-12 07:02:29 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Dispatch - SMS',
   'log' => '',
   'status' => 1,
@@ -3880,6 +3988,113 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '4840e21c-6ce8-4fb7-84cb-fa178e20b95b',
 );
   $nodes[] = array(
+  'title' => 'Service - Client - Test',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1650719038,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '7800e1f0-f1c7-4ede-a434-0138d4289f1f',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>This form can be used to verify that connection settings are correct when configuring this domain as a "client". There are two test options.</p>
+
+<ul>
+	<li>The&nbsp;<strong>client connection test</strong>&nbsp;will attempt to run a "ping" function on the remote server. It will fail if the client is not active or if the remote server fails to respond appropriately.</li>
+	<li>The <strong>proxy connection test</strong>&nbsp;will attempt to run the same "ping" function using a proxy call. If the domain is not configured as a proxy, then it will run the function locally. This means that a successful test doesn\'t necessarily indicate that a proxy is active; the response must be examined to determine whether the call was made locally or remotely.</li>
+</ul>
+
+<p>&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/service/config/client/test',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the form below to test service connectivity settings.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-04-23 06:03:58 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Employer User List',
   'log' => '',
   'status' => 1,
@@ -4067,6 +4282,110 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2021-12-31 03:03:02 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'IP Restrictions',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1650112292,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '7b2fde97-c290-4854-bf08-fd9cf71e6f87',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the tool below to configure IP restrictions for this server.</p>
+
+<p>IP restrictions are applied globally, across the entire Drupal instance. They are not specific to a domain.</p>
+
+<p>Please use this tool with caution, as it is possible to lock yourself out of the system.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/iprestrict',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this tool to configure IP restrictions for this server.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-04-16 05:31:32 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -7154,6 +7473,117 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2020-09-08 04:22:04 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Service - Client',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1649772002,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'db849e14-403e-4995-b000-35f1d54ee550',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Configure this domain as a client. The authoritative server is hosted elsewhere, and service requests will be made to that server.</p>
+
+<p><strong>Client Active:</strong>&nbsp;Is this domain a client for a remote server?</p>
+
+<p><strong>Remote Host:</strong>&nbsp;The domain name of the remote server.&nbsp;</p>
+
+<p><strong>Account ID:</strong> The account ID to use when accessing the remote server.</p>
+
+<p><strong>Access Token: </strong>The access token to use when accessing the remote server.</p>
+
+<hr />
+<p>Note that a <a href="/admin/structure/services">Drupal service must also be configured</a>.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/service/config/client',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Configure this domain as a client.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-04-12 07:00:02 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(

@@ -31,6 +31,10 @@ function sirius_worker_skills($worker_node) {
  */
 
 function sirius_worker_skills_cron($force = FALSE) {
+	// Don't run unless reminders are active
+	$active = (variable_get('sirius_worker_skill_reminders_active', '') == 'Yes');
+	if (!$active) { return array('success' => FALSE, 'msg' => 'Skill reminders are not enabled.'); }
+
 	// Run once a day
 	$today = date('Y-m-d');
 	$last_run = variable_get('sirius_worker_skills_last_date', 0);
@@ -181,7 +185,10 @@ function sirius_worker_skill_set($worker_node, $tids, $expires, $action, $reason
 	} else {
 		$expires = date('Y-m-d', strtotime('+100 years'));
 		$expires_display = 'Never';
-	} 
+	}
+
+	$args = array($worker_node, $tids, $expires, $action, $reason, $files, $certification_nid, $participant_nid);
+	drupal_alter('sirius_worker_skill_set', $args);
 
 	// Adding an expired skll does nothing. But we still log the attempt
 	/*

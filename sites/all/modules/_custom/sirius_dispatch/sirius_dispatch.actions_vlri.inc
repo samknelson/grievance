@@ -78,37 +78,39 @@ function sirius_dispatch_vlri_resolve($dispatch_node, $notes, $resolution) {
 	sirius_log('dispatch:vlri', $resolution, $msg, $notes, '', array($dispatch_node->nid, $worker_nid, $employer_nid));
 
 	// Notify the worker.
-	$unique_id = "UNIQUE/vlri/" . $dispatch_node->nid;
-	global $base_url;
-	$url = "$base_url/d/" . $dispatch_node->nid . "/" . $dispatch_node->field_sirius_aat['und'][0]['value'];
+	if (variable_get('sirius_dispatch_vlri_worker_notify', 'Yes') == 'Yes') {
+		$unique_id = "UNIQUE/vlri/" . $dispatch_node->nid;
+		global $base_url;
+		$url = "$base_url/d/" . $dispatch_node->nid . "/" . $dispatch_node->field_sirius_aat['und'][0]['value'];
 
-	$subject = "Dispatch system notification: Layoff Request";
-	$body = $msg;
-	$body .= "<br /><br />";
-	$body .= "<a href=\"$url\">" . $dispatch_node->title . '</a>';
-	if ($notes) {
+		$subject = "Dispatch system notification: Layoff Request";
+		$body = $msg;
 		$body .= "<br /><br />";
-		$body .= $notes;
-	}
+		$body .= "<a href=\"$url\">" . $dispatch_node->title . '</a>';
+		if ($notes) {
+			$body .= "<br /><br />";
+			$body .= $notes;
+		}
 
-	$sms = "Dispatch system notification: Layoff Request\n";
-	$sms .= "Dispatch: " . $dispatch_node->title . "\n";
-	$sms .= $msg . "\n";
-	$sms .= "URL: " . $url;
-	if ($notes) {
-		$sms .= "\n\n";
-		$sms .= $notes;
-	}
+		$sms = "Dispatch system notification: Layoff Request\n";
+		$sms .= "Dispatch: " . $dispatch_node->title . "\n";
+		$sms .= $msg . "\n";
+		$sms .= "URL: " . $url;
+		if ($notes) {
+			$sms .= "\n\n";
+			$sms .= $notes;
+		}
 
-	$result = sirius_worker_notify(
-		$worker_node, 
-		array(
-			'subject' => $subject,
-			'body' => $body,
-			'sms' => $sms,
-			'X-Sirius-Id' => $unique_id,
-		)
-	);
+		$result = sirius_worker_notify(
+			$worker_node, 
+			array(
+				'subject' => $subject,
+				'body' => $body,
+				'sms' => $sms,
+				'X-Sirius-Id' => $unique_id,
+			)
+		);
+	}
 
 	return array('success' => TRUE, 'msg' => $msg);
 }
@@ -175,6 +177,17 @@ function sirius_dispatch_vlri_admin() {
 		'#title' => 'Limit',
 		'#description' => 'Number of pending VLRI requests (older than the grace period) before an employer is blocked from creating new jobs.',
 		'#default_value' => variable_get('sirius_dispatch_vlri_block_limit', 1),
+	);
+
+	$form['sirius_dispatch_vlri_worker_notify'] = array(
+		'#title' => t('Notify worker?'),
+		'#type' => 'select',
+		'#options' => array(
+			'No' => 'No', 
+			'Yes' => 'Yes'
+		),
+		'#default_value' => variable_get('sirius_dispatch_vlri_worker_notify', 'Yes'),
+		'#description' => t('Should the worker receive a notification when the VLRI request is resolved?'),
 	);
 
   return system_settings_form($form);

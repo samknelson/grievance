@@ -26,6 +26,34 @@ function unite_relationships_render($node, $options = array()) {
 	}
 }
 
+function unite_relationships_render_ownership($pa_node) {
+	$parts = array();
+	if ($pa_node->field_owned_raw['und'][0]['value']) {
+		$parts[] = $pa_node->field_owned_raw['und'][0]['value'];
+	}
+	if ($pa_node->field_percent_owned['und'][0]['value'] > 0) {
+		$parts[] = number_format($pa_node->field_percent_owned['und'][0]['value'], 2) . "%";
+	}
+	if ($pa_node->field_amount_owned['und'][0]['value'] > 0) {
+		$parts[] = '$' . number_format($pa_node->field_amount_owned['und'][0]['value'], 2);
+	}
+	if ($pa_node->field_lg_type['und'][0]['tid']) {
+		$term = taxonomy_term_load($pa_node->field_lg_type['und'][0]['tid']);
+		$parts[] = $term->name;
+	}
+	if ($pa_node->field_lg_status['und'][0]['tid']) {
+		$term = taxonomy_term_load($pa_node->field_lg_status['und'][0]['tid']);
+		$parts[] = $term->name;
+	}
+	if ($pa_node->field_lg_balance['und'][0]['value']) {
+		$parts[] = 'Balance $' . number_format($pa_node->field_lg_balance['und'][0]['value'], 0);
+	}
+	if ($pa_node->field_lg_amount['und'][0]['value']) {
+		$parts[] = 'Initial $' . number_format($pa_node->field_lg_amount['und'][0]['value'], 0);
+	}
+	return join(' / ', $parts);
+}
+
 function unite_relationships_render_property($property_node, $options = array()) {
 	$pa_nodes = array();
 	$query = new EntityFieldQuery();
@@ -47,7 +75,7 @@ function unite_relationships_render_property($property_node, $options = array())
 	$header = array(
 		'entity_2' => t('Actor'),
 		'relationship_type' => t('Relationship'),
-		'ownership' => t('Ownership'),
+		'ownership' => t('Summary'),
 		'notes' => t('Notes'),
 		'tools' => 'Tools',
 	);
@@ -71,18 +99,7 @@ function unite_relationships_render_property($property_node, $options = array())
 		$tools .= l('Relationship', 'node/' . $pa_node->nid, array('attributes' => array('class' => array('tool-button'))));
 		$tools .= l('Edit Relationship', 'node/' . $pa_node->nid . '/edit', array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
 
-		$ownership = '';		
-		if ($pa_node->field_owned_raw['und'][0]['value']) {
-			$ownership .= $pa_node->field_owned_raw['und'][0]['value'];
-		}
-		if ($pa_node->field_percent_owned['und'][0]['value'] > 0) {
-			if ($ownership) { $ownership .= ' / '; }
-			$ownership .= number_format($pa_node->field_percent_owned['und'][0]['value'], 2) . "%";
-		}
-		if ($pa_node->field_amount_owned['und'][0]['value'] > 0) {
-			if ($ownership) { $ownership .= ' / '; }
-			$ownership .= '$' . number_format($pa_node->field_amount_owned['und'][0]['value'], 2);
-		}
+		$ownership = unite_relationships_render_ownership($pa_node);
 
 		$name = $actor_node->title;
 
@@ -146,7 +163,7 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
 	$header = array(
 		'entity_1' => t('Property'),
 		'relationship_type' => t('Relationship'),
-		'ownership' => t('Ownership'),
+		'ownership' => t('Summary'),
 		'rooms' => t('Rooms'),
 		'city' => t('City'),
 		'state' => t('State'),
@@ -172,18 +189,7 @@ function unite_relationships_render_actor($actor_node, $options = array()) {
 		$tools .= l('View Relationship', 'node/' . $pa_node->nid, array('attributes' => array('class' => array('tool-button'))));
 		$tools .= l('Edit Relationship', 'node/' . $pa_node->nid . '/edit', array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
 
-		$ownership = '';		
-		if ($pa_node->field_owned_raw['und'][0]['value']) {
-			$ownership .= $pa_node->field_owned_raw['und'][0]['value'];
-		}
-		if ($pa_node->field_percent_owned['und'][0]['value'] > 0) {
-			if ($ownership) { $ownership .= ' / '; }
-			$ownership .= number_format($pa_node->field_percent_owned['und'][0]['value'], 2) . "%";
-		}
-		if ($pa_node->field_amount_owned['und'][0]['value'] > 0) {
-			if ($ownership) { $ownership .= ' / '; }
-			$ownership .= '$' . number_format($pa_node->field_amount_owned['und'][0]['value'], 2);
-		}
+		$ownership = unite_relationships_render_ownership($pa_node);
 
 		if ($property_node->field_rooms['und'][0]['value']) {
 			$rooms = number_format($property_node->field_rooms['und'][0]['value'], 0);

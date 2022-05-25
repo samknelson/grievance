@@ -6,11 +6,11 @@ function report_cache_page_landing() {
 
 	$rows = array();
 	foreach ($report_type_infos as $report_type => $report_type_info) {
-		$tools = l('List', "admin/reports/report-cache/$report_type", array('attributes' => array('class' => array('tool-button'))));
+		$tools = l('List', "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button'))));
 
 		$path = $report_type_info['path'];
 		if (!$path) { 
-			$path = 'sirius/report-cache/' . $report_type . '/form';
+			$path = "sirius/reports/$report_type/form";
 		}
 		$tools .= l(t('Generate'), $path, array('attributes' => array('class' => array('tool-button'))));
 

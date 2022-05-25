@@ -14,7 +14,7 @@ function sirius_quickactions_add($link = array()) {
 function sirius_quickactions_render() {
 	$node = menu_get_object('node');
 	if ($node && is_object($node)) {
-		if ($node->type == 'sirius_worker') {
+		if ($node->type == 'sirius_worker' && user_access('sirius worker admin')) {
 			sirius_quickactions_add(
 				array(
 					'path' => 'sirius/modal/' . $node->nid . '/quicklog',
@@ -106,26 +106,54 @@ function sirius_backlinks_from_node($node) {
 	if (!$contact_nid) { $contact_nid = $node->field_sirius_contact['und'][0]['target_id']; }
 	if ($contact_nid) { $worker_nid = sirius_worker_get_by_contact_nid($contact_nid, TRUE); }
 	if ($contact_nid && !$worker_nid) {
+		$name = 'Contact'; 
+
 		if ($node->type == 'sirius_event_participant') 			{ $path = "node/$contact_nid"; }
+		else if ($node->type == 'sirius_contact_relationship') { $path = "node/$contact_nid/sirius_contact_relationships"; $name = 'FROM Contact'; }
 		else 																								{ $path = ""; }
 
-		if ($path) { $links[$path] = array('name' => 'Contact', 'title' => sirius_backlink_title($contact_nid)); }
+		if ($path) { $links[$path] = array('name' => $name, 'title' => sirius_backlink_title($contact_nid)); }
 	}
 
 	if (!$worker_nid) { $worker_nid = $node->field_sirius_worker['und'][0]['target_id']; }
 	if ($worker_nid) {
+		$name = 'Worker';
+
 		if ($node->type == 'sirius_payperiod') 										{ $path = "node/$worker_nid/sirius_worker_hours"; }
 		else if ($node->type == 'sirius_dispatch') 								{ $path = "node/$worker_nid/sirius_worker_dispatches"; }
 		else if ($node->type == 'sirius_event_participant') 			{ $path = "node/$worker_nid/sirius_worker_events"; }
+		else if ($node->type == 'sirius_contact_relationship') 		{ $path = "node/$worker_nid/sirius_worker_relationships"; $name = 'FROM Worker'; }
+		else if ($node->type == 'sirius_trust_worker_benefit') 		{ $path = "node/$worker_nid/sirius_trust_worker_benefits"; $name = 'Dependent'; }
+		else if ($node->type == 'sirius_trust_worker_election') 	{ $path = "node/$worker_nid/sirius_trust_worker_elections"; }
 		else if ($node->type == 'sirius_worker')									{ $path = ""; }
 		else 																											{ $path = "node/$worker_nid"; }
 
-		if ($path) { $links[$path] = array('name' => 'Worker', 'title' => sirius_backlink_title($worker_nid)); }
+		if ($path) { $links[$path] = array('name' => $name, 'title' => sirius_backlink_title($worker_nid)); }
 	}
 
-	$subscriber_nid = $node->field_sirius_trust_subscriber['und'][0]['target_id'];
-	if ($subscriber_nid) {
-		$links["node/$subscriber_nid"] = array('name' => 'Subscriber', 'title' => sirius_backlink_title($subscriber_nid));
+	if ($node->type == 'sirius_contact_relationship') { 
+		$other_contact_nid = $node->field_sirius_contact_alt['und'][0]['target_id'];
+		$other_worker_nid = sirius_worker_get_by_contact_nid($other_contact_nid, TRUE);
+		if ($other_worker_nid) {
+			$links["node/$other_worker_nid/sirius_worker_relationships"] = array('name' => 'TO Worker', 'title' => sirius_backlink_title($other_worker_nid));
+		} else {
+			$links["node/$other_contact_nid/sirius_worker_relationships"] = array('name' => 'TO Contact ', 'title' => sirius_backlink_title($other_contact_nid));
+		}
+	}
+
+	if ($node->type == 'sirius_trust_worker_benefit') {
+		$relationship_nid = $node->field_sirius_contact_relation['und'][0]['target_id'];
+		if ($relationship_nid) {
+			$relationship_node = node_load($relationship_nid);
+			$subscriber_contact_nid = $relationship_node->field_sirius_contact['und'][0]['target_id'];
+			if ($subscriber_contact_nid) {
+				$subscriber_worker_nid = sirius_worker_get_by_contact_nid($subscriber_contact_nid, TRUE);	
+			}
+			if ($subscriber_worker_nid) {
+				$links["node/$subscriber_worker_nid/sirius_trust_worker_benefits"] = array('name' => 'Subscriber', 'title' => sirius_backlink_title($subscriber_worker_nid));
+			}
+			$links["node/$relationship_nid"] = array('name' => 'Relationship', 'title' => '');
+		}
 	}
 
 	if ($node->type == 'sirius_operator') { $links['sirius/office/operator/list'] = array('name' => 'Operator List'); }
@@ -149,7 +177,7 @@ function sirius_backlinks_from_node($node) {
 
 	$employer_nid = $node->field_grievance_shop['und'][0]['target_id'];
 	if ($employer_nid) {
-		if ($node->type == 'sirius_payperiod') 			{ 
+		if ($node->type == 'sirius_payperiod') { 
 			/*
 			$ts = sirius_date_ts($node, 'field_sirius_datetime');
 			$date = gmdate('Y-m', $ts);
@@ -225,6 +253,7 @@ function sirius_backlinks_from_node($node) {
 	if ($node->type == 'sirius_json_definition') {
 		$definition_type = $node->field_sirius_type['und'][0]['value'];
 		if ($definition_type == 'sirius_event:catalog')	{ $links['sirius/event/catalog/list'] = array('name' => 'All Catalogs'); }
+		else if ($definition_type == 'sirius_ledger:policy') { $links['sirius/config/ledger/policies'] = array('name' => 'All Policies'); }
 	}
 
 	if ($node->type == 'grievance_basic_page') {

@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Create an index on cannonical title
+ */
+
+function unite_update_7001() {
+  $table = 'field_data_field_title_canon';
+  $column = 'field_title_canon_value';
+  try { db_add_index($table, "${table}_${column}", array($column)); } catch (exception $ignore) { print_r($ignore); }
+}

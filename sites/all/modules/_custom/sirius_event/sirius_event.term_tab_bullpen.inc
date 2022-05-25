@@ -64,6 +64,13 @@ function sirius_event_term_tab_bullpen_form($form, &$form_state, $event_type_ter
 		'#description' => t('Enter the period before the event start date when a steward can begin signing in workers. This should be set as a nubmer of seconds; for example, if a steward can sign-in a worker one hour before the event, enter 60*60 = <strong>3600</strong>.'),
 	);
 
+	$form["signin_grace"] = array(
+		'#title' => t('Steward Sign-in Grace'),
+		'#type' => 'textfield',
+		'#default_value' => $json['bullpen']['signin_grace'],
+		'#description' => t('Enter the grace period in seconds after the start of a bullpen during which signin is still permitted.'),
+	);
+
 	$form["self_signin_must_be_employed"] = array(
 		'#title' => t('Self Sign-in Employed Only'),
 		'#type' => 'select',

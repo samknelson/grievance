@@ -315,6 +315,12 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_trust_benefit_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_trust_benefit_type']['display'] = 'block';
     $settings['sirius_trust_benefit_type']['multidomain'] = 'Yes';
+    $settings['sirius_trust_election_type']['view'] = 'sirius_taxonomy';
+    $settings['sirius_trust_election_type']['display'] = 'block_15';
+    $settings['sirius_trust_election_type']['multidomain'] = 'Yes';
+    $settings['sirius_trust_election_status']['view'] = 'sirius_taxonomy';
+    $settings['sirius_trust_election_status']['display'] = 'block_14';
+    $settings['sirius_trust_election_status']['multidomain'] = 'Yes';
   }
 
   if ($vocabulary_machine_name == 'all') { return $settings; }
