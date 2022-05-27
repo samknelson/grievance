@@ -6,14 +6,15 @@ function sirius_flood_page_unblock() {
 
 function sirius_flood_page_unblock_form($form, &$form_state) {
   $entries = sirius_flood_list();
-  $ip_limit = variable_get('user_failed_login_ip_limit', 50);
-  $user_limit = variable_get('user_failed_login_user_limit', 5);
+  $ip_threshold = variable_get('user_failed_login_ip_threshold', 50);
+  $user_threshold = variable_get('user_failed_login_user_threshold', 5);
 
   $header = array(
     'title'    			=> t('Type of block'),
     'identifier'   	=> t('Identifier'),
     'count'   			=> t('Count'),
-    'limit'   			=> t('Limit'),
+    'window'        => t('Window'),
+    'threshold'     => t('Threshold'),
     'blocked'				=> t('Blocked?'),
   );
 
@@ -24,12 +25,14 @@ function sirius_flood_page_unblock_form($form, &$form_state) {
   	$event = $entry['event'];
   	$info = $info_all[$event];
   	if ($info) {
-  		$title = $info['title'] . '<br />' . $event;
-  		$limit = $info['limit'];
-  		if ($limit <= $entry['count']) { $blocked = 'Yes'; } else { $blocked = 'No'; }
+  		$title = sirius_tooltip_render($info['description'], $info['title']) . '<br />' . $event;
+  		$threshold = $info['threshold'];
+      $window = number_format($info['window'], 0) . ' Seconds';
+  		if (sirius_flood_is_allowed($event)) { $blocked = 'No'; } else { $blocked = 'Yes'; }
   	} else {
   		$title = $event;
-  		$limit = 'Unknown';
+      $window = 'Unknown';
+  		$threshold = 'Unknown';
   		$blocked = 'Unknown';
   	}
 
@@ -37,7 +40,8 @@ function sirius_flood_page_unblock_form($form, &$form_state) {
       'title'    		=> $title,
       'identifier' 	=> $entry['identifier'],
       'count'   		=> $entry['count'],
-      'limit'				=> $limit,
+      'window'      => $window,
+      'threshold'   => $threshold,
       'blocked'			=> $blocked,
     );
   }
