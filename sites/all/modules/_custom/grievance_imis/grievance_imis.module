@@ -142,7 +142,12 @@ function grievance_imis_callback_lookup($imis_id, $verbose = FALSE) {
   if ($verbose) { sirius_minilog('<pre>' . print_r($response, 1) . '</pre>'); }
 
   // HTTP Request execute
-  if ($response->code != 200) {
+  // Note: It looks like Bursting Silver's implementation of the lookup throws a 500 server error (!) if the 
+  // worker ID isn't found. This is pretty confusing to me; a much more rational response would be to return 
+  // no data, or at worst throw a 404.
+  // 
+  // This means that we can't distinguish between "the server is broken" and "the worker wasn't found." Oh well.
+  if ($response->code != 200 && $response->code != 500) {
     drupal_set_message(
       t(
         'Unable to connect to server at @url: @error (@code)', 
