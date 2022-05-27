@@ -277,3 +277,16 @@ function sirius_update_7016() {
     }
   }
 }
+
+
+/**
+ * Turn on the fontawesome module
+ */
+
+function sirius_update_7017() {
+  $modules = array('fontawesome');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
