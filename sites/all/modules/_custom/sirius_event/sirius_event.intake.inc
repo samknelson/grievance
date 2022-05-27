@@ -259,6 +259,7 @@ function sirius_event_intake_application_submit(&$application_node) {
 
 
 	$event_node = sirius_log_handler($application_node, 'sirius_event');
+	$worker_node = sirius_log_handler($application_node, 'sirius_worker');
 	$event_json = sirius_json_get($event_node);
 
 	// Submit and log
@@ -277,7 +278,7 @@ function sirius_event_intake_application_submit(&$application_node) {
 		$email,
 		$phone,
 		$notification_params, 
-		array('application_node' => $application_node, 'event_node' => $event_node)
+		array('application_node' => $application_node, 'event_node' => $event_node, 'worker_node' => $worker_node)
 	);
 	if ($result['msg']) {
 		sirius_jsonfield_log($application_node, "notification", $result['msg']);
