@@ -83,6 +83,12 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 		$actions['complete'] = t('Mark application as "Complete"');
 	}
 
+	if (user_access('sirius admin') && $_REQUEST['test']) {
+		if (!$actions['accept']) {
+			$actions['accept'] = t('TESTING: Rerun the "accept" action');
+		}
+	}
+
 	if ($actions) {
 		$form['action'] = array(
 			'#title' => t('Action'),
@@ -254,35 +260,15 @@ function sirius_node_tab_event_intake_application_manage_form($form, &$form_stat
 }
 
 function sirius_node_tab_event_intake_application_manage_form_validate($form, &$form_state) {
+	if ($form_state['values']['skip_validation'] == 'Yes') { return; }
+
 	$application_node = node_load($form_state['application_nid']);
-	$application_json = sirius_json_get($application_node);
-	$event_node = sirius_log_handler($application_node, 'sirius_event');
-	$event_json = sirius_json_get($event_node);
-
-	$action = $form_state['values']['action'];
-	if ($action == 'accept') {
-		$worker_node = sirius_log_handler($application_node, 'sirius_worker');
-		if ($worker_node) {
-			form_set_error('action', 'There is already a worker associated with this application.');
-		}
-
-		$ssn = $application_json['wizard']['intake']['identity']['ssn'];
-		if (sirius_worker_get_by_ssn($ssn)) {
-			form_set_error('action', 'There is an existing worker with the same SSN as this application.');
-		}
-
-		$id2 = trim($form_state['values']['id2']);
-		if (!$id2) {
-			if ($event_json['intake']['worker']['id2_required'] != 'No') {
-				form_set_error('id2', 'Please enter an ID.');
-			}
-		} else if	(sirius_worker_get_by_id2($id2)) {
-			form_set_error('id2', 'There is already a worker with this ID.');
-		}
-	}
 }
 
 function sirius_node_tab_event_intake_application_manage_form_submit($form, &$form_state) {
+	// @todo
+	$form_state['rebuild'] = TRUE;
+
 	$application_node = node_load($form_state['application_nid']);
 	$application_json = sirius_json_get($application_node);
 
@@ -320,210 +306,12 @@ function sirius_node_tab_event_intake_application_manage_form_submit($form, &$fo
 	}
 
 	if ($action == 'accept') {
-		$application_json = sirius_json_get($application_node);
-
-		$event_node = sirius_log_handler($application_node, 'sirius_event');
-		$event_json = sirius_json_get($event_node);
-		$event_nid = $event_node->nid;
-
-		// ////////////////////////////////////
-		// Create the worker
-		// ////////////////////////////////////
-
-	  $worker_node = new stdClass();
-	  $worker_node->type = 'sirius_worker';
-	  $worker_node->language = LANGUAGE_NONE;
-	  $worker_node->uid = $user->uid;
-	  $worker_node->status = 1;
-	  $worker_node->promote = 0;
-	  $worker_node->comment = 0;
-	  $domain_nid = sirius_domain_nid();
-	  if ($domain_nid) { $worker_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
-	  $worker_node->field_sirius_name['und'][0]['given'] = $application_json['wizard']['intake']['identity']['name_first']; 
-	  $worker_node->field_sirius_name['und'][0]['family'] = $application_json['wizard']['intake']['identity']['name_last']; 
-	  $worker_node->field_sirius_phone['und'][0]['value'] = $application_json['wizard']['intake']['phone'];
-	  $worker_node->field_sirius_email['und'][0]['value'] = $application_json['wizard']['intake']['email'];
-	  $worker_node->field_sirius_ssn['und'][0]['value'] = $application_json['wizard']['intake']['identity']['ssn'];
-
-		$id2 = trim($form_state['values']['id2']);
-		if ($id2) { $worker_node->field_sirius_id2['und'][0]['value'] = $id2; }
-
-	  $addr = $application_json['wizard']['intake']['addr'];
-	  $addr['country'] = 'US';
-	  $worker_node->field_sirius_address['und'][0] = $addr;
-
-	  node_object_prepare($worker_node);
-	  $worker_node = node_submit($worker_node);
-		node_save($worker_node);
-	  drupal_set_message("Created worker: " . l($worker_node->title . ' (' . $worker_node->field_sirius_id['und'][0]['value'] . ')', 'node/' . $worker_node->nid));
-	  $contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
-
-	 	// ////////////////////////////////////
-		// Set linked JSON fields in the contact record
-		// ////////////////////////////////////
-
-	  if ($event_json['intake']['survey']['list']) {
-		  $contact_node = node_load($contact_nid);
-		  $contact_json = sirius_json_get($contact_node);
-			$contact_results = sirius_jsonfield_util_results_get($contact_json, 'default');
-
-			$link_count = 0;
-  		foreach ($event_json['intake']['survey']['list'] as $delta => $element) {
-  			$survey_nid = $element['survey_nid'];
-  			$survey_node = node_load($survey_nid);
-				$survey_json = sirius_json_get($survey_node);
-				$survey_form = sirius_jsonfield_util_form_get($survey_json,  "default");
-				$survey_results = sirius_jsonfield_util_results_get($application_json, "survey_" . $survey_nid);
-
-				$link_count += sirius_jsonfield_link_set($survey_form, $survey_results, $contact_results);
-  		}
-			if ($link_count) {
-				sirius_jsonfield_util_results_set($contact_json, 'default', $contact_results);
-				sirius_json_set($contact_node, $contact_json);
-				node_save($contact_node);
-			}
-  	}
-
-		// ////////////////////////////////////
-		// Set the work status
-		// ////////////////////////////////////
-
-	  $ws_tid = $event_json['intake']['work_status'];
-	  if ($ws_tid) {
-	  	$ws_term = taxonomy_term_load($ws_tid);
-	  	$result = sirius_worker_work_status_set($worker_node, $ws_tid, 'Intake', array());
-	  	if ($result['success']) {
-	  		drupal_set_message("Set work status to: " . $ws_term->name);
-	  	} else {
-	  		drupal_set_message("Unable to set work status to " . $ws_term->name . ': ' . $result['msg'], 'warning');
-	  	}
-	  }
-
-		// ////////////////////////////////////
-		// Set the member statuses and levels
-		// ////////////////////////////////////
-
-		$ms_tid_levels = array();
-		if ($event_json['intake']['ms']['required']) {
-			$ms_tid_levels = array_filter(array_values($event_json['intake']['ms']['required']));
+		$result = sirius_event_intake_application_accept($application_node, $form_state['values']);
+		if ($result['success']) {
+			drupal_set_message($result['msg']); 
+		} else {
+			drupal_set_message($result['msg'], 'warning');
 		}
-		foreach ($ms_tid_levels as $ms_tid_level) {
-		  list ($ms_tid, $level_code) = explode('|', $ms_tid_level);
-	  	$ms_term = taxonomy_term_load($ms_tid);
-		  if ($ms_tid) {
-		  	$result = sirius_worker_member_status_set($worker_node, $ms_term, TRUE, 'intake');
-		  	if ($result['success']) {
-		  		drupal_set_message("Added member status: " . $ms_term->name);
-		  	} else {
-		  		drupal_set_message("Unable to add member status " . $ms_term->name . ': ' . $result['msg'], 'warning');
-		  	}
-		  }
-
-		  if ($level_code) {
-		  	$level = sirius_training_levels_fetch_record($ms_tid, $level_code);
-		  	$result = sirius_training_level_graduate($worker_node, $ms_term, $level, array());
-		  	if ($result['success']) {
-		  		drupal_set_message("Set level to: " . $level['title']);
-		  	} else {
-		  		drupal_set_message("Unable to set level to " . $level['title'] . ': ' . $result['msg'], 'warning');
-		  	}
-		  }
-		}
-
-		// ////////////////////////////////////
-		// Set Dispatch Status
-		// ////////////////////////////////////
-
-		$dispstatus_tid = $form_state['values']['dispstatus_tid'];
-		if ($dispstatus_tid) {
-			$dispstatus_term = taxonomy_term_load($dispstatus_tid);
-			$result = sirius_dispatch_worker_dispstatus_set($worker_node, $dispstatus_tid, NULL, 'Signed in during intake');
-			if ($result['success']) {
-				drupal_set_message("Dispatch status set to " . $dispstatus_term->name);
-			} else {
-				drupal_set_message("Failed to set dispatch status to " . $dispstatus_term->name . ': ' . $result['msg'], 'warning');
-			}
-		}
-
-		// ////////////////////////////////////
-		// Create the materials
-		// ////////////////////////////////////
-
-
-	  $required_attachments = $event_json['intake']['attachments']['required'];
-	  if (!$required_attachments) { $required_attachments = array(); }
-	  $required_attachments = array_filter(array_values($required_attachments));
-	  $optional_attachments = $event_json['intake']['attachments']['optional'];
-	  if (!$optional_attachments) { $optional_attachments = array(); }
-	  $optional_attachments = array_filter(array_values($optional_attachments));
-
-	  $attachment_tids = array_unique($required_attachments + $optional_attachments);
-	  if ($attachment_tids) {
-	  	$attachment_tids = array_filter(array_values($attachment_tids));
-	  	foreach ($attachment_tids as $tid) {
-	  		$attachment_term = taxonomy_term_load($tid);
-
-	  		$attachment = $application_json['wizard']['intake']['attachments'][$tid];
-	  		if ($attachment) {
-	  			$attachment_json = array();
-	  			$attachment_json['material']['title'] = $attachment_term->name;
-	  			$attachment_json['material']['document_type_tid'] = $tid;
-	  			$attachment_json['material']['summary'] = 'Uploaded with the intake wizard';
-
-	  			$file =  (array) file_load($attachment['fid']);
-	  			$file['display'] = TRUE;
-					$material_node = sirius_log('material', $attachment_term->name, $attachment_json['material']['summary'], $attachment_json['material']['summary'], NULL, array($worker_node->nid), array($file), $attachment_json);
-					drupal_set_message("Created attachment node: " . l($attachment_term->name, 'node/' . $material_node->nid));
-	  		}
-	  	}
-	  }
-
-		// ////////////////////////////////////
-		// Register for the event
-		// ////////////////////////////////////
-
-		$paccess = $event_json['intake']['register']['paccess'];
-		if ($paccess) {
-			list ($prole_tid, $pstatus_tid) = explode('|', $paccess);
-			$result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
-			if ($result['success']) {
-				$participant_node = node_load($result['nid']);
-				drupal_set_message("Created participant record: " . l($participant_node->title, 'node/' . $participant_node->nid));
-			} else {
-				drupal_set_message("Unable to create participant record: " . $result['msg'], 'warning');
-			}
-		}
-
-		// ////////////////////////////////////
-		// Update the application node
-		// ////////////////////////////////////
-		
-	  $application_node->field_sirius_log_handler['und'][] = array('target_id' => $worker_node->nid);
-	  if ($participant_node) { $application_node->field_sirius_log_handler['und'][] = array('target_id' => $participant_node->nid); }
-		$application_node->field_sirius_type['und'][0]['value'] = 'accepted';
-		sirius_jsonfield_log($application_node, "status_set", "Changed status from $old_status to $new_status");
-		node_save($application_node);
-		drupal_set_message("Status changed.");
-
-		// ////////////////////////////////////
-		// Send the notification
-		// ////////////////////////////////////
-
-		if ($form_state['values']['accept']['notification']['medium']) {
-			$result = sirius_event_notify(
-				$application_node,
-				$email,
-				$phone,
-				$form_state['values']['accept']['notification'], 
-				array('application_node' => $application_node, 'worker_node' => $worker_node, 'participant_node' => $participant_node, 'event_node' => $event_node)
-			);
-		}
-
-		// ////////////////////////////////////
-		// Create a log entry
-		// ////////////////////////////////////
-
-		sirius_log('event:intake_accepted', 'accepted', 'Intake application accepted', 'Intake application accepted', NULL, array($worker_node->nid), array(), array());
 	}
 
 	if ($action == 'resend') {

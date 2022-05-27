@@ -653,7 +653,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	$facility_nid = $job_node->field_sirius_dispatch_facility['und'][0]['target_id'];
 
 	// Exclude current dispatches
-	if (!$filters['ignore_redispatch']) {
+	if (!$filters['redispatch'] && !$filters['ignore_redispatch']) {
 		$sql = "select count(*) as c from ";
 		$sql .= "node, ";
 		$sql .= "field_data_field_sirius_worker, ";

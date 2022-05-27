@@ -36,10 +36,9 @@ function sirius_dispatch_notify_possible($dispatch_node) {
 
 	// Verify that the worker is dispatchable
 	$worker_nid = $dispatch_node->field_sirius_worker['und'][0]['target_id'];
-	$check = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name', 1, array('worker_nid' => $worker_nid, 'redispatch' => TRUE));
-	if (!$check[$worker_nid]) {
-		$worker_node = node_load($worker_nid);
-		return array('success' => FALSE, 'msg' => "The worker " . $worker_node->title . " cannot be dispatched on this job.");
+	$check = sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, array('redispatch' => TRUE));
+	if (!$check['success']) {
+		return array('success' => FALSE, 'msg' => "Dispatch not possible: " . $check['msg']);
 	}
 
 	return array('success' => TRUE, 'msg' => 'Possible');
@@ -49,7 +48,18 @@ function sirius_dispatch_notify(&$dispatch_node, $requested_medium = NULL, $note
 	// Possible?
 	$possible = sirius_dispatch_notify_possible($dispatch_node);
 	if (!$possible['success']) {
-		sirius_log('dispatch:notify', 'fail', "Notify failed - " . $possible['msg'], $notes, '', array($dispatch_node->nid));
+		$unique_id = $dispatch_node->nid . '/dispatch_not_possible/' . $possible['msg'];
+		sirius_log(
+			'dispatch:notify', 
+			'fail', 
+			"Notify failed - " . $possible['msg'], 
+			$notes . ' ' . $possible['msg'] . ' (subsequent messages of this type will be supressed.)', 
+			$unique_id, 
+			array($dispatch_node->nid),
+			NULL,
+			array('log_once' => TRUE)
+		);
+
 		return $possible;
 	}
 

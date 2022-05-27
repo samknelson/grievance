@@ -4,4 +4,5 @@
 ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
 
 sirius_require('sirius_bsh', 'sirius_bsh.banner.inc');
+sirius_require('sirius_bsh', 'sirius_bsh.intake.inc');
 

@@ -1060,7 +1060,7 @@ function sirius_event_intake_wizard_deliver_form_submit($form, &$form_state) {
 
 	$result = sirius_event_intake_application_submit($application_node);
 	if ($result['success']) { 
-		sirius_wizard_submit($info, $data, $application_node, $current_step, "Response saved.", array('nonsequential' => TRUE));
+		sirius_wizard_submit($info, $data, $application_node, $current_step, "Your application has been submitted.", array('nonsequential' => TRUE));
 	} else {
 		drupal_set_message($result['msg'], 'warning');
 	}

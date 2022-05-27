@@ -360,6 +360,7 @@ function sirius_event_notify($main_node, $email, $phone, $msg, $tokens) {
   $email_subject  = sirius_text_render($msg['email_subject'], $tokens);
   $email_body     = sirius_text_render(sirius_richtext_handle_input($msg['email_body']), $tokens);
   $sms            = sirius_text_render($msg['sms'], $tokens);
+  $silent         = $msg['silent'];
 
   $success_msg = '';
   $failure_msg = '';
@@ -384,11 +385,11 @@ function sirius_event_notify($main_node, $email, $phone, $msg, $tokens) {
 
   if ($success_msg) {
     sirius_jsonfield_log($main_node, 'notification', $success_msg);
-    drupal_set_message($success_msg);
+    if (!$silent) { drupal_set_message($success_msg); }
   }
 
   if ($failure_msg) {
-    sirius_jsonfield_log($main_node, 'notification_failued', $failure_msg);
+    sirius_jsonfield_log($main_node, 'notification_failed', $failure_msg);
     drupal_set_message($failure_msg, 'warning');
   }
 
