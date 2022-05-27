@@ -69,18 +69,18 @@ function sirius_flood_sirius_flood_info() {
   $info['failed_login_attempt_ip'] = array(
     'title' => 'Failed Login (IP)',
     'window_variable' => 'user_failed_login_ip_window',
-    'window_default' => 50,
+    'window_default' => 3600,
     'threshold_variable' => 'user_failed_login_ip_limit',
-    'threshold_default' => 3600,
+    'threshold_default' => 50,
     'description' => 'A failed login attempt from a specific IP address.',
   );
 
   $info['failed_login_attempt_user'] = array(
     'title' => 'Failed Login (User)',
     'window_variable' => 'user_failed_login_user_window',
-    'window_default' => 5,
+    'window_default' => 21600,
     'threshold_variable' => 'user_failed_login_user_limit',
-    'threshold_default' => 21600,
+    'threshold_default' => 53600  ,
     'description' => 'A failed login attempt from a specific IP address, for a specific user.',
   );
   
