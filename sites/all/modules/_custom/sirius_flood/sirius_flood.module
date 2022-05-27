@@ -1,0 +1,61 @@
+<?php
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_flood/sirius_flood.menu.inc';
+
+function  sirius_flood_list() {
+  $entries = array();
+
+  $sql = "select event, identifier, count(*) as 'count' ";
+  $sql .= "from flood ";
+  $sql .= "group by event, identifier ";
+  $sql .= "order by event, identifier ";
+
+  $stmt = sirius_sql_query($sql, array());
+  $entries = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $entries[$hr['event'] . '|' . $hr['identifier']] = $hr;
+  }
+
+  return $entries;
+}
+
+function sirius_flood_clear($event, $identifier) {
+  $sql = "delete from flood where event = :event and identifier = :identifier";
+  $stmt = sirius_sql_query($sql, array(':event' => $event, ':identifier' => $identifier));
+}
+
+function sirius_flood_info($event) {
+  $info_all = &drupal_static(__FUNCTION__); 
+  if (!isset($info_all)) { 
+    $info_all = sirius_flood_info_all();
+  }
+
+  return $info_all[$event];
+}
+
+function sirius_flood_info_all() {
+  $info_all = &drupal_static(__FUNCTION__);
+  if (!isset($info_all)) {
+    $info_all = module_invoke_all('sirius_flood_info');
+    ksort($info_all);
+  }
+  return $info_all;
+}
+
+/**
+ * Implements hook_sirius_flood_info
+ */
+
+function sirius_flood_sirius_flood_info() {
+  $info['failed_login_attempt_ip'] = array(
+    'title' => 'Failed Login (IP)',
+    'limit' => variable_get('user_failed_login_ip_limit', 50),
+  );
+
+  $info['failed_login_attempt_user'] = array(
+    'title' => 'Failed Login (User)',
+    'limit' => variable_get('user_failed_login_user_limit', 50),
+  );
+  
+  return $info;
+}

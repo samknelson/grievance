@@ -290,3 +290,21 @@ function sirius_update_7017() {
     module_enable(array($module), TRUE);
   }
 }
+
+/**
+ * Our own flood control module
+ */
+
+function sirius_update_7018() {
+  $modules = array('sirius_flood');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+
+  $modules = array('flood_unblock');
+  foreach ($modules as $module) {
+    print "Disabling $module\n";
+    module_disable(array($module), TRUE);
+  }
+}
