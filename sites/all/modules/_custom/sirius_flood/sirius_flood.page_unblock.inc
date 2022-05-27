@@ -76,6 +76,7 @@ function sirius_flood_page_unblock_form_validate($form, &$form_state) {
 function sirius_flood_page_unblock_form_submit($form, &$form_state) {
   foreach ($form_state['values']['table'] as $value) {
   	list ($event, $identifier) = explode('|', $value);
+  	if (!$event || !$identifier) { continue; }
   	drupal_set_message("Clearing: $event, $identifier");
     sirius_flood_clear($event, $identifier);
   }
