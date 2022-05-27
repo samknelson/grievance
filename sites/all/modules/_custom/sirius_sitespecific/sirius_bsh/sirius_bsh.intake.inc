@@ -157,7 +157,7 @@ function sirius_bsh_event_intake_worker_lookup_form_validate($form, &$form_state
 	}
 
 	// Flood control: 250 events in an hour
-	if (!flood_is_allowed('sirius_bsh_worker_lookup', 30, 60)) {
+	if (!sirius_flood_is_allowed('sirius_bsh_worker_lookup')) {
 		form_set_error('bsh_worker][id', 'Flood control: too many lookups. Please try again later.');
 		return; 
 	}
@@ -165,7 +165,7 @@ function sirius_bsh_event_intake_worker_lookup_form_validate($form, &$form_state
 	// Load the workersync plugin
 	$plugin = grievance_workersync_plugin_fetch();
 	if (!$plugin) {
-		form_set_error('bsh_worker][id', 'System error: non worker plugin has been configured.');
+		form_set_error('bsh_worker][id', 'System error: no worker plugin has been configured.');
 		return;
 	}
 	$callback = $plugin['lookup_callback'];
@@ -181,7 +181,7 @@ function sirius_bsh_event_intake_worker_lookup_form_validate($form, &$form_state
 	}
 
 	if (!$match) {
-		flood_register_event('sirius_bsh_worker_lookup', 60);
+		sirius_flood_register_event('sirius_bsh_worker_lookup');
 		form_set_error('bsh_worker][id', 'The data in your application does not match the data in our records. Please make sure to use the same name, phone number, postal address, OR email address as appears in the Local 5 database.');
 		return;
 	}
@@ -210,7 +210,9 @@ function sirius_bsh_event_intake_worker_lookup_form_submit($form, &$form_state) 
 function sirius_bsh_sirius_flood_info() {
   $info['sirius_bsh_worker_lookup'] = array(
     'title' => 'BSH Worker Lookup',
-    'limit' => 30,
+    'threshold_default' => 15,
+    'window_default' => 5*60,
+    'description' => 'A user attempted to lookup a worker on the BSH intake screen',
   );
 
   return $info;
