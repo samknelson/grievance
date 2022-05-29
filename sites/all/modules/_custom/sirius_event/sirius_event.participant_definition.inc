@@ -13,9 +13,10 @@ function sirius_node_tab_event_participant_definition_edit_access($definition_no
 	$no_form_types = array(
 		'sirius_ledger:policy', 
 		'sirius:disclaimer', 
-		'sirius_event:catalog'
+		'sirius_event:catalog',
 	);
 	if (in_array($type, $no_form_types)) { return FALSE; }
+	if (preg_match('/^cron\:scan\:/', $type)) { return FALSE; }
 	return TRUE; 
 }
 
