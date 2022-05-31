@@ -124,11 +124,15 @@ function sirius_event_register_worker_byname_form($form, &$form_state, $event_no
 
   list($prole_tid, $pstatus_tid) = explode('|', $form_state['values']['paccess']);
 
+  if (!$form_state['submitted'] && !$pstatus_tid) {
+    list ($prole_tid, $pstatus_tid) = explode('|', array_keys($paccess_options)[0]);
+  }
+
   if ($pstatus_tid) {
     $pstatus_term = taxonomy_term_load($pstatus_tid);
     $pstatus_json = sirius_jsonfield_util_term_json_get($pstatus_term);
 
-    if ($form_state['triggering_element']['#name'] == 'paccess') {
+    if ($form_state['triggering_element']['#name'] == 'paccess' || !$form_state['submitted']) {
       // If we changed the paccess, update the default notification text
       $keys = array('medium', 'email_subject', 'email_body', 'sms');
       $tokens = array('node' => $event_node);
@@ -138,9 +142,7 @@ function sirius_event_register_worker_byname_form($form, &$form_state, $event_no
       }
 
       foreach ($keys as $key) {
-        if ($pstatus_json['notification']['register'][$key]) {
-          $form_state['input']['notification'][$key] = $tokenized[$key];
-        }
+        $form_state['input']['notification'][$key] = $tokenized[$key];
       }
     }
   }
