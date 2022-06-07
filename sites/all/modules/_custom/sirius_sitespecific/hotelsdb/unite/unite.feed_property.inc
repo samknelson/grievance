@@ -25,7 +25,6 @@ function unite_feed_property_info() {
       'create_new_records' => 'optional',
       'fields' => array(
         'nid' => array('group' => 'pk', 'title' => 'Internal ID (NID)'),
-        'pk_addr' => array('group' => 'pk', 'title' => 'Full Address'),
 
         'title' => array('group' => 'core', 'title' => 'Title'),
         'rooms' => array('group' => 'core', 'type' => 'integer'),
@@ -250,10 +249,16 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
       if (!$probe) { return array('success' => FALSE, 'msg' => 'No node was found with this NID.'); }
       if ($probe->type != 'property') { return array('success' => FALSE, 'msg' => 'The node for this NID was found, but it is not a property.'); }
     } else if ($pk = 'pk_addr') {
-      $addr = $row['pk_addr'];
-      if (!$addr) { return array('success' => FALSE, 'msg' => 'PK is address, but no address provided.'); }
+      $parts = array('thoroughfare', 'locality', 'administrative_area', 'postal_code', 'country');
+      $addr = array();
+      foreach ($parts as $part) {
+        if ( ($part != 'locality') && !$row["address_$part"]) {
+          return array('success' => FALSE, 'msg' => "Please include all the address parts.");
+        }
+        $addr[$part] = $row["address_$part"];
+      }
 
-      if ($rowcount > 1) { return array('success' => FALSE, 'msg' => 'Be kind.'); }
+      // if ($rowcount > 5) { return array('success' => FALSE, 'msg' => 'Be kind.'); }
 
       $result = sirius_addr_validate_full($addr);
       if (!$result['success']) { return $result; }
@@ -298,7 +303,8 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
     }
   }
 
-  return array('success' => TRUE, 'msg' => 'Looks good.');
+  if (!$msg) { $msg = "Looks good."; }
+  return array('success' => TRUE, 'msg' => $msg);
 }
 
 function unite_feed_property_row_process($feed_node, $info, $data, $row) {
