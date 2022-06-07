@@ -71,6 +71,9 @@ function sirius_wizard_steps($info, $data = NULL, $node = NULL) {
 		$steps = $info['steps'];
 	}
 
+	$context = array('info' => $info, 'data' => $data, 'node' => $node);
+	drupal_alter('sirius_wizard_steps', $steps, $context);
+
 	// Get the list of complete steps
 	$prior_complete = TRUE;
 	foreach ($steps as $step_name => $ignore) {
@@ -79,6 +82,7 @@ function sirius_wizard_steps($info, $data = NULL, $node = NULL) {
 		$steps[$step_name]['access'] = $prior_complete;
 		$prior_complete = $prior_complete && $complete;
 	}
+
 	return $steps;
 }
 
@@ -103,10 +107,18 @@ function sirius_wizard_content($info, $data, $node, $current_step) {
 	$callback = $steps[$current_step]['callback'];
 	$args = $steps[$current_step]['callback_args'];
 	if (!$callback) { $callback = 'sirius_wizard_content_default'; }
-	if ($args) {
-		return call_user_func($callback, $info, $data, $node, $current_step, $args);	
+	if (preg_match('/_form$/', $callback)) {
+		if ($args) {
+			return drupal_get_form($callback, $info, $data, $node, $current_step, $args);	
+		} else {
+			return drupal_get_form($callback, $info, $data, $node, $current_step);	
+		}
 	} else {
-		return call_user_func($callback, $info, $data, $node, $current_step);	
+		if ($args) {
+			return call_user_func($callback, $info, $data, $node, $current_step, $args);	
+		} else {
+			return call_user_func($callback, $info, $data, $node, $current_step);	
+		}
 	}
 }
 
@@ -223,6 +235,16 @@ function sirius_wizard_submit($info, $data, &$node, $current_step, $msg = NULL, 
 	// Set a friendly message
 	if (!$msg) { $msg = "Data saved for step: " . $steps[$current_step]['label']; }
 	drupal_set_message($msg);
+
+	$alterable = array(
+		'info' => $info, 
+		'data' => $data,
+		'node' => $node,
+		'current_step' => $current_step,
+		'msg' => $msg,
+		'options' => $options
+	);
+	drupal_alter('sirius_wizard_submit', $alterable);
 
 	// If we requested a specific step in the URL, we have to clear it.
 	if ($_REQUEST['step']) {

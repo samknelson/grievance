@@ -1,0 +1,124 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_revision') . '/sirius_revision.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_revision') . '/sirius_revision.permission.inc';
+
+/**
+ * Implements hook_node_postsave
+ * 
+ * After saving a node, attempt to execute every trigger that references, or is referenced by, the triggering node
+ */
+
+function sirius_revision_node_presave($node) {
+  if (!sirius_revision_conent_type_enabled($node->type)) { return; }
+  $key = sirius_revision_changed($node, $node->original);
+  if (!$key) { return; }
+
+  if (user_access('sirius admin')) {
+    // drupal_set_message("Creating a new revision in node of type " . sirius_content_type_name($node->type) . " because of change in $key");
+  }
+
+  $node->revision = TRUE;
+}
+
+function sirius_revision_conent_type_enabled($content_type) {
+  $enabled = array_filter(array_values(variable_get('sirius_revision_content_types', array())));
+  return in_array($content_type, $enabled);
+}
+
+function sirius_revision_changed($node1, $node2) {
+  if (!$node1 || !$node2) { return "[node is new]"; }
+
+  $key = sirius_revision_changed_impl($node1, $node2);
+  if (!$key) { $key = sirius_revision_changed_impl($node2, $node1); }
+  return $key;
+}
+
+function sirius_revision_changed_impl($arr1, $arr2, $depth = 0, $field_name = NULL) {
+  $arr1 = (array) $arr1;
+  $arr2 = (array) $arr2;
+  if ($depth > 99) { return FALSE; }
+
+  static $ignore;
+  if (!isset($ignore)) {
+    $ignore[0]['vid'] = TRUE;
+
+    $ignore[3]['offset'] = TRUE;
+    $ignore[3]['offset2'] = TRUE;
+    $ignore[3]['safe_value'] = TRUE;
+    $ignore[3]['safe'] = TRUE;
+    $ignore[3]['geom'] = TRUE;
+  }
+
+  foreach ($arr1 as $key => $value1) {
+    $value2 = $arr2[$key];
+
+    // We're only interested in real fields, not crud in the node
+    if ($depth == 0 && $key != 'title' && !preg_match('/^field_/', $key)) {
+      continue;
+    }
+
+    // Field name is at depth 0
+    if (!$depth) {
+      $field_name = $key;
+    }
+
+    // Some keys we ignore
+    if ($ignore[$depth][$key]) {
+      continue;
+    }
+
+    // If neither value1 nore value2 is an array and if they're equal, we ignore them
+    if (!is_array($value1) && !is_array($value2) && ($value1 == $value2)) {
+      continue; 
+    }
+
+    // Date fields always set value2, but don't always save it. We'll ignore it if one of the entries is NULL.
+    // This is unfortunate because it means you can remove an end date without creating a new revision.
+    if ($key == 'value2' && ($value1 == NULL || $value2 == NULL)) { 
+      continue;
+    }
+
+    // If we're in a JSON field, we need to decode the json and comopare.
+    if ($field_name == 'field_sirius_json' && $depth == 3) {
+      $value1 = json_decode($value1, TRUE);
+      $value2 = json_decode($value2, TRUE);
+    }
+
+    // If neither value1 nore value2 is an array and they're not equal, it's a change
+    if (!is_array($value1) && !is_array($value2) && ($value1 != $value2)) {
+      if (is_object($value1)) { $value1render = 'object'; } else { $value1render = $value1; }
+      if (is_object($value2)) { $value2render = 'object'; } else { $value2render = $value2; }
+      // drupal_set_message("Found a difference in $field_name at depth $depth between value1 = [$value1render] and value2 = [$value2render]");
+      return $key;
+    }
+
+    // If value1 is an array and value2 is a non-null non-array, it's a change. Or vice versa.
+    if (is_array($value1) && !is_array($value2) && ($value2 != NULL)) { 
+      return $key;
+    }
+    if (is_array($value2) && !is_array($value1) && ($value1 != NULL)) { 
+      return $key;
+    }
+
+    // At least one of value1 and value2 is an array. We need to recurse.
+    if ($subkey = sirius_revision_changed_impl($value1, $value2, $depth+1, $field_name)) {
+      // drupal_set_message("Here with $key/$subkey");
+      // dpm($arr1);
+      // dpm($arr2);
+      return "$key/$subkey";
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+
+function sirius_revision_sirius_config_links_alter(&$links) {
+  $links = array_merge($links, array('sirius_revision' => array('title' => 'Revisions')));
+  $links['sirius_revision']['links']['sirius/revision/config'] = array('title' => 'Settings', 'description' => 'Revision settings, including which content types should be versioned.');
+}

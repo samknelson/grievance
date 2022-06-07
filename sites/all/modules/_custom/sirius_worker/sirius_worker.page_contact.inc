@@ -143,6 +143,8 @@ function sirius_node_tab_worker_contact_form_validate($form, &$form_state) {
 }
 
 function sirius_node_tab_worker_contact_form_submit($form, &$form_state) {
+	drupal_alter('sirius_node_tab_worker_contact_form_submit', $form, $form_state);
+
 	$worker_node = $form_state['worker_node'];
 	global $user;
 

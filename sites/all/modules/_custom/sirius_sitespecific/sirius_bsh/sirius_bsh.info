@@ -1,0 +1,4 @@
+name = Sirius BSH
+description = Implements custom theme and other features for the TrainHawaii sites
+package = sirius
+core = 7.x

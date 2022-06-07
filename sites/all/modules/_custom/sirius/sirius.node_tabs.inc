@@ -52,7 +52,12 @@ function sirius_node_tab_content($node, $in_tab_name) {
   }
   */
   
-  return call_user_func_array($callback, $args);
+  // Allow other modules to modify our output
+  $result = call_user_func_array($callback, $args);
+  $context = array('node' => $node, 'in_tab_name' => $in_tab_name, 'tab_record' => $tab_record);
+  drupal_alter('sirius_node_tab_content', $result, $context);
+
+  return $result;
 }
 
 function sirius_node_tab_access($node, $in_tab_name) {
@@ -117,9 +122,9 @@ function sirius_term_tab_content($term, $in_tab_name) {
     $args = array_merge($args, $tab_record['callback arguments']);
   }
   sirius_node_tab_handle_requires($tab_record);
-  return call_user_func_array($callback, $args);
-  
-  return "";
+  $result = call_user_func_array($callback, $args);
+
+  return $result;
 }
 
 function sirius_term_tab_access($term, $in_tab_name) {

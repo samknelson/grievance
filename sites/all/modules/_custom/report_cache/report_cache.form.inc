@@ -82,8 +82,8 @@ function report_cache_form_submit($form, &$form_state) {
 		return;
 	}
 
-	$report_type_infos = module_invoke_all('report_cache_info');
-	$report_type_info = $report_type_infos[$report_type];
+	$report_type_info = report_cache_info($report_type);
+	if ($report_type_info['file']) { sirius_require($report_type_info['module'], $report_type_info['file']); }
 
 	$pk_list_callback = $report_type_info['pk_list_callback'];
 	if (!$pk_list_callback) {
@@ -97,38 +97,61 @@ function report_cache_form_submit($form, &$form_state) {
 		$pks = array_slice($pks, 0, $limit);
 	}
 
-  $stmt = db_insert('report_cache');
-	$stmt->fields(
-		array(
-			'report_id' => $report_id,
-			'report_row_pk' => 'PARAMETERS',
-			'report_type' => $report_type . ' :: PARAMETERS',
-			'report_data' => serialize($form_state['values']),
-			'report_domain_nid' => $domain_nid,
-		)
+	$parameters = $form_state['values'];
+	global $user;
+	$parameters['meta'] = array(
+		'user' => array(
+			'uid' => $user->uid,
+			'name' => $user->name,
+			'mail' => $user->mail,
+		),
+		'ts' => array(
+			'started' => time(),
+		),
 	);
-	$stmt->execute();
-
-
-	$operations = array();
-	$count = 0;
+	report_cache_parameters($report_type, $report_id, $parameters);
 	$total = count($pks);
-	foreach ($pks as $pk) {
-		++$count;
-		$operations[] = array(
-			'report_cache_batch', 
-			array($pk, $count, $total, $form_state['values'], $report_type_info),
-		);
+	$count = 0;
+
+	if ($form_state['values']['nobatch']) {
+		//
+		// Skip batch processing. We still run in chunks, but we simply run each chunk manually. Typically for a command line or auto-run background
+		//
+
+		$context = array();
+		foreach ($pks as $pk) {
+			++$count;
+			report_cache_batch($pk, $count, $total, $form_state['values'], $report_type_info, $context);
+			entity_get_controller('node')->resetCache();
+		}
+		report_cache_batch_finished(TRUE, $context['results'], array());
+
+	} else {
+		//
+		// Use batch processing. Typically for browser-based interactive
+		//
+
+		$operations = array();
+		foreach ($pks as $pk) {
+			++$count;
+			$operations[] = array(
+				'report_cache_batch', 
+				array($pk, $count, $total, $form_state['values'], $report_type_info),
+			);
+		}
+
+		// Launch the batch processor.
+	  $batch = array(
+	    'operations' => $operations,
+			'finished' => 'report_cache_batch_finished',
+	  );
+	  if ($report_type_info['file']) {
+	  	$batch['file'] = drupal_get_path('module', $report_type_info['module']) . '/' . $report_type_info['file'];
+	  }
+		
+		batch_set($batch);
 	}
-	
-	// Launch the batch processor.
-  $batch = array(
-    'operations' => $operations,
-		'finished' => 'report_cache_batch_finished',
-  );
-	
-	batch_set($batch);
-	
+		
 	return;
 }
 
@@ -140,7 +163,9 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 	$report_action = $values['report_action'];
 
 	$context['results']['report_type'] = $report_type;
+	$context['results']['report_id'] = $report_id;
 	$context['results']['count']++;
+	$context['results']['noninteractive'] = $values['noninteractive'];
 
 	if ($report_action == 'continue') {
 		$stmt = db_query(
@@ -205,15 +230,30 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 }
 
 function report_cache_batch_finished($success, $results, $operations) {
+	$report_type = $results['report_type'];
+	$report_id = $results['report_id'];
+	if ($report_id) {
+		$parameters = report_cache_parameters($report_type, $report_id);
+		$parameters['meta']['ts']['completed'] = time();
+		$parameters['meta']['ts']['duration'] = $parameters['meta']['ts']['completed'] - $parameters['meta']['ts']['started'];
+		$parameters['meta']['dashboard'] = $results['dashboard'];
+		report_cache_parameters($report_type, $report_id, $parameters);
+	}
+
 	if ($results['count']) {
 		$report_type = $results['report_type'];
 		$count = $results['count'];
-		drupal_set_message(
-			t('The report has been generated and may be viewed ') . 
-			l(t('here.'), "admin/reports/report-cache/$report_type")
-		);
+
+		if (!$results['noninteractive']) {
+			drupal_set_message(
+				t('The report has been generated and may be viewed ') . 
+				l(t('here.'), "sirius/reports/$report_type")
+			);
+		}
 	} else {
-		drupal_set_message(t('No records found.'));
+		if (!$results['noninteractive']) {
+			drupal_set_message(t('No records found.'));
+		}
 	}
 }
 
