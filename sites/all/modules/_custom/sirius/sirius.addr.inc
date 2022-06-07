@@ -59,16 +59,21 @@ function sirius_addr_states() {
 }
 
 function sirius_addr_validate_full($addr) {
-	if (!$addr['thoroughfare'] || !$addr['locality'] || !$addr['administrative_area'] || !$addr['postal_code']) {
-		return array('success' => FALSE, 'msg' => "Please enter an address, city, state, and zip.");
-	}
-
 	$result = sirius_addr_geocode_enabled();
 	if (!$result['success']) { 
 		return array('success' => TRUE, 'msg' => 'Skipping validation because geocoding is not enabled: ' . $result['msg']);
 	}
 
-	return sirius_addr_geocode_impl(sirius_addr_format_oneline($addr));
+	if (is_array($addr)) {
+		if (!$addr['thoroughfare'] || !$addr['locality'] || !$addr['administrative_area'] || !$addr['postal_code']) {
+			return array('success' => FALSE, 'msg' => "Please enter an address, city, state, and zip.");
+		}
+		$oneline = sirius_addr_format_oneline($addr);
+	} else {
+		$oneline = $addr;
+	}
+
+	return sirius_addr_geocode_impl($oneline);
 }
 
 function sirius_addr_geocode_enabled() {
