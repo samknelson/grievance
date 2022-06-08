@@ -18,9 +18,11 @@ function unite_feed_property_info() {
     'feed' => array(
       'pks' => array(
         'nid' => 'Internal ID (NID)',
+        'pk_addr' => 'Address',
         // 'id' => 'External ID',
         // 'addr' => 'Address',
       ),
+      'create_new_records' => 'optional',
       'fields' => array(
         'nid' => array('group' => 'pk', 'title' => 'Internal ID (NID)'),
 
@@ -246,6 +248,47 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
       $probe = node_load($nid);
       if (!$probe) { return array('success' => FALSE, 'msg' => 'No node was found with this NID.'); }
       if ($probe->type != 'property') { return array('success' => FALSE, 'msg' => 'The node for this NID was found, but it is not a property.'); }
+    } else if ($pk = 'pk_addr') {
+      $parts = array('thoroughfare', 'locality', 'administrative_area', 'postal_code', 'country');
+      $addr = array();
+      foreach ($parts as $part) {
+        if ( ($part != 'locality') && !$row["address_$part"]) {
+          return array('success' => FALSE, 'msg' => "Please include all the address parts.");
+        }
+        $addr[$part] = $row["address_$part"];
+      }
+
+      // if ($rowcount > 5) { return array('success' => FALSE, 'msg' => 'Be kind.'); }
+
+      $result = sirius_addr_validate_full($addr);
+      if (!$result['success']) { return $result; }
+      if (!$result['point']) { return array('success' => FALSE, 'msg' => 'No point in the address result?'); }
+
+      $addr_canon = $result['point']->data['geocoder_formatted_address'];
+      if (!$addr_canon) { return array('success' => FALSE, 'msg' => 'No geocoder_formatted_address in the data for the point returned from Google.'); }
+
+      $result = sirius_feed_lookup_by_field(
+        'property', 
+        'field_data_field_address_canon', 
+        'field_address_canon_value', 
+        $addr_canon
+      );
+
+      if ($result['success']) {
+        // We found exactly one. Use that NID.
+        $row['nid'] = $result['nid'];
+        $msg = "An existing property will be updated.";
+      } else {
+        if ($result['not_found'] && $data['create_new_records'] == 'Yes') { 
+          // Not found, but we can create new records. Do nothing
+          $msg = "A new property will be created.";
+        } else {
+          // We can't create new records, or we have a different kind of error
+          return $result;
+        }
+      }
+    } else {
+      return array('success' => FALSE, 'msg' => 'Missing or unknown pk $pk.');
     }
 
     foreach ($info['feed']['fields'] as $field_name => $field_info) {
@@ -260,7 +303,8 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
     }
   }
 
-  return array('success' => TRUE, 'msg' => 'Looks good.');
+  if (!$msg) { $msg = "Looks good."; }
+  return array('success' => TRUE, 'msg' => $msg);
 }
 
 function unite_feed_property_row_process($feed_node, $info, $data, $row) {
