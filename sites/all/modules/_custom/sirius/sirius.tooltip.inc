@@ -14,7 +14,15 @@ function sirius_tooltip_render($tooltip_content, $trigger_content = '') {
 	$html  = '<span class="sirius-tooltip" title="Tooltip">';
 	$html .= '  <span class="sirius-tooltip-trigger">';
 	$html .=      $trigger_content;
-	$html .=      '<span class="sirius-tooltip-info-icon">&#128712;</span>';
+	if (module_exists('fontawesome')) {
+		$html .=      '<span class="sirius-tooltip-info-icon sirius-tooltip-info-icon-awesome">';
+		$html .=      	'<i class="fas fa-info-circle"></i>';
+		$html .= 			'</span>';
+	} else {
+		$html .=      '<span class="sirius-tooltip-info-icon sirius-tooltip-info-icon-html">';
+		$html .=      	'&#128712;';
+		$html .= 			'</span>';
+	}
 	$html .= '  </span>';
 	$html .= '  <span class="sirius-tooltip-content">'; 
 	$html .=      $tooltip_content;

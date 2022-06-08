@@ -1,0 +1,111 @@
+<?php
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_cron/sirius_cron.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_cron/sirius_cron.info.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_cron/sirius_cron.scan.inc';
+
+/**
+ * Implements hook_cron
+ */
+
+function sirius_cron_cron() {
+  sirius_cron_scan_all();
+}
+
+
+/**
+ * Implements hook_sirius_config_links_alter
+ */
+
+function sirius_cron_sirius_config_links_alter(&$links) {
+  $links['systems']['links']['sirius/cron'] = array('title' => 'Cron', 'description' => 'Review cron jobs and run manually.');
+}
+
+
+function sirius_cron_scan_test($mode) {
+  $random_total = 0;
+  for ($i=1; $i<=10; ++$i) {
+    $random_value = rand(100,999);
+    $random_total += $random_value;
+    sirius_minilog("Pass #$i: Found value $random_value, total $random_total.");
+  }
+  return array('success' => TRUE, 'msg' => "Test scan found a random total of $random_total.");
+}
+
+function sirius_cron_scan_expired_active_nodes($mode) {
+  $content_types = array(
+    'sirius_contact_relationship',
+    'sirius_trust_worker_benefit',
+    'sirius_trust_worker_election',
+  );
+
+  $current_date = gmdate('Y-m-d H:i:s');
+  $sql_args = array();
+  $sql_args[':current_date'] = $current_date;
+
+  foreach ($content_types as $content_type) {
+    $sql_args[':content_type'] = $content_type;
+
+    sirius_minilog("$content_type: Scanning for active nodes that should be expired.");
+
+    $sql = "select nid, title ";
+    $sql .= "from node ";
+    $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
+    $sql .= "where node.type = :content_type ";
+    $sql .= "and field_sirius_active_value = 'Yes' ";
+    $sql .= "and (field_sirius_date_end_value is not null and field_sirius_date_end_value < :current_date) ";
+    $sql .= "order by nid ";
+    $stmt = db_query($sql, $sql_args);
+
+    $count = 0;
+    while ($hr = $stmt->fetchAssoc()) {
+      ++$count;
+      if ($mode == 'live') {
+        sirius_minilog("$content_type: Found $hr[nid] ($hr[title]). Resaving.");
+        $node = node_load($hr['nid']);
+        node_save($node);
+        sirius_minilog("$content_type: Found $hr[nid] ($hr[title]). Save complete.");
+
+      } else {
+        sirius_minilog("$content_type: Found $hr[nid] ($hr[title]). Mode is $mode, so no action is taken.");
+      }
+
+      sirius_minilog("$content_type: Found $count nodes that needed to be expired.");
+    }
+
+    sirius_minilog("$content_type: Scanning for inactive nodes that should be activated.");
+
+    $sql = "select nid, title ";
+    $sql .= "from node ";
+    $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
+    $sql .= "where node.type = :content_type ";
+    $sql .= "and field_sirius_active_value = 'No' ";
+    $sql .= "and (field_sirius_date_start_value is not null and field_sirius_date_start_value <= :current_date) ";
+    $sql .= "and (field_sirius_date_end_value is null or field_sirius_date_end_value >= :current_date) ";
+    $sql .= "order by nid ";
+    $stmt = db_query($sql, $sql_args);
+
+    $count = 0;
+    while ($hr = $stmt->fetchAssoc()) {
+      ++$count;
+      if ($mode == 'live') {
+        sirius_minilog("$content_type: Found $hr[nid] ($hr[title]). Resaving.");
+        $node = node_load($hr['nid']);
+        node_save($node);
+        sirius_minilog("$content_type: Found $hr[nid] ($hr[title]). Save complete.");
+
+      } else {
+        sirius_minilog("$content_type: Found $hr[nid] ($hr[title]). Mode is $mode, so no action is taken.");
+      }
+
+      sirius_minilog("$content_type: Found $count nodes that needed to be activated.");
+    }
+
+  }
+
+  return array('success' => TRUE);
+}

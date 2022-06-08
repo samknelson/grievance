@@ -23,23 +23,6 @@ function sirius_dispatch_eba_dates_worker($worker_node) {
 	return $dates;
 }
 
-function sirius_dispatch_eba_cron() {
-	// Run once a day
-	$today = date('Y-m-d');
-	$last_run = variable_get('sirius_dispatch_eba_last_date', 0);
-	if ($last_run == $today) { return; }
-	variable_set('sirius_dispatch_eba_last_date', $today);
-
-	// Don't run before a specific time
-	$hour = variable_get('sirius_dispatch_eba_start_hr', 1);
-	$min = variable_get('sirius_dispatch_eba_start_min', 30);
-	if (time() < strtotime("$today $hour:$min")) { return; }
-
-	// Run the scan
-	// $result = sirius_dispatch_eba_cleanup('live');
-	watchdog('sirius_dispatch_eba', $result['msg']);
-}
-
 /**
  * Clean up EBA:
  * - Remove any dates in the past
@@ -90,7 +73,7 @@ function sirius_dispatch_eba_cleanup_worker($worker_nid, $mode = 'test') {
 			if ($tmp['value'] > $date) { 
 				$new_dates['und'][] = $tmp;
 			} else {
-				$msg .= "Removed old EBA date " . gmdate('Y-m-d', strtotime($tmp['value']));
+				$msg .= " Removed old EBA date " . gmdate('Y-m-d', strtotime($tmp['value']));
 				$need_save = TRUE;
 			}
 		}
@@ -100,7 +83,6 @@ function sirius_dispatch_eba_cleanup_worker($worker_nid, $mode = 'test') {
 
 	// Can't be "Yes" without a date.
 	if ($worker_node->field_sirius_dispatch_eba['und'][0]['value'] == 'Yes' && !$new_dates) {
-		print_r($new_dates);
 		$worker_node->field_sirius_dispatch_eba['und'][0]['value'] = 'No';
 		$msg .= "Worker has no upcoming EBA dates, setting EBA to 'No'. ";
 		$need_save = TRUE;
@@ -116,54 +98,18 @@ function sirius_dispatch_eba_cleanup_worker($worker_nid, $mode = 'test') {
 
 	if (!$need_save) {
 		$msg .= "No updated needed. ";
-	}
-
-	if ($need_save && $mode == 'live') {
-		node_save($worker_node);
-		sirius_log('worker:eba', 'cleanup', $msg, '', '', array($worker_node->nid), array());
+		return array('success' => TRUE, 'msg' => $msg);
 	}
 
 	sirius_minilog($msg);
+	if ($mode == 'live') {
+		node_save($worker_node);
+		sirius_log('worker:eba', 'cleanup', $msg, '', '', array($worker_node->nid), array());
+	} else {
+		sirius_minilog("(Skipping save because mode = $mode)");
+	}
+
 
 	return array('success' => TRUE, 'msg' => $msg);
 }
 
-function sirius_dispatch_page_eba_cleanup() { 
-	return drupal_get_form('sirius_dispatch_page_eba_cleanup_form'); 
-}
-
-function sirius_dispatch_page_eba_cleanup_form($form, &$form_state) {
-	$intro = t('Use the form below to perform a manual EBA cleanup. This process will also run automatically on a daily basis.');
-	$form['intro'] = array('#markup' => '<div class"sirius_form_intro">' . $intro . '</div>');
-
-	$form['mode'] = array(
-		'#type' => 'select',
-		'#title' => 'Mode',
-		'#options' => array(
-			'test' => 'Test Mode',
-			'live' => 'Live Mode',
-		),
-		'#required' => TRUE,
-	);
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => 'Submit',
-	);
-
-	if ($form_state['results']) {
-		$form['results'] = array('#markup' => $form_state['results']);
-	}
-
-	return $form;
-}
-
-function sirius_dispatch_page_eba_cleanup_form_submit($form, &$form_state) {
-	$result = sirius_dispatch_eba_cleanup($form_state['values']['mode']);
-	drupal_set_message($result['msg']);
-	if ($result['count']) { 
-		drupal_set_message("Detailed results are below.");
-		$form_state['results'] = '<h2>Results</h2><pre>' . sirius_minilog_render() . '</pre>';
-		$form_state['rebuild'] = TRUE;
-	}
-}

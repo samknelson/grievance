@@ -64,13 +64,10 @@ function sirius_page_config() {
 	$links['training'] = array('title' => 'Training Center');
 	$links['training']['links']['sirius/config/training'] 					= array('title' => 'Training Center Settings', 'description' => 'Settings for the training center (evaluations, etc.).');
 
-	$links['ledger'] = array('title' => 'A/R Accounting and Ledger');
-	$links['ledger']['links']['sirius/config/ledger'] 					= array('title' => 'A/R Settings', 'description' => 'Settings for the A/R accounting system: ledger, dues, payments, charges, etc.');
-
 	$links['users'] = array('title' => 'Users');
 	$links['users']['links']['admin/people'] = array('title' => 'Users', 'description' => 'Sitewide user management');
 	$links['users']['links']['admin/config/system/flood-control'] = array('title' => 'Flood Control', 'description' => 'Settings for blocking multiple failed login attempts from the same IP address.');
-	$links['users']['links']['admin/config/system/flood-control']['sub_paths']['admin/config/system/flood-unblock'] = array('title' => 'Flood Unblock');
+	$links['users']['links']['admin/config/system/flood-control']['sub_paths']['sirius/flood'] = array('title' => 'Flood Unblock');
 	$links['users']['links']['admin/config/people/tfa-trusted-ip'] = array('title' => 'TFA Trusted IPs', 'description' => 'Set the list of trusted IP addresses for two-factor authentication.');
 
 	$links['systems'] = array('title' => 'Systems');

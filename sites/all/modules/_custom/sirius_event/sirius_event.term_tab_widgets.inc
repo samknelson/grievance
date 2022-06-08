@@ -27,6 +27,7 @@ function sirius_event_term_tab_widgets_quicknav($event_type_json, $base_path) {
 	$links[] = $link;
 
 	foreach (array('register' => 'Register', 'participants' => 'Participant') as $rule_type => $rule_type_name) {
+		if (!$event_type_json[$rule_type]) { continue; }
 		foreach ($event_type_json[$rule_type] as $rules) {
 			foreach ($rules as $delta => $rule) {
 				foreach ($rule['widget'] as $widget) {

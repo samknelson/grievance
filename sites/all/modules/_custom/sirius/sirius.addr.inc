@@ -59,16 +59,21 @@ function sirius_addr_states() {
 }
 
 function sirius_addr_validate_full($addr) {
-	if (!$addr['thoroughfare'] || !$addr['locality'] || !$addr['administrative_area'] || !$addr['postal_code']) {
-		return array('success' => FALSE, 'msg' => "Please enter an address, city, state, and zip.");
-	}
-
 	$result = sirius_addr_geocode_enabled();
 	if (!$result['success']) { 
 		return array('success' => TRUE, 'msg' => 'Skipping validation because geocoding is not enabled: ' . $result['msg']);
 	}
 
-	return sirius_addr_geocode_impl(sirius_addr_format_oneline($addr));
+	if (is_array($addr)) {
+		if (!$addr['thoroughfare'] || !$addr['locality'] || !$addr['administrative_area'] || !$addr['postal_code']) {
+			return array('success' => FALSE, 'msg' => "Please enter an address, city, state, and zip.");
+		}
+		$oneline = sirius_addr_format_oneline($addr);
+	} else {
+		$oneline = $addr;
+	}
+
+	return sirius_addr_geocode_impl($oneline);
 }
 
 function sirius_addr_geocode_enabled() {
@@ -214,4 +219,50 @@ function sirius_addr_latlon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
   } else {
     return $miles;
   }
+}
+
+function sirius_addr_driving_distance($addr1, $addr2, $options = array()) {
+  // Get a Google API key
+  $geocoder_settings = variable_get('geocoder_settings', array());
+  $google_api_key = $geocoder_settings['geocoder_apikey_google'];
+  if (!$google_api_key) {
+    return array('success' => FALSE, 'msg' => "Please make sure that the geocoder module is configured with a Google API key.");
+  }
+
+  $units = $options['units'];
+  if (!$units) { $units = 'imperial'; }
+
+  $total_distance = 0;
+
+  // Get directions from google directions api
+  $url = 'https://maps.googleapis.com/maps/api/distancematrix/json';
+  $options = array(
+    'query' => array(
+      'origins' => sirius_addr_format_oneline($addr1),
+      'destinations' => sirius_addr_format_oneline($addr2),
+      // 'waypoints' => implode('|', $waypoints),
+      'units' => $units,
+      'key' => $google_api_key
+    )
+  );
+  $full_url = url($url, $options);
+  $response = drupal_http_request($full_url);
+  if (!$response->data) {
+    return array('success' => FALSE, 'msg' => "Unable to connect to $url: " . $response->error);
+  }
+
+  $result = json_decode($response->data);
+  if ($result->error_message) {
+    return array('success' => FALSE, 'msg' => $result->error_message);
+  }
+  if ($result->status != 'OK') {
+    return array('success' => FALSE, 'msg' => "Google API returned status " . $result->status); 
+  }
+
+  if (!$result->rows[0]) {
+    return array('success' => FALSE, 'msg' => "Unable to parse the Google API response."); 
+  }
+  $meters = $result->rows[0]->elements[0]->distance->value;
+  $miles = $meters / 1609.34;
+  return array('success' => TRUE, 'distance' => $miles);
 }

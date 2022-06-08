@@ -9,13 +9,19 @@
 .sirius-tooltip-trigger {
 }
 
-.sirius-tooltip-info-icon {
+.sirius-tooltip-info-icon-html {
 	margin-left:  3px;
 	padding:  2px;
 	color:  #333333;
-
 	font-size:  170%;
   line-height: 70%;
   display: inline-block;
   vertical-align: middle
 }
+
+.sirius-tooltip-info-icon-awesome {
+	color:  #333399;
+	margin-left:  3px;
+	padding:  2px;
+	font-size:  125%;
+ }

@@ -504,7 +504,7 @@ function sirius_dispatch_page_job_create_ajax_halls($form, $form_state) {
 }
 
 function sirius_dispatch_page_job_create_workers($form, $form_state) {
-	return $form['fieldset_workers']['workers'];
+	return $form['fieldset_workers']['ajax']['workers'];
 }
 
 function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
@@ -548,8 +548,8 @@ function sirius_dispatch_page_job_create_form_validate($form, &$form_state) {
 	$job_policy = sirius_dispatch_job_policy_from_tid($job_type_tid);
 	$count = $form_state['values']['count'];
 	$selected = 0;
-	if ($form_state['values']['workers']) {
-		foreach ($form_state['values']['workers'] as $ignore => $worker_nid) {
+	if ($form_state['values']['fieldset_workers']['ajax']['workers']) {
+		foreach ($form_state['values']['fieldset_workers']['ajax']['workers'] as $ignore => $worker_nid) {
 			if ($worker_nid) { ++$selected; }
 		}
 	}
@@ -593,10 +593,12 @@ function sirius_dispatch_page_job_create_form_submit($form, &$form_state) {
 	$job_nid = $job_node->nid;
 
 	// Build and save any CBN workers
-	if ($form_state['values']['workers']) {
-		foreach ($form_state['values']['workers'] as $worker_nid => $checked) {
+	if ($form_state['values']['fieldset_workers']['ajax']['workers']) {
+		foreach ($form_state['values']['fieldset_workers']['ajax']['workers'] as $worker_nid => $checked) {
 			if (!$checked) { continue; }
-			sirius_dispatch_actions_create($job_node, $worker_nid, 'Yes');
+			// drupal_set_message("Creating: $worker_nid");
+			$result = sirius_dispatch_actions_create($job_node, $worker_nid, 'Yes');
+			// drupal_set_message('<pre>' . print_r($result, 1) . '</pre>');
 		}
 	}
 
@@ -650,8 +652,8 @@ function sirius_dispatch_page_job_create_get_job_node($form_state) {
 		$job_node->field_sirius_count['und'][0]['value'] = $job_policy['workers']['count_fixed'];
 	} else if ($count_policy == 'automatic') {
 		$count = 0;
-		if ($form_state['values']['workers']) {
-			foreach ($form_state['values']['workers'] as $worker_nid => $checked) {
+		if ($form_state['values']['fieldset_workers']['ajax']['workers']) {
+			foreach ($form_state['values']['fieldset_workers']['ajax']['workers'] as $worker_nid => $checked) {
 				if (!$checked) { continue; }
 				++$count;
 			}

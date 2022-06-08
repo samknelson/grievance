@@ -200,6 +200,7 @@ function sirius_node_tab_event_phonebank_call_form($form, &$form_state, $event_n
 		$browserphone_params['omg']['callback_js'] = 'sirius_event_phonebank_set_all_pstatus';
 		$browserphone_params['omg']['callback_js_args'] = array($survey_json['omg']['pstatus']);
 	}
+	$browserphone_params['agent']['active'] = TRUE;
 	$form['phone_interface_html'] = array('#markup' => sirius_twilio_browserphone_render($browserphone_params));
 
 	if ($_REQUEST['face']) {

@@ -15,15 +15,24 @@ function sirius_node_tab_worker_dnc_form($form, &$form_state, $worker_node) {
 	$html = '';
 	if ($worker_node->field_sirius_dispatch_dncs['und']) {
 		foreach ($worker_node->field_sirius_dispatch_dncs['und'] as $tmp) {
-			$employer_nid = $tmp['target_id'];
-			$employer_node = node_load($employer_nid);
-			$html .= '<li>' . $employer_node->title . '</li>';
+			$entity_nid = $tmp['target_id'];
+			$entity_node = node_load($entity_nid);
+			$entity_title = $entity_node->title;
+			if ($entity_node->type == 'grievance_shop') {
+				$entity_title = "Employer: $entity_title";
+			} else if ($entity_node->type == 'sirius_dispatch_facility') {
+				$entity_title = "Employer: $entity_title";
+			} else if ($entity_node->type == 'sirius_term_proxy') {
+				$term = taxonomy_term_load($entity_node->field_sirius_term_proxy['und'][0]['target_id']);
+				$entity_title = "Industry: " . $term->name;
+			}
+			$html .= '<li>' . $entity_title . '</li>';
 		}
 	}
 	if ($html) {
-		$html = t('@title is currently on the Do Not Call list for the following employers and/or facilities:', array('@title' => $worker_node->title)) . '<ul>' . $html . '</ul>';
+		$html = t('@title is currently on the Do Not Call list for the following employers, facilities, or industries:', array('@title' => $worker_node->title)) . '<ul>' . $html . '</ul>';
 	} else {
-		$html = t('@title is not currently on the Do Not Call list for any employers or facilities.', array('@title' => $worker_node->title));
+		$html = t('@title is not currently on the Do Not Call list for any employers, facilities, or industries.', array('@title' => $worker_node->title));
 	}
 	$form['intro'] = array(
 		'#type' => 'markup',
@@ -43,10 +52,16 @@ function sirius_node_tab_worker_dnc_form($form, &$form_state, $worker_node) {
 			if (!$nid) { continue; }
 			$options[$nid] = t('Facility: ') . $title;
 		}
+		$industries = sirius_taxonomy_load('sirius_industry', 'tid', 'name');
+		foreach ($industries as $industry_tid => $industry_name) {
+			$proxy_node = sirius_taxonomy_proxy($industry_tid);
+			$options[$proxy_node->nid] = t('Industry: ') . $industry_name;
+		}
+
 
 		$form['employer_nid'] = array(
 			'#type' => 'select',
-			'#title' => 'Employer or Facility',
+			'#title' => 'Employer, Facility, or Industry',
 			'#options' => $options,
 			'#required' => TRUE,
 		);

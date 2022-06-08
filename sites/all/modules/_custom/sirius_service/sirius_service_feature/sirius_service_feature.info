@@ -1,0 +1,10 @@
+name = sirius_service_feature
+core = 7.x
+package = Features
+dependencies[] = ctools
+dependencies[] = rest_server
+dependencies[] = services
+dependencies[] = sirius_service
+features[ctools][] = services:services:3
+features[features_api][] = api:2
+features[services_endpoint][] = sirius_service

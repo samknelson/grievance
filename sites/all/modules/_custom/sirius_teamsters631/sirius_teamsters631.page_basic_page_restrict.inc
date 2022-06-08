@@ -11,25 +11,33 @@ function sirius_teamsters631_node_tab_basic_page_restrict_form($form, &$form_sta
 
 	$form['#tree'] = TRUE;
 
-	$ms_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
-	$form['restrict']['ms'] = array(
-		'#title' => t('Retrict by Member Status'),
-		'#type' => 'checkboxes',
-		'#options' => $ms_options,
-		'#checkall' => TRUE,
-		'#description' => t('Leave blank to allow access to all member statuses.'),
-	);
-	if ($basic_page_json['restrict']['ms']) { $form['restrict']['ms']['#default_value'] = $basic_page_json['restrict']['ms']; }
+	$result = sirius_proxy_call('sirius_taxonomy_load', 'sirius_member_status', 'tid', 'name');
+	if (!$result['success']) { return sirius_form_error($result['msg']); }
+	$ms_options = $result['data'];
+	if ($ms_options) {
+		$form['restrict']['ms'] = array(
+			'#title' => t('Retrict by Member Status'),
+			'#type' => 'checkboxes',
+			'#options' => $ms_options,
+			'#checkall' => TRUE,
+			'#description' => t('Leave blank to allow access to all member statuses.'),
+			'#default_value' => sirius_form_array_default_value($basic_page_json['restrict']['ms']),
+		);
+	}
 
-	$ws_options = sirius_taxonomy_load('sirius_work_status', 'tid', 'name');
-	$form['restrict']['ws'] = array(
-		'#title' => t('Retrict by Work Status'),
-		'#type' => 'checkboxes',
-		'#options' => $ws_options,
-		'#checkall' => TRUE,
-		'#description' => t('Leave blank to allow access to all work statuses.'),
-	);
-	if ($basic_page_json['restrict']['ws']) { $form['restrict']['ws']['#default_value'] = $basic_page_json['restrict']['ws']; }
+	$result = sirius_proxy_call('sirius_taxonomy_load', 'sirius_work_status', 'tid', 'name');
+	if (!$result['success']) { return sirius_form_error($result['msg']); }
+	$ws_options = $result['data'];
+	if ($ws_options) {
+		$form['restrict']['ws'] = array(
+			'#title' => t('Retrict by Work Status'),
+			'#type' => 'checkboxes',
+			'#options' => $ws_options,
+			'#checkall' => TRUE,
+			'#description' => t('Leave blank to allow access to all work statuses.'),
+			'#default_value' => sirius_form_array_default_value($basic_page_json['restrict']['ws']),
+		);
+	}
 
 	$form['submit'] = array(
 		'#type' => 'submit',

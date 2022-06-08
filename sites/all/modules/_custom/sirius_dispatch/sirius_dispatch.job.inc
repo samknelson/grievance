@@ -251,6 +251,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	// Get the industry TID
 	$industry_tid = $job_node->field_sirius_industry['und'][0]['tid'];
 	if (!$industry_tid) { return array(); }
+	$industry_proxy = sirius_taxonomy_proxy($industry_tid);
 
 	// Get the dispatchable member statuses for this job.
 	$member_status_tids = array();
@@ -460,6 +461,7 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	$sql .= "  and field_sirius_dispatch_dncs_target_id in (:employer_nid1) ";
 	$args[':employer_nid1'] = array($employer_nid);
 	if ($facility_nid) { $args[':employer_nid1'][] = $facility_nid; }
+	if ($industry_proxy) { $args[':employer_nid1'][] = $industry_proxy->nid; }
 	$sql .= ") ";
 
 	// Exclude employee-initiated DNCs
@@ -634,7 +636,8 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 
 	// Get the industry TID
 	$industry_tid = $job_node->field_sirius_industry['und'][0]['tid'];
-	if (!$industry_tid) { return array('success' => FALSE, 'msg' => t('There is no work industry specified for this job.')); }
+	if (!$industry_tid) { return array('success' => FALSE, 'msg' => t('There is no industry specified for this job.')); }
+	$industry_proxy = sirius_taxonomy_proxy($industry_tid);
 
 	// Get the dispatchable member statuses for this job.
 	$member_status_tids = array();
@@ -653,7 +656,7 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	$facility_nid = $job_node->field_sirius_dispatch_facility['und'][0]['target_id'];
 
 	// Exclude current dispatches
-	if (!$filters['ignore_redispatch']) {
+	if (!$filters['redispatch'] && !$filters['ignore_redispatch']) {
 		$sql = "select count(*) as c from ";
 		$sql .= "node, ";
 		$sql .= "field_data_field_sirius_worker, ";
@@ -828,9 +831,14 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 		return array('success' => FALSE, 'msg' => t('The worker has been placed on the do-not-call list for this employer.'));
 	}
 
-	// Exclude employer-initiated DNCs
+	// Exclude facility DNCs
 	if ($facility_nid && in_array($facility_nid, sirius_fieldvals($worker_node, 'field_sirius_dispatch_dncs', 'target_id'))) {
 		return array('success' => FALSE, 'msg' => t('The worker has been placed on the do-not-call list for this facility.'));
+	}
+
+	// Exclude industry DNCs
+	if ($industry_proxy && in_array($industry_proxy->nid, sirius_fieldvals($worker_node, 'field_sirius_dispatch_dncs', 'target_id'))) {
+		return array('success' => FALSE, 'msg' => t('The worker has been placed on the do-not-call list for this industry.'));
 	}
 
 	// Exclude employee-initiated DNCs
