@@ -109,6 +109,7 @@ function sirius_teamsters631_render_banner($which) {
 				$html .= 'Questions? Contact the Union Hall at <a href="phone:+17024305048">(702) 430-5048</a>';
 			} else {
 				$html .= 'Questions? Contact the Training Center at <a href="phone:+17026510344">(702) 651-0344</a>';
+				$html .= '<br>Office hours: 7am-4pm PT M-F';
 			}
 		$html .= '</div>'; // user-links-text
 	$html .= '</div>'; // user-links
