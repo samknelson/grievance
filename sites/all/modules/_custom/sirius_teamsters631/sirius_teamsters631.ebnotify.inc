@@ -71,3 +71,4 @@ function sirius_teamsters631_taxonomy_term_update_ebnotify($term) {
 		drupal_set_message("Sent a notification to $email: $subject");
 	}
 }
+
