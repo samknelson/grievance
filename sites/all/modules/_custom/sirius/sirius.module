@@ -54,7 +54,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.do_not_dist
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.server_paths.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.shortlink.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.showhide.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.quickhash.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.richtext.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.map.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.disclaimer.inc';
@@ -62,7 +61,10 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mailattach.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.customfield.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.bookmark.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.public.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
+
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -105,6 +107,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_esigna
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_license.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_voice_forward_to_operator.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_feed_landing.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_user_proxy.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
 
@@ -128,6 +131,7 @@ function sirius_entity_presave($entity, $type) {
     if ($entity->type == 'sirius_worker') { sirius_contact_sync_from_worker($entity); }
   }
   if ($type == 'user') { sirius_contact_sync_from_user($entity); }
+
 }
 
 /**
@@ -165,8 +169,19 @@ function sirius_node_presave($node) {
 
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_presave($node); }
   if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_presave($node); }
+  if ($node->type == 'sirius_contact_relationship') { sirius_contact_relationship_node_presave($node); }
 
   sirius_addr_node_presave($node);
+
+  // Force a new revision
+  /*
+  if (in_array($node->type, array('sirius_worker'))) {
+    if (!$node->sirius_norevision) {
+      dpm($node);
+      dpm(diff_entity_diff($node, $node->original, array('entity_type' => 'node')));
+    }
+  }
+  */
 }
 
 
@@ -258,7 +273,7 @@ function sirius_field_formatter_settings_summary($field, $instance, $view_mode) 
 
 function sirius_form_alter(&$form, &$form_state, $form_id) {
   // Set default values for entity fields with autocomplete widgets
-  $defaultable_fields = array('sirius_dispatch_facility', 'sirius_dispatch_job');
+  $defaultable_fields = array('sirius_dispatch_facility', 'sirius_dispatch_job', 'sirius_contact', 'sirius_contact_alt', 'sirius_worker', 'sirius_contact_relation', 'grievance_shop');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $nid = $_GET[$field];
@@ -269,7 +284,7 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
-  $defaultable_fields = array('sirius_domain', 'sirius_event_type');
+  $defaultable_fields = array('sirius_domain', 'sirius_event_type', 'sirius_trust_policy');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $form['field_' . $field]["und"]['#default_value'][0] = $_GET[$field];
@@ -331,13 +346,22 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
       $form_id == 'sirius_ledger_account_node_form' ||
       $form_id == 'sirius_employee_node_form' ||
       $form_id == 'grievance_letter_template_node_form' ||
-      $form_id == 'property_node_form') {
+      $form_id == 'property_node_form' ||
+      $form_id == 'sirius_contact_relationship_node_form' ||
+      $form_id == 'sirius_trust_worker_benefit_node_form') {
     if (!user_access('sirius admin')) { $form['field_sirius_json']['#access'] = FALSE; }
+  }
+
+  if ($form_id == 'sirius_contact_relationship_node_form') {
+    sirius_contact_relationship_node_form_alter($form, $form_state, $form_id);
   }
 
   // Remove access to denormalized fields
   if ($form_id == 'sirius_worker_node_form') {
-    if (!user_access('sirius admin')) { $form['field_sirius_denorm_level']['#access'] = FALSE; }
+    if (!user_access('sirius admin')) {
+      $form['field_sirius_denorm_level']['#access'] = FALSE;
+      $form['field_sirius_denorm_benefits']['#access'] = FALSE;
+    }
   }
 
   // Can't change the "type" of a JSON Definition
@@ -608,6 +632,8 @@ function sirius_node_view($node, $view_mode, $langcode) {
     $tab = 'sirius_phonenumber_info';
   } else if ($node->type == 'sirius_json_definition' && $view_mode == 'full' && $node->field_sirius_type['und'][0]['value'] == 'sirius_event:catalog') {
     $tab = 'sirius_event_catalog_view';
+  } else if ($node->type == 'sirius_domain' && $view_mode == 'full') {
+    $tab = 'sirius_domain_info';
   }
 
   sirius_public_node_view($node, $view_mode, $langcode);
@@ -640,6 +666,7 @@ function sirius_node_validate($node, $form, &$form_state) {
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_validate($node, $form, $form_state); }
   if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_validate($node, $form, $form_state); }
   if ($node->type == 'sirius_domain') { sirius_domain_node_validate($node, $form, $form_state); }
+  if ($node->type == 'sirius_contact_relationship') { sirius_contact_relationship_node_validate($node, $form, $form_state); }
 }
 
 
@@ -931,6 +958,7 @@ function sirius_quicknav($links) {
       if ($key == 'q') { continue; }
       if ($query[$key] != $value) { $is_current = FALSE; }
     }
+    if ($link['current']) { $is_current = TRUE; }
 
     if ($is_current) {
       $html .= '<span>' . $link['title'] . '</span>';
@@ -1028,6 +1056,13 @@ function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $
   if (is_numeric($str)) { return number_format($str, $decimals, $decimal_separator, $thousands_separator); }
 }
 
+
+function sirius_table_render($header, $rows, $attributes = array()) {
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/table.css');
+  $attributes['class'][] = 'sirius_table';
+  return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
+}
+
 /**
  * Return a user-friendly name for a content type. For instance, if the machine name is "sirius_worker", the internal name is "Sirius Worker". But we just return "Worker".
  */
@@ -1079,5 +1114,88 @@ function sirius_user_cancel_methods_alter(&$methods) {
 function sirius_views_pre_render(&$view) {
   if ($view->name == 'sirius_bookmarks') {
     return sirius_bookmark_view_pre_render($view);
+  }
+}
+
+function sirius_form_array_default_value($value) {
+  if ($value) { return $value; } else { return array(); }
+}
+
+function sirius_form_error($msg) {
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/form.css');
+
+  return array(
+    'err' => array(
+      '#markup' => $msg,
+      '#prefix' => '<div class="sirius-form-error">',
+      '#suffix' => '</div>'
+    )
+  );
+}
+
+
+
+
+
+
+
+
+
+function sirius_form_prep(&$form, $defaults = array(), $settings = array()) {
+  _sirius_form_prep_recursive($form, $defaults, $settings);
+  return $form;
+}
+
+function _sirius_form_prep_recursive(&$form, $defaults = array(), $settings = array()) {
+  drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/survey.css', 'file');
+
+  if (!is_array($form)) { return; }
+  foreach ($form as $key => $value) {
+    if (!is_array($form[$key])) { continue; }
+    
+    $type = $form[$key]['#type'];
+    if ($type) {
+      if ($type == 'select' || $type == 'textfield' || $type == 'textarea' || $type == 'date_popup' || $type == 'radios' || $type == 'checkboxes')  {
+        if ($form[$key]['#prefix']) { $form[$key]['#prefix'] = '<div class="prefix_wrap"><div class="prefix">' . $form[$key]['#prefix'] . '</div></div>'; }
+        if ($form[$key]['#suffix']) { $form[$key]['#suffix'] = '<div class="suffix_wrap"><div class="suffix">' . $form[$key]['#suffix'] . '</div></div>'; }
+        if ($form[$key]['#title']) {
+          $form[$key]['#title'] = '<span class="title_wrap">' . $form[$key]['#title'] . '</span>';
+        }
+        if ($form[$key]['#description']) {
+          if ($settings['hide_instructions']) {
+            unset($form[$key]['#description']);
+          } else {
+            $form[$key]['#description'] = '<div class="sirius_ckstyles_script_instructions">' . $form[$key]['#description'] . '</div>'; 
+          }
+        }
+
+        if ($settings['phonebank']['autosave']['field'] == 'Yes') {
+          $form[$key]['#ajax'] = array(
+            'callback' => 'sirius_node_tab_event_phonebank_call_form_submit_ajax',
+            'event' => 'blur'
+          );
+        }
+
+        if (isset($defaults[$key])) {
+          $form[$key]['#default_value'] = $defaults[$key];
+          if ($type == 'date_popup' && is_array($defaults[$key])) { 
+            $form[$key]['#default_value'] = date('Y-m-d H:i:s', strtotime($defaults[$key]['date'] . ' ' . $defaults[$key]['time']));
+            $form[$key]['#attributes']['autocomplete'] = 'off';
+          }
+          else { $form[$key]['#default_value'] = $defaults[$key]; }
+        }
+        if ($settings['clear_required']) {
+          if ($form[$key]['#required']) {
+            unset($form[$key]['#required']);
+            $form[$key]['#title'] = '<strong>[' . t('Required') . ']</strong> ' . $form[$key]['#title'];
+            $form[$key]['#attributes']['class'][] = 'sirius_phonebank_field_required'; 
+          }
+        }
+      } else if ($type == 'fieldset') {
+        _sirius_form_prep_recursive($form[$key], $defaults[$key], $settings);
+      }
+    } else {
+      _sirius_form_prep_recursive($form[$key], $defaults[$key], $settings);
+    }
   }
 }
