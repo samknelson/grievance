@@ -251,6 +251,7 @@ function sirius_teamsters631_sirius_worker_member_status_set_remote($args) {
 
 function sirius_teamsters631_sirius_worker_work_status_set_alter(&$args) {
 	if (sirius_teamsters631_is_remote()) { return; }
+	if (!sirius_teamsters631_banner_which()) { return; }
 
 	$result = sirius_service_client_request('sirius_teamsters631_sirius_worker_work_status_set_remote', $args);
 	if (!$result['success']) { drupal_set_message("Remote connection failed: " . $result['msg'], 'warning'); }
@@ -278,7 +279,7 @@ function sirius_teamsters631_sirius_worker_work_status_set_remote($args) {
 	$local_term = taxonomy_term_load($term_tid);
 	if (!$local_term) { return array('success' => FALSE, 'msg' => "Work status $term_name not found."); }
 
-	return sirius_worker_work_status_set($worker_node, $local_term->tid, $reason, array());
+	return sirius_worker_work_status_set($worker_node, $local_term->tid, $reason, array(), $json);
 }
 
 function sirius_teamsters631_node_insert_worker_remote($rnode) {
