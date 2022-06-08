@@ -3301,7 +3301,9 @@ function grievance_content_types_uuid_features_default_content() {
 	&nbsp;</li>
 	<li><strong>Window: </strong>Employers are expected to resolve VLRI\'s within this window. The window is in seconds, so it\'s a good idea to enter a fairly large number, i.e. 43,200 seconds = 60*60*12, or 12 hours.<br />
 	&nbsp;</li>
-	<li><strong>Limit:</strong> Emloyers who fail to resolve VLRI\'s in a timely manner will be blocked from the dispatch system, and unable to create new jobs. Use this field to enter the number of unresolved VLRI\'s (older than the window) before the Employer\'s access to the dispatch system is blcoked.</li>
+	<li><strong>Limit:</strong> Emloyers who fail to resolve VLRI\'s in a timely manner will be blocked from the dispatch system, and unable to create new jobs. Use this field to enter the number of unresolved VLRI\'s (older than the window) before the Employer\'s access to the dispatch system is blcoked.<br />
+	&nbsp;</li>
+	<li><strong>Notify Worker:</strong>&nbsp;By default, workers are notified when their VLRI request is approved or rejected. This flag allows the notification to be suppressed.</li>
 </ul>
 ',
         'summary' => '',
@@ -4595,6 +4597,132 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2018-11-19 07:23:50 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Flood',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1653679948,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '86359528-b19e-401b-925d-d49fab0e8f0e',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>"Floods" are used to detect and block attempts to access services too frequently. For example, to prevent users from attempting to guess passwords, we may limit the number of login attempts from a given IP address.</p>
+
+<p>Each type of flood can have a&nbsp;<strong>threshold</strong>, which is the number of events before the service is blocked, and a&nbsp;<strong>window</strong>, which is a number of seconds before access to the service is blocked. For example, we might limit login attempts to a threshold of 50 attempts within a window of 60*60 = 3600 seconds, or one hour.</p>
+
+<p><strong>Unblock</strong></p>
+
+<p>The "Unblock" page can be used to manually clear a block. For example, if a user is prevented from logging in, an administrator can clear their block and allow them to try again. (Note that blocks clear automatically after their window has expired, so in general it should not be necessary to manually clear blocks.)</p>
+
+<p><strong>Settings</strong></p>
+
+<p>Use the settings page to set the threshold and window for each type of block.</p>
+
+<p><strong>Test</strong></p>
+
+<p>The test page can be used to manually create blocks, as a way to test the settings or ensure that the system is working as expected.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/flood',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'sirius/flood/unblock',
+        'format' => NULL,
+      ),
+      2 => array(
+        'value' => 'sirius/flood/settings',
+        'format' => NULL,
+      ),
+      3 => array(
+        'value' => 'sirius/flood/test',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>View and unblock flood events.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-05-27 12:32:28 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
