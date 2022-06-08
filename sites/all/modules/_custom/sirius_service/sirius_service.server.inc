@@ -182,6 +182,8 @@ function sirius_service_func_info_all() {
     'sirius_trust_benefits',
     'sirius_trust_policy_benefits_offered',
     'sirius_trust_benefit_options',
+    'sirius_trust_worker_election_wizard_push_remote',
+    'sirius_trust_worker_election_post_from_wizard',
     'sirius_ledger_policy_list',
     'sirius_ledger_policy_lookup',
     'sirius_esignature_defs',
@@ -193,31 +195,63 @@ function sirius_service_func_info_all() {
     'sirius_teamsters631_sirius_worker_work_status_set_remote',
   );
 
+  $functions_nocache = array(
+    'sirius_teamsters631_switch_authenticate',
+    'sirius_teamsters631_sirius_node_tab_worker_contact_form_submit_remote',
+    'sirius_teamsters631_sirius_worker_skill_set_remote',
+    'sirius_teamsters631_sirius_worker_member_status_set_remote',
+    'sirius_teamsters631_node_insert_worker_remote',
+    'sirius_teamsters631_sirius_worker_work_status_set_remote',
+    'sirius_trust_worker_election_wizard_push_remote',
+    'sirius_trust_worker_election_post_from_wizard',
+  );
+
   $info = array();
   foreach ($functions as $function_name) {
-    $info[$function_name] = array('callback' => $function_name);
+    $info[$function_name] = array();
+    $info[$function_name]['callback'] = $function_name;
+
+    if (!in_array($function_name, $functions_nocache)) {
+      $info[$function_name]['cache'] = TRUE;
+    }
   }
 
   return $info;
 }
 
+function sirius_service_func_info($func) {
+  $info_all = &drupal_static(__FUNCTION__);
+  if (!isset($info_all)) { $info_all = sirius_service_func_info_all(); }
+  return $info_all[$func];
+}
+
 function sirius_service_generic_action($args) {
+  // The first argument is a function name
   $key = array_shift($args);
   if (!$key) { return array('success' => FALSE, 'msg' => "The first argument to this service must be a service-enabled function key."); }
 
-  $info_all = sirius_service_func_info_all();
-  $info = $info_all[$key];
+  // We don't let the server run all functions, just the ones which are enabled
+  $info = sirius_service_func_info($key);
   if (!$info) { return array('success' => FALSE, 'msg' => "$key is not a valid service-enabled function."); }
 
-  $args = _sirius_service_array_to_node($args);
+  // Prepare our result payload
+  $result = array();
+  $result['success'] = TRUE;
+  $result['ts'] = time();
+  $result['is_remote'] = TRUE;
 
+  // Prepare the callback
+  $args = _sirius_service_array_to_node($args);
   $callback = $info['callback'];
-  $data = $callback($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8]);
-  return array(
-    'success' => TRUE, 
-    'ts' => time(),
-    'data' => $data,
-    'minilog' => sirius_minilog_render_html(),
-    'is_remote' => TRUE,
-  );
-}
+  if (!$callback) { return array('success' => FALSE, 'msg' => "$key is not associated with a valid callback function."); }
+  if (!function_exists($callback)) { return array('success' => FALSE, 'msg' => "The function $callback does not exist."); }
+  $result['data'] = $callback($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8]);
+
+  // If the function logged debugging information, include the minilog
+  $result['minilog'] = sirius_minilog_render_html();
+
+  // If the function generated any drupal messages, let's send them to the client and *not* show them on the server
+  $result['drupal_messages'] = drupal_get_messages();
+
+  return $result;
+  }
