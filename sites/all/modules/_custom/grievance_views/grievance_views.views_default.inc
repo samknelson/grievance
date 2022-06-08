@@ -32507,6 +32507,7 @@ Accepted';
   $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['field'] = 'field_sirius_dispatch_status_value';
   $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['value'] = array(
     'resigned' => 'resigned',
+    'vlri' => 'vlri',
     'terminated' => 'terminated',
   );
   $translatables['sirius_worker_dispatches'] = array(
