@@ -119,6 +119,25 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 		'#required' => TRUE,
 	);
 
+	$form['keep_seniority'] = array(
+		'#title' => t('Keep Seniority?'),
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => 'No',
+		'#states' => array(
+			'visible' => array(
+				array(':input[name="action"]' => array('value' => 'terminate')),
+				array(':input[name="action"]' => array('value' => 'resign')),
+				array(':input[name="action"]' => array('value' => 'vlri')),
+			)
+		),
+		'#description' => t('Workers who are laid off within 24 hours automatically keep their seniority. Select "Yes" to preserve seniority even if they layoff is more than 24 hours later than the report time.'),
+	);
+
 	$medium_options = array(NULL => t('Use the worker\'s notification preference'));
 	$medium_options += sirius_dispatch_notify_medium_options();
 	$form['medium'] = array(
@@ -238,6 +257,14 @@ function sirius_node_tab_dispatch_manage_form_submit($form, &$form_state) {
 	$dispatch_node = $form_state['dispatch_node'];
 	$action = $form_state['values']['action'];
 	$notes = $form_state['values']['notes'];
+
+	if ($form_state['values']['keep_seniority'] == 'Yes') {
+		$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+		$json = sirius_json_get($worker_node);
+		$json['dispatch']['keep_seniority'] = 'Yes';
+		sirius_json_set($worker_node, $json);
+		node_save($worker_node);
+	}
 
 	if ($action == 'notify') 				{ $result = sirius_dispatch_notify($dispatch_node, $form_state['values']['medium'], $notes); }
 	if ($action == 'send') 					{ $result = sirius_dispatch_send($dispatch_node, $form_state['values']['send_medium'], $form_state['values']['recipient'], $notes); }
