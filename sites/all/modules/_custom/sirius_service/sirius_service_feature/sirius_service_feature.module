@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Code for the sirius_service_feature feature.
+ */
+
+include_once 'sirius_service_feature.features.inc';

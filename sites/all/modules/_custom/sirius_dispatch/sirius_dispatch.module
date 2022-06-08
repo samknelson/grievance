@@ -77,7 +77,23 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 function sirius_dispatch_cron() {
   sirius_dispatch_run_all();
   sirius_dispatch_threestrikes_cron();
-  sirius_dispatch_eba_cron();
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_dispatch_sirius_cron_scan_info() {
+  $items['dispatch_eba'] = array(
+    'title' => 'Dispatch EBA Scan',
+    'description' => 'Clear expired EBA states',
+    'schedule' => 'daily',
+    'callback' => 'sirius_dispatch_eba_cleanup',
+    'multidomain' => FALSE,
+    'component' => 'trust',
+  );
+
+  return $items;
 }
 
 /**

@@ -15,6 +15,10 @@ function sirius_minilog($msg = NULL, $type = 'info') {
 	$log[] = $log_entry;
 }
 
+function sirius_minilog_reset() {
+	return sirius_minilog(NULL, 'reset');
+}
+
 function sirius_minilog_render() {
 	$log = sirius_minilog();
 	$result = '';

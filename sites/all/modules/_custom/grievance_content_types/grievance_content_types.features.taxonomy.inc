@@ -539,6 +539,29 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'sirius_contact_relationship_types' => array(
+      'name' => 'Sirius Contact Relationship Types',
+      'machine_name' => 'sirius_contact_relationship_types',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'sirius_contact_tags' => array(
       'name' => 'Sirius Contact Tags',
       'machine_name' => 'sirius_contact_tags',
@@ -819,6 +842,75 @@ function grievance_content_types_taxonomy_default_vocabularies() {
       'name' => 'Sirius Skill',
       'machine_name' => 'sirius_skill',
       'description' => 'The skills a worker has, and how long they last.',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'sirius_trust_benefit_type' => array(
+      'name' => 'Sirius Trust Benefit Type',
+      'machine_name' => 'sirius_trust_benefit_type',
+      'description' => 'E.g. "Medical", "Legal", "Retirement"',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'sirius_trust_election_status' => array(
+      'name' => 'Sirius Trust Election Status',
+      'machine_name' => 'sirius_trust_election_status',
+      'description' => '',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'sirius_trust_election_type' => array(
+      'name' => 'Sirius Trust Election Type',
+      'machine_name' => 'sirius_trust_election_type',
+      'description' => '',
       'hierarchy' => 0,
       'module' => 'taxonomy',
       'weight' => 0,

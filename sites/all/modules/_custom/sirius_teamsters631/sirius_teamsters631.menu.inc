@@ -10,6 +10,7 @@ function sirius_teamsters631_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
+  /*
   $node_tabs['grievance_basic_page']['sirius_teamsters631_basic_page_restrict'] = array(
     'title' => 'Access Control',
     'description' => '',
@@ -17,6 +18,7 @@ function sirius_teamsters631_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
     'file' => 'sirius_teamsters631.page_basic_page_restrict.inc',
   );
+  */
 
   sirius_node_tab_set_module('sirius_teamsters631', $node_tabs);
 

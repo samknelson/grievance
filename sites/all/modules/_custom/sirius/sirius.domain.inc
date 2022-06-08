@@ -112,9 +112,33 @@ function sirius_domain_component_info_all() {
       'title' => 'Public',
       'description' => 'Permission to create public pages',
     ),
+    'training' => array(
+      'title' => 'Training Center',
+      'description' => 'Use training center functionality, including levels and certifications',
+    ),
     'trust' => array(
       'title' => 'Trust',
-      'descriptino' => 'Manage Trust Benefits, Dependants, etc.',
+      'description' => 'Manage Trust Benefits, Dependants, etc.',
+    ),
+    'contact:relationships' => array(
+      'title' => 'Contact - Relationships',
+      'description' => 'Enable relationships between contacts (or workers)',
+    ),
+    'service' => array(
+      'title' => 'Services',
+      'description' => 'Enable functionality to allow Sirius to be a service for remote function calls',
+    ),
+    'service:client' => array(
+      'title' => 'Services - Client',
+      'description' => 'Allow this instance to server as a client',
+    ),
+    'service:server' => array(
+      'title' => 'Services - Server',
+      'description' => 'Allow this instance to server as a server',
+    ),
+    'ledger:stripe' => array(
+      'title' => 'Ledger - Stripe',
+      'description' => 'Enable this domain to connect to the Stripe payment processor',
     ),
   );
 }
@@ -146,7 +170,8 @@ function sirius_domain_component_enabled($key, $domain_nid_or_node = NULL) {
 
     if ($domain_nid < 1) {
       // Legacy support: In the root domain everything is enabled unless explititly removed
-      $cache[$domain_nid][$key] = ($json['component'][$key]['enabled'] != 'No');
+      $variable_name = 'sirius_domain_root_component_enabled_' . $key;
+      $cache[$domain_nid][$key] = (variable_get($variable_name, 'Yes') != 'No');
     } else {
       // Normal domains: Must explicitly enable all components
       $cache[$domain_nid][$key] = ($json['component'][$key]['enabled'] == 'Yes');

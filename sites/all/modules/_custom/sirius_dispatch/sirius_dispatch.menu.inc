@@ -88,6 +88,7 @@ function sirius_dispatch_node_tabs() {
     'callback' => 'sirius_node_tab_dispatch_job_payrate',
     'permissions' => array('sirius dispatch payrate override'),
     'weight' => 8,
+    'file' => 'sirius_dispatch.page_job_payrate.inc',
   );
 
   $node_tabs['sirius_dispatch']['sirius_dispatch_payrate'] = array(
@@ -96,6 +97,7 @@ function sirius_dispatch_node_tabs() {
     'callback' => 'sirius_node_tab_dispatch_payrate',
     'permissions' => array('sirius dispatch payrate override'),
     'weight' => 8,
+    'file' => 'sirius_dispatch.page_payrate.inc',
   );
 
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_fore'] = array(
@@ -403,14 +405,6 @@ function sirius_dispatch_menu() {
     'page callback' => 'sirius_dispatch_page_jwa_prefs',
     'page arguments' => array(),
     'access arguments' => array('sirius dispatch staff'),
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items['sirius/dispatch/eba/cleanup'] = array(
-    'title' => 'EBA Cleanup',
-    'page callback' => 'sirius_dispatch_page_eba_cleanup',
-    'page arguments' => array(),
-    'access arguments' => array('sirius dispatch admin'),
     'type' => MENU_LOCAL_TASK,
   );
 
