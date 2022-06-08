@@ -1,11 +1,11 @@
 <?php
+/*
 
 function sirius_node_tab_dispatch_payrate($dispatch_node) {
 	return 'temporarily disabled';
 	// return drupal_get_form('sirius_node_tab_dispatch_payrate_form', $dispatch_node);
 }
 
-/*
 function sirius_node_tab_dispatch_payrate_form($form, &$form_state, $dispatch_node) {
 	$form_state['dispatch_nid'] = $dispatch_node->nid;
 
