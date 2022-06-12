@@ -1332,6 +1332,10 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 			if ($recipient['disposition'] != 'send') { continue; }
 			$params['to'] = $recipient['phone'];
 
+			$params['handler_nids'] = array();
+			$params['handler_nids'][] = $letter_node->nid;
+			if ($log_node) { $params['handler_nids'][] = $log_node->nid; }
+
 			$result = sirius_sms_send($params);
 			if (!$result['success']) {
 				drupal_set_message("SMS delivery to $recipient[phone] failed: " . $result['msg'] . ': ' . $result['details'], 'warning');
