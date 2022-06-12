@@ -289,6 +289,8 @@ function sirius_update_7017() {
     print "Enabling $module\n";
     module_enable(array($module), TRUE);
   }
+
+  variable_set('fontawesome_external', array('use_cdn' => FALSE));
 }
 
 /**
