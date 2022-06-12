@@ -477,6 +477,8 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 
 	if ($data['format'] == 'sms') {
 		// Add a link shortener
+		// No longer recommended, carriers block messages with shortened links.
+		/*
 	  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/sirius.popup.js');
 	  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.popup.css');
 	  $html .= '<br /><a href="#" class="sirius_popup_trigger tool-button">' . t('Link Shortener') . '</a>';
@@ -491,6 +493,7 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 	  $html .= '<div class="sirius_popup_close"></div>';
 	  $html .= '</div>';
 	  $form['#prefix'] = $html;
+	  */
 	}
 
 	if ($data['format'] == 'email') {
@@ -666,64 +669,86 @@ function sirius_letter_wizard_recipients_email_form($form, &$form_state, $info, 
 	$form_state['data'] = $data;
 	$form_state['letter_nid'] = $letter_node->nid;
 	$form_state['current_step'] = $current_step;
+	$form['#tree'] = TRUE;
 
 	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
 	$steps = sirius_wizard_steps($info, $data, $entity_node);
 
-	$recipients = $data['recipients'];
-	if ($recipients) { usort($recipients, function($a, $b) { 
-			if ($a['delta'] < $b['delta']) { return -1; }
-			if ($a['delta'] > $b['delta']) { return 1; }
-			return 0;
-		});
-	}
-	for ($i=0; $i<5; ++$i) {
-		$recipients[] = array('description' => t('Additional Recipient #@i', array('@i' => ($i+1))));
-	}
+  $ajax_params = $form_state['triggering_element']['#sirius_ajax'];
 
-	$form['intro'] = array('#markup' => '<table><tr><th>Description</th><th>Name</th><th>Email</th><th>Disposition</th></tr>');
+	$items = array_values($data['recipients']);
+	if (!$items) { $items = array(); }
+	if ($items) { uksort($items, function($a, $b) use ($items) { return $items[$a]['weight'] <=> $items[$a]['weight']; }); }
+
+	if ($form_state['item_count']) {
+		$item_count = $form_state['item_count'];
+	} else {
+		$item_count = count($items);
+	}
+  $item_count += $ajax_params['qty'];
+  if ($item_count < 1) { $item_count = 1; }
+  $form_state['item_count'] = $item_count;
+
+  for ($i=count($items); $i<$item_count; ++$i) {
+  	$items[] = array();
+  }
+
+	$form['items']['intro'] = array('#markup' => '<div id="sirius_item_list_wrapper"><table><tr><th>Description</th><th>Name</th><th>Email</th><th>Disposition</th></tr>');
 
 	$delta = 0;
-	foreach ($recipients as $recipient) {
-		$form["tr_$delta"] = array('#markup' => '<tr>');
+	foreach ($items as $delta => $item) {
+		$form['items'][$delta]["tr"] = array('#markup' => '<tr>');
 
-		$form["description_markup_$delta"] = array('#markup' => '<td>' . $recipient['description'] . '</td>');
-		$form["description_$delta"] = array('#type' => 'hidden', '#value' => $recipient['description']);
+		$form['items'][$delta]["description_markup"] = array('#markup' => '<td>' . $item['description'] . '</td>');
+		$form['items'][$delta]["description"] = array('#type' => 'hidden', '#value' => $item['description']);
 
-		$form["name_$delta"] = array(
+		$form['items'][$delta]["name"] = array(
 			'#prefix' => '<td>',
 			'#suffix' => '</td>',
 			'#type' => 'textfield',
-			'#default_value' => $recipient['name'],
+			'#default_value' => $item['name'],
 		);
 
-		$form["email_$delta"] = array(
+		$form['items'][$delta]["email"] = array(
 			'#prefix' => '<td>',
 			'#suffix' => '</td>',
 			'#type' => 'textfield',
-			'#default_value' => $recipient['email'],
+			'#default_value' => $item['email'],
 		);
 
-		$form["disposition_$delta"] = array(
+		$form['items'][$delta]["disposition"] = array(
 			'#prefix' => '<td>',
 			'#suffix' => '</td>',
 			'#type' => 'select',
-			'#default_value' => $recipient['disposition'],
+			'#default_value' => $item['disposition'],
 			'#options' => array('skip' => t('Skip'), 'Reply-To' => t('From'), 'to' => t('To'), 'cc' => t('Cc'), 'bcc' => t('Bcc'))
 		);
 
-		if ($recipient['locked'] == 'yes') {
-			$form["name_$delta"]['#disabled'] = TRUE;
-			$form["email_$delta"]['#disabled'] = TRUE;
-			$form["disposition_$delta"]['#disabled'] = TRUE;
+		if ($item['locked'] == 'yes') {
+			$form['items'][$delta]["name"]['#disabled'] = TRUE;
+			$form['items'][$delta]["email"]['#disabled'] = TRUE;
+			$form['items'][$delta]["disposition"]['#disabled'] = TRUE;
 		}
 
-		$form["tr2_$delta"] = array('#markup' => '<tr>');
+		$form['items'][$delta]["tr2"] = array('#markup' => '</tr>');
 		++$delta;
 	}
 
-	$form['outro'] = array('#markup' => '</table>');
-	$form_state['recipient_count'] = count($recipients);
+	$form['items']['outro'] = array('#markup' => '</table></div>');
+
+  $form['add_one'] = array(
+    '#type' => 'button',
+    '#value' => t('Add one'),
+    '#ajax' => array(
+      'callback' => 'sirius_ajax_generic_replace',
+    ),
+    '#sirius_ajax' => array(
+    	'qty' => 1,
+    	'wrapper' => '#sirius_item_list_wrapper',
+    	'element' => 'items',
+    ),
+    '#limit_validation_errors' => array(),
+  );
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -738,35 +763,31 @@ function sirius_letter_wizard_recipients_email_form_validate($form, &$form_state
 	$data = $form_state['data'];
 	$letter_node = node_load($form_state['letter_nid']);
 	$current_step = $form_state['current_step'];
-	$recipient_count = $form_state['recipient_count'];
 
 	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
 
-
-	// Verify exactly one "From"
 	$found_from = FALSE;
-	for ($delta = 0; $delta < $recipient_count; ++$delta) {
-		if ($form_state['values']["disposition_$delta"] == 'Reply-To') {
-			if ($found_from) { form_set_error("disposition_$delta", 'Select exactly one recipient as the sender.'); }
+	$found_to = 0;
+	$item_count = $form_state['item_count'];
+	for ($delta = 0; $delta < $item_count; ++$delta) {
+		$item = $form_state['values']['items'][$delta];
+		if ($item["disposition"] == 'skip') { continue; }
+
+		if ($item["disposition"] == 'Reply-To') {
+			if ($found_from) { form_set_error("items][$delta][disposition", 'Select exactly one recipient as the sender.'); }
 			$found_from = TRUE;
 		}
-	}
-	if (!$found_from) { form_set_error("disposition_0", 'Select exactly one recipient as the sender.'); }
 
-	// Verify at least one "To"
-	$found_to = 0;
-	for ($delta = 0; $delta < $recipient_count; ++$delta) {
-		if ($form_state['values']["disposition_$delta"] == 'to') {
+		if ($item["disposition"] == 'to') {
 			++$found_to;
 		}
-	}
-	if (!$found_to) { form_set_error("disposition_0", 'Select at least one recipient as the main recipient'); }
 
-	// Verify all email addresses
-	for ($delta = 0; $delta < $recipient_count; ++$delta) {
-		if ($form_state['values']["disposition_$delta"] == 'skip') { continue; }
-		if (!sirius_email_validate($form_state['values']["email_$delta"])) { form_set_error("email_$delta", "Please enter a valid email address for recipient #$delta (" . $form_state['values']["email_$delta"] . ")"); }
+		if (!$item['email']) { form_set_error("items][$delta][email", "Email address cannot be blank."); }
+		else if (!sirius_email_validate($item['email'])) { form_set_error("items][$delta][email", "Please enter a valid email address (" . $item['email'] . ")"); }
 	}
+	if (!$found_from) { form_set_error("items][0][disposition", 'Select exactly one recipient as the sender.'); }
+	if (!$found_to) { form_set_error("items][0][disposition", 'Select at least one recipient as the main recipient'); }
+
 }
 
 function sirius_letter_wizard_recipients_email_form_submit($form, &$form_state) {
@@ -778,19 +799,14 @@ function sirius_letter_wizard_recipients_email_form_submit($form, &$form_state) 
 
 	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
 
-	$recipients = array();
-	for ($delta = 0; $delta < $recipient_count; ++$delta) {
-		$recipient = array(
-			'delta' => $delta,
-			'disposition' => $form_state['values']["disposition_$delta"],
-			'name' => $form_state['values']["name_$delta"],
-			'description' => $form_state['values']["description_$delta"],
-			'email' => $form_state['values']["email_$delta"],
-		);
-		if (!$recipient['email'] && !$recipient['name']) { continue; }
-		$recipients[] = $recipient;
+	$items = array();
+	$item_count = $form_state['item_count'];
+	for ($delta = 0; $delta < $item_count; ++$delta) {
+		$item = $form_state['values']['items'][$delta];
+		if (!$item['email'] && !$item['name']) { continue; }
+		$items[] = $item;
 	}
-	$data['recipients'] = $recipients;
+	$data['recipients'] = $items;
 
 	sirius_letter_set_title($letter_node);
 	sirius_wizard_submit($info, $data, $letter_node, $current_step, "Recipients saved.");
