@@ -51,6 +51,10 @@ function mightysearch_mschema() {
 			'postal_code' => 'Zip',
 		),
 	);
+	$schema['property']['fields']['address_canon'] = array(
+		'prompt' => 'Canonical Address',
+		'type' => 'text',
+	);
 	
 	$schema['property']['fields']['msa'] = array(
 		'prompt' => 'MSA',

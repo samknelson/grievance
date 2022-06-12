@@ -4,10 +4,23 @@ use Twilio\Rest\Client;
 use Twilio\TwiML;
 
 /**********************************************************************************
+ * Status Callback
+ **********************************************************************************/
+
+function sirius_twilio_statuscallback_sms_url($id) {
+	global $base_url;
+	return $base_url . "/sirius/twilio/statuscallback/sms/$id";
+}
+
+function sirius_twilio_statuscallback_sms($id) {
+	return sirius_sms_callback($id, $_POST['SmsStatus'], $_POST);
+}
+
+/**********************************************************************************
  * SMS
  **********************************************************************************/
 
-function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
+function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NULL) {
 
 	if (sirius_domain_variable_get('sirius_twilio_sms_unsubscribe', TRUE)) {
 		$msg .= sirius_domain_variable_get('sirius_twilio_sms_unsubscribe_msg', "\nReply STOP to unsubscribe.\n");
@@ -34,13 +47,13 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
 
   static $registered;
   if (sirius_domain_variable_get('sirius_twilio_sms_consolidate', FALSE)) {
-		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg);
+		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg, $id);
 		if (!$registered) {
 			$registered = TRUE;
 			drupal_register_shutdown_function('sirius_twilio_outgoing_sms_queue', TRUE);
 		}
   } else {
-		$result = sirius_twilio_outgoing_sms_queue(TRUE, $phone, $msg);
+		$result = sirius_twilio_outgoing_sms_queue(TRUE, $phone, $msg, $id);
 	}
 
 	if ($result['success']) {
@@ -58,7 +71,7 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL) {
 	return $result;
 }
 
-function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NULL) {
+function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NULL, $id = NULL) {
 	static $queue;
 
 	if ($phone) { 
@@ -67,16 +80,20 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 	}
 	if (!$deliver_now) { return array('success' => TRUE, 'msg' => "Queued for delivery: $phone, $msg"); }
 
+	$count = 0;
 	foreach ($queue as $phone => $msg) {
+		++$count;
 		try {
 			$client = sirius_twilio_client_get();
-			$client->messages->create(
-		    $phone,
-		    array(
-		      'from' => sirius_domain_variable_get('sirius_twilio_phone', ''),
-		      'body' => $msg,
-		    )
-			);
+
+			$sms_params = array();
+			$sms_params['from'] = sirius_domain_variable_get('sirius_twilio_phone', '');
+			$sms_params['body'] = $msg;
+			if ($id) { $sms_params['statusCallback'] = sirius_twilio_statuscallback_sms_url($id); }
+
+			$message = $client->messages->create($phone, $sms_params);
+
+			$sid = $message->sid;
 		} catch (Exception $e) {
 			$result = array(
 				'success' => FALSE, 
@@ -90,7 +107,13 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 
 	$queue = NULL;
 	if ($result && !$result['success']) { return $result; }
-	return array('success' => TRUE, 'msg' => 'Queue delivered.');
+
+	$result = array();
+	$result['success'] = TRUE;
+	$result['msg'] = "Delivered $count messages.";
+	$result['count'] = $count;
+	if ( ($count == 1) && $sid) { $result['sid'] = $sid; }
+	return $result;
 }
 
 /**********************************************************************************
