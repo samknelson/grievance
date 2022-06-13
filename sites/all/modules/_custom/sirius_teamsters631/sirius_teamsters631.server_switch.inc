@@ -313,3 +313,81 @@ function sirius_teamsters631_node_insert_worker_remote($rnode) {
   node_save($node);
 	return array('success' => TRUE);
 }
+
+
+function sirius_teamsters631_taxonomy_term_updateinsert($term) {
+	// Don't loop if we're already running remotely
+	if (sirius_teamsters631_is_remote()) { return; }
+
+	// Only run if we're TC or UH
+	$banner_which = sirius_teamsters631_banner_which();
+	if (!$banner_which) { return; }
+
+	// Only interested in certain vocabularies
+  $vid = $term->vid;
+  $vocabulary = taxonomy_vocabulary_load($vid);
+  $vocabulary_name = $vocabulary->machine_name;
+  if (!in_array($vocabulary_name, array('sirius_skill'))) { return; }
+
+  // Only sync one way
+  if ( ($vocabulary_name == 'sirius_skill') && ($banner_which != 'tc') ) { return; }
+
+  // Load the remote taxonomies, 
+  $result = sirius_service_client_request('sirius_taxonomy_load', 'sirius_skill', 'tid', 'name');
+  if (!$result['success']) { drupal_set_message("Remote connection failed: " . $result['msg'], 'warning'); return; }
+  $remote_skill_lookup = array_flip($result['data']);
+
+  $result = sirius_service_client_request('sirius_taxonomy_load', 'sirius_industry', 'tid', 'name');
+  if (!$result['success']) { drupal_set_message("Remote connection failed: " . $result['msg'], 'warning'); return; }
+  $remote_industry_lookup = array_flip($result['data']);
+
+  $result = sirius_service_client_request('taxonomy_get_vocabularies');
+  if (!$result['success']) { drupal_set_message("Remote connection failed: " . $result['msg'], 'warning'); return; }
+  $remote_vocabulary_lookup = array();
+  foreach ($result['data'] as $vid => $record) { $remote_vocabulary_lookup[$record['machine_name']] = $vid; }
+
+  // Create our remote term
+  $remote_term = clone $term;
+  unset($remote_term->parent);
+  unset($remote_term->original);
+  unset($remote_term->uuid);
+  unset($remote_term->field_sirius_domain);
+
+  // Try to lookup the remote TID based on the new and original names. If we don't succeed, we're going to create a new term
+  if ($term->original) { $original_name = $term->original->name; } else { $original_name = ''; }
+  if ($original_name) { $remote_tid = $remote_skill_lookup[$original_name]; }
+  if (!$remote_tid) { $remote_tid = $remote_skill_lookup[$term->name]; }
+  $remote_term->tid = $remote_tid;
+
+  // Set the remote vid
+  $remote_vid = $remote_vocabulary_lookup[$vocabulary_name];
+  if (!$remote_vid) { drupal_set_message("Vocabulary $vocabulary_name doesn't exist on the remote server.", 'warning'); return; }
+	$remote_term->vid = $remote_vid;
+
+	// Set the remote industries
+	if ($term->field_sirius_industry['und']) {
+		$remote_term->field_sirius_industry['und'] = array();
+		foreach ($term->field_sirius_industry['und'] as $delta => $record) {
+			$local_industry_term = taxonomy_term_load($record['tid']);
+			$remote_industry_tid = $remote_industry_lookup[$local_industry_term->name];
+			if ($remote_industry_tid) {
+				$remote_term->field_sirius_industry['und'][] = array('tid' => $remote_industry_tid);
+			}
+		}
+	}
+
+	$result = sirius_service_client_request('sirius_teamsters631_taxonomy_term_updateinsert_remote', $remote_term);
+	if (!$result['success']) { drupal_set_message("Remote connection failed: " . $result['msg'], 'warning'); }
+	else if (!$result['data']['success']) { drupal_set_message("Remote update failed: " . $result['data']['msg'], 'warning'); }
+	return $result;
+}
+
+function sirius_teamsters631_taxonomy_term_updateinsert_remote($remote_term) {
+	$remote_term = (object) $remote_term;
+	if (sirius_domain_nid()) {
+		$remote_term->field_sirius_domain['und'][0]['target_id'] = sirius_domain_nid();
+	}
+	sirius_teamsters631_is_remote(TRUE);
+	taxonomy_term_save($remote_term);
+	return array('success' => TRUE);	
+}
