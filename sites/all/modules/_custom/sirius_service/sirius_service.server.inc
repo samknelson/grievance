@@ -173,6 +173,7 @@ function sirius_service_ping($arg_0, $arg_1, $arg_2) {
 
 function sirius_service_func_info_all() {
   $functions = array(
+    'taxonomy_get_vocabularies',
     'sirius_service_ping',
     'sirius_proxy_node_load',
     'sirius_taxonomy_load',
@@ -193,6 +194,7 @@ function sirius_service_func_info_all() {
     'sirius_teamsters631_sirius_worker_member_status_set_remote',
     'sirius_teamsters631_node_insert_worker_remote',
     'sirius_teamsters631_sirius_worker_work_status_set_remote',
+    'sirius_teamsters631_taxonomy_term_updateinsert_remote',
   );
 
   $functions_nocache = array(
@@ -204,6 +206,7 @@ function sirius_service_func_info_all() {
     'sirius_teamsters631_sirius_worker_work_status_set_remote',
     'sirius_trust_worker_election_wizard_push_remote',
     'sirius_trust_worker_election_post_from_wizard',
+    'sirius_teamsters631_taxonomy_term_updateinsert_remote',
   );
 
   $info = array();
