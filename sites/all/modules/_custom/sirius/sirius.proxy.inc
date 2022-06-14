@@ -29,6 +29,34 @@ function sirius_proxy_get_user_employer_nid() {
 }
 
 /**
+ * A smart wrapper. For example, if you call with sirius_user_get(), it does a remote lookup by stored SSN
+ */
+
+function sirius_proxy_call_wrap() {
+  $args = func_get_args();
+
+  // If we're not in proxy mode, we just call locally
+  if (!sirius_proxy_active()) {
+    return sirius_proxy_call($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8]);
+  }
+
+  $function = $args[0];
+
+  if ($function == 'sirius_worker_get') {
+    $uid = $args[1];
+    global $user;
+    if (!$uid) { $uid = $user->uid; }
+    $user_full = user_load($uid);
+    $json = sirius_json_get($user_full);
+    $ssn = $json['proxy']['worker_ssn'];
+    if (!$ssn) { return array('success' => TRUE, 'msg' => "No worker SSN has been set for this user.", 'data' => NULL); }
+    return sirius_proxy_call('sirius_worker_get_by_ssn', $ssn);
+  }
+
+  return sirius_proxy_call($args[0], $args[1], $args[2], $args[3], $args[4], $args[5], $args[6], $args[7], $args[8]);
+}
+
+/**
  * Call a Sirius service. If this domain is configured as a client, then it will call the main server remotely. Otherwise, it will call locally.
  * 
  * Call with a function name, e.g. sirius_proxy_call('sirius_worker_get_by_ssn', '123-45-6789');
@@ -86,8 +114,6 @@ function sirius_proxy_call() {
  * ]
  * 
  * At the moment we're only doing this:
- * 
- * Second, recurse through the data and convert anything that looks like a node from an array into an object.
  */
 
 function sirius_proxy_unwrap($result) {
@@ -113,7 +139,7 @@ function sirius_proxy_node_load($nid) {
   }
 
   $type = $node->type;
-  if (!in_array($type, array('sirius_json_definition'))) { 
+  if (!in_array($type, array('sirius_json_definition', 'sirius_worker', 'sirius_contact', 'sirius_trust_benefit'))) { 
     return array('success' => FALSE, 'msg' => "Node $nid is not one of the approved content types.");
   }
 
