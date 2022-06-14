@@ -106,6 +106,10 @@ function sirius_node_access($node, $op, $account) {
     }
   }
 
+  // Check access restrictions
+  $result = sirius_node_access_restrict($node, $op, $account);
+  if ($result != NODE_ACCESS_IGNORE) { return $result; }
+
   // Specific checks by node type
 	if ($type == 'sirius_log') { return sirius_node_access_log($node, $op, $account); }
   if ($type == 'sirius_news') { return sirius_node_access_news($node, $op, $account); }
@@ -118,3 +122,54 @@ function sirius_node_access($node, $op, $account) {
   // We know nothing.
   return NODE_ACCESS_IGNORE;
 }
+
+
+function sirius_node_access_restrict($node, $op, $account) {
+  $type = is_string($node) ? $node : $node->type;
+  if ($op != 'view') { return NODE_ACCESS_IGNORE; }
+
+  if (user_access('sirius admin') || user_access('sirius domain admin')) { return NODE_ACCESS_IGNORE; }
+
+  $json = sirius_json_get($node);
+  if (!$json || !$json['restrict']) { return NODE_ACCESS_IGNORE; }
+
+  global $user;
+
+  // All users: restrict by role
+  if ($json['restrict']['role']) {
+    $ok_rids = array_filter(array_values($json['restrict']['role']));
+    if ($ok_rids) {
+      if (!$user->roles) { return NODE_ACCESS_DENY; }
+      $my_rids = array_filter(array_keys($user->roles));
+      if (!$my_rids) { return NODE_ACCESS_DENY; }
+      if (!array_intersect($my_rids, $ok_rids)) { return NODE_ACCESS_DENY; }
+    }
+  }
+
+  // The following restictions are for workers only. 
+  if (user_access('sirius dispatch staff')) { return NODE_ACCESS_IGNORE; }
+
+  $worker_node = sirius_worker_get();
+  if (!$worker_node) { return NODE_ACCESS_IGNORE; }
+
+  if ($json['restrict']['ms']) { 
+    $ok_ms_tids = array_filter(array_values($json['restrict']['ms']));
+    if ($ok_ms_tids) {
+      $my_ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+      if (!$my_ms_tids) { return NODE_ACCESS_DENY; }
+      if (!array_intersect($my_ms_tids, $ok_ms_tids)) { return NODE_ACCESS_DENY; }
+    }
+  }
+
+  if ($json['restrict']['ws']) { 
+    $ok_ws_tids = array_filter(array_values($json['restrict']['ws']));
+    if ($ok_ws_tids) {
+      $my_ws_tids = sirius_fieldvals($worker_node, 'field_sirius_work_status', 'tid');
+      if (!$my_ws_tids) { return NODE_ACCESS_DENY; }
+      if (!array_intersect($my_ws_tids, $ok_ws_tids)) { return NODE_ACCESS_DENY; }
+    }
+  }
+
+  return NODE_ACCESS_IGNORE;
+}
+
