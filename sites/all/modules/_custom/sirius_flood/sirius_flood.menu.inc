@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Implements hook_menu()
+ */
+
 function sirius_flood_menu() {
   $items = array();
 
