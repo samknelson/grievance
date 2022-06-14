@@ -14,7 +14,7 @@ function sirius_worker_user_create_form($form, &$form_state, $worker_node) {
   	$html .= '</strong>';
   	$html .= l('Edit', 'user/' . $worker_user->uid . '/edit', ['attributes' => ['class' => ['tool-button']]]);
 	} else {
-		$html = 'There is no user currently associated with this worker. Use the button below to create one.';
+		$html = 'There is no user currently associated with this worker.';
 	}
 
 	$form['intro'] = array(
@@ -22,12 +22,14 @@ function sirius_worker_user_create_form($form, &$form_state, $worker_node) {
 		'#markup' => '<div class="sirius_form_intro">' . $html . '</div>'
 	);
 
-	$form_state['worker_node'] = $worker_node;
+	if (sirius_worker_usersync_enabled()) {
+		$form_state['worker_node'] = $worker_node;
 
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Sync Now'),
-	);
+		$form['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t('Sync Now'),
+		);
+	}
 
 	return $form;
 }
