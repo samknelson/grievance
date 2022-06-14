@@ -25,17 +25,6 @@ function report_cache_menu() {
 		'type' => MENU_DEFAULT_LOCAL_TASK
 	);
 
-	$items['sirius/reports/auto-test'] = array(
-		'title' => 'Auto Tester',
-		'description' => '',
-		'page callback' => 'report_cache_page_auto_test',
-		'page arguments' => array(3),
-		'access arguments' => array('sirius admin'),
-		'file' => 'report_cache.page_auto_test.inc',
-		'weight' => 2,
-		'type' => MENU_LOCAL_TASK,
-	);
-
 	$items['sirius/reports/%'] = array(
 		'title' => 'Reports',
 		'description' => '',
