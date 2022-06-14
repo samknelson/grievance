@@ -107,6 +107,11 @@ function sirius_wizard_content($info, $data, $node, $current_step) {
 	$callback = $steps[$current_step]['callback'];
 	$args = $steps[$current_step]['callback_args'];
 	if (!$callback) { $callback = 'sirius_wizard_content_default'; }
+
+	if ($steps[$current_step]['file']) { 
+		sirius_require($steps[$current_step]['module'], $steps[$current_step]['file']);
+	}
+
 	if (preg_match('/_form$/', $callback)) {
 		if ($args) {
 			return drupal_get_form($callback, $info, $data, $node, $current_step, $args);	
