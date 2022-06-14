@@ -132,19 +132,17 @@ function sirius_domain_page_list_render($tree, $depth = NULL, $options) {
 		if ($options['tools']) {
 			$html .= '<td>';
 			$tools = array(
-				'view' => 'node/' . $nid,
-				'edit' => 'node/' . $nid . '/edit',
-				'users' => 'node/' . $nid . '/sirius_domain_users',
-				'clone' => 'node/' . $nid . '/sirius_domain_clone',
-				'components' => 'node/' . $nid . '/sirius_domain_components',
-				'stats' => 'node/' . $nid . '/sirius_domain_stats',
-				'delete' => 'node/' . $nid . '/sirius_domain_delete',
+				array('path' => "node/$nid", 'title' => 'view'),
+				array('path' => "node/$nid/sirius_domain_users", 'title' => 'users'),
+				array('path' => "node/$nid/sirius_domain_components", 'title' => 'components'),
+				array('path' => "node/$nid/sirius_domain_stats", 'title' => 'stats'),
 			);
-			foreach ($tools as $name => $path) {
-				if (drupal_valid_path($path)) {
-					$html .= l($name, $path, array('attributes' => array('class' => array('tool-button'))));
+			foreach ($tools as $link) {
+				if (drupal_valid_path($link['path'])) {
+					$html .= l($link['title'], $link['path'], array('attributes' => array('class' => array('tool-button'))));
 				}
 			}
+
 			$html .= '</td>';
 		}
 
@@ -172,5 +170,6 @@ function sirius_domain_page_list_render($tree, $depth = NULL, $options) {
 		$html .= sirius_domain_page_list_render($branch['children'], $depth + 1, $options);
 	}
 	if (!$depth) { $html .= '</table>'; }
+
 	return $html;
 }
