@@ -8,15 +8,19 @@ function sirius_node_tab_entity_customfield_access($entity_node) {
 
   // @todo: At some point, we probably need some kind of a fancy system for deciding which event roles and statuses can access which custom field sets.
   if ($entity_node->type == 'sirius_event') {
-	 if (user_access('sirius event admin')) { return TRUE; }
+		if (user_access('sirius event admin')) { return TRUE; }
   }
 
   if ($entity_node->type == 'sirius_ledger_account') {
-   if (user_access('sirius ledger admin')) { return TRUE; }
+		if (user_access('sirius ledger admin')) { return TRUE; }
   }
 
   if ($entity_node->type == 'sirius_trust_benefit') {
-   if (user_access('sirius trust admin')) { return TRUE; }
+		if (user_access('sirius trust admin')) { return TRUE; }
+  }
+
+  if ($entity_node->type == 'sirius_contact_relationship') {
+		if (user_access('sirius contact admin')) { return TRUE; }
   }
 
 	return FALSE;
