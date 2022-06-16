@@ -1102,10 +1102,23 @@ function sirius_letter_wizard_send_form($form, &$form_state, $info, $data, $lett
 		}
 	}
 
+	if ($data['format'] == 'email') {
+		if (strlen($data['pdf_body']) > 10) {
+			$form['action'] = array(
+				'#type' => 'select',
+				'#title' => t('Action'),
+				'#options' => array(
+					'send' => t('Send Email Now'),
+					'preview_download' => t('Download PDF')
+				),
+			);
+		}
+	}
+
 	if ($data['format'] == 'pdf') { $submit_label = t('Download PDF'); }
 	else if ($data['format'] == 'sms') { $submit_label = t('Send SMS Now'); }
 	else if ($data['format'] == 'fax') { $submit_label = t('Send Fax Now'); }
-	else { $submit_label = t("Send Email Now"); }
+	else { $submit_label = t("Submit"); }
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -1123,6 +1136,9 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 
 	$entity_node = node_load($letter_node->field_sirius_log_handler['und'][0]['target_id']);
 
+	$action = $form_state['values']['action'];
+	if (!$action) { $action = 'send'; }
+
 	$format = $data['format'];
 
 	// Generate PDF if necessary
@@ -1132,7 +1148,7 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 	}
 
 	// Log the letter
-	if ($form_state['values']['logging']) {
+	if ($form_state['values']['logging'] && ($action != 'preview_download')) {
 
 		$log_title = "Letter: " . $data['format'] . ': ';
 		$is_first = TRUE;
@@ -1161,6 +1177,27 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		}
 		if ($data['body']) {
 			$log_body .= "Message: " . drupal_html_to_text($data['body']) . "\n";
+		}
+
+
+
+
+
+		if ($letter_node->field_sirius_attachments) {
+			foreach ($letter_node->field_sirius_attachments['und'] as $delta => $record) {
+				$log_body .= "Attached: Grievance attachment " . $record['filename'] . ' / original filename ' . $record['origname'] . "\n";
+			}
+		}
+
+		if ($data['upload_others']) {
+			$keys = array_filter(array_values($data['upload_others']));
+			foreach ($keys as $key) {
+				list ($other_nid, $delta) = explode('|', $key);
+				if (!$delta) { $delta = 0; }
+				$other_node = node_load($other_nid);
+				$record = $other_node->field_grievance_attachments['und'][$delta];
+				$log_body .= "Attached: Letter attachment " . $record['filename'] . ' / original filename ' . $record['origname'] . "\n";
+			}
 		}
 
 	  global $user;
@@ -1196,11 +1233,12 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 	}
 
 	// If format is PDF, just output it and exit
-	if ($format == 'pdf') {
+	if ($format == 'pdf' || $action == 'preview_download') {
 		// Dump to browser and exit
 		header('Content-Type: application/pdf');
 		header("Content-Disposition: attachment; filename=$pdf_basename.pdf");
 		print $pdf_contents;
+		if ($action == 'preview_download'); { exit(); }
 
 		// Can't call sirius_wizard_submit() because that redirects
 		$data['steps'][$current_step]['complete'] = TRUE;
