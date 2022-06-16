@@ -119,6 +119,15 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 		'#required' => TRUE,
 	);
 
+	$prefix = '<div class="sirius_field_intro">';
+	$prefix .= "<p>Workers who are laid off within 24 hours automatically keep their senioriy. Select \"Yes\" to preserve seniority even if the layoff is more than 24 hours later than the report time.</p>";
+	$availdate = $worker_node->field_sirius_dispatch_availdate['und'][0]['value'];
+	if ($availdate) {
+		$availdate = date('m/d/Y h:i a', strtotime($availdate . ' GMT'));
+		$prefix .= '<p>' . t('The worker\'s <em>previous</em> seniority date was <strong>@date</strong>. ', array('@date' => $availdate)) . '</p>';
+	}
+	$prefix .= '</div>';
+
 	$form['keep_seniority'] = array(
 		'#title' => t('Keep Seniority?'),
 		'#type' => 'select',
@@ -135,7 +144,7 @@ function sirius_node_tab_dispatch_manage_form($form, &$form_state, $dispatch_nod
 				array(':input[name="action"]' => array('value' => 'vlri')),
 			)
 		),
-		'#description' => t('Workers who are laid off within 24 hours automatically keep their seniority. Select "Yes" to preserve seniority even if they layoff is more than 24 hours later than the report time.'),
+		'#field_prefix' => $prefix,
 	);
 
 	$medium_options = array(NULL => t('Use the worker\'s notification preference'));
