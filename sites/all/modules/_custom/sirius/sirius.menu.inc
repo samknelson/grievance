@@ -254,6 +254,7 @@ function sirius_node_tabs() {
     'callback' => 'sirius_node_tab_sirius_domain_components',
     'permissions' => array('sirius admin'),
     'weight' => 6,
+    'file' => 'sirius.page_domain_components.inc',
   );
 
   $node_tabs['sirius_domain']['sirius_domain_stats'] = array(
@@ -1372,6 +1373,16 @@ function sirius_menu() {
     'access arguments' => array('sirius'),
     'type' => MENU_CALLBACK,
   );
+
+  $items['sirius/domain/components/root'] = array(
+    'title' => 'Root Domain Components',
+    'page callback' => 'sirius_page_domain_components_root',
+    'page arguments' => array(),
+    'access arguments' => array('sirius admin'),
+    'file' => 'sirius.page_domain_components_root.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
 
   /*
   $items['public'] = array(
