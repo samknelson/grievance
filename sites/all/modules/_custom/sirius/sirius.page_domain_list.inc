@@ -66,9 +66,15 @@ function sirius_domain_page_list_impl($options) {
 
 	$html .= sirius_domain_page_list_render($tree, NULL, $options);
 
-	$path = 'node/add/sirius-domain';
-	if (drupal_valid_path($path)) {
-		$html .= l('Add a Domain', $path, array('attributes' => array('class' => array('tool-button'))));
+	$paths = array(
+		'node/add/sirius-domain' => 'Add a Domain',
+		'sirius/domain/components/root' => 'Root Domain Components',
+	);
+
+	foreach ($paths as $path => $title) {
+		if (drupal_valid_path($path)) {
+			$html .= l($title, $path, array('attributes' => array('class' => array('tool-button'))));
+		}
 	}
 
 	return $html;
