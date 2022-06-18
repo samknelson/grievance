@@ -2655,76 +2655,6 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-grievance-field_grievance_data_alert'.
-  $field_instances['node-grievance-field_grievance_data_alert'] = array(
-    'bundle' => 'grievance',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'Admin data never displayed',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 37,
-      ),
-      'grievance_arbitrationform' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'grievance_form_226' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 65,
-      ),
-      'grievance_gform' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 84,
-      ),
-      'grievance_gform_a' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 46,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'token' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 75,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_grievance_data_alert',
-    'label' => 'Alert Data',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 5,
-      ),
-      'type' => 'text_textarea',
-      'weight' => 2,
-    ),
-  );
-
   // Exported field_instance: 'node-grievance-field_grievance_date_1'.
   $field_instances['node-grievance-field_grievance_date_1'] = array(
     'bundle' => 'grievance',
@@ -32720,8 +32650,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('Address');
   t('Address 2');
   t('Address Geocode');
-  t('Admin data never displayed');
-  t('Alert Data');
   t('Allocated?');
   t('Alt. Contact');
   t('Alt. Phone');
