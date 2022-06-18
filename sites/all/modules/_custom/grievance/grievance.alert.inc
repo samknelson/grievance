@@ -1,74 +1,100 @@
 <?php
 
-function grievance_page_alert_test() {
-	return drupal_get_form('grievance_page_alert_test_form');
-}
+/**
+ * Alert the organizer when the assignment has changed
+ */
 
-function grievance_page_alert_test_form($form, &$form_state) {
-	$form['action'] = array(
-		'#type' => 'select',
-		'#title' => t('Action'),
-		'#options' => array(
-			'all' => t('Run the standard alert cron job'),
-			'single' => t('Execute the alerts for a specific grievance'),
-			'reset' => t('Reset the alerts for a specific grievance'),
-		),
-	);
-
-	$form['grievance_nid'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Grievance NID'),
-		'#size' => 8,
-		'#states' => array(
-			'visible' => array(
-				array(":input[name=\"action\"]" => array('value' => 'single')), 
-				'or',
-				array(":input[name=\"action\"]" => array('value' => 'reset')),
-			),
-		),
-	);
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Submit'),
-	);
-
-  $log = sirius_minilog_render_html();
-  if ($log) { $form['results'] = array('#markup' => '<hr>' . $log); }
-
-	return $form;
-}
-
-function grievance_page_alert_test_form_submit($form, &$form_state) {
-	$form_state['rebuild'] = TRUE;
-
-	$action = $form_state['values']['action'];
-	if ($action == 'all') {
-		grievance_alert_all();
-	} else {
-		$node = node_load($form_state['values']['grievance_nid']);
-		if (!$node) { drupal_set_message("Not a node.", 'error'); return; }
-		if ($node->type != 'grievance') { drupal_set_message("Not a grievance node.", 'error'); return; }
-		if ($node->field_sirius_domain['und'][0]['target_id'] != sirius_domain_nid()) { drupal_set_message("Not in your domain.", 'error'); return; }
-
-		if ($action == 'reset') {
-			unset($node->field_grievance_data_alert['und']);
-			node_save($node);
-			drupal_set_message("Alert data reset for " . $node->title);
-		}
-
-		if ($action == 'single') {
-			grievance_alert($node);
-		}
+function grievance_alert_assignment($grievance_node) {
+	// Component must be enabled.
+	if (!sirius_domain_component_enabled('grievance:alert:assignment')) {
+		return array('success' => TRUE, 'msg' => 'Component grievance:alert:assignment is not enabled.');
 	}
+
+	$grievance_json = sirius_json_get($grievance_node);
+
+	$alert_uids = array_filter(array_unique(array_merge(
+		sirius_fieldvals($grievance_node, 'field_grievance_rep_assignee', 'target_id'),
+		sirius_fieldvals($grievance_node, 'field_grievance_rep_organizer', 'target_id')
+	)));
+	$intake_uids = sirius_fieldvals($grievance_node, 'field_grievance_rep_filed', 'target_id');
+
+	$need_save = FALSE;
+
+	global $base_url;
+	$url = "$base_url/node/" . $grievance_node->nid;
+
+	$params = array();
+	$params['subject'] = "Grievance assignment: $grievance_node->title";
+
+	$params['sms'] = "You have been assigned a grievance\n\n";
+	$params['sms'] .= "Grievance: $grievance_node->title\n\n";
+	$params['sms'] .= "Link: $url";
+
+	$params['body'] = "You have been assigned a grievance.<br />";
+	$params['body'] .= "Grievance: $grievance_node->title<br />";
+	$params['body'] .= "Link: <a href=\"$url\">$url</a>";
+
+	$params['handler_nids'] = array($grievance_node->nid);
+
+	$count_email = $count_sms = $count_notifications = 0;
+	foreach ($alert_uids as $alert_uid) {
+		// Don't send to intakes
+		if (in_array($alert_uid, $intake_uids)) { continue; }
+
+		// Don't send if it's already been sent.
+		if ($grievance_json['grievance']['alert']['assignment'][$alert_uid]) { continue; }
+
+		++$count_notifications;
+
+		$user_full = user_load($alert_uid);
+		$user_json = json_decode($user_full->field_sirius_json['und'][0]['value'], TRUE);
+		$medium = $user_json['sirius']['grievance']['alert']['prefs']['medium'];
+		if (!$medium) { $medium = '[default: email]'; }
+
+		$msg = "Alerting user " . $user_full->name . " (" . $user_full->uid . ") by preferred medium $medium.";
+
+		if ($medium == 'email' || $medium == '[default: email]' || $medium == 'both') {
+			$params['to'] = $user_full->mail;
+			if ($params['to']) {
+				$email_result = sirius_email_send($params);
+				++$count_email;
+			}
+		}
+
+		if ($medium == 'sms' || $medium == 'both') {
+			$params['to'] = $user_full->field_grievance_phone['und'][0]['value'];
+			if ($params['to']) { 
+				$sms_result = sirius_sms_send($params);
+				++$count_sms;
+			}
+		}
+	
+		$grievance_json['grievance']['alert']['assignment'][$alert_uid] = array(
+			'alerted' => TRUE,
+			'ts' => time(),
+			'medium' => $medium,
+			'sms_result' => $sms_result,
+			'email_result' => $email_result,
+		);
+		$need_save = TRUE;
+	}
+
+	if ($need_save) {
+		sirius_json_set($grievance_node, $grievance_json);
+		node_save($grievance_node);
+	}
+
+	return array('success' => TRUE, 'msg' => "Scanned $count_notifications users; sent $count_email email and $count_sms SMS.");
 }
 
 /**
  * Iterate through all grievances, and send alerts to any that have a due date in the future.
  */
 
-function grievance_alert_all() {
-	if (variable_get('grievance_alert_disable', NULL) == 'Yes') { return; }
+function grievance_alert_deadline_all($mode = 'test') {
+	if (variable_get('grievance_alert_disable', NULL) == 'Yes') { 
+		return array('success' => TRUE, 'count' => 0, 'msg' => 'Grievance deadline alerts have been disabled');
+	}
 
 	sirius_minilog('Starting alert generation.');
 
@@ -79,20 +105,22 @@ function grievance_alert_all() {
 	$stmt = $query->execute();
 	if (!$stmt['node']) {
 		sirius_minilog('No grievances have alert dates in the future.');
-		return;
+		return array('success' => TRUE, 'count' => 0, 'msg' => 'No grievances have deadline alert dates in the future.');
 	}
 
+	$count = 0;
 	$nids = array_keys($stmt['node']);
 	if ($nids) {
 		foreach ($nids as $nid) {
+			++$count;
 			$node = node_load($nid);
-			grievance_alert($node);
+			grievance_alert_deadline($mode, $node);
 		}
 	}
 
 	sirius_minilog('Alert generation complete.');
 
-	return;
+	return array('success' => TRUE, 'msg' => "Scanned $count nodes", 'count' => $count);
 }
 
 /**
@@ -101,16 +129,13 @@ function grievance_alert_all() {
  * @param node The grievance node to examine.
  */
 
-function grievance_alert($node) {
+function grievance_alert_deadline($mode, $node) {
 		sirius_minilog('Processing alerts for: ' . $node->title);
 
 	// Load previous alert data for this node.  We should only send one alert per person per status
-	$alert_data_serialized = $node->field_grievance_data_alert['und'][0]['value'];
-	if ($alert_data_serialized) {
-		$alert_data = unserialize($alert_data_serialized);
-	} else {
-		$alert_data = array();
-	}
+	$node_json = sirius_json_get($node);
+	$alert_data = $node_json['grievance']['alert']['deadline'];
+	if (!$alert_data) { $alert_data = array(); }
 
 	// Get the deadline and alert term
 	$deadline = $node->field_grievance_alert_date['und'][0]['value'];
@@ -189,11 +214,15 @@ function grievance_alert($node) {
 				$params['to'] = $user_full->mail;
 				if (!$params['to']) { sirius_minilog("$log_msg: No email address found.", 'warning');  continue;  }
 				
-				$result = sirius_email_send($params);
-				if ($result['success']) {
-					sirius_minilog("$log_msg: Sent to $params[to].");
+				if ($mode == 'live') {
+					$result = sirius_email_send($params);
+					if ($result['success']) {
+						sirius_minilog("$log_msg: Sent to $params[to].");
+					} else {
+						sirius_minilog("$log_msg: Failed to send to $params[to]: " . $result['msg'], 'warning');
+					}
 				} else {
-					sirius_minilog("$log_msg: Failed to send to $params[to]: " . $result['msg'], 'warning');
+					sirius_minilog("$log_msg: (Skipping sending to $params[to] because mode = $mode)");
 				}
 			}
 
@@ -201,24 +230,29 @@ function grievance_alert($node) {
 				$params['to'] = $user_full->field_grievance_phone['und'][0]['value'];
 				if (!$params['to']) { sirius_minilog("$log_msg: No phone number found.", 'warning');  continue;  }
 
-				$result = sirius_sms_send($params);
-				if ($result['success']) {
-					sirius_minilog("$log_msg: Sent to $params[to].");
+				if ($mode == 'live') {
+					$result = sirius_sms_send($params);
+					if ($result['success']) {
+						sirius_minilog("$log_msg: Sent to $params[to].");
+					} else {
+						sirius_minilog("$log_msg: Failed to send to $params[to]: " . $result['msg'], 'warning');
+					}
 				} else {
-					sirius_minilog("$log_msg: Failed to send to $params[to]: " . $result['msg'], 'warning');
+					sirius_minilog("$log_msg: (Skipping sending to $params[to] because mode = $mode)");
 				}
 			}
 		}
 	}
 
-	if ($need_save) {
-		$node->field_grievance_data_alert['und'][0]['value'] = serialize($alert_data);
+	if ($mode == 'live' && $need_save) {
+		$node_json['grievance']['alert']['deadline'] = $alert_data;
+		sirius_json_set($node, $node_json);
 		$node->grievance_no_recurse = TRUE;
 		node_save($node);
 		sirius_minilog('Alerts sent for: ' . $node->title);
 	}
 
-	return;
+	return array('success' => TRUE);
 }
 
 /**
