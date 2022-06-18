@@ -25669,59 +25669,6 @@ If the file has multiple pages, then each page in the input document will use th
   );
 
   // Exported field_instance:
-  // 'node-sirius_trust_worker_election-field_sirius_trust_election_stat'.
-  $field_instances['node-sirius_trust_worker_election-field_sirius_trust_election_stat'] = array(
-    'bundle' => 'sirius_trust_worker_election',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'taxonomy',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'taxonomy_term_reference_plain',
-        'weight' => 7,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_sirius_trust_election_stat',
-    'label' => 'Election Status',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'view' => array(
-      'args' => array(
-        0 => 'sirius_trust_election_status',
-        1 => 'CURRENT_DOMAIN',
-      ),
-      'display_name' => 'term_reference_1',
-      'match_operator' => 'CONTAINS',
-      'size' => '',
-      'view_name' => 'sirius_taxonomy',
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'content_taxonomy_opt_groups' => 0,
-      ),
-      'type' => 'options_select',
-      'weight' => 6,
-    ),
-  );
-
-  // Exported field_instance:
   // 'node-sirius_trust_worker_election-field_sirius_trust_election_type'.
   $field_instances['node-sirius_trust_worker_election-field_sirius_trust_election_type'] = array(
     'bundle' => 'sirius_trust_worker_election',
@@ -32253,82 +32200,6 @@ If the file has multiple pages, then each page in the input document will use th
   );
 
   // Exported field_instance:
-  // 'taxonomy_term-sirius_trust_election_status-field_sirius_domain'.
-  $field_instances['taxonomy_term-sirius_trust_election_status-field_sirius_domain'] = array(
-    'bundle' => 'sirius_trust_election_status',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 1,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'taxonomy_term',
-    'field_name' => 'field_sirius_domain',
-    'label' => 'Domain',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'content_taxonomy_opt_groups' => FALSE,
-      ),
-      'type' => 'options_select',
-      'weight' => 3,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'taxonomy_term-sirius_trust_election_status-field_sirius_member_active'.
-  $field_instances['taxonomy_term-sirius_trust_election_status-field_sirius_member_active'] = array(
-    'bundle' => 'sirius_trust_election_status',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'Each worker can have only one election with an "Active" status at a time.',
-    'display' => array(
-      'default' => array(
-        'label' => 'inline',
-        'module' => 'list',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'list_default',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'taxonomy_term',
-    'field_name' => 'field_sirius_member_active',
-    'label' => 'Active Election?',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'content_taxonomy_opt_groups' => FALSE,
-      ),
-      'type' => 'options_select',
-      'weight' => 1,
-    ),
-  );
-
-  // Exported field_instance:
   // 'taxonomy_term-sirius_trust_election_type-field_sirius_domain'.
   $field_instances['taxonomy_term-sirius_trust_election_type-field_sirius_domain'] = array(
     'bundle' => 'sirius_trust_election_type',
@@ -32841,7 +32712,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('Abbreviation should be unique to the domain, and should be suitable for use in a URL, i.e. only letters, numbers, hyphens and underscores.');
   t('Accepted Count');
   t('Active');
-  t('Active Election?');
   t('Active From');
   t('Active Until');
   t('Active?');
@@ -32969,8 +32839,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('E.g. 04.01 or 04.01.01 or 04.01.A');
   t('EBA');
   t('EBA Dates');
-  t('Each worker can have only one election with an "Active" status at a time.');
-  t('Election Status');
   t('Election Type');
   t('Email');
   t('Email Body');
