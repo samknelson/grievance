@@ -11,7 +11,7 @@ function report_cache_menu() {
 		'description' => '',
 		'page callback' => 'report_cache_page_landing',
 		'page arguments' => array(3),
-		'access arguments' => array('access site reports'),
+		'access arguments' => array('grievance report'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 
@@ -20,7 +20,7 @@ function report_cache_menu() {
 		'description' => '',
 		'page callback' => 'report_cache_page_landing',
 		'page arguments' => array(3),
-		'access arguments' => array('access site reports'),
+		'access arguments' => array('grievance report'),
 		'weight' => 1,
 		'type' => MENU_DEFAULT_LOCAL_TASK
 	);
