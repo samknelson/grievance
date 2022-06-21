@@ -455,9 +455,9 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 
 	// Exclude employer-initiated DNCs
 	$sql .= "and not exists (";
-	$sql .= "  select 1 from field_revision_field_sirius_dispatch_dncs ";
-	$sql .= "  where field_revision_field_sirius_dispatch_dncs.entity_type = 'node' ";
-	$sql .= "  and field_revision_field_sirius_dispatch_dncs.entity_id = node.nid ";
+	$sql .= "  select 1 from field_data_field_sirius_dispatch_dncs ";
+	$sql .= "  where field_data_field_sirius_dispatch_dncs.entity_type = 'node' ";
+	$sql .= "  and field_data_field_sirius_dispatch_dncs.entity_id = node.nid ";
 	$sql .= "  and field_sirius_dispatch_dncs_target_id in (:employer_nid1) ";
 	$args[':employer_nid1'] = array($employer_nid);
 	if ($facility_nid) { $args[':employer_nid1'][] = $facility_nid; }
@@ -467,9 +467,9 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 	// Exclude employee-initiated DNCs
 	if ($job_policy['workers']['ignore_prefs_dnc'] != 'Yes') {
 		$sql .= "and not exists (";
-		$sql .= "  select 1 from field_revision_field_sirius_dispatch_dncs2 ";
-		$sql .= "  where field_revision_field_sirius_dispatch_dncs2.entity_type = 'node' ";
-		$sql .= "  and field_revision_field_sirius_dispatch_dncs2.entity_id = node.nid ";
+		$sql .= "  select 1 from field_data_field_sirius_dispatch_dncs2 ";
+		$sql .= "  where field_data_field_sirius_dispatch_dncs2.entity_type = 'node' ";
+		$sql .= "  and field_data_field_sirius_dispatch_dncs2.entity_id = node.nid ";
 		$sql .= "  and field_sirius_dispatch_dncs2_target_id = :employer_nid2 ";
 		$sql .= ") ";
 		$args[':employer_nid2'] = $employer_nid;
