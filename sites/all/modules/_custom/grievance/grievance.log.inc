@@ -48,65 +48,69 @@ function grievance_log_update($grievance_node, $op) {
       $log_type_tid = sirius_get_special_tid('grievance_log_types|update_without_status_change');
     }
   }
-  $log_node->type = 'grievance_log';
-  node_object_prepare($log_node);
-  $log_node->language = LANGUAGE_NONE;
-  $log_node->uid = $user->uid; 
-  $log_node->status = 1;
-  $log_node->promote = 0;
-  $log_node->comment = 0;
+  if ($log_type_tid) {
+    $log_node->type = 'grievance_log';
+    node_object_prepare($log_node);
+    $log_node->language = LANGUAGE_NONE;
+    $log_node->uid = $user->uid; 
+    $log_node->status = 1;
+    $log_node->promote = 0;
+    $log_node->comment = 0;
 
-  $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
-  $log_node->field_grievance_status = $grievance_node->field_grievance_status;
-  $log_node->field_grievance_alert = $grievance_node->field_grievance_alert;
-  $log_node->field_grievance_alert_tid = $grievance_node->field_grievance_alert_tid;
-  $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
-  $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
+    $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+    $log_node->field_grievance_status = $grievance_node->field_grievance_status;
+    $log_node->field_grievance_alert = $grievance_node->field_grievance_alert;
+    $log_node->field_grievance_alert_tid = $grievance_node->field_grievance_alert_tid;
+    $log_node->field_grievance_alert_date = $grievance_node->field_grievance_alert_date;
+    $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
 
-  $log_node->field_grievance_status_date = $grievance_node->field_grievance_status_date;
-  if (!$log_node->field_grievance_status_date['und'][0]['value']) {
-    $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d');
+    $log_node->field_grievance_status_date = $grievance_node->field_grievance_status_date;
+    if (!$log_node->field_grievance_status_date['und'][0]['value']) {
+      $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d');
+    }
+
+    $log_node = node_submit($log_node); // Prepare node for saving
+    node_save($log_node);
   }
-
-  $log_node = node_submit($log_node); // Prepare node for saving
-  node_save($log_node);
 
   //
   // Log the event date, which starts the timeline.  But only if we don't already have one.
   //
 
   $incident_type_tid = sirius_get_special_tid('grievance_log_types|incident');
-  $probe = grievance_log_list($grievance_node, array($incident_type_tid));
-  if (!$probe) {
-    $event_date = $grievance_node->field_grievance_date_2['und'][0]['value'];
-    if (!$event_date) {
-      $event_date = $grievance_node->field_grievance_date_1['und'][0]['value'];
-    }
-    if (!$event_date) {
-      $days_ago = variable_get('grievance_incident_default_days_ago', 15);
-      $event_date = date('Y-m-d 00:00:00', strtotime("-$days_ago days"));
-    }
+  if ($incident_type_tid) {
+    $probe = grievance_log_list($grievance_node, array($incident_type_tid));
+    if (!$probe) {
+      $event_date = $grievance_node->field_grievance_date_2['und'][0]['value'];
+      if (!$event_date) {
+        $event_date = $grievance_node->field_grievance_date_1['und'][0]['value'];
+      }
+      if (!$event_date) {
+        $days_ago = variable_get('grievance_incident_default_days_ago', 15);
+        $event_date = date('Y-m-d 00:00:00', strtotime("-$days_ago days"));
+      }
 
-    if ($event_date) {
-      $ts = strtotime($event_date);
-      $log_node = new stdClass();
-      $log_node->title = t('Event date, timeline starts');
-      $log_node->type = 'grievance_log';
-      node_object_prepare($log_node);
-      $log_node->language = LANGUAGE_NONE;
-      $log_node->uid = $user->uid; 
-      $log_node->status = 1;
-      $log_node->promote = 0;
-      $log_node->comment = 0;
+      if ($event_date) {
+        $ts = strtotime($event_date);
+        $log_node = new stdClass();
+        $log_node->title = t('Event date, timeline starts');
+        $log_node->type = 'grievance_log';
+        node_object_prepare($log_node);
+        $log_node->language = LANGUAGE_NONE;
+        $log_node->uid = $user->uid; 
+        $log_node->status = 1;
+        $log_node->promote = 0;
+        $log_node->comment = 0;
 
-      $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
-      $log_node->field_grievance_status['und'][0]['tid'] =  variable_get('grievance_log_incident_status', '');
-      $log_node->field_grievance_log_type['und'][0]['tid'] = sirius_get_special_tid('grievance_log_types|incident');
+        $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+        $log_node->field_grievance_status['und'][0]['tid'] =  variable_get('grievance_log_incident_status', '');
+        $log_node->field_grievance_log_type['und'][0]['tid'] = sirius_get_special_tid('grievance_log_types|incident');
 
-      $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:00', strtotime($event_date));
+        $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:00', strtotime($event_date));
 
-      $log_node = node_submit($log_node); // Prepare node for saving
-      node_save($log_node);
+        $log_node = node_submit($log_node); // Prepare node for saving
+        node_save($log_node);
+      }
     }
   }
 
@@ -115,29 +119,32 @@ function grievance_log_update($grievance_node, $op) {
   //
 
   if ($grievance_node->grievance_assignment_changed) {
-    $log_node = new stdClass();
-    $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
-    $assignee_uid = $grievance_node->field_grievance_rep_assignee['und'][0]['target_id'];
-    if ($assignee_uid) {
-      $assignee_user = user_load($assignee_uid);
-      $title = t('Grievance assigned to: ') . $assignee_user->name;
-    } else {
-      $title = t('Grievance Unassigned');
-    }
-    $log_node->title = $title;
-    $log_node->type = 'grievance_log';
-    node_object_prepare($log_node);
-    $log_node->language = LANGUAGE_NONE;
-    $log_node->uid = $user->uid; 
-    $log_node->status = 1;
-    $log_node->promote = 0;
-    $log_node->comment = 0;
-    $log_node->body['und'][0]['value'] = $grievance_node->field_grievance_assignee_notes['und'][0]['value'];
-    $log_node->field_grievance_log_type['und'][0]['tid'] = sirius_get_special_tid('grievance_log_types|assignment');
-    $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s');
+    $log_type_tid = sirius_get_special_tid('grievance_log_types|assignment');
+    if ($log_type_tid) {
+      $log_node = new stdClass();
+      $log_node->field_grievance['und'][0]['target_id'] = $grievance_node->nid;
+      $assignee_uid = $grievance_node->field_grievance_rep_assignee['und'][0]['target_id'];
+      if ($assignee_uid) {
+        $assignee_user = user_load($assignee_uid);
+        $title = t('Grievance assigned to: ') . $assignee_user->name;
+      } else {
+        $title = t('Grievance Unassigned');
+      }
+      $log_node->title = $title;
+      $log_node->type = 'grievance_log';
+      node_object_prepare($log_node);
+      $log_node->language = LANGUAGE_NONE;
+      $log_node->uid = $user->uid; 
+      $log_node->status = 1;
+      $log_node->promote = 0;
+      $log_node->comment = 0;
+      $log_node->body['und'][0]['value'] = $grievance_node->field_grievance_assignee_notes['und'][0]['value'];
+      $log_node->field_grievance_log_type['und'][0]['tid'] = $log_type_tid;
+      $log_node->field_grievance_status_date['und'][0]['value'] = date('Y-m-d H:i:s');
 
-    $log_node = node_submit($log_node); // Prepare node for saving
-    node_save($log_node);
+      $log_node = node_submit($log_node); // Prepare node for saving
+      node_save($log_node);
+    }
   }
 
   //

@@ -103,6 +103,15 @@ function sirius_twilio_node_tabs() {
 function sirius_twilio_menu() {
   $items = array();
 
+  $items['sirius/twilio/statuscallback/sms/%'] = array(
+    'title' => 'Sirius: Twilio: Status Callback: SMS',
+    'description' => '',
+    'page callback' => 'sirius_twilio_statuscallback_sms',
+    'page arguments' => array(4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   $items['sirius/twilio/incoming/sms'] = array(
     'title' => 'Sirius: Twilio: Incoming: SMS',
     'description' => '',

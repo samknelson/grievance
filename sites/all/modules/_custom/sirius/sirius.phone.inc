@@ -103,11 +103,13 @@ function sirius_sms_enabled() { return TRUE; }
 
 function sirius_sms_send($params) {
   // Allow callers to set the X-Sirius-Id, and don't resent with the same ID. This allows callers to set unique keys.
-  $id = $params['X-Sirius-Id'];
-  if ($id) {
+  if ($params['X-Sirius-Id']) {
+    $id = $params['X-Sirius-Id'];
     if (sirius_sms_already_sent($id)) {
       return array('success' => FALSE, 'msg' => "Skipping sending for message with id $id, because it's already been sent.");
     }
+  } else {
+    $id =  uuid_generate();
   }
 
   $phone = $params['to'];
@@ -120,13 +122,18 @@ function sirius_sms_send($params) {
   }
 
   $possible = sirius_phonenumber_sms_possible($phone);
-  if (!$possible) { return array('success' => FALSE, 'msg' => "SMS messaging to $phone is not possible because the number is flagged as non-deliverable. Possible causes include a user STOP message, an administrative block, or a detected landline."); }
+  if (!$possible) { 
+    return array(
+      'success' => FALSE, 
+      'msg' => "SMS messaging to $phone is not possible because the number is flagged as non-deliverable. Possible causes include a user STOP message, an administrative block, or a detected landline."
+    );
+  }
 
   $phonenumber_node = sirius_phonenumber_lookup($phone);
   if (!$phonenumber_node->nid) { node_save($phonenumber_node); }
   $handler_nids[] = $phonenumber_node->nid;
 
-  $result = sirius_twilio_outgoing_sms($phone, $msg, $handler_nid);
+  $result = sirius_twilio_outgoing_sms($phone, $msg, $handler_nid, $id);
 
   if ($result['success']) {
     sirius_log(
@@ -174,6 +181,37 @@ function sirius_sms_already_sent($id) {
   $hr = $stmt->fetchAssoc();
   if ($hr) { return TRUE; }
   return FALSE;
+}
+
+function sirius_sms_callback($id, $type, $json) {
+  if ($id) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'sirius_log');
+    $query->fieldCondition('field_sirius_notes', 'value', $id);
+    $query->fieldCondition('field_sirius_log_handler', 'target_id', 0, '>');
+    $query->fieldCondition('field_sirius_category', 'value', 'sms');
+    $query->fieldCondition('field_sirius_type', 'value', 'sending');
+    $query->propertyOrderBy('nid', 'desc');
+    $stmt = $query->execute();
+    if ($stmt['node']) {
+      $previous_log_node = node_load(array_keys($stmt['node'])[0]);
+      $handler_nids = sirius_fieldvals($previous_log_node, 'field_sirius_log_handler', 'target_id');
+    }
+  }
+
+  $summary = $json['SmsStatus'];
+
+  sirius_log(
+    'sms', 
+    $type, 
+    "Callback of type $type", 
+    $summary,
+    $id, 
+    $handler_nids,
+    NULL,
+    $json
+  );
 }
 
 function sirius_voice_send($params) {

@@ -33,12 +33,32 @@ function sirius_user_tab_proxy_form($form, &$form_state, $proxy_user) {
 		'#default_value' => $json['employer_rnid'],
 	);
 
+	$form['proxy']['worker_ssn'] = array(
+		'#type' => 'select',
+		'#title' => t('Worker SSN'),
+		'#type' => 'textfield',
+		'#default_value' => $json['worker_ssn'],
+		'#size' => 10,
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
 	);
 
 	return $form;
+}
+
+function sirius_user_tab_proxy_form_validate($form, &$form_state) {
+	$worker_ssn = $form_state['values']['proxy']['worker_ssn'];
+	if ($worker_ssn) {
+		$result = sirius_proxy_call('sirius_worker_get_by_ssn', $worker_ssn);
+		if (!$result['success']) {
+			form_set_error('proxy][worker_ssn', $result['msg']);
+		} else if (!$result['data']) {
+			form_set_error('proxy][worker_ssn', "Worker not found.");
+		}
+	}
 }
 
 function sirius_user_tab_proxy_form_submit($form, &$form_state) {

@@ -2,6 +2,10 @@
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_flood/sirius_flood.menu.inc';
 
+/**
+ * List all non-expired flood entries, grouped by event (e.g. "Failed Login Attempt") and identifier (typically the IP address)
+ */
+
 function  sirius_flood_list() {
   $entries = array();
   $ts = time();
@@ -21,10 +25,18 @@ function  sirius_flood_list() {
   return $entries;
 }
 
+/**
+ * Clear a flood, deleting all entries for a given event and identifier
+ */
+
 function sirius_flood_clear($event, $identifier) {
   $sql = "delete from flood where event = :event and identifier = :identifier";
   $stmt = sirius_sql_query($sql, array(':event' => $event, ':identifier' => $identifier));
 }
+
+/**
+ * Get info about a given event type
+ */
 
 function sirius_flood_info($event) {
   $info_all = &drupal_static(__FUNCTION__); 
@@ -37,20 +49,25 @@ function sirius_flood_info($event) {
 
 function sirius_flood_info_all() {
   $info_all = &drupal_static(__FUNCTION__);
+
   if (!isset($info_all)) {
+    // Allow modules to define new flood types by implementing hook_sirius_flood_info
     $info_all = module_invoke_all('sirius_flood_info');
+
+    // Sort by key
     ksort($info_all);
-  }
 
-  foreach ($info_all as $event => $info) {
-    $info_all[$event]['event'] = $event; 
+    // Fill in some information, including looking up windows and thresholds based on the variable name
+    foreach ($info_all as $event => $info) {
+      $info_all[$event]['event'] = $event; 
 
-    if (!$info_all[$event]['window_variable'])    { $info_all[$event]['window_variable'] = 'sirius_flood_' . $event . '_window'; }
-    if (!$info_all[$event]['window_default'])     { $info_all[$event]['window_default'] = 3600; }
-    if (!$info_all[$event]['threshold_variable']) { $info_all[$event]['threshold_variable'] = 'sirius_flood_' . $event . '_threshold'; }
-    if (!$info_all[$event]['threshold_default'])  { $info_all[$event]['threshold_default'] = 50; }
-    if (!$info_all[$event]['window'])             { $info_all[$event]['window'] = variable_get($info_all[$event]['window_variable'], $info_all[$event]['window_default']); }
-    if (!$info_all[$event]['threshold'])          { $info_all[$event]['threshold'] = variable_get($info_all[$event]['threshold_variable'], $info_all[$event]['threshold_default']); }
+      if (!$info_all[$event]['window_variable'])    { $info_all[$event]['window_variable'] = 'sirius_flood_' . $event . '_window'; }
+      if (!$info_all[$event]['window_default'])     { $info_all[$event]['window_default'] = 3600; }
+      if (!$info_all[$event]['threshold_variable']) { $info_all[$event]['threshold_variable'] = 'sirius_flood_' . $event . '_threshold'; }
+      if (!$info_all[$event]['threshold_default'])  { $info_all[$event]['threshold_default'] = 50; }
+      if (!$info_all[$event]['window'])             { $info_all[$event]['window'] = variable_get($info_all[$event]['window_variable'], $info_all[$event]['window_default']); }
+      if (!$info_all[$event]['threshold'])          { $info_all[$event]['threshold'] = variable_get($info_all[$event]['threshold_variable'], $info_all[$event]['threshold_default']); }
+    }
   }
 
   return $info_all;
@@ -88,17 +105,20 @@ function sirius_flood_sirius_flood_info() {
 }
 
 /**
- * Wrapper for flood_register_event, lookup expiration automatically
+ * Wrapper for flood_register_event(), but lookup the window automatically, so client code doesn't have to pay attention
  */
 
 function sirius_flood_register_event($event, $identifier = NULL) {
   $info = sirius_flood_info($event);
+
   $window = $info['window'];
+  if (!$window) { $window = 3600; }
+  
   flood_register_event($event, $window, $identifier);
 }
 
 /**
- * Wrapper for flood_is_allowed
+ * Wrapper for flood_is_allowed(), but lookup the window and threshold automatically, so client code doesn't have to pay attention.
  */
 
 function sirius_flood_is_allowed($event, $identifier = NULL) {

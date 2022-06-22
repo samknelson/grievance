@@ -10,7 +10,7 @@
 function sirius_node_tabs() {
   $node_tabs = array();
 
-  $content_types = array('sirius_event', 'sirius_worker', 'grievance_shop', 'sirius_ledger_account');
+  $content_types = array('sirius_event', 'sirius_worker', 'grievance_shop', 'sirius_ledger_account', 'sirius_contact_relationship');
   foreach ($content_types as $content_type) {
     $node_tabs[$content_type][$content_type . '_materials'] = array(
       'title' => 'Materials',
@@ -30,6 +30,18 @@ function sirius_node_tabs() {
       'permissions' => array('sirius domain admin'),
       'weight' => 20,
       'file' => 'sirius.page_entity_machine_name.inc',
+    );
+  }
+
+  $content_types = array('grievance_basic_page');
+  foreach ($content_types as $content_type) {
+    $node_tabs[$content_type][$content_type . '_machine_name'] = array(
+      'title' => 'Restrict',
+      'description' => '',
+      'callback' => 'sirius_node_tab_entity_restrict',
+      'permissions' => array('sirius'),
+      'weight' => 20,
+      'file' => 'sirius.page_entity_restrict.inc',
     );
   }
 
@@ -88,7 +100,7 @@ function sirius_node_tabs() {
     'sirius.page_entity_customfield.inc', 
     'sirius.page_entity_customfield_settings.inc', 
   );
-  foreach (array('sirius_event', 'sirius_ledger_account', 'sirius_trust_benefit') as $content_type) {
+  foreach (array('sirius_event', 'sirius_ledger_account', 'sirius_trust_benefit', 'sirius_trust_worker_election', 'sirius_contact_relationship') as $content_type) {
     $node_tabs[$content_type][$content_type . '_customfield'] = array(
       'title' => 'Custom Fields',
       'description' => '',
@@ -201,6 +213,17 @@ function sirius_node_tabs() {
     'permissions' => array('sirius letterhead edit'),
   );
 
+  $node_tabs['sirius_domain']['sirius_domain_info'] = array(
+    'title' => 'Info',
+    'description' => '',
+    'callback' => 'sirius_node_tab_sirius_domain_info',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
+    'file' => 'sirius.page_domain_info.inc',
+    'landing' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   $node_tabs['sirius_domain']['sirius_domain_subdomains'] = array(
     'title' => 'Subdomains',
     'description' => '',
@@ -231,6 +254,7 @@ function sirius_node_tabs() {
     'callback' => 'sirius_node_tab_sirius_domain_components',
     'permissions' => array('sirius admin'),
     'weight' => 6,
+    'file' => 'sirius.page_domain_components.inc',
   );
 
   $node_tabs['sirius_domain']['sirius_domain_stats'] = array(
@@ -319,8 +343,25 @@ function sirius_node_tabs() {
     'weight' => 3,
   );
 
+  $node_tabs['sirius_contact']['sirius_contact_relationships'] = array(
+    'title' => 'Relationships',
+    'description' => '',
+    'callback' => 'sirius_node_tab_contact_relationships',
+    'permissions' => array('sirius contact admin'), 
+    'file' => 'sirius.page_contact_relationships.inc',
+    'component' => 'contact:relationships',
+  );
 
-  $content_types = array('sirius_log', 'sirius_letterhead', 'sirius_contact', 'sirius_phonenumber', 'sirius_payperiod', 'sirius_dispatch');
+  $content_types = array(
+    'sirius_log', 
+    'sirius_json_definition',
+    'sirius_letterhead', 
+    'sirius_contact', 
+    'sirius_phonenumber', 
+    'sirius_payperiod', 
+    'sirius_dispatch',
+    'sirius_trust_worker_benefit',
+  );
   foreach ($content_types as $content_type) {
     $node_tabs[$content_type][$content_type . '_rawjson'] = array(
       'title' => 'JSON',
@@ -400,7 +441,7 @@ function sirius_menu() {
       } else {
         $type = MENU_LOCAL_TASK;
       }
-      $items['node/%node/' . $tab_name] = array(
+      $item = array(
         'title' => $tab_record['title'],
         'page callback' => 'sirius_node_tab_content',
         'page arguments' => array(1, $tab_name),
@@ -408,21 +449,24 @@ function sirius_menu() {
         'access arguments' => array(1, $tab_name),
         'type' => $type,
       );
-      if ($tab_record['weight']) {
-        $items['node/%node/' . $tab_name]['weight'] = $tab_record['weight'];
-      }
-      if ($tab_record['description']) {
-        $items['node/%node/' . $tab_name]['weight'] = $tab_record['description'];
-      }
-      if ($tab_record['page arguments']) {
-        $items['node/%node/' . $tab_name]['page_arguments'] = array_merge($items['node/%node/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
+      if ($tab_record['weight']) { $item['weight'] = $tab_record['weight']; }
+      if ($tab_record['description']) { $item['description'] = $tab_record['description']; }
+      if ($tab_record['page arguments']) { 
+        $item['page_arguments'] = array_merge($items['node/%node/' . $tab_name]['page_arguments'], $tab_record['page arguments']);
       }
       if ($tab_record['title callback']) {
-        $items['node/%node/' . $tab_name]['title callback'] = $tab_record['title callback'];
-        unset($items['node/%node/' . $tab_name]['title']);
+        $item['title callback'] = $tab_record['title callback'];
+        unset($$item['title']);
       }
-      if ($tab_record['title arguments']) {
-        $items['node/%node/' . $tab_name]['title arguments'] = $tab_record['title arguments'];
+      if ($tab_record['title arguments']) { $item['title arguments'] = $tab_record['title arguments']; }
+      $items['node/%node/' . $tab_name] = $item;
+
+      if ($tab_record['rnode']) {
+        $item['page callback'] = 'sirius_rnode_tab_content';
+        $item['access callback'] = 'sirius_page_access_wrap';
+        $item['access arguments'] = array('sirius.page_proxy_rnode.inc', 'sirius_rnode_tab_access', 1, $tab_name);
+        $item['file'] = 'sirius.page_proxy_rnode.inc';
+        $items['rnode/%/' . $tab_name] = $item;
       }
     }
   }
@@ -1275,6 +1319,16 @@ function sirius_menu() {
     'weight' => 8,
   );
 
+  $items['user/%/sirius_proxy'] = array(
+    'title' => 'Proxy',
+    'page callback' => 'sirius_user_tab_proxy',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_user_tab_proxy_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 8,
+  );
+
   $items['user/%/current_location'] = array(
     'title' => 'Current Location',
     'page callback' => 'sirius_user_tab_map_current_location',
@@ -1283,6 +1337,27 @@ function sirius_menu() {
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
+  );
+
+  $items['rnode/%'] = array(
+    'title' => 'Proxy',
+    'page callback' => 'sirius_rnode_tab_content',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_page_access_wrap',
+    'access arguments' => array('sirius.page_proxy_rnode.inc', 'sirius_rnode_tab_access', 1),
+    'file' => 'sirius.page_proxy_rnode.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['rnode/%/view'] = array(
+    'title' => 'Proxy',
+    'page callback' => 'sirius_rnode_tab_content',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_page_access_wrap',
+    'access arguments' => array('sirius.page_proxy_rnode.inc', 'sirius_rnode_tab_access', 1),
+    'file' => 'sirius.page_proxy_rnode.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
   );
 
   $items['sirius/ajax/map/current_location/checkin'] = array(
@@ -1299,6 +1374,16 @@ function sirius_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['sirius/domain/components/root'] = array(
+    'title' => 'Root Domain Components',
+    'page callback' => 'sirius_page_domain_components_root',
+    'page arguments' => array(),
+    'access arguments' => array('sirius admin'),
+    'file' => 'sirius.page_domain_components_root.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+
   /*
   $items['public'] = array(
     'page callback' => 'sirius_page_public',
@@ -1310,6 +1395,11 @@ function sirius_menu() {
   */
 
   return $items;
+}
+
+function sirius_page_access_wrap($file, $callback, $arg, $arg2 = NULL) {
+  sirius_require('sirius', $file);
+  return $callback($arg, $arg2);
 }
 
 function sirius_aatlink($nid, $aat) {

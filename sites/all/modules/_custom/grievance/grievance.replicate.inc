@@ -32,6 +32,11 @@ function grievance_contract_template_replicate_form_all_submit($form, &$form_sta
 
 	$node = $form_state['node'];
 
+  if ($node->field_grievance_artsel['und'][0]['value'] == 'Yes') {
+    drupal_set_message("Contracts with \"Articles Selectable\" cannot be duplicated. Please clear this flag before continuing.", 'error');
+    return;
+  }
+
 	drupal_set_message(t('Duplicating: @title', array('@title' => $node->title)));
 
   // Iterate over the bundles, because we want to do all the sections first (so the clauses will know which section they're in)

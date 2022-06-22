@@ -27,7 +27,7 @@ function sirius_customfield_value($node, $set_machine_name, $path) {
 	$set_nid = sirius_customfield_set_lookup_by_machine_name($set_machine_name);
 	if (!$set_nid) { return '[custom field set not found]'; }
   $which = 'customfield_' . $set_nid;
-	$entity_json = sirius_jsonfield_util_node_json_get($node);
+	$entity_json = sirius_json_get($node);
   $entity_results = sirius_jsonfield_util_results_get($entity_json, $which);
 	return sirius_jsonfield_util_get_from_path($entity_results, $path);
 }

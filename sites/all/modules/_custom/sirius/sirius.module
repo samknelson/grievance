@@ -90,7 +90,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_clone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_delete.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_activity.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_components.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_stats.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_list.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.page_domain_list_stats.inc';

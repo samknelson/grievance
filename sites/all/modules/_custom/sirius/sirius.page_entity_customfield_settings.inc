@@ -17,6 +17,10 @@ function sirius_node_tab_entity_customfield_settings_access($entity_node) {
    if (user_access('sirius trust admin')) { return TRUE; }
   }
 
+  if ($entity_node->type == 'sirius_contact_relationship') {
+		if (user_access('sirius contact admin')) { return TRUE; }
+  }
+
 	return FALSE;
 }
 

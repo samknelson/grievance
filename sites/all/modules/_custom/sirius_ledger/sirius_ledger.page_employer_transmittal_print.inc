@@ -92,18 +92,12 @@ function sirius_ledger_node_tab_employer_transmittal_print($employer_node, $acco
 	if ($include_hours == 'Yes') { $schedule_key = 'hour'; } else { $schedule_key = 'month'; }
 
 	// Get the policy for this employer
-	$policy_nodes = array();
-	foreach ($account_nids as $account_nid) {
-		$policy_node = sirius_ledger_policy_lookup($schedule_key, NULL, $employer_node, $account_nid);
-		if (!$policy_node) {
-			drupal_set_message("No charge policy found: " . sirius_minilog_render_html(), 'warning');
-			return array();
-		}
-
-		$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
-		$policy_nodes[$account_nid] = $policy_node;
-		$rates[$account_nid] = $policy_json['ledger']['policy']['rates'][$schedule_key];
+	$policy_node = sirius_ledger_policy_lookup(NULL, $employer_node);
+	if (!$policy_node) {
+		drupal_set_message("No charge policy found: " . sirius_minilog_render_html(), 'warning');
+		return array();
 	}
+	$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
 
 	$html .= '<div class="sirius_ledger_transmittal">';
 
@@ -174,6 +168,12 @@ function sirius_ledger_node_tab_employer_transmittal_print($employer_node, $acco
 			}
 		}
 
+		if ($dispatch['worker_nid']) {
+			$worker_node = node_load($dispatch['worker_nid']);
+			sirius_minilog_reset();
+			$rates = sirius_ledger_policy_lookup_rates_new($worker_node, $policy_node, $schedule_key, array('ms_tid' => $ms_tid));
+		}
+
 		// I might have a level within an MS
 		$level_code = $worker_json['training']['levels'][$ms_tid]['code'];
 		$level_name = NULL; 
@@ -195,8 +195,7 @@ function sirius_ledger_node_tab_employer_transmittal_print($employer_node, $acco
 
 		foreach ($account_nids as $account_nid) {
 			// Get the rate
-			$rate = $rates[$account_nid][$ms_tid][$account_nid]['rate'];
-			if ($level_code && $rates[$account_nid]["$ms_tid|$level_code"][$account_nid]['rate']) { $rate = $rates[$account_nid]["$ms_tid|$level_code"][$account_nid]['rate']; }
+			$rate = $rates[$account_nid]['rate'];
 			if ($rate) { $rate = '$' . number_format($rate, 2); }
 			if (!$rate) { $rate = '____________'; }
 

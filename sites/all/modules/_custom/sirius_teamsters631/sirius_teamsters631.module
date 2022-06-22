@@ -63,6 +63,26 @@ function sirius_teamsters631_node_insert($node) {
 	return $result;
 }
 
+/**
+ * Implements hook_taxonomy_term_update() 
+ */
+
+function sirius_teamsters631_taxonomy_term_update($term) {
+  $vid = $term->vid;
+  $vocabulary = taxonomy_vocabulary_load($vid);
+  if ($vocabulary->machine_name == 'sirius_member_status') { sirius_teamsters631_taxonomy_term_update_ebnotify($term); }
+	sirius_teamsters631_taxonomy_term_updateinsert($term);
+}
+
+/**
+ * Implement hook_taxonomy_term_insert()
+ */
+
+function sirius_teamsters631_taxonomy_term_insert($term) {
+	sirius_teamsters631_taxonomy_term_updateinsert($term);
+}
+
+
 /***
  * Implements hook_sirius_wizard_info()
  */
@@ -74,16 +94,6 @@ function sirius_teamsters631_sirius_wizard_info() {
   $items += sirius_teamsters631_feed_hours_check_info();
 
   return $items;
-}
-
-/**
- * Implements hook_taxonomy_term_update() 
- */
-
-function sirius_teamsters631_taxonomy_term_update($term) {
-  $vid = $term->vid;
-  $vocabulary = taxonomy_vocabulary_load($vid);
-  if ($vocabulary->machine_name == 'sirius_member_status') { sirius_teamsters631_taxonomy_term_update_ebnotify($term); }
 }
 
 /**

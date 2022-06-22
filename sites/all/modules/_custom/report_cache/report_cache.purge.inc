@@ -25,31 +25,24 @@ function report_cache_purge_date($report_type, $start_ts = NULL, $end_ts = NULL,
 
 	$sql = "select distinct report_id from report_cache where report_type = :report_type and report_domain_nid = :domain_nid";
 	$stmt = db_query($sql, array(':report_type' => $report_type, ':domain_nid' => $domain_nid));
+
+	$count = 0; 
 	while ($hr = $stmt->fetchAssoc()) {
 		$report_id = $hr['report_id'];
 
 		if ($suffix) {
-			// if (!str_ends_with($report_id, $suffix)) { // PHP 8
-			if (substr($report_id, -1 * strlen($suffix)) !== $suffix) {
-				sirius_minilog("$report_type: Skipping $report_id (Doesn't end in $suffix).");
-				continue;
-			}
+			if (substr($report_id, -1 * strlen($suffix)) !== $suffix) { continue; }
 		}
 
 		$report_id_clean = preg_replace('/ \- (.+)/', '', $report_id);
 
 		$ts = strtotime($report_id_clean);
-		if ($ts < 1) {
-			sirius_minilog("$report_type: Skipping $report_id (couldn't parse the date).");
-			continue;
-		}
+		if ($ts < 1) { continue; }
+		if ($ts < $start_ts || $ts > $end_ts) { continue; }
 
-		if ($ts < $start_ts || $ts > $end_ts) {
-			sirius_minilog("$report_type: Skipping $report_id (date not in range).");
-			continue;
-		}
-
-		sirius_minilog("$report_type: $report_type - Purging $report_id.");
+		sirius_minilog("-- $report_type - Purging $report_id.");
+		++$count;
 		report_cache_purge($report_type, $report_id);
 	}
+	return array('success' => TRUE, 'count' => $count);
 }

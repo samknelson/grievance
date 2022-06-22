@@ -132,12 +132,43 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 			'#required' => TRUE,
 		);
 
+		if ($is_staff) {
+			$prefix = '<div class="sirius_field_intro">';
+			$prefix .= "<p>Workers who are laid off within 24 hours automatically keep their senioriy. Select \"Yes\" to preserve seniority even if the layoff is more than 24 hours later than the report time.</p>";
+			$availdate = $worker_node->field_sirius_dispatch_availdate['und'][0]['value'];
+			if ($availdate) {
+				$availdate = date('m/d/Y h:i a', strtotime($availdate . ' GMT'));
+				$prefix .= '<p>' . t('The worker\'s <em>previous</em> seniority date was <strong>@date</strong>. ', array('@date' => $availdate)) . '</p>';
+			}
+			$prefix .= '</div>';
+
+			$form['keep_seniority'] = array(
+				'#title' => t('Keep Seniority?'),
+				'#type' => 'select',
+				'#options' => array(
+					NULL => t('-- Select --'),
+					'No' => t('No'),
+					'Yes' => t('Yes'),
+				),
+				'#default_value' => 'No',
+				'#states' => array(
+					'visible' => array(
+						array(':input[name="action"]' => array('value' => 'terminate')),
+						array(':input[name="action"]' => array('value' => 'resign')),
+						array(':input[name="action"]' => array('value' => 'vlri')),
+					)
+				),
+				'#field_prefix' => $prefix,
+			);
+		}
+
 		$form['submit'] = array(
 			'#type' => 'submit',
 			'#value' => 'Go',
 			'#suffix' => '</div>',
 		);
 	}
+
 
 	$form['dispatch_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_dispatch_section">');
 	$form['dispatch_section_qr'] = array('#markup' => sirius_qr_url());
@@ -146,24 +177,26 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['dispatch_section_c'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_dispatch_cbn', t('Call by Name?')));
 	$form['dispatch_section_d'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_payrate', t('Pay Rate')));
 
+	// @TODO: Broken now
 	$account_options = sirius_ledger_account_list();
 	$account_nids = array_filter(array_values(sirius_domain_variable_get('sirius_dispatch_view_accounts', array())));
-	if ($account_nids) {
-		$schedules = array('month' => 'Monthly', 'semimonth' => 'Semi-Monthly', 'hour' => 'Hourly');
-		foreach ($schedules as $schedule_key => $schedule_name) {
-			$policy_node = sirius_ledger_policy_lookup($schedule_key, $worker_node);
-			if (!$policy_node) { continue; }
-			$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
-			$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule_key);
-			foreach ($rates as $account_nid => $rate_record) {
-				if ($rate_record['rate'] && in_array($account_nid, $account_nids)) {
-					$title = $account_options[$account_nid] . ':';
-					$value = '$' . number_format($rate_record['rate'], 2) . ' ' . $schedule_name;
-					$form['dispatch_section_' . $account_nid . '_' . $schedule_key] = array('#markup' => sirius_fakerender_field($title, $value));
+	$policy_node = sirius_ledger_policy_lookup($worker_node);
+	if ($policy_node) {
+		if ($account_nids) {
+			$schedules = array('month' => 'Monthly', 'semimonth' => 'Semi-Monthly', 'hour' => 'Hourly');
+			foreach ($schedules as $schedule_key => $schedule_name) {
+				$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
+				$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule_key);
+				foreach ($rates as $account_nid => $rate_record) {
+					if ($rate_record['rate'] && in_array($account_nid, $account_nids)) {
+						$title = $account_options[$account_nid] . ':';
+						$value = '$' . number_format($rate_record['rate'], 2) . ' ' . $schedule_name;
+						$form['dispatch_section_' . $account_nid . '_' . $schedule_key] = array('#markup' => sirius_fakerender_field($title, $value));
+					}
 				}
+				// dpm($policy_node);
+				// dpm($rates);
 			}
-			// dpm($policy_node);
-			// dpm($rates);
 		}
 	}
 
@@ -308,6 +341,16 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 function sirius_node_tab_dispatch_worker_view_form_submit($form, &$form_state) {
 	$dispatch_node = $form_state['dispatch_node'];
 	$action = $form_state['values']['action'];
+	$notes = $form_state['values']['notes'];
+
+	if ($form_state['values']['keep_seniority'] == 'Yes') {
+		$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+		$json = sirius_json_get($worker_node);
+		$json['dispatch']['keep_seniority'] = 'Yes';
+		sirius_json_set($worker_node, $json);
+		node_save($worker_node);
+	}
+
 	if ($action == 'accept') { $result = sirius_dispatch_accept($dispatch_node); }
 	if ($action == 'decline') { $result = sirius_dispatch_decline($dispatch_node); }
 	if ($action == 'terminate') { $result = sirius_dispatch_terminate($dispatch_node); }

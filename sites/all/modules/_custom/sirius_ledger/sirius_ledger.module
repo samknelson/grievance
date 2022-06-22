@@ -47,6 +47,14 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.report_discrepancy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.report_transmittal_balances.inc';
 
+
+function sirius_ledger_sirius_config_links_alter(&$links) {
+	$links['ledger'] = array('title' => 'A/R Accounting and Ledger');
+	$links['ledger']['links']['sirius/config/ledger'] 					= array('title' => 'A/R Settings', 'description' => 'Settings for the A/R accounting system: ledger, dues, payments, charges, etc.');
+	$links['ledger']['links']['sirius/ledger/stripe/config']		= array('title' => 'Stripe Settings', 'description' => 'Settings for using the Stripe payment processor');
+}
+
+
 /***
  * Implements hook_report_cache_info() 
  */
@@ -59,11 +67,19 @@ function sirius_ledger_report_cache_info() {
 }
 
 /**
- * Implements hook_cron
+ * Implements hook_sirius_cron_scan_info()
  */
 
-function sirius_ledger_cron() {
-	sirius_ledger_monthly_cron();
+function sirius_ledger_sirius_cron_scan_info() {
+	$items['ledger_monthly'] = array(
+		'title' => 'Ledger Monthly Charge',
+		'description' => 'Charge any monthly or semimonthly dues.',
+		'schedule' => 'hourly',
+		'callback' => 'sirius_ledger_monthly_charge_batch',
+		'multidomain' => TRUE,
+	);
+
+	return $items;
 }
 
 /**
@@ -71,7 +87,7 @@ function sirius_ledger_cron() {
  */
 
 function sirius_ledger_node_insert($node) {
-	if ($node->type == 'sirius_payperiod') { sirius_ledger_payperiod_set($node); }
+	if ($node->type == 'sirius_payperiod') { sirius_ledger_payperiod_set($node, 'live'); }
 }
 
 /**
@@ -79,7 +95,7 @@ function sirius_ledger_node_insert($node) {
  */
 
 function sirius_ledger_node_update($node) {
-	if ($node->type == 'sirius_payperiod') { sirius_ledger_payperiod_set($node); }
+	if ($node->type == 'sirius_payperiod') { sirius_ledger_payperiod_set($node, 'live'); }
 }
 
 /**
@@ -87,7 +103,7 @@ function sirius_ledger_node_update($node) {
  */
 
 function sirius_ledger_node_delete($node) {
-	if ($node->type == 'sirius_payperiod') { sirius_ledger_payperiod_clear($node); }
+	if ($node->type == 'sirius_payperiod') { sirius_ledger_payperiod_clear($node, 'live'); }
 }
 
 
@@ -96,6 +112,13 @@ function sirius_ledger_node_delete($node) {
  */
 
 function sirius_ledger_node_view($node, $view_mode, $langcode) {
+	// Show Stripe links in the payment
+	if ($view_mode == 'full' && $node->type == 'sirius_payment') {
+		sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
+		sirius_ledger_stripe_payment_node_view($node, $view_mode, $langcode);
+	}
+
+
 	// Change rendering for "Payer"
 	/*
 	if ($view_mode == 'full' && $node->type == 'sirius_payment') {
