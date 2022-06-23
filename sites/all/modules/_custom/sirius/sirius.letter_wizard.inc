@@ -30,7 +30,7 @@ function sirius_letter_wizard_steps($data, $entity_node) {
   	$steps['recipients'] = array(
   		'label' => 'Recipients', 
   		'callback' => 'sirius_letter_wizard_recipients_phone',
-	  	'file' => 'sirius.letter_wizard.recipients_sms.inc',
+	  	'file' => 'sirius.letter_wizard.recipients_phone.inc',
 	  	'module' => 'sirius',
   	);
   } else if ($data['format'] == 'fax') {
