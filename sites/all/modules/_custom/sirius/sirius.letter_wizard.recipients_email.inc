@@ -7,6 +7,8 @@
 function sirius_letter_wizard_recipients_email($info, $data, $letter_node, $current_step) { return drupal_get_form('sirius_letter_wizard_recipients_email_form', $info, $data, $letter_node, $current_step); }
 
 function sirius_letter_wizard_recipients_email_form($form, &$form_state, $info, $data, $letter_node, $current_step) {
+	form_load_include($form_state, 'inc', 'sirius', 'sirius.letter_wizard.recipients_email');
+
 	$form_state['info'] = $info;
 	$form_state['data'] = $data;
 	$form_state['letter_nid'] = $letter_node->nid;
