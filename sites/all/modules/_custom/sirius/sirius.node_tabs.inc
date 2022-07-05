@@ -60,9 +60,9 @@ function sirius_node_tab_content($node, $in_tab_name) {
   return $result;
 }
 
-function sirius_node_tab_access($node, $in_tab_name) {
+function sirius_node_tab_access($node, $in_tab_name, $options = array()) {
   // Deny access to all nodes that are not in your domain
-  if (!user_access('sirius admin') && $node->type != 'sirius_domain') {
+  if (!user_access('sirius admin') && $node->type != 'sirius_domain' && !$options['skip_domain_check']) {
     $node_domain_nid = $node->field_sirius_domain['und'][0]['target_id'];
     $my_domain_nid = sirius_domain_nid();
     if ($node_domain_nid && ($node_domain_nid != $my_domain_nid)) { return FALSE; }
@@ -80,6 +80,12 @@ function sirius_node_tab_access($node, $in_tab_name) {
 
   // Check if the component is enabled
   if ($tab_record['component'] && !sirius_domain_component_enabled($tab_record['component'])) {
+    return FALSE;
+  }
+
+  // In general, you must have access to the underlying node. 
+  // (Some tabs are accessible even if the user can't see the underlying node)
+  if (!node_access('view', $node) && !$tab_record['skip_node_view_check']) {
     return FALSE;
   }
 
