@@ -31,16 +31,28 @@ function sirius_node_tab_content($node, $in_tab_name) {
   $tab_record = $node_tabs[$node->type][$in_tab_name];
   if (!$tab_record) { 
     drupal_set_message(t('Bad tab: ') . $node->type . ', ' . $in_tab_name, 'error'); 
-    return FALSE;
+    return '';
   }
+
+  sirius_node_tab_handle_requires($tab_record);
 
   $callback = $tab_record['callback'];
   $args = array($node);
+
+  if (!function_exists($callback)) {
+    $callback_form = "$callback" . '_form';
+    if (!function_exists($callback_form)) {
+      drupal_set_message("Callback doesn't exist: $callback", 'error');
+      return '';
+    }
+    $callback = 'drupal_get_form';
+    $args = array($callback_form, $node);
+  }
+
   drupal_set_title($node->title);
   if ($tab_record['callback arguments']) {
     $args = array_merge($args, $tab_record['callback arguments']);
   }
-  sirius_node_tab_handle_requires($tab_record);
 
   /*
   // Make landing page redirect to the main view page. Not sure why we bother, though. 
