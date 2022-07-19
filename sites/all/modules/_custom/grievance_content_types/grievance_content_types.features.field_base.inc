@@ -6429,7 +6429,7 @@ function grievance_content_types_field_default_field_bases() {
       'handler_settings' => array(
         'behaviors' => array(
           'views-select-list' => array(
-            'status' => 0,
+            'status' => 1,
           ),
         ),
         'sort' => array(
