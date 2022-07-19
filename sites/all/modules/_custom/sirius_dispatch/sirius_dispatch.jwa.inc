@@ -110,18 +110,20 @@ function sirius_dispatch_jwa_hours_clause($prefs) {
   }
 
   $delta = 0;
-  foreach ($prefs['display']['hour_type'] as $type) {
-    $clauses = array();
-    list ($hours_type_tid, $department_tid) = explode('|', $type);
-    if ($hours_type_tid > 0) { $clauses[] = "hours_type_tid = $hours_type_tid "; }
-    if ($department_tid > 0) { $clauses[] = "department_tid = $department_tid "; }
-    if ($date_range_sql) { $clauses[] = $date_range_sql; }
-    if (!$clauses) { $clauses[] = 'TRUE'; }
-    $sql .= "\nSUM(CASE WHEN ( ";
-    $sql .= join(' AND ', $clauses);
-    $sql .= ") THEN hours ELSE 0 END) AS hours_$delta,\n ";
-    ++$delta;
-  }
+  if ($prefs['display']['hour_type']) {
+	  foreach ($prefs['display']['hour_type'] as $type) {
+	    $clauses = array();
+	    list ($hours_type_tid, $department_tid) = explode('|', $type);
+	    if ($hours_type_tid > 0) { $clauses[] = "hours_type_tid = $hours_type_tid "; }
+	    if ($department_tid > 0) { $clauses[] = "department_tid = $department_tid "; }
+	    if ($date_range_sql) { $clauses[] = $date_range_sql; }
+	    if (!$clauses) { $clauses[] = 'TRUE'; }
+	    $sql .= "\nSUM(CASE WHEN ( ";
+	    $sql .= join(' AND ', $clauses);
+	    $sql .= ") THEN hours ELSE 0 END) AS hours_$delta,\n ";
+	    ++$delta;
+	  }
+	}
 
   return $sql;
 }
