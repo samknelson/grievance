@@ -55,6 +55,10 @@ function mightysearch_mschema() {
 		'prompt' => 'Canonical Address',
 		'type' => 'text',
 	);
+	$schema['property']['fields']['address_canon_accuracy'] = array(
+		'prompt' => 'Canonical Address Accuracy',
+		'type' => 'text',
+	);
 	
 	$schema['property']['fields']['msa'] = array(
 		'prompt' => 'MSA',

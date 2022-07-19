@@ -361,6 +361,9 @@ function sirius_node_tabs() {
     'sirius_payperiod', 
     'sirius_dispatch',
     'sirius_trust_worker_benefit',
+    'property',
+    'actor',
+    'property_actor',
   );
   foreach ($content_types as $content_type) {
     $node_tabs[$content_type][$content_type . '_rawjson'] = array(

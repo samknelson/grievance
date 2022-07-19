@@ -171,6 +171,12 @@ function sirius_addr_node_presave($node) {
     }
     $geometry = geocoder_cache_get($handler['name'], $item, $handler_settings);
 
+    if ($geometry) { 
+			$node->field_address_canon_accuracy['und'][0]['value'] = $geometry->data['geocoder_accuracy'];
+    } else {
+    	unset($node->field_address_canon_accuracy['und'][0]['value']);
+    }
+
     if ($geometry && ($geometry->data['geocoder_accuracy'] == 'ROOFTOP') && $geometry->data['geocoder_formatted_address']) {
     	$node->field_address_canon['und'][0]['value'] = $geometry->data['geocoder_formatted_address'];
     } else {
@@ -189,6 +195,7 @@ function sirius_addr_node_presave($node) {
 function sirius_addr_form_alter_node(&$form, &$form_state, $form_id) {
 	// Hide canonical addresses on the node form. They are always set automatically.
 	if (isset($form['field_address_canon'])) { $form['field_address_canon']['#access'] = FALSE; }
+	if (isset($form['field_address_canon_accuracy'])) { $form['field_address_canon_accuracy']['#access'] = FALSE; }
 }
 
 function sirius_addr_get_compponent($point, $type) {

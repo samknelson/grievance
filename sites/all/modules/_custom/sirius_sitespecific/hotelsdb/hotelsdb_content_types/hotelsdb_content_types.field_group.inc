@@ -483,6 +483,7 @@ function hotelsdb_content_types_field_group_info() {
       9 => 'field_on_public_land',
       10 => 'field_pin',
       11 => 'field_address_canon',
+      12 => 'field_address_canon_accuracy',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
