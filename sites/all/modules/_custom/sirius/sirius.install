@@ -323,3 +323,41 @@ function sirius_update_7019() {
     module_enable(array($module), TRUE);
   }
 }
+
+/**
+ * Grant dispatch preference permissions
+ */
+
+function sirius_update_7020() {
+  $if_you_haves    = array('sirius dispatch own preferences', 'sirius dispatch staff');
+  $then_you_gets  = array(
+    'sirius dispatch pref notifications',
+    'sirius dispatch pref asi',
+    'sirius dispatch pref dnc2',
+    'sirius dispatch pref hfe',
+    'sirius dispatch pref cbn',
+    'sirius dispatch pref eba',
+  );
+  sirius_updateutil_grant($if_you_haves, $then_you_gets);
+
+  $if_you_haves    = array('sirius dispatch own preferences skill', 'sirius dispatch staff');
+  $then_you_gets  = array('sirius dispatch pref skill');
+  sirius_updateutil_grant($if_you_haves, $then_you_gets);
+
+  $if_you_haves    = array('sirius dispatch own preferences department', 'sirius dispatch staff');
+  $then_you_gets  = array('sirius dispatch pref dept');
+  sirius_updateutil_grant($if_you_haves, $then_you_gets);
+}
+
+function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
+  foreach ($if_you_haves as $if_you_have) {
+    foreach ($then_you_gets as $then_you_get) {
+      print "Granting new permission [$then_you_get] to anybody with permission [$if_you_have] ...\n";
+      $roles = user_roles(FALSE, $if_you_have);
+      foreach ($roles as $rid => $name) {
+        print "... granting [$then_you_get] to [$name]\n";
+        user_role_grant_permissions($rid, array($then_you_get));
+      }
+    }
+  }
+}
