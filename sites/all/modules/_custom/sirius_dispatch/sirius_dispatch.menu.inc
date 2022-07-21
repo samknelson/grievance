@@ -21,6 +21,7 @@ function sirius_dispatch_node_tabs() {
     'title' => 'Dispatch',
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_view',
+    'skip_node_view_check' => TRUE,
     'permissions' => array(),
   );
 
@@ -29,6 +30,7 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_manage',
     'permissions' => array('sirius dispatch employer'),
+    'skip_node_view_check' => TRUE,
     'weight' => 4,
   );
 
@@ -37,7 +39,7 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_dispatches',
     'permissions' => array('sirius'),
-    'weight' => 5,
+    'weight' => 5, 
   );
 
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_dispatches/list'] = array(
@@ -45,6 +47,7 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_dispatches',
     'permissions' => array('sirius'),
+    'skip_node_view_check' => TRUE,
     'weight' => 1,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
@@ -63,6 +66,7 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_bullpen',
     'permissions' => array('sirius'),
+    'skip_node_view_check' => TRUE,
     'weight' => 6,
   );
 
@@ -71,6 +75,7 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_events',
     'permissions' => array('sirius dispatch employer'),
+    'skip_node_view_check' => TRUE,
     'weight' => 6,
   );
 
@@ -79,6 +84,7 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_attachments',
     'permissions' => array('sirius dispatch employer'),
+    'skip_node_view_check' => TRUE,
     'weight' => 7,
   );
 
@@ -105,6 +111,7 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_fore',
     'permissions' => array('sirius dispatch employer'),
+    'skip_node_view_check' => TRUE,
     'weight' => 8,
   );
 
@@ -291,6 +298,7 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_employer_dispatch_preferences',
     'permissions' => array('sirius dispatch employer'),
+    'skip_node_view_check' => TRUE,
   );
 
   $node_tabs['grievance_shop']['sirius_employer_dispatch/preferences'] = array(
@@ -300,6 +308,7 @@ function sirius_dispatch_node_tabs() {
     'permissions' => array('sirius dispatch employer'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
+    'skip_node_view_check' => TRUE,
   );
 
   $node_tabs['grievance_shop']['sirius_employer_dispatch/attachments'] = array(
@@ -308,6 +317,7 @@ function sirius_dispatch_node_tabs() {
     'callback' => 'sirius_node_tab_employer_dispatch_attachments',
     'permissions' => array('sirius dispatch employer'),
     'weight' => 2,
+    'skip_node_view_check' => TRUE,
   );
 
   $node_tabs['grievance_shop']['sirius_employer_dispatch/payrate'] = array(
