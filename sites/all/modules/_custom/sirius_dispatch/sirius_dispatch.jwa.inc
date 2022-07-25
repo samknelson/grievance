@@ -11,10 +11,12 @@ function sirius_dispatch_jwa_hours_render($prefs, $hr) {
 	$hours = '';
 	$is_first = TRUE;
 	$delta = 0;
-	foreach ($prefs['display']['hour_type'] as $type) { 
-		if ($is_first) { $is_first = FALSE; } else { $hours .= '&nbsp;/&nbsp;'; }
-		$hours .= round($hr["hours_$delta"], 2); 
-		++$delta;
+	if ($prefs['display']['hour_type']) {
+		foreach ($prefs['display']['hour_type'] as $type) { 
+			if ($is_first) { $is_first = FALSE; } else { $hours .= '&nbsp;/&nbsp;'; }
+			$hours .= round($hr["hours_$delta"], 2); 
+			++$delta;
+		}
 	}
 	return $hours;
 }
@@ -184,6 +186,21 @@ function sirius_dispatch_jwa_workers($prefs) {
 		$sql_args[':work_status'] = $ws_tids;
 	}
 
+	$ms_tids = array();
+	if ($prefs['workers']['ms_level']) {
+		$ms_level_filter = array_filter(array_values($prefs['workers']['ms_level']));
+		foreach ($ms_level_filter as $key) {
+			list($ms_tid, $level) = explode('|', $key);
+			$ms_tids[] = $ms_tid;
+		}
+	}
+	$ms_tids = array_unique($ms_tids);
+	if ($ms_tids) {
+		$sql .= "and field_sirius_member_status_tid in (:ms_tids) ";
+		$sql_args[':ms_tids'] = $ms_tids;
+	}
+
+
 	$dispstatus_tids = array();
 	if ($prefs['workers']['dispstatus']) {
 		$dispstatus_tids = array_filter(array_values($prefs['workers']['dispstatus']));
@@ -238,6 +255,12 @@ function sirius_dispatch_jwa_workers($prefs) {
 		if ($prefs['workers']['ms_level']) {
 			$ms_level_filter = array_filter(array_values($prefs['workers']['ms_level']));
 		}
+		$need_level = FALSE; 
+		foreach ($ms_level_filter as $key) {
+			if (preg_match('/\|/', $key)) {
+				$need_level = TRUE;
+			}
+		}
 		foreach ($workers as $worker_nid => $hr) {
 	  	$json = json_decode($hr['json_value'], TRUE);
 	  	$ms_tids = explode(',', $hr['ms_tid']);
@@ -264,7 +287,7 @@ function sirius_dispatch_jwa_workers($prefs) {
 			$workers[$worker_nid]['ms_name'] = join('<br>', $ms_names);
 			$workers[$worker_nid]['level_weight'] = $level_weight;
 
-			if ($ms_level_filter && !$filter_found) { unset($workers[$worker_nid]); }
+			if ($need_level && $ms_level_filter && !$filter_found) { unset($workers[$worker_nid]); }
 		}
 	}
 
