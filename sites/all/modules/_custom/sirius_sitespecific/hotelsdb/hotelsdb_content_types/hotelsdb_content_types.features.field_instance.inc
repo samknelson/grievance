@@ -1193,7 +1193,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_address_canon_accuracy',
-    'label' => 'Canonical Address Accuracy',
+    'label' => 'Address Accuracy',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -5521,6 +5521,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Actor Type');
   t('Actors');
   t('Address');
+  t('Address Accuracy');
   t('Address Geofield');
   t('Airport');
   t('Airport (Secondary)');
@@ -5536,7 +5537,6 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Boycott URL');
   t('Brand');
   t('Canonical Address');
-  t('Canonical Address Accuracy');
   t('Canonical Title');
   t('Common Name');
   t('Convention Center');
