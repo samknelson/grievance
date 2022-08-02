@@ -5,10 +5,14 @@ function mightysearch_search_form($form, &$form_state) {
 		$saved_nid = $_GET['saved'];
 		if ($saved_nid) {
 			$saved_node = node_load($saved_nid);
-			if ($saved_node && $saved_node->type == 'sirius_json_definition' && $saved_node->field_sirius_type['und'][0]['value'] == 'mightysearch:saved_search') {
+			if ($saved_node && 
+					($saved_node->type == 'sirius_json_definition' && $saved_node->field_sirius_type['und'][0]['value'] == 'mightysearch:saved_search') ||
+					($saved_node->type == 'sirius_log')
+				) {
 				$saved_json = sirius_json_get($saved_node);
 				$form_state['input'] = $saved_json['search']['values'];
 				unset($form_state['input']['save_as']);
+				$form_state['input']['output'] = 'html';
 				drupal_set_message("Loaded saved search: " . $saved_node->title);
 			}
 		}
