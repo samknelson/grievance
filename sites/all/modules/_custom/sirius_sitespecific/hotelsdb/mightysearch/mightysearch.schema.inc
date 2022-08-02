@@ -49,6 +49,7 @@ function mightysearch_mschema() {
 			'locality' => 'City',
 			'administrative_area' => 'State',
 			'postal_code' => 'Zip',
+			'country' => 'Country',
 		),
 	);
 	$schema['property']['fields']['address_canon'] = array(
@@ -215,6 +216,11 @@ function mightysearch_mschema() {
 		//
 		
 		$schema[$relationship_type . '_pa']['fields'] = array();
+		$schema[$relationship_type . '_pa']['fields']['nid'] = array(
+			'prompt' => 'ID',
+			'type' => 'text',
+		);
+
 		$schema[$relationship_type . '_pa']['fields']['pension'] = array(
 			'prompt' => 'Pension',
 			'type' => 'text',
@@ -293,6 +299,7 @@ function mightysearch_mschema() {
 				'locality' => 'City',
 				'administrative_area' => 'State',
 				'postal_code' => 'Zip',
+				'country' => 'Country',
 			),
 		);
 	}
