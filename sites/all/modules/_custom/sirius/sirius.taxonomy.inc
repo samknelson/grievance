@@ -238,7 +238,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['grievance_remedies']['multidomain'] = 'No';
     $settings['grievance_resproc']['view'] = 'sirius_taxonomy';
     $settings['grievance_resproc']['display'] = 'block';
-    $settings['grievance_resproc']['multidomain'] = 'No';
+    $settings['grievance_resproc']['multidomain'] = 'Yes';
     $settings['grievance_settlement_tags']['view'] = 'sirius_taxonomy';
     $settings['grievance_settlement_tags']['display'] = 'block_3';
     $settings['grievance_settlement_tags']['multidomain'] = 'Yes';

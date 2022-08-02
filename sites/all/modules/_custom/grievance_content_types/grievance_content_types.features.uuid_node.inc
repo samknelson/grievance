@@ -388,6 +388,210 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Dispatch - Prefs - EBA',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1657027020,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '0e25b013-c51e-474f-9487-ec8ac39990a0',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_worker_dispatches/eba',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>If you are currently employed but have room in your schedule, use the tool below to indicate which days you would be available for additional work.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-07-05 06:17:00 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Custom Field Settings',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1658150660,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '0fe92454-0c87-471b-a0fa-552322169caf',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/grievance_customfield_settings',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'node/%/sirius_event_customfield_settings',
+        'format' => NULL,
+      ),
+      2 => array(
+        'value' => 'node/%/sirius_ledger_account_customfield_settings',
+        'format' => NULL,
+      ),
+      3 => array(
+        'value' => 'node/%/grievance_customfield_settings',
+        'format' => NULL,
+      ),
+      4 => array(
+        'value' => 'node/%/sirius_trust_benefit_customfield_settings',
+        'format' => NULL,
+      ),
+      5 => array(
+        'value' => 'node/%/sirius_trust_worker_election_customfield_settings',
+        'format' => NULL,
+      ),
+      6 => array(
+        'value' => 'node/%/sirius_contact_relationship_customfield_settings',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Select which custom field sets are associated with this entity. Custom field sets can be managed <a href="/sirius/customfield/definition/list">here</a>.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-07-18 06:24:20 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Twilio - Recordings - Local',
   'log' => '',
   'status' => 1,
@@ -1480,6 +1684,113 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2020-09-14 04:32:34 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Dispatch - Prefs - ASI',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1657026640,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '3923d9b5-6283-4f47-9842-291b1d5bb712',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_worker_dispatches/asi',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use this form to indicate whether you would like to be automatically signed in to the out-of-work list whenever a dispatch ends.</p>
+
+<p>By selecting "Yes, When a dispatch ends I should be automatically signed in,"&nbsp;I acknowledge that:&nbsp;</p>
+
+<ol>
+	<li>When an employer lays off multiple employees simultaneously, laid-off employees’ names will be added to the out-of-work list in alphabetical order.</li>
+	<li>Upon being successfully signed in to the out-of-work list, I will receive a notification based upon the preferred manner of notification that I selected.&nbsp;</li>
+	<li>I am responsible for completing my scheduled shift regardless what time of day I receive the notification that my name was added to the out-of-work list. &nbsp;Failure to do so may result in disciplinary action by the employer.</li>
+	<li>The Union will not be liable if my employer does not sign me in to the out-of-work list in a timely fashion or at all, or if the system errs and my name is not automatically added to the out-of-work list. &nbsp;It is my responsibility to verify that I have been successfully added to the out-of-work list.&nbsp;</li>
+</ol>
+
+<p>By selecting "No, when a dispatch ends I will sign in to the out of work list manually" I acknowledge that:</p>
+
+<ol>
+	<li>My name will only be added to the out-of-work list when I sign myself in either (A) through the web interface, (B) through the telephone sign-in system; or (C) in person at the Union Hall.</li>
+	<li>Upon being successfully signed in to the out-of-work list, I will receive a notification based upon the preferred manner of notification that I selected.</li>
+	<li>The Union will not be liable if the system errs and my name is not added to the out-of-work list. &nbsp;It is my responsibility to verify that I have been successfully added to the out-of-work list.&nbsp;</li>
+</ol>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-07-05 06:10:40 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -3183,6 +3494,116 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Dispatch - Prefs - Notifications',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1657026525,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '5eec031f-f807-4e52-b152-694458e954c9',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p><strong>Primary Dispatch Medium</strong></p>
+
+<p>This is your primary notification medium for new dispatches.</p>
+
+<p><strong>Secondary Dispatch Medium</strong></p>
+
+<p>This is your secondary notification medium. New dispatches will be sent to&nbsp;<strong>both</strong>&nbsp;your primary and secondary media.</p>
+
+<p><strong>Other Notifications Medium</strong></p>
+
+<p>All other notifications (skill expiration, layoff notifications, etc.) will be sent by your "other" notifications medium.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_worker_dispatches/notifications',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Indicate how you would like to receive notifications about new dispatches - by text message, email, or automated voice call (if available).</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-07-05 06:08:45 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Dispatch - SMS',
   'log' => '',
   'status' => 1,
@@ -4726,6 +5147,96 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Dispatch - Prefs - CBN',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1657026961,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '866f7845-3949-4806-aa28-c50acbccfb4d',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_worker_dispatches/cbn',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the tool below to indicate whether you would like to receive open calls only, or only call-by-name jobs requesting that specifically request you.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-07-05 06:16:01 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Training Center - Evaluations',
   'log' => '',
   'status' => 1,
@@ -5569,6 +6080,96 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Dispatch - Prefs - HFE',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1657026886,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '9bea50c5-f275-40b1-baf3-ee8ff9031ccd',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_worker_dispatches/hfe',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>If you are waiting for a call from a specific employer, you can put a hold on your dispatches using this tool. For the specified length of time, you will not receive calls from any employers&nbsp;<strong>except</strong>&nbsp;the one that you specify.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-07-05 06:14:46 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Sirius Industry List',
   'log' => '',
   'status' => 1,
@@ -5854,6 +6455,96 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2021-08-31 07:38:22 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Grievance - Custom Field Settings',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1658068332,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'a93543f7-446f-48c9-85dc-906575ae1afc',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/grievance_customfield_settings',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Note that if there is a resolution procedure associated with the grievance, and if the resolution procedure defines one or more custom field sets, then those will always be selected. For example (depending on the site\'s configuration)&nbsp;a grievance with the status "Arbitration Scheduled" will always show the Arbitration field set, whether or not it is selected here.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-07-17 07:32:12 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -7390,6 +8081,96 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2021-03-29 06:08:01 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Dispatch - Prefs - DNC2',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1657026735,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'cc3f0b78-70e5-4f1c-9c9a-0695f2f43950',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_worker_dispatches/dnc2',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>If you would prefer <strong>NOT </strong>to receive dispatches from certain employers, select them below.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-07-05 06:12:15 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(

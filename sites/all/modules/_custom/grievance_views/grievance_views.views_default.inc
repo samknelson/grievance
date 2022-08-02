@@ -3337,7 +3337,10 @@ Section',
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '500';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '100';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
   $handler->display->display_options['style_plugin'] = 'table';
   /* Header: Global: Text area */
   $handler->display->display_options['header']['area']['id'] = 'area';
@@ -4950,6 +4953,11 @@ Section',
   $handler->display->display_options['relationships']['field_grievance_status_tid']['field'] = 'field_grievance_status_tid';
   $handler->display->display_options['relationships']['field_grievance_status_tid']['relationship'] = 'field_grievance_target_id';
   $handler->display->display_options['relationships']['field_grievance_status_tid']['label'] = 'Status Term';
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_grievance_company_target_id']['id'] = 'field_grievance_company_target_id';
+  $handler->display->display_options['relationships']['field_grievance_company_target_id']['table'] = 'field_data_field_grievance_company';
+  $handler->display->display_options['relationships']['field_grievance_company_target_id']['field'] = 'field_grievance_company_target_id';
+  $handler->display->display_options['relationships']['field_grievance_company_target_id']['relationship'] = 'field_grievance_shop_target_id';
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
   $handler->display->display_options['fields']['nid']['table'] = 'node';
@@ -5220,6 +5228,20 @@ Section',
     8 => 0,
     9 => 0,
   );
+  /* Filter criterion: Content: Title */
+  $handler->display->display_options['filters']['title_1']['id'] = 'title_1';
+  $handler->display->display_options['filters']['title_1']['table'] = 'node';
+  $handler->display->display_options['filters']['title_1']['field'] = 'title';
+  $handler->display->display_options['filters']['title_1']['relationship'] = 'field_grievance_company_target_id';
+  $handler->display->display_options['filters']['title_1']['operator'] = 'contains';
+  $handler->display->display_options['filters']['title_1']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['title_1']['expose']['operator_id'] = 'title_1_op';
+  $handler->display->display_options['filters']['title_1']['expose']['label'] = 'Company Name';
+  $handler->display->display_options['filters']['title_1']['expose']['operator'] = 'title_1_op';
+  $handler->display->display_options['filters']['title_1']['expose']['identifier'] = 'title_1';
+  $handler->display->display_options['filters']['title_1']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page_1');
@@ -5247,6 +5269,7 @@ Section',
     t('Grievance'),
     t('Shop'),
     t('Status Term'),
+    t('Content entity referenced from field_grievance_company'),
     t('Nid'),
     t('Grievance Nid'),
     t('Status Change Date'),
@@ -5269,6 +5292,7 @@ Section',
     t('Grievance ID'),
     t('Log Date'),
     t('Show only open grievances?'),
+    t('Company Name'),
     t('Page'),
   );
   $export['grievance_log_all'] = $view;
@@ -9057,8 +9081,9 @@ This tool will bulk-update existing grievances, changing their statuses <strong>
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
   $handler->display->display_options['footer']['area']['empty'] = TRUE;
-  $handler->display->display_options['footer']['area']['content'] = '<a href="/admin/structure/taxonomy/grievance_status/add?destination=sirius/taxonomy/grievance_status" class="action button">Add a status</a>';
+  $handler->display->display_options['footer']['area']['content'] = '<a href="/admin/structure/taxonomy/!1/add?destination=sirius/taxonomy/!1&sirius_domain=!2" class="tool-button">Add a New Term</a>';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
+  $handler->display->display_options['footer']['area']['tokenize'] = TRUE;
   /* Field: Taxonomy term: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'taxonomy_term_data';
@@ -9395,7 +9420,7 @@ This tool will bulk-update existing grievances, changing their statuses <strong>
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('<a href="/admin/structure/taxonomy/grievance_status/add?destination=sirius/taxonomy/grievance_status" class="action button">Add a status</a>'),
+    t('<a href="/admin/structure/taxonomy/!1/add?destination=sirius/taxonomy/!1&sirius_domain=!2" class="tool-button">Add a New Term</a>'),
     t('Status'),
     t('Unresolved?'),
     t('Show on Timeline?'),
