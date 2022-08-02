@@ -39,6 +39,7 @@ function sirius_dispatch_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_dispatch_job_dispatches',
     'permissions' => array('sirius'),
+    'skip_node_view_check' => TRUE,
     'weight' => 5, 
   );
 
