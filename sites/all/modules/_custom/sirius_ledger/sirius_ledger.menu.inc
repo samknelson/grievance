@@ -363,10 +363,11 @@ function sirius_ledger_menu() {
 
   $items['sirius/config/ledger/policies'] = array(
     'title' => 'Policies',
-    'page callback' => 'sirius_ledger_config_policies',
+    'page callback' => 'sirius_ledger_page_policies',
     'access arguments' => array('sirius ledger admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
+    'file' => 'sirius_ledger.page_policies.inc'
   );
 
   $items['sirius/config/ledger/test-monthly'] = array(
