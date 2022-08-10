@@ -476,6 +476,23 @@ function mightysearch_search_form_submit($form, &$form_state) {
 	
 	if ($output == 'csv') {
 		$form_state['rebuild'] = 1;
+
+		// Log all downloads
+		$count = count($rows);
+		if ($count > 100) {
+			$json = array();
+			$json['search']['values'] = $form_state['values'];
+			sirius_log(
+			  'hotelsdb', 
+			  'search:export', 
+			  "Search results exported, $count results.", 
+			  "Search results exported, $count results.", 
+			  $count, 
+			  array(), 
+			  array(),
+			  $json
+			);
+		}
 		
 		drupal_add_http_header('Content-Type', 'text/csv');
 		drupal_add_http_header('Content-Disposition', 'attachment;filename=property_search.csv');
