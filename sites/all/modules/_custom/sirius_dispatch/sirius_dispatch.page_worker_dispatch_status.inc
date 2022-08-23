@@ -153,15 +153,7 @@ function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state)
 	$worker_node = $form_state['worker_node'];
 	$reason = $form_state['values']['reason'];
 
-	if ($form_state['values']['status']) {
-		$result = sirius_dispatch_worker_dispstatus_set($worker_node, $form_state['values']['status'], NULL, $reason);
-		if ($result['success']) {
-			drupal_set_message($result['msg']);
-		} else {
-			drupal_set_message($result['msg'], 'warning');
-		}
-	}
-
+	$newdate = NULL;
 	if (user_access('sirius dispatch staff')) {
 		if ($form_state['values']['set_availdate'] && $form_state['values']['availdate']) {
 			$newdate = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['availdate']));
@@ -182,5 +174,15 @@ function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state)
 			}
 		}
 	}
+
+	if ($form_state['values']['status']) {
+		$result = sirius_dispatch_worker_dispstatus_set($worker_node, $form_state['values']['status'], NULL, $reason, NULL, $newdate);
+		if ($result['success']) {
+			drupal_set_message($result['msg']);
+		} else {
+			drupal_set_message($result['msg'], 'warning');
+		}
+	}
+
 }
 
