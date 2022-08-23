@@ -8,7 +8,7 @@ function sirius_service_menu() {
     'page callback' => 'sirius_service_page_config',
     'page arguments' => array(),
     'access callback' => 'sirius_service_page_config_access',
-    'access arguments' => array('client'),
+    'access arguments' => array('none'),
     'file' => 'sirius_service.page_config.inc',
     'type' => MENU_NORMAL_ITEM,
   );
