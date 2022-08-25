@@ -150,6 +150,7 @@ function hotelsdb_content_types_field_group_info() {
       7 => 'field_csno_book',
       8 => 'field_csno_horse',
       9 => 'field_csno_online',
+      10 => 'field_csno_type',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -187,6 +188,7 @@ function hotelsdb_content_types_field_group_info() {
       7 => 'field_csno_book',
       8 => 'field_csno_horse',
       9 => 'field_csno_online',
+      10 => 'field_csno_type',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

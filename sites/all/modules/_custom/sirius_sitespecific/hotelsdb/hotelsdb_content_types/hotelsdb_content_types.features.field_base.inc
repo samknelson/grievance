@@ -781,6 +781,31 @@ function hotelsdb_content_types_field_default_field_bases() {
     'type' => 'datetime',
   );
 
+  // Exported field_base: 'field_csno_type'.
+  $field_bases['field_csno_type'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_csno_type',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Tribal' => 'Tribal',
+        'Non-Tribal' => 'Non-Tribal',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_development_status'.
   $field_bases['field_development_status'] = array(
     'active' => 1,
@@ -2402,6 +2427,72 @@ function hotelsdb_content_types_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'link_field',
+  );
+
+  // Exported field_base: 'field_verified_date'.
+  $field_bases['field_verified_date'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_verified_date',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'date',
+    'settings' => array(
+      'cache_count' => 4,
+      'cache_enabled' => 0,
+      'granularity' => array(
+        'day' => 'day',
+        'hour' => 'hour',
+        'minute' => 'minute',
+        'month' => 'month',
+        'second' => 'second',
+        'year' => 'year',
+      ),
+      'timezone_db' => 'UTC',
+      'todate' => '',
+      'tz_handling' => 'site',
+    ),
+    'translatable' => 0,
+    'type' => 'datetime',
+  );
+
+  // Exported field_base: 'field_verified_user'.
+  $field_bases['field_verified_user'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_verified_user',
+    'indexes' => array(
+      'target_id' => array(
+        0 => 'target_id',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'entityreference',
+    'settings' => array(
+      'handler' => 'base',
+      'handler_settings' => array(
+        'behaviors' => array(
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'target_bundles' => array(),
+      ),
+      'target_type' => 'user',
+    ),
+    'translatable' => 0,
+    'type' => 'entityreference',
   );
 
   return $field_bases;

@@ -1891,7 +1891,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 33,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1912,7 +1912,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 24,
+      'weight' => 25,
     ),
   );
 
@@ -1928,7 +1928,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 34,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1949,7 +1949,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 25,
+      'weight' => 26,
     ),
   );
 
@@ -1965,7 +1965,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 36,
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1986,7 +1986,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 26,
+      'weight' => 27,
     ),
   );
 
@@ -2002,7 +2002,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_plain',
-        'weight' => 35,
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2026,7 +2026,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 27,
+      'weight' => 28,
     ),
   );
 
@@ -2047,7 +2047,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 29,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2072,7 +2072,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 20,
+      'weight' => 21,
     ),
   );
 
@@ -2096,7 +2096,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 30,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2129,7 +2129,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 21,
+      'weight' => 22,
     ),
   );
 
@@ -2145,7 +2145,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_plain',
-        'weight' => 37,
+        'weight' => 38,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2169,7 +2169,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 28,
+      'weight' => 29,
     ),
   );
 
@@ -2190,7 +2190,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 31,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2215,7 +2215,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 22,
+      'weight' => 23,
     ),
   );
 
@@ -2238,7 +2238,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 32,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2271,7 +2271,44 @@ function hotelsdb_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 23,
+      'weight' => 24,
+    ),
+  );
+
+  // Exported field_instance: 'node-property-field_csno_type'.
+  $field_instances['node-property-field_csno_type'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 29,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_csno_type',
+    'label' => 'Casino Type',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 20,
     ),
   );
 
@@ -5341,6 +5378,106 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-property_actor-field_verified_date'.
+  $field_instances['node-property_actor-field_verified_date'] = array(
+    'bundle' => 'property_actor',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'date',
+        'settings' => array(
+          'custom_date_format' => '',
+          'format_type' => 'date_only',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => 0,
+        ),
+        'type' => 'date_default',
+        'weight' => 32,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_verified_date',
+    'label' => 'Verified Date',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'blank',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 15,
+        'input_format' => 'Y-m-d H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'no_fieldset' => 0,
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_popup',
+      'weight' => 77,
+    ),
+  );
+
+  // Exported field_instance: 'node-property_actor-field_verified_user'.
+  $field_instances['node-property_actor-field_verified_user'] = array(
+    'bundle' => 'property_actor',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 1,
+          'link' => 0,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 33,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_verified_user',
+    'label' => 'Verified By',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 78,
+    ),
+  );
+
   // Exported field_instance: 'node-saved_search-field_search_body'.
   $field_instances['node-saved_search-field_search_body'] = array(
     'bundle' => 'saved_search',
@@ -5538,6 +5675,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Brand');
   t('Canonical Address');
   t('Canonical Title');
+  t('Casino Type');
   t('Common Name');
   t('Convention Center');
   t('Convention Center Attached?');
@@ -5622,6 +5760,8 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('URL');
   t('Union Status');
   t('Use control- or shift-click to select multiple files.');
+  t('Verified By');
+  t('Verified Date');
 
   return $field_instances;
 }
