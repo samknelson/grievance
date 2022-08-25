@@ -160,7 +160,7 @@ function sirius_log_entity_render($nids, $log_bucket, $filters) {
 		}
 	}
 	$sql .= "group by node.nid ";
-	$sql .= "order by created desc ";
+	$sql .= "order by created desc, node.nid desc ";
 	$sql .= "limit $limit ";
 
 	$stmt = sirius_sql_query($sql, $sql_args);
