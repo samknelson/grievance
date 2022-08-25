@@ -262,6 +262,10 @@ function mightysearch_mschema() {
 			'prompt' => 'Relationship Type',
 			'type' => 'text',
 		);
+		$schema[$relationship_type . '_pa']['fields']['verified_date'] = array(
+			'prompt' => 'Verified Date',
+			'type' => 'text',
+		);
 	
 		//
 		// Actor Table
