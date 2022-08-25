@@ -74,6 +74,7 @@ function unite_feed_property_info() {
         'fh_outdoor' => array('group' => 'amenities', 'type' => 'list'),
         'fh_parking' => array('group' => 'amenities', 'type' => 'list'),
 
+        'csno_type' => array('group' => 'casino', 'title' => 'Casino Type', 'type' => 'list'),
         'csno_slots_count' => array('group' => 'casino', 'title' => 'Slots count', 'type' => 'integer'),
         'csno_tables_count' => array('group' => 'casino', 'title' => 'Tables count', 'type' => 'integer'),
         'is_casino' => array('group' => 'casino', 'type' => 'list'),
@@ -301,6 +302,9 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
         $row[$field_name] = $value;
       }
     }
+
+    // Clean postal codes
+    $row['address_postal_code'] = sirius_addr_zip_zeropad($row['address_postal_code']);
   }
 
   if (!$msg) { $msg = "Looks good."; }

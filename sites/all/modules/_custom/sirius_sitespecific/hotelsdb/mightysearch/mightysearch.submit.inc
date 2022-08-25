@@ -44,9 +44,15 @@ function mightysearch_makecondition_anyactor($op, $value) {
 		} else if ($op == 'ends_with') {
 			$condition->condition($aliased_field, '%' . $value, 'like');
 		} else if ($op == 'empty') {
-			$condition->isNull($aliased_field);
+			$a = db_or();
+			$a->isNull($aliased_field);
+			$a->condition($aliased_field, '', '=');
+			$condition->condition($a);
 		} else if ($op == 'not_empty') {
-			$condition->isNotNull($aliased_field);
+			$a = db_and();
+			$a->isNotNull($aliased_field);
+			$a->condition($aliased_field, '', '!=');
+			$condition->condition($a);
 		}	else {
 			$condition->condition($aliased_field, $value, $op);
 		}
@@ -104,9 +110,15 @@ function mightysearch_makecondition($tree, &$query, &$already_joined, $schema) {
 			} else if ($op == 'ends_with') {
 				$condition->condition($aliased_field, '%' . $value, 'like');
 			} else if ($op == 'empty') {
-				$condition->isNull($aliased_field);
+				$a = db_or();
+				$a->isNull($aliased_field);
+				$a->condition($aliased_field, '', '=');
+				$condition->condition($a);
 			} else if ($op == 'not_empty') {
-				$condition->isNotNull($aliased_field);
+				$a = db_and();
+				$a->isNotNull($aliased_field);
+				$a->condition($aliased_field, '', '!=');
+				$condition->condition($a);
 			}	else {
 				$condition->condition($aliased_field, $value, $op);
 			}
@@ -463,7 +475,8 @@ function mightysearch_search_form_submit($form, &$form_state) {
 	
 	if ($output == 'html') {
 		$form_state['rebuild'] = 1;
-		$form_state['results'] = '<h2>' . t('Results') . '</h2>';
+		$count = count($rows);
+		$form_state['results'] = '<h2>' . t('Found @count results', array('@count' => $count)) . '</h2>';
 		$form_state['results'] .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
 	}
 	

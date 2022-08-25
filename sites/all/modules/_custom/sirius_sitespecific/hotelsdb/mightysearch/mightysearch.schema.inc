@@ -140,6 +140,11 @@ function mightysearch_mschema() {
 		'type' => 'text',
 	);
 
+	$schema['property']['fields']['csno_type'] = array(
+		'prompt' => 'Casino - Type',
+		'type' => 'text',
+	);
+
 	$schema['property']['fields']['csno_slots_count'] = array(
 		'prompt' => 'Casino - Slots',
 		'type' => 'text',
