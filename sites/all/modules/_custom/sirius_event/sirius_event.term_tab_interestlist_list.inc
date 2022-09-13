@@ -64,6 +64,7 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 			$ms_names = array();
 			foreach ($ms_tids as $ms_tid) {
 				$ms_name = $ms_lookup[$ms_tid];
+				if (!$ms_name) { continue; }
 				$level_code = $worker_json['training']['levels'][$ms_tid]['code'];
 				if ($level_code) {
 					$level_name = $all_levels[$ms_tid][$level_code]['title'];
@@ -72,7 +73,9 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 				}
 				$ms_names[] = $ms_name;
 			}
-			$comments .= '(Member status: ' . join(', ', $ms_names) . ')';
+			if ($ms_names) {
+				$comments .= '(Member status: ' . join(', ', $ms_names) . ')';
+			}
 		}
 
 
