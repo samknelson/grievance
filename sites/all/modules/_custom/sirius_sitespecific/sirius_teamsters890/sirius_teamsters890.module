@@ -1,0 +1,19 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_teamsters890') . '/sirius_teamsters890.feed_titan.inc';
+
+/***
+ * Implements hook_sirius_wizard_info()
+ */
+
+function sirius_teamsters890_sirius_wizard_info() {
+  $items = array();
+
+  $items += sirius_teamsters890_feed_titan_info();
+
+  return $items;
+}
+

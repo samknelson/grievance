@@ -1,0 +1,4 @@
+name = Sirius Teamsters 890
+description = Custom functionality for Teamsters 890
+package = Sirius
+core = 7.x
