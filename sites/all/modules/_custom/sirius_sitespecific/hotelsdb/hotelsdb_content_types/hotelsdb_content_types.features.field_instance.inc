@@ -1471,7 +1471,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'link',
       'settings' => array(),
       'type' => 'link_field',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -1600,7 +1600,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 16,
+      'weight' => 17,
     ),
   );
 
@@ -1646,7 +1646,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 18,
+      'weight' => 19,
     ),
   );
 
@@ -1798,7 +1798,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 17,
+      'weight' => 18,
     ),
   );
 
@@ -1835,7 +1835,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 19,
+      'weight' => 20,
     ),
   );
 
@@ -1912,7 +1912,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 25,
+      'weight' => 26,
     ),
   );
 
@@ -1949,7 +1949,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 26,
+      'weight' => 27,
     ),
   );
 
@@ -1986,7 +1986,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 27,
+      'weight' => 28,
     ),
   );
 
@@ -2026,7 +2026,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 28,
+      'weight' => 29,
     ),
   );
 
@@ -2169,7 +2169,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 29,
+      'weight' => 30,
     ),
   );
 
@@ -2215,7 +2215,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 23,
+      'weight' => 24,
     ),
   );
 
@@ -2271,7 +2271,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 24,
+      'weight' => 25,
     ),
   );
 
@@ -2629,7 +2629,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 21,
+      'weight' => 22,
     ),
   );
 
@@ -2675,7 +2675,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 20,
+      'weight' => 21,
     ),
   );
 
@@ -2801,7 +2801,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -3028,7 +3028,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => ',',
         ),
         'type' => 'number_integer',
-        'weight' => 18,
+        'weight' => 62,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3053,7 +3053,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 27,
+      'weight' => 37,
     ),
   );
 
@@ -3077,7 +3077,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 16,
+        'weight' => 61,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3110,7 +3110,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'year_range' => '-3:2050',
       ),
       'type' => 'date_popup',
-      'weight' => 26,
+      'weight' => 36,
     ),
   );
 
@@ -3134,7 +3134,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 15,
+        'weight' => 60,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3167,7 +3167,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 25,
+      'weight' => 35,
     ),
   );
 
@@ -3299,7 +3299,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 13,
+        'weight' => 57,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3324,7 +3324,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 23,
+      'weight' => 32,
     ),
   );
 
@@ -3700,7 +3700,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'thousand_separator' => ',',
         ),
         'type' => 'number_integer',
-        'weight' => 21,
+        'weight' => 65,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3725,7 +3725,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 30,
+      'weight' => 40,
     ),
   );
 
@@ -3749,7 +3749,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 20,
+        'weight' => 64,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3782,7 +3782,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'year_range' => '-3:2050',
       ),
       'type' => 'date_popup',
-      'weight' => 29,
+      'weight' => 39,
     ),
   );
 
@@ -3806,7 +3806,7 @@ function hotelsdb_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 19,
+        'weight' => 63,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3839,7 +3839,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 28,
+      'weight' => 38,
     ),
   );
 
@@ -3929,6 +3929,46 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-property-field_union_other'.
+  $field_instances['node-property-field_union_other'] = array(
+    'bundle' => 'property',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Enter the name of any non-UNITE HERE Union, e.g. "IBT". If the local is known, include that as well, i.e. "IBT 631".',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 59,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_union_other',
+    'label' => 'Other Union',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 34,
+    ),
+  );
+
   // Exported field_instance: 'node-property-field_union_status'.
   $field_instances['node-property-field_union_status'] = array(
     'bundle' => 'property',
@@ -3941,7 +3981,7 @@ function hotelsdb_content_types_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 14,
+        'weight' => 58,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3962,7 +4002,7 @@ function hotelsdb_content_types_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 24,
+      'weight' => 33,
     ),
   );
 
@@ -5686,6 +5726,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Distance to Airport (Secondary)');
   t('Employees Claimed');
   t('End date');
+  t('Enter the name of any non-UNITE HERE Union, e.g. "IBT". If the local is known, include that as well, i.e. "IBT 631".');
   t('Event Space');
   t('FairHotel Last Updated');
   t('FairHotel Notes');
@@ -5724,6 +5765,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Online Betting?');
   t('Operator Last Updated');
   t('Origination Date');
+  t('Other Union');
   t('Outdoor Event Area (sf)');
   t('Outdoor Event Space?');
   t('Owner Last Updated');

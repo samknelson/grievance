@@ -36,6 +36,10 @@ function mightysearch_mschema() {
 		'prompt' => 'Union Status',
 		'type' => 'text',
 	);
+	$schema['property']['fields']['union_other'] = array(
+		'prompt' => 'Other Union',
+		'type' => 'text',
+	);
 	$schema['property']['fields']['development_status'] = array(
 		'prompt' => 'Development Status',
 		'type' => 'text',
@@ -58,6 +62,10 @@ function mightysearch_mschema() {
 	);
 	$schema['property']['fields']['address_canon_accuracy'] = array(
 		'prompt' => 'Canonical Address Accuracy',
+		'type' => 'text',
+	);
+	$schema['property']['fields']['county'] = array(
+		'prompt' => 'County',
 		'type' => 'text',
 	);
 	
@@ -351,14 +359,6 @@ function mightysearch_mschema() {
 		'prompt' => 'Name',
 		'type' => 'text',
 	);
-	$schema['local']['fields']['union_name'] = array(
-		'prompt' => 'Union Name',
-		'type' => 'integer',
-	);
-	$schema['local']['fields']['contact'] = array(
-		'prompt' => 'Contact',
-		'type' => 'text',
-	);
 
 	//
 	// Brand fields
@@ -386,6 +386,16 @@ function mightysearch_mschema() {
 	$schema['brand']['fields']['service_level'] = array(
 		'prompt' => 'Service Level',
 		'type' => 'text',
+	);
+
+	$schema['brand_parent']['table'] = array(
+		'prompt' => 'Brand Parent',
+	);
+
+	$schema['brand_parent']['fields']['name'] = array(
+		'prompt' => 'Name',
+		'type' => 'text',
+		'col' => '',
 	);
 
 

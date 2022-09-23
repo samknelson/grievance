@@ -52,6 +52,7 @@ function unite_feed_property_info() {
         'hotel_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
         'rest_contract_covered' => array('group' => 'contract', 'type' => 'integer'),
         'union_status' => array('group' => 'contract', 'type' => 'list'),
+        'union_other' => array('group' => 'contract', 'type' => 'text',),
         'hotel_contract_start_date' => array('group' => 'contract', 'type' => 'date'),
         'hotel_contract_end_date' => array('group' => 'contract', 'type' => 'date'),
         'rest_contract_start_date' => array('group' => 'contract', 'type' => 'date'),

@@ -124,7 +124,44 @@ function mightysearch_join(&$query, &$already_joined, $schema, $table, $field) {
 		}
 	}
 
-	if ($table != 'property') {
+	// 
+	// Joins for "Brand Parent"
+	//
+
+	if ($table == 'brand_parent') {
+		if (!$already_joined["field_data_field_brand"]) {
+			$already_joined["field_data_field_brand"] = 1;
+			$query->leftJoin(
+				"field_data_field_brand",
+				"field_data_field_brand",
+				"field_data_field_brand.entity_type = 'node' and field_data_field_brand.entity_id = property_node.nid"
+			);
+		}
+
+		if (!$already_joined["taxonomy_term_hierarchy_brand"]) {
+			$already_joined["taxonomy_term_hierarchy_brand"] = 1;
+			$query->leftJoin(
+				"taxonomy_term_hierarchy",
+				"taxonomy_term_hierarchy_brand",
+				"taxonomy_term_hierarchy_brand.tid = field_brand_tid"
+			);
+
+			if (!$already_joined["brand_parent"]) {
+				$already_joined["brand_parent"] = 1;
+				$query->leftJoin(
+					"taxonomy_term_data",
+					"brand_parent_term",
+					"brand_parent_term.tid = taxonomy_term_hierarchy_brand.parent"
+				);
+			}
+		}
+	}
+
+	//
+	// All other joins (terms and basic fields)
+	// 
+	
+	if ($table != 'property' && $table != 'brand_parent') {
 
 		if ($schema[$table]['table']['table_type'] == 'term') {
 

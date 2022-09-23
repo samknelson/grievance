@@ -333,33 +333,35 @@ function mightysearch_search_form_submit($form, &$form_state) {
 	/////////////////////////////////////////
 	
 	$fields = $form_state['values']['display'];
-	foreach ($rows as &$hr) {
-		foreach ($fields as $field) {
-			list ($table, $field, $col) = explode('.', $field);
-			if (!$table || !$field) { continue; }
-			if (!$col) { $col = 'value'; }
-			
-			$type = $schema[$table]['fields'][$field]['type'];
-			
-			if ($type == 'tid') {
-				$aliased_table = "${table}_${field}_term";
-				$aliased_field = "name";
-			} else if ($field == 'title') {
-				$aliased_table = "${table}_node";
-				$aliased_field = "title";
-			} else if ($field == 'nid') {
-				$aliased_table = "${table}_node";
-				$aliased_field = "nid";
-			} else {
-				$aliased_table = "${table}_${field}";
-				$aliased_field = "field_${field}_${col}";
-			}
-			
-			$f = "${aliased_table}___${aliased_field}";
-			
-			if ($type == 'date') {
-				if ($hr[$f]) {
-					$hr[$f] = date('Y-m-d', strtotime($hr[$f]));
+	if ($fields) {
+		foreach ($rows as &$hr) {
+			foreach ($fields as $field) {
+				list ($table, $field, $col) = explode('.', $field);
+				if (!$table || !$field) { continue; }
+				if (!$col) { $col = 'value'; }
+				
+				$type = $schema[$table]['fields'][$field]['type'];
+				
+				if ($type == 'tid') {
+					$aliased_table = "${table}_${field}_term";
+					$aliased_field = "name";
+				} else if ($field == 'title') {
+					$aliased_table = "${table}_node";
+					$aliased_field = "title";
+				} else if ($field == 'nid') {
+					$aliased_table = "${table}_node";
+					$aliased_field = "nid";
+				} else {
+					$aliased_table = "${table}_${field}";
+					$aliased_field = "field_${field}_${col}";
+				}
+				
+				$f = "${aliased_table}___${aliased_field}";
+				
+				if ($type == 'date') {
+					if ($hr[$f]) {
+						$hr[$f] = date('Y-m-d', strtotime($hr[$f]));
+					}
 				}
 			}
 		}
@@ -485,6 +487,22 @@ function mightysearch_search_form_submit($form, &$form_state) {
 		require_once(DRUPAL_ROOT . '/sites/all/libraries/sql-formatter/lib/SqlFormatter.php');
 		$form_state['results'] = '<h2>Raw Query</h2>';
 		$form_state['results'] .= SqlFormatter::format($query->__toString());
+	}
+
+	if ($output == 'json') {
+		$results = array();
+		foreach ($rows as $row) {
+			$result_row = array();
+
+			$idx = 0;
+			foreach ($row as $val) {
+				$result_row[$header[$idx]] = $val;
+				++$idx;
+			}
+
+			$results[] = $result_row;
+		}
+		$form_state['results'] = $results;
 	}
 	
 	if ($output == 'csv') {
