@@ -224,6 +224,7 @@ function hotelsdb_content_types_field_group_info() {
       5 => 'field_rest_contract_start_date',
       6 => 'field_rest_contract_end_date',
       7 => 'field_rest_contract_covered',
+      8 => 'field_union_other',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -259,6 +260,7 @@ function hotelsdb_content_types_field_group_info() {
       5 => 'field_rest_contract_start_date',
       6 => 'field_rest_contract_end_date',
       7 => 'field_rest_contract_covered',
+      8 => 'field_union_other',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
