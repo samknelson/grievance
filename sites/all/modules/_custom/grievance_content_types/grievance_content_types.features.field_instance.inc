@@ -2659,7 +2659,7 @@ function grievance_content_types_field_default_field_instances() {
   $field_instances['node-grievance-field_grievance_date_1'] = array(
     'bundle' => 'grievance',
     'deleted' => 0,
-    'description' => 'For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action (if unknown, choose "Investigation").',
+    'description' => 'For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action.',
     'display' => array(
       'default' => array(
         'label' => 'inline',
@@ -2754,6 +2754,44 @@ function grievance_content_types_field_default_field_instances() {
     'label' => 'Incident Date',
     'required' => 0,
     'settings' => array(
+      'date_popup_timepicker' => array(
+        'timepicker' => array(
+          'timepicker_options' => array(
+            'amPmText' => array(
+              0 => 'AM',
+              1 => 'PM',
+            ),
+            'closeButtonText' => 'Done',
+            'defaultTime' => 'now',
+            'deselectButtonText' => 'Deselect',
+            'hourText' => 'Hour',
+            'hours' => array(
+              'ends' => 23,
+              'starts' => 0,
+            ),
+            'minuteText' => 'Minute',
+            'minutes' => array(
+              'ends' => 55,
+              'interval' => 5,
+              'starts' => 0,
+            ),
+            'nowButtonText' => 'Now',
+            'periodSeparator' => ' ',
+            'rows' => 4,
+            'showCloseButton' => FALSE,
+            'showDeselectButton' => FALSE,
+            'showHours' => TRUE,
+            'showLeadingZero' => TRUE,
+            'showMinutes' => TRUE,
+            'showMinutesLeadingZero' => TRUE,
+            'showNowButton' => FALSE,
+            'showOn' => 'focus',
+            'showPeriod' => FALSE,
+            'showPeriodLabels' => TRUE,
+            'timeSeparator' => ':',
+          ),
+        ),
+      ),
       'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -2765,13 +2803,11 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'date',
       'settings' => array(
         'date_single_day' => array(),
-        'display_all_day' => 0,
         'increment' => 1,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
-        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -19275,6 +19311,54 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-sirius_dispatch_job_group-field_grievance_shop'.
+  $field_instances['node-sirius_dispatch_job_group-field_grievance_shop'] = array(
+    'bundle' => 'sirius_dispatch_job_group',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_shop',
+    'label' => 'Official Services Contractor',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 9,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-sirius_dispatch_job_group-field_sirius_datetime'.
   $field_instances['node-sirius_dispatch_job_group-field_sirius_datetime'] = array(
     'bundle' => 'sirius_dispatch_job_group',
@@ -30777,7 +30861,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 0,
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30795,7 +30879,45 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 32,
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_gender-field_sirius_name_short'.
+  $field_instances['taxonomy_term-sirius_gender-field_sirius_name_short'] = array(
+    'bundle' => 'sirius_gender',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_name_short',
+    'label' => 'Short name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 15,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
     ),
   );
 
@@ -30814,7 +30936,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 3,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30833,7 +30955,7 @@ If the file has multiple pages, then each page in the input document will use th
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 34,
+      'weight' => 4,
     ),
   );
 
@@ -32230,7 +32352,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 1,
+        'weight' => 2,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -32248,7 +32370,45 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 2,
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_trust_election_type-field_sirius_id'.
+  $field_instances['taxonomy_term-sirius_trust_election_type-field_sirius_id'] = array(
+    'bundle' => 'sirius_trust_election_type',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_id',
+    'label' => 'ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
     ),
   );
 
@@ -32267,7 +32427,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'sirius_jsonfield_formatter_full',
-        'weight' => 2,
+        'weight' => 3,
       ),
     ),
     'entity_type' => 'taxonomy_term',
@@ -32606,7 +32766,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -32639,6 +32799,44 @@ If the file has multiple pages, then each page in the input document will use th
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
       'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_worker_tor_type-field_sirius_name_short'.
+  $field_instances['taxonomy_term-sirius_worker_tor_type-field_sirius_name_short'] = array(
+    'bundle' => 'sirius_worker_tor_type',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_name_short',
+    'label' => 'Short name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
     ),
   );
 
@@ -32890,7 +33088,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Filled');
   t('Final?');
   t('First Name');
-  t('For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action (if unknown, choose "Investigation").');
+  t('For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action.');
   t('For grievances with this category, hide the fields listed below. Enter one per line, using the machine name of the field (i.e. field_grievance_remedy)');
   t('From Status');
   t('Full Text');
@@ -32976,6 +33174,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Number of Days');
   t('Number of days to extend the timelines');
   t('Office Phone');
+  t('Official Services Contractor');
   t('Organizer');
   t('Outcome');
   t('PDF');
