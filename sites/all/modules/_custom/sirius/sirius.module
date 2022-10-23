@@ -176,8 +176,6 @@ function sirius_node_presave($node) {
   /*
   if (in_array($node->type, array('sirius_worker'))) {
     if (!$node->sirius_norevision) {
-      dpm($node);
-      dpm(diff_entity_diff($node, $node->original, array('entity_type' => 'node')));
     }
   }
   */
@@ -924,27 +922,6 @@ function sirius_views_pre_view(&$view, &$display_id, &$args) {
   if ($view->name == 'taxonomy_term') {
     $args = array(-999);
   }
-}
-
-function sirius_views_pre_build_disabled(&$view) {
-  // Validate the domain argument if we're expecting CURRENT_DOMAIN
-  dpm($view->argument);
-  if ($view->argument) {
-    $delta = -1;
-    foreach ($view->argument as $argument_key => $argument) {
-      ++$delta;
-      if ($argument_key != 'field_sirius_domain_target_id') { continue; }
-      if ($argument->options['default_argument_options']['argument'] != 'CURRENT_DOMAIN') { continue; }
-
-      $arg = $view->arg[$delta];
-
-      $view->argument[$argument_key]->specify_validation = 1;
-      $view->argument[$argument_key]->validate = array('type' => 'php', 'fail' => 'access denied');
-      $domain_nid = sirius_domain_nid();
-      $view->argument[$argument_key]->validate_options = array('code' => "drupal_set_message('Generated validator here!'); return \$argument == $domain_nid;");
-    }
-  }
-  dpm($view->argument);
 }
 
 /**

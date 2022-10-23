@@ -15,7 +15,7 @@ function grievance_content_types_ckeditor_profile_defaults() {
       'settings' => array(
         'ss' => 2,
         'toolbar' => '[
-    [\'Source\',\'Cut\',\'Copy\',\'Paste\',\'PasteText\',\'PasteFromWord\',\'Table\',\'Bold\',\'Italic\',\'Underline\',\'NumberedList\',\'BulletedList\',\'Outdent\',\'Indent\',\'HorizontalRule\',\'Link\',\'Format\',\'Styles\']
+    [\'Source\',\'Cut\',\'Copy\',\'Paste\',\'PasteText\',\'PasteFromWord\',\'Undo\',\'Redo\',\'Table\',\'Bold\',\'Italic\',\'Underline\',\'TextColor\',\'BGColor\',\'NumberedList\',\'BulletedList\',\'Outdent\',\'Indent\',\'HorizontalRule\',\'Link\',\'Format\',\'Styles\']
 ]',
         'expand' => 't',
         'default' => 't',

@@ -282,7 +282,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_event_type']['display'] = 'block_13';
     $settings['sirius_event_type']['multidomain'] = 'Yes';
     $settings['sirius_gender']['view'] = 'sirius_taxonomy';
-    $settings['sirius_gender']['display'] = 'block';
+    $settings['sirius_gender']['display'] = 'block_16';
     $settings['sirius_gender']['multidomain'] = 'Yes';
     $settings['sirius_hour_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_hour_type']['display'] = 'block';

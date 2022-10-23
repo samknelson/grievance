@@ -7360,6 +7360,116 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Worker - Schedule - TOR Type - Statuses',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1664115799,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'ba173dbf-4354-41a2-aff8-18269ec8b608',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Each TOR type can have multiple statuses. For example, a time-off request might have the statuses "Requested", "Approved", and "Denied". An out-on-injury record might have statuses like "Entered" and "Verified".</p>
+
+<p>For each type, indicate:</p>
+
+<ul>
+	<li>The title of the status, as it will appear on lists.<br />
+	&nbsp;</li>
+	<li>Whether the status should appear on the worker\'s schedule. For example, we might not show time-off requests on the schedule until they are approved. Requested or denied time-off requests might not appear on the worker\'s schedule</li>
+</ul>
+
+<p>"Weight" is used to sort entries, and "Delete" can be used to remove a status from the list.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'taxonomy/term/%/sirius_worker_tor_type_statuses',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Use the form below to enter the statuses available for this TOR type.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2022-09-25 07:23:19 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Grievance Core',
   'log' => '',
   'status' => 1,
