@@ -274,3 +274,10 @@ function sirius_addr_driving_distance($addr1, $addr2, $options = array()) {
   $miles = $meters / 1609.34;
   return array('success' => TRUE, 'distance' => $miles);
 }
+
+function sirius_addr_zip_zeropad($zip) {
+	if (!preg_match('/^\d+$/', $zip)) { return $zip; }
+	if (strlen($zip) >= 5) { return $zip; }
+	while (strlen($zip) < 5) { $zip = '0' . $zip; }
+	return $zip;
+}
