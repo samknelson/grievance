@@ -15,6 +15,7 @@ function grievance_bundle_cleanup() {
 	);
 
 	foreach ($dirs as $dir) {
+		if (!is_dir($dir)) { continue; }
 		$candidates = scandir($dir);
 		$too_old = time() - 24*60*60*90;
 		foreach ($candidates as $candidate) {
