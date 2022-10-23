@@ -1514,6 +1514,14 @@ function sirius_modal_styles() {
     ),
   );
 
+  $styles['sirius-modal-style-small'] = array(
+    'modalSize' => array(
+      'type' => 'fixed',
+      'width' => 400,
+      'height' => 200,
+    ),
+  );
+
   return $styles;
 }
 
