@@ -219,6 +219,8 @@ function sirius_service_func_info_all() {
     }
   }
 
+  drupal_alter('sirius_service_func_info_all', $info);
+
   return $info;
 }
 

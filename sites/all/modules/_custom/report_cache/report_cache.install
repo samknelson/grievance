@@ -47,16 +47,26 @@ function report_cache_schema() {
   return $schema;
 }
 
-//
-// Upgrade
-//
+/**
+ * Add domain_nid to report cache
+ */
 
-/*
-alter table report_cache add report_domain_nid integer;
-alter table report_cache drop primary key;
-alter table report_cache add primary key (report_domain_nid, report_type, report_id, report_row_pk);
-alter table report_cache add index(report_id);
-alter table report_cache add index(report_row_pk);
-alter table report_cache add index(report_type);
-alter table report_cache add index(report_domain_nid);
-*/
+function report_cache_update_7001() {
+  $sqls = array();
+  $sqls[] = 'alter table report_cache add report_domain_nid integer';
+  $sqls[] = 'alter table report_cache drop primary key';
+  $sqls[] = 'alter table report_cache add primary key (report_domain_nid, report_type, report_id, report_row_pk)';
+  $sqls[] = 'alter table report_cache add index(report_id)';
+  $sqls[] = 'alter table report_cache add index(report_row_pk)';
+  $sqls[] = 'alter table report_cache add index(report_type)';
+  $sqls[] = 'alter table report_cache add index(report_domain_nid)';
+
+  foreach ($sqls as $sql) {
+    print "Executing: $sql\n";
+    try {
+      db_query($sql);
+    } catch(Exception $ignore) {
+
+    }
+  }
+}
