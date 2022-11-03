@@ -197,6 +197,7 @@ function sirius_service_func_info_all() {
     'sirius_teamsters631_node_insert_worker_remote',
     'sirius_teamsters631_sirius_worker_work_status_set_remote',
     'sirius_teamsters631_taxonomy_term_updateinsert_remote',
+    'sirius_teamsters631_sirius_training_level_graduate_remote',
     'sirius_worker_nextid',
   );
 
