@@ -1,13 +1,19 @@
 <?php
 
+/**
+ * Much of this code is copied from the contributed module flood_unblock. However, that module had some limitations:
+ * - It only handled two built-in types of floods, for login blocks by IP and user
+ * - It hadn't been updated since 2011
+ * - It's deprecated in favor of flood_control, which hasn't been updated for D7 and doesn't have tools to clear flods
+ * So we rolled our own.
+ */
+
 function sirius_flood_page_unblock() {
 	return drupal_get_form('sirius_flood_page_unblock_form');
 }
 
 function sirius_flood_page_unblock_form($form, &$form_state) {
   $entries = sirius_flood_list();
-  $ip_threshold = variable_get('user_failed_login_ip_threshold', 50);
-  $user_threshold = variable_get('user_failed_login_user_threshold', 5);
 
   $header = array(
     'title'    			=> t('Type of block'),
@@ -22,7 +28,12 @@ function sirius_flood_page_unblock_form($form, &$form_state) {
 
   $options = array();
   foreach ($entries as $key => $entry) {
+    // "key" is "event|identifier"
+
+    // What type of event (e.g. "Login Failure")
   	$event = $entry['event'];
+
+    // Look up that event type
   	$info = $info_all[$event];
   	if ($info) {
   		$title = sirius_tooltip_render($info['description'], $info['title']) . '<br />' . $event;

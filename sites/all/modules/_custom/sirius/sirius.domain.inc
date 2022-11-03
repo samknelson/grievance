@@ -96,6 +96,10 @@ function sirius_domain_component_info_all() {
       'title' => 'Activist - Phonebank - Prescan',
       'description' => 'For a given phonebank, enable the "prescan" function, allowing phonebank admins to remove invalid phone numbers.',
     ),
+    'grievance:alert:assignment' => array(
+      'title' => 'Grievance - Alert - Assignment',
+      'description' => 'Notify users when a new grievance has been assigned to them',
+    ),
     'mapping' => array(
       'title' => 'Mapping',
       'description' => 'Enable geocoding and map generation.'

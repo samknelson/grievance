@@ -205,92 +205,14 @@ function sirius_ledger_node_tab_payment_addedit_form_validate($form, &$form_stat
 	}
 }
 
-
 function sirius_ledger_node_tab_payment_addedit_form_submit($form, &$form_state) {
-	global $user;
-	$domain_nid = sirius_domain_nid();
-
-	if ($form_state['payment_nid']) {
-		$payment_node = node_load($form_state['payment_nid']);
-
-		// Clear the ledger if the amount has changed
-		if ($form_state['values']['payment']['dollar_amt'] != $payment_node->field_sirius_dollar_amt['und'][0]['value']) {
-			$count = sirius_ledger_payment_clear($payment_node->nid);
-			if ($count) { drupal_set_message("$count A/R entries have been cleared. This payment must be re-allocated."); }
-		}
+	$result = sirius_ledger_payment_save($form_state);
+	if ($result['success']) {
+		drupal_set_message($result['msg']);
 	} else {
-		$payment_node = new stdClass();
-		$payment_node->type = 'sirius_payment';
-		$payment_node->no_recurse = TRUE;
-		$payment_node->language = $user->language;
-		$payment_node->uid = $user->uid;
-		$payment_node->status = 1;
-		$payment_node->promote = 0;
-		$payment_node->comment = 0;
-		if ($domain_nid) { $payment_node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
-	}
-
-	$payment_node->revision = TRUE;
-	$payment_node->field_sirius_ledger_allocated['und'][0]['value'] = 'No';
-	$payment_node->field_sirius_ledger_account['und'][0]['target_id'] = $form_state['values']['payment']['ledger_account'];
-	$payment_node->field_sirius_payment_type['und'][0]['tid'] = $form_state['values']['payment']['payment_type'];
-	$payment_node->field_sirius_dollar_amt['und'][0]['value'] = $form_state['values']['payment']['dollar_amt'];
-	$payment_node->field_sirius_merchant_name['und'][0]['value'] = $form_state['values']['payment']['merchant_name'];
-	$payment_node->field_sirius_check_number['und'][0]['value'] = $form_state['values']['payment']['check_number'];
-	$payment_node->field_sirius_notes['und'][0]['value'] = $form_state['values']['payment']['notes'];
-	$payment_node->field_sirius_payment_status['und'][0]['value'] = $form_state['values']['payment']['payment_status'];
-
-	if ($form_state['values']['payment']['payer_type'] == 'employer') {
-		$payment_node->field_sirius_payer['und'][0]['target_id'] = $form_state['values']['payment']['payer_employer'];
-	} else {
-		$worker_node = sirius_worker_get_by_id($form_state['values']['payment']['payer_worker']);
-		if (!$worker_node) { drupal_set_message("Worker not found.", 'error'); return; }
-		$payment_node->field_sirius_payer['und'][0]['target_id'] = $worker_node->field_sirius_contact['und'][0]['target_id'];
-	}
-
-	if ($form_state['values']['payment']['datetime_created']) {
-		$payment_node->field_sirius_datetime_created['und'][0]['value'] = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['payment']['datetime_created']));
-	} else {
-		unset($payment_node->field_sirius_datetime_created['und']);
-	}
-
-	if ($form_state['values']['payment']['datetime']) {
-		$payment_node->field_sirius_datetime['und'][0]['value'] = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['payment']['datetime']));
-	} else {
-		unset($payment_node->field_sirius_datetime['und']);
-	}
-	
-	sirius_ledger_payment_set_title($payment_node);
-
-	$payment_node->revision = TRUE;
-	node_save($payment_node);
-	drupal_set_message("Payment updated.");
-
-	$allocated = FALSE;
-	if ($form_state['values']['payment']['allocate'] == 'Yes') {
-		if (sirius_ledger_node_tab_payment_allocate_simple_access($payment_node)) { 
-			sirius_ledger_payment_allocate_simple($payment_node);
-			drupal_set_message("The payment has been allocated.");
-			$allocated = TRUE;
-		} else {
-			drupal_set_message("Simple allocation is not available for this payment. The payment must be allocated manually.");
-		}
-	}
-
-	if (!$allocated) {
-		$entries = sirius_ledger_ar_fetch(array('ledger_reference' => $payment_node->nid));
-		$count = 0;
-		$ts = sirius_fieldval($payment_node, 'field_sirius_datetime_created', 'ts');
-		foreach ($entries as $entry) {
-			++$count;
-			$entry['ledger_status'] = $form_state['values']['payment']['payment_status'];
-			$entry['ledger_ts'] = $ts;
-			sirius_ledger_ar_update($entry);
-		}
-		if ($count) { drupal_set_message("$count A/R entries updated."); }
+		drupal_set_message($result['msg'], 'error');
 	}
 }
-
 
 function sirius_ledger_page_payment_addedit_form_ajax_change_payment_type($form, $form_state) {
 	$commands = array();

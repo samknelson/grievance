@@ -73,7 +73,6 @@ function grievance_views_pre_view(&$view, &$display_id, &$args) {
  */
 
 function grievance_cron() {
-  grievance_alert_all();
   grievance_bundle_cleanup();
   grievance_workersync_cron();
 }
@@ -96,6 +95,7 @@ function grievance_node_update($node) {
 
     grievance_workersync_backsync($node);
   }
+
 }
 
 /**
@@ -116,6 +116,7 @@ function grievance_node_insert($node) {
  * - Log the updates, assignment changes, etc.
  * - Set the node's ID
  * - Set the alert date and time
+ * - Alert organizers
  * 
  * This is registered as a shutdown function, because it shouldn't run
  * during the same transaction as when the node is created.
@@ -186,6 +187,9 @@ function grievance_node_postsave($node, $op) {
     if ($need_save) {
       node_save($node);
     }
+
+    // Alert the organizer
+    grievance_alert_assignment($node);
   }
 
   //
@@ -611,10 +615,12 @@ function grievance_views_pre_build(&$view) {
  */
 
 function grievance_report_cache_info() {
+  sirius_require('grievance', 'grievance.report_log_include_exclude.inc');
+
   $items = array();
 
   $items['grievance-report-average-time'] = array(
-    'name' => t('Average Time between Statuses'),
+    'name' => t('Grievances: Average Time between Statuses'),
     'description' => '',
     'fields' => grievance_report_average_time_fields(),
     'access' => 'grievance report',
@@ -630,7 +636,7 @@ function grievance_report_cache_info() {
   );
 
   $items['grievance-report-spi-term'] = array(
-    'name' => t('SPI / Term Report'),
+    'name' => t('Grievances: SPI / Term Report'),
     'description' => '',
     'access' => 'grievance report',
     'path' => 'grievance/report/spi-term',
@@ -640,7 +646,7 @@ function grievance_report_cache_info() {
   );
 
   $items['grievance-report-settlement-summary'] = array(
-    'name' => t('Settlement Summary Report'),
+    'name' => t('Grievances: Settlement Summary Report'),
     'description' => '',
     'access' => 'grievance report',
     'path' => 'grievance/report/settlement/summary',
@@ -654,7 +660,7 @@ function grievance_report_cache_info() {
   );
 
   $items['grievance-report-open-summary-with-log'] = array(
-    'name' => t('Open Grievance Summary With Log'),
+    'name' => t('Grievances: Open Grievance Summary With Log'),
     'description' => '',
     'access' => 'grievance report open summary with log',
     'path' => 'grievance/report/open-summary-log',
@@ -670,7 +676,7 @@ function grievance_report_cache_info() {
   );
 
   $items['grievance-report-shop-monthly'] = array(
-    'name' => t('Monthly Grievances by Shop'),
+    'name' => t('Grievances: Monthly Grievances by Shop'),
     'description' => '',
     'access' => 'grievance report',
     'path' => 'grievance/report/shop-monthly',
@@ -683,7 +689,7 @@ function grievance_report_cache_info() {
   );
 
   $items['grievance-report-status-summary'] = array(
-    'name' => t('Status Summary Report'),
+    'name' => t('Grievances: Status Summary Report'),
     'description' => '',
     'access' => 'grievance report',
     'path' => 'grievance/report/status-summary',
@@ -693,6 +699,18 @@ function grievance_report_cache_info() {
     'render_callbacks' => array(
       'Breakout by Company' => 'grievance_report_status_summary_render_company',
     ),
+  );
+
+  $items['grievance-report-log-include-exclude'] = array(
+    'name' => t('Grievances: Log Include / Exclude'),
+    'description' => '',
+    'access' => 'grievance report',
+    'fields' => grievance_report_log_include_exclude_fields(),
+    'form_callback' => 'grievance_report_log_include_exclude_form',
+    'pk_list_callback' => 'grievance_report_log_include_exclude_pks',
+    'batch_callback' => 'grievance_report_log_include_exclude_batch',
+    'file' => 'grievance.report_log_include_exclude.inc',
+    'module' => 'grievance',
   );
 
   return $items;
@@ -827,3 +845,17 @@ function grievance_sirius_jsonfield_form_definitions() {
   return $definition;
 }
 
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function grievance_sirius_cron_scan_info() {
+  $items['grievance_alert'] = array(
+    'title' => 'Grievance: Alert: Deadline',
+    'description' => 'Send "deadline approaching" alerts',
+    'schedule' => 'daily',
+    'callback' => 'grievance_alert_deadline_all',
+    'multidomain' => FALSE,
+  );
+  return $items;
+}

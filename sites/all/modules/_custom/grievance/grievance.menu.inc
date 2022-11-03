@@ -451,16 +451,6 @@ function grievance_menu() {
 		'type' => MENU_DEFAULT_LOCAL_TASK,
 	);
 
-	$items['admin/config/grievance/core/alert-tester'] = array(
-		'title' => 'Alert Tester',
-		'description' => t('Settings for the Grievance Module core'),
-		'page callback' => 'grievance_page_alert_test',
-		'page arguments' => array('grievance_admin'),
-		'access arguments' => array('grievance admin'),
-		'type' => MENU_LOCAL_TASK,
-		'weight' => 2,
-	);
-
 	$items['admin/config/grievance/gform'] = array(
 		'title' => 'Grievance Module - Form',
 		'description' => t('Settings for the Grievance Form'),

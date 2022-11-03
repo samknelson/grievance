@@ -1,0 +1,13 @@
+<?php
+
+// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.menu.inc';
+
+function sirius_vsam_parse_template($filename) {
+  $file = fopen($csv_path, 'r');
+
+}
+
+
+function sirius_vsam_dir() {
+  return '/var/www/sirius-smf.activistcentral.net/sites/default/files/private/vsam';
+}

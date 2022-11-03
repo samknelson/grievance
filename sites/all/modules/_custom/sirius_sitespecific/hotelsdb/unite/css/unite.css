@@ -49,3 +49,33 @@
 #content .unite_home_col_left {
 	/* padding-right:  25px; */
 }
+
+a.hotelsdb_last_verified_modal_link {
+	display: inline-block;
+	width: 150px;
+	padding:  2px;
+}
+
+a.hotelsdb_last_verified_green, 
+a.hotelsdb_last_verified_green:link, 
+a.hotelsdb_last_verified_green:visited {
+	color:  #006600;
+	background-color: #99ff99;
+	border:  1px solid #003300;
+}
+
+a.hotelsdb_last_verified_blue, 
+a.hotelsdb_last_verified_blue:link, 
+a.hotelsdb_last_verified_blue:visited {
+	color:  #000066;
+	background-color: #9999ff;
+	border:  1px solid #000033;
+}
+
+a.hotelsdb_last_verified_red, 
+a.hotelsdb_last_verified_red:link, 
+a.hotelsdb_last_verified_red:visited {
+	color:  #660000;
+	background-color: #ff9999;
+	border:  1px solid #330000;
+}

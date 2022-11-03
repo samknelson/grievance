@@ -206,6 +206,19 @@ function unite_menu() {
 		'type' => MENU_CALLBACK,
 	);
 
+
+  $items['sirius/modal/%node/unite-relationship-verify'] = array(
+    'title'            => 'Verify',
+    'page callback'    => 'unite_property_verify',
+    'page arguments'   => array(2),
+		'access arguments' => array('unite hotels user'),
+		'file' 						 => 'unite.modal_property_verify.inc',
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+  );
+
+
   return $items;
 }
 
@@ -232,3 +245,33 @@ function unite_node_tab_get_addlink($content_type, $query) {
 	
 	return $result;
 }
+
+/**
+ * Implments hook_modal_paths
+ */
+
+function unite_modal_paths() {
+  $paths = array();
+
+  $paths['sirius/modal/%node/unite-relationship-verify'] = array(
+    'style' => 'sirius-modal-style-small',
+  );
+
+  return $paths;
+}
+
+/*
+function sirius_modal_styles() {
+  $styles = array();
+
+  $styles['sirius-modal-style'] = array(
+    'modalSize' => array(
+      'type' => 'fixed',
+      'width' => 600,
+      'height' => 500,
+    ),
+  );
+
+  return $styles;
+}
+*/

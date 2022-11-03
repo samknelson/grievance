@@ -1,0 +1,90 @@
+.sirius_stripe_wrapper {
+	padding: 20px;
+	margin: 20px;
+	border: 1px solid #666666;
+}
+
+.sirius_stripe_wrapper #payment-form {
+	display: none;
+}
+
+.sirius_ledger_stripe_paymentmethod {
+	width: 250px;
+	float: left;
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid #999999;
+	background-color: #aaaaaa;	
+	color:  #000000;
+}
+
+.sirius_ledger_stripe_paymentmethod_default {
+	border: 1px solid #000099;
+	background-color: #ffffff;	
+}
+
+.sirius_ledger_stripe_paymentmethods:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.sirius_ledger_stripe_card_namenumber,
+.sirius_ledger_stripe_usbank_namenumber {
+	font-weight:  bold;
+}
+
+.sirius_ledger_stripe_card_expires,
+.sirius_ledger_stripe_usbank_type {
+	color:  #333333;
+}
+
+.sirius_ledger_stripe_cc_icon {
+	float:  left;
+	font-size:  30px;
+	padding-right:  10px;
+	color:  #333333;
+}
+
+.sirius_ledger_stripe_paymentmethod_default .sirius_ledger_stripe_cc_icon {
+	color:  #0000aa;
+}
+
+.sirius_ledger_stripe_customer {
+	width: 500px;
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid #999999;
+	background-color: #aaaaaa;	
+	color:  #000000;
+}
+
+.sirius_ledger_stripe_customer_active {
+	border: 1px solid #000099;
+	background-color: #ffffff;	
+}
+
+
+.sirius_ledger_stripe_customer_icon {
+	float:  left;
+	font-size:  60px;
+	padding-right:  10px;
+	color:  #333333;
+}
+
+.sirius_ledger_stripe_customer_active .sirius_ledger_stripe_customer_icon {
+	color:  #0000aa;
+}
+
+.sirius_ledger_stripe_customer_name {
+	font-weight:  bold;
+}
+.sirius_ledger_stripe_customer_id, .sirius_ledger_stripe_customer_created {
+	color:  #333333;
+}
+
+.sirius_ledger_stripe_link_icon {
+	font-size: 150%;
+	padding-right: 5px;
+	color:  #0000aa;
+}

@@ -73,9 +73,10 @@ function sirius_revision_changed_impl($arr1, $arr2, $depth = 0, $field_name = NU
       continue; 
     }
 
+
     // Date fields always set value2, but don't always save it. We'll ignore it if one of the entries is NULL.
     // This is unfortunate because it means you can remove an end date without creating a new revision.
-    if ($key == 'value2' && ($value1 == NULL || $value2 == NULL)) { 
+    if ($key === 'value2' && ($value1 == NULL || $value2 == NULL)) { 
       continue;
     }
 
@@ -102,10 +103,8 @@ function sirius_revision_changed_impl($arr1, $arr2, $depth = 0, $field_name = NU
     }
 
     // At least one of value1 and value2 is an array. We need to recurse.
-    if ($subkey = sirius_revision_changed_impl($value1, $value2, $depth+1, $field_name)) {
-      // drupal_set_message("Here with $key/$subkey");
-      // dpm($arr1);
-      // dpm($arr2);
+    $subkey = sirius_revision_changed_impl($value1, $value2, $depth+1, $field_name);
+    if ($subkey !== FALSE) {
       return "$key/$subkey";
     }
   }

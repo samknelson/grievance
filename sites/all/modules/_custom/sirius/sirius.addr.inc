@@ -133,11 +133,12 @@ function sirius_addr_format_html($addr) {
 	// 123 Fake St.<br />Apt 11<br />Beacon, NY 12508	
 	if (!$addr) { return ''; }
 	$txt = '<div class="sirius_addr">';
-	if ($addr['thoroughfare']) 				{ $txt = '<span class="sirius_addr_thoroughfare">' . $addr['thoroughfare'] . '</span><br />'; }
+	if ($addr['thoroughfare']) 				{ $txt .= '<span class="sirius_addr_thoroughfare">' . $addr['thoroughfare'] . '</span><br />'; }
 	if ($addr['premise']) 						{ $txt .= '<span class="sirius_addr_premise">' . $addr['premise'] . '</span>' . '<br />'; }
 	if ($addr['locality']) 						{ $txt .= '<span class="sirius_addr_locality">' . $addr['locality'] . '</span>, '; }
 	if ($addr['administrative_area']) { $txt .= '<span class="sirius_addr_administrative_area">' . $addr['administrative_area'] . '</span> '; }
 	if ($addr['postal_code'])					{ $txt .= '<span class="sirius_addr_postal_code">' . $addr['postal_code'] . '</span>'; }
+	$txt .= '</div>';
 	return $txt;
 }
 
@@ -170,6 +171,12 @@ function sirius_addr_node_presave($node) {
     }
     $geometry = geocoder_cache_get($handler['name'], $item, $handler_settings);
 
+    if ($geometry) { 
+			$node->field_address_canon_accuracy['und'][0]['value'] = $geometry->data['geocoder_accuracy'];
+    } else {
+    	unset($node->field_address_canon_accuracy['und'][0]['value']);
+    }
+
     if ($geometry && ($geometry->data['geocoder_accuracy'] == 'ROOFTOP') && $geometry->data['geocoder_formatted_address']) {
     	$node->field_address_canon['und'][0]['value'] = $geometry->data['geocoder_formatted_address'];
     } else {
@@ -188,6 +195,7 @@ function sirius_addr_node_presave($node) {
 function sirius_addr_form_alter_node(&$form, &$form_state, $form_id) {
 	// Hide canonical addresses on the node form. They are always set automatically.
 	if (isset($form['field_address_canon'])) { $form['field_address_canon']['#access'] = FALSE; }
+	if (isset($form['field_address_canon_accuracy'])) { $form['field_address_canon_accuracy']['#access'] = FALSE; }
 }
 
 function sirius_addr_get_compponent($point, $type) {
@@ -265,4 +273,11 @@ function sirius_addr_driving_distance($addr1, $addr2, $options = array()) {
   $meters = $result->rows[0]->elements[0]->distance->value;
   $miles = $meters / 1609.34;
   return array('success' => TRUE, 'distance' => $miles);
+}
+
+function sirius_addr_zip_zeropad($zip) {
+	if (!preg_match('/^\d+$/', $zip)) { return $zip; }
+	if (strlen($zip) >= 5) { return $zip; }
+	while (strlen($zip) < 5) { $zip = '0' . $zip; }
+	return $zip;
 }

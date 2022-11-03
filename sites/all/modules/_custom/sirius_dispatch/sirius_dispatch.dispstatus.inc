@@ -51,7 +51,7 @@ function sirius_dispatch_worker_dispstatus_set_possible($worker_node, $dispstatu
 	return array('success' => TRUE);
 }
 
-function sirius_dispatch_worker_dispstatus_set(&$worker_node, $dispstatus_tid = NULL, $account = NULL, $reason = NULL, $attachments = NULL) {
+function sirius_dispatch_worker_dispstatus_set(&$worker_node, $dispstatus_tid = NULL, $account = NULL, $reason = NULL, $attachments = NULL, $availdate = NULL) {
 	global $user;
 	if (!$account) { $account = $user; }
 	if (is_numeric($account)) { $account = user_load($account); }
@@ -91,7 +91,9 @@ function sirius_dispatch_worker_dispstatus_set(&$worker_node, $dispstatus_tid = 
 	if ($dispstatus_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
 
 		$json = json_decode($worker_node->field_sirius_json['und'][0]['value'], TRUE);
-		if ($json['dispatch']['keep_seniority'] == 'Yes') {
+		if ($availdate) {
+			// Explicitly passed an availability date
+		} else if ($json['dispatch']['keep_seniority'] == 'Yes') {
 			$json['dispatch']['keep_seniority'] = 'No';
 			$worker_node->field_sirius_json['und'][0]['value'] = json_encode($json);
 			$availdate = sirius_date_date($worker_node, 'field_sirius_dispatch_availdate', $format = 'Y-m-d H:i:s');

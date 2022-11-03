@@ -125,8 +125,7 @@ function sirius_ledger_monthly_charge_batch_reset() {
 function sirius_ledger_monthly_charge_batch($mode, $ts = NULL, $trigger = 'cron') {
 	if (!$ts) { $ts = time(); }
 	if (!sirius_ledger_monthly_enabled()) {
-		sirius_minilog('Monthly billing is not enabled for this domain.');
-		return;
+		return array('success' => TRUE, 'msg' => 'Monthly billing is not enabled for this domain.');
 	}
 
 	$batch_size = sirius_domain_variable_get('sirius_ledger_monthly_batch_size', 1000);
@@ -134,13 +133,12 @@ function sirius_ledger_monthly_charge_batch($mode, $ts = NULL, $trigger = 'cron'
 	$today = date('Y-m-d', $ts);
 	if ($batch_status['date'] != $today) {
 		$batch_status = array('date' => $today);
-		sirius_minilog("Starting batch processing for $today"); 
+		sirius_minilog("Starting monthly charging for $today"); 
 	} else {
 		if ($batch_status['complete']) { 
-			sirius_minilog("Batch processing for $today is complete."); 
-			return;
+			return array('success' => TRUE, 'msg' => "Batch processing for $today is complete."); 
 		} else {
-			sirius_minilog("Continuing batch processing for $today"); 
+			sirius_minilog("-- Continuing previously started batch"); 
 		}
 	}
 
@@ -164,15 +162,16 @@ function sirius_ledger_monthly_charge_batch($mode, $ts = NULL, $trigger = 'cron'
   }
   if ($count < $batch_size) { 
   	$batch_status['complete'] = TRUE;
-  	sirius_minilog("All records for $today processed."); 
+  	sirius_minilog("-- All records for $today processed."); 
   }
 
 	if ($mode == 'live') { 
 		sirius_domain_variable_set('sirius_ledger_monthly_batch_status', json_encode($batch_status));
 	}
+	return array('sucecess' => TRUE, 'msg' => "Scanned $count workers.");
 }
 
-function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts = NULL, $action = 'generate') {
+function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts = NULL, $action = 'generate', $options = array()) {
 	$trigger_options = sirius_ledger_policy_trigger_options('month');
 	if (!$ts) { $ts = time(); }
 
@@ -213,19 +212,31 @@ function sirius_ledger_monthly_charge_worker($worker_nid, $mode, $trigger, $ts =
 	$schedules = array('month' => 'Monthly', 'semimonth' => 'Semi-Monthly');
 	$total_charged = 0;
 
+
+	if ($options['policy_node']) {
+		$policy_node = $options['policy_node'];
+		sirius_minilog("Forcing policy " . $policy_node->title . ". This may not be the current policy for this worker.", 'warning');
+	} else {
+		$policy_node = sirius_ledger_policy_lookup($worker_node);
+	}
+
+	if (!$policy_node) {
+		sirius_minilog("No ledger policy found for " . $worker_node->title, 'warning');
+		return;
+	}
+	$policy_json = sirius_json_get($policy_node);
+
 	foreach ($schedules as $schedule => $schedule_name) {
-		$policy_node = sirius_ledger_policy_lookup($schedule, $worker_node);
-		if (!$policy_node) {
-			sirius_minilog("No ledger policy found for " . $worker_node->title, 'warning');
-			continue;
-		}
-		$policy_json = sirius_jsonfield_util_node_json_get($policy_node);
 		if ($policy_json['ledger']['policy']['monthly']['skip_months'][$today_month]) {
-			sirius_minilog("The ledger policy lists the current month, month #$today_month, as a \"skip month\". Monthly dues are not charged this month.");
+			sirius_minilog("$schedule_name: The ledger policy lists the current month, month #$today_month, as a \"skip month\". Monthly dues are not charged this month.");
 			continue;
 		}
 
-		$rates = sirius_ledger_policy_lookup_rates($worker_node, $policy_node, $schedule);
+		$rates = sirius_ledger_policy_lookup_rates_new($worker_node, $policy_node, $schedule, array('ts' => $ts));
+		if (!$rates) {
+			sirius_minilog("$schedule_name: no rates found.");
+			continue; 
+		}
 
 		if ($schedule == 'month') { 
 			$charge_days = array($policy_json['ledger']['policy']['monthly']['monthly_charge_day']);

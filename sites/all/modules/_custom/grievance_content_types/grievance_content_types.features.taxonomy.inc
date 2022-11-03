@@ -884,29 +884,6 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
-    'sirius_trust_election_status' => array(
-      'name' => 'Sirius Trust Election Status',
-      'machine_name' => 'sirius_trust_election_status',
-      'description' => '',
-      'hierarchy' => 0,
-      'module' => 'taxonomy',
-      'weight' => 0,
-      'rdf_mapping' => array(
-        'rdftype' => array(
-          0 => 'skos:ConceptScheme',
-        ),
-        'name' => array(
-          'predicates' => array(
-            0 => 'dc:title',
-          ),
-        ),
-        'description' => array(
-          'predicates' => array(
-            0 => 'rdfs:comment',
-          ),
-        ),
-      ),
-    ),
     'sirius_trust_election_type' => array(
       'name' => 'Sirius Trust Election Type',
       'machine_name' => 'sirius_trust_election_type',

@@ -43,6 +43,7 @@ features[views_view][] = grievance_prior_grievances
 features[views_view][] = grievance_reassign
 features[views_view][] = grievance_settlement_report
 features[views_view][] = grievance_settlements
+features[views_view][] = grievance_shop_assignments
 features[views_view][] = grievance_shop_contacts
 features[views_view][] = grievance_shops
 features[views_view][] = grievance_status_correct

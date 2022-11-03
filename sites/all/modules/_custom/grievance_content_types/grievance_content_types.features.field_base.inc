@@ -1510,28 +1510,6 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_grievance_data_alert'.
-  $field_bases['field_grievance_data_alert'] = array(
-    'active' => 1,
-    'cardinality' => 1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_grievance_data_alert',
-    'field_permissions' => array(
-      'type' => 0,
-    ),
-    'indexes' => array(
-      'format' => array(
-        0 => 'format',
-      ),
-    ),
-    'locked' => 0,
-    'module' => 'text',
-    'settings' => array(),
-    'translatable' => 0,
-    'type' => 'text_long',
-  );
-
   // Exported field_base: 'field_grievance_date'.
   $field_bases['field_grievance_date'] = array(
     'active' => 1,
@@ -2949,6 +2927,7 @@ function grievance_content_types_field_default_field_bases() {
         0 => array(
           'vocabulary' => 'grievance_resproc',
           'parent' => 0,
+          'depth' => '',
         ),
       ),
       'options_list_callback' => 'content_taxonomy_allowed_values',
@@ -6450,7 +6429,7 @@ function grievance_content_types_field_default_field_bases() {
       'handler_settings' => array(
         'behaviors' => array(
           'views-select-list' => array(
-            'status' => 0,
+            'status' => 1,
           ),
         ),
         'sort' => array(
@@ -7802,34 +7781,6 @@ Prof.',
     ),
     'translatable' => 0,
     'type' => 'entityreference',
-  );
-
-  // Exported field_base: 'field_sirius_trust_election_stat'.
-  $field_bases['field_sirius_trust_election_stat'] = array(
-    'active' => 1,
-    'cardinality' => 1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_sirius_trust_election_stat',
-    'indexes' => array(
-      'tid' => array(
-        0 => 'tid',
-      ),
-    ),
-    'locked' => 0,
-    'module' => 'taxonomy',
-    'settings' => array(
-      'allowed_values' => array(
-        0 => array(
-          'vocabulary' => 'sirius_trust_election_status',
-          'parent' => 0,
-          'depth' => '',
-        ),
-      ),
-      'options_list_callback' => 'content_taxonomy_allowed_values',
-    ),
-    'translatable' => 0,
-    'type' => 'taxonomy_term_reference',
   );
 
   // Exported field_base: 'field_sirius_trust_election_type'.

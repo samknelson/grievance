@@ -136,6 +136,16 @@ function sirius_ledger_node_tabs() {
     'weight' => 3,
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_ledger/stripe'] = array(
+    'title' => 'Stripe',
+    'description' => '',
+    'callback' => 'sirius_ledger_node_tab_entity_stripe',
+    'permissions' => array('sirius ledger admin'),
+    'file' => 'sirius_ledger.page_entity_stripe.inc',
+    'weight' => 4,
+    'component' => 'ledger:stripe',
+  );
+
   $node_tabs['grievance_shop']['sirius_employer_ledger'] = array(
     'title' => 'A/R',
     'callback' => 'sirius_ledger_node_tab_employer_ar',
@@ -181,7 +191,7 @@ function sirius_ledger_node_tabs() {
 
 
   $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition'] = array(
-    'title' => 'Policy',
+    'title' => 'Billing Policy',
     'callback' => 'sirius_ledger_node_tab_policy_definition',
     'permissions' => array('sirius ledger admin'),
     'weight' => 2,
@@ -207,13 +217,30 @@ function sirius_ledger_node_tabs() {
     'callback' => 'sirius_ledger_node_tab_policy_definition_rates',
     'permissions' => array('sirius ledger admin'),
     'weight' => 2,
+    'file' => 'sirius_ledger.page_policy_definition_rates.inc',
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/rates_new'] = array(
+    'title' => 'Rates (New)',
+    'callback' => 'sirius_ledger_node_tab_policy_rates_new',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 2,
+    'file' => 'sirius_ledger.page_policy_rates_new.inc',
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/rates_test'] = array(
+    'title' => 'Rates Test',
+    'callback' => 'sirius_ledger_node_tab_policy_rates_test',
+    'permissions' => array('sirius ledger admin'),
+    'weight' => 3,
+    'file' => 'sirius_ledger.page_policy_rates_test.inc',
   );
 
   $node_tabs['sirius_json_definition']['sirius_ledger_policy_definition/exim'] = array(
     'title' => 'Export / Import',
     'callback' => 'sirius_ledger_node_tab_policy_definition_exim',
     'permissions' => array('sirius ledger admin'),
-    'weight' => 3,
+    'weight' => 10,
   );
 
   $node_tabs['sirius_payperiod']['sirius_payperiod_ledger_test'] = array(
@@ -336,10 +363,11 @@ function sirius_ledger_menu() {
 
   $items['sirius/config/ledger/policies'] = array(
     'title' => 'Policies',
-    'page callback' => 'sirius_ledger_config_policies',
+    'page callback' => 'sirius_ledger_page_policies',
     'access arguments' => array('sirius ledger admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
+    'file' => 'sirius_ledger.page_policies.inc'
   );
 
   $items['sirius/config/ledger/test-monthly'] = array(
@@ -365,6 +393,45 @@ function sirius_ledger_menu() {
     'access arguments' => array('sirius admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 4,
+  );
+
+  $items['sirius/ledger/stripe/config'] = array(
+    'title' => 'Stripe',
+    'page callback' => 'sirius_ledger_page_stripe_config',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_ledger.page_stripe_config.inc',
+  );
+
+  $items['sirius/ledger/stripe/config/account'] = array(
+    'title' => 'Account Information',
+    'page callback' => 'sirius_ledger_page_stripe_config',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'sirius_ledger.page_stripe_config.inc',
+    'weight' => 1,
+  );
+
+  $items['sirius/ledger/stripe/config/test'] = array(
+    'title' => 'Test',
+    'page callback' => 'sirius_ledger_page_stripe_test',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'sirius_ledger.page_stripe_test.inc',
+    'weight' => 2,
+  );
+
+  $items['sirius/ledger/stripe/config/webhook'] = array(
+    'title' => 'Webhook',
+    'page callback' => 'sirius_ledger_page_stripe_config_webhook',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'sirius_ledger.page_stripe_config_webhook.inc',
+    'weight' => 2,
   );
 
  $items['sirius/ledger/payment/create'] = array(
@@ -429,7 +496,7 @@ function sirius_ledger_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
- $items['sirius/ledger/delinquency/employer'] = array(
+  $items['sirius/ledger/delinquency/employer'] = array(
     'title' => 'Employers',
     'description' => '',
     'access arguments' => array('sirius ledger admin'),
@@ -439,7 +506,7 @@ function sirius_ledger_menu() {
     'weight' => 2,
   );
 
- $items['sirius/ledger/delinquency/worker'] = array(
+  $items['sirius/ledger/delinquency/worker'] = array(
     'title' => 'Workers',
     'description' => '',
     'access arguments' => array('sirius ledger admin'),
@@ -449,7 +516,7 @@ function sirius_ledger_menu() {
     'weight' => 2,
   );
 
- $items['sirius/ledger/workers'] = array(
+  $items['sirius/ledger/workers'] = array(
     'title' => 'Workers',
     'description' => '',
     'access arguments' => array('sirius ledger admin'),
@@ -457,13 +524,33 @@ function sirius_ledger_menu() {
     'page arguments' => array(),
   );
 
- $items['sirius/ledger/ar/search'] = array(
+  $items['sirius/ledger/ar/search'] = array(
     'title' => 'AR Search',
     'description' => '',
     'access arguments' => array('sirius ledger admin'),
     'page callback' => 'sirius_ledger_page_ar_search',
     'page arguments' => array(),
     'file' => 'sirius_ledger.page_ar_search.inc',
+  );
+
+  $items['sirius/ledger/stripe/paymentmethod/add'] = array(
+    'title' => 'Add a Payment Method',
+    'description' => '',
+    'access arguments' => array('sirius'),
+    'page callback' => 'sirius_ledger_page_stripe_paymentmethod_add',
+    'page arguments' => array(),
+    'file' => 'sirius_ledger.page_stripe_paymentmethod_add.inc',
+  );
+
+
+  $items['sirius/stripe/webhookendpoint/%'] = array(
+    'title' => 'Webhook Endpoint',
+    'description' => '',
+    'access callback' => TRUE,
+    'page callback' => 'sirius_ledger_stripe_webhook_handle',
+    'page arguments' => array(3),
+    'file' => 'sirius_ledger.stripe.inc',
+    'type' => MENU_CALLBACK,
   );
 
   return $items;

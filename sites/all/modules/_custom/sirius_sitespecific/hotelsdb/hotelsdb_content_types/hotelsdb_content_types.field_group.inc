@@ -150,6 +150,7 @@ function hotelsdb_content_types_field_group_info() {
       7 => 'field_csno_book',
       8 => 'field_csno_horse',
       9 => 'field_csno_online',
+      10 => 'field_csno_type',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -187,6 +188,7 @@ function hotelsdb_content_types_field_group_info() {
       7 => 'field_csno_book',
       8 => 'field_csno_horse',
       9 => 'field_csno_online',
+      10 => 'field_csno_type',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -222,6 +224,7 @@ function hotelsdb_content_types_field_group_info() {
       5 => 'field_rest_contract_start_date',
       6 => 'field_rest_contract_end_date',
       7 => 'field_rest_contract_covered',
+      8 => 'field_union_other',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -257,6 +260,7 @@ function hotelsdb_content_types_field_group_info() {
       5 => 'field_rest_contract_start_date',
       6 => 'field_rest_contract_end_date',
       7 => 'field_rest_contract_covered',
+      8 => 'field_union_other',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -483,6 +487,7 @@ function hotelsdb_content_types_field_group_info() {
       9 => 'field_on_public_land',
       10 => 'field_pin',
       11 => 'field_address_canon',
+      12 => 'field_address_canon_accuracy',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

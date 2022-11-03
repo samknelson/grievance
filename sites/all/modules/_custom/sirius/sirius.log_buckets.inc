@@ -140,7 +140,7 @@ function sirius_log_buckets() {
 				'content_type' => 'sirius_worker',
 				'permissions' => array('sirius dispatch staff'),
 				'path' => 'sirius_worker_dispatches/log',
-				'weight' => 7,
+				'weight' => 30,
 				'categories' => array('worker:employer', 'dispatch:status', 'worker:dispstatus', 'worker:availdate', 'worker:dispstatus_block', 'dispatch:dnc'),
 				'can_add' => FALSE,
 			),

@@ -24,7 +24,7 @@ My Grievances {"url":"grievances","weight":"-49"}
 Contracts {"url":"grievance\/admin\/contract-templates","weight":"-46"}
 -Article Search {"url":"grievance\/admin\/contract-templates\/section-search","weight":"0"}
 -Section Search {"url":"grievance\/admin\/contract-templates\/clause-search","weight":"0"}
-Reports {"url":"<front>","weight":"-48"}
+Reports {"url":"sirius\/reports","weight":"-48"}
 -Type and Status {"url":"grievance\/report\/bytype","weight":"-41"}
 -Settlement Detail {"url":"grievance\/report\/settlement","weight":"-43"}
 -Average Time Between Statuses {"url":"grievance\/report\/average-time","weight":"-47"}
@@ -42,10 +42,6 @@ Reports {"url":"<front>","weight":"-48"}
 --No Assignee {"url":"grievance\/report\/missing-assignee","weight":"0"}
 --No Specialist / Organizer {"url":"grievance\/report\/missing-specialist","weight":"0"}
 -Open Grievances: Aged Summary {"url":"grievance\/report\/aged-summary","weight":"-44"}
--UH226 Weekly Summary {"url":"grievance\/report\/custom\/uh226-report-summary","weight":"0"}
--UH226 SPI Term Summary {"url":"grievance\/report\/custom\/uh226-spi-term-summary","weight":"0"}
--UH226 SPI Term Detail {"url":"grievance\/report\/custom\/uh226-spi-term-detail","weight":"0"}
--UH226 Violation {"url":"grievance\/report\/custom\/uh226-violation","weight":"0"}
 -UH23 Summary {"url":"grievance\/report\/custom\/uh23-report-summary","weight":"0"}
 -Quick Export {"url":"grievance\/report\/grievance-quick-export","weight":"0"}
 -Status Summary {"url":"grievance\/report\/status-summary","weight":"0"}

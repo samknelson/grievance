@@ -5,13 +5,13 @@ function sirius_node_access_contact($node, $op, $account) {
 }
 
 function sirius_contact_sync_from_worker($worker_node) {
-	$contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
-
 	$need_save = FALSE;
-
+	$contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
 	if ($contact_nid) {
 		$contact_node = node_load($contact_nid);
-	} else {
+	}
+
+	if (!$contact_node) {
 		$contact_node = new stdClass();
 		$contact_node->type = 'sirius_contact';
 		$contact_node->no_recurse = TRUE;
@@ -257,4 +257,141 @@ function sirius_contact_entity_remove($entity_node, $contact_nid) {
 	unset($entity_json['contacts'][$contact_nid]); 
 	sirius_jsonfield_util_node_json_set($entity_node, $entity_json);
 	node_save($entity_node);
+}
+
+function sirius_contact_relationship_node_presave($relationship_node) {
+	// Relationship is active only if it started before now, and it either hasn't ended yet, or it ended after now.
+	$start_ts = sirius_fieldval($relationship_node, 'field_sirius_date_start', 'ts');
+	$end_ts = sirius_fieldval($relationship_node, 'field_sirius_date_end', 'ts');
+	$now_ts = time();
+
+	if ($start_ts <= $now_ts && ($end_ts < 1 || $end_ts >= $now_ts)) {
+		$relationship_node->field_sirius_active['und'][0]['value'] = 'Yes';
+	} else {
+		$relationship_node->field_sirius_active['und'][0]['value'] = 'No';
+	}
+}
+
+function sirius_contact_relationship_node_form_alter(&$form, &$form_state, $form_id) {
+	// Admins can see the full form
+	if (user_access('sirius admin')) {
+		drupal_set_message("Administrative user: Full form is displayed. Please use caution.", 'warning');
+		return;
+	}
+
+	// "Active" field is computed, so don't edit manually
+	if ($form['field_sirius_active']) { $form['field_sirius_active']['#access'] = FALSE; }
+
+	// New record or existing record?
+	$relationship_node = $form['#entity'];
+	if ($relationship_node && $relationship_node->nid) {
+		$is_edit = TRUE;
+	}
+
+	// You can never change the contacts
+	$form['field_sirius_contact']['#disabled'] = TRUE;
+	$form['field_sirius_contact_alt']['#disabled'] = TRUE;
+
+	if ($is_edit) {
+		// Existing record: You can't change the type, from, or to
+		$form['field_sirius_contact_reltype']['#access'] = FALSE;
+	} else {
+		// New record: Relationship type is required
+		$form['field_sirius_contact_reltype']['#required'] = TRUE;
+		$form['field_sirius_contact_reltype']['und']['#required'] = TRUE;
+
+		// Include some confirmation text
+		$contact_node = node_load($_REQUEST['sirius_contact']);
+		$other_contact_node = node_load($_REQUEST['sirius_contact_alt']);
+		if (!$contact_node || !$other_contact_node) {
+			drupal_set_message('Must receive valid contact nodes.', 'error');
+			$form['#access'] = FALSE;
+			return;
+		}
+
+		drupal_set_message("Creating a relationship FROM " . $contact_node->title . " TO " . $other_contact_node->title, 'warning');
+	}
+}
+
+function sirius_contact_relationship_node_validate($node, $form, &$form_state) {
+	$contact_nid = $node->field_sirius_contact['und'][0]['target_id'];
+	$contact_node = node_load($contact_nid);
+	$other_contact_nid = $node->field_sirius_contact_alt['und'][0]['target_id'];
+	$other_contact_node = node_load($other_contact_nid);
+
+	if (!$contact_nid) { form_set_error('field_sirius_contact', t('Please enter a contact.')); return; }
+	if (!$contact_node) { form_set_error('field_sirius_contact', t('Contact not found.')); return; }
+	if (!$other_contact_nid) { form_set_error('field_sirius_contact_alt', t('Please enter a second contact')); return; }
+	if (!$other_contact_node) { form_set_error('field_sirius_contact_alt', t('Contact not found.')); return; }
+
+	if ($contact_nid == $other_contact_nid) { form_set_error('field_sirius_contact_alt', t('The two contacts are the same.')); return; }
+
+	// End date must be after start date
+	$ts1 = strtotime($node->field_sirius_date_start['und'][0]['value']);
+	$ts2 = strtotime($node->field_sirius_date_end['und'][0]['value']);
+	if ($ts1 && $ts2 && $ts2 < $ts1) { form_set_error('field_sirius_date_end', t('End date must be after start date.')); return; }
+
+	// Relationship type is required
+	$reltype_tid = $node->field_sirius_contact_reltype['und'][0]['tid'];
+	if (!$reltype_tid) { form_set_error('field_sirius_contact_reltype', t('Please select a relationship type.')); return; }
+
+	// Can only have one spouse at a time
+	$reltype_term = taxonomy_term_load($reltype_tid);
+	$count = $reltype_term->field_sirius_count['und'][0]['value'];
+	if ($count) {
+		$params['active'] = 'Yes';
+		$params['contact_nid'] = $contact_nid;
+		$params['reltype_tid'] = $reltype_tid;
+		$params['nids_only'] = TRUE;
+		$params['exclude_nid'] = $node->nid;
+		$relationships = sirius_contact_relationships($params);
+		if ($count <= count($relationships)) {
+			form_set_error('field_sirius_contact_reltype', "Only $count relationships of type " . $reltype_term->name . " are permitted."); return;
+		}
+	}
+}
+
+function sirius_contact_relationships($params) {
+	$query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_contact_relationship');
+  if ($params['contact_nid']) {
+	  $query->fieldCondition('field_sirius_contact', 'target_id', $params['contact_nid']);
+  }
+  if ($params['contact_alt_nid']) {
+	  $query->fieldCondition('field_sirius_contact_alt', 'target_id', $params['contact_alt_nid']);
+  }
+  if ($params['reltype_tid']) {
+	  $query->fieldCondition('field_sirius_contact_reltype', 'tid', $params['reltype_tid']);
+  }
+  if ($params['reltype_tids']) {
+	  $query->fieldCondition('field_sirius_contact_reltype', 'tid', $params['reltype_tids'], 'in');
+  }
+  if ($params['exclude_nid']) {
+	  $query->propertyCondition('nid', $params['exclude_nid'], '!=');
+  }
+  if ($params['active']) {
+	  $query->fieldCondition('field_sirius_active', 'value', $params['active']);
+  }
+  $query->propertyOrderBy('created', 'desc');
+  $limit = $params['limit'];
+  if (!$limit) { $limit = 100; }
+  $query->range(0, $limit);
+  // $query->fieldOrderBy('field_sirius_date_start', 'value', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return array(); }
+
+  if ($params['nids_only']) {
+  	return array_keys($stmt['node']);
+  }
+
+  // Can't use fieldOrderBy because it eliminates nulls
+  $nodes = node_load_multiple(array_keys($stmt['node']));
+  uksort($nodes, function($a, $b) use ($nodes) { 
+  	$a_date = $nodes[$a]->field_sirius_date_start['und'][0]['value'];
+  	$b_date = $nodes[$b]->field_sirius_date_start['und'][0]['value'];
+  	return strcmp($b_date, $a_date);
+  });
+
+  return $nodes;
 }

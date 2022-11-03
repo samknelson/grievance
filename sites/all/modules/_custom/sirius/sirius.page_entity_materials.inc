@@ -137,6 +137,17 @@ function sirius_materials_access($action, $entity, $material_node = NULL) {
 		return FALSE;
 	}
 
+	if ($node->type == 'sirius_contact_relationship') {
+		if (!node_access('view', $node)) { return FALSE; }
+
+		// Admins can do anything
+		if (user_access('sirius admin')) { return TRUE; }
+		if (user_access('sirius domain admin')) { return TRUE; }
+		if (user_access('sirius worker admin')) { return TRUE; }
+
+		return FALSE;
+	}
+
 	return FALSE;
 }
 
