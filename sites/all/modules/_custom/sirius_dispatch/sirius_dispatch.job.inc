@@ -366,9 +366,17 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 			if ($skill_tid) {
 				$sql .= "and exists (";
 				$sql .= "  select 1 from field_data_field_sirius_skill ";
+				$sql .= "  left join field_data_field_sirius_skill_expire on ";
+				$sql .= "    field_data_field_sirius_skill_expire.entity_type = 'node' and ";
+				$sql .= "    field_data_field_sirius_skill_expire.entity_id = field_data_field_sirius_skill.entity_id and ";
+				$sql .= "    field_data_field_sirius_skill_expire.delta = field_data_field_sirius_skill.delta ";
 				$sql .= "  where field_data_field_sirius_skill.entity_type = 'node' ";
 				$sql .= "  and field_data_field_sirius_skill.entity_id = node.nid ";
 				$sql .= "  and field_sirius_skill_tid = :skill_tid_$delta ";
+				$sql .= "  and ( ";
+				$sql .= "    field_sirius_skill_expire_value is null ";
+				$sql .= "    or field_sirius_skill_expire_value >= CURDATE() ";
+				$sql .= "  )";
 				$sql .= ") ";
 				$args[":skill_tid_$delta"] = $skill_tid;
 			}
@@ -723,10 +731,20 @@ function sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker
 	if (!$filters['ignore_skill']) {
 		$skill_tids = sirius_fieldvals($job_node, 'field_sirius_skill', 'tid');
 		if ($skill_tids) {
+			$my_skill_tids = sirius_fieldvals($worker_node, 'field_sirius_skill', 'tid');
+			$my_skill_expires = sirius_fieldvals($worker_node, 'field_sirius_skill_expire', 'value');
 			foreach ($skill_tids as $delta => $skill_tid) {
-				if (!in_array($skill_tid, sirius_fieldvals($worker_node, 'field_sirius_skill', 'tid'))) {
+				$delta = array_search($skill_tid, $my_skill_tids);
+				if ($delta === FALSE) {
 					$skill_term = taxonomy_term_load($skill_tid);
 					return array('success' => FALSE, 'msg' => t('The worker does not have the skill @skill_name.', array('@skill_name' => $skill_term->name)));
+				}
+				if ($my_skill_expires[$delta] <= date('Y-m-d 00:00:00')) {
+					$skill_term = taxonomy_term_load($skill_tid);
+					return array('success' => FALSE, 'msg' => t('The skill @skill_name expired on @date.', array(
+						'@skill_name' => $skill_term->name,
+						'@date' => $my_skill_expires[$delta],
+					)));
 				}
 			}
 		}
