@@ -247,7 +247,15 @@ function sirius_service_func_info($func) {
   return $info_all[$func];
 }
 
+function sirius_service_is_remote($value = NULL) {
+  $is_remote = &drupal_static(__FUNCTION__);
+  if (isset($value)) { $is_remote = $value; }
+  return $is_remote;
+}
+
 function sirius_service_generic_action($args) {
+  sirius_service_is_remote(TRUE);
+
   // The first argument is a function name
   $key = array_shift($args);
   if (!$key) { return array('success' => FALSE, 'msg' => "The first argument to this service must be a service-enabled function key."); }
