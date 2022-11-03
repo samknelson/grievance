@@ -595,6 +595,13 @@ function sirius_dispatch_job_get_dispatchable_workers($job_node, $order = 'name'
 		sirius_dispatch_rollover_dates($employer_nid, $workers, $roll_cutoff);
 	}
 
+	// Alter
+	$context = array();
+	$context['job_node'] = $job_node;
+	$context['order'] = $order;
+	$context['limit'] = $limit;
+	$context['filters'] = $filters;
+	drupal_alter('sirius_dispatch_job_get_dispatchable_workers', $workers, $context);
 	return $workers;
 }
 
