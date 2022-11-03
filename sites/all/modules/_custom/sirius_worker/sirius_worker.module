@@ -283,9 +283,9 @@ function sirius_worker_nextid() {
     if ($id == 999099) { $id++; }
     if ($id == 666666) { $id++; }
     if ($id == 999001) { $id++; }
-    return $id;
-    
   }
+  drupal_alter('sirius_worker_nextid', $id);
+  return $id;
 }
 
 /***
