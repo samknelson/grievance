@@ -2927,6 +2927,7 @@ function grievance_content_types_field_default_field_bases() {
         0 => array(
           'vocabulary' => 'grievance_resproc',
           'parent' => 0,
+          'depth' => '',
         ),
       ),
       'options_list_callback' => 'content_taxonomy_allowed_values',
@@ -6428,7 +6429,7 @@ function grievance_content_types_field_default_field_bases() {
       'handler_settings' => array(
         'behaviors' => array(
           'views-select-list' => array(
-            'status' => 0,
+            'status' => 1,
           ),
         ),
         'sort' => array(

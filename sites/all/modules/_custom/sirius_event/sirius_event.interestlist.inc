@@ -162,6 +162,8 @@ function sirius_event_interestlist_list($event_type_term, $params = array()) {
 	$sql .= "field_sirius_email_value as contact_email, ";
 	$sql .= "worker_node.nid as worker_nid, ";
 	$sql .= "worker_node.title as worker_title, ";
+	$sql .= "worker_json.field_sirius_json_value as worker_json, ";
+	$sql .= "group_concat(distinct ms_term.tid order by ms_term.tid separator ',') as worker_ms_tid, ";
 	$sql .= "group_concat(distinct ms_term.name order by ms_term.name separator ', ') as worker_ms_name, ";
 	$sql .= "ws_term.tid as worker_ws_tid, ";
 	$sql .= "ws_term.name as worker_ws_name, ";
@@ -178,6 +180,7 @@ function sirius_event_interestlist_list($event_type_term, $params = array()) {
 	$sql .= "left join field_data_field_sirius_log_handler handler_contact on handler_contact.entity_type = 'node' and handler_contact.entity_id = node.nid ";
 	$sql .= "left join node contact_node on handler_contact.field_sirius_log_handler_target_id = contact_node.nid ";
 
+
 	$sql .= "left join field_data_field_sirius_phone on field_data_field_sirius_phone.entity_type = 'node' and field_data_field_sirius_phone.entity_id = contact_node.nid ";
 	$sql .= "left join field_data_field_sirius_email on field_data_field_sirius_email.entity_type = 'node' and field_data_field_sirius_email.entity_id = contact_node.nid ";
 	$sql .= "left join field_data_field_sirius_contact worker_contact on worker_contact.entity_type = 'node' and worker_contact.bundle = 'sirius_worker' and worker_contact.field_sirius_contact_target_id = contact_node.nid ";
@@ -188,6 +191,8 @@ function sirius_event_interestlist_list($event_type_term, $params = array()) {
 
 	$sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = worker_node.nid ";
 	$sql .= "left join taxonomy_term_data ms_term on ms_term.tid = field_sirius_member_status_tid ";
+
+	$sql .= "left join field_data_field_sirius_json worker_json on worker_json.entity_type = 'node' and worker_json.entity_id = worker_node.nid ";
 
 	$sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = worker_node.nid ";
 

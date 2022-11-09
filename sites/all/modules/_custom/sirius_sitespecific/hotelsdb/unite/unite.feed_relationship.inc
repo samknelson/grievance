@@ -27,6 +27,12 @@ function unite_feed_relationship_info() {
         'actor_title' => array('group' => 'pk', 'title' => 'Actor Name'),
         'pk_relationship_type' => array('group' => 'pk', 'title' => 'Relationship Type'),
 
+        'replace' => array(
+          'group' => 'pk', 
+          'title' => 'Replace Existing Owner / Operator?',
+          'description' => 'If this value is set to "Yes", and if this is an Owner or Operator relationship, and if there is an existing relationship of that type to a different actor, then that relationship whill be changed to "Previous Owner" or "Previous Operator", as appropriate.'
+        ),
+
         'relationship_type' => array('group' => 'core', 'title' => 'New Relationship Type', 'type' => 'list'),
         'notes' => array('group' => 'core', 'type' => 'long'),
 
@@ -164,6 +170,19 @@ function unite_feed_relationship_row_verify($feed_node, $info, $data, &$row, $pr
     if (!is_array($value)) { $row[$key] = trim($value); }
 	}
 
+  // "Replace" must be "Yes" or "No"
+  if ($row['replace']) {
+    $replace = strtolower(substr($row['replace'], 0, 1));
+    if (!in_array($replace, array('y', 'n'))) {
+      return array('success' => FALSE, 'msg' => '"Replace" must contain the value "Yes" or "No".');
+    }
+    if ($replace == 'y') {
+      if (!in_array($row['pk_relationship_type'], array('Owner', 'Operator'))) {
+        return array('success' => FALSE, 'msg' => 'Replace is only available if relationship type is "Owner" or "Operator"');
+      }
+    }
+  }
+
   foreach ($info['feed']['fields'] as $field_name => $field_info) {
     if (!$row[$field_name]) { continue; }
 
@@ -192,6 +211,8 @@ function unite_feed_relationship_row_verify($feed_node, $info, $data, &$row, $pr
   $relationship_type_allowed_values= list_allowed_values($relationship_type_field_info);
 
   if ($precompute) {
+    $row['replace'] = $replace; 
+
     if ($pk == 'nid') {
       $nid = $row['nid'];
       if (!$nid) { return array('success' => FALSE, 'msg' => 'If the primary key is NID, all rows must have a node ID.'); }
@@ -286,6 +307,26 @@ function unite_feed_relationship_row_process($feed_node, $info, $data, $row) {
   // return array('success' => FALSE, 'msg' => 'Disabled');
 	$result = unite_feed_relationship_row_verify($feed_node, $info, $data, $row, TRUE);
 	if (!$result['success']) { return $result; }
+
+  // Replace any existing entries
+  if ($row['replace'] == 'y') {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node');
+    $query->entityCondition('bundle', 'property_actor');
+    $query->fieldCondition('field_property', 'target_id', $row['property_nid']);
+    $query->fieldCondition('field_actor', 'target_id', $row['actor_nid'], '!=');
+    $query->fieldCondition('field_relationship_type', 'value', $row['pk_relationship_type']);
+    $query->range(0,100);
+    $stmt = $query->execute();
+    if ($stmt['node']) {
+      $replace_relationship_nids = array_keys($stmt['node']);
+      $replace_relationship_nodes = node_load_multiple($replace_relationship_nids);
+      foreach ($replace_relationship_nodes as $replace_relationship_nid => $replace_relationship_node) {
+        $replace_relationship_node->field_relationship_type['und'][0]['value'] = 'Previous ' . $replace_relationship_node->field_relationship_type['und'][0]['value'];
+        node_save($replace_relationship_node);
+      }
+    }
+  }
 
   if ($row['nid']) {
     $is_new = FALSE;

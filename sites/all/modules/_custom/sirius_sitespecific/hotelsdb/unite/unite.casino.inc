@@ -3,6 +3,7 @@
 function unite_casino_fields() {
 	return array(
 		'field_is_casino',
+		'field_csno_type',
 		'field_csno_slots_count',
 		'field_csno_slots_date',
 		'field_csno_tables_count',

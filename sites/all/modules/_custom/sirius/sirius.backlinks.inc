@@ -159,7 +159,24 @@ function sirius_backlinks_from_node($node) {
 	if ($node->type == 'sirius_operator') { $links['sirius/office/operator/list'] = array('name' => 'Operator List'); }
 	if ($node->type == 'sirius_phonenumber') { $links['sirius/phonenumber'] = array('name' => 'Phone Number List'); }
 	if ($node->type == 'sirius_trust_benefit') { $links['sirius/trust/benefits'] = array('name' => 'Benefit List'); }
-	if ($node->type == 'grievance_contract_template') { $links['grievance/admin/contract-templates'] = array('name' => 'Contract List'); }
+
+	if ($node->type == 'grievance_contract_template') {
+		$links['grievance/admin/contract-templates'] = array('name' => 'Contract List');
+	}
+
+	if ($node->type == 'grievance_contract_section' || $node->type == 'grievance_contract_clause') {
+		$template_nid = $node->field_grievance_contract_tplt['und'][0]['target_id'];
+		if ($template_nid) {
+			$links["node/$template_nid/section/list"] = array('name' => 'Template', 'title' => sirius_backlink_title($template_nid));
+		}
+	}
+
+	if ($node->type == 'grievance_contract_clause') {
+		$section_nid = $node->field_grievance_contract_section['und'][0]['target_id'];
+		if ($section_nid) {
+			$links["node/$section_nid//clauses/list"] = array('name' => 'Article', 'title' => sirius_backlink_title($section_nid));
+		}
+	}
 
 	if ($node->type == 'sirius_feed') {
 		$feed_type = $node->field_sirius_type['und'][0]['value'];
@@ -254,6 +271,7 @@ function sirius_backlinks_from_node($node) {
 		$definition_type = $node->field_sirius_type['und'][0]['value'];
 		if ($definition_type == 'sirius_event:catalog')	{ $links['sirius/event/catalog/list'] = array('name' => 'All Catalogs'); }
 		else if ($definition_type == 'sirius_ledger:policy') { $links['sirius/config/ledger/policies'] = array('name' => 'All Policies'); }
+		else if ($definition_type == 'customfield') { $links['sirius/customfield/definition/list'] = array('name' => 'All Custom Field Sets'); }
 	}
 
 	if ($node->type == 'grievance_basic_page') {

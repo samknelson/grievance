@@ -28,6 +28,7 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 
 	$pstatus_lookup = sirius_taxonomy_load('sirius_event_participant_status', 'tid', 'name');
 	$prole_lookup = sirius_taxonomy_load('sirius_event_participant_role', 'tid', 'name');
+	$ms_lookup = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
 
 	$header = array();
 	$header[] = t('Signup Date');
@@ -40,8 +41,13 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 	$header[] = t('Comments');
 	$header[] = t('Tools');
 
+	$all_levels = sirius_training_levels_fetch_all();
+
+
 	$options = array();
 	foreach ($interestlist as $record) {
+		$worker_json = json_decode($record['worker_json'], TRUE);
+
 		$tools = '';
 		if ($record['worker_nid']) { $tools .= l('Worker', 'node/' . $record['worker_nid'], array('attributes' => array('class' => array('tool-button')))); }
 
@@ -52,9 +58,27 @@ function sirius_event_term_tab_interestlist_list_form($form, &$form_state, $even
 		$contact_info = sirius_phone_render($record['contact_phone']) . '<br />' . sirius_email_render($record['contact_email']);
 
 		$comments = $record['interestlist_json']['interestlist']['signup']['comments'];
-		if ($record['worker_ms_name']) {
+		$ms_tids = explode(',', $record['worker_ms_tid']);
+		if ($ms_tids) {
 			if ($comments) { $comments .= '<hr>'; }
-			$comments .= '(Member status: ' . $record['worker_ms_name'] . ')'; }
+			$ms_names = array();
+			foreach ($ms_tids as $ms_tid) {
+				$ms_name = $ms_lookup[$ms_tid];
+				if (!$ms_name) { continue; }
+				$level_code = $worker_json['training']['levels'][$ms_tid]['code'];
+				if ($level_code) {
+					$level_name = $all_levels[$ms_tid][$level_code]['title'];
+					$ms_name .= ' ';
+					$ms_name .= $level_name;
+				}
+				$ms_names[] = $ms_name;
+			}
+			if ($ms_names) {
+				$comments .= '(Member status: ' . join(', ', $ms_names) . ')';
+			}
+		}
+
+
 
 		$row = array();
 		$row[] = date('Y-m-d\<\b\r \/\>h:i a', $record['interestlist_signup_ts']);

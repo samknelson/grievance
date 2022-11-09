@@ -180,6 +180,7 @@ function sirius_service_func_info_all() {
     'sirius_contact_relationships',
     'sirius_employer_list',
     'sirius_worker_get_by_ssn',
+    'sirius_trust_worker_election',
     'sirius_trust_benefits',
     'sirius_trust_policy_benefits_offered',
     'sirius_trust_benefit_options',
@@ -188,6 +189,7 @@ function sirius_service_func_info_all() {
     'sirius_ledger_policy_list',
     'sirius_ledger_policy_lookup',
     'sirius_esignature_defs',
+    'sirius_dashboard_item_data',
     'sirius_teamsters631_switch_authenticate',
     'sirius_teamsters631_sirius_node_tab_worker_contact_form_submit_remote',
     'sirius_teamsters631_sirius_worker_skill_set_remote',
@@ -195,6 +197,8 @@ function sirius_service_func_info_all() {
     'sirius_teamsters631_node_insert_worker_remote',
     'sirius_teamsters631_sirius_worker_work_status_set_remote',
     'sirius_teamsters631_taxonomy_term_updateinsert_remote',
+    'sirius_teamsters631_sirius_training_level_graduate_remote',
+    'sirius_worker_nextid',
   );
 
   $functions_nocache = array(
@@ -207,6 +211,8 @@ function sirius_service_func_info_all() {
     'sirius_trust_worker_election_wizard_push_remote',
     'sirius_trust_worker_election_post_from_wizard',
     'sirius_teamsters631_taxonomy_term_updateinsert_remote',
+    'sirius_teamsters631_sirius_training_level_graduate_remote',
+    'sirius_worker_nextid',
   );
 
   $info = array();
@@ -219,6 +225,20 @@ function sirius_service_func_info_all() {
     }
   }
 
+  $info['sirius_service_ping']['description'] = 'Respond to a "ping" request; used to test that the server is responding correctly.';
+
+  // Default enable all functions. 
+  $settings = sirius_domain_variable_get('sirius_service_server_funcs', array());
+  foreach ($functions as $function_name) {
+    if ($settings[$function_name]['enabled'] == 'No') {
+      $info[$function_name]['enabled'] = 'No';
+    } else {
+      $info[$function_name]['enabled'] = 'Yes';
+    }
+  }
+
+  drupal_alter('sirius_service_func_info_all', $info);
+
   return $info;
 }
 
@@ -228,7 +248,15 @@ function sirius_service_func_info($func) {
   return $info_all[$func];
 }
 
+function sirius_service_is_remote($value = NULL) {
+  $is_remote = &drupal_static(__FUNCTION__);
+  if (isset($value)) { $is_remote = $value; }
+  return $is_remote;
+}
+
 function sirius_service_generic_action($args) {
+  sirius_service_is_remote(TRUE);
+
   // The first argument is a function name
   $key = array_shift($args);
   if (!$key) { return array('success' => FALSE, 'msg' => "The first argument to this service must be a service-enabled function key."); }
@@ -236,6 +264,7 @@ function sirius_service_generic_action($args) {
   // We don't let the server run all functions, just the ones which are enabled
   $info = sirius_service_func_info($key);
   if (!$info) { return array('success' => FALSE, 'msg' => "$key is not a valid service-enabled function."); }
+  if ($info['enabled'] != 'Yes')  { return array('success' => FALSE, 'msg' => "Access to $key has been disabled by the server administrator."); }
 
   // Prepare our result payload
   $result = array();

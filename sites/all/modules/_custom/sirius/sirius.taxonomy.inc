@@ -238,7 +238,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['grievance_remedies']['multidomain'] = 'No';
     $settings['grievance_resproc']['view'] = 'sirius_taxonomy';
     $settings['grievance_resproc']['display'] = 'block';
-    $settings['grievance_resproc']['multidomain'] = 'No';
+    $settings['grievance_resproc']['multidomain'] = 'Yes';
     $settings['grievance_settlement_tags']['view'] = 'sirius_taxonomy';
     $settings['grievance_settlement_tags']['display'] = 'block_3';
     $settings['grievance_settlement_tags']['multidomain'] = 'Yes';
@@ -282,7 +282,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_event_type']['display'] = 'block_13';
     $settings['sirius_event_type']['multidomain'] = 'Yes';
     $settings['sirius_gender']['view'] = 'sirius_taxonomy';
-    $settings['sirius_gender']['display'] = 'block';
+    $settings['sirius_gender']['display'] = 'block_16';
     $settings['sirius_gender']['multidomain'] = 'Yes';
     $settings['sirius_hour_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_hour_type']['display'] = 'block';

@@ -11,8 +11,6 @@ function report_cache_sirius_cron_scan_info() {
 		'schedule' => 'daily',
 		'callback' => 'report_cache_auto_all',
 		'multidomain' => TRUE,
-
-
 	);
 
 	return $items;
@@ -25,7 +23,6 @@ function report_cache_auto_all($mode = 'test') {
 	foreach ($report_info_all as $report_type => $report_info) {
 		$settings = report_cache_settings($report_type);
     if ($settings['auto']['enabled'] != 'Yes') { continue; }
-
 		sirius_minilog("$report_type: Report generation starting.");	
 		$result = report_cache_auto_run($report_type, $mode);
 		$result = report_cache_auto_purge($report_type, $mode);

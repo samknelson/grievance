@@ -19,8 +19,13 @@ function sirius_customfield_definition_list() {
   if ($nodes) {
 	  $rows = array();
 	  foreach ($nodes as $nid => $node) {
+	  	$json = sirius_json_get($node);
+	  	$content_types_options = sirius_customfield_content_type_options(sirius_customfield_content_types($json));
+	  	$content_types_render = join('<br />', array_values($content_types_options));
 	  	$tools = '';
 	  	$tools .= l('Form', "node/$nid/sirius_event_participant_definition_form", array('attributes' => array('class' => array('tool-button'))));
+	  	$tools .= l('Content Types', "node/$nid/sirius_customfield_content_types", array('attributes' => array('class' => array('tool-button'))));
+	  	$tools .= l('Tab', "node/$nid/sirius_customfield_tab", array('attributes' => array('class' => array('tool-button'))));
 
 	  	$json = sirius_jsonfield_util_node_json_get($node);
 	  	$machine_name = $json['machine_name'];
@@ -28,6 +33,7 @@ function sirius_customfield_definition_list() {
 	  	$row = array();
 	  	$row[] = $node->title;
 	  	$row[] = $machine_name;
+	  	$row[] = $content_types_render;
 	  	$row[] = $tools;
 	  	$rows[] = $row;
 	  }
@@ -35,6 +41,7 @@ function sirius_customfield_definition_list() {
 	  $header = array(
 	  	t('Title'),
 	  	t('Machine Name'),
+	  	t('Content Types'),
 	  	t('Tools'),
 	  );
 

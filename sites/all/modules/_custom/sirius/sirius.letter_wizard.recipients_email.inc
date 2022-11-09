@@ -54,6 +54,7 @@ function sirius_letter_wizard_recipients_email_form($form, &$form_state, $info, 
 			'#suffix' => '</td>',
 			'#type' => 'textfield',
 			'#default_value' => $item['name'],
+			'#size' => 20,
 		);
 
 		$form['items'][$delta]["email"] = array(
@@ -61,6 +62,7 @@ function sirius_letter_wizard_recipients_email_form($form, &$form_state, $info, 
 			'#suffix' => '</td>',
 			'#type' => 'textfield',
 			'#default_value' => $item['email'],
+			'#size' => 20,
 		);
 
 		$form['items'][$delta]["disposition"] = array(

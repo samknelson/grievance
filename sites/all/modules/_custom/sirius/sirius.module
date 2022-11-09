@@ -176,8 +176,6 @@ function sirius_node_presave($node) {
   /*
   if (in_array($node->type, array('sirius_worker'))) {
     if (!$node->sirius_norevision) {
-      dpm($node);
-      dpm(diff_entity_diff($node, $node->original, array('entity_type' => 'node')));
     }
   }
   */
@@ -533,6 +531,14 @@ function sirius_menu_local_tasks_alter(&$data, $router_item, $root_path) {
 }
 */
 
+/**
+ * Implements hook_menu_local_tasks_alter()
+ */
+
+function sirius_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  sirius_customfield_menu_local_tasks_alter($data, $router_item, $root_path);
+}
+
 function sirius_emptytheme() {
   return NULL;
 }
@@ -654,6 +660,10 @@ function sirius_node_view($node, $view_mode, $langcode) {
       $node->content = array('body' => array('#markup' => 'Your user does not have the correct permissions to access this page.'));
     }
   }
+
+
+  sirius_customfield_node_view($node, $view_mode, $langcode);
+
   return sirius_field_overrides_node_view($node, $view_mode, $langcode);
 }
 
@@ -914,27 +924,6 @@ function sirius_views_pre_view(&$view, &$display_id, &$args) {
   }
 }
 
-function sirius_views_pre_build_disabled(&$view) {
-  // Validate the domain argument if we're expecting CURRENT_DOMAIN
-  dpm($view->argument);
-  if ($view->argument) {
-    $delta = -1;
-    foreach ($view->argument as $argument_key => $argument) {
-      ++$delta;
-      if ($argument_key != 'field_sirius_domain_target_id') { continue; }
-      if ($argument->options['default_argument_options']['argument'] != 'CURRENT_DOMAIN') { continue; }
-
-      $arg = $view->arg[$delta];
-
-      $view->argument[$argument_key]->specify_validation = 1;
-      $view->argument[$argument_key]->validate = array('type' => 'php', 'fail' => 'access denied');
-      $domain_nid = sirius_domain_nid();
-      $view->argument[$argument_key]->validate_options = array('code' => "drupal_set_message('Generated validator here!'); return \$argument == $domain_nid;");
-    }
-  }
-  dpm($view->argument);
-}
-
 /**
  *  Needed this to dynamically generate links. 
  *  @todo It either needs to be refactored, removed, or pushed into its own file. Very rudimentary at the moment.
@@ -1074,7 +1063,7 @@ function sirius_content_type_name($machine_name) {
     while ($hr = $stmt->fetchAssoc()) {
       $name = $hr['name'];
       $name = preg_replace('/sirius/i', '', $name);
-      $name = preg_replace('/grievance/i', '', $name);
+      if ($name != 'Grievance') { $name = preg_replace('/grievance/i', '', $name); }
       $name = preg_replace('/ledger/i', '', $name);
       $name = trim($name);
 
@@ -1197,4 +1186,9 @@ function _sirius_form_prep_recursive(&$form, $defaults = array(), $settings = ar
       _sirius_form_prep_recursive($form[$key], $defaults[$key], $settings);
     }
   }
+}
+
+function sirius_page_error($msg) {
+  drupal_set_message($msg, 'error');
+  return '';
 }

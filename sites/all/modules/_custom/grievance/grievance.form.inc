@@ -242,8 +242,8 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
     if (!$contract_tplt_nid || $form_state['triggering_element']['#field_name'] == 'field_grievance_shop' || $form['field_grievance_contract_tplt']['#disabled']) {
       $contract_tplt_nid = $shop_node->field_grievance_contract_tplt['und'][0]['target_id'];
 
+      $form['field_grievance_contract_tplt']['und']['#default_value'][0] = $contract_tplt_nid;
       if ($form['field_grievance_contract_tplt']['#disabled']) {
-        $form['field_grievance_contract_tplt']['und']['#default_value'][0] = $contract_tplt_nid;
         $form['field_grievance_contract_tplt']['und']['#value'] = $form['field_grievance_contract_tplt']['und']['#default_value'];
       } else {
         $form_state['input']['field_grievance_contract_tplt']['und'] = $contract_tplt_nid;

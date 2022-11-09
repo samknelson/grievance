@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * OBSOLETE
+ * 
+ * I believe this page has been rewritten as e.g. page_jwa_jobs, page_jwa_workers, etc.
+ * 
+ * It should be safe to delete.
+ */
+
 function sirius_dispatch_page_jwa_prefs() {
 	return drupal_get_form('sirius_dispatch_page_jwa_prefs_form');
 }

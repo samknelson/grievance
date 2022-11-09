@@ -38,6 +38,43 @@ function sirius_dispatch_permission() {
       'title' => t('Sirius Dispatch Signin'), 
       'description' => t('Permission to sign yourself in to the out-of-work list'),
     ),
+
+
+
+    'sirius dispatch pref notifications' => array(
+      'title' => t('Sirius Dispatch Pref Notifications'), 
+      'description' => t('Permission to set dispatch notification preferences (on any worker you have access to)'),
+    ),
+    'sirius dispatch pref asi' => array(
+      'title' => t('Sirius Dispatch Pref ASI'), 
+      'description' => t('Permission to set dispatch auto-sign-in preferences (on any worker you have access to)'),
+    ),
+    'sirius dispatch pref skill' => array(
+      'title' => t('Sirius Dispatch Pref Skill'), 
+      'description' => t('Permission to set dispatch skills preferences (on any worker you have access to)'),
+    ),
+    'sirius dispatch pref dept' => array(
+      'title' => t('Sirius Dispatch Pref Dept'), 
+      'description' => t('Permission to set dispatch department preferences (on any worker you have access to)'),
+    ),
+    'sirius dispatch pref dnc2' => array(
+      'title' => t('Sirius Dispatch Pref DNC2'), 
+      'description' => t('Permission to set dispatch will-not-work preferences (on any worker you have access to)'),
+    ),
+    'sirius dispatch pref hfe' => array(
+      'title' => t('Sirius Dispatch Pref HFE'), 
+      'description' => t('Permission to set dispatch hold-for-employer preferences (on any worker you have access to)'),
+    ),
+    'sirius dispatch pref cbn' => array(
+      'title' => t('Sirius Dispatch Pref CBN'), 
+      'description' => t('Permission to set dispatch call-by-name-only preferences (on any worker you have access to)'),
+    ),
+    'sirius dispatch pref eba' => array(
+      'title' => t('Sirius Dispatch Pref EBA'), 
+      'description' => t('Permission to set dispatch employed-but-available preferences (on any worker you have access to)'),
+    ),
+
+    /*
     'sirius dispatch own preferences' => array(
       'title' => t('Sirius Dispatch Own Preferences'), 
       'description' => t('Permission to set your own dispatch preferences, except for the ones listed below'),
@@ -50,6 +87,7 @@ function sirius_dispatch_permission() {
       'title' => t('Sirius Dispatch Own Preferences department'), 
       'description' => t('Permission to set your own dispatch skill preferences'),
     ),
+    */
   );
 }
 

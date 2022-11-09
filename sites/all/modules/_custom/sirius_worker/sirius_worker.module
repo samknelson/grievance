@@ -283,9 +283,9 @@ function sirius_worker_nextid() {
     if ($id == 999099) { $id++; }
     if ($id == 666666) { $id++; }
     if ($id == 999001) { $id++; }
-    return $id;
-    
   }
+  drupal_alter('sirius_worker_nextid', $id);
+  return $id;
 }
 
 /***
@@ -345,7 +345,7 @@ function sirius_worker_report_cache_info() {
 function sirius_worker_node_view($node, $view_mode, $langcode) {
   if ($node->type != 'sirius_worker') { return; }
   sirius_worker_ein_node_view($node, $view_mode, $langcode);
-  sirius_worker_customfields_node_view($node, $view_mode, $langcode);
+  // sirius_worker_customfields_node_view($node, $view_mode, $langcode);
 }
 
 function sirius_worker_customfields_node_view($worker_node, $view_mode, $langcode) {
