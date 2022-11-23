@@ -1132,3 +1132,71 @@ function sirius_feed_lookup_by_field($content_type, $table, $field_name, $value)
   return array('success' => TRUE, 'nid' => $nid);
 }
 
+function sirius_feed_handle_list($field_name, $value) {
+  $structure_info = field_info_field("field_$field_name");
+  $allowed_values = list_allowed_values($structure_info);
+  $allowed_values_flip = array_flip($allowed_values);
+
+  // Match case insensitive
+  foreach ($allowed_values as $a => $b) {
+    if (trim(strtolower($a)) == trim(strtolower($value))) { return $a; }
+    if (trim(strtolower($b)) == trim(strtolower($value))) { return $a; }
+
+    if (trim(strtolower($value)) == 'yes') {
+      if (trim(strtolower($a)) == 'y') { return $a; }
+    }
+
+    if (trim(strtolower($value)) == 'no') {
+      if (trim(strtolower($a)) == 'n') { return $a; }
+    }
+  }
+
+  return NULL;
+}
+
+//
+// @todo: Under development. Make sure these are domain-specific. Get sirius_employer working with them properly.
+// 
+
+function sirius_feed_handle_date($field_name, $value) {
+  $ts = strtotime($value);
+  if (!$ts) { return NULL; }
+  return gmdate('Y-m-d', $ts);
+}
+
+function sirius_feed_handle_entity_reference($entity_type, $value) {
+  $sql = "select min(nid) as mn, max(nid) as mx from node ";
+  $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_name_short on field_data_field_sirius_name_short.entity_type = 'node' and field_data_field_sirius_name_short.entity_id = node.nid ";
+  $sql .= "where nid = :v1 ";
+  $sql .= "or title = :v2 ";
+  $sql .= "or field_sirius_id_value = :v3 ";
+  $sql .= "or field_sirius_name_short_value = :v4 ";
+  $stmt = sirius_sql_query($sql, array(':v1' => $value, ':v2' => $value, ':v3' => $value, ':v4' => $value));
+  $hr = $stmt->fetchAssoc();
+  if (!$hr['mn']) { return NULL; }
+  if ($hr['mn'] != $hr['mx']) { return NULL; }
+  return $hr['mn'];
+}
+
+function sirius_feed_handle_pk_nid($content_type, $nid) {
+  if (!$nid) { 
+  	return array('success' => FALSE, 'msg' => 'If the primary key is NID, all rows must have a node ID.');
+  }
+
+  $sql = "select title, type from node where nid = :nid";
+  $stmt = sirius_sql_query($sql, array(':nid' => $nid));
+  $hr = $stmt->fetchAssoc();
+  if (!$hr['type']) {
+		return array('success' => FALSE, 'msg' => 'No node was found with this NID.');
+	}
+	if ($hr['type'] != $content_type) {
+  	return array('success' => FALSE, 'msg' => 'The node for this NID was found, but it is not an employer.');
+  }
+
+  return array(
+  	'sucess' => TRUE,
+  	'msg' => 'Found node: ' . $hr['title'],
+  	'pk' => $nid
+  );
+}
