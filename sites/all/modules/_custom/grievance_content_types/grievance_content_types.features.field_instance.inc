@@ -451,7 +451,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 39,
+      'weight' => 36,
     ),
   );
 
@@ -639,7 +639,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 41,
+      'weight' => 40,
     ),
   );
 
@@ -1113,7 +1113,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 36,
+      'weight' => 37,
     ),
   );
 
@@ -1621,7 +1621,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 36,
+      'weight' => 35,
     ),
   );
 
@@ -3469,7 +3469,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 43,
+      'weight' => 42,
     ),
   );
 
@@ -3824,7 +3824,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 42,
+      'weight' => 41,
     ),
   );
 
@@ -4082,7 +4082,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 40,
+      'weight' => 39,
     ),
   );
 
@@ -4409,7 +4409,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 40,
+      'weight' => 39,
     ),
   );
 
@@ -4497,7 +4497,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 41,
+      'weight' => 40,
     ),
   );
 
@@ -6879,7 +6879,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 39,
+      'weight' => 36,
     ),
   );
 
@@ -19583,6 +19583,47 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'node-sirius_dispatch_job_group-field_sirius_json'.
+  $field_instances['node-sirius_dispatch_job_group-field_sirius_json'] = array(
+    'bundle' => 'sirius_dispatch_job_group',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'sirius_jsonfield',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'sirius_jsonfield_formatter_full',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Definition',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 11,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_domain-field_sirius_active'.
   $field_instances['node-sirius_domain-field_sirius_active'] = array(
     'bundle' => 'sirius_domain',
@@ -24758,7 +24799,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -24782,7 +24823,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 8,
+      'weight' => 7,
     ),
   );
 
@@ -24855,7 +24896,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -24928,7 +24969,7 @@ If the file has multiple pages, then each page in the input document will use th
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 7,
+      'weight' => 6,
     ),
   );
 
@@ -24953,7 +24994,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 5,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -25026,7 +25067,7 @@ If the file has multiple pages, then each page in the input document will use th
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 6,
+      'weight' => 5,
     ),
   );
 
@@ -25109,6 +25150,50 @@ If the file has multiple pages, then each page in the input document will use th
   );
 
   // Exported field_instance:
+  // 'node-sirius_trust_worker_benefit-field_sirius_notes'.
+  $field_instances['node-sirius_trust_worker_benefit-field_sirius_notes'] = array(
+    'bundle' => 'sirius_trust_worker_benefit',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_notes',
+    'label' => 'Notes',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-sirius_trust_worker_benefit-field_sirius_trust_benefit'.
   $field_instances['node-sirius_trust_worker_benefit-field_sirius_trust_benefit'] = array(
     'bundle' => 'sirius_trust_worker_benefit',
@@ -25125,7 +25210,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 4,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -25149,7 +25234,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 4,
     ),
   );
 
@@ -30861,7 +30946,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 3,
+        'weight' => 6,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30879,7 +30964,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -30995,6 +31080,46 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'taxonomy_term-sirius_gender-field_sirius_nota'.
+  $field_instances['taxonomy_term-sirius_gender-field_sirius_nota'] = array(
+    'bundle' => 'sirius_gender',
+    'default_value' => array(
+      0 => array(
+        'value' => 'No',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Indicates that this entry represents "none of the above", and a separate field should allow the user to identify their own value.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 3,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_nota',
+    'label' => 'None of the above?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 4,
+    ),
+  );
+
   // Exported field_instance:
   // 'taxonomy_term-sirius_gender-field_sirius_term_source'.
   $field_instances['taxonomy_term-sirius_gender-field_sirius_term_source'] = array(
@@ -31029,7 +31154,7 @@ If the file has multiple pages, then each page in the input document will use th
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -33197,6 +33322,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('In addition to the usual access restrictions, materials of this type should be restricted to the roles checked below. If no roles are selected, all roles with appropriate permissions will have access. <strong>Important note:</strong> For grievance attachments, this field is ignored.');
   t('Incident Date');
   t('Include EBA Workers');
+  t('Indicates that this entry represents "none of the above", and a separate field should allow the user to identify their own value.');
   t('Indicates which job types this employer can create.');
   t('Industry');
   t('Information Request');
@@ -33236,6 +33362,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Next Status');
   t('Next Step');
   t('Next Step in the Grievance Procedure');
+  t('None of the above?');
   t('Notes');
   t('Notification Body');
   t('Notification Email');
