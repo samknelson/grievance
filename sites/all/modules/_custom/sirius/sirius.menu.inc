@@ -10,7 +10,7 @@
 function sirius_node_tabs() {
   $node_tabs = array();
 
-  $content_types = array('sirius_event', 'sirius_worker', 'grievance_shop', 'sirius_ledger_account', 'sirius_contact_relationship');
+  $content_types = array('sirius_event', 'sirius_worker', 'grievance_shop', 'sirius_ledger_account', 'sirius_contact_relationship', 'sirius_dispatch_job_group');
   foreach ($content_types as $content_type) {
     $node_tabs[$content_type][$content_type . '_materials'] = array(
       'title' => 'Materials',
