@@ -88,7 +88,7 @@ function grievance_workersync_search_form(&$form, &$form_state) {
 	$str = $form_state['values']['grievance_workersync_search'];
   if ($str) {
   	$callback = $plugin['search_callback'];
-    $candidates = $callback($str);
+    $candidates = $callback($str, FALSE, $form, $form_state);
     $result_body = '';
 
     if (!$candidates) {

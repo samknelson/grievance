@@ -526,6 +526,9 @@ function sirius_menu() {
         'access arguments' => array(2, $tab_name),
         'type' => $type,
       );
+      if (!$tab_record['description']) {
+        $items['taxonomy/term/%taxonomy_term/' . $tab_name]['description'] = '';
+      }
       if ($tab_record['weight']) {
         $items['taxonomy/term/%taxonomy_term/' . $tab_name]['weight'] = $tab_record['weight'];
       }
