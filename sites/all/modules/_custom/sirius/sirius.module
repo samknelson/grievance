@@ -822,9 +822,9 @@ function sirius_file_download_access($file_item, $entity_type, $entity) {
   // Allow loopback requests (from the originating server)
   if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
 
-  // Employers can see headshots. @todo this should probably live in the sirius_employer module.
+  // Employers can see headshots. @todo this should probably live in the sirius_worker module.
   if ($entity_type == 'node' && $entity->type == 'sirius_worker' && preg_match('/private:\/\/sirius_headshot/', $file_item['uri'])) {
-    if (user_access('sirius dispatch employer')) { return TRUE; }
+    if (user_access('sirius worker view headshot')) { return TRUE; }
   }
 
   // Materials get treated specially

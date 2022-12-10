@@ -93,6 +93,12 @@ function sirius_customfield_content_types_all() {
   		'permission' => 'sirius event admin',
   	);
 
+  	$types['sirius_dispatch_job_group'] = array(
+  		'key' => 'sirius_dispatch_job_group',
+  		'title' => 'Dispatch Job Group',
+  		'permission' => 'sirius dispatch admin',
+  	);
+
   	$types['sirius_ledger_account'] = array(
   		'key' => 'sirius_ledger_account',
   		'title' => 'Ledger Account',
