@@ -349,6 +349,19 @@ function sirius_update_7020() {
   sirius_updateutil_grant($if_you_haves, $then_you_gets);
 }
 
+/**
+ * Delete some temporary tables that might still exists
+ */
+
+function sirius_update_7021() {
+  $tables = array('foo', 'bar', 'bak', 'bak2', 'tmp');
+  foreach ($tables as $table) {
+    print "Dropping: $table...\n";
+    $sql = "drop table if exists $table";
+    $stmt = sirius_sql_query($sql, array());
+  }
+}
+
 function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
   foreach ($if_you_haves as $if_you_have) {
     foreach ($then_you_gets as $then_you_get) {
