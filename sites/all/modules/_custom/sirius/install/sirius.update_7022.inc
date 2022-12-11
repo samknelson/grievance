@@ -5,6 +5,25 @@ function sirius_update_7022_impl() {
 	sirius_minilog("==== Migrating grievances gender field. ====");
 
 	////////////////////////////////////////////////////
+	// Add our new fields to "hide fields" if necessary
+	////////////////////////////////////////////////////
+
+	foreach (array('grievance_hidefields', 'grievance_classaction_hidefields') as $variable_name) {
+		sirius_minilog("Updating variable $val");
+		$val = variable_get($variable_name, '');
+		if (!$val) {
+			sirius_minilog("... variable not set.");
+			continue; 
+		}
+
+		if (preg_match('/grievance_gender/', $val) && !preg_match('/sirius_gender/', $val)) {
+			sirius_minilog("... Since the variable included gender, adding the new gender fields.");
+			$val .= "\nfield_sirius_gender\nfield_sirius_gender_nota";
+			variable_set($variable_name, $val);
+		}
+	}
+
+	////////////////////////////////////////////////////
 	// If there are no values in the legacy field, we don't have to do anything
 	////////////////////////////////////////////////////
 
@@ -106,11 +125,13 @@ function sirius_update_7022_impl() {
 
   sirius_minilog("Using TID map: " . print_r($tid_map, 1));
 
+  foreach ($tid_map as $key => $tid) { $term_map[$key] = taxonomy_term_load($tid); }
+
 	////////////////////////////////////////////////////
 	// Update our legacy data
 	////////////////////////////////////////////////////
 
-	$sql = "select field_data_field_grievance_gender.* from node ";
+	$sql = "select nid, field_data_field_grievance_gender.* from node ";
 	$sql .= "left join field_data_field_sirius_gender on field_data_field_sirius_gender.entity_type = 'node' and field_data_field_sirius_gender.entity_id = node.nid ";
 	$sql .= "left join field_data_field_grievance_gender on field_data_field_grievance_gender.entity_type = 'node' and field_data_field_grievance_gender.entity_id = node.nid ";
 	$sql .= "where field_grievance_gender_value is not null ";
@@ -122,6 +143,61 @@ function sirius_update_7022_impl() {
 	while ($hr = $stmt->fetchAssoc()) {
 		$records_to_fix[] = $hr;
 	}
+	if (!$records_to_fix) {
+		sirius_minilog("There are no legacy gender entries that haven't been updated. Nothing left to do.");
+		return;
+	}
+	$total = count($records_to_fix);
+	sirius_minilog("Found $total legacy gender entries.");
 
-	print_r($records_to_fix);
+	$count = 0;
+	foreach ($records_to_fix as $record) {
+		$count++;
+		$nid = $record['nid'];
+		sirius_minilog("Fixing record $count / $total (node #$nid)");
+
+		$tables = array('field_data_field_sirius_gender', 'field_revision_field_sirius_gender');
+		foreach ($tables as $table) {
+			if (!$tid_map[$record['field_grievance_gender_value']]) { continue; }
+			$sql = "insert ignore into $table ";
+			$sql .= "(entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_sirius_gender_tid) ";
+			$sql .= " values ";
+			$sql .= "(:entity_type, :bundle, :deleted, :entity_id, :revision_id, :language, :delta, :field_sirius_gender_tid) ";
+			$sql_args = array(
+				':entity_type' => $record['entity_type'],
+				':bundle' => $record['bundle'],
+				':deleted' => $record['deleted'],
+				':entity_id' => $record['entity_id'],
+				':revision_id' => $record['revision_id'],
+				':language' => $record['language'],
+				':delta' => $record['delta'],
+				':field_sirius_gender_tid' => $tid_map[$record['field_grievance_gender_value']],
+			);
+
+			$stmt = db_query($sql, $sql_args);
+			sirius_minilog("... Inserted into $table");
+		}
+
+		$tables = array('field_data_field_sirius_gender_nota_calc', 'field_revision_field_sirius_gender_nota_calc');
+		foreach ($tables as $table) {
+			if (!$term_map[$record['field_grievance_gender_value']]) { continue; }
+			$sql = "insert ignore into $table ";
+			$sql .= "(entity_type, bundle, deleted, entity_id, revision_id, language, delta, field_sirius_gender_nota_calc_value) ";
+			$sql .= " values ";
+			$sql .= "(:entity_type, :bundle, :deleted, :entity_id, :revision_id, :language, :delta, :field_sirius_gender_nota_calc_value) ";
+			$sql_args = array(
+				':entity_type' => $record['entity_type'],
+				':bundle' => $record['bundle'],
+				':deleted' => $record['deleted'],
+				':entity_id' => $record['entity_id'],
+				':revision_id' => $record['revision_id'],
+				':language' => $record['language'],
+				':delta' => $record['delta'],
+				':field_sirius_gender_nota_calc_value' => $term_map[$record['field_grievance_gender_value']]->name,
+			);
+
+			$stmt = db_query($sql, $sql_args);
+			sirius_minilog("... Inserted into $table");
+		}
+	}
 }
