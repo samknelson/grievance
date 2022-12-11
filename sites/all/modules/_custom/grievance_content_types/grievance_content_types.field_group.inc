@@ -1035,6 +1035,7 @@ function grievance_content_types_field_group_info() {
       17 => 'field_grievance_shift',
       18 => 'field_grievance_work_status',
       19 => 'field_grievance_gender',
+      20 => 'field_sirius_gender_nota_calc',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -1082,6 +1083,9 @@ function grievance_content_types_field_group_info() {
       18 => 'field_grievance_shift',
       19 => 'field_grievance_work_status',
       20 => 'field_grievance_gender',
+      21 => 'field_sirius_gender',
+      22 => 'field_sirius_gender_nota_val',
+      23 => 'field_sirius_gender_nota_calc',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
