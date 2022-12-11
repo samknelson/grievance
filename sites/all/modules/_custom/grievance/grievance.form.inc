@@ -76,7 +76,7 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   //
 
   if (!$_REQUEST['legacy_gender']) {
-    $form['field_sirius_gender']['#access'] = FALSE;
+    $form['field_grievance_gender']['#access'] = FALSE;
   }
 
   //
