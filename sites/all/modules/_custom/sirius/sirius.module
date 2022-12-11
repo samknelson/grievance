@@ -63,6 +63,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.bookmark.in
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.public.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.nota.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 
@@ -130,7 +131,6 @@ function sirius_entity_presave($entity, $type) {
     if ($entity->type == 'sirius_worker') { sirius_contact_sync_from_worker($entity); }
   }
   if ($type == 'user') { sirius_contact_sync_from_user($entity); }
-
 }
 
 /**
@@ -179,6 +179,7 @@ function sirius_node_presave($node) {
     }
   }
   */
+  sirius_nota_node_presave($node);
 }
 
 
@@ -403,6 +404,9 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     sirius_log_views_exposed_form_alter($form, $form_state); 
   }
   */
+
+  // Handle none-of-the-above
+  sirius_nota_form_alter($form, $form_state, $form_id);
 }
 
 /**

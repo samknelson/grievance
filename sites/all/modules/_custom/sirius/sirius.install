@@ -362,6 +362,15 @@ function sirius_update_7021() {
   }
 }
 
+/**
+ * Migrate the grievance_gender field
+ */
+
+function sirius_updatex_7022() {
+  sirius_require('sirius', 'install/sirius.update_7022.inc');
+  sirius_update_7022_impl();
+}
+
 function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
   foreach ($if_you_haves as $if_you_have) {
     foreach ($then_you_gets as $then_you_get) {
