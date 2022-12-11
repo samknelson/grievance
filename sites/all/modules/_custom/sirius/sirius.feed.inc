@@ -591,8 +591,10 @@ function sirius_feed_wizard_fields($info, $data = NULL, $feed_node = NULL, $curr
 	if ($info['feed']['fields']) { return $info['feed']['fields']; }
 	$callback = $info['feed']['callback_fields'];
 	if ($callback) {
-		return $callback($info, $data, $feed_node, $current_step);
+		$fields = $callback($info, $data, $feed_node, $current_step);
 	}
+	if (!$fields) { $fields = array(); }
+	return $fields;
 }
 
 function sirius_feed_wizard_map($info, $data, $feed_node, $current_step) { return drupal_get_form('sirius_feed_wizard_map_form', $info, $data, $feed_node, $current_step); }
