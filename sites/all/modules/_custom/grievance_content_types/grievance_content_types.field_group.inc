@@ -1034,8 +1034,7 @@ function grievance_content_types_field_group_info() {
       16 => 'field_grievance_department_tid',
       17 => 'field_grievance_shift',
       18 => 'field_grievance_work_status',
-      19 => 'field_grievance_gender',
-      20 => 'field_sirius_gender_nota_calc',
+      19 => 'field_sirius_gender_nota_calc',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

@@ -3563,11 +3563,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'list',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'list_default',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 44,
       ),
       'grievance_arbitrationform' => array(
