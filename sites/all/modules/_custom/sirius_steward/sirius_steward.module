@@ -1,0 +1,14 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '/sirius_steward.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '/sirius_steward.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '/sirius_steward.facility_checkin.inc';
+
+/**
+ * Implements hook_sirius_config_links_alter
+ */
+
+function sirius_steward_sirius_config_links_alter(&$links) {
+  $links['steward'] = array('title' => 'Steward');
+  $links['steward']['links']['sirius/steward/config'] = array('title' => 'Config', 'description' => 'Configure client and server service access.');
+}
