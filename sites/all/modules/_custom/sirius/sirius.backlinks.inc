@@ -124,7 +124,8 @@ function sirius_backlinks_from_node($node) {
 		else if ($node->type == 'sirius_event_participant') 			{ $path = "node/$worker_nid/sirius_worker_events"; }
 		else if ($node->type == 'sirius_contact_relationship') 		{ $path = "node/$worker_nid/sirius_worker_relationships"; $name = 'FROM Worker'; }
 		else if ($node->type == 'sirius_trust_worker_benefit') 		{ $path = "node/$worker_nid/sirius_trust_worker_benefits"; $name = 'Dependent'; }
-		else if ($node->type == 'sirius_trust_worker_election') 	{ $path = "node/$worker_nid/sirius_trust_worker_elections"; }
+		else if ($node->type == 'sirius_trust_worker_election') 	{ $path = "node/$worker_nid/sirius_trust_worker_election"; }
+		else if ($node->type == 'sirius_trust_worker_beneficiary'){ $path = "node/$worker_nid/sirius_trust_worker_beneficiary"; }
 		else if ($node->type == 'sirius_worker')									{ $path = ""; }
 		else 																											{ $path = "node/$worker_nid"; }
 
@@ -157,6 +158,7 @@ function sirius_backlinks_from_node($node) {
 	}
 
 	if ($node->type == 'sirius_operator') { $links['sirius/office/operator/list'] = array('name' => 'Operator List'); }
+	if ($node->type == 'sirius_help') { $links['sirius/admin/help'] = array('name' => 'All Help Text'); }
 	if ($node->type == 'sirius_phonenumber') { $links['sirius/phonenumber'] = array('name' => 'Phone Number List'); }
 	if ($node->type == 'sirius_trust_benefit') { $links['sirius/trust/benefits'] = array('name' => 'Benefit List'); }
 
@@ -242,6 +244,7 @@ function sirius_backlinks_from_node($node) {
 				else if ($handler_type == 'sirius_event') 																							{ $path = "node/$handler_nid/sirius_event_info"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'worker:certification') 	{ $path = "node/$handler_nid/sirius_worker_tc/certifications"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'tor') 										{ $path = "node/$handler_nid/sirius_worker_schedule/tor"; }
+				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:checkin')				{ $path = "node/$handler_nid/sirius_steward_worker_facility_checkin"; }
 				else if ($handler_type == 'sirius_log') {
 					if ($handler_category == 'twilio:recording') { 
 						$path = "node/$handler_nid/sirius_twilio_recording";
