@@ -339,3 +339,37 @@ function sirius_map_icon_url($icon) {
 	return "/sites/all/modules/_custom/sirius/images/map/$icon";
 }
 
+/**
+ * An unrelated set of functionality to allow your position to be recorded in a form
+ */
+
+function sirius_map_geolocation_render_form() {
+	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/map_form.js');
+	$form['latlon'] = array(
+		'#type' => 'container',
+		'#tree' => TRUE,
+	);
+
+	$form['latlon']['lat'] = array(
+		'#type' => 'hidden',
+		'#id' => 'sirius_map_current_location_lat',
+		'#attributes' => array('id' => 'sirius_map_current_location_lat'),
+	);
+	$form['latlon']['lon'] = array(
+		'#type' => 'hidden',
+		'#id' => 'sirius_map_current_location_lon',
+		'#attributes' => array('id' => 'sirius_map_current_location_lon'),
+	);
+	$form['latlon']['ts'] = array(
+		'#type' => 'hidden',
+		'#id' => 'sirius_map_current_location_ts',
+		'#attributes' => array('id' => 'sirius_map_current_location_ts'),
+	);
+	$form['latlon']['err'] = array(
+		'#type' => 'hidden',
+		'#id' => 'sirius_map_current_location_err',
+		'#attributes' => array('id' => 'sirius_map_current_location_err'),
+	);
+
+	return $form;
+}
