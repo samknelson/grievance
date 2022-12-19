@@ -21,6 +21,7 @@ function sirius_disclaimer_admin($form, &$form_state) {
 }
 
 function sirius_disclaimer_page_list() {
+	drupal_set_title('Disclaimers');
 	$domain_nid = sirius_domain_nid();
 	$type = 'sirius:disclaimer';
 	$html = views_embed_view('sirius_json_definitions', 'block_3', $domain_nid, $type);
