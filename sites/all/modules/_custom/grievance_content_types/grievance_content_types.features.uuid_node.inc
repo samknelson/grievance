@@ -39,7 +39,7 @@ function grievance_content_types_uuid_features_default_content() {
   'field_sirius_paths' => array(
     'und' => array(
       0 => array(
-        'value' => 'node/%/sirius_steward_worker_facility_checkin',
+        'value' => 'node/%/sirius_steward_worker_checkin',
         'format' => NULL,
       ),
     ),
