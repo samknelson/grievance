@@ -1,0 +1,4 @@
+name = Grievance UH
+description = Implements custom logic for UNITE HERE
+package = grievance
+core = 7.x
