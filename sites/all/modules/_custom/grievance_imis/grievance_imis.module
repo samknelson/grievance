@@ -1,5 +1,15 @@
 <?php
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_imis') . '/grievance_imis.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_imis') . '/grievance_imis.page_user_settings.inc';
+
+function grievance_imis_access_check($broughtby_tid) {
+  global $user;
+  $user_full = user_load($user->uid);
+  $json = sirius_json_get($user_full);
+  return $json['grievance_imis']['broughtby'][$broughtby_tid];
+}
+
 /**
  * Implements hook_grievance_workersync_plugin_info
  */
@@ -48,8 +58,8 @@ function grievance_imis_callback_settings(&$form, &$form_state) {
       '#description' => t('This will be something like: https://unite-test3.burstingsilver.com/BSi.iMIS.WebServices/api/member/grievance'),
     );
 
-     $variable_name = sirius_domain_variable_name('grievance_workersync_imis_apikey' . $suffix);
-     $form['plugin_settings'][$tid][$variable_name] = array(
+    $variable_name = sirius_domain_variable_name('grievance_workersync_imis_apikey' . $suffix);
+    $form['plugin_settings'][$tid][$variable_name] = array(
       '#type' => 'textarea',
       '#title' => t('SePuede API Key'),
       '#description'   => t('SePuede API Key.'),
@@ -67,6 +77,10 @@ function grievance_imis_callback_search($str, $verbose = FALSE, $form = NULL, $f
       $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey' . $suffix);
       if ($imis_url && $imis_apikey) {
         sirius_minilog("Found broughtby_tid $tid, using URL $imis_url");
+        if (!grievance_imis_access_check($tid)) {
+          sirius_minilog("Access denied.");
+          return array(array('id' => 0, 'title' => 'You do not have access to this SePuede database.'));
+        }
       } else {
         sirius_minilog("Found broughtby_tid $tid, but the URL or apikey is missing. Using the default connection settings.");
       }
@@ -161,6 +175,12 @@ function grievance_imis_callback_search($str, $verbose = FALSE, $form = NULL, $f
 function grievance_imis_callback_lookup($imis_key, $verbose = FALSE) {
   list($imis_id, $tid) = explode('-', $imis_key);
   if ($tid) { $suffix = "_broughtby_$tid";  } else { $suffix = ''; }
+
+  if ($tid) {
+    if (!grievance_imis_access_check($tid)) {
+      return array(array('id' => 0, 'first_name' => 'You do not have access to this SePuede database.'));
+    }
+  }
   $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url' . $suffix);
   $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey' . $suffix);
 
