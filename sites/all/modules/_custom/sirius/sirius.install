@@ -363,6 +363,26 @@ function sirius_update_7021() {
 }
 
 /**
+ * Uninstall some unnecessary modules
+ */
+
+function sirius_update_7022() {
+  $modules = array(
+    'grievance_oneoffs',
+    'grievance_pages',
+    'grievance_menus'
+  );
+
+  foreach ($modules as $module) {
+    if (module_exists($module)) {
+      print "Removing: $module\n";
+      module_disable(array($module));
+      drupal_uninstall_modules(array($module));
+    }
+  }
+}
+
+/**
  * Migrate the grievance_gender field
  */
 
