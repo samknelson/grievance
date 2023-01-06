@@ -55,7 +55,7 @@ function sirius_customfield_menu_local_tasks_alter(&$data, $router_item, &$root_
 		}
 
 		$weight = $cf_json['customfield']['tab']['weight'];
-		if (!isset($weight)) { $weight = 100; }
+		if (!isset($weight) || ($weight === '')) { $weight = 100; }
 
 	  $data['tabs'][0]['output'][] = array(
 	    '#theme' => 'menu_local_task',
@@ -144,18 +144,30 @@ function sirius_customfield_content_type_options($content_types) {
 }
 
 function sirius_customfield_set_list_all($content_type = NULL) {
-	if (!$content_type) {
-		$avail = views_get_view_result('sirius_json_definitions', 'entityreference_1', sirius_domain_nid(), 'customfield');
-		$options = array();
-		if ($avail) {
-			foreach ($avail as $hr) {
-				$options[$hr->nid] = $hr->node_title;
-			}
-		}
-		return $options;
+	$domain_nid = sirius_domain_nid();
+
+	$sql_args = array();
+	$sql = "select nid, title ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+	$sql .= "where type = 'sirius_json_definition' ";
+	$sql .= "and field_sirius_type_value = 'customfield' ";
+	$sql_args = array();
+	if ($domain_nid) {
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	} else {
+		$sql .= "and field_sirius_domain_target_id is null ";
+	}
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$options_all = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$options_all[$hr['nid']] = $hr['title'];
 	}
 
-	$options_all = sirius_customfield_set_list_all();
+	if (!$content_type) { return $options_all; }
+
 	$options = array();
 	foreach ($options_all as $cf_nid => $ignore) {
 		$cf_node = node_load($cf_nid);
