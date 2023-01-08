@@ -370,7 +370,9 @@ function sirius_update_7022() {
   $modules = array(
     'grievance_oneoffs',
     'grievance_pages',
-    'grievance_menus'
+    'grievance_menus',
+    'grievance_settings',
+    'grievance_roles_and_permissions',
   );
 
   foreach ($modules as $module) {
