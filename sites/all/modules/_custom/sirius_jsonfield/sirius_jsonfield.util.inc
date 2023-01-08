@@ -149,7 +149,9 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 			}
 		}
 		else { $value_rendered = '<pre>' . print_r($value, 1) . '</pre>'; }
-	} else { $value_rendered = $value; }
+	} else { 
+		$value_rendered = sirius_text_to_html($value);
+	}
 
 	if ($options['raw']) { return $value_rendered; }
 

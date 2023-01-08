@@ -160,6 +160,8 @@ function grievance_workersync_local_backsync($grievance_node, $verbose = FALSE) 
   if ($value = $grievance_node->field_grievance_last_name['und'][0]['value'])  { $worker_node->field_sirius_name['und'][0]['family'] = $value; }
   if ($value = $grievance_node->field_grievance_phone['und'][0]['value'])      { $worker_node->field_sirius_phone['und'][0]['value'] = $value; }
   if ($value = $grievance_node->field_grievance_email['und'][0]['email'])      { $worker_node->field_sirius_email['und'][0]['value'] = $value; }
+  if ($value = $grievance_node->field_sirius_gender['und'][0]['tid'])          { $worker_node->field_sirius_gender['und'][0]['tid'] = $value; }
+  if ($value = $grievance_node->field_sirius_gender_nota['und'][0]['value'])   { $worker_node->field_sirius_gender_nota['und'][0]['value'] = $value; }
 
   if ($value = $grievance_node->field_grievance_address['und'][0]['value'])    {
     $worker_node->field_sirius_address['und'][0]['thoroughfare'] = $value; 
@@ -170,15 +172,6 @@ function grievance_workersync_local_backsync($grievance_node, $verbose = FALSE) 
   if ($value = $grievance_node->field_grievance_city['und'][0]['value'])       { $worker_node->field_sirius_address['und'][0]['locality'] = $value; }
   if ($value = $grievance_node->field_grievance_state['und'][0]['value'])      { $worker_node->field_sirius_address['und'][0]['administrative_area'] = $value; }
   if ($value = $grievance_node->field_grievance_zip['und'][0]['value'])        { $worker_node->field_sirius_address['und'][0]['postal_code'] = $value; }
-
-  if ($grievance_node->field_grievance_gender['und'][0]['value'] == 'M' && sirius_get_special_tid('sirius_gender|M')) { 
-    $worker_node->field_sirius_gender['und'][0]['tid'] = sirius_get_special_tid('sirius_gender|M');
-  }
-
-  if ($grievance_node->field_grievance_gender['und'][0]['value'] == 'F' && sirius_get_special_tid('sirius_gender|F')) { 
-    $worker_node->field_sirius_gender['und'][0]['tid'] = sirius_get_special_tid('sirius_gender|F');
-  }
-
 
   $worker_node = node_submit($worker_node);
   node_object_prepare($worker_node);

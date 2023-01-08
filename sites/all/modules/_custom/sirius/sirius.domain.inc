@@ -144,6 +144,10 @@ function sirius_domain_component_info_all() {
       'title' => 'Ledger - Stripe',
       'description' => 'Enable this domain to connect to the Stripe payment processor',
     ),
+    'steward:facility:checkin' => array(
+      'title' => 'Steward - Facility - Checkin',
+      'description' => 'Enable steward checkin functionality for facilities',
+    ),
   );
 }
 

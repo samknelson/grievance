@@ -53,12 +53,11 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_view.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dnc.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatches.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatch_preferences.inc';
+// require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatch_preferences.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_worker_dispatch_status.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_dispatch_preferences.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_dispatch_attachments.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_attachments.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_jwa_prefs.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_jwa_assign.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_employer_landing.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.page_job_create.inc';
@@ -84,13 +83,23 @@ function sirius_dispatch_cron() {
  */
 
 function sirius_dispatch_sirius_cron_scan_info() {
-  $items['dispatch_eba'] = array(
-    'title' => 'Dispatch EBA Scan',
-    'description' => 'Clear expired EBA states',
+
+  $items['dispatch_eba_remove_expired_dates'] = array(
+    'title' => 'Dispatch EBA Remove Expired Dates',
+    'description' => 'Clean up any EBA dates for workers that are in the past.',
     'schedule' => 'daily',
-    'callback' => 'sirius_dispatch_eba_cleanup',
+    'callback' => 'sirius_dispatch_eba_remove_expired_dates',
     'multidomain' => FALSE,
-    'component' => 'trust',
+    'component' => 'dispatch',
+  );
+
+  $items['dispatch_eba_layoff_expired_dispatches'] = array(
+    'title' => 'Dispatch EBA Layoff Expired Dispatches',
+    'description' => 'Lay off any workers who are on secondary EBA dispatches, when the date has passed.',
+    'schedule' => 'daily',
+    'callback' => 'sirius_dispatch_eba_layoff_expired_dispatches',
+    'multidomain' => FALSE,
+    'component' => 'dispatch',
   );
 
   return $items;

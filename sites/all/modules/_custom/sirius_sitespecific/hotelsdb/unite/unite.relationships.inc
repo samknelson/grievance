@@ -16,6 +16,7 @@ function unite_relationships_type_order($type_name) {
 
 function unite_relationships_render($node, $options = array()) {
 	drupal_add_css(drupal_get_path('module', 'unite') . '/css/unite.css', 'file');
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/sirius.modal.css', 'file');
 
 	if ($node->type == 'actor') {
 		return unite_relationships_render_actor($node, $options);
@@ -55,6 +56,10 @@ function unite_relationships_render_ownership($pa_node) {
 }
 
 function unite_relationships_render_property($property_node, $options = array()) {
+	$path = $options['path'];
+	if (!$path) { $path = $_REQUEST['path']; }
+	if (!$path) { $path = current_path(); }
+
 	$pa_nodes = array();
 	$query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
@@ -97,7 +102,7 @@ function unite_relationships_render_property($property_node, $options = array())
 
 		$tools = l('Actor', 'node/' . $actor_node->nid, array('attributes' => array('class' => array('tool-button'))));
 		$tools .= l('Relationship', 'node/' . $pa_node->nid, array('attributes' => array('class' => array('tool-button'))));
-		$tools .= l('Edit Relationship', 'node/' . $pa_node->nid . '/edit', array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
+		$tools .= l('Edit Relationship', 'node/' . $pa_node->nid . '/edit', array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => $path)));
 
 		$ownership = unite_relationships_render_ownership($pa_node);
 
@@ -110,16 +115,38 @@ function unite_relationships_render_property($property_node, $options = array())
 			$notes .= l(sirius_node_title($parent_nid), "node/$parent_nid");
 		}
 
+	  $last_verified = $pa_node->field_verified_date['und'][0]['value'];
+	  if ($last_verified) {
+	  	$last_verified_ts = strtotime($last_verified . ' GMT');
+	  	$last_verified_interval = time() - $last_verified_ts;
+	  	$last_verified_txt = "Verified: <strong>" . format_interval($last_verified_interval, 1) . " ago</strong>";
+	  	if ($last_verified_interval < 60*60*24*30*6) { $class = "hotelsdb_last_verified_green"; }
+	  	else if ($last_verified_interval < 60*60*24*30*18) { $class = "hotelsdb_last_verified_blue"; }
+	  	else  { $class = "hotelsdb_last_verified_red"; }
+	  } else {
+	  	$class = "hotelsdb_last_verified_red";
+	  	$last_verified_txt = "Verified: <strong>Never</strong>";
+	  }
+	  if ($notes) { $notes .= '<br />'; }
+	  $notes .= l(
+	  	$last_verified_txt, 
+	  	'sirius/modal/' . $pa_node->nid . '/unite-relationship-verify', 
+	  	array('query' => array('path' => $path), 'html' => TRUE, 'attributes' => array('class' => array('hotelsdb_last_verified_modal_link', $class)))
+	  );
+
+
 		$row = array();
 		$row[] = $name;
 		$row[] = $pa_node->field_relationship_type['und'][0]['value'];
 		$row[] = $ownership;
 		$row[] = $notes;
 		$row[] = $tools;
+
 		$rows[] = $row;
 	}
 
-	$html = '<h2>Actors</h2>';
+	$html .= '<div id="hotelsdb_actors_table">';
+	$html .= '<h2>Actors</h2>';
 	$html .= sirius_showhide_open('actors_' . $property_node->nid);
 	$html .= "<div id=\"$showhide_target_id\">";
 	if ($rows) {
@@ -127,8 +154,10 @@ function unite_relationships_render_property($property_node, $options = array())
 	} else {
 		$html .= '<p><em>' . t('There are no actors connected to this property.') . '</em></p>';
 	}
-	$html .= l('Add an Actor', 'node/add/property-actor', array('attributes' => array('class' => array('tool-button')), 'query' => array('property' => $property_node->nid, 'destination' => current_path())));
+	$html .= l('Add an Actor', 'node/add/property-actor', array('attributes' => array('class' => array('tool-button')), 'query' => array('property' => $property_node->nid, 'destination' => $path)));
 	$html .= sirius_showhide_close();
+	$html .= '<div id="sirius_modal_messages"></div>';
+	$html .= '</div>';
 
 	return $html;
 }

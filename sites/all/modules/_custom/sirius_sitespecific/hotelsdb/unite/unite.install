@@ -9,3 +9,43 @@ function unite_update_7001() {
   $column = 'field_title_canon_value';
   try { db_add_index($table, "${table}_${column}", array($column)); } catch (exception $ignore) { print_r($ignore); }
 }
+
+/**
+ * Migrate local-with-jurisdiction
+ */
+
+function unite_update_7002() {
+  // Find all locals with no name. This is a fairly cumbersome way to do it, because I want to output some debugging.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'local');
+  $query->fieldCondition('field_union_name', 'value', 'UNITE HERE', '!=');
+  $query->propertyCondition('title', '');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return; }
+  $local_nids = array_keys($stmt['node']);
+  if (!$local_nids) { return; }
+
+  $local_nodes = node_load_multiple($local_nids);
+  print "Locals:\n";
+  foreach ($local_nodes as $local_nid => $local_node) {
+    print "$local_nid: " . $local_node->title . " / " . $local_node->field_union_name['und'][0]['value'] . "\n";
+  }
+  print "\n\n";
+
+  // Find all Properties with one of those Locals
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'property');
+  $query->fieldCondition('field_local', 'target_id', $local_nids, 'in');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return; }
+  $property_nodes = node_load_multiple(array_keys($stmt['node']));
+
+  print "Properties:\n";
+  foreach ($property_nodes as $property_nid => $property_node) {
+    print "$property_nid: " . $property_node->title . "\n";
+  }
+}
+
+

@@ -1,0 +1,22 @@
+table.sirius_table tbody tr.inactive td,
+table.sirius_table tbody tr.gray td,
+table.sirius_table tbody tr.grey td {
+	background-color: #bbbbbb;
+}
+
+table.sirius_table tbody tr.warning td {
+	background-color: #ffff99;
+}
+
+table.sirius_table tbody tr.red td {
+	background-color: #ff9999;
+}
+
+table.sirius_table tbody tr.green td {
+	background-color: #99ff99;
+}
+
+table.sirius_table tbody tr.yellow td {
+	background-color: #ffff99;
+}
+

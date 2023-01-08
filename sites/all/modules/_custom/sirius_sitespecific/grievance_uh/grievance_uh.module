@@ -1,0 +1,14 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uh') . '/grievance_uh.menu.inc';
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function grievance_uh_sirius_config_links_alter(&$links) {
+  $links['grievance']['links']['grievance/uh/config'] = array('title' => 'UNITE HERE Grievances', 'description' => 'Settings specific to UNITE HERE.');
+}

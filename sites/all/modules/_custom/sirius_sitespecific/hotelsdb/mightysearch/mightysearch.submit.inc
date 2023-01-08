@@ -44,9 +44,15 @@ function mightysearch_makecondition_anyactor($op, $value) {
 		} else if ($op == 'ends_with') {
 			$condition->condition($aliased_field, '%' . $value, 'like');
 		} else if ($op == 'empty') {
-			$condition->isNull($aliased_field);
+			$a = db_or();
+			$a->isNull($aliased_field);
+			$a->condition($aliased_field, '', '=');
+			$condition->condition($a);
 		} else if ($op == 'not_empty') {
-			$condition->isNotNull($aliased_field);
+			$a = db_and();
+			$a->isNotNull($aliased_field);
+			$a->condition($aliased_field, '', '!=');
+			$condition->condition($a);
 		}	else {
 			$condition->condition($aliased_field, $value, $op);
 		}
@@ -104,9 +110,15 @@ function mightysearch_makecondition($tree, &$query, &$already_joined, $schema) {
 			} else if ($op == 'ends_with') {
 				$condition->condition($aliased_field, '%' . $value, 'like');
 			} else if ($op == 'empty') {
-				$condition->isNull($aliased_field);
+				$a = db_or();
+				$a->isNull($aliased_field);
+				$a->condition($aliased_field, '', '=');
+				$condition->condition($a);
 			} else if ($op == 'not_empty') {
-				$condition->isNotNull($aliased_field);
+				$a = db_and();
+				$a->isNotNull($aliased_field);
+				$a->condition($aliased_field, '', '!=');
+				$condition->condition($a);
 			}	else {
 				$condition->condition($aliased_field, $value, $op);
 			}
@@ -321,33 +333,35 @@ function mightysearch_search_form_submit($form, &$form_state) {
 	/////////////////////////////////////////
 	
 	$fields = $form_state['values']['display'];
-	foreach ($rows as &$hr) {
-		foreach ($fields as $field) {
-			list ($table, $field, $col) = explode('.', $field);
-			if (!$table || !$field) { continue; }
-			if (!$col) { $col = 'value'; }
-			
-			$type = $schema[$table]['fields'][$field]['type'];
-			
-			if ($type == 'tid') {
-				$aliased_table = "${table}_${field}_term";
-				$aliased_field = "name";
-			} else if ($field == 'title') {
-				$aliased_table = "${table}_node";
-				$aliased_field = "title";
-			} else if ($field == 'nid') {
-				$aliased_table = "${table}_node";
-				$aliased_field = "nid";
-			} else {
-				$aliased_table = "${table}_${field}";
-				$aliased_field = "field_${field}_${col}";
-			}
-			
-			$f = "${aliased_table}___${aliased_field}";
-			
-			if ($type == 'date') {
-				if ($hr[$f]) {
-					$hr[$f] = date('Y-m-d', strtotime($hr[$f]));
+	if ($fields) {
+		foreach ($rows as &$hr) {
+			foreach ($fields as $field) {
+				list ($table, $field, $col) = explode('.', $field);
+				if (!$table || !$field) { continue; }
+				if (!$col) { $col = 'value'; }
+				
+				$type = $schema[$table]['fields'][$field]['type'];
+				
+				if ($type == 'tid') {
+					$aliased_table = "${table}_${field}_term";
+					$aliased_field = "name";
+				} else if ($field == 'title') {
+					$aliased_table = "${table}_node";
+					$aliased_field = "title";
+				} else if ($field == 'nid') {
+					$aliased_table = "${table}_node";
+					$aliased_field = "nid";
+				} else {
+					$aliased_table = "${table}_${field}";
+					$aliased_field = "field_${field}_${col}";
+				}
+				
+				$f = "${aliased_table}___${aliased_field}";
+				
+				if ($type == 'date') {
+					if ($hr[$f]) {
+						$hr[$f] = date('Y-m-d', strtotime($hr[$f]));
+					}
 				}
 			}
 		}
@@ -463,7 +477,8 @@ function mightysearch_search_form_submit($form, &$form_state) {
 	
 	if ($output == 'html') {
 		$form_state['rebuild'] = 1;
-		$form_state['results'] = '<h2>' . t('Results') . '</h2>';
+		$count = count($rows);
+		$form_state['results'] = '<h2>' . t('Found @count results', array('@count' => $count)) . '</h2>';
 		$form_state['results'] .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
 	}
 	
@@ -473,9 +488,42 @@ function mightysearch_search_form_submit($form, &$form_state) {
 		$form_state['results'] = '<h2>Raw Query</h2>';
 		$form_state['results'] .= SqlFormatter::format($query->__toString());
 	}
+
+	if ($output == 'json') {
+		$results = array();
+		foreach ($rows as $row) {
+			$result_row = array();
+
+			$idx = 0;
+			foreach ($row as $val) {
+				$result_row[$header[$idx]] = $val;
+				++$idx;
+			}
+
+			$results[] = $result_row;
+		}
+		$form_state['results'] = $results;
+	}
 	
 	if ($output == 'csv') {
 		$form_state['rebuild'] = 1;
+
+		// Log all downloads
+		$count = count($rows);
+		if ($count > 100) {
+			$json = array();
+			$json['search']['values'] = $form_state['values'];
+			sirius_log(
+			  'hotelsdb', 
+			  'search:export', 
+			  "Search results exported, $count results.", 
+			  "Search results exported, $count results.", 
+			  $count, 
+			  array(), 
+			  array(),
+			  $json
+			);
+		}
 		
 		drupal_add_http_header('Content-Type', 'text/csv');
 		drupal_add_http_header('Content-Disposition', 'attachment;filename=property_search.csv');

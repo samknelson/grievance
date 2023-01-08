@@ -224,12 +224,21 @@ function sirius_feed_worker_row_verify($feed_node, $info, $data, &$row, $precomp
     if ($precompute) { $row['level_ms_tid'] = $level_ms_tid; }
   }
 
-
-  return array('success' => TRUE, 'msg' => 'Looks good.');
+  if ($precompute) {
+    if ($row['worker_nid']) {
+      return array('success' => TRUE, 'msg' => 'An existing worker will be updated.');
+    } else {
+      return array('success' => TRUE, 'msg' => 'An new worker will be created.');
+    }
+  } else {
+    return array('success' => TRUE, 'msg' => 'Looks good.');
+  }
 }
 
 function sirius_feed_worker_row_process($feed_node, $info, $data, $row) {
-  $result = sirius_feed_worker_row_verify($feed_node, $info, $data, $row, TRUE);
+  $verify_callback = $info['feed']['callback_row_verify'];
+  if (!$verify_callback) { $verify_callback = 'sirius_feed_worker_row_verify'; }
+  $result = $verify_callback($feed_node, $info, $data, $row, TRUE);
   if (!$result['success']) { return $result; }
 
   if ($row['worker_nid']) {

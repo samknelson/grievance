@@ -40,6 +40,7 @@ function sirius_letter_wizard_recipients_phone_form($form, &$form_state, $info, 
 			'#suffix' => '</td>',
 			'#type' => 'textfield',
 			'#default_value' => $recipient['name'],
+			'#size' => 20,
 		);
 
 		$form["phone_$delta"] = array(
@@ -47,6 +48,7 @@ function sirius_letter_wizard_recipients_phone_form($form, &$form_state, $info, 
 			'#suffix' => '</td>',
 			'#type' => 'textfield',
 			'#default_value' => $recipient['phone'],
+			'#size' => 20,
 		);
 
 		$form["disposition_$delta"] = array(

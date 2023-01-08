@@ -7,3 +7,39 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'mightysearch') . "/m
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'mightysearch') . "/mightysearch.submit.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'mightysearch') . "/mightysearch.saved.inc";
 
+function mightysearch_saved_execute($saved_nid) {
+	if (!$saved_nid) {
+		return array('success' => FALSE, 'msg' => 'The first argument should be the node ID of a saved search.');
+	}
+
+	$saved_node = node_load($saved_nid);
+	if (
+		!$saved_node || 
+		($saved_node->type != 'sirius_json_definition') ||
+		($saved_node->field_sirius_type['und'][0]['value'] != 'mightysearch:saved_search')
+		) {
+		return array('success' => FALSE, 'msg' => "The saved search node ID, $saved_nid, does not correspond to a valid saved search record.");
+	}
+
+	$saved_json = sirius_json_get($saved_node);
+	if (!$saved_json) {
+		return array('success' => FALSE, 'msg' => "The saved search, $saved_nid, doesn't look like a valid saved search. (No JSON found in the node.)");
+	}
+
+	$form = array();
+	$form_state = array();
+	$form_state['input'] = $saved_json['search']['values'];
+	unset($form_state['input']['save_as']);
+	$form_state['input']['output'] = 'json';
+
+	$form_state['values'] = $form_state['input'];
+	mightysearch_search_form_submit($form, $form_state);
+	return array('success' => TRUE, 'results' => $form_state['results']);
+}
+
+function mightysearch_sirius_service_func_info_all_alter(&$info) {
+	$info['mightysearch_saved_execute'] = array(
+		'callback' => 'mightysearch_saved_execute',
+		'cache' => TRUE,
+	);
+}

@@ -47,6 +47,7 @@ Reports {"url":"sirius\/reports","weight":"-48"}
 -Status Summary {"url":"grievance\/report\/status-summary","weight":"0"}
 -Monthly Grievances by Shop {"url":"admin\/reports\/report-cache\/grievance-report-shop-monthly","weight":"0"}
 -Open Grievances by Specialist {"url":"grievance\/report\/open","weight":"0"}
+-UNITE HERE Snapshot Report {"url":"grievance\/uh\/snapshot","weight":"0"}
 Help {"url":"grievances\/uh\/help","weight":"50"}
 -Emailing Attachments {"url":"grievances\/uh\/help\/emailing_attachments","weight":"-48"}
 -Logging In and Out {"url":"grievances\/uh\/help\/logging_in_and_out","weight":"-50"}

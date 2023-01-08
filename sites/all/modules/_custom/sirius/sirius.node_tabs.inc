@@ -31,16 +31,28 @@ function sirius_node_tab_content($node, $in_tab_name) {
   $tab_record = $node_tabs[$node->type][$in_tab_name];
   if (!$tab_record) { 
     drupal_set_message(t('Bad tab: ') . $node->type . ', ' . $in_tab_name, 'error'); 
-    return FALSE;
+    return '';
   }
+
+  sirius_node_tab_handle_requires($tab_record);
 
   $callback = $tab_record['callback'];
   $args = array($node);
+
+  if (!function_exists($callback)) {
+    $callback_form = "$callback" . '_form';
+    if (!function_exists($callback_form)) {
+      drupal_set_message("Callback doesn't exist: $callback", 'error');
+      return '';
+    }
+    $callback = 'drupal_get_form';
+    $args = array($callback_form, $node);
+  }
+
   drupal_set_title($node->title);
   if ($tab_record['callback arguments']) {
     $args = array_merge($args, $tab_record['callback arguments']);
   }
-  sirius_node_tab_handle_requires($tab_record);
 
   /*
   // Make landing page redirect to the main view page. Not sure why we bother, though. 
@@ -60,9 +72,9 @@ function sirius_node_tab_content($node, $in_tab_name) {
   return $result;
 }
 
-function sirius_node_tab_access($node, $in_tab_name) {
+function sirius_node_tab_access($node, $in_tab_name, $options = array()) {
   // Deny access to all nodes that are not in your domain
-  if (!user_access('sirius admin') && $node->type != 'sirius_domain') {
+  if (!user_access('sirius admin') && $node->type != 'sirius_domain' && !$options['skip_domain_check']) {
     $node_domain_nid = $node->field_sirius_domain['und'][0]['target_id'];
     $my_domain_nid = sirius_domain_nid();
     if ($node_domain_nid && ($node_domain_nid != $my_domain_nid)) { return FALSE; }
@@ -80,6 +92,12 @@ function sirius_node_tab_access($node, $in_tab_name) {
 
   // Check if the component is enabled
   if ($tab_record['component'] && !sirius_domain_component_enabled($tab_record['component'])) {
+    return FALSE;
+  }
+
+  // In general, you must have access to the underlying node. 
+  // (Some tabs are accessible even if the user can't see the underlying node)
+  if (!node_access('view', $node) && !$tab_record['skip_node_view_check']) {
     return FALSE;
   }
 

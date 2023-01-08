@@ -132,3 +132,15 @@ function sirius_teamsters631_sirius_node_tab_content_alter($result, $context) {
 		drupal_set_message("As an apprentice, all dispatch (except bullpens) will be performed by the Training Center.<br /><br />Please use the link at the top of the page to switch to the Training Center's site in order to review your current dispatches or set your dispatch preferences.", 'warning');
 	}
 }
+/**
+ * Implements hook_sirius_worker_nextid_alter
+ */
+
+function sirius_teamsters631_sirius_worker_nextid_alter(&$id) {
+	if (sirius_service_is_remote()) { return; }
+	$result = sirius_service_client_request('sirius_worker_nextid');
+	if ($result['success']) {
+		$id2 = $result['data'];
+		$id = max($id, $id2);
+	}
+}

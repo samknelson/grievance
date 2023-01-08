@@ -323,3 +323,83 @@ function sirius_update_7019() {
     module_enable(array($module), TRUE);
   }
 }
+
+/**
+ * Grant dispatch preference permissions
+ */
+
+function sirius_update_7020() {
+  $if_you_haves    = array('sirius dispatch own preferences', 'sirius dispatch staff');
+  $then_you_gets  = array(
+    'sirius dispatch pref notifications',
+    'sirius dispatch pref asi',
+    'sirius dispatch pref dnc2',
+    'sirius dispatch pref hfe',
+    'sirius dispatch pref cbn',
+    'sirius dispatch pref eba',
+  );
+  sirius_updateutil_grant($if_you_haves, $then_you_gets);
+
+  $if_you_haves    = array('sirius dispatch own preferences skill', 'sirius dispatch staff');
+  $then_you_gets  = array('sirius dispatch pref skill');
+  sirius_updateutil_grant($if_you_haves, $then_you_gets);
+
+  $if_you_haves    = array('sirius dispatch own preferences department', 'sirius dispatch staff');
+  $then_you_gets  = array('sirius dispatch pref dept');
+  sirius_updateutil_grant($if_you_haves, $then_you_gets);
+}
+
+/**
+ * Delete some temporary tables that might still exists
+ */
+
+function sirius_update_7021() {
+  $tables = array('foo', 'bar', 'bak', 'bak2', 'tmp');
+  foreach ($tables as $table) {
+    print "Dropping: $table...\n";
+    $sql = "drop table if exists $table";
+    $stmt = sirius_sql_query($sql, array());
+  }
+}
+
+/**
+ * Uninstall some unnecessary modules
+ */
+
+function sirius_update_7022() {
+  $modules = array(
+    'grievance_oneoffs',
+    'grievance_pages',
+    'grievance_menus'
+  );
+
+  foreach ($modules as $module) {
+    if (module_exists($module)) {
+      print "Removing: $module\n";
+      module_disable(array($module));
+      drupal_uninstall_modules(array($module));
+    }
+  }
+}
+
+/**
+ * Migrate the grievance_gender field
+ */
+
+function sirius_updatex_7022() {
+  sirius_require('sirius', 'install/sirius.update_7022.inc');
+  sirius_update_7022_impl();
+}
+
+function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
+  foreach ($if_you_haves as $if_you_have) {
+    foreach ($then_you_gets as $then_you_get) {
+      print "Granting new permission [$then_you_get] to anybody with permission [$if_you_have] ...\n";
+      $roles = user_roles(FALSE, $if_you_have);
+      foreach ($roles as $rid => $name) {
+        print "... granting [$then_you_get] to [$name]\n";
+        user_role_grant_permissions($rid, array($then_you_get));
+      }
+    }
+  }
+}

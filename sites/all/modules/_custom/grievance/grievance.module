@@ -352,6 +352,10 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
+  if ($form_id == 'grievance_node_form') {
+    grievance_contract_grievance_form_alter_limit_to_active($form, $form_state, $form_id);
+  }
+
   if ($form_id == 'grievance_contract_template_node_form') { 
     // Holidays is a system-only field
     $form['field_grievance_holidays']['#access'] = FALSE;
@@ -711,6 +715,9 @@ function grievance_report_cache_info() {
     'batch_callback' => 'grievance_report_log_include_exclude_batch',
     'file' => 'grievance.report_log_include_exclude.inc',
     'module' => 'grievance',
+    'render_callbacks' => array(
+      'View' => 'grievance_report_log_include_exclude_view',
+    ),
   );
 
   return $items;
