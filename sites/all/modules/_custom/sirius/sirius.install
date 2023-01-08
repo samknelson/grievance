@@ -388,8 +388,8 @@ function sirius_update_7022() {
  * Migrate the grievance_gender field
  */
 
-function sirius_updatex_7022() {
-  sirius_require('sirius', 'install/sirius.update_7022.inc');
+function sirius_update_7023() {
+  sirius_require('sirius', 'install/sirius.update_7023.inc');
   sirius_update_7022_impl();
 }
 
