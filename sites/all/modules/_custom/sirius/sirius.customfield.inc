@@ -41,6 +41,7 @@ function sirius_customfield_menu_local_tasks_alter(&$data, $router_item, &$root_
 		$cf_json = sirius_json_get($cf_node);
 
 		// Must have access to this CF set
+		sirius_require('sirius', 'sirius.page_entity_customfield.inc');
 		if (!sirius_node_tab_entity_customfield_access_set($entity_node, $cf_nid)) { continue; }
 
 		$title = $cf_json['customfield']['tab']['title'];

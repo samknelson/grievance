@@ -106,7 +106,7 @@ function grievance_uh226_report_spi_term_detail_pks(&$form_state) {
   if ($form_state['values']['open_only'] == 'yes') {
     $sql .= "and field_data_field_grievance_status.entity_type = 'node' ";
     $sql .= "and field_data_field_grievance_status.entity_id = node.nid ";
-    $sql .= "and field_data_field_grievance_status.field_grievance_status_tid in (" . join(',', $lookups[open_status_tids]) . ") ";
+    $sql .= "and field_data_field_grievance_status.field_grievance_status_tid in (" . join(',', $lookups['open_status_tids']) . ") ";
   }
 
   if ($form_state['values']['organizer']['entity_id']) {
@@ -362,7 +362,10 @@ function grievance_uh226_report_spi_term_detail_lookups() {
     if (preg_match('/referred/i', $term->name)) {
       $arb_sub_status_tids[] = $tid;
     }
-    if (preg_match('/held/i', $term->name)) {
+    if (preg_match('/held/i', $term->name) && 
+      !preg_match('/boa/i', $term->name) &&
+      !preg_match('/step/i', $term->name) &&
+      !preg_match('/remedy/i', $term->name)) {
       $arb_held_status_tids[] = $tid;
     }
   }
@@ -497,8 +500,8 @@ function grievance_uh226_report_spi_term_detail_render($report_type, $report_id,
   $header[] = 'Griev#';
   $header[] = 'Violations';
   $header[] = 'BOA Date';
-  $header[] = 'Sub Arb Date';
-  $header[] = 'Arb Date';
+  $header[] = 'Sub Arb / Med Date';
+  $header[] = 'Arb / Med Date';
   $header[] = 'Last Called Date';
 
   $attributes = array();
