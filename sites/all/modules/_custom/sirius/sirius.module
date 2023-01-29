@@ -1087,6 +1087,14 @@ function sirius_node_title($nid) {
   return $hr['title'];
 }
 
+function sirius_term_title($tid) {
+  if (!$tid) { return NULL; }
+  $sql = "select name from taxonomy_term_data where tid = :tid";
+  $stmt = sirius_sql_query($sql, array(':tid' => $tid));
+  $hr = $stmt->fetchAssoc();
+  return $hr['name'];
+}
+
 /**
  * Implements hook_user_cancel_methods_alter
  *
