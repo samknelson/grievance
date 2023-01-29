@@ -1051,6 +1051,7 @@ function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $
 
 function sirius_table_render($header, $rows, $attributes = array()) {
   drupal_add_css(drupal_get_path('module', 'sirius') . '/css/table.css');
+  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/table.js', 'file');
   $attributes['class'][] = 'sirius_table';
   return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
 }
