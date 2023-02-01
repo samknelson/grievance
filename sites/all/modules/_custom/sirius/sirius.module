@@ -1,8 +1,6 @@
 <?php
 
-// I hate notice errors
-ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
-
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.inc';
