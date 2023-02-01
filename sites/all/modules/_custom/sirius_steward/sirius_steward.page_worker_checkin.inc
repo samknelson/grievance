@@ -1,14 +1,14 @@
 <?php
 
-function sirius_steward_node_tab_worker_facility_checkin_access($worker_node) {
+function sirius_steward_node_tab_worker_checkin_access($worker_node) {
 	// Do I have superpowers?
 	if (user_access('sirius admin') || user_access('sirius domain admin')) { return TRUE; }
 
 	// Can I check in *anybody*?
-	if (user_access('sirius steward facility checkin other')) { return TRUE; }
+	if (user_access('sirius steward checkin other')) { return TRUE; }
 
 	// Can I check in myself
-	if (user_access('sirius steward facility checkin self')) {
+	if (user_access('sirius steward checkin self')) {
 		$my_worker_node = sirius_worker_get();
 		if ($my_worker_node && ($my_worker_node->nid == $worker_node->nid)) { return TRUE; }
 	}
@@ -17,15 +17,15 @@ function sirius_steward_node_tab_worker_facility_checkin_access($worker_node) {
 	return FALSE;
 }
 
-function sirius_steward_node_tab_worker_facility_checkin($worker_node) {
-	$current_checkins = sirius_steward_facility_checkin_search(array('worker_nid' => $worker_node->nid, 'status' => 'in'));
+function sirius_steward_node_tab_worker_checkin($worker_node) {
+	$current_checkins = sirius_steward_checkin_search(array('worker_nid' => $worker_node->nid, 'status' => 'in'));
 
 	if ($current_checkins) {
 		$current_checkin_nid = reset($current_checkins);
 		$current_checkin_node = node_load($current_checkin_nid);
-		return drupal_get_form('sirius_steward_node_tab_worker_facility_checkin_out_form', $worker_node, $current_checkin_node);
+		return drupal_get_form('sirius_steward_node_tab_worker_checkin_out_form', $worker_node, $current_checkin_node);
 	} else {
-		return drupal_get_form('sirius_steward_node_tab_worker_facility_checkin_in_form', $worker_node);
+		return drupal_get_form('sirius_steward_node_tab_worker_checkin_in_form', $worker_node);
 	}
 }
 
@@ -33,7 +33,7 @@ function sirius_steward_node_tab_worker_facility_checkin($worker_node) {
 // * Check IN
 // *****************************************************************************************/
 
-function sirius_steward_node_tab_worker_facility_checkin_in_form($form, &$form_state, $worker_node) {
+function sirius_steward_node_tab_worker_checkin_in_form($form, &$form_state, $worker_node) {
 	$form_state['worker_nid'] = $worker_node->nid;
 	$form['#tree'] = TRUE;
 
@@ -58,7 +58,7 @@ function sirius_steward_node_tab_worker_facility_checkin_in_form($form, &$form_s
 	);
 
 	// Render the disclaimer
-	$disclaimer_nid = sirius_domain_variable_get('sirius_steward_facility_checkin_disclaimer');
+	$disclaimer_nid = sirius_domain_variable_get('sirius_steward_checkin_disclaimer');
 	if (!$disclaimer_nid) { 
 		return sirius_form_error(
 			"Please select a disclaimer for steward checkin: " . 
@@ -67,19 +67,9 @@ function sirius_steward_node_tab_worker_facility_checkin_in_form($form, &$form_s
 	}
 	$disclaimer_node = node_load($disclaimer_nid);
 	$disclaimer_json = sirius_json_get($disclaimer_node)['disclaimer'];
-
-	/*
-	$form['checkin']['disclaimer'] = array(
-		'#type' => 'fieldset',
-		'#states' => array('visible' => array(":input[name=\"checkin[facility]\"" => array('value' => 2402816))),
-		'#title' => 'Whatever',
-	);
-	*/
-	
 	$form['checkin']['disclaimer'][$disclaimer_nid] = sirius_disclaimer_render_form($disclaimer_json);
-	$form['checkin']['disclaimer']['#states'] = array(
-		
-	);
+
+	$form['checkin']['customfield'] = sirius_steward_checkin_customfield_form($checkin_node, sirius_domain_variable_get('sirius_steward_checkin_in_customfield'));
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -89,12 +79,12 @@ function sirius_steward_node_tab_worker_facility_checkin_in_form($form, &$form_s
 	return $form;
 }
 
-function sirius_steward_node_tab_worker_facility_checkin_in_form_submit($form, &$form_state) {
+function sirius_steward_node_tab_worker_checkin_in_form_submit($form, &$form_state) {
 	$worker_nid = $form_state['worker_nid'];
 	$facility_nid = $form_state['values']['checkin']['facility'];
 	$json = $form_state['values']['checkin'];
 
-	$result = sirius_steward_facility_checkin_in($facility_nid, $worker_nid, $json);
+	$result = sirius_steward_checkin_in($facility_nid, $worker_nid, $json);
 	if (!$result['success']) {
 		$form_state['rebuild'] = TRUE;
 		drupal_set_message("Checkin failed: " . $result['msg'], 'error');
@@ -108,7 +98,7 @@ function sirius_steward_node_tab_worker_facility_checkin_in_form_submit($form, &
 // * Check OUT
 // *****************************************************************************************/
 
-function sirius_steward_node_tab_worker_facility_checkin_out_form($form, &$form_state, $worker_node, $checkin_node) {
+function sirius_steward_node_tab_worker_checkin_out_form($form, &$form_state, $worker_node, $checkin_node) {
 	$form_state['worker_nid'] = $worker_node->nid;
 	$form_state['checkin_nid'] = $checkin_node->nid;
 	$form['#tree'] = TRUE;
@@ -116,7 +106,14 @@ function sirius_steward_node_tab_worker_facility_checkin_out_form($form, &$form_
 	// Get the current location
 	$form['checkin']['geolocation'] = sirius_map_geolocation_render_form();
 
-	$form['checkin']['render'] = sirius_steward_facility_checkin_render_form($checkin_node, array('hide_map' => TRUE, 'hide_disclaimer' => TRUE));
+	$form['checkin']['render'] = sirius_steward_checkin_render_form($checkin_node, array(
+			'hide_map' => TRUE, 
+			'hide_disclaimer' => TRUE,
+			'hide_customfield' => TRUE,
+		)
+	);
+
+	$form['checkin']['customfield'] = sirius_steward_checkin_customfield_form($checkin_node, sirius_domain_variable_get('sirius_steward_checkin_out_customfield'));
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -126,12 +123,12 @@ function sirius_steward_node_tab_worker_facility_checkin_out_form($form, &$form_
 	return $form;
 }
 
-function sirius_steward_node_tab_worker_facility_checkin_out_form_submit($form, &$form_state) {
+function sirius_steward_node_tab_worker_checkin_out_form_submit($form, &$form_state) {
 	$checkin_nid = $form_state['checkin_nid'];
 	$checkin_node = node_load($checkin_nid);
 	$json = $form_state['values']['checkin'];
 
-	$result = sirius_steward_facility_checkin_out($checkin_node, $json);
+	$result = sirius_steward_checkin_out($checkin_node, $json);
 	if (!$result['success']) {
 		$form_state['rebuild'] = TRUE;
 		drupal_set_message("Checkin failed: " . $result['msg'], 'error');
@@ -139,4 +136,35 @@ function sirius_steward_node_tab_worker_facility_checkin_out_form_submit($form, 
 	}
 
 	drupal_set_message("You have been checked out.");
+}
+
+/**
+ * Utility function to add a customfield form
+ */
+
+function sirius_steward_checkin_customfield_form($entity_node, $customfield_set_nid) {
+	if (!$customfield_set_nid) { return array(); }
+
+  $customfield_set_node = node_load($customfield_set_nid);
+  $customfield_set_json = sirius_json_get($customfield_set_node);
+  $customfield_form = sirius_jsonfield_util_form_get($customfield_set_json, 'default');
+  if (!$customfield_form) { 
+  	return sirius_form_error("The form for this custom field set has not been configured. It can be set up " . l('here.', 'sirius/customfield/definition/list'));
+  }
+
+  $which = 'customfield_' . $customfield_set_nid;
+
+  $entity_json = sirius_json_get($checkin_node);
+  $entity_results = sirius_jsonfield_util_results_get($entity_json, $which);
+  sirius_jsonfield_util_set_defaults($customfield_form, $entity_results);
+  $customfield_form['!intro'] = array(
+    '#markup' => '<div class="sirius-form">',
+    '#weight' => -9999,
+  );
+  $customfield_form['!outro'] = array(
+    '#markup' => '</div>',
+    '#weight' => 9999,
+  );
+
+  return array($which => $customfield_form);
 }

@@ -74,7 +74,19 @@ function sirius_domain($new_domain_nid = NULL) {
 }
 
 function sirius_domain_component_info_all() {
-  // @todo: Implement a complicate and hard to follow system of callbacks so that each module defines its own components.
+  $infos = &drupal_static(__FUNCTION__);
+  if (!isset($infos)) {
+    $infos = module_invoke_all('sirius_domain_component_info');
+    ksort($infos);
+  }
+  return $infos;
+}
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_sirius_domain_component_info() {
   return array(
     'worker' => array(
       'title' => 'Worker',

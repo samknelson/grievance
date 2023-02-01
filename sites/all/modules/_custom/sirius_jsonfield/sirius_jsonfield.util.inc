@@ -121,7 +121,7 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 		if ($options['raw']) { 
 			return NULL;
 		} else if ($options['fieldsets']) {
-			$html = '<fieldset class="field-group-fieldset form-wrapper"><legend><span class="fieldset-legend">';
+			$html = '<fieldset class="collapsible field-group-fieldset form-wrapper"><legend><span class="fieldset-legend">';
 			$html .= $form_element['#title'];
 			$html .= '</span></legend>';
 			$html .= '<div class="fieldset-wrapper">';

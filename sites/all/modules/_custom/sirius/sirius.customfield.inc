@@ -41,6 +41,7 @@ function sirius_customfield_menu_local_tasks_alter(&$data, $router_item, &$root_
 		$cf_json = sirius_json_get($cf_node);
 
 		// Must have access to this CF set
+		sirius_require('sirius', 'sirius.page_entity_customfield.inc');
 		if (!sirius_node_tab_entity_customfield_access_set($entity_node, $cf_nid)) { continue; }
 
 		$title = $cf_json['customfield']['tab']['title'];
@@ -123,6 +124,12 @@ function sirius_customfield_content_types_all() {
   		'permission' => 'sirius domain admin',
   	);
 
+  	$types['sirius_log'] = array(
+  		'key' => 'sirius_log',
+  		'title' => 'Log',
+  		'permission' => 'sirius domain admin',
+  	);
+
 		drupal_alter('sirius_customfield_content_types', $types);
   }
 
@@ -138,6 +145,7 @@ function sirius_customfield_content_types($json) {
 }
 
 function sirius_customfield_content_type_options($content_types) {
+	if (!$content_types) { return array(); }
 	$result = array();
 	foreach ($content_types as $key => $record) { $result[$key] = $record['title']; }
 	return $result;
@@ -173,6 +181,7 @@ function sirius_customfield_set_list_all($content_type = NULL) {
 		$cf_node = node_load($cf_nid);
 		$cf_json = sirius_json_get($cf_node);
 		$content_types = sirius_customfield_content_types($cf_json);
+		if (!$content_types) { $content_types = array(); }
 		if (!in_array($content_type, array_keys($content_types))) { continue; }
 		$options[$cf_nid] = $cf_node->title;
 	}

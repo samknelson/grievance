@@ -11,7 +11,23 @@ function sirius_node_tab_sirius_domain_components_form($form, &$form_state, $dom
 
 	$all_info = sirius_domain_component_info_all();
 
+	$form['component']['open'] = array(
+		'#markup' => '<table>' .
+			'<tr>' . 
+			'<th>' . t('Component') . '</th>' .
+			'<th>' . t('Enable?') . '</th>' .
+			'</tr>'
+	);
+
 	foreach ($all_info as $key => $info) {
+		$form['component'][$key]['open'] = array('#markup' => '<tr>');
+
+		$form['component'][$key]['title'] = array(
+			'#markup' => '<td>' .
+				sirius_tooltip_render($info['description'], $info['title']) . 
+				'</td>',
+		);
+
 		$form['component'][$key]['enabled'] = array(
 			'#type' => 'select',
 			'#options' => array(
@@ -19,11 +35,17 @@ function sirius_node_tab_sirius_domain_components_form($form, &$form_state, $dom
 				'No' => t('No'),
 				'Yes' => t('Yes'),
 			),
-			'#title' => $info['title'],
-			'#description' => $info['description'],
 			'#default_value' => $json['component'][$key]['enabled'],
+			'#prefix' => '<td>',
+			'#suffix' => '</td>',
 		);
+
+		$form['component'][$key]['close'] = array('#markup' => '</tr>');
 	}
+
+	$form['component']['close'] = array(
+		'#markup' => '</table>'
+	);
 
 	$form['submit'] = array(
 		'#type' => 'submit',
