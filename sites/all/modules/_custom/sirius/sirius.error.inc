@@ -16,6 +16,7 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATE
  * that looks at the error text and decides if it should be a WARNING or a NOTICE.
  */
 
+// This function doesn't exist in php7.
 function sirius_error_str_starts_with($haystack, $needle) {
   return (string)$needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0;
 }
