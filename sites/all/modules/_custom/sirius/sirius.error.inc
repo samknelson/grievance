@@ -24,8 +24,9 @@ function sirius_error_str_starts_with($haystack, $needle) {
 function sirius_error_handler($error_level, $message, $filename, $line) {
   // If this doesn't look like an important WARNING, then convert it into a NOTICE
   if ($message && (
-      substr($message, 'Trying to access array offset') ||
+      sirius_error_str_starts_with($message, 'Trying to access array offset') ||
       sirius_error_str_starts_with($message, 'Undefined array') || 
+      sirius_error_str_starts_with($message, 'Attempt to read property "') ||
       sirius_error_str_starts_with($message, 'Undefined variable') ||
       sirius_error_str_starts_with($message, 'Undefined property')
     ) 
