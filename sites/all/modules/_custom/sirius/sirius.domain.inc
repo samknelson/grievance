@@ -132,10 +132,6 @@ function sirius_sirius_domain_component_info() {
       'title' => 'Training Center',
       'description' => 'Use training center functionality, including levels and certifications',
     ),
-    'trust' => array(
-      'title' => 'Trust',
-      'description' => 'Manage Trust Benefits, Dependants, etc.',
-    ),
     'contact:relationships' => array(
       'title' => 'Contact - Relationships',
       'description' => 'Enable relationships between contacts (or workers)',
@@ -156,9 +152,9 @@ function sirius_sirius_domain_component_info() {
       'title' => 'Ledger - Stripe',
       'description' => 'Enable this domain to connect to the Stripe payment processor',
     ),
-    'steward:facility:checkin' => array(
-      'title' => 'Steward - Facility - Checkin',
-      'description' => 'Enable steward checkin functionality for facilities',
+    'phonetree' => array(
+      'title' => 'Phonetree',
+      'description' => 'Enable phonetree processing',
     ),
   );
 }
