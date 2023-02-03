@@ -58,6 +58,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.disclaimer.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mailattach.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.customfield.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.bookmark.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.config.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.public.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';

@@ -1295,6 +1295,30 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/config/by-module/all'] = array(
+    'title' => 'All',
+    'page callback' => 'sirius_page_config',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $links = sirius_config_links();
+  $weight = 1;
+  foreach ($links as $key => $record) {
+    ++$weight;
+    $items["sirius/config/by-module/$key"] = array(
+      'title' => $record['title'],
+      'page callback' => 'sirius_page_config',
+      'page arguments' => array(3),
+      'access arguments' => array('sirius domain admin'),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => $weight,
+    );
+  }
+
+
   $items['sirius/customfield/definition/list'] = array(
     'title' => 'Custom Field Definitions',
     'description' => '',
