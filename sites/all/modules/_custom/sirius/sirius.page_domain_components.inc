@@ -5,6 +5,8 @@ function sirius_node_tab_sirius_domain_components($domain_node) {
 }
 
 function sirius_node_tab_sirius_domain_components_form($form, &$form_state, $domain_node) {
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/table.css');
+
 	$form_state['domain_nid'] = $domain_node->nid;
 	$json = sirius_jsonfield_util_node_json_get($domain_node);
 	$form['#tree'] = TRUE;
@@ -12,7 +14,7 @@ function sirius_node_tab_sirius_domain_components_form($form, &$form_state, $dom
 	$all_info = sirius_domain_component_info_all();
 
 	$form['component']['open'] = array(
-		'#markup' => '<table>' .
+		'#markup' => '<table class="sirius_table">' .
 			'<tr>' . 
 			'<th>' . t('Component') . '</th>' .
 			'<th>' . t('Enable?') . '</th>' .
@@ -20,7 +22,9 @@ function sirius_node_tab_sirius_domain_components_form($form, &$form_state, $dom
 	);
 
 	foreach ($all_info as $key => $info) {
-		$form['component'][$key]['open'] = array('#markup' => '<tr>');
+		if ($json['component'][$key]['enabled'] == 'Yes') { $class = 'green'; } else { $class = 'gray'; }
+
+		$form['component'][$key]['open'] = array('#markup' => "<tr class=\"$class\">");
 
 		$form['component'][$key]['title'] = array(
 			'#markup' => '<td>' .
