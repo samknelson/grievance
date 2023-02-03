@@ -77,6 +77,7 @@ function sirius_page_config() {
 	$links['systems']['links']['sirius/config/specialtid'] 			= array('title' => 'Special Terms', 'description' => 'Certain taxonomy terms have special meaning for the system; select them here.');
 	$links['systems']['links']['sirius/config/email'] 					= array('title' => 'Email', 'description' => 'Oubound email settings');
 	$links['systems']['links']['sirius/config/phone'] 					= array('title' => 'Phone', 'description' => 'Phone settings, including caller IDs, SMS and Twilio');
+	$links['systems']['links']['sirius/phonetree/config'] 			= array('title' => 'Phonetree', 'description' => 'Phonetree settings for when a user calls in to the system.');
 	$links['systems']['links']['sirius/office/operator/list'] 	= array('title' => 'Operators', 'description' => 'List of operators available to the phone tree.');
 	$links['systems']['links']['sirius/twilio/network-test'] 		= array('title' => 'Twilio Network Test', 'description' => 'Use the Twilio network test tool to verify if the client computer has sufficient connectivity to run a VoIP call.');
 	$links['systems']['links']['sirius/phonenumber'] 						= array('title' => 'Phone Number Cache', 'description' => 'Search and review the cache of phone numbers and deliverability metrics (i.e. SMS-enabled).');
