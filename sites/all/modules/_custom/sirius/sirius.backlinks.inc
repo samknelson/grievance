@@ -288,7 +288,6 @@ function sirius_backlinks_from_node($node) {
 	}
 
 	if ($node->type == 'sirius_trust_provider') {
-		drupal_set_message("Here with " . $node->type);
 		$links['sirius/trust/providers'] = array('name' => 'All Providers');
 	}
 
