@@ -16,7 +16,7 @@ function sirius_dispatch_group_list_active($industry_tid = NULL, $ts = NULL) {
   }
   $query->propertyOrderBy('title');
   $stmt = $query->execute();
-  if (!$stmt['node']) { return NULL; }
+  if (!$stmt['node']) { return array(); }
   $nids = array_keys($stmt['node']);
 
   // node_load_multiple has too much overhead
