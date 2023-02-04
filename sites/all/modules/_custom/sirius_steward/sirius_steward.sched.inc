@@ -98,8 +98,11 @@ function sirius_steward_sched_render($sched_node, $options = array()) {
 
 	$html = '<div class="sirius_steward_sched">';
 	$date = $sched_json['date'];
+
+	$employer_node = sirius_log_handler($sched_node, 'grievance_shop');
+
 	if ($sched_json) {
-		$html .= '<h2>' . date('l, F j', strtotime($sched_json['date'])) . '</h2>';
+		$html .= '<h2>' . t('Schedule - ') . $employer_node->title . ' - ' . date('l, F j', strtotime($sched_json['date'])) . '</h2>';
 	}
 	if ($sched_json['sched']['stewards']) {
 		if (!$options['hide_header']) {
@@ -177,7 +180,7 @@ function sirius_steward_sched_render($sched_node, $options = array()) {
 
 	}
 	if (!$options['hide_edit']) {
-		$html .= l('Edit', 'node/' . $sched_node->nid . '/sirius_steward_log_sched/edit', array('attributes' => array('class' => array('tool-button'))));
+		$html .= l('Edit', 'node/' . $sched_node->nid . '/sirius_steward_log_sched/edit', array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button'))));
 	}
 	$html .= '</div>';
 

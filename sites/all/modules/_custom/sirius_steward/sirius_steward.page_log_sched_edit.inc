@@ -1,7 +1,29 @@
 <?php
 
 function sirius_steward_node_tab_log_sched_edit_access($sched_node) {
+	// Must be the right type of log
 	if ($sched_node->field_sirius_category['und'][0]['value'] != 'steward:sched') { return FALSE; }
+
+	// Must have an employer
+	$employer_node = sirius_log_handler($sched_node, 'grievance_shop');
+	if (!$employer_node) { return FALSE; }
+
+	// If I'm admin, I can do anything
+	if (user_access('sirius steward admin')) { return TRUE; }
+
+	// Otherwise, I can only edit schedules for my own shop...
+	$my_worker = sirius_worker_get();
+	if (!$my_worker) { return FALSE; }
+	$my_employer_nid = $my_worker->field_grievance_shop['und'][0]['target_id'];
+	if (!$my_employer_nid) { return FALSE; }
+	if ($my_employer_nid != $employer_node->nid) { return FALSE; }
+
+	// Cannot edit entries in the past
+	$sched_json = sirius_json_get($sched_node);
+	$date = $sched_json['date'];
+	if (!$date) { return FALSE; }
+	if (strtotime($date) < strtotime(date('Y-m-d'))) { return FALSE; }
+
 	return TRUE;
 }
 
@@ -15,7 +37,7 @@ function sirius_steward_node_tab_log_sched_edit_form($form, &$form_state, $sched
 	// Dropdowns
 	$departments = sirius_taxonomy_load('grievance_department', 'tid', 'name');
 	$facilities = sirius_dispatch_facility_dropdown();
-	$job_groups = sirius_dispatch_group_list_active(NULL, strtotime($sched_json['date']) . ' 12:00:00');
+	$job_groups = sirius_dispatch_group_list_upcoming(NULL, strtotime($sched_json['date']) . ' 12:00:00');
 
 	// Employer
 	$employer_node = sirius_log_handler($sched_node, 'grievance_shop');
@@ -74,7 +96,6 @@ function sirius_steward_node_tab_log_sched_edit_form($form, &$form_state, $sched
 			'#suffix' => '<br />',
 			'#default_value' => $steward_json['job_group_nid'],
 		);
-
 		$form['sched']['stewards'][$worker_nid]['facility_nid'] = array(
 			'#type' => 'select',
 			'#options' => array(NULL => t('NOT SCHEDULED')) + $facilities,
