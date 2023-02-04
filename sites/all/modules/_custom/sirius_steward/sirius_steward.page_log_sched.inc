@@ -5,32 +5,8 @@ function sirius_steward_node_tab_log_sched_access($sched_node) {
 	return TRUE;
 }
 
-function sirius_steward_node_tab_log_sched_form($form, &$form_state, $sched_node) {
-	$form['#tree'] = TRUE;
-	$form_state['sched_nid'] = $sched_node->nid;
-
-	$json = sirius_json_get($sched_node);
-
-	$form['sched']['whatever'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Whatever'),
-		'#default_value' => $json['sched']['whatever'],
-	);
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Save'),
-	);
-
-	return $form;
-}
-
-function sirius_steward_node_tab_log_sched_form_submit($form, &$form_state) {
-	$sched_nid = $form_state['sched_nid'];
-	$sched_node = node_load($sched_nid);
-	$json = sirius_json_get($sched_node);
-	$json['sched'] = $form_state['values']['sched'];
-	sirius_json_set($sched_node, $json);
-	node_save($sched_node);
-	drupal_set_message("Schedule saved.");
+function sirius_steward_node_tab_log_sched($sched_node) {
+	$options = array();
+	$options['hide_edit'] = TRUE;
+	return sirius_steward_sched_render($sched_node, $options);
 }

@@ -13,7 +13,7 @@ function sirius_steward_checkin_status_list() {
 
 function sirius_steward_checkin_search($params = array()) {
 	$sql_args = array();
-	$sql = "select distinct nid ";
+	$sql = "select distinct nid, field_sirius_json_value ";
 	$sql .= "from node ";
 	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
@@ -52,11 +52,22 @@ function sirius_steward_checkin_search($params = array()) {
 	$stmt = sirius_sql_query($sql, $sql_args);
 	$checkin_nids = array();
 	while ($hr = $stmt->fetchAssoc()) {
+		$checkin_json = json_decode($hr['field_sirius_json_value'], TRUE);
+
+		if ($params['in_ts_after']) {
+			if (!$checkin_json['in']['ts']) { continue; }
+			if ($checkin_json['in']['ts'] < $params['in_ts_after']) { continue; }
+		}
+
+		if ($params['in_ts_before']) {
+			if (!$checkin_json['in']['ts']) { continue; }
+			if ($checkin_json['in']['ts'] > $params['in_ts_before']) { continue; }
+		}
+
 		$checkin_nids[] = $hr['nid'];
 	}
 
 	return $checkin_nids;
-
 }
 
 function sirius_steward_checkin_in_possible($facility_nid, $worker_nid, $json) {
@@ -214,14 +225,16 @@ function sirius_steward_checkin_render_list($checkin_nids, $options = array()) {
 	}
 
 	$header = array();
-	if (!$options['hide_facility']) { $header[] = t('Facility'); }
-	if (!$options['hide_worker']) { $header[] = t('Steward'); }
-	if (!$options['hide_phone']) { $header[] = t('Phone'); }
-	if (!$options['hide_employer']) { $header[] = t('Employer'); }
-	if (!$options['hide_status']) { $header[] = t('Status'); }
-	if (!$options['hide_in']) { $header[] = t('In'); }
-	if (!$options['hide_out']) { $header[] = t('out'); }
-	if (!$options['hide_tools']) { $header[] = t('Tools'); }
+	if (!$options['hide_header']) {
+		if (!$options['hide_facility']) { $header[] = t('Facility'); }
+		if (!$options['hide_worker']) { $header[] = t('Steward'); }
+		if (!$options['hide_phone']) { $header[] = t('Phone'); }
+		if (!$options['hide_employer']) { $header[] = t('Employer'); }
+		if (!$options['hide_status']) { $header[] = t('Status'); }
+		if (!$options['hide_in']) { $header[] = t('In'); }
+		if (!$options['hide_out']) { $header[] = t('out'); }
+		if (!$options['hide_tools']) { $header[] = t('Tools'); }
+	}
 
 	return sirius_table_render($header, $rows, array('class' => array('sirius_table_align')));
 }
