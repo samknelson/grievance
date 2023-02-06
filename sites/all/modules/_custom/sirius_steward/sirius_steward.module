@@ -53,6 +53,10 @@ function sirius_steward_search($params = array()) {
     $sql .= "and field_grievance_shop_target_id = :employer_nid ";
     $sql_args[':employer_nid'] = $params['employer_nid'];
   }
+  if ($params['name']) {
+    $sql .= "and node.title like :name ";
+    $sql_args[':name'] = '%' . $params['name'] . '%';
+  }
   if ($domain_nid) {
     $sql .= "and field_sirius_domain_target_id = :domain_nid ";
     $sql_args[':domain_nid'] = $domain_nid;
