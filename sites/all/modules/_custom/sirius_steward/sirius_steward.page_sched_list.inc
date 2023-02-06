@@ -47,8 +47,16 @@ function sirius_steward_page_sched_list_form($form, &$form_state) {
 		$sched_nids = sirius_steward_sched_list($search_params);
 		$sched_nodes = node_load_multiple($sched_nids);
 		if ($sched_nodes) {
+
+
+
 			$header = array('Employer', 'Date', 'Tools');
-			$rows = array();
+
+			// @todo It's challenging to sort these, because we don't have the employer name until we load the node and the log handler, and
+			//       we don't have the date until we extract the JSON. This code is ugly and should be moved into the sched library,
+			//       and generally made better.
+
+			$data = array();
 			foreach ($sched_nodes as $sched_nid => $sched_node) {
 				$employer_node = sirius_log_handler($sched_node, 'grievance_shop');
 				$sched_json = sirius_json_get($sched_node);
@@ -61,8 +69,12 @@ function sirius_steward_page_sched_list_form($form, &$form_state) {
 				$row[] = $employer_node->title;
 				$row[] = date('l, F j, Y', strtotime($sched_json['date']));
 				$row[] = join(' ', $tools);
-				$rows[] = $row;
+
+				$key = $employer_node->title . '|' . $sched_json['date'];
+				$data[$key] = $row;
 			}
+			ksort($data);
+			$rows = array_values($data);
 			$html = sirius_table_render($header, $rows);
 		} else {
 			$html = '<p>' . t('No steward schedule records found.') . '</p>';
