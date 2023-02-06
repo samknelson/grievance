@@ -11,18 +11,26 @@ function sirius_steward_page_sched_list_form($form, &$form_state) {
 		'#type' => 'select',
 		'#title' => t('Employer'),
 		'#options' => array(NULL => t('-- Select --')) + $employers,
-		'#required' => TRUE,
 	);
 
-	$form['date'] = array(
-		'#title' => t('Date'),
+	$form['start_date'] = array(
+		'#title' => t('Start Date'),
 		'#type' => 'date_popup',
     '#attributes' => array(
       'autocomplete' => 'off',
     ),
-    '#required' => TRUE,
     '#date_format' => 'Y-m-d',
     '#default_value' => date('Y-m-d'),
+	);
+
+	$form['end_date'] = array(
+		'#title' => t('End Date'),
+		'#type' => 'date_popup',
+    '#attributes' => array(
+      'autocomplete' => 'off',
+    ),
+    '#date_format' => 'Y-m-d',
+    '#default_value' => date('Y-m-d', strtotime('+7 days')),
 	);
 
 	$form['submit'] = array(
@@ -30,11 +38,41 @@ function sirius_steward_page_sched_list_form($form, &$form_state) {
 		'#value' => t('Go'),
 	);
 
+	if ($form_state['submitted']) {
+		$search_params = array();
+		$search_params['employer_nid'] = $form_state['values']['employer_nid'];
+		$search_params['date'] = $form_state['values']['date'];
+		$search_params['start_date'] = $form_state['values']['start_date'];
+		$search_params['end_date'] = $form_state['values']['end_date'];
+		$sched_nids = sirius_steward_sched_list($search_params);
+		$sched_nodes = node_load_multiple($sched_nids);
+		if ($sched_nodes) {
+			$header = array('Employer', 'Date', 'Tools');
+			$rows = array();
+			foreach ($sched_nodes as $sched_nid => $sched_node) {
+				$employer_node = sirius_log_handler($sched_node, 'grievance_shop');
+				$sched_json = sirius_json_get($sched_node);
+
+				$tools = array();
+				$tools[] = l('View', 'node/' . $sched_nid . '/sirius_steward_log_sched/view', array('attributes' => array('class' => array('tool-button'))));
+				$tools[] = l('Edit', 'node/' . $sched_nid . '/sirius_steward_log_sched/edit', array('attributes' => array('class' => array('tool-button'))));
+
+				$row = array();
+				$row[] = $employer_node->title;
+				$row[] = date('l, F j, Y', strtotime($sched_json['date']));
+				$row[] = join(' ', $tools);
+				$rows[] = $row;
+			}
+			$html = sirius_table_render($header, $rows);
+		} else {
+			$html = '<p>' . t('No steward schedule records found.') . '</p>';
+		}
+		$form['results'] = array('#markup' => $html);
+	}
+
 	return $form;
 }
 
 function sirius_steward_page_sched_list_form_submit($form, &$form_state) {
-	$employer_nid = $form_state['values']['employer_nid'];
-	$sched_node = sirius_steward_sched_fetch($employer_nid, $form_state['values']['date'], TRUE);
-	drupal_goto('node/' . $sched_node->nid . '/sirius_steward_log_sched');
+	$form_state['rebuild'] = TRUE;
 }

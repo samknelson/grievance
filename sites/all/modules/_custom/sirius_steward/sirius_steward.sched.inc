@@ -33,22 +33,51 @@ function sirius_steward_sched_access($action, $employer_nid) {
 
 function sirius_steward_sched_list($search_params) {
 	$domain_nid = sirius_domain_nid();
-	$query = new EntityFieldQuery;
-	$query->entityCondition('entity_type', 'node');
-	$query->entityCondition('bundle', 'sirius_log');
-	if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
-	$query->fieldCondition('field_sirius_category', 'value', 'steward:sched');
-	// $query->fieldCondition('field_sirius_type', 'value', array('draft', 'active'), 'in');
-	if ($search_params['employer_nid']) { $query->fieldCondition('field_sirius_log_handler', 'target_id', $search_params['employer_nid']); }
-	if ($search_params['key']) { $query->fieldCondition('field_sirius_notes', 'value', $search_params['key']); }
-	if ($search_params['date']) { $query->fieldCondition('field_sirius_notes', 'value', '%/' . $search_params['date'], 'like'); }
+
+	$sql_args = array();
+	$sql = "select distinct nid from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_log' ";
+	$sql .= "and field_sirius_category_value = 'steward:sched' ";
+	if ($search_params['key']) {
+		$sql .= "and field_sirius_notes_value = :key ";
+		$sql_args[':key'] = $search_params['key'];
+	}
+	if ($search_params['employer_nid']) {
+		$sql .= "and field_sirius_log_handler_target_id = :employer_nid ";
+		$sql_args[':employer_nid'] = $search_params['employer_nid'];
+	}
+	if ($search_params['date']) {
+		$sql .= "and field_sirius_notes_value like :date_pattern ";
+		$sql_args[':date_pattern'] = '%/' . $search_params['date'];
+	}
+	if ($search_params['start_date']) {
+		$sql .= "and json_unquote(json_extract(field_sirius_json_value, '\$.date')) >= :start_date ";
+		$sql_args[':start_date'] = $search_params['start_date'];
+	}
+	if ($search_params['end_date']) {
+		$sql .= "and json_unquote(json_extract(field_sirius_json_value, '\$.date')) <= :end_date ";
+		$sql_args[':end_date'] = $search_params['end_date'];
+	}
+	if ($domain_nid) { 
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	} else {
+		$sql .= "and field_sirius_domain_target_id is null ";
+	}
 	$limit = $search_params['limit'];
 	if (!$limit) { $limit = 1000; }
-	$query->range(0, $limit);
-	$query->propertyOrderBy('nid', 'desc');
-	$stmt = $query->execute();
-	if (!$stmt['node']) { return array(); }
-	return array_keys($stmt['node']);
+	$sql .= "order by nid desc ";
+	$sql .= "limit $limit";
+
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$sched_nids = array();
+	while ($hr = $stmt->fetchAssoc()) { $sched_nids[] = $hr['nid']; }
+	return $sched_nids;
 }
 
 function sirius_steward_sched_fetch($employer_nid, $date, $create = FALSE) {
