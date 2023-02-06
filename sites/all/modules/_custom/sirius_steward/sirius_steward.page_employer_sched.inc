@@ -28,7 +28,8 @@ function sirius_steward_node_tab_employer_sched_form($form, &$form_state, $emplo
 	$form['intro'] = array('#markup' => $html);
 
 	if (user_access('sirius steward sched worker')) {
-		$html .= '<h2>' . t('Create or Edit a Steward Schedule') . '</h2>';
+		$html = '<h2>' . t('Create or Edit a Steward Schedule') . '</h2>';
+
 		$form['date'] = array(
 			'#title' => t('Date'),
 			'#type' => 'date_popup',
@@ -38,6 +39,7 @@ function sirius_steward_node_tab_employer_sched_form($form, &$form_state, $emplo
 	    '#required' => TRUE,
 	    '#date_format' => 'Y-m-d',
 	    '#default_value' => date('Y-m-d'),
+	    '#prefix' => $html,
 		);
 
 		$form['submit'] = array(
@@ -50,9 +52,13 @@ function sirius_steward_node_tab_employer_sched_form($form, &$form_state, $emplo
 }
 
 function sirius_steward_node_tab_employer_sched_form_validate($form, &$form_state) {
-	$date = $form_state['values']['date'];
-	if (strtotime($date) < strtotime('-1 day')) {
-		form_set_error('date', 'Please enter a date in the future.');
+	// Only admins can edit past schedules
+	if (!user_access('sirius steward admin')) {
+		$date = $form_state['values']['date'];
+		if (!$date) { return FALSE; }
+		if (strtotime($date) < strtotime(date('Y-m-d'))) { 
+			form_set_error('date', 'Please enter a date in the future.');
+		}
 	}
 }
 
@@ -60,5 +66,5 @@ function sirius_steward_node_tab_employer_sched_form_validate($form, &$form_stat
 function sirius_steward_node_tab_employer_sched_form_submit($form, &$form_state) {
 	$employer_nid = $form_state['employer_nid'];
 	$sched_node = sirius_steward_sched_fetch($employer_nid, $form_state['values']['date'], TRUE);
-	drupal_goto('node/' . $sched_node->nid . '/sirius_steward_log_sched/edit');
+	drupal_goto('node/' . $sched_node->nid . '/sirius_steward_log_sched/edit', array('query' => array('destination' => current_path())));
 }
