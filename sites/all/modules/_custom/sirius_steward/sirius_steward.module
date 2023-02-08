@@ -2,7 +2,25 @@
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '/sirius_steward.menu.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '/sirius_steward.permission.inc';
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '/sirius_steward.facility_checkin.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '/sirius_steward.checkin.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '/sirius_steward.sched.inc';
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_steward_sirius_domain_component_info() {
+  return array(
+    'steward:checkin' => array(
+      'title' => 'Steward - Checkin',
+      'description' => 'Enable steward checkin functionality for facilities',
+    ),
+    'steward:sched' => array(
+      'title' => 'Steward - Schedule',
+      'description' => 'Enable steward scheduling tools for employers',
+    ),
+  );
+}
 
 /**
  * Implements hook_sirius_config_links_alter
@@ -12,3 +30,64 @@ function sirius_steward_sirius_config_links_alter(&$links) {
   $links['steward'] = array('title' => 'Steward');
   $links['steward']['links']['sirius/steward/config'] = array('title' => 'Config', 'description' => 'Configure client and server service access.');
 }
+
+function sirius_steward_search($params = array()) {
+  $roles = user_roles(TRUE, 'sirius steward');
+  if (!$roles) { return array(); }
+  $rids = array_keys($roles);
+
+  $domain_nid = sirius_domain_nid();
+  $sql_args = array();
+
+  $sql = "select distinct nid from node ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  if ($params['employer_nid']) {
+    $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid ";
+  }
+  $sql .= "left join field_data_field_sirius_contact worker_contact on worker_contact.entity_type = 'node' and worker_contact.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_contact user_contact on user_contact.entity_type = 'user' and user_contact.field_sirius_contact_target_id = worker_contact.field_sirius_contact_target_id ";
+  $sql .= "left join users on users.uid = user_contact.entity_id ";
+  $sql .= "left join users_roles on users.uid = users_roles.uid ";
+  $sql .= "where node.type = 'sirius_worker' ";
+  if ($params['employer_nid']) {
+    $sql .= "and field_grievance_shop_target_id = :employer_nid ";
+    $sql_args[':employer_nid'] = $params['employer_nid'];
+  }
+  if ($params['name']) {
+    $sql .= "and node.title like :name ";
+    $sql_args[':name'] = '%' . $params['name'] . '%';
+  }
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id is null ";
+  }
+  $sql .= "and rid in (:rids) ";
+  $sql_args[':rids'] = $rids;
+  $sql .= "order by node.title limit 100 ";
+  $stmt = sirius_sql_query($sql, $sql_args);
+
+  $worker_nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $worker_nids[] = $hr['nid'];
+  }
+
+  if ($params['checkin_status']) {
+    $worker_nids_good = array();
+    foreach ($worker_nids as $worker_nid) {
+      $checkin_params = array();
+      $checkin_params['worker_nid'] = $worker_nid;
+      $checkin_params['status'] = 'in';
+      $checkin_nids = sirius_steward_checkin_search($checkin_params);
+
+      if ($params['checkin_status'] == 'in' && !$checkin_nids) { continue; }
+      if ($params['checkin_status'] == 'out' && $checkin_nids) { continue; }
+      $worker_nids_good[] = $worker_nid;
+    }
+    $worker_nids = $worker_nids_good;
+  }
+
+  return node_load_multiple($worker_nids);
+}
+

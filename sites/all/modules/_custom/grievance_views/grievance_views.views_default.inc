@@ -14944,7 +14944,7 @@ Grievance Form',
   $handler->display->display_options['filters']['field_grievance_broughtby_tid']['id'] = 'field_grievance_broughtby_tid';
   $handler->display->display_options['filters']['field_grievance_broughtby_tid']['table'] = 'field_data_field_grievance_broughtby';
   $handler->display->display_options['filters']['field_grievance_broughtby_tid']['field'] = 'field_grievance_broughtby_tid';
-  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_grievance_broughtby_tid']['operator'] = 'empty';
   $handler->display->display_options['filters']['field_grievance_broughtby_tid']['expose']['operator_id'] = 'field_grievance_broughtby_tid_op';
   $handler->display->display_options['filters']['field_grievance_broughtby_tid']['expose']['label'] = 'Brought By';
   $handler->display->display_options['filters']['field_grievance_broughtby_tid']['expose']['operator'] = 'field_grievance_broughtby_tid_op';
@@ -20326,7 +20326,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Field: Worker Count */
+  /* Field: Field: Sequence */
   $handler->display->display_options['fields']['field_sirius_count']['id'] = 'field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['table'] = 'field_data_field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['field'] = 'field_sirius_count';
@@ -20422,7 +20422,7 @@ Grievance Form',
     t('Created'),
     t('Start Date / Time'),
     t('End Date / Time'),
-    t('Worker Count'),
+    t('Sequence'),
     t('Accepted'),
     t('Tools'),
     t('<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a> <a href="/node/[nid]/sirius_dispatch_job_dispatches" target="_blank" class="tool-button">Dispatches</a>'),
@@ -21024,7 +21024,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Field: Worker Count */
+  /* Field: Field: Sequence */
   $handler->display->display_options['fields']['field_sirius_count']['id'] = 'field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['table'] = 'field_data_field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['field'] = 'field_sirius_count';
@@ -21184,7 +21184,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Field: Worker Count */
+  /* Field: Field: Sequence */
   $handler->display->display_options['fields']['field_sirius_count']['id'] = 'field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['table'] = 'field_data_field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['field'] = 'field_sirius_count';
@@ -21361,7 +21361,7 @@ Grievance Form',
     t('Status'),
     t('Created'),
     t('Start Date / Time'),
-    t('Worker Count'),
+    t('Sequence'),
     t('Notified'),
     t('Accepted'),
     t('Declined'),
@@ -21683,7 +21683,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Field: Worker Count */
+  /* Field: Field: Sequence */
   $handler->display->display_options['fields']['field_sirius_count']['id'] = 'field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['table'] = 'field_data_field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['field'] = 'field_sirius_count';
@@ -22100,7 +22100,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Field: Worker Count */
+  /* Field: Field: Sequence */
   $handler->display->display_options['fields']['field_sirius_count']['id'] = 'field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['table'] = 'field_data_field_sirius_count';
   $handler->display->display_options['fields']['field_sirius_count']['field'] = 'field_sirius_count';
@@ -22175,7 +22175,7 @@ Grievance Form',
     t('Status'),
     t('Created'),
     t('Report Date'),
-    t('Worker Count'),
+    t('Sequence'),
     t('Notified'),
     t('Accepted'),
     t('Declined'),
@@ -31931,6 +31931,10 @@ Grievance Form',
   $handler->display->display_options['fields']['tid']['field'] = 'tid';
   $handler->display->display_options['fields']['tid']['exclude'] = TRUE;
   $handler->display->display_options['fields']['tid']['separator'] = '';
+  /* Field: Field: ID */
+  $handler->display->display_options['fields']['field_sirius_id']['id'] = 'field_sirius_id';
+  $handler->display->display_options['fields']['field_sirius_id']['table'] = 'field_data_field_sirius_id';
+  $handler->display->display_options['fields']['field_sirius_id']['field'] = 'field_sirius_id';
   /* Field: Taxonomy term: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'taxonomy_term_data';

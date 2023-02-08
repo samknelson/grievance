@@ -15496,7 +15496,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15520,7 +15520,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -15674,6 +15674,55 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-sirius_contact_relationship-field_sirius_count'.
+  $field_instances['node-sirius_contact_relationship-field_sirius_count'] = array(
+    'bundle' => 'sirius_contact_relationship',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_count',
+    'label' => 'Sequence',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-sirius_contact_relationship-field_sirius_date_end'.
   $field_instances['node-sirius_contact_relationship-field_sirius_date_end'] = array(
     'bundle' => 'sirius_contact_relationship',
@@ -15694,7 +15743,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15767,7 +15816,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -15792,7 +15841,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15865,7 +15914,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -15881,7 +15930,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 4,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15905,7 +15954,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -15921,7 +15970,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 5,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15943,7 +15992,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -30315,7 +30364,7 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => 'The maximum number of active relationships of this type that a contact can have. For example, a person might only be permitted to have one spouse at a time.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'number',
         'settings' => array(
           'decimal_separator' => '.',
@@ -30325,7 +30374,7 @@ If the file has multiple pages, then each page in the input document will use th
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 4,
+        'weight' => 3,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30345,7 +30394,7 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -30361,7 +30410,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 1,
+        'weight' => 4,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30379,7 +30428,45 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_contact_relationship_types-field_sirius_id'.
+  $field_instances['taxonomy_term-sirius_contact_relationship_types-field_sirius_id'] = array(
+    'bundle' => 'sirius_contact_relationship_types',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_id',
+    'label' => 'ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
     ),
   );
 
@@ -30395,7 +30482,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 5,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30411,7 +30498,7 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -30424,13 +30511,13 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => 'I.e. "Child"',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -33683,6 +33770,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Select the system roles that the user associated with workers with this member status should receive. For example, if the member status is "journeyman", and journeymen have a special role granting them additional permission, you might add that role here.');
   t('Send Date');
   t('Send Notifications?');
+  t('Sequence');
   t('Settlement Amount');
   t('Settlement Tags');
   t('Shift');

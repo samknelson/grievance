@@ -1,8 +1,6 @@
 <?php
 
-// I hate notice errors
-ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
-
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.inc';
@@ -60,6 +58,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.disclaimer.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mailattach.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.customfield.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.bookmark.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.config.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.public.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';
@@ -1051,6 +1050,7 @@ function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $
 
 function sirius_table_render($header, $rows, $attributes = array()) {
   drupal_add_css(drupal_get_path('module', 'sirius') . '/css/table.css');
+  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/table.js', 'file');
   $attributes['class'][] = 'sirius_table';
   return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
 }
@@ -1085,6 +1085,14 @@ function sirius_node_title($nid) {
   $stmt = sirius_sql_query($sql, array(':nid' => $nid));
   $hr = $stmt->fetchAssoc();
   return $hr['title'];
+}
+
+function sirius_term_title($tid) {
+  if (!$tid) { return NULL; }
+  $sql = "select name from taxonomy_term_data where tid = :tid";
+  $stmt = sirius_sql_query($sql, array(':tid' => $tid));
+  $hr = $stmt->fetchAssoc();
+  return $hr['name'];
 }
 
 /**

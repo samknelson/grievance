@@ -1469,6 +1469,96 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Steward - Check-in List',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1674254606,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '2d1592c6-810e-4196-9168-d034a2fea8d9',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_worker_steward',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Select a facility to view which stewards are checked in.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2023-01-20 14:43:26 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Custom Contact Fields - Display',
   'log' => '',
   'status' => 1,
@@ -5337,7 +5427,7 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
-  'title' => 'Steward - Settings',
+  'title' => 'Steward - Settings - Checkin',
   'log' => '',
   'status' => 1,
   'comment' => 0,
@@ -5360,7 +5450,9 @@ function grievance_content_types_uuid_features_default_content() {
 <p>Stewards can "check in" to a facility, indicating that they are presence. This flags them as available to other workers dispatched to the facility.</p>
 
 <ul>
-	<li><strong>Disclaimer:&nbsp;</strong>Specify the disclaimer that stewards must accept when the check in. Disclaimers are managed <a href="/sirius/disclaimer/list">here.</a></li>
+	<li><strong>Disclaimer:&nbsp;</strong>Specify the disclaimer that stewards must accept when the check in. Disclaimers are managed <a href="/sirius/disclaimer/list">here.</a><br />
+	&nbsp;</li>
+	<li><strong>Custom Fieldsets:&nbsp;</strong>Specify the custom fieldsets (or surveys) which steawards must complete on checkin or checkout. Custom fieldsets are managed&nbsp;&nbsp;<a href="/sirius/customfield/definition/list">here.</a></li>
 </ul>
 ',
         'summary' => '',
@@ -5372,7 +5464,7 @@ function grievance_content_types_uuid_features_default_content() {
   'field_sirius_paths' => array(
     'und' => array(
       0 => array(
-        'value' => 'sirius/steward/config',
+        'value' => 'sirius/steward/config/checkin',
         'format' => NULL,
       ),
     ),
@@ -5380,7 +5472,7 @@ function grievance_content_types_uuid_features_default_content() {
   'field_sirius_summary' => array(
     'und' => array(
       0 => array(
-        'value' => '<p>Use this form to configure settings for stewards.</p>
+        'value' => '<p>Use this form to configure settings for stewards "checkin" tools.</p>
 ',
         'format' => 'full_html',
       ),
