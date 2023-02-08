@@ -38,7 +38,7 @@ function report_cache_access($report_type) {
 	}
 	
 	$access = $info['access'];
-	if (!$access) { $access = 'access site reports'; }
+	if (!$access) { $access = 'grievance report'; }
 
 	return user_access($access);
 }

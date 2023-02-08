@@ -16,7 +16,7 @@ function report_cache_form_prepare($report_type, &$form, &$form_state) {
 		'#markup' => 
 			t('Use the form below to re-generate the report.  The results from previous runs may be seen ') .
 			'<strong>' . 
-			l(t('here'), "sirius/reports/grievance-report-log-include-exclude/$report_type") .
+			l(t('here'), "sirius/reports/$report_type") .
 			'</strong>',
 	);
 	
