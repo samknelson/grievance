@@ -143,9 +143,9 @@ function sirius_term_tab_content($term, $in_tab_name) {
       return '';
     }
     $callback = 'drupal_get_form';
-    $args = array($callback_form, $node);
+    $args = array($callback_form, $term);
   }
-  
+
   drupal_set_title($term->name);
   if ($tab_record['callback arguments']) {
     $args = array_merge($args, $tab_record['callback arguments']);
