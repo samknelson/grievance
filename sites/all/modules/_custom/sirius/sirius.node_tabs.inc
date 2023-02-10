@@ -135,6 +135,17 @@ function sirius_term_tab_content($term, $in_tab_name) {
 
   $callback = $tab_record['callback'];
   $args = array($term);
+
+  if (!function_exists($callback)) {
+    $callback_form = "$callback" . '_form';
+    if (!function_exists($callback_form)) {
+      drupal_set_message("Callback doesn't exist: $callback", 'error');
+      return '';
+    }
+    $callback = 'drupal_get_form';
+    $args = array($callback_form, $node);
+  }
+  
   drupal_set_title($term->name);
   if ($tab_record['callback arguments']) {
     $args = array_merge($args, $tab_record['callback arguments']);
