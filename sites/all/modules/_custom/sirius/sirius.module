@@ -328,27 +328,6 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     sirius_domain_restrict_taxonomy_fields($form, $form_id);
   }
 
-  // Remove access to some JSON fields
-  if ($form_id == 'sirius_worker_node_form' ||
-      $form_id == 'grievance_shop_node_form' ||
-      $form_id == 'sirius_dispatch_node_form' ||
-      $form_id == 'sirius_dispatch_job_node_form' ||
-      $form_id == 'grievance_node_form' ||
-      $form_id == 'sirius_contact_node_form' || 
-      $form_id == 'sirius_json_definition_node_form' ||
-      $form_id == 'sirius_event_participant_node_form' ||
-      $form_id == 'sirius_phonenumber_node_form' || 
-      $form_id == 'sirius_emailaddress_node_form' || 
-      $form_id == 'sirius_bulk_node_form' ||
-      $form_id == 'sirius_ledger_account_node_form' ||
-      $form_id == 'sirius_employee_node_form' ||
-      $form_id == 'grievance_letter_template_node_form' ||
-      $form_id == 'property_node_form' ||
-      $form_id == 'sirius_contact_relationship_node_form' ||
-      $form_id == 'sirius_trust_worker_benefit_node_form') {
-    if (!user_access('sirius admin')) { $form['field_sirius_json']['#access'] = FALSE; }
-  }
-
   if ($form_id == 'sirius_contact_relationship_node_form') {
     sirius_contact_relationship_node_form_alter($form, $form_state, $form_id);
   }
@@ -774,11 +753,24 @@ function sirius_field_changed($node1, $node2, $field_name) {
 
 
 function sirius_find_nid_by_id($sirius_id, $bundle) {
-  $sql = "select entity_id from field_data_field_sirius_id ";
-  $sql .= "where entity_type = 'node' ";
-  $sql .= "and bundle = :bundle ";
+  $domain_nid = sirius_domain_nid();
+
+  $sql_args = array();
+  $sql = "select field_data_field_sirius_id.entity_id ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "where node.type = :bundle ";
   $sql .= "and field_sirius_id_value = :sirius_id ";
-  $stmt = db_query($sql, array(':bundle' => $bundle, ':sirius_id' => $sirius_id));
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id is null ";
+  }
+  $sql_args[':bundle'] = $bundle;
+  $sql_args[':sirius_id'] = $sirius_id;
+  $stmt = sirius_sql_query($sql, $sql_args);
   $hr = $stmt->fetchAssoc();
   return $hr['entity_id'];
 }
