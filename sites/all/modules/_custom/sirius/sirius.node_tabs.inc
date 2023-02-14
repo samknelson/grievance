@@ -3,7 +3,9 @@
 function sirius_node_tab_set_module($module_name, &$node_tabs) {
   foreach ($node_tabs as $content_type => $ignore) {
     foreach ($node_tabs[$content_type] as $path => $ignore) {
-      $node_tabs[$content_type][$path]['module'] = $module_name;
+      if (!$node_tabs[$content_type][$path]['module']) {
+        $node_tabs[$content_type][$path]['module'] = $module_name;
+      }
     }
   }
 }
