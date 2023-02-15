@@ -602,6 +602,7 @@ function grievance_preprocess_html(&$variables) {
 
 
 function grievance_views_query_alter(&$view, &$query) {
+  if (!isset($view->name)) { return; }
   grievance_views_query_alter_permission($view, $query); 
   if ($view->name == 'grievances_mine') {
     grievance_views_query_alter_grievances_mine($view, $query);
