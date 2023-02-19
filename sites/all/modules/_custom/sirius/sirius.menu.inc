@@ -316,13 +316,24 @@ function sirius_node_tabs() {
   );
 
   $node_tabs['sirius_json_definition']['sirius_customfield_tab'] = array(
-    'title' => 'Tab',
+    'title' => 'Single-Value Tab',
     'description' => '',
     'callback' => 'sirius_node_tab_customfield_tab',
     'permissions' => array('sirius domain admin'),
     'weight' => 2,
     'file' => 'sirius.page_customfield_tab.inc',
   );
+
+  /*
+  $node_tabs['sirius_json_definition']['sirius_customfield_log'] = array(
+    'title' => 'Multi-Value Tab',
+    'description' => '',
+    'callback' => 'sirius_node_tab_customfield_log',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 3,
+    'file' => 'sirius.page_customfield_log.inc',
+  );
+  */
 
   $node_tabs['sirius_phonenumber']['sirius_phonenumber_info'] = array(
     'title' => 'Info',
