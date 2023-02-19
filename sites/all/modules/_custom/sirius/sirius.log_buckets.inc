@@ -144,6 +144,15 @@ function sirius_log_buckets() {
 				'categories' => array('worker:employer', 'dispatch:status', 'worker:dispstatus', 'worker:availdate', 'worker:dispstatus_block', 'dispatch:dnc'),
 				'can_add' => FALSE,
 			),
+
+			'trust_worker_benefit' => array(
+				'title' => 'Log',
+				'content_type' => 'sirius_trust_worker_benefit',
+				'permissions' => array('sirius domain admin'),
+				'path' => 'sirius_log/log',
+				'weight' => 7,
+				'can_add' => FALSE,
+			),
 		);
 
 		foreach ($buckets as $bucket_id => $bucket) {
