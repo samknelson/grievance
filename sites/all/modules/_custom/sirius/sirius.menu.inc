@@ -880,6 +880,21 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/phonetree/config'] = array(
+    'title' => 'Phone Tree Configuration',
+    'page callback' => 'sirius_page_phonetree_config',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius admin',
+        'component' => 'phonetree',
+      ),
+    ),
+    'file' => 'sirius.page_phonetree_config.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/domain/config'] = array(
     'title' => 'Domain Configuration',
     'page callback' => 'drupal_get_form',
@@ -1228,8 +1243,12 @@ function sirius_menu() {
     'title'            => 'Add Log Entry',
     'page callback'    => 'sirius_log_quicklog_page_add',
     'page arguments'   => array(2),
-    'access callback' => 'sirius_menu_access_multiple_permissions',
-    'access arguments' => array('sirius dispatch staff', 'sirius trust staff'),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permissions' => array('sirius dispatch staff', 'sirius trust staff')
+      ),
+    ),
     'type'             => MENU_LOCAL_ACTION,
     'context'          => MENU_CONTEXT_INLINE,
     'modal'            => TRUE,
@@ -1285,6 +1304,30 @@ function sirius_menu() {
     'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
   );
+
+  $items['sirius/config/by-module/all'] = array(
+    'title' => 'All',
+    'page callback' => 'sirius_page_config',
+    'page arguments' => array(),
+    'access arguments' => array('sirius domain admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $links = sirius_config_links();
+  $weight = 1;
+  foreach ($links as $key => $record) {
+    ++$weight;
+    $items["sirius/config/by-module/$key"] = array(
+      'title' => $record['title'],
+      'page callback' => 'sirius_page_config',
+      'page arguments' => array(3),
+      'access arguments' => array('sirius domain admin'),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => $weight,
+    );
+  }
+
 
   $items['sirius/customfield/definition/list'] = array(
     'title' => 'Custom Field Definitions',
@@ -1539,14 +1582,33 @@ function sirius_modal_styles() {
 }
 
 /**
- * Utility function to allow a menu item to accept any one of multiple permissions
+ * Utility function to wrap permission, component, and other restrictions
  */
 
-function sirius_menu_access_multiple_permissions() {
-  $permissions = func_get_args();
-  foreach ($permissions as $permission) {
-    if (user_access($permission)) { return TRUE; }
+function sirius_menu_access_callback($options) {
+  // Simple permission
+  if ($options['permission']) {
+    if (!user_access($options['permission'])) {
+      return FALSE; 
+    }
   }
-  return FALSE;
-}
 
+  // Multiple permissions
+  if ($options['permissions']) {
+    $found = FALSE;
+    foreach ($options['permissions'] as $permission) {
+      if (user_access($permission)) { $found = TRUE; }
+    }
+    if (!$found) { return FALSE; }
+  } 
+
+  // Component
+  if ($options['component']) {
+    if (!sirius_domain_component_enabled($options['component'])) {
+      return FALSE;
+    }
+  }
+
+  // Passed all tests
+  return TRUE;
+}

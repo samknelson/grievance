@@ -7,39 +7,15 @@
 function grievance_imis_menu() {
   $items = array();
 
-	$items['admin/config/grievance/imis'] = array(
-		'title' => 'Grievance Module - SePuede',
-		'description' => t('Settings for the SePuede integration'),
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('grievance_imis_admin'),
-		'access arguments' => array('grievance admin'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-
-	$items['admin/config/grievance/imis/settings'] = array(
-		'title' => 'Settings',
-		'description' => t('Settings for the SePuede integration'),
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('grievance_imis_admin'),
-		'access arguments' => array('grievance admin'),
-		'type' => MENU_DEFAULT_LOCAL_TASK,
-	);
-
-	$items['admin/config/grievance/imis/test'] = array(
-		'title' => 'Test',
-		'description' => t('Test the SePuede connection and search'),
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('grievance_imis_test_form'),
-		'access arguments' => array('grievance admin'),
+	$items['user/%/grievance_imis_user_settings'] = array(
+		'title' => 'SePuede',
+		'page callback' => 'grievance_imis_user_settings',
+		'page arguments' => array(1),
+		'access callback' => 'grievance_imis_user_settings_access',
+		'access arguments' => array(1),
 		'type' => MENU_LOCAL_TASK,
-	);
-
-	$items['grievance/imis/lookup/%'] = array(
-		'page callback' => 'grievance_imis_lookup_ajax',
-		'page arguments' => array(3),
-		'access arguments' => array('grievance user'),
-		'type' => MENU_CALLBACK,
 	);
 
   return $items;
 }
+

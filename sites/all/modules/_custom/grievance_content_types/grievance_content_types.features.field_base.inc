@@ -4646,6 +4646,7 @@ function grievance_content_types_field_default_field_bases() {
         'grievance' => 'Grievance',
         'sirius_worker' => 'Worker',
         'sirius_employer' => 'Employer',
+        'sirius_dispatch_job_group' => 'Dispatch Job Group',
       ),
       'allowed_values_function' => '',
     ),

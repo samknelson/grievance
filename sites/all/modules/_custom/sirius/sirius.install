@@ -363,11 +363,33 @@ function sirius_update_7021() {
 }
 
 /**
+ * Uninstall some unnecessary modules
+ */
+
+function sirius_update_7022() {
+  $modules = array(
+    'grievance_oneoffs',
+    'grievance_pages',
+    'grievance_menus',
+    'grievance_settings',
+    'grievance_roles_and_permissions',
+  );
+
+  foreach ($modules as $module) {
+    if (module_exists($module)) {
+      print "Removing: $module\n";
+      module_disable(array($module));
+      drupal_uninstall_modules(array($module));
+    }
+  }
+}
+
+/**
  * Migrate the grievance_gender field
  */
 
-function sirius_updatex_7022() {
-  sirius_require('sirius', 'install/sirius.update_7022.inc');
+function sirius_update_7023() {
+  sirius_require('sirius', 'install/sirius.update_7023.inc');
   sirius_update_7022_impl();
 }
 

@@ -122,8 +122,8 @@ function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 	// Find any EBA dates in the past
 	$date = date('Y-m-d 00:00:00', strtotime('-1 days'));
 
-	$mode = "test";
-	sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
+	// $mode = "test";
+	// sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
 
 	$sql = "select distinct node.nid from node ";
 	$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";
@@ -165,10 +165,10 @@ function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 				'This was an EBA dispatch and the last scheduled work date has passed, so the dispatch is being automatically terminated.'
 			);
 			if ($result['success']) {
-				++$count['success'];
+				++$count_success;
 				sirius_minilog("-- Layoff succeeded");
 			} else {
-				++$count['failure'];
+				++$count_failure;
 				$last_failure_msg = $result['msg'];
 				sirius_minilog("-- Layoff failed: " . $result['msg'], 'warning');
 			}
