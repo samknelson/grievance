@@ -736,6 +736,7 @@ function sirius_feed_wizard_tag_form_submit($form, &$form_state) {
 function sirius_feed_wizard_verify($info, $data, $feed_node, $current_step) { return drupal_get_form('sirius_feed_wizard_verify_form', $info, $data, $feed_node, $current_step); }
 
 function sirius_feed_wizard_verify_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
+	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/table.js', 'file');
 	$form_state['info'] = $info;
 	$form_state['data'] = $data;
 	$form_state['feed_node'] = $feed_node;
@@ -814,7 +815,7 @@ function sirius_feed_wizard_verify_form_submit($form, &$form_state) {
 	// Get our data
 	$count = 0;
 	$import_data = array();
-	$counts = array();
+	$counts = $warning_counts = array();
 	$callback = $info['feed']['callback_row_verify'];
 	$verify_limit = $form_state['values']['verify_limit'];
 	$precompute = ($form_state['values']['precompute'] == 'Yes');
@@ -837,13 +838,29 @@ function sirius_feed_wizard_verify_form_submit($form, &$form_state) {
 		++$counts[$result['msg']];
 		if ($counts[$result['msg']] == 6) { $preview_data_row['xxxmsgxxx'] .= ' (Subsequent messages of this type will be suppresssed.)'; }
 		if ($counts[$result['msg']] <= 6) { $import_data[] = $preview_data_row; }
+
+		if ($result['warnings']) {
+			foreach ($result['warnings'] as $msg) {
+				++$warning_counts[$msg];
+			}
+		}
 	}
 	$data['rows'] = $count + 1;
+
+	$attributes = array('class' => array('sirius_table_align'));
 
 	$html = "<h2>Verification Summary</h2>";
 	$summary_rows = array();
 	foreach ($counts as $key => $value) { $summary_rows[] = array($key, $value); }
-	$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => array()));
+	$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => $attributes));
+
+	if ($warning_counts) {
+		$html .= "<h2>Warnings</h2>";
+		$summary_rows = array();
+		foreach ($warning_counts as $key => $value) { $summary_rows[] = array($key, $value); }
+		$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => $attributes));
+	}
+
 	$html .= "<h2>Records to Import</h2>";
 	$html .= theme_table(array('rows' => $import_data, 'header' => $import_header, 'attributes' => array()));
 	$data['verify_html'] = $html;
@@ -857,6 +874,8 @@ function sirius_feed_wizard_verify_form_submit($form, &$form_state) {
 function sirius_feed_wizard_process($info, $data, $feed_node, $current_step) { return drupal_get_form('sirius_feed_wizard_process_form', $info, $data, $feed_node, $current_step); }
 
 function sirius_feed_wizard_process_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
+	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/table.js', 'file');
+
 	$form_state['info'] = $info;
 	$form_state['data'] = $data;
 	$form_state['feed_node'] = $feed_node;
@@ -953,6 +972,7 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 	$count = 0;
 	$import_data = array();
 	$counts = $context['results']['counts'];
+	$warning_counts = $context['results']['warning_counts'];
 	$callback = $info['feed']['callback_row_process'];
 	foreach ($sheet->getRowIterator() as $row) {
 		if ($count == 0 && $data['header_row'] == 'Yes') { ++$count; continue; }
@@ -961,7 +981,16 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 		if ($count > $idx+$batch_size) { break; }
 		$import_data_row = sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header);
 		$result = $callback($feed_node, $info, $data, $import_data_row);
+
 		++$counts[$result['msg']];
+
+		if ($result['warnings']) {
+	    $result['warnings'] = array_unique($result['warnings']);
+	    foreach ($result['warnings'] as $warning_msg) {
+	    	++$warning_counts[$warning_msg];
+	    }
+  	  $result['msg'] .= " (Warning: " . join(' / ', $result['warnings']) . ')'; 
+  	}
 
 		$results_row = array();
 		foreach (array_keys($fields) as $field_name) {
@@ -998,6 +1027,7 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 		}
 	}
 	$context['results']['counts'] = $counts;
+	$context['results']['warning_counts'] = $warning_counts;
 
 	$context['message'] = "Processing rows $idx to " . ($idx+$batch_size-1) . ".";
 }
@@ -1005,6 +1035,11 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 function sirius_feed_wizard_process_finish($feed_node, $info, $data, $idx, &$context) {
 	$context['message'] = "Cleaning up.";
 	$data['feed']['counts'] = $context['results']['counts'];
+	if ($data['feed']['counts']) { ksort($data['feed']['counts']); }
+
+	$data['feed']['warning_counts'] = $context['results']['warning_counts'];
+	if ($data['feed']['warning_counts']) { ksort($data['feed']['warning_counts']); }
+
   $feed_node->field_sirius_feed_status['und'][0]['value'] = 'complete';
 
 	$file = new stdClass;
@@ -1039,11 +1074,21 @@ function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed
 	$form_state['feed_node'] = $feed_node;
 	$form_state['current_step'] = $current_step;
 
+	$attributes = array('class' => array('sirius_table_align'));
+
 	$summary_rows = array();
 	foreach ($data['feed']['counts'] as $key => $value) { $summary_rows[] = array($key, $value); }
 	$html = '<h2>' . t('Results Summary') . '</h2>';
-	$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => array()));
+	$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => $attributes));
 	$form['review'] = array('#markup' => $html);
+
+	if ($data['feed']['warning_counts']) {
+		$summary_rows = array();
+		foreach ($data['feed']['warning_counts'] as $key => $value) { $summary_rows[] = array($key, $value); }
+		$html = '<h2>' . t('Warnings') . '</h2>';
+		$html .= theme_table(array('rows' => $summary_rows, 'header' => array('Type', 'Count'), 'attributes' => $attributes));
+		$form['review_warning'] = array('#markup' => $html);
+	}
 
 	if ($info['feed']['results_details']['active']) {
 		$error_limit = $info['feed']['results_details']['error_limit'];
@@ -1051,7 +1096,6 @@ function sirius_feed_wizard_review_form($form, &$form_state, $info, $data, $feed
 		$success_limit = $info['feed']['results_details']['success_limit'];
 		if (!$success_limit) { $success_limit = 1000; }
 
-		$attributes = array('class' => array('sirius_table_align'));
 		if ($data['feed']['results_details']['error']) {
 			$html = '<h2>' . t('Error Rows') . '</h2>';
 			$html .= theme_table(array('header' => $data['feed']['results_details']['header'], 'rows' => $data['feed']['results_details']['error'], 'attributes' => $attributes));
@@ -1199,4 +1243,19 @@ function sirius_feed_handle_pk_nid($content_type, $nid) {
   	'msg' => 'Found node: ' . $hr['title'],
   	'pk' => $nid
   );
+}
+
+function sirius_feed_info_set_titles(&$item) {
+  foreach ($item['feed']['fields'] as $field_name => $field_info) {
+    $group = $field_info['group'];
+    $group_name = $item['feed']['groups'][$group];
+
+    if (!$field_info['title']) {
+      $structure_info = field_info_instance('node', "field_$field_name", $item['feed']['content_type']);
+      if ($structure_info) { $item['feed']['fields'][$field_name]['title'] = $structure_info['label']; }
+    }
+
+    $item['feed']['fields'][$field_name]['title'] = 
+      $group_name . ': ' . $item['feed']['fields'][$field_name]['title'];
+  }
 }

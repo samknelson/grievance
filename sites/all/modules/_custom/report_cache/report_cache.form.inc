@@ -1,5 +1,65 @@
 <?php
 
+function report_cache_parameters_form_callback_empty($report_type) {
+	return array();
+}
+
+function report_cache_generate_form($form, &$form_state, $report_type) {
+  $info = report_cache_info($report_type);
+
+  report_cache_form_prepare($report_type, $form, $form_state);
+
+  if ($info['parameters_form_callback']) {
+	  $instance_options = report_cache_instances_list($report_type);
+	  if ($instance_options) {
+	  	$form['instance'] = array(
+	  		'#title' => t('Load Instance'),
+	  		'#type' => 'select',
+	  		'#options' => array(NULL => t('-- Select --')) + $instance_options,
+				'#ajax' => array(
+			    'callback' => 'report_cache_generate_form_callback_replace',
+			    'method' => 'replace',
+				),
+				'#limit_validation_errors' => array(),
+	  	);
+	  }
+
+  	$form['parameters'] = $info['parameters_form_callback']($report_type);
+  	if ($form['parameters']) {
+	  	if (isset($form_state['input']['instance'])) {
+	  		$uuid = $form_state['input']['instance'];
+	  		$instance = report_cache_instance($report_type, $uuid);
+	  		$form_state['input']['parameters'] = $instance['xxxrawinputxxx']['parameters'];
+	  	}
+	  	$form['parameters']['#type'] = 'fieldset';
+	  	$form['parameters']['#tree'] = TRUE;
+	  	$form['parameters']['#title'] = t('Parameters');
+	  	$form['parameters']['#prefix'] = '<div id=\'report_cache_generate_form_parameters\'>';
+	  	$form['parameters']['#suffix'] = '</div>';
+	  }
+  }
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Generate',
+  );
+
+  return $form;
+}
+
+function report_cache_generate_form_callback_replace($form, $form_state) {
+  $commands = array();
+  $commands[] = ajax_command_replace("#report_cache_generate_form_parameters", render($form['parameters']));
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands
+  );
+}
+
+function report_cache_generate_form_submit($form, &$form_state) {
+  return report_cache_form_submit($form, $form_state);
+}
+
 // Add some fields to a cached report generation form
 function report_cache_form_prepare($report_type, &$form, &$form_state) {
 
@@ -11,6 +71,8 @@ function report_cache_form_prepare($report_type, &$form, &$form_state) {
 		'#collapsible' => TRUE,
   );
 
+
+	/*
 	$form['report_cache']['report_intro'] = array(
 		'#type' => 'markup',
 		'#markup' => 
@@ -19,6 +81,7 @@ function report_cache_form_prepare($report_type, &$form, &$form_state) {
 			l(t('here'), "sirius/reports/$report_type") .
 			'</strong>',
 	);
+	*/
 	
 	$form['report_cache']['report_id'] = array(
 		'#type' => 'textfield',
@@ -48,6 +111,16 @@ function report_cache_form_prepare($report_type, &$form, &$form_state) {
 		'#type' => 'hidden',
 		'#value' => $report_type,
 	);
+
+	/*
+	if (!$form['submit']) {
+	  $form['submit'] = array(
+	    '#type' => 'submit',
+	    '#value' => 'Generate',
+	    '#weight' => 10,
+	  );
+	}
+	*/
 }
 
 function report_cache_form_submit($form, &$form_state) {
@@ -107,6 +180,9 @@ function report_cache_form_submit($form, &$form_state) {
 		),
 		'ts' => array(
 			'started' => time(),
+		),
+		'instance' => array(
+			'uuid' => $form_state['values']['instance'],
 		),
 	);
 	report_cache_parameters($report_type, $report_id, $parameters);
@@ -198,6 +274,8 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 	if (!$row) {
 		return;
 	}
+
+	$instance_uuid = $values['instance'];
 	
 	// A "row" could be multiple.
 	if (is_array($row) && $row['is_multiple']) {
@@ -210,6 +288,7 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 					'report_type' => $report_type,
 					'report_data' => serialize($sub_row),
 					'report_domain_nid' => $domain_nid,
+					'report_instance' => $instance_uuid,
 				)
 			);
 			$stmt->execute();
@@ -223,6 +302,7 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 				'report_type' => $report_type,
 				'report_data' => serialize($row),
 				'report_domain_nid' => $domain_nid,
+				'report_instance' => $instance_uuid,
 			)
 		);
 		$stmt->execute();
@@ -298,3 +378,4 @@ function report_cache_run($report_type, $values = array()) {
 	drupal_save_session($old_state);
 	return;
 }
+

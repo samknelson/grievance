@@ -843,6 +843,16 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/feeds/by-module/%'] = array(
+    'title' => 'Feeds',
+    'description' => '',
+    'access callback' => 'sirius_feed_page_landing_access',
+    'access arguments' => array(3),
+    'page callback' => 'sirius_feed_page_landing',
+    'page arguments' => array(3),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['sirius/feeds/%'] = array(
     'title' => 'Feed List',
     'description' => '',
