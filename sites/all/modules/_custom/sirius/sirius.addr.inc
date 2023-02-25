@@ -252,6 +252,8 @@ function sirius_addr_latlon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
     return ($miles * 1.609344);
   } else if ($unit == "N") {
     return ($miles * 0.8684);
+  } else if ($unit == 'F') { 
+  	return $miles * 5280;
   } else {
     return $miles;
   }

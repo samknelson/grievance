@@ -79,17 +79,18 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 		return array('success' => FALSE, 'msg' => $msg);
 	}
 
-	if ($info['schedule'] == 'daily') {
-		// Run once a day
-		$today = date('Y-m-d');
-		$last_run = variable_get("sirius_cron_scan_${key}_last_run", 0);
-		if ($last_run == $today && !$force) {
-			$msg = "Cron scan: $info[title]: Too soon to run";
-			sirius_minilog($msg);
-			return array('success' => TRUE, 'msg' => $msg);
-		}
-		variable_set("sirius_cron_scan_${key}_last_run", $today);
+	// Too soon to run?
+	if ($info['schedule'] == 'daily') { $today = gmdate('Y-m-d'); }
+	else if ($info['schedule'] == 'hourly') { $today = gmdate('Y-m-d H'); }
+	else { $today = date('Y-m-d H:i'); }
+
+	$last_run = variable_get("sirius_cron_scan_${key}_last_run", 0);
+	if ($last_run == $today && !$force) {
+		$msg = "Cron scan: $info[title]: Too soon to run ($today)";
+		sirius_minilog($msg);
+		return array('success' => TRUE, 'msg' => $msg);
 	}
+	variable_set("sirius_cron_scan_${key}_last_run", $today);
 
 	$scan_node = sirius_cron_scan_get($key, TRUE);
 	$scan_json = sirius_json_get($scan_node);

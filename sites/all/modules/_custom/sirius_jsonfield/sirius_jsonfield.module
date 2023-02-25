@@ -20,10 +20,13 @@ function sirius_jsonfield_form_definition($entity_type, $bundle, $field_name, $e
     $form = $callback($element);
   }
   if (!$form) {
+    /*
     $form = array(
       '#type' => 'markup',
       '#markup' => t('Please supply a form definition by implementing hook_sirius_jsonfield_form_definitions and returning a value for $all_defintions[@entity_type][@bundle][@field_name]', array('@entity_type' => $entity_type, '@bundle' => $bundle, '@field_name' => $field_name)),
     );
+    */
+    $form = array();
   }
 
   return $form;

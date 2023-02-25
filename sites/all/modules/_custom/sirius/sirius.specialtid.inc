@@ -32,9 +32,6 @@ function sirius_specialtid_keys() {
 			'blocked' => array('title' => 'Blocked'),
 			'threestrikes' => array('title' => 'Three-Strikes'),
 		),
-		'sirius_dispatch_job_tags' => array(
-			'ASAP' => array('title' => 'As Soon As Possible (ASAP)'),
-		),
 		'sirius_gender' => array(
 			'M' => array('title' => 'Male'),
 			'F' => array('title' => 'Female'),

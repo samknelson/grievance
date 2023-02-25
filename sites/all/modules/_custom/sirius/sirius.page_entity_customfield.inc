@@ -29,7 +29,7 @@ function sirius_node_tab_entity_customfield($entity_node) {
 	// Get our current customfield set
 	$set_nid = sirius_node_tab_arg(0);
 	if (!$set_nid) { return sirius_page_error("No custom field set selected."); }
-	if (!$sets[$set_nid]) { return sirius_page_error('That custom field set has not been configured for this entity.'); }
+	if (!$sets[$set_nid]) { return sirius_page_error('That custom field set has not been configured for this entity'); }
 	if (!sirius_node_tab_entity_customfield_access_set($entity_node, $set_nid)) { return sirius_page_error('You do not have permission to access that custom field set.'); }
 
 	// Render the particular form we're interested in.
@@ -46,7 +46,7 @@ function sirius_node_tab_entity_customfield_form($form, &$form_state, $entity_no
   $customfield_set_json = sirius_json_get($customfield_set_node);
   $customfield_form = sirius_jsonfield_util_form_get($customfield_set_json, 'default');
   if (!$customfield_form) { 
-    drupal_set_message("No custom fields have been configured. They can be set up " . l('here.', 'sirius/customfield/definition/list'));
+    drupal_set_message("The form for this custom field set has not been configured. It can be set up " . l('here.', 'sirius/customfield/definition/list'));
     return array();
   }
 

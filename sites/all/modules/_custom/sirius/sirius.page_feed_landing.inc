@@ -9,7 +9,7 @@
  * @todo: This is pretty expensive. We should probably just create a permission of some kind.
  */
 
-function sirius_feed_page_landing_access() {
+function sirius_feed_page_landing_access($module = NULL) {
 	$all_info = sirius_wizard_info_all();
 	foreach ($all_info as $key => $info) {
 		if (!$info['feed']) { continue; }
@@ -20,15 +20,35 @@ function sirius_feed_page_landing_access() {
 	return FALSE;
 }
 
-function sirius_feed_page_landing() {
+function sirius_feed_page_landing($module = NULL) {
 	$all_info = sirius_wizard_info_all();
-	$html = '<h2>Available Feeds</h2>';
+
+	// Get our modules
+	$links = array();
+	$links[] = array(
+		'path' => 'sirius/feeds',
+		'title' => t('All Reports'),
+	);
+	$unique = array();
+	foreach ($all_info as $key => $info) {
+		if (!$info['feed']) { continue; }
+		if ($unique[$info['module']]) { continue; }
+		$unique[$info['module']] = TRUE;
+	
+		$links[] = array(
+			'path' => 'sirius/feeds/by-module/' . $info['module'],
+			'title' => $info['module_name'],
+		);
+	}
+	$html .= sirius_quicknav($links);
+
 	$found = FALSE;
 
 	$rows = array();
 
 	foreach ($all_info as $key => $info) {
 		if (!$info['feed']) { continue; }
+		if ($module && ($module != $info['module'])) { continue; }
 		$path = "sirius/feeds/$key";
 		if (drupal_valid_path($path)) {
 
@@ -52,21 +72,25 @@ function sirius_feed_page_landing() {
 				$tools .= l($tool_name, $path, array('attributes' => array('class' => array('tool-button'))));
 			}
 
+			$title = sirius_tooltip_render($info['description'], $info['title']);
+
 			$row = array();
-			$row[] = $info['title'];
+			$row[] = $info['module'];
+			$row[] = $title;
 			$row[] = $last_status;
-			$row[] = $info['description'];
 			$row[] = $tools;
 			$rows[] = $row;
 		}
 	}
 
 	$header = array(
+		t('Module'),
 		t('Name'),
 		t('Latest Feed'),
-		t('Description'),
 		t('Tools'),
 	);
 
-	return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+
+	return $html;
 }
