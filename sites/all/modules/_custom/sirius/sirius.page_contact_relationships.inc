@@ -71,7 +71,8 @@ function sirius_contact_render_relationships($contact_node, $direction, $show_in
   	$row = array();
   	$row[] = $relationship_name;
   	$row[] = $other_contact_node->title;
-  	$row[] = $relationship_node->field_sirius_active['und'][0]['value'];
+    $row[] = $relationship_node->field_sirius_count['und'][0]['value'];
+    $row[] = $relationship_node->field_sirius_active['und'][0]['value'];
   	$row[] = $start_date;
   	$row[] = $end_date;
   	$row[] = join(' ', $tools);
@@ -86,12 +87,13 @@ function sirius_contact_render_relationships($contact_node, $direction, $show_in
   }
 
   $header = array(
-  	'Relationship', 
-  	'Contact', 
-  	'Active',
-  	'Start Date',
-  	'End Date',
-  	'Tools'
+  	t('Relationship'), 
+  	t('Contact'),
+    t('Sequence'),
+  	t('Active'),
+  	t('Start Date'),
+  	t('End Date'),
+  	t('Tools'),
   );
 
   return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => array('sirius_table_align', 'sirius_contact_relationships'))));

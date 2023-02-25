@@ -6,6 +6,23 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_steward') . '/sirius_steward.sched.inc';
 
 /**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_steward_sirius_domain_component_info() {
+  return array(
+    'steward:checkin' => array(
+      'title' => 'Steward - Checkin',
+      'description' => 'Enable steward checkin functionality for facilities',
+    ),
+    'steward:sched' => array(
+      'title' => 'Steward - Schedule',
+      'description' => 'Enable steward scheduling tools for employers',
+    ),
+  );
+}
+
+/**
  * Implements hook_sirius_config_links_alter
  */
 
@@ -35,6 +52,10 @@ function sirius_steward_search($params = array()) {
   if ($params['employer_nid']) {
     $sql .= "and field_grievance_shop_target_id = :employer_nid ";
     $sql_args[':employer_nid'] = $params['employer_nid'];
+  }
+  if ($params['name']) {
+    $sql .= "and node.title like :name ";
+    $sql_args[':name'] = '%' . $params['name'] . '%';
   }
   if ($domain_nid) {
     $sql .= "and field_sirius_domain_target_id = :domain_nid ";

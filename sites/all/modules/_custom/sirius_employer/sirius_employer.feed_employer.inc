@@ -16,24 +16,28 @@ function sirius_employer_feed_employer_info() {
       'review'    => array('label' => 'Review',     'callback' => 'sirius_feed_wizard_review'),
     ),
     'feed' => array(
+      'content_type' => 'grievance_shop',
       'pks' => array(
         'nid' => 'Internal ID (NID)',
-        'sirius_id' => 'External ID',
+        'sirius_id' => 'ID',
       ),
       'create_new_records' => 'optional',
+      'groups' => array(
+        'pk' => 'Primary Key',
+        'core' => 'Core',
+      ),
       'fields' => array(
         'nid' => array('group' => 'pk', 'title' => 'Internal ID (NID)'),
-        'sirius_id' => array('group' => 'pk', 'title' => 'External ID'),
+        'sirius_id' => array('group' => 'pk', 'title' => 'ID'),
 
         'title' => array('group' => 'core', 'title' => 'Title'),
-        'rooms' => array('group' => 'core', 'type' => 'integer'),
-        'brand' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'brand'),
+        'sirius_industry' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'sirius_industry'),
+        /*
         'niche' => array('group' => 'core', 'type' => 'term_reference', 'taxonomy' => 'hdb_niche'),
         'development_status' => array('group' => 'core', 'type' => 'list'),
         'owner_of_record' => array('group' => 'core', 'type' => 'text'),
         'notes' => array('group' => 'core', 'type' => 'long'),
-
-
+        */
      ),
       'batch_size' => 10,
       'callback_row_verify' => 'sirius_employer_feed_employer_row_verify',
@@ -43,24 +47,7 @@ function sirius_employer_feed_employer_info() {
     'callback_launch_args' => array('sirius_employer_feed_employer'),
   );
 
-  $groups = array(
-    'pk' => 'Primary Key',
-    'core' => 'Core',
-  );
-
-  foreach ($items['sirius_employer_feed_employer']['feed']['fields'] as $field_name => $field_info) {
-    $group = $field_info['group'];
-    $group_name = $groups[$group];
-
-    if (!$field_info['title']) {
-      $structure_info = field_info_instance('node', "field_$field_name", 'property');
-      if ($structure_info) { $items['sirius_employer_feed_employer']['feed']['fields'][$field_name]['title'] = $structure_info['label']; }
-    }
-
-    $items['sirius_employer_feed_employer']['feed']['fields'][$field_name]['title'] = 
-      $group_name . ': ' . $items['sirius_employer_feed_employer']['feed']['fields'][$field_name]['title'];
-  }
-
+  foreach ($items as $key => $item) { sirius_feed_info_set_titles($items[$key]); }
   return $items;
 }
 
@@ -106,7 +93,7 @@ function sirius_employer_feed_employer_row_verify($feed_node, $info, $data, &$ro
     }
   }
 
-  $content_type = 'grievance_shop';
+  $content_type = $info['feed']['content_type'];
   if ($precompute) {
     if ($pk == 'nid') {
       $pk_result = sirius_feed_handle_pk_nid($content_type, $row['nid']);
@@ -114,7 +101,7 @@ function sirius_employer_feed_employer_row_verify($feed_node, $info, $data, &$ro
       $nid = $pk_result['nid'];
     } else if ($pk = 'sirius_id') {
       $result = sirius_feed_lookup_by_field(
-        'grievance_shop', 
+        $content_type, 
         'field_data_field_sirius_id', 
         'field_sirius_id_value', 
         $row['sirius_id']
@@ -175,6 +162,9 @@ function sirius_employer_feed_employer_row_process($feed_node, $info, $data, $ro
   }
 
   if ($row['title']) { $node->title = $row['title']; }
+  if ($row['sirius_id']) {
+    $node->field_sirius_id['und'][0]['value'] = $row['sirius_id'];
+  }
 
   foreach ($info['feed']['fields'] as $field_name => $field_info) {
     if ($row[$field_name]) {
@@ -191,11 +181,12 @@ function sirius_employer_feed_employer_row_process($feed_node, $info, $data, $ro
   }
 
   $node = node_submit($node);
+  // dpm($node);
   node_save($node);
 
   if ($is_new) {
-    return array('success' => TRUE, 'msg' => 'Created a new property.');
+    return array('success' => TRUE, 'msg' => 'Created a new record.');
   } else {
-    return array('success' => TRUE, 'msg' => 'Updated an existing property.');
+    return array('success' => TRUE, 'msg' => 'Updated an existing record.');
   }
 }

@@ -246,7 +246,9 @@ function sirius_backlinks_from_node($node) {
 				else if ($handler_type == 'sirius_event') 																							{ $path = "node/$handler_nid/sirius_event_info"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'worker:certification') 	{ $path = "node/$handler_nid/sirius_worker_tc/certifications"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'tor') 										{ $path = "node/$handler_nid/sirius_worker_schedule/tor"; }
-				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:checkin')				{ $path = "node/$handler_nid/sirius_steward_worker_checkin"; }
+				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:checkin')				{ $path = "node/$handler_nid/sirius_worker_steward/checkin"; }
+				else if ($handler_type == 'grievance_shop' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_employer_steward/sched"; }
+				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_worker_steward/checkin-history"; }
 				else if ($handler_type == 'sirius_log') {
 					if ($handler_category == 'twilio:recording') { 
 						$path = "node/$handler_nid/sirius_twilio_recording";
@@ -283,6 +285,10 @@ function sirius_backlinks_from_node($node) {
 
 	if ($node->type == 'grievance_basic_page') {
 		$links['grievance/admin/basic-pages'] = array('name' => 'All Basic Pages');
+	}
+
+	if ($node->type == 'sirius_trust_provider') {
+		$links['sirius/trust/providers'] = array('name' => 'All Providers');
 	}
 
 	drupal_alter('sirius_backlinks_from_node', $links, $node);

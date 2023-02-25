@@ -12,3 +12,31 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_uh') . '/g
 function grievance_uh_sirius_config_links_alter(&$links) {
   $links['grievance']['links']['grievance/uh/config'] = array('title' => 'UNITE HERE Grievances', 'description' => 'Settings specific to UNITE HERE.');
 }
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function grievance_uh_report_cache_info() {
+  $items = array();
+
+  sirius_require('grievance_uh', 'grievance_uh.report_resproc_cancelby.inc');
+
+  $items['grievance-uh-resproc-cancelby'] = array(
+    'name' => t('Resolution Procedures - Cancel By Report'),
+    'description' => '',
+    'access' => 'grievance report',
+    'fields' => grievance_uh_report_resproc_cancelby_fields(),
+    'form_callback' => 'grievance_uh_report_resproc_cancelby_form',
+    'pk_list_callback' => 'grievance_uh_report_resproc_cancelby_pks',
+    'batch_callback' => 'grievance_uh_report_resproc_cancelby_batch',
+    'render_callbacks' => array(
+      'View' => 'grievance_uh_report_resproc_cancelby_view',
+    ),
+    'module' => 'grievance_uh',
+    'file' => 'grievance_uh.report_resproc_cancelby.inc',
+    // 'dashboard' => TRUE,
+  );
+
+  return $items;
+}

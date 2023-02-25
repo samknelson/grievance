@@ -53,6 +53,18 @@ function sirius_steward_node_tabs() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_steward/sched'] = array(
+    'title' => 'Schedule',
+    'description' => '',
+    'callback' => 'sirius_steward_node_tab_worker_sched',
+    'permissions' => array('sirius steward'),
+    'weight' => 3,
+    'file' => 'sirius_steward.page_worker_sched.inc',
+    'component' => 'steward:sched',
+    'skip_node_view_check' => TRUE,
+    'type' => MENU_LOCAL_TASK,
+  );
+
 
   $node_tabs['grievance_shop']['sirius_employer_steward'] = array(
     'title' => 'Steward',
@@ -149,6 +161,31 @@ function sirius_steward_node_tabs() {
     'skip_node_view_check' => TRUE,
   );
 
+  $node_tabs['sirius_log']['sirius_steward_log_sched/view'] = array(
+    'title' => 'View',
+    'description' => '',
+    'callback' => 'sirius_steward_node_tab_log_sched',
+    'permissions' => array('sirius steward admin'),
+    'weight' => 1,
+    'file' => 'sirius_steward.page_log_sched.inc',
+    'component' => 'steward:sched',
+    'skip_node_view_check' => TRUE,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $node_tabs['sirius_log']['sirius_steward_log_sched/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_steward_node_tab_log_sched_edit',
+    'permissions' => array('sirius steward sched worker'),
+    'weight' => 1,
+    'file' => 'sirius_steward.page_log_sched_edit.inc',
+    'component' => 'steward:sched',
+    'skip_node_view_check' => TRUE,
+    'weight' => 2,
+  );
+
   sirius_node_tab_set_module('sirius_steward', $node_tabs);
 
   return $node_tabs;
@@ -204,14 +241,49 @@ function sirius_steward_menu() {
     'weight' => 2,
   );
 
-  $items['sirius/steward/checkin/list'] = array(
-    'title' => 'Active Steward Check-Ins',
+
+  $items['sirius/steward'] = array(
+    'title' => 'Stewards',
+    'description' => '',
+    'page callback' => 'sirius_steward_page_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius steward admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_steward.page_list.inc',
+  );
+
+  $items['sirius/steward/list'] = array(
+    'title' => 'List',
+    'description' => '',
+    'page callback' => 'sirius_steward_page_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius steward admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'sirius_steward.page_list.inc',
+    'weight' => 1,
+  );
+
+  $items['sirius/steward/checkins'] = array(
+    'title' => 'Checkins',
     'description' => '',
     'page callback' => 'sirius_steward_page_checkin_list',
     'page arguments' => array(),
     'access arguments' => array('sirius steward admin'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
     'file' => 'sirius_steward.page_checkin_list.inc',
+    'weight' => 2,
+  );
+
+ $items['sirius/steward/scheds'] = array(
+    'title' => 'Schedules',
+    'description' => '',
+    'page callback' => 'sirius_steward_page_sched_list',
+    'page arguments' => array(),
+    'access arguments' => array('sirius steward admin'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'sirius_steward.page_sched_list.inc',
+    'weight' => 3,
+    'component' => 'Whatever',
   );
 
   return $items;

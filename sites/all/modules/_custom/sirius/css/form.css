@@ -3,3 +3,20 @@
 	margin: 10px;
 	border: 1px solid #993333;
 }
+
+.sirius_form_addone_deleteweight_prefix {
+	font-size: 75%;
+	border-top:  1px solid #999999;
+}
+
+.sirius_form_addone_deleteweight_prefix .form-item {
+	float: left;
+	display: inline-block;
+	padding-right: 10px;
+}
+
+.sirius_form_addone_deleteweight_prefix .form-item label {
+	float: left;
+	display: inline-block;
+	padding-right: 10px;
+}

@@ -115,14 +115,22 @@ function sirius_phonetree($call_sid, $context) {
  * Login
  */
 
+function sirius_phonetree_text($key) {
+	if ($key == 'worker_login_intro') {
+		$def = "You have reached " . variable_get('sirius_twilio_site_name_tts', '') . ". Please enter your worker I D. "; 
+		$def .= "You may enter 9 at any time to be connected with the operator. Enter star to hear this message again. ";
+	}
+
+	return variable_get("sirius_phonetree_text_$key", $def);
+}
+
 function sirius_phonetree_worker_login($call_sid, $context) {
 	$expect = $context['expect'];
 	$digits = $context['digits'];
 
 	if (!$expect) {
 
-		$text .= "You have reached " . variable_get('sirius_twilio_site_name_tts', '') . ". Please enter your worker I D. "; 
-		$text .= "You may enter 9 at any time to be connected with the operator. Enter star to hear this message again. ";
+		$text .= sirius_phonetree_text('worker_login_intro');
 		$context['expect'] = 'worker_nid';
 		sirius_twilio_outgoing_voice_say($call_sid, $context, $text, 6);
 

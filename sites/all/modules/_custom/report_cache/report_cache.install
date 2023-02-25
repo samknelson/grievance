@@ -70,3 +70,21 @@ function report_cache_update_7001() {
     }
   }
 }
+
+/**
+ * Add instance to report cache
+ */
+
+function report_cache_update_7002() {
+  $sqls = array();
+  $sqls[] = 'alter table report_cache add report_instance varchar(255)';
+
+  foreach ($sqls as $sql) {
+    print "Executing: $sql\n";
+    try {
+      db_query($sql);
+    } catch(Exception $ignore) {
+
+    }
+  }
+}
