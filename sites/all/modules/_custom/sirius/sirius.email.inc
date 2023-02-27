@@ -354,16 +354,3 @@ function sirius_email_render($email) {
 
   return "<a href=\"mailto:$email\">$email</a>";
 }
-
-/**
- * Implements hook_smtp_mail_settings_alter()
- */
-
-function sirius_smtp_mail_settings_alter(&$settings) {
-  foreach (array_keys($settings) as $key) {
-    $value = sirius_domain_variable_get("smtp_$key");
-    if ($value) {
-      $settings[$key] = $value;
-    }
-  }
-}

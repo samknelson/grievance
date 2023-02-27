@@ -53,7 +53,7 @@ function sirius_log_buckets() {
 			'shop' => array(
 				'title' => 'Log',
 				'content_type' => 'grievance_shop',
-				'permissions' => array('sirius dispatch staff'),
+				'permissions' => array('sirius employer admin'),
 				'path' => 'grievance_shop_log',
 				'weight' => 20,
 				'can_add' => TRUE,
