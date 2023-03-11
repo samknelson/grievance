@@ -4202,3 +4202,20 @@ body.cke_editable_themed {
     display: none;
   }
 }
+
+
+
+.sirius-views-exposed-filters .views-exposed-widget {
+  width: 200px;
+  height: 80px;
+  float: left;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border:  1px solid #cccccc;
+}
+
+.sirius-views-exposed-filters .views-submit-button {
+  clear: none;
+  border: none;
+}
