@@ -2182,8 +2182,7 @@ h2.field-label {
 }
 
 #page-footer #block-views-trustfund-flags-block,
-#page-footer #block-views-trustfund-flags-block-1,
-#page-footer #block-masquerade-masquerade {
+#page-footer #block-views-trustfund-flags-block-1 {
 	float: left;
 	width: 250px;
 }
