@@ -261,29 +261,6 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 				}
 			}
 
-			// Shop contacts
-			$status_tid = $entity_node->field_grievance_status['und'][0]['tid'];
-			$shop_nid = $entity_node->field_grievance_shop['und'][0]['target_id'];
-			$candidates = grievance_notify_company_contacts(array('shop_nid' => $shop_nid, 'status_nid' => $status_tid));
-			foreach ($candidates as $candidate_nid => $candidate) {
-				if (!$candidate['email']) { continue; }
-				if ($recipients[$candidate['email']]) { continue; }
-				$candidate_name = $candidate['name'];
-
-				$candidate_description = $candidate['type'];
-				if ($candidate['contact_type_names']) {
-					if ($candidate_description) { $candidate_description .= '<br />'; }
-					$candidate_description .= join('<br />', $candidate['contact_type_names']);
-				}
-				$recipients[$candidate['email']] = array(
-					'name' => $candidate['name'],
-					'email' => $candidate['email'],
-					'description' => $candidate_description,
-					'disposition' => 'skip',
-					'delta' => $delta++,
-					'nid' => $candidate_nid,
-				);
-			}
 
 			// Main Contact from the grievance
 			$candidate_email = $entity_node->field_grievance_co_email['und'][0]['email'];
@@ -316,7 +293,39 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 					$recipients[$candidate_email]['description'] = 'Assigned Shop Steward';
 				}
 			}
+
+			$shop_nid = $entity_node->field_grievance_shop['und'][0]['target_id'];
 		}
+
+		if ($entity_node->type == 'grievance_shop') {
+			$shop_nid = $entity_node->nid;
+		}
+
+		if ($shop_nid) {
+			// Shop contacts
+			$status_tid = $entity_node->field_grievance_status['und'][0]['tid'];
+			$candidates = grievance_notify_company_contacts(array('shop_nid' => $shop_nid, 'status_nid' => $status_tid));
+			foreach ($candidates as $candidate_nid => $candidate) {
+				if (!$candidate['email']) { continue; }
+				if ($recipients[$candidate['email']]) { continue; }
+				$candidate_name = $candidate['name'];
+
+				$candidate_description = $candidate['type'];
+				if ($candidate['contact_type_names']) {
+					if ($candidate_description) { $candidate_description .= '<br />'; }
+					$candidate_description .= join('<br />', $candidate['contact_type_names']);
+				}
+				$recipients[$candidate['email']] = array(
+					'name' => $candidate['name'],
+					'email' => $candidate['email'],
+					'description' => $candidate_description,
+					'disposition' => 'skip',
+					'delta' => $delta++,
+					'nid' => $candidate_nid,
+				);
+			}
+		}
+
 
 		$context = array('entity_node' => $entity_node);
 		drupal_alter('sirius_letter_recipients_email', $recipients, $context);

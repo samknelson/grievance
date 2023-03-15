@@ -115,7 +115,7 @@ function sirius_node_tab_sirius_domain_delete_form_submit($form, &$form_state) {
 			foreach (array_values($form_state['values']["${entity_type}_bundles"]) as $bundle) {
 				if (!$bundle) { continue; }
 				$entity_ids = sirius_domain_delete_inventory($domain_nid, $entity_type, $bundle);
-				$chunks = array_chunk($entity_ids, 1000, TRUE);
+				$chunks = array_chunk($entity_ids, 100, TRUE);
 				foreach ($chunks as $chunk) {
 					$operations[] = array(
 						'sirius_domain_delete_batch', 
