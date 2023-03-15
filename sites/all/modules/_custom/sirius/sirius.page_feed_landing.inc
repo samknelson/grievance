@@ -27,7 +27,7 @@ function sirius_feed_page_landing($module = NULL) {
 	$links = array();
 	$links[] = array(
 		'path' => 'sirius/feeds',
-		'title' => t('All Reports'),
+		'title' => t('All Feeds'),
 	);
 	$unique = array();
 	foreach ($all_info as $key => $info) {
