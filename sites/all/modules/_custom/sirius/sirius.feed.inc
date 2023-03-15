@@ -232,6 +232,7 @@ function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header)
  ************************************************************************************************/
 
 function sirius_feed_page_launch_access($wizard_name) {
+	sirius_require('sirius', 'sirius.page_feed_list.inc');
 	return sirius_feed_page_list_access($wizard_name);
 }
 
