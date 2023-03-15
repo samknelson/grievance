@@ -142,7 +142,7 @@ function sirius_smf_feed_dependents_row_verify_coverage($feed_node, $info, $data
         $prev_date = $prev_wb_node->field_sirius_date_start['und'][0]['value'];
         $row['wb_nodes'][$benefit_nid][$prev_date]->field_sirius_date_end['und'][0]['value'] = max(
           $row['wb_nodes'][$benefit_nid][$prev_date]->field_sirius_date_end['und'][0]['value'],
-          $row['wb_nodes'][$benefit_nid][$date]->field_sirius_date_end['und'][0]['value'],
+          $row['wb_nodes'][$benefit_nid][$date]->field_sirius_date_end['und'][0]['value']
         );
 
         // Get rid of the current node
