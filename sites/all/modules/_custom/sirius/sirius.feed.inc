@@ -82,58 +82,6 @@ function sirius_feed_node_search($id, $bundle, $fields) {
 	return array('success' => FALSE, 'msg' => "No record of type $bundle found with id $id.");
 }
 
-/************************************************************************************************
- * List page
- ************************************************************************************************/
-
-function sirius_feed_page_list_access($wizard_name) {
-	// Must be a legitimate feed
-	$info = sirius_wizard_info($wizard_name);
-	if (!$info) { return FALSE; }
-
-	// Admins can access
-	if (user_access('sirius admin')) { return TRUE; }
-	if (user_access('sirius domain admin')) { return TRUE; }
-
-	// @todo should be in a callback
-	if ($info['feed']['employer_access'] && user_access('sirius employer user manager')) { 
-		$employer_node = sirius_employer_get();
-		if (!$employer_node) { return FALSE; }
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
-function sirius_feed_page_list($wizard_name) {
- sirius_backlink_add('sirius/feeds', array('name' => 'All Feeds'));
-
-	$domain_nid = sirius_domain_nid();
-	$info = sirius_wizard_info($wizard_name);
-	if (!$info) { return "No such wizard."; }
-
-	drupal_set_title("Feed list: " . $info['title']);
-
-	// Is there a callback?
-	$callback = $info['feed']['callback_list'];
-	if ($callback) {
-		return $callback($wizard_name);
-	}
-
-	// Oh well, no callback. In that case we just hardcode some view.
-	if (user_access('sirius admin') || user_access('sirius domain admin')) {
-		// admins see the full list
-		$html .= views_embed_view('sirius_feeds', 'block_2', $wizard_name, $domain_nid);
-	} else {
-		// Non-admins see a filtered list
-		$employer_node = sirius_employer_get();
-		if (!$employer_node) { return 'No employer set for this user.'; }
-		$html .= views_embed_view('sirius_feeds', 'block_1', $wizard_name, $domain_nid, $employer_node->nid);
-	}
-
-	return $html;
-}
-
 function sirius_feed_latest_entry($wizard_name) {
 	$domain_nid = sirius_domain_nid();
 	$info = sirius_wizard_info($wizard_name);
@@ -284,6 +232,7 @@ function sirius_feed_spout_get_import_row($fields, $row, $data, $count, $header)
  ************************************************************************************************/
 
 function sirius_feed_page_launch_access($wizard_name) {
+	sirius_require('sirius', 'sirius.page_feed_list.inc');
 	return sirius_feed_page_list_access($wizard_name);
 }
 

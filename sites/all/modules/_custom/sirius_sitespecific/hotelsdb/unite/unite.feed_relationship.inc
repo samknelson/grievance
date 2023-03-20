@@ -18,7 +18,7 @@ function unite_feed_relationship_info() {
     'feed' => array(
       'pks' => array(
         'nid' => 'Internal ID (NID)',
-        'pat' => 'Propert + Actor + Type',
+        'pat' => 'Property + Actor + Type',
       ),
       'create_new_records' => 'optional',
       'fields' => array(

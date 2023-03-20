@@ -1,0 +1,4 @@
+name = Sirius SMF
+description = Custom functionality for the Santa Monica Funds
+package = Sirius
+core = 7.x
