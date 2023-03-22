@@ -719,6 +719,9 @@ function sirius_event_node_tabs() {
     'weight' => 12,
   );
 
+  foreach ($node_tabs['sirius_event'] as $key => $ignore) {
+    $node_tabs['sirius_event'][$key]['skip_node_view_check'] = TRUE; 
+  }
   sirius_node_tab_set_module('sirius_event', $node_tabs);
 
 	return $node_tabs;

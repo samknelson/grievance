@@ -506,7 +506,7 @@ function sirius_menu() {
       }
       if ($tab_record['title callback']) {
         $item['title callback'] = $tab_record['title callback'];
-        unset($$item['title']);
+        unset($item['title']);
       }
       if ($tab_record['title arguments']) { $item['title arguments'] = $tab_record['title arguments']; }
       $items['node/%node/' . $tab_name] = $item;
