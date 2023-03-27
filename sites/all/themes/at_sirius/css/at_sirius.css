@@ -4227,23 +4227,24 @@ body.cke_editable_themed {
   padding-top: 10px;
 }
 
-.region-footer .block-masquerade .description {
-  display: none;
-}
-
 .region-footer .block-masquerade .block-title {
-  float: left;
   font-weight: bold;
-  display: inline-block;
-  padding-top: 4px;
-  padding-right: 5px;
   font-size: 1.1em;
+  margint-bottom: 2px;
 }
 
+/*
 .region-footer .block-masquerade .block-content {
   display: inline-block;
   float: left;
 }
+*/
+
+.region-footer .block-masquerade .block-content .form-item {
+  margin-top: 2px;
+  margint-bottom: 2px;
+}
+
 
 .region-footer .block-masquerade .block-content input[type=submit] {
   padding-top: 5px;
