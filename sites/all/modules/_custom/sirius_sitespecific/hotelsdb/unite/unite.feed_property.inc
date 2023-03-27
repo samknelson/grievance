@@ -33,6 +33,7 @@ function unite_feed_property_info() {
         'development_status' => array('group' => 'core', 'type' => 'list'),
         'owner_of_record' => array('group' => 'core', 'type' => 'text'),
         'notes' => array('group' => 'core', 'type' => 'long'),
+        'legacy_id' => array('group' => 'core', 'type' => 'text'),
 
         'address_thoroughfare' => array('group' => 'location', 'title' => 'Address 1',),
         'address_premise' => array('group' => 'location', 'title' => 'Address 2',),
