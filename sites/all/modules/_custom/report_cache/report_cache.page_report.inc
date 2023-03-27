@@ -229,8 +229,15 @@ function report_cache_download($report_type, $report_id, $info) {
 	while ($hr = $stmt->fetchAssoc()) {
 		$hr = unserialize($hr['report_data']);
 		$row = array();
+
+		$idx = 0;
 		foreach ($fields as $name => $prompt) {
-			$row[] = $hr[$name];
+			if ($info['legacy_noassociative']) {
+				$row[] = $hr[$idx];
+			} else {
+				$row[] = $hr[$name];
+			}
+			++$idx;
 		}
 		fputcsv($fp, $row);
 	}
