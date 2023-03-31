@@ -602,6 +602,7 @@ function grievance_preprocess_html(&$variables) {
 
 
 function grievance_views_query_alter(&$view, &$query) {
+  if (!isset($view->name)) { return; }
   grievance_views_query_alter_permission($view, $query); 
   if ($view->name == 'grievances_mine') {
     grievance_views_query_alter_grievances_mine($view, $query);
@@ -865,4 +866,15 @@ function grievance_sirius_cron_scan_info() {
     'multidomain' => FALSE,
   );
   return $items;
+}
+
+
+function grievance_status_terms_open() {
+  $status_terms = sirius_taxonomy_load('grievance_status', 'tid', 'full');
+  $open_status_terms = array();
+  foreach ($status_terms as $status_tid => $status_term) {
+    if ($status_term->field_grievance_open['und'][0]['value'] != 1) { continue; }
+    $open_status_terms[$status_tid] = $status_term;
+  }
+  return $open_status_terms;
 }

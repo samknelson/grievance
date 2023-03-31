@@ -53,7 +53,7 @@ function sirius_log_buckets() {
 			'shop' => array(
 				'title' => 'Log',
 				'content_type' => 'grievance_shop',
-				'permissions' => array('sirius dispatch staff'),
+				'permissions' => array('sirius employer admin'),
 				'path' => 'grievance_shop_log',
 				'weight' => 20,
 				'can_add' => TRUE,
@@ -144,7 +144,45 @@ function sirius_log_buckets() {
 				'categories' => array('worker:employer', 'dispatch:status', 'worker:dispstatus', 'worker:availdate', 'worker:dispstatus_block', 'dispatch:dnc'),
 				'can_add' => FALSE,
 			),
+
+			'trust_worker_benefit' => array(
+				'title' => 'Log',
+				'content_type' => 'sirius_trust_worker_benefit',
+				'permissions' => array('sirius domain admin'),
+				'path' => 'sirius_log/log',
+				'weight' => 7,
+				'can_add' => FALSE,
+			),
 		);
+
+		/*
+		$cf_sets = sirius_customfield_set_list_all();
+		if ($cf_sets) {
+			$cf_nodes = node_load_multiple(array_keys($cf_sets));
+			foreach ($cf_nodes as $cf_nid => $cf_node) {
+				$cf_json = sirius_json_get($cf_node);
+
+				if ($cf_json['customfield']['multiple'] != 'Yes') { continue; }
+				$content_types = sirius_customfield_content_types($cf_json);
+
+				$log_key = 'customfield:';
+				if ($cf_json['machine_name']) { $log_key .= $cf_json['machine_name']; } else { $log_key .= $cf_nid; }
+
+				foreach ($content_types as $content_type => $record) {
+					$buckets["customfield_$cf_nid"] = array(
+						'title' => $cf_node->title,
+						'content_type' => $content_type,
+						'permissions' => array($record['permission']),
+						'path' => "customfield_$cf_nid",
+						'weight' => 30,
+						'categories' => array($log_key),
+						'can_add' => TRUE,
+						'customfield_nid' => $cf_nid,
+					);
+				}
+			}
+		}
+		*/
 
 		foreach ($buckets as $bucket_id => $bucket) {
 			$buckets[$bucket_id]['id'] = $bucket_id;

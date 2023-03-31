@@ -1,0 +1,24 @@
+<?php
+
+// I hate notice errors
+ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_members.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_dependents.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_contributions.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_smf') . '/sirius_smf.feed_notes.inc';
+
+/***
+ * Implements hook_sirius_wizard_info()
+ */
+
+function sirius_smf_sirius_wizard_info() {
+  $items = array();
+
+  $items += sirius_smf_feed_members_info();
+  $items += sirius_smf_feed_dependents_info();
+  $items += sirius_smf_feed_contributions_info();
+  $items += sirius_smf_feed_notes_info();
+
+  return $items;
+}

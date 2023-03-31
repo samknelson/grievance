@@ -277,6 +277,7 @@ function grievance_node_access_grievance($node, $op, $account) {
 }
 
 function grievance_views_query_alter_permission(&$view, &$query) {
+  if (!isset($view->name)) { return; }
 	if ($view->name != 'grievances') { return; }
 
 	global $user;

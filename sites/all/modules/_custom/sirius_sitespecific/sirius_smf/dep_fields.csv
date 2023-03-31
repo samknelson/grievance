@@ -1,0 +1,63 @@
+Row #,Map: Content Type:Field,Notes,Log?
+10 BPA-DEP2-CLIENT,,Skip,No
+10 BPA-DEP2-SSN,sirius_contact_relationship:field_sirius_contact,Member/Subscriber SSN - Use this to create the relationship to set field_sirius_contact in the relationship.,Yes
+10 BPA-DEP2-SEQ,,Depenent sequence number,Yes
+10 BPA-DEP2-CLIENT2,,Skip,No
+10 BPA-DEP2-SSN2,sirius_contact_relationship:field_sirius_contact_alt,Dependent SSN; use this field to create a worker with this SSN,Yes
+10 BPA-DEP2-CLIENT3,,Skip,No
+15 BPA-DEP2-LNAME,sirius_worker:field_sirius_name:Family,,Yes
+15 BPA-DEP2-FNAME,sirius_worker:field_sirius_name:Given,,Yes
+05 BPA-DEP2-MI,sirius_worker:field_sirius_name:Middle Name(s),,Yes
+05 BPA-DEP2-ADDR1,sirius_worker:field_sirius_address:thoroughfare,,Yes
+10 BPA-DEP2-ADDR2,sirius_worker:field_sirius_address:premise,,Yes
+10 BPA-DEP2-ADDR3,sirius_worker:field_sirius_address:locality,,Yes
+05 BPA-DEP2-ST,sirius_worker:field_sirius_address:administrative_area,,Yes
+05 BPA-DEP2-ZIP,sirius_worker:field_sirius_address:postal_code,,Yes
+05 BPA-DEP2-2NDADDR1,Sirius Log,CREATE LOG ENTRY,Yes
+05 BPA-DEP2-2NDADDR2,Sirius Log,CREATE LOG ENTRY,Yes
+05 BPA-DEP2-2NDADDR3,Sirius Log,CREATE LOG ENTRY,Yes
+05 BPA-DEP2-2NDST,Sirius Log,CREATE LOG ENTRY,Yes
+05 BPA-DEP2-2NDZIP,Sirius Log,CREATE LOG ENTRY,Yes
+05 BPA-DEP2-GUARD-LNAME,Sirius Log,CREATE LOG ENTRY,Yes
+05 BPA-DEP2-GUARD-FNAME,Sirius Log,CREATE LOG ENTRY,Yes
+05 BPA-DEP2-GUARD-MI,Sirius Log,CREATE LOG ENTRY,Yes
+05 BPA-DEP2-AREA,sirius_worker:field_sirius_phone,05 BPA-DEP2-PHONEconcatenate 05 BPA-DEP2-AREA and ,Yes
+05 BPA-DEP2-PHONE,sirius_worker:field_sirius_phone,05 BPA-DEP2-PHONEconcatenate 05 BPA-DEP2-AREA and ,Yes
+05 BPA-DEP2-BD,sirius_worker:field_sirius_dob,,Yes
+05 BPA-DEP2-SEX,sirius_worker:field_sirius_gender,,Yes
+05 BPA-DEP2-REL,sirius_contact_relationship:ield_sirius_contact_reltype,"SP =  Spouse
+DP = Domestic Partner
+ES = Ex Spouse
+C = Child (Parent)
+SC = Step Child
+H = Handicap Child
+AC = Adopted Child",Yes
+05 BPA-DEP2-EFF,sirius_contact_relationship:field_sirius_date_start OR sirius_contact_relationship:field_sirius_date_end,"If 05 BPA-DEP2-ENROLL = E, then set START; if BPA-DEP2-ENROLL = null, then set end",Yes
+05 BPA-DEP2-ENROLL,"if = E, then set benefit based on subscriber starting on 05 BPA-DEP2-EFF ; if null, end benefits as of 05 BPA-DEP2-EFF",,Yes
+05 BPA-DEP2-MARR-STAT,skip,,Yes
+05 BPA-DEP2-MARR-DATE,skip,,Yes
+05 BPA-DEP2-DIV-STAT,skip,,Yes
+05 BPA-DEP2-DIV-DATE,skip,,Yes
+05 BPA-DEP2-QMSCO,"if Y, then set C type relationship as QMSCO",,Yes
+05 BPA-DEP2-BCERT,skip,,No
+05 BPA-DEP2-ADOPT,skip,,No
+05 BPA-DEP2-TERM,"if > 0, set sirius_contact_relationship:field_sirius_date_end",,Yes
+05 BPA-DEP2-COMMENT,skip,,Yes
+05 BPA-DEP2-USERID,skip,,Yes
+05 BPA-DEP2-REVDATE,skip,,Yes
+10 BPA-DEP2-CLAIMS-SUFFIX,skip,,No
+05 BPA-DEP2-CASENO,skip,,Yes
+05 BPA-DEP2-BADADDR,skip,,Yes
+05 BPA-DEP2-BADADDR2,skip,,No
+05 BPA-DEP2-PARTD,skip,,No
+05 BPA-DEP2-PARTDREJ,skip,,No
+05 BPA-DEP2-PARTDDT,skip,,No
+05 BPA-DEP2-REENROLL,skip,,No
+05 BPA-DEP2-TERM2,"If 05 BPA-DEP2-TERM2 is newer than 05 BPA-DEP2-EFF or BPA-DEP2-EFF2, set end date of relationship using BPA-DEP2-TERM2; if the order is BPA-DEP2-EFF2 < BPA-DEP2-TERM2 < 05 BPA-DEP2-EFF, then end and create a second relationship",,Yes
+05 BPA-DEP2-EFF2,"If 05 BPA-DEP2-EFF2 is older than 05 BPA-DEP2-EFF, use BPA-DEP2-EFF2 as relationship start date.",,Yes
+05 BPA-DEP2-VERIFY,skip,,No
+05 BPA-DEP2-MEDFLAG,skip,,No
+05 BPA-DEP2-ACCT-CLI,skip,,No
+05 BPA-DEP2-ACCT,skip,,No
+05 BPA-TMT-TERM-DD,skip,,No
+05 FILLER,skip,,No

@@ -1,0 +1,26 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.permission.inc';
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_pcct_sirius_domain_component_info() {
+  return array(
+    'pcct' => array(
+      'title' => 'PCCT',
+      'description' => 'Enable the Personal Cost Comparison Tool (PCCT) functionality',
+    ),
+  );
+}
+
+/**
+ * Implements hook_sirius_config_links_alter
+ */
+
+function sirius_pcct_sirius_config_links_alter(&$links) {
+  $links['pcct'] = array('title' => 'PCCT');
+  $links['pcct']['links']['sirius/pcct/config'] = array('title' => 'Config', 'description' => 'Configure Personal Cost Comparison Tool (PCCT) functionality');
+}

@@ -1,5 +1,27 @@
 <?php
 
+/**
+ * @todo: The whole "auto" thing is basically a legacy, and should be handled within the "instances" framework. But for now, it's 
+ *        here for report without a parameters callback.
+ */
+
+function report_cache_page_report_auto_access($report_type) {
+	// Must have a report type
+	if (!$report_type) { return FALSE; }
+	$info = report_cache_info($report_type);
+	if (!$info) { return FALSE; }
+
+	// Must have suitable privileges
+	$access = $info['access'];
+	if (!$access) { $access = 'access site reports'; }
+	if (!user_access($access)) { return FALSE; }
+
+	// Must NOT have a parameteres callback; otherwise, it's handled in instances
+	if ($info['parameters_form_callback']) { return FALSE; }
+
+	return TRUE;
+}
+
 function report_cache_page_report_auto($report_type) {
 	return drupal_get_form('report_cache_page_report_auto_form', $report_type);
 }

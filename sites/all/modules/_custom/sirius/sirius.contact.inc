@@ -270,6 +270,37 @@ function sirius_contact_relationship_node_presave($relationship_node) {
 	} else {
 		$relationship_node->field_sirius_active['und'][0]['value'] = 'No';
 	}
+
+	// Never change a value that already exists
+	if ($relationship_node->field_sirius_count['und'][0]['value']) { return; }
+
+	// Load all our existing relationships
+	$contact_nid = $relationship_node->field_sirius_contact['und'][0]['target_id'];
+	$target_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
+	if (!$contact_nid || !$target_nid) { return; }
+	$relationships = sirius_contact_relationships(array('contact_nid' => $contact_nid));
+	$by_seq = $by_target = array();
+	foreach ($relationships as $other_relationship_nid => $other_relationship_node) {
+		if ($other_relationship_nid == $relationship_node->nid) { continue; }
+		$other_relationship_seq = $other_relationship_node->field_sirius_count['und'][0]['value'];
+		if (!$other_relationship_seq) { continue; }
+		$by_seq[$other_relationship_seq] = TRUE;
+		$other_target_nid = $other_relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
+		if (!$other_target_nid) { continue; }
+		$by_target[$other_target_nid] = $other_relationship_seq;
+	}
+
+	if ($by_target[$target_nid]) {
+		// If there's another relationship with the same target, then we use that sequence.
+		$relationship_node->field_sirius_count['und'][0]['value'] = $by_target[$target_nid];
+	} else {
+		// Assign a new sequence number. This is not my most elegant code.
+		for ($i=1; $i<1000; ++$i) {
+			if ($by_seq[$i]) { continue; }
+			$relationship_node->field_sirius_count['und'][0]['value'] = $i;
+			break;
+		}
+	}
 }
 
 function sirius_contact_relationship_node_form_alter(&$form, &$form_state, $form_id) {

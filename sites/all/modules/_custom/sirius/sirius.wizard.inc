@@ -55,12 +55,41 @@ function sirius_wizard_info($wizard_name) {
 }
 
 function sirius_wizard_info_all() {
-  $wizard_infos = &drupal_static(__FUNCTION__);
-  if (!isset($wizard_infos)) {
-  	$wizard_infos = module_invoke_all('sirius_wizard_info');
-		ksort($wizard_infos);
+  $info_all = &drupal_static(__FUNCTION__);
+
+  if (!isset($info_all)) {
+		// We want to do this:
+		// $wizard_infos = module_invoke_all('sirius_wizard_info');
+		// But we want to add information about the module that defines it. So we call each function manually.
+
+		$info_all = array();
+		$hook = 'sirius_wizard_info';
+		foreach (module_implements($hook) as $module) {
+			$function = $module . '_' . $hook;
+    	if (function_exists($function)) {
+    		$module_info = system_get_info('module', $module);
+      	$result = call_user_func_array($function, array());
+      	if (isset($result) && is_array($result)) {
+        	$info_all = array_merge_recursive($info_all, $result);
+      		// Add the module to the results, so we know which module provides which report.
+      		foreach ($result as $key => $info) {
+      			$info_all[$key]['module'] = $module;
+      			$info_all[$key]['module_name'] = $module_info['name'];
+      		}
+      	} elseif (isset($result)) {
+        	$info_all[] = $result;
+      	}
+    	}
+  	}
+
+		uksort($info_all, function($a, $b) use ($info_all) {
+			$result = strcasecmp($info_all[$a]['module_name'], $info_all[$b]['module_name']);
+			if (!$result) { $result = strcasecmp($info_all[$a]['title'], $info_all[$b]['title']); }
+			return $result;
+		});
   }
-	return $wizard_infos;
+
+	return $info_all;
 }
 
 function sirius_wizard_steps($info, $data = NULL, $node = NULL) {

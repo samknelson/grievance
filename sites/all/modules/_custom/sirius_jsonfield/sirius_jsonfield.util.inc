@@ -174,10 +174,15 @@ function sirius_jsonfield_util_set_defaults(&$form, $defaults) {
 		if (!is_array($form[$key])) { continue; }
 		$type = $form[$key]['#type'];
 		if ($type && $type != 'fieldset') {
-			if ($type == 'select' || $type == 'textfield' || $type == 'textarea' || $type == 'date_popup' || $type == 'radios' || $type == 'checkboxes')  {
+			if ($type == 'select' || $type == 'textfield' || $type == 'textarea' || $type == 'date_popup' || $type == 'radios' || $type == 'checkboxes' || $type == 'text_format')  {
 				if (isset($defaults[$key])) {
-					if ($type == 'date_popup' && is_array($defaults[$key])) { $form[$key]['#default_value'] =  date('Y-m-d H:i:s', strtotime($defaults[$key]['date'] . ' ' . $defaults[$key]['time'])); } 
-					else { $form[$key]['#default_value'] = $defaults[$key]; }
+					if ($type == 'date_popup' && is_array($defaults[$key])) { 
+						$form[$key]['#default_value'] = date('Y-m-d H:i:s', strtotime($defaults[$key]['date'] . ' ' . $defaults[$key]['time']));
+					} else if ($type == 'text_format') {
+						$form[$key]['#default_value'] = sirius_richtext_handle_input($defaults[$key]); 
+					} else {
+						$form[$key]['#default_value'] = $defaults[$key];
+					}
 				}
 			}
 		} else {
