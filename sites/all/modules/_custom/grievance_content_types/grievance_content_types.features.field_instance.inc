@@ -7465,7 +7465,7 @@ function grievance_content_types_field_default_field_instances() {
     'settings' => array(
       'description_field' => 1,
       'file_directory' => '',
-      'file_extensions' => 'txt pdf doc png mov mp3 mp4 jpg jpeg gif docx xls xlsx rtf htm html',
+      'file_extensions' => 'txt pdf doc png mov mp3 mp4 jpg jpeg gif docx xls xlsx rtf htm html avi',
       'filefield_paths' => array(
         'active_updating' => 0,
         'file_name' => array(
@@ -26643,7 +26643,11 @@ If the file has multiple pages, then each page in the input document will use th
   // Exported field_instance: 'node-sirius_worker-field_sirius_dispatch_asi'.
   $field_instances['node-sirius_worker-field_sirius_dispatch_asi'] = array(
     'bundle' => 'sirius_worker',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => 'Yes',
+      ),
+    ),
     'deleted' => 0,
     'description' => '',
     'display' => array(
