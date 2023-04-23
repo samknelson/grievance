@@ -775,6 +775,29 @@ function sirius_find_nid_by_id($sirius_id, $bundle) {
   return $hr['entity_id'];
 }
 
+function sirius_find_tid_by_id($sirius_id, $bundle) {
+  $domain_nid = sirius_domain_nid();
+
+  $sql_args = array();
+  $sql = "select * ";
+  $sql .= "from taxonomy_term_data ";
+  $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'taxonomy_term' and field_data_field_sirius_id.entity_id = taxonomy_term_data.tid ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'taxonomy_term' and field_data_field_sirius_domain.entity_id = taxonomy_term_data.tid ";
+  $sql .= "where field_data_field_sirius_id.bundle = :bundle ";
+  $sql .= "and field_sirius_id_value = :sirius_id ";
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id is null ";
+  }
+  $sql_args[':bundle'] = $bundle;
+  $sql_args[':sirius_id'] = $sirius_id;
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $hr = $stmt->fetchAssoc();
+  return $hr['entity_id'];
+}
+
 /**
  * Implements hook_module_implements_alter
  * 
