@@ -325,7 +325,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_trust_provider_level']['display'] = 'block';
     $settings['sirius_trust_provider_level']['multidomain'] = 'Yes';
     $settings['sirius_trust_service_type']['view'] = 'sirius_taxonomy';
-    $settings['sirius_trust_service_type']['display'] = 'block';
+    $settings['sirius_trust_service_type']['display'] = 'block_17';
     $settings['sirius_trust_service_type']['multidomain'] = 'Yes';
   }
 
