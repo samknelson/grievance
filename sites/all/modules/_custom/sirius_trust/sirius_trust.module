@@ -264,9 +264,11 @@ function sirius_trust_sirius_flood_info() {
 function sirius_trust_sirius_wizard_info() {
   sirius_require('sirius_trust', 'sirius_trust.election_wizard.inc');
   sirius_require('sirius_trust', 'sirius_trust.feed_providers.inc');
+  sirius_require('sirius_trust', 'sirius_trust.feed_services.inc');
 
   $items = array();
   $items += sirius_trust_election_wizard_info();
   $items += sirius_trust_feed_providers_info();
+  $items += sirius_trust_feed_services_info();
   return $items;
 }
