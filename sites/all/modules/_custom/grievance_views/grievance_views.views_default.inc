@@ -32991,6 +32991,15 @@ Grievance Form',
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['sorts'] = FALSE;
+  /* Sort criterion: Content: Sirius Trust Service Type (field_sirius_trust_service_type) */
+  $handler->display->display_options['sorts']['field_sirius_trust_service_type_tid']['id'] = 'field_sirius_trust_service_type_tid';
+  $handler->display->display_options['sorts']['field_sirius_trust_service_type_tid']['table'] = 'field_data_field_sirius_trust_service_type';
+  $handler->display->display_options['sorts']['field_sirius_trust_service_type_tid']['field'] = 'field_sirius_trust_service_type_tid';
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
   $handler->display->display_options['path'] = 'sirius/trust/services';
   $translatables['sirius_trust_services'] = array(
     t('Master'),
