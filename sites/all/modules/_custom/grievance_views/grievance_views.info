@@ -99,6 +99,7 @@ features[views_view][] = sirius_provider_worker_lookup
 features[views_view][] = sirius_skills
 features[views_view][] = sirius_taxonomy
 features[views_view][] = sirius_trust_benefits
+features[views_view][] = sirius_trust_services
 features[views_view][] = sirius_trust_worker_elections
 features[views_view][] = sirius_twilio_sms_conversations
 features[views_view][] = sirius_work_status
