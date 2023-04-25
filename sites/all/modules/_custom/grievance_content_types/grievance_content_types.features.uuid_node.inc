@@ -292,6 +292,130 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Trust - Services',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1682254034,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '0556460a-21e4-4468-8b41-e29da6dc4f80',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>"Services" are procedures or treatments offered by the Trust Fund. For each service, the following information is available:</p>
+
+<p><strong>Service Type</strong></p>
+
+<p>The type of service, i.e. "Inpatient", "Alternative", etc.</p>
+
+<p><strong>ID / CPT Code</strong></p>
+
+<p>The primary identifier of the service, generally used for billing. This will typically be a CPT code, but for inpatient or alternative therapies it may be a different identifier.</p>
+
+<p><strong>Internal ID</strong></p>
+
+<p>Optionally, an internal identifier such as a "concept ID" or a billing code may be entered.</p>
+
+<p><strong>Title</strong></p>
+
+<p>The name of the service, as it should appear to users.</p>
+
+<p><strong>Description</strong></p>
+
+<p>The description of the service.</p>
+
+<p><strong>Active</strong></p>
+
+<p>Whether or not the service is "active". Inactive services are not shown to users.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/trust/services',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>"Services" are procedures or treatments provided by the Trust Fund. They are typically (but not always) identified by a CPT code.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2023-04-23 05:47:14 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Twilio - Call - Recording',
   'log' => '',
   'status' => 1,
@@ -2086,6 +2210,96 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2019-04-18 05:49:19 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Dispatch - Steward - Schedule',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1678600729,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '3c92fb75-7b61-41d5-9b6e-50fdc909c852',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'node/%/sirius_steward_log_sched/edit',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Make sure to include the&nbsp;<strong>report location</strong>&nbsp;in the notes. If the show does not appear on the list, make sure to include it in the notes as well.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2023-03-11 21:58:49 -0800',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -9621,6 +9835,118 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2022-01-28 06:02:40 -0800',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Report - Trust - New Hires',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1682419650,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'f1c411e5-49e4-42c6-bc9a-302a22c2afc6',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>For a given date range, this report fetches the list of [worker/employer] pairs where the first appearance of hours at the employer occurs during the date range.</p>
+
+<p>This report is generated by hours alone, and does not reference dispatch status or work status. A worker who is dispatched but shows no hours will not appear on this report; similarly, a worker who shows hours but is not dispatched will appear.</p>
+
+<p>Any positive number of hours is sufficient to trigger the report, and the report does not distinguish between part-time or full-time employees. However, the report pulls both the total number of hours at the employer, as well as the total number of hours at all employers during the date range, which can help to identify whether the new employer was the source of most of the hours.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/reports/sirius-trust-newhire',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'sirius/reports/sirius-trust-newhire/form',
+        'format' => NULL,
+      ),
+      2 => array(
+        'value' => 'sirius/reports/sirius-trust-newhire/%',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Fetch a list of the first appearance of hours at an employer (the "hiring" employer) within a date range.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2023-04-25 03:47:30 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(

@@ -11,6 +11,24 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/s
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.denorm.inc';
 
 /**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_trust_sirius_domain_component_info() {
+  return array(
+    'trust' => array(
+      'title' => 'Trust',
+      'description' => 'Manage Trust Benefits, Dependants, etc.',
+    ),
+    'trust:provider' => array(
+      'title' => 'Trust - Provider',
+      'description' => 'Manage Trust service providers, such as doctor offices or hospitals.',
+    ),
+  );
+}
+
+
+/**
  * Implements hook_form_alter
  */
 
@@ -20,12 +38,24 @@ function sirius_trust_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Implements hook_node_validate()
+ */
+
+function sirius_trust_node_validate($node, $form, &$form_state) {
+  if (isset($node->field_sirius_provider_npi)) {
+    sirius_require('sirius_trust', 'sirius_trust.npi.inc');
+    sirius_trust_provider_npi_node_validate($node, $form, $form_state);
+  }
+}
+
+/**
  * Implements hook_node_presave()
  */
 
 function sirius_trust_node_presave($node) {
   if ($node->type == 'sirius_trust_worker_benefit') { sirius_trust_worker_benefit_node_presave($node); }
   if ($node->type == 'sirius_trust_worker_election') { sirius_trust_worker_election_node_presave($node); }
+  if ($node->type == 'sirius_trust_worker_beneficiary') { sirius_trust_worker_beneficiary_node_presave($node); }
 }
 
 /**
@@ -114,19 +144,7 @@ function sirius_trust_report_cache_info() {
 function sirius_trust_sirius_config_links_alter(&$links) {
   $links['trust'] = array('title' => 'Trust');
   $links['trust']['links']['sirius/trust/benefits'] = array('title' => 'Benefits', 'description' => 'Configure system benefits.');
-}
-
-/***
- * Implements hook_sirius_wizard_info() 
- */
-
-function sirius_trust_sirius_wizard_info() {
-  
-  sirius_require('sirius_trust', 'sirius_trust.election_wizard.inc');
-
-  $items = array();
-  $items += sirius_trust_election_wizard_info();
-  return $items;
+  $links['trust']['links']['sirius/trust/services'] = array('title' => 'Services', 'description' => 'Configure services (usually associated with CPT codes).');
 }
 
 /**
@@ -148,6 +166,15 @@ function sirius_trust_sirius_cron_scan_info() {
     'description' => 'Check elections for all workers, and make sure that only one is active at a time.',
     'schedule' => 'daily',
     'callback' => 'sirius_trust_worker_election_scan',
+    'multidomain' => TRUE,
+    'component' => 'trust',
+  );
+
+  $items['trust_beneficiary'] = array(
+    'title' => 'Trust Worker Beneficiary Scan',
+    'description' => 'Check beneficiaries for all workers, and make sure that only one is active at a time.',
+    'schedule' => 'daily',
+    'callback' => 'sirius_trust_worker_beneficiary_scan',
     'multidomain' => TRUE,
     'component' => 'trust',
   );
@@ -185,4 +212,21 @@ function sirius_trust_sirius_flood_info() {
   );
 
   return $info;
+}
+
+
+/***
+ * Implements hook_sirius_wizard_info()
+ */
+
+function sirius_trust_sirius_wizard_info() {
+  sirius_require('sirius_trust', 'sirius_trust.election_wizard.inc');
+  sirius_require('sirius_trust', 'sirius_trust.feed_providers.inc');
+  sirius_require('sirius_trust', 'sirius_trust.feed_services.inc');
+
+  $items = array();
+  $items += sirius_trust_election_wizard_info();
+  $items += sirius_trust_feed_providers_info();
+  $items += sirius_trust_feed_services_info();
+  return $items;
 }

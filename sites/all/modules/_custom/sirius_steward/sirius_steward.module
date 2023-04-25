@@ -28,7 +28,7 @@ function sirius_steward_sirius_domain_component_info() {
 
 function sirius_steward_sirius_config_links_alter(&$links) {
   $links['steward'] = array('title' => 'Steward');
-  $links['steward']['links']['sirius/steward/config'] = array('title' => 'Config', 'description' => 'Configure client and server service access.');
+  $links['steward']['links']['sirius/steward/config'] = array('title' => 'Config', 'description' => 'Configure features for stewards.');
 }
 
 function sirius_steward_search($params = array()) {

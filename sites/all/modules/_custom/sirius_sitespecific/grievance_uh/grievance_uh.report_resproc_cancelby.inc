@@ -30,8 +30,8 @@ function grievance_uh_report_resproc_cancelby_form($form, &$form_state, $report_
 
 function grievance_uh_report_resproc_cancelby_form_validate($form, &$form_state) {
   $days = $form_state['values']['days'];
-  if (!($days > 0)) {
-    form_set_error('days', "Please enter a positive nubmer of days.");
+  if (!($days > 0) && !($days < 0)) {
+    form_set_error('days', "Please enter an integer number of days.");
   }
 }
 
@@ -80,7 +80,14 @@ function grievance_uh_report_resproc_cancelby_batch($grievance_nids, $values, $r
   $resproc_terms = sirius_taxonomy_load('grievance_resproc', 'tid', 'full');
   $all_status_terms = sirius_taxonomy_load('grievance_status', 'tid', 'full');
   $days = $values['days'];
-  $ts = strtotime("+$days days");
+
+  if ($days > 0) {
+    $ts_start = strtotime("-1 days");
+    $ts_end = strtotime("+$days days");
+  } else {
+    $ts_start = strtotime("$days days");
+    $ts_end = strtotime("+1 days");
+  }
 
   $grievance_nodes = node_load_multiple($grievance_nids);
   foreach ($grievance_nodes as $grievance_nid => $grievance_node) {
@@ -100,7 +107,10 @@ function grievance_uh_report_resproc_cancelby_batch($grievance_nids, $values, $r
       break;
     }
     if (!$cancelby_date) { continue; }
-    if (strtotime($cancelby_date) > $ts) { continue; }
+    $ts = strtotime($cancelby_date);
+
+    if ($ts < $ts_start) { continue; }
+    if ($ts > $ts_end) { continue; }
 
     $row['grievance_nid'] = $grievance_nid;
     $row['grievance_id'] = $grievance_node->field_grievance_id['und'][0]['value'];

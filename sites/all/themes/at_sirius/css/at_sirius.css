@@ -4219,3 +4219,39 @@ body.cke_editable_themed {
   clear: none;
   border: none;
 }
+
+
+
+
+.region-footer .block-masquerade {
+  padding-top: 10px;
+}
+
+.region-footer .block-masquerade .block-title {
+  font-weight: bold;
+  font-size: 1.1em;
+  margint-bottom: 2px;
+}
+
+/*
+.region-footer .block-masquerade .block-content {
+  display: inline-block;
+  float: left;
+}
+*/
+
+.region-footer .block-masquerade .block-content .form-item {
+  margin-top: 2px;
+  margint-bottom: 2px;
+}
+
+
+.region-footer .block-masquerade .block-content input[type=submit] {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 1.1em;
+  margin: 0;
+  margin-left: 5px;
+}
