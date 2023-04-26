@@ -9838,6 +9838,124 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Report - Trust - Hours',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1682514448,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'ec3216ac-5da2-4856-83cf-2e0d2f8b2cfd',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>For a given month, this report fetches all workers with at least one hour at any employer within the six months through the given month -- i.e. the entire active worker population.</p>
+
+<p>For each worker, it fetches:</p>
+
+<ul>
+	<li>Demographic information such as name, address, phone, and email;</li>
+	<li>The "main emlpoyer", defined as the employer with the most hours during the six month period;</li>
+	<li>The total number of hours worker in each of the six months</li>
+</ul>
+
+<p>The summary report allows you to filter by a "threshold", and shows the number of workers at each employer who are above the threshold (in the given month) and the number who have been below the threshold for 1, 2, 3, 4, 5, or 6 months.</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/reports/sirius-trust-hour',
+        'format' => NULL,
+      ),
+      1 => array(
+        'value' => 'sirius/reports/sirius-trust-hour/form',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Report on hours worked in a given month.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2023-04-26 06:07:28 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Report - Trust - New Hires',
   'log' => '',
   'status' => 1,
