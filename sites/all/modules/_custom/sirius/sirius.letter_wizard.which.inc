@@ -261,9 +261,49 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 				}
 			}
 
+
+			// Main Contact from the grievance
+			$candidate_email = $entity_node->field_grievance_co_email['und'][0]['email'];
+			if ($candidate_email) {
+				$recipients[$candidate_email]['email'] = $candidate_email;
+				if ($entity_node->field_grievance_co_name['und'][0]['value']) {
+					$recipients[$candidate_email]['name'] = $entity_node->field_grievance_co_name['und'][0]['value'];
+				}
+				$recipients[$candidate_email]['disposition'] = 'to';
+				if (!$recipients[$candidate_email]['delta']) {
+					$recipient[$candidate_email]['delta'] = $delta++;
+				}
+				if (!$recipients[$candidate_email]['description']) {
+					$recipients[$candidate_email]['description'] = 'Assigned Shop Contact';
+				}
+			}
+
+			// Shop Steward from the grievance
+			$candidate_email = $entity_node->field_grievance_st_email['und'][0]['value'];
+			if ($candidate_email) {
+				$recipients[$candidate_email]['email'] = $candidate_email;
+				if ($entity_node->field_grievance_st_name['und'][0]['value']) {
+					$recipients[$candidate_email]['name'] = $entity_node->field_grievance_st_name['und'][0]['value'];
+				}
+				$recipients[$candidate_email]['disposition'] = 'skip';
+				if (!$recipients[$candidate_email]['delta']) {
+					$recipient[$candidate_email]['delta'] = $delta++;
+				}
+				if (!$recipients[$candidate_email]['description']) {
+					$recipients[$candidate_email]['description'] = 'Assigned Shop Steward';
+				}
+			}
+
+			$shop_nid = $entity_node->field_grievance_shop['und'][0]['target_id'];
+		}
+
+		if ($entity_node->type == 'grievance_shop') {
+			$shop_nid = $entity_node->nid;
+		}
+
+		if ($shop_nid) {
 			// Shop contacts
 			$status_tid = $entity_node->field_grievance_status['und'][0]['tid'];
-			$shop_nid = $entity_node->field_grievance_shop['und'][0]['target_id'];
 			$candidates = grievance_notify_company_contacts(array('shop_nid' => $shop_nid, 'status_nid' => $status_tid));
 			foreach ($candidates as $candidate_nid => $candidate) {
 				if (!$candidate['email']) { continue; }
@@ -284,23 +324,8 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 					'nid' => $candidate_nid,
 				);
 			}
-
-			// Contact from the grievance
-			$candidate_email = $entity_node->field_grievance_co_email['und'][0]['email'];
-			if ($candidate_email) {
-				$recipients[$candidate_email]['email'] = $candidate_email;
-				if ($entity_node->field_grievance_co_name['und'][0]['value']) {
-					$recipients[$candidate_email]['name'] = $entity_node->field_grievance_co_name['und'][0]['value'];
-				}
-				$recipients[$candidate_email]['disposition'] = 'to';
-				if (!$recipients[$candidate_email]['delta']) {
-					$recipient[$candidate_email]['delta'] = $delta++;
-				}
-				if (!$recipients[$candidate_email]['description']) {
-					$recipients[$candidate_email]['description'] = 'Assigned Shop Contact';
-				}
-			}
 		}
+
 
 		$context = array('entity_node' => $entity_node);
 		drupal_alter('sirius_letter_recipients_email', $recipients, $context);

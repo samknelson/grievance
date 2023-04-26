@@ -57,6 +57,7 @@ function sirius_banner_config_submit($form, &$form_state) {
 
 function sirius_banner_render() {
 	global $user;
+  $domain = sirius_domain();
 	$html = '<div class="user-links">';
 
 		if ($user->uid) 
@@ -68,7 +69,6 @@ function sirius_banner_render() {
 			  $html .= $user->name;
 				$html .= "&nbsp;&nbsp;&nbsp;&nbsp;";
 
-			  $domain = sirius_domain();
 			  if (user_access('sirius domain switch')) {
 			    $html .= l('domain','sirius/domain/switch');
 			    $html .= ' / ';

@@ -65,7 +65,7 @@ function sirius_hour_node_tab_worker_hours_form($form, &$form_state, $worker_nod
 	$sql .= "order by year desc, month desc, day desc, hours_type_name, department_name ";
 	$stmt = db_query($sql, array(':worker_nid' => $worker_node->nid));
 	$rows = array();
-	$totals = array();
+	$totals = $grand_totals = array();
 	$grand_total = 0;
 	while ($hr = $stmt->fetchAssoc()) {
 		$tools = l(t('View'), 'node/' . $hr['payperiod_nid'] . '/sirius_payperiod_entries_view', array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button'))));

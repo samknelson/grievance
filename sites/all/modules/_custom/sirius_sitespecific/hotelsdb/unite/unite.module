@@ -26,6 +26,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.fe
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_convention.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_actor.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.feed_relationship.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'unite') . "/unite.service.inc";
 
 
 /**
@@ -370,4 +371,29 @@ function unite_node_subform($form, &$form_state, $property_node, $fields) {
 	);
 
 	return $form;
+}
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function unite_report_cache_info() {
+  $items = array();
+
+  sirius_require('unite', 'unite.report_datawarehouse.inc');
+
+  $items['unite-datawarehouse-actors'] = array(
+    'name' => t('HotelsDB - Data Warehouse - Actors'),
+    'description' => '',
+    'access' => 'unite hotels admin',
+    'fields' => unite_report_datawarehouse_actors_fields(),
+    'form_callback' => 'unite_report_datawarehouse_actors_form',
+    'pk_list_callback' => 'unite_report_datawarehouse_actors_pks',
+    'batch_callback' => 'unite_report_datawarehouse_actors_batch',
+    'module' => 'unite',
+    'file' => 'unite.report_datawarehouse.inc',
+    'dashboard' => TRUE,
+  );
+
+  return $items;
 }

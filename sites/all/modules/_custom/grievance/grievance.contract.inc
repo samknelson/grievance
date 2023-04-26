@@ -28,6 +28,32 @@ function grievance_contract_template_node_tab_clauses($contract_template_node) {
   drupal_goto('/node/' . $contract_template_node->nid . '/clauses/list');
 }
 
+
+function grievance_contract_template_list($active_only = TRUE) {
+  $sql_args = array();
+  $domain_nid = sirius_domain_nid();
+  $sql = "select nid, title ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
+  $sql .= "where node.type = 'grievance_contract_template' ";
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  }
+  if ($active_only) {
+    $sql .= "and (field_sirius_active_value IS NULL or field_sirius_active_value = 'Yes') ";
+  }
+  $sql .= "order by title ";
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $result = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $result[$hr['nid']] = $hr['title'];
+  }
+  return $result;
+}
+
+
 function grievance_contract_template_node_tab_clauses_list($contract_template_node) {
   $entity_nid = $contract_template_node->nid;
 
@@ -379,6 +405,13 @@ function grievance_form_grievance_contract_rule_node_form_alter(&$form, &$form_s
     '#description' => theme('token_tree', array('token_types' => array('node'))),
     '#weight' => $weight
   );
+}
+
+function grievance_contract_grievance_form_alter_limit_to_active(&$form, &$form_state, $form_id) {
+  // Only limit on create, not on edit
+  if ($form['nid']['#value']) { return; }
+  if (!$form['field_grievance_contract_tplt']['und']['#options']) { return; }
+  $form['field_grievance_contract_tplt']['und']['#options'] = array('_none' => t('- None -')) + grievance_contract_template_list();
 }
 
 function grievance_contract_find_rule($contract_tplt_nid, $status_tid) {

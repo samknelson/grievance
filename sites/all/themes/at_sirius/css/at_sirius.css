@@ -2182,8 +2182,7 @@ h2.field-label {
 }
 
 #page-footer #block-views-trustfund-flags-block,
-#page-footer #block-views-trustfund-flags-block-1,
-#page-footer #block-masquerade-masquerade {
+#page-footer #block-views-trustfund-flags-block-1 {
 	float: left;
 	width: 250px;
 }
@@ -4202,4 +4201,57 @@ body.cke_editable_themed {
   .backlink-wrapper {
     display: none;
   }
+}
+
+
+
+.sirius-views-exposed-filters .views-exposed-widget {
+  width: 200px;
+  height: 80px;
+  float: left;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border:  1px solid #cccccc;
+}
+
+.sirius-views-exposed-filters .views-submit-button {
+  clear: none;
+  border: none;
+}
+
+
+
+
+.region-footer .block-masquerade {
+  padding-top: 10px;
+}
+
+.region-footer .block-masquerade .block-title {
+  font-weight: bold;
+  font-size: 1.1em;
+  margint-bottom: 2px;
+}
+
+/*
+.region-footer .block-masquerade .block-content {
+  display: inline-block;
+  float: left;
+}
+*/
+
+.region-footer .block-masquerade .block-content .form-item {
+  margin-top: 2px;
+  margint-bottom: 2px;
+}
+
+
+.region-footer .block-masquerade .block-content input[type=submit] {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 1.1em;
+  margin: 0;
+  margin-left: 5px;
 }

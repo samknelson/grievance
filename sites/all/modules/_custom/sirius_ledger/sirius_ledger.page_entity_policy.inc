@@ -24,7 +24,7 @@ function sirius_ledger_node_tab_entity_policy_form($form, &$form_state, $entity_
 
 	if ($json['ledger']['policy']['ebh']) { $items = array_values($json['ledger']['policy']['ebh']); }
 	if (!$items) { $items = array(); }
-	uksort($items, function($a, $b) use ($items) { return $items[$a]['weight'] <=> $items[$a]['weight']; });
+	uksort($items, function($a, $b) use ($items) { return $items[$a]['date'] <=> $items[$b]['date']; });
 
   $ajax_params = $form_state['triggering_element']['#sirius_ajax'];
 

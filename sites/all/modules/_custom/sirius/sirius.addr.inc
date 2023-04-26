@@ -150,6 +150,12 @@ function sirius_geofield_enabled($entity_type, $entity, $field = NULL, $instance
 }
 
 function sirius_addr_node_presave($node) {
+	sirius_addr_node_presave_geometry($node);
+	sirius_addr_node_presave_county($node);
+}
+
+function sirius_addr_node_presave_geometry($node) {
+	// Set the address JSON from geocoder
 	$field_name = 'field_address';
 	if (isset($node->{$field_name})) {
 		$entity_type = 'node';
@@ -187,10 +193,31 @@ function sirius_addr_node_presave($node) {
 	    $json = sirius_json_get($node);
 	    $json['addr'][$field_name]['geometry'] = $geometry;
 	    sirius_json_set($node, $json);
-	    // dpm($json);
 	  }
 	}
 }
+
+function sirius_addr_node_presave_county($node) {
+	$field_names = array(
+		'field_county' => 'field_address',
+		// 'field_sirius_county' => 'field_sirius_address',
+	);
+
+	foreach ($field_names as $to_field_name => $from_field_name) {
+		// Never overwrite existing values
+		if ($node->{$to_field_name}['und'][0]['value']) { continue; }
+
+		// Check to see if our geocoder gave us a county
+		$json = sirius_json_get($node);
+		$geometry_json = $json['addr'][$from_field_name]['geometry'];
+		$county_name = sirius_addr_get_component_name($geometry_json, 'administrative_area_level_2');
+		if (!$county_name) { continue; }
+
+		// Set the county
+		$node->{$to_field_name}['und'][0]['value'] = $county_name;
+	}
+}
+
 
 function sirius_addr_form_alter_node(&$form, &$form_state, $form_id) {
 	// Hide canonical addresses on the node form. They are always set automatically.
@@ -224,6 +251,8 @@ function sirius_addr_latlon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
     return ($miles * 1.609344);
   } else if ($unit == "N") {
     return ($miles * 0.8684);
+  } else if ($unit == 'F') { 
+  	return $miles * 5280;
   } else {
     return $miles;
   }

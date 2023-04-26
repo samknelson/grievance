@@ -4,28 +4,63 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/r
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.form.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.auto.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.purge.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.settings.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.instances.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_landing.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_generate.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_instances.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_auto.inc";
 
 function report_cache_info_all() {
 	$info_all = &drupal_static(__FUNCTION__, NULL);
 	if (!isset($info_all)) {
-		$info_all = module_invoke_all('report_cache_info');
+		// We want to do this:
+		// $info_all = module_invoke_all('report_cache_info');
+		// But we want to add information about the module that defines it. So we call each function manually.
+
+		$info_all = array();
+		$hook = 'report_cache_info';
+		foreach (module_implements($hook) as $module) {
+			$function = $module . '_' . $hook;
+    	if (function_exists($function)) {
+    		$module_info = system_get_info('module', $module);
+      	$result = call_user_func_array($function, array());
+      	if (isset($result) && is_array($result)) {
+        	$info_all = array_merge_recursive($info_all, $result);
+      		// Add the module to the results, so we know which module provides which report.
+      		foreach ($result as $key => $info) {
+      			$info_all[$key]['module'] = $module;
+      			$info_all[$key]['module_name'] = $module_info['name'];
+      		}
+      	} elseif (isset($result)) {
+        	$info_all[] = $result;
+      	}
+    	}
+  	}
 	}
+
+	foreach ($info_all as $key => $record) {
+		// Clean up some of our names. 
+		$info_all[$key]['name'] = preg_replace('/^\s*Grievances\:\s*/', '', $info_all[$key]['name']);
+		$info_all[$key]['module_name'] = preg_replace('/^\s*Sirius\s*/', '', $info_all[$key]['module_name']);
+
+		// Set default form callback
+		if (!$info_all[$key]['form_callback']) { $info_all[$key]['form_callback'] = 'report_cache_generate_form'; }
+	}
+
+	uksort($info_all, function($a, $b) use ($info_all) {
+		$result = strcasecmp($info_all[$a]['module_name'], $info_all[$b]['module_name']);
+		if (!$result) { $result = strcasecmp($info_all[$a]['name'], $info_all[$b]['name']); }
+		return $result;
+	});
+
 	return $info_all;
 }
 
 function report_cache_info($report_type) {
 	$info_all = report_cache_info_all();
 	return $info_all[$report_type];
-}
-
-function report_cache_settings($report_type, $new_settings = array()) {
-	if ($new_settings) {
-		sirius_domain_variable_set("sirius_report_" . $report_type . "_settings", json_encode($new_settings));
-	}
-	return json_decode(sirius_domain_variable_get("sirius_report_" . $report_type . "_settings"), TRUE);
 }
 
 function report_cache_access($report_type) {
@@ -38,7 +73,7 @@ function report_cache_access($report_type) {
 	}
 	
 	$access = $info['access'];
-	if (!$access) { $access = 'access site reports'; }
+	if (!$access) { $access = 'grievance report'; }
 
 	return user_access($access);
 }
@@ -59,6 +94,8 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
 		$stmt->condition('report_domain_nid', $domain_nid);
 		$stmt->execute();
 
+		$instance_uuid = $parameters['meta']['instance']['uuid'];
+
 	  $stmt = db_insert('report_cache');
 		$stmt->fields(
 			array(
@@ -67,6 +104,7 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
 				'report_type' => $report_type . ' :: PARAMETERS',
 				'report_data' => serialize($parameters),
 				'report_domain_nid' => $domain_nid,
+				'report_instance' => $instance_uuid,
 			)
 		);
 		$stmt->execute();
@@ -92,10 +130,27 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
 	return $parameters;
 }
 
-function report_cache_most_recent($report_type) {
-	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
-	$sql = "select distinct report_id from report_cache where report_type = :report_type and report_domain_nid = :domain_nid /* and report_id like '% Auto'*/ order by report_id desc limit 1";
-	$stmt = db_query($sql, array(':report_type' => $report_type, ':domain_nid' => $domain_nid));
+function report_cache_most_recent($report_type, $instance_uuid = NULL) {
+	$domain_nid = sirius_domain_nid(); 
+	if (!$domain_nid) { $domain_nid = 0; }
+
+	$sql_args = array();
+	$sql = "select distinct report_id ";
+	$sql .= "from report_cache ";
+
+	$sql .= "where report_type = :report_type ";
+	$sql_args[':report_type'] = $report_type;
+
+	$sql .= "and report_domain_nid = :domain_nid ";
+	$sql_args[':domain_nid'] = $domain_nid;
+
+	if ($instance_uuid) {
+		$sql .= "and report_instance = :instance_uuid ";
+		$sql_args[':instance_uuid'] = $instance_uuid;
+	}
+
+	$sql .= "order by report_id desc limit 1 ";
+	$stmt = db_query($sql, $sql_args);
 	$hr = $stmt->fetchAssoc();
 	return $hr['report_id'];
 }

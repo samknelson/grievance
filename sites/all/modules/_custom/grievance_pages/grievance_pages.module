@@ -1,7 +1,0 @@
-<?php
-/**
- * @file
- * Code for the Grievance Pages feature.
- */
-
-include_once 'grievance_pages.features.inc';

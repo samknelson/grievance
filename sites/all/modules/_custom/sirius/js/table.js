@@ -17,9 +17,6 @@
           $(element2).width(col_widths[index2]);
         });
 	    });
-
-	    console.log("Here...");
-
 	  }
 	};
 })(jQuery);

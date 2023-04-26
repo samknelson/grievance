@@ -124,7 +124,8 @@ function sirius_backlinks_from_node($node) {
 		else if ($node->type == 'sirius_event_participant') 			{ $path = "node/$worker_nid/sirius_worker_events"; }
 		else if ($node->type == 'sirius_contact_relationship') 		{ $path = "node/$worker_nid/sirius_worker_relationships"; $name = 'FROM Worker'; }
 		else if ($node->type == 'sirius_trust_worker_benefit') 		{ $path = "node/$worker_nid/sirius_trust_worker_benefits"; $name = 'Dependent'; }
-		else if ($node->type == 'sirius_trust_worker_election') 	{ $path = "node/$worker_nid/sirius_trust_worker_elections"; }
+		else if ($node->type == 'sirius_trust_worker_election') 	{ $path = "node/$worker_nid/sirius_trust_worker_election"; }
+		else if ($node->type == 'sirius_trust_worker_beneficiary'){ $path = "node/$worker_nid/sirius_trust_worker_beneficiary"; }
 		else if ($node->type == 'sirius_worker')									{ $path = ""; }
 		else 																											{ $path = "node/$worker_nid"; }
 
@@ -157,6 +158,7 @@ function sirius_backlinks_from_node($node) {
 	}
 
 	if ($node->type == 'sirius_operator') { $links['sirius/office/operator/list'] = array('name' => 'Operator List'); }
+	if ($node->type == 'sirius_help') { $links['sirius/admin/help'] = array('name' => 'All Help Text'); }
 	if ($node->type == 'sirius_phonenumber') { $links['sirius/phonenumber'] = array('name' => 'Phone Number List'); }
 	if ($node->type == 'sirius_trust_benefit') { $links['sirius/trust/benefits'] = array('name' => 'Benefit List'); }
 
@@ -237,11 +239,16 @@ function sirius_backlinks_from_node($node) {
 				$handler_category = $hr['field_sirius_category_value'];
 
 				$name = sirius_content_type_name($handler_type);
+				$path = '';
+
 				if ($handler_type == 'sirius_event' && $log_category == 'ledger:auth')									{ $path = "node/$handler_nid/sirius_event_auths"; }
 				else if ($handler_type == 'sirius_event' && $log_category == 'event:intake_application'){ $path = "node/$handler_nid/sirius_event_intake/applications"; }
 				else if ($handler_type == 'sirius_event') 																							{ $path = "node/$handler_nid/sirius_event_info"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'worker:certification') 	{ $path = "node/$handler_nid/sirius_worker_tc/certifications"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'tor') 										{ $path = "node/$handler_nid/sirius_worker_schedule/tor"; }
+				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:checkin')				{ $path = "node/$handler_nid/sirius_worker_steward/checkin"; }
+				else if ($handler_type == 'grievance_shop' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_employer_steward/sched"; }
+				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_worker_steward/checkin-history"; }
 				else if ($handler_type == 'sirius_log') {
 					if ($handler_category == 'twilio:recording') { 
 						$path = "node/$handler_nid/sirius_twilio_recording";
@@ -253,14 +260,16 @@ function sirius_backlinks_from_node($node) {
 						$path = "node/$handler_nid";
 					}
 				}
-				else if ($handler_type == 'grievance_shop') {
-					if ($log_category == 'labproj') {
-						$path = "node/$handler_nid/employer_labproj";
-						$name = 'Employer Labor Projections';
-					}
+				else if ($handler_type == 'grievance_shop' && $log_category == 'labproj') {
+					$path = "node/$handler_nid/employer_labproj";
+					$name = 'Employer Labor Projections';
 				}
-				else if ($handler_type == 'sirius_json_definition') 																		{ $path = ''; }
-				else 																																										{ $path = "node/$handler_nid/${handler_type}_log"; }
+				else if ($handler_type == 'sirius_dispatch_facility' && $log_category == 'steward:checkin') {
+					$path = "node/$handler_nid/sirius_steward_dispatch_facility_checkin";
+					$name = 'Facility';
+				}
+				else if ($handler_type == 'sirius_json_definition') { $path = ''; }
+				else { $path = "node/$handler_nid/${handler_type}_log"; }
 
 				$links[$path] = array('name' => $name, 'title' => $hr['title']);
 			}
@@ -276,6 +285,10 @@ function sirius_backlinks_from_node($node) {
 
 	if ($node->type == 'grievance_basic_page') {
 		$links['grievance/admin/basic-pages'] = array('name' => 'All Basic Pages');
+	}
+
+	if ($node->type == 'sirius_trust_provider') {
+		$links['sirius/trust/providers'] = array('name' => 'All Providers');
 	}
 
 	drupal_alter('sirius_backlinks_from_node', $links, $node);

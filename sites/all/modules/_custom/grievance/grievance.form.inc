@@ -72,6 +72,14 @@ function grievance_form_grievance_node_form_alter(&$form, &$form_state, $form_id
   $domain_nid = sirius_domain_nid();
 
   //
+  // Hide the legacy grievance_gender
+  //
+
+  if (!$_REQUEST['legacy_gender']) {
+    $form['field_grievance_gender']['#access'] = FALSE;
+  }
+
+  //
   // Damn limit validation problme
   //
 

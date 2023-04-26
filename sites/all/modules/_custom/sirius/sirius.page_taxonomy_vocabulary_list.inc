@@ -19,8 +19,16 @@ function sirius_page_taxonomy_vocabulary_list() {
 
   $rows = array();
 	while ($hr = $stmt->fetchAssoc()) {
+		$machine_name = $hr['machine_name'];
 		// This taxonomy must be configured for Sirius access
-		if (!$all_settings[$hr['machine_name']]) { continue; }
+		if (!$all_settings[$machine_name]) { continue; }
+
+		// The component must be enabled
+		if ($all_settings[$machine_name]['component']) {
+			if (!sirius_domain_component_enabled($all_settings[$machine_name]['component'])) {
+				continue;
+			}
+		}
 
 		// The user must have access to these terms
 		if (!user_access('edit terms in ' . $hr['vid']) && !user_access('sirius admin')) { continue; }

@@ -3,7 +3,9 @@
 function sirius_node_tab_set_module($module_name, &$node_tabs) {
   foreach ($node_tabs as $content_type => $ignore) {
     foreach ($node_tabs[$content_type] as $path => $ignore) {
-      $node_tabs[$content_type][$path]['module'] = $module_name;
+      if (!$node_tabs[$content_type][$path]['module']) {
+        $node_tabs[$content_type][$path]['module'] = $module_name;
+      }
     }
   }
 }
@@ -135,6 +137,17 @@ function sirius_term_tab_content($term, $in_tab_name) {
 
   $callback = $tab_record['callback'];
   $args = array($term);
+
+  if (!function_exists($callback)) {
+    $callback_form = "$callback" . '_form';
+    if (!function_exists($callback_form)) {
+      drupal_set_message("Callback doesn't exist: $callback", 'error');
+      return '';
+    }
+    $callback = 'drupal_get_form';
+    $args = array($callback_form, $term);
+  }
+
   drupal_set_title($term->name);
   if ($tab_record['callback arguments']) {
     $args = array_merge($args, $tab_record['callback arguments']);

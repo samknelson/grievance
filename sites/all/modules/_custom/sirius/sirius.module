@@ -1,8 +1,6 @@
 <?php
 
-// I hate notice errors
-ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATED);
-
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.inc';
@@ -60,9 +58,11 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.disclaimer.
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.mailattach.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.customfield.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.bookmark.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.config.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.public.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.nota.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 
@@ -130,7 +130,6 @@ function sirius_entity_presave($entity, $type) {
     if ($entity->type == 'sirius_worker') { sirius_contact_sync_from_worker($entity); }
   }
   if ($type == 'user') { sirius_contact_sync_from_user($entity); }
-
 }
 
 /**
@@ -179,6 +178,7 @@ function sirius_node_presave($node) {
     }
   }
   */
+  sirius_nota_node_presave($node);
 }
 
 
@@ -328,27 +328,6 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     sirius_domain_restrict_taxonomy_fields($form, $form_id);
   }
 
-  // Remove access to some JSON fields
-  if ($form_id == 'sirius_worker_node_form' ||
-      $form_id == 'grievance_shop_node_form' ||
-      $form_id == 'sirius_dispatch_node_form' ||
-      $form_id == 'sirius_dispatch_job_node_form' ||
-      $form_id == 'grievance_node_form' ||
-      $form_id == 'sirius_contact_node_form' || 
-      $form_id == 'sirius_json_definition_node_form' ||
-      $form_id == 'sirius_event_participant_node_form' ||
-      $form_id == 'sirius_phonenumber_node_form' || 
-      $form_id == 'sirius_emailaddress_node_form' || 
-      $form_id == 'sirius_bulk_node_form' ||
-      $form_id == 'sirius_ledger_account_node_form' ||
-      $form_id == 'sirius_employee_node_form' ||
-      $form_id == 'grievance_letter_template_node_form' ||
-      $form_id == 'property_node_form' ||
-      $form_id == 'sirius_contact_relationship_node_form' ||
-      $form_id == 'sirius_trust_worker_benefit_node_form') {
-    if (!user_access('sirius admin')) { $form['field_sirius_json']['#access'] = FALSE; }
-  }
-
   if ($form_id == 'sirius_contact_relationship_node_form') {
     sirius_contact_relationship_node_form_alter($form, $form_state, $form_id);
   }
@@ -403,6 +382,9 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     sirius_log_views_exposed_form_alter($form, $form_state); 
   }
   */
+
+  // Handle none-of-the-above
+  sirius_nota_form_alter($form, $form_state, $form_id);
 }
 
 /**
@@ -771,11 +753,24 @@ function sirius_field_changed($node1, $node2, $field_name) {
 
 
 function sirius_find_nid_by_id($sirius_id, $bundle) {
-  $sql = "select entity_id from field_data_field_sirius_id ";
-  $sql .= "where entity_type = 'node' ";
-  $sql .= "and bundle = :bundle ";
+  $domain_nid = sirius_domain_nid();
+
+  $sql_args = array();
+  $sql = "select field_data_field_sirius_id.entity_id ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+  $sql .= "where node.type = :bundle ";
   $sql .= "and field_sirius_id_value = :sirius_id ";
-  $stmt = db_query($sql, array(':bundle' => $bundle, ':sirius_id' => $sirius_id));
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id is null ";
+  }
+  $sql_args[':bundle'] = $bundle;
+  $sql_args[':sirius_id'] = $sirius_id;
+  $stmt = sirius_sql_query($sql, $sql_args);
   $hr = $stmt->fetchAssoc();
   return $hr['entity_id'];
 }
@@ -822,9 +817,9 @@ function sirius_file_download_access($file_item, $entity_type, $entity) {
   // Allow loopback requests (from the originating server)
   if ($_REQUEST['loopback']) { return sirius_loopback_access(); }
 
-  // Employers can see headshots. @todo this should probably live in the sirius_employer module.
+  // Employers can see headshots. @todo this should probably live in the sirius_worker module.
   if ($entity_type == 'node' && $entity->type == 'sirius_worker' && preg_match('/private:\/\/sirius_headshot/', $file_item['uri'])) {
-    if (user_access('sirius dispatch employer')) { return TRUE; }
+    if (user_access('sirius worker view headshot')) { return TRUE; }
   }
 
   // Materials get treated specially
@@ -1047,6 +1042,7 @@ function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $
 
 function sirius_table_render($header, $rows, $attributes = array()) {
   drupal_add_css(drupal_get_path('module', 'sirius') . '/css/table.css');
+  drupal_add_js(drupal_get_path('module', 'sirius') . '/js/table.js', 'file');
   $attributes['class'][] = 'sirius_table';
   return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
 }
@@ -1081,6 +1077,14 @@ function sirius_node_title($nid) {
   $stmt = sirius_sql_query($sql, array(':nid' => $nid));
   $hr = $stmt->fetchAssoc();
   return $hr['title'];
+}
+
+function sirius_term_title($tid) {
+  if (!$tid) { return NULL; }
+  $sql = "select name from taxonomy_term_data where tid = :tid";
+  $stmt = sirius_sql_query($sql, array(':tid' => $tid));
+  $hr = $stmt->fetchAssoc();
+  return $hr['name'];
 }
 
 /**

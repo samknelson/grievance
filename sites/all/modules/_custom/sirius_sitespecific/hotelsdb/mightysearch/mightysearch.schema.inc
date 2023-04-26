@@ -203,6 +203,11 @@ function mightysearch_mschema() {
 		'type' => 'integer',
 	);
 
+	$schema['property']['fields']['legacy_id'] = array(
+		'prompt' => 'Employer ID',
+		'type' => 'text',
+	);
+
 
 	$relationship_types = array(
 		'owner' => 'Owner',

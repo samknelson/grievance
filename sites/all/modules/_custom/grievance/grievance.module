@@ -352,6 +352,10 @@ function grievance_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
+  if ($form_id == 'grievance_node_form') {
+    grievance_contract_grievance_form_alter_limit_to_active($form, $form_state, $form_id);
+  }
+
   if ($form_id == 'grievance_contract_template_node_form') { 
     // Holidays is a system-only field
     $form['field_grievance_holidays']['#access'] = FALSE;
@@ -598,6 +602,7 @@ function grievance_preprocess_html(&$variables) {
 
 
 function grievance_views_query_alter(&$view, &$query) {
+  if (!isset($view->name)) { return; }
   grievance_views_query_alter_permission($view, $query); 
   if ($view->name == 'grievances_mine') {
     grievance_views_query_alter_grievances_mine($view, $query);
@@ -711,6 +716,9 @@ function grievance_report_cache_info() {
     'batch_callback' => 'grievance_report_log_include_exclude_batch',
     'file' => 'grievance.report_log_include_exclude.inc',
     'module' => 'grievance',
+    'render_callbacks' => array(
+      'View' => 'grievance_report_log_include_exclude_view',
+    ),
   );
 
   return $items;
@@ -858,4 +866,15 @@ function grievance_sirius_cron_scan_info() {
     'multidomain' => FALSE,
   );
   return $items;
+}
+
+
+function grievance_status_terms_open() {
+  $status_terms = sirius_taxonomy_load('grievance_status', 'tid', 'full');
+  $open_status_terms = array();
+  foreach ($status_terms as $status_tid => $status_term) {
+    if ($status_term->field_grievance_open['und'][0]['value'] != 1) { continue; }
+    $open_status_terms[$status_tid] = $status_term;
+  }
+  return $open_status_terms;
 }

@@ -907,6 +907,52 @@ function grievance_content_types_taxonomy_default_vocabularies() {
         ),
       ),
     ),
+    'sirius_trust_provider_level' => array(
+      'name' => 'Sirius Trust Provider Level',
+      'machine_name' => 'sirius_trust_provider_level',
+      'description' => 'Provider level -- e.g. "Ph.D.", "ARPN", etc.',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'sirius_trust_service_type' => array(
+      'name' => 'Sirius Trust Service Type',
+      'machine_name' => 'sirius_trust_service_type',
+      'description' => 'Service type -- e.g. "Inpatient", "Outpatient", "Alternative"',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
     'sirius_work_status' => array(
       'name' => 'Sirius Work Status',
       'machine_name' => 'sirius_work_status',

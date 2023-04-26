@@ -184,8 +184,10 @@ if (at_sirius_is_popup()) {
         <div class="block-inner">
           <?php
             print sirius_footer_html();
-            if (variable_get('grievance_last_updated', '')) {
-              print '<br />Last Updated: <strong>' . variable_get('grievance_last_updated', '') . '</strong>';
+            if (user_access('sirius')) {
+              if (variable_get('grievance_last_updated', '')) {
+                print '<br />Last Updated: <strong>' . variable_get('grievance_last_updated', '') . '</strong>';
+              }
             }
           ?>
         </div>

@@ -1,5 +1,15 @@
 <?php
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_imis') . '/grievance_imis.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_imis') . '/grievance_imis.page_user_settings.inc';
+
+function grievance_imis_access_check($broughtby_tid) {
+  global $user;
+  $user_full = user_load($user->uid);
+  $json = sirius_json_get($user_full);
+  return $json['grievance_imis']['broughtby'][$broughtby_tid];
+}
+
 /**
  * Implements hook_grievance_workersync_plugin_info
  */
@@ -23,26 +33,69 @@ function grievance_imis_grievance_workersync_plugin_info() {
  */
 
 function grievance_imis_callback_settings(&$form, &$form_state) {
-  $variable_name = sirius_domain_variable_name('grievance_workersync_imis_url');
-  $form['plugin_settings'][$variable_name] = array(
-    '#type' => 'textfield',
-    '#default_value' => variable_get($variable_name, ''),
-    '#title' => t('SePuede URL'),
-    '#description' => t('This will be something like: https://unite-test3.burstingsilver.com/BSi.iMIS.WebServices/api/member/grievance'),
-  );
+  $terms = array(0 => t('Default')) + sirius_taxonomy_load('grievance_broughtby', 'tid', 'name');
 
-   $variable_name = sirius_domain_variable_name('grievance_workersync_imis_apikey');
-   $form['plugin_settings'][$variable_name] = array(
-    '#type' => 'textarea',
-    '#title' => t('SePuede API Key'),
-    '#description'   => t('SePuede API Key.'),
-    '#default_value' => variable_get($variable_name, ''),
-  );
+  foreach ($terms as $tid => $term_name) {
+    if ($tid) { $suffix = "_broughtby_$tid"; } else { $suffix = ''; }
+    if (count($terms) > 1) {
+      $form['plugin_settings']['intro'] = array(
+        '#markup' => '<p>' . t('Enter the connection settings for each "brought by" option, as well as the default settings to be used when no "brought by" is found. Note that the test page will use exclusively the default settings') . '</p>',
+      );
+    }
+
+    $form['plugin_settings'][$tid] = array(
+      '#type' => 'fieldset', 
+      '#title' => t('SePuede Settings:') . ' ' . $term_name,
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+
+    $variable_name = sirius_domain_variable_name('grievance_workersync_imis_url' . $suffix);
+    $form['plugin_settings'][$tid][$variable_name] = array(
+      '#type' => 'textfield',
+      '#default_value' => variable_get($variable_name, ''),
+      '#title' => t('SePuede URL'),
+      '#description' => t('This will be something like: https://unite-test3.burstingsilver.com/BSi.iMIS.WebServices/api/member/grievance'),
+    );
+
+    $variable_name = sirius_domain_variable_name('grievance_workersync_imis_apikey' . $suffix);
+    $form['plugin_settings'][$tid][$variable_name] = array(
+      '#type' => 'textarea',
+      '#title' => t('SePuede API Key'),
+      '#description'   => t('SePuede API Key.'),
+      '#default_value' => variable_get($variable_name, ''),
+    );
+  }
 }
 
-function grievance_imis_callback_search($str, $verbose = FALSE) {
-  $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url');
-  $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey');
+function grievance_imis_callback_search($str, $verbose = FALSE, $form = NULL, $form_state = NULL) {
+  if ($form && $form_state) {
+    $tid = grievance_form_current_value('field_grievance_broughtby', 'tid', $form, $form_state);
+    if ($tid) {
+      $suffix = "_broughtby_$tid";
+      $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url' . $suffix);
+      $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey' . $suffix);
+      if ($imis_url && $imis_apikey) {
+        sirius_minilog("Found broughtby_tid $tid, using URL $imis_url");
+        if (!grievance_imis_access_check($tid)) {
+          sirius_minilog("Access denied.");
+          return array(array('id' => 0, 'title' => 'You do not have access to this SePuede database.'));
+        }
+      } else {
+        sirius_minilog("Found broughtby_tid $tid, but the URL or apikey is missing. Using the default connection settings.");
+      }
+    } else {
+      sirius_minilog("Context was provided, but there is no broughtby_tid. Using the default connection settings.");
+    }
+  } else {
+    sirius_minilog("No context was provided. Using the default connection settings.");
+  }
+
+  if (!$imis_url || !$imis_apikey) {
+    $tid = NULL;
+    $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url');
+    $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey');
+  }
 
   if (!$imis_url || !$imis_apikey) {
     sirius_minilog('SePuede access is not configured.', 'error');
@@ -96,6 +149,7 @@ function grievance_imis_callback_search($str, $verbose = FALSE) {
     foreach ($candidates as $candidate) {
       $match = array();
       $match['id'] = $candidate->ImisId;
+      if ($tid) { $match['id'] .= '-' . $tid; }
       $match['title'] = $candidate->FullName;
       $extra = '';
       if ($candidate->TimssId) {
@@ -118,9 +172,17 @@ function grievance_imis_callback_search($str, $verbose = FALSE) {
   return $matches;
 }
 
-function grievance_imis_callback_lookup($imis_id, $verbose = FALSE) {
-  $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url');
-  $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey');
+function grievance_imis_callback_lookup($imis_key, $verbose = FALSE) {
+  list($imis_id, $tid) = explode('-', $imis_key);
+  if ($tid) { $suffix = "_broughtby_$tid";  } else { $suffix = ''; }
+
+  if ($tid) {
+    if (!grievance_imis_access_check($tid)) {
+      return array(array('id' => 0, 'first_name' => 'You do not have access to this SePuede database.'));
+    }
+  }
+  $imis_url = sirius_domain_variable_get('grievance_workersync_imis_url' . $suffix);
+  $imis_apikey = sirius_domain_variable_get('grievance_workersync_imis_apikey' . $suffix);
 
   if (!$imis_url || !$imis_apikey) {
     sirius_minilog('SePuede access is not configured.', 'error');

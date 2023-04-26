@@ -21,8 +21,6 @@ function report_cache_auto_all($mode = 'test') {
 
 	$count_run = 0; 
 	foreach ($report_info_all as $report_type => $report_info) {
-		$settings = report_cache_settings($report_type);
-    if ($settings['auto']['enabled'] != 'Yes') { continue; }
 		sirius_minilog("$report_type: Report generation starting.");	
 		$result = report_cache_auto_run($report_type, $mode);
 		$result = report_cache_auto_purge($report_type, $mode);
@@ -43,10 +41,36 @@ function report_cache_auto_run($report_type, $mode = 'test') {
 	$form_state['values']['report_id'] = 'Auto';
 	$form_state['values']['nobatch'] = TRUE;
 	$form_state['values']['noninteractive'] = TRUE;
-	if ($mode != 'live') {
-		sirius_minilog("-- Skipping run because mode = $mode");
+
+	if ($info['parameters_form_callback']) { 
+		// We want to iterate through the instances ...
+		$instances = report_cache_instances($report_type);
 	} else {
-		$result = report_cache_form_submit(array(), $form_state);
+		// ... but (legacy support) if there are no instances, 
+		$settings = report_cache_settings($report_type);
+		$instances = array(
+			'dummy_uuid' => array(
+				'title' => 'Default', 
+				'auto' => $settings['auto'],
+			),
+		);
+	}
+
+	foreach ($instances as $instance_uuid => $instance) {
+		sirius_minilog("-- Scanning instance " . $instance['title']);
+
+		if ($instance['auto']['enabled'] != 'Yes') {
+			sirius_minilog("-- -- Auto-generation not enabled for this instance.");
+			continue; 
+		}
+
+		if ($mode != 'live') {
+			sirius_minilog("-- -- Skipping run because mode = $mode");
+		} else {
+			$form_state['values']['parameters'] = $instance['parameters'];
+			if ($instance_uuid != 'dummy_uuid') { $form_state['values']['instance'] = $instance_uuid; }
+			$result = report_cache_form_submit(array(), $form_state);
+		}
 	}
 
 	sirius_minilog("-- Report generation complete.");	

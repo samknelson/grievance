@@ -3267,7 +3267,7 @@ function hotelsdb_content_types_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_legacy_id',
-    'label' => 'Legacy ID',
+    'label' => 'Employer ID',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -5725,6 +5725,7 @@ function hotelsdb_content_types_field_default_field_instances() {
   t('Distance to Airport');
   t('Distance to Airport (Secondary)');
   t('Employees Claimed');
+  t('Employer ID');
   t('End date');
   t('Enter the name of any non-UNITE HERE Union, e.g. "IBT". If the local is known, include that as well, i.e. "IBT 631".');
   t('Event Space');

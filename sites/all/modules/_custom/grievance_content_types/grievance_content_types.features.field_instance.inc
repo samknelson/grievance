@@ -451,7 +451,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 39,
+      'weight' => 36,
     ),
   );
 
@@ -639,7 +639,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 41,
+      'weight' => 37,
     ),
   );
 
@@ -1113,7 +1113,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 36,
+      'weight' => 39,
     ),
   );
 
@@ -1294,7 +1294,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 45,
+        'weight' => 46,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -1363,7 +1363,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 38,
+      'weight' => 41,
     ),
   );
 
@@ -1442,7 +1442,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 38,
+      'weight' => 40,
     ),
   );
 
@@ -1460,7 +1460,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 46,
+        'weight' => 47,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'inline',
@@ -1526,7 +1526,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 39,
+      'weight' => 42,
     ),
   );
 
@@ -1621,7 +1621,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 36,
+      'weight' => 35,
     ),
   );
 
@@ -2651,7 +2651,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 47,
+      'weight' => 50,
     ),
   );
 
@@ -2933,7 +2933,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => ', ',
         ),
         'type' => 'list_default',
-        'weight' => 51,
+        'weight' => 52,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -2990,7 +2990,7 @@ function grievance_content_types_field_default_field_instances() {
         'checkall' => FALSE,
       ),
       'type' => 'options_buttons',
-      'weight' => 44,
+      'weight' => 47,
     ),
   );
 
@@ -3008,7 +3008,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 47,
+        'weight' => 48,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'inline',
@@ -3071,7 +3071,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 41,
+      'weight' => 44,
     ),
   );
 
@@ -3089,7 +3089,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 48,
+        'weight' => 49,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -3146,7 +3146,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 40,
+      'weight' => 43,
     ),
   );
 
@@ -3252,7 +3252,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 52,
+        'weight' => 53,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -3313,7 +3313,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 45,
+      'weight' => 48,
     ),
   );
 
@@ -3469,7 +3469,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 43,
+      'weight' => 42,
     ),
   );
 
@@ -3563,11 +3563,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'list',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'list_default',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 44,
       ),
       'grievance_arbitrationform' => array(
@@ -3824,7 +3821,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 42,
+      'weight' => 41,
     ),
   );
 
@@ -4082,7 +4079,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 40,
+      'weight' => 38,
     ),
   );
 
@@ -4158,7 +4155,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 46,
+      'weight' => 49,
     ),
   );
 
@@ -4409,7 +4406,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 40,
+      'weight' => 39,
     ),
   );
 
@@ -4497,7 +4494,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 41,
+      'weight' => 40,
     ),
   );
 
@@ -5670,7 +5667,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 50,
+        'weight' => 51,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -5727,7 +5724,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 43,
+      'weight' => 46,
     ),
   );
 
@@ -6879,7 +6876,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 39,
+      'weight' => 36,
     ),
   );
 
@@ -6897,7 +6894,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 49,
+        'weight' => 50,
       ),
       'grievance_arbitrationform' => array(
         'label' => 'above',
@@ -6954,7 +6951,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 42,
+      'weight' => 45,
     ),
   );
 
@@ -7109,6 +7106,225 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-grievance-field_sirius_gender'.
+  $field_instances['node-grievance-field_sirius_gender'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 58,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_form_226' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'token' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_gender',
+    'label' => 'Gender',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => '',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => '',
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 38,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance-field_sirius_gender_nota_calc'.
+  $field_instances['node-grievance-field_sirius_gender_nota_calc'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 45,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_form_226' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'token' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_gender_nota_calc',
+    'label' => 'Gender',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 40,
+    ),
+  );
+
+  // Exported field_instance: 'node-grievance-field_sirius_gender_nota_val'.
+  $field_instances['node-grievance-field_sirius_gender_nota_val'] = array(
+    'bundle' => 'grievance',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 59,
+      ),
+      'grievance_arbitrationform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_form_226' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'grievance_gform_a' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'token' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_gender_nota_val',
+    'label' => 'I Identify As',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 39,
+    ),
+  );
+
   // Exported field_instance: 'node-grievance-field_sirius_json'.
   $field_instances['node-grievance-field_sirius_json'] = array(
     'bundle' => 'grievance',
@@ -7249,7 +7465,7 @@ function grievance_content_types_field_default_field_instances() {
     'settings' => array(
       'description_field' => 1,
       'file_directory' => '',
-      'file_extensions' => 'txt pdf doc png mov mp3 mp4 jpg jpeg gif docx xls xlsx rtf htm html',
+      'file_extensions' => 'txt pdf doc png mov mp3 mp4 jpg jpeg gif docx xls xlsx rtf htm html avi',
       'filefield_paths' => array(
         'active_updating' => 0,
         'file_name' => array(
@@ -15280,7 +15496,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15304,7 +15520,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -15458,6 +15674,55 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-sirius_contact_relationship-field_sirius_count'.
+  $field_instances['node-sirius_contact_relationship-field_sirius_count'] = array(
+    'bundle' => 'sirius_contact_relationship',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'field_delimiter' => '',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_count',
+    'label' => 'Sequence',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-sirius_contact_relationship-field_sirius_date_end'.
   $field_instances['node-sirius_contact_relationship-field_sirius_date_end'] = array(
     'bundle' => 'sirius_contact_relationship',
@@ -15478,7 +15743,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15551,7 +15816,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -15576,7 +15841,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15649,7 +15914,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -15665,7 +15930,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 4,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15689,7 +15954,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -15705,7 +15970,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 5,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15727,7 +15992,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -17111,7 +17376,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 15,
+        'weight' => 16,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -17145,7 +17410,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 12,
+      'weight' => 13,
     ),
   );
 
@@ -17784,7 +18049,7 @@ function grievance_content_types_field_default_field_instances() {
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
-      'type' => 'date_text',
+      'type' => 'date_popup',
       'weight' => 8,
     ),
   );
@@ -17810,7 +18075,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 23,
+        'weight' => 12,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -17839,9 +18104,47 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_sirius_datetime_completed',
-    'label' => 'Filled',
+    'label' => 'End Date',
     'required' => 0,
     'settings' => array(
+      'date_popup_timepicker' => array(
+        'timepicker' => array(
+          'timepicker_options' => array(
+            'amPmText' => array(
+              0 => 'AM',
+              1 => 'PM',
+            ),
+            'closeButtonText' => 'Done',
+            'defaultTime' => 'now',
+            'deselectButtonText' => 'Deselect',
+            'hourText' => 'Hour',
+            'hours' => array(
+              'ends' => 23,
+              'starts' => 0,
+            ),
+            'minuteText' => 'Minute',
+            'minutes' => array(
+              'ends' => 55,
+              'interval' => 5,
+              'starts' => 0,
+            ),
+            'nowButtonText' => 'Now',
+            'periodSeparator' => ' ',
+            'rows' => 4,
+            'showCloseButton' => FALSE,
+            'showDeselectButton' => FALSE,
+            'showHours' => TRUE,
+            'showLeadingZero' => TRUE,
+            'showMinutes' => TRUE,
+            'showMinutesLeadingZero' => TRUE,
+            'showNowButton' => FALSE,
+            'showOn' => 'focus',
+            'showPeriod' => FALSE,
+            'showPeriodLabels' => TRUE,
+            'timeSeparator' => ':',
+          ),
+        ),
+      ),
       'default_value' => 'now',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -17853,18 +18156,16 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'date',
       'settings' => array(
         'date_single_day' => array(),
-        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
-        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 6,
+      'weight' => 9,
     ),
   );
 
@@ -18078,7 +18379,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 13,
+        'weight' => 14,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -18121,7 +18422,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -18142,7 +18443,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 14,
+        'weight' => 15,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -18185,7 +18486,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -18206,7 +18507,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 12,
+        'weight' => 13,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -18239,7 +18540,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -18365,7 +18666,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 16,
+        'weight' => 17,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -18400,7 +18701,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 13,
+      'weight' => 14,
     ),
   );
 
@@ -18475,13 +18776,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 26,
       ),
       'sirius_worker' => array(
@@ -18635,7 +18931,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 17,
+        'weight' => 18,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -18849,11 +19145,8 @@ function grievance_content_types_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'sirius_jsonfield',
-        'settings' => array(
-          'field_delimiter' => '',
-        ),
-        'type' => 'sirius_jsonfield_formatter_full',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 25,
       ),
       'sirius_worker' => array(
@@ -19319,15 +19612,15 @@ function grievance_content_types_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
+          'bypass_access' => 1,
           'field_delimiter' => '',
-          'link' => FALSE,
+          'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 5,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19354,7 +19647,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 9,
+      'weight' => 4,
     ),
   );
 
@@ -19379,7 +19672,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 2,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19416,7 +19709,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 2,
+      'weight' => 1,
     ),
   );
 
@@ -19441,7 +19734,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 1,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19478,7 +19771,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 3,
+      'weight' => 2,
     ),
   );
 
@@ -19494,9 +19787,9 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
+          'bypass_access' => 1,
           'field_delimiter' => '',
-          'link' => FALSE,
+          'link' => 0,
         ),
         'type' => 'entityreference_label',
         'weight' => 4,
@@ -19523,7 +19816,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 5,
     ),
   );
 
@@ -19542,7 +19835,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -19579,7 +19872,45 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 5,
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_dispatch_job_group-field_sirius_json'.
+  $field_instances['node-sirius_dispatch_job_group-field_sirius_json'] = array(
+    'bundle' => 'sirius_dispatch_job_group',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Definition',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 6,
     ),
   );
 
@@ -24695,6 +25026,848 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'node-sirius_trust_provider-body'.
+  $field_instances['node-sirius_trust_provider-body'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+          'trim_length' => 600,
+        ),
+        'type' => 'text_summary_or_trimmed',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'body',
+    'label' => 'Description',
+    'required' => 0,
+    'settings' => array(
+      'display_summary' => 1,
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 20,
+        'summary_rows' => 5,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => 9,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_provider-field_sirius_active'.
+  $field_instances['node-sirius_trust_provider-field_sirius_active'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_active',
+    'label' => 'Active?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_provider-field_sirius_address'.
+  $field_instances['node-sirius_trust_provider-field_sirius_address'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'addressfield',
+        'settings' => array(
+          'field_delimiter' => '',
+          'format_handlers' => array(
+            0 => 'address',
+          ),
+          'use_widget_handlers' => 1,
+        ),
+        'type' => 'addressfield_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_address',
+    'label' => 'Address',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'addressfield',
+      'settings' => array(
+        'available_countries' => array(),
+        'default_country' => 'site_default',
+        'format_handlers' => array(
+          'address' => 'address',
+          'address-hide-postal-code' => 0,
+          'address-hide-street' => 0,
+          'address-hide-administrative-area' => 0,
+          'address-hide-locality' => 0,
+          'address-hide-country' => 0,
+          'thoroughfare-textarea' => 0,
+          'organisation' => 0,
+          'name-full' => 0,
+          'name-oneline' => 0,
+          'address-optional' => 0,
+        ),
+      ),
+      'type' => 'addressfield_standard',
+      'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_trust_provider-field_sirius_address_geo'.
+  $field_instances['node-sirius_trust_provider-field_sirius_address_geo'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'geofield_map',
+        'settings' => array(
+          'field_delimiter' => '',
+          'geofield_map_baselayers_hybrid' => 1,
+          'geofield_map_baselayers_map' => 1,
+          'geofield_map_baselayers_physical' => 0,
+          'geofield_map_baselayers_satellite' => 1,
+          'geofield_map_center' => array(
+            'geocode' => 'Find my location',
+            'lat' => 41.5064498,
+            'lon' => -73.9761444,
+          ),
+          'geofield_map_controltype' => 'default',
+          'geofield_map_draggable' => 0,
+          'geofield_map_height' => '300px',
+          'geofield_map_maptype' => 'map',
+          'geofield_map_max_zoom' => 0,
+          'geofield_map_min_zoom' => 0,
+          'geofield_map_mtc' => 'standard',
+          'geofield_map_overview' => 0,
+          'geofield_map_overview_opened' => 0,
+          'geofield_map_pancontrol' => 1,
+          'geofield_map_scale' => 0,
+          'geofield_map_scrollwheel' => 0,
+          'geofield_map_streetview_show' => 0,
+          'geofield_map_width' => '100%',
+          'geofield_map_zoom' => 14,
+        ),
+        'type' => 'geofield_map_map',
+        'weight' => 8,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_address_geo',
+    'label' => 'Address Geocode',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'geocoder',
+      'settings' => array(
+        'delta_handling' => 'default',
+        'geocoder_field' => 'field_sirius_address',
+        'geocoder_handler' => 'google',
+        'handler_settings' => array(
+          'google' => array(
+            'all_results' => 0,
+            'biasing' => array(
+              'bounds' => '',
+              'components' => '',
+              'region' => '',
+            ),
+            'geometry_type' => 'point',
+            'reject_results' => array(
+              'APPROXIMATE' => 0,
+              'GEOMETRIC_CENTER' => 0,
+              'RANGE_INTERPOLATED' => 0,
+              'ROOFTOP' => 0,
+            ),
+          ),
+        ),
+        'latlng_override' => 0,
+      ),
+      'type' => 'geocoder',
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_provider-field_sirius_domain'.
+  $field_instances['node-sirius_trust_provider-field_sirius_domain'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Domain',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 10,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_provider-field_sirius_id'.
+  $field_instances['node-sirius_trust_provider-field_sirius_id'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_id',
+    'label' => 'ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_provider-field_sirius_json'.
+  $field_instances['node-sirius_trust_provider-field_sirius_json'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Definition',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_provider-field_sirius_phone'.
+  $field_instances['node-sirius_trust_provider-field_sirius_phone'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_phone',
+    'label' => 'Phone',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_trust_provider-field_sirius_provider_npi'.
+  $field_instances['node-sirius_trust_provider-field_sirius_provider_npi'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_provider_npi',
+    'label' => 'NPI',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 10,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_provider-field_sirius_ssn'.
+  $field_instances['node-sirius_trust_provider-field_sirius_ssn'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_ssn',
+    'label' => 'Taxpayer ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_trust_provider-field_sirius_trust_prov_levels'.
+  $field_instances['node-sirius_trust_provider-field_sirius_trust_prov_levels'] = array(
+    'bundle' => 'sirius_trust_provider',
+    'default_value' => array(),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_trust_prov_levels',
+    'label' => 'Levels',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => '',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => '',
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'options',
+      'settings' => array(
+        'checkall' => FALSE,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_service-body'.
+  $field_instances['node-sirius_trust_service-body'] = array(
+    'bundle' => 'sirius_trust_service',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+          'trim_length' => 600,
+        ),
+        'type' => 'text_summary_or_trimmed',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'body',
+    'label' => 'Body',
+    'required' => FALSE,
+    'settings' => array(
+      'display_summary' => TRUE,
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 20,
+        'summary_rows' => 5,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_service-field_sirius_active'.
+  $field_instances['node-sirius_trust_service-field_sirius_active'] = array(
+    'bundle' => 'sirius_trust_service',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_active',
+    'label' => 'Active?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_service-field_sirius_domain'.
+  $field_instances['node-sirius_trust_service-field_sirius_domain'] = array(
+    'bundle' => 'sirius_trust_service',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Domain',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_service-field_sirius_id'.
+  $field_instances['node-sirius_trust_service-field_sirius_id'] = array(
+    'bundle' => 'sirius_trust_service',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_id',
+    'label' => 'ID / CPT Code',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_service-field_sirius_id2'.
+  $field_instances['node-sirius_trust_service-field_sirius_id2'] = array(
+    'bundle' => 'sirius_trust_service',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_id2',
+    'label' => 'Internal ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_trust_service-field_sirius_json'.
+  $field_instances['node-sirius_trust_service-field_sirius_json'] = array(
+    'bundle' => 'sirius_trust_service',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Definition',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_trust_service-field_sirius_trust_service_type'.
+  $field_instances['node-sirius_trust_service-field_sirius_trust_service_type'] = array(
+    'bundle' => 'sirius_trust_service',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_trust_service_type',
+    'label' => 'Sirius Trust Service Type',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(),
+      'display_name' => '',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => '',
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 1,
+    ),
+  );
+
   // Exported field_instance:
   // 'node-sirius_trust_worker_benefit-field_grievance_shop'.
   $field_instances['node-sirius_trust_worker_benefit-field_grievance_shop'] = array(
@@ -24758,7 +25931,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -24782,7 +25955,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 8,
+      'weight' => 7,
     ),
   );
 
@@ -24855,7 +26028,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -24928,7 +26101,7 @@ If the file has multiple pages, then each page in the input document will use th
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 7,
+      'weight' => 6,
     ),
   );
 
@@ -24953,7 +26126,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 5,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -25026,7 +26199,7 @@ If the file has multiple pages, then each page in the input document will use th
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 6,
+      'weight' => 5,
     ),
   );
 
@@ -25109,6 +26282,50 @@ If the file has multiple pages, then each page in the input document will use th
   );
 
   // Exported field_instance:
+  // 'node-sirius_trust_worker_benefit-field_sirius_notes'.
+  $field_instances['node-sirius_trust_worker_benefit-field_sirius_notes'] = array(
+    'bundle' => 'sirius_trust_worker_benefit',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_notes',
+    'label' => 'Notes',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-sirius_trust_worker_benefit-field_sirius_trust_benefit'.
   $field_instances['node-sirius_trust_worker_benefit-field_sirius_trust_benefit'] = array(
     'bundle' => 'sirius_trust_worker_benefit',
@@ -25125,7 +26342,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 4,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -25149,7 +26366,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 4,
     ),
   );
 
@@ -26268,7 +27485,11 @@ If the file has multiple pages, then each page in the input document will use th
   // Exported field_instance: 'node-sirius_worker-field_sirius_dispatch_asi'.
   $field_instances['node-sirius_worker-field_sirius_dispatch_asi'] = array(
     'bundle' => 'sirius_worker',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => 'Yes',
+      ),
+    ),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -28402,6 +29623,41 @@ If the file has multiple pages, then each page in the input document will use th
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_broughtby-field_sirius_json'.
+  $field_instances['taxonomy_term-grievance_broughtby-field_sirius_json'] = array(
+    'bundle' => 'grievance_broughtby',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'sirius_jsonfield',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'sirius_jsonfield_formatter_full',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Definition',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_category-field_grievance_hidefields'.
   $field_instances['taxonomy_term-grievance_category-field_grievance_hidefields'] = array(
     'bundle' => 'grievance_category',
@@ -29979,7 +31235,7 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => 'The maximum number of active relationships of this type that a contact can have. For example, a person might only be permitted to have one spouse at a time.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'number',
         'settings' => array(
           'decimal_separator' => '.',
@@ -29989,7 +31245,7 @@ If the file has multiple pages, then each page in the input document will use th
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 4,
+        'weight' => 3,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30009,7 +31265,7 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -30025,7 +31281,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 1,
+        'weight' => 4,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30043,7 +31299,45 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_contact_relationship_types-field_sirius_id'.
+  $field_instances['taxonomy_term-sirius_contact_relationship_types-field_sirius_id'] = array(
+    'bundle' => 'sirius_contact_relationship_types',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_id',
+    'label' => 'ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
     ),
   );
 
@@ -30059,7 +31353,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 5,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30075,7 +31369,7 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -30088,13 +31382,13 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => 'I.e. "Child"',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30861,7 +32155,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 3,
+        'weight' => 6,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -30879,7 +32173,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -30995,6 +32289,46 @@ If the file has multiple pages, then each page in the input document will use th
     ),
   );
 
+  // Exported field_instance: 'taxonomy_term-sirius_gender-field_sirius_nota'.
+  $field_instances['taxonomy_term-sirius_gender-field_sirius_nota'] = array(
+    'bundle' => 'sirius_gender',
+    'default_value' => array(
+      0 => array(
+        'value' => 'No',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Indicates that this entry represents "none of the above", and a separate field should allow the user to identify their own value.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 3,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_nota',
+    'label' => 'None of the above?',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 4,
+    ),
+  );
+
   // Exported field_instance:
   // 'taxonomy_term-sirius_gender-field_sirius_term_source'.
   $field_instances['taxonomy_term-sirius_gender-field_sirius_term_source'] = array(
@@ -31029,7 +32363,7 @@ If the file has multiple pages, then each page in the input document will use th
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -32520,6 +33854,224 @@ If the file has multiple pages, then each page in the input document will use th
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-sirius_trust_provider_level-field_sirius_domain'.
+  $field_instances['taxonomy_term-sirius_trust_provider_level-field_sirius_domain'] = array(
+    'bundle' => 'sirius_trust_provider_level',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 1,
+          'field_delimiter' => '',
+          'link' => 0,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Domain',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_trust_provider_level-field_sirius_id'.
+  $field_instances['taxonomy_term-sirius_trust_provider_level-field_sirius_id'] = array(
+    'bundle' => 'sirius_trust_provider_level',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_id',
+    'label' => 'ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_trust_provider_level-field_sirius_json'.
+  $field_instances['taxonomy_term-sirius_trust_provider_level-field_sirius_json'] = array(
+    'bundle' => 'sirius_trust_provider_level',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Definition',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_trust_service_type-field_sirius_domain'.
+  $field_instances['taxonomy_term-sirius_trust_service_type-field_sirius_domain'] = array(
+    'bundle' => 'sirius_trust_service_type',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 1,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Domain',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_trust_service_type-field_sirius_id'.
+  $field_instances['taxonomy_term-sirius_trust_service_type-field_sirius_id'] = array(
+    'bundle' => 'sirius_trust_service_type',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_id',
+    'label' => 'ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_trust_service_type-field_sirius_json'.
+  $field_instances['taxonomy_term-sirius_trust_service_type-field_sirius_json'] = array(
+    'bundle' => 'sirius_trust_service_type',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Definition',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-sirius_work_status-field_sirius_dispatch_available'.
   $field_instances['taxonomy_term-sirius_work_status-field_sirius_dispatch_available'] = array(
     'bundle' => 'sirius_work_status',
@@ -33159,7 +34711,6 @@ If the file has multiple pages, then each page in the input document will use th
   t('Field Name');
   t('Field name to override, e.g. "field_grievance_organizer"');
   t('Filed By');
-  t('Filled');
   t('Final?');
   t('First Name');
   t('For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action.');
@@ -33184,8 +34735,10 @@ If the file has multiple pages, then each page in the input document will use th
   t('Hold for Employer');
   t('Hold for Employer Until');
   t('Holidays');
+  t('I Identify As');
   t('I.e. "Child"');
   t('ID');
+  t('ID / CPT Code');
   t('ID2');
   t('If "Yes", then letters of this type MUST be logged.');
   t('If "Yes", then the default will be that any letter sent using this template will also set the grievance\'s "company representative" field to be the main recipient of the letter.  Generally this should be "Yes" for notifications to the company -- grievance filings and so forth -- and "No" for notifications to the grievant or letters that are meant to be sent internally.');
@@ -33197,11 +34750,13 @@ If the file has multiple pages, then each page in the input document will use th
   t('In addition to the usual access restrictions, materials of this type should be restricted to the roles checked below. If no roles are selected, all roles with appropriate permissions will have access. <strong>Important note:</strong> For grievance attachments, this field is ignored.');
   t('Incident Date');
   t('Include EBA Workers');
+  t('Indicates that this entry represents "none of the above", and a separate field should allow the user to identify their own value.');
   t('Indicates which job types this employer can create.');
   t('Industry');
   t('Information Request');
   t('Information Request?');
   t('Intake Person');
+  t('Internal ID');
   t('Is this a "dummy" or "placeholder" section?  This field should be left blank or set to "No" except for automatically-generated placeholder sections created when the article itself is meant to be selectable.');
   t('Is this an "attachment", meaning that it can be used as an attachment type for the grievance?');
   t('Is this status considered "Un-Resolved"?  Only unresolved grievances are displayed on the "my grievances" list.');
@@ -33215,6 +34770,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Lead Organizer');
   t('Lead\'s Recommendaiton');
   t('Length of Hearing');
+  t('Levels');
   t('ListID');
   t('Maximum Count');
   t('Medium');
@@ -33228,6 +34784,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Mobile Phone');
   t('Must Log?');
   t('NOT Available for Departments');
+  t('NPI');
   t('Name');
   t('Name B ==> A');
   t('Name as it should be rendered by Text to Speech systems');
@@ -33236,6 +34793,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Next Status');
   t('Next Step');
   t('Next Step in the Grievance Procedure');
+  t('None of the above?');
   t('Notes');
   t('Notification Body');
   t('Notification Email');
@@ -33304,6 +34862,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Select the system roles that the user associated with workers with this member status should receive. For example, if the member status is "journeyman", and journeymen have a special role granting them additional permission, you might add that role here.');
   t('Send Date');
   t('Send Notifications?');
+  t('Sequence');
   t('Settlement Amount');
   t('Settlement Tags');
   t('Shift');
@@ -33319,6 +34878,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Sign-in Blocked?');
   t('Signature');
   t('Sirius Term Source');
+  t('Sirius Trust Service Type');
   t('Skill Expires');
   t('Skilled Payrate');
   t('Skills');
@@ -33338,6 +34898,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Supervisor Unit');
   t('Survey');
   t('Tags');
+  t('Taxpayer ID');
   t('Template Tags');
   t('Term');
   t('The date the employee received discipline.');

@@ -4646,6 +4646,7 @@ function grievance_content_types_field_default_field_bases() {
         'grievance' => 'Grievance',
         'sirius_worker' => 'Worker',
         'sirius_employer' => 'Employer',
+        'sirius_dispatch_job_group' => 'Dispatch Job Group',
       ),
       'allowed_values_function' => '',
     ),
@@ -6230,6 +6231,50 @@ function grievance_content_types_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
+  // Exported field_base: 'field_sirius_gender_nota_calc'.
+  $field_bases['field_sirius_gender_nota_calc'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_gender_nota_calc',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_sirius_gender_nota_val'.
+  $field_bases['field_sirius_gender_nota_val'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_gender_nota_val',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
   // Exported field_base: 'field_sirius_headshot'.
   $field_bases['field_sirius_headshot'] = array(
     'active' => 1,
@@ -6881,6 +6926,32 @@ Prof.',
     'type' => 'text',
   );
 
+  // Exported field_base: 'field_sirius_nota'.
+  $field_bases['field_sirius_nota'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_nota',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Yes' => 'Yes',
+        'No' => 'No',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_sirius_notes'.
   $field_bases['field_sirius_notes'] = array(
     'active' => 1,
@@ -7223,6 +7294,28 @@ Prof.',
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_sirius_provider_npi'.
+  $field_bases['field_sirius_provider_npi'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_provider_npi',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 20,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -7846,6 +7939,64 @@ Prof.',
     ),
     'translatable' => 0,
     'type' => 'entityreference',
+  );
+
+  // Exported field_base: 'field_sirius_trust_prov_levels'.
+  $field_bases['field_sirius_trust_prov_levels'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_trust_prov_levels',
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'sirius_trust_provider_level',
+          'parent' => 0,
+          'depth' => '',
+        ),
+      ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
+  );
+
+  // Exported field_base: 'field_sirius_trust_service_type'.
+  $field_bases['field_sirius_trust_service_type'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_trust_service_type',
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'sirius_trust_service_type',
+          'parent' => 0,
+          'depth' => '',
+        ),
+      ),
+      'options_list_callback' => 'content_taxonomy_allowed_values',
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
   );
 
   // Exported field_base: 'field_sirius_type'.

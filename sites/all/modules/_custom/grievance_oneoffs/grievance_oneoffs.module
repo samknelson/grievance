@@ -1,6 +1,1 @@
 <?php
-
-// I hate notice errors
-ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE);
-
-require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'grievance_oneoffs') . "/grievance_oneoffs.unitehere_local23contactsimport.inc";
