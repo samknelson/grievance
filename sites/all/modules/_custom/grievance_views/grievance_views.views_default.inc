@@ -32909,7 +32909,9 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" class="tool-button">View</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" class="tool-button">View</a>
+<a href="/node/[nid]/edit" class="tool-button">Edit</a>
+<a href="/node/[nid]/sirius_trust_service_rates_by_level" class="tool-button">Rates by Level</a>';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -33026,7 +33028,9 @@ Grievance Form',
     t('Title'),
     t('Active?'),
     t('Tools'),
-    t('<a href="/node/[nid]" class="tool-button">View</a>'),
+    t('<a href="/node/[nid]" class="tool-button">View</a>
+<a href="/node/[nid]/edit" class="tool-button">Edit</a>
+<a href="/node/[nid]/sirius_trust_service_rates_by_level" class="tool-button">Rates by Level</a>'),
     t('(substring ok)'),
     t('Page'),
   );
