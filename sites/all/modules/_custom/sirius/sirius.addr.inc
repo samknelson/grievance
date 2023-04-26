@@ -198,13 +198,13 @@ function sirius_addr_form_alter_node(&$form, &$form_state, $form_id) {
 	if (isset($form['field_address_canon_accuracy'])) { $form['field_address_canon_accuracy']['#access'] = FALSE; }
 }
 
-function sirius_addr_get_compponent($point, $type) {
-	if (!$point) { return NULL; }
-	if (!$point->data) { return NULL; }
-	if (!$point->data['geocoder_address_components']) { return NULL; }
-	foreach ($point->data['geocoder_address_components'] as $component) {
-		if (!in_array($type, $component->types)) { continue; }
-		return $component->long_name;
+function sirius_addr_get_component_name($geometry_json, $type) {
+	if (!$geometry_json) { return NULL; }
+	if (!$geometry_json['data']) { return NULL; }
+	if (!$geometry_json['data']['geocoder_address_components']) { return NULL; }
+	foreach ($geometry_json['data']['geocoder_address_components'] as $component) {
+		if (!in_array($type, $component['types'])) { continue; }
+		return $component['long_name'];
 	}
 }
 
