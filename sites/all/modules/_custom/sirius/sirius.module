@@ -168,6 +168,7 @@ function sirius_node_presave($node) {
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_presave($node); }
   if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_presave($node); }
   if ($node->type == 'sirius_contact_relationship') { sirius_contact_relationship_node_presave($node); }
+  if ($node->type == 'sirius_feed') { sirius_feed_node_presave($node); }
 
   sirius_addr_node_presave($node);
 
