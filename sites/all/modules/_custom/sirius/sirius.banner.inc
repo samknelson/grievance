@@ -31,6 +31,17 @@ function sirius_banner_config() {
 		'#upload_location' => 'public://sirius/banner/logo',
 	);
 
+	$form['sirius_banner_homelink'] = array(
+		'#title' => t('Home Link?'),
+		'#type' => 'select',
+		'#default_value' => variable_get('sirius_banner_homelink', 'No'),
+		'#options' => array(
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#description' => t('Show a link to "Home" in the banner? (The site title also always links to home.)'),
+	);
+
 	$form = system_settings_form($form);
 	$form['#submit'][] = 'sirius_banner_config_submit';	
   return $form;
@@ -69,6 +80,11 @@ function sirius_banner_render() {
 			  $html .= $user->name;
 				$html .= "&nbsp;&nbsp;&nbsp;&nbsp;";
 
+				if (variable_get('sirius_banner_homelink', 'No') == 'Yes') {
+					$html .= l(t('home'), '<front>');
+					$html .= ' / ';
+				}
+
 			  if (user_access('sirius domain switch')) {
 			    $html .= l('domain','sirius/domain/switch');
 			    $html .= ' / ';
@@ -102,7 +118,12 @@ function sirius_banner_render() {
 	  }
 	  else 
 	  {
+
 	    $html .= '<div class="user-links-content anon-user-links-content">';
+				if (variable_get('sirius_banner_homelink', 'No') == 'Yes') {
+					$html .= l(t('home'), '<front>');
+					$html .= ' / ';
+				}
 	    	$html .= l("login","user/login");
 	    $html .= '</div>'; // user-links-content
 	  }
