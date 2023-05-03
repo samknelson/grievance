@@ -1092,6 +1092,8 @@ function sirius_content_type_name($machine_name) {
     }
   }
 
+  if (!$lookup[$machine_name]) { $lookup[$machine_name] = $machine_name; }
+  
   return $lookup[$machine_name];
 }
 
