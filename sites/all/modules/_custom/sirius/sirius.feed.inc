@@ -286,6 +286,7 @@ function sirius_feed_wizard_launch($wizard_name) {
   	$feed_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
   }
 
+  $feed_node->title = sirius_feed_title($feed_node);
   $feed_node = node_submit($feed_node);
   node_object_prepare($feed_node);
   node_save($feed_node);
@@ -1278,4 +1279,33 @@ function sirius_feed_info_set_titles(&$item) {
     $item['feed']['fields'][$field_name]['title'] = 
       $group_name . ': ' . $item['feed']['fields'][$field_name]['title'];
   }
+}
+
+function sirius_feed_node_presave(&$feed_node) {
+	$json = sirius_json_get($feed_node);
+	$wizard_name = $feed_node->field_sirius_type['und'][0]['value'];
+	$info = sirius_wizard_info($wizard_name);
+
+	$title = 'Feed - '; 
+	if ($info) {
+		$title .= $info['title'];
+	} else {
+		$title .= "Feed #" . $feed_node->nid;
+	}
+
+  // Source is:
+  // - The source field from the JSON (if it's not auto-generated)
+  // - Followed by the original file name (if any)
+  $source = '';
+  if (!preg_match('/^Import \d\d\d\d/', $json['wizard'][$wizard_name]['source'])) {
+    $source .= $json['wizard'][$wizard_name]['source'];
+  }
+  if ($json['wizard'][$wizard_name]['origname']) {
+    if ($source) { $source .= ' / '; }
+    $source .= $json['wizard'][$wizard_name]['origname'];
+  }
+
+  $title .= ': ' . $source;
+  $title = substr($title, 0, 255);
+  $feed_node->title = $title;
 }
