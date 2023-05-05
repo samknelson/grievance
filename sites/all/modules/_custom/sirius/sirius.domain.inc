@@ -493,16 +493,16 @@ function sirius_domain_taxonomy_get_tree($vid, $parent = 0, $max_depth = NULL, $
  * Wrapper functions for variable_get() and variable_set() that make them multi-domain-aware.
  */
 
-function sirius_domain_variable_get($name, $default = NULL) {
-  return variable_get(sirius_domain_variable_name($name), $default);
+function sirius_domain_variable_get($name, $default = NULL, $domain_nid = NULL) {
+  return variable_get(sirius_domain_variable_name($name, $domain_nid), $default);
 }
 
 function sirius_domain_variable_set($name, $value) {
   return variable_set(sirius_domain_variable_name($name), $value);
 }
 
-function sirius_domain_variable_name($name) {
-  $domain_nid = sirius_domain_nid();
+function sirius_domain_variable_name($name, $domain_nid = NULL) {
+  if ($domain_nid === NULL) { $domain_nid = sirius_domain_nid(); }
   if ($domain_nid > 0) { return $domain_nid . '/' . $name; } else { return $name; }
 }
 

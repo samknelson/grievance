@@ -2017,6 +2017,134 @@ function grievance_content_types_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_trust_provider|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_trust_provider';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'two_column_66_33';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_sirius_active',
+        1 => 'field_sirius_id',
+        2 => 'field_sirius_provider_npi',
+        3 => 'field_sirius_ssn',
+        4 => 'field_sirius_trust_prov_levels',
+        5 => 'body',
+      ),
+      'right' => array(
+        6 => 'field_sirius_phone',
+        7 => 'field_sirius_address',
+        8 => 'field_sirius_address_geo',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_active' => 'left',
+      'field_sirius_id' => 'left',
+      'field_sirius_provider_npi' => 'left',
+      'field_sirius_ssn' => 'left',
+      'field_sirius_trust_prov_levels' => 'left',
+      'body' => 'left',
+      'field_sirius_phone' => 'right',
+      'field_sirius_address' => 'right',
+      'field_sirius_address_geo' => 'right',
+    ),
+    'classes' => array(),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+    'hide_page_title' => '0',
+    'page_option_title' => '',
+  );
+  $export['node|sirius_trust_provider|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_trust_worker_beneficiary|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_trust_worker_beneficiary';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_sirius_worker',
+        1 => 'field_sirius_trust_policy',
+        2 => 'field_sirius_date_start',
+        3 => 'field_sirius_date_end',
+        4 => 'field_sirius_active',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_worker' => 'ds_content',
+      'field_sirius_trust_policy' => 'ds_content',
+      'field_sirius_date_start' => 'ds_content',
+      'field_sirius_date_end' => 'ds_content',
+      'field_sirius_active' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => TRUE,
+    'layout_link_attribute' => FALSE,
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|sirius_trust_worker_beneficiary|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|sirius_trust_worker_election|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'sirius_trust_worker_election';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_sirius_worker',
+        1 => 'field_sirius_trust_benefits',
+        2 => 'field_sirius_trust_policy',
+        3 => 'field_sirius_attachments',
+        4 => 'field_sirius_active',
+        5 => 'field_sirius_trust_election_type',
+        6 => 'field_sirius_date_start',
+        7 => 'field_sirius_date_end',
+        8 => 'field_sirius_contact_relations',
+      ),
+    ),
+    'fields' => array(
+      'field_sirius_worker' => 'ds_content',
+      'field_sirius_trust_benefits' => 'ds_content',
+      'field_sirius_trust_policy' => 'ds_content',
+      'field_sirius_attachments' => 'ds_content',
+      'field_sirius_active' => 'ds_content',
+      'field_sirius_trust_election_type' => 'ds_content',
+      'field_sirius_date_start' => 'ds_content',
+      'field_sirius_date_end' => 'ds_content',
+      'field_sirius_contact_relations' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => TRUE,
+    'layout_link_attribute' => FALSE,
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|sirius_trust_worker_election|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|sirius_worker|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'sirius_worker';

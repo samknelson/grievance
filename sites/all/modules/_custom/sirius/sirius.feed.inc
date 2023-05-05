@@ -286,6 +286,7 @@ function sirius_feed_wizard_launch($wizard_name) {
   	$feed_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
   }
 
+  $feed_node->title = sirius_feed_title($feed_node);
   $feed_node = node_submit($feed_node);
   node_object_prepare($feed_node);
   node_save($feed_node);
@@ -887,6 +888,10 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 }
 
 function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$context) {
+	// Load include files
+	$wizard_name = $info['name'];
+	sirius_wizard_info($wizard_name);
+
 	$batch_size = $info['feed']['batch_size'];
 	if (!$batch_size) { $batch_size = 10; }
 
@@ -1125,6 +1130,61 @@ function sirius_feed_lookup_by_field($content_type, $table, $field_name, $value)
   return array('success' => TRUE, 'nid' => $nid);
 }
 
+function sirius_feed_handle_field($field_name, $field_info, &$value, $precompute) {
+  if (!$value) { return array('success' => TRUE); }
+
+  // Validate integer fields
+  if ($field_info['type'] == 'integer') {
+    $value = preg_replace('/\,/', '', $value);
+    if (!preg_match('/^[0-9]+$/', $value)) { return array('success' => FALSE, 'msg' => "$field_name must be an integer."); }
+  }
+
+  // Validate list fields
+  if ($field_info['type'] == 'list') {
+    $value = sirius_feed_handle_list($field_name, $value);
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name must be one of the allowed values."); }
+    $value = $value;
+  }
+
+  // Validate term_reference
+  if ($field_info['type'] == 'term_reference') {
+    $value = sirius_taxonomy_lookup_by_anything($field_info['taxonomy'], $value);
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name must be one of the values in the taxonomy: $field_info[taxonomy]."); }
+    $value = $value;
+  }
+
+  // Validate date
+  if ($field_info['type'] == 'date') {
+    $value = sirius_feed_handle_date($field_name, $value);
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name does not look like a valid date."); }
+    $value = $value;
+  }
+
+  // Validate list fields
+  if ($field_info['type'] == 'ssn') {
+    $value = sirius_feed_handle_ssn($field_name, $value);
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name must be a valid SSN."); }
+    $value = $value;
+  }
+
+  // Validate list fields
+  if ($field_info['type'] == 'phone') {
+    $value = sirius_feed_handle_phone($field_name, $value);
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name must be a valid phone number."); }
+    $value = $value;
+  }
+
+  // Expensive tests
+  if ($precompute) {
+    if ($field_info['type'] == 'entity_reference') {
+      $value = sirius_feed_handle_entity_reference($field_info['entity_type'], $value);
+      if (!$value) { return array('success' => FALSE, 'msg' => "No value found (or multiple values found) for $field_name in the entity type: $field_info[entity_type]."); }
+    }
+  }
+
+  return array('success' => TRUE);
+}
+
 function sirius_feed_handle_list($field_name, $value) {
   $structure_info = field_info_field("field_$field_name");
   $allowed_values = list_allowed_values($structure_info);
@@ -1145,6 +1205,18 @@ function sirius_feed_handle_list($field_name, $value) {
   }
 
   return NULL;
+}
+
+function sirius_feed_handle_ssn($field_name, $value) {
+	$value = sirius_ssn_format($value);
+	if (!sirius_ssn_validate($value)) { return NULL; }
+	return $value;
+}
+
+function sirius_feed_handle_phone($field_name, $value) {
+	$value = sirius_phone_format($value);
+	if (!sirius_phone_validate($value)) { return NULL; }
+	return $value;
 }
 
 //
@@ -1207,4 +1279,33 @@ function sirius_feed_info_set_titles(&$item) {
     $item['feed']['fields'][$field_name]['title'] = 
       $group_name . ': ' . $item['feed']['fields'][$field_name]['title'];
   }
+}
+
+function sirius_feed_node_presave(&$feed_node) {
+	$json = sirius_json_get($feed_node);
+	$wizard_name = $feed_node->field_sirius_type['und'][0]['value'];
+	$info = sirius_wizard_info($wizard_name);
+
+	$title = 'Feed - '; 
+	if ($info) {
+		$title .= $info['title'];
+	} else {
+		$title .= "Feed #" . $feed_node->nid;
+	}
+
+  // Source is:
+  // - The source field from the JSON (if it's not auto-generated)
+  // - Followed by the original file name (if any)
+  $source = '';
+  if (!preg_match('/^Import \d\d\d\d/', $json['wizard'][$wizard_name]['source'])) {
+    $source .= $json['wizard'][$wizard_name]['source'];
+  }
+  if ($json['wizard'][$wizard_name]['origname']) {
+    if ($source) { $source .= ' / '; }
+    $source .= $json['wizard'][$wizard_name]['origname'];
+  }
+
+  $title .= ': ' . $source;
+  $title = substr($title, 0, 255);
+  $feed_node->title = $title;
 }

@@ -459,6 +459,22 @@ function grievance_content_types_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'sirius_trust_provider' => array(
+      'name' => t('Sirius Trust Provider'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'sirius_trust_service' => array(
+      'name' => t('Sirius Trust Service'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'sirius_trust_worker_benefit' => array(
       'name' => t('Sirius Trust Worker Benefit'),
       'base' => 'node_content',

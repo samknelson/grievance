@@ -321,6 +321,14 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_trust_election_status']['view'] = 'sirius_taxonomy';
     $settings['sirius_trust_election_status']['display'] = 'block_14';
     $settings['sirius_trust_election_status']['multidomain'] = 'Yes';
+    $settings['sirius_trust_provider_level']['view'] = 'sirius_taxonomy';
+    $settings['sirius_trust_provider_level']['display'] = 'block';
+    $settings['sirius_trust_provider_level']['multidomain'] = 'Yes';
+    $settings['sirius_trust_provider_level']['component'] = 'trust';
+    $settings['sirius_trust_service_type']['view'] = 'sirius_taxonomy';
+    $settings['sirius_trust_service_type']['display'] = 'block_17';
+    $settings['sirius_trust_service_type']['multidomain'] = 'Yes';
+    $settings['sirius_trust_service_type']['component'] = 'trust';
   }
 
   if ($vocabulary_machine_name == 'all') { return $settings; }
