@@ -565,7 +565,6 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
-	/*
 	$items['grievance/report/open'] = array(
 		'title' => 'Report: Open Grievances by Specialist',
 		'description' => '',
@@ -574,7 +573,6 @@ function grievance_menu() {
 		'access arguments' => array('grievance view'),
 		'type' => MENU_NORMAL_ITEM,
 	);
-	*/
 
 	$items['grievance/report/average-time'] = array(
 		'title' => 'Report: Average Time Between Statuses',
