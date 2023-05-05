@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This is all unused now.
+ */
+
 function grievance_report_open_by_specialist() {
 	return drupal_get_form('grievance_report_open_by_specialist_form');
 }
