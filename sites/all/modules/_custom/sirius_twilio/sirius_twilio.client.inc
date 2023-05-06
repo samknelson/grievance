@@ -1,17 +1,30 @@
 <?php
 
-use Twilio\Rest\Client;
-use Twilio\Jwt\ClientToken;
+function sirius_twilio_provider_get() {
+	$provider = sirius_domain_variable_get('sirius_twilio_provider', 'twilio');
+	if ($provider == 'signalwire') {
+		require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/signalwire-php/autoload.php';
+	} else {
+		require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/twilio-php/Twilio/autoload.php';
+	}
+	return $provider;
+}
 
-function sirius_twilio_client_get($account_sid = NULL, $account_token = NULL) {
+function sirius_twilio_client_get() {
 	static $client;
 	if (!$client) {
-		require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/twilio-php/Twilio/autoload.php';
-		// Autoload error with respect to TwiML, I think it has to do with capitalization
-		// require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_twilio/twilio-php/Twilio/Twiml.php';
-		if (!$account_sid) { $account_sid = sirius_domain_variable_get('sirius_twilio_account_sid', ''); }
-		if (!$account_token) { $account_token = sirius_domain_variable_get('sirius_twilio_account_token', ''); }
-		$client = new Client($account_sid, $account_token);
+
+		$provider = sirius_twilio_provider_get();
+
+		$account_sid = sirius_domain_variable_get('sirius_twilio_account_sid', '');
+		$account_token = sirius_domain_variable_get('sirius_twilio_account_token', '');
+		$space_url = sirius_domain_variable_get('sirius_twilio_signalwire_space_url', '');
+
+		if ($provider == 'signalwire') {
+			$client = new SignalWire\Rest\Client($account_sid, $account_token, array('signalwireSpaceUrl' => $space_url));
+		} else {
+			$client = new Twilio\Rest\Client($account_sid, $account_token);
+		}
 	}
 
 	return $client;
@@ -19,6 +32,7 @@ function sirius_twilio_client_get($account_sid = NULL, $account_token = NULL) {
 
 function sirius_twilio_capability_token_get() {
 	global $user;
+	$provider = sirius_twilio_provider_get();
 
 	// put your Twilio API credentials here
 	$account_sid = sirius_domain_variable_get('sirius_twilio_account_sid', '');
