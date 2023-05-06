@@ -1,54 +1,54 @@
-Users {"url":"admin\/people","weight":"-45"}
--Flood Control {"url":"admin\/config\/system\/flood-control","weight":"-50"}
--Flood Unblock {"url":"admin\/config\/system\/flood-unblock","weight":"-48"}
-Web {"url":"node\/1","weight":"-44"}
--Help Text {"url":"admin\/structure\/custom_help_text","weight":"-48"}
---Add {"url":"admin\/structure\/custom_help_text\/add","weight":"-50"}
--Basic Pages {"url":"grievance\/admin\/basic-pages","weight":"-49"}
---Add {"url":"node\/add\/grievance-basic-page","weight":"0"}
-Employers {"url":"grievance\/admin\/shops","weight":"-47"}
--Add a Shop {"url":"node\/add\/grievance-shop","weight":"-48"}
--Contacts {"url":"grievance\/admin\/shops\/contacts","weight":"-50"}
---Add a Contact {"url":"node\/add\/grievance-shop-contact","weight":"-50"}
--Companies {"url":"grievance\/admin\/shops\/companies","weight":"-49"}
---Add a Company {"url":"node\/add\/grievance-company","weight":"0"}
--Chapters {"url":"grievance\/admin\/chapters","weight":"-47"}
--Grievance Shop Assignments {"url":"grievance\/admin\/shops\/assignments","weight":"-46"}
---Bulk-Reassign Organizers {"url":"grievance\/admin\/shops\/bulk-reassign","weight":"-49"}
---Grievance Reassign {"url":"admin\/grievance\/reassign","weight":"-50"}
-Config {"url":"sirius\/config","weight":"-43"}
-File a Grievance {"url":"node\/add\/grievance","weight":"-50"}
-My Grievances {"url":"grievances","weight":"-49"}
--All Grievances {"url":"grievances\/all","weight":"-50"}
--Status Correction Tool {"url":"grievance\/status-correct","weight":"0"}
-Contracts {"url":"grievance\/admin\/contract-templates","weight":"-46"}
--Article Search {"url":"grievance\/admin\/contract-templates\/section-search","weight":"0"}
--Section Search {"url":"grievance\/admin\/contract-templates\/clause-search","weight":"0"}
-Reports {"url":"sirius\/reports","weight":"-48"}
--Type and Status {"url":"grievance\/report\/bytype","weight":"-41"}
--Settlement Detail {"url":"grievance\/report\/settlement","weight":"-43"}
--Average Time Between Statuses {"url":"grievance\/report\/average-time","weight":"-47"}
--Yearly Summary {"url":"grievance\/report\/year-summary","weight":"-40"}
--Log Search {"url":"grievances\/log","weight":"-50"}
--Settlement Summary {"url":"grievance\/report\/settlement\/summary","weight":"-42"}
--Log Status Search {"url":"grievances\/log\/status","weight":"-49"}
--Open Grievances: Summary With Log {"url":"grievance\/report\/open-summary-log","weight":"-45"}
--Data Integrity Reports {"url":"grievance\/admin\/corrected","weight":"-48"}
---Corrected Member Data {"url":"grievance\/admin\/corrected","weight":"-50"}
---No Status {"url":"grievance\/report\/missing-status","weight":"-47"}
---No Member ID {"url":"grievance\/report\/missing-member-id","weight":"-46"}
---No "Brought By" {"url":"grievance\/report\/missing-broughtby","weight":"-49"}
---No Category {"url":"grievance\/report\/missing-category","weight":"-48"}
---No Assignee {"url":"grievance\/report\/missing-assignee","weight":"0"}
---No Specialist / Organizer {"url":"grievance\/report\/missing-specialist","weight":"0"}
--Open Grievances: Aged Summary {"url":"grievance\/report\/aged-summary","weight":"-44"}
--UH23 Summary {"url":"grievance\/report\/custom\/uh23-report-summary","weight":"0"}
--Quick Export {"url":"grievance\/report\/grievance-quick-export","weight":"0"}
--Status Summary {"url":"grievance\/report\/status-summary","weight":"0"}
--Monthly Grievances by Shop {"url":"admin\/reports\/report-cache\/grievance-report-shop-monthly","weight":"0"}
--UNITE HERE Snapshot Report {"url":"grievance\/uh\/snapshot","weight":"0"}
-Help {"url":"grievances\/uh\/help","weight":"50"}
--Emailing Attachments {"url":"grievances\/uh\/help\/emailing_attachments","weight":"-48"}
--Logging In and Out {"url":"grievances\/uh\/help\/logging_in_and_out","weight":"-50"}
--Find A Grievance {"url":"grievances\/uh\/help\/find_a_grievance","weight":"-49"}
-Open Grievances by Specialist {"url":"grievance\/report\/open","weight":"0"}
+Users {"url":"admin\/people","hidden":true,"weight":"-45"}
+-Flood Control {"url":"admin\/config\/system\/flood-control","hidden":true,"weight":"-50"}
+-Flood Unblock {"url":"admin\/config\/system\/flood-unblock","hidden":true,"weight":"-48"}
+Web {"url":"node\/1","hidden":true,"weight":"-44"}
+-Help Text {"url":"admin\/structure\/custom_help_text","hidden":true,"weight":"-48"}
+--Add {"url":"admin\/structure\/custom_help_text\/add","hidden":true,"weight":"-50"}
+-Basic Pages {"url":"grievance\/admin\/basic-pages","hidden":true,"weight":"-49"}
+--Add {"url":"node\/add\/grievance-basic-page","hidden":true,"weight":"0"}
+Employers {"url":"grievance\/admin\/shops","hidden":true,"weight":"-47"}
+-Add a Shop {"url":"node\/add\/grievance-shop","hidden":true,"weight":"-48"}
+-Contacts {"url":"grievance\/admin\/shops\/contacts","hidden":true,"weight":"-50"}
+--Add a Contact {"url":"node\/add\/grievance-shop-contact","hidden":true,"weight":"-50"}
+-Companies {"url":"grievance\/admin\/shops\/companies","hidden":true,"weight":"-49"}
+--Add a Company {"url":"node\/add\/grievance-company","hidden":true,"weight":"0"}
+-Chapters {"url":"grievance\/admin\/chapters","hidden":true,"weight":"-47"}
+-Grievance Shop Assignments {"url":"grievance\/admin\/shops\/assignments","hidden":true,"weight":"-46"}
+--Bulk-Reassign Organizers {"url":"grievance\/admin\/shops\/bulk-reassign","hidden":true,"weight":"-49"}
+--Grievance Reassign {"url":"admin\/grievance\/reassign","hidden":true,"weight":"-50"}
+Config {"url":"sirius\/config","hidden":true,"weight":"-43"}
+File a Grievance {"url":"node\/add\/grievance","hidden":true,"weight":"-50"}
+My Grievances {"url":"grievances","hidden":true,"weight":"-49"}
+-All Grievances {"url":"grievances\/all","hidden":true,"weight":"-50"}
+-Status Correction Tool {"url":"grievance\/status-correct","hidden":true,"weight":"0"}
+Contracts {"url":"grievance\/admin\/contract-templates","hidden":true,"weight":"-46"}
+-Article Search {"url":"grievance\/admin\/contract-templates\/section-search","hidden":true,"weight":"0"}
+-Section Search {"url":"grievance\/admin\/contract-templates\/clause-search","hidden":true,"weight":"0"}
+Reports {"url":"sirius\/reports","hidden":true,"weight":"-48"}
+-Type and Status {"url":"grievance\/report\/bytype","hidden":true,"weight":"-41"}
+-Settlement Detail {"url":"grievance\/report\/settlement","hidden":true,"weight":"-43"}
+-Average Time Between Statuses {"url":"grievance\/report\/average-time","hidden":true,"weight":"-47"}
+-Yearly Summary {"url":"grievance\/report\/year-summary","hidden":true,"weight":"-40"}
+-Log Search {"url":"grievances\/log","hidden":true,"weight":"-50"}
+-Settlement Summary {"url":"grievance\/report\/settlement\/summary","hidden":true,"weight":"-42"}
+-Log Status Search {"url":"grievances\/log\/status","hidden":true,"weight":"-49"}
+-Open Grievances: Summary With Log {"url":"grievance\/report\/open-summary-log","hidden":true,"weight":"-45"}
+-Data Integrity Reports {"url":"grievance\/admin\/corrected","hidden":true,"weight":"-48"}
+--Corrected Member Data {"url":"grievance\/admin\/corrected","hidden":true,"weight":"-50"}
+--No Status {"url":"grievance\/report\/missing-status","hidden":true,"weight":"-47"}
+--No Member ID {"url":"grievance\/report\/missing-member-id","hidden":true,"weight":"-46"}
+--No "Brought By" {"url":"grievance\/report\/missing-broughtby","hidden":true,"weight":"-49"}
+--No Category {"url":"grievance\/report\/missing-category","hidden":true,"weight":"-48"}
+--No Assignee {"url":"grievance\/report\/missing-assignee","hidden":true,"weight":"0"}
+--No Specialist / Organizer {"url":"grievance\/report\/missing-specialist","hidden":true,"weight":"0"}
+-Open Grievances: Aged Summary {"url":"grievance\/report\/aged-summary","hidden":true,"weight":"-44"}
+-UH23 Summary {"url":"grievance\/report\/custom\/uh23-report-summary","hidden":true,"weight":"0"}
+-Quick Export {"url":"grievance\/report\/grievance-quick-export","hidden":true,"weight":"0"}
+-Status Summary {"url":"grievance\/report\/status-summary","hidden":true,"weight":"0"}
+-Monthly Grievances by Shop {"url":"admin\/reports\/report-cache\/grievance-report-shop-monthly","hidden":true,"weight":"0"}
+-UNITE HERE Snapshot Report {"url":"grievance\/uh\/snapshot","hidden":true,"weight":"0"}
+Help {"url":"grievances\/uh\/help","hidden":true,"weight":"50"}
+-Emailing Attachments {"url":"grievances\/uh\/help\/emailing_attachments","hidden":true,"weight":"-48"}
+-Logging In and Out {"url":"grievances\/uh\/help\/logging_in_and_out","hidden":true,"weight":"-50"}
+-Find A Grievance {"url":"grievances\/uh\/help\/find_a_grievance","hidden":true,"weight":"-49"}
+Open Grievances by Specialist {"url":"grievance\/report\/open","hidden":true,"weight":"0"}
