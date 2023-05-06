@@ -170,6 +170,9 @@ function sirius_bulk_deliver_entry($log_nid) {
 		$log_node->field_sirius_type['und'][0]['value'] = 'error';
 	}
 	$log_node->field_sirius_summary['und'][0]['value'] .= $result['msg'];
+	if ($result['details']) {
+		$log_node->field_sirius_summary['und'][0]['value'] .= " " . $result['details'];
+	}
 	node_save($log_node);
 
 	return $result;
@@ -188,6 +191,7 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $deliver_args = arra
 	$params['voice'] = $json['voice']['text']['human'];
 	$params['voice_machine'] = $json['voice']['text']['machine'];
 	$params['callerid_nid'] = $bulk_node->field_sirius_callerids['und'][0]['target_id'];
+	$params['sms_from'] = $json['sms']['from'];
 
 	if ($bulk_node->field_sirius_audio_public['und'][0]['uri']) { 
 		$params['phonetree']['play']['url'] = file_create_url($bulk_node->field_sirius_audio_public['und'][0]['uri']);
