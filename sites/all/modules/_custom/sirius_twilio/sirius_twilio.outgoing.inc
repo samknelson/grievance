@@ -20,7 +20,7 @@ function sirius_twilio_statuscallback_sms($id) {
  * SMS
  **********************************************************************************/
 
-function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NULL, $from = NULL) {
+function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NULL, $from = NULL, $attach = NULL) {
 
 	if (sirius_domain_variable_get('sirius_twilio_sms_unsubscribe', TRUE)) {
 		$msg .= sirius_domain_variable_get('sirius_twilio_sms_unsubscribe_msg', "\nReply STOP to unsubscribe.\n");
@@ -49,13 +49,13 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NUL
 
   static $registered;
   if (sirius_domain_variable_get('sirius_twilio_sms_consolidate', FALSE)) {
-		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg, $id, $from);
+		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg, $id, $from, $attach);
 		if (!$registered) {
 			$registered = TRUE;
 			drupal_register_shutdown_function('sirius_twilio_outgoing_sms_queue', TRUE);
 		}
   } else {
-		$result = sirius_twilio_outgoing_sms_queue(TRUE, $phone, $msg, $id, $from);
+		$result = sirius_twilio_outgoing_sms_queue(TRUE, $phone, $msg, $id, $from, $attach);
 	}
 
 	if ($result['success']) {
@@ -73,7 +73,7 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NUL
 	return $result;
 }
 
-function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NULL, $id = NULL, $from = NULL) {
+function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NULL, $id = NULL, $from = NULL, $attach = NULL) {
 	static $queue;
 
 	if (!$from) { $from = sirius_domain_variable_get('sirius_twilio_phone', ''); }
@@ -93,6 +93,7 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 			$sms_params = array();
 			$sms_params['from'] = $from;
 			$sms_params['body'] = $msg;
+			if ($attach) { $sms_params["mediaUrl"] = $attach['url']; }
 
 			if ($id) { $sms_params['statusCallback'] = sirius_twilio_statuscallback_sms_url($id); }
 

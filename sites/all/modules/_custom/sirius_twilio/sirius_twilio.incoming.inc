@@ -16,6 +16,7 @@ function sirius_twilio_incoming_sms() {
 
 	// Get the phone number, message, and account SID
 	$phone = sirius_phone_format($_POST['From']);
+	$to = sirius_phone_format($_POST['To']);
 	$msg = $_POST['Body'];
 	$account_sid = $_POST['AccountSid'];
 	$message_sid = $_POST['MessageSid'];
@@ -57,14 +58,14 @@ function sirius_twilio_incoming_sms() {
 		$msg_trim = preg_replace('/[^A-Z]/', '', strtoupper(trim($msg)));
 		if (in_array($msg_trim, array('STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT', 'SIRIUSSTOP'))) {
 			// Handle STOP
-			$phonenumber_json['user_block'] = array(
+			$phonenumber_json['user_block'][$to] = array(
 				'ts' => time(),
 				'comments' => 'Received message: ' . $msg,
 				'sms' => 'Yes',
 			);
 		} else if (in_array($msg_trim, array('START', 'YES', 'SIRIUSSTART'))) {
 			// Handle START
-			$phonenumber_json['user_block'] = array(
+			$phonenumber_json['user_block'][$to] = array(
 				'ts' => time(),
 				'comments' => 'Received message: ' . $msg,
 				'sms' => 'No',
