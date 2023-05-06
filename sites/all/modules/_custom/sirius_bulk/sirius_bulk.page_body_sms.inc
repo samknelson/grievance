@@ -49,7 +49,7 @@ function sirius_bulk_node_tab_body_sms_form($form, &$form_state, $bulk_node) {
 	$ipn_default = $bulk_json['sms']['from'];
 	if (!$ipn_default) { $ipn_default = sirius_phone_format(sirius_domain_variable_get('sirius_twilio_phone', '')); }
 
-	$form['from'] = array(
+	$form['sms']['from'] = array(
 		'#title' => t('Outgoing Phone Number'),
 		'#type' => 'select',
 		'#required' => TRUE,
