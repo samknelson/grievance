@@ -192,6 +192,7 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $deliver_args = arra
 	$params['voice_machine'] = $json['voice']['text']['machine'];
 	$params['callerid_nid'] = $bulk_node->field_sirius_callerids['und'][0]['target_id'];
 	$params['sms_from'] = $json['sms']['from'];
+	$params['sms_attach'] = $json['sms']['attach'];
 
 	if ($bulk_node->field_sirius_audio_public['und'][0]['uri']) { 
 		$params['phonetree']['play']['url'] = file_create_url($bulk_node->field_sirius_audio_public['und'][0]['uri']);
