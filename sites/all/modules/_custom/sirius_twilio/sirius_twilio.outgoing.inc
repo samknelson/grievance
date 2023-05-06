@@ -93,7 +93,7 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 			$sms_params = array();
 			$sms_params['from'] = $from;
 			$sms_params['body'] = $msg;
-			if ($attach) { $sms_params["mediaUrl"] = $attach['url']; }
+			if ($attach['url'][0]) { $sms_params["mediaUrl"] = $attach['url']; }
 
 			if ($id) { $sms_params['statusCallback'] = sirius_twilio_statuscallback_sms_url($id); }
 
