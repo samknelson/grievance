@@ -3,6 +3,20 @@
 function sirius_twilio_config() {
   $form = array();
 
+  /*
+  $name = sirius_domain_variable_name('sirius_twilio_provider');
+  $form[$name] = array(
+    '#type' => 'select',
+    '#title' => t('Provider'),
+    '#options' => array(
+      'twilio' => t('Twilio'),
+      'signalwire' => t('Signalwire'),
+    ),
+    '#default_value' => variable_get($name, 'twilio'),
+    '#description' => t('Select the telelphony service provider.'),
+  );
+  */
+
   $name = sirius_domain_variable_name('sirius_twilio_phone');
   $form[$name] = array(
     '#type' => 'textfield',
@@ -24,6 +38,17 @@ function sirius_twilio_config() {
     '#title' => t('Account Token'),
     '#default_value' => variable_get($name, ''),
   );
+
+  /*
+  $name = sirius_domain_variable_name('sirius_twilio_signalwire_space_url');
+  $form[$name] = array(
+    '#type' => 'textfield',
+    '#title' => t('Space URL'),
+    '#default_value' => variable_get($name, ''),
+    '#description' => t('The SignalWire "Space URL", e.g. yourspace.signalwire.com.'),
+    '#states' => array('visible' => array(array(":input[name=\"" . sirius_domain_variable_name('sirius_twilio_provider') . "\"]" => array('value' => 'signalwire')))),
+  );
+  */
 
   $name = sirius_domain_variable_name('sirius_twilio_app_sid');
   $form[$name] = array(

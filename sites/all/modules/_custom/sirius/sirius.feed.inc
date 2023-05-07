@@ -286,7 +286,6 @@ function sirius_feed_wizard_launch($wizard_name) {
   	$feed_node->field_grievance_shop['und'][0]['target_id'] = $employer_node->nid;
   }
 
-  $feed_node->title = sirius_feed_title($feed_node);
   $feed_node = node_submit($feed_node);
   node_object_prepare($feed_node);
   node_save($feed_node);

@@ -98,8 +98,11 @@ function sirius_banner_render() {
 			  if ($user_full->field_grievance_shops['und'][0]['target_id'] && !$user_full->field_grievance_shops['und'][1]['target_id']) {
 			    $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
 			    $shop_node = node_load($shop_nid);
-			    // print l($shop_node->title, 'node/' . $shop_node->nid);
-			    $html .= $shop_node->title;
+			    if (drupal_valid_path('node/' . $shop_node->nid)) {
+			    	$html .= l($shop_node->title, 'node/' . $shop_node->nid);
+			    } else {
+			    	$html .= $shop_node->title;
+			    }
 			    $html .= ' / ';
 			    $contract_uri = $shop_node->field_grievance_contract['und'][0]['uri'];
 			    if ($contract_uri) {

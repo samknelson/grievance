@@ -32,15 +32,46 @@ function sirius_bulk_node_tab_body_sms_form($form, &$form_state, $bulk_node) {
   $html .= '<div class="sirius_popup_close"></div>';
   $html .= '</div>';
   */
+
   $form['#prefix'] = $html;
 
-	$form['sms'] = array(
+  $result = sirius_twilio_incoming_phone_numbers_list();
+  if (!$result['success']) { return sirius_form_error($result['msg']); }
+  $ipns = $result['records'];
+  if (!$ipns) { return sirius_form_error(t('No phone numbers were found in the account. Please create at least one SMS-capable phone number in your Twilio account.')); }
+
+  $ipn_options = array();
+  foreach ($ipns as $ipn) {
+  	$ipn_options[sirius_phone_format($ipn['phoneNumber'])] = sirius_phone_format($ipn['phoneNumber']) . ' - ' . $ipn['friendlyName'];
+  	// drupal_set_message($ipn['phoneNumber'] . ': ' . $ipn['smsUrl']);
+  }
+	$bulk_json = sirius_json_get($bulk_node);
+	$ipn_default = $bulk_json['sms']['from'];
+	if (!$ipn_default) { $ipn_default = sirius_phone_format(sirius_domain_variable_get('sirius_twilio_phone', '')); }
+
+	$form['sms']['from'] = array(
+		'#title' => t('Outgoing Phone Number'),
+		'#type' => 'select',
+		'#required' => TRUE,
+		'#options' => $ipn_options,
+		'#default_value' => $ipn_default,
+	);
+
+	$form['sms']['body'] = array(
 		'#title' => t('SMS Body'),
 		'#type' => 'textarea',
 		'#default_value' => $bulk_node->field_sirius_sms['und'][0]['value'],
 		'#required' => TRUE,
 		'#id' => 'sms_body',
 		'#description' => sirius_sms_segment_count('sms_body'),
+	);
+
+	$form['sms']['attach']['url'][0] = array(
+		'#type' => 'textfield',
+		'#title' => t('MMS URL'),
+		'#states' => array('visible' => array(":input[id=\"sms_attach_medthod\"]" => array('value' => 'url'))),
+		'#default_value' => $bulk_json['sms']['attach']['url'][0],
+		'#description' => t('If a URL is entered, the message will be sent as an MMS. Additional carrier fees may apply.'),
 	);
 
 	$form['submit'] = array(
@@ -54,7 +85,11 @@ function sirius_bulk_node_tab_body_sms_form($form, &$form_state, $bulk_node) {
 
 function sirius_bulk_node_tab_body_sms_form_submit($form, &$form_state) {
 	$bulk_node = node_load($form_state['bulk_nid']);
-	$bulk_node->field_sirius_sms['und'][0]['value'] = $form_state['values']['sms'];
+	$bulk_node->field_sirius_sms['und'][0]['value'] = $form_state['values']['sms']['body'];
+
+	$bulk_json = sirius_json_get($bulk_node);
+	$bulk_json['sms'] = $form_state['values']['sms'];
+	sirius_json_set($bulk_node, $bulk_json);
   node_submit($bulk_node);
 	node_save($bulk_node);
 	drupal_set_message("Message body saved.");
