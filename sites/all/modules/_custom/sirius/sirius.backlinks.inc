@@ -291,6 +291,10 @@ function sirius_backlinks_from_node($node) {
 		$links['sirius/trust/providers'] = array('name' => 'All Providers');
 	}
 
+	if ($node->type == 'sirius_trust_service') {
+		$links['sirius/trust/services'] = array('name' => 'All Services');
+	}
+
 	drupal_alter('sirius_backlinks_from_node', $links, $node);
 
 	return $links;
