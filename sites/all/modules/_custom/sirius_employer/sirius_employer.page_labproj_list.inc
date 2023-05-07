@@ -1,8 +1,11 @@
 <?php
 
 function sirius_employer_node_tab_labproj_list_access($employer_node) {
-	// Admins can access
+	// Admins can see
 	if (user_access('sirius employer admin')) { return TRUE; }
+
+	// Scheduling stewards can see
+	if (user_access('sirius steward sched worker')) { return TRUE; }	
 
 	// Employers can access their own page only
 	if (user_access('sirius employer labor projection manager')) { 
