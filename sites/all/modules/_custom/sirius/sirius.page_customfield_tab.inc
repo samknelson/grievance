@@ -33,6 +33,16 @@ function sirius_node_tab_customfield_tab_form($form, &$form_state, $cf_node) {
 		'#checkall' => TRUE,
 	);
 
+	$form['customfield']['tab']['show_by_default'] = array(
+		'#title' => 'Show by Default?',
+		'#type' => 'select',
+		'#default_value' => sirius_form_array_default_value($cf_json['customfield']['tab']['show_by_default']),
+		'#options' => array(
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
