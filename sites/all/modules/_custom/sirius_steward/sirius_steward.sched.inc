@@ -10,7 +10,6 @@ function sirius_steward_sched_access($action, $employer_nid) {
 	if (user_access('sirius domain admin')) { return TRUE; }
 	if (user_access('sirius admin')) { return TRUE; }
 
-
 	// Employers can view their own record
 	if ($action == 'view') {
 		if (user_access('sirius steward sched employer')) { 
@@ -214,4 +213,88 @@ function sirius_steward_sched_render($sched_node, $options = array()) {
 	$html .= '</div>';
 
 	return $html;
+}
+
+
+/**
+ * Because I'm a doofus ... in the code below, "sched" might refer to either:
+ * - The steward schedule record, which is a node of type sirius_log and category 'steward:sched', OR
+ * - A record managed by the sirius_sched module, to show on the worker's combined schedule along with events, dispatches, etc.
+ */
+
+
+/**
+ * Implements hook_sirius_sched_info
+ */
+
+function sirius_steward_sirius_sched_info() {
+	$info['steward'] = array(
+		'title' => 'Steward Schedule',
+		'callback_denorm_check' => 'sirius_steward_sched_check',
+		'callback_denorm' => 'sirius_steward_sched',
+	);
+	return $info;
+}
+
+/**
+ * Called on every node save; determines whether we need to queue it for scheduling
+ */
+
+function sirius_steward_sched_check($sched_node) {
+	// Just if it's a sched node
+  if ($sched_node->type != 'sirius_log') { return FALSE; }
+  if ($sched_node->field_sirius_category['und'][0]['value'] != 'steward:sched') { return FALSE; }
+
+	return TRUE;
+}
+
+
+function sirius_steward_sched($sched_node) {
+	$sched_json = sirius_json_get($sched_node);
+	if (!$sched_json['sched']['stewards']) { return array(); }
+
+	// Switch into the appropriate timezone
+	$domain_nid = $sched_node->field_sirius_domain['und'][0]['target_id'];
+	if ($domain_nid) {
+		$domain_node = node_load($domain_nid);
+		$tz = $domain_node->field_sirius_tz['und'][0]['value'];
+	}
+	if (!$tz) {
+		$tz = variable_get('date_default_timezone', @date_default_timezone_get());
+	}
+	$orig_tz = date_default_timezone_get();
+	date_default_timezone_set($tz); 
+
+	$scheds = array();
+	foreach ($sched_json['sched']['stewards'] as $worker_nid => $record) {
+		if (!$record['time']) { continue; }
+
+
+		$ts1 = strtotime($sched_json['date'] . ' ' . $record['time']);
+		$ts2 = $ts1 + 8*60*60;
+
+		$title_short = 'Steward';
+
+		$details = array();
+		if ($record['facility_nid']) { $details[] = sirius_node_title($record['facility_nid']); }
+		if ($record['worker_count']) { $details[] = $record['worker_count'] . ' workers'; }
+		if ($record['last_crew']) { $details[] = 'last crew at ' . date('h:i A', strtotime($record['last_crew'])); }
+		if ($record['lead']) { $details[] = 'lead ' . $record['lead']; }
+
+		$sched = array();
+		$sched['entity_nid'] = $worker_nid;
+		$sched['start_ts'] = $ts1; 
+		$sched['end_ts'] = $ts2; 
+		$sched['json']['display']['type'] = 'Steward';
+		$sched['json']['display']['status'] = 'Assigned';
+		$sched['json']['display']['title_short'] = 'Steward';
+		$sched['json']['display']['details'] = join(' / ', $details);
+		$sched['json']['display']['granularity'] = 'min';
+		$sched['json']['display']['path'] = 'node/' . $sched_node->nid . '/sirius_steward_log_sched';
+		$scheds[] = $sched;
+	}
+
+	date_default_timezone_set($orig_tz); 
+
+  return $scheds;
 }
