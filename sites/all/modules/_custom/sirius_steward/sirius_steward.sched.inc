@@ -208,8 +208,10 @@ function sirius_steward_sched_render($sched_node, $options = array()) {
 		$html .= sirius_table_render($header, $rows, array('class' => array('sirius_table_align')));
 
 	}
-	if (!$options['hide_edit']) {
-		$html .= l('Edit', 'node/' . $sched_node->nid . '/sirius_steward_log_sched/edit', array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button'))));
+
+	$edit_path = 'node/' . $sched_node->nid . '/sirius_steward_log_sched/edit';
+	if (!$options['hide_edit'] && drupal_valid_path($edit_path)) {
+		$html .= l('Edit', $edit_path, array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button'))));
 	}
 	$html .= '</div>';
 
