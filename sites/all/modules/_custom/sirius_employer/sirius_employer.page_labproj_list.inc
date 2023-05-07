@@ -1,7 +1,24 @@
 <?php
 
 function sirius_employer_node_tab_labproj_list_access($employer_node) {
-	return sirius_worker_schedule_tor_access('list', $employer_node);
+	// Admins can access
+	if (user_access('sirius employer admin')) { return TRUE; }
+
+	// Employers can access their own page only
+	if (user_access('sirius employer labor projection manager')) { 
+		global $user;
+		$user_full = user_load($user->uid);
+		if ($user_full->field_grievance_shops['und'][0]['target_id'] == $employer_node->nid) { return TRUE; }
+	}
+
+	// Stewards can access if it's their page
+	if (user_access("sirius steward")) {
+		$my_employer = sirius_employer_get();
+		if ($my_employer->nid == $employer_node->nid) { return TRUE; }
+	}
+
+	// Oh well.
+	return FALSE;
 }
 
 function sirius_employer_node_tab_labproj_list($employer_node) {
@@ -57,10 +74,19 @@ function sirius_employer_node_tab_labproj_list_form($form, &$form_state, $employ
 
 	$rows = array();
 	foreach ($labproj_nodes as $labproj_nid => $labproj_node) {
+		$paths = array(
+			"node/$labproj_nid/employer_labproj_view" => t('View'),
+			"node/$labproj_nid/employer_labproj_status" => t('Status'),
+			"node/$labproj_nid/employer_labproj_edit" => t('Edit')
+		);
+
 		$tools = '';
-		$tools .= l('View', "node/$labproj_nid/employer_labproj_view", array('attributes' => array('class' => array('tool-button'))));
-		$tools .= l('Status', "node/$labproj_nid/employer_labproj_status", array('attributes' => array('class' => array('tool-button'))));
-		$tools .= l('Edit', "node/$labproj_nid/employer_labproj_edit", array('attributes' => array('class' => array('tool-button'))));
+		foreach ($paths as $path => $title) {
+			if (drupal_valid_path($path)) {
+				$tools .= l($title, $path, array('attributes' => array('class' => array('tool-button'))));
+			}
+		}
+
 
 		$labproj_json = sirius_jsonfield_util_node_json_get($labproj_node);
 		list ($year, $month) = sirius_employer_labproj_get_yearmonth($labproj_node);
