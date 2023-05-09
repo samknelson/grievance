@@ -2256,7 +2256,7 @@ h2.field-label {
 }
 
 .block-superfish {
-  padding: 16px 0 13px 0;
+  padding: 0;
 	text-align: center;
 }
 ul.sf-menu.sf-style-white {
@@ -2456,7 +2456,7 @@ table.trustfund-payperiod tr.error {
 	color: #1b4784;
 	font-size: 32px;
 	font-weight: 300;
-	margin: 0px 0 25px 36px;
+	margin: 0px 0 15px 36px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
