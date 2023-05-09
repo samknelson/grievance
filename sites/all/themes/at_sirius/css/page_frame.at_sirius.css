@@ -28,10 +28,6 @@ img.banner-logo {
     /* border-bottom: solid 4px #5984be; */
     background: transparent;
 }
-#page-banner .banner-wrapper {
-  margin-left: 36px;
-  margin-right: 36px;
-}
 #page-banner .user-links {
 	z-index: 9;
 	color: #fff;
