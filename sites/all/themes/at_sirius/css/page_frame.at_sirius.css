@@ -34,6 +34,7 @@ img.banner-logo {
 	font-size: 14px;
 	float: right;
 	text-align: right;
+	margin-right: 36px;
 }
 #page-banner .user-links a {
 	color: #fff;
@@ -83,12 +84,6 @@ div.region-help {
 }
 
 .banner-wrapper .inner {
-	/*
-  margin-left: 36px;
-  margin-right: 36px;
-  */
-  margin: 0;
-  padding: 0;
 }
 
 .banner-menu-outer-wrapper {
