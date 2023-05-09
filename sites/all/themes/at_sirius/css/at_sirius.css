@@ -2256,7 +2256,7 @@ h2.field-label {
 }
 
 .block-superfish {
-  padding: 16px 0 13px 0; /*  */
+  padding: 16px 0 13px 0;
 	text-align: center;
 }
 ul.sf-menu.sf-style-white {
@@ -3299,10 +3299,6 @@ table.grievance-timeline tr.pending {
     border-bottom: none;
   }
 
-  #page-banner {
-
-  }
-
   div.sirius_noprint { 
     display: none;
   }
@@ -4107,7 +4103,6 @@ input.ajax-processed:hover {
   }
 }
 
-
 .sirius_signature_wrapper {
   width: 100%;
   overflow: hidden;
@@ -4230,7 +4225,7 @@ body.cke_editable_themed {
 .region-footer .block-masquerade .block-title {
   font-weight: bold;
   font-size: 1.1em;
-  margint-bottom: 2px;
+  margin-bottom: 2px;
 }
 
 /*
@@ -4242,7 +4237,7 @@ body.cke_editable_themed {
 
 .region-footer .block-masquerade .block-content .form-item {
   margin-top: 2px;
-  margint-bottom: 2px;
+  margin-bottom: 2px;
 }
 
 
