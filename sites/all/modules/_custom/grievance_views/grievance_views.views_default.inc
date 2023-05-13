@@ -6188,14 +6188,14 @@ Section',
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['table'] = 'field_data_field_grievance_rep_organizer';
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['field'] = 'field_grievance_rep_organizer';
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['label'] = '';
-  $handler->display->display_options['fields']['field_grievance_rep_organizer']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['empty'] = '[No Specialist Assigned]';
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['settings'] = array(
+    'bypass_access' => 0,
     'link' => 0,
     'field_delimiter' => '',
   );
-  $handler->display->display_options['fields']['field_grievance_rep_organizer']['delta_limit'] = 'all';
+  $handler->display->display_options['fields']['field_grievance_rep_organizer']['delta_limit'] = '1';
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['delta_offset'] = '0';
   /* Field: Content: Employer */
   $handler->display->display_options['fields']['field_grievance_shop']['id'] = 'field_grievance_shop';
