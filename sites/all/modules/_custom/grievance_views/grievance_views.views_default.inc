@@ -4227,7 +4227,7 @@ Section',
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
-  /* Field: Field: Default Information Request */
+  /* Field: Field: Standard Information Request */
   $handler->display->display_options['fields']['field_grievance_document_types']['id'] = 'field_grievance_document_types';
   $handler->display->display_options['fields']['field_grievance_document_types']['table'] = 'field_data_field_grievance_document_types';
   $handler->display->display_options['fields']['field_grievance_document_types']['field'] = 'field_grievance_document_types';
@@ -4300,7 +4300,7 @@ Section',
     t('last »'),
     t('<a href="/node/add/grievance-irset?destination=grievances/irsets" class="tool-button">Add a New Information Request Set</a>'),
     t('Title'),
-    t('Default Information Request'),
+    t('Standard Information Request'),
     t('Nid'),
     t('Tools'),
     t('<a href="/node/[nid]/edit?destination=grievances/irsets" class="tool-button">Edit</a>'),

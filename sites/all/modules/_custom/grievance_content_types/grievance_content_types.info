@@ -624,7 +624,6 @@ features[field_instance][] = node-grievance_contract_template-field_grievance_co
 features[field_instance][] = node-grievance_contract_template-field_grievance_cont_tplt_tags
 features[field_instance][] = node-grievance_contract_template-field_grievance_contract
 features[field_instance][] = node-grievance_contract_template-field_grievance_departments
-features[field_instance][] = node-grievance_contract_template-field_grievance_document_types
 features[field_instance][] = node-grievance_contract_template-field_grievance_holidays
 features[field_instance][] = node-grievance_contract_template-field_grievance_pullclause
 features[field_instance][] = node-grievance_contract_template-field_sirius_active
