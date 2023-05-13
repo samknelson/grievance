@@ -1010,3 +1010,15 @@ function grievance_update_7046() {
   }
 }
 
+/**
+ * Remove "default information request" from contract template
+ */
+
+function grievance_update_7047() {
+  $bundle = 'grievance_contract_template';
+  $field = 'field_grievance_document_types';
+  if ($instance = field_info_instance('node', $field, $bundle)) {
+    print "Deleting: $bundle / $field\n";
+    field_delete_instance($instance);
+  }
+}
