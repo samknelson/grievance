@@ -6187,7 +6187,6 @@ Section',
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['id'] = 'field_grievance_rep_organizer';
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['table'] = 'field_data_field_grievance_rep_organizer';
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['field'] = 'field_grievance_rep_organizer';
-  $handler->display->display_options['fields']['field_grievance_rep_organizer']['label'] = '';
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['empty'] = '[No Specialist Assigned]';
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['settings'] = array(
