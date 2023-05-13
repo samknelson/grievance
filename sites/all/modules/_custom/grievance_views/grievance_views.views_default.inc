@@ -6247,6 +6247,8 @@ Section',
     'page' => 'page',
     'default' => 0,
   );
+  $handler->display->display_options['use_batch'] = 'batch';
+  $handler->display->display_options['segment_size'] = '100';
   $translatables['grievance_open_report'] = array(
     t('Master'),
     t('Open Grievances Report'),
