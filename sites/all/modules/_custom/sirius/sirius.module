@@ -1034,7 +1034,8 @@ function sirius_ajax_generic_replace($form, $form_state) {
  * Just a stupid wrapper around number_format() that doesn't throw an error when it's not passed a number.
  */
 
-function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $thousands_separator = ",") {
+function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $thousands_separator = ",", $output = 'page') {
+  if ($output == 'csv') { return $str; }
   if (!is_numeric($str)) { return $str; }
   if (is_numeric($str)) { return number_format($str, $decimals, $decimal_separator, $thousands_separator); }
 }
