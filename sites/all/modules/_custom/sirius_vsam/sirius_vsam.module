@@ -1,10 +1,101 @@
 <?php
 
-// require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_vsam') . '/sirius_vsam.oneoff.inc';
+
+/*
+function sirius_vsam_file_download_access($file_item, $entity_type, $entity) {
+  dpm($file_item);
+  global $user;
+  return (in_array('hr', $user->roles) || in_array('administrator', $user->roles)) ? TRUE : FALSE;
+}
+*/
+
+/**
+ * Parse a VSAM template.
+ * 
+ * The source is a little funky; I had to extract from a PDF to HTML, then copy the table,
+ * which lost some indenting and merged some columns. Ick.
+ * 
+ * In any event, we assume that the "start byte" is in column 2, the "end byte" is in column 4, and
+ * the character "-" is in column 3. If that's not the case, skip the row.
+ */
 
 function sirius_vsam_parse_template($filename) {
-  $file = fopen($csv_path, 'r');
+  $path = sirius_vsam_dir() . '/' . $filename;
+  $fp = fopen($path, "r");
+  if (!$fp) { die("Unable to open $path"); }
 
+  $template = array();
+  $count = 0;
+  while ($row = fgetcsv($fp, 1000, ",")) {
+    $start = $row[2];
+    $end = $row[4];
+    $dash = $row[3];
+
+    if (! ($start > 0)) { continue; }
+    if (! ($end >= $start)) { continue; }
+    if (! ($dash == '-')) { continue; }
+
+    // Templates have 1-indexed strings, su subtract one
+    $start--;
+    $end--;
+
+    $template[$start] = array(
+      'start' => $start,
+      'end' => $end, 
+      'len' => $end - $start + 1,
+      'name' => trim(join(' ', array($row[0], $row[1]))),
+    );
+
+    ++$count;
+    // if ($count > 10) { break; }
+  }
+  fclose($fp);
+  return $template;
+}
+
+/**
+ * E.g.
+ * 
+ * drush --user=1 php-eval "sirius_vsam_parse('EEMSTR_Y20211228.TXT', 'eemaster_layout.csv');"
+ */
+
+function sirius_vsam_parse($filename, $template_filename) {
+  $template = sirius_vsam_parse_template($template_filename);
+
+  $header = array();
+  $header[] = 'Row #';
+  foreach ($template as $start => $record) {
+    $header[] = $record['name'];
+  }
+
+  $out = fopen('php://output', 'w');
+  fputcsv($out, $header);
+
+  $path = sirius_vsam_dir() . '/' . $filename;
+  $fp = fopen($path, "r");
+  if (!$fp) { die("Unable to open $path"); }
+  $line_count = 0;
+  while ($line = fgets($fp)) {
+    $line = preg_replace('/\x0/', ' ', $line);
+    // print "$linecount: $line\n\n\n";
+
+    $row = array();
+    $row[] = $line_count;
+    foreach ($template as $start => $record) {
+      // if (!preg_match('/SSN/', $record['name'])) { continue; }
+
+      $end = $record['end'];
+      $len = $record['len'];
+      $str = substr($line, $start, $len);
+      $row[] = trim($str);
+      // print "$record[name]: $start/$end/$len/[$str]\n";
+    }
+    fputcsv($out, $row);
+
+    ++$line_count;
+    // if ($line_count > 3) { break; }
+  }
 }
 
 
