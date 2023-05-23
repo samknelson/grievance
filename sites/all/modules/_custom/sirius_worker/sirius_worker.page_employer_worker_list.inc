@@ -19,6 +19,12 @@ function sirius_worker_page_employer_worker_list($member_status_tid = NULL) {
 		global $user;
 		$user_full = user_load($user->uid);
 		$shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
+
+		// Admins can pass in a shop_nid.
+		if (!$shop_nid && user_access('sirius admin')) { $shop_nid = $_REQUEST['shop_nid']; }
+
+		if (!$shop_nid) { return sirius_page_error('Your user account is not associated with an employer.'); }
+
 		$result .= views_embed_view('sirius_employer_workers', 'block_1', $shop_nid);
 	} else {
 		$member_status_term = taxonomy_term_load($member_status_tid);

@@ -92,28 +92,38 @@ function grievance_quicksearch_autocomplete($string, $s2 = NULL, $s3 = NULL, $s4
 
 function grievance_quicksearch_results_html($grievance, $limit = 20) {
 	$results = grievance_quicksearch_results($grievance, $limit);
-	
-	if ($results) {
-		$output = "<ul>";
-		$count = 0;
-		foreach ($results as $idx => $result) {
-			if (preg_match('/\s+\((\d+)\)/', $idx, $matches) && $matches[1]) { 
-				$count++;
-				$output .= "<li>";
-				$output .= l($idx, 'node/' . $matches[1]);
-				$output .= '</li>';
-			}
-		}
-		
 
-		$output = "<h2>" . t('Found @count results matching: @grievance', array('@count' => $count, '@grievance' => $grievance)) . '</h2>' . $output;
-		
-		return $output;
-	} else {
-		drupal_set_message(t("No records found."));
-		
-		return '<h2>' . t('No records found.') . '</h2>';
+	$header = array();
+	$header[] = t('Type');
+	$header[] = t('Title');
+	$header[] = t('ID');
+	$header[] = t('Tools');
+
+	if (!$results) { return '<h2>' . t('No records found.') . '</h2>'; }
+
+	$rows = array();
+	$count = 0;
+	foreach ($results as $idx => $result) {
+		if (preg_match('/\s+\((\d+)\)/', $idx, $matches) && $matches[1]) { $nid = $matches[1]; }
+		$node = node_load($nid);
+		if (!$node) { continue; }
+
+		$id = $node->field_grievance_id['und'][0]['value'];
+		if (!$id) { $id = $node->field_sirius_id['und'][0]['value']; }
+
+		$row = array();
+		$row[] = sirius_content_type_name($node->type);
+		$row[] = $node->title;
+		$row[] = $id;
+		$row[] = l('View', "node/$nid", array('attributes' => array('class' => array('tool-button'))));
+		$rows[] = $row;
+
+		++$count;
 	}
+	
+	$html = "<h2>" . t('Found @count results matching: @grievance', array('@count' => $count, '@grievance' => $grievance)) . '</h2>';
+	$html .= sirius_table_render($header, $rows);
+	return $html;
 }
 
 function grievance_quicksearch_results($string, $limit = 20) {

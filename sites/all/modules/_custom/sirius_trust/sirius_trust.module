@@ -9,6 +9,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/s
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.policy.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.relationships.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.denorm.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.services.inc';
 
 /**
  * Implements hook_sirius_domain_component_info
@@ -147,6 +148,7 @@ function sirius_trust_sirius_config_links_alter(&$links) {
   $links['trust'] = array('title' => 'Trust');
   $links['trust']['links']['sirius/trust/benefits'] = array('title' => 'Benefits', 'description' => 'Configure system benefits.');
   $links['trust']['links']['sirius/trust/services'] = array('title' => 'Services', 'description' => 'Configure services (usually associated with CPT codes).');
+  $links['trust']['links']['sirius/trust/providers'] = array('title' => 'Providers', 'description' => 'Configure service providers, such as outpatient facilities, clinics, or hospitals.');
 }
 
 /**
@@ -231,4 +233,14 @@ function sirius_trust_sirius_wizard_info() {
   $items += sirius_trust_feed_providers_info();
   $items += sirius_trust_feed_services_info();
   return $items;
+}
+
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_trust_sirius_backlinks_from_node_alter(&$links, $node) {
+  if ($node->type == 'sirius_trust_service') {
+    $links['sirius/trust/services'] = array('name' => 'All Services');
+  }
 }

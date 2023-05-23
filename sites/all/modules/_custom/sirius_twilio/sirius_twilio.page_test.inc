@@ -55,6 +55,24 @@ function sirius_twilio_page_test_form($form, &$form_state) {
 		'#states' => array('visible' => array(":input[name=\"medium\"]" => array('value' => 'voice'))),
 	);
 
+  $result = sirius_twilio_incoming_phone_numbers_list();
+  if (!$result['success']) { return sirius_form_error($result['msg']); }
+  $ipns = $result['records'];
+  if (!$ipns) { return sirius_form_error(t('No phone numbers were found in the account. Please create at least one SMS-capable phone number in your Twilio account.')); }
+  $ipn_options = array();
+  foreach ($ipns as $ipn) {
+  	$ipn_options[sirius_phone_format($ipn['phoneNumber'])] = sirius_phone_format($ipn['phoneNumber']) . ' - ' . $ipn['friendlyName'];
+  }
+	$ipn_default = sirius_phone_format(sirius_domain_variable_get('sirius_twilio_phone', ''));
+	$form['sms_from'] = array(
+		'#title' => t('Outgoing Phone Number'),
+		'#type' => 'select',
+		'#required' => TRUE,
+		'#options' => $ipn_options,
+		'#default_value' => $ipn_default,
+		'#states' => array('visible' => array(":input[name=\"medium\"]" => array('value' => 'sms'))),
+	);
+
 	$form['msg'] = array(
 		'#type' => 'textarea',
 		'#title' => t('Message'),
@@ -88,6 +106,7 @@ function sirius_twilio_page_test_form_submit($form, &$form_state) {
 	// $params['phonetree']['play']['url'] = file_create_url($bulk_node->field_sirius_audio_public['und'][0]['uri']);
 	$params['phonetree']['disable'] = TRUE;
 	$params['amd']['MachineDetection'] = 'DetectMessageEnd';
+	$params['sms_from'] = $form_state['values']['sms_from'];
 
 	if ($medium == 'voice') {
 		$result = sirius_voice_send($params);
@@ -100,5 +119,8 @@ function sirius_twilio_page_test_form_submit($form, &$form_state) {
 		if ($result['msg']) { drupal_set_message($result['msg']); }
 	} else {
 		drupal_set_message("Message failed: " . $result['msg'], 'warning');
+		if ($result['details']) {
+			drupal_set_message("Details: " . $result['details'], 'warning');
+		}
 	}
 }

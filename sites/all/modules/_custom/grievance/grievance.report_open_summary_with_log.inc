@@ -1,5 +1,9 @@
 <?php
 
+function grievance_report_open_summary_with_log_redirect() {
+  drupal_goto('sirius/reports/grievance-report-open-summary-with-log/form');
+}
+
 function grievance_report_open_summary_with_log() {
 	return drupal_get_form('grievance_report_open_summary_with_log_form');
 }
@@ -542,21 +546,22 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
 
   $header = array();
   if ($which == 'specialist') {
-    $header[] = 'Employer';
+    $header[] = t('Employer');
   } else {
-    $header[] = 'Specialist';
+    $header[] = t('Specialist');
   }
-  $header[] = 'Grievance ID';
-  $header[] = 'First Name';
-  $header[] = 'Last Name';
-  $header[] = 'Classification';
-  $header[] = 'Current Status';
-  $header[] = 'CBA Provision(s) Violated';
+  $header[] = t('Grievance ID');
+  $header[] = t('First Name');
+  $header[] = t('Last Name');
+  $header[] = t('Classification');
+  $header[] = t('Current Status');
+  $header[] = t('CBA Provision(s) Violated');
   for ($i=1; $i<=2; ++$i) {
     if ($parameters["col_$i"]) {
-      $header[] = "Milestone #$i Date";
+      $header[] = t("Milestone #$i Date");
     }
   }
+  if (!$csv) { $header[] = t('Tools'); }
 
   $rows = array();
   foreach ($data as $key => $sub_data) {
@@ -587,6 +592,10 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
           if ($hr["col_${i}_date"]) { $row[] = date('Y-m-d', strtotime($hr["col_${i}_date"])); } 
           else { $row[] = 'N/A'; }
         }
+      }
+
+      if (!$csv) {
+        $row[] = l('View', 'node/' . $hr['nid'], array('attributes' => array('class' => array('tool-button'))));
       }
       $rows[] = $row;
     }

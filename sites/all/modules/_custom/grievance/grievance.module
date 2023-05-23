@@ -19,7 +19,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.repor
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_spi_term.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_year_specialist_summary.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_by_specialist.inc";
+// require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_by_specialist.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_aged_summary.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_open_summary_with_log.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/grievance/grievance.report_settlement_summary.inc";
@@ -668,7 +668,8 @@ function grievance_report_cache_info() {
     'name' => t('Grievances: Open Grievance Summary With Log'),
     'description' => '',
     'access' => 'grievance report open summary with log',
-    'path' => 'grievance/report/open-summary-log',
+    // 'path' => 'grievance/report/open-summary-log',
+    'form_callback' => 'grievance_report_open_summary_with_log_form',
     'fields' => grievance_report_open_summary_with_log_fields(),
     'pk_list_callback' => 'grievance_report_open_summary_with_log_pks',
     'batch_callback' => 'grievance_report_open_summary_with_log_batch',
@@ -678,6 +679,7 @@ function grievance_report_cache_info() {
       'Detail by Specialist' => 'grievance_report_open_summary_with_log_render_specialist_detail',
       'Detail by Employer' => 'grievance_report_open_summary_with_log_render_employer_detail',
     ),
+    'legacy_noassociative' => TRUE,
   );
 
   $items['grievance-report-shop-monthly'] = array(

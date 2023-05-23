@@ -189,15 +189,26 @@ function sirius_customfield_set_list_all($content_type = NULL) {
 }
 
 function sirius_customfield_set_list($entity_node) {
-	$lookup = sirius_customfield_set_list_all();
+	$lookup = sirius_customfield_set_list_all($entity_node->type);
 
-	// Any custom fields explicitly selected
 	$entity_json = sirius_json_get($entity_node);
 	$options = array();
+
+	// We may have set this explicitly.
 	if ($entity_json && $entity_json['customfield']['sets']) { 
 		$cf_nids = array_filter(array_values($entity_json['customfield']['sets']));
 		foreach ($cf_nids as $cf_nid) {
 			$options[$cf_nid] = $lookup[$cf_nid];
+		}
+		return $options;
+	}
+
+	// Any custom field sets which are "show by default"
+	foreach ($lookup as $cf_nid => $cf_title) {
+		$cf_node = node_load($cf_nid);
+		$cf_json = sirius_json_get($cf_node);
+		if ($cf_json['customfield']['tab']['show_by_default'] == 'Yes') {
+			$options[$cf_nid] = $cf_title;
 		}
 	}
 
@@ -302,4 +313,48 @@ function sirius_customfield_node_view($entity_node, $view_mode, $langcode) {
 
   $entity_node->content['custom_fields'][0]['#markup'] = $html;
   if (!$html) { $entity_node->content['custom_fields']['#access'] = FALSE; }
+}
+
+function sirius_customfield_form($cf_nid, $entity_node = NULL) {
+	$cf_node = node_load($cf_nid);
+  $cf_json = sirius_json_get($cf_node);
+  $cf_form = sirius_jsonfield_util_form_get($cf_json, 'default');
+  if (!$cf_form) { 
+  	return sirius_form_error("The form for this custom field set has not been configured. It can be set up " . l('here.', 'sirius/customfield/definition/list'));
+  }
+
+  $which = 'customfield_' . $cf_nid;
+
+  if ($entity_node) {
+	  $entity_json = sirius_json_get($entity_node);
+	  $entity_results = sirius_jsonfield_util_results_get($entity_json, $which);
+	  sirius_jsonfield_util_set_defaults($cf_form, $entity_results);
+	}
+
+  $cf_form['!intro'] = array(
+    '#markup' => '<div class="sirius-form">',
+    '#weight' => -9999,
+  );
+  $cf_form['!outro'] = array(
+    '#markup' => '</div>',
+    '#weight' => 9999,
+  );
+
+  return $cf_form;
+}
+
+function sirius_customfield_log_statuses($cf_node) {
+	return array(
+		'draft' => 'Draft',
+		'submitted' => 'Submitted',
+	);
+}
+
+function sirius_customfield_log_permissions() {
+	return array(
+		'view own' => t('View your own records'),
+		'view any' => t('View any records'),
+		'edit own' => t('Create a new record, or edit your own record'),
+		'edit any' => t('Create a new record, or edit any record')
+	);
 }
