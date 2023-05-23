@@ -20,3 +20,8 @@
 	display: inline-block;
 	padding-right: 10px;
 }
+
+.sirius_form_inline_field_collection .form-item {
+	float: left;
+	margin-right: 10px;
+}
