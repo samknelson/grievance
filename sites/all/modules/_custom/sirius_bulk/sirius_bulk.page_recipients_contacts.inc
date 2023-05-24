@@ -23,7 +23,7 @@ function sirius_bulk_node_tab_recipients_contacts_form($form, &$form_state, $bul
 		$form, 
 		$form_state, 
 		$event_node->nid,
-		$forms,
+		$json_forms,
 		array(
 			'bulk_recipient_add' => array(
 				'title' => 'Add Bulk Recipient',
