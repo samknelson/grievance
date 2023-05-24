@@ -1,5 +1,25 @@
 <?php
 
+function sirius_trust_report_worker_benefit_info() {
+  $result = array(
+    'name' => t('Coverage - Overview'),
+    'description' => '',
+    'access' => 'sirius trust staff',
+    'fields' => sirius_trust_report_worker_benefit_fields(),
+    'form_callback' => 'sirius_trust_report_worker_benefit_form',
+    'pk_list_callback' => 'sirius_trust_report_worker_benefit_pks',
+    'batch_callback' => 'sirius_trust_report_worker_benefit_batch',
+    'render_callbacks' => array(
+      'View' => 'sirius_trust_report_worker_benefit_view',
+    ),
+    'module' => 'sirius_trust',
+    'file' => 'sirius_trust.report_worker_benefit.inc',
+    'dashboard' => TRUE,
+  );
+
+  return $result;
+}
+
 function sirius_trust_report_worker_benefit_fields() {
   return array(
     'wb_nid' => 'WB NID',
@@ -35,15 +55,18 @@ function sirius_trust_report_worker_benefit_form($form, &$form_state, $report_ty
     '#type' => 'submit',
     '#value' => 'Generate',
   );
-  
+
   return $form;
 }
 
 function sirius_trust_report_worker_benefit_form_submit($form, &$form_state) { return report_cache_form_submit($form, $form_state); }
 
 function sirius_trust_report_worker_benefit_pks(&$form_state) {
-  $asof = $form_state['values']['asof'] . ' 00:00:00';
-  if (!$asof) { $asof = date('Y-m-d 00:00:00'); }
+  if ($form_state['values']['asof']) {
+    $asof = $form_state['values']['asof'] . ' 00:00:00';
+  } else {
+    $asof = date('Y-m-d 00:00:00');
+  }
 
   $domain_nid = sirius_domain_nid();
   $sql_args = array();
@@ -108,7 +131,12 @@ function sirius_trust_report_worker_benefit_batch($wb_nids, $values, $report_id,
     $row['employer_nid'] = $wb_node->field_grievance_shop['und'][0]['target_id'];
     $row['employer_name'] = $employer_names[$row['employer_nid']];
     $rows['rows'][] = $row;
+
     $context['results']['dashboard']['count']++;
+    $context['results']['dashboard']['summary']['count_by_benefit'][$row['benefit_nid']]++;
+
+    $context['results']['dedup'][$row['benefit_nid']]['subscriber'][$row['subscriber_nid']]++;
+    $context['results']['dedup'][''][$row['subscriber_nid']] = TRUE;
   }
   return $rows;
 }
@@ -253,7 +281,6 @@ function sirius_trust_report_worker_benefit_view($report_type, $report_id) {
     }
     drupal_exit();
   }
-
 
   $attributes = array();
   $html .= theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => $attributes));

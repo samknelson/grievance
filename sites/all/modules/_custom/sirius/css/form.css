@@ -35,3 +35,8 @@
 .sirius_form_inline .container-inline-date .form-item .form-item {
 	clear: none;
 }
+
+.sirius_form_inline_field_collection .form-item {
+	float: left;
+	margin-right: 10px;
+}

@@ -1,0 +1,73 @@
+00001 **  DEPENDENT FILE (BPADEP2) FOR SMC DATABASE                     00001
+00002 ***           NON COMP FIELD VERSION                              00002
+00011  01  SMCSDDP2-DEPENDENT-FILE.                                     00003
+00012      05  BPA-DEP2-KEY1.                                           00004
+00013          10  BPA-DEP2-CLIENT     PIC X(3).                        00005
+00014          10  BPA-DEP2-SSN        PIC X(9).          Member SSN              
+00015          10  BPA-DEP2-SEQ        PIC 9(5) .                       00007
+00021      05  BPA-DEP2-KEY2.                                           00008**3
+00022          10  BPA-DEP2-CLIENT2    PIC X(3).                        00009**3
+00023          10  BPA-DEP2-SSN2       PIC X(9).          Dep. SSN    (can have characters for unknown SSNs)         
+00024      05  BPA-DEP2-KEY3.                                           00011
+00025          10  BPA-DEP2-CLIENT3    PIC X(3).                        00012
+00026          10  BPA-DEP2-FULL-NAME.                                  00013
+00027              15  BPA-DEP2-LNAME      PIC X(20).                   00014
+00028              15  BPA-DEP2-FNAME      PIC X(11).                   00015
+00029      05  BPA-DEP2-MI             PIC X.                           00016
+00030      05  BPA-DEP2-ADDR1          PIC X(25).                       00017
+00031      05  BPA-DEP2-ADDR2-3.                                        00018
+00032          10  BPA-DEP2-ADDR2      PIC X(25).                       00019
+00033          10  BPA-DEP2-ADDR3      PIC X(25).                       00020
+00034      05  BPA-DEP2-ST             PIC X(2).                        00021
+00035      05  BPA-DEP2-ZIP            PIC 9(9).                        00022
+00036      05  BPA-DEP2-2NDADDR1       PIC X(25).                       00023
+00037      05  BPA-DEP2-2NDADDR2       PIC X(25).                       00024
+00038      05  BPA-DEP2-2NDADDR3       PIC X(25).                       00025
+00039      05  BPA-DEP2-2NDST          PIC XX.                          00026
+00040      05  BPA-DEP2-2NDZIP         PIC 9(9).                        00027
+00041      05  BPA-DEP2-GUARD-LNAME    PIC X(20).                       00028
+00042      05  BPA-DEP2-GUARD-FNAME    PIC X(11).                       00029
+00043      05  BPA-DEP2-GUARD-MI       PIC X.                           00030
+00044      05  BPA-DEP2-AREA           PIC 999 .                        00031
+00045      05  BPA-DEP2-PHONE          PIC 9(7).                        00032
+00046      05  BPA-DEP2-BD             PIC 9(8).                        00033
+00047      05  BPA-DEP2-SEX            PIC X.                           00034
+00048      05  BPA-DEP2-REL            PIC XX.                          00035
+00049          88  BPA-DEP-SPOUSE   VALUE 'SP'.                         00036
+00050          88  BPA-DEP-DOMPART  VALUE 'DP'.                         00037
+00051          88  BPA-DEP-EXSPOUSE VALUE 'ES'.                         00038
+00052          88  BPA-DEP-CHILD    VALUE 'C'.                          00039
+00053          88  BPA-DEP-STEP-CHILD        VALUE 'SC'.                00040
+00054          88  BPA-DEP-HANDICAP-CHILD    VALUE 'H'.                 00041
+00055          88  BPA-DEP-ADOPTED-CHILD     VALUE 'AC'.                00042
+00056      05  BPA-DEP2-EFF            PIC 9(6).                        00043
+00057      05  BPA-DEP2-ENROLL         PIC X.                           00044
+00058      05  BPA-DEP2-MARR-STAT      PIC XX.                          00045
+00059      05  BPA-DEP2-MARR-DATE      PIC 9(8).                        00046
+00060      05  BPA-DEP2-DIV-STAT       PIC XX.                          00047
+00061      05  BPA-DEP2-DIV-DATE       PIC 9(8).                        00048
+00062      05  BPA-DEP2-QMSCO          PIC XX.                          00049
+00063      05  BPA-DEP2-BCERT          PIC XX.                          00050
+00064      05  BPA-DEP2-ADOPT          PIC XX.                          00051
+00065      05  BPA-DEP2-TERM           PIC 9(6).                        00052
+00066      05  BPA-DEP2-COMMENT        PIC X(89).                       00053
+00067      05  BPA-DEP2-USERID         PIC X(5).                        00054
+00068      05  BPA-DEP2-REVDATE        PIC 9(8).                        00055
+00069      05  BPA-DEP2-SUFFIX.                                         00056
+00070          10  BPA-DEP2-CLAIMS-SUFFIX  PIC 99.                      00057
+00071      05  BPA-DEP2-CASENO         PIC X(10).                       00058
+00072      05  BPA-DEP2-BADADDR        PIC X.                           00059
+00073      05  BPA-DEP2-BADADDR2       PIC X.                           00060
+00074      05  BPA-DEP2-PARTD          PIC X.                           00061
+00075      05  BPA-DEP2-PARTDREJ       PIC 99.                          00062
+00076      05  BPA-DEP2-PARTDDT        PIC X(8).                        00063
+00077      05  BPA-DEP2-REENROLL       PIC X.                           00064
+00078      05  BPA-DEP2-TERM2          PIC 9(6).                        00065
+00079      05  BPA-DEP2-EFF2           PIC 9(6).                        00066
+00080      05  BPA-DEP2-VERIFY         PIC X.                           00067
+00081      05  BPA-DEP2-MEDFLAG        PIC X.                           00068
+00091      05  BPA-DEP2-ACCT-CLI       PIC X(3).                        00069
+00092      05  BPA-DEP2-ACCT           PIC X(9).            Dep Account # U12345678  last 2 are dep #           
+00093                                                                   00071
+00094      05  BPA-TMT-TERM-DD         PIC X(02).                       00072
+00095      05  FILLER                  PIC X(01).                       00073

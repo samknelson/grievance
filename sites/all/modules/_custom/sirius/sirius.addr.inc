@@ -314,3 +314,14 @@ function sirius_addr_zip_zeropad($zip) {
 	while (strlen($zip) < 5) { $zip = '0' . $zip; }
 	return $zip;
 }
+
+function sirius_addr_cols() {
+	return array(
+    'thoroughfare' => 'Street',
+    'premise' => 'Street 2',
+    'locality' => 'City',
+    'administrative_area' => 'State',
+    'postal_code' => 'Zip',
+    'country' => 'Country',
+  );
+}
