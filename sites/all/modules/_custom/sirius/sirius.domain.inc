@@ -592,6 +592,8 @@ function sirius_domain_form_restrict(&$form) {
     'field_sirius_dispatch_sib_status_tid' => 'sirius_dispatch_sib_status',
     'field_sirius_worker_dispstatus_tid' => 'sirius_worker_dispatch_status',
     'field_sirius_work_status_tid' => 'sirius_work_status',
+    'field_grievance_from_status' => 'grievance_status',
+    'field_grievance_next_status' => 'grievance_status',
   );
 
   foreach ($field_names as $field_name => $taxonomy) {
