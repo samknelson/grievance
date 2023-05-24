@@ -1,6 +1,8 @@
 <?php
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Singleton.php';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.access.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.inc';
@@ -1090,6 +1092,8 @@ function sirius_content_type_name($machine_name) {
       if ($name == 'Shop') { $name = 'Employer'; }
       $lookup[$hr['type']] = $name;
     }
+
+    $lookup['sirius_dispatch_job_group'] = 'Show / Job Group';
   }
 
   if (!$lookup[$machine_name]) { $lookup[$machine_name] = $machine_name; }
