@@ -1,9 +1,5 @@
 <?php
 
-function grievance_report_settlement_summary_redirect() {
-  drupal_goto('sirius/reports/grievance-report-settlement-summary/form');
-}
-
 class Grievance_Report_Settlement_Summary extends Report_Cache_Report_Generator {
   public $type = 'grievance-report-settlement-summary';
 
