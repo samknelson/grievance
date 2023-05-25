@@ -828,3 +828,7 @@ function grievance_modal_styles() {
 
   return $styles;
 }
+
+function grievance_report_settlement_summary_redirect() {
+  drupal_goto('sirius/reports/grievance-report-settlement-summary/form');
+}
