@@ -1,43 +1,5 @@
 <?php
 
-class Report_Cache_Report_Generator {
-  // Reports are singletons. Use My_Report::getInstance()->whatever()
-  protected static $instance;
-  protected function __construct() { }
-  final private function __clone() { }
-
-  final public static function getInstance() {
-    if (!isset(static::$instance)) { static::$instance = new static(); }
-    return static::$instance;
-  }
-
-  public function info($result = array()) {
-    $result['generator'] = $this;
-    $result['fields'] = $this->fields();
-    return $result;
-  }
-
-  public function fields() {
-    return array();
-  }
-
-  public function pks(&$form_state) {
-    return array();
-  }
-
-  public function batch($pks, $values, &$context) {
-    return array();
-  }
-
-  public function render_parameters($parameters) {
-    return '';
-  }
-
-  public function setInfo(&$items) {
-    $items[$this->type] = $this->info();
-  }
-}
-
 /**
  * First appearance of hours at an employer (the "triggering" employer)
  *  - Name
@@ -71,6 +33,14 @@ class Sirius_Trust_Report_Newhire extends Report_Cache_Report_Generator {
       'module' => 'sirius_trust',
       'file' => 'sirius_trust.report_newhire.inc',
       'dashboard' => TRUE,
+      'preview' => array(
+        'default_display_fields' => array(
+          'worker_name',
+          'triggering_employer_name',
+          'hours_total',
+          'hours_at_tirggering_employer',
+        ),
+      ),
     );
 
     return parent::info($result);
@@ -147,6 +117,13 @@ class Sirius_Trust_Report_Newhire extends Report_Cache_Report_Generator {
     $fields['hours_at_tirggering_employer'] = 'Hours at Hiring Employer';
 
     return $fields;
+  }
+
+  public function preview_links($row) {
+    return array(
+      'node/' . $row['worker_nid'] => 'Worker',
+      'node/' . $row['worker_nid'] . '/sirius_worker_hours' => 'Hours',
+    );
   }
 
   public function pks(&$form_state) {
@@ -279,23 +256,8 @@ class Sirius_Trust_Report_Newhire extends Report_Cache_Report_Generator {
 
   public function render_parameters($parameters) {
     $parameters = $parameters['parameters'];
-    $benefit_nid = $parameters['benefit_nid'];
-    $benefit_node = node_load($benefit_nid);
-    $html .= sirius_fakerender_field('Benefit:', $benefit_node->title);
-
-    $start_date = $parameters['asof'];
     $html .= sirius_fakerender_field('Start Date:', $parameters['start_date']);
     $html .= sirius_fakerender_field('End Date:', $parameters['end_date']);
-
-    for ($i=0; $i<10; ++$i) {
-      $policy_nid = $parameters["policy_{$i}_nid"];
-      if ($policy_nid) {
-        $val = sirius_node_title($policy_nid);
-        $val .= ' ';
-        $val .= '[' . l('View', "node/$policy_nid/sirius_trust_policy_benefits") . ']';
-        $html .= sirius_fakerender_field('Policy #' . ($i+1) . ':', $val);
-      }
-    }
     return $html;
   }
 
