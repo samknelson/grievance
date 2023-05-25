@@ -24,7 +24,10 @@ function report_cache_page_report($report_type) {
 	$info = report_cache_info($report_type);
 	if ($info['file']) { sirius_require($info['module'], $info['file']); }
 	$fields = $info['fields'];
-	drupal_set_title("Reports: " . $info['name']);
+
+	if ($info['description']) {
+
+	}
 
 	if ($action == 'purge') {
 		$count = report_cache_purge($report_type, $report_id);
@@ -32,16 +35,18 @@ function report_cache_page_report($report_type) {
 	} elseif ($action == 'download') {
 		report_cache_download($report_type, $report_id, $info);
 	} elseif ($action == 'preview') {
-		$preview .= report_cache_preview($report_type, $report_id, $info);
+		$render = report_cache_preview($report_type, $report_id, $info);
 	} elseif ($action == 'render') {
-		$render .= report_cache_render($report_type, $report_id, $info, $_REQUEST['callback-name']);
+		$render = report_cache_render($report_type, $report_id, $info, $_REQUEST['callback-name']);
 	}
 
 	if ($render) {
+		drupal_set_title(t("Reports: ") . $info['name'] . ': ' . $report_id);
  		sirius_backlink_add("sirius/reports/$report_type", array('name' => 'Report List'));
-		$html .= $render;
-		return $html;
+		return $render;
 	}
+
+	drupal_set_title(t("Reports: ") . $info['name']);
 
 	$sql_args = array();
 	$sql = "select distinct report_id from report_cache ";
@@ -120,60 +125,6 @@ function report_cache_page_report($report_type) {
 	return $html;
 }
 
-
-function report_cache_preview($report_type, $report_id, $info) {
-	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
-	$fields = $info['fields'];
-
-	$html = '';
-
-	$parameters = report_cache_parameters($report_type, $report_id);
-
-	$html = '<h2>';
-	if ($info['title_callback']) {
-		$html .= $info['title_callback']($report_type, $report_id);
-	} else {
-		$html .= "$report_id Preview";
-	}
-	$html .= '</h2>';
-
-	$header = array_values($fields);
-	$query = db_select('report_cache');
-	$query->fields('report_cache');
-	$query->condition('report_id', $report_id);
-	$query->condition('report_type', $report_type);
-	$query->condition('report_domain_nid', $domain_nid);
-	$query = $query->extend('PagerDefault');
-	$query->limit(100);
-	
-	$stmt = $query->execute();
-	
-	$rows = array();
-	$count = 0;
-	while ($hr = $stmt->fetchAssoc()) {
-		$hr = unserialize($hr['report_data']);
-		$row = array();
-
-		$idx = 0;
-		foreach ($fields as $name => $prompt) {
-			if ($info['legacy_noassociative']) {
-				$row[] = $hr[$idx];
-			} else {
-				$row[] = $hr[$name];
-			}
-			++$idx;
-		}
-		$rows[] = $row;
-		++$count;
-	}
-
-	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
-	$html .= theme('pager', array('tags' => array()));
-	$html .= report_cache_render_meta($parameters);
-
-	return $html;
-}
-
 function report_cache_render_meta($parameters) {
 	$html = '<div class="report_cache_meta">';
 	if ($parameters['meta']['instance']['uuid']) {
@@ -192,106 +143,6 @@ function report_cache_render_meta($parameters) {
 	$html .= '</div>';
 	return $html;
 }
-
-function report_cache_render($report_type, $report_id, $info, $callback_name) {
-	$callback_record = $info['render_callbacks'][$callback_name];
-	if (!$callback_record) { 
-		drupal_set_message(t('Unable to find callback named "@name"', array('@name' => $callback_name)), 'error');
-		return NULL;
-	}
-
-	if ($info['generator']) {
-		$csv = $callback_record['csv'];
-		$render_callback = $callback_record['method'];
-	} else {
-		$render_callback = $callback_record;
-		$csv = FALSE;
-	}
-
-	$parameters = report_cache_parameters($report_type, $report_id);
-
-	if ($csv) {
-		if ($_REQUEST['output'] == 'csv') {
-			if ($info['generator']) {
-				$data = $info['generator']->$render_callback($report_id, 'csv');
-			} else {
-				$data = $render_callback($report_type, $report_id, 'csv');
-			}
-
-	    $filename = "${report_type}_";
-	    $r = $report_id;
-	    $r = preg_replace('/[^a-zA-Z0-9_ ]/', '', $r);
-	    $r = preg_replace('/ +/', '_', $r);
-	    $filename .= $r;
-	    $filename .= ".csv";
-
-	    drupal_add_http_header('Content-Type', 'text/csv');
-	    drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
-	    $fp = fopen('php://output', 'w');
-	    fputcsv($fp, $data['header']);
-	    foreach ($data['rows'] as $row) {
-	    	if ($row['data']) { $row = $row['data']; }
-	      foreach ($row as $delta => $val) { $row[$delta] = strip_tags($val); }
-	      fputcsv($fp, $row);
-	    }
-	    drupal_exit();
-		}
-
-		$csv_link = '<div class="report_cache_csv_link">';
-		$tmp = $_REQUEST;
-		$tmp['output'] = 'csv';
-		$csv_link .= l('Download', current_path(), array('query' => $tmp, 'attributes' => array('class' => array('tool-button'))));
-		$csv_link .= '</div>';
-	}
-
-	if ($info['generator']) {
-		$parameters_render = $info['generator']->render_parameters($parameters);
-	} else {
-		// Legacy support
-		$render_parameters_callback = $info['render_parameters_callback'];
-		$parameters_render = $render_parameters_callback($parameters);
-	}
-
-	if ($parameters_render) {
-		$html = '<div class="report_cache_parameters">';
-		$html .= '<h2>' . t('Report Settings') . '</h2>';
-		$html .= $parameters_render;
-		
-		$html .= sirius_fakerender_field('Instance:', $report_id);
-		if ($callback_name) {
-			$html .= sirius_fakerender_field('Display:', $callback_name);
-		}
-	  $html .= '</div>';
-	}
-
-	$html .= $csv_link;
-	$html .= '<div class="report_cache_render_body">';
-
-	if ($info['generator']) {
-		$result = $info['generator']->{$render_callback}($report_id);
-	} else {
-		$result = $render_callback($report_type, $report_id);
-	}
-
-	if (is_array($result)) {
-		if ($result['header']) {
-			$result['attributes']['class'][] = 'report_cache_table';
-			$html .= sirius_table_render($result['header'], $result['rows'], $result['attributes']);
-		}
-	} else {
-		$html .= $result;
-	}
-
-	$html .= '</div>';
-	$html .= $csv_link;
-
-	$html .= report_cache_render_meta($parameters);
-
-	return $html;
-}
-
-
-
 
 function report_cache_download($report_type, $report_id, $info) {
 	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
@@ -323,15 +174,8 @@ function report_cache_download($report_type, $report_id, $info) {
 	while ($hr = $stmt->fetchAssoc()) {
 		$hr = unserialize($hr['report_data']);
 		$row = array();
-
-		$idx = 0;
 		foreach ($fields as $name => $prompt) {
-			if ($info['legacy_noassociative']) {
-				$row[] = $hr[$idx];
-			} else {
-				$row[] = $hr[$name];
-			}
-			++$idx;
+			$row[] = $hr[$name];
 		}
 		fputcsv($fp, $row);
 	}
