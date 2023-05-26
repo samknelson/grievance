@@ -393,6 +393,16 @@ function sirius_update_7023() {
   sirius_update_7022_impl();
 }
 
+/**
+ * Delete the "Settlement" View
+ */
+
+function sirius_update_7024() {
+  if ($view = views_get_view('grievance_settlement_report')) {
+    views_delete_view($view);
+  }
+}
+
 function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
   foreach ($if_you_haves as $if_you_have) {
     foreach ($then_you_gets as $then_you_get) {
