@@ -26,7 +26,6 @@ Contracts {"url":"grievance\/admin\/contract-templates","weight":"-46"}
 -Section Search {"url":"grievance\/admin\/contract-templates\/clause-search","weight":"0"}
 Reports {"url":"sirius\/reports","weight":"-48"}
 -Type and Status {"url":"grievance\/report\/bytype","weight":"-41"}
--Settlement Detail {"url":"grievance\/report\/settlement","weight":"-43"}
 -Average Time Between Statuses {"url":"grievance\/report\/average-time","weight":"-47"}
 -Yearly Summary {"url":"grievance\/report\/year-summary","weight":"-40"}
 -Log Search {"url":"grievances\/log","weight":"-50"}
