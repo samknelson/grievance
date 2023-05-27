@@ -65,7 +65,9 @@ function report_cache_render_form($form, &$form_state, $report_type, $report_id,
 	} else {
 		// Legacy support
 		$render_parameters_callback = $info['render_parameters_callback'];
-		$parameters_render = $render_parameters_callback($parameters);
+		if ($render_parameters_callback) {
+			$parameters_render = $render_parameters_callback($parameters);
+		}
 	}
 
 	if ($parameters_render) {
