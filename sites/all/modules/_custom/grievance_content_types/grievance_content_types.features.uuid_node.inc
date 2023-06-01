@@ -3081,7 +3081,7 @@ function grievance_content_types_uuid_features_default_content() {
   'comment' => 0,
   'promote' => 0,
   'sticky' => 0,
-  'ds_switch' => '',
+  'ds_switch' => 'default',
   'type' => 'sirius_help',
   'language' => 'en',
   'created' => 1604084683,
@@ -3100,12 +3100,7 @@ function grievance_content_types_uuid_features_default_content() {
   'field_sirius_summary' => array(
     'und' => array(
       0 => array(
-        'value' => '<ul>
-	<li>Load demographics -- upload new people</li>
-	<li>Load Member status&nbsp;</li>
-	<li>Load the worker work status</li>
-	<li>Load payments / allocations</li>
-</ul>
+        'value' => '<p>Use "Feeds" to upload data into Sirius from a spreadsheet.</p>
 ',
         'format' => 'full_html',
       ),
