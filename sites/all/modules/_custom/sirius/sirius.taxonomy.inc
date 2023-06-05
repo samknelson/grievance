@@ -223,7 +223,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['grievance_document_types']['multidomain'] = 'Yes';
     $settings['grievance_job_classification']['view'] = 'sirius_taxonomy';
     $settings['grievance_job_classification']['display'] = 'block_4';
-    $settings['grievance_job_classification']['multidomain'] = 'No';
+    $settings['grievance_job_classification']['multidomain'] = 'Yes';
     $settings['grievance_log_tags']['view'] = 'sirius_taxonomy';
     $settings['grievance_log_tags']['display'] = 'block_3';
     $settings['grievance_log_tags']['multidomain'] = 'No';
