@@ -120,8 +120,12 @@ function sirius_backlinks_from_node($node) {
 		$name = 'Worker';
 
 		if ($node->type == 'sirius_payperiod') 										{ $path = "node/$worker_nid/sirius_worker_hours"; }
-		else if ($node->type == 'sirius_dispatch') 								{ $path = "node/$worker_nid/sirius_worker_dispatches"; }
-		else if ($node->type == 'sirius_event_participant') 			{ $path = "node/$worker_nid/sirius_worker_events"; }
+		else if ($node->type == 'sirius_dispatch') {
+			if (preg_match('/emphist/', current_path()))            { $path = "node/$worker_nid/sirius_worker_emphist"; }
+			else if (sirius_domain_component_enabled('dispatch:live'))     { $path = "node/$worker_nid/sirius_worker_dispatches"; }
+			else if (sirius_domain_component_enabled('dispatch:emphist'))  { $path = "node/$worker_nid/sirius_worker_emphist"; }
+			else                                                    { $path = "node/$worker_nid"; }
+		} else if ($node->type == 'sirius_event_participant') 		{ $path = "node/$worker_nid/sirius_worker_events"; }
 		else if ($node->type == 'sirius_contact_relationship') 		{ $path = "node/$worker_nid/sirius_worker_relationships"; $name = 'FROM Worker'; }
 		else if ($node->type == 'sirius_trust_worker_benefit') 		{ $path = "node/$worker_nid/sirius_trust_worker_benefits"; $name = 'Dependent'; }
 		else if ($node->type == 'sirius_trust_worker_election') 	{ $path = "node/$worker_nid/sirius_trust_worker_election"; }
@@ -237,11 +241,13 @@ function sirius_backlinks_from_node($node) {
 				$handler_type = $hr['type'];
 				$handler_nid = $hr['nid'];
 				$handler_category = $hr['field_sirius_category_value'];
+				$handler_log_type = $hr['field_sirius_type_value'];
 
 				$name = sirius_content_type_name($handler_type);
 				$path = '';
 
-				if ($handler_type == 'sirius_event' && $log_category == 'ledger:auth')									{ $path = "node/$handler_nid/sirius_event_auths"; }
+				if ($log_category == 'customfield') { $path = "node/$handler_nid/sirius_dispatch_job_group_customfield_tab/$log_type"; }
+				else if ($handler_type == 'sirius_event' && $log_category == 'ledger:auth')									{ $path = "node/$handler_nid/sirius_event_auths"; }
 				else if ($handler_type == 'sirius_event' && $log_category == 'event:intake_application'){ $path = "node/$handler_nid/sirius_event_intake/applications"; }
 				else if ($handler_type == 'sirius_event') 																							{ $path = "node/$handler_nid/sirius_event_info"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'worker:certification') 	{ $path = "node/$handler_nid/sirius_worker_tc/certifications"; }
@@ -273,6 +279,11 @@ function sirius_backlinks_from_node($node) {
 
 				$links[$path] = array('name' => $name, 'title' => $hr['title']);
 			}
+		}
+
+		if ($log_category == 'customfield') {
+			$set_nid = $log_type;
+			$links["node/$set_nid/sirius_event_participant_definition_form"] = array('name' => 'Custom Field Set Definition', 'title' => sirius_backlink_title($set_nid));
 		}
 	}
 
