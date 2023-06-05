@@ -68,6 +68,28 @@ function sirius_service_menu() {
     'weight' => 3,
   );
 
+  $items['sirius/service/config/server/settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'sirius_service_page_config_server',
+    'page arguments' => array(),
+    'access callback' => 'sirius_service_page_config_access',
+    'access arguments' => array('server'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'sirius_service.page_config_server.inc',
+    'weight' => 1,
+  );
+
+  $items['sirius/service/config/server/funcs'] = array(
+    'title' => 'Enabled Functions',
+    'page callback' => 'sirius_service_page_config_server_funcs',
+    'page arguments' => array(),
+    'access callback' => 'sirius_service_page_config_access',
+    'access arguments' => array('server'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'sirius_service.page_config_server_funcs.inc',
+    'weight' => 2,
+  );
+
   return $items;
 }
 
