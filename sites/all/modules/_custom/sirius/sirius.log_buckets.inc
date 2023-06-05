@@ -115,23 +115,13 @@ function sirius_log_buckets() {
 				'can_add' => FALSE,
 			),
 
-			'worker_ws' => array(
+			'worker_status' => array(
 				'title' => 'Log',
 				'content_type' => 'sirius_worker',
 				'permissions' => array('sirius dispatch staff'),
-				'path' => 'sirius_worker_work_status/log',
-				'weight' => 7,
-				'categories' => array('worker:work_status'),
-				'can_add' => FALSE,
-			),
-
-			'worker_ms' => array(
-				'title' => 'Log',
-				'content_type' => 'sirius_worker',
-				'permissions' => array('sirius dispatch staff'),
-				'path' => 'sirius_worker_industry/log',
-				'weight' => 7,
-				'categories' => array('worker:member_status'),
+				'path' => 'sirius_worker_status/log',
+				'weight' => 50,
+				'categories' => array('worker:work_status', 'worker:member_status'),
 				'can_add' => FALSE,
 			),
 
