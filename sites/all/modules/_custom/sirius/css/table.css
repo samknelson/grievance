@@ -5,23 +5,30 @@ table.sirius_table th {
 
 table.sirius_table tbody tr.inactive td,
 table.sirius_table tbody tr.gray td,
-table.sirius_table tbody tr.grey td {
+table.sirius_table tbody tr.grey td,
+table.sirius_table tbody td.inactive,
+table.sirius_table tbody td.gray,
+table.sirius_table tbody td.grey {
 	background-color: #bbbbbb;
 }
 
-table.sirius_table tbody tr.warning td {
+table.sirius_table tbody tr.warning td,
+table.sirius_table tbody td.warning {
 	background-color: #ffff99;
 }
 
-table.sirius_table tbody tr.red td {
+table.sirius_table tbody tr.red td,
+table.sirius_table tbody td.red {
 	background-color: #ff9999;
 }
 
-table.sirius_table tbody tr.green td {
+table.sirius_table tbody tr.green td,
+table.sirius_table tbody td.green {
 	background-color: #99ff99;
 }
 
-table.sirius_table tbody tr.yellow td {
+table.sirius_table tbody tr.yellow td,
+table.sirius_table tbody td.yellow {
 	background-color: #ffff99;
 }
 
