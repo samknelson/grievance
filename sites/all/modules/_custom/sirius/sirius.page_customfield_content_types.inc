@@ -39,6 +39,7 @@ function sirius_node_tab_customfield_content_types_form_submit($form, &$form_sta
 	$cf_node = node_load($form_state['cf_nid']);
 	$cf_json = sirius_json_get($cf_node);
 	$cf_json['customfield']['content_types'] = $form_state['values']['customfield']['content_types'];
+	$cf_json['customfield']['multiple'] = $form_state['values']['customfield']['multiple'];
 	sirius_json_set($cf_node, $cf_json);
 	node_save($cf_node);
 	drupal_set_message('Settings saved.');
