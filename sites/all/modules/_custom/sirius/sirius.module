@@ -1102,6 +1102,13 @@ function sirius_content_type_name($machine_name) {
   return $lookup[$machine_name];
 }
 
+function sirius_module_friendly_name($module) {
+  $module_info = system_get_info('module', $module);
+  $module_name = $module_info['name'];
+  $module_name = preg_replace("/Sirius /", '', $module_name);
+  return $module_name;
+}
+
 function sirius_node_title($nid) {
   if (!$nid) { return NULL; }
   $sql = "select title from node where nid = :nid";
@@ -1226,4 +1233,9 @@ function _sirius_form_prep_recursive(&$form, $defaults = array(), $settings = ar
 function sirius_page_error($msg) {
   drupal_set_message($msg, 'error');
   return '';
+}
+
+function sirius_tool_link($path, $label) {
+  if (!drupal_valid_path($path)) { return ''; }
+  return l($label, $path, array('attributes' => array('class' => array('tool-button'))));
 }
