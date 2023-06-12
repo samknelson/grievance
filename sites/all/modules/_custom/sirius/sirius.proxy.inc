@@ -138,8 +138,16 @@ function sirius_proxy_node_load($nid) {
     return array('success' => FALSE, 'msg' => "Node $nid is not in the server's domain.");
   }
 
+  $ok_proxy_types = array(
+    'sirius_json_definition', 
+    'sirius_worker', 
+    'sirius_contact', 
+    'sirius_contact_relationship',
+    'sirius_trust_benefit'
+  );
+
   $type = $node->type;
-  if (!in_array($type, array('sirius_json_definition', 'sirius_worker', 'sirius_contact', 'sirius_trust_benefit'))) { 
+  if (!in_array($type, $ok_proxy_types)) { 
     return array('success' => FALSE, 'msg' => "Node $nid is not one of the approved content types.");
   }
 

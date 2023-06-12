@@ -67,14 +67,14 @@ function sirius_wizard_info_all() {
 		foreach (module_implements($hook) as $module) {
 			$function = $module . '_' . $hook;
     	if (function_exists($function)) {
-    		$module_info = system_get_info('module', $module);
+    		$module_name = sirius_module_friendly_name($module);
       	$result = call_user_func_array($function, array());
       	if (isset($result) && is_array($result)) {
         	$info_all = array_merge_recursive($info_all, $result);
       		// Add the module to the results, so we know which module provides which report.
       		foreach ($result as $key => $info) {
       			$info_all[$key]['module'] = $module;
-      			$info_all[$key]['module_name'] = $module_info['name'];
+      			$info_all[$key]['module_name'] = $module_name;
       		}
       	} elseif (isset($result)) {
         	$info_all[] = $result;

@@ -1,5 +1,16 @@
 <?php
 
+function sirius_node_tab_entity_customfield_settings_access($entity_node) {
+	// You can't put custom fields on custom fields. 
+	// If we're a log entry of type "customfield", it means we're a single customfield entry for somebody else.
+	// So we can't add or remove other customfield forms.
+	if ($entity_node->type == 'sirius_log' && $entity_node->field_sirius_category['und'][0]['value'] == 'customfield') {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 function sirius_node_tab_entity_customfield_settings_form($form, &$form_state, $entity_node) {
 	$form_state['entity_nid'] = $entity_node->nid;
 	$domain_nid = sirius_domain_nid();

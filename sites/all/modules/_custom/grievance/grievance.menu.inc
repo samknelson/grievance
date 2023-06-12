@@ -586,10 +586,11 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
+	// Legacy support
 	$items['grievance/report/settlement/summary'] = array(
 		'title' => 'Report: Settlement Summary',
 		'description' => '',
-		'page callback' => 'grievance_report_settlement_summary',
+		'page callback' => 'grievance_report_settlement_summary_redirect',
 		'page arguments' => array(),
 		'access arguments' => array('grievance report'),
 		'type' => MENU_NORMAL_ITEM,
@@ -826,4 +827,8 @@ function grievance_modal_styles() {
   );
 
   return $styles;
+}
+
+function grievance_report_settlement_summary_redirect() {
+  drupal_goto('sirius/reports/grievance-report-settlement-summary/form');
 }
