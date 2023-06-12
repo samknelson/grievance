@@ -16,6 +16,7 @@ function sirius_bulk_node_tabs() {
     'callback' => 'sirius_bulk_node_tab_medium',
     'permissions' => array('sirius bulk send'),
     'weight' => 1,
+    'component' => 'bulk',
   );
 
   $node_tabs['sirius_bulk']['sirius_bulk_body_voice'] = array(
@@ -25,6 +26,7 @@ function sirius_bulk_node_tabs() {
     'permissions' => array('sirius bulk send'),
     'weight' => 2,
     'file' => 'sirius_bulk.page_body_voice.inc',
+    'component' => 'bulk',
   );
 
   $node_tabs['sirius_bulk']['sirius_bulk_body_sms'] = array(
@@ -34,6 +36,7 @@ function sirius_bulk_node_tabs() {
     'permissions' => array('sirius bulk send'),
     'weight' => 2,
     'file' => 'sirius_bulk.page_body_sms.inc',
+    'component' => 'bulk',
   );
 
   $node_tabs['sirius_bulk']['sirius_bulk_body_email'] = array(
@@ -43,6 +46,7 @@ function sirius_bulk_node_tabs() {
     'permissions' => array('sirius bulk send'),
     'weight' => 2,
     'file' => 'sirius_bulk.page_body_email.inc',
+    'component' => 'bulk',
   );
 
   $node_tabs['sirius_bulk']['sirius_bulk_test'] = array(
@@ -51,6 +55,7 @@ function sirius_bulk_node_tabs() {
     'callback' => 'sirius_bulk_node_tab_test',
     'permissions' => array('sirius bulk send'),
     'weight' => 3,
+    'component' => 'bulk',
   );
 
 	$node_tabs['sirius_bulk']['sirius_bulk_recipients'] = array(
@@ -59,6 +64,7 @@ function sirius_bulk_node_tabs() {
 		'callback' => 'sirius_bulk_node_tab_recipients_contacts',
 		'permissions' => array('sirius bulk send'),
 		'weight' => 4,
+    'component' => 'bulk',
 	);
 
   $node_tabs['sirius_bulk']['sirius_bulk_manual'] = array(
@@ -67,6 +73,7 @@ function sirius_bulk_node_tabs() {
     'callback' => 'sirius_bulk_node_tab_manual',
     'permissions' => array('sirius bulk manual'),
     'weight' => 5,
+    'component' => 'bulk',
   );
 
   $node_tabs['sirius_bulk']['sirius_bulk_send'] = array(
@@ -75,6 +82,7 @@ function sirius_bulk_node_tabs() {
     'callback' => 'sirius_bulk_node_tab_send',
     'permissions' => array('sirius bulk send'),
     'weight' => 6,
+    'component' => 'bulk',
   );
 
   $node_tabs['sirius_bulk']['sirius_bulk_send/send'] = array(
@@ -84,6 +92,7 @@ function sirius_bulk_node_tabs() {
     'permissions' => array('sirius bulk send'),
     'weight' => 1,
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'component' => 'bulk',
   );
 
   $node_tabs['sirius_bulk']['sirius_bulk_send/throttle'] = array(
@@ -93,6 +102,7 @@ function sirius_bulk_node_tabs() {
     'permissions' => array('sirius bulk send'),
     'weight' => 2,
     'file' => 'sirius_bulk.page_throttle.inc',
+    'component' => 'bulk',
   );
 
 	$node_tabs['sirius_bulk']['sirius_bulk_queue'] = array(
@@ -101,6 +111,7 @@ function sirius_bulk_node_tabs() {
 		'callback' => 'sirius_bulk_node_tab_queue',
 		'permissions' => array('sirius bulk send'),
 		'weight' => 7,
+    'component' => 'bulk',
 	);
 
   $node_tabs['sirius_bulk']['sirius_bulk_delete'] = array(
@@ -110,6 +121,7 @@ function sirius_bulk_node_tabs() {
     'permissions' => array('sirius bulk admin'),
     'weight' => 7,
     'file' => 'sirius_bulk.page_delete.inc',
+    'component' => 'bulk',
   );
 
   sirius_node_tab_set_module('sirius_bulk', $node_tabs);

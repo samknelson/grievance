@@ -29,8 +29,7 @@ function sirius_bulk_node_access($node, $op, $account) {
   if (is_object($node)) { $type = $node->type; } else { $type = $node; }
   if ($type != 'sirius_bulk') { return NODE_ACCESS_IGNORE; }
 
-  // ALL bulk functionality is accessed via tabs. So there's never any reason for anybody to access any node directly.
-  if (user_access('sirius admin')) { return NODE_ACCESS_IGNORE; }
+  if (user_access('sirius bulk send')) { return NODE_ACCESS_IGNORE; }
 
   return NODE_ACCESS_DENY;
 
