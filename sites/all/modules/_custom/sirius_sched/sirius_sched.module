@@ -1,0 +1,59 @@
+<?php
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_sched/sirius_sched.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_sched/sirius_sched.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_sched/sirius_sched.denorm.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_sched/sirius_sched.db.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_sched/sirius_sched.render.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_sched/sirius_sched.install';
+
+function sirius_sched_info_all() {
+  $infos = &drupal_static(__FUNCTION__);
+  if (!isset($infos)) {
+    $infos = module_invoke_all('sirius_sched_info');
+    ksort($infos);
+  }
+  return $infos;
+}
+
+function sirius_sched_info($key) {
+  $infos = &drupal_static(__FUNCTION__); 
+  if (!isset($infos)) { $infos = sirius_sched_info_all(); }
+  return $infos[$key];
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_sched_sirius_cron_scan_info() {
+  $items['sirius_sched'] = array(
+    'title' => 'Schedule',
+    'description' => 'Clean up schedules, delete orphaned entries',
+    'schedule' => 'daily',
+    'callback' => 'sirius_sched_db_cleanup',
+    'multidomain' => FALSE,
+  );
+
+  return $items;
+}
+
+function sirius_sched_search($params) {
+  $records = sirius_sched_db_search($params);
+  return $records;
+}
+
+/** 
+ * Implements hook_sirius_dispatch_elig_info
+ */
+
+function sirius_sched_sirius_dispatch_elig_info() {
+  sirius_require('sirius_sched', 'sirius_sched.dispatch.noconflict.inc');
+  sirius_require('sirius_sched', 'sirius_sched.dispatch.noovertime.inc');
+
+  $items = array();
+  Sirius_Sched_Dispatch_Noconflict::getInstance()->setInfo($items);
+  Sirius_Sched_Dispatch_Noovertime::getInstance()->setInfo($items);
+  return $items;
+}
+
