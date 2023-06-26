@@ -4,7 +4,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_deno
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.permission.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.admin.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.queue.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.install.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.install';
 
 /**
  * Implements hook_node_postsave
