@@ -404,11 +404,11 @@ function sirius_update_7024() {
 }
 
 /**
- * Enable the sched module
+ * Enable the sched, denorm module
  */
 
 function sirius_update_7025() {
-  $modules = array('sirius_sched');
+  $modules = array('sirius_sched', 'sirius_denorm');
   foreach ($modules as $module) {
     print "Enabling $module\n";
     module_enable(array($module), TRUE);
