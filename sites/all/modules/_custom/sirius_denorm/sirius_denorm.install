@@ -4,7 +4,7 @@
  * Create the denorm table.
  */
 
-function sirius_denorm_update_7001() {
+function sirius_denorm_install() {
 
   $sqls = array();
 
