@@ -4,7 +4,7 @@
  * Create the sched table.
  */
 
-function sirius_sched_update_7005() {
+function sirius_sched_install() {
 
   $sqls = array();
 
