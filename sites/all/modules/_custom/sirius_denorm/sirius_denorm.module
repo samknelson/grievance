@@ -1,0 +1,35 @@
+<?php
+
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.menu.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.admin.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.queue.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_denorm.install.inc';
+
+/**
+ * Implements hook_node_postsave
+ * 
+ * After saving a node, attempt to execute every trigger that references, or is referenced by, the triggering node
+ */
+
+function sirius_denorm_node_postsave($node, $op) {
+
+	$items = sirius_denorm_queue_search(array('status' => 'pending', 'source_nid' => $node->nid));
+	$items += sirius_denorm_queue_search(array('status' => 'pending', 'target_nid' => $node->nid));
+	foreach ($items as $item) {
+		sirius_denorm_queue_execute_item($item);
+		sirius_denorm_queue_remove($item['denorm_id']);
+	}
+}
+
+
+/**
+ * Implements hook_cron
+ */
+
+function sirius_denorm_cron() {
+  $last_ts = variable_get('sirius_denorm_cron_last_ts');
+  if (time() - $last_ts < 60*60) { return; }
+  variable_set('sirius_denorm_cron_last_ts', time());
+  sirius_denorm_queue_run();
+}
