@@ -3,27 +3,30 @@
 function sirius_worker_user_admin() {
   $form = array();
 
-  $form['sirius_worker_usersync_enable'] = array(
+	$name = sirius_domain_variable_name('sirius_worker_usersync_enable');
+  $form[$name] = array(
     '#type' => 'select',
     '#title' => t('Enable Worker / User Sync?'),
-    '#default_value' => variable_get('sirius_worker_usersync_enable', ''),
+    '#default_value' => variable_get($name, ''),
     '#options' => array('No' => 'No', 'Yes' => 'Yes'),
     '#description' => t('Should Sirius Workers by associated with Drupal Users?'),
   );
 
-  $form['sirius_worker_dummy_domain'] = array(
+	$name = sirius_domain_variable_name('sirius_worker_dummy_domain');
+  $form[$name] = array(
     '#type' => 'textfield',
     '#title' => t('Dummy Domain'),
-    '#default_value' => variable_get('sirius_worker_dummy_domain', ''),
+    '#default_value' => variable_get($name, ''),
     '#description' => t('Workers without an email address will be assigned an address at this domain.'),
   );
 
 	$role_options = user_roles(TRUE);
-  $form['sirius_worker_roles'] = array(
+	$name = sirius_domain_variable_name('sirius_worker_roles');
+  $form[$name] = array(
     '#type' => 'checkboxes',
     '#title' => t('Worker Roles'),
     '#options' => $role_options,
-    '#default_value' => variable_get('sirius_worker_roles', array()),
+    '#default_value' => variable_get($name, array()),
     '#description' => t('The checked roles are used for workers. Workers are assigned to, or removed from, roles within this list, based on the settings in their member status.'),
   );
 
@@ -31,7 +34,7 @@ function sirius_worker_user_admin() {
 }
 
 function sirius_worker_usersync_enabled() {
-	return variable_get('sirius_worker_usersync_enable', '') == 'Yes';
+	return sirius_domain_variable_get('sirius_worker_usersync_enable') == 'Yes';
 }
 
 function sirius_worker_get_uid($worker_nid) {
@@ -59,7 +62,7 @@ function sirius_worker_get($uid = NULL) {
 
 function sirius_worker_usersync($worker_nid) {
 
-	if (!sirius_worker_usersync_enabled()) { return; }
+	if (!sirius_worker_usersync_enabled()) { return array('success' => FALSE, 'msg' => 'User sync is not enabled.'); }
 
 	$worker_node = node_load($worker_nid);
 	if (!$worker_node) {
@@ -141,7 +144,7 @@ function sirius_worker_usersync($worker_nid) {
 	$stmt = db_query($sql, array(':name' => $id, 'mail' => $email));
 	while ($hr = $stmt->fetchAssoc()) {
 		if ($hr['field_sirius_worker_target_id'] == $worker_nid) { continue; }
-		return array('success' => FALSE, 'msg' => "There is already an existing user " . $hr['uid'] . " with name $id or mail $mail.");
+		return array('success' => FALSE, 'msg' => "There is already an existing user " . $hr['uid'] . " with name $id or mail $email.");
 	}
 
 	$need_save = FALSE;
