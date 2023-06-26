@@ -5,12 +5,6 @@ function sirius_worker_page_schedule_tor_list() {
 }
 
 function sirius_worker_page_schedule_tor_list_form($form, &$form_state) {
-	$form['status'] = array(
-		'#type' => 'select',
-		'#title' => t('Status'),
-		'#options' => array(NULL => t('-- Select --')) + sirius_worker_schedule_tor_status_options(),
-	);
-
 	if (user_access('sirius admin') || user_access('sirius domain admin') || user_access('sirius worker admin')) { 
 		$employer_options = array(NULL => t('-- Select --')) + sirius_employer_list();
 		$form['employer_nid'] = array(
@@ -26,10 +20,11 @@ function sirius_worker_page_schedule_tor_list_form($form, &$form_state) {
 		);
 	}
 
-	$form['type_tid'] = array(
-		'#title' => t('Type'),
+	$type_status_options = sirius_worker_schedule_tor_type_status_options();
+	$form['type_status_key'] = array(
+		'#title' => t('Type / Status'),
 		'#type' => 'select',
-		'#options' => array(NULL => t('-- Select --')) + sirius_taxonomy_load('sirius_worker_tor_type', 'tid', 'name'),
+		'#options' => array(NULL => t('-- Select --')) + $type_status_options,
 	);
 
 
@@ -78,12 +73,15 @@ function sirius_worker_page_schedule_tor_list_form($form, &$form_state) {
 
 function sirius_worker_page_schedule_tor_list_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUe;
+
+	$type_status_key = $form_state['values']['type_status_key'];
+	list ($type_tid, $status_uuid) = explode('|', $type_status_key);
 	$params = array();
 	$params['employer_nid'] = $form_state['values']['employer_nid'];
-	$params['status'] = $form_state['values']['status'];
+	$params['status'] = $status_uuid;
 	$params['start_date'] = $form_state['values']['start_date'];
 	$params['end_date'] = $form_state['values']['end_date'];
-	$params['type_tid'] = $form_state['values']['type_tid'];
+	$params['type_tid'] = $type_tid;
 	$tors = sirius_worker_schedule_tor_list($params);
 
 	$rows = array();
