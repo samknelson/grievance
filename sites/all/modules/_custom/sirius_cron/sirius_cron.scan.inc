@@ -82,7 +82,7 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 	// Too soon to run?
 	if ($info['schedule'] == 'daily') { $today = gmdate('Y-m-d'); }
 	else if ($info['schedule'] == 'hourly') { $today = gmdate('Y-m-d H'); }
-	else { $today = date('Y-m-d H:i'); }
+	else { $today = gmdate('Y-m-d H:i'); }
 
 	$last_run = variable_get("sirius_cron_scan_${key}_last_run", 0);
 	if ($last_run == $today && !$force) {

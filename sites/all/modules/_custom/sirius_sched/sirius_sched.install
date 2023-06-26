@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * Create the sched table.
+ */
+
+function sirius_sched_update_7005() {
+
+  $sqls = array();
+
+  $sqls[] = "CREATE TABLE sirius_sched (
+id INTEGER PRIMARY KEY AUTO_INCREMENT,
+entity_nid integer,
+handler_nid integer,
+type varchar(255),
+start_ts integer,
+end_ts integer,
+title varchar(255),
+json json,
+index(start_ts),
+index(end_ts),
+index(entity_nid),
+index(handler_nid),
+unique index (entity_nid, handler_nid, start_ts, end_ts, type)
+);";
+
+  // $sqls[] = 'create index sirius_hours_cache_idx01 on sirius_hours_cache (payperiod_nid);';
+
+  foreach ($sqls as $sql)
+  try { 
+    print "Executing: $sql\n";
+    db_query($sql, array());
+  } catch (exception $ignore) {
+    print "... Got error: " . $ignore->getMessage() . "\n";
+  }
+}

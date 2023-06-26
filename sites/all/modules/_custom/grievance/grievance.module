@@ -666,7 +666,6 @@ function grievance_report_cache_info() {
       'Detail by Specialist' => 'grievance_report_open_summary_with_log_render_specialist_detail',
       'Detail by Employer' => 'grievance_report_open_summary_with_log_render_employer_detail',
     ),
-    'legacy_noassociative' => TRUE,
   );
 
   $items['grievance-report-shop-monthly'] = array(

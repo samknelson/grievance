@@ -15,6 +15,8 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.merge.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.ein.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.schedule.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.schedule_tor.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.history.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_duplicate_id.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_multiple_member_status.inc";
@@ -40,6 +42,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_expiring.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_merge.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_schedule.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_contact_phone.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_optin.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tor.inc";
@@ -155,13 +158,13 @@ function sirius_worker_node_postsave($node, $op) {
 
 /**
  * Implements hook_cron
+ * 
+ * Old-style cron; @todo switch to sirius_cron
  */
 
 function sirius_worker_cron() {
   sirius_worker_skills_cron();
 }
-
-
 
 /**
  * Implements hook_views_pre_render
@@ -235,8 +238,8 @@ function sirius_worker_form_alter(&$form, &$form_state, $form_id) {
     $form['field_sirius_aat_required']['#access'] = FALSE;
     $form['field_sirius_dispatch_hfe']['#access'] = FALSE;
     $form['field_sirius_dispatch_hfe_until']['#access'] = FALSE;
-    $form['field_sirius_dispatch_eba']['#access'] = FALSE;
-    $form['field_sirius_dispatch_eba_dates']['#access'] = FALSE;
+    //$form['field_sirius_dispatch_eba']['#access'] = FALSE;
+    //$form['field_sirius_dispatch_eba_dates']['#access'] = FALSE;
     $form['field_sirius_email']['#access'] = FALSE;
     $form['field_sirius_address']['#access'] = FALSE;
     $form['field_sirius_phone_fax']['#access'] = FALSE;
@@ -306,6 +309,7 @@ function sirius_worker_report_cache_info() {
     'render_callbacks' => array(
       'View' => 'sirius_worker_report_duplicate_id_view',
     ),
+    'module' => 'sirius_worker',
   );
 
   $items['sirius-worker-multiple-member-status'] = array(
@@ -319,6 +323,7 @@ function sirius_worker_report_cache_info() {
     'render_callbacks' => array(
       'View' => 'sirius_worker_report_multiple_member_status_view',
     ),
+    'module' => 'sirius_worker',
   );
 
   $items['sirius-worker-skill-log'] = array(
@@ -333,6 +338,69 @@ function sirius_worker_report_cache_info() {
       'Summary' => 'sirius_worker_report_skill_log_view_summary',
       'Details' => 'sirius_worker_report_skill_log_view_detail',
     ),
+    'module' => 'sirius_worker',
+  );
+
+  $items['sirius-worker-ssn-missing'] = array(
+    'name' => t('SSN Missing'),
+    'description' => '',
+    'access' => 'sirius worker view',
+    'fields' => array(
+      'worker_nid' => 'Worker NID',
+      'worker_title' => 'Worker Name',
+      'worker_id' => 'Worker ID',
+    ),
+    'form_callback' => 'sirius_worker_report_ssn_missing_form',
+    'pk_list_callback' => 'sirius_worker_report_ssn_missing_pks',
+    'batch_callback' => 'sirius_worker_report_ssn_missing_batch',
+    'render_callbacks' => array(
+      'View' => 'sirius_worker_report_ssn_missing_view',
+    ),
+    'file' => 'sirius_worker.report_ssn_missing.inc',
+    'module' => 'sirius_worker',
+    'dashboard' => TRUE,
+  );
+
+  $items['sirius-worker-ssn-invalid'] = array(
+    'name' => t('SSN Invalid'),
+    'description' => '',
+    'access' => 'sirius worker view',
+    'fields' => array(
+      'worker_nid' => 'Worker NID',
+      'worker_title' => 'Worker Name',
+      'worker_id' => 'Worker ID',
+      'ssn' => 'SSN',
+    ),
+    'form_callback' => 'sirius_worker_report_ssn_invalid_form',
+    'pk_list_callback' => 'sirius_worker_report_ssn_invalid_pks',
+    'batch_callback' => 'sirius_worker_report_ssn_invalid_batch',
+    'render_callbacks' => array(
+      'View' => 'sirius_worker_report_ssn_invalid_view',
+    ),
+    'file' => 'sirius_worker.report_ssn_invalid.inc',
+    'module' => 'sirius_worker',
+    'dashboard' => TRUE,
+  );
+
+  $items['sirius-worker-ssn-duplicate'] = array(
+    'name' => t('SSN Duplicate'),
+    'description' => '',
+    'access' => 'sirius worker view',
+    'fields' => array(
+      'worker_nid' => 'Worker NID',
+      'worker_title' => 'Worker Name',
+      'worker_id' => 'Worker ID',
+      'ssn' => 'SSN',
+    ),
+    'form_callback' => 'sirius_worker_report_ssn_duplicate_form',
+    'pk_list_callback' => 'sirius_worker_report_ssn_duplicate_pks',
+    'batch_callback' => 'sirius_worker_report_ssn_duplicate_batch',
+    'render_callbacks' => array(
+      'View' => 'sirius_worker_report_ssn_duplicate_view',
+    ),
+    'file' => 'sirius_worker.report_ssn_duplicate.inc',
+    'module' => 'sirius_worker',
+    'dashboard' => TRUE,
   );
 
   return $items;
@@ -345,33 +413,6 @@ function sirius_worker_report_cache_info() {
 function sirius_worker_node_view($node, $view_mode, $langcode) {
   if ($node->type != 'sirius_worker') { return; }
   sirius_worker_ein_node_view($node, $view_mode, $langcode);
-  // sirius_worker_customfields_node_view($node, $view_mode, $langcode);
-}
-
-function sirius_worker_customfields_node_view($worker_node, $view_mode, $langcode) {
-  if ($worker_node->type != 'sirius_worker') { return; }
-  if (!$worker_node->content['custom_fields']) { return; }
-
-  $which = 'default';
-
-  $contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
-  if (!$contact_node) { $worker_node->content['custom_fields']['#access'] = FALSE; return; }
-
-  $contact_definition_json = sirius_contact_definition();
-  $contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, $which);
-  $contact_json = sirius_jsonfield_util_node_json_get($contact_node);
-  $contact_results = sirius_jsonfield_util_results_get($contact_json, $which);
-  if (!$contact_results) { $worker_node->content['custom_fields']['#access'] = FALSE; return; }
-
-  sirius_jsonfield_util_set_defaults($contact_definition_form, $contact_results);
-
-  $options = array();
-  $options['fieldsets'] = TRUE;
-  $options['skip_empty'] = TRUE;
-  $html = sirius_jsonfield_util_render_all_values_new($contact_definition_form, $contact_results, $options);
-  if (!$html) { $worker_node->content['custom_fields']['#access'] = FALSE; return; }
-
-  $worker_node->content['custom_fields'][0]['#markup'] = $html;
 }
 
 /**
@@ -434,4 +475,34 @@ function sirius_worker_schedule_tor_list_all($params) {
     $tor_nids[] = $hr['nid'];
   }
   return node_load_multiple($tor_nids);
+}
+
+/**
+ * Implements hook_node_update
+ */
+
+function sirius_worker_node_update($node) { return sirius_worker_denormalize_queue($node); }
+
+/**
+ * Implements hook_node_insert
+ */
+
+function sirius_worker_node_insert($node) { return sirius_worker_denormalize_queue($node); }
+
+/**
+ * Implements hook_node_delete
+ */
+
+function sirius_worker_node_delete($node) { return sirius_worker_denormalize_queue($node); }
+
+function sirius_worker_denormalize_queue($node) {
+  if ($node->type == 'sirius_log') { sirius_worker_denorm_history_queue($node); }
+}
+
+/**
+ * Implements hook_sirius_denorm
+ */
+
+function sirius_worker_sirius_denorm($item) {
+  if ($item['denorm_trigger'] == 'sirius_worker_history') { sirius_worker_denorm_history($item); }
 }
