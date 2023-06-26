@@ -53,13 +53,30 @@ function sirius_bulk_node_tabs() {
     'weight' => 3,
   );
 
-	$node_tabs['sirius_bulk']['sirius_bulk_recipients'] = array(
-		'title' => 'Add Recipients',
-		'description' => '',
-		'callback' => 'sirius_bulk_node_tab_recipients_contacts',
-		'permissions' => array('sirius bulk send'),
-		'weight' => 4,
-	);
+  $node_tabs['sirius_bulk']['sirius_bulk_recipients'] = array(
+    'title' => 'Recipients',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_recipients_workers',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 4,
+  );
+
+  $node_tabs['sirius_bulk']['sirius_bulk_recipients/contacts'] = array(
+    'title' => 'Contacts',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_recipients_contacts',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 2,
+  );
+
+  $node_tabs['sirius_bulk']['sirius_bulk_recipients/workers'] = array(
+    'title' => 'Workers',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_recipients_workers',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
 
   $node_tabs['sirius_bulk']['sirius_bulk_manual'] = array(
     'title' => 'Manual Confirmation',
