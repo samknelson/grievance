@@ -403,6 +403,18 @@ function sirius_update_7024() {
   }
 }
 
+/**
+ * Enable the sched module
+ */
+
+function sirius_update_7025() {
+  $modules = array('sirius_sched');
+  foreach ($modules as $module) {
+    print "Enabling $module\n";
+    module_enable(array($module), TRUE);
+  }
+}
+
 function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
   foreach ($if_you_haves as $if_you_have) {
     foreach ($then_you_gets as $then_you_get) {
