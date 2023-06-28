@@ -233,8 +233,8 @@ function sirius_dispatch_job_workerform($form, &$form_state, $states = NULL) {
 function sirius_dispatch_layoff_expired_jobs($mode = 'test') {
 	$date = gmdate('Y-m-d H:i:s');
 
-	// $mode = "test";
-	// sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
+	$mode = "test";
+	sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
 
 	$sql = "select distinct node.nid from node ";
 	$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";

@@ -30,31 +30,39 @@ function sirius_dispatch_run_all() {
 }
 
 function sirius_dispatch_run($job_node) {
+  $info = array();
+
   // Close jobs after the report date
   $result = sirius_dispatch_run_check_report_date($job_node);
   if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Check report date: " . $result['msg']; }
 
 	// Expire dispatches
 	$result = sirius_dispatch_run_expire($job_node);
 	if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Expire dispatches: " . $result['msg']; }
 
 	// Create dispatches
 	$result = sirius_dispatch_run_create_dispatches($job_node);
 	if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Create dispatches: " . $result['msg']; }
 
 	// Send notifications
 	$result = sirius_dispatch_run_notify($job_node);
 	if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Notify: " . $result['msg']; }
 
 	// Are we filled?
-	sirius_dispatch_run_finalize($job_node);
+	$result = sirius_dispatch_run_finalize($job_node);
+  if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Finalize: " . $result['msg']; }
 
 	// Log the end
   if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
     sirius_log('job:run', 'poll', 'complete', '', '', array($job_node->nid));
   }
 
-	return array('success' => TRUE);
+	return array('success' => TRUE, 'info' => $info);
 }
 
 function sirius_dispatch_run_check_report_date($job_node) {
@@ -101,7 +109,7 @@ function sirius_dispatch_run_finalize($job_node) {
 
   if ($count_we_have < $count_we_need) {
   	// do nothing
-  	return;
+  	return array('success' => TRUE, 'msg' => 'Job is not ready to finalize.');
   }
 
   if ($count_we_have > $count_we_need) {
@@ -117,7 +125,10 @@ function sirius_dispatch_run_finalize($job_node) {
     if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
       sirius_log('job:run', 'complete', "There are $count_we_have dispatches with status accepted. This job is filled.", '', '', array($job_node->nid));
     }
+    return array('success' => TRUE, 'msg' => "Job status was set to Filled.");
   }
+
+  return array('success' => TRUE, 'msg' => "Unreachable code.");
 }
 
 function sirius_dispatch_run_notify($job_node) {

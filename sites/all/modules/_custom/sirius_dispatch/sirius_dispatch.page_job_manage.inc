@@ -365,8 +365,18 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 	}
 
 	if ($action == 'poll') {
-		sirius_dispatch_run($job_node);
-		drupal_set_message(t("Poll complete; see the log for details."));
+		$result = sirius_dispatch_run($job_node);
+		if ($result['success']) {
+			drupal_set_message(t("Poll complete; see the log for details."));
+		} else {
+			drupal_set_message("Poll failed: " . $result['msg'], 'error');
+		}
+
+		if ($result['info']) {
+			foreach ($result['info'] as $info) {
+				drupal_set_message($info);
+			}
+		}
 		return;
 	}
 
