@@ -230,11 +230,11 @@ function sirius_dispatch_run_create_dispatches($job_node) {
   if ($count_to_create > $batch_max) { $count_to_create = $batch_max; }
   if ($count_to_create < $batch_min) { $count_to_create = $batch_min; }
   if ($count_to_create >= 1) {
-  	$workers = sirius_dispatch_job_get_dispatchable_workers(
+  	$workers = sirius_dispatch_elig_fetch(
       $job_node, 
       'dispatch', 
       $count_to_create,
-      array('cbn' => 'No')
+      array('cbn' => 'No', 'set_eligibility_cache' => TRUE)
     );
 
   	// Create all

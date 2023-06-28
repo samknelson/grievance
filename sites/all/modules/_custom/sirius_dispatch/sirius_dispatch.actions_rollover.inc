@@ -29,6 +29,12 @@ function sirius_dispatch_rollover($dispatch_node, $rollover_employer_nid, $rollo
 
 	// For permanent rollovers, set the dispatch status to "terminated" and notify the worker
 	if ($rollover_type == 'permanent') {
+		
+		// Set the "end" timestamp. 
+		if (!$dispatch_node->field_sirius_date_end['und'][0]['value']) {
+			$dispatch_node->field_sirius_date_end['und'][0]['value'] = date('Y-m-d');
+		}
+
 		$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = 'terminated';
 		node_save($dispatch_node);
 

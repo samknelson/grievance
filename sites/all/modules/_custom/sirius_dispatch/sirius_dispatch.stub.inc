@@ -139,7 +139,7 @@ function sirius_dispatch_page_job_stub_form_submit($form, &$form_state) {
 	}
 }
 
-function sirius_dispatch_job_stub_fetch($employer_nid, $industry_tid) {
+function sirius_dispatch_job_stub_fetch($employer_nid, $industry_tid, $nid_only = FALSE) {
 	$domain_nid = sirius_domain_nid();
 	$query = new EntityFieldQuery;
 	$query->entityCondition('entity_type', 'node');
@@ -153,5 +153,6 @@ function sirius_dispatch_job_stub_fetch($employer_nid, $industry_tid) {
 	$stmt = $query->execute();
 	if (!$stmt['node']) { return NULL; }
 	$stub_nid = array_keys($stmt['node'])[0];
+	if ($nid_only) { return $stub_nid; }
 	return node_load($stub_nid);
 }

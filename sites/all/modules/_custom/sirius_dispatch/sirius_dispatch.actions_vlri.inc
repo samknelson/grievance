@@ -30,6 +30,11 @@ function sirius_dispatch_vlri($dispatch_node, $notes = '') {
 		return $possible;
 	}
 
+	// Set the "end" timestamp. 
+	if (!$dispatch_node->field_sirius_date_end['und'][0]['value']) {
+		$dispatch_node->field_sirius_date_end['und'][0]['value'] = date('Y-m-d');
+	}
+
 	// Set the dispatch status to "resigned", save and log
 	$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = 'vlri';
 	node_save($dispatch_node);

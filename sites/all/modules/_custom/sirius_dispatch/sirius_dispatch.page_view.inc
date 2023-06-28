@@ -271,12 +271,8 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$job_tags = sirius_fieldvals($job_node, 'field_sirius_dispatch_job_tags', 'tid');
 
 	if (sirius_domain_variable_get('sirius_dispatch_view_show_report_date', 'Yes') == 'Yes') {
-		if (in_array(sirius_get_special_tid('sirius_dispatch_job_tags|ASAP'), $job_tags)) {
-			$stupid_html = '<section class="field field-name-datetime field-label-inline clearfix view-mode-full"><h2 class="field-label">Report Date</h2><div class="field-items"><div class="field-item">As Soon As Possible</div></div></section>';
-			$form['job_location_section_a'] = array('#markup' => $stupid_html);
-		} else {
-			$form['job_location_section_a'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_datetime'));
-		}
+		$form['job_location_section_a'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_datetime'));
+		$form['job_location_section_a0'] = array('#markup' => sirius_dispatch_view_render_field($job_node, 'field_sirius_datetime_completed'));
 	}
 
 	if (sirius_domain_variable_get('sirius_dispatch_view_show_create_date', 'No') == 'Yes') {
