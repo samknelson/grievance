@@ -22,13 +22,16 @@ function sirius_node_tab_dispatch_job_dispatches_access($job_node) {
 }
 
 function sirius_node_tab_dispatch_job_dispatches($job_node) {
+	$html = sirius_dispatch_job_counts_render($job_node->nid);
+
 	if (user_access('sirius dispatch staff')) {
-		return views_embed_view('sirius_dispatches', 'block', $job_node->nid);
+		$html .= views_embed_view('sirius_dispatches', 'block', $job_node->nid);
 	} else if (sirius_rename_this_is_steward($job_node)) {
-		return views_embed_view('sirius_dispatches', 'block_2', $job_node->nid);
+		$html .= views_embed_view('sirius_dispatches', 'block_2', $job_node->nid);
 	} else {
-		return views_embed_view('sirius_dispatches', 'block_1', $job_node->nid);
+		$html .= views_embed_view('sirius_dispatches', 'block_1', $job_node->nid);
 	}
+	return $html;
 }
 
 function sirius_rename_this_is_steward($job_node) {

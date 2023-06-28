@@ -12,6 +12,10 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.twilio.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.worker.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.job.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.elig.fetch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.elig.explain.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.elig.cache.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.elig.plugins.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.policy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.run.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.hfe.inc';
@@ -25,6 +29,10 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.payrate.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.fore.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.stub.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.sched.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.type.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.search.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.emphist.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_accept.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.actions_decline.inc';
@@ -78,6 +86,23 @@ function sirius_dispatch_cron() {
 }
 
 /**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_dispatch_sirius_domain_component_info() {
+  return array(
+    'dispatch:emphist' => array(
+      'title' => 'Dispatch - Employment History',
+      'description' => 'Use the "Employment History" framework to view or edit historical work',
+    ),
+    'dispatch:live' => array(
+      'title' => 'Dispatch - Live',
+      'description' => 'Perform "Live" dispatches, allowing workers to accept and decline dispatch notifications.',
+    ),
+  );
+}
+
+/**
  * Implements hook_sirius_cron_scan_info()
  */
 
@@ -89,9 +114,10 @@ function sirius_dispatch_sirius_cron_scan_info() {
     'schedule' => 'daily',
     'callback' => 'sirius_dispatch_eba_remove_expired_dates',
     'multidomain' => FALSE,
-    'component' => 'dispatch',
+    'component' => 'dispatch:live',
   );
 
+  /*
   $items['dispatch_eba_layoff_expired_dispatches'] = array(
     'title' => 'Dispatch EBA Layoff Expired Dispatches',
     'description' => 'Lay off any workers who are on secondary EBA dispatches, when the date has passed.',
@@ -99,6 +125,34 @@ function sirius_dispatch_sirius_cron_scan_info() {
     'callback' => 'sirius_dispatch_eba_layoff_expired_dispatches',
     'multidomain' => FALSE,
     'component' => 'dispatch',
+  );
+  */
+
+  $items['dispatch_elig_cache_cleanup'] = array(
+    'title' => 'Dispatch Eligibility Cache',
+    'description' => 'Clean up the dispatch eligibility cache.',
+    'schedule' => 'daily',
+    'callback' => 'sirius_dispatch_elig_cache_cleanup',
+    'multidomain' => FALSE,
+    'component' => 'dispatch:live',
+  );
+
+  $items['dispatch_layoff_expired_jobs'] = array(
+    'title' => 'Dispatch Layoff Expired Jobs',
+    'description' => 'Lay off all workers from jobs that are past their end date.',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_dispatch_layoff_expired_jobs',
+    'multidomain' => FALSE,
+    'component' => 'dispatch:live',
+  );
+
+  $items['dispatch_layoff_secondary_without_primary'] = array(
+    'title' => 'Dispatch Layoff Secondary Without Primary',
+    'description' => 'Lay off all secondary dispatches if the worker does not have a primary dispatch and if the job type has the appropriate flag set.',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_dispatch_layoff_secondary_without_primary',
+    'multidomain' => TRUE,
+    'component' => 'dispatch:live',
   );
 
   return $items;
@@ -115,6 +169,15 @@ function sirius_dispatch_node_presave($node) {
 
   if ($node->type == 'sirius_dispatch') {
     sirius_dispatch_payrate_compute($node);
+    sirius_dispatch_type_compute($node);
+
+    $title = sirius_node_title($node->field_sirius_worker['und'][0]['target_id']);
+    $title .= ': ';
+    $title .= 'Dispatch';
+    if ($node->nid) {
+      $title .= ' #' . $node->nid;
+    }
+    $node->title = $title;
   }
 }
 
@@ -300,7 +363,7 @@ function sirius_dispatch_listcounts_block_view() {
     $industry_html .= '<ul>';
     foreach ($open_statuses as $status_tid => $status_term) {
       $job_node->field_sirius_member_status['und'] = array(array('tid' => $status_tid));
-      $count = sirius_dispatch_job_get_dispatchable_workers(
+      $count = sirius_dispatch_elig_fetch(
         $job_node, 
         $worker_node->nid,
         0,
@@ -327,16 +390,6 @@ function sirius_dispatch_listcounts_block_view() {
   $block['subject'] = '';
   $block['content'] = $html;
   return $block;
-}
-
-/**
- * Implements hook_sirius_jsonfield_form_definitions()
- */
-
-function sirius_dispatch_sirius_jsonfield_form_definitions() {
-  $definition = array();
-  $definition += sirius_dispatch_policy_sirius_jsonfield_form_definitions();
-  return $definition;
 }
 
 /**
@@ -374,4 +427,22 @@ function sirius_dispatch_node_view($node, $view_mode, $langcode) {
       }
     }
   }
+}
+
+/** 
+ * Implements hook_sirius_dispatch_elig_info
+ */
+
+function sirius_dispatch_sirius_dispatch_elig_info() {
+  sirius_require('sirius_dispatch', 'sirius_dispatch.1for1.inc');
+  sirius_require('sirius_dispatch', 'sirius_dispatch.nosecondaryatprimary.inc');
+
+  $items = array();
+  Sirius_Dispatch_1for1::getInstance()->setInfo($items);
+  Sirius_Dispatch_Nosecondaryatprimary::getInstance()->setInfo($items);
+  return $items;
+}
+
+function sirius_dispatch_status_options() {
+  return list_allowed_values(field_info_field('field_sirius_dispatch_status'));
 }

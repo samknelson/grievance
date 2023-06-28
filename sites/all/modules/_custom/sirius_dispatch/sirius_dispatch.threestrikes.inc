@@ -77,7 +77,6 @@ function sirius_dispatch_threestrikes_cron() {
 	$today = date('Y-m-d');
 	$last_run = variable_get('sirius_dispatch_threestrikes_last_date', 0);
 	if ($last_run == $today) { return; }
-	variable_set('sirius_dispatch_threestrikes_last_date', $today);
 
 	// Don't run before a specific time
 	$hour = variable_get('sirius_dispatch_threestrikes_start_hr', 1);
@@ -87,6 +86,7 @@ function sirius_dispatch_threestrikes_cron() {
 	// Run the scan
 	$result = sirius_dispatch_threestrikes_scan();
 	watchdog('sirius_dispatch_threestrikes', "Ran a threestrikes scan. Looked at " . $result['count_scanned'] . " workers, signed out " . $result['count_signed_out'] . ".");
+	variable_set('sirius_dispatch_threestrikes_last_date', $today);
 }
 
 function sirius_dispatch_threestrikes_page() {

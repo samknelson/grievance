@@ -116,8 +116,11 @@ function sirius_dispatch_eba_remove_expired_dates_worker($worker_nid, $mode = 't
 /**
  * Lay off expired EBA dispatches
  * - Any "accepted_secondary" dispatch where there are EBA dates and they're all in the past
+ * 
+ * This is obsolete now because EBA jobs have end dates, and workers are laid off after the job ends.
  */
 
+/*
 function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 	// Find any EBA dates in the past
 	$date = date('Y-m-d 00:00:00', strtotime('-1 days'));
@@ -182,4 +185,4 @@ function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 	if ($last_failure_msg) { $msg .= " The last error message was: $last_failure_message."; }
 	return array('success' => TRUE, 'msg' => $msg, 'count' => $count_success);
 }
-
+*/

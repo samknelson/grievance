@@ -23,7 +23,7 @@ function sirius_dispatch_accept_possible($dispatch_node) {
 	}
 
 	// Verify that the worker is still dispatchable for this job
-	$check = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name', 1, array('worker_nid' => $worker_nid, 'redispatch' => TRUE));
+	$check = sirius_dispatch_elig_fetch($job_node, 'name', 1, array('worker_nid' => $worker_nid, 'redispatch' => TRUE));
 	if (!$check) {
 		return array('success' => FALSE, 'msg' => 'This worker can no longer be dispatched to this job.');
 	}
@@ -39,9 +39,21 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 		return $possible;
 	}
 
-	// Get the job polic
+	// Get the job policy
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
-	$policy = sirius_dispatch_job_policy($job_node);
+	$job_policy = sirius_dispatch_job_policy($job_node);
+
+	// Run any plugins. 
+	$plugins = sirius_dispatch_elig_info_all();
+	foreach ($plugins as $plugin_key => $plugin) {
+		// Only active plugins with an eligibility callback
+		if ($job_policy['plugin'][$plugin_key]['active'] != 'Yes') { continue; }
+		$plugin = sirius_dispatch_elig_instance($plugin_key);
+
+		// Attempt to run the plugin
+		$result = $plugin->accept($dispatch_node, $notes);
+		if (!$result['success']) { return $result; }
+	}
 
 	// Remove from the event
 	$event_nid = $job_node->field_sirius_events['und'][0]['target_id'];
@@ -59,7 +71,7 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 
 	// Set the status
 	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
-	if ($policy['workers']['always_secondary'] == 'Yes') {
+	if ($job_policy['workers']['always_secondary'] == 'Yes') {
 		$new_status = 'accepted_secondary';
 	} else if ($worker_node->field_grievance_shop['und'][0]['target_id']) {
 		$new_status = 'accepted_secondary';
@@ -68,9 +80,18 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 	}
 	$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = $new_status;
 
-	// Set the timestamp
+	// Set the "responded" timestamp
 	if (!$dispatch_node->field_sirius_datetime_completed['und'][0]['value']) {
-		$dispatch_node->field_sirius_datetime_completed['und'][0]['value'] = date('Y-m-d H:i:s');
+		$dispatch_node->field_sirius_datetime_completed['und'][0]['value'] = gmdate('Y-m-d H:i:s');
+	}
+
+	// Set the "start" timestamp. This is the later of the current date and the job's report date.
+	if (!$dispatch_node->field_sirius_date_start['und'][0]['value']) {
+		$ts1 = time();
+		$ts2 = sirius_fieldval($job_node, 'field_sirius_datetime', 'ts');
+		if ($ts2 === NULL) { $ts2 = 0; }
+		$ts = max($ts1, $ts2);
+		$dispatch_node->field_sirius_date_start['und'][0]['value'] = date('Y-m-d', $ts);
 	}
 
 	// Save and log

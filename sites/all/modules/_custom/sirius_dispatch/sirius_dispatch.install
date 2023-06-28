@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * Create the dispatch ineligble table
+ */
+
+function sirius_dispatch_update_7001() {
+
+  $sqls = array();
+
+  $sqls[] = "CREATE TABLE sirius_dispatch_elig_cache (
+job_nid integer,
+worker_nid integer,
+plugin varchar(255),
+details text,
+ts integer,
+primary key (job_nid, worker_nid)
+);";
+
+  // $sqls[] = 'create index sirius_hours_cache_idx01 on sirius_hours_cache (payperiod_nid);';
+
+  foreach ($sqls as $sql)
+  try { 
+    print "Executing: $sql\n";
+    db_query($sql, array());
+  } catch (exception $ignore) {
+    print "... Got error: " . $ignore->getMessage() . "\n";
+  }
+}
