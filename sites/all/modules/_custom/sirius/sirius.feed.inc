@@ -902,7 +902,11 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 	if (!$context['results']['results_path']) {
 		$context['results']['results_path'] = 'temporary://sirius_feed_results_' . rand();
 		$results_fp = fopen(drupal_realpath($context['results']['results_path']), 'w');
-		$cols = array_keys($fields);
+		if ($info['feed']['results_echo_input']) {
+			$cols = $header;
+		} else {
+			$cols = array_keys($fields);
+		}
 		$cols[] = 'Message';
 		$cols[] = 'Result';
 		if ($info['feed']['results_fields']) {
@@ -946,8 +950,12 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
   	}
 
 		$results_row = array();
-		foreach (array_keys($fields) as $field_name) {
-			$results_row[] = $import_data_row[$field_name];
+		if ($info['feed']['results_echo_input']) {
+			$results_row = array_values($import_data_row['xxxrawxxx']);
+		} else {
+			foreach (array_keys($fields) as $field_name) {
+				$results_row[] = $import_data_row[$field_name];
+			}
 		}
 
 		if ($result['success']) { 
