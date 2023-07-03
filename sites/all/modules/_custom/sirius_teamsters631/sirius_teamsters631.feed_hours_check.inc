@@ -56,6 +56,7 @@ function sirius_teamsters631_feed_hours_check_info() {
         'error_limit' => 1000,
         'success_limit' => 1000,
       ),
+      'results_echo_input' => TRUE,
     ),
     'callback_launch' => 'sirius_feed_wizard_launch',
     'callback_launch_args' => array('teamsters631_feed_hours_check'),
@@ -270,6 +271,14 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
   $ws_term = taxonomy_term_load($worker_node->field_sirius_work_status['und'][0]['tid']);
   if ($ws_term) { $result['worker_ws'] = $ws_term->name; }
 
+  $employer_node = node_load($employer_nid);
+  $industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
+  foreach ($industry_tids as $industry_tid) {
+    $ms_tid = sirius_worker_ms_by_industry($worker_node, $industry_tid); 
+    if ($ms_tid) { break; }
+  }
+  if ($ms_tid) { $result['worker_ms'] = sirius_term_title($ms_tid); }
+
   if (!$dispatch_node) {
     $result['success'] = FALSE;
     $result['msg'] = 'Not dispatched.';
@@ -289,18 +298,6 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
     if ($job_group_node) {
       $result['job_group_title'] = $job_group_node->title;
     }
-
-    $ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
-    $ms_terms = taxonomy_term_load_multiple($ms_tids);
-    $job_industry_tids = sirius_fieldvals($job_node, 'field_sirius_industry', 'tid');
-    $ms_names = array();
-    if ($ms_terms && $job_industry_tids) {
-      foreach ($ms_terms as $ms_term) {
-        if (!in_array($ms_term->field_sirius_industry['und'][0]['tid'], $job_industry_tids)) { continue; }
-        $ms_names[] = $ms_term->name;
-      }
-    }
-    $result['worker_ms'] = join(' / ', $ms_names);
   }
 
   $result['success'] = TRUE;
