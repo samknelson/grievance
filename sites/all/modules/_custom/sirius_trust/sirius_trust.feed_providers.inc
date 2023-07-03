@@ -46,7 +46,7 @@ function sirius_trust_feed_providers_info() {
       'fields' => array(
         'sirius_id' => array('group' => 'pk', 'type' => 'text',),
 
-        'title' => array('group' => 'core', 'title' => 'Company Name'),
+        'title' => array('group' => 'core', 'title' => 'Full Name', 'description' => 'Name as it should be rendered, i.e. Mokos, Joey, M.D., Ph.D.'),
         'sirius_active' => array('group' => 'core', 'type' => 'list',),
         'sirius_provider_npi' => array('group' => 'core', 'type' => 'text'),
         'sirius_ssn' => array('group' => 'core', 'type' => 'ssn'),
@@ -58,6 +58,7 @@ function sirius_trust_feed_providers_info() {
         'sirius_address_administrative_area' => array('group' => 'contact', 'type' => 'text', 'title' => 'State'),
         'sirius_address_postal_code' => array('group' => 'contact', 'type' => 'text', 'title' => 'Zip'),
         'sirius_address_country' => array('group' => 'contact', 'type' => 'text', 'title' => 'Country'),
+        'sirius_trust_prov_levels' => array('group' => 'core', 'title' => 'Provider Level', 'type' => 'term_reference', 'taxonomy' => 'sirius_trust_provider_level'),
       ),
       'batch_size' => 50,
       'callback_row_verify' => 'sirius_trust_feed_providers_row_verify',
@@ -139,6 +140,7 @@ function sirius_trust_feed_providers_row_verify($feed_node, $info, $data, &$row,
       }
     }
     if ($need_country && !$row['sirius_address_country']) { $row['sirius_address_country'] = 'US'; }
+    if (strlen($row['sirius_address_country']) > 2) { return array('success' => FALSE, 'msg' => 'Please enter a two-digit country code.'); }
   }
 
   if (!$msg) { $msg = "Looks good."; }
@@ -186,9 +188,10 @@ function sirius_trust_feed_providers_row_process($feed_node, $info, $data, $row)
   }
 
   foreach (array('thoroughfare', 'premise', 'locality', 'administrative_area', 'postal_code', 'country') as $col) {
-    if ($row["sirius_address_$col"]) {
-      $node->field_sirius_address['und'][0][$col] = $row["sirius_address_$col"];
-    }
+    $value = $row["sirius_address_$col"];
+    if (!$value) { continue; }
+    if ($col == 'postal_code') { $value = sirius_addr_zip_zeropad($value); }
+    $node->field_sirius_address['und'][0][$col] = $value;
   }
 
   $node = node_submit($node);
