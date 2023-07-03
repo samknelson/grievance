@@ -2,6 +2,8 @@
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.menu.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.policy.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.blocks.inc';
 
 /**
  * Implements hook_sirius_domain_component_info
@@ -22,5 +24,56 @@ function sirius_pcct_sirius_domain_component_info() {
 
 function sirius_pcct_sirius_config_links_alter(&$links) {
   $links['pcct'] = array('title' => 'PCCT');
+
   $links['pcct']['links']['sirius/pcct/config'] = array('title' => 'Config', 'description' => 'Configure Personal Cost Comparison Tool (PCCT) functionality');
+  $links['pcct']['links']['sirius/pcct/config/global'] = array('title' => 'Global Config', 'description' => 'Global settings which apply across all domains');
+}
+
+
+function sirius_pcct_node_access_util($nid, $type) {
+  $node = node_load($nid);
+  if (!$node) {
+    return array('success' => FALSE, 'msg' => 'Not a node.');
+  }
+
+  if ($node->type != $type) {
+    return array('success' => FALSE, 'msg' => "Node is not of type $type.");
+  }
+
+  if ($node->field_sirius_domain['und'][0]['target_id'] != sirius_domain_nid()) {
+    return array('success' => FALSE, 'msg' => "Node is in the wrong domain.");
+  }
+
+  if ($node->field_sirius_active['und'][0]['value'] == 'No') {
+    return array('success' => FALSE, 'msg' => "Node is not active.");
+  }
+
+  return array('success' => TRUE);
+}
+
+/***
+ * Implements hook_sirius_wizard_info()
+ */
+
+function sirius_pcct_sirius_wizard_info() {
+  sirius_require('sirius_pcct', 'sirius_pcct.feed_rates_by_level.inc');
+  sirius_require('sirius_pcct', 'sirius_pcct.feed_rates_by_service.inc');
+
+  $items = array();
+  $items += sirius_pcct_feed_rates_by_level_info();
+  $items += sirius_pcct_feed_rates_by_service_info();
+  return $items;
+}
+
+function sirius_pcct_launch_code_lookup($launch_code) {
+  if (!$launch_code) { return NULL; }
+  $launch_code = strtolower($launch_code);
+
+  $domains = sirius_domain_tree_render_as_select();
+  foreach ($domains as $domain_nid => $ignore) {
+    $probe = sirius_domain_variable_get('sirius_pcct_launch_code', NULL, $domain_nid);
+    if ($probe == $launch_code) { return $domain_nid; }
+  }
+
+  return NULL;
 }

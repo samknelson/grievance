@@ -1,0 +1,98 @@
+.sirius_pcct_policy_wrap {
+	/* 
+	float: right;
+	width: 40%;
+	padding: 20px;
+	margin-left: 20px;
+	*/
+
+	border: 1px solid #999999;
+	background-color: #ffffff;
+	padding: 10px;
+	margin:  10px;
+}
+
+.sirius_pcct_cost_calculation_wrap {
+	border: 1px solid #999999;
+	background-color: #ffffff;
+	padding: 10px;
+	margin:  10px;
+}
+
+.sirius_pcct_cost_calculation_wrap h2.field-label {
+	width: 225px;
+}
+
+#content .sirius_pcct_policy h2 {
+	padding: 0;
+	margin-top: 0;
+	margin-bottom: 20px;
+}
+
+#content .sirius_pcct_policy h3 {
+	padding: 0;
+	margin-top: 0;
+	margin-bottom: 20px;
+}
+
+.sirius_pcct_policy_table {
+	margin-bottom:  20px;
+}
+
+/*
+.sirius_pcct_policy_table, 
+.sirius_pcct_policy_table tr,
+.sirius_pcct_policy_table td,
+.sirius_pcct_policy_table th {
+	border:  1px solid #999999;
+}
+
+.sirius_pcct_policy_table th {
+	border-bottom: 3px solid #aaaaaa;
+}
+
+.sirius_pcct_policy_table tr,
+.sirius_pcct_policy_table td,
+.sirius_pcct_policy_table th {
+	padding: 4px;
+}
+*/
+
+.sirius_pcct_popular_searches_col1 {
+	width: 50%;
+	float: left;
+}
+
+.sirius_pcct_popular_searches_col2 {
+	width: 50%;
+	float: right;
+}
+
+.sirius_pcct_popular_searches ul {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.sirius_pcct_popular_searches {
+	margin-bottom: 20px;
+}
+
+.sirius_pcct_popular_searches::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+
+.sirius_pcct_landing_body select {
+	width: 400px;
+}
+
+.sirius_pcct_landing_body .form-item label {
+	font-size:  150%;
+	font-weight: bold;
+}
+
+.sirius_pcct_landing_body .form-item {
+	display: inline-block;
+}

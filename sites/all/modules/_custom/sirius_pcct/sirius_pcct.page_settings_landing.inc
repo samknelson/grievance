@@ -6,6 +6,14 @@ function sirius_pcct_page_settings_landing() {
 
 function sirius_pcct_page_settings_landing_form($form, &$form_state) {
 	$form['#tree'] = TRUE;
+
+	$form['settings']['sirius_pcct_popular_searches'] = array(
+		'#title' => t('Popular Searches'),
+		'#type' => 'textarea',
+		'#default_value' => sirius_domain_variable_get('sirius_pcct_popular_searches'),
+		'#description' => t('Enter the popular searches that should appear on the landing page, one per line.'),
+	);
+
 	$form['settings']['sirius_pcct_landing_header'] = array(
 		'#title' => t('Landing Page Header'),
 		'#type' => 'text_format',
