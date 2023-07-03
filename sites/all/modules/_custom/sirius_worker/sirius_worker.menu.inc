@@ -11,7 +11,7 @@ function sirius_worker_node_tabs() {
 	$node_tabs = array();
 
   $node_tabs['sirius_worker']['sirius_worker_status'] = array(
-    'title' => 'Status',
+    'title' => 'Industries',
     'callback' => 'sirius_node_tab_worker_status',
     'permissions' => array('sirius'),
     'file' => 'sirius_worker.page_status.inc',
