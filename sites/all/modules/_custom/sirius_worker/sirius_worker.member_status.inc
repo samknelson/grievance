@@ -275,3 +275,13 @@ function sirius_worker_member_status_history_callback(&$parent_node, $history) {
     $worker_node->field_sirius_industry['und'][] = array('tid' => $industry_tid);
   }
 }
+
+function sirius_worker_ms_by_industry($worker_node, $industry_tid) {
+  $member_status_map = sirius_worker_member_status_industry_map();
+  $ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+  foreach ($ms_tids as $ms_tid) {
+    if (in_array($industry_tid, $member_status_map[$ms_tid])) {
+      return $ms_tid;
+    }
+  }
+}
