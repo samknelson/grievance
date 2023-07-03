@@ -1404,7 +1404,7 @@ function grievance_content_types_uuid_features_default_content() {
   'field_sirius_summary' => array(
     'und' => array(
       0 => array(
-        'value' => '<p>The classification is a custom field defined <a href="/sirius/contact/definition">here.</a> The rates for each classification are defined <a href="/bac1/iu-classification-rates">here.</a></p>
+        'value' => '<p>The classification is a custom field defined <a href="/sirius/contact/definition">here.</a>&nbsp; The rates for each classification are defined <a href="/bac1/iu-classification-rates">here.</a></p>
 ',
         'format' => 'full_html',
       ),
@@ -9352,6 +9352,96 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2021-03-29 06:08:01 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'TFA - Re-authenticate',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1687869646,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'cad7ba1e-35a7-4d44-abac-a7c802d04322',
+  'body' => array(),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/tfa/reauthenticate',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>In order to access sensitive pages such as your account page, you must re-enter your current password.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2023-06-27 05:40:46 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
