@@ -10,6 +10,9 @@
 
 	  	function sirius_map_form_failure(error) {
 	  		$('#sirius_map_current_location_err').val(error.message).trigger('change');
+	  		$('#sirius_map_current_location_lat').trigger('change');
+	  		$('#sirius_map_current_location_lon').trigger('change');
+				$('#sirius_map_current_location_ts').trigger('change');
 	  	}
 
 	  	navigator.geolocation.getCurrentPosition(sirius_map_form_success, sirius_map_form_failure);
