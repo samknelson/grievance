@@ -31,3 +31,53 @@ function sirius_dob_format($dob) {
 	$ts = strtotime($dob);
 	return date('m/d/Y') . ' (' . format_interval(time() - $ts, 1) . ')';
 }
+
+function sirius_date_yearmonth_widget($params) {
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/form.css');
+
+	$form = array(
+		'#type' => 'container',
+		'#title' => t('Month'),
+		'#attributes' => array('class' => array('sirius_form_inline_field_collection')),
+		'#tree' => TRUE,
+	);
+
+	$default_year = $params['default_year'];
+	if (!$default_year) { $default_year = date('Y'); }
+	$year_options = array();
+	for ($i=$default_year-10; $i<=$default_year+1; ++$i) {
+		$year_options[$i] = $i;
+	}
+	$form['year'] = array(
+		'#type' => 'select',
+		'#options' => $year_options,
+		'#default_value' => $default_year,
+		'#title' => t('Year'),
+	);
+
+	$month_options = array(
+		1 => t('January'),
+		2 => t('February'),
+		3 => t('March'),
+		4 => t('April'),
+		5 => t('May'),
+		6 => t('June'),
+		7 => t('July'),
+		8 => t('August'),
+		9 => t('September'),
+		10 => t('October'),
+		11 => t('November'),
+		12 => t('December'),
+	);
+
+	$default_month = $params['default_month'];
+	if (!$default_month) { $default_month = date('n'); }
+	$form['month'] = array(
+		'#type' => 'select',
+		'#options' => $month_options,
+		'#default_value' => $default_month,
+		'#title' => t('Month'),
+	);
+
+	return $form;
+}

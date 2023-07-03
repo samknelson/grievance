@@ -10,7 +10,7 @@
 function sirius_node_tabs() {
   $node_tabs = array();
 
-  $content_types = array('sirius_event', 'sirius_worker', 'grievance_shop', 'sirius_ledger_account', 'sirius_contact_relationship', 'sirius_dispatch_job_group');
+  $content_types = array('sirius_event', 'sirius_worker', 'grievance_shop', 'sirius_ledger_account', 'sirius_contact_relationship', 'sirius_dispatch_job_group', 'sirius_log');
   foreach ($content_types as $content_type) {
     $node_tabs[$content_type][$content_type . '_materials'] = array(
       'title' => 'Materials',
@@ -19,6 +19,9 @@ function sirius_node_tabs() {
       'permissions' => array('sirius'),
       'weight' => 20,
     );
+    if ($content_type == 'sirius_log') {
+      $node_tabs[$content_type][$content_type . '_materials']['skip_node_view_check'] = TRUE;
+    }
   }
 
   $content_types = array('sirius_json_definition');
@@ -122,6 +125,28 @@ function sirius_node_tabs() {
       'type' => MENU_LOCAL_TASK,
     );
   }
+
+  $node_tabs['sirius_log']['sirius_log_customfield_multiple_edit'] = array(
+    'title' => 'Form',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_customfield_multiple_edit',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'file' => 'sirius.page_entity_customfield_multiple_edit.inc',
+    'type' => MENU_LOCAL_TASK,
+    'skip_node_view_check' => TRUE,
+  );
+
+  $node_tabs['sirius_log']['sirius_log_customfield_multiple_status'] = array(
+    'title' => 'Status',
+    'description' => '',
+    'callback' => 'sirius_node_tab_entity_customfield_multiple_status',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'file' => 'sirius.page_entity_customfield_multiple_status.inc',
+    'type' => MENU_LOCAL_TASK,
+    'skip_node_view_check' => TRUE,
+  );
 
   // 
   // Entity Log
@@ -316,24 +341,32 @@ function sirius_node_tabs() {
   );
 
   $node_tabs['sirius_json_definition']['sirius_customfield_tab'] = array(
-    'title' => 'Single-Value Tab',
+    'title' => 'Tab',
     'description' => '',
     'callback' => 'sirius_node_tab_customfield_tab',
     'permissions' => array('sirius domain admin'),
-    'weight' => 2,
+    'weight' => 3,
     'file' => 'sirius.page_customfield_tab.inc',
   );
 
-  /*
-  $node_tabs['sirius_json_definition']['sirius_customfield_log'] = array(
-    'title' => 'Multi-Value Tab',
+  $node_tabs['sirius_json_definition']['sirius_customfield_tab_accesssettings'] = array(
+    'title' => 'Access Settings',
     'description' => '',
-    'callback' => 'sirius_node_tab_customfield_log',
+    'callback' => 'sirius_node_tab_customfield_accesssettings',
     'permissions' => array('sirius domain admin'),
-    'weight' => 3,
-    'file' => 'sirius.page_customfield_log.inc',
+    'weight' => 4,
+    'file' => 'sirius.page_customfield_tab_accesssettings.inc',
   );
-  */
+
+  $node_tabs['sirius_json_definition']['sirius_customfield_multiple_list'] = array(
+    'title' => 'List',
+    'description' => '',
+    'callback' => 'sirius_node_tab_customfield_multiple_list',
+    'permissions' => array('sirius'),
+    'weight' => 4,
+    'file' => 'sirius.page_customfield_multiple_list.inc',
+    'skip_node_view_check' => TRUE,
+  );
 
   $node_tabs['sirius_phonenumber']['sirius_phonenumber_info'] = array(
     'title' => 'Info',

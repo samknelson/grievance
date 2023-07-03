@@ -36,9 +36,16 @@ function sirius_worker_member_status_check($worker_node, $member_status_term) {
   return FALSE;
 }
 
-function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reason, $attachments = NULL) {
+function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reason, $attachments = NULL, $ts = NULL) {
+  $history_key = 'worker:member_status';
+  if (!$ts) { $ts = time(); }
+
+  $args = array($worker_node, $new_ms_term, $tf, $reason, $attachments, $ts);
+  drupal_alter('sirius_worker_member_status_set', $args);
+
   // Get my current MS
-  $my_ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+  // $my_ms_tids = sirius_worker_history_asof($worker_node, $history_key, $ts);
+  if ($my_ms_tids === NULL) { $my_ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid'); }
 
   // Don't add duplicates or remove nonexistent
   $new_ms_tid = $new_ms_term->tid;
@@ -46,15 +53,7 @@ function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reaso
   if (!$tf && !in_array($new_ms_tid, $my_ms_tids)) { return array('success' => TRUE, 'msg' => 'The worker did not have this member status.'); }
 
   // Build a map fom industry to ms
-  static $industry_ms_map;
-  if (!$industry_ms_map) {
-    $industry_terms = sirius_taxonomy_load('sirius_industry', 'tid', 'full');
-    $ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
-    $industry_ms_map = array();
-    foreach ($ms_terms as $ms_tid => $ms_term) {
-      $industry_ms_map[$ms_tid] = sirius_fieldvals($ms_term, 'field_sirius_industry', 'tid');
-    }
-  }
+  $industry_ms_map = sirius_worker_member_status_industry_map();
   $new_industry_tids = $industry_ms_map[$new_ms_tid];
   $clear_ms_tids = array();
 
@@ -88,11 +87,11 @@ function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reaso
 
   // Dedupe
   $my_ms_tids = array_unique($my_ms_tids);
+
+  // @todo: This SHOULD BE unnecessary, because it will be computed from the history. But I'm saving here just in case.
   $value = array();
   foreach ($my_ms_tids as $ms_tid) { $value[] = array('tid' => $ms_tid); }
   $worker_node->field_sirius_member_status['und'] = $value;
-
-  // Fix industries
   $industry_tids = array();
   foreach ($my_ms_tids as $ms_tid) {
     foreach ($industry_ms_map[$ms_tid] as $industry_tid) {
@@ -103,15 +102,21 @@ function sirius_worker_member_status_set($worker_node, $new_ms_term, $tf, $reaso
   foreach ($industry_tids as $industry_tid => $ignore) {
     $worker_node->field_sirius_industry['und'][] = array('tid' => $industry_tid);
   }
+  try {
+    node_save($worker_node);
+  } catch (exception $e) {
+    return array('success' => FALSE, 'msg' => "Save failed: " . $e->getMessage());
+  }
 
-  node_save($worker_node);
+  $json = array();
+  $json['change']['new_value'] = $my_ms_tids;
+  $json['change']['ts'] = $ts;
 
-  $category = 'worker:member_status';
   if ($tf) { $type = 'set'; } else { $type = 'clear'; }
   $summary = $reason;
   $notes = $new_ms_tid;
   $handler_nids = array($worker_node->nid);
-  sirius_log($category, $type, $msg, $summary, $notes, $handler_nids, $attachments);
+  sirius_log($history_key, $type, $msg, $summary, $notes, $handler_nids, $attachments, $json);
 
   // Send notifications
   $notify_ms_tids = $clear_ms_tids;
@@ -157,7 +162,7 @@ function sirius_worker_render_industries($worker_node, $options = array()) {
     $industry_member_status_map[$member_status_tid] = $industry_tid;
   }
 
-  $my_member_status_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+  $my_ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
   $rows = array();
   foreach ($industry_terms as $industry_tid => $industry_term) {
     $row = array();
@@ -165,7 +170,7 @@ function sirius_worker_render_industries($worker_node, $options = array()) {
 
     $str = '';
     $str2 = '';
-    if ($my_member_status_tids) {
+    if ($my_ms_tids) {
 
       $job_node = new stdClass();
       $job_node->title = "Dummy";
@@ -181,7 +186,7 @@ function sirius_worker_render_industries($worker_node, $options = array()) {
       $job_node->field_sirius_datetime_created['und'][0]['value'] = date('Y-m-d H:i:s');
       $job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Pending';
 
-      foreach ($my_member_status_tids as $member_status_tid) {
+      foreach ($my_ms_tids as $member_status_tid) {
         if ($industry_tid == $industry_member_status_map[$member_status_tid]) {
           if ($str) { $str .= ' / '; }
           if ($str2) { $str2 .= ' / '; }
@@ -234,4 +239,49 @@ function sirius_worker_render_industries($worker_node, $options = array()) {
   }
 
   return $html;
+}
+
+
+function sirius_worker_member_status_industry_map() {
+  $industry_ms_map = &drupal_static(__FUNCTION__);
+
+  if (!isset($industry_ms_map)) {
+    $industry_terms = sirius_taxonomy_load('sirius_industry', 'tid', 'full');
+    $ms_terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+    $industry_ms_map = array();
+    foreach ($ms_terms as $ms_tid => $ms_term) {
+      $industry_ms_map[$ms_tid] = sirius_fieldvals($ms_term, 'field_sirius_industry', 'tid');
+    }
+  }
+
+  return $industry_ms_map;
+}
+
+function sirius_worker_member_status_history_callback(&$parent_node, $history) {
+  $industry_ms_map = sirius_worker_member_status_industry_map();
+  $my_ms_tids = $history['last']['new_value'];
+  if (!$my_ms_tids) { $my_ms_tids = array(); }
+  $value = array();
+  foreach ($my_ms_tids as $ms_tid) { $value[] = array('tid' => $ms_tid); }
+  $worker_node->field_sirius_member_status['und'] = $value;
+  $industry_tids = array();
+  foreach ($my_ms_tids as $ms_tid) {
+    foreach ($industry_ms_map[$ms_tid] as $industry_tid) {
+      $industry_tids[$industry_tid] = TRUE;
+    }
+  }
+  $worker_node->field_sirius_industry = array();
+  foreach ($industry_tids as $industry_tid => $ignore) {
+    $worker_node->field_sirius_industry['und'][] = array('tid' => $industry_tid);
+  }
+}
+
+function sirius_worker_ms_by_industry($worker_node, $industry_tid) {
+  $member_status_map = sirius_worker_member_status_industry_map();
+  $ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
+  foreach ($ms_tids as $ms_tid) {
+    if (in_array($industry_tid, $member_status_map[$ms_tid])) {
+      return $ms_tid;
+    }
+  }
 }

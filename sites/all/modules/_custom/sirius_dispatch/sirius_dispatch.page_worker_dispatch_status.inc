@@ -71,7 +71,7 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 				if ($json['dispatch']['keep_seniority'] == 'Yes') {
 					$prefix .= t(' Because the "keep seniority" flag is set, if the sign in, they will keep their previous seniority.');
 				} else {
-					$prefix .= t(' By default, if they sign in now, their availability date will be reset to today\'s date and they will lose their seniority.');
+					$prefix .= t(' By default, if they sign in now, their seniority date will be reset to today\'s date and they will lose their seniority.');
 				}
 			}
 			$prefix .= '</div>';
@@ -79,13 +79,13 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 
 		$form['set_availdate'] = array(
 			'#type' => 'checkbox',
-			'#title' => t('Manually set the worker\'s availability date'),
+			'#title' => t('Manually set the worker\'s seniority date'),
 			'#prefix' => $prefix,
 		);
 
 		$form['availdate'] = array(
 			'#type' => 'date_popup',
-			'#title' => t('Available As Of'),
+			'#title' => t('Seniority As Of'),
 			'#states' => array(
 				'visible' => array(
 					array(':input[name="set_availdate"]' => array('checked' => TRUE)),
@@ -159,7 +159,7 @@ function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state)
 			$newdate = gmdate('Y-m-d H:i:s', strtotime($form_state['values']['availdate']));
 			$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $newdate;
 			node_save($worker_node);
-			sirius_log('worker:availdate', 'set', "Set worker's availability date to $newdate", $reason, '', array($worker_node->nid));
+			sirius_log('worker:availdate', 'set', "Set worker's seniority date to $newdate", $reason, '', array($worker_node->nid));
 		}
 
 		$block_tid = $form_state['values']['sib'];

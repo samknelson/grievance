@@ -382,13 +382,18 @@ function grievance_content_types_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'sirius_log';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'custom_fields' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'author' => array(
-      'weight' => '8',
+      'weight' => '9',
       'label' => 'inline',
       'format' => 'author',
     ),
     'post_date' => array(
-      'weight' => '7',
+      'weight' => '8',
       'label' => 'inline',
       'format' => 'ds_post_date_long',
     ),
@@ -483,7 +488,8 @@ function grievance_content_types_ds_custom_fields_info() {
   $ds_field->entities = array(
     'node' => 'node',
   );
-  $ds_field->ui_limit = 'sirius_worker|default
+  $ds_field->ui_limit = 'sirius_log|default
+sirius_worker|default
 grievance|default';
   $ds_field->properties = array(
     'code' => array(
@@ -1939,19 +1945,21 @@ function grievance_content_types_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'field_sirius_log_handler',
-        1 => 'field_sirius_category',
-        2 => 'field_sirius_type',
-        3 => 'field_sirius_message',
-        4 => 'field_sirius_notes',
-        5 => 'field_sirius_summary',
-        6 => 'field_sirius_attachments',
-        7 => 'post_date',
-        8 => 'author',
-        9 => 'field_sirius_domain',
+        0 => 'custom_fields',
+        1 => 'field_sirius_log_handler',
+        2 => 'field_sirius_category',
+        3 => 'field_sirius_type',
+        4 => 'field_sirius_message',
+        5 => 'field_sirius_notes',
+        6 => 'field_sirius_summary',
+        7 => 'field_sirius_attachments',
+        8 => 'post_date',
+        9 => 'author',
+        10 => 'field_sirius_domain',
       ),
     ),
     'fields' => array(
+      'custom_fields' => 'ds_content',
       'field_sirius_log_handler' => 'ds_content',
       'field_sirius_category' => 'ds_content',
       'field_sirius_type' => 'ds_content',

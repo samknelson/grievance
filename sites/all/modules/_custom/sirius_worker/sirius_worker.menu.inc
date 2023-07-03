@@ -10,24 +10,76 @@
 function sirius_worker_node_tabs() {
 	$node_tabs = array();
 
-  $node_tabs['sirius_worker']['sirius_worker_work_status'] = array(
-    'title' => 'Work Status',
-    'callback' => 'sirius_node_tab_worker_work_status',
+  $node_tabs['sirius_worker']['sirius_worker_status'] = array(
+    'title' => 'Industries',
+    'callback' => 'sirius_node_tab_worker_status',
     'permissions' => array('sirius'),
+    'file' => 'sirius_worker.page_status.inc',
+    'weight' => 0,
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_work_status/ws'] = array(
+  $node_tabs['sirius_worker']['sirius_worker_status/view'] = array(
+    'title' => 'View',
+    'callback' => 'sirius_node_tab_worker_status',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_worker.page_status.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+
+  $node_tabs['sirius_worker']['sirius_worker_status/ws'] = array(
     'title' => 'Work Status',
     'callback' => 'sirius_node_tab_worker_work_status',
-    'permissions' => array('sirius'),
-    'weight' => 1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'permissions' => array('sirius worker admin'),
+    'weight' => 2,
   );
+
+  $node_tabs['sirius_worker']['sirius_worker_status/ws_history'] = array(
+    'title' => 'Work Status History',
+    'callback' => 'sirius_node_tab_worker_work_status_history',
+    'permissions' => array('sirius worker admin'),
+    'file' => 'sirius_worker.page_work_status_history.inc',
+    'weight' => 3,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_status/ms'] = array(
+    'title' => 'Member Status',
+    'callback' => 'sirius_node_tab_worker_industry',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 4,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_status/ms_history'] = array(
+    'title' => 'Member Status History',
+    'callback' => 'sirius_node_tab_worker_industry_history',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 2,
+    'file' => 'sirius_worker.page_industry_history.inc',
+    'weight' => 5,
+  );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   $node_tabs['sirius_worker']['sirius_worker_schedule'] = array(
     'title' => 'Schedule',
     'callback' => 'sirius_worker_node_tab_schedule',
     'permissions' => array('sirius'),
+    'component' => 'worker:schedule',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_schedule/overview'] = array(
@@ -36,6 +88,7 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
+    'component' => 'worker:schedule',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_schedule/tor'] = array(
@@ -44,6 +97,7 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
     'weight' => 2,
     'file' => 'sirius_worker.page_schedule_tor_worker_list.inc',
+    'component' => 'worker:schedule',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_schedule/tor/add'] = array(
@@ -52,6 +106,7 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
     'weight' => 2,
     'file' => 'sirius_worker.page_schedule_tor_add.inc',
+    'component' => 'worker:schedule',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_skill'] = array(
@@ -59,6 +114,7 @@ function sirius_worker_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_worker_skill',
     'permissions' => array('sirius'),
+    'component' => 'worker:skill',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_skill/view'] = array(
@@ -67,6 +123,7 @@ function sirius_worker_node_tabs() {
     'callback' => 'sirius_node_tab_worker_skill_view',
     'permissions' => array('sirius'),
     'weight' => 1,
+    'component' => 'worker:skill',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_skill/add'] = array(
@@ -75,6 +132,7 @@ function sirius_worker_node_tabs() {
     'callback' => 'sirius_node_tab_worker_skill_add',
     'permissions' => array('sirius dispatch staff'),
     'weight' => 2,
+    'component' => 'worker:skill',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_skill/add2'] = array(
@@ -83,6 +141,7 @@ function sirius_worker_node_tabs() {
     'callback' => 'sirius_node_tab_worker_skill_add2',
     'permissions' => array('sirius dispatch staff'),
     'weight' => 3,
+    'component' => 'worker:skill',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_skill/renew'] = array(
@@ -91,6 +150,7 @@ function sirius_worker_node_tabs() {
     'callback' => 'sirius_node_tab_worker_skill_renew',
     'permissions' => array('sirius dispatch staff'),
     'weight' => 4,
+    'component' => 'worker:skill',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_skill/remove'] = array(
@@ -99,6 +159,7 @@ function sirius_worker_node_tabs() {
     'callback' => 'sirius_node_tab_worker_skill_remove',
     'permissions' => array('sirius dispatch staff'),
     'weight' => 5,
+    'component' => 'worker:skill',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_contact'] = array(
@@ -106,6 +167,7 @@ function sirius_worker_node_tabs() {
     'description' => '',
     'callback' => 'sirius_node_tab_worker_contact',
     'permissions' => array('sirius'),
+    'rnode' => TRUE,
   );
 
   $node_tabs['sirius_worker']['sirius_worker_contact/contact'] = array(
@@ -115,6 +177,17 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
+    'rnode' => TRUE,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_contact/phone'] = array(
+    'title' => 'Phone',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_contact_phone',
+    'file' => 'sirius_worker.page_contact_phone.inc',
+    'permissions' => array('sirius'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
   );
 
   $node_tabs['sirius_worker']['sirius_worker_contact/user'] = array(
@@ -141,31 +214,45 @@ function sirius_worker_node_tabs() {
     'weight' => 4
   );
 
-  $node_tabs['sirius_worker']['sirius_worker_industry/ms'] = array(
-    'title' => 'Industries',
-    'description' => '',
-    'callback' => 'sirius_node_tab_worker_industry',
-    'permissions' => array('sirius'),
-    'weight' => 1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  $node_tabs['sirius_worker']['sirius_worker_industry'] = array(
-    'title' => 'Industries',
-    'description' => '',
-    'callback' => 'sirius_node_tab_worker_industry',
-    'permissions' => array('sirius'),
-  );
-
   $node_tabs['sirius_worker']['sirius_worker_grievances'] = array(
     'title' => 'Grievances',
     'description' => '',
     'callback' => 'sirius_node_tab_worker_grievances',
     'permissions' => array('grievance view'),
     'file' => 'sirius_worker.page_grievances.inc',
+    'rnode' => TRUE,
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_relationships'] = array(
+    'title' => 'Relationships',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_relationships',
+    'permissions' => array('sirius worker view'),
+    'file' => 'sirius_worker.page_relationships.inc',
+    'component' => 'contact:relationships',
+    'rnode' => TRUE,
+  );
 
+  $node_tabs['sirius_worker']['sirius_worker_relationships/list'] = array(
+    'title' => 'List',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_relationships',
+    'permissions' => array('sirius worker view'),
+    'file' => 'sirius_worker.page_relationships.inc',
+    'component' => 'contact:relationships',
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_relationships/add'] = array(
+    'title' => 'Add',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_relationship_add',
+    'permissions' => array('sirius worker admin'),
+    'file' => 'sirius_worker.page_relationship_add.inc',
+    'component' => 'contact:relationships',
+    'weight' => 2,
+  );
 
   $node_tabs['sirius_log']['sirius_worker_schedule_tor'] = array(
     'title' => 'Time-Off',
@@ -194,6 +281,15 @@ function sirius_worker_node_tabs() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
   );
+
+  $node_tabs['sirius_log']['sirius_log_history'] = array(
+    'title' => 'Manage',
+    'callback' => 'sirius_node_tab_worker_log_history',
+    'permissions' => array('sirius worker admin'),
+    'weight' => 2,
+    'file' => 'sirius_worker.page_log_history.inc',
+  );
+  
 
   sirius_node_tab_set_module('sirius_worker', $node_tabs);
 	return $node_tabs;
@@ -236,6 +332,26 @@ function sirius_worker_term_tabs() {
     'file' => 'sirius_worker.term_tab_tor_settings.inc',
     'weight' => 1,
   );
+
+  $term_tabs['sirius_worker_tor_type']['sirius_worker_tor_type_statuses'] = array(
+    'title' => 'Statuses',
+    'description' => '',
+    'callback' => 'sirius_worker_term_tab_tor_statuses',
+    'permissions' => array('sirius worker admin'),
+    'file' => 'sirius_worker.term_tab_tor_statuses.inc',
+    'weight' => 1,
+  );
+
+  /*
+  $term_tabs['sirius_worker_tor_type']['sirius_worker_tor_type_worker_notifications'] = array(
+    'title' => 'Worker Notifications',
+    'description' => '',
+    'callback' => 'sirius_worker_term_tab_tor_worker_notifications',
+    'permissions' => array('sirius worker admin'),
+    'file' => 'sirius_worker.term_tab_tor_worker_notifications.inc',
+    'weight' => 2,
+  );
+  */
 
   sirius_node_tab_set_module('sirius_worker', $term_tabs);
 
@@ -420,6 +536,17 @@ $items['sirius/skill/settings'] = array(
     'access arguments' => array('sirius worker admin'),
     'page callback' => 'sirius_worker_page_search_by_phone_carrier',
     'file' => 'sirius_worker.page_search_by_phone_carrier.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+
+  $items['sirius/worker/proxy/%'] = array(
+    'title' => 'Proxy Worker',
+    'page callback' => 'sirius_worker_page_proxy_view',
+    'page arguments' => array(3),
+    'access callback' => 'sirius_page_access_wrap',
+    'access arguments' => array('sirius_worker', 'sirius_worker.page_proxy_view.inc', 'sirius_worker_page_proxy_view_access', 3),
+    'file' => 'sirius_worker.page_proxy_view.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 

@@ -44,8 +44,9 @@ a.tool-button {
 	text-align: center;
 }
 a.tool-button:hover {
-	color: #1b4784;
+	color: #000000;
 	border-color: #1b4784;
+	background-color: #ffbb99;
 }
 
 .block a.action-button,

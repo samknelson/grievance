@@ -223,7 +223,7 @@ function sirius_dispatch_page_jwa_assign_form_submit($form, &$form_state) {
 		$result = sirius_dispatch_notify($dispatch_node);
 		if (!$result['success']) { 
 			drupal_set_message(t('Notification failed for @worker_name to @job_name: @msg', array('@worker_name' => $worker_name, '@job_name' => $job_node->title, '@msg' => $result['msg'])), 'warning');
-			$result = sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, array('cbn' => 'Yes', 'ignore_redispatch' => TRUE));
+			$result = sirius_dispatch_elig_explain($job_node, $worker_nid, array('cbn' => 'Yes', 'ignore_redispatch' => TRUE));
 			if (!$result['success']) {
 				drupal_set_message($result['msg'], 'warning');
 			}

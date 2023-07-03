@@ -20,3 +20,23 @@
 	display: inline-block;
 	padding-right: 10px;
 }
+
+.sirius_form_inline label {
+	float: left;
+	display: inline-block;
+	width: 100px;
+	font-weight: bold;
+}
+
+.sirius_form_inline .form-item {
+	clear: left;
+}
+
+.sirius_form_inline .container-inline-date .form-item .form-item {
+	clear: none;
+}
+
+.sirius_form_inline_field_collection .form-item {
+	float: left;
+	margin-right: 10px;
+}

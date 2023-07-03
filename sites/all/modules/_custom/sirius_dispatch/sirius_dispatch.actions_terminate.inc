@@ -32,6 +32,11 @@ function sirius_dispatch_terminate($dispatch_node, $notes = '') {
 		}
 	}
 
+	// Set the "end" timestamp. 
+	if (!$dispatch_node->field_sirius_date_end['und'][0]['value']) {
+		$dispatch_node->field_sirius_date_end['und'][0]['value'] = date('Y-m-d');
+	}
+
 	// Set the dispatch status to "terminated", save and log
 	$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = 'terminated';
 	node_save($dispatch_node);

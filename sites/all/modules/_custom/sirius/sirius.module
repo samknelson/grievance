@@ -1,6 +1,8 @@
 <?php
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Singleton.php';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.access.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.inc';
@@ -1058,7 +1060,8 @@ function sirius_ajax_generic_replace($form, $form_state) {
  * Just a stupid wrapper around number_format() that doesn't throw an error when it's not passed a number.
  */
 
-function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $thousands_separator = ",") {
+function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $thousands_separator = ",", $output = 'page') {
+  if ($output == 'csv') { return $str; }
   if (!is_numeric($str)) { return $str; }
   if (is_numeric($str)) { return number_format($str, $decimals, $decimal_separator, $thousands_separator); }
 }
@@ -1090,11 +1093,20 @@ function sirius_content_type_name($machine_name) {
       if ($name == 'Shop') { $name = 'Employer'; }
       $lookup[$hr['type']] = $name;
     }
+
+    $lookup['sirius_dispatch_job_group'] = 'Show / Job Group';
   }
 
   if (!$lookup[$machine_name]) { $lookup[$machine_name] = $machine_name; }
   
   return $lookup[$machine_name];
+}
+
+function sirius_module_friendly_name($module) {
+  $module_info = system_get_info('module', $module);
+  $module_name = $module_info['name'];
+  $module_name = preg_replace("/Sirius /", '', $module_name);
+  return $module_name;
 }
 
 function sirius_node_title($nid) {
@@ -1221,4 +1233,9 @@ function _sirius_form_prep_recursive(&$form, $defaults = array(), $settings = ar
 function sirius_page_error($msg) {
   drupal_set_message($msg, 'error');
   return '';
+}
+
+function sirius_tool_link($path, $label) {
+  if (!drupal_valid_path($path)) { return ''; }
+  return l($label, $path, array('attributes' => array('class' => array('tool-button'))));
 }

@@ -11,6 +11,8 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/r
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_generate.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_instances.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_auto.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_preview.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_render.inc";
 
 function report_cache_info_all() {
 	$info_all = &drupal_static(__FUNCTION__, NULL);
@@ -153,4 +155,43 @@ function report_cache_most_recent($report_type, $instance_uuid = NULL) {
 	$stmt = db_query($sql, $sql_args);
 	$hr = $stmt->fetchAssoc();
 	return $hr['report_id'];
+}
+
+class Report_Cache_Report_Generator {
+  // Reports are singletons. Use My_Report::getInstance()->whatever()
+  protected static $instance = array();
+  protected function __construct() { }
+  final private function __clone() { }
+
+  final public static function getInstance() {
+  	$class = get_called_class();
+    if (!isset(static::$instance[$class])) { static::$instance[$class] = new static(); }
+    return static::$instance[$class];
+  }
+
+  public function info($result = array()) {
+    $result['generator'] = $this;
+    $result['fields'] = $this->fields();
+    return $result;
+  }
+
+  public function fields() {
+    return array();
+  }
+
+  public function pks(&$form_state) {
+    return array();
+  }
+
+  public function batch($pks, $values, &$context) {
+    return array();
+  }
+
+  public function render_parameters($parameters) {
+    return '';
+  }
+
+  public function setInfo(&$items) {
+    $items[$this->type] = $this->info();
+  }
 }

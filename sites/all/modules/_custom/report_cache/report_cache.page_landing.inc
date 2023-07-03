@@ -48,6 +48,7 @@ function report_cache_page_landing($module = NULL) {
 		$row = array();
 		if (!$module) { $row[] = $module_name; }
 		$row[] = $name;
+		if (user_access("sirius admin")) { $row[] = $report_type_info['access']; }
 		$row[] = $tools;
 		$rows[] = $row;
 	}
@@ -55,6 +56,7 @@ function report_cache_page_landing($module = NULL) {
 	$header = array();
 	if (!$module) { $header[] = t('Module'); }
 	$header[] = t('Report Type');
+	if (user_access('sirius admin')) { $header[] = t('Permission'); }
 	$header[] = t('Tools');
 	$result .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
 	return $result;

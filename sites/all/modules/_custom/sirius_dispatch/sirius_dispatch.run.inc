@@ -30,37 +30,45 @@ function sirius_dispatch_run_all() {
 }
 
 function sirius_dispatch_run($job_node) {
+  $info = array();
+
   // Close jobs after the report date
   $result = sirius_dispatch_run_check_report_date($job_node);
   if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Running task [Check report date]: " . $result['msg']; }
 
 	// Expire dispatches
 	$result = sirius_dispatch_run_expire($job_node);
 	if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Running task [Expire dispatches]: " . $result['msg']; }
 
 	// Create dispatches
 	$result = sirius_dispatch_run_create_dispatches($job_node);
 	if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Running task [Create dispatches]: " . $result['msg']; }
 
 	// Send notifications
 	$result = sirius_dispatch_run_notify($job_node);
 	if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Running task [Notify]: " . $result['msg']; }
 
 	// Are we filled?
-	sirius_dispatch_run_finalize($job_node);
+	$result = sirius_dispatch_run_finalize($job_node);
+  if (!$result['success']) { return $result; }
+  if ($result['msg']) { $info[] = "Running task [Finalize]: " . $result['msg']; }
 
 	// Log the end
   if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
     sirius_log('job:run', 'poll', 'complete', '', '', array($job_node->nid));
   }
 
-	return array('success' => TRUE);
+	return array('success' => TRUE, 'info' => $info);
 }
 
 function sirius_dispatch_run_check_report_date($job_node) {
   $report_ts = sirius_date_ts($job_node, 'field_sirius_datetime');
 
-  if ($report_ts >= time()) { return array('success' => TRUE, 'msg' => 'Report date has not yet passed.'); }
+  if ($report_ts >= time()) { return array('success' => TRUE, 'msg' => 'It is not necessary to close the job, because the report date has not yet passed.'); }
 
   $job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Filled';
   $job_node->field_sirius_summary['und'][0]['value'] = 'Closing because report date passed on ' . date('c');
@@ -101,7 +109,7 @@ function sirius_dispatch_run_finalize($job_node) {
 
   if ($count_we_have < $count_we_need) {
   	// do nothing
-  	return;
+  	return array('success' => TRUE, 'msg' => "The job is not ready to finalize, because we have $count_we_have accepted dispatches and need $count_we_need.");
   }
 
   if ($count_we_have > $count_we_need) {
@@ -117,7 +125,10 @@ function sirius_dispatch_run_finalize($job_node) {
     if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
       sirius_log('job:run', 'complete', "There are $count_we_have dispatches with status accepted. This job is filled.", '', '', array($job_node->nid));
     }
+    return array('success' => TRUE, 'msg' => "Job status was set to Filled.");
   }
+
+  return array('success' => TRUE, 'msg' => "Unreachable code.");
 }
 
 function sirius_dispatch_run_notify($job_node) {
@@ -179,7 +190,7 @@ function sirius_dispatch_run_create_dispatches($job_node) {
     if (variable_get('sirius_dispatch_log_level', '') == 'debug') {
       sirius_log('job:run', 'create_dispatches', 'Dispatches are not created for call-by-names.', '', '', array($job_node->nid));
     }
-    return array('success' => TRUE, 'msg' => 'Dispatches are not created for call-by-names.');
+    return array('success' => TRUE, 'msg' => 'New dispatches are not created for call-by-names. (They are generally created at the time that the job is created.)');
   }
 
 	// How many do we need?
@@ -230,11 +241,11 @@ function sirius_dispatch_run_create_dispatches($job_node) {
   if ($count_to_create > $batch_max) { $count_to_create = $batch_max; }
   if ($count_to_create < $batch_min) { $count_to_create = $batch_min; }
   if ($count_to_create >= 1) {
-  	$workers = sirius_dispatch_job_get_dispatchable_workers(
+  	$workers = sirius_dispatch_elig_fetch(
       $job_node, 
       'dispatch', 
       $count_to_create,
-      array('cbn' => 'No')
+      array('cbn' => 'No', 'set_eligibility_cache' => TRUE)
     );
 
   	// Create all

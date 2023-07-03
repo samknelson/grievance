@@ -306,7 +306,7 @@ function sirius_esignature_entity_status($entity_node) {
 	}
 	else { 
 		$status = "signed";
-		$status_msg = "Fully signed - $$count signatures complete";
+		$status_msg = "Fully signed - $count signatures complete";
 	}
 
 	return array(

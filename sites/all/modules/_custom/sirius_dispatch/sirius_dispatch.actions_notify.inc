@@ -36,7 +36,7 @@ function sirius_dispatch_notify_possible($dispatch_node) {
 
 	// Verify that the worker is dispatchable
 	$worker_nid = $dispatch_node->field_sirius_worker['und'][0]['target_id'];
-	$check = sirius_dispatch_job_get_dispatchable_workers_explain($job_node, $worker_nid, array('redispatch' => TRUE));
+	$check = sirius_dispatch_elig_explain($job_node, $worker_nid, array('redispatch' => TRUE));
 	if (!$check['success']) {
 		return array('success' => FALSE, 'msg' => "Dispatch not possible: " . $check['msg']);
 	}

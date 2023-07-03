@@ -11,7 +11,7 @@ function report_cache_menu() {
 		'description' => '',
 		'page callback' => 'report_cache_page_landing',
 		'page arguments' => array(),
-		'access arguments' => array('grievance report'),
+		'access arguments' => array('sirius'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 
@@ -21,7 +21,7 @@ function report_cache_menu() {
 		'page callback' => 'report_cache_page_landing',
 		'page arguments' => array(3),
 		'access callback' => 'report_cache_page_landing_access',
-		// 'access arguments' => array('grievance report'),
+		// 'access arguments' => array('sirius'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 
@@ -30,7 +30,7 @@ function report_cache_menu() {
 		'description' => '',
 		'page callback' => 'report_cache_page_landing',
 		'page arguments' => array(3),
-		'access arguments' => array('grievance report'),
+		'access arguments' => array('sirius'),
 		'weight' => 1,
 		'type' => MENU_DEFAULT_LOCAL_TASK
 	);

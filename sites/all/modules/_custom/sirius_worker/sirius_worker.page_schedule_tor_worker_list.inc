@@ -11,7 +11,6 @@ function sirius_worker_node_tab_schedule_tor_worker_list($worker_node) {
 function sirius_worker_schedule_tor_list_form($form, &$form_state, $worker_node) {
 	$form_state['worker_nid'] = $worker_node->nid;
 	$tor_type_lookup = sirius_taxonomy_load('sirius_worker_tor_type', 'tid', 'name');
-	$tor_status_lookup = sirius_worker_schedule_tor_status_options();
 
 	$form['#tree'] = TRUE;
 	$form['filters'] = array(
@@ -25,12 +24,6 @@ function sirius_worker_schedule_tor_list_form($form, &$form_state, $worker_node)
 		'#title' => t('Type'),
 		'#type' => 'select',
 		'#options' => array(NULL => t('-- Select --')) + $tor_type_lookup,
-	);
-
-	$form['filters']['status'] = array(
-		'#title' => t('Status'),
-		'#type' => 'select',
-		'#options' => array(NULL => t('-- Select --')) + $tor_status_lookup,
 	);
 
 	$form['filters']['submit'] = array(
@@ -64,14 +57,14 @@ function sirius_worker_schedule_tor_list_form($form, &$form_state, $worker_node)
 		}
 
 		$json = sirius_jsonfield_util_node_json_get($tor_node);
-		$status_options = sirius_worker_schedule_tor_status_options();
+		$tor_status = sirius_worker_schedule_tor_status($tor_node);
 
 		$row = array();
 		$row[] = $tor_type_lookup[$json['tor']['type_tid']];
 		$row[] = $json['tor']['start_date'];
 		$row[] = $json['tor']['end_date'];
 		$row[] = sirius_text_to_html(sirius_fieldval($tor_node, 'field_sirius_summary'));
-		$row[] = $status_options[$json['tor']['status']];
+		$row[] = $tor_status['title'];
 		$row[] = $attachment_render;	
 		$row[] = $tools;
 		$rows[] = $row;
