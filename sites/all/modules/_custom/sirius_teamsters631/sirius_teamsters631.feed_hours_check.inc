@@ -271,9 +271,26 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
   $start_offset = $data['teamsters631_feed_hours_check']['payperiod_start_offset'];
   $end_offset = $data['teamsters631_feed_hours_check']['payperiod_end_offset'];
 
-
   $ts = strtotime($row['date']);
-  $start_ts = strtotime("-$start_offset days", $ts);
+
+  if ($start_offset > 0) {
+    $start_ts = strtotime("-$start_offset days", $ts);
+  } else if ($start_offset < 0) {
+    $start_offset *= -1;
+    $start_ts = strtotime("$start_offset days", $ts);
+  } else {
+    $start_ts = $ts;
+  }
+
+  if ($end_offset > 0) {
+    $start_ts = strtotime("-$end_offset days", $ts);
+  } else if ($end_offset < 0) {
+    $end_offset *= -1;
+    $start_ts = strtotime("$end_offset days", $ts);
+  } else {
+    $start_ts = $ts;
+  }
+
   $end_ts = strtotime("-$end_offset days", $ts);
   $dispatch_node = sirius_teamsters631_dispatched_as_of($worker_nid, $employer_nid, $start_ts, $end_ts);
 
@@ -447,6 +464,7 @@ function sirius_teamsters631_feed_hours_check_dates_form_validate($form, &$form_
   $start = $form_state['values']['teamsters631_feed_hours_check']['payperiod_start_offset'];
   $end = $form_state['values']['teamsters631_feed_hours_check']['payperiod_end_offset'];
 
+  /*
   if (!($start > 0)) {
     form_set_error('teamsters631_feed_hours_check][payperiod_start_offset', t('Please enter a positive integer.'));
   }
@@ -454,6 +472,7 @@ function sirius_teamsters631_feed_hours_check_dates_form_validate($form, &$form_
   if (!($end > 0)) {
     form_set_error('teamsters631_feed_hours_check][payperiod_end_offset', t('Please enter a positive integer.'));
   }
+  */
 
   if (! ($start > $end)) {
     form_set_error('teamsters631_feed_hours_check][payperiod_start_offset', t('Start must be greater than end.'));
