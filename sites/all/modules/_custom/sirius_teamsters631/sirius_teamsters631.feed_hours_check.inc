@@ -10,6 +10,7 @@ function sirius_teamsters631_feed_hours_check_info() {
       'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
       'sheet'     => array('label' => 'Worksheet',  'callback' => 'sirius_feed_wizard_sheet'),
       'map'       => array('label' => 'Mapping',    'callback' => 'sirius_feed_wizard_map'),
+      'dates'     => array('label' => 'Payperiod Dates',  'callback' => 'sirius_teamsters631_feed_hours_check_dates'),
       'verify'    => array(
         'label' => 'Verify Upload',
         'callback' => 'sirius_feed_wizard_verify',
@@ -257,14 +258,19 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
 
   $employer_nid = $feed_node->field_grievance_shop['und'][0]['target_id'];
   $worker_nid = $row['worker_nid'];
-  $ts = strtotime($row['date']);
   $worker_node = node_load($worker_nid);
   if (!$worker_node) {
     return array('success' => FALSE, 'msg' => 'Worker not found.', 'worker_nid' => $row['worker_nid']);
   }
 
-  $dispatch_node = sirius_teamsters631_dispatch_as_of($worker_nid, $employer_nid, $ts);
-  // return array('success' => FALSE, 'msg' => 'Testing');
+  $start_offset = $data['teamsters631_feed_hours_check']['payperiod_start_offset'];
+  $end_offset = $data['teamsters631_feed_hours_check']['payperiod_end_offset'];
+
+
+  $ts = strtotime($row['date']);
+  $start_ts = strtotime("-$start_offset days", $ts);
+  $end_ts = strtotime("-$end_offset days", $ts);
+  $dispatch_node = sirius_teamsters631_dispatched_as_of($worker_nid, $employer_nid, $start_ts, $end_ts);
 
   $result = array();
   $result['worker_nid'] = $worker_node->nid;
@@ -306,7 +312,7 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
   return $result;
 }
 
-function sirius_teamsters631_dispatch_as_of($worker_nid, $employer_nid, $ts) {
+function sirius_teamsters631_dispatched_as_of($worker_nid, $employer_nid, $start_ts, $end_ts) {
   // First, find all the dispatches for this worker which were accepted or declined before the relevant TS.
   $sql = "select node.nid, field_sirius_dispatch_status_value, field_sirius_datetime_completed_value from node ";
   $sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
@@ -318,10 +324,9 @@ function sirius_teamsters631_dispatch_as_of($worker_nid, $employer_nid, $ts) {
   $sql .= "where node.type = 'sirius_dispatch' ";
   $sql .= "and field_sirius_worker_target_id = :worker_nid ";
   $sql .= "and field_grievance_shop_target_id = :employer_nid ";
-  // $sql .= "and field_sirius_dispatch_status_value in ('accepted', 'accepted_secondary') ";
   $sql .= "and field_sirius_datetime_completed_value <= :date ";
   $sql .= "order by node.created desc ";
-  $sql_args[':date'] = gmdate('Y-m-d H:i:s', $ts);
+  $sql_args[':date'] = gmdate('Y-m-d H:i:s', $start_ts);
   $sql_args[':worker_nid'] = $worker_nid;
   $sql_args[':employer_nid'] = $employer_nid;
   $stmt = sirius_sql_query($sql, $sql_args);
@@ -336,37 +341,129 @@ function sirius_teamsters631_dispatch_as_of($worker_nid, $employer_nid, $ts) {
   // Next, scan the log for each dispatch
   foreach ($candidate_dispatch_nodes as $dispatch_nid => $dispatch_node) {
     // If it's currently accepted, we're good
-    if ($worker_nid == 124070) {
-      // drupal_set_message("Scanning: $dispatch_nid, status = " . $dispatch_node->field_sirius_dispatch_status['und'][0]['value']);
-    }
-
     if (in_array($dispatch_node->field_sirius_dispatch_status['und'][0]['value'], array('accepted', 'accepted_secondary'))) {
       return $dispatch_node;
     }
 
+    // Load the log for this dispatch
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node');
     $query->entityCondition('bundle', 'sirius_log');
     $query->fieldCondition('field_sirius_log_handler', 'target_id', $dispatch_nid);
-    $query->propertyCondition('created', $ts, '<=');
+    $query->fieldCondition('field_sirius_type', 'value', 'complete');
+    $query->propertyCondition('created', $end_ts, '<=');
     $query->propertyOrderBy('created');
     $stmt = $query->execute();
     $log_nids = $stmt['node'];
     if (!$log_nids) { continue; }
     $log_nodes = node_load_multiple(array_keys($stmt['node']));
 
-    // Walk the log nodes and find an accept that is not followed by a terminate or resign or rollover
-    $current_status = 'none';
+    // Walk the log nodes and find out if it was accepted at some point between start_ts and end_ts
+    $accepted = FALSE;
     foreach ($log_nodes as $log_node) {
-      if ($log_node->field_sirius_type['und'][0]['value'] != 'complete') { continue; }
-
       $category = $log_node->field_sirius_category['und'][0]['value'];
-      if ($category == 'dispatch:accept') { $current_status = 'accept'; }
-      else if ($category == 'dispatch:rollover') { $current_status = 'rollover'; }
-      else if ($category == 'dispatch:terminate') { $current_status = 'terminate'; }
-      else if ($category == 'dispatch:resign') { $current_status = 'resign'; }
-      else if ($category == 'dispatch:vlri') { $current_status = 'vlri'; }
+      $ts = $log_node->created;
+
+      // If it was accepted before end_ts, we're good ...
+      if ($category == 'dispatch:accept') { $accepted = TRUE; }
+
+      // ... But if it was resigned before start_ts, we're bad
+      if ($ts < $start_ts) {
+        if (in_array($category, array('dispatch:rollover', 'dispatch:terminate', 'dispatch:resign', 'dispatch:vlri'))) {
+          $accepted = FALSE;
+        }
+      }
     }
-    if ($current_status == 'accept') { return $dispatch_node; }
+    if ($accepted) { return $log_node; }
   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function sirius_teamsters631_feed_hours_check_dates($info, $data, $feed_node, $current_step) { 
+  return drupal_get_form('sirius_teamsters631_feed_hours_check_dates_form', $info, $data, $feed_node, $current_step);
+}
+
+function sirius_teamsters631_feed_hours_check_dates_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
+  $form_state['info'] = $info;
+  $form_state['data'] = $data;
+  $form_state['feed_node'] = $feed_node;
+  $form_state['current_step'] = $current_step;
+  $steps = sirius_wizard_steps($info, $data, $feed_node);
+
+  $form['#tree'] = TRUE;
+
+  $default = $data['teamsters631_feed_hours_check']['payperiod_start_offset'];
+  if (!$default) { $default = 14; }
+  $form['teamsters631_feed_hours_check']['payperiod_start_offset'] = array(
+    '#title' => t('Payperiod Start'),
+    '#type' => 'textfield',
+    '#default_value' => $default,
+    '#required' => TRUE,
+    '#description' => t('Number of days before the pay date that the payperiod starts.'),
+  );
+
+  $default = $data['teamsters631_feed_hours_check']['payperiod_end_offset'];
+  if (!$default) { $default = 3; }
+  $form['teamsters631_feed_hours_check']['payperiod_end_offset'] = array(
+    '#title' => t('Payperiod End'),
+    '#type' => 'textfield',
+    '#default_value' => $default,
+    '#required' => TRUE,
+    '#description' => t('Number of days before the pay date that the payperiod ends.'),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+
+  return $form;
+}
+
+function sirius_teamsters631_feed_hours_check_dates_form_validate($form, &$form_state) {
+  $start = $form_state['values']['teamsters631_feed_hours_check']['payperiod_start_offset'];
+  $end = $form_state['values']['teamsters631_feed_hours_check']['payperiod_end_offset'];
+
+  if (!($start > 0)) {
+    form_set_error('teamsters631_feed_hours_check][payperiod_start_offset', t('Please enter a positive integer.'));
+  }
+
+  if (!($end > 0)) {
+    form_set_error('teamsters631_feed_hours_check][payperiod_end_offset', t('Please enter a positive integer.'));
+  }
+
+  if (! ($start > $end)) {
+    form_set_error('teamsters631_feed_hours_check][payperiod_start_offset', t('Start must be greater than end.'));
+  }
+}
+
+function sirius_teamsters631_feed_hours_check_dates_form_submit($form, &$form_state) {
+  $info = $form_state['info'];
+  $data = $form_state['data'];
+  $feed_node = $form_state['feed_node'];
+  $current_step = $form_state['current_step'];
+
+  // Save the data for this step
+  $data['teamsters631_feed_hours_check'] = $form_state['values']['teamsters631_feed_hours_check'];
+
+  sirius_wizard_submit($info, $data, $feed_node, $current_step, "File uploaded.");
 }
