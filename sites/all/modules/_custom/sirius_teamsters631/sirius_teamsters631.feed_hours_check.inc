@@ -44,6 +44,7 @@ function sirius_teamsters631_feed_hours_check_info() {
       'employer_access' => TRUE,
       'results_fields' => array(
           'worker_nid' => 'Worker NID',
+          'link' => 'Link',
           'worker_ws' => 'Work Status',
           'worker_ms' => 'Member Status',
           'dispatch_nid' => 'Dispatch NID',
@@ -256,6 +257,8 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
 	if (!$result['success']) { return $result; }
   if (!$row['worker_nid']) { return array('success' => FALSE, 'msg' => 'No worker.'); }
 
+  $result = array();
+
   $employer_nid = $feed_node->field_grievance_shop['und'][0]['target_id'];
   $worker_nid = $row['worker_nid'];
   $worker_node = node_load($worker_nid);
@@ -263,6 +266,8 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
     return array('success' => FALSE, 'msg' => 'Worker not found.', 'worker_nid' => $row['worker_nid']);
   }
 
+  global $base_url;
+  $result['link'] = $base_url . "/node/$worker_nid/sirius_worker_dispatches/all";
   $start_offset = $data['teamsters631_feed_hours_check']['payperiod_start_offset'];
   $end_offset = $data['teamsters631_feed_hours_check']['payperiod_end_offset'];
 
@@ -272,7 +277,6 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
   $end_ts = strtotime("-$end_offset days", $ts);
   $dispatch_node = sirius_teamsters631_dispatched_as_of($worker_nid, $employer_nid, $start_ts, $end_ts);
 
-  $result = array();
   $result['worker_nid'] = $worker_node->nid;
   $ws_term = taxonomy_term_load($worker_node->field_sirius_work_status['und'][0]['tid']);
   if ($ws_term) { $result['worker_ws'] = $ws_term->name; }
