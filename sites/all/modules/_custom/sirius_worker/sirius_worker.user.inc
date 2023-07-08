@@ -121,6 +121,7 @@ function sirius_worker_usersync($worker_nid) {
 			}
 		}
 	}
+	if (!$all_rids) { $all_rids = array(); }
 	$no_rids = array_diff_assoc($all_rids, $yes_rids);
 
 	// Next, get the current rids. We're going to add the YES's, and remove the NO's.  
