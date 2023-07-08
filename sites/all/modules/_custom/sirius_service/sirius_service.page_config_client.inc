@@ -17,38 +17,21 @@ function sirius_service_page_config_client_form($form, &$form_state) {
     '#default_value' => sirius_domain_variable_get($name_active, ''),
   );
 
-  $form['tokens'] = array(
-  	'#type' => 'fieldset',
-  	'#title' => 'Access Tokens',
-		'#collapsible' => TRUE, 
-		'#collapsed' => TRUE,
+	$clients_all = sirius_service_client_info_all();
+	$options = array(NULL => t('-- Select --'));
+	foreach ($clients_all as $key => $record) {
+		$options[$key] = $record['name'];
+	}
+	$form['sirius_service_client_type'] = array(
+		'#title' => 'Client Type',
+		'#type' => 'select',
+		'#default_value' => sirius_domain_variable_get('sirius_service_client_type'),
+		'#options' => $options,
 		'#states' => array(
 			'visible' => array(
 				array(':input[name="' . $name_active . '"]' => array('value' => 'Yes')),
 			)
 		),
-  );
-
-  $form['tokens']['client_ip'] = array(
-  	'#markup' => '<p>' . 'This server\'s IP is listed as <strong>' . $_SERVER['SERVER_ADDR'] . '</strong>. That address must be allowed on the main server. Note that because this server may connect through a proxy, the listed IP may not be the same as the IP that is used for requests.' . '</p>'
-  );
-
-	$form['tokens']['sirius_service_client_host'] = array(
-		'#type' => 'textfield',
-		'#title' => 'Remote Host',
-		'#default_value' => sirius_domain_variable_get('sirius_service_client_host'),
-	);
-
-	$form['tokens']['sirius_service_client_account'] = array(
-		'#type' => 'textfield',
-		'#title' => 'Account ID',
-		'#default_value' => sirius_domain_variable_get('sirius_service_client_account'),
-	);
-
-	$form['tokens']['sirius_service_client_access'] = array(
-		'#type' => 'textfield',
-		'#title' => 'Access Token',
-		'#default_value' => sirius_domain_variable_get('sirius_service_client_access'),
 	);
 
   $form['sirius_proxy_active'] = array(
@@ -71,7 +54,7 @@ function sirius_service_page_config_client_form($form, &$form_state) {
 }
 
 function sirius_service_page_config_client_form_submit($form, &$form_state) {
-	foreach (array('sirius_service_client_active', 'sirius_proxy_active', 'sirius_service_client_host', 'sirius_service_client_account', 'sirius_service_client_access') as $name) {
+	foreach (array('sirius_service_client_type', 'sirius_service_client_active', 'sirius_proxy_active') as $name) {
 		sirius_domain_variable_set($name, $form_state['values'][$name]);
 	}
 
