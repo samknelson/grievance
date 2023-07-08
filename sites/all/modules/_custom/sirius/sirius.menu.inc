@@ -1458,6 +1458,7 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  /*
   $items['user/%/esig'] = array(
     'title' => 'Signature Preferences',
     'page callback' => 'sirius_user_tab_esignature',
@@ -1467,6 +1468,7 @@ function sirius_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 8,
   );
+  */
 
   $items['user/%/sirius_proxy'] = array(
     'title' => 'Proxy',
