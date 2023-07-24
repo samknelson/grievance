@@ -104,6 +104,10 @@ function sirius_trust_worker_benefits_search($params) {
   	$sql .= "and field_sirius_contact_relation_target_id in (:relationship_nids) ";
   	$sql_args[':relationship_nids'] = $params['relationship_nids'];
   }
+  if ($params['relationship_nid']) {
+  	$sql .= "and field_sirius_contact_relation_target_id = :relationship_nid ";
+  	$sql_args[':relationship_nid'] = $params['relationship_nid'];
+  }
   if ($params['benefit_nids']) {
   	$sql .= "and field_sirius_trust_benefit_target_id in (:benefit_nids) ";
   	$sql_args[':benefit_nids'] = $params['benefit_nids'];
@@ -118,6 +122,9 @@ function sirius_trust_worker_benefits_search($params) {
   while ($hr = $stmt->fetchAssoc()) {
   	$election_nids[] = $hr['nid'];
   }
+
+  if (!$election_nids) { return array(); }
+  
   if ($params['nids_only']) { return $election_nids; }
 	return node_load_multiple($election_nids);
 }
@@ -145,7 +152,7 @@ function sirius_trust_worker_benefit_node_presave($wb_node) {
 		$wb_node->field_sirius_active['und'][0]['value'] = 'No';
 	}
 
-	// print "Here with " . date('Y-m-d', $start_ts) . ', ' . date('Y-m-d', $now_ts) . ', ' . date('Y-m-d', $end_ts) . ', ' . $wb_node->field_sirius_active['und'][0]['value'] . "\n";
+	// drupal_set_message("Here with " . date('Y-m-d', $start_ts) . ', ' . date('Y-m-d', $now_ts) . ', ' . date('Y-m-d', $end_ts) . ', ' . $wb_node->field_sirius_active['und'][0]['value'] . "\n");
 }
 
 function sirius_trust_benefit_get_by_id($id) {
@@ -252,12 +259,23 @@ function sirius_trust_worker_benefit_scan($mode = 'test') {
 
 			$date = gmdate('Y-m-d', strtotime('-1 day'));
 			$wb_node->field_sirius_date_end['und'][0]['value'] = $date;
-			$wb_json['scan']['msg'] = $msg;
+			$wb_json['scan']['msg'] = $result['msg'];
+			$wb_json['scan']['ts'] = time();
 			$need_save = TRUE;
+			if ($mode == 'live') {
+				$log_node = sirius_log(
+					'trust:wb:scan', 
+					'terminated',
+					'Automated scan terminated benefit: ' . $result['msg'], 
+					'Automated scan terminated benefit: ' . $result['msg'], 
+					NULL,
+					array($wb_node->nid)
+				);
+			}
 		}
 
 		if (sirius_revision_changed_impl($wb_json, $wb_json_orig, 10) || sirius_revision_changed_impl($wb_json_orig, $wb_json, 10)) {
-				$need_save = TRUE;
+			$need_save = TRUE;
 		}
 
 		if ($need_save) {

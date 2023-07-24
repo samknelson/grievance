@@ -33,10 +33,10 @@ function sirius_trust_render_worker_elections($worker_node, $show_inactive) {
   	foreach ($benefit_nids as $benefit_nid) { $benefit_names[] = sirius_node_title($benefit_nid); }
 
   	$start_ts = sirius_fieldval($election_node, 'field_sirius_date_start', 'ts');
-  	if ($start_ts > 0) { $start_date = gmdate('m/d/Y', $start_ts); } else { $start_date = ''; }
+  	if ($start_ts > 0) { $start_date = date('m/d/Y', $start_ts); } else { $start_date = ''; }
 
   	$end_ts = sirius_fieldval($election_node, 'field_sirius_date_end', 'ts');
-  	if ($end_ts > 0) { $end_date = gmdate('m/d/Y', $end_ts); } else { $end_date = ''; }
+  	if ($end_ts > 0) { $end_date = date('m/d/Y', $end_ts); } else { $end_date = ''; }
 
   	$employer_name = '';
   	$employer_node = node_load($election_node->field_grievance_shop['und'][0]['target_id']);

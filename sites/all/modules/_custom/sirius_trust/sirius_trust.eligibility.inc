@@ -4,13 +4,45 @@ function sirius_trust_eligibility_plugin_info_all() {
 	$info_all = &drupal_static(__FUNCTION__, NULL);
 	if (!isset($info_all)) {
 		$info_all = module_invoke_all('sirius_trust_eligibility_plugin_info');
+		foreach ($info_all as $key => $record) {
+			$info_all[$key]['key'] = $key;
+			if (!$info_all[$key]['execution_cost']) { $info_all[$key]['execution_cost'] = 0; }
+		}
 	}
+
+	ksort($info_all);
+
 	return $info_all;
 }
 
 function sirius_trust_eligibility_plugin_info($plugin_key) {
 	$info_all = sirius_trust_eligibility_plugin_info_all();
 	return $info_all[$plugin_key];
+}
+
+function sirius_trust_eligibility_plugin_check_all($policy_node, $benefit_node, $subscriber_worker_node, $relationship_node, $ts, $shortcut = FALSE) {
+	$plugins = sirius_trust_eligibility_plugins_enabled($policy_node, $benefit_node);
+	if (!$plugins) { return array('success' => FALSE, 'plugins' => array()); }
+
+	$result = array('success' => TRUE);
+
+	// Sort by execution cost, so we run the cheapest check first
+	$plugin_info_all = sirius_trust_eligibility_plugin_info_all();
+	usort($plugins, function($a, $b) use ($plugins, $plugin_info_all) {
+		return $plugin_info_all[$a]['execution_cost'] <=> $plugin_info_all[$b]['execution_cost'];
+	});
+
+	foreach ($plugins as $plugin_key) {
+		$sub_result = sirius_trust_eligibility_plugin_check($policy_node, $benefit_node, $subscriber_worker_node, $relationship_node, $ts, $plugin_key);
+		if (!$sub_result['success']) {
+			$result['success'] = FALSE;
+			if ($shortcut) { break; }
+		}
+
+		$result['plugins'][$plugin_key] = $sub_result;
+	}
+
+	return $result;
 }
 
 function sirius_trust_eligibility_plugin_check($policy_node, $benefit_node, $subscriber_worker_node, $relationship_node, $ts, $plugin_key) {
@@ -27,6 +59,7 @@ function sirius_trust_eligibility_plugin_check($policy_node, $benefit_node, $sub
 	$params['benefit_node'] = $benefit_node;
 	$params['relationship_node'] = $relationship_node;
 	$params['ts'] = $ts;
+	$params['plugin_info'] = $plugin_info;
 
 	return $callback($settings, $params);
 }
@@ -51,6 +84,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 		'callbacks' => array(
 			'check' => 'sirius_trust_eligibility_plugin_election_check',
 		),
+		'execution_cost' => 3,
 	);
 
 	$items['universal'] = array(
@@ -62,6 +96,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 			'settings' => 'sirius_trust_eligibility_plugin_universal_settings_form',
 			'check' => 'sirius_trust_eligibility_plugin_universal_check',
 		),
+		'execution_cost' => -10,
 	);
 
 	$items['ws'] = array(
@@ -73,6 +108,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 			'settings' => 'sirius_trust_eligibility_plugin_ws_settings_form',
 			'check' => 'sirius_trust_eligibility_plugin_ws_check',
 		),
+		'execution_cost' => 5,
 	);
 
 	$items['ms'] = array(
@@ -84,6 +120,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 			'settings' => 'sirius_trust_eligibility_plugin_ms_settings_form',
 			'check' => 'sirius_trust_eligibility_plugin_ms_check',
 		),
+		'execution_cost' => 5,
 	);
 
 	$items['reltype'] = array(
@@ -95,6 +132,7 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 			'settings' => 'sirius_trust_eligibility_plugin_reltype_settings_form',
 			'check' => 'sirius_trust_eligibility_plugin_reltype_check',
 		),
+		'execution_cost' => -7,
 	);
 
 	$items['employer'] = array(
@@ -106,6 +144,30 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 			// 'benefit_settings' => 'sirius_trust_eligibility_plugin_employer_benefit_settings_form',
 			'check' => 'sirius_trust_eligibility_plugin_employer_check',
 		),
+		'execution_cost' => 7,
+	);
+
+	$items['hours'] = array(
+		'title' => 'Hours',
+		'description' => 'Eligibility for this benefit is restricted based on the subscriber\'s hours.',
+		'file' => 'sirius_trust.eligibility_plugin_hours.inc',
+		'module' => 'sirius_trust',
+		'callbacks' => array(
+			'settings' => 'sirius_trust_eligibility_plugin_hours_settings_form',
+			'check' => 'sirius_trust_eligibility_plugin_hours_check',
+		),
+		'execution_cost' => 2,
+	);
+
+	$items['relationship_active'] = array(
+		'title' => 'Relationship Active',
+		'description' => 'The relationship must be active at the time that the eligibility is checked.',
+		'file' => 'sirius_trust.eligibility_plugin_relationship_active.inc',
+		'module' => 'sirius_trust',
+		'callbacks' => array(
+			'check' => 'sirius_trust_eligibility_plugin_relationship_active_check',
+		),
+		'execution_cost' => -7,
 	);
 
 	return $items;
