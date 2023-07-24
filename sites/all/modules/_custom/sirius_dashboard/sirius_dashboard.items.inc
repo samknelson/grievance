@@ -26,5 +26,29 @@ function sirius_dashboard_item_data($json, $uuid, $options = array()) {
 	$callback = $plugin_info['callbacks']['data'];
 	if (!$callback) { return '[no callback for this dashboard item has been defined.]'; }
 	sirius_require($plugin_info['module'], $plugin_info['file']);
-	return $callback($json['item'][$uuid]['preferences'], $options);
+
+	$result = $callback($json['item'][$uuid]['preferences'], $options);
+
+	// Set the priority
+	$priority_cutoffs = $json['item_list'][$uuid]['priority_cutoffs'];
+	if ($priority_cutoffs && $result) {
+		foreach ($result as $key => $row) {
+			foreach ($priority_cutoffs as $priority => $cutoff) {
+				if (!is_numeric($cutoff)) { continue; }
+				if ($row['count'] >= $cutoff) {
+					$result[$key]['priority'] = $priority;
+				}
+			}
+		}
+	}
+
+	if ($result) {
+		foreach ($result as $key => $row) {
+			if ($row['priority'] == -1) {
+				unset($result[$key]);
+			}
+		}
+	}
+
+	return $result;
 }

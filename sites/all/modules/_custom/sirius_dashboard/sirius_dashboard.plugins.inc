@@ -15,6 +15,18 @@ function sirius_dashboard_plugin_info($plugin_key) {
 function sirius_dashboard_plugin_info_all() {
 	$plugins = array();
 
+	$plugins['report'] = array(
+		'title' => 'Report',
+		'description' => '',
+		'file' => 'sirius_dashboard.plugin_report.inc',
+		'module' => 'sirius_dashboard',
+		'callbacks' => array(
+			'data' => 'sirius_dashboard_plugin_report_data',
+			'config' => 'sirius_dashboard_plugin_report_config',
+			'prefs' => 'sirius_dashboard_plugin_report_prefs',
+		),
+	);
+
 	$plugins['worker_schedule_tor'] = array(
 		'title' => 'Worker: Schedule: Time-Off Requests',
 		'file' => 'sirius_dashboard.plugin_worker_schedule_tor.inc',
@@ -81,6 +93,17 @@ function sirius_dashboard_plugin_info_all() {
 		),
 	);
 
+	$plugins['bookmarks'] = array(
+		'title' => 'Bookmarks',
+		'description' => '',
+		'file' => 'sirius_dashboard.plugin_bookmarks.inc',
+		'module' => 'sirius_dashboard',
+		'callbacks' => array(
+			'data' => 'sirius_dashboard_plugin_bookmarks_data',
+			'prefs' => 'sirius_dashboard_plugin_bookmarks_prefs',
+		),
+	);
+
 	$plugins['markup'] = array(
 		'title' => 'Raw Markup',
 		'description' => '',
@@ -90,6 +113,18 @@ function sirius_dashboard_plugin_info_all() {
 			'data' => 'sirius_dashboard_plugin_markup_data',
 			'config' => 'sirius_dashboard_plugin_markup_config',
 			'prefs' => 'sirius_dashboard_plugin_markup_prefs',
+		),
+	);
+
+	$plugins['trust_elections'] = array(
+		'title' => 'Trust - Elections',
+		'description' => '',
+		'file' => 'sirius_trust.dashboard_plugin_elections.inc',
+		'module' => 'sirius_trust',
+		'callbacks' => array(
+			'data' => 'sirius_trust_dashboard_plugin_elections_data',
+			'config' => 'sirius_trust_dashboard_plugin_elections_config',
+			'prefs' => 'sirius_trust_dashboard_plugin_elections_prefs',
 		),
 	);
 
