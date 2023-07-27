@@ -15,3 +15,13 @@ function sirius_lang_options() {
 	if (!$options) { return sirius_lang_options_global(); }
 	return $options;
 }
+
+function sirius_lang_node_view(&$node) {
+	if (!$node->content['langs']) { return; }
+
+	if ($node->type == 'sirius_contact') { $source_node = $node; }
+	else if ($node->type == 'sirius_worker') { $source_node = sirius_worker_contact_get($node); }
+
+  $renderable = field_view_field('node', $source_node, 'field_sirius_lang', 'full');
+  $node->content['langs'][0]['#markup'] = render($renderable);
+}
