@@ -2737,6 +2737,7 @@ function grievance_content_types_field_group_info() {
       2 => 'field_sirius_phone_alt',
       3 => 'field_sirius_email',
       4 => 'field_sirius_phone_fax',
+      5 => 'langs',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

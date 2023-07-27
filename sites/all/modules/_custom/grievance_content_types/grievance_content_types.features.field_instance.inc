@@ -27422,7 +27422,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -27527,7 +27527,7 @@ If the file has multiple pages, then each page in the input document will use th
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 21,
+        'weight' => 20,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28429,7 +28429,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 10,
+        'weight' => 11,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28571,7 +28571,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 20,
+        'weight' => 19,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28623,7 +28623,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'sirius_worker' => array(
         'label' => 'above',
