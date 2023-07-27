@@ -190,6 +190,17 @@ function sirius_worker_node_tabs() {
     'weight' => 2,
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_contact/lang'] = array(
+    'title' => 'Languages',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_contact_lang',
+    'file' => 'sirius_worker.page_contact_lang.inc',
+    'permissions' => array('sirius'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'component' => 'lang',
+  );
+
   $node_tabs['sirius_worker']['sirius_worker_contact/user'] = array(
     'title' => 'User',
     'description' => '',
