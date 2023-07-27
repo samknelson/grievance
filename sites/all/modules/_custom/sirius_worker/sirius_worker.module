@@ -412,7 +412,12 @@ function sirius_worker_report_cache_info() {
 
 function sirius_worker_node_view($node, $view_mode, $langcode) {
   if ($node->type != 'sirius_worker') { return; }
+
+  // Render EINs
   sirius_worker_ein_node_view($node, $view_mode, $langcode);
+
+  // Render languages
+  sirius_lang_node_view($node, $view_mode, $langcode);
 }
 
 /**
