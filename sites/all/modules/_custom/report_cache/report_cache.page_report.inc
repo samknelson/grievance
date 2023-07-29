@@ -175,7 +175,7 @@ function report_cache_download($report_type, $report_id, $info) {
 		$hr = unserialize($hr['report_data']);
 		$row = array();
 		foreach ($fields as $name => $prompt) {
-			$row[] = $hr[$name];
+			$row[] = strip_tags($hr[$name]);
 		}
 		fputcsv($fp, $row);
 	}
