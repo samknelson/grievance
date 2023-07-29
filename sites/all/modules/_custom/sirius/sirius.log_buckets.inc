@@ -178,6 +178,20 @@ function sirius_log_buckets() {
 			$buckets[$bucket_id]['id'] = $bucket_id;
 		}
 
+		if (sirius_domain_variable_get('sirius_log_quicklog_sirius_worker_bucketview', '') == 'Yes') {
+			$buckets['worker']['views'] = array(
+				'quicklog' => array(
+					'title' => 'Quicklog Only',
+					'filters' => array(
+						'category_types' => array_keys(sirius_log_quicklog_category_type_options('sirius_worker')),
+					),
+				),
+				'all' => array(
+					'title' => 'All Entries',
+				),
+			);
+		}
+
 		drupal_alter('sirius_log_buckets', $buckets);
 
 		$my_excluded_categories = sirius_log_my_excluded_categories();

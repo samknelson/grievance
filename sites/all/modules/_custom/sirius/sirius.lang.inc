@@ -22,6 +22,11 @@ function sirius_lang_node_view(&$node) {
 	if ($node->type == 'sirius_contact') { $source_node = $node; }
 	else if ($node->type == 'sirius_worker') { $source_node = sirius_worker_contact_get($node); }
 
+	if (!$source_node) {
+		unset($node->content['langs'][0]['#markup']);
+		return;
+	}
+
   $renderable = field_view_field('node', $source_node, 'field_sirius_lang', 'full');
   $node->content['langs'][0]['#markup'] = render($renderable);
 }
