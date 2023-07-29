@@ -160,6 +160,10 @@ function sirius_sirius_domain_component_info() {
       'title' => 'Phonetree',
       'description' => 'Enable phonetree processing',
     ),
+    'lang' => array(
+      'title' => 'Lang',
+      'description' => 'Enable support for languages, such as primary and secondary languages for contacts and workers.',
+    ),
   );
 }
 

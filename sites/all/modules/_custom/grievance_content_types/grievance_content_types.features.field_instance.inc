@@ -14850,7 +14850,7 @@ function grievance_content_types_field_default_field_instances() {
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 9,
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -14928,7 +14928,7 @@ function grievance_content_types_field_default_field_instances() {
           'geofield_map_zoom' => 14,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 10,
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -14990,7 +14990,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15019,7 +15019,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -15063,7 +15063,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -15164,7 +15164,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15186,7 +15186,47 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget',
-      'weight' => 10,
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_contact-field_sirius_lang'.
+  $field_instances['node-sirius_contact-field_sirius_lang'] = array(
+    'bundle' => 'sirius_contact',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'The first entry is the primary language for the contact.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_lang',
+    'label' => 'Languages',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'multiple_selects',
+      'settings' => array(),
+      'type' => 'multiple_selects',
+      'weight' => 9,
     ),
   );
 
@@ -15446,7 +15486,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15471,7 +15511,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 12,
+      'weight' => 13,
     ),
   );
 
@@ -27382,7 +27422,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -27487,7 +27527,7 @@ If the file has multiple pages, then each page in the input document will use th
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 21,
+        'weight' => 20,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28389,7 +28429,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 10,
+        'weight' => 11,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28531,7 +28571,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 20,
+        'weight' => 19,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28583,7 +28623,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -36267,6 +36307,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Job Types');
   t('Label');
   t('Labor charges or other relevant shop issues');
+  t('Languages');
   t('Last Name');
   t('Lead Organizer');
   t('Lead\'s Recommendaiton');
@@ -36403,6 +36444,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Template Tags');
   t('Term');
   t('The date the employee received discipline.');
+  t('The first entry is the primary language for the contact.');
   t('The maximum number of active relationships of this type that a contact can have. For example, a person might only be permitted to have one spouse at a time.');
   t('These email addresses will be CC\'d on EVERY letter sent using this template.');
   t('Threestrikes Enable');

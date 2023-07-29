@@ -412,7 +412,12 @@ function sirius_worker_report_cache_info() {
 
 function sirius_worker_node_view($node, $view_mode, $langcode) {
   if ($node->type != 'sirius_worker') { return; }
+
+  // Render EINs
   sirius_worker_ein_node_view($node, $view_mode, $langcode);
+
+  // Render languages
+  sirius_lang_node_view($node, $view_mode, $langcode);
 }
 
 /**
@@ -505,4 +510,8 @@ function sirius_worker_denormalize_queue($node) {
 
 function sirius_worker_sirius_denorm($item) {
   if ($item['denorm_trigger'] == 'sirius_worker_history') { sirius_worker_denorm_history($item); }
+}
+
+function sirius_worker_contact_get($worker_node) {
+  return node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
 }

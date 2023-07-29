@@ -1356,6 +1356,21 @@ function sirius_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/lang/config'] = array(
+    'title' => 'Language Configuration',
+    'page callback' => 'sirius_page_lang_config',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius.page_lang_config.inc',
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius domain admin',
+        'component' => 'lang',
+      ),
+    ),
+  );
+
   $items['sirius/config/by-module/all'] = array(
     'title' => 'All',
     'page callback' => 'sirius_page_config',
