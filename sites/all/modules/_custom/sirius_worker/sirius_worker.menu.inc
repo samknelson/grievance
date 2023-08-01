@@ -59,22 +59,6 @@ function sirius_worker_node_tabs() {
     'weight' => 5,
   );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   $node_tabs['sirius_worker']['sirius_worker_schedule'] = array(
     'title' => 'Schedule',
     'callback' => 'sirius_worker_node_tab_schedule',
@@ -216,6 +200,16 @@ function sirius_worker_node_tabs() {
     'permissions' => array('sirius worker admin'),
     'weight' => 3,
   );
+
+  $node_tabs['sirius_worker']['sirius_worker_contact/tags'] = array(
+    'title' => 'Tags',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_tags',
+    'permissions' => array('sirius worker admin'), 
+    'file' => 'sirius_worker.page_tags.inc',
+    'weight' => 3,
+  );
+
 
   $node_tabs['sirius_worker']['sirius_worker_contact/merge'] = array(
     'title' => 'Merge',
