@@ -406,6 +406,14 @@ function sirius_node_tabs() {
     'component' => 'contact:relationships',
   );
 
+  $node_tabs['sirius_contact']['sirius_contact_tags'] = array(
+    'title' => 'Tags',
+    'description' => '',
+    'callback' => 'sirius_node_tab_contact_tags',
+    'permissions' => array('sirius contact admin'), 
+    'file' => 'sirius.page_contact_tags.inc',
+  );
+
   $content_types = array(
     'sirius_log', 
     'sirius_json_definition',
