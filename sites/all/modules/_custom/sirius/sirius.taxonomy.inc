@@ -1,38 +1,5 @@
 <?php
 
-function sirius_taxonomy_checkboxes(&$form, &$form_state, $field_name, $vocabulary_name) {
-  $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
-  $terms = sirius_domain_taxonomy_get_tree($vocabulary->vid, 0, NULL, TRUE, sirius_domain_nid());
-
-  foreach ($terms as $term) {
-    $tid = $term->tid;
-    $name = $term->name;
-    $depth = $term->depth;
-    $parent = $term->parents[0];
-
-    $field_prefix = '';
-    for ($i=0; $i<$depth; ++$i) {
-      $field_prefix .= '&nbsp;--';
-    }
-    $states = NULL;
-    if ($parent) {
-      $states = array(
-        'visible' => array(
-          array(':input[name="' . $field_name . '_checkbox_' . $parent . '"]' => array('checked' => TRUE)),
-        )
-      );
-    }
-
-    $form["${field_name}_checkbox_{$tid}"] = array(
-      '#type' => 'checkbox',
-      '#value' => $tid,
-      '#title' => $name,
-      '#field_prefix' => $field_prefix,
-      '#states' => $states,
-    );
-  }
-}
-
 /**
  * A stupid utility function to create dropdowns and mappings from taxonomies.
  * Key can be:
@@ -258,7 +225,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['grievance_work_status']['display'] = 'block';
     $settings['grievance_work_status']['multidomain'] = 'Yes';
     $settings['sirius_contact_tags']['view'] = 'sirius_taxonomy';
-    $settings['sirius_contact_tags']['display'] = 'block';
+    $settings['sirius_contact_tags']['display'] = 'block_18';
     $settings['sirius_contact_tags']['multidomain'] = 'Yes';
     $settings['sirius_contact_relationship_types']['view'] = 'sirius_taxonomy';
     $settings['sirius_contact_relationship_types']['display'] = 'block_12';

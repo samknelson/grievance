@@ -640,45 +640,6 @@ function sirius_feed_wizard_map_form_submit($form, &$form_state) {
 }
 
 /************************************************************************************************
- * Step 3A: Tagging
- ************************************************************************************************/
-
-/*
-function sirius_feed_wizard_tag($info, $data, $feed_node, $current_step) { return drupal_get_form('sirius_feed_wizard_tag_form', $info, $data, $feed_node, $current_step); }
-
-function sirius_feed_wizard_tag_form($form, &$form_state, $info, $data, $feed_node, $current_step) {
-	$form_state['info'] = $info;
-	$form_state['data'] = $data;
-	$form_state['feed_node'] = $feed_node;
-	$form_state['current_step'] = $current_step;
-	$steps = sirius_wizard_steps($info, $data, $feed_node);
-	$last_data = sirius_feed_lastdata($info, $feed_node);
-
-	sirius_taxonomy_checkboxes($form, $form_state, 'whatever', 'sirius_contact_tags');
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => 'Submit',
-	);
-
-	return $form;
-}
-
-function sirius_feed_wizard_tag_form_submit($form, &$form_state) {
-	$info = $form_state['info'];
-	$data = $form_state['data'];
-	$feed_node = $form_state['feed_node'];
-	$current_step = $form_state['current_step'];
-	$fields = array();
-	foreach ($fields as $field_name => $field_info) {
-		$data["map_$field_name"] = $form_state['values']["map_$field_name"];
-	}
-
-	sirius_wizard_submit($info, $data, $feed_node, $current_step, "Worksheet selection saved.");
-}
-*/
-
-/************************************************************************************************
  * Step 4: Verify
  ************************************************************************************************/
 
