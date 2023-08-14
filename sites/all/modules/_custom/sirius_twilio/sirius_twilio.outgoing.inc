@@ -9,18 +9,18 @@ use Twilio\TwiML;
 
 function sirius_twilio_statuscallback_sms_url($id) {
 	global $base_url;
-	return $base_url . "/sirius/twilio/statuscallback/sms/$id";
+	return $base_url . "/sirius/twilio/statuscallback/sms/" . urlencode($id);
 }
 
 function sirius_twilio_statuscallback_sms($id) {
-	return sirius_sms_callback($id, $_POST['SmsStatus'], $_POST);
+	return sirius_sms_callback(urldecode($id), $_POST['SmsStatus'], $_POST);
 }
 
 /**********************************************************************************
  * SMS
  **********************************************************************************/
 
-function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NULL) {
+function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NULL, $from = NULL, $attach = NULL) {
 
 	if (sirius_domain_variable_get('sirius_twilio_sms_unsubscribe', TRUE)) {
 		$msg .= sirius_domain_variable_get('sirius_twilio_sms_unsubscribe_msg', "\nReply STOP to unsubscribe.\n");
@@ -29,6 +29,8 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NUL
 	if (strlen($msg) > 1595) {
 		return array('success' => FALSE, 'msg' => 'SMS sending failed: the outoing message length exceeded 1600 characters.');
 	}
+
+	if ($from) { $from = sirius_phone_format_e164($from); }
 
   // Are we in a global disable mode?
   $disable = sirius_domain_variable_get("sirius_sms_global_disable", '');
@@ -47,13 +49,13 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NUL
 
   static $registered;
   if (sirius_domain_variable_get('sirius_twilio_sms_consolidate', FALSE)) {
-		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg, $id);
+		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg, $id, $from, $attach);
 		if (!$registered) {
 			$registered = TRUE;
 			drupal_register_shutdown_function('sirius_twilio_outgoing_sms_queue', TRUE);
 		}
   } else {
-		$result = sirius_twilio_outgoing_sms_queue(TRUE, $phone, $msg, $id);
+		$result = sirius_twilio_outgoing_sms_queue(TRUE, $phone, $msg, $id, $from, $attach);
 	}
 
 	if ($result['success']) {
@@ -71,24 +73,36 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NUL
 	return $result;
 }
 
-function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NULL, $id = NULL) {
+function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NULL, $id = NULL, $from = NULL, $attach = NULL) {
 	static $queue;
 
+	if (!$from) { $from = sirius_domain_variable_get('sirius_twilio_phone', ''); }
+
 	if ($phone) { 
-		if ($queue[$phone]) { $queue[$phone] .= "\n\n"; }
-		$queue[$phone] .= $msg;
+		if ($queue[$phone]['msg']) { $queue[$phone]['msg'] .= "\n\n"; }
+		$queue[$phone]['msg'] .= $msg;
+
+		if ($attach) {
+			// Can only attach one image.
+			$queue[$phone]['attach'] = $attach;
+		}
 	}
+
+	// drupal_set_message('<pre>' . print_r($queue, 1) . '</pre>');
+
 	if (!$deliver_now) { return array('success' => TRUE, 'msg' => "Queued for delivery: $phone, $msg"); }
 
 	$count = 0;
-	foreach ($queue as $phone => $msg) {
+	foreach ($queue as $phone => $record) {
 		++$count;
 		try {
 			$client = sirius_twilio_client_get();
 
 			$sms_params = array();
-			$sms_params['from'] = sirius_domain_variable_get('sirius_twilio_phone', '');
-			$sms_params['body'] = $msg;
+			$sms_params['from'] = $from;
+			$sms_params['body'] = $record['msg'];
+			if ($record['attach']['url'][0]) { $sms_params["mediaUrl"] = $record['attach']['url']; }
+
 			if ($id) { $sms_params['statusCallback'] = sirius_twilio_statuscallback_sms_url($id); }
 
 			$message = $client->messages->create($phone, $sms_params);

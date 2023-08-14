@@ -1289,6 +1289,7 @@ function hotelsdb_content_types_field_default_field_bases() {
         3 => 'Risk of Dispute',
         4 => 'Boycott or Labor Dispute',
         5 => 'Strike',
+        6 => 'Delist from FairHotel',
       ),
       'allowed_values_function' => '',
     ),

@@ -31,6 +31,17 @@ function sirius_banner_config() {
 		'#upload_location' => 'public://sirius/banner/logo',
 	);
 
+	$form['sirius_banner_homelink'] = array(
+		'#title' => t('Home Link?'),
+		'#type' => 'select',
+		'#default_value' => variable_get('sirius_banner_homelink', 'No'),
+		'#options' => array(
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#description' => t('Show a link to "Home" in the banner? (The site title also always links to home.)'),
+	);
+
 	$form = system_settings_form($form);
 	$form['#submit'][] = 'sirius_banner_config_submit';	
   return $form;
@@ -69,6 +80,11 @@ function sirius_banner_render() {
 			  $html .= $user->name;
 				$html .= "&nbsp;&nbsp;&nbsp;&nbsp;";
 
+				if (variable_get('sirius_banner_homelink', 'No') == 'Yes') {
+					$html .= l(t('home'), '<front>');
+					$html .= ' / ';
+				}
+
 			  if (user_access('sirius domain switch')) {
 			    $html .= l('domain','sirius/domain/switch');
 			    $html .= ' / ';
@@ -82,8 +98,11 @@ function sirius_banner_render() {
 			  if ($user_full->field_grievance_shops['und'][0]['target_id'] && !$user_full->field_grievance_shops['und'][1]['target_id']) {
 			    $shop_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
 			    $shop_node = node_load($shop_nid);
-			    // print l($shop_node->title, 'node/' . $shop_node->nid);
-			    $html .= $shop_node->title;
+			    if (drupal_valid_path('node/' . $shop_node->nid)) {
+			    	$html .= l($shop_node->title, 'node/' . $shop_node->nid);
+			    } else {
+			    	$html .= $shop_node->title;
+			    }
 			    $html .= ' / ';
 			    $contract_uri = $shop_node->field_grievance_contract['und'][0]['uri'];
 			    if ($contract_uri) {
@@ -102,7 +121,12 @@ function sirius_banner_render() {
 	  }
 	  else 
 	  {
+
 	    $html .= '<div class="user-links-content anon-user-links-content">';
+				if (variable_get('sirius_banner_homelink', 'No') == 'Yes') {
+					$html .= l(t('home'), '<front>');
+					$html .= ' / ';
+				}
 	    	$html .= l("login","user/login");
 	    $html .= '</div>'; // user-links-content
 	  }

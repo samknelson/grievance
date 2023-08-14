@@ -1,6 +1,6 @@
 <?php
 
-function sirius_node_tab_entity_log_view_form($form, &$form_state, $node, $log_bucket_id) {
+function sirius_node_tab_entity_log_view_form($form, &$form_state, $node, $log_bucket_id, $view_id) {
 	$form_state['node'] = $node;
 	$form_state['log_bucket_id'] = $log_bucket_id;
   $form['#tree'] = TRUE;
@@ -85,8 +85,11 @@ function sirius_node_tab_entity_log_view_form($form, &$form_state, $node, $log_b
 		if ($node->field_sirius_contact['und'][0]['target_id']) { $nids[] = $node->field_sirius_contact['und'][0]['target_id']; }
 	}
 
+	$filters = $form_state['values']['filters'];
+	$filters['view_id'] = $view_id;
+
 	$form['results'] = array(
-		'#markup' => '<hr>' . sirius_log_entity_render($nids, $log_bucket, $form_state['values']['filters'])
+		'#markup' => '<hr>' . sirius_log_entity_render($nids, $log_bucket, $filters)
 	);
 
 	return $form;
@@ -98,6 +101,16 @@ function sirius_node_tab_entity_log_view_form_submit($form, &$form_state) {
 }
 
 function sirius_log_entity_render($nids, $log_bucket, $filters) {
+	// Use view filters as an override
+	$view_id = $filters['view_id'];
+	if ($view_id) {
+		if ($log_bucket['views'][$view_id]['filters']) {
+			foreach ($log_bucket['views'][$view_id]['filters'] as $key => $value) {
+				$filters[$key] = $value;
+			}
+		}
+	}
+
 	$display = $filters['display'];
 	if ($display == 'csv') { $limit = 10000000; } else { $limit = 1000; }
 
@@ -105,6 +118,7 @@ function sirius_log_entity_render($nids, $log_bucket, $filters) {
 	$sql .= "node.created, ";
 	$sql .= "field_sirius_category_value, ";
 	$sql .= "field_sirius_type_value, ";
+	$sql .= "concat(field_sirius_category_value, '|', field_sirius_type_value) as category_type, ";
 	$sql .= "field_sirius_message_value, ";
 	$sql .= "users.uid as user_uid, ";
 	$sql .= "users.name as user_name, ";
@@ -158,6 +172,11 @@ function sirius_log_entity_render($nids, $log_bucket, $filters) {
 			$sql .= "and node.created <= :ts_end ";
 			$sql_args[':ts_end'] = $ts;
 		}
+	}
+
+	if ($filters['category_types']) {
+		$sql .= "and concat(field_sirius_category_value, '|', field_sirius_type_value) in (:category_types) ";
+		$sql_args[':category_types'] = $filters['category_types'];
 	}
 	$sql .= "group by node.nid ";
 	$sql .= "order by created desc, node.nid desc ";

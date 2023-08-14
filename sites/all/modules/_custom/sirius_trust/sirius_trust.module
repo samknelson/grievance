@@ -8,6 +8,8 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/s
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.elections.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.policy.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.relationships.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.denorm.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_trust') . '/sirius_trust.services.inc';
 
 /**
  * Implements hook_sirius_domain_component_info
@@ -75,48 +77,6 @@ function sirius_trust_node_insert($node) { return sirius_trust_denormalize_queue
 
 function sirius_trust_node_delete($node) { return sirius_trust_denormalize_queue($node); }
 
-function sirius_trust_denormalize_queue($node) {
-  if ($node->type == 'sirius_trust_worker_benefit') {
-    sirius_denorm_queue_add($node->nid, $node->field_sirius_worker['und'][0]['target_id'], 'sirius_trust_worker_benefits');
-  }
-}
-
-/**
- * Implements hook_sirius_denorm
- */
-
-function sirius_trust_sirius_denorm($item) {
-  if ($item['denorm_trigger'] == 'sirius_trust_worker_benefits') {
-    sirius_trust_denorm_worker_benefits($item['denorm_target_nid']);
-  }
-}
-
-/**
- * Make sure that there is a simple field in the Worker record that shows all active
- * worker benefits
- */
-
-function sirius_trust_denorm_worker_benefits($worker_nid) {
-  $worker_node = node_load($worker_nid);
-
-  $benefits = sirius_trust_worker_benefits_search(array('worker_nid' => $worker_nid, 'active' => 'Yes'));
-
-  $new_benefit_nids = array();
-  foreach ($benefits as $worker_benefit) {
-    $new_benefit_nids[] = $worker_benefit->field_sirius_trust_benefit['und'][0]['target_id'];
-  }
-  $new_benefit_nids = array_unique($new_benefit_nids);
-  $old_benefit_nids = sirius_fieldvals($worker_node, 'field_sirius_denorm_benefits', 'target_id');
-
-  if (array_diff($new_benefit_nids, $old_benefit_nids) || array_diff($old_benefit_nids, $new_benefit_nids)) {
-    $worker_node->field_sirius_denorm_benefits = array();
-    foreach ($new_benefit_nids as $new_benefit_nid) {
-      $worker_node->field_sirius_denorm_benefits['und'][] = array('target_id' => $new_benefit_nid);
-    }
-    node_save($worker_node);
-  }
-}
-
 /***
  * Implements hook_report_cache_info() 
  */
@@ -124,25 +84,26 @@ function sirius_trust_denorm_worker_benefits($worker_nid) {
 function sirius_trust_report_cache_info() {
   $items = array();
 
+  sirius_require('sirius_trust', 'sirius_trust.report_eligibility_compare.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit_warning.inc');
   sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit_multiple.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit_summary.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_worker_benefit_change.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_relationship_sequence.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_newhire.inc');
+  sirius_require('sirius_trust', 'sirius_trust.report_hour.inc');
 
-  $items['sirius-trust-worker-benefit'] = array(
-    'name' => t('Coverage - Overview'),
-    'description' => '',
-    'access' => 'sirius trust staff',
-    'fields' => sirius_trust_report_worker_benefit_fields(),
-    'form_callback' => 'sirius_trust_report_worker_benefit_form',
-    'pk_list_callback' => 'sirius_trust_report_worker_benefit_pks',
-    'batch_callback' => 'sirius_trust_report_worker_benefit_batch',
-    'render_callbacks' => array(
-      'View' => 'sirius_trust_report_worker_benefit_view',
-    ),
-    'module' => 'sirius_trust',
-    'file' => 'sirius_trust.report_worker_benefit.inc',
-    'dashboard' => TRUE,
-  );
+  $items['sirius-trust-eligibility-compare'] = sirius_trust_report_eligibility_compare_info();
+  $items['sirius-trust-worker-benefit'] = sirius_trust_report_worker_benefit_info();
+  $items['sirius-trust-worker-summary'] = sirius_trust_report_worker_benefit_summary_info();
+  $items['sirius-trust-worker-change'] = sirius_trust_report_worker_benefit_change_info();
+  $items['sirius-trust-relationship-sequence'] = sirius_trust_report_relationship_sequence_info();
+
+  Sirius_Trust_Report_Newhire::getInstance()->setInfo($items);
+  Sirius_Trust_Report_Hour::getInstance()->setInfo($items);
+
+  // $items['sirius-trust-worker-detail'] = sirius_trust_report_worker_benefit_detail_info();
 
   $items['sirius-trust-worker-benefit-warning'] = array(
     'name' => t('Coverage - Warnings'),
@@ -187,6 +148,7 @@ function sirius_trust_sirius_config_links_alter(&$links) {
   $links['trust'] = array('title' => 'Trust');
   $links['trust']['links']['sirius/trust/benefits'] = array('title' => 'Benefits', 'description' => 'Configure system benefits.');
   $links['trust']['links']['sirius/trust/services'] = array('title' => 'Services', 'description' => 'Configure services (usually associated with CPT codes).');
+  $links['trust']['links']['sirius/trust/providers'] = array('title' => 'Providers', 'description' => 'Configure service providers, such as outpatient facilities, clinics, or hospitals.');
 }
 
 /**
@@ -271,4 +233,14 @@ function sirius_trust_sirius_wizard_info() {
   $items += sirius_trust_feed_providers_info();
   $items += sirius_trust_feed_services_info();
   return $items;
+}
+
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_trust_sirius_backlinks_from_node_alter(&$links, $node) {
+  if ($node->type == 'sirius_trust_service') {
+    $links['sirius/trust/services'] = array('name' => 'All Services');
+  }
 }

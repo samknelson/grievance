@@ -17,17 +17,17 @@ function sirius_node_tab_dispatch_job_bullpen_access($job_node) {
 	return FALSE;
 }
 
-function sirius_node_tab_dispatch_job_bullpen($job_node) {
-	return drupal_get_form('sirius_node_tab_dispatch_job_bullpen_form', $job_node);
-}
-
 function sirius_node_tab_dispatch_job_bullpen_form($form, &$form_state, $job_node) {
 	$form_state['job_nid'] = $job_node->nid;
 	$policy = sirius_dispatch_job_policy($job_node);
 	$event_node = node_load($job_node->field_sirius_events['und'][0]['target_id']);
 
+	// Summary text box
+	$summary_html = sirius_dispatch_job_counts_render($job_node->nid);
+	$form['counts'] = array('#markup' => $summary_html);
+
 	// Get the list of dispatchable workers
-	$workers = sirius_dispatch_job_get_dispatchable_workers($job_node, 'name', 0);
+	$workers = sirius_dispatch_elig_fetch($job_node, 'name', 0);
 	$tmp = array('ignore_redispatch' => TRUE);
 	if (!$workers) {
 		drupal_set_message(t('There are no workers currently available for dispatch.'), 'warning');

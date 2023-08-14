@@ -41,8 +41,11 @@ function sirius_customfield_menu_local_tasks_alter(&$data, $router_item, &$root_
 		$cf_json = sirius_json_get($cf_node);
 
 		// Must have access to this CF set
-		sirius_require('sirius', 'sirius.page_entity_customfield.inc');
-		if (!sirius_node_tab_entity_customfield_access_set($entity_node, $cf_nid)) { continue; }
+		$context = array(
+			'set_node' => $cf_node,
+			'entity_node' => $entity_node
+		);
+		if (!sirius_customfield_access('list', $context)) { continue; }
 
 		$title = $cf_json['customfield']['tab']['title'];
 		if (!$title) { $title = $cf_node->title; }
@@ -84,51 +87,47 @@ function sirius_customfield_content_types_all() {
   if (!isset($types)) {
   	$types['grievance'] = array(
   		'key' => 'grievance',
-  		'title' => 'Grievance',
   		'permission' => 'grievance admin',
   	);
 
   	$types['sirius_event'] = array(
   		'key' => 'sirius_event',
-  		'title' => 'Event',
   		'permission' => 'sirius event admin',
   	);
 
   	$types['sirius_dispatch_job_group'] = array(
   		'key' => 'sirius_dispatch_job_group',
-  		'title' => 'Dispatch Job Group',
   		'permission' => 'sirius dispatch admin',
   	);
 
   	$types['sirius_ledger_account'] = array(
   		'key' => 'sirius_ledger_account',
-  		'title' => 'Ledger Account',
   		'permission' => 'sirius ledger admin',
   	);
 
   	$types['sirius_trust_benefit'] = array(
   		'key' => 'sirius_trust_benefit',
-  		'title' => 'Trust Benefit',
   		'permission' => 'sirius trust admin',
   	);
 
   	$types['sirius_trust_worker_election'] = array(
   		'key' => 'sirius_trust_worker_election',
-  		'title' => 'Trust Worker Election',
   		'permission' => 'sirius trust admin',
   	);
 
   	$types['sirius_contact_relationship'] = array(
   		'key' => 'sirius_contact_relationship',
-  		'title' => 'Contact Relationship',
   		'permission' => 'sirius domain admin',
   	);
 
   	$types['sirius_log'] = array(
   		'key' => 'sirius_log',
-  		'title' => 'Log',
   		'permission' => 'sirius domain admin',
   	);
+
+  	foreach ($types as $key => $record) { 
+  		$types[$key]['title'] = sirius_content_type_name($key); 
+  	}
 
 		drupal_alter('sirius_customfield_content_types', $types);
   }
@@ -189,15 +188,26 @@ function sirius_customfield_set_list_all($content_type = NULL) {
 }
 
 function sirius_customfield_set_list($entity_node) {
-	$lookup = sirius_customfield_set_list_all();
+	$lookup = sirius_customfield_set_list_all($entity_node->type);
 
-	// Any custom fields explicitly selected
 	$entity_json = sirius_json_get($entity_node);
 	$options = array();
+
+	// We may have set this explicitly.
 	if ($entity_json && $entity_json['customfield']['sets']) { 
 		$cf_nids = array_filter(array_values($entity_json['customfield']['sets']));
 		foreach ($cf_nids as $cf_nid) {
 			$options[$cf_nid] = $lookup[$cf_nid];
+		}
+		return $options;
+	}
+
+	// Any custom field sets which are "show by default"
+	foreach ($lookup as $cf_nid => $cf_title) {
+		$cf_node = node_load($cf_nid);
+		$cf_json = sirius_json_get($cf_node);
+		if ($cf_json['customfield']['tab']['show_by_default'] == 'Yes') {
+			$options[$cf_nid] = $cf_title;
 		}
 	}
 
@@ -289,6 +299,10 @@ function sirius_customfield_node_view($entity_node, $view_mode, $langcode) {
 	$entity_json = sirius_json_get($entity_node);
 	$cf_sets = sirius_customfield_set_list($entity_node);
 	$cf_nodes = node_load_multiple(array_keys($cf_sets));
+	if ($entity_node->type == 'sirius_log' && $entity_node->field_sirius_category['und'][0]['value'] == 'customfield') {
+		$cf_nid = $entity_node->field_sirius_type['und'][0]['value'];
+		$cf_nodes[$cf_nid] = node_load($cf_nid);
+	}
 
 	foreach ($cf_nodes as $cf_nid => $cf_node) {
 		$cf_json = sirius_json_get($cf_node);
@@ -300,6 +314,128 @@ function sirius_customfield_node_view($entity_node, $view_mode, $langcode) {
 		}
 	}
 
+	// Add materials. This is a kludge.
+	if (sirius_materials_access('list', $entity_node)) {
+		$html .= sirius_node_tab_entity_materials_list($entity_node, array('hide_add' => TRUE, 'hide_empty' => TRUE, 'hide_header' => TRUE));
+	}
+
   $entity_node->content['custom_fields'][0]['#markup'] = $html;
   if (!$html) { $entity_node->content['custom_fields']['#access'] = FALSE; }
+}
+
+function sirius_customfield_form($cf_nid, $entity_node = NULL) {
+	$cf_node = node_load($cf_nid);
+  $cf_json = sirius_json_get($cf_node);
+  $cf_form = sirius_jsonfield_util_form_get($cf_json, 'default');
+  if (!$cf_form) { 
+  	return sirius_form_error("The form for this custom field set has not been configured. It can be set up " . l('here.', 'sirius/customfield/definition/list'));
+  }
+
+  $which = 'customfield_' . $cf_nid;
+
+  if ($entity_node) {
+	  $entity_json = sirius_json_get($entity_node);
+	  $entity_results = sirius_jsonfield_util_results_get($entity_json, $which);
+	  sirius_jsonfield_util_set_defaults($cf_form, $entity_results);
+	}
+
+  $cf_form['!intro'] = array(
+    '#markup' => '<div class="sirius-form">',
+    '#weight' => -9999,
+  );
+  $cf_form['!outro'] = array(
+    '#markup' => '</div>',
+    '#weight' => 9999,
+  );
+
+  return $cf_form;
+}
+
+function sirius_customfield_access_instance($set_node) {
+	$set_json = sirius_json_get($set_node);
+	$type = $set_json['customfield']['access']['type'];
+	if ($type) { $instance = sirius_access_instance($type); }
+	if (!$instance) { $instance = sirius_access_instance('denyall'); }
+	return $instance;
+}
+
+function sirius_customfield_access_instance_settings($set_node) {
+	$instance = sirius_customfield_access_instance($set_node);
+	$set_json = sirius_json_get($set_node);
+	$settings = $set_json['customfield']['access']['settings'][$instance->get_type()];
+	if (!$settings) { $settings = array(); }
+	return $settings;
+}
+
+//
+// Actions:
+// - list
+// - view
+// - add
+// - edit
+//
+
+function sirius_customfield_access($action, $context) {
+	$set_node = $context['set_node'];
+	$entity_node = $context['entity_node'];
+	$data_node = $context['data_node'];
+
+	// LEGACY SUPPORT: We simply have a list of roles.
+	$set_json = sirius_json_get($set_node);
+	if ($set_json['customfield']['tab']['roles']) {
+		global $user;
+		$set_rids = array_filter(array_values($set_json['customfield']['tab']['roles'])); 
+		$my_rids = array_filter(array_keys($user->roles));
+		if (!array_intersect($set_rids, $my_rids)) { return FALSE; }
+		if (!node_access('update', $entity_node)) { return FALSE; }
+		return TRUE; 
+	} 
+
+
+	// Fetch our settings
+	if (!$context['settings']) {
+		$settings = sirius_customfield_access_instance_settings($set_node); 
+		$context['settings'] = $settings;
+	}
+
+	// Call the access plugin
+	$instance = sirius_customfield_access_instance($set_node);
+	return $instance->access($action, $context);
+}
+
+function sirius_customfield_status($context) {
+	$json = sirius_json_get($context['data_node']);
+	$set_nid = $context['set_node']->nid;
+	$which = "customfield_$set_nid";
+	return $json[$which]['status'];
+}
+
+function sirius_customfield_status_set($context, $new_status) {
+	$data_node = $context['data_node'];
+	$json = sirius_json_get($data_node);
+	$set_nid = $context['set_node']->nid;
+	$which = "customfield_$set_nid";
+	$json[$which]['status'] = $new_status;
+	sirius_json_set($data_node, $json);
+	node_save($data_node);
+	return $new_status;
+}
+
+function sirius_customfield_multiple_context($data_node) {
+	$set_nid = $data_node->field_sirius_type['und'][0]['value'];
+	$set_node = node_load($set_nid);
+	$entity_node = sirius_log_handler($data_node, NULL);
+	$settings = sirius_customfield_access_instance_settings($set_node); 
+	$context = array(	
+		'set_node' => $set_node,
+		'entity_node' => $entity_node,
+		'data_node' => $data_node,
+		'settings' => $settings,
+	);
+	return $context;
+}
+
+function sirius_customfield_multiple($set_node) {
+	$set_json = sirius_json_get($set_node);
+	return ($set_json['customfield']['tab']['multiple'] == 'Yes');
 }

@@ -143,6 +143,7 @@ function sirius_worker_ein_node_view($node, $view_mode, $langcode) {
 	$html = '';
 	foreach ($employee_records as $employee_record) {
 		if (!$employee_record['ein']) { continue; }
+		if (!$employee_record['employer_name']) { continue; }
 		$html .= sirius_fakerender_field($employee_record['employer_name'] . ': ', $employee_record['ein']);
 	}
 	if (!$html) {

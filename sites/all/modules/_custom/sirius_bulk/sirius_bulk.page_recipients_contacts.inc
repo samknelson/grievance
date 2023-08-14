@@ -15,14 +15,15 @@ function sirius_bulk_node_tab_recipients_contacts_form($form, &$form_state, $bul
 	$contact_definition_json = sirius_contact_definition();
 	$contact_definition_form = sirius_jsonfield_util_form_get($contact_definition_json, 'default');
 
+	$json_forms = array();
+	$json_forms['sirius_contact'] = array('default' => $contact_definition_form);
+	$json_forms['sirius_worker'] = array('default' => array());
+
 	sirius_mightysearch_form_prepare(
 		$form, 
 		$form_state, 
 		$event_node->nid,
-		array(
-			'sirius_contact' => array('default' => $contact_definition_form),
-			'sirius_worker' => array('default' => array()),
-		),
+		$json_forms,
 		array(
 			'bulk_recipient_add' => array(
 				'title' => 'Add Bulk Recipient',

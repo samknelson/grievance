@@ -763,6 +763,13 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_enable_revisions_page_node_grievance_settlement';
+  $strongarm->value = 1;
+  $export['diff_enable_revisions_page_node_grievance_settlement'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'diff_enable_revisions_page_node_grievance_shop';
   $strongarm->value = 0;
   $export['diff_enable_revisions_page_node_grievance_shop'] = $strongarm;
@@ -1043,6 +1050,13 @@ function grievance_content_types_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_show_preview_changes_node_grievance_settlement';
+  $strongarm->value = 0;
+  $export['diff_show_preview_changes_node_grievance_settlement'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'diff_show_preview_changes_node_grievance_shop';
   $strongarm->value = 0;
   $export['diff_show_preview_changes_node_grievance_shop'] = $strongarm;
@@ -1319,6 +1333,13 @@ function grievance_content_types_strongarm() {
   $strongarm->name = 'diff_view_mode_preview_node_grievance_log';
   $strongarm->value = 'full';
   $export['diff_view_mode_preview_node_grievance_log'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_view_mode_preview_node_grievance_settlement';
+  $strongarm->value = 'full';
+  $export['diff_view_mode_preview_node_grievance_settlement'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -2219,6 +2240,12 @@ function grievance_content_types_strongarm() {
         'custom_settings' => FALSE,
       ),
       'grievance_form_226' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'sirius_worker' => array(
         'custom_settings' => FALSE,
       ),
     ),
@@ -5857,7 +5884,7 @@ function grievance_content_types_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_grievance_settlement';
-  $strongarm->value = '1';
+  $strongarm->value = '0';
   $export['node_preview_grievance_settlement'] = $strongarm;
 
   $strongarm = new stdClass();

@@ -31,7 +31,9 @@ function sirius_bookmark_types() {
 		'sirius_worker', 
 		'grievance_shop', 
 		'sirius_contact', 
-		'sirius_phonenumber'
+		'sirius_phonenumber',
+		'sirius_trust_provider',
+		'sirius_trust_service',
 	);
 }
 

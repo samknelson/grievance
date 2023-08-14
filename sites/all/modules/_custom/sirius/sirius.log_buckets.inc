@@ -115,23 +115,13 @@ function sirius_log_buckets() {
 				'can_add' => FALSE,
 			),
 
-			'worker_ws' => array(
+			'worker_status' => array(
 				'title' => 'Log',
 				'content_type' => 'sirius_worker',
 				'permissions' => array('sirius dispatch staff'),
-				'path' => 'sirius_worker_work_status/log',
-				'weight' => 7,
-				'categories' => array('worker:work_status'),
-				'can_add' => FALSE,
-			),
-
-			'worker_ms' => array(
-				'title' => 'Log',
-				'content_type' => 'sirius_worker',
-				'permissions' => array('sirius dispatch staff'),
-				'path' => 'sirius_worker_industry/log',
-				'weight' => 7,
-				'categories' => array('worker:member_status'),
+				'path' => 'sirius_worker_status/log',
+				'weight' => 50,
+				'categories' => array('worker:work_status', 'worker:member_status'),
 				'can_add' => FALSE,
 			),
 
@@ -186,6 +176,20 @@ function sirius_log_buckets() {
 
 		foreach ($buckets as $bucket_id => $bucket) {
 			$buckets[$bucket_id]['id'] = $bucket_id;
+		}
+
+		if (sirius_domain_variable_get('sirius_log_quicklog_sirius_worker_bucketview', '') == 'Yes') {
+			$buckets['worker']['views'] = array(
+				'quicklog' => array(
+					'title' => 'Quicklog Only',
+					'filters' => array(
+						'category_types' => array_keys(sirius_log_quicklog_category_type_options('sirius_worker')),
+					),
+				),
+				'all' => array(
+					'title' => 'All Entries',
+				),
+			);
 		}
 
 		drupal_alter('sirius_log_buckets', $buckets);

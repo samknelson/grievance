@@ -81,6 +81,15 @@ function sirius_materials_access($action, $entity, $material_node = NULL) {
 	$document_type_tid = $json['material']['document_type_tid'];
 	if ($document_type_tid && !in_array($document_type_tid, array_keys($document_types))) { return FALSE; }
 
+	// Handle attachment to customfield logs specially. This is not the most elegant code ever written.
+	if ($node->type == 'sirius_log') {
+		// Only customfield log entries can have materials.
+		if ($node->field_sirius_category['und'][0]['value'] != 'customfield') { return FALSE; }
+
+		// Defer access control to customfield access plugin
+		return sirius_customfield_access("material_$action", sirius_customfield_multiple_context($node));
+	}
+
 	// Admins can do anything
 	if (user_access('sirius admin')) { return TRUE; }
 
@@ -189,14 +198,21 @@ function sirius_node_tab_entity_materials_list($entity, $options = array()) {
 	foreach ($materials as $material_nid => $material_node) {
 
 		$tools = '';
+
+		// Kludge...
+		$path = current_path();
+		if (preg_match('/\d+$/', $path)) {
+			$path .= '/' . $entity->type . '_materials';
+		}
+
 		if (sirius_materials_has_body($material_node) && sirius_materials_access('view', $entity, $material_node)) {
-			$tools .= l('View', current_path() . '/view/' . $material_nid, array('attributes' => array('class' => array('tool-button'))));
+			$tools .= l('View', $path . '/view/' . $material_nid, array('attributes' => array('class' => array('tool-button'))));
 		}
 		if (sirius_materials_access('edit', $entity, $material_node)) {
-			$tools .= l('Edit', current_path() . '/edit/' . $material_nid, array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
+			$tools .= l('Edit', $path . '/edit/' . $material_nid, array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
 		}
 		if (sirius_materials_access('delete', $entity, $material_node)) {
-			$tools .= l('Delete', current_path() . '/delete/' . $material_nid, array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
+			$tools .= l('Delete', $path . '/delete/' . $material_nid, array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
 		}
 
 		if (sirius_materials_access('view', $entity, $material_node)) {
@@ -225,7 +241,13 @@ function sirius_node_tab_entity_materials_list($entity, $options = array()) {
 	}
 
 	if ($materials) {
-		$header = array('Title', 'Description', 'Attachment', 'Tools');
+		
+		if ($options['hide_header']) {
+			$header = array();
+		} else {
+			$header = array('Title', 'Description', 'Attachment', 'Tools');
+		}
+
 		$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => array('sirius_materials'))));
 	} else {
 		$html .= '<p>No materials found.</p>';

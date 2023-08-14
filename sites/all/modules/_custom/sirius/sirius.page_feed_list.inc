@@ -54,8 +54,12 @@ function sirius_feed_page_list($wizard_name) {
   $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid ";
   $sql .= "left join node shop_node on shop_node.nid = field_grievance_shop_target_id ";
   $sql .= "where node.type = 'sirius_feed' ";
-  $sql .= "and field_sirius_domain_target_id = :domain_nid ";
-  $sql_args[':domain_nid'] = $domain_nid;
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id is null ";
+  }
   $sql .= "and field_sirius_type_value = :wizard_name ";
   $sql_args[':wizard_name'] = $wizard_name;
   if ($employer) {

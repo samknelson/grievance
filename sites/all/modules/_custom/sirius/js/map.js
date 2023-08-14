@@ -45,6 +45,24 @@
 				// Don't know why this doesn't get passed in
 				map_id = map._container.id;
 
+				// If we were passed a center and a zoom, set it.
+				if (map_settings && 
+					map_settings['sirius'] &&
+					map_settings['sirius']['center']) {
+
+					// map.setView([41.506390, -73.976160], 13);
+					console.log(map_settings);
+					map.setView(
+						[
+							map_settings['sirius']['center']['lat'],
+							map_settings['sirius']['center']['lon']
+						], 
+						map_settings['sirius']['center']['zoom']
+					);
+				}
+
+				// console.log(map_settings);
+
 				// Handle modal links within marker popups. Normally we wouldn't bother, Drupal does this for free. 
 				// But the HTML for the popup is rendered dynamically, so Drupal doesn't get a chance to handle it. So we
 				// do some ugliness.
@@ -75,6 +93,8 @@
        				$('#sirius_map_poll_message').html(e.message);
         		});
 		  	}
+
+
 		  });
 
 			// Send our location back to the server

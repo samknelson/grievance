@@ -2,6 +2,47 @@
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.menu.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.policy.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_pcct') . '/sirius_pcct.blocks.inc';
+
+function sirius_pcct_member_lookup() {
+  global $user;
+  $uid = $user->uid;
+  if (!$user || !$uid) { return array('success' => FALSE, 'msg' => 'User is not logged in.'); }
+
+  $worker_node = sirius_worker_get();
+  if (!$worker_node) { return array('success' => FALSE, 'msg' => 'The current user is not associated with a worker.'); }
+
+  return sirius_pcct_member_lookup_by_worker($worker_node);
+}
+
+
+function sirius_pcct_member_lookup_by_worker($worker_node) {
+  $member_id = $worker_node->field_sirius_id['und'][0]['value'];
+  if (!$member_id) { return array('success' => FALSE, 'msg' => 'The worker does not have a member ID.'); }
+
+  $member_token = $worker_node->field_sirius_id2['und'][0]['value'];
+  if (!$member_token) { return array('success' => FALSE, 'msg' => 'The worker does not have a member token.'); }
+
+  if (!sirius_flood_is_allowed('sirius_pcct_member_lookup')) { return array('success' => FALSE, 'msg' => 'Too many member lookups. Please wait or contact an administrator.'); }
+  sirius_flood_register_event('sirius_pcct_member_lookup');
+
+  sirius_log('pcct:member_lookup', 'lookup', 'Lookup member id: ' . $member_id, '', '', array($worker_node->nid), array());
+
+  return sirius_service_client_request('pcct_member_lookup', $member_id, $member_token);
+}
+
+/** 
+ * Implements hook_sirius_service_client_info
+ */
+
+function sirius_pcct_sirius_service_client_info() {
+  sirius_require('sirius_pcct', 'sirius_pcct.member.inc');
+
+  $infos = array();
+  Sirius_Pcct_Member_Lookup_Dummy::getInstance()->setInfo($infos);
+  return $infos;
+}
 
 /**
  * Implements hook_sirius_domain_component_info
@@ -22,5 +63,71 @@ function sirius_pcct_sirius_domain_component_info() {
 
 function sirius_pcct_sirius_config_links_alter(&$links) {
   $links['pcct'] = array('title' => 'PCCT');
+
   $links['pcct']['links']['sirius/pcct/config'] = array('title' => 'Config', 'description' => 'Configure Personal Cost Comparison Tool (PCCT) functionality');
+  $links['pcct']['links']['sirius/pcct/config/global'] = array('title' => 'Global Config', 'description' => 'Global settings which apply across all domains');
+}
+
+
+function sirius_pcct_node_access_util($nid, $type) {
+  $node = node_load($nid);
+  if (!$node) {
+    return array('success' => FALSE, 'msg' => 'Not a node.');
+  }
+
+  if ($node->type != $type) {
+    return array('success' => FALSE, 'msg' => "Node is not of type $type.");
+  }
+
+  if ($node->field_sirius_domain['und'][0]['target_id'] != sirius_domain_nid()) {
+    return array('success' => FALSE, 'msg' => "Node is in the wrong domain.");
+  }
+
+  if ($node->field_sirius_active['und'][0]['value'] == 'No') {
+    return array('success' => FALSE, 'msg' => "Node is not active.");
+  }
+
+  return array('success' => TRUE);
+}
+
+/***
+ * Implements hook_sirius_wizard_info()
+ */
+
+function sirius_pcct_sirius_wizard_info() {
+  sirius_require('sirius_pcct', 'sirius_pcct.feed_rates_by_level.inc');
+  sirius_require('sirius_pcct', 'sirius_pcct.feed_rates_by_service.inc');
+
+  $items = array();
+  $items += sirius_pcct_feed_rates_by_level_info();
+  $items += sirius_pcct_feed_rates_by_service_info();
+  return $items;
+}
+
+function sirius_pcct_launch_code_lookup($launch_code) {
+  if (!$launch_code) { return NULL; }
+  $launch_code = strtolower($launch_code);
+
+  $domains = sirius_domain_tree_render_as_select();
+  foreach ($domains as $domain_nid => $ignore) {
+    $probe = sirius_domain_variable_get('sirius_pcct_launch_code', NULL, $domain_nid);
+    if ($probe == $launch_code) { return $domain_nid; }
+  }
+
+  return NULL;
+}
+
+/**
+ * Implements hook_sirius_flood_info()
+ */
+
+function sirius_pcct_sirius_flood_info() {
+  $info['sirius_pcct_member_lookup'] = array(
+    'title' => 'PCCT Member Lookup',
+    'threshold_default' => 10,
+    'window_default' => 60,
+    'description' => 'A user attempted a PCCT member lookup.',
+  );
+
+  return $info;
 }

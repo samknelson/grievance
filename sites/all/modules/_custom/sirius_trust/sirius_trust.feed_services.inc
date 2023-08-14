@@ -44,11 +44,11 @@ function sirius_trust_feed_services_info() {
       ),
       'fields' => array(
         'sirius_id' => array('group' => 'pk', 'type' => 'text',),
-
-        'title' => array('group' => 'core', 'title' => 'Company Name'),
+        'sirius_trust_service_type' => array('group' => 'core', 'title' => 'Service Type', 'type' => 'term_reference', 'taxonomy' => 'sirius_trust_service_type'),
+        'title' => array('group' => 'core', 'title' => 'Treatment Name'),
         'sirius_id2' => array('group' => 'core'),
         'sirius_active' => array('group' => 'core', 'type' => 'list',),
-        'body' => array('group' => 'core', 'type' => 'text'),
+        'body' => array('group' => 'core', 'type' => 'text', 'title' => 'Description'),
       ),
       'batch_size' => 50,
       'callback_row_verify' => 'sirius_trust_feed_services_row_verify',
@@ -142,6 +142,8 @@ function sirius_trust_feed_services_row_process($feed_node, $info, $data, $row) 
   }
 
   if ($row['title']) { $node->title = $row['title']; }
+  if ($row['body']) { $node->body['und'][0]['value'] = $row['body']; }
+
   if ($row['sirius_id']) {
     $node->field_sirius_id['und'][0]['value'] = $row['sirius_id'];
   }

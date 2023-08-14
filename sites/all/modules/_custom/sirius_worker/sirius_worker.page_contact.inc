@@ -1,6 +1,7 @@
 <?php
 
 function sirius_node_tab_worker_contact_access($worker_node) {
+	// @todo Redundant
 	return node_access('view', $worker_node);
 }
 

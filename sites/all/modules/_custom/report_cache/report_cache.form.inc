@@ -9,7 +9,9 @@ function report_cache_generate_form($form, &$form_state, $report_type) {
 
   report_cache_form_prepare($report_type, $form, $form_state);
 
-  if ($info['parameters_form_callback']) {
+  // "parameters_form_callback" is legacy. We also support "instance", and call the method "form".
+  
+  if ($info['parameters_form_callback'] || $info['generator']) {
 	  $instance_options = report_cache_instances_list($report_type);
 	  if ($instance_options) {
 	  	$form['instance'] = array(
@@ -24,7 +26,12 @@ function report_cache_generate_form($form, &$form_state, $report_type) {
 	  	);
 	  }
 
-  	$form['parameters'] = $info['parameters_form_callback']($report_type);
+	  if ($info['generator']) {
+  		$form['parameters'] = $info['generator']->form();
+	  } else {
+	  	// Legacy support
+  		$form['parameters'] = $info['parameters_form_callback']($report_type);
+	  }
   	if ($form['parameters']) {
 	  	if (isset($form_state['input']['instance'])) {
 	  		$uuid = $form_state['input']['instance'];
@@ -158,13 +165,18 @@ function report_cache_form_submit($form, &$form_state) {
 	$report_type_info = report_cache_info($report_type);
 	if ($report_type_info['file']) { sirius_require($report_type_info['module'], $report_type_info['file']); }
 
-	$pk_list_callback = $report_type_info['pk_list_callback'];
-	if (!$pk_list_callback) {
-		drupal_set_message(t('No pk_list_callback.'), 'error');
-		return;
+	if ($report_type_info['generator']) {
+		$pks = $report_type_info['generator']->pks($form_state, $report_type, $report_id);
+	} else {
+		$pk_list_callback = $report_type_info['pk_list_callback'];
+		if (!$pk_list_callback && !$report_type_info) {
+			drupal_set_message(t('No pk_list_callback.'), 'error');
+			return;
+		}
+
+		$pks = $pk_list_callback($form_state, $report_type, $report_id);
 	}
 
-	$pks = $pk_list_callback($form_state, $report_type, $report_id);
 	$limit = (int) $form_state['values']['report_limit'];
 	if ($limit) {
 		$pks = array_slice($pks, 0, $limit);
@@ -257,23 +269,25 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 		}
 	}
 	
-	$batch_callback = $report_type_info['batch_callback'];
-	if (!$batch_callback) {
-		drupal_set_message(t('No batch_callback.'), 'error');
-		return;
-	}
-
 	$msg = t('Generating statement for batch @count / @total', array('@count' => $count, '@total' => $total));
 	if (!is_array($pk)) {
 		$msg .= ': ' . $pk;
 	}
 	$context['message'] = $msg;
 
-	$row = $batch_callback($pk, $values, $report_id, $report_action, $context);
-
-	if (!$row) {
-		return;
+	if ($report_type_info['generator']) {
+		$row = $report_type_info['generator']->batch($pk, $values, $context);
+	} else {
+		// Legacy support
+		$batch_callback = $report_type_info['batch_callback'];
+		if (!$batch_callback) {
+			drupal_set_message(t('No batch_callback.'), 'error');
+			return;
+		}
+		$row = $batch_callback($pk, $values, $report_id, $report_action, $context);
 	}
+
+	if (!$row) { return; }
 
 	$instance_uuid = $values['instance'];
 	

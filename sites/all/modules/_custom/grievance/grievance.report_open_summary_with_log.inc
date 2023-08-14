@@ -1,7 +1,11 @@
 <?php
 
+function grievance_report_open_summary_with_log_redirect() {
+  drupal_goto('sirius/reports/grievance-report-open-summary-with-log/form');
+}
+
 function grievance_report_open_summary_with_log() {
-	return drupal_get_form('grievance_report_open_summary_with_log_form');
+  return drupal_get_form('grievance_report_open_summary_with_log_form');
 }
 
 function grievance_report_open_summary_with_log_form($form, &$form_state) {
@@ -40,6 +44,12 @@ function grievance_report_open_summary_with_log_form($form, &$form_state) {
     '#era_query_settings' => array(),
     '#description' => t('Leave blank to select all organizers.'),
     '#prefix' => '<div class="form-start">',
+  );
+
+  $form['company'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Company'),
+    '#description' => t('Enter all or part of the company name.  Leave blank to select all companies.'),
   );
 
   $form['shop'] = array(
@@ -104,6 +114,7 @@ function grievance_report_open_summary_with_log_fields() {
   return array(
     'nid' => t('NID'),
     'specialist' => t('Specialist'), 
+    'company' => t('Company'),
     'shop' => t('Shop'), 
     'grievance_id' => t('Grievance ID'), 
     'first_name' => t('First Name'), 
@@ -142,6 +153,7 @@ function grievance_report_open_summary_with_log_pks($form_state, $report_type, $
   $organizer_nid = $form_state['values']['organizer']['entity_id'];
   $classaction = $form_state['values']['classaction'];
   $broughtby = $form_state['values']['broughtby'];
+  $company = $form_state['values']['company'];
 
   $args = array();
   $args[':open_status_tids'] = $open_status_tids;
@@ -154,6 +166,8 @@ function grievance_report_open_summary_with_log_pks($form_state, $report_type, $
   $sql .= "left join field_data_field_grievance_classaction on (field_data_field_grievance_classaction.entity_type = 'node' and node.nid = field_data_field_grievance_classaction.entity_id) ";
   $sql .= "left join field_data_field_grievance_broughtby on (field_data_field_grievance_broughtby.entity_type = 'node' and node.nid = field_data_field_grievance_broughtby.entity_id) ";
   $sql .= "left join node shop_node on shop_node.nid = field_grievance_shop_target_id ";
+  $sql .= "left join field_data_field_grievance_company on field_data_field_grievance_company.entity_type = 'node' and field_data_field_grievance_company.entity_id = shop_node.nid ";
+  $sql .= "left join node company_node on field_grievance_company_target_id = company_node.nid ";
   $sql .= "where node.type = 'grievance' ";
   $sql .= "and field_data_field_grievance_status.field_grievance_status_tid in (:open_status_tids) ";
   if ($shop) {
@@ -164,6 +178,10 @@ function grievance_report_open_summary_with_log_pks($form_state, $report_type, $
       $sql .= "and shop_node.title like :shop ";
       $args[':shop'] = '%' . $shop . '%';
     }
+  }
+  if ($company) {
+    $sql .= "and company_node.title like :company ";
+    $args[':company'] = '%' . $company . '%';
   }
   if ($organizer_nid) {
     $sql .= "and field_grievance_rep_organizer_target_id = :organizer_nid ";
@@ -179,7 +197,7 @@ function grievance_report_open_summary_with_log_pks($form_state, $report_type, $
   }
   $sql .= "order by node.nid ";
 
-  $stmt = db_query($sql, $args);
+  $stmt = sirius_sql_query($sql, $args);
   $nids = array();
   while ($hr = $stmt->fetchAssoc()) {
     $nids[] = $hr['nid'];
@@ -206,11 +224,12 @@ function grievance_report_open_summary_with_log_batch($grievance_nids, $values, 
 
 function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $values, $context, $lookups) {
   $row = array();
-  $row[] = $grievance_nid;
+  $row['nid'] = $grievance_nid;
 
   // Basic grievancce information 
   $sql = "select users.name as user_name, ";
   $sql .= "shop_node.title as shop_title, ";
+  $sql .= "company_node.title as company_title, ";
   $sql .= "field_grievance_id_value as id, ";
   $sql .= "field_grievance_first_name_value as first_name, "; 
   $sql .= "field_grievance_last_name_value as last_name, "; 
@@ -226,18 +245,21 @@ function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $value
   $sql .= "left join field_data_field_grievance_status on (field_data_field_grievance_status.entity_type = 'node' and field_data_field_grievance_status.entity_id = node.nid) ";
   $sql .= "left join users on field_grievance_rep_organizer_target_id = users.uid ";
   $sql .= "left join node shop_node on field_grievance_shop_target_id = shop_node.nid ";
+  $sql .= "left join field_data_field_grievance_company on field_data_field_grievance_company.entity_type = 'node' and field_data_field_grievance_company.entity_id = shop_node.nid ";
+  $sql .= "left join node company_node on field_grievance_company_target_id = company_node.nid ";
   $sql .= "left join taxonomy_term_data class_term on field_grievance_class_tid_tid = class_term.tid ";
   $sql .= "left join taxonomy_term_data status_term on field_grievance_status_tid = status_term.tid ";
   $sql .= "where node.nid = :nid ";
   $stmt = db_query($sql, array(':nid' => $grievance_nid));
   $hr = $stmt->fetchAssoc();
-  $row[] = $hr['user_name'];
-  $row[] = $hr['shop_title'];
-  $row[] = $hr['id'];
-  $row[] = $hr['first_name'];
-  $row[] = $hr['last_name'];
-  $row[] = $hr['classification'];
-  $current_status_name = $hr['current_status_name'];
+  $row['specialist'] = $hr['user_name'];
+  $row['company'] = $hr['company_title'];
+  $row['shop'] = $hr['shop_title'];
+  $row['grievance_id'] = $hr['id'];
+  $row['first_name'] = $hr['first_name'];
+  $row['last_name'] = $hr['last_name'];
+  $row['classification'] = $hr['classification'];
+  $row['current_status'] = $hr['current_status_name'];
 
   // Violations
   $sql = "select clause_node.title as clause_title ";
@@ -251,7 +273,7 @@ function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $value
     if ($clause_title) { $clause_title .= '<br />'; }
     $clause_title .= $hr['clause_title'];
   }
-  $row[] = $clause_title;
+  $row['cba'] = $clause_title;
 
   for ($i=1; $i<=2; ++$i) {
     if ($values['col_' . $i]) {
@@ -274,15 +296,13 @@ function grievance_report_open_summary_with_log_batch_nid($grievance_nid, $value
       else { $sql .= "and field_grievance_status_tid in (:tids) "; }
       $stmt = db_query($sql, array(':nid' => $grievance_nid, ':tids' => $tids));
       $hr = $stmt->fetchAssoc();
-      $row[] = $hr['c'];
-      $row[] = $hr['first_date'];
+      $row["col_${i}_count"] = $hr['c'];
+      $row["col_${i}_date"] = $hr['first_date'];
     } else {
-      $row[] = 'N/A';
-      $row[] = 'N/A';
+      $row["col_${i}_count"] = 'N/A';
+      $row["col_${i}_date"] = 'N/A';
     }
   }
-
-  $row[] = $current_status_name;
 
   return $row;
 }
@@ -542,21 +562,22 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
 
   $header = array();
   if ($which == 'specialist') {
-    $header[] = 'Employer';
+    $header[] = t('Employer');
   } else {
-    $header[] = 'Specialist';
+    $header[] = t('Specialist');
   }
-  $header[] = 'Grievance ID';
-  $header[] = 'First Name';
-  $header[] = 'Last Name';
-  $header[] = 'Classification';
-  $header[] = 'Current Status';
-  $header[] = 'CBA Provision(s) Violated';
+  $header[] = t('Grievance ID');
+  $header[] = t('First Name');
+  $header[] = t('Last Name');
+  $header[] = t('Classification');
+  $header[] = t('Current Status');
+  $header[] = t('CBA Provision(s) Violated');
   for ($i=1; $i<=2; ++$i) {
     if ($parameters["col_$i"]) {
-      $header[] = "Milestone #$i Date";
+      $header[] = t("Milestone #$i Date");
     }
   }
+  if (!$csv) { $header[] = t('Tools'); }
 
   $rows = array();
   foreach ($data as $key => $sub_data) {
@@ -587,6 +608,10 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
           if ($hr["col_${i}_date"]) { $row[] = date('Y-m-d', strtotime($hr["col_${i}_date"])); } 
           else { $row[] = 'N/A'; }
         }
+      }
+
+      if (!$csv) {
+        $row[] = l('View', 'node/' . $hr['nid'], array('attributes' => array('class' => array('tool-button'))));
       }
       $rows[] = $row;
     }

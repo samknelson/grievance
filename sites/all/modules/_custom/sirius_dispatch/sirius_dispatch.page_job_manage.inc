@@ -25,13 +25,11 @@ function sirius_node_tab_dispatch_job_manage($job_node) {
 function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node) {
 	$form_state['job_node'] = $job_node;
 	$policy = sirius_dispatch_job_policy($job_node);
-	// drupal_add_js(drupal_get_path('module', 'sirius_dispatch') . '/js/sirius_dispatch.employer_job_view.js', 'file');
-	// drupal_add_css(drupal_get_path('module', 'sirius_dispatch') . '/css/sirius_dispatch.css');
-  // drupal_add_library('system', 'ui.tabs');
-  // drupal_add_js(array('sirius_dispatch' => array('job_nid' => $job_node->nid)), array('type' => 'setting'));
+	$status = $job_node->field_sirius_dispatch_job_status['und'][0]['value'];
 
 	$form['#tree'] = TRUE;
 
+	// Render the job
   $html .= '<div class="sirius_dispatch_job_intro">';
   $count = $job_node->field_sirius_count['und'][0]['value'];
   if (!$count) { $count = 0; }
@@ -48,10 +46,9 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
   $html .= '</div>';
 	$renderable = node_view($job_node, 'full');
 	$html .= drupal_render($renderable);
-
 	$form['intro'] = array('#markup' => $html);
 
-	$status = $job_node->field_sirius_dispatch_job_status['und'][0]['value'];
+	// Can the user run this job?
 	global $user;
 	$user_roles = array_keys($user->roles);
 	$can_run = FALSE;
@@ -63,10 +60,9 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 			$can_run = TRUE;
 		}
 	}
-
 	$is_staff = user_access('sirius dispatch staff');
 
-	// Staff form
+	// What actions are available?
 	$options = array();
 	$options[NULL] = t('-- Select --');
 	$options['refresh'] = t('Refresh this page');
@@ -96,6 +92,8 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 		$options['create_dispatches_auto'] = t('Create Dispatches - Automatic');
 		$options['create_dispatches_manual'] = t('Create Dispatches - Manual');
 		$options['notify'] = t('Send notifications');
+		$options['show_next_dispatches'] = t('Show Next Dispatches');
+		$options['clear_eligibility_cache'] = t('Clear Eligibility Cache');
 	}
 
 	if ($status == 'Filled' && $can_run && $is_staff) {
@@ -242,8 +240,10 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 			'#states' => array(
 		  	'visible' => array(
 		  		array(':input[name="action"]' => array('value' => 'create_dispatches_auto')),
+		  		array(':input[name="action"]' => array('value' => 'show_next_dispatches')),
 		  	)
 			),
+			'#default_value' => 10,
 		);
 
 		if (user_access('sirius dispatch staff')) {
@@ -298,7 +298,7 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 	}
 
 	if ($action == 'explain') {
-		$result = sirius_dispatch_job_get_dispatchable_workers_explain_by_worker_id($job_node, $form_state['values']['wtf'], array('cbn' => $form_state['values']['wtf_cbn'], 'ignore_redispatch' => TRUE));
+		$result = sirius_dispatch_elig_explain_by_worker_id($job_node, $form_state['values']['wtf'], array('cbn' => $form_state['values']['wtf_cbn'], 'ignore_redispatch' => TRUE));
 		if ($result['success']) {
 			drupal_set_message($result['msg']);
 		} else {
@@ -365,8 +365,18 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 	}
 
 	if ($action == 'poll') {
-		sirius_dispatch_run($job_node);
-		drupal_set_message(t("Poll complete; see the log for details."));
+		$result = sirius_dispatch_run($job_node);
+		if ($result['success']) {
+			drupal_set_message(t("Poll complete; see the log for details."));
+		} else {
+			drupal_set_message("Poll failed: " . $result['msg'], 'error');
+		}
+
+		if ($result['info']) {
+			foreach ($result['info'] as $info) {
+				drupal_set_message($info);
+			}
+		}
 		return;
 	}
 
@@ -392,20 +402,21 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 	}
 
 	if ($action == 'create_dispatches_manual') {
-		foreach ($form_state['values']['workers'] as $ignore => $worker_nid) {
-			if ($worker_nid) {
-				$worker_node = node_load($worker_nid);
-				$result = sirius_dispatch_actions_create($job_node, $worker_node->nid, $form_state['values']['sirius_dispatch_cbn']);
-				if ($result['success']) {
-					drupal_set_message(t("Dispatched: @name", array('@name' => $worker_node->title)));
-				} else {
-					drupal_set_message(t("Dispatch failed for @name: @msg", array('@name' => $worker_node->title, '@msg' => $result['msg'])), 'warning');
-				}
+		if (!$form_state['values']['fieldset_workers']['ajax']['workers']) { drupal_set_message("No workers found."); return; }
+		$workers = array_filter(array_values($form_state['values']['fieldset_workers']['ajax']['workers']));
+		if (!$workers) { drupal_set_message("Please select at least one worker to dispatch."); return; }
+		foreach ($workers as $worker_nid) {
+			$worker_node = node_load($worker_nid);
+			$result = sirius_dispatch_actions_create($job_node, $worker_node->nid, $form_state['values']['sirius_dispatch_cbn']);
+			if ($result['success']) {
+				drupal_set_message(t("Dispatched: @name", array('@name' => $worker_node->title)));
+			} else {
+				drupal_set_message(t("Dispatch failed for @name: @msg", array('@name' => $worker_node->title, '@msg' => $result['msg'])), 'warning');
 			}
 		}
 	}
 
-	if ($action == 'create_dispatches_auto') {
+	if ($action == 'create_dispatches_auto' || $action == 'show_next_dispatches') {
 		$count = $form_state['values']['count'];
 		if ($count < 1) {
 			drupal_set_message(t("Please enter a number greater than 0."), 'error');
@@ -421,24 +432,46 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 			drupal_set_message(t("Please enter a number less than the number of unfilled positions."), 'error');
 			return;
 		}
-		$workers = sirius_dispatch_job_get_dispatchable_workers($job_node, 'dispatch', $count);
-		$created = 0;
-		foreach ($workers as $hr) {
-			$worker_node = node_load($hr['nid']);
-			sirius_dispatch_actions_create($job_node, $worker_node->nid, 'No');
-			drupal_set_message(t("Dispatched: @name", array('@name' => $worker_node->title)));
-			++$created;
-		}
 
-		$msg = '';
-		if ($created < $count) {
-			$msg = t("Only created @created out of @count dispatches; presumably there are no more available workers.", array('@created' => $created, '@count' => $count));
-			drupal_set_message($msg, 'warning');
+		$filters = array();
+		$filters['set_eligibility_cache'] = TRUE;
+		$workers = sirius_dispatch_elig_fetch($job_node, 'dispatch', $count, $filters);
+
+		if ($action == 'show_next_dispatches') {
+			if (!$workers) { 
+				drupal_set_message("There are no more available workers to be dispatched.");
+			} else {
+				$count = 0;
+				$total = count($workers);
+				foreach ($workers as $worker_nid => $worker) {
+					++$count;
+					$msg = "$count / $total: ";
+					$msg .= l(
+						$worker['given'] . ' ' . $worker['family'] . ' : ' . $worker['id'],
+						"node/$worker_nid"
+					);
+					drupal_set_message($msg);
+				}
+			}
 		} else {
-			$msg = t("Created @created dispatch(es).", array('@created' => $created));
-			drupal_set_message($msg);
+			$created = 0;
+			foreach ($workers as $hr) {
+				$worker_node = node_load($hr['nid']);
+				sirius_dispatch_actions_create($job_node, $worker_node->nid, 'No');
+				drupal_set_message(t("Dispatched: @name", array('@name' => $worker_node->title)));
+				++$created;
+			}
+
+			$msg = '';
+			if ($created < $count) {
+				$msg = t("Only created @created out of @count dispatches; presumably there are no more available workers.", array('@created' => $created, '@count' => $count));
+				drupal_set_message($msg, 'warning');
+			} else {
+				$msg = t("Created @created dispatch(es).", array('@created' => $created));
+				drupal_set_message($msg);
+			}
+			sirius_log('job:create_dispatches', 'auto', $msg, $notes, $notes, array($job_node->nid));
 		}
-		sirius_log('job:create_dispatches', 'auto', $msg, $notes, $notes, array($job_node->nid));
 	}
 
 	if ($action == 'notify') {
@@ -466,5 +499,13 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 			}
 	  }
 		// sirius_log('job:notify', 'notify', "Sent $count notifications", $notes, $notes, array($job_node->nid));
+	}
+
+	if ($action == 'clear_eligibility_cache') {
+		sirius_dispatch_elig_cache_clear_job($job_node->nid);
+	}
+
+	if ($_REQUEST['debug']) {
+		drupal_set_message(sirius_minilog_render_html());
 	}
 }

@@ -120,10 +120,16 @@ function sirius_jsonfield_field_widget_form(&$form, &$form_state, $field, $insta
   $bundle = $instance['bundle'];
 
   if ($instance['widget']['type'] == 'sirius_jsonfield_widget_raw') {
-    $element['value'] = array(
-      '#type' => 'textarea',
-      '#default_value' => $items[$delta]['value'],
-    );
+    // Only show "raw" widget to user #1
+    global $user;
+    if ($user && ($user->uid == 1)) {
+      $element['value'] = array(
+        '#type' => 'textarea',
+        '#default_value' => $items[$delta]['value'],
+      );
+    } else {
+      $element['#access'] = FALSE;
+    }
   } else {
     $element['sirius_jsonfield'] = sirius_jsonfield_form_definition($entity_type, $bundle, $field['field_name'], $element);
     if ($element['#type'] == 'markup') {

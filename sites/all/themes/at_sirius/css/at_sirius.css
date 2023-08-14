@@ -758,7 +758,7 @@ thead th {
   background: #f5f5f5;
 }
 tbody {
-  border-top: 1px solid #eee;
+  border-top: 1px solid #5984be;
 }
 td,th {
   margin: 0;
@@ -2256,7 +2256,7 @@ h2.field-label {
 }
 
 .block-superfish {
-  padding: 16px 0 13px 0; /*  */
+  padding: 0;
 	text-align: center;
 }
 ul.sf-menu.sf-style-white {
@@ -2456,7 +2456,7 @@ table.trustfund-payperiod tr.error {
 	color: #1b4784;
 	font-size: 32px;
 	font-weight: 300;
-	margin: 0px 0 25px 36px;
+	margin: 0px 0 15px 36px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -3299,10 +3299,6 @@ table.grievance-timeline tr.pending {
     border-bottom: none;
   }
 
-  #page-banner {
-
-  }
-
   div.sirius_noprint { 
     display: none;
   }
@@ -4107,7 +4103,6 @@ input.ajax-processed:hover {
   }
 }
 
-
 .sirius_signature_wrapper {
   width: 100%;
   overflow: hidden;
@@ -4230,7 +4225,7 @@ body.cke_editable_themed {
 .region-footer .block-masquerade .block-title {
   font-weight: bold;
   font-size: 1.1em;
-  margint-bottom: 2px;
+  margin-bottom: 2px;
 }
 
 /*
@@ -4242,7 +4237,7 @@ body.cke_editable_themed {
 
 .region-footer .block-masquerade .block-content .form-item {
   margin-top: 2px;
-  margint-bottom: 2px;
+  margin-bottom: 2px;
 }
 
 

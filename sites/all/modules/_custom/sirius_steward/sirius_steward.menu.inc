@@ -70,7 +70,7 @@ function sirius_steward_node_tabs() {
     'title' => 'Steward',
     'description' => '',
     'callback' => 'sirius_steward_node_tab_employer_checkin_list',
-    'permissions' => array('sirius steward'),
+    'permissions' => array('sirius steward', 'sirius steward sched employer'),
     'file' => 'sirius_steward.page_employer_checkin_list.inc',
     'component' => 'steward:checkin',
     'skip_node_view_check' => TRUE,
@@ -80,7 +80,7 @@ function sirius_steward_node_tabs() {
     'title' => 'List',
     'description' => '',
     'callback' => 'sirius_steward_node_tab_employer_checkin_list',
-    'permissions' => array('sirius steward'),
+    'permissions' => array('sirius steward', 'sirius steward sched employer'),
     'file' => 'sirius_steward.page_employer_checkin_list.inc',
     'component' => 'steward:checkin',
     'skip_node_view_check' => TRUE,
@@ -92,15 +92,13 @@ function sirius_steward_node_tabs() {
     'title' => 'Schedule',
     'description' => '',
     'callback' => 'sirius_steward_node_tab_employer_sched',
-    'permissions' => array('sirius steward sched'),
+    'permissions' => array('sirius steward sched', 'sirius steward sched employer'),
     'file' => 'sirius_steward.page_employer_sched.inc',
     'component' => 'steward:sched',
     'skip_node_view_check' => TRUE,
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
   );
-
-
 
   $node_tabs['sirius_dispatch_facility']['sirius_steward_dispatch_facility_checkin'] = array(
     'title' => 'Check In',

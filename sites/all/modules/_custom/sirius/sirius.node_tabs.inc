@@ -87,9 +87,16 @@ function sirius_node_tab_access($node, $in_tab_name, $options = array()) {
   $tab_record = $node_tabs[$node->type][$in_tab_name];
   if (!$tab_record) { return FALSE; }
 
-  // Check basic permission
-  foreach ($tab_record['permissions'] as $permission) {
-    if (!user_access($permission)) { return FALSE; }
+  // Check basic permission. Must have at least one.
+  if ($tab_record['permissions']) {
+    $found = FALSE;
+    foreach ($tab_record['permissions'] as $permission) {
+      if (user_access($permission)) {
+        $found = TRUE; 
+        break;
+      }
+    }
+    if (!$found) { return FALSE; }
   }
 
   // Check if the component is enabled
@@ -172,10 +179,18 @@ function sirius_term_tab_access($term, $in_tab_name) {
 
   if (!$tab_record) { return FALSE; }
 
-  // Check basic permission
-  foreach ($tab_record['permissions'] as $permission) {
-    if (!user_access($permission)) { return false; }
+  // Check basic permission. Must have at least one.
+  if ($tab_record['permissions']) {
+    $found = FALSE;
+    foreach ($tab_record['permissions'] as $permission) {
+      if (user_access($permission)) {
+        $found = TRUE; 
+        break;
+      }
+    }
+    if (!$found) { return FALSE; }
   }
+
 
   // Check for a custom access permission
   $access_function_name = $tab_record['callback'] . '_access';

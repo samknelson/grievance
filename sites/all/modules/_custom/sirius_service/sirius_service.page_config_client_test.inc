@@ -55,14 +55,14 @@ function sirius_service_page_config_client_test_form_submit($form, &$form_state)
 			$function, 
 			$form_state['values']['arg'][0],
 			$form_state['values']['arg'][1],
-			$form_state['values']['arg'][2],
+			$form_state['values']['arg'][2]
 		);
 	} else {
 		$result = sirius_proxy_call(
 			$function, 
 			$form_state['values']['arg'][0],
 			$form_state['values']['arg'][1],
-			$form_state['values']['arg'][2],
+			$form_state['values']['arg'][2]
 		);
 	}
 

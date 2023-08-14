@@ -1,6 +1,8 @@
 <?php
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Singleton.php';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.access.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.backlinks.inc';
@@ -63,6 +65,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.public.inc'
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.nota.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lang.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 
@@ -168,6 +171,7 @@ function sirius_node_presave($node) {
   if ($node->type == 'sirius_phonenumber') { sirius_phonenumber_node_presave($node); }
   if ($node->type == 'sirius_emailaddress') { sirius_emailaddress_node_presave($node); }
   if ($node->type == 'sirius_contact_relationship') { sirius_contact_relationship_node_presave($node); }
+  if ($node->type == 'sirius_feed') { sirius_feed_node_presave($node); }
 
   sirius_addr_node_presave($node);
 
@@ -775,6 +779,29 @@ function sirius_find_nid_by_id($sirius_id, $bundle) {
   return $hr['entity_id'];
 }
 
+function sirius_find_tid_by_id($sirius_id, $bundle) {
+  $domain_nid = sirius_domain_nid();
+
+  $sql_args = array();
+  $sql = "select * ";
+  $sql .= "from taxonomy_term_data ";
+  $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'taxonomy_term' and field_data_field_sirius_id.entity_id = taxonomy_term_data.tid ";
+  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'taxonomy_term' and field_data_field_sirius_domain.entity_id = taxonomy_term_data.tid ";
+  $sql .= "where field_data_field_sirius_id.bundle = :bundle ";
+  $sql .= "and field_sirius_id_value = :sirius_id ";
+  if ($domain_nid) {
+    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
+    $sql_args[':domain_nid'] = $domain_nid;
+  } else {
+    $sql .= "and field_sirius_domain_target_id is null ";
+  }
+  $sql_args[':bundle'] = $bundle;
+  $sql_args[':sirius_id'] = $sirius_id;
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $hr = $stmt->fetchAssoc();
+  return $hr['entity_id'];
+}
+
 /**
  * Implements hook_module_implements_alter
  * 
@@ -1034,7 +1061,8 @@ function sirius_ajax_generic_replace($form, $form_state) {
  * Just a stupid wrapper around number_format() that doesn't throw an error when it's not passed a number.
  */
 
-function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $thousands_separator = ",") {
+function sirius_number_format($str, $decimals = 0 , $decimal_separator = "." , $thousands_separator = ",", $output = 'page') {
+  if ($output == 'csv') { return $str; }
   if (!is_numeric($str)) { return $str; }
   if (is_numeric($str)) { return number_format($str, $decimals, $decimal_separator, $thousands_separator); }
 }
@@ -1066,9 +1094,20 @@ function sirius_content_type_name($machine_name) {
       if ($name == 'Shop') { $name = 'Employer'; }
       $lookup[$hr['type']] = $name;
     }
+
+    $lookup['sirius_dispatch_job_group'] = 'Show / Job Group';
   }
 
+  if (!$lookup[$machine_name]) { $lookup[$machine_name] = $machine_name; }
+  
   return $lookup[$machine_name];
+}
+
+function sirius_module_friendly_name($module) {
+  $module_info = system_get_info('module', $module);
+  $module_name = $module_info['name'];
+  $module_name = preg_replace("/Sirius /", '', $module_name);
+  return $module_name;
 }
 
 function sirius_node_title($nid) {
@@ -1195,4 +1234,30 @@ function _sirius_form_prep_recursive(&$form, $defaults = array(), $settings = ar
 function sirius_page_error($msg) {
   drupal_set_message($msg, 'error');
   return '';
+}
+
+function sirius_tool_link($path, $label) {
+  if (!drupal_valid_path($path)) { return ''; }
+  return l($label, $path, array('attributes' => array('class' => array('tool-button'))));
+}
+
+function sirius_options_to_str($options) {
+  $str = '';
+  foreach ($options as $key => $value) {
+    $str .= "$key|$value\n";
+  }
+  return $str;
+}
+
+function sirius_str_to_options($str) {
+  $lines = preg_split('/\s*[\n\r]+\s*/', $str);
+  $options = array();
+  foreach ($lines as $line) {
+    list ($key, $value) = explode('|', $line);
+    if ($key === '' || $key === NULL) { continue; }
+    if ($value === '' || $value === NULL) { $value = $key; }
+    $options[$key] = $value;
+  }
+
+  return $options;
 }

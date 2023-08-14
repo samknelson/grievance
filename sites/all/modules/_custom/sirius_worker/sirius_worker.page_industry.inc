@@ -20,9 +20,6 @@ function sirius_node_tab_worker_industry_form($form, &$form_state, $worker_node)
 		$industry_member_status_map[$member_status_tid] = $industry_tid;
 	}
 
-  $html = '<h2>' . t('Current Industries') . '</h2>';
-  $html .= sirius_worker_render_industries($worker_node);
-
 	$member_status_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
 	if (!user_access('sirius dispatch staff')) {
 		$new_member_status_options = array();
@@ -66,6 +63,18 @@ function sirius_node_tab_worker_industry_form($form, &$form_state, $worker_node)
 		if (user_access('sirius dispatch staff')) {
 
 			$form['member_status_tid']['#description'] .= t('Warning: Adding a member status will remove any other member statuses in the same industry.');
+
+			$form['date'] = array(
+				'#title' => t('Effective Date'),
+				'#type' => 'date_popup',
+				'#value' => t('Submit'),
+				'#default_value' => date('Y-m-d H:i:s'),
+				'#date_format' => 'Y-m-d H:i:s',
+		    '#attributes' => array(
+					'autocomplete' => 'off',
+		    ),
+		    '#required' => TRUE,
+			);
 
 			$form['reason'] = array(
 				'#type' => 'textarea',
@@ -139,10 +148,12 @@ function sirius_node_tab_worker_industry_form_submit($form, &$form_state) {
 
 	$new_member_status_tid = $form_state['values']['member_status_tid'];
 	$new_member_status_term = taxonomy_term_load($new_member_status_tid);
-	$new_industry_tid = $industry_member_status_map[$new_member_status_tid];
 	$action = $form_state['values']['action'];
 	$reason = $form_state['values']['reason'];
 	if (!$reason) { $reason = 'Worker opt-in or opt-out.'; }
+
+  /*
+	$new_industry_tid = $industry_member_status_map[$new_member_status_tid];
 
 	if ($action && in_array($new_member_status_tid, $my_member_status_tids)) {
 		drupal_set_message(t('The worker already has that member status.'), 'error');
@@ -164,32 +175,30 @@ function sirius_node_tab_worker_industry_form_submit($form, &$form_state) {
 				drupal_set_message(t('You already have a member status @status in this industry, and cannot add a new one.', array('@status' => $clear_member_status_term->name)), 'error');
 				return;
 			}
-
-			/*
-			sirius_worker_member_status_set(
-				$worker_node, 
-				$clear_member_status_term, 
-				FALSE, 
-				$reason,
-				array()
-			);
-
-			drupal_set_message(t('Removed member status @status.', array('@status' => $clear_member_status_term->name)), 'error');
-			*/
 		}
 	}
+	*/
 
-	sirius_worker_member_status_set(
+	$result = sirius_worker_member_status_set(
 		$worker_node, 
 		$new_member_status_term, 
 		$action, 
 		$reason,
-		$files
+		$files,
+		strtotime($form_state['values']['date'])
 	);
 
+	if ($result['success']) {
+		drupal_set_message($result['msg']);
+	} else {
+		drupal_set_message($result['msg'], 'error');
+	}
+
+	/*
 	if ($form_state['values']['action']) {
 		drupal_set_message(t("Success! Worker @worker has added @member_status.", array('@worker' => $worker_node->title, '@member_status' => $new_member_status_term->name)));
 	} else {
 		drupal_set_message(t("Success! Worker @worker has removed the @member_status.", array('@worker' => $worker_node->title, '@member_status' => $new_member_status_term->name)));
 	}
+	*/
 }

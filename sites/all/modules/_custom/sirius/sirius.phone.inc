@@ -58,7 +58,7 @@ function sirius_phone_validate($phonenumber) {
 function sirius_phone_format_e164($phonenumber) {
 	$phonenumber = preg_replace('/[^\d]/', '', $phonenumber);
   if (strlen($phonenumber) < 11) { $phonenumber = '1' . $phonenumber; }
-  // $phonenumber = '+' . $phonenumber;
+  if (preg_match('/^[0-9]/', $phonenumber)) { $phonenumber = '+' . $phonenumber; }
 	return $phonenumber;
 }
 
@@ -112,6 +112,8 @@ function sirius_sms_send($params) {
     $id =  uuid_generate();
   }
 
+  $from = $params['sms_from'];
+  if (!$from) { $from = sirius_domain_variable_get('sirius_twilio_phone', ''); }
   $phone = $params['to'];
   $msg = $params['sms'];
   $handler_nids = $params['handler_nids'];
@@ -121,7 +123,7 @@ function sirius_sms_send($params) {
     $handler_nid = $handler_nids;
   }
 
-  $possible = sirius_phonenumber_sms_possible($phone);
+  $possible = sirius_phonenumber_sms_possible($phone, $from);
   if (!$possible) { 
     return array(
       'success' => FALSE, 
@@ -133,7 +135,7 @@ function sirius_sms_send($params) {
   if (!$phonenumber_node->nid) { node_save($phonenumber_node); }
   $handler_nids[] = $phonenumber_node->nid;
 
-  $result = sirius_twilio_outgoing_sms($phone, $msg, $handler_nid, $id);
+  $result = sirius_twilio_outgoing_sms($phone, $msg, $handler_nid, $id, $from, $params['sms_attach']);
 
   if ($result['success']) {
     sirius_log(
@@ -417,12 +419,24 @@ function sirius_phonenumber_voice_possible($phonenumber) {
   return $node->field_sirius_voice_possible['und'][0]['value'] != 'No';
 }
 
-function sirius_phonenumber_sms_possible($phonenumber) {
+function sirius_phonenumber_sms_possible($phonenumber, $from = NULL) {
+  if (!$from) { $from = sirius_domain_variable_get('sirius_twilio_phone', ''); }
+  $from = sirius_phone_format($from);
+
   $node = sirius_phonenumber_lookup($phonenumber);
   if (sirius_domain_variable_get('sirius_twilio_lookup_enable_sms', FALSE)) {
     sirius_phonenumber_scan($node);
   }
-  return $node->field_sirius_sms_possible['und'][0]['value'] != 'No';
+
+  // No SMS to this number at all?
+  if ($node->field_sirius_sms_possible['und'][0]['value'] == 'No') { return FALSE; }
+
+  // Check for STOPs from our sender
+  $json = sirius_json_get($node);
+  if ($json['user_block']['sms'] == 'Yes') { return FALSE; }
+  if ($json['user_block'][$from]['sms'] == 'Yes') { return FALSE; }
+
+  return TRUE;
 }
 
 function sirius_page_phonenumber_list() {
@@ -634,10 +648,13 @@ function sirius_phonenumber_render_user_block($node) {
   if (!$json['user_block']) {
     $html .= t('No user block.');
   } else {
-    $html .= "SMS block: " . $json['user_block']['sms'];
-    if ($json['user_block']['voice']) { $html .= "<br />Voice block: " . $json['user_block']['voice']; }
-    $html .= "<br />Comments: " . $json['user_block']['comments'];
-    $html .= '<br />' . t('Set on ') . date('r', $json['user_block']['ts']);
+    foreach ($json['user_block'] as $phone => $record) {
+      if (!sirius_phone_validate($phone)) { continue; }
+      $html .= "SMS block on <strong>$phone</strong>: " . $record['sms'];
+      if ($json['user_block']['voice']) { $html .= "<br />Voice block: " . $record['voice']; }
+      $html .= "<br />Comments: " . $record['comments'];
+      $html .= '<br />' . t('Set on ') . date('r', $record['ts']);
+    }
   }
 
   $html = '<div class="sirius_phonenumber_last_sms">' . '<strong>' . t('User Block') . '</strong><br />' . $html . '</div>';

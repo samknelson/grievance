@@ -1,0 +1,4 @@
+name = Sirius Modern Assistance Program
+description = Implements custom features the Sirius Modern Assistance Program (MAP)
+package = sirius
+core = 7.x

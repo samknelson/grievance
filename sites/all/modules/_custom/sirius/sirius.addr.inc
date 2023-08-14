@@ -98,7 +98,7 @@ function sirius_addr_geocode_enabled() {
 	return array('success' => TRUE);
 }
 
-function sirius_addr_geocode_impl($addr_oneline) {
+function sirius_addr_geocode_impl($addr_oneline, $approximate_ok = FALSE) {
 	$result = sirius_addr_geocode_enabled();
 	if (!$result['success']) { return $result; }
 
@@ -106,8 +106,11 @@ function sirius_addr_geocode_impl($addr_oneline) {
 	if (!$point) {
 		return array('success' => FALSE, 'msg' => 'The mapping service was unable to find a location for that address.');
 	}
-	if (!($point->data['geocoder_formatted_address']) || ($point->data['geocoder_accuracy'] == 'APPROXIMATE')) {
-		return array('success' => FALSE, 'msg' => 'The mapping service was unable to find an exact location for that address.', 'point' => $point);
+
+	if (!$approximate_ok) {
+		if (!($point->data['geocoder_formatted_address']) || ($point->data['geocoder_accuracy'] == 'APPROXIMATE')) {
+			return array('success' => FALSE, 'msg' => 'The mapping service was unable to find an exact location for that address.', 'point' => $point);
+		}
 	}
 
 	return array('success' => TRUE, 'point' => $point);
@@ -309,4 +312,15 @@ function sirius_addr_zip_zeropad($zip) {
 	if (strlen($zip) >= 5) { return $zip; }
 	while (strlen($zip) < 5) { $zip = '0' . $zip; }
 	return $zip;
+}
+
+function sirius_addr_cols() {
+	return array(
+    'thoroughfare' => 'Street',
+    'premise' => 'Street 2',
+    'locality' => 'City',
+    'administrative_area' => 'State',
+    'postal_code' => 'Zip',
+    'country' => 'Country',
+  );
 }
