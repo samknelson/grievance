@@ -388,14 +388,28 @@ function grievance_content_types_ds_field_settings_info() {
       'format' => 'default',
     ),
     'author' => array(
-      'weight' => '9',
+      'weight' => '8',
       'label' => 'inline',
       'format' => 'author',
     ),
     'post_date' => array(
-      'weight' => '8',
+      'weight' => '7',
       'label' => 'inline',
       'format' => 'ds_post_date_long',
+    ),
+    'field_sirius_message' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'Summary',
+        ),
+      ),
+    ),
+    'field_sirius_summary' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'Full Entry',
+        ),
+      ),
     ),
   );
   $export['node|sirius_log|default'] = $ds_fieldsetting;
@@ -1956,13 +1970,13 @@ function grievance_content_types_ds_layout_settings_info() {
         1 => 'field_sirius_log_handler',
         2 => 'field_sirius_category',
         3 => 'field_sirius_type',
-        4 => 'field_sirius_message',
-        5 => 'field_sirius_notes',
-        6 => 'field_sirius_summary',
-        7 => 'field_sirius_attachments',
-        8 => 'post_date',
-        9 => 'author',
-        10 => 'field_sirius_domain',
+        4 => 'field_sirius_notes',
+        5 => 'field_sirius_message',
+        6 => 'field_sirius_attachments',
+        7 => 'post_date',
+        8 => 'author',
+        9 => 'field_sirius_domain',
+        10 => 'field_sirius_summary',
       ),
     ),
     'fields' => array(
@@ -1970,13 +1984,13 @@ function grievance_content_types_ds_layout_settings_info() {
       'field_sirius_log_handler' => 'ds_content',
       'field_sirius_category' => 'ds_content',
       'field_sirius_type' => 'ds_content',
-      'field_sirius_message' => 'ds_content',
       'field_sirius_notes' => 'ds_content',
-      'field_sirius_summary' => 'ds_content',
+      'field_sirius_message' => 'ds_content',
       'field_sirius_attachments' => 'ds_content',
       'post_date' => 'ds_content',
       'author' => 'ds_content',
       'field_sirius_domain' => 'ds_content',
+      'field_sirius_summary' => 'ds_content',
     ),
     'classes' => array(),
     'wrappers' => array(
