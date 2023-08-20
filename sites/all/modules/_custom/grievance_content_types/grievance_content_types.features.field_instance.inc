@@ -23047,7 +23047,7 @@ If the file has multiple pages, then each page in the input document will use th
       'active' => 1,
       'module' => 'text',
       'settings' => array(
-        'rows' => 5,
+        'rows' => 50,
       ),
       'type' => 'text_textarea',
       'weight' => 6,
@@ -23090,7 +23090,7 @@ If the file has multiple pages, then each page in the input document will use th
       'active' => 1,
       'module' => 'text',
       'settings' => array(
-        'rows' => 5,
+        'rows' => 50,
       ),
       'type' => 'text_textarea',
       'weight' => 5,
