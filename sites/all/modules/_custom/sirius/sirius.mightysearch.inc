@@ -83,7 +83,7 @@ function sirius_mightysearch_form_prepare_valuefield_from_path($form_state, $jso
 				if ($which_form == 'core') {
 					list ($field_name, $column) = explode(':', $path);
 					if ($field_name == 'status') {
-						$element = array('#type' => 'select', '#options' => $bulk_statuses);
+						$element = array('#type' => 'select', '#options' => sirius_bulk_queue_statuses());
 					} else {
 						$element = array('#type' => 'textfield');
 					}
