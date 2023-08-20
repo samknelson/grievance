@@ -23,11 +23,34 @@ function sirius_cron_scan_info($key) {
 function sirius_cron_scan_info_all() {
   $info_all = &drupal_static(__FUNCTION__);
   if (!isset($info_all)) {
-  	$info_all = module_invoke_all('sirius_cron_scan_info');
+  	
+		// We want to do this:
+		// $info_all = module_invoke_all('sirius_cron_scan_info');
+		// But we want to add information about the module that defines it. So we call each function manually.
+
+		$info_all = array();
+		$hook = 'sirius_cron_scan_info';
+		foreach (module_implements($hook) as $module) {
+			$function = $module . '_' . $hook;
+    	if (function_exists($function)) {
+      	$result = call_user_func_array($function, array());
+      	if (isset($result) && is_array($result)) {
+        	$info_all = array_merge_recursive($info_all, $result);
+      		// Add the module to the results, so we know which module provides which report.
+      		foreach ($result as $key => $info) {
+      			$info_all[$key]['module'] = $module;
+      			$info_all[$key]['module_name'] = sirius_module_friendly_name($module);
+      		}
+      	} elseif (isset($result)) {
+        	$info_all[] = $result;
+      	}
+    	}
+    }
+
+	  foreach ($info_all as $key => $info) {
+	  	$info_all[$key]['key'] = $key;
+	  }
 		ksort($info_all);
-  }
-  foreach ($info_all as $key => $info) {
-  	$info_all[$key]['key'] = $key;
   }
 	return $info_all;
 }
