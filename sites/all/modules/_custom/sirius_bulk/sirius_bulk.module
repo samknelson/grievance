@@ -254,3 +254,33 @@ function sirius_bulk_create($title, $medium) {
 	node_save($bulk_node);
 	return $bulk_node;
 }
+
+function sirius_bulk_list($params = array()) {
+	$domain_nid = sirius_domain_nid();
+
+	$sql_args = array();
+	$sql = "select nid, title ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_bulk_status on field_data_field_sirius_bulk_status.entity_type = 'node' and field_data_field_sirius_bulk_status.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "where type = 'sirius_bulk' ";
+	if ($domain_nid) {
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	} else {
+		$sql .= "and field_sirius_domain_target_id is null ";
+	}
+	if ($params['statuses']) {
+		$sql .= "and field_sirius_bulk_status_value in (:statuses) ";
+		$sql_args[':statuses'] = $params['statuses'];
+	}
+	$sql .= "order by nid ";
+
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$result = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$result[$hr['nid']] = $hr['title'];
+	}
+
+	return $result;
+}
