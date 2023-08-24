@@ -11,7 +11,7 @@
  * - field_whatever to return the value of "field_whatever"
  */
 
-function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE, $show_depth = TRUE) {
+function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE, $show_depth = FALSE) {
   $domain_nid = sirius_domain_nid();
   if ($domain_nid < 0) { $domain_nid = NULL; }
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
