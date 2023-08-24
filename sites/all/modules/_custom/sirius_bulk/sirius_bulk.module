@@ -119,6 +119,7 @@ function sirius_bulk_recipient_add($bulk_nid, $contact_nid, $params = array()) {
 
   // Add to the queue.
   $contact_node = node_load($contact_nid);
+  if (!$contact_node) { return array('success' => FALSE, 'msg' => 'Contact not found.'); }
 	sirius_log('bulk:queue', $type, $contact_node->title, '', '', array($bulk_nid, $contact_nid));
 
 	if ($type == 'add-manual') { 
