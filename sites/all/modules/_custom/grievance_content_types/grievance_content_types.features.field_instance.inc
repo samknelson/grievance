@@ -22570,6 +22570,48 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-sirius_letterhead-body'.
+  $field_instances['node-sirius_letterhead-body'] = array(
+    'bundle' => 'sirius_letterhead',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Use ONLY for HTML letterhead. Include full page raw markup.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'body',
+    'label' => 'Body',
+    'required' => 0,
+    'settings' => array(
+      'display_summary' => 0,
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 20,
+        'summary_rows' => 5,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => 4,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_letterhead-field_sirius_attachments'.
   $field_instances['node-sirius_letterhead-field_sirius_attachments'] = array(
     'bundle' => 'sirius_letterhead',
@@ -22639,7 +22681,7 @@ If the file has multiple pages, then each page in the input document will use th
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 3,
+      'weight' => 5,
     ),
   );
 
@@ -22659,7 +22701,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22698,7 +22740,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22720,6 +22762,49 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_letterhead-field_sirius_letterhead_format'.
+  $field_instances['node-sirius_letterhead-field_sirius_letterhead_format'] = array(
+    'bundle' => 'sirius_letterhead',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_letterhead_format',
+    'label' => 'Format',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
       'weight' => 1,
     ),
   );
@@ -22887,7 +22972,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -36329,6 +36414,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('First Name');
   t('For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action.');
   t('For grievances with this category, hide the fields listed below. Enter one per line, using the machine name of the field (i.e. field_grievance_remedy)');
+  t('Format');
   t('From Status');
   t('Full Text');
   t('Gender');
@@ -36542,6 +36628,7 @@ If the file has a single page, then that will be used as the background for all 
 If the file has multiple pages, then each page in the input document will use the corresponding page in the letterhead as a background, with the last page in the letterhead repeated as many times as necessary if the input document is longer.  
 
 (For example, if a two-page letterhead is uploaded, then the first page of the letterhead will be used as the first page of the generated document, and the second page will be repeated as many times as necessary.)');
+  t('Use ONLY for HTML letterhead. Include full page raw markup.');
   t('Use for Dispatch?');
   t('Use this field for a "letter" which has no customization, and which is simply meant to be downloaded.  No drop-in tokens are supported.');
   t('Use this field to enter the default body of the email; it should generally be something like "Please refer to the attached document re. a grievance filed against your company."');

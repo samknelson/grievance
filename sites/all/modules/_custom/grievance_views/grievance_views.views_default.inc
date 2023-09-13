@@ -28244,7 +28244,7 @@ Grievance Form',
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
   $handler->display->display_options['footer']['area']['empty'] = TRUE;
-  $handler->display->display_options['footer']['area']['content'] = '<a href="/node/add/sirius-letterhead?destination=[current_path]" class="action-button">Add a new letterhead</a>';
+  $handler->display->display_options['footer']['area']['content'] = '<a href="/node/add/sirius-letterhead" class="action-button">Add a new letterhead</a>';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
@@ -28259,6 +28259,11 @@ Grievance Form',
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
+  /* Field: Content: Format */
+  $handler->display->display_options['fields']['field_sirius_letterhead_format']['id'] = 'field_sirius_letterhead_format';
+  $handler->display->display_options['fields']['field_sirius_letterhead_format']['table'] = 'field_data_field_sirius_letterhead_format';
+  $handler->display->display_options['fields']['field_sirius_letterhead_format']['field'] = 'field_sirius_letterhead_format';
   /* Field: Content: Attachments */
   $handler->display->display_options['fields']['field_sirius_attachments']['id'] = 'field_sirius_attachments';
   $handler->display->display_options['fields']['field_sirius_attachments']['table'] = 'field_data_field_sirius_attachments';
@@ -28274,11 +28279,10 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a> <a href="/node/[nid]/sirius_letterhead_preview" target="_blank" class="tool-button">Preview</a>';
-  /* Sort criterion: Content: Post date */
-  $handler->display->display_options['sorts']['created']['id'] = 'created';
-  $handler->display->display_options['sorts']['created']['table'] = 'node';
-  $handler->display->display_options['sorts']['created']['field'] = 'created';
-  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
   /* Contextual filter: Field: Domain (field_sirius_domain) */
   $handler->display->display_options['arguments']['field_sirius_domain_target_id']['id'] = 'field_sirius_domain_target_id';
   $handler->display->display_options['arguments']['field_sirius_domain_target_id']['table'] = 'field_data_field_sirius_domain';
@@ -28323,8 +28327,9 @@ Grievance Form',
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('<a href="/node/add/sirius-letterhead?destination=[current_path]" class="action-button">Add a new letterhead</a>'),
+    t('<a href="/node/add/sirius-letterhead" class="action-button">Add a new letterhead</a>'),
     t('Title'),
+    t('Format'),
     t('Attachments'),
     t('Tools'),
     t('<a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a> <a href="/node/[nid]/sirius_letterhead_preview" target="_blank" class="tool-button">Preview</a>'),
@@ -28565,6 +28570,11 @@ Grievance Form',
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid_1']['id'] = 'nid_1';
+  $handler->display->display_options['fields']['nid_1']['table'] = 'node';
+  $handler->display->display_options['fields']['nid_1']['field'] = 'nid';
+  $handler->display->display_options['fields']['nid_1']['exclude'] = TRUE;
   /* Field: Content: Post date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'node';
@@ -28584,6 +28594,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_message']['id'] = 'field_sirius_message';
   $handler->display->display_options['fields']['field_sirius_message']['table'] = 'field_data_field_sirius_message';
   $handler->display->display_options['fields']['field_sirius_message']['field'] = 'field_sirius_message';
+  $handler->display->display_options['fields']['field_sirius_message']['alter']['text'] = '[field_sirius_message]&nbsp;<a href="/sirius/modal/[nid_1]/quicklog-view">&neArr;</a>';
   /* Field: Content: Notes */
   $handler->display->display_options['fields']['field_sirius_notes']['id'] = 'field_sirius_notes';
   $handler->display->display_options['fields']['field_sirius_notes']['table'] = 'field_data_field_sirius_notes';
@@ -28907,10 +28918,12 @@ Grievance Form',
     t('next ›'),
     t('last »'),
     t('author'),
+    t('Nid'),
     t('Post date'),
     t('Category/Type'),
     t('Type'),
     t('Message'),
+    t('[field_sirius_message]&nbsp;<a href="/sirius/modal/[nid_1]/quicklog-view">&neArr;</a>'),
     t('Token or ID'),
     t('Handler'),
     t('Actions'),

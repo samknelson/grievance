@@ -382,6 +382,11 @@ function grievance_content_types_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'sirius_log';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'comm' => array(
+      'weight' => '11',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'custom_fields' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -1977,6 +1982,7 @@ function grievance_content_types_ds_layout_settings_info() {
         8 => 'author',
         9 => 'field_sirius_domain',
         10 => 'field_sirius_summary',
+        11 => 'comm',
       ),
     ),
     'fields' => array(
@@ -1991,6 +1997,7 @@ function grievance_content_types_ds_layout_settings_info() {
       'author' => 'ds_content',
       'field_sirius_domain' => 'ds_content',
       'field_sirius_summary' => 'ds_content',
+      'comm' => 'ds_content',
     ),
     'classes' => array(),
     'wrappers' => array(
