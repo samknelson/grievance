@@ -32,7 +32,7 @@ function sirius_taxonomy_options($vocabulary_name, $options = array()) {
  * - field_whatever to return the value of "field_whatever"
  */
 
-function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE) {
+function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE, $show_depth = FALSE) {
   $domain_nid = sirius_domain_nid();
   if ($domain_nid < 0) { $domain_nid = NULL; }
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
@@ -49,6 +49,11 @@ function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include
       $value = $term;
     } else if ($value_type == 'name') {
       $value = $term->name;
+      if ($show_depth) {
+        for ($i=0; $i<$term->depth; ++$i) {
+          $value = '- ' . $value;
+        }
+      }
     } else {
       $value = $term->{$value_type}['und'][0]['value'];
     }
