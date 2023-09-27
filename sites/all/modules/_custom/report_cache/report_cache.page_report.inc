@@ -38,7 +38,9 @@ function report_cache_page_report($report_type) {
 		$render = report_cache_preview($report_type, $report_id, $info);
 	} elseif ($action == 'render') {
 		$render = report_cache_render($report_type, $report_id, $info, $_REQUEST['callback-name']);
-	}
+	} elseif ($action == 'operations') {
+		$render = report_cache_operations($report_type, $report_id, $info, $_REQUEST['callback-name']);
+	} 
 
 	if ($render) {
 		drupal_set_title(t("Reports: ") . $info['name'] . ': ' . $report_id);
@@ -92,6 +94,10 @@ function report_cache_page_report($report_type) {
 					)
 				);
 			}
+		}
+
+		if ($info['operations']) {
+			$tools .= l(t('Operations'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'operations')));
 		}
 		$tools .= l(t('Purge'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
 
