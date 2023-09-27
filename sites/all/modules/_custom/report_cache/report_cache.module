@@ -13,6 +13,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/r
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_auto.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_preview.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_render.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_operations.inc";
 
 function report_cache_info_all() {
 	$info_all = &drupal_static(__FUNCTION__, NULL);
@@ -157,6 +158,18 @@ function report_cache_most_recent($report_type, $instance_uuid = NULL) {
 	return $hr['report_id'];
 }
 
+function report_cache_rowcount($report_type, $report_id) {
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
+	$sql = "select count(*) as c ";
+	$sql .= "from report_cache ";
+	$sql .= "where report_type = :report_type ";
+	$sql .= "and report_id = :report_id ";
+	$sql .= "and report_domain_nid = :domain_nid ";
+	$stmt = sirius_sql_query($sql, array(':report_type' => $report_type, ':report_id' => $report_id, ':domain_nid' => $domain_nid));
+	$hr = $stmt->fetchAssoc();
+	return $hr['c'];
+}
+
 class Report_Cache_Report_Generator {
   // Reports are singletons. Use My_Report::getInstance()->whatever()
   protected static $instance = array();
@@ -195,3 +208,4 @@ class Report_Cache_Report_Generator {
     $items[$this->type] = $this->info();
   }
 }
+

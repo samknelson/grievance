@@ -6,6 +6,7 @@ function sirius_training_node_tab_certification_grant_access($certification_node
 
 	// Admin can access
 	if (user_access('sirius training admin')) { return TRUE; }
+	if (user_access('sirius training certification edit')) { return TRUE; }
 
 	// Author can access, but only in "signed" mode.
 	global $user;
@@ -42,10 +43,6 @@ function sirius_training_node_tab_certification_grant_form($form, &$form_state, 
 
 	$form['#tree'] = TRUE;
 
-	$form['intro'] = array(
-		'#markup' => '<div class="sirius_form_intro">' . sirius_training_node_tab_certification_backlinks($certification_node) . '<br /><br />' . '</div><div class="sirius-form">',
-	);
-	
 	$form['status_intro'] = array('#markup' => '<hr><h2>' . t('Certification Status') . '</h2>');
 
 	$form['certification_status'] = array(

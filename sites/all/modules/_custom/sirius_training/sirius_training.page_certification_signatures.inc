@@ -12,6 +12,7 @@ function sirius_training_node_tab_certification_signatures_access($certification
 
 	// Admin can access
 	if (user_access('sirius training admin')) { return TRUE; }
+	if (user_access('sirius training certification edit')) { return TRUE; }
 
 	// Author can access
 	global $user;
@@ -57,8 +58,6 @@ function sirius_training_node_tab_certification_signatures($certification_node) 
 		}
 	}
 
-
-	$html = sirius_training_node_tab_certification_backlinks($certification_node);
 
 	$header = array('Name', 'Signature', 'Tools');
 	$rows = array();

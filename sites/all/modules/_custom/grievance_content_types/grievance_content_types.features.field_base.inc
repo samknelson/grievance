@@ -4315,6 +4315,7 @@ function grievance_content_types_field_default_field_bases() {
         'voice' => 'Voice',
         'email' => 'Email',
         'choice' => 'User\'s Choice',
+        'postal' => 'Postal Mail',
       ),
       'allowed_values_function' => '',
     ),
@@ -6748,6 +6749,32 @@ function grievance_content_types_field_default_field_bases() {
         'grievance' => 'Grievance',
         'sirius_log' => 'Work Authorization',
         'sirius_worker' => 'Worker',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
+  // Exported field_base: 'field_sirius_letterhead_format'.
+  $field_bases['field_sirius_letterhead_format'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_id_type' => NULL,
+    'entity_types' => array(),
+    'field_name' => 'field_sirius_letterhead_format',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'pdf' => 'PDF',
+        'html' => 'HTML',
       ),
       'allowed_values_function' => '',
     ),
