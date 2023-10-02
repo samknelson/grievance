@@ -151,8 +151,6 @@ function sirius_trust_worker_benefit_node_presave($wb_node) {
 	} else {
 		$wb_node->field_sirius_active['und'][0]['value'] = 'No';
 	}
-
-	// drupal_set_message("Here with " . date('Y-m-d', $start_ts) . ', ' . date('Y-m-d', $now_ts) . ', ' . date('Y-m-d', $end_ts) . ', ' . $wb_node->field_sirius_active['und'][0]['value'] . "\n");
 }
 
 function sirius_trust_benefit_get_by_id($id) {
@@ -222,6 +220,10 @@ function sirius_trust_worker_benefit_start_ts($worker_node, $benefit_nids, $ts =
 
 function sirius_trust_worker_benefit_scan($mode = 'test') {
 	sirius_minilog("Worker benefit scan: Starting (mode = $mode)");
+
+	$mode = 'test';
+	sirius_minilog("FEATURE UNDER DEVELOPMENT: Forcing mode = $mode", 'warning');
+
 
 	$count = 0;
 	$count_ok = 0;
