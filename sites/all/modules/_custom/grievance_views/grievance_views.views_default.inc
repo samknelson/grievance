@@ -6635,6 +6635,28 @@ Section',
     'field_delimiter' => '',
   );
   $handler->display->display_options['fields']['field_grievance_rep_organizer']['delta_offset'] = '0';
+  /* Field: Field: Lead Organizer */
+  $handler->display->display_options['fields']['field_grievance_rep_lead']['id'] = 'field_grievance_rep_lead';
+  $handler->display->display_options['fields']['field_grievance_rep_lead']['table'] = 'field_data_field_grievance_rep_lead';
+  $handler->display->display_options['fields']['field_grievance_rep_lead']['field'] = 'field_grievance_rep_lead';
+  $handler->display->display_options['fields']['field_grievance_rep_lead']['label'] = 'Current Lead Organizer';
+  $handler->display->display_options['fields']['field_grievance_rep_lead']['settings'] = array(
+    'bypass_access' => 0,
+    'link' => 0,
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_rep_lead']['delta_offset'] = '0';
+  /* Field: Content: Grievance Admin */
+  $handler->display->display_options['fields']['field_grievance_rep_manager']['id'] = 'field_grievance_rep_manager';
+  $handler->display->display_options['fields']['field_grievance_rep_manager']['table'] = 'field_data_field_grievance_rep_manager';
+  $handler->display->display_options['fields']['field_grievance_rep_manager']['field'] = 'field_grievance_rep_manager';
+  $handler->display->display_options['fields']['field_grievance_rep_manager']['label'] = 'Current Grievance Admin';
+  $handler->display->display_options['fields']['field_grievance_rep_manager']['settings'] = array(
+    'bypass_access' => 0,
+    'link' => 0,
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_grievance_rep_manager']['delta_offset'] = '0';
   /* Field: Content: Watching */
   $handler->display->display_options['fields']['field_grievance_rep_watching']['id'] = 'field_grievance_rep_watching';
   $handler->display->display_options['fields']['field_grievance_rep_watching']['table'] = 'field_data_field_grievance_rep_watching';
@@ -6650,6 +6672,7 @@ Section',
   $handler->display->display_options['fields']['field_grievance_rep_assignee']['id'] = 'field_grievance_rep_assignee';
   $handler->display->display_options['fields']['field_grievance_rep_assignee']['table'] = 'field_data_field_grievance_rep_assignee';
   $handler->display->display_options['fields']['field_grievance_rep_assignee']['field'] = 'field_grievance_rep_assignee';
+  $handler->display->display_options['fields']['field_grievance_rep_assignee']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_grievance_rep_assignee']['settings'] = array(
     'bypass_access' => 0,
     'link' => 0,
@@ -6658,6 +6681,13 @@ Section',
   $handler->display->display_options['fields']['field_grievance_assignee_notes']['id'] = 'field_grievance_assignee_notes';
   $handler->display->display_options['fields']['field_grievance_assignee_notes']['table'] = 'field_data_field_grievance_assignee_notes';
   $handler->display->display_options['fields']['field_grievance_assignee_notes']['field'] = 'field_grievance_assignee_notes';
+  $handler->display->display_options['fields']['field_grievance_assignee_notes']['exclude'] = TRUE;
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing_1']['id'] = 'nothing_1';
+  $handler->display->display_options['fields']['nothing_1']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing_1']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing_1']['label'] = 'Assignee and Notes (if any)';
+  $handler->display->display_options['fields']['nothing_1']['alter']['text'] = '[field_grievance_rep_assignee]<br><br>[field_grievance_assignee_notes]';
   /* Sort criterion: Content: Employer (field_grievance_shop) */
   $handler->display->display_options['sorts']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
   $handler->display->display_options['sorts']['field_grievance_shop_target_id']['table'] = 'field_data_field_grievance_shop';
@@ -6832,9 +6862,13 @@ Section',
     t('[field_grievance_first_name] [field_grievance_last_name]'),
     t('Status'),
     t('Current Specialist(s)'),
+    t('Current Lead Organizer'),
+    t('Current Grievance Admin'),
     t('Current Watching'),
     t('Assignee'),
     t('Assignee Notes'),
+    t('Assignee and Notes (if any)'),
+    t('[field_grievance_rep_assignee]<br><br>[field_grievance_assignee_notes]'),
     t('All'),
     t('Specialist'),
     t('Specialists beyond 1'),
