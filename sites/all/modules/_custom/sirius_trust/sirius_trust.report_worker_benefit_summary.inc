@@ -362,8 +362,7 @@ function sirius_trust_report_worker_benefit_summary_dashboard($prefs, $options, 
     $details = join(' / ', $names);
     $details .= "<br />";
     $details .= "<strong>$hr[subscriber_count]</strong> subscribers / ";
-    $details .= "<strong>$hr[dependent_count]</strong> dependents / ";
-    // $details .= "<strong>$hr[record_count]</strong> records";
+    $details .= "<strong>$hr[dependent_count]</strong> covered lives";
 
     $row = array();
     $row['tools'] = l('View', "sirius/reports/$report_type", array('query' => array('report_id' => $report_id, 'action' => 'render', 'callback-name' => 'View'), 'attributes' => array('class' => array('tool-button'))));
