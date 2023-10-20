@@ -31,9 +31,9 @@ function sirius_dashboard_item_data($json, $uuid, $options = array()) {
 	if (sirius_proxy_active() && $plugin_info['proxy']) {
 		$result = sirius_proxy_call('sirius_dashboard_item_data', $json, $uuid, $options);
 		if ($result['success']) {
-			$item_data = $result['data'];
+			$result = $result['data'];
 		} else {
-			$item_data = array(
+			$result = array(
 				array(
 					'count' => 0,
 					'tools' => '',
@@ -42,7 +42,7 @@ function sirius_dashboard_item_data($json, $uuid, $options = array()) {
 			);
 		}
 	} else {
-		$item_data = $callback($json['item'][$uuid]['preferences'], $options);
+		$result = $callback($json['item'][$uuid]['preferences'], $options);
 	}
 
 	// Set the priority

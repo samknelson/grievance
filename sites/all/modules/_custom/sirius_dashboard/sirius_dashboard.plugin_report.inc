@@ -54,13 +54,13 @@ function sirius_dashboard_plugin_report_data($prefs, $options = array()) {
 		);
 	}
 
+	$callback = $info['dashboard_callback'];
+	if ($callback) { return $callback($prefs, $options, $report_type, $report_id); }
+
 	$parameters = report_cache_parameters($report_type, $report_id);
 	if (!$parameters['meta']['dashboard']['count']) { return array(); }
 
 	$details = $parameters['meta']['dashboard']['details'];
-
-	$callback = $info['dashboard_callback'];
-	if ($callback) { return $callback($prefs, $options, $report_type, $report_id); }
 
 	$result = array();
 	$result['tools'] = l('View', "sirius/reports/$report_type", array('query' => array('report_id' => $report_id, 'action' => 'render', 'callback-name' => 'View'), 'attributes' => array('class' => array('tool-button'))));
