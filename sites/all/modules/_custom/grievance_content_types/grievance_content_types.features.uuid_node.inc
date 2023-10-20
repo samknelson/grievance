@@ -1379,6 +1379,112 @@ function grievance_content_types_uuid_features_default_content() {
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
+  'title' => 'Dispatch - Job Type - Event',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1697454366,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '1d452c2c-e89f-4fec-ba78-40202812e90a',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Jobs can be associated with events. When this happens, in order to be eligible for a job, the worker must be registered for the event with the correct role and status.</p>
+
+<p>The typical use case is for a time-limited hiring hall. Workers must register for the hiring hall. Depending on the event settings, this might happen in advance of the event, or at the event itself. It might be in-person or remote. Workers might be added by a steward, or they might be able to sign themselves in.</p>
+
+<p>Once a worker has registered for the event, they become eligible for dispatches.</p>
+
+<p>When a job is created, depending on the settings, it can automatically create a new event (i.e. if an employer is sponsoring a hiring hall) or it can require the employer to select an existing event (i.e. if the employer is "sharing" an already created hiring hall.)</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'taxonomy/term/%/sirius_dispatch_job_type_event',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Should this job type be associated with an event?</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2023-10-16 04:06:06 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
   'title' => 'Machine Name',
   'log' => '',
   'status' => 1,
@@ -1954,6 +2060,106 @@ function grievance_content_types_uuid_features_default_content() {
     ),
   ),
   'date' => '2023-08-01 05:21:20 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'TFA - Recovery Codes - List',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1696935364,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => '355ede04-7d25-4b41-8f7c-db1775a46936',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The list below contains one-time recovery codes that can be used to access your account. You should print out or save these recover codes to a secure location. If you lose the recover code list or if it is stolen, you can use the "Generate New Recovery Codes" tab to generate new codes.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'user/%/sirius-tfa/recovery-codes-list',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>The list below contains one-time recovery codes that can be used to access your account.&nbsp; If you update your TFA settings, you will need to generate new recovery codes.</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2023-10-10 03:56:04 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(
@@ -7902,7 +8108,9 @@ Languages will be presented to the user in the order that they appear on this li
       0 => array(
         'value' => '<p>The "No Secondary At Primary" eligibility plugin prevents workers who are on a primary dispatch from accepting secondary dispatches at any of the employers at the same company as their current employer.</p>
 
-<p>For example, if a worker is on a primary dispatch to "ABC Corp Branch 1", they cannot accept a secondary dispatch to any branch of ABC Corp.</p>
+<p>For example, if a worker is on a primary dispatch to "ABC Corp Branch 1", they cannot accept a secondary dispatch <em>of this job type</em>&nbsp;to any branch of ABC Corp.</p>
+
+<p>In addition, if you accept a primary dispatch <em>of this job type</em>&nbsp;at a company where you already have a secondary dispatch, the secondary dispatch will be laid off.</p>
 ',
         'summary' => '',
         'format' => 'full_html',
@@ -10142,6 +10350,112 @@ Languages will be presented to the user in the order that they appear on this li
     ),
   ),
   'date' => '2020-09-05 03:49:15 -0700',
+  'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
+);
+  $nodes[] = array(
+  'title' => 'Dev - Config',
+  'log' => '',
+  'status' => 1,
+  'comment' => 0,
+  'promote' => 0,
+  'sticky' => 0,
+  'ds_switch' => 'default',
+  'type' => 'sirius_help',
+  'language' => 'en',
+  'created' => 1697454131,
+  'tnid' => 0,
+  'translate' => 0,
+  'uuid' => 'ce7f7144-394d-4a6b-a981-f1a41c0a3fa8',
+  'body' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Set the development server type:</p>
+
+<p><strong>Development:</strong> This is a development server. It will be used for software development.</p>
+
+<p><strong>Staging:</strong> This is a staging server. It will be used to preview features, but it should not send bulk email or text messages, and it should not be accessible to end-users.</p>
+
+<p><strong>Live (Default):</strong> This is a live Sirius server.</p>
+',
+        'summary' => '',
+        'format' => 'full_html',
+        'safe_summary' => '',
+      ),
+    ),
+  ),
+  'field_sirius_paths' => array(
+    'und' => array(
+      0 => array(
+        'value' => 'sirius/dev/config',
+        'format' => NULL,
+      ),
+    ),
+  ),
+  'field_sirius_summary' => array(
+    'und' => array(
+      0 => array(
+        'value' => '<p>Set the development "server type".</p>
+',
+        'format' => 'full_html',
+      ),
+    ),
+  ),
+  'rdf_mapping' => array(
+    'rdftype' => array(
+      0 => 'sioc:Item',
+      1 => 'foaf:Document',
+    ),
+    'title' => array(
+      'predicates' => array(
+        0 => 'dc:title',
+      ),
+    ),
+    'created' => array(
+      'predicates' => array(
+        0 => 'dc:date',
+        1 => 'dc:created',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'changed' => array(
+      'predicates' => array(
+        0 => 'dc:modified',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+    'body' => array(
+      'predicates' => array(
+        0 => 'content:encoded',
+      ),
+    ),
+    'uid' => array(
+      'predicates' => array(
+        0 => 'sioc:has_creator',
+      ),
+      'type' => 'rel',
+    ),
+    'name' => array(
+      'predicates' => array(
+        0 => 'foaf:name',
+      ),
+    ),
+    'comment_count' => array(
+      'predicates' => array(
+        0 => 'sioc:num_replies',
+      ),
+      'datatype' => 'xsd:integer',
+    ),
+    'last_activity' => array(
+      'predicates' => array(
+        0 => 'sioc:last_activity_date',
+      ),
+      'datatype' => 'xsd:dateTime',
+      'callback' => 'date_iso8601',
+    ),
+  ),
+  'date' => '2023-10-16 04:02:11 -0700',
   'user_uuid' => '88058974-df68-466a-bc2d-adc1b80e4cd5',
 );
   $nodes[] = array(

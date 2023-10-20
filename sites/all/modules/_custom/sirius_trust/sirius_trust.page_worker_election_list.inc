@@ -2,16 +2,17 @@
 
 function sirius_trust_node_tab_worker_election_list($worker_node) {
 	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/table.js', 'file');
-
 	$show_inactive = $_REQUEST['show_inactive'];
-
+	$show_inactive = TRUE;
 	$html .= sirius_trust_render_worker_elections($worker_node, $show_inactive);
 
+	/*
 	if ($show_inactive) {
 		$html .= l('Hide inactive elections', current_path(), array('query' => array('show_inactive' => FALSE), 'attributes' => array('class' => array('tool-button'))));
 	} else {
 		$html .= l('Show inactive elections', current_path(), array('query' => array('show_inactive' => TRUE), 'attributes' => array('class' => array('tool-button'))));
 	}
+	*/
 
 	return $html;
 }
