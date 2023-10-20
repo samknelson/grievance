@@ -391,3 +391,12 @@ function sirius_taxonomy_proxy($tid) {
 }
 
 function sirius_node_access_term_proxy($node, $op, $account) { return FALSE; }
+
+function sirius_taxonomy_friendly_name($vocabulary_machine_name) {
+  $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_machine_name);
+  if (!$vocabulary) { return $vocabulary_machine_name; }
+  $name = $vocabulary->name;
+  $name = preg_replace("/Sirius /", '', $name);
+  $name = preg_replace("/Grievance /", '', $name);
+  return $name;
+}
