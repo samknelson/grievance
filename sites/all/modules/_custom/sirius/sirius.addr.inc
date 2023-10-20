@@ -229,7 +229,6 @@ function sirius_addr_form_alter_node(&$form, &$form_state, $form_id) {
 }
 
 function sirius_addr_get_component_name($geometry_json, $type) {
-	print_r($geometry_json);
 	if (!$geometry_json) { return NULL; }
 	if (!$geometry_json['data']) { return NULL; }
 	if (!$geometry_json['data']['geocoder_address_components']) { return NULL; }
