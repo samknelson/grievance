@@ -25,6 +25,25 @@ function sirius_dashboard_item_data($json, $uuid, $options = array()) {
 	$plugin_info = sirius_dashboard_plugin_info($plugin_key);
 	$callback = $plugin_info['callbacks']['data'];
 	if (!$callback) { return '[no callback for this dashboard item has been defined.]'; }
+
 	sirius_require($plugin_info['module'], $plugin_info['file']);
-	return $callback($json['item'][$uuid]['preferences'], $options);
+
+	if (sirius_proxy_active() && $plugin_info['proxy']) {
+		$result = sirius_proxy_call('sirius_dashboard_item_data', $json, $uuid, $options);
+		if ($result['success']) {
+			$item_data = $result['data'];
+		} else {
+			$item_data = array(
+				array(
+					'count' => 0,
+					'tools' => '',
+					'details' => '<em><strong>ERROR:</strong> ' . $result['msg'] . '</em>',
+				)
+			);
+		}
+	} else {
+		$item_data = $callback($json['item'][$uuid]['preferences'], $options);
+	}
+
+	return $item_data;
 }
