@@ -136,7 +136,7 @@ function report_cache_page_report($report_type) {
 function report_cache_render_meta($parameters) {
 	$html = '<div class="report_cache_meta">';
 	if ($parameters['meta']['instance']['uuid']) {
-		$instance = report_cache_instance($report_type, $parameters['meta']['instance']['uuid']);
+		$instance = report_cache_instance($parameters['report_type'], $parameters['meta']['instance']['uuid']);
 		if ($instance) {
 			$html .= sirius_fakerender_field('Instance:', $instance['title']);
 		}
