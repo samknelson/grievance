@@ -33,6 +33,17 @@ function sirius_dashboard_plugin_report_prefs($json, $form_state = NULL) {
 		$form['instance'] = array('#value' => NULL);
 	}
 
+	$form['link_only'] = array(
+		'#title' => t('Link Only?'),
+		'#type' => 'select',
+		'#options' => array(
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $json['link_only'],
+		'#description' => t('Some reports have a dashboard callback to show detailed information, i.e. a multi-row breakout. Use this option to suppress the detailed callback, and instead show only a link to the most recent report.'),
+	);
+
 	return $form;
 }
 
@@ -54,11 +65,13 @@ function sirius_dashboard_plugin_report_data($prefs, $options = array()) {
 		);
 	}
 
-	$callback = $info['dashboard_callback'];
-	if ($callback) { return $callback($prefs, $options, $report_type, $report_id); }
+	// Does the report have a "dashboard callback"?
+	if ($prefs['link_only'] != 'Yes') {
+		$callback = $info['dashboard_callback'];
+		if ($callback) { return $callback($prefs, $options, $report_type, $report_id); }
+	}
 
 	$parameters = report_cache_parameters($report_type, $report_id);
-	if (!$parameters['meta']['dashboard']['count']) { return array(); }
 
 	$details = $parameters['meta']['dashboard']['details'];
 
@@ -67,7 +80,11 @@ function sirius_dashboard_plugin_report_data($prefs, $options = array()) {
 	$count = $parameters['meta']['dashboard']['count'];
 	$result['count'] = $count;
 	$ts = $parameters['meta']['ts']['completed'];
-	$result['details'] = "<strong>$count records</strong> found " . format_interval(time() - $ts) . ' ago.';
+	if (isset($count)) {
+		$result['details'] = "<strong>$count records</strong> found " . format_interval(time() - $ts) . ' ago.';
+	} else {
+		$result['details'] = "Last report run " . format_interval(time() - $ts) . ' ago.';
+	}
 	if ($details) { $result['details'] .= '<br>' . $details; }
 	return array($result);
 }
