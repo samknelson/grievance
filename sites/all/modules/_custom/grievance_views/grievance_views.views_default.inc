@@ -6495,6 +6495,8 @@ Section',
   $handler->display->display_options['access']['perm'] = 'grievance admin';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['query']['options']['distinct'] = TRUE;
+  $handler->display->display_options['query']['options']['pure_distinct'] = TRUE;
   $handler->display->display_options['exposed_form']['type'] = 'input_required';
   $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
   $handler->display->display_options['exposed_form']['options']['text_input_required_format'] = 'full_html';
@@ -32936,6 +32938,10 @@ Grievance Form',
   $handler->display->display_options['fields']['name']['alter']['text'] = '<div style="display: inline-block; width: [expression]px;">&nbsp;</div>[name]';
   $handler->display->display_options['fields']['name']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['name']['alter']['ellipsis'] = FALSE;
+  /* Field: Field: ID */
+  $handler->display->display_options['fields']['field_sirius_id']['id'] = 'field_sirius_id';
+  $handler->display->display_options['fields']['field_sirius_id']['table'] = 'field_data_field_sirius_id';
+  $handler->display->display_options['fields']['field_sirius_id']['field'] = 'field_sirius_id';
   /* Field: Global: Current Path */
   $handler->display->display_options['fields']['current_path']['id'] = 'current_path';
   $handler->display->display_options['fields']['current_path']['table'] = 'views';
