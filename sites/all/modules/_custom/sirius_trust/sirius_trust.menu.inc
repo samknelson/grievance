@@ -54,11 +54,14 @@ function sirius_trust_node_tabs() {
     'component' => 'trust',
   );
 
+
+
+
   $node_tabs['sirius_worker']['sirius_trust_worker_election'] = array(
     'title' => 'Elections',
     'description' => '',
     'callback' => 'sirius_trust_node_tab_worker_election',
-    'permissions' => array('sirius trust staff'),
+    'permissions' => array('sirius'),
     'weight' => 13,
     'file' => 'sirius_trust.page_worker_election.inc',
     'component' => 'trust',
@@ -96,6 +99,53 @@ function sirius_trust_node_tabs() {
     'component' => 'trust',
   );
 
+
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_beneficiary'] = array(
+    'title' => 'Beneficiaries   ',
+    'description' => '',
+    'callback' => 'sirius_trust_node_tab_worker_beneficiary',
+    'permissions' => array('sirius'),
+    'weight' => 14,
+    'file' => 'sirius_trust.page_worker_beneficiary.inc',
+    'component' => 'trust',
+  );
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_beneficiary/current'] = array(
+    'title' => 'Current Beneficiary',
+    'description' => '',
+    'callback' => 'sirius_trust_node_tab_worker_beneficiary',
+    'permissions' => array('sirius trust staff'),
+    'weight' => 1,
+    'file' => 'sirius_trust.page_worker_beneficiary.inc',
+    'component' => 'trust',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_beneficiary/list'] = array(
+    'title' => 'List',
+    'description' => '',
+    'callback' => 'sirius_trust_node_tab_worker_beneficiary_list',
+    'permissions' => array('sirius trust staff'),
+    'weight' => 2,
+    'file' => 'sirius_trust.page_worker_beneficiary_list.inc',
+    'component' => 'trust',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_worker']['sirius_trust_worker_beneficiary/add'] = array(
+    'title' => 'Add',
+    'description' => '',
+    'callback' => 'sirius_trust_node_tab_worker_beneficiary_add',
+    'permissions' => array('sirius trust staff'),
+    'weight' => 3,
+    'file' => 'sirius_trust.page_worker_beneficiary_add.inc',
+    'component' => 'trust',
+  );
+
+
+
+
   $node_tabs['sirius_json_definition']['sirius_trust_policy_benefits'] = array(
     'title' => 'Benefits',
     'description' => '',
@@ -126,6 +176,16 @@ function sirius_trust_node_tabs() {
     'component' => 'trust',
   );
 
+  $node_tabs['sirius_json_definition']['sirius_trust_policy_service_rates'] = array(
+    'title' => 'Service Rates',
+    'description' => '',
+    'callback' => 'sirius_trust_node_tab_policy_service_rates',
+    'permissions' => array('sirius trust admin'),
+    'weight' => 2,
+    'file' => 'sirius_trust.page_policy_service_rates.inc',
+    'component' => 'trust:provider',
+  );
+
   $node_tabs['sirius_trust_worker_election']['sirius_trust_election_wizard_link'] = array(
     'title' => 'Wizard',
     'description' => '',
@@ -143,16 +203,6 @@ function sirius_trust_node_tabs() {
     'permissions' => array('sirius trust admin'),
     'weight' => 1,
     'file' => 'sirius_trust.page_election_relationships.inc',
-    'component' => 'trust',
-  );
-
-  $node_tabs['sirius_trust_benefit']['sirius_trust_benefit_beneficiary'] = array(
-    'title' => 'Beneficiaries',
-    'description' => '',
-    'callback' => 'sirius_trust_node_tab_benefit_beneficiary',
-    'permissions' => array('sirius trust admin'),
-    'weight' => 13,
-    'file' => 'sirius_trust.page_benefit_beneficiary.inc',
     'component' => 'trust',
   );
 
@@ -196,7 +246,13 @@ function sirius_trust_menu() {
     'title' => 'Benefits',
     'page callback' => 'sirius_trust_page_benefits',
     'page arguments' => array(),
-    'access arguments' => array('sirius trust admin'),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust admin',
+        'component' => 'trust',
+      ),
+    ),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_trust.page_benefits.inc'
   );
@@ -215,7 +271,13 @@ function sirius_trust_menu() {
     'title' => 'Election Wizards',
     'page callback' => 'sirius_trust_page_election_wizard_list',
     'page arguments' => array(),
-    'access arguments' => array('sirius trust staff'),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust staff',
+        'component' => 'trust',
+      ),
+    ),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_trust.page_election_wizard_list.inc',
     'weight' => 1,
