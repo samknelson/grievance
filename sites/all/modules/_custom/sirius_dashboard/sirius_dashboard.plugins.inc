@@ -126,6 +126,7 @@ function sirius_dashboard_plugin_info_all() {
 		'callbacks' => array(
 			'data' => 'sirius_trust_dashboard_plugin_elections_data',
 			'config' => 'sirius_trust_dashboard_plugin_elections_config',
+			'prefs' => 'sirius_trust_dashboard_plugin_elections_prefs',
 		),
 	);
 

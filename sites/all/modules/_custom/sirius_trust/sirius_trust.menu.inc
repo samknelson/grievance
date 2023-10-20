@@ -51,7 +51,7 @@ function sirius_trust_node_tabs() {
     'permissions' => array('sirius trust staff'),
     'weight' => 14,
     'file' => 'sirius_trust.page_worker_beneficiary.inc',
-    'component' => 'trust',
+    'component' => 'trust:beneficiary',
   );
 
 
@@ -206,6 +206,16 @@ function sirius_trust_node_tabs() {
     'component' => 'trust',
   );
 
+  $node_tabs['sirius_trust_benefit']['sirius_trust_benefit_beneficiary'] = array(
+    'title' => 'Beneficiaries',
+    'description' => '',
+    'callback' => 'sirius_trust_node_tab_benefit_beneficiary',
+    'permissions' => array('sirius trust admin'),
+    'weight' => 13,
+    'file' => 'sirius_trust.page_benefit_beneficiary.inc',
+    'component' => 'trust:beneficiary',
+  );
+
   $node_tabs['sirius_log']['sirius_trust_election_wizard'] = array(
     'title' => 'Election Wizard',
     'description' => '',
@@ -241,6 +251,21 @@ function sirius_trust_term_tabs() {
 
 function sirius_trust_menu() {
   $items = array();
+
+  $items['sirius/trust/config'] = array(
+    'title' => 'Trust General Configuration',
+    'page callback' => 'sirius_trust_page_config',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_trust.page_config.inc',
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius trust admin',
+        'component' => 'trust',
+      ),
+    ),
+  );
 
   $items['sirius/trust/benefits'] = array(
     'title' => 'Benefits',

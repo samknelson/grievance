@@ -85,9 +85,9 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 
 	$rows = array();
 	foreach ($benefits as $benefit_nid => $benefit_node) {
-		$eligibility_plugins = sirius_trust_eligibility_plugins_enabled($policy_node, $benefit_node);
+		$result = sirius_trust_eligibility_plugin_check_all($policy_node, $benefit_node, $worker_node, $relationship_node, $ts);
 
-		if (!$eligibility_plugins) {
+		if (!$result['plugins']) {
 			$paths = array(
 				"node/$policy_nid/sirius_trust_policy_benefits/$benefit_nid" => 'Eligibility Settings',
 			);
@@ -107,12 +107,12 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 			$row[] = join('', $tools);
 			$rows[] = array('data' => $row, 'class' => array($class, 'summary'));
 			continue;
-		}
+		} 
 
 		$subrows = array();
 		$summary_eligible = TRUE;
 		$summary_failed = array();
-		foreach ($eligibility_plugins as $plugin_key) {
+		foreach ($result['plugins'] as $plugin_key => $sub_result) {
 			$plugin_info = sirius_trust_eligibility_plugin_info($plugin_key);
 
 			$paths = array();
@@ -126,11 +126,10 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 			}
 
 			$class = 'eligible';
-			$result = sirius_trust_eligibility_plugin_check($policy_node, $benefit_node, $worker_node, $relationship_node, $ts, $plugin_key);
 
-			$msg = $result['msg'];
-			if ($result['success']) {
-				if ($result['warning']) {
+			$msg = $sub_result['msg'];
+			if ($sub_result['success']) {
+				if ($sub_result['warning']) {
 					$class = 'warning';
 					$eligible = 'Warning';
 					$summary_warning = TRUE;
@@ -144,14 +143,14 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 				$summary_eligible = FALSE;
 				$summary_failed[] = $plugin_info['title'];
 			}
-			if ($result['tools']) { $tools = array_merge($tools, $result['tools']); }
+			if ($sub_result['tools']) { $tools = array_merge($tools, $sub_result['tools']); }
 
 			$row = array();
 			$row[] = '';
 			$row[] = '';
 			$row[] = $plugin_info['title'];
 			$row[] = $eligible;
-			$row[] = $result['msg'];
+			$row[] = $sub_result['msg'];
 			$row[] = join('', $tools);
 			$subrows[] = array('data' => $row, 'class' => array($class));
 		}

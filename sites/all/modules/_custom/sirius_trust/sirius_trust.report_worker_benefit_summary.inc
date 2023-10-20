@@ -293,8 +293,10 @@ function sirius_trust_report_worker_benefit_summary_view($report_type, $report_i
       }
       $row[] = $name;
     }
-    $row[] = $hr['record_count'];
+    // $row[] = $hr['record_count'];
+
     $row[] = $hr['subscriber_count'];
+    $row[] = $hr['dependent_count'] - $hr['subscriber_count'];
     $row[] = $hr['dependent_count'];
     $rows[] = $row;
   }
@@ -303,9 +305,10 @@ function sirius_trust_report_worker_benefit_summary_view($report_type, $report_i
   foreach ($breakouts as $breakout) {
     $header[] = $breakout_options[$breakout];
   }
-  $header[] = 'Record Count';
-  $header[] = 'Subscriber Count';
-  $header[] = 'Dependent Count';
+  // $header[] = 'Record Count';
+  $header[] = 'Subscribers';
+  $header[] = 'Dependents';
+  $header[] = 'Covered Lives';
 
   if ($_REQUEST['output'] == 'csv') {
     $filename = "${report_type}_";
@@ -360,7 +363,7 @@ function sirius_trust_report_worker_benefit_summary_dashboard($prefs, $options, 
     $details .= "<br />";
     $details .= "<strong>$hr[subscriber_count]</strong> subscribers / ";
     $details .= "<strong>$hr[dependent_count]</strong> dependents / ";
-    $details .= "<strong>$hr[record_count]</strong> records";
+    // $details .= "<strong>$hr[record_count]</strong> records";
 
     $row = array();
     $row['tools'] = l('View', "sirius/reports/$report_type", array('query' => array('report_id' => $report_id, 'action' => 'render', 'callback-name' => 'View'), 'attributes' => array('class' => array('tool-button'))));

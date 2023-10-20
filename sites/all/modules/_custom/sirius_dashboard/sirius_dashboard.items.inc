@@ -45,5 +45,26 @@ function sirius_dashboard_item_data($json, $uuid, $options = array()) {
 		$item_data = $callback($json['item'][$uuid]['preferences'], $options);
 	}
 
-	return $item_data;
+	// Set the priority
+	$priority_cutoffs = $json['item_list'][$uuid]['priority_cutoffs'];
+	if ($priority_cutoffs && $result) {
+		foreach ($result as $key => $row) {
+			foreach ($priority_cutoffs as $priority => $cutoff) {
+				if (!is_numeric($cutoff)) { continue; }
+				if ($row['count'] >= $cutoff) {
+					$result[$key]['priority'] = $priority;
+				}
+			}
+		}
+	}
+
+	if ($result) {
+		foreach ($result as $key => $row) {
+			if ($row['priority'] == -1) {
+				unset($result[$key]);
+			}
+		}
+	}
+
+	return $result;
 }
