@@ -115,7 +115,7 @@ function sirius_config_links() {
 	}
 
 	foreach ($links as $category => $record) {
-		if (!$record['title']) { $record['title'] = $category; }
+		if (!$record['title']) { $links[$category]['title'] = $category; }
 	}
 
 	return $links;
