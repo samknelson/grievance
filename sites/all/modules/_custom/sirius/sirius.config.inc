@@ -111,6 +111,11 @@ function sirius_config_links() {
 	  	if ($links[$a]['weight'] > $links[$b]['weight']) { return -1; }
 	  	return strcasecmp($links[$a]['title'], $links[$b]['title']);
 	  });
+
+	}
+
+	foreach ($links as $category => $record) {
+		if (!$record['title']) { $record['title'] = $category; }
 	}
 
 	return $links;
