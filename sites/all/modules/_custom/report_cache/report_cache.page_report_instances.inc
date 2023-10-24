@@ -12,7 +12,7 @@ function report_cache_page_report_instances_access($report_type) {
 	if (!user_access($access)) { return FALSE; }
 
 	// Must have a parameteres callback; otherwise, there's no need for instances
-	if (!$info['parameters_form_callback']) { return FALSE; }
+	if (!$info['parameters_form_callback'] && !$info['generator']) { return FALSE; }
 
 	return TRUE;
 }
@@ -23,6 +23,7 @@ function report_cache_page_report_instances($report_type) {
 
 function report_cache_page_report_instances_form($form, &$form_state, $report_type) {
 	sirius_backlink_add('sirius/reports', array('name' => 'All Reports'));
+	drupal_add_css(drupal_get_path('module', 'sirius_event') . '/css/event.css', 'file');
 
 	$form_state['report_type'] = $report_type;
 	form_load_include($form_state, 'inc', 'report_cache', 'report_cache.page_report_instances');
@@ -56,7 +57,7 @@ function report_cache_page_report_instances_form($form, &$form_state, $report_ty
     	'#type' => 'fieldset',
     	'#title' => $title,
     	'#collapsible' => TRUE,
-    	'#collapsed' => FALSE,
+    	'#collapsed' => TRUE,
     );
 
     $form['items'][$delta]['uuid'] = array(
@@ -82,11 +83,10 @@ function report_cache_page_report_instances_form($form, &$form_state, $report_ty
 
 	  if ($info['parameters_form_callback']) {
 	  	$form['items'][$delta]['parameters'] = $info['parameters_form_callback']($report_type); 
-	  	//$form['items'][$delta]['parameters']['#type'] = 'fieldset';
-	  	//$form['items'][$delta]['parameters']['#tree'] = TRUE;
-	  	//$form['items'][$delta]['parameters']['#title'] = t('Parameters');
-			sirius_form_prep($form['items'][$delta]['parameters'], $item['parameters']);
+	  } else if ($info['generator']) {
+	  	$form['items'][$delta]['parameters'] = $info['generator']->form();
 	  }
+		sirius_form_prep($form['items'][$delta]['parameters'], $item['parameters']);
 
     $form['items'][$delta]['weight'] = array(
       '#title' => t('Sort Order'),
