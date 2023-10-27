@@ -125,6 +125,24 @@ function sirius_cron() {
 }
 
 /**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_sirius_cron_scan_info() {
+  $items = array();
+
+  $items['log_cleanup_orphans'] = array(
+    'title' => 'Cleanup Orphaned Log Entries',
+    'description' => 'Deletes any log entries where the handlers are all missing.',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_log_cleanup_orphans',
+    'multidomain' => FALSE,
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_entity_presave()
  */
 
