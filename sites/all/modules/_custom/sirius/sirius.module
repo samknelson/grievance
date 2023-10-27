@@ -2,6 +2,7 @@
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Singleton.php';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Result.php';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.access.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
