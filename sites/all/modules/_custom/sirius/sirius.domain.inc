@@ -534,13 +534,13 @@ function sirius_domain_restrict_taxonomy_fields(&$form, $form_id) {
 
     // @todo there has to be an easier way.
     if ($form_field['und']['#options']) {
-      $form_field['und']['#options'] = array_intersect($form_field['und']['#options'], $options);
+      $form_field['und']['#options'] = array_intersect_key($form_field['und']['#options'], $options);
     }
     if ($form_field['und'][0]['tid']['#options']) {
-      $form_field['und'][0]['tid']['#options'] = array_intersect($form_field['und'][0]['tid']['#options'], $options);
+      $form_field['und'][0]['tid']['#options'] = array_intersect_key($form_field['und'][0]['tid']['#options'], $options);
     }
     if ($form_field['und'][1]['tid']['#options']) {
-      $form_field['und'][1]['tid']['#options'] = array_intersect($form_field['und'][1]['tid']['#options'], $options);
+      $form_field['und'][1]['tid']['#options'] = array_intersect_key($form_field['und'][1]['tid']['#options'], $options);
     }
   }
 }
