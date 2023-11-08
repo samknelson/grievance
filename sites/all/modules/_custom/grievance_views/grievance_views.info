@@ -94,7 +94,6 @@ features[views_view][] = sirius_news
 features[views_view][] = sirius_news_admin
 features[views_view][] = sirius_payments
 features[views_view][] = sirius_payperiods
-features[views_view][] = sirius_pcct_members
 features[views_view][] = sirius_phonenumbers
 features[views_view][] = sirius_provider_worker_lookup
 features[views_view][] = sirius_skills

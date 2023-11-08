@@ -24939,9 +24939,8 @@ Grievance Form',
   $handler->display->display_options['filters']['tid_1']['type'] = 'select';
   $handler->display->display_options['filters']['tid_1']['vocabulary'] = 'grievance_department';
 
-  /* Display: Current Employed */
-  $handler = $view->new_display('block', 'Current Employed', 'block_1');
-  $handler->display->display_options['display_description'] = 'Currently employed; employer is in contextual filter';
+  /* Display: Block */
+  $handler = $view->new_display('block', 'Block', 'block_1');
   $handler->display->display_options['defaults']['header'] = FALSE;
   /* Header: Global: Result summary */
   $handler->display->display_options['header']['result']['id'] = 'result';
@@ -24978,15 +24977,6 @@ Grievance Form',
       'label' => 'Rollover',
     ),
   );
-  /* Field: Content: Headshot */
-  $handler->display->display_options['fields']['field_sirius_headshot']['id'] = 'field_sirius_headshot';
-  $handler->display->display_options['fields']['field_sirius_headshot']['table'] = 'field_data_field_sirius_headshot';
-  $handler->display->display_options['fields']['field_sirius_headshot']['field'] = 'field_sirius_headshot';
-  $handler->display->display_options['fields']['field_sirius_headshot']['click_sort_column'] = 'fid';
-  $handler->display->display_options['fields']['field_sirius_headshot']['settings'] = array(
-    'image_style' => 'thumbnail',
-    'image_link' => '',
-  );
   /* Field: Field: Worker */
   $handler->display->display_options['fields']['field_sirius_worker']['id'] = 'field_sirius_worker';
   $handler->display->display_options['fields']['field_sirius_worker']['table'] = 'field_data_field_sirius_worker';
@@ -25016,6 +25006,16 @@ Grievance Form',
     'field_delimiter' => '',
   );
   $handler->display->display_options['fields']['field_sirius_member_status']['delta_offset'] = '0';
+  /* Field: Content: Skills */
+  $handler->display->display_options['fields']['field_sirius_skill']['id'] = 'field_sirius_skill';
+  $handler->display->display_options['fields']['field_sirius_skill']['table'] = 'field_data_field_sirius_skill';
+  $handler->display->display_options['fields']['field_sirius_skill']['field'] = 'field_sirius_skill';
+  $handler->display->display_options['fields']['field_sirius_skill']['relationship'] = 'field_sirius_worker_target_id';
+  $handler->display->display_options['fields']['field_sirius_skill']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_sirius_skill']['settings'] = array(
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_sirius_skill']['delta_offset'] = '0';
   /* Field: Content: Group or Show */
   $handler->display->display_options['fields']['field_sirius_dispatch_job_group']['id'] = 'field_sirius_dispatch_job_group';
   $handler->display->display_options['fields']['field_sirius_dispatch_job_group']['table'] = 'field_data_field_sirius_dispatch_job_group';
@@ -25040,10 +25040,9 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_dispatch_eba_dates']['table'] = 'field_data_field_sirius_dispatch_eba_dates';
   $handler->display->display_options['fields']['field_sirius_dispatch_eba_dates']['field'] = 'field_sirius_dispatch_eba_dates';
   $handler->display->display_options['fields']['field_sirius_dispatch_eba_dates']['relationship'] = 'field_sirius_worker_target_id';
-  $handler->display->display_options['fields']['field_sirius_dispatch_eba_dates']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_sirius_dispatch_eba_dates']['settings'] = array(
-    'format_type' => 'custom',
-    'custom_date_format' => 'D',
+    'format_type' => 'date_only',
+    'custom_date_format' => '',
     'fromto' => 'both',
     'multiple_number' => '',
     'multiple_from' => '',
@@ -25058,15 +25057,6 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_dispatch_eba']['field'] = 'field_sirius_dispatch_eba';
   $handler->display->display_options['fields']['field_sirius_dispatch_eba']['relationship'] = 'field_sirius_worker_target_id';
   $handler->display->display_options['fields']['field_sirius_dispatch_eba']['label'] = 'EBA?';
-  $handler->display->display_options['fields']['field_sirius_dispatch_eba']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['field_sirius_dispatch_eba']['empty'] = 'No';
-  /* Field: Global: Custom text */
-  $handler->display->display_options['fields']['nothing_1']['id'] = 'nothing_1';
-  $handler->display->display_options['fields']['nothing_1']['table'] = 'views';
-  $handler->display->display_options['fields']['nothing_1']['field'] = 'nothing';
-  $handler->display->display_options['fields']['nothing_1']['label'] = 'EBA';
-  $handler->display->display_options['fields']['nothing_1']['alter']['text'] = 'EBA: [field_sirius_dispatch_eba]<br />[field_sirius_dispatch_eba_dates]
-';
   /* Field: Global: Custom text */
   $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
@@ -25587,6 +25577,15 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_dispatch_eba']['field'] = 'field_sirius_dispatch_eba';
   $handler->display->display_options['fields']['field_sirius_dispatch_eba']['relationship'] = 'field_sirius_worker_target_id';
   $handler->display->display_options['fields']['field_sirius_dispatch_eba']['label'] = 'EBA?';
+  /* Field: Content: Member Status */
+  $handler->display->display_options['fields']['field_sirius_member_status']['id'] = 'field_sirius_member_status';
+  $handler->display->display_options['fields']['field_sirius_member_status']['table'] = 'field_data_field_sirius_member_status';
+  $handler->display->display_options['fields']['field_sirius_member_status']['field'] = 'field_sirius_member_status';
+  $handler->display->display_options['fields']['field_sirius_member_status']['relationship'] = 'field_sirius_worker_target_id';
+  $handler->display->display_options['fields']['field_sirius_member_status']['settings'] = array(
+    'field_delimiter' => '',
+  );
+  $handler->display->display_options['fields']['field_sirius_member_status']['delta_offset'] = '0';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
   /* Contextual filter: Content: Employer (field_grievance_shop) */
   $handler->display->display_options['arguments']['field_grievance_shop_target_id']['id'] = 'field_grievance_shop_target_id';
@@ -25805,17 +25804,10 @@ Grievance Form',
     t('Member Status'),
     t('IS NOT willing to work:'),
     t('IS willing to work:'),
-    t('Current Employed'),
-    t('Currently employed; employer is in contextual filter'),
     t('Layoff'),
     t('Rollover'),
-    t('Headshot'),
     t('Nid'),
     t('Show'),
-    t('No'),
-    t('EBA'),
-    t('EBA: [field_sirius_dispatch_eba]<br />[field_sirius_dispatch_eba_dates]
-'),
     t('Tools'),
     t('<a href="/node/[nid]/sirius_dispatch_worker_view" target="_blank" class="tool-button">Dispatch</a>'),
     t('Primary/Secondary'),
@@ -30520,237 +30512,6 @@ Grievance Form',
     t('Approved?'),
   );
   $export['sirius_payperiods'] = $view;
-
-  $view = new view();
-  $view->name = 'sirius_pcct_members';
-  $view->description = '';
-  $view->tag = 'default';
-  $view->base_table = 'node';
-  $view->human_name = 'Sirius PCCT Members';
-  $view->core = 7;
-  $view->api_version = '3.0';
-  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
-
-  /* Display: Master */
-  $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Members';
-  $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'sirius pcct admin';
-  $handler->display->display_options['cache']['type'] = 'none';
-  $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['exposed_form']['type'] = 'basic';
-  $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '100';
-  $handler->display->display_options['style_plugin'] = 'table';
-  /* Footer: Global: Text area */
-  $handler->display->display_options['footer']['area']['id'] = 'area';
-  $handler->display->display_options['footer']['area']['table'] = 'views';
-  $handler->display->display_options['footer']['area']['field'] = 'area';
-  $handler->display->display_options['footer']['area']['empty'] = TRUE;
-  $handler->display->display_options['footer']['area']['content'] = '<a href="/sirius/pcct/register" class="tool-button">Register a Member</a>';
-  $handler->display->display_options['footer']['area']['format'] = 'full_html';
-  /* Relationship: Entity Reference: Referencing entity */
-  $handler->display->display_options['relationships']['reverse_field_sirius_worker_user']['id'] = 'reverse_field_sirius_worker_user';
-  $handler->display->display_options['relationships']['reverse_field_sirius_worker_user']['table'] = 'node';
-  $handler->display->display_options['relationships']['reverse_field_sirius_worker_user']['field'] = 'reverse_field_sirius_worker_user';
-  $handler->display->display_options['relationships']['reverse_field_sirius_worker_user']['label'] = 'User';
-  /* Field: Content: Nid */
-  $handler->display->display_options['fields']['nid']['id'] = 'nid';
-  $handler->display->display_options['fields']['nid']['table'] = 'node';
-  $handler->display->display_options['fields']['nid']['field'] = 'nid';
-  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
-  /* Field: User: Uid */
-  $handler->display->display_options['fields']['uid']['id'] = 'uid';
-  $handler->display->display_options['fields']['uid']['table'] = 'users';
-  $handler->display->display_options['fields']['uid']['field'] = 'uid';
-  $handler->display->display_options['fields']['uid']['relationship'] = 'reverse_field_sirius_worker_user';
-  $handler->display->display_options['fields']['uid']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['uid']['link_to_user'] = FALSE;
-  /* Field: Content: Title */
-  $handler->display->display_options['fields']['title']['id'] = 'title';
-  $handler->display->display_options['fields']['title']['table'] = 'node';
-  $handler->display->display_options['fields']['title']['field'] = 'title';
-  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
-  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
-  $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
-  /* Field: Content: Phone */
-  $handler->display->display_options['fields']['field_sirius_phone']['id'] = 'field_sirius_phone';
-  $handler->display->display_options['fields']['field_sirius_phone']['table'] = 'field_data_field_sirius_phone';
-  $handler->display->display_options['fields']['field_sirius_phone']['field'] = 'field_sirius_phone';
-  /* Field: Content: Email */
-  $handler->display->display_options['fields']['field_sirius_email']['id'] = 'field_sirius_email';
-  $handler->display->display_options['fields']['field_sirius_email']['table'] = 'field_data_field_sirius_email';
-  $handler->display->display_options['fields']['field_sirius_email']['field'] = 'field_sirius_email';
-  /* Field: Field: ID */
-  $handler->display->display_options['fields']['field_sirius_id']['id'] = 'field_sirius_id';
-  $handler->display->display_options['fields']['field_sirius_id']['table'] = 'field_data_field_sirius_id';
-  $handler->display->display_options['fields']['field_sirius_id']['field'] = 'field_sirius_id';
-  $handler->display->display_options['fields']['field_sirius_id']['label'] = 'Member ID';
-  /* Field: Field: ID2 */
-  $handler->display->display_options['fields']['field_sirius_id2']['id'] = 'field_sirius_id2';
-  $handler->display->display_options['fields']['field_sirius_id2']['table'] = 'field_data_field_sirius_id2';
-  $handler->display->display_options['fields']['field_sirius_id2']['field'] = 'field_sirius_id2';
-  $handler->display->display_options['fields']['field_sirius_id2']['label'] = 'Client Token';
-  /* Field: Global: Custom text */
-  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
-  $handler->display->display_options['fields']['nothing']['table'] = 'views';
-  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
-  $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_pcct_worker" class="tool-button">View Member</a>
-<a href="/node/[nid]/sirius_worker_contact" class="tool-button">Edit Contact</a>
-<a href="/user/[uid]/edit" class="tool-button">Edit User</a>';
-  /* Sort criterion: Content: Post date */
-  $handler->display->display_options['sorts']['created']['id'] = 'created';
-  $handler->display->display_options['sorts']['created']['table'] = 'node';
-  $handler->display->display_options['sorts']['created']['field'] = 'created';
-  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
-  /* Contextual filter: Field: Domain (field_sirius_domain) */
-  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['id'] = 'field_sirius_domain_target_id';
-  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['table'] = 'field_data_field_sirius_domain';
-  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['field'] = 'field_sirius_domain_target_id';
-  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['default_action'] = 'default';
-  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['default_argument_type'] = 'fixed';
-  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['default_argument_options']['argument'] = 'CURRENT_DOMAIN';
-  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['summary']['number_of_records'] = '0';
-  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['summary']['format'] = 'default_summary';
-  $handler->display->display_options['arguments']['field_sirius_domain_target_id']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published status */
-  $handler->display->display_options['filters']['status']['id'] = 'status';
-  $handler->display->display_options['filters']['status']['table'] = 'node';
-  $handler->display->display_options['filters']['status']['field'] = 'status';
-  $handler->display->display_options['filters']['status']['value'] = 1;
-  $handler->display->display_options['filters']['status']['group'] = 1;
-  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Filter criterion: Content: Type */
-  $handler->display->display_options['filters']['type']['id'] = 'type';
-  $handler->display->display_options['filters']['type']['table'] = 'node';
-  $handler->display->display_options['filters']['type']['field'] = 'type';
-  $handler->display->display_options['filters']['type']['value'] = array(
-    'sirius_worker' => 'sirius_worker',
-  );
-  $handler->display->display_options['filters']['type']['group'] = 1;
-  /* Filter criterion: Content: Phone (field_sirius_phone) */
-  $handler->display->display_options['filters']['field_sirius_phone_value']['id'] = 'field_sirius_phone_value';
-  $handler->display->display_options['filters']['field_sirius_phone_value']['table'] = 'field_data_field_sirius_phone';
-  $handler->display->display_options['filters']['field_sirius_phone_value']['field'] = 'field_sirius_phone_value';
-  $handler->display->display_options['filters']['field_sirius_phone_value']['operator'] = 'contains';
-  $handler->display->display_options['filters']['field_sirius_phone_value']['group'] = 1;
-  $handler->display->display_options['filters']['field_sirius_phone_value']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['operator_id'] = 'field_sirius_phone_value_op';
-  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['label'] = 'Phone';
-  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['description'] = 'substring ok';
-  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['operator'] = 'field_sirius_phone_value_op';
-  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['identifier'] = 'field_sirius_phone_value';
-  $handler->display->display_options['filters']['field_sirius_phone_value']['expose']['remember_roles'] = array(
-    2 => '2',
-  );
-  /* Filter criterion: Content: Email (field_sirius_email) */
-  $handler->display->display_options['filters']['field_sirius_email_value']['id'] = 'field_sirius_email_value';
-  $handler->display->display_options['filters']['field_sirius_email_value']['table'] = 'field_data_field_sirius_email';
-  $handler->display->display_options['filters']['field_sirius_email_value']['field'] = 'field_sirius_email_value';
-  $handler->display->display_options['filters']['field_sirius_email_value']['operator'] = 'contains';
-  $handler->display->display_options['filters']['field_sirius_email_value']['group'] = 1;
-  $handler->display->display_options['filters']['field_sirius_email_value']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_sirius_email_value']['expose']['operator_id'] = 'field_sirius_email_value_op';
-  $handler->display->display_options['filters']['field_sirius_email_value']['expose']['label'] = 'Email';
-  $handler->display->display_options['filters']['field_sirius_email_value']['expose']['description'] = 'substring ok';
-  $handler->display->display_options['filters']['field_sirius_email_value']['expose']['operator'] = 'field_sirius_email_value_op';
-  $handler->display->display_options['filters']['field_sirius_email_value']['expose']['identifier'] = 'field_sirius_email_value';
-  $handler->display->display_options['filters']['field_sirius_email_value']['expose']['remember_roles'] = array(
-    2 => '2',
-  );
-  /* Filter criterion: Content: Title */
-  $handler->display->display_options['filters']['title']['id'] = 'title';
-  $handler->display->display_options['filters']['title']['table'] = 'node';
-  $handler->display->display_options['filters']['title']['field'] = 'title';
-  $handler->display->display_options['filters']['title']['operator'] = 'contains';
-  $handler->display->display_options['filters']['title']['group'] = 1;
-  $handler->display->display_options['filters']['title']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['title']['expose']['operator_id'] = 'title_op';
-  $handler->display->display_options['filters']['title']['expose']['label'] = 'Name';
-  $handler->display->display_options['filters']['title']['expose']['description'] = 'substring ok';
-  $handler->display->display_options['filters']['title']['expose']['operator'] = 'title_op';
-  $handler->display->display_options['filters']['title']['expose']['identifier'] = 'title';
-  $handler->display->display_options['filters']['title']['expose']['remember_roles'] = array(
-    2 => '2',
-  );
-  /* Filter criterion: Field: ID2 (field_sirius_id2) */
-  $handler->display->display_options['filters']['field_sirius_id2_value']['id'] = 'field_sirius_id2_value';
-  $handler->display->display_options['filters']['field_sirius_id2_value']['table'] = 'field_data_field_sirius_id2';
-  $handler->display->display_options['filters']['field_sirius_id2_value']['field'] = 'field_sirius_id2_value';
-  $handler->display->display_options['filters']['field_sirius_id2_value']['group'] = 1;
-  $handler->display->display_options['filters']['field_sirius_id2_value']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['operator_id'] = 'field_sirius_id2_value_op';
-  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['label'] = 'Client Token';
-  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['operator'] = 'field_sirius_id2_value_op';
-  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['identifier'] = 'field_sirius_id2_value';
-  $handler->display->display_options['filters']['field_sirius_id2_value']['expose']['remember_roles'] = array(
-    2 => '2',
-  );
-  /* Filter criterion: Field: ID (field_sirius_id) */
-  $handler->display->display_options['filters']['field_sirius_id_value']['id'] = 'field_sirius_id_value';
-  $handler->display->display_options['filters']['field_sirius_id_value']['table'] = 'field_data_field_sirius_id';
-  $handler->display->display_options['filters']['field_sirius_id_value']['field'] = 'field_sirius_id_value';
-  $handler->display->display_options['filters']['field_sirius_id_value']['group'] = 1;
-  $handler->display->display_options['filters']['field_sirius_id_value']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['operator_id'] = 'field_sirius_id_value_op';
-  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['label'] = 'Member ID';
-  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['operator'] = 'field_sirius_id_value_op';
-  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['identifier'] = 'field_sirius_id_value';
-  $handler->display->display_options['filters']['field_sirius_id_value']['expose']['remember_roles'] = array(
-    2 => '2',
-  );
-
-  /* Display: Admin Page */
-  $handler = $view->new_display('page', 'Admin Page', 'page');
-  $handler->display->display_options['path'] = 'sirius/pcct/members';
-
-  /* Display: Data export */
-  $handler = $view->new_display('views_data_export', 'Data export', 'views_data_export_1');
-  $handler->display->display_options['pager']['type'] = 'some';
-  $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
-  $handler->display->display_options['path'] = 'sirius/pcct/members/csv';
-  $handler->display->display_options['displays'] = array(
-    'default' => 'default',
-    'page' => 'page',
-  );
-  $translatables['sirius_pcct_members'] = array(
-    t('Master'),
-    t('Members'),
-    t('more'),
-    t('Apply'),
-    t('Reset'),
-    t('Sort by'),
-    t('Asc'),
-    t('Desc'),
-    t('Items per page'),
-    t('- All -'),
-    t('Offset'),
-    t('« first'),
-    t('‹ previous'),
-    t('next ›'),
-    t('last »'),
-    t('<a href="/sirius/pcct/register" class="tool-button">Register a Member</a>'),
-    t('User'),
-    t('Nid'),
-    t('Uid'),
-    t('Title'),
-    t('Phone'),
-    t('Email'),
-    t('Member ID'),
-    t('Client Token'),
-    t('Tools'),
-    t('<a href="/node/[nid]/sirius_pcct_worker" class="tool-button">View Member</a>
-<a href="/node/[nid]/sirius_worker_contact" class="tool-button">Edit Contact</a>
-<a href="/user/[uid]/edit" class="tool-button">Edit User</a>'),
-    t('All'),
-    t('substring ok'),
-    t('Name'),
-    t('Admin Page'),
-    t('Data export'),
-  );
-  $export['sirius_pcct_members'] = $view;
 
   $view = new view();
   $view->name = 'sirius_phonenumbers';
