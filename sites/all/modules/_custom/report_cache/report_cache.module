@@ -13,6 +13,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/r
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_auto.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_preview.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_render.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_operations.inc";
 
 function report_cache_info_all() {
 	$info_all = &drupal_static(__FUNCTION__, NULL);
@@ -157,6 +158,18 @@ function report_cache_most_recent($report_type, $instance_uuid = NULL) {
 	return $hr['report_id'];
 }
 
+function report_cache_rowcount($report_type, $report_id) {
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
+	$sql = "select count(*) as c ";
+	$sql .= "from report_cache ";
+	$sql .= "where report_type = :report_type ";
+	$sql .= "and report_id = :report_id ";
+	$sql .= "and report_domain_nid = :domain_nid ";
+	$stmt = sirius_sql_query($sql, array(':report_type' => $report_type, ':report_id' => $report_id, ':domain_nid' => $domain_nid));
+	$hr = $stmt->fetchAssoc();
+	return $hr['c'];
+}
+
 class Report_Cache_Report_Generator {
   // Reports are singletons. Use My_Report::getInstance()->whatever()
   protected static $instance = array();
@@ -194,4 +207,56 @@ class Report_Cache_Report_Generator {
   public function setInfo(&$items) {
     $items[$this->type] = $this->info();
   }
+
+  public function parameters($report_id, $parameters = array()) {
+  	return report_cache_parameters($this->type, $report_id, $parameters);
+  }
+
+  public function most_recent($instance_uuid = NULL) {
+  	return report_cache_most_recent($this->type, $instance_uuid);
+  }
+
+  public function dashboard_render_never_run($prefs, $options) {
+		return array(
+			array(
+				'count' => 0, 
+				'tools' => l('Generate', "sirius/reports/$report_type/form", array('attributes' => array('class' => array('tool-button')))),
+				'details' => 'Report has never been run',
+			)
+		);
+	}
+
+  public function dashboard($prefs, $options, $report_id = NULL) {
+		$report_id = $this->most_recent($prefs['instance']);
+		if (!$report_id) { return $this->dashboard_render_never_run($prefs, $options); }
+
+    if ($prefs['link_only'] != 'Yes') {
+      return $this->dashboard_render_link($prefs, $options, $report_id);
+    }
+
+    return $this->dashboard_render_full($prefs, $options, $report_id);
+  }
+
+  public function dashboard_render_link($prefs, $options, $report_id) {
+  	$report_type = $this->type;
+		$parameters = $this->parameters($report_id);
+		$details = $parameters['meta']['dashboard']['details'];
+		$result = array();
+		$result['tools'] = l('View', "sirius/reports/$report_type", array('query' => array('report_id' => $report_id, 'action' => 'render', 'callback-name' => 'View'), 'attributes' => array('class' => array('tool-button'))));
+		$count = $parameters['meta']['dashboard']['count'];
+		$result['count'] = $count;
+		$ts = $parameters['meta']['ts']['completed'];
+		if (isset($count)) {
+			$result['details'] = "<strong>$count records</strong> found " . format_interval(time() - $ts) . ' ago.';
+		} else {
+			$result['details'] = "Last report run " . format_interval(time() - $ts) . ' ago.';
+		}
+		if ($details) { $result['details'] .= '<br>' . $details; }
+		return array($result);
+  }
+
+  public function dashboard_render_full($prefs, $options, $report_id) {
+  	return $this->dashboard_render_link($prefs, $options, $report_id);
+  }
 }
+

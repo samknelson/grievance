@@ -48,6 +48,16 @@ function sirius_cron_menu() {
     'file' => 'sirius_cron.page_scan_list.inc',
   );
 
+  $items['sirius/cron/by-module/%'] = array(
+    'title' => 'Cron Management',
+    'description' => '',
+    'page callback' => 'sirius_cron_page_scan_list',
+    'page arguments' => array(3),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_cron.page_scan_list.inc',
+  );
+
   /*
   $items['sirius/cron/list'] = array(
     'title' => 'List',

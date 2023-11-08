@@ -415,6 +415,25 @@ function sirius_update_7025() {
   }
 }
 
+/**
+ * Create some indices on JSON field
+ */
+
+function sirius_update_7026() {
+  $sqls = array(
+    'alter table field_data_field_sirius_json add column json_denorm_external_id varchar(255) generated always as (field_sirius_json_value ->> \'$.external_id\')',
+    'alter table field_data_field_sirius_json add index json_denorm_external_id (json_denorm_external_id)',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
+
 function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
   foreach ($if_you_haves as $if_you_have) {
     foreach ($then_you_gets as $then_you_get) {
@@ -427,3 +446,4 @@ function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
     }
   }
 }
+

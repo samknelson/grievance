@@ -16,6 +16,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.p
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_body.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_recipients.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_recipients_contacts.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_recipients_workers.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_send.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_queue.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_test.inc";
@@ -118,6 +119,7 @@ function sirius_bulk_recipient_add($bulk_nid, $contact_nid, $params = array()) {
 
   // Add to the queue.
   $contact_node = node_load($contact_nid);
+  if (!$contact_node) { return array('success' => FALSE, 'msg' => 'Contact not found.'); }
 	sirius_log('bulk:queue', $type, $contact_node->title, '', '', array($bulk_nid, $contact_nid));
 
 	if ($type == 'add-manual') { 
@@ -252,4 +254,34 @@ function sirius_bulk_create($title, $medium) {
 	$bulk_node = node_submit($bulk_node);
 	node_save($bulk_node);
 	return $bulk_node;
+}
+
+function sirius_bulk_list($params = array()) {
+	$domain_nid = sirius_domain_nid();
+
+	$sql_args = array();
+	$sql = "select nid, title ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_bulk_status on field_data_field_sirius_bulk_status.entity_type = 'node' and field_data_field_sirius_bulk_status.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "where type = 'sirius_bulk' ";
+	if ($domain_nid) {
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	} else {
+		$sql .= "and field_sirius_domain_target_id is null ";
+	}
+	if ($params['statuses']) {
+		$sql .= "and field_sirius_bulk_status_value in (:statuses) ";
+		$sql_args[':statuses'] = $params['statuses'];
+	}
+	$sql .= "order by nid ";
+
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$result = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$result[$hr['nid']] = $hr['title'];
+	}
+
+	return $result;
 }

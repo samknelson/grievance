@@ -6,13 +6,35 @@ function sirius_log_quicklog_config() {
 }
 
 function sirius_log_quicklog_config_form($form, &$form_state) {
-  $name = sirius_domain_variable_name('sirius_log_quicklog_sirius_worker_options');
-  $form[$name] = array(
-    '#type' => 'textarea',
-    '#title' => t('Quicklog Worker Options'),
-    '#description' => t('Enter the worker options, one row per option. Each option should be of the form category|type|title, i.e. call|left_message|Called: Left Message'),
-    '#default_value' => variable_get($name, ''),
-  );
+
+  $content_types = array('sirius_worker');
+  foreach ($content_types as $content_type) {
+    $form[$content_type] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Settings: ' . sirius_content_type_name($content_type)),
+    );
+
+    $name = sirius_domain_variable_name("sirius_log_quicklog_${content_type}_options");
+    $form[$content_type][$name] = array(
+      '#type' => 'textarea',
+      '#title' => t('Quicklog Options'),
+      '#description' => t('Enter the options, one row per option. Each option should be of the form category|type|title, i.e. call|left_message|Called: Left Message'),
+      '#default_value' => variable_get($name, ''),
+    );
+
+    $name = sirius_domain_variable_name("sirius_log_quicklog_${content_type}_bucketview");
+    $form[$content_type][$name] = array(
+      '#type' => 'select',
+      '#title' => t('Breakout?'),
+      '#description' => t('Should the quicklog be broken out as a separate tab under "Log"?'),
+      '#default_value' => variable_get($name, ''),
+      '#options' => array(
+        NULL => t('-- Select --'),
+        'No' => t('No'),
+        'Yes' => t('Yes'),
+      ),
+    );
+  }
 
   return system_settings_form($form);
 }

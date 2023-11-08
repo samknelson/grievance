@@ -46,12 +46,6 @@ function grievance_report_open_summary_with_log_form($form, &$form_state) {
     '#prefix' => '<div class="form-start">',
   );
 
-  $form['company'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Company'),
-    '#description' => t('Enter all or part of the company name.  Leave blank to select all companies.'),
-  );
-
   $form['shop'] = array(
     '#type' => 'textfield',
     '#title' => t('Shop'),
@@ -62,6 +56,12 @@ function grievance_report_open_summary_with_log_form($form, &$form_state) {
     '#type' => 'select',
     '#title' => t('Exact match on shop name?'),
     '#options' => array('No' => t('No'), 'Yes' => t('Yes')),
+  );
+
+  $form['company'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Company'),
+    '#description' => t('Enter all or part of the company name.  Leave blank to select all companies.'),
   );
 
   $form['classaction'] = array(
@@ -382,13 +382,7 @@ function grievance_report_open_summary_with_log_render($report_type, $report_id,
   $stmt = $query->execute();
   $data = array();
   while ($hr = $stmt->fetchAssoc()) {
-    $raw_hr = unserialize($hr['report_data']);
-    $hr = array();
-    $delta = 0;
-    foreach ($fields as $name => $prompt) {
-      $hr[$name] = $raw_hr[$delta];
-      ++$delta;
-    }
+    $hr = unserialize($hr['report_data']);
 
     if ($which == 'specialist') {
       $key = $hr['specialist'];
@@ -539,13 +533,8 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
   $stmt = $query->execute();
   $data = array();
   while ($hr = $stmt->fetchAssoc()) {
-    $raw_hr = unserialize($hr['report_data']);
-    $hr = array();
-    $delta = 0;
-    foreach ($fields as $name => $prompt) {
-      $hr[$name] = $raw_hr[$delta];
-      ++$delta;
-    }
+    $raw_hr = 
+    $hr = unserialize($hr['report_data']);
 
     if ($which == 'specialist') {
       $key = $hr['specialist'];
@@ -581,6 +570,7 @@ function grievance_report_open_summary_with_log_render_detail($report_type, $rep
 
   $rows = array();
   foreach ($data as $key => $sub_data) {
+    usort($sub_data, function($a, $b) { return $a['grievance_id'] <=> $b['grievance_id']; });
     $row = array();
     if ($csv) {
       $row[] = $key;

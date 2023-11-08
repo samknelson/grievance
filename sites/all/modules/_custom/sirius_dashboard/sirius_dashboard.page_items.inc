@@ -82,12 +82,30 @@ function sirius_dashboard_page_items_form($form, &$form_state, $rid) {
     	$form['item_list'][$delta]['prefs'] = array('#markup' => l('Plugin Preferences', current_path() . '/' . $item['uuid'], array('query' => array('destination' => current_path()), 'attributes' => array('class' => array('tool-button')))));
     }
 
+		$form['item_list'][$delta]['priority_cutoffs'] = array(
+			'#type' => 'fieldset',
+			'#title' => t('Priority Cutoffs'),
+			'#description' => t('Enter the cutoffs for each priority level. For instance, you might indicate that a value above 100 should be considered "normal priority", but a value above 500 is "high priority".')
+		);
+
+		$priority_options = array(-1 => t('Hidden (do not show)')) + sirius_dashboard_priority_options();
+		foreach ($priority_options as $priority => $title) {
+			$form['item_list'][$delta]['priority_cutoffs'][$priority] = array(
+				'#title' => t('Cutoff for Priority: ') . $title,
+				'#type' => 'textfield',
+				'#size' => 4,
+				'#default_value' => $item['priority_cutoffs'][$priority],
+			);
+		}
+
+		/*
     $form['item_list'][$delta]['priority'] = array(
       '#title' => t('Priority'),
       '#type' => 'select',
       '#options' => sirius_dashboard_priority_options(),
       '#default_value' => $item['priority'],
     );
+    */
   
     $form['item_list'][$delta]['weight'] = array(
       '#title' => t('Sort Order'),

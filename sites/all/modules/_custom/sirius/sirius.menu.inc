@@ -406,6 +406,14 @@ function sirius_node_tabs() {
     'component' => 'contact:relationships',
   );
 
+  $node_tabs['sirius_contact']['sirius_contact_tags'] = array(
+    'title' => 'Tags',
+    'description' => '',
+    'callback' => 'sirius_node_tab_contact_tags',
+    'permissions' => array('sirius contact admin'), 
+    'file' => 'sirius.page_contact_tags.inc',
+  );
+
   $content_types = array(
     'sirius_log', 
     'sirius_json_definition',
@@ -1358,6 +1366,21 @@ function sirius_menu() {
     'page arguments' => array(),
     'access arguments' => array('sirius domain admin'),
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['sirius/lang/config'] = array(
+    'title' => 'Language Configuration',
+    'page callback' => 'sirius_page_lang_config',
+    'page arguments' => array(),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius.page_lang_config.inc',
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius domain admin',
+        'component' => 'lang',
+      ),
+    ),
   );
 
   $items['sirius/config/by-module/all'] = array(

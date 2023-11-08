@@ -40,6 +40,11 @@ table.sirius_table tbody td.yellow {
 	background-color: #ffff99;
 }
 
+table.sirius_table tbody tr.blue td,
+table.sirius_table tbody td.blue {
+	background-color: #9999ff;
+}
+
 table.sirius_table_form td div.form-item {
 	margin-top:  0;
 	margin-bottom:  0;

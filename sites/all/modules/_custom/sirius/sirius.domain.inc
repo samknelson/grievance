@@ -108,6 +108,10 @@ function sirius_sirius_domain_component_info() {
       'title' => 'Activist - Phonebank - Prescan',
       'description' => 'For a given phonebank, enable the "prescan" function, allowing phonebank admins to remove invalid phone numbers.',
     ),
+    'grievance' => array(
+      'title' => 'Grievance',
+      'description' => 'Grievance and contract enforcement functionality',
+    ),
     'grievance:alert:assignment' => array(
       'title' => 'Grievance - Alert - Assignment',
       'description' => 'Notify users when a new grievance has been assigned to them',
@@ -155,6 +159,10 @@ function sirius_sirius_domain_component_info() {
     'phonetree' => array(
       'title' => 'Phonetree',
       'description' => 'Enable phonetree processing',
+    ),
+    'lang' => array(
+      'title' => 'Lang',
+      'description' => 'Enable support for languages, such as primary and secondary languages for contacts and workers.',
     ),
   );
 }

@@ -1,9 +1,12 @@
 <?php
 
-function sirius_taxonomy_checkboxes(&$form, &$form_state, $field_name, $vocabulary_name) {
+function sirius_taxonomy_options($vocabulary_name, $options = array()) {
+  $indent = $options['indent'];
+  if (!isset($indent)) { $indent = ' -- '; }
+
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
   $terms = sirius_domain_taxonomy_get_tree($vocabulary->vid, 0, NULL, TRUE, sirius_domain_nid());
-
+  $options = array();
   foreach ($terms as $term) {
     $tid = $term->tid;
     $name = $term->name;
@@ -11,26 +14,11 @@ function sirius_taxonomy_checkboxes(&$form, &$form_state, $field_name, $vocabula
     $parent = $term->parents[0];
 
     $field_prefix = '';
-    for ($i=0; $i<$depth; ++$i) {
-      $field_prefix .= '&nbsp;--';
-    }
-    $states = NULL;
-    if ($parent) {
-      $states = array(
-        'visible' => array(
-          array(':input[name="' . $field_name . '_checkbox_' . $parent . '"]' => array('checked' => TRUE)),
-        )
-      );
-    }
-
-    $form["${field_name}_checkbox_{$tid}"] = array(
-      '#type' => 'checkbox',
-      '#value' => $tid,
-      '#title' => $name,
-      '#field_prefix' => $field_prefix,
-      '#states' => $states,
-    );
+    for ($i=0; $i<$depth; ++$i) { $field_prefix .= $indent; }
+    $options[$tid] = $field_prefix . $name;
   }
+
+  return $options;
 }
 
 /**
@@ -44,7 +32,7 @@ function sirius_taxonomy_checkboxes(&$form, &$form_state, $field_name, $vocabula
  * - field_whatever to return the value of "field_whatever"
  */
 
-function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE) {
+function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include_null = FALSE, $show_depth = FALSE) {
   $domain_nid = sirius_domain_nid();
   if ($domain_nid < 0) { $domain_nid = NULL; }
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
@@ -61,6 +49,11 @@ function sirius_taxonomy_load($vocabulary_name, $key_type, $value_type, $include
       $value = $term;
     } else if ($value_type == 'name') {
       $value = $term->name;
+      if ($show_depth) {
+        for ($i=0; $i<$term->depth; ++$i) {
+          $value = '- ' . $value;
+        }
+      }
     } else {
       $value = $term->{$value_type}['und'][0]['value'];
     }
@@ -258,7 +251,7 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['grievance_work_status']['display'] = 'block';
     $settings['grievance_work_status']['multidomain'] = 'Yes';
     $settings['sirius_contact_tags']['view'] = 'sirius_taxonomy';
-    $settings['sirius_contact_tags']['display'] = 'block';
+    $settings['sirius_contact_tags']['display'] = 'block_18';
     $settings['sirius_contact_tags']['multidomain'] = 'Yes';
     $settings['sirius_contact_relationship_types']['view'] = 'sirius_taxonomy';
     $settings['sirius_contact_relationship_types']['display'] = 'block_12';
@@ -329,6 +322,53 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_trust_service_type']['display'] = 'block_17';
     $settings['sirius_trust_service_type']['multidomain'] = 'Yes';
     $settings['sirius_trust_service_type']['component'] = 'trust';
+
+
+    $settings['grievance_alert_types']['config_category'] = 'grievance';
+    $settings['grievance_assignee_notes']['config_category'] = 'grievance';
+    $settings['grievance_broughtby']['config_category'] = 'grievance';
+    $settings['grievance_category']['config_category'] = 'grievance';
+    $settings['grievance_contact_types']['config_category'] = 'grievance';
+    $settings['grievance_contract_section_tags']['config_category'] = 'grievance';
+    $settings['grievance_contract_clause_tags']['config_category'] = 'grievance';
+    $settings['grievance_contract_template_tags']['config_category'] = 'grievance';
+    $settings['grievance_delivery']['config_category'] = 'grievance';
+    $settings['grievance_department']['config_category'] = 'employer';
+    $settings['grievance_document_types']['config_category'] = 'core';
+    $settings['grievance_job_classification']['config_category'] = 'employer';
+    $settings['grievance_log_tags']['config_category'] = 'grievance';
+    $settings['grievance_log_types']['config_category'] = 'grievance';
+    $settings['grievance_outcome']['config_category'] = 'grievance';
+    $settings['grievance_remedies']['config_category'] = 'grievance';
+    $settings['grievance_resproc']['config_category'] = 'grievance';
+    $settings['grievance_settlement_tags']['config_category'] = 'grievance';
+    $settings['grievance_shift']['config_category'] = 'employer';
+    $settings['grievance_status']['config_category'] = 'grievance';
+    $settings['grievance_tags']['config_category'] = 'grievance';
+    $settings['grievance_types']['config_category'] = 'grievance';
+    $settings['grievance_work_status']['config_category'] = 'grievance';
+    $settings['sirius_contact_relationship_types']['config_category'] = 'core';
+    $settings['sirius_contact_tags']['config_category'] = 'core';
+    $settings['sirius_dispatch_job_tags']['config_category'] = 'dispatch';
+    $settings['sirius_dispatch_job_type']['config_category'] = 'dispatch';
+    $settings['sirius_dispatch_sib']['config_category'] = 'dispatch';
+    $settings['sirius_event_participant_role']['config_category'] = 'event';
+    $settings['sirius_event_participant_status']['config_category'] = 'event';
+    $settings['sirius_event_type']['config_category'] = 'event';
+    $settings['sirius_gender']['config_category'] = 'worker';
+    $settings['sirius_hour_type']['config_category'] = 'employer';
+    $settings['sirius_industry']['config_category'] = 'employer';
+    $settings['sirius_ledger_type']['config_category'] = 'ledger';
+    $settings['sirius_member_status']['config_category'] = 'worker';
+    $settings['sirius_payment_type']['config_category'] = 'ledger';
+    $settings['sirius_skill']['config_category'] = 'worker';
+    $settings['sirius_trust_benefit_type']['config_category'] = 'trust';
+    $settings['sirius_trust_election_type']['config_category'] = 'trust';
+    $settings['sirius_trust_provider_level']['config_category'] = 'trust';
+    $settings['sirius_trust_service_type']['config_category'] = 'trust';
+    $settings['sirius_work_status']['config_category'] = 'worker';
+    $settings['sirius_worker_dispatch_status']['config_category'] = 'worker';
+    $settings['sirius_worker_tor_type']['config_category'] = 'worker';
   }
 
   if ($vocabulary_machine_name == 'all') { return $settings; }
@@ -372,3 +412,12 @@ function sirius_taxonomy_proxy($tid) {
 }
 
 function sirius_node_access_term_proxy($node, $op, $account) { return FALSE; }
+
+function sirius_taxonomy_friendly_name($vocabulary_machine_name) {
+  $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_machine_name);
+  if (!$vocabulary) { return $vocabulary_machine_name; }
+  $name = $vocabulary->name;
+  $name = preg_replace("/Sirius /", '', $name);
+  $name = preg_replace("/Grievance /", '', $name);
+  return $name;
+}

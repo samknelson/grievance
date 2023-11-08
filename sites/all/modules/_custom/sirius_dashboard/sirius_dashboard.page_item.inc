@@ -33,8 +33,9 @@ function sirius_dashboard_page_item_form($form, &$form_state, $rid, $uuid) {
 		return array();
 	}
 	sirius_require($plugin_info['module'], $plugin_info['file']);
-	$form['preferences'] = $callback($json['item'][$uuid]['preferences']);
-
+	$form['preferences'] = $callback($json['item'][$uuid]['preferences'], $form_state);
+	$form['preferences']['#prefix'] = '<div id="sirius_dashboard_item_preferences_wrap">';
+	$form['preferences']['#suffix'] = '</div>';
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -43,12 +44,26 @@ function sirius_dashboard_page_item_form($form, &$form_state, $rid, $uuid) {
 	return $form;
 }
 
+/**
+ * Just in case any dashboard item wants to be ajax-updateable
+ */
+
+function sirius_dashboard_page_item_form_callback_replace($form, $form_state) {
+  $commands = array();
+  $commands[] = ajax_command_replace("#sirius_dashboard_item_preferences_wrap", render($form['preferences']));
+  return array(
+    '#type' => 'ajax',
+    '#commands' => $commands
+  );
+}
+
 function sirius_dashboard_page_item_form_submit($form, &$form_state) {
 	$rid = $form_state['rid'];
 	$uuid = $form_state['uuid'];
 
 	$json = json_decode(sirius_domain_variable_get("sirius_dashboard_items_by_rid_$rid"), TRUE);
 	$json['item'][$uuid]['preferences'] = $form_state['values']['preferences'];
+
 	sirius_domain_variable_set("sirius_dashboard_items_by_rid_$rid", json_encode($json));
 
 	drupal_set_message("Items saved.");

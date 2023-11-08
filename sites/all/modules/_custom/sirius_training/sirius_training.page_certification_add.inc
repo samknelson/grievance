@@ -1,8 +1,11 @@
 <?php
 
-function sirius_training_certification_add_access($worker_nid, $definition_nid, $participant_nid = NULL) {
+function sirius_training_certification_page_add_access($worker_nid, $definition_nid, $participant_nid = NULL) {
 	// certifications must be enabled
 	if (sirius_domain_variable_get('sirius_training_certifications_enabled', '') != 'Yes') { return FALSE; }
+
+	// Must have "Add" permission
+	if (!user_access('sirius training certification edit')) { return FALSE; }
 
 	// Verify the participant
 	if ($participant_nid) {
@@ -38,11 +41,11 @@ function sirius_training_certification_add_access($worker_nid, $definition_nid, 
 	return TRUE;
 }
 
-function sirius_training_certification_add($worker_nid, $definition_nid, $participant_nid = NULL) {
-	return drupal_get_form('sirius_training_certification_add_form', $worker_nid, $definition_nid, $participant_nid);
+function sirius_training_certification_page_add($worker_nid, $definition_nid, $participant_nid = NULL) {
+	return drupal_get_form('sirius_training_certification_page_add_form', $worker_nid, $definition_nid, $participant_nid);
 }
 
-function sirius_training_certification_add_form($form, &$form_state, $worker_nid, $definition_nid, $participant_nid = NULL) {
+function sirius_training_certification_page_add_form($form, &$form_state, $worker_nid, $definition_nid, $participant_nid = NULL) {
 	$form_state['worker_nid'] = $worker_nid;
 	$form_state['definition_nid'] = $definition_nid;
 	$form_state['participant_nid'] = $participant_nid;
@@ -87,7 +90,7 @@ function sirius_training_certification_add_form($form, &$form_state, $worker_nid
 	return $form;
 }
 
-function sirius_training_certification_add_form_submit($form, &$form_state) {
+function sirius_training_certification_page_add_form_submit($form, &$form_state) {
 	$worker_nid = $form_state['worker_nid'];
 	$worker_node = node_load($worker_nid);
 	$definition_nid = $form_state['definition_nid'];
@@ -106,19 +109,10 @@ function sirius_training_certification_add_form_submit($form, &$form_state) {
 	$json_results = $form_state['values']['survey'];
 	sirius_jsonfield_util_form_set($json, 'certification', $json_form);
 	sirius_jsonfield_util_results_set($json, 'certification', $json_results);
-	$handlers = array($worker_nid);
-	$handlers[] = $definition_nid;
-	if ($participant_nid) { $handlers[] = $participant_nid; }
-	$certification_node = sirius_log(
-		'worker:certification', 
-		'draft', 
-		'Certification submitted', 
-		NULL, 
-		NULL, 
-		$handlers, 
-		NULL,
-		$json
-	);
+	$handler_nids = array($worker_nid);
+	$handler_nids[] = $definition_nid;
+	if ($participant_nid) { $handler_nids[] = $participant_nid; }
+	$certification_node = sirius_training_certification_add($handler_nids, $json);
 
 	// Notify the worker
 	/*

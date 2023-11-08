@@ -53,5 +53,9 @@ function sirius_worker_work_status_set(&$worker_node, $work_status_tid, $reason,
 }
 
 function sirius_worker_work_status_history_callback(&$parent_node, $history) {
-  $parent_node->field_sirius_work_status['und'][0]['tid'] = $history['last']['new_value'];
+	if ($history['last']['new_value']) {
+  	$parent_node->field_sirius_work_status['und'][0]['tid'] = $history['last']['new_value'];
+  } else {
+  	unset($parent_node->field_sirius_work_status['und']);
+  }
 }

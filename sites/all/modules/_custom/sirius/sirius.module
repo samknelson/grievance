@@ -2,6 +2,7 @@
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Singleton.php';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Result.php';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.access.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
@@ -65,6 +66,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.public.inc'
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.nota.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lang.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 
 
@@ -121,6 +123,24 @@ function sirius_cron() {
   // sirius_signature_cleanup();
   sirius_domain_stats_cron();
   sirius_mailattach_fetch_all();
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_sirius_cron_scan_info() {
+  $items = array();
+
+  $items['log_cleanup_orphans'] = array(
+    'title' => 'Cleanup Orphaned Log Entries',
+    'description' => 'Deletes any log entries where the handlers are all missing.',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_log_cleanup_orphans',
+    'multidomain' => FALSE,
+  );
+
+  return $items;
 }
 
 /**
@@ -1238,4 +1258,25 @@ function sirius_page_error($msg) {
 function sirius_tool_link($path, $label) {
   if (!drupal_valid_path($path)) { return ''; }
   return l($label, $path, array('attributes' => array('class' => array('tool-button'))));
+}
+
+function sirius_options_to_str($options) {
+  $str = '';
+  foreach ($options as $key => $value) {
+    $str .= "$key|$value\n";
+  }
+  return $str;
+}
+
+function sirius_str_to_options($str) {
+  $lines = preg_split('/\s*[\n\r]+\s*/', $str);
+  $options = array();
+  foreach ($lines as $line) {
+    list ($key, $value) = explode('|', $line);
+    if ($key === '' || $key === NULL) { continue; }
+    if ($value === '' || $value === NULL) { $value = $key; }
+    $options[$key] = $value;
+  }
+
+  return $options;
 }

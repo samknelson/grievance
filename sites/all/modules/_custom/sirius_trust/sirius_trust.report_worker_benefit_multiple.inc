@@ -6,6 +6,8 @@ function sirius_trust_report_worker_benefit_multiple_fields() {
     'worker_name' => 'Worker Name',
     'benefit_nid' => 'Benefit NID',
     'benefit_name' => 'Benefit Name',
+    'benefit_type_tid' => 'Benefit Type TID',
+    'benefit_type_name' => 'Benefit Type Name',
     'count' => 'Count',
   );
 }
@@ -24,6 +26,16 @@ function sirius_trust_report_worker_benefit_multiple_form($form, &$form_state, $
     '#default_value' => date('Y-m-d'),
   );
 
+  $form['group_by'] = array(
+    '#title' => t('Group By'),
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#options' => array(
+      'benefit' => t('Benefit'),
+      'benefit_type' => t('Benefit Type'),
+    ),
+  );
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Generate',
@@ -38,16 +50,20 @@ function sirius_trust_report_worker_benefit_multiple_pks(&$form_state) {
   $asof = $form_state['values']['asof'] . ' 00:00:00';
   if (!$asof) { $asof = date('Y-m-d 00:00:00'); }
 
+  $group_by = $form_state['values']['group_by'];
+
   $domain_nid = sirius_domain_nid();
   $sql_args = array();
   $sql_args[':asof'] = $asof;
 
-  $sql = "select field_sirius_worker_target_id, field_sirius_trust_benefit_target_id, count(*) as c from node ";
+  $sql = "select field_sirius_worker_target_id, field_sirius_trust_benefit_target_id, field_sirius_trust_benefit_type_tid, count(*) as c from node ";
   $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_trust_benefit on field_data_field_sirius_trust_benefit.entity_type = 'node' and field_data_field_sirius_trust_benefit.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+  $sql .= "left join node benefit_node on field_sirius_trust_benefit_target_id = benefit_node.nid ";
+  $sql .= "left join field_data_field_sirius_trust_benefit_type on field_data_field_sirius_trust_benefit_type.entity_type = 'node' and field_data_field_sirius_trust_benefit_type.entity_id = benefit_node.nid ";
   $sql .= "where node.type = 'sirius_trust_worker_benefit' ";
   if ($domain_nid) { 
     $sql .= "and field_sirius_domain_target_id = :domain_nid ";
@@ -57,34 +73,40 @@ function sirius_trust_report_worker_benefit_multiple_pks(&$form_state) {
   }
   $sql .= "and field_sirius_date_start_value <= :asof ";
   $sql .= "and (field_sirius_date_end_value >= :asof or field_sirius_date_end_value is null) ";
-  $sql .= "group by field_sirius_worker_target_id, field_sirius_trust_benefit_target_id ";
+  if ($group_by == 'benefit_type') {
+    $sql .= "group by field_sirius_worker_target_id, field_sirius_trust_benefit_type_tid ";
+  } else {
+    $sql .= "group by field_sirius_worker_target_id, field_sirius_trust_benefit_target_id ";
+  }
   $sql .= "having c > 1 ";
   $sql .= "order by field_sirius_worker_target_id ";
 
   $stmt = sirius_sql_query($sql, $sql_args);
   $wbs = array();
   while ($hr = $stmt->fetchAssoc()) {
-    $wbs[] = $hr['field_sirius_worker_target_id'] . '|' . $hr['field_sirius_trust_benefit_target_id'] . '|' . $hr['c'];
+    $wbs[] = $hr['field_sirius_worker_target_id'] . '|' . $hr['field_sirius_trust_benefit_target_id'] . '|' . $hr['field_sirius_trust_benefit_type_tid'] . '|' . $hr['c'];
   }
   return array_chunk($wbs, 100, TRUE);
 }
 
 function sirius_trust_report_worker_benefit_multiple_batch($wbs, $values, $report_id, $report_action, &$context) {
   $rows = array('is_multiple' => TRUE, 'rows' => array());
+  $group_by = $values['group_by'];
 
   $benefit_names = sirius_trust_benefit_options(FALSE);
 
   foreach ($wbs as $wb) {
-    list($worker_nid, $benefit_nid, $count) = explode('|', $wb);
-    drupal_set_message("Here with $worker_nid, $benefit_nid");
+    list($worker_nid, $benefit_nid, $benefit_type_tid, $count) = explode('|', $wb);
 
     $row = array();
     $row['worker_nid'] = $worker_nid;
     $row['worker_name'] = sirius_node_title($worker_nid);
     $row['benefit_nid'] = $benefit_nid;
     $row['benefit_name'] = $benefit_names[$benefit_nid];
+    $row['benefit_type_tid'] = $benefit_type_tid;
+    $row['benefit_type_name'] = sirius_term_title($benefit_type_tid);
     $row['count'] = $count;
-    $rows['rows'][] = $row;
+    $rows['rows'][$wb] = $row;
     $context['results']['dashboard']['count']++;
   }
   return $rows;
@@ -116,13 +138,22 @@ function sirius_trust_report_worker_benefit_multiple_view($report_type, $report_
     $tools = array();
     $tools[] = l('Benefits', 'node/' . $hr['worker_nid'] . '/sirius_trust_worker_benefits', array('attributes' => array('class' => array('tool-button'))));
     $row[] = $hr['worker_name'];
-    $row[] = $hr['benefit_name'];
+
+    if ($parameters['group_by'] == 'benefit') {
+      $row[] = $hr['benefit_name'];
+    } else {
+      $row[] = $hr['benefit_type_name'];
+    }
     $row[] = join('', $tools);
     $rows[] = $row;
   }
 
   $header[] = 'Worker';
-  $header[] = 'Benefit';
+  if ($parameters['group_by'] == 'benefit') {
+    $header[] = 'Benefit';
+  } else {
+    $header[] = 'Benefit Type';
+  }
   $header[] = 'Tools';
 
   if ($_REQUEST['output'] == 'csv') {

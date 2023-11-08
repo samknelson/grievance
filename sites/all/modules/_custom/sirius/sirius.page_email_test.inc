@@ -45,10 +45,17 @@ function sirius_email_test_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   $params = $form_state['values']['message'];
   $result = sirius_email_send($params);
-  $msg = htmlspecialchars($result['msg']);
   if ($result['success']) {
-    drupal_set_message($msg);
+    drupal_set_message("Email sent.");
   } else {
+    $msg = htmlspecialchars($result['msg']);
     drupal_set_message($msg, 'error');
+  }
+
+  if ($result['comm']) {
+    $path = 'node/' . $result['comm']->nid . '/sirius_log_comm';
+    $msg = "The mail message can be viewed and tracked <strong>" . l('here', $path) . '</strong>';
+    drupal_set_message($msg);
+    sirius_minilog($msg);
   }
 }

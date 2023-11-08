@@ -40,6 +40,7 @@ function sirius_hour_node_tabs() {
     'callback' => 'sirius_hour_node_tab_payperiod_entries_reconcile',
     'permissions' => array('sirius hour admin'),
     'weight' => 3,
+    'component' => 'hour:reconcile',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_hours'] = array(

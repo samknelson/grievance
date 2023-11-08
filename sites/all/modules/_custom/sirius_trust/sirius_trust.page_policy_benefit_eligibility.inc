@@ -23,7 +23,7 @@ function sirius_trust_node_tab_policy_benefit_eligibility_form($form, &$form_sta
 	$form['#tree'] = TRUE;
 
 	$form['benefits'][$benefit_node->nid]['eligibility']['plugins']['enabled'] = array(
-		'#title' => 'Enabled Eligigibility Plugins',
+		'#title' => 'Enabled Eligibility Plugins',
 		'#type' => 'checkboxes',
 		'#options' => $plugin_options,
 		'#default_value' => sirius_form_array_default_value($policy_json['benefits'][$benefit_node->nid]['eligibility']['plugins']['enabled']),
