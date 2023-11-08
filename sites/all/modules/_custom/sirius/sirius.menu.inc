@@ -1297,7 +1297,11 @@ function sirius_menu() {
     'access callback' => 'sirius_menu_access_callback',
     'access arguments' => array(
       array(
-        'permissions' => array('sirius dispatch staff', 'sirius trust staff')
+        'permissions' => array(
+          'sirius dispatch staff', 
+          'sirius trust staff',
+          'sirius pcct admin'
+        )
       ),
     ),
     'type'             => MENU_LOCAL_ACTION,
