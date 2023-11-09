@@ -68,7 +68,7 @@ function sirius_dispatch_run($job_node) {
 function sirius_dispatch_run_check_report_date($job_node) {
   $report_ts = sirius_date_ts($job_node, 'field_sirius_datetime');
 
-  if ($report_ts >= time()) { return array('success' => TRUE, 'msg' => 'It is not necessary to close the job, because the report date has not yet passed.'); }
+  if ($report_ts + 30*60*60 >= time()) { return array('success' => TRUE, 'msg' => 'It is not necessary to close the job, because the report date has not yet passed.'); }
 
   $job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Filled';
   $job_node->field_sirius_summary['und'][0]['value'] = 'Closing because report date passed on ' . date('c');
