@@ -260,7 +260,11 @@ function sirius_dispatch_node_delete($node) {
  */
 
 function sirius_dispatch_report_cache_info() {
+  sirius_require('sirius_dispatch', 'sirius_dispatch.report_job_status.inc');
+
   $items = array();
+
+  Sirius_Dispatch_Report_Job_Status::getInstance()->setInfo($items);
 
   $items['sirius-dispatch-member-status-ratios'] = array(
     'name' => t('Member Status Ratios'),
