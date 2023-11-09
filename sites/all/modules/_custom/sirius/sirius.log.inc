@@ -205,3 +205,49 @@ function sirius_log_handler_clear($log_node, $handler_nid) {
   $log_node->field_sirius_log_handler['und'] = $new_handlers;
 }
 
+
+function sirius_log_cleanup_orphans($mode = 'test') {
+  // Find any records where all handlers are null or reference a missing node.
+  // We're limiting to the first 10 handlers
+  $sql = "select node.nid, node.title from node ";
+  for ($delta = 0; $delta < 10; ++$delta) {
+    $sql .= "left join field_data_field_sirius_log_handler ref_$delta on ref_$delta.entity_type = 'node' and ref_$delta.entity_id = node.nid and ref_$delta.delta = $delta ";
+    $sql .= "left join node node_$delta on node_$delta.nid = ref_$delta.field_sirius_log_handler_target_id ";
+  }
+
+  // It's a log node
+  $sql .= "where node.type = 'sirius_log' ";
+
+  // It was attached to at least one handler
+  $sql .= "and (ref_0.field_sirius_log_handler_target_id is not null ";
+  $sql .= "  or ref_1.field_sirius_log_handler_target_id is not null ";
+  $sql .= "  or ref_2.field_sirius_log_handler_target_id is not null ";
+  $sql .= "  or ref_3.field_sirius_log_handler_target_id is not null) ";
+
+  // All of the handlers no longer exist
+  for ($delta = 0; $delta < 10; ++$delta) {
+    $sql .= "and node_$delta.nid is null ";
+  }
+  
+  $sql .= "order by node.nid desc ";
+  $sql .= "limit 100 ";
+  $stmt = sirius_sql_query($sql, array());
+
+  $nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $nids[$hr['nid']] = $hr['title'];
+  }
+
+  $count = 0;
+  foreach ($nids as $nid => $title) {
+    $msg = "Deleting log node $title (" . l($nid, "node/$nid") . ")";
+    if ($mode == 'live') {
+      node_delete($nid);
+    } else {
+      $msg .= " (Skipping save because mode = $mode)";
+    }
+    sirius_minilog($msg);
+    ++$count;
+  }
+  return array('success' => TRUE, 'msg' => "Cleaned up $count records", 'count' => $count);
+}
