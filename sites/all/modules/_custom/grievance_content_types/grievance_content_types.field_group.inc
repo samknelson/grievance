@@ -1880,6 +1880,35 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_html|node|sirius_letterhead|form';
+  $field_group->group_name = 'group_html';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_letterhead';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'HTML',
+    'weight' => '3',
+    'children' => array(
+      0 => 'body',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'HTML',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-html field-group-fieldset',
+        'description' => 'Complete this section for HTML letterhead only.',
+      ),
+      'formatter' => 'collapsible',
+    ),
+  );
+  $field_groups['group_html|node|sirius_letterhead|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_identity|node|grievance_letter_template|form';
   $field_group->group_name = 'group_identity';
   $field_group->entity_type = 'node';
@@ -2008,6 +2037,36 @@ function grievance_content_types_field_group_info() {
     ),
   );
   $field_groups['group_notifications|node|grievance_shop|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_pdf|node|sirius_letterhead|form';
+  $field_group->group_name = 'group_pdf';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_letterhead';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'PDF',
+    'weight' => '2',
+    'children' => array(
+      0 => 'field_sirius_attachments',
+      1 => 'field_sirius_json',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'PDF',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-pdf field-group-fieldset',
+        'description' => 'Complete this section for PDF letterhead only.',
+      ),
+      'formatter' => 'collapsible',
+    ),
+  );
+  $field_groups['group_pdf|node|sirius_letterhead|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -2737,6 +2796,7 @@ function grievance_content_types_field_group_info() {
       2 => 'field_sirius_phone_alt',
       3 => 'field_sirius_email',
       4 => 'field_sirius_phone_fax',
+      5 => 'langs',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -3243,6 +3303,7 @@ function grievance_content_types_field_group_info() {
   t('Grievance Form');
   t('Grievance Settings');
   t('Grievance-Specific Fields');
+  t('HTML');
   t('Holds');
   t('Identity');
   t('Information Request');

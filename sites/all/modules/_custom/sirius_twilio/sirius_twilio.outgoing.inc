@@ -79,21 +79,29 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 	if (!$from) { $from = sirius_domain_variable_get('sirius_twilio_phone', ''); }
 
 	if ($phone) { 
-		if ($queue[$phone]) { $queue[$phone] .= "\n\n"; }
-		$queue[$phone] .= $msg;
+		if ($queue[$phone]['msg']) { $queue[$phone]['msg'] .= "\n\n"; }
+		$queue[$phone]['msg'] .= $msg;
+
+		if ($attach) {
+			// Can only attach one image.
+			$queue[$phone]['attach'] = $attach;
+		}
 	}
+
+	// drupal_set_message('<pre>' . print_r($queue, 1) . '</pre>');
+
 	if (!$deliver_now) { return array('success' => TRUE, 'msg' => "Queued for delivery: $phone, $msg"); }
 
 	$count = 0;
-	foreach ($queue as $phone => $msg) {
+	foreach ($queue as $phone => $record) {
 		++$count;
 		try {
 			$client = sirius_twilio_client_get();
 
 			$sms_params = array();
 			$sms_params['from'] = $from;
-			$sms_params['body'] = $msg;
-			if ($attach['url'][0]) { $sms_params["mediaUrl"] = $attach['url']; }
+			$sms_params['body'] = $record['msg'];
+			if ($record['attach']['url'][0]) { $sms_params["mediaUrl"] = $record['attach']['url']; }
 
 			if ($id) { $sms_params['statusCallback'] = sirius_twilio_statuscallback_sms_url($id); }
 

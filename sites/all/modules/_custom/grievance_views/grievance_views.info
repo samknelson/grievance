@@ -58,6 +58,7 @@ features[views_view][] = grievances_without_status
 features[views_view][] = sirius_bookmarks
 features[views_view][] = sirius_bulk_admin
 features[views_view][] = sirius_bulk_queue
+features[views_view][] = sirius_bulkmsg
 features[views_view][] = sirius_bullpens
 features[views_view][] = sirius_contacts
 features[views_view][] = sirius_departments

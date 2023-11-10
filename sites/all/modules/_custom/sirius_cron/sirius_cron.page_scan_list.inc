@@ -1,7 +1,25 @@
 <?php
 
-function sirius_cron_page_scan_list() {
+function sirius_cron_page_scan_list($module = NULL) {
 	$info_all = sirius_cron_scan_info_all();
+
+	// Get our modules
+	$links = array();
+	$links[] = array(
+		'path' => 'sirius/cron',
+		'title' => t('All Jobs'),
+	);
+	$unique = array();
+	foreach ($info_all as $key => $info) {
+		if ($unique[$info['module']]) { continue; }
+		$unique[$info['module']] = TRUE;
+	
+		$links[] = array(
+			'path' => 'sirius/cron/by-module/' . $info['module'],
+			'title' => $info['module_name'],
+		);
+	}
+	$html .= sirius_quicknav($links);
 
 	$header = array();
 	$header[] = t('Title');
@@ -12,6 +30,7 @@ function sirius_cron_page_scan_list() {
 
 	$rows = array();
 	foreach ($info_all as $key => $info) {
+		if ($module && ($info['module'] != $module)) { continue; }
 		$scan_node = sirius_cron_scan_get($key, TRUE);
 		$scan_json = sirius_json_get($scan_node);
 
@@ -28,5 +47,7 @@ function sirius_cron_page_scan_list() {
 		$rows[] = $row;
 	}
 
-	return theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+	$html .= sirius_table_render($header, $rows);
+
+	return $html;
 }

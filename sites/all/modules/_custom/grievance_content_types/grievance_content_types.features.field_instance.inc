@@ -14850,7 +14850,7 @@ function grievance_content_types_field_default_field_instances() {
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 9,
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -14928,7 +14928,7 @@ function grievance_content_types_field_default_field_instances() {
           'geofield_map_zoom' => 14,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 10,
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -14990,7 +14990,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15019,7 +15019,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -15063,7 +15063,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -15164,7 +15164,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15186,7 +15186,47 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget',
-      'weight' => 10,
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_contact-field_sirius_lang'.
+  $field_instances['node-sirius_contact-field_sirius_lang'] = array(
+    'bundle' => 'sirius_contact',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'The first entry is the primary language for the contact.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_lang',
+    'label' => 'Languages',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'multiple_selects',
+      'settings' => array(),
+      'type' => 'multiple_selects',
+      'weight' => 9,
     ),
   );
 
@@ -15446,7 +15486,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15471,7 +15511,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 12,
+      'weight' => 13,
     ),
   );
 
@@ -22530,6 +22570,48 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-sirius_letterhead-body'.
+  $field_instances['node-sirius_letterhead-body'] = array(
+    'bundle' => 'sirius_letterhead',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Use ONLY for HTML letterhead. Include full page raw markup.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'body',
+    'label' => 'Body',
+    'required' => 0,
+    'settings' => array(
+      'display_summary' => 0,
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 20,
+        'summary_rows' => 5,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => 4,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_letterhead-field_sirius_attachments'.
   $field_instances['node-sirius_letterhead-field_sirius_attachments'] = array(
     'bundle' => 'sirius_letterhead',
@@ -22599,7 +22681,7 @@ If the file has multiple pages, then each page in the input document will use th
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 3,
+      'weight' => 5,
     ),
   );
 
@@ -22619,7 +22701,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22658,7 +22740,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22680,6 +22762,49 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_letterhead-field_sirius_letterhead_format'.
+  $field_instances['node-sirius_letterhead-field_sirius_letterhead_format'] = array(
+    'bundle' => 'sirius_letterhead',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_letterhead_format',
+    'label' => 'Format',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
       'weight' => 1,
     ),
   );
@@ -22697,7 +22822,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'file_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22810,7 +22935,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 10,
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22847,7 +22972,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22942,7 +23067,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -22985,7 +23110,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -23007,7 +23132,7 @@ If the file has multiple pages, then each page in the input document will use th
       'active' => 1,
       'module' => 'text',
       'settings' => array(
-        'rows' => 5,
+        'rows' => 50,
       ),
       'type' => 'text_textarea',
       'weight' => 6,
@@ -23022,13 +23147,13 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -23050,7 +23175,7 @@ If the file has multiple pages, then each page in the input document will use th
       'active' => 1,
       'module' => 'text',
       'settings' => array(
-        'rows' => 5,
+        'rows' => 50,
       ),
       'type' => 'text_textarea',
       'weight' => 5,
@@ -26091,7 +26216,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -26118,7 +26243,7 @@ If the file has multiple pages, then each page in the input document will use th
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -26137,7 +26262,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'list_default',
-        'weight' => 6,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -26161,7 +26286,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 9,
     ),
   );
 
@@ -26182,7 +26307,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -26209,7 +26334,7 @@ If the file has multiple pages, then each page in the input document will use th
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -26234,7 +26359,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 5,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -26307,7 +26432,7 @@ If the file has multiple pages, then each page in the input document will use th
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 6,
+      'weight' => 8,
     ),
   );
 
@@ -26332,7 +26457,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 4,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -26405,7 +26530,7 @@ If the file has multiple pages, then each page in the input document will use th
         'year_range' => '1900:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 5,
+      'weight' => 7,
     ),
   );
 
@@ -26421,7 +26546,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 9,
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -26445,7 +26570,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 10,
+      'weight' => 12,
     ),
   );
 
@@ -26461,7 +26586,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 8,
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -26483,7 +26608,7 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
-      'weight' => 9,
+      'weight' => 11,
     ),
   );
 
@@ -26502,7 +26627,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -26527,7 +26652,7 @@ If the file has multiple pages, then each page in the input document will use th
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 8,
+      'weight' => 10,
     ),
   );
 
@@ -26548,7 +26673,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 3,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -26572,7 +26697,103 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_trust_worker_benefit-field_sirius_trust_election'.
+  $field_instances['node-sirius_trust_worker_benefit-field_sirius_trust_election'] = array(
+    'bundle' => 'sirius_trust_worker_benefit',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 1,
+          'field_delimiter' => '',
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_trust_election',
+    'label' => 'Election',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_trust_worker_benefit-field_sirius_trust_subscriber'.
+  $field_instances['node-sirius_trust_worker_benefit-field_sirius_trust_subscriber'] = array(
+    'bundle' => 'sirius_trust_worker_benefit',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 1,
+          'field_delimiter' => '',
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_trust_subscriber',
+    'label' => 'Subscriber',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 2,
     ),
   );
 
@@ -26588,7 +26809,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => 0,
+          'bypass_access' => 1,
           'field_delimiter' => '',
           'link' => 1,
         ),
@@ -27382,7 +27603,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -27487,7 +27708,7 @@ If the file has multiple pages, then each page in the input document will use th
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 21,
+        'weight' => 20,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28064,10 +28285,56 @@ If the file has multiple pages, then each page in the input document will use th
     'label' => 'EBA Dates',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'date_popup_timepicker' => array(
+        'timepicker' => array(
+          'timepicker_options' => array(
+            'amPmText' => array(
+              0 => 'AM',
+              1 => 'PM',
+            ),
+            'closeButtonText' => 'Done',
+            'defaultTime' => 'now',
+            'deselectButtonText' => 'Deselect',
+            'hourText' => 'Hour',
+            'hours' => array(
+              'ends' => 23,
+              'starts' => 0,
+            ),
+            'minuteText' => 'Minute',
+            'minutes' => array(
+              'ends' => 55,
+              'interval' => 5,
+              'starts' => 0,
+            ),
+            'nowButtonText' => 'Now',
+            'periodSeparator' => ' ',
+            'rows' => 4,
+            'showCloseButton' => FALSE,
+            'showDeselectButton' => FALSE,
+            'showHours' => TRUE,
+            'showLeadingZero' => TRUE,
+            'showMinutes' => TRUE,
+            'showMinutesLeadingZero' => TRUE,
+            'showNowButton' => FALSE,
+            'showOn' => 'focus',
+            'showPeriod' => FALSE,
+            'showPeriodLabels' => TRUE,
+            'timeSeparator' => ':',
+          ),
+        ),
+      ),
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
+      'field_lock_multi_values' => array(
+        'disable_reorder' => 0,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
+        'lock_previous' => 0,
+        'remove_header' => 0,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -28075,13 +28342,11 @@ If the file has multiple pages, then each page in the input document will use th
       'module' => 'date',
       'settings' => array(
         'date_single_day' => array(),
-        'display_all_day' => 0,
         'increment' => 15,
         'input_format' => 'm/d/Y - H:i:s',
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
-        'repeat_collapsed' => 0,
         'text_parts' => array(),
         'year_range' => '-3:+3',
       ),
@@ -28345,7 +28610,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 10,
+        'weight' => 11,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28404,7 +28669,7 @@ If the file has multiple pages, then each page in the input document will use th
           ),
         ),
       ),
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -28487,7 +28752,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 20,
+        'weight' => 19,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28539,7 +28804,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -32386,7 +32651,7 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'entityreference',
         'settings' => array(
           'bypass_access' => FALSE,
@@ -32394,7 +32659,7 @@ If the file has multiple pages, then each page in the input document will use th
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 0,
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -32412,7 +32677,80 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 32,
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_contact_tags-field_sirius_id'.
+  $field_instances['taxonomy_term-sirius_contact_tags-field_sirius_id'] = array(
+    'bundle' => 'sirius_contact_tags',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_id',
+    'label' => 'ID',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_contact_tags-field_sirius_json'.
+  $field_instances['taxonomy_term-sirius_contact_tags-field_sirius_json'] = array(
+    'bundle' => 'sirius_contact_tags',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'sirius_jsonfield',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'sirius_jsonfield_formatter_full',
+        'weight' => 3,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Definition',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 5,
     ),
   );
 
@@ -32425,13 +32763,13 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 2,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -32450,7 +32788,7 @@ If the file has multiple pages, then each page in the input document will use th
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 34,
+      'weight' => 4,
     ),
   );
 
@@ -36133,6 +36471,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('E.g. 04.01 or 04.01.01 or 04.01.A');
   t('EBA');
   t('EBA Dates');
+  t('Election');
   t('Election Type');
   t('Email');
   t('Email Body');
@@ -36172,6 +36511,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('First Name');
   t('For discipline, the date of the employee’s conduct which led to discipline. For contract violation, the date of the employer’s action.');
   t('For grievances with this category, hide the fields listed below. Enter one per line, using the machine name of the field (i.e. field_grievance_remedy)');
+  t('Format');
   t('From Status');
   t('Full Text');
   t('Gender');
@@ -36223,6 +36563,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Job Types');
   t('Label');
   t('Labor charges or other relevant shop issues');
+  t('Languages');
   t('Last Name');
   t('Lead Organizer');
   t('Lead\'s Recommendaiton');
@@ -36348,6 +36689,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Status Change Date');
   t('Status Notes');
   t('Subject');
+  t('Subscriber');
   t('Subsequent Statuses');
   t('Summary');
   t('Supervisor Name');
@@ -36359,6 +36701,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Template Tags');
   t('Term');
   t('The date the employee received discipline.');
+  t('The first entry is the primary language for the contact.');
   t('The maximum number of active relationships of this type that a contact can have. For example, a person might only be permitted to have one spouse at a time.');
   t('These email addresses will be CC\'d on EVERY letter sent using this template.');
   t('Threestrikes Enable');
@@ -36383,6 +36726,7 @@ If the file has a single page, then that will be used as the background for all 
 If the file has multiple pages, then each page in the input document will use the corresponding page in the letterhead as a background, with the last page in the letterhead repeated as many times as necessary if the input document is longer.  
 
 (For example, if a two-page letterhead is uploaded, then the first page of the letterhead will be used as the first page of the generated document, and the second page will be repeated as many times as necessary.)');
+  t('Use ONLY for HTML letterhead. Include full page raw markup.');
   t('Use for Dispatch?');
   t('Use this field for a "letter" which has no customization, and which is simply meant to be downloaded.  No drop-in tokens are supported.');
   t('Use this field to enter the default body of the email; it should generally be something like "Please refer to the attached document re. a grievance filed against your company."');

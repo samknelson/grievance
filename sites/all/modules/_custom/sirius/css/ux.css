@@ -1,0 +1,11 @@
+.sirius_callout_basic {
+	border: 1px solid #999999;
+	background-color: #ffffff;
+	padding: 10px;
+	margin: 10px;
+}
+
+#content .sirius_callout_basic h2 {
+	margin-top: 0;
+	padding-top: 0;
+}

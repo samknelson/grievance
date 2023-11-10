@@ -61,6 +61,9 @@ function unite_feed_relationship_info() {
         'lg_sources' => array('group' => 'lg', 'type' => 'long'),
         'lg_date_sources' => array('group' => 'lg', 'type' => 'date'),
 
+        'verified_date' => array('group' => 'verified', 'type' => 'date'),
+        'verified_user' => array('group' => 'verified', 'type' => 'entity_reference', 'entity_type' => 'user'),
+
       ),
       'batch_size' => 10,
       'callback_row_verify' => 'unite_feed_relationship_row_verify',
@@ -75,6 +78,7 @@ function unite_feed_relationship_info() {
     'core' => 'Core',
     'ownership' => 'Ownership',
     'lg' => 'Loans and Grants',
+    'verified' => 'Verified',
   );
   foreach ($items['unite_feed_relationship']['feed']['fields'] as $field_name => $field_info) {
     $group = $field_info['group'];
@@ -186,25 +190,8 @@ function unite_feed_relationship_row_verify($feed_node, $info, $data, &$row, $pr
   foreach ($info['feed']['fields'] as $field_name => $field_info) {
     if (!$row[$field_name]) { continue; }
 
-    // Validate integer fields
-    if ($field_info['type'] == 'integer') {
-      $row[$field_name] = preg_replace('/\,/', '', $row[$field_name]);
-      if (!preg_match('/^[0-9]+$/', $row[$field_name])) { return array('success' => FALSE, 'msg' => "$field_name must be an integer."); }
-    }
-
-    // Validate list fields
-    if ($field_info['type'] == 'list') {
-      $value = unite_feed_relationship_handle_list($field_name, $row[$field_name]);
-      if (!$value) { return array('success' => FALSE, 'msg' => "$field_name must be one of the allowed values."); }
-      $row[$field_name] = $value;
-    }
-
-    // Validate term_reference
-    if ($field_info['type'] == 'term_reference') {
-      $value = sirius_taxonomy_lookup_by_anything($field_info['taxonomy'], $row[$field_name]);
-      if (!$value) { return array('success' => FALSE, 'msg' => "$field_name must be one of the values in the taxonomy: $field_info[taxonomy]."); }
-      $row[$field_name] = $value;
-    }
+    $result = sirius_feed_handle_field($field_name, $field_info, $row[$field_name], $precompute);
+    if (!$result['success']) { return $result; }
   }
 
   $relationship_type_field_info = field_info_field('field_relationship_type');
@@ -277,13 +264,6 @@ function unite_feed_relationship_row_verify($feed_node, $info, $data, &$row, $pr
 
     foreach ($info['feed']['fields'] as $field_name => $field_info) {
       if (!$row[$field_name]) { continue; }
-
-      // Validate entity_reference
-      if ($field_info['type'] == 'entity_reference') {
-        $value = unite_feed_relationship_handle_entity_reference($field_info['entity_type'], $row[$field_name]);
-        if (!$value) { return array('success' => FALSE, 'msg' => "No value found (or multiple values found) for $field_name in the entity type: $field_info[entity_type]."); }
-        $row[$field_name] = $value;
-      }
 
       // Lookup parent
       if ($field_name == 'parent') {

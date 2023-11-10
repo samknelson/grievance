@@ -38,7 +38,9 @@ function report_cache_page_report($report_type) {
 		$render = report_cache_preview($report_type, $report_id, $info);
 	} elseif ($action == 'render') {
 		$render = report_cache_render($report_type, $report_id, $info, $_REQUEST['callback-name']);
-	}
+	} elseif ($action == 'operations') {
+		$render = report_cache_operations($report_type, $report_id, $info, $_REQUEST['callback-name']);
+	} 
 
 	if ($render) {
 		drupal_set_title(t("Reports: ") . $info['name'] . ': ' . $report_id);
@@ -73,10 +75,10 @@ function report_cache_page_report($report_type) {
 	$attributes = array();
 
 	$rows = array();
-	foreach ($report_ids as $tmp_report_id) {
 
-		$tools = l(t('Preview'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
-		$tools .= l(t('Download'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
+	foreach ($report_ids as $tmp_report_id) {
+		
+		$tools = '';
 		if ($info['render_callbacks']) {
 			foreach ($info['render_callbacks'] as $name => $callback) {
 				$tools .= l(
@@ -93,6 +95,12 @@ function report_cache_page_report($report_type) {
 				);
 			}
 		}
+
+		if ($info['operations']) {
+			$tools .= l(t('Operations'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'operations')));
+		}
+		$tools .= l(t('View Source Data'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
+		$tools .= l(t('Download Source Data'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
 		$tools .= l(t('Purge'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
 
 		$row = array();
@@ -128,7 +136,7 @@ function report_cache_page_report($report_type) {
 function report_cache_render_meta($parameters) {
 	$html = '<div class="report_cache_meta">';
 	if ($parameters['meta']['instance']['uuid']) {
-		$instance = report_cache_instance($report_type, $parameters['meta']['instance']['uuid']);
+		$instance = report_cache_instance($parameters['report_type'], $parameters['meta']['instance']['uuid']);
 		if ($instance) {
 			$html .= sirius_fakerender_field('Instance:', $instance['title']);
 		}
@@ -158,7 +166,7 @@ function report_cache_download($report_type, $report_id, $info) {
 	$filename = preg_replace('/_+/', '_', $filename);
 	$filename = strtolower($filename);
 	$filename = $filename . '.csv';
-	
+
 	drupal_add_http_header('Content-Type', 'text/csv');
 	drupal_add_http_header('Content-Disposition', 'attachment;filename=' . $filename);
 	$fp = fopen('php://output', 'w');
@@ -170,12 +178,16 @@ function report_cache_download($report_type, $report_id, $info) {
 	$query->condition('report_id', $report_id);
 	$query->condition('report_domain_nid', $domain_nid);
 	$stmt = $query->execute();
-	
+
 	while ($hr = $stmt->fetchAssoc()) {
 		$hr = unserialize($hr['report_data']);
 		$row = array();
 		foreach ($fields as $name => $prompt) {
-			$row[] = $hr[$name];
+			// A one-off hack. Don't ask.
+			if ($report_type == 'grievance-report-open-summary-with-log') {
+				$hr[$name] = preg_replace('/\<br \/\>/', ', ', $hr[$name]);
+			}
+			$row[] = strip_tags($hr[$name]);
 		}
 		fputcsv($fp, $row);
 	}

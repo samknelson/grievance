@@ -68,6 +68,15 @@ function sirius_pcct_node_tabs() {
     'skip_node_view_check' => TRUE,
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_pcct'] = array(
+    'title' => 'PCCT',
+    'description' => '',
+    'callback' => 'sirius_pcct_node_tab_worker',
+    'permissions' => array(),
+    'file' => 'sirius_pcct.page_worker.inc',
+    'component' => 'pcct',
+  );
+
   sirius_node_tab_set_module('sirius_pcct', $node_tabs);
 
   return $node_tabs;

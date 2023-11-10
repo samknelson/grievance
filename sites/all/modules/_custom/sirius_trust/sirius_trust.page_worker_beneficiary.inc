@@ -1,9 +1,33 @@
 <?php
 
 function sirius_trust_node_tab_worker_beneficiary($worker_node) {
-	return drupal_get_form('sirius_trust_node_tab_worker_beneficiary_form', $worker_node);
+  $result = sirius_proxy_call('sirius_trust_worker_beneficiary', $worker_node);
+  if (!$result['success']) { return sirius_page_error($result['msg']); }
+  $beneficiary_rnode = $result['data'];
+
+  $html = '<h2>' . t('Current Beneficiary Designation') . '</h2>';
+  if (!$beneficiary_rnode) {
+     $html .= '<p>' . t('There is no current beneficiary designation.') . '</p>';
+  } else {
+    $renderable = node_view($beneficiary_rnode, 'full');
+    $html .= drupal_render($renderable);
+  }
+
+  return $html;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+/*
 function sirius_trust_node_tab_worker_beneficiary_form($form, &$form_state, $worker_node) {
 	$form_state['worker_nid'] = $worker_node->nid;
 
@@ -46,3 +70,4 @@ function sirius_trust_node_tab_worker_beneficiary_form_submit($form, &$form_stat
 
 	drupal_set_message("Beneficiaries saved.");
 }
+*/

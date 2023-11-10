@@ -109,28 +109,6 @@ function sirius_trust_worker_election_node_presave($election_node) {
 	$election_node->title = "$worker_name - Election $date";
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * If we have multiple active elections, expire any duplciates (i.e. give them an end date just before 
  * the start date of the next active one.)
@@ -153,7 +131,7 @@ function sirius_trust_worker_election_cleanup_multiple_active($mode, $worker_nid
 		$next_start_date = $next_election_node->field_sirius_date_start['und'][0]['value'];
     $next_start_ts = strtotime($next_start_date);
 
-    if ($next_start_ts < 1) {
+    if ($next_start_ts == 0) {
     	return array('success' => FALSE, 'msg' => 'It looks like one of the elections doesn\'t have a start date.');
     }
 
@@ -164,7 +142,7 @@ function sirius_trust_worker_election_cleanup_multiple_active($mode, $worker_nid
     if ($mode == 'live') {
     	node_save($election_node);
     } else {
-    	sirius_minilog("(Skipping svae because mode = $mode.)");
+    	sirius_minilog("(Skipping save because mode = $mode.)");
     }
     ++$count_expired;
   }

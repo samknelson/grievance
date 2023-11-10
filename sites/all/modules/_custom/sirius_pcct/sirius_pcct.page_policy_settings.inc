@@ -19,11 +19,27 @@ function sirius_pcct_node_tab_policy_settings_form($form, &$form_state, $policy_
 		'#description' => t('Enter the deductible as it should be displayed to members, e.g. "$250 ind / $500 fam".'),
 	);
 
+	$form['pcct']['settings']['deductible'] = array(
+		'#title' => t('Deductible'),
+		'#type' => 'textfield',
+		'#default_value' => $pcct_json['settings']['deductible'],
+		'#description' => t('Enter the deductible as a single number (for use in calculations).'),
+		'#size' => 4,
+	);
+
 	$form['pcct']['settings']['oop_display'] = array(
 		'#title' => t('Out-of-pocket (Display)'),
 		'#type' => 'textfield',
 		'#default_value' => $pcct_json['settings']['oop_display'],
 		'#description' => t('Enter the out-of-pocket max as it should be displayed to members, e.g. "$5,000 ind / $10,000 fam".'),
+	);
+
+	$form['pcct']['settings']['oop'] = array(
+		'#title' => t('Out-of-Pocket'),
+		'#type' => 'textfield',
+		'#default_value' => $pcct_json['settings']['oop'],
+		'#description' => t('Enter the oop max as a single number (for use in calculations).'),
+		'#size' => 4,
 	);
 
 

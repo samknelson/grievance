@@ -115,7 +115,7 @@ function sirius_trust_service_provider_search($service_node, $params = array()) 
 	$sql_args = array();
 	$sql = "select nid, ";
 	$sql .= "title, ";
-	$sql .= "cast(json_unquote(json_extract(field_sirius_json_value, '\$.rates.by_service.$service_nid')) as signed) as rate, ";
+	$sql .= "cast(json_unquote(json_extract(field_sirius_json_value, '\$.rates.by_service.\"$service_nid\"')) as signed) as rate, ";
 	$sql .= "field_sirius_address_geo_lat as lat, ";		
 	$sql .= "field_sirius_address_geo_lon as lon ";
 	$sql .= "from node ";
@@ -125,7 +125,7 @@ function sirius_trust_service_provider_search($service_node, $params = array()) 
 	$sql .= "left join field_data_field_sirius_address_geo on field_data_field_sirius_address_geo.entity_type = 'node' and field_data_field_sirius_address_geo.entity_id = node.nid ";
 	$sql .= "where node.type = 'sirius_trust_provider' ";
 	$sql .= "and field_sirius_domain_target_id = :domain_nid ";
-	$sql .= "and cast(json_unquote(json_extract(field_sirius_json_value, '\$.rates.by_service.$service_nid')) as signed) > 0 ";
+	$sql .= "and cast(json_unquote(json_extract(field_sirius_json_value, '\$.rates.by_service.\"$service_nid\"')) as signed) > 0 ";
 		if ($params['title_match']) {
 			$sql .= "and title like :title_match ";
 			$sql_args[':title_match'] = $params['title_match'];

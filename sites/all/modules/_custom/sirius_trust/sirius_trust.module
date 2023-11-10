@@ -25,6 +25,10 @@ function sirius_trust_sirius_domain_component_info() {
       'title' => 'Trust - Provider',
       'description' => 'Manage Trust service providers, such as doctor offices or hospitals.',
     ),
+    'trust:beneficiary' => array(
+      'title' => 'Trust - Beneficiary',
+      'description' => 'Manage beneficiary designations.',
+    ),
   );
 }
 
@@ -145,7 +149,8 @@ function sirius_trust_report_cache_info() {
  */
 
 function sirius_trust_sirius_config_links_alter(&$links) {
-  $links['trust'] = array('title' => 'Trust');
+  $links['trust']['title'] = 'Trust';
+  $links['trust']['links']['sirius/trust/config'] = array('title' => 'General Configuration', 'description' => 'Configure general settings for the Sirius Trust module.');
   $links['trust']['links']['sirius/trust/benefits'] = array('title' => 'Benefits', 'description' => 'Configure system benefits.');
   $links['trust']['links']['sirius/trust/services'] = array('title' => 'Services', 'description' => 'Configure services (usually associated with CPT codes).');
   $links['trust']['links']['sirius/trust/providers'] = array('title' => 'Providers', 'description' => 'Configure service providers, such as outpatient facilities, clinics, or hospitals.');
