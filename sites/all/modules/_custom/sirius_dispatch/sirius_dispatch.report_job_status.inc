@@ -171,8 +171,6 @@ class Sirius_Dispatch_Report_Job_Status extends Report_Cache_Report_Generator {
 
     ksort($data);
 
-    dpm($data);
-
     $header = array();
     $header[] = t('Shop');
     $header[] = t('Workers Requested');
