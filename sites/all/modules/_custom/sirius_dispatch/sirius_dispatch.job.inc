@@ -287,8 +287,8 @@ function sirius_dispatch_layoff_expired_jobs($mode = 'test') {
 
 
 function sirius_dispatch_layoff_secondary_without_primary($mode = 'test') {
-	$mode = "test";
-	sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
+	//$mode = "test";
+	//sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
 
 	// Get the job types
 	$job_types = sirius_taxonomy_load('sirius_dispatch_job_type', 'tid', 'full');
@@ -339,7 +339,7 @@ function sirius_dispatch_layoff_secondary_without_primary($mode = 'test') {
 		$dispatch_nids[] = $hr['nid'];
 	}
 	if (!$dispatch_nids) {
-		return array('success' => FALSE, 'msg' => 'No secondary dispatches found for these job types where the worker does not have a primary dispatch.');
+		return array('success' => TRUE, 'msg' => 'No secondary dispatches found for these job types where the worker does not have a primary dispatch.');
 	}
 
 	$count = $count_success = $count_failure = 0;

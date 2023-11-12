@@ -141,7 +141,7 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 
 			$old_domain_nid = sirius_domain_nid();
 			sirius_domain($domain_nid);
-			$sub_result = $info['callback']($mode);
+			$sub_result = $info['callback']($mode, $force);
 			sirius_domain($old_domain_nid);
 
 			++$count;
@@ -155,7 +155,7 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 		}
 		$result = array('success' => TRUE, 'msg' => "Scanned $count domains, with $count_success success and $count_failure failures.");
 	} else {
-		$result = $info['callback']($mode);
+		$result = $info['callback']($mode, $force);
 	}
 
 	if (!$result['success']) {

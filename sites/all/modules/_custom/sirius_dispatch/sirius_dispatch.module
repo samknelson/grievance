@@ -111,13 +111,12 @@ function sirius_dispatch_sirius_cron_scan_info() {
   $items['dispatch_eba_remove_expired_dates'] = array(
     'title' => 'Dispatch EBA Remove Expired Dates',
     'description' => 'Clean up any EBA dates for workers that are in the past.',
-    'schedule' => 'daily',
+    'schedule' => 'hourly',
     'callback' => 'sirius_dispatch_eba_remove_expired_dates',
     'multidomain' => FALSE,
     'component' => 'dispatch:live',
   );
 
-  /*
   $items['dispatch_eba_layoff_expired_dispatches'] = array(
     'title' => 'Dispatch EBA Layoff Expired Dispatches',
     'description' => 'Lay off any workers who are on secondary EBA dispatches, when the date has passed.',
@@ -126,7 +125,6 @@ function sirius_dispatch_sirius_cron_scan_info() {
     'multidomain' => FALSE,
     'component' => 'dispatch',
   );
-  */
 
   $items['dispatch_elig_cache_cleanup'] = array(
     'title' => 'Dispatch Eligibility Cache',
@@ -151,7 +149,7 @@ function sirius_dispatch_sirius_cron_scan_info() {
     'description' => 'Lay off all secondary dispatches if the worker does not have a primary dispatch and if the job type has the appropriate flag set.',
     'schedule' => 'hourly',
     'callback' => 'sirius_dispatch_layoff_secondary_without_primary',
-    'multidomain' => TRUE,
+    'multidomain' => FALSE,
     'component' => 'dispatch:live',
   );
 
@@ -260,7 +258,11 @@ function sirius_dispatch_node_delete($node) {
  */
 
 function sirius_dispatch_report_cache_info() {
+  sirius_require('sirius_dispatch', 'sirius_dispatch.report_job_status.inc');
+
   $items = array();
+
+  Sirius_Dispatch_Report_Job_Status::getInstance()->setInfo($items);
 
   $items['sirius-dispatch-member-status-ratios'] = array(
     'name' => t('Member Status Ratios'),

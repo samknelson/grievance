@@ -43,6 +43,17 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
 	$job_policy = sirius_dispatch_job_policy($job_node);
 
+	// Set the status
+	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+	if ($job_policy['workers']['always_secondary'] == 'Yes') {
+		$new_status = 'accepted_secondary';
+	} else if ($worker_node->field_grievance_shop['und'][0]['target_id']) {
+		$new_status = 'accepted_secondary';
+	} else {
+		$new_status = 'accepted';
+	}
+	$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = $new_status;
+
 	// Run any plugins. 
 	$plugins = sirius_dispatch_elig_info_all();
 	foreach ($plugins as $plugin_key => $plugin) {
@@ -68,17 +79,6 @@ function sirius_dispatch_accept(&$dispatch_node, $notes = '') {
 			sirius_event_participant_pstatus_set($participant_node, $prole_tid, $pstatus_tid);
 		}
 	}
-
-	// Set the status
-	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
-	if ($job_policy['workers']['always_secondary'] == 'Yes') {
-		$new_status = 'accepted_secondary';
-	} else if ($worker_node->field_grievance_shop['und'][0]['target_id']) {
-		$new_status = 'accepted_secondary';
-	} else {
-		$new_status = 'accepted';
-	}
-	$dispatch_node->field_sirius_dispatch_status['und'][0]['value'] = $new_status;
 
 	// Set the "responded" timestamp
 	if (!$dispatch_node->field_sirius_datetime_completed['und'][0]['value']) {
