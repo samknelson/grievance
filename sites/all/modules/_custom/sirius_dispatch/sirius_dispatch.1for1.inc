@@ -46,7 +46,7 @@ class Sirius_Dispatch_1for1 extends Sirius_Dispatch_Elig_Plugin {
 	 * If there is no "ready" worker, then return a failure.
 	 */
 
-	function accept(&$dispatch_node, $notes = '') {
+	public function accept(&$dispatch_node, $notes = '') {
 		$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
 		$job_policy = sirius_dispatch_job_policy($job_node);
 		$worker_nid = $dispatch_node->field_sirius_worker['und'][0]['target_id'];

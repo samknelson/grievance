@@ -11,6 +11,7 @@ function sirius_dispatch_search($params) {
 	$sql .= "left join field_data_field_sirius_dispatch_type on field_data_field_sirius_dispatch_type.entity_type = 'node' and field_data_field_sirius_dispatch_type.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = node.nid ";
 	$sql .= "where node.type = 'sirius_dispatch' ";
 	if ($domain_nid) {
 		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
@@ -29,6 +30,10 @@ function sirius_dispatch_search($params) {
   if ($params['types']) {
   	$sql .= "and field_sirius_dispatch_type_value in (:types) ";
   	$sql_args[':types'] = $params['types'];
+  }
+  if ($params['status']) {
+  	$sql .= "and field_sirius_dispatch_status_value = :status ";
+  	$sql_args[':status'] = $params['status'];
   }
   if ($params['ts']) {
   	$sql .= "and field_sirius_date_start_value <= :date ";
