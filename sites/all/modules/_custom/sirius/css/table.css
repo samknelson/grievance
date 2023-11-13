@@ -70,3 +70,8 @@ table.sirius_table_form td div.form-item {
 .sirius_table_basic th {
 	padding: 4px;
 }
+
+table.sirius_table td p {
+	padding-top: 0;
+	margin-top: 0;
+}
