@@ -12,6 +12,7 @@ function sirius_edls_assignment_fetch_crew($date, $sheet_nid, $crew_uuid) {
   $sql .= "where assignment_date = :date and sheet_nid = :sheet_nid and crew_uuid = :crew_uuid ";
   $stmt = sirius_sql_query($sql, array(':date' => $date, ':sheet_nid' => $sheet_nid, ':crew_uuid' => $crew_uuid));
 
+  $crew = array();
   while ($hr = $stmt->fetchAssoc()) {
     $crew[$hr['assignment_position']] = $hr;
   }
@@ -87,8 +88,7 @@ function sirius_edls_assign($date, $worker_id, $sheet_nid, $crew_uuid, $extra = 
   $sql = "insert into sirius_edls_assignments (assignment_date, worker_id, worker_name, employer_nid, sheet_nid, crew_uuid, assignment_position, assignment_extra) ";
   $sql .= "values (:date, :worker_id, :worker_name, :employer_nid, :sheet_nid, :crew_uuid, :assignment_position, :assignment_extra)";
   $stmt = db_query($sql, $sql_args);
-
-  return array('success' => TRUE, 'position' => $position);
+  return array('success' => TRUE, 'position' => $position, 'values' => $sql_args);
 }
 
 function sirius_edls_assignment_set_extra($date, $worker_id, $sheet_nid, $extra = array()) {
