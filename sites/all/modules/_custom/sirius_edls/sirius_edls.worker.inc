@@ -106,6 +106,16 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
     $sql_args[':industry_tids'] = $industry_tids;
   }
 
+  if ($filters['nameid']) {
+    $sql .= "and (node.title like :match or field_sirius_id_value like :match) ";
+    $sql_args[':match'] = '%' . $filters['nameid'] . '%';
+  }
+
+  if ($filters['ms']) {
+    $sql .= "and ms_term.tid = :ms ";
+    $sql_args[':ms'] = $filters['ms'];
+  }
+
   $sql .= "group by node.nid ";
 
   $sql .= "order by field_sirius_name_family, field_sirius_name_given ";
