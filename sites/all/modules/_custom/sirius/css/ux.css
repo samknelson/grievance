@@ -9,3 +9,35 @@
 	margin-top: 0;
 	padding-top: 0;
 }
+
+#sirius_ux_flash_wrapper {
+  height: auto;
+  position: fixed; 
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  opacity: 0.8;
+  padding: 10px;
+  margin: 20px;
+	color: #000000;
+}
+
+.sirius_ux_flash_warning {
+	background-color: #ffff99;
+	border: 1px solid #999933;
+}
+
+.sirius_ux_flash_error {
+	background-color: #ff9999;
+	border: 1px solid #993333;
+}
+
+.sirius_ux_flash_info {
+	background-color: #bbbbbb;
+	border: 1px solid #333333;
+}
+
+.sirius_ux_flash_success {
+	background-color: #99ff99;
+	border: 1px solid #339933;
+}

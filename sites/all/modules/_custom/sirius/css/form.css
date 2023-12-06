@@ -40,3 +40,20 @@
 	float: left;
 	margin-right: 10px;
 }
+
+.sirius_form_weight_indicator {
+	float: right;
+	padding-right: 10px;
+	font-size: 10px;
+}
+
+.sirius_form_weightfield {
+	font-size: 70%;
+	float: right;
+	margin-top: -25px;
+	margin-right: -10px;
+}
+
+.sirius_form_weightfield input {
+	font-size: 100%;
+}
