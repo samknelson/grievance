@@ -10,20 +10,22 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 	$sheet_vid = $sheet_node->vid;
 	$sheet_nid = $sheet_node->nid;
 	$status_options = sirius_edls_sheet_status_options();
+	$sheet_json = sirius_json_get($sheet_node);
 
 	$html = '';
 	$html .= sirius_fakerender_field('Version:', "$sheet_nid-$sheet_vid");
-	$html .= sirius_fakerender_field('Employer:', sirius_node_title($sheet_node->field_grievance_shop['und'][0]['target_id']));
-	$html .= sirius_fakerender_field('Start Date:', date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])));
-	$html .= sirius_fakerender_field('Job #:', sirius_text_to_html($sheet_node->field_sirius_job_number['und'][0]['value']));
 	$html .= sirius_fakerender_field('Status:', $status_options[$sheet_node->field_sirius_edls_sheet_status['und'][0]['value']]);
+	$html .= sirius_fakerender_field('Employer:', sirius_node_title($sheet_node->field_grievance_shop['und'][0]['target_id']));
+	$html .= sirius_fakerender_field('Supervisor:', sirius_edls_supervisor_render($sheet_node));
+	$html .= sirius_fakerender_field('Start Date:', date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])));
+
+
+	$html .= sirius_fakerender_field('Event:', sirius_node_title($sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id']));
+	$html .= sirius_fakerender_field('Event Status:', sirius_text_to_html($sheet_json['edls']['sheet']['show_status']));
 	$html .= sirius_fakerender_field('Department:', sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid']));
+	$html .= sirius_fakerender_field('Job #:', sirius_text_to_html($sheet_node->field_sirius_job_number['und'][0]['value']));
 	$html .= sirius_fakerender_field('Facility:', sirius_node_title($sheet_node->field_sirius_dispatch_facility['und'][0]['target_id']));
 	$html .= sirius_fakerender_field('Hall:', sirius_node_title($sheet_node->field_sirius_dispatch_hall['und'][0]['target_id']));
-
-	$supervisor_name = sirius_edls_supervisor_render($sheet_node);
-	if ($supervisor_name) { $html .= sirius_fakerender_field('Supervisor:', $supervisor_name); }
-
 	$assigned_count = sirius_edls_assignment_count_sheet($sheet_node->field_sirius_date_start['und'][0]['value'], $sheet_nid);
 	$html .= sirius_fakerender_field('Count:', $assigned_count . ' / ' . $sheet_node->field_sirius_count['und'][0]['value']);
 

@@ -27,40 +27,6 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 	);
 	if ($sheet_node) { $form['sheet']['#collapsed'] = TRUE; }
 
-	$supervisor_options = sirius_edls_supervisor_list($sheet_employer_nid);
-	$form['sheet']['supervisor'] = array(
-		'#type' => 'select',
-		'#title' => t('Supervisor'),
-		'#options' => array(NULL => t('-- Select --')) + $supervisor_options,
-		'#default_value' => $sheet_node->field_grievance_rep_assignee['und'][0]['target_id'],
-		'#required' => TRUE,
-	);
-
-	$job_group_options = sirius_dispatch_group_list_active(NULL, $ts);
-	$form['sheet']['sirius_dispatch_job_group'] = array(
-		'#type' => 'select',
-		'#title' => t('Event'),
-		'#options' => array(NULL => t('-- Select --')) + $job_group_options,
-		'#default_value' => $sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id'],
-		'#required' => TRUE,
-	);
-
-	$department_options = sirius_taxonomy_load('grievance_department', 'tid', 'name');
-	$form['sheet']['department'] = array(
-		'#type' => 'select',
-		'#title' => t('Department'),
-		'#options' => array(NULL => t('-- Select --')) + $department_options,
-		'#default_value' => $sheet_node->field_grievance_department_tid['und'][0]['tid'],
-		'#id' => 'sirius_edls_sheet_department',
-	);
-
-	$form['sheet']['show_status'] = array(
-		'#type' => 'select',
-		'#title' => t('Show Status'),
-		'#options' => array(NULL => t('-- Select --')) + array('Move-in' => 'Move-in', 'Show Day' => 'Show Day', 'Teardown' => 'Teardown'),
-		'#default_value' => $sheet_json['edls']['sheet']['show_status'],
-	);
-
 	if ($my_employer_node) {
 		$form['sheet']['grievance_shop'] = array(
 			'#type' => 'value',
@@ -78,6 +44,15 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 	  if ($sheet_node->nid) { $form['sheet']['grievance_shop']['#disabled'] = TRUE; }
 	}
 
+	$supervisor_options = sirius_edls_supervisor_list($sheet_employer_nid);
+	$form['sheet']['supervisor'] = array(
+		'#type' => 'select',
+		'#title' => t('Supervisor'),
+		'#options' => array(NULL => t('-- Select --')) + $supervisor_options,
+		'#default_value' => $sheet_node->field_grievance_rep_assignee['und'][0]['target_id'],
+		'#required' => TRUE,
+	);
+
   $form['sheet']['date_start'] = array(
 	  '#type' => 'date_popup',
 	  '#title' => t('Date'),
@@ -89,6 +64,31 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 		'#required' => TRUE,
   );
   if ($sheet_node->nid) { $form['sheet']['date_start']['#disabled'] = TRUE; }
+
+	$job_group_options = sirius_dispatch_group_list_active(NULL, $ts);
+	$form['sheet']['sirius_dispatch_job_group'] = array(
+		'#type' => 'select',
+		'#title' => t('Event'),
+		'#options' => array(NULL => t('-- Select --')) + $job_group_options,
+		'#default_value' => $sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id'],
+		'#required' => TRUE,
+	);
+
+	$form['sheet']['show_status'] = array(
+		'#type' => 'select',
+		'#title' => t('Show Status'),
+		'#options' => array(NULL => t('-- Select --')) + array('Move-in' => 'Move-in', 'Show Day' => 'Show Day', 'Teardown' => 'Teardown'),
+		'#default_value' => $sheet_json['edls']['sheet']['show_status'],
+	);
+
+	$department_options = sirius_taxonomy_load('grievance_department', 'tid', 'name');
+	$form['sheet']['department'] = array(
+		'#type' => 'select',
+		'#title' => t('Department'),
+		'#options' => array(NULL => t('-- Select --')) + $department_options,
+		'#default_value' => $sheet_node->field_grievance_department_tid['und'][0]['tid'],
+		'#id' => 'sirius_edls_sheet_department',
+	);
 
   $form['sheet']['job_number'] = array(
 	  '#type' => 'textfield',

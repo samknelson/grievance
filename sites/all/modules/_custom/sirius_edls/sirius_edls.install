@@ -49,8 +49,9 @@ function sirius_edls_update_7007() {
 
       sheet_nid integer not null,
       crew_uuid varchar(255) not null,
-      worker_position integer not null,
-      assignment_data json,
+      assignment_position integer not null,
+
+      assignment_extra json,
 
       primary key (assignment_id),
       unique index (assignment_date, worker_id),
