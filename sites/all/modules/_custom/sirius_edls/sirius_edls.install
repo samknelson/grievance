@@ -35,7 +35,7 @@
   );
 */
 
-function sirius_edls_update_7005() {
+function sirius_edls_update_7006() {
   $sqls = array(
     'create table sirius_edls_assignments (
       assignment_id integer not null auto_increment,
@@ -52,7 +52,7 @@ function sirius_edls_update_7005() {
       worker_position integer not null,
       assignment_data json,
 
-      primary key (assignment_id)
+      primary key (assignment_id),
       unique index (assignment_date, worker_id),
       index(sheet_nid),
       index(worker_id),
