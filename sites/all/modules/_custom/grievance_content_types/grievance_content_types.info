@@ -840,7 +840,6 @@ features[field_instance][] = node-sirius_domain-field_sirius_tz
 features[field_instance][] = node-sirius_edls_sheet-field_grievance_department_tid
 features[field_instance][] = node-sirius_edls_sheet-field_grievance_rep_assignee
 features[field_instance][] = node-sirius_edls_sheet-field_grievance_shop
-features[field_instance][] = node-sirius_edls_sheet-field_sirius_category
 features[field_instance][] = node-sirius_edls_sheet-field_sirius_count
 features[field_instance][] = node-sirius_edls_sheet-field_sirius_date_start
 features[field_instance][] = node-sirius_edls_sheet-field_sirius_dispatch_facility
