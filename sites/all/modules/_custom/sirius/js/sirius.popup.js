@@ -10,7 +10,6 @@ Drupal.behaviors.sirius = {
       var overlay = $(this).parent().find('.sirius_popup_overlay');
       var announcement = $(this).parent().find('.sirius_popup_wrap');
       var close = $(this).parent().find('.sirius_popup_close');
-      console.log(overlay);
 
       overlay.show();
       announcement.show().css({
