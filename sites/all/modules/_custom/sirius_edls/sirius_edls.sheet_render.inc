@@ -47,10 +47,11 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 	if (!$sheet_nodes) { return '<p>' . t('No matching sheets found') . '</p>'; }
 	$header = array();
 	if (!$options['hide_employer']) { $header[] = t('Employer'); }
-	if (!$options['hide_date']) { $header[] = t('Date'); }
-	if (!$options['hide_job_number']) { $header[] = t('Job #'); }
 	if (!$options['hide_supervisor']) { $header[] = t('Supervisor'); }
+	if (!$options['hide_date']) { $header[] = t('Date'); }
+	if (!$options['hide_event']) { $header[] = t('Event'); }
 	if (!$options['hide_department']) { $header[] = t('Department'); }
+	if (!$options['hide_job_number']) { $header[] = t('Job #'); }
 	if (!$options['hide_facility']) { $header[] = t('Facility') . '<br />' . t('Hall'); }
 	if (!$options['hide_count']) { $header[] = t('Count') . '<br />' . t('Assigned'); }
 	$header[] = t('Tools');
@@ -66,16 +67,27 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 		$status = $sheet_node->field_sirius_edls_sheet_status['und'][0]['value'];
 		if (!$status) { $status = 'draft'; }
 
+		$sheet_json = sirius_json_get($sheet_node);
+
 		if (!$options['hide_employer']) { $row[] = sirius_node_title($sheet_node->field_grievance_shop['und'][0]['target_id']); }
+
+		if (!$options['hide_supervisor']) { $row[] = $supervisor_name; }
+
 		if (!$options['hide_date']) { $row[] = date('m/d/Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])); }
+
+		if (!$options['hide_job_group']) { 
+			$row[] = sirius_node_title($sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id']) . 
+				'<br />' .
+				$sheet_json['edls']['sheet']['show_status'];		
+		}
+
+		if (!$options['hide_department']) { $row[] = sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid']); }
+
 		if (!$options['hide_job_number']) {
 			$row[] = sirius_text_to_html($sheet_node->field_sirius_job_number['und'][0]['value']) .
 				'<br />' .
 				$status_options[$status];
 		}
-		if (!$options['hide_supervisor']) { $row[] = $supervisor_name; }
-		if (!$options['hide_supervisor']) { $row[] = sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid']); }
-		if (!$options['hide_job_group']) { $row[] = sirius_node_title($sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id']); }
 		if (!$options['hide_facility']) {
 			$row[] = sirius_node_title($sheet_node->field_sirius_dispatch_facility['und'][0]['target_id']) . 
 				'<br />' .

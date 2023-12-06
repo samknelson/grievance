@@ -34,6 +34,12 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
 	  '#collapsed' => FALSE,
   );
 
+  $form['filters']['status'] = array(
+	  '#type' => 'select',
+	  '#title' => t('Status'),
+		'#options' => array(NULL => t('-- Select --')) + sirius_edls_sheet_status_options(),
+  );
+
 	$my_employer_node = sirius_employer_get();
 	if ($my_employer_node) {
 		$form['filters']['grievance_shop'] = array(
@@ -48,6 +54,12 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
 			'#options' => array(NULL => t('-- Select --')) + $employer_options,
 		);
 	}
+
+  $form['filters']['supervisor'] = array(
+	  '#type' => 'select',
+	  '#title' => t('Supervisor'),
+		'#options' => array(NULL => t('-- Select --')) + sirius_edls_supervisor_list($my_employer_node->nid),
+  );
 
 	$date_options = array();
 	foreach (array("-1 days", "today", "+1 day", "+2 day", "+3 days", "+4 days", "+5 days", "+6 days") as $d) {
@@ -80,28 +92,16 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
 		'#states' => array('visible' => array(":input[name=\"filters[date]\"]" => array('value' => 'other'))),
   );
 
-  $form['filters']['job_number'] = array(
-	  '#type' => 'textfield',
-	  '#title' => t('Job Number'),
-	  '#size' => 10,
-  );
-
-  $form['filters']['supervisor'] = array(
-	  '#type' => 'select',
-	  '#title' => t('Supervisor'),
-		'#options' => array(NULL => t('-- Select --')) + sirius_edls_supervisor_list($my_employer_node->nid),
-  );
-
   $form['filters']['department'] = array(
 	  '#type' => 'select',
 	  '#title' => t('Department'),
 		'#options' => array(NULL => t('-- Select --')) + sirius_taxonomy_load('grievance_department', 'tid', 'name'),
   );
 
-  $form['filters']['status'] = array(
-	  '#type' => 'select',
-	  '#title' => t('Status'),
-		'#options' => array(NULL => t('-- Select --')) + sirius_edls_sheet_status_options(),
+  $form['filters']['job_number'] = array(
+	  '#type' => 'textfield',
+	  '#title' => t('Job Number'),
+	  '#size' => 10,
   );
 
   $form['filters']['submit'] = array(
