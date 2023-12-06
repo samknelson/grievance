@@ -75,6 +75,9 @@ function sirius_edls_assign($date, $worker_id, $sheet_nid, $crew_uuid, $extra = 
   $worker = sirius_edls_worker_fetch($employer_nid, $worker_id);
   if (!$worker) { return array('success' => FALSE, 'msg' => "Worker ID $worker_id not found."); }
 
+  drupal_set_message("Fetching: $worker_id");
+  dpm($worker);
+
   $sql_args = array();
   $sql_args[':date'] = $date;
   $sql_args[':worker_id'] = $worker_id;

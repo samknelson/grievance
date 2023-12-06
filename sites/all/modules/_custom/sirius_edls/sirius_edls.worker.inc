@@ -36,7 +36,7 @@ function sirius_edls_worker_fetch($employer_nid, $worker_id) {
 }
 
 function sirius_edls_dispatch_worker_fetch($employer_nid, $worker_id) {
-  $real_id = preg_replace('/^I/', '', $real_id);
+  $real_id = preg_replace('/^I/', '', $worker_id);
   $worker_node = sirius_worker_get_by_id($real_id);
   $result = array(
     'worker_id' => $worker_id, 
