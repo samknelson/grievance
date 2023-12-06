@@ -26183,10 +26183,10 @@ If the file has multiple pages, then each page in the input document will use th
     ),
     'view' => array(
       'args' => array(),
-      'display_name' => '',
+      'display_name' => 'term_reference_1',
       'match_operator' => 'CONTAINS',
       'size' => '',
-      'view_name' => '',
+      'view_name' => 'sirius_trust_service_types',
     ),
     'widget' => array(
       'active' => 1,
@@ -31246,13 +31246,13 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'taxonomy',
         'settings' => array(
           'field_delimiter' => '',
         ),
-        'type' => 'taxonomy_term_reference_link',
-        'weight' => 0,
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -31270,7 +31270,7 @@ If the file has multiple pages, then each page in the input document will use th
         'checkall' => FALSE,
       ),
       'type' => 'options_buttons',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -31286,7 +31286,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 4,
+        'weight' => 5,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -31304,7 +31304,7 @@ If the file has multiple pages, then each page in the input document will use th
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 6,
+      'weight' => 5,
     ),
   );
 
@@ -31347,6 +31347,44 @@ If the file has multiple pages, then each page in the input document will use th
   );
 
   // Exported field_instance:
+  // 'taxonomy_term-grievance_job_classification-field_sirius_name_short'.
+  $field_instances['taxonomy_term-grievance_job_classification-field_sirius_name_short'] = array(
+    'bundle' => 'grievance_job_classification',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_name_short',
+    'label' => 'Short name',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
   // 'taxonomy_term-grievance_job_classification-field_sirius_term_source'.
   $field_instances['taxonomy_term-grievance_job_classification-field_sirius_term_source'] = array(
     'bundle' => 'grievance_job_classification',
@@ -31355,13 +31393,13 @@ If the file has multiple pages, then each page in the input document will use th
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 3,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -31380,7 +31418,7 @@ If the file has multiple pages, then each page in the input document will use th
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 8,
+      'weight' => 6,
     ),
   );
 
