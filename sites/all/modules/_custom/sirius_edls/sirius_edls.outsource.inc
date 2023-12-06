@@ -74,8 +74,7 @@ function sirius_edls_outsource_list($employer_nid, $date = NULL, $filters = arra
     $sql_args[':ms'] = $filters['ms'];
   }
 
-  // $sql .= "order by sirius_edls_outsource.worker_name ";
-  // $sql .= "limit 20";
+  $sql .= "limit 20";
   $stmt = sirius_sql_query($sql, $sql_args);
 
   $workers = array();

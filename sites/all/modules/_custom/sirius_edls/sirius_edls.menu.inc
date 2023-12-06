@@ -143,6 +143,25 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_sheet_list.inc'
   );
 
+  $items['sirius/edls/worker/list'] = array(
+    'title' => 'EDLS Workers',
+    'page callback' => 'sirius_edls_page_worker_list',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'sheet_list',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_edls.page_worker_list.inc'
+  );
+
   $items['sirius/edls/config'] = array(
     'title' => 'EDLS Configuration',
     'page callback' => 'sirius_edls_page_config',
