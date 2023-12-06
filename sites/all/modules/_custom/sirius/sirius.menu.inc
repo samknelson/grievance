@@ -1689,6 +1689,15 @@ function sirius_menu_access_callback($options) {
     }
   }
 
+  // Access plugin
+  if ($options['access']) {
+    $instance = sirius_access_instance($options['access']['type']);
+    if (!$instance) { return FALSE; }
+    $action = $options['access']['action'];
+    $context = $options['access']['context'];
+    if (!$instance->access($action, $context)) { return FALSE; }
+  }
+
   // Passed all tests
   return TRUE;
 }
