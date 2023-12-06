@@ -1,0 +1,18 @@
+.sirius_edls_crew_name {
+	border: 1px solid #000000;
+}
+
+.sirius_edls_crew_name {
+	font-weight: bold;
+}
+
+.sirius_edls_crew {
+	width: 40%;
+	float: left;
+}
+
+.sirius_edls_crews::after {
+	content: "";
+	clear: both;
+	display: table;
+}

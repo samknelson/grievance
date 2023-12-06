@@ -1,0 +1,51 @@
+<?php
+
+/*
+  create table sirius_edls_assignments (
+    assignment_id integer not null auto_increment,
+
+    assignment_date date not null,
+    worker_id varchar(255) not null,
+
+    worker_name varchar(255) not null,
+
+    employer_nid integer not null,
+
+    sheet_nid integer not null,
+    crew_uuid varchar(255) not null,
+    worker_position integer not null,
+    assignment_data json,
+
+    primary key (assignment_id)
+    unique index (assignment_date, worker_id),
+    index(sheet_nid),
+    index(worker_id),
+  );
+
+  create table sirius_edls_outsource (
+    outsource_id integer not null auto_increment,
+    employer_nid integer not null,
+    worker_id varchar(255) not null,
+    worker_ms varchar(255) not null,
+    worker_name varchar(255) not null,
+    worker_data json,
+    index(worker_id),
+    unique index (employer_nid, worker_id),
+    primary key (outsource_id)
+  );
+*/
+
+function sirius_edls_update_7002() {
+  $sqls = array(
+    'alter table field_data_field_sirius_json add column json_denorm_external_id varchar(255) generated always as (field_sirius_json_value ->> \'$.external_id\')',
+    'alter table field_data_field_sirius_json add index json_denorm_external_id (json_denorm_external_id)',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
