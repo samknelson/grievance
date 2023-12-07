@@ -93,7 +93,17 @@
 							}
 
 							html = '<div class="' + c + '" id="sirius_edls_worker_' + worker['worker_id'] + '" data-id="' + worker['worker_id'] + '">';
+
+							/*
+							html += '<a href="#" class="sirius_popup_trigger">';
+							html += '<i class="fas fa-info-circle"></i>';
+							html += '</a>';
+							*/
+
+							html += '<span class="sirius_edls_worker_name">';
 							html += worker['worker_id'] + ' - ' + worker['worker_name'];
+							html += '</span>';
+
 							html += '</div>';
 							worker_div.html(html);
 
@@ -103,8 +113,8 @@
 							$('#sirius_edls_workers .sirius_edls_workers_ms_wrap[data-ms=\'' + worker['worker_ms'] + '\']').removeClass('sirius_edls_hidden');
 						}
 
-						$('.sirius_edls_worker_wrapper').click(function() {
-							worker_id = $(this).attr('data-id');
+						$('.sirius_edls_worker_wrapper .sirius_edls_worker_name').click(function() {
+							worker_id = $(this).parents('.sirius_edls_worker_wrapper').attr('data-id');
 							crew_uuid = get_selected_crew();
 							assign(worker_id, crew_uuid);
 							return false;
@@ -122,7 +132,7 @@
 			}
 
 			function assign(worker_id, crew_uuid) {
-				worker_nameid = $('#sirius_edls_worker_' + worker_id).html();
+				worker_nameid = $('#sirius_edls_worker_' + worker_id + ' .sirius_edls_worker_name').html();
 				flash('Assigning: ' + worker_nameid + '...', 'info');
 
 				$.ajax({

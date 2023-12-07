@@ -44,7 +44,12 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 	$access = sirius_access_instance('edls');
 
-	if (!$sheet_nodes) { return '<p>' . t('No matching sheets found') . '</p>'; }
+	if (!$sheet_nodes) {
+		$msg = $options['empty_msg'];
+		if (!$msg) { $msg = t('No matching sheets found'); }
+		return '<div class="sirius_edls_sheet_list_empty">' . $msg . '</div>';
+	}
+
 	$header = array();
 	if (!$options['hide_employer']) { $header[] = t('Employer'); }
 	if (!$options['hide_supervisor']) { $header[] = t('Supervisor'); }

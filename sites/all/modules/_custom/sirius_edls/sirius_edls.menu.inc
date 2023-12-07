@@ -105,7 +105,7 @@ function sirius_edls_node_tabs() {
 function sirius_edls_menu() {
   $items = array();
 
-  $items['sirius/edls/sheet/create'] = array(
+  $items['sirius/edls/sheet-create'] = array(
     'title' => 'Create a Sheet',
     'page callback' => 'sirius_edls_page_sheet_create',
     'page arguments' => array(),
@@ -124,8 +124,50 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_sheet_create.inc'
   );
 
-  $items['sirius/edls/sheet/list'] = array(
-    'title' => 'EDLS Sheets',
+
+
+
+  $items['sirius/edls'] = array(
+    'title' => 'Employer Daily Labor Schedules',
+    'page callback' => 'sirius_edls_page_landing',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'sheet_list',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_edls.page_landing.inc'
+  );
+
+  $items['sirius/edls/landing'] = array(
+    'title' => 'Home',
+    'page callback' => 'sirius_edls_page_landing',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'sheet_list',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'sirius_edls.page_landing.inc'
+  );
+
+  $items['sirius/edls/sheets'] = array(
+    'title' => 'Sheets',
     'page callback' => 'sirius_edls_page_sheet_list',
     'page arguments' => array(),
     'access callback' => 'sirius_menu_access_callback',
@@ -139,12 +181,13 @@ function sirius_edls_menu() {
         ),
       ),
     ),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
     'file' => 'sirius_edls.page_sheet_list.inc'
   );
 
-  $items['sirius/edls/worker/list'] = array(
-    'title' => 'EDLS Workers',
+  $items['sirius/edls/workers'] = array(
+    'title' => 'Workers',
     'page callback' => 'sirius_edls_page_worker_list',
     'page arguments' => array(),
     'access callback' => 'sirius_menu_access_callback',
@@ -158,9 +201,15 @@ function sirius_edls_menu() {
         ),
       ),
     ),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
     'file' => 'sirius_edls.page_worker_list.inc'
   );
+
+
+
+
+
 
   $items['sirius/edls/config'] = array(
     'title' => 'EDLS Configuration',

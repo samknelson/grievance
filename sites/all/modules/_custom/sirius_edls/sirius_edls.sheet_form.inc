@@ -81,7 +81,7 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 		'#default_value' => $sheet_json['edls']['sheet']['show_status'],
 	);
 
-	$department_options = sirius_taxonomy_load('grievance_department', 'tid', 'name');
+	$department_options = sirius_edls_departments($my_employer_node);
 	$form['sheet']['department'] = array(
 		'#type' => 'select',
 		'#title' => t('Department'),
@@ -316,13 +316,28 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 		}
 
 		$sheet_node->field_sirius_date_start['und'][0]['value'] = date('Y-m-d 00:00:00', strtotime($form_state['values']['sheet']['date_start']));
-		$sheet_node->field_grievance_shop['und'][0]['target_id'] = $form_state['values']['sheet']['grievance_shop'];
+
+		if ($form_state['values']['sheet']['grievance_shop']) {
+			$sheet_node->field_grievance_shop['und'][0]['target_id'] = $form_state['values']['sheet']['grievance_shop'];
+		} else {
+			unset($sheet_node->field_grievance_shop['und'][0]);
+		}
 		$sheet_node->field_sirius_edls_sheet_status['und'][0]['value'] = 'draft';
 	}
 	$sheet_json = sirius_json_get($sheet_node);
 
-	$sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id'] = $form_state['values']['sheet']['sirius_dispatch_job_group'];
-	$sheet_node->field_grievance_department_tid['und'][0]['tid'] = $form_state['values']['sheet']['department'];
+	if ($form_state['values']['sheet']['sirius_dispatch_job_group']) {
+		$sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id'] = $form_state['values']['sheet']['sirius_dispatch_job_group'];
+	} else {
+		unset($sheet_node->field_sirius_dispatch_job_group['und'][0]);
+	}
+
+	if ($form_state['values']['sheet']['department']) {
+		$sheet_node->field_grievance_department_tid['und'][0]['tid'] = $form_state['values']['sheet']['department'];
+	} else {
+		unset($sheet_node->field_grievance_department_tid['und'][0]);
+	}
+
 	$sheet_node->field_sirius_job_number['und'][0]['value'] = trim($form_state['values']['sheet']['job_number']);
 	$sheet_node->field_sirius_count['und'][0]['value'] = $count;
 

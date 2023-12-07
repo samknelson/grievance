@@ -29,6 +29,16 @@ function sirius_edls_sheet_search($params) {
 		$sql_args[':date'] = date('Y-m-d', strtotime($params['date']));
 	}
 
+	if ($params['date_min']) {
+		$sql .= "and field_sirius_date_start_value >= :date_min ";
+		$sql_args[':date_min'] = date('Y-m-d', strtotime($params['date_min']));
+	}
+
+	if ($params['date_max']) {
+		$sql .= "and field_sirius_date_start_value <= :date_max ";
+		$sql_args[':date_max'] = date('Y-m-d', strtotime($params['date_max']));
+	}
+
 	if ($params['job_number']) {
 		$sql .= "and field_sirius_job_number_value = :job_number ";
 		$sql_args[':job_number'] = date('Y-m-d', strtotime($params['job_number']));

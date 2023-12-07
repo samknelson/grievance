@@ -9,7 +9,7 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
   $form['#tree'] = TRUE;
 
 	$form['header_links'] = array(
-		'#markup' => '<p>' . l('Create a New Sheet', 'sirius/edls/sheet/create', array('attributes' => array('class' => array('tool-button')))) . '</p>',
+		'#markup' => '<p>' . l('Create a New Sheet', 'sirius/edls/sheet-create', array('attributes' => array('class' => array('tool-button')))) . '</p>',
 	);
 
 	if ($form_state['submitted']) {
@@ -25,7 +25,6 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
 	} else {
 		$date = date('Y-m-d');
 	}
-	drupal_set_title('EDLS Sheets for ' . date('l, F j, Y', strtotime($date)));
 
 	$form['filters'] = array(
 	  '#type' => 'fieldset',
@@ -95,7 +94,7 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
   $form['filters']['department'] = array(
 	  '#type' => 'select',
 	  '#title' => t('Department'),
-		'#options' => array(NULL => t('-- Select --')) + sirius_taxonomy_load('grievance_department', 'tid', 'name'),
+		'#options' => array(NULL => t('-- Select --')) + sirius_edls_departments($my_employer_node),
   );
 
   $form['filters']['job_number'] = array(
@@ -123,7 +122,6 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
   $sheet_nodes = sirius_edls_sheet_search($params);
 
   $render_options = array();
-  $render_options['hide_date'] = TRUE;
   if ($my_employer_node) { $render_options['hide_employer'] = TRUE; }
   $form['results'] = array('#markup' => sirius_edls_sheet_list_render($sheet_nodes, $render_options));
 

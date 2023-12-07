@@ -134,6 +134,22 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 		$worker_wrap .= '</div>';
 		$worker_wrap .= '</div>';
 	}
+
+
+	$worker_wrap .= '<div style="display:none" class="sirius_popup_overlay"></div>';
+	$worker_wrap .= '<div style="display:none" class="sirius_popup_wrap">';
+	$worker_wrap .= '<div class="sirius_popup_contents">';
+
+	$worker_wrap .= '[Details go here...]';
+
+	$worker_wrap .= '</div>'; // sirius_popup_contents
+	$worker_wrap .= '<div class="sirius_popup_close"></div>';
+
+	$worker_wrap .= '</div>'; // sirius_popup_wrap
+
+
+
+
 	$worker_wrap .= '</div>';
 	$form['available']['workers'] = array('#markup' => $worker_wrap);
 

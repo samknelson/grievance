@@ -9,7 +9,7 @@ function sirius_edls_node_tab_employer_tasks_form($form, &$form_state, $employer
 	$form['#tree'] = TRUE;
 	$form_state['employer_nid'] = $employer_node->nid;
 
-	$departments = sirius_taxonomy_load('grievance_department', 'tid', 'name');
+	$departments = sirius_edls_departments($employer_node);
 	$tasks_by_department = sirius_edls_tasks_by_department($employer_node);
 	foreach ($departments as $department_tid => $department_name) {
 		$form['tasks'][$department_tid]['tasks'] = array(
