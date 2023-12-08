@@ -44,8 +44,10 @@ function sirius_edls_supervisor_render($sheet_node) {
 	$supervisor = user_load($sheet_node->field_grievance_rep_assignee['und'][0]['target_id']);
 	$supervisor_name = $supervisor->name;
 	$supervisor_name .= '<br />';
-	$supervisor_name .= sirius_phone_render($supervisor->field_grievance_phone['und'][0]['value']);
-	$supervisor_name .= '<br />';
+	if ($supervisor->field_grievance_phone['und'][0]['value']) {
+		$supervisor_name .= sirius_phone_render($supervisor->field_grievance_phone['und'][0]['value']);
+		$supervisor_name .= '<br />';
+	}
 	$supervisor_name .= sirius_email_render($supervisor->mail, array('maxlength' => 15));
 
 	return $supervisor_name;
