@@ -23,6 +23,14 @@
 	color: #aaaaaa;
 }
 
+.sirius_edls_worker_indicator {
+	font-weight: normal;
+	font-style: normal;	
+	margin-right: 5px;
+	/* border: 1px solid #999999; */
+	font-size: 85%;
+}
+
 .sirius_edls_workers_ms_title {
 	padding-top: 10px;
 	padding-bottom: 5px;
@@ -41,4 +49,74 @@
 
 .sirius_edls_extra_wrap .sirius_popup_trigger {
 	padding-right:  4px;
+}
+
+
+.sirius_edls_worker_detail_assignment {
+	width: 28%;
+	float: left;
+	border: 1px solid #cccccc;
+	padding: 10px;
+	margin: 10px;
+	min-height: 200px;
+	font-size: 85%;
+}
+
+.sirius_edls_worker_detail_assignment h2 {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+#content .sirius_edls_worker_detail_assignment h2.field-label {
+	width: auto;
+	min-width: auto;
+}
+
+.sirius_edls_worker_detail_assignment_empty {
+	background-color: #cccccc;
+}
+
+.sirius_edls_worker_detail_assignment_full {
+	background-color: #aaffaa;
+}
+
+#popup_worker_details_overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
+  z-index: 9998;
+  background-color: black;
+}
+#popup_worker_details_wrap {
+  position: absolute;
+  z-index: 9999;
+  overflow: auto;
+  background: white;
+  border-radius: 8px;
+  -moz-box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+#popup_worker_details_wrap {
+  padding: 20px;
+  min-height: 50px;
+}
+#popup_worker_details_close {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  height: 26px;
+  width: 26px;
+  background: url('../../sirius/images/popup-announcement-icons.png');
+}
+#popup_worker_details_hover:hover {
+  background: url('../../sirius/images/popup-announcement-icons.png') 0 -28px;
+  cursor: pointer;
 }

@@ -1,8 +1,18 @@
 <?php
 
 function sirius_edls_page_landing() {
-	global $user;
-	$my_employer_node = sirius_employer_get();
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
+
+	$result = sirius_edls_employer_switch();
+	$my_employer_node = $result['employer_node'];
+	$html .= $result['markup'];
+
+	if ($my_employer_node && sirius_access_instance('edls')->access('employer_dashboard', array('employer_nid' => $my_employer_node->nid))) {
+		$html .= '<div class="sirius_callout_basic">';
+		$html .= '<h2>' . $my_employer_node->title . ': ' . date('l, F j, Y') . '</h2>';
+		$html .= '<div style="height: 250px;"></div>';
+		$html .= '</div>';
+	}
 
 	$html .= '<h2>' . t('My Sheets') . '</h2>';
 	$html .= '<p>' . l('Create a New Sheet', 'sirius/edls/sheet-create', array('attributes' => array('class' => array('tool-button')))) . '</p>';

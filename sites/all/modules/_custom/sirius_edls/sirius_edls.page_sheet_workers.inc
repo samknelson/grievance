@@ -108,52 +108,11 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 	$form['col1_close'] = array('#markup' => '</td>');
 
 	$form['col2_open'] = array('#markup' => '<td width="40%" valign="top" style="vertical-align: top;"><strong>' . t('Available Workers') . '</strong><br />');
-	$form['available']['filters']['name'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Name or ID'),
-		'#id' => 'sirius_edls_worker_filter_nameid'
-	);
-	$form['available']['filters']['members_status'] = array(
-		'#type' => 'select',
-		'#title' => t('Member Status'),
-		'#options' => array(NULL => t('-- Select --')) + $ms_list,
-		'#id' => 'sirius_edls_worker_filter_ms'
-	);
 
-	$form['available']['filters']['search'] = array(
-		'#type' => 'button',
-		'#value' => t('Search'),
-		'#id' => 'sirius_edls_worker_search',
-	);
+	$form['available']['filters'] = sirius_worker_form_filters(array('ms_list' => $ms_list));
+	$form['available']['workers'] = array('#markup' => sirius_worker_render_list(array('ms_list' => $ms_list)));
 
-	$worker_wrap = '<div id="sirius_edls_workers">';
-	foreach ($ms_list as $ms_key => $ms_name) {
-		$worker_wrap .= '<div class="sirius_edls_workers_ms_wrap sirius_edls_hidden" data-ms="' . $ms_key . '">';
-		$worker_wrap .= '<div class="sirius_edls_workers_ms_title">' . $ms_name . '</div>';
-		$worker_wrap .= '<div class="sirius_edls_workers_ms">';
-		$worker_wrap .= '</div>';
-		$worker_wrap .= '</div>';
-	}
-
-
-	$worker_wrap .= '<div style="display:none" class="sirius_popup_overlay"></div>';
-	$worker_wrap .= '<div style="display:none" class="sirius_popup_wrap">';
-	$worker_wrap .= '<div class="sirius_popup_contents">';
-
-	$worker_wrap .= '[Details go here...]';
-
-	$worker_wrap .= '</div>'; // sirius_popup_contents
-	$worker_wrap .= '<div class="sirius_popup_close"></div>';
-
-	$worker_wrap .= '</div>'; // sirius_popup_wrap
-
-
-
-
-	$worker_wrap .= '</div>';
-	$form['available']['workers'] = array('#markup' => $worker_wrap);
-
-	$form['col1_close'] = array('#markup' => '</td>');
+	$form['col2_close'] = array('#markup' => '</td>');
 	$form['wrapper_close'] = array('#markup' => '</tr></table>');
 
 	return $form;

@@ -54,17 +54,34 @@ function sirius_edls_outsource_list($employer_nid, $date = NULL, $filters = arra
   $ms_list = sirius_edls_outsource_ms_list($employer_node, 'full');
 
   $sql_args = array();
-  $sql = "select sirius_edls_assignments.*, sirius_edls_outsource.* from sirius_edls_outsource ";
-  $sql .= "left join sirius_edls_assignments on (";
-  $sql .= "  sirius_edls_assignments.worker_id = sirius_edls_outsource.worker_id ";
+  $sql = "select ";
+  $sql .= "( ";
+  $sql .= "  select sheet_nid from sirius_edls_assignments ";
+  $sql .= "  where sirius_edls_assignments.worker_id = sirius_edls_outsource.worker_id ";
   $sql .= "  and sirius_edls_assignments.employer_nid = sirius_edls_outsource.employer_nid ";
   $sql .= "  and sirius_edls_assignments.assignment_date = :date ";
-  $sql .= ") ";
+  $sql .= ") as curr_sheet_nid, ";
+  $sql .= "( ";
+  $sql .= "  select sheet_nid from sirius_edls_assignments ";
+  $sql .= "  where sirius_edls_assignments.worker_id = sirius_edls_outsource.worker_id ";
+  $sql .= "  and sirius_edls_assignments.employer_nid = sirius_edls_outsource.employer_nid ";
+  $sql .= "  and sirius_edls_assignments.assignment_date < :date ";
+  $sql .= "  order by assignment_date desc limit 1 ";
+  $sql .= ") as last_sheet_nid, ";
+  $sql .= "( ";
+  $sql .= "  select sheet_nid from sirius_edls_assignments ";
+  $sql .= "  where sirius_edls_assignments.worker_id = sirius_edls_outsource.worker_id ";
+  $sql .= "  and sirius_edls_assignments.employer_nid = sirius_edls_outsource.employer_nid ";
+  $sql .= "  and sirius_edls_assignments.assignment_date > :date ";
+  $sql .= "  order by assignment_date limit 1 ";
+  $sql .= ") as next_sheet_nid, ";
+  $sql .= "sirius_edls_outsource.* ";
+  $sql .= "from sirius_edls_outsource ";
   $sql_args['date'] = $date;
   $sql .= "where sirius_edls_outsource.employer_nid = :employer_nid ";
   $sql_args[':employer_nid'] = $employer_nid;
 
-  if ($filters['nameid']) {
+  if ($filters['nameid']) { 
     $sql .= "and (sirius_edls_outsource.worker_name like :match or sirius_edls_outsource.worker_id like :match) ";
     $sql_args[':match'] = '%' . $filters['nameid'] . '%';
   }
@@ -74,7 +91,7 @@ function sirius_edls_outsource_list($employer_nid, $date = NULL, $filters = arra
     $sql_args[':ms'] = $filters['ms'];
   }
 
-  $sql .= "limit 20";
+  // $sql .= "limit 20";
   $stmt = sirius_sql_query($sql, $sql_args);
 
   $workers = array();

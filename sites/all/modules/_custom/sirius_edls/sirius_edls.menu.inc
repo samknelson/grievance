@@ -240,6 +240,20 @@ function sirius_edls_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['sirius/edls/ajax/worker/lookup'] = array(
+    'title' => 'EDLS Ajax Worker Lookup',
+    'page callback' => 'sirius_edls_ajax_worker_lookup',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'permission' => 'sirius'
+      ),
+    ),
+    'type' => MENU_CALLBACK,
+  );
+
   $items['sirius/edls/ajax/assign'] = array(
     'title' => 'EDLS Ajax Assign',
     'page callback' => 'sirius_edls_ajax_assign',

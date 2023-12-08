@@ -56,7 +56,8 @@ function sirius_edls_update_7007() {
       primary key (assignment_id),
       unique index (assignment_date, worker_id),
       index(sheet_nid),
-      index(worker_id)
+      index(worker_id),
+      index(worker_id, date)
     );',
 
     'create table sirius_edls_outsource (

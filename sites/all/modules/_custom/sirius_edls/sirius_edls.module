@@ -112,3 +112,34 @@ function sirius_edls_sirius_access_info() {
   Sirius_Edls_Access::getInstance()->setInfo($infos);
   return $infos;
 }
+
+function sirius_edls_employer_switch() {
+  $access = sirius_access_instance('edls');
+  if (!$access->access('staff')) {
+    return array('markup' => '', 'employer_node' => sirius_employer_get());
+  }
+
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
+  drupal_add_css(drupal_get_path('module', 'sirius_edls') . '/css/employer.css');
+
+  $incoming_employer_nid = $_GET['employer_nid'];
+
+  $html = '<div class="sirius_edls_employer_switch">';
+  $html .= '<form method="get">';
+  $html .= t('Employer:');
+  $html .= '<select name="employer_nid">';
+  $html .= '<option value="">' . t('-- Select --') . '</option>';
+  $employers = sirius_employer_list();
+  foreach ($employers as $employer_nid => $employer_name) {
+    if ($employer_nid == $incoming_employer_nid) { $selected = ' selected'; } else { $selected = ''; }
+    $html .= "<option value=\"$employer_nid\" $selected>$employer_name</option>";
+  }
+  $html .= '</select>';
+  $html .= '<input type="submit" value="' . t('Go') . '">';
+  $html .= '</form>';
+  $html .= '</div>';
+  $html .= '<br clear="right">';
+
+  if ($incoming_employer_nid && $employers[$incoming_employer_nid]) { $employer_node = node_load($incoming_employer_nid); }
+  return array('markup' => $html, 'employer_node' => $employer_node);
+}

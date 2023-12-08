@@ -9,10 +9,16 @@ class Sirius_Edls_Access extends Sirius_Access {
     global $user;
 
     $actions = array(
+      // No parameters
+      'staff',
+      
     	// Parameter employer_nid
 			'employer_config_tasks', 
 			'employer_config_outsource_workers', 
 			'employer_config_outsource_ms',
+
+      // Parameter employer_nid
+      'employer_dashboard',
 
     	// Parameter employer_nid
     	'worker_list',
@@ -67,8 +73,8 @@ class Sirius_Edls_Access extends Sirius_Access {
 			if ($my_employer_nid != $context['sheet_node']->field_grievance_shop['und'][0]['target_id']) { return FALSE; }
 		}
 
-    // Employer Configuration: workers, tasks, member statuses
-    if (in_array($action, array('employer_config_tasks', 'employer_config_outsource_workers', 'employer_config_outsource_ms'))) {
+    // Employer Configuration: workers, tasks, member statuses, employer dashboard
+    if (in_array($action, array('employer_config_tasks', 'employer_config_outsource_workers', 'employer_config_outsource_ms', 'employer_dashboard'))) {
       // Labor coordinators can configure the employer
       if ($is_employer_coordinator) { return TRUE; }
 		}

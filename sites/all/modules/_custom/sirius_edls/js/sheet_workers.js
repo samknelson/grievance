@@ -4,6 +4,7 @@
 			var settings = Drupal.settings.sirius_edls_sheet_workers;
 
 			function sheet_search() {
+				if (!settings.sheet_nid) { return; }
 				flash('Loading sheet ...', 'info');
 
 				$.ajax({
@@ -48,6 +49,8 @@
 			function worker_search() {
 				flash('Loading workers ...', 'info');
 
+				start = Date.now();
+
 				$.ajax({
 					'url': '/sirius/edls/ajax/worker/list',
 					'data': {
@@ -56,6 +59,9 @@
 						'filters': {
 							'nameid': $('#sirius_edls_worker_filter_nameid').val(),
 							'ms': $('#sirius_edls_worker_filter_ms').val(),
+							'has_assignment_curr': $('#sirius_edls_worker_filter_has_assignment_curr').val(),
+							'has_assignment_next': $('#sirius_edls_worker_filter_has_assignment_next').val(),
+							'curr_sheet_nid': settings.sheet_nid,
 						},
 					},
 					'type': 'GET',
@@ -68,6 +74,8 @@
 							flash('Error: ' + result['msg'], 'error');
 							return;
 						}
+						end = Date.now();
+						console.log("Duration: " + (end - start));
 
 						workers = result['data']['workers'];
 
@@ -86,19 +94,20 @@
 							var worker_div = $('<div />');
 
 							var c = 'sirius_edls_worker_wrapper';
-							if (worker['sheet_nid'] == settings.sheet_nid) {
+
+							if (worker['curr_sheet_nid'] && (worker['curr_sheet_nid'] == settings.sheet_nid)) {
 								c += ' sirius_edls_worker_assigned';
-							} else if (worker['sheet_nid']) {
+							} else if (worker['curr_sheet_nid']) {
 								c += ' sirius_edls_worker_unavailable';
 							}
 
 							html = '<div class="' + c + '" id="sirius_edls_worker_' + worker['worker_id'] + '" data-id="' + worker['worker_id'] + '">';
 
-							/*
-							html += '<a href="#" class="sirius_popup_trigger">';
-							html += '<i class="fas fa-info-circle"></i>';
-							html += '</a>';
-							*/
+							html += '<span class="sirius_edls_worker_indicator">';
+							if (worker['last_sheet_nid']) { html += '&#9899'; } else { html += '&#9898;'; }
+							if (worker['curr_sheet_nid']) { html += '&#9899'; } else { html += '&#9898;'; }
+							if (worker['next_sheet_nid']) { html += '&#9899'; } else { html += '&#9898;'; }
+							html += '</span>';
 
 							html += '<span class="sirius_edls_worker_name">';
 							html += worker['worker_id'] + ' - ' + worker['worker_name'];
@@ -113,10 +122,18 @@
 							$('#sirius_edls_workers .sirius_edls_workers_ms_wrap[data-ms=\'' + worker['worker_ms'] + '\']').removeClass('sirius_edls_hidden');
 						}
 
-						$('.sirius_edls_worker_wrapper .sirius_edls_worker_name').click(function() {
+						if (settings.sheet_nid) {
+							$('.sirius_edls_worker_wrapper .sirius_edls_worker_name').click(function() {
+								worker_id = $(this).parents('.sirius_edls_worker_wrapper').attr('data-id');
+								crew_uuid = get_selected_crew();
+								assign(worker_id, crew_uuid);
+								return false;
+							});
+						}
+
+						$('.sirius_edls_worker_wrapper .sirius_edls_worker_indicator').click(function() {
 							worker_id = $(this).parents('.sirius_edls_worker_wrapper').attr('data-id');
-							crew_uuid = get_selected_crew();
-							assign(worker_id, crew_uuid);
+							popup_worker_details(worker_id);
 							return false;
 						});
 
@@ -285,6 +302,70 @@
 			function flash(msg, priority) {
 				return Drupal.behaviors.sirius_ux.flash(msg, priority);
 			}
+
+			function popup_worker_details(worker_id) {
+				flash('Loading worker ' + worker_id, 'info');
+
+				$.ajax({
+					'url': '/sirius/edls/ajax/worker/lookup',
+					'data': {
+						'employer_nid': settings.employer_nid,
+						'worker_id': worker_id,
+						'date': settings.date,
+					},
+					'type': 'GET',
+					'dataType': 'json',
+					'error': function(jqXHR, textStatus, errorThrown) {
+						flash('Connection failed: ' + textStatus + ': ' + errorThrown, 'error');
+					},
+					'success': function(result) {
+						if (!result['success']) {
+							flash('Error: ' + result['msg'], 'error');
+							return;
+						}
+
+			      var left = Math.floor(($(window).width() - 600) / 2);
+			      var top = Math.floor(($(window).height() - 400) / 2);
+
+			      var overlay = $('#popup_worker_details_overlay');
+			      var wrap = $('#popup_worker_details_wrap');
+			      var close = $('#popup_worker_details_close');
+			      var content = $('#popup_worker_details_content');
+
+			      console.log(result);
+			      content.html(result['render']);
+
+			      overlay.show();
+			      wrap.show().css({
+			        'width': 800,
+			        'height': 'auto',
+			        'position': 'fixed',
+			        'top': '10%',
+			        'left': '50%',
+			        'transform': 'translate(-50%, 0)',
+			      });
+
+			      // close announcement by keyboard or mouse
+			      close.click(function() {
+			        overlay.fadeOut();
+			        wrap.fadeOut();
+			      });
+			      overlay.click(function() {
+			        overlay.fadeOut();
+			        wrap.fadeOut();
+			      });
+			      $(document).keyup(function(e) {
+			        if (e.keyCode == 27) {
+			          overlay.fadeOut();
+			          wrap.fadeOut();
+			        }
+			      });
+
+						flash('Worker details loaded.', 'success');
+					}
+				});
+		  }
+
 
 			//
 			// Run once on load...

@@ -22,20 +22,86 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
 	// @todo: Both dispatched and outsourced
   $outsource_workers = sirius_edls_outsource_list($employer_nid, $date, $filters);
   $dispatch_workers = sirius_edls_dispatch_list($employer_nid, $date, $filters);
-  return array_merge($outsource_workers, $dispatch_workers);
+  $result = array_merge($outsource_workers, $dispatch_workers);
+
+  // $result = array_splice($result, 0, 20);
+
+  $result = array_values(array_filter($result, function($v) use ($filters) {
+    if ($filters['has_assignment_curr'] == 'include') {
+      if (!$v['curr_sheet_nid']) { return FALSE; }
+    }
+
+    if ($filters['has_assignment_curr'] == 'exclude') {
+      if ($v['curr_sheet_nid'] && ($v['curr_sheet_nid'] != $filters['curr_sheet_nid'])) { return FALSE; }
+    }
+
+    if ($filters['has_assignment_next'] == 'include') {
+      if (!$v['next_sheet_nid']) { return FALSE; }
+    }
+
+    if ($filters['has_assignment_next'] == 'exclude') {
+      if ($v['next_sheet_nid']) { return FALSE; }
+    }
+
+    return TRUE;
+  }));
+
+  foreach ($result as $delta => $record) {
+    /*
+    $sql = "select sheet_nid from sirius_edls_assignments where worker_id = :worker_id and assignment_date = :date";
+    $stmt = db_query($sql, array(':worker_id' => $record['worker_id'], ':date' => $date));
+    $result[$delta]['assignment']['current'] = $stmt->fetchAssoc();
+
+    $sql = "select sheet_nid from sirius_edls_assignments where worker_id = :worker_id and assignment_date < :date order by assignment_date desc limit 1";
+    $stmt = db_query($sql, array(':worker_id' => $record['worker_id'], ':date' => $date));
+    $result[$delta]['assignment']['past'] = $stmt->fetchAssoc();
+
+    $sql = "select sheet_nid from sirius_edls_assignments where worker_id = :worker_id and assignment_date > :date order by assignment_date limit 1";
+    $stmt = db_query($sql, array(':worker_id' => $record['worker_id'], ':date' => $date));
+    $result[$delta]['assignment']['future'] = $stmt->fetchAssoc();
+    */
+  }
+  return $result;
 }
 
-function sirius_edls_worker_fetch($employer_nid, $worker_id) {
+
+function sirius_edls_worker_fetch($employer_nid, $worker_id, $date = NULL) {
+  if (!$date) { $date = date('Y-m-d'); }
   if (preg_match('/^O/', $worker_id)) {
-    return sirius_edls_outsource_worker_fetch($employer_nid, $worker_id);
+    $record = sirius_edls_outsource_worker_fetch($employer_nid, $worker_id, $date);
   }
-  if (preg_match('/^I/', $worker_id)) {
-    return sirius_edls_dispatch_worker_fetch($employer_nid, $worker_id);
+  else if (preg_match('/^I/', $worker_id)) {
+    $record = sirius_edls_dispatch_worker_fetch($employer_nid, $worker_id, $date);
+  } else {
+    $record = array();
   }
-  return NULL;
+
+  $sql = "select * from sirius_edls_assignments ";
+  $sql .= "where sirius_edls_assignments.worker_id = :worker_id ";
+  $sql .= "and sirius_edls_assignments.employer_nid = :employer_nid ";
+  $sql .= "and sirius_edls_assignments.assignment_date = :date ";
+  $stmt = sirius_sql_query($sql, array(':worker_id' => $worker_id, ':employer_nid' => $employer_nid, ':date' => $date));
+  $record['assignments']['curr'] = $stmt->fetchAssoc();
+
+  $sql = "select * from sirius_edls_assignments ";
+  $sql .= "where sirius_edls_assignments.worker_id = :worker_id ";
+  $sql .= "and sirius_edls_assignments.employer_nid = :employer_nid ";
+  $sql .= "and sirius_edls_assignments.assignment_date < :date order by assignment_date desc limit 1";
+  $stmt = sirius_sql_query($sql, array(':worker_id' => $worker_id, ':employer_nid' => $employer_nid, ':date' => $date));
+  $record['assignments']['prev'] = $stmt->fetchAssoc();
+
+  $sql = "select * from sirius_edls_assignments ";
+  $sql .= "where sirius_edls_assignments.worker_id = :worker_id ";
+  $sql .= "and sirius_edls_assignments.employer_nid = :employer_nid ";
+  $sql .= "and sirius_edls_assignments.assignment_date > :date order by assignment_date limit 1";
+  $stmt = sirius_sql_query($sql, array(':worker_id' => $worker_id, ':employer_nid' => $employer_nid, ':date' => $date));
+  $record['assignments']['next'] = $stmt->fetchAssoc();
+
+  return $record;
+
 }
 
-function sirius_edls_dispatch_worker_fetch($employer_nid, $worker_id) {
+function sirius_edls_dispatch_worker_fetch($employer_nid, $worker_id, $date) {
   $real_id = preg_replace('/^I/', '', $worker_id);
   $worker_node = sirius_worker_get_by_id($real_id);
   $result = array(
@@ -45,8 +111,57 @@ function sirius_edls_dispatch_worker_fetch($employer_nid, $worker_id) {
   return $result;
 }
 
+function sirius_edls_worker_render_details($worker_record) {
+  $html .= '<div class="sirius_edls_worker_detail">';
+  $html .= '<h2>' . t('Assignment Details for ') . $worker_record['worker_name'] . ' (' . $worker_record['worker_id'] . ')' . '</h2>';
+  $html .= sirius_edls_worker_render_details_assignment($worker_record, $worker_record['assignments']['prev'], array('title' => t('Previous Assignment')));
+  $html .= sirius_edls_worker_render_details_assignment($worker_record, $worker_record['assignments']['curr'], array('title' => t('Current Assignment')));
+  $html .= sirius_edls_worker_render_details_assignment($worker_record, $worker_record['assignments']['next'], array('title' => t('Next Assignment')));
+  $html .= '</div>';
+
+  return $html;
+}
+
+function sirius_edls_worker_render_details_assignment($worker_record, $assignment, $options = array()) {
+  $class = 'sirius_edls_worker_detail_assignment';
+  if ($assignment) { $class .= ' sirius_edls_worker_detail_assignment_full'; } else { $class .= ' sirius_edls_worker_detail_assignment_empty'; }
+  $html .= "<div class=\"$class\">";
+  $html .= '<h2>' . $options['title'] . '</h2>';
+  if ($assignment) {
+    $sheet_nid = $assignment['sheet_nid'];
+    $sheet_node = node_load($sheet_nid);
+
+    $status_options = sirius_edls_sheet_status_options();
+
+    $html .= '<strong>' . t('Status:') . '</strong>' . $status_options[$sheet_node->field_sirius_edls_sheet_status['und'][0]['value']] . '<br />';
+    $html .= '<strong>' . t('Supervisor:') . '</strong>' . sirius_edls_supervisor_render($sheet_node) . '<br />';
+    $html .= '<strong>' . t('Date:') . '</strong>' . date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])) . '<br />';
+    $html .= '<strong>' . t('Department:') . '</strong>' . sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid']) . '<br />';
+    $html .= '<strong>' . t('Job #:') . '</strong>' . sirius_text_to_html($sheet_node->field_sirius_job_number['und'][0]['value']) . '<br />';
+    $html .= '<br />';
+
+    $html .= l('View', "node/$sheet_nid/sirius_edls_sheet_view", array('attributes' => array('class' => array('tool-button'))));
+  } else {
+    $html .= '[no assignment]';
+  }
+  $html .= '</div>';
+  return $html;
+}
+
+
 function sirius_edls_ms_list($employer_node, $type = 'name') {
-  $insource_ms_list = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+  $terms = sirius_taxonomy_load('sirius_member_status', 'tid', 'full');
+  $industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
+
+  $insource_ms_list = array();
+  foreach ($terms as $tid => $term) {
+    if ($industry_tids) {
+      $term_industry_tids = sirius_fieldvals($term, 'field_sirius_industry', 'tid');
+      if (!array_intersect($industry_tids, $term_industry_tids)) { continue; }
+    }
+    $insource_ms_list[$tid] = $term->name;
+  }
+
   $outsource_ms_list = sirius_edls_outsource_ms_list($employer_node, $type);
   return $insource_ms_list + $outsource_ms_list;
 }
@@ -58,7 +173,26 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
   $sql_args = array();
 
   $sql = "select ";
-  $sql .= "sirius_edls_assignments.*, ";
+  $sql .= "( ";
+  $sql .= "  select sheet_nid from sirius_edls_assignments ";
+  $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
+  $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
+  $sql .= "  and sirius_edls_assignments.assignment_date = :date ";
+  $sql .= ") as curr_sheet_nid, ";
+  $sql .= "( ";
+  $sql .= "  select sheet_nid from sirius_edls_assignments ";
+  $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
+  $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
+  $sql .= "  and sirius_edls_assignments.assignment_date < :date ";
+  $sql .= "  order by assignment_date desc limit 1 ";
+  $sql .= ") as last_sheet_nid, ";
+  $sql .= "( ";
+  $sql .= "  select sheet_nid from sirius_edls_assignments ";
+  $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
+  $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
+  $sql .= "  and sirius_edls_assignments.assignment_date > :date ";
+  $sql .= "  order by assignment_date limit 1 ";
+  $sql .= ") as next_sheet_nid, ";
   $sql .= "concat('I', field_sirius_id_value) as worker_id, ";
   $sql .= "concat(field_sirius_name_family, ', ', field_sirius_name_given) as worker_name, ";
   $sql .= "ms_term.tid as worker_ms ";
@@ -81,11 +215,6 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
 
   $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
 
-  $sql .= "left join sirius_edls_assignments on (";
-  $sql .= "  sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
-  $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
-  $sql .= "  and sirius_edls_assignments.assignment_date = :date ";
-  $sql .= ") ";
   $sql_args[':date'] = $date;
 
   $sql .= "where node.type = 'sirius_worker' ";
@@ -127,3 +256,75 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
   }
   return $workers;
 }
+
+function sirius_worker_form_filters($options = array()) {
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name or ID'),
+    '#id' => 'sirius_edls_worker_filter_nameid'
+  );
+
+  $form['members_status'] = array(
+    '#type' => 'select',
+    '#title' => t('Member Status'),
+    '#options' => array(NULL => t('-- Select --')) + $options['ms_list'],
+    '#id' => 'sirius_edls_worker_filter_ms'
+  );
+
+  $form['has_assignment_curr'] = array(
+    '#type' => 'select',
+    '#title' => t('Current Assignment'),
+    '#options' => array(
+      'NULL' => t('-- Select --'),
+      'exclude' => t('Exclude'),
+      'include' => t('Include'),
+    ),
+    '#default_value' => 'exclude',
+    '#id' => 'sirius_edls_worker_filter_has_assignment_curr',
+  );
+
+  $form['has_assignment_next'] = array(
+    '#type' => 'select',
+    '#title' => t('Next Assignment'),
+    '#options' => array(
+      'NULL' => t('-- Select --'),
+      'exclude' => t('Exclude'),
+      'include' => t('Include'),
+    ),
+    '#id' => 'sirius_edls_worker_filter_has_assignment_next',
+  );
+
+  $form['search'] = array(
+    '#type' => 'button',
+    '#value' => t('Search'),
+    '#id' => 'sirius_edls_worker_search',
+  );
+
+  return $form;
+}
+
+function sirius_worker_render_list($options = array()) {
+  $html = '<div id="sirius_edls_workers">';
+  foreach ($options['ms_list'] as $ms_key => $ms_name) {
+    $html .= '<div class="sirius_edls_workers_ms_wrap sirius_edls_hidden" data-ms="' . $ms_key . '">';
+    $html .= '<div class="sirius_edls_workers_ms_title">' . $ms_name . '</div>';
+    $html .= '<div class="sirius_edls_workers_ms">';
+    $html .= '</div>';
+    $html .= '</div>';
+  }
+
+  $html .= '<div style="display:none" id="popup_worker_details_overlay"></div>';
+  $html .= '<div style="display:none" id="popup_worker_details_wrap">';
+  $html .= '<div id="popup_worker_details_content">';
+  $html .= '[Details go here...]';
+  $html .= '</div>'; // popup_worker_details_content
+  $html .= '<div id="popup_worker_details_close"></div>';
+  $html .= '</div>'; // popup_worker_details_wrap
+
+
+
+  $html .= '</div>'; // sirius_worker_wrap
+
+  return $html;
+}
+

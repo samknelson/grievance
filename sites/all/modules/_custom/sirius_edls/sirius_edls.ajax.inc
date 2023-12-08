@@ -14,11 +14,37 @@ function sirius_edls_ajax_worker_list() {
 
 	$workers = sirius_edls_worker_list($employer_nid, $date, $filters);
 
+	// return drupal_json_output(array('success' => FALSE, 'msg' => print_r($filters, 1)));
+
 	$result = array(
 		'success' => TRUE,
 		'data' => array(
 			'workers' => $workers,
 		),
+	);
+	
+	return drupal_json_output($result);
+}
+
+function sirius_edls_ajax_worker_lookup() {
+	$employer_nid = $_REQUEST['employer_nid'];
+	if (!$employer_nid) { return sirius_edls_ajax_error('Please pass in an employer_nid.'); }
+
+	$worker_id = $_REQUEST['worker_id'];
+	if (!$worker_id) { return sirius_edls_ajax_error('Please pass in a worker_id.'); }
+
+	$date = $_REQUEST['date'];
+	if (!$date) { return sirius_edls_ajax_error('Please pass in an employer_nid.'); }
+
+	$can_access = sirius_access_instance('edls')->access('worker_list', array('employer_nid' => $employer_nid));
+	if (!$can_access) { return sirius_edls_ajax_error('Access denied'); }
+
+	$worker = sirius_edls_worker_fetch($employer_nid, $worker_id, $date);
+
+	$result = array(
+		'success' => TRUE,
+		'worker' => $worker,
+		'render' => sirius_edls_worker_render_details($worker),
 	);
 	
 	return drupal_json_output($result);
