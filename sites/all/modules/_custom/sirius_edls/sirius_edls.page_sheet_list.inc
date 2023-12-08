@@ -1,11 +1,19 @@
 <?php
 
 function sirius_edls_page_sheet_list() {
-	return drupal_get_form('sirius_edls_page_sheet_list_form');
+	$result = sirius_edls_employer_switch();
+	$html = $result['markup'];
+	$employer_node = $result['employer_node'];
+	if (!$employer_node) {
+		$html .= sirius_page_error('Please select an employer.');
+		return $html;
+	}
+
+	$html .= drupal_render(drupal_get_form('sirius_edls_page_sheet_list_form', $employer_node));
+	return $html;
 }
 
-function sirius_edls_page_sheet_list_form($form, &$form_state) {
-  $my_employer_node = sirius_employer_get();
+function sirius_edls_page_sheet_list_form($form, &$form_state, $emlolyer_node) {
   $form['#tree'] = TRUE;
 
 	$form['header_links'] = array(
@@ -39,25 +47,15 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
 		'#options' => array(NULL => t('-- Select --')) + sirius_edls_sheet_status_options(),
   );
 
-	$my_employer_node = sirius_employer_get();
-	if ($my_employer_node) {
-		$form['filters']['grievance_shop'] = array(
-			'#type' => 'value',
-			'#value' => $my_employer_node->nid,
-		);
-	} else {
-		$employer_options = sirius_employer_list(TRUE);
-		$form['filters']['grievance_shop'] = array(
-			'#type' => 'select',
-			'#title' => t('Employer'),
-			'#options' => array(NULL => t('-- Select --')) + $employer_options,
-		);
-	}
+	$form['filters']['grievance_shop'] = array(
+		'#type' => 'value',
+		'#value' => $employer_node->nid,
+	);
 
   $form['filters']['supervisor'] = array(
 	  '#type' => 'select',
 	  '#title' => t('Supervisor'),
-		'#options' => array(NULL => t('-- Select --')) + sirius_edls_supervisor_list($my_employer_node->nid),
+		'#options' => array(NULL => t('-- Select --')) + sirius_edls_supervisor_list($employer_node->nid),
   );
 
 	$date_options = array();
@@ -72,6 +70,7 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
 		$date_options[date('Y-m-d', $t)] = $name;
 	}
 	$date_options['other'] = t('Other Date');
+
 
   $form['filters']['date'] = array(
 	  '#type' => 'select',
@@ -94,7 +93,7 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
   $form['filters']['department'] = array(
 	  '#type' => 'select',
 	  '#title' => t('Department'),
-		'#options' => array(NULL => t('-- Select --')) + sirius_edls_departments($my_employer_node),
+		'#options' => array(NULL => t('-- Select --')) + sirius_edls_departments($employer_node),
   );
 
   $form['filters']['job_number'] = array(
@@ -110,19 +109,17 @@ function sirius_edls_page_sheet_list_form($form, &$form_state) {
 
   if ($form_state['submitted']) {
   	$params = $form_state['values']['filters'];
-  	$params['date'] = $date;
-
   	if ($params['status'] == 'trash') { $params['include_trash'] = TRUE; }
   } else {
   	$params = array();
-
-  	$params['date'] = $date;
-  	if ($my_employer_node) { $params['grievance_shop'] = $my_employer_node->nid; }
   }
+	$params['date'] = $date;
+	$params['grievance_shop'] = $employer_node->nid;
   $sheet_nodes = sirius_edls_sheet_search($params);
 
+
   $render_options = array();
-  if ($my_employer_node) { $render_options['hide_employer'] = TRUE; }
+  $render_options['hide_employer'] = TRUE;
   $form['results'] = array('#markup' => sirius_edls_sheet_list_render($sheet_nodes, $render_options));
 
 	$form['footer_links'] = $form['header_links'];
