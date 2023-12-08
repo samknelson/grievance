@@ -75,7 +75,7 @@
 							return;
 						}
 						end = Date.now();
-						console.log("Duration: " + (end - start));
+						// console.log("Duration: " + (end - start));
 
 						workers = result['data']['workers'];
 
@@ -332,7 +332,7 @@
 			      var close = $('#popup_worker_details_close');
 			      var content = $('#popup_worker_details_content');
 
-			      console.log(result);
+			      // console.log(result);
 			      content.html(result['render']);
 
 			      overlay.show();
