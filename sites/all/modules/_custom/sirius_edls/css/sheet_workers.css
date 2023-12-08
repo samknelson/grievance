@@ -56,13 +56,13 @@
 	width: 28%;
 	float: left;
 	border: 1px solid #cccccc;
-	padding: 10px;
-	margin: 10px;
+	padding: 5px;
+	margin: 5px;
 	min-height: 200px;
 	font-size: 85%;
 }
 
-.sirius_edls_worker_detail_assignment h2 {
+#content .sirius_edls_worker_detail h2 {
 	margin-top: 0;
 	padding-top: 0;
 }
