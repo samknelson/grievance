@@ -133,10 +133,11 @@ function sirius_edls_worker_render_details_assignment($worker_record, $assignmen
 
     $status_options = sirius_edls_sheet_status_options();
 
-    $html .= '<strong>' . t('Status:') . '</strong>' . $status_options[$sheet_node->field_sirius_edls_sheet_status['und'][0]['value']] . '<br />';
-    $html .= '<strong>' . t('Supervisor:') . '</strong>' . sirius_edls_supervisor_render($sheet_node) . '<br />';
-    $html .= '<strong>' . t('Date:') . '</strong>' . date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])) . '<br />';
-    $html .= '<strong>' . t('Department:') . '</strong>' . sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid']) . '<br />';
+    $html .= sirius_edls_supervisor_render($sheet_node) . '<br /><br />';
+
+    $html .= '<strong>' . t('Status: ') . '</strong>' . $status_options[$sheet_node->field_sirius_edls_sheet_status['und'][0]['value']] . '<br />';
+    $html .= '<strong>' . t('Date: ') . '</strong>' . date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])) . '<br />';
+    $html .= '<strong>' . t('Dept.: ') . '</strong>' . sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid']) . '<br />';
     $html .= '<strong>' . t('Job #:') . '</strong>' . sirius_text_to_html($sheet_node->field_sirius_job_number['und'][0]['value']) . '<br />';
     $html .= '<br />';
 
