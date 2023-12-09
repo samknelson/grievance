@@ -24,6 +24,7 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 				$data[$ms_key][$status]++;
 			} else {
 				$data[$ms_key]['unassigned']++;
+				if ($ms_key == 635) { drupal_set_message('<pre>' . print_r($worker, 1) . '</pre>'); }
 			}
 
 			$ms_key = $worker['worker_ms'];
