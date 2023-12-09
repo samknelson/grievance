@@ -6,7 +6,6 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 	$ms_list = sirius_edls_ms_list($employer_node);
 	$status_options = sirius_edls_sheet_status_options();
 	$sheet_nodes = array();
-	drupal_set_message('<pre>' . print_r($ms_list, 1) . '</pre>');
 
 	foreach (array('today' => t('Today'), '+1 day' => t('Tomorrow')) as $d => $d_name) {
 		$html .= '<h2>' . $d_name . '</h2>';
@@ -15,6 +14,7 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 
 		$data = array();
 		foreach ($workers as $worker) {
+			$ms_key = $worker['worker_ms'];
 			$data[$ms_key]['total']++;
 
 			$sheet_nid = $worker['curr_sheet_nid'];
@@ -24,7 +24,6 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 				$data[$ms_key][$status]++;
 			} else {
 				$data[$ms_key]['unassigned']++;
-				if ($ms_key == 635) { drupal_set_message('<pre>' . print_r($worker, 1) . '</pre>'); }
 			}
 
 			$ms_key = $worker['worker_ms'];
