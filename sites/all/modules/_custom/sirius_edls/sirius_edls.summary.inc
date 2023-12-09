@@ -21,8 +21,6 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 				if (!$sheet_nodes[$sheet_nid]) { $sheet_nodes[$sheet_nid] = node_load($sheet_nid); }
 				$status = $sheet_nodes[$sheet_nid]->field_sirius_edls_sheet_status['und'][0]['value'];
 				$data[$ms_key][$status]++;
-				drupal_set_message($ms_list[$ms_key]);
-				drupal_set_message('<pre>' . print_r($worker,1) . '</pre>');
 			} else {
 				$data[$ms_key]['unassigned']++;
 			}
