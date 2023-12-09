@@ -6,6 +6,7 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 	$ms_list = sirius_edls_ms_list($employer_node);
 	$status_options = sirius_edls_sheet_status_options();
 	$sheet_nodes = array();
+	drupal_set_message('<pre>' . print_r($ms_list, 1) . '</pre>');
 
 	foreach (array('today' => t('Today'), '+1 day' => t('Tomorrow')) as $d => $d_name) {
 		$html .= '<h2>' . $d_name . '</h2>';
