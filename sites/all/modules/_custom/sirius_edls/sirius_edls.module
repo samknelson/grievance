@@ -14,6 +14,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/si
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.tasks.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.outsource.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.ajax.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.summary.inc';
 
 /**
  * Implements hook_sirius_domain_component_info
