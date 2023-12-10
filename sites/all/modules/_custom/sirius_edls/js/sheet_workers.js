@@ -39,10 +39,11 @@
 								assignment_div.find('.sirius_edls_extra_time').val(extra['time']);
 								assignment_div.find('.sirius_edls_extra_classification').val(extra['classification']);
 
-								$('#sirius_edls_notes_inner').html(result['data']['notes_render']);
-								$('#sirius_edls_notes_edit').val(result['data']['notes']);
 							}
 						}
+						
+						$('#sirius_edls_notes_inner').html(result['data']['notes_render']);
+						$('#sirius_edls_notes_edit').val(result['data']['notes']);
 
 						flash('Sheet refreshed at: ' + new Date().toLocaleTimeString(), 'success');
 					}
