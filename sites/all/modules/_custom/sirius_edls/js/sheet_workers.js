@@ -8,7 +8,7 @@
 				flash('Loading sheet ...', 'info');
 
 				$.ajax({
-					'url': '/sirius/edls/ajax/sheet/assignments',
+					'url': '/sirius/edls/ajax/sheet_assignments',
 					'data': {
 						'sheet_nid': settings.sheet_nid,
 					},
@@ -38,6 +38,9 @@
 								assignment_div.find('.sirius_edls_extra').html(extra_render(extra));
 								assignment_div.find('.sirius_edls_extra_time').val(extra['time']);
 								assignment_div.find('.sirius_edls_extra_classification').val(extra['classification']);
+
+								$('#sirius_edls_notes_inner').html(result['data']['notes_render']);
+								$('#sirius_edls_notes_edit').val(result['data']['notes']);
 							}
 						}
 
@@ -52,7 +55,7 @@
 				start = Date.now();
 
 				$.ajax({
-					'url': '/sirius/edls/ajax/worker/list',
+					'url': '/sirius/edls/ajax/worker_list',
 					'data': {
 						'employer_nid': settings.employer_nid,
 						'date': settings.date,
@@ -87,6 +90,7 @@
 							flash('No workers found.', 'warning');
 							return;
 						}
+						console.log(workers);
 
 						for (i=0; i<workers.length; ++i) {
 							worker = workers[i];
@@ -104,9 +108,33 @@
 							html = '<div class="' + c + '" id="sirius_edls_worker_' + worker['worker_id'] + '" data-id="' + worker['worker_id'] + '">';
 
 							html += '<span class="sirius_edls_worker_indicator">';
-							if (worker['last_sheet_nid']) { html += '&#9899'; } else { html += '&#9898;'; }
-							if (worker['curr_sheet_nid']) { html += '&#9899'; } else { html += '&#9898;'; }
-							if (worker['next_sheet_nid']) { html += '&#9899'; } else { html += '&#9898;'; }
+
+							var c = 'sirius_edls_worker_indicator_dot'; 
+							if (worker['prev_sheet_nid']) { c += ' sirius_edls_worker_indicator_dot_filled'; }
+							html += '<span class="' + c + '"></span>';
+
+							var c = 'sirius_edls_worker_indicator_dot'; 
+							if (worker['curr_sheet_nid']) {
+								status = worker['curr_status'];
+								if (status == 'lock') { c += ' sirius_edls_worker_indicator_dot_filled'; }
+								else { c += ' sirius_edls_worker_indicator_dot_draft'; }
+							}
+							html += '<span class="' + c + '"></span>';
+
+							var c = 'sirius_edls_worker_indicator_dot'; 
+							if (worker['next_sheet_nid']) {
+								status = worker['next_status'];
+								if (status == 'lock') { c += ' sirius_edls_worker_indicator_dot_filled'; }
+								else { c += ' sirius_edls_worker_indicator_dot_draft'; }
+							}
+							html += '<span class="' + c + '"></span>';
+
+							/*
+							html += '<span class="sirius_edls_worker_indicator_' + status + '">';
+							if (worker['next_sheet_nid']) { html += '&#9899;'; } else { html += '&#9898;'; }
+							html += '</span>';
+							*/
+
 							html += '</span>';
 
 							html += '<span class="sirius_edls_worker_name">';
@@ -272,6 +300,40 @@
 				});
 			}
 
+			function set_notes() {
+				flash('Sending notes...', 'info');
+
+				$.ajax({
+					'url': '/sirius/edls/ajax/sheet_set_notes',
+					'data': {
+						'sheet_nid': settings.sheet_nid,
+						'notes': $('#sirius_edls_notes_edit').val(),
+					},
+					'type': 'POST',
+					'dataType': 'json',
+					'error': function(jqXHR, textStatus, errorThrown) {
+						flash('Connection failed: ' + textStatus + ': ' + errorThrown, 'error');
+					},
+					'success': function(result) {
+						console.log(result);
+						if (!result['success']) {
+							flash('Error: ' + result['msg'], 'error');
+							return;
+						}
+
+						$('#sirius_edls_notes_inner').html(result['data']['notes_render']);
+						$('#sirius_edls_notes_edit').val(result['data']['notes']);
+
+						// This should really be handled by popup.js, but I'm being lazy and copy-paste
+						$('.sirius_popup_overlay').fadeOut();
+      			$('.sirius_popup_wrap').fadeOut();
+
+						flash('Updated notes', 'success');
+						return;
+					}
+				});
+			}
+
 			function extra_render(extra) {
 				if (!extra) { return ''; }
 				render = '';
@@ -307,7 +369,7 @@
 				flash('Loading worker ' + worker_id, 'info');
 
 				$.ajax({
-					'url': '/sirius/edls/ajax/worker/lookup',
+					'url': '/sirius/edls/ajax/worker_lookup',
 					'data': {
 						'employer_nid': settings.employer_nid,
 						'worker_id': worker_id,
@@ -405,6 +467,11 @@
 				return false;
 			});
 
+			// Set notes
+			$('.sirius_edls_set_notes_submit').click(function() {
+				set_notes();
+				return false;
+			});
 
 			// Select a crew
 			$('.sirius_edls_crew').click(function() {

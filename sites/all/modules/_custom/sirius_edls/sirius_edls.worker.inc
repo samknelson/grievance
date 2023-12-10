@@ -19,13 +19,24 @@ function sirius_edls_worker_classification_options() {
 }
 
 function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
-	// @todo: Both dispatched and outsourced
+  // There are some challenges for this function:
+  // - It will be called very frequently (many supervisors, refreshing their worker list every few seconds)
+  // - It may return a lot of results (~2000 workers)
+  // - It is expected to return a lot of data (worker list, assignments, previous department, etc.)
+  //
+  // For efficiency, we're breaking some compartmentalization rules here. In an ideal world, we'd run one
+  // query to fetch all the workers, and then query each worker for their current assignment, etc. 
+  // 
+  // But we want to avoid running ~2000 individual queries every few seconds for every active user. So 
+  // we fetch as much information as we can in the one big query, and then pad it with additional information 
+  // here. It's a cumbersome code design, but much more efficient.
+
   $outsource_workers = sirius_edls_outsource_list($employer_nid, $date, $filters);
   $dispatch_workers = sirius_edls_dispatch_list($employer_nid, $date, $filters);
   $result = array_merge($outsource_workers, $dispatch_workers);
-
   // $result = array_splice($result, 0, 20);
 
+  // Filter by "has_assignment". This is hard to do in the underlying raw SQL.
   $result = array_values(array_filter($result, function($v) use ($filters) {
     if ($filters['has_assignment_curr'] == 'include') {
       if (!$v['curr_sheet_nid']) { return FALSE; }
@@ -46,21 +57,28 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
     return TRUE;
   }));
 
+  // Add sheet-specific information. Again, this is cumbersome to do in the worker list SQL. 
+  $sheet_lookup = array();
   foreach ($result as $delta => $record) {
-    /*
-    $sql = "select sheet_nid from sirius_edls_assignments where worker_id = :worker_id and assignment_date = :date";
-    $stmt = db_query($sql, array(':worker_id' => $record['worker_id'], ':date' => $date));
-    $result[$delta]['assignment']['current'] = $stmt->fetchAssoc();
+    foreach (array('curr', 'prev', 'next') as $prefix) {
+      $sheet_nid = $record["{$prefix}_sheet_nid"];
+      if ($sheet_nid) {
+        if (!$sheet_lookup[$sheet_nid]) {
+          $sql = "select field_sirius_edls_sheet_status_value as status, field_grievance_department_tid_tid as department ";
+          $sql .= "from node ";
+          $sql .= "left join field_data_field_sirius_edls_sheet_status on field_data_field_sirius_edls_sheet_status.entity_type = 'node' and field_data_field_sirius_edls_sheet_status.entity_id = node.nid ";
+          $sql .= "left join field_data_field_grievance_department_tid on field_data_field_grievance_department_tid.entity_type = 'node' and field_data_field_grievance_department_tid.entity_id = node.nid ";
+          $sql .= "where node.nid = :sheet_nid ";
+          $stmt = sirius_sql_query($sql, array(':sheet_nid' => $sheet_nid));
+          $sheet_lookup[$sheet_nid] = $stmt->fetchAssoc();
+        }
 
-    $sql = "select sheet_nid from sirius_edls_assignments where worker_id = :worker_id and assignment_date < :date order by assignment_date desc limit 1";
-    $stmt = db_query($sql, array(':worker_id' => $record['worker_id'], ':date' => $date));
-    $result[$delta]['assignment']['past'] = $stmt->fetchAssoc();
-
-    $sql = "select sheet_nid from sirius_edls_assignments where worker_id = :worker_id and assignment_date > :date order by assignment_date limit 1";
-    $stmt = db_query($sql, array(':worker_id' => $record['worker_id'], ':date' => $date));
-    $result[$delta]['assignment']['future'] = $stmt->fetchAssoc();
-    */
+        $result[$delta]["${prefix}_status"] = $sheet_lookup[$sheet_nid]['status'];
+        $result[$delta]["${prefix}_department"] = $sheet_lookup[$sheet_nid]['department'];
+      }
+    }
   }
+
   return $result;
 }
 
@@ -186,7 +204,7 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
   $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
   $sql .= "  and sirius_edls_assignments.assignment_date < :date ";
   $sql .= "  order by assignment_date desc limit 1 ";
-  $sql .= ") as last_sheet_nid, ";
+  $sql .= ") as prev_sheet_nid, ";
   $sql .= "( ";
   $sql .= "  select sheet_nid from sirius_edls_assignments ";
   $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";

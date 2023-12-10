@@ -67,7 +67,7 @@ function sirius_edls_outsource_list($employer_nid, $date = NULL, $filters = arra
   $sql .= "  and sirius_edls_assignments.employer_nid = sirius_edls_outsource.employer_nid ";
   $sql .= "  and sirius_edls_assignments.assignment_date < :date ";
   $sql .= "  order by assignment_date desc limit 1 ";
-  $sql .= ") as last_sheet_nid, ";
+  $sql .= ") as prev_sheet_nid, ";
   $sql .= "( ";
   $sql .= "  select sheet_nid from sirius_edls_assignments ";
   $sql .= "  where sirius_edls_assignments.worker_id = sirius_edls_outsource.worker_id ";

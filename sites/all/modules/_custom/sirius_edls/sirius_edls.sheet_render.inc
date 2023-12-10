@@ -19,7 +19,6 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 	if (!$options['hide_supervisor']) { $html .= sirius_fakerender_field('Supervisor:', sirius_edls_supervisor_render($sheet_node)); }
 	if (!$options['hide_date']) { $html .= sirius_fakerender_field('Date:', date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value']))); }
 
-
 	if (!$options['hide_event']) { $html .= sirius_fakerender_field('Event:', sirius_node_title($sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id'])); }
 	if (!$options['hide_event_status']) { $html .= sirius_fakerender_field('Event Status:', sirius_text_to_html($sheet_json['edls']['sheet']['show_status'])); }
 	if (!$options['hide_department']) { $html .= sirius_fakerender_field('Department:', sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid'])); }
@@ -32,6 +31,10 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 	if (!$options['hide_count']) {
 		$assigned_count = sirius_edls_assignment_count_sheet($sheet_node->field_sirius_date_start['und'][0]['value'], $sheet_nid);
 		$html .= sirius_fakerender_field('Count:', $assigned_count . ' / ' . $sheet_node->field_sirius_count['und'][0]['value']);
+	}
+
+	if (!$options['hide_notes']) {
+		$html .= sirius_fakerender_field('Notes:', sirius_edls_sheet_notes_render($sheet_node));
 	}
 
 	if (!$options['hide_crews']) {

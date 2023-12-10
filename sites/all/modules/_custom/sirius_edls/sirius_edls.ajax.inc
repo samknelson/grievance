@@ -129,6 +129,34 @@ function sirius_edls_ajax_sheet_assignments() {
 		'success' => TRUE,
 		'data' => array(
 			'assignments' => $assignments,
+			'notes_render' => sirius_edls_sheet_notes_render($sheet_node),
+			'notes' => sirius_edls_sheet_notes_get($sheet_node),
+		),
+	);
+
+	return drupal_json_output($result);
+}
+
+function sirius_edls_ajax_sheet_set_notes() {
+	$sheet_nid = $_REQUEST['sheet_nid'];
+	if (!$sheet_nid) { return sirius_edls_ajax_error('Please pass in a sheet_nid'); }
+	$sheet_node = node_load($sheet_nid);
+
+	$can_access = sirius_access_instance('edls')->access('sheet_edit_workers', array('sheet_node' => $sheet_node));
+	if (!$can_access) { return sirius_edls_ajax_error('Access denied'); }
+
+	$notes = $_REQUEST['notes'];
+
+	sirius_edls_sheet_notes_set($sheet_node, $notes);
+
+	$result = array(
+		'success' => TRUE,
+		'data' => array(
+			'notes_render' => sirius_edls_sheet_notes_render($sheet_node),
+			'notes' => sirius_edls_sheet_notes_get($sheet_node),
+			'whatever' => $_REQUEST,
+			'node' => $sheet_node,
+			'json' => sirius_json_get($sheet_node),
 		),
 	);
 

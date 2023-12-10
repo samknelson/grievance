@@ -108,3 +108,24 @@ function sirius_edls_sheet_status_set($sheet_node, $new_status) {
 	node_save($sheet_node);
 	return array('success' => TRUE);
 }
+
+
+function sirius_edls_sheet_notes_set($sheet_node, $notes) {
+	$notes = substr($notes, 0, 10000);
+	$sheet_json = sirius_json_get($sheet_node);
+	$sheet_json['edls']['notes'] = $notes;
+	sirius_json_set($sheet_node, $sheet_json);
+	node_save($sheet_node);
+}
+
+function sirius_edls_sheet_notes_get($sheet_node) {
+	$sheet_json = sirius_json_get($sheet_node);
+	return $sheet_json['edls']['notes'];
+}
+
+function sirius_edls_sheet_notes_render($sheet_node, $options = array()) {
+	$html = '<div class="sirius_edls_notes">';
+	$html .= sirius_text_to_html(sirius_edls_sheet_notes_get($sheet_node));
+	$html .= '</div>';
+	return $html;
+}

@@ -159,6 +159,12 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 
 	$tasks_by_department = sirius_edls_tasks_by_department($employer_node);
 
+  $form['sheet']['notes'] = array(
+	  '#type' => 'textarea',
+	  '#title' => t('Notes'),
+		'#default_value' => sirius_edls_sheet_notes_get($sheet_node),
+  );
+
   $form['#tree'] = TRUE;
 	$form['crews']['prefix'] = array('#markup' => '<div id="crews">');
 	foreach ($crews as $delta => $crew) {
@@ -382,6 +388,9 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 	$sheet_node->title = sirius_edls_sheet_title($sheet_node);
 
 	node_save($sheet_node);
+
+	sirius_edls_sheet_notes_set($sheet_node, $form_state['values']['sheet']['notes']);
+
 	drupal_set_message("Sheet saved.");
 	drupal_goto('node/' . $sheet_node->nid . '/sirius_edls_sheet_edit');
 }

@@ -226,89 +226,30 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_config.inc'
   );
 
-  $items['sirius/edls/ajax/worker/list'] = array(
-    'title' => 'EDLS Ajax Worker List',
-    'page callback' => 'sirius_edls_ajax_worker_list',
-    'page arguments' => array(),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'component' => 'edls',
-        'permission' => 'sirius'
-      ),
-    ),
-    'type' => MENU_CALLBACK,
+  $ajax_actions = array(
+    'worker_list' => 'sirius_edls_ajax_worker_list',
+    'worker_lookup' => 'sirius_edls_ajax_worker_lookup',
+    'assign' => 'sirius_edls_ajax_assign',
+    'assignment_set_extra' => 'sirius_edls_ajax_assignment_set_extra',
+    'unassign' => 'sirius_edls_ajax_unassign',
+    'sheet_assignments' => 'sirius_edls_ajax_sheet_assignments',
+    'sheet_set_notes' => 'sirius_edls_ajax_sheet_set_notes',
   );
 
-  $items['sirius/edls/ajax/worker/lookup'] = array(
-    'title' => 'EDLS Ajax Worker Lookup',
-    'page callback' => 'sirius_edls_ajax_worker_lookup',
-    'page arguments' => array(),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'component' => 'edls',
-        'permission' => 'sirius'
+  foreach ($ajax_actions as $action => $callback) {
+    $items["sirius/edls/ajax/$action"] = array(
+      'page callback' => $callback,
+      'page arguments' => array(),
+      'access callback' => 'sirius_menu_access_callback',
+      'access arguments' => array(
+        array(
+          'component' => 'edls',
+          'permission' => 'sirius'
+        ),
       ),
-    ),
-    'type' => MENU_CALLBACK,
-  );
-
-  $items['sirius/edls/ajax/assign'] = array(
-    'title' => 'EDLS Ajax Assign',
-    'page callback' => 'sirius_edls_ajax_assign',
-    'page arguments' => array(),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'component' => 'edls',
-        'permission' => 'sirius'
-      ),
-    ),
-    'type' => MENU_CALLBACK,
-  );
-
-  $items['sirius/edls/ajax/assignment_set_extra'] = array(
-    'title' => 'EDLS Ajax Update',
-    'page callback' => 'sirius_edls_ajax_assignment_set_extra',
-    'page arguments' => array(),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'component' => 'edls',
-        'permission' => 'sirius'
-      ),
-    ),
-    'type' => MENU_CALLBACK,
-  );
-
-  $items['sirius/edls/ajax/unassign'] = array(
-    'title' => 'EDLS Ajax Unassign',
-    'page callback' => 'sirius_edls_ajax_unassign',
-    'page arguments' => array(),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'component' => 'edls',
-        'permission' => 'sirius'
-      ),
-    ),
-    'type' => MENU_CALLBACK,
-  );
-
-  $items['sirius/edls/ajax/sheet/assignments'] = array(
-    'title' => 'EDLS Ajax Sheet Assignments',
-    'page callback' => 'sirius_edls_ajax_sheet_assignments',
-    'page arguments' => array(),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'component' => 'edls',
-        'permission' => 'sirius'
-      ),
-    ),
-    'type' => MENU_CALLBACK,
-  );
+      'type' => MENU_CALLBACK,
+    );
+  }
 
   return $items;
 }

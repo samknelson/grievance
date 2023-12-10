@@ -23,6 +23,37 @@
 	/* color: #aaaaaa; */
 }
 
+.sirius_edls_worker_indicator_dot {
+  height: 0.9em;
+  width: 0.9em;
+  border-radius: 50%;
+  border: 1px solid #000000;
+  background-color: #ffffff;
+  display: inline-block;
+  margin-right: 2px;
+}
+
+.sirius_edls_worker_indicator_dot_filled {
+	background-color: #000000;
+}
+
+.sirius_edls_worker_indicator_dot_draft {
+	background-color: #aaaaaa;
+}
+
+.sirius_edls_worker_indicator_dot_request {
+	background-color: #aaaa00;
+}
+
+.sirius_edls_worker_indicator_dot_lock {
+	background-color: #00aa00;
+}
+
+.sirius_edls_worker_indicator_dot_trash {
+	background-color: #aa0000;
+}
+
+
 .sirius_edls_worker_indicator {
 	font-weight: normal;
 	font-style: normal;	
@@ -77,7 +108,7 @@
 }
 
 .sirius_edls_worker_detail_assignment_full {
-	background-color: #aaffaa;
+	background-color: #ffffff;
 }
 
 #popup_worker_details_overlay {
@@ -119,4 +150,18 @@
 #popup_worker_details_hover:hover {
   background: url('../../sirius/images/popup-announcement-icons.png') 0 -28px;
   cursor: pointer;
+}
+
+#sirius_edls_notes_edit {
+	width: 100%;
+}
+
+.sirius_edls_notes_wrap {
+	border: 1px solid #333333;
+	padding: 5px;
+}
+
+#content .sirius_edls_notes_wrap h2 {
+	margin-top: 0;
+	padding-top: 0;
 }
