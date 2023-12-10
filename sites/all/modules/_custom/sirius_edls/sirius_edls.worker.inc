@@ -79,6 +79,12 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
     }
   }
 
+  // Tidy case
+  $sheet_lookup = array();
+  foreach ($result as $delta => $record) {
+    $result[$delta]['worker_name'] = ucwords(strtolower($result[$delta]['worker_name']));
+  }
+
   return $result;
 }
 
