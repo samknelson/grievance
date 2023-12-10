@@ -294,16 +294,38 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 	}
 
 	$count_verify = 0;
-	if ($form_state['values']['crews']) {
-		foreach ($form_state['values']['crews'] as $delta => $crew) {
-			$crew_count = $form_state['values']['crews'][$delta]['count'] = intval($crew['count']);
-			$count_verify += $crew_count;
-		}
+	$crews_input = $form_state['values']['crews'];
+	if (!$crews_input) { $crews_input = array(); }
+	$crews_input_by_uuid = array();
+	foreach ($crews_input as $delta => $crew) {
+		$crew_count = $form_state['values']['crews'][$delta]['count'] = intval($crew['count']);
+		$count_verify += $crew_count;
+		$crews_input_by_uuid[$crew['uuid']] = $crew;
 	}
 	if ($count_verify != $count) {
 		drupal_set_message("The count in all the crews ($count_verify) must add up to the total count ($count).", 'error');
 		$form_state['rebuild'] = TRUE; 
 		return;
+	}
+
+	if ($sheet_node) {
+		$assignments = sirius_edls_assignment_fetch_sheet($sheet_node->field_sirius_date_start['und'][0]['value'], $sheet_node->nid);
+		foreach ($assignments as $crew_uuid => $assignment_records) {
+			if (!$crews_input_by_uuid[$crew_uuid]) {
+				drupal_set_message("There is a worker assigned to a crew that does not appear on this sheet. Please remove the assignment.", 'error');
+				$form_state['rebuild'] = TRUE;
+				return;
+			}
+
+			foreach ($assignment_records as $assignment_record) {
+				$position = $assignment_record['assignment_position'];
+				if ($position > $crews_input_by_uuid[$crew_uuid]['count']) {
+					drupal_set_message("There is a worker assigned to position " . ($position+1) . " on a crew that only has " . $crews_input_by_uuid[$crew_uuid]['count'] . ' positions. Please remove the assignment or increase the number of positions.', 'error');
+					$form_state['rebuild'] = TRUE;
+					return;
+				}
+			}
+		}
 	}
 
 	if (!$sheet_node) {
@@ -377,8 +399,6 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 	}
 
 	$crews = array();
-	$crews_input = $form_state['values']['crews'];
-	if (!$crews_input) { $crews_input = array(); }
 
 	foreach ($crews_input as $crew) {
 		if (!$crew['start_time'] && !$crew['count']) { continue; }
