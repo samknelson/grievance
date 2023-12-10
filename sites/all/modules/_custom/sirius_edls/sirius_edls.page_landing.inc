@@ -1,6 +1,7 @@
 <?php
 
 function sirius_edls_page_landing() {
+	global $user;
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
 	drupal_add_css(drupal_get_path('module', 'sirius_edls') . '/css/sheet.css');
 
