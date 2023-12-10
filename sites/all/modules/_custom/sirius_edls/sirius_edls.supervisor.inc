@@ -27,7 +27,7 @@ function sirius_edls_supervisor_list($employer_nid) {
 	}
 
 	$sql .= "group by users.uid ";
-	$sql .= "order by name ";
+	$sql .= "order by name";
 
 	$stmt = sirius_sql_query($sql, $sql_args);
 	$options = array();

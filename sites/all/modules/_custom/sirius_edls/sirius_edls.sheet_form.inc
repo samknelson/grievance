@@ -44,14 +44,16 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 	  if ($sheet_node->nid) { $form['sheet']['grievance_shop']['#disabled'] = TRUE; }
 	}
 
-	$supervisor_options = sirius_edls_supervisor_list($sheet_employer_nid);
-	$form['sheet']['supervisor'] = array(
-		'#type' => 'select',
-		'#title' => t('Supervisor'),
-		'#options' => array(NULL => t('-- Select --')) + $supervisor_options,
-		'#default_value' => $sheet_node->field_grievance_rep_assignee['und'][0]['target_id'],
-		'#required' => TRUE,
-	);
+	if (sirius_access_instance('edls')->access('sheet_change_supervisor', array('sheet_node' => $sheet_node))) {
+		$supervisor_options = sirius_edls_supervisor_list($sheet_employer_nid);
+		$form['sheet']['supervisor'] = array(
+			'#type' => 'select',
+			'#title' => t('Supervisor'),
+			'#options' => array(NULL => t('-- Select --')) + $supervisor_options,
+			'#default_value' => $sheet_node->field_grievance_rep_assignee['und'][0]['target_id'],
+			'#required' => TRUE,
+		);
+	}
 
   $form['sheet']['date_start'] = array(
 	  '#type' => 'date_popup',
@@ -361,10 +363,17 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 		unset($sheet_node->field_sirius_dispatch_hall['und'][0]);
 	}
 
-	if ($form_state['values']['sheet']['supervisor']) {
-		$sheet_node->field_grievance_rep_assignee['und'][0]['target_id'] = $form_state['values']['sheet']['supervisor'];
+	if (sirius_access_instance('edls')->access('sheet_change_supervisor', array('sheet_node' => $sheet_node))) {
+		if ($form_state['values']['sheet']['supervisor']) {
+			$sheet_node->field_grievance_rep_assignee['und'][0]['target_id'] = $form_state['values']['sheet']['supervisor'];
+		} else {
+			unset($sheet_node->field_grievance_rep_assignee['und'][0]);
+		}
 	} else {
-		unset($sheet_node->field_grievance_rep_assignee['und'][0]);
+		if (!$sheet_node->field_grievance_rep_assignee['und'][0]['target_id']) {
+			global $user;
+			$sheet_node->field_grievance_rep_assignee['und'][0]['target_id'] = $user->uid;
+		}
 	}
 
 	$crews = array();

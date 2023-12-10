@@ -33,6 +33,7 @@ class Sirius_Edls_Access extends Sirius_Access {
     	'sheet_clone',
     	'sheet_edit',
     	'sheet_edit_workers',
+      'sheet_change_supervisor',
 
       // parameter sheet_node
       'sheet_status_draft',
@@ -78,6 +79,12 @@ class Sirius_Edls_Access extends Sirius_Access {
       // Labor coordinators can configure the employer
       if ($is_employer_coordinator) { return TRUE; }
 		}
+
+    // Change the supervisor on a sheet
+    if (in_array($action, array('sheet_change_supervisor'))) {
+      // Labor coordinators can configure the employer
+      if ($is_employer_coordinator) { return TRUE; }
+    }
 
     // Create a sheet, list sheets, list workers
     if (in_array($action, array('sheet_create', 'sheet_list', 'worker_list'))) {
