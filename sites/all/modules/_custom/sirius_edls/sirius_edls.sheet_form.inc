@@ -319,7 +319,7 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 
 			foreach ($assignment_records as $assignment_record) {
 				$position = $assignment_record['assignment_position'];
-				if ($position > $crews_input_by_uuid[$crew_uuid]['count']) {
+				if ($position+1 > $crews_input_by_uuid[$crew_uuid]['count']) {
 					drupal_set_message("There is a worker assigned to position " . ($position+1) . " on a crew that only has " . $crews_input_by_uuid[$crew_uuid]['count'] . ' positions. Please remove the assignment or increase the number of positions.', 'error');
 					$form_state['rebuild'] = TRUE;
 					return;
