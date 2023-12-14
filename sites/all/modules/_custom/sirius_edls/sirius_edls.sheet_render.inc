@@ -13,7 +13,7 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 	$sheet_json = sirius_json_get($sheet_node);
 
 	$html = '';
-	if (!$options['hide_version']) { $html .= sirius_fakerender_field('Version:', "$sheet_nid-$sheet_vid"); }
+	if (!$options['hide_version']) { $html .= sirius_fakerender_field('Version:', sirius_sheet_render_version($sheet_node)); }
 	if (!$options['hide_status']) { $html .= sirius_fakerender_field('Status:', $status_options[$sheet_node->field_sirius_edls_sheet_status['und'][0]['value']]); }
 	if (!$options['hide_employer']) { $html .= sirius_fakerender_field('Employer:', sirius_node_title($sheet_node->field_grievance_shop['und'][0]['target_id'])); }
 	if (!$options['hide_supervisor']) { $html .= sirius_fakerender_field('Supervisor:', sirius_edls_supervisor_render($sheet_node)); }
@@ -41,7 +41,7 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 		$crews = sirius_edls_crews($sheet_node);
 		$html .= '<div class="sirius_edls_crews">';
 		foreach ($crews as $crew_uuid => $crew) {
-			$html .= sirius_edls_crew_render($sheet_node, $crew);
+			$html .= sirius_edls_crew_render($sheet_node, $crew, $options);
 		}
 		$html .= '</div>';
 	}
@@ -138,3 +138,14 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 	return sirius_table_render($header, $rows);
 }
 
+function sirius_sheet_render_version($sheet_node) {
+	return sirius_sheet_render_version_impl($sheet_node->nid, $sheet_node->vid);
+}
+
+function sirius_sheet_render_version_impl($nid, $vid) {
+	$html = '<span class="sirius_edls_sheet_version">';
+	$html .= '<i class="fas fa-history"></i>&nbsp;';
+	$html .= "$nid-$vid";
+	$html .= '</span>';
+	return $html;
+}

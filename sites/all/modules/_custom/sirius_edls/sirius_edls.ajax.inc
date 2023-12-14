@@ -70,6 +70,7 @@ function sirius_edls_ajax_assign() {
 
 	$result = sirius_edls_assign($date, $worker_id, $sheet_nid, $crew_uuid, $extra);
 	if (!$result['success']) { return sirius_edls_ajax_error($result['msg']); }
+	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
 
 	return drupal_json_output($result);
 }
@@ -91,6 +92,7 @@ function sirius_edls_ajax_assignment_set_extra() {
 
 	$result = sirius_edls_assignment_set_extra($date, $worker_id, $sheet_nid, $extra);
 	if (!$result['success']) { return sirius_edls_ajax_error($result['msg']); }
+	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
 
 	return drupal_json_output($result);
 }
@@ -110,6 +112,7 @@ function sirius_edls_ajax_unassign() {
 
 	$result = sirius_edls_unassign($date, $worker_id, $sheet_nid);
 	if (!$result['success']) { return sirius_edls_ajax_error($result['msg']); }
+	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
 
 	return drupal_json_output($result);
 }
@@ -133,6 +136,7 @@ function sirius_edls_ajax_sheet_assignments() {
 			'notes' => sirius_edls_sheet_notes_get($sheet_node),
 		),
 	);
+	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
 
 	return drupal_json_output($result);
 }
@@ -159,10 +163,18 @@ function sirius_edls_ajax_sheet_set_notes() {
 			'json' => sirius_json_get($sheet_node),
 		),
 	);
+	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
 
 	return drupal_json_output($result);
 }
 
 function sirius_edls_ajax_error($msg) {
 	return drupal_json_output(array('success' => FALSE, 'msg' => $msg));
+}
+
+function sirius_edls_ajax_sheet_stats($sheet_node) {
+	$date = $sheet_node->field_sirius_date_start['und'][0]['value'];
+	$assigned = sirius_edls_assignment_count_sheet($date, $sheet_node->nid);
+	$count = $sheet_node->field_sirius_count['und'][0]['value'];
+	return array('count' => $count, 'assigned' => $assigned);
 }

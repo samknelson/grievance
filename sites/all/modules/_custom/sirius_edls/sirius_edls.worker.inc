@@ -165,7 +165,9 @@ function sirius_edls_worker_render_details_assignment($worker_record, $assignmen
     $html .= '<strong>' . t('Job #:') . '</strong>' . sirius_text_to_html($sheet_node->field_sirius_job_number['und'][0]['value']) . '<br />';
     $html .= '<br />';
 
-    $html .= l('View', "node/$sheet_nid/sirius_edls_sheet_view", array('attributes' => array('class' => array('tool-button'))));
+    if (drupal_valid_path("node/$sheet_nid/sirius_edls_sheet_view")) {
+      $html .= l('View', "node/$sheet_nid/sirius_edls_sheet_view", array('attributes' => array('class' => array('tool-button'))));
+    }
   } else {
     $html .= '[no assignment]';
   }

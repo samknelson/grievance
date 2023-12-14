@@ -144,3 +144,34 @@ function sirius_edls_employer_switch() {
   if ($incoming_employer_nid && $employers[$incoming_employer_nid]) { $employer_node = node_load($incoming_employer_nid); }
   return array('markup' => $html, 'employer_node' => $employer_node);
 }
+
+/**
+ * Implements hook_node_presave()
+ */
+
+function sirius_edls_node_presave($sheet_node) {
+  if ($sheet_node->type != 'sirius_edls_sheet') { return; }
+
+  $assignments = sirius_edls_assignment_fetch_sheet(
+    $sheet_node->field_sirius_date_start['und'][0]['value'], 
+    $sheet_node->nid
+  );
+  $sheet_json = sirius_json_get($sheet_node);
+  $sheet_json['edls']['assignments'] = $assignments;
+  sirius_json_set($sheet_node, $sheet_json);
+}
+
+/**
+ * Implements hook_module_implements_alter()
+ * 
+ * Make our node_presave run *before* the one in sirius_version, so that data we capture here
+ * can be versioned.
+ */
+
+function sirius_edls_module_implements_alter(&$implementations, $hook) {
+  if ($hook != 'node_presave') { return; }
+  $module = 'sirius_edls';
+  $group = array($module => $implementations[$module]);
+  unset($implementations[$module]);
+  $implementations = $group + $implementations;
+}

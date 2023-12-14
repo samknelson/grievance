@@ -34,6 +34,8 @@ class Sirius_Edls_Access extends Sirius_Access {
     	'sheet_edit',
     	'sheet_edit_workers',
       'sheet_change_supervisor',
+      'sheet_revisions',
+      'sheet_assignmentlog',
 
       // parameter sheet_node
       'sheet_status_draft',
@@ -108,6 +110,12 @@ class Sirius_Edls_Access extends Sirius_Access {
 
       // Labor supervisors can edit their own sheets in "draft"
       if ($is_employer_supervisor && $is_my_sheet && ($sheet_status == 'draft')) { return TRUE; }
+    }
+
+    // View changes
+    if (in_array($action, array('sheet_revisions', 'sheet_assignmentlog'))) {
+      // Labor coordinators only
+      if ($is_employer_coordinator) { return TRUE; }
     }
 
     // Set sheet to "Draft"

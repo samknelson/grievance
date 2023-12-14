@@ -46,6 +46,13 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 	$form['wrapper_open'] = array('#markup' => '<table class="sirius_table sirius_table_align"><tr>');
 
 	$form['col1_open'] = array('#markup' => '<td width="60%" valign="top" style="vertical-align: top;">');
+	$html = '<strong><div id="sirius_worker_edls_sheet_stats">';
+	$html .= t('Assigned');
+	$html .= ' <span id="sirius_worker_edls_sheet_stats_assigned">0</span> / ';
+	$html .= '<span id="sirius_worker_edls_sheet_stats_count">0</span> ';
+	$html .= t('Positions'); 
+	$html .= '</div></strong><br>';
+	$form['col1_stats'] = array('#markup' => $html);
 
 	foreach ($crews as $crew_delta => $crew) {
 		$uuid = $crew['uuid'];

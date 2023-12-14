@@ -51,27 +51,49 @@ function sirius_edls_node_tabs() {
     'weight' => 4,
   );
 
-  $node_tabs['grievance_shop']['grievance_shop_edls'] = array(
-    'title' => 'EDLS',
+  $node_tabs['sirius_edls_sheet']['sirius_edls_sheet_revisions'] = array(
+    'title' => 'Sheet Change History',
     'description' => '',
-    'callback' => 'sirius_edls_node_tab_employer_outsource',
+    'callback' => 'sirius_edls_node_tab_sheet_revisions',
     'permissions' => array('sirius'),
-    'file' => 'sirius_edls.page_employer_outsource.inc',
+    'file' => 'sirius_edls.page_sheet_revisions.inc',
     'skip_node_view_check' => TRUE,
     'component' => 'edls',
-    'weight' => 3,
+    'weight' => 4,
   );
 
-  $node_tabs['grievance_shop']['grievance_shop_edls/outsource'] = array(
-    'title' => 'Outsource Workers',
+  $node_tabs['sirius_edls_sheet']['sirius_edls_sheet_revisions/revisions'] = array(
+    'title' => 'Revisions',
     'description' => '',
-    'callback' => 'sirius_edls_node_tab_employer_outsource',
+    'callback' => 'sirius_edls_node_tab_sheet_revisions',
     'permissions' => array('sirius'),
-    'file' => 'sirius_edls.page_employer_outsource.inc',
+    'file' => 'sirius_edls.page_sheet_revisions.inc',
     'skip_node_view_check' => TRUE,
     'component' => 'edls',
     'weight' => 1,
     'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_edls_sheet']['sirius_edls_sheet_revisions/assignmentlog'] = array(
+    'title' => 'Assignment Log',
+    'description' => '',
+    'callback' => 'sirius_edls_node_tab_sheet_assignmentlog',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_edls.page_sheet_assignmentlog.inc',
+    'skip_node_view_check' => TRUE,
+    'component' => 'edls',
+    'weight' => 2,
+  );
+
+  $node_tabs['grievance_shop']['grievance_shop_edls'] = array(
+    'title' => 'EDLS',
+    'description' => '',
+    'callback' => 'sirius_edls_node_tab_employer_outsource_ms',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_edls.page_employer_outsource_ms.inc',
+    'skip_node_view_check' => TRUE,
+    'component' => 'edls',
+    'weight' => 3,
   );
 
   $node_tabs['grievance_shop']['grievance_shop_edls/outsource_ms'] = array(
@@ -82,7 +104,8 @@ function sirius_edls_node_tabs() {
     'file' => 'sirius_edls.page_employer_outsource_ms.inc',
     'skip_node_view_check' => TRUE,
     'component' => 'edls',
-    'weight' => 2,
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   $node_tabs['grievance_shop']['grievance_shop_edls/tasks'] = array(
@@ -93,7 +116,7 @@ function sirius_edls_node_tabs() {
     'file' => 'sirius_edls.page_employer_tasks.inc',
     'skip_node_view_check' => TRUE,
     'component' => 'edls',
-    'weight' => 3,
+    'weight' => 2,
   );
 
 
@@ -123,9 +146,6 @@ function sirius_edls_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_edls.page_sheet_create.inc'
   );
-
-
-
 
   $items['sirius/edls'] = array(
     'title' => 'Employer Daily Labor Schedules',
@@ -206,10 +226,57 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_worker_list.inc'
   );
 
+  $items['sirius/edls/workers/list'] = array(
+    'title' => 'List',
+    'page callback' => 'sirius_edls_page_worker_list',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'sheet_list',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'sirius_edls.page_worker_list.inc'
+  );
 
+  $items['sirius/edls/workers/outsource'] = array(
+    'title' => 'Outsource',
+    'page callback' => 'sirius_edls_page_worker_outsource',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'employer_config_outsource_workers',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'sirius_edls.page_worker_outsource.inc'
+  );
 
-
-
+  /*
+  $node_tabs['grievance_shop']['grievance_shop_edls/outsource'] = array(
+    'title' => 'Outsource Workers',
+    'description' => '',
+    'callback' => 'sirius_edls_node_tab_employer_outsource',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_edls.page_employer_outsource.inc',
+    'skip_node_view_check' => TRUE,
+    'component' => 'edls',
+  );
+  */
 
   $items['sirius/edls/config'] = array(
     'title' => 'EDLS Configuration',

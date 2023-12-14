@@ -412,13 +412,20 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 	}
 
 	$sheet_json['edls']['crews'] = $crews;
-	sirius_json_set($sheet_node, $sheet_json);
 
 	$sheet_node->title = sirius_edls_sheet_title($sheet_node);
 
+	// We really should call
+	// sirius_edls_sheet_notes_set($sheet_node, );
+	// but that does multiple node_save()s, and keeps generating new versions
+	$notes = substr($form_state['values']['sheet']['notes'], 0, 10000);
+	$sheet_json['edls']['notes'] = $notes;
+
+	sirius_json_set($sheet_node, $sheet_json);
+
 	node_save($sheet_node);
 
-	sirius_edls_sheet_notes_set($sheet_node, $form_state['values']['sheet']['notes']);
+	
 
 	drupal_set_message("Sheet saved.");
 	drupal_goto('node/' . $sheet_node->nid . '/sirius_edls_sheet_edit');

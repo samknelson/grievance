@@ -38,13 +38,13 @@
 								assignment_div.find('.sirius_edls_extra').html(extra_render(extra));
 								assignment_div.find('.sirius_edls_extra_time').val(extra['time']);
 								assignment_div.find('.sirius_edls_extra_classification').val(extra['classification']);
-
 							}
 						}
 						
 						$('#sirius_edls_notes_inner').html(result['data']['notes_render']);
 						$('#sirius_edls_notes_edit').val(result['data']['notes']);
 
+						stats_render(result);
 						flash('Sheet refreshed at: ' + new Date().toLocaleTimeString(), 'success');
 					}
 				});
@@ -91,7 +91,6 @@
 							flash('No workers found.', 'warning');
 							return;
 						}
-						console.log(workers);
 
 						for (i=0; i<workers.length; ++i) {
 							worker = workers[i];
@@ -214,6 +213,7 @@
 
 						worker_div.addClass('sirius_edls_worker_assigned');
 
+						stats_render(result);
 						flash('Assigned: ' + worker_nameid + ' to position #' + (position+1), 'success');
 						return;
 					}
@@ -255,6 +255,7 @@
 
 						worker_div.removeClass('sirius_edls_worker_assigned');
 
+						stats_render(result);
 						flash('Removed: ' + worker_nameid, 'success');
 						return;
 					}
@@ -295,6 +296,7 @@
 						$('.sirius_popup_overlay').fadeOut();
       			$('.sirius_popup_wrap').fadeOut();
 
+						stats_render(result);
 						flash('Updated: ' + worker_nameid, 'success');
 						return;
 					}
@@ -329,6 +331,7 @@
 						$('.sirius_popup_overlay').fadeOut();
       			$('.sirius_popup_wrap').fadeOut();
 
+						stats_render(result);
 						flash('Updated notes', 'success');
 						return;
 					}
@@ -360,6 +363,13 @@
 				if (!('time' in extra)) { extra['time'] = ''; }
 				if (!('classification' in extra)) { extra['classification'] = ''; }
 				return extra;
+			}
+
+			function stats_render(ajax_result) {
+				if (!ajax_result || !ajax_result['data'] || !ajax_result['data']['stats']) { return; }
+				$('#sirius_worker_edls_sheet_stats_assigned').html(ajax_result['data']['stats']['assigned']);
+				$('#sirius_worker_edls_sheet_stats_count').html(ajax_result['data']['stats']['count']);
+				console.log(ajax_result);
 			}
 
 			function flash(msg, priority) {
@@ -424,6 +434,7 @@
 			        }
 			      });
 
+						stats_render(result);
 						flash('Worker details loaded.', 'success');
 					}
 				});

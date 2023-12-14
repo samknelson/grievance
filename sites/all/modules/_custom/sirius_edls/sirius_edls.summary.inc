@@ -13,17 +13,21 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 		$workers = sirius_edls_worker_list($employer_node->nid, $date, $filters = array());
 
 		$data = array();
+		$grand_total = array();
 		foreach ($workers as $worker) {
 			$ms_key = $worker['worker_ms'];
 			$data[$ms_key]['total']++;
+			$grand_total['total']++;
 
 			$sheet_nid = $worker['curr_sheet_nid'];
 			if ($sheet_nid) {
 				if (!$sheet_nodes[$sheet_nid]) { $sheet_nodes[$sheet_nid] = node_load($sheet_nid); }
 				$status = $sheet_nodes[$sheet_nid]->field_sirius_edls_sheet_status['und'][0]['value'];
 				$data[$ms_key][$status]++;
+				$grand_total[$status]++;
 			} else {
 				$data[$ms_key]['unassigned']++;
+				$grand_total['unassigned']++;
 			}
 
 			$ms_key = $worker['worker_ms'];
@@ -48,6 +52,22 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 			$row[] = array('data' => $data[$ms_key]['total'], 'width' => '10%');
 			$rows[] = $row;
 		}
+
+		$row = array();
+		$row[] = array('data' => '<strong>' . t('Total') . '</strong>', 'width' => '40%');
+		foreach ($status_options as $status_key => $status_name) {
+			if ($status_key == 'trash') { continue; }
+			$value = $grand_total[$status_key];
+			if (!$value) { $value = 0; }
+			$row[] = array('data' => "<strong>$value</strong>", 'width' => '10%');
+		}
+		$value = $grand_total['unassigned'];
+		if (!$value) { $value = 0; }
+		$row[] = array('data' => "<strong>$value</strong>", 'width' => '10%');
+		$value = $grand_total['total'];
+		if (!$value) { $value = 0; }
+		$row[] = array('data' => "<strong>$value</strong>", 'width' => '10%');
+		$rows[] = $row;
 
 		$header = array();
 		$header[] = array('data' => t('Member Status'), 'width' => '40%');

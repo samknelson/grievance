@@ -1,7 +1,14 @@
 <?php
 
-function sirius_edls_crew_render($sheet_node, $crew) {
-	$assignments = sirius_edls_assignment_fetch_crew($sheet_node->field_sirius_date_start['und'][0]['value'], $sheet_node->nid, $crew['uuid']);
+function sirius_edls_crew_render($sheet_node, $crew, $options) {
+	if ($options['fetch_workers_from_json']) {
+		$sheet_json = sirius_json_get($sheet_node);
+		$all_assignments = $sheet_json['edls']['assignments'];
+		$assignments = $all_assignments[$crew['uuid']];
+		if (!$assignments) { $assignments = array(); }
+	} else {
+		$assignments = sirius_edls_assignment_fetch_crew($sheet_node->field_sirius_date_start['und'][0]['value'], $sheet_node->nid, $crew['uuid']);
+	}
 	$assigned_count = count($assignments);
 
 	$html = '<div class="sirius_edls_crew sirius_callout_basic">';
