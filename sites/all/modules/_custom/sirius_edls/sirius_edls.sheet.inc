@@ -92,7 +92,7 @@ function sirius_edls_sheet_clone($old_sheet_node, $options = array()) {
 
 function sirius_edls_sheet_status_set($sheet_node, $new_status) {
 	$access = sirius_access_instance('edls');
-	if (!$access->access("sheet_status_$new_status")) { return array('success' => FALSE, 'msg' => 'Access Denied'); }
+	if (!$access->access("sheet_status_$new_status", array('sheet_node' => $sheet_node))) { return array('success' => FALSE, 'msg' => 'Access Denied'); }
 
 	$date = $sheet_node->field_sirius_date_start['und'][0]['value'];
 	if ($new_status == 'trash') {
