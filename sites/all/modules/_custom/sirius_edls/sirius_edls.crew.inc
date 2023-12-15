@@ -31,7 +31,7 @@ function sirius_edls_crew_render($sheet_node, $crew, $options) {
 		$row = array();
 		$row[] = ($position+1);
 		$row[] = $assignment['worker_id'];
-		$row[] = $assignment['worker_name'];
+		$row[] = ucwords(strtolower($assignment['worker_name']));
 		$row[] = sirius_edls_crew_render_extra($assignment['assignment_extra']);
 		$rows[] = $row;
 	}

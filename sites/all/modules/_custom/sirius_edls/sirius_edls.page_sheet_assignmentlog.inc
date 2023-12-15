@@ -21,7 +21,7 @@ function sirius_edls_node_tab_sheet_assignmentlog($sheet_node) {
   	$row[] = $author->name;
   	$row[] = $type_lookup[$entry['log_type']];
   	$row[] = $assignment['worker_id'];
-  	$row[] = $assignment['worker_name'];
+  	$row[] = ucwords(strtolower($assignment['worker_name']));
   	$rows[] = $row;
   }
 
