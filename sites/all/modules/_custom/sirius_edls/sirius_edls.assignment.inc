@@ -33,6 +33,15 @@ function sirius_edls_assignment_fetch_sheet($date, $sheet_nid) {
   return $assignments;
 }
 
+function sirius_edls_assignment_fetch_sheet_worker($date, $sheet_nid, $worker_id) {
+  $sql = "select * from sirius_edls_assignments ";
+  $sql .= "where assignment_date = :date and sheet_nid = :sheet_nid and worker_id = :worker_id ";
+  $stmt = sirius_sql_query($sql, array(':date' => $date, ':sheet_nid' => $sheet_nid, ':worker_id' => $worker_id));
+  $result = $stmt->fetchAssoc();
+  if (!$result) { $result = array(); }
+  return $result;
+}
+
 function sirius_edls_assignment_count_sheet($date, $sheet_nid) {
   $sql = "select count(*) as c from sirius_edls_assignments ";
   $sql .= "where assignment_date = :date and sheet_nid = :sheet_nid ";
@@ -88,6 +97,10 @@ function sirius_edls_assign($date, $worker_id, $sheet_nid, $crew_uuid, $extra = 
   $sql = "insert into sirius_edls_assignments (assignment_date, worker_id, worker_name, employer_nid, sheet_nid, crew_uuid, assignment_position, assignment_extra) ";
   $sql .= "values (:date, :worker_id, :worker_name, :employer_nid, :sheet_nid, :crew_uuid, :assignment_position, :assignment_extra)";
   $stmt = db_query($sql, $sql_args);
+
+  $assignment = sirius_edls_assignment_fetch_sheet_worker($date, $sheet_nid, $worker_id);
+  sirius_edls_log_instance()->assignment_log('assign', $assignment);
+
   return array('success' => TRUE, 'position' => $position, 'values' => $sql_args);
 }
 
@@ -114,11 +127,18 @@ function sirius_edls_assignment_set_extra($date, $worker_id, $sheet_nid, $extra 
   $sql = "update sirius_edls_assignments set assignment_extra = :extra where assignment_id = :assignment_id";
   $stmt = db_query($sql, array(':assignment_id' => $assignment['assignment_id'], ':extra' => json_encode($extra)));
 
+  $assignment = sirius_edls_assignment_fetch_sheet_worker($date, $sheet_nid, $worker_id);
+  sirius_edls_log_instance()->assignment_log('update', $assignment);
+
   return array('success' => TRUE, 'extra' => $extra);
 }
 
 function sirius_edls_unassign($date, $worker_id, $sheet_nid) {
+  $assignment = sirius_edls_assignment_fetch_sheet_worker($date, $sheet_nid, $worker_id);
+  sirius_edls_log_instance()->assignment_log('unassign', $assignment);
+
   $sql = "delete from sirius_edls_assignments where assignment_date = :date and worker_id = :worker_id and sheet_nid = :sheet_nid";
   $stmt = db_query($sql, array(':date' => $date, ':worker_id' => $worker_id, ':sheet_nid' => $sheet_nid));
+
   return array('success' => TRUE);
 }

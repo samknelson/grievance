@@ -80,3 +80,30 @@ function sirius_edls_update_7007() {
     } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
   }
 }
+
+
+function sirius_edls_update_7008() {
+  $sqls = array(
+    'create table sirius_edls_dblog (
+      log_id integer not null auto_increment,
+
+      log_uid integer,
+      log_ts integer,
+      log_category varchar(255),
+      log_type varchar(255),
+      log_handler_nid integer,
+      log_msg varchar(255),
+      log_json json,
+
+      index(log_handler_nid),
+      primary key (log_id)
+    );',
+  );
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
