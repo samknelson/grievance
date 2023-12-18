@@ -91,14 +91,9 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
 
 function sirius_edls_worker_fetch($employer_nid, $worker_id, $date = NULL) {
   if (!$date) { $date = date('Y-m-d'); }
-  if (preg_match('/^O/', $worker_id)) {
-    $record = sirius_edls_outsource_worker_fetch($employer_nid, $worker_id, $date);
-  }
-  else if (preg_match('/^I/', $worker_id)) {
-    $record = sirius_edls_dispatch_worker_fetch($employer_nid, $worker_id, $date);
-  } else {
-    $record = array();
-  }
+  $result = sirius_edls_worker_list($employer_nid, $date, array('worker_id' => $worker_id));
+  $record = $result[0];
+  if (!$record) { $record = array(); }
 
   $sql = "select * from sirius_edls_assignments ";
   $sql .= "where sirius_edls_assignments.worker_id = :worker_id ";
@@ -125,18 +120,17 @@ function sirius_edls_worker_fetch($employer_nid, $worker_id, $date = NULL) {
 
 }
 
-function sirius_edls_dispatch_worker_fetch($employer_nid, $worker_id, $date) {
-  $real_id = preg_replace('/^I/', '', $worker_id);
-  $worker_node = sirius_worker_get_by_id($real_id);
-  $result = array(
-    'worker_id' => $worker_id, 
-    'worker_name' => $worker_node->field_sirius_name['und'][0]['family'] . ', ' . $worker_node->field_sirius_name['und'][0]['given'],
-  );
-  return $result;
-}
-
 function sirius_edls_worker_render_details($worker_record) {
   $html .= '<div class="sirius_edls_worker_detail">';
+
+  /*
+  $worker_id = $worker_record['worker_id'];
+  if (preg_match('/^I/', $worker_id)) {
+    $real_id = preg_replace('/^I/', '', $worker_id);
+    $worker_node =  sirius_worker_get_by_id($real_id);
+  }
+  */
+
   $html .= '<h2>' . t('Assignment Details for ') . $worker_record['worker_name'] . ' (' . $worker_record['worker_id'] . ')' . '</h2>';
   $html .= sirius_edls_worker_render_details_assignment($worker_record, $worker_record['assignments']['prev'], array('title' => t('Previous Assignment')));
   $html .= sirius_edls_worker_render_details_assignment($worker_record, $worker_record['assignments']['curr'], array('title' => t('Current Assignment')));
@@ -186,7 +180,14 @@ function sirius_edls_ms_list($employer_node, $type = 'name') {
       $term_industry_tids = sirius_fieldvals($term, 'field_sirius_industry', 'tid');
       if (!array_intersect($industry_tids, $term_industry_tids)) { continue; }
     }
-    $insource_ms_list[$tid] = $term->name;
+
+    if ($type == 'short') {
+      $name = $term->field_sirius_name_short['und'][0]['value'];
+      if (!$name) { $name = substr($term->name, 0, 6); }
+    } else {
+      $name = $term->name;
+    }
+    $insource_ms_list[$tid] = $name;
   }
 
   $outsource_ms_list = sirius_edls_outsource_ms_list($employer_node, $type);
@@ -272,6 +273,11 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
     $sql_args[':ms'] = $filters['ms'];
   }
 
+  if ($filters['worker_id']) {
+    $sql .= "and field_sirius_id_value = :real_id ";
+    $sql_args[':real_id'] = preg_replace('/^I/', '', $filters['worker_id']);
+  }
+
   $sql .= "group by node.nid ";
 
   $sql .= "order by field_sirius_name_family, field_sirius_name_given ";
@@ -288,14 +294,19 @@ function sirius_worker_form_filters($options = array()) {
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Name or ID'),
-    '#id' => 'sirius_edls_worker_filter_nameid'
+    '#id' => 'sirius_edls_worker_filter_nameid',
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
+    '#size' => 20,
   );
 
   $form['members_status'] = array(
     '#type' => 'select',
     '#title' => t('Member Status'),
     '#options' => array(NULL => t('-- Select --')) + $options['ms_list'],
-    '#id' => 'sirius_edls_worker_filter_ms'
+    '#id' => 'sirius_edls_worker_filter_ms',
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
   );
 
   $form['has_assignment_curr'] = array(
@@ -308,6 +319,8 @@ function sirius_worker_form_filters($options = array()) {
     ),
     '#default_value' => 'exclude',
     '#id' => 'sirius_edls_worker_filter_has_assignment_curr',
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
   );
 
   $form['has_assignment_next'] = array(
@@ -319,6 +332,8 @@ function sirius_worker_form_filters($options = array()) {
       'include' => t('Include'),
     ),
     '#id' => 'sirius_edls_worker_filter_has_assignment_next',
+    '#prefix' => '<div class="container-inline">',
+    '#suffix' => '</div>',
   );
 
   $form['search'] = array(

@@ -22,8 +22,8 @@ function sirius_edls_permission() {
       'title' => t('Sirius EDLS Employer Labor Supervisor'), 
       'description' => t(''),
     ),
-    'sirius edls fore' => array(
-      'title' => t('Sirius EDLS Lead Person / Foreperson'), 
+    'sirius edls worker labor advisor' => array(
+      'title' => t('Sirius EDLS Worker Labor Advisor'), 
       'description' => t(''),
     ),
   );

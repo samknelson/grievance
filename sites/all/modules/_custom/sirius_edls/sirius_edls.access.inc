@@ -51,13 +51,17 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Who am I?
     if (user_access('sirius admin') || user_access('sirius edls admin')) { 
-      $is_admin = $is_employer_manager = $is_employer_coordinator = $is_employer_supervisor = TRUE;
+      $is_admin = $is_employer_manager = $is_employer_coordinator = $is_employer_supervisor = $is_worker_advisor = TRUE;
     } else if (user_access('sirius edls employer labor manager')) { 
-      $is_employer_manager = $is_employer_coordinator = $is_employer_supervisor = TRUE;
+      $is_employer_manager = $is_employer_coordinator = $is_employer_supervisor = $is_worker_advisor = TRUE;
     } else if (user_access('sirius edls employer labor coordinator')) { 
       $is_employer_coordinator = $is_employer_supervisor = TRUE;
     } else if (user_access('sirius edls employer labor supervisor')) { 
       $is_employer_supervisor = TRUE;
+    }
+
+    if (user_access('sirius edls worker labor advisor')) { 
+      $is_worker_advisor = TRUE;
     }
 
     // Admins can do anything
@@ -76,11 +80,21 @@ class Sirius_Edls_Access extends Sirius_Access {
 			if ($my_employer_nid != $context['sheet_node']->field_grievance_shop['und'][0]['target_id']) { return FALSE; }
 		}
 
-    // Employer Configuration: workers, tasks, member statuses, employer dashboard
-    if (in_array($action, array('employer_config_tasks', 'employer_config_outsource_workers', 'employer_config_outsource_ms', 'employer_dashboard'))) {
+    // Employer Configuration: workers, tasks, member statuses
+    if (in_array($action, array('employer_config_tasks', 'employer_config_outsource_workers', 'employer_config_outsource_ms'))) {
       // Labor coordinators can configure the employer
       if ($is_employer_coordinator) { return TRUE; }
 		}
+
+    // View the employer statistics
+    if (in_array($action, array('employer_dashboard'))) {
+      // Labor coordinators can view the statistics
+      if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
+
+      // Labor supervisors can view the statistics
+      if ($is_worker_advisor) { return TRUE; }
+    }
 
     // Change the supervisor on a sheet
     if (in_array($action, array('sheet_change_supervisor'))) {
@@ -92,12 +106,14 @@ class Sirius_Edls_Access extends Sirius_Access {
     if (in_array($action, array('sheet_create', 'sheet_list', 'worker_list'))) {
       // Labor supervisors can create and list sheets and workers
       if ($is_employer_supervisor) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
     }
 
     // View, clone, or manage a sheet
     if (in_array($action, array('sheet_view', 'sheet_clone', 'sheet_manage'))) {
       // Labor coordinators can view anything
       if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
 
       // Labor supervisors can view their own sheets
       if ($is_employer_supervisor && $is_my_sheet) { return TRUE; }
@@ -108,6 +124,9 @@ class Sirius_Edls_Access extends Sirius_Access {
       // Labor coordinators can edit sheets in "draft" or "request")
       if ($is_employer_coordinator && in_array($sheet_status, array('draft', 'request'))) { return TRUE; }
 
+      // Labor advisors can edit sheets that are not in "lock"
+      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
+
       // Labor supervisors can edit their own sheets in "draft"
       if ($is_employer_supervisor && $is_my_sheet && ($sheet_status == 'draft')) { return TRUE; }
     }
@@ -116,6 +135,7 @@ class Sirius_Edls_Access extends Sirius_Access {
     if (in_array($action, array('sheet_revisions', 'sheet_assignmentlog'))) {
       // Labor coordinators only
       if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
     }
 
     // Set sheet to "Draft"
@@ -125,6 +145,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
       // Coordinators can set any sheet to "draft"
       if ($is_employer_coordinator) { return TRUE; }
+
+      // Labor advisors can edit sheets that are not in "lock"
+      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
     }
 
     // Set sheet to "Request"
@@ -134,6 +157,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
       // Coordinators can set any sheet to "request"
       if ($is_employer_coordinator) { return TRUE; }
+
+      // Labor advisors can edit sheets that are not in "lock"
+      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
 
       // Supervisors can set their own sheet to "request" if it's in "draft"
       if ($is_employer_supervisor && $is_my_sheet && ($sheet_status == 'draft')) { return TRUE; }
@@ -155,6 +181,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
       // Coordinators can set any sheet to "trash"
       if ($is_employer_coordinator) { return TRUE; }
+
+      // Labor advisors can edit sheets that are not in "lock"
+      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
 
       // Supervisors can set their own sheet to "trash" if it's in "draft"
       if ($is_employer_supervisor && $is_my_sheet && ($sheet_status == 'draft')) { return TRUE; }

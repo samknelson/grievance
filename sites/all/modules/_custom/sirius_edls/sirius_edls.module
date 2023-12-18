@@ -51,6 +51,7 @@ function sirius_edls_node_delete($node) { return sirius_edls_denormalize_queue($
 function sirius_edls_denormalize_queue($node) {
   return;
 }
+
 /***
  * Implements hook_report_cache_info() 
  */
@@ -80,16 +81,14 @@ function sirius_edls_sirius_config_links_alter(&$links) {
  */
 
 function sirius_edls_sirius_cron_scan_info() {
-  /*
-  $items['trust_benefit'] = array(
-    'title' => 'Trust Worker Benefit Scan',
-    'description' => 'Check eligibility for all worker benefits',
+  $items['edls_dblog_cleanup'] = array(
+    'title' => 'EDLS DbLog Cleanup',
+    'description' => 'Clean up the EDLS Dblog',
     'schedule' => 'daily',
-    'callback' => 'sirius_trust_worker_benefit_scan',
-    'multidomain' => TRUE,
-    'component' => 'trust',
+    'callback' => 'sirius_edls_dblog_cleanup',
+    'multidomain' => FALSE,
+    'component' => 'edls',
   );
-  */
 
   return $items;
 }
@@ -152,11 +151,7 @@ function sirius_edls_employer_switch() {
 
 function sirius_edls_node_presave($sheet_node) {
   if ($sheet_node->type != 'sirius_edls_sheet') { return; }
-
-  $assignments = sirius_edls_assignment_fetch_sheet(
-    $sheet_node->field_sirius_date_start['und'][0]['value'], 
-    $sheet_node->nid
-  );
+  $assignments = sirius_edls_assignment_fetch_sheet($sheet_node);
   $sheet_json = sirius_json_get($sheet_node);
   $sheet_json['edls']['assignments'] = $assignments;
   sirius_json_set($sheet_node, $sheet_json);

@@ -21,6 +21,7 @@ function sirius_edls_ajax_worker_list() {
 		'data' => array(
 			'workers' => $workers,
 		),
+		'msg' => 'Found ' . count($workers) . ' workers.',
 	);
 	
 	return drupal_json_output($result);
@@ -45,6 +46,7 @@ function sirius_edls_ajax_worker_lookup() {
 		'success' => TRUE,
 		'worker' => $worker,
 		'render' => sirius_edls_worker_render_details($worker),
+		'msg' => "Looked up $worker[worker_name] ($worker_id)",
 	);
 	
 	return drupal_json_output($result);
@@ -70,7 +72,6 @@ function sirius_edls_ajax_assign() {
 
 	$result = sirius_edls_assign($date, $worker_id, $sheet_nid, $crew_uuid, $extra);
 	if (!$result['success']) { return sirius_edls_ajax_error($result['msg']); }
-	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
 
 	return drupal_json_output($result);
 }
@@ -92,7 +93,6 @@ function sirius_edls_ajax_assignment_set_extra() {
 
 	$result = sirius_edls_assignment_set_extra($date, $worker_id, $sheet_nid, $extra);
 	if (!$result['success']) { return sirius_edls_ajax_error($result['msg']); }
-	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
 
 	return drupal_json_output($result);
 }
@@ -112,7 +112,6 @@ function sirius_edls_ajax_unassign() {
 
 	$result = sirius_edls_unassign($date, $worker_id, $sheet_nid);
 	if (!$result['success']) { return sirius_edls_ajax_error($result['msg']); }
-	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
 
 	return drupal_json_output($result);
 }
@@ -127,16 +126,22 @@ function sirius_edls_ajax_sheet_assignments() {
 
 	$date = $sheet_node->field_sirius_date_start['und'][0]['value'];
 
-	$assignments = sirius_edls_assignment_fetch_sheet($date, $sheet_nid);
-	$result = array(
-		'success' => TRUE,
-		'data' => array(
-			'assignments' => $assignments,
-			'notes_render' => sirius_edls_sheet_notes_render($sheet_node),
-			'notes' => sirius_edls_sheet_notes_get($sheet_node),
-		),
-	);
-	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
+	$result = array();
+	$result['success'] = TRUE;
+	$result['data']['assignments'] = sirius_edls_assignment_fetch_sheet($sheet_node);
+	$result['data']['notes'] = sirius_edls_sheet_notes_get($sheet_node);
+	$result['data']['notes_render'] = sirius_edls_sheet_notes_render($sheet_node);
+	$result['data']['stats']['count'] = $sheet_node->field_sirius_count['und'][0]['value'];
+	$result['data']['stats']['assigned'] = sirius_edls_assignment_count_sheet($date, $sheet_node->nid);
+	$result['data']['crews'] = sirius_edls_crews($sheet_node, 'uuid');
+	foreach ($result['data']['crews'] as $crew_uuid => $crew) {
+		if ($result['data']['assignments'][$crew_uuid]) {
+			$result['data']['crews'][$crew_uuid]['assigned'] = count($result['data']['assignments'][$crew_uuid]);
+		} else {
+			$result['data']['crews'][$crew_uuid]['assigned'] = 0;
+		}
+	}
+	$result['msg'] = 'Sheet loaded.';
 
 	return drupal_json_output($result);
 }
@@ -163,18 +168,10 @@ function sirius_edls_ajax_sheet_set_notes() {
 			'json' => sirius_json_get($sheet_node),
 		),
 	);
-	$result['data']['stats'] = sirius_edls_ajax_sheet_stats($sheet_node);
-
+	$result['msg'] = 'Notes updated';
 	return drupal_json_output($result);
 }
 
 function sirius_edls_ajax_error($msg) {
 	return drupal_json_output(array('success' => FALSE, 'msg' => $msg));
-}
-
-function sirius_edls_ajax_sheet_stats($sheet_node) {
-	$date = $sheet_node->field_sirius_date_start['und'][0]['value'];
-	$assigned = sirius_edls_assignment_count_sheet($date, $sheet_node->nid);
-	$count = $sheet_node->field_sirius_count['und'][0]['value'];
-	return array('count' => $count, 'assigned' => $assigned);
 }

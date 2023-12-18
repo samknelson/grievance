@@ -67,7 +67,7 @@ function sirius_edls_sheet_clone($old_sheet_node, $options = array()) {
 
 	// Assign all workers. Failure is a warning
 	$warnings = array();
-	$assignments = sirius_edls_assignment_fetch_sheet($old_sheet_node->field_sirius_date_start['und'][0]['value'], $old_sheet_node->nid);
+	$assignments = sirius_edls_assignment_fetch_sheet($old_sheet_node);
 
 	foreach ($assignments as $old_crew_uuid => $records) {
 		foreach ($records as $assignment) {
@@ -76,7 +76,7 @@ function sirius_edls_sheet_clone($old_sheet_node, $options = array()) {
 				$assignment['worker_id'], 
 				$sheet_node->nid, 
 				$crew_uuid_map[$old_crew_uuid],
-				$assignment['extra']
+				$assignment['assignment_extra']
 			);
 
 			if (!$result['success']) { $warnings[] = "Unable to assign $assignment[worker_name]: " . $result['msg']; }
@@ -96,7 +96,7 @@ function sirius_edls_sheet_status_set($sheet_node, $new_status) {
 
 	$date = $sheet_node->field_sirius_date_start['und'][0]['value'];
 	if ($new_status == 'trash') {
-		$assignments = sirius_edls_assignment_fetch_sheet($date, $sheet_node->nid);
+		$assignments = sirius_edls_assignment_fetch_sheet($sheet_node);
 		foreach ($assignments as $crew_nid => $records) {
 			foreach ($records as $position => $assignment) {
 				sirius_edls_unassign($date, $assignment['worker_id'], $sheet_node->nid);
@@ -124,8 +124,9 @@ function sirius_edls_sheet_notes_get($sheet_node) {
 }
 
 function sirius_edls_sheet_notes_render($sheet_node, $options = array()) {
-	$html = '<div class="sirius_edls_notes">';
+	$html = '';
+	if (!$options['hide_div']) { $html .= '<div class="sirius_edls_notes">'; }
 	$html .= sirius_text_to_html(sirius_edls_sheet_notes_get($sheet_node));
-	$html .= '</div>';
+	if (!$options['hide_div']) { $html .= '</div>'; }
 	return $html;
 }

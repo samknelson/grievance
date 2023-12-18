@@ -44,6 +44,14 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 	  if ($sheet_node->nid) { $form['sheet']['grievance_shop']['#disabled'] = TRUE; }
 	}
 
+  $form['sheet']['count'] = array(
+	  '#type' => 'textfield',
+	  '#title' => t('Worker Count'),
+		'#default_value' => $sheet_node->field_sirius_count['und'][0]['value'],
+		'#required' => TRUE,
+		'#size' => 4,
+  );
+
 	if (sirius_access_instance('edls')->access('sheet_change_supervisor', array('sheet_node' => $sheet_node))) {
 		$supervisor_options = sirius_edls_supervisor_list($sheet_employer_nid);
 		$form['sheet']['supervisor'] = array(
@@ -135,14 +143,6 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 		);
 	}
 
-  $form['sheet']['count'] = array(
-	  '#type' => 'textfield',
-	  '#title' => t('Worker Count'),
-		'#default_value' => $sheet_node->field_sirius_count['und'][0]['value'],
-		'#required' => TRUE,
-		'#size' => 4,
-  );
-
   $ajax_params = $form_state['triggering_element']['#sirius_ajax'];
 
 	$crews = sirius_edls_crews($sheet_node);
@@ -206,6 +206,13 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
     	'#default_value' => $crew['name'],
     );
 
+    $form['crews'][$delta]['count'] = array(
+    	'#type' => 'textfield',
+    	'#title' => t('Count'),
+    	'#size' => 4,
+    	'#default_value' => $crew['count'],
+    );
+
    	$department = $sheet_node->field_grievance_department_tid['und'][0]['tid'];
 		$task_options = $tasks_by_department[$department];
 		if (!$task_options) { $task_options = array(); }
@@ -224,13 +231,6 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
     	'#type' => 'textfield',
     	'#title' => t('Check-In Location'),
     	'#default_value' => $crew['checkin_location'],
-    );
-
-    $form['crews'][$delta]['count'] = array(
-    	'#type' => 'textfield',
-    	'#title' => t('Count'),
-    	'#size' => 4,
-    	'#default_value' => $crew['count'],
     );
 
     $form['crews'][$delta]['start_time'] = array(
@@ -309,7 +309,7 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 	}
 
 	if ($sheet_node) {
-		$assignments = sirius_edls_assignment_fetch_sheet($sheet_node->field_sirius_date_start['und'][0]['value'], $sheet_node->nid);
+		$assignments = sirius_edls_assignment_fetch_sheet($sheet_node);
 		foreach ($assignments as $crew_uuid => $assignment_records) {
 			if (!$crews_input_by_uuid[$crew_uuid]) {
 				drupal_set_message("There is a worker assigned to a crew that does not appear on this sheet. Please remove the assignment.", 'error');

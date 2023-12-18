@@ -15,6 +15,16 @@
 	border: 1px solid #339933;
 }
 
+.sirius_edls_crew_selected table tbody td:nth-child(1),
+.sirius_edls_crew_selected table tbody td:nth-child(1):hover {
+	background-color: #99ff99 !important;
+	border: 1px solid #339933 !important;
+}
+
+.sirius_edls_crew_selected:hover {
+	border: 1px solid #339933 !important;
+}
+
 .sirius_edls_worker_assigned {
 	font-weight: bold;
 }
@@ -78,8 +88,12 @@
 	font-weight: bold;
 }
 
+.sirius_edls_extra_wrap {
+	float: right;
+}
+
 .sirius_edls_extra_wrap .sirius_popup_trigger {
-	padding-right:  4px;
+	padding-left: 4px;
 }
 
 
@@ -164,4 +178,38 @@
 #content .sirius_edls_notes_wrap h2 {
 	margin-top: 0;
 	padding-top: 0;
+}
+
+.sirius_edls_ctrl_unassign {
+	margin-right: 4px;
+}
+
+.sirius_edls_ctrl_unassign_disabled {
+	color: #999999;
+}
+
+.sirius_edls_crew_head {
+	font-weight: bold;
+	padding: 8px;
+}
+
+.sirius_edls_crew_stats {
+	float: right;
+}
+
+#sirius_worker_edls_sheet_stats,
+#sirius_edls_sheet_avail_head {
+	font-weight: bold;
+	margin-bottom: 8px;
+}
+
+#sirius_worker_edls_sheet_stats .sirius_worker_edls_sheet_stats_inner,
+#sirius_edls_sheet_avail_head .sirius_edls_worker_stats_inner {
+	float: right;
+	margin-right: 10px;
+}
+
+.container-inline label {
+	display: inline-block;
+	width: 130px;
 }

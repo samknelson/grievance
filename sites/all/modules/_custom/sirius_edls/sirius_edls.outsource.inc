@@ -91,6 +91,11 @@ function sirius_edls_outsource_list($employer_nid, $date = NULL, $filters = arra
     $sql_args[':ms'] = $filters['ms'];
   }
 
+  if ($filters['worker_id']) {
+    $sql .= "and sirius_edls_outsource.worker_id = :real_id ";
+    $sql_args[':real_id'] = $filters['worker_id']; // preg_replace('/^O/', '', $filters['worker_id']);
+  }
+
   // $sql .= "limit 20";
   $stmt = sirius_sql_query($sql, $sql_args);
 
@@ -152,12 +157,6 @@ function sirius_edls_outsource_set_all($employer_node, $new_workers) {
   return array('success' => TRUE);
 }
 
-function sirius_edls_outsource_worker_fetch($employer_nid, $worker_id) {
-  $sql = "select * from sirius_edls_outsource where employer_nid = :employer_nid and worker_id = :worker_id ";
-  $stmt = db_query($sql, array(':employer_nid' => $employer_nid, ':worker_id' => $worker_id));
-  return $stmt->fetchAssoc();
-}
-
 function sirius_edls_outsource_ms_set_all($employer_node, $options) {
   $employer_json = sirius_json_get($employer_node);
   $employer_json['edls']['outsource']['ms']['options'] = $options;
@@ -174,11 +173,16 @@ function sirius_edls_outsource_ms_list($employer_node, $type = 'name') {
 
   if ($type == 'full') {
     return $items;
-  }
-
-  $result = array();
-  foreach ($items as $key => $record) {
-    $result[$key] = $record['ms_name'];
+  } else if ($type == 'short') {
+    $result = array();
+    foreach ($items as $key => $record) {
+      $result[$key] = $key;
+    }
+  } else {
+    $result = array();
+    foreach ($items as $key => $record) {
+      $result[$key] = $record['ms_name'];
+    }
   }
 
   return $result;

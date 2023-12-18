@@ -34,6 +34,7 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 	$ms_list = sirius_edls_ms_list($employer_node, 'name');
 	$js_settings['ms_name_lookup'] = $ms_list;
 	$js_settings['ms_keys'] = array_values($ms_list);
+	$js_settings['ms_name_lookup_short'] = sirius_edls_ms_list($employer_node, 'short');
 
 	drupal_add_js(array('sirius_edls_sheet_workers' => $js_settings), 'setting');
 
@@ -46,35 +47,48 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 	$form['wrapper_open'] = array('#markup' => '<table class="sirius_table sirius_table_align"><tr>');
 
 	$form['col1_open'] = array('#markup' => '<td width="60%" valign="top" style="vertical-align: top;">');
-	$html = '<strong><div id="sirius_worker_edls_sheet_stats">';
-	$html .= t('Assigned');
-	$html .= ' <span id="sirius_worker_edls_sheet_stats_assigned">0</span> / ';
-	$html .= '<span id="sirius_worker_edls_sheet_stats_count">0</span> ';
-	$html .= t('Positions'); 
-	$html .= '</div></strong><br>';
+	$html = '<div id="sirius_worker_edls_sheet_stats">';
+	$html .= t('Assigned Workers');
+	$html .= '<span class="sirius_worker_edls_sheet_stats_inner">';
+	$html .= '<span id="sirius_edls_sheet_stats_assigned">0</span> / ';
+	$html .= '<span id="sirius_edls_sheet_stats_count">0</span> ';
+	$html .= '</span>';
+	$html .= '</div>';
 	$form['col1_stats'] = array('#markup' => $html);
 
 	foreach ($crews as $crew_delta => $crew) {
 		$uuid = $crew['uuid'];
 		$form['assigned'][$crew_delta]['open'] = array('#markup' => 
 			'<div class="sirius_edls_crew" data-uuid="' . $uuid . '" id="sirius_edls_crew_' . $uuid . '">' .
-			'<strong>' . sirius_edls_crew_title($crew) . '</strong>' . 
+			'<div class="sirius_edls_crew_head">' . 
+			sirius_edls_crew_title($crew) . 
+			'<span class="sirius_edls_crew_stats">' . 
+			'<span class="sirius_edls_crew_stats_assigned">0</span> / ' .
+			'<span class="sirius_edls_crew_stats_count">0</span> ' .
+			'</span>' .
+			'</div>' .
 			'<table class="sirius_table sirius_table_basic sirius_table_form">'
 		);
 
 		for ($position = 0; $position < $crew['count']; ++$position) {
 			$html = "<tr class=\"sirius_edls_assignment_wrapper\" id=\"crew_$crew[uuid]_position_$position\">";
 
-			$html .= '<td width="5%"><div class="sirius_edls_crew_position">' . ($position+1) . '</div></td>';
-			$html .= '<td width="70%"><div class="sirius_edls_crew_worker_name"></div></td>';
-			$html .= '<td width="25%">';
+			$html .= '<td width="10%">';
+			$html .= '<span class="sirius_edls_ms"></span>';
+			$html .= '</td>';
 
-			$html .= '<div class="sirius_edls_extra_wrap">';
+			$html .= '<td width="90%">';
+			$html .= '<span class="sirius_edls_ctrl_unassign sirius_edls_ctrl_unassign_disabled">';
+			$html .= '<i class="far fa-times-circle"></i>';
+			$html .= '</span>';
+			$html .= '<span class="sirius_edls_crew_worker_name"></span>';
 
+			$html .= '<span class="sirius_edls_extra_wrap">';
+
+			$html .= '<span class="sirius_edls_extra"></span>';
 			$html .= '<a href="#" class="sirius_popup_trigger sirius_edls_hidden">';
 			$html .= '<i class="far fa-edit sirius_popup_trigger"></i>';
 			$html .= '</a>';
-			$html .= '<span class="sirius_edls_extra"></span>';
 
 			$html .= '<div style="display:none" class="sirius_popup_overlay"></div>';
 			$html .= '<div style="display:none" class="sirius_popup_wrap">';
@@ -90,7 +104,11 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 			$html .= '<br /><br />';
 
 			$html .= '<strong>' . t('Time') . '</strong>' . '<br />';
-			$html .= '<input type="time" class="sirius_edls_extra_time" size="5">';
+			$html .= '<input type="time" class="sirius_edls_extra_time">';
+			$html .= '<br /><br />';
+
+			$html .= '<strong>' . t('Truck #') . '</strong>' . '<br />';
+			$html .= '<input type="text" class="sirius_edls_extra_truck" size="5">';
 			$html .= '<br /><br />';
 
 			$html .= '<a href="#" class="sirius_edls_set_extra_submit tool-button">';
@@ -102,7 +120,7 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 
 			$html .= '</div>'; // sirius_popup_wrap
 
-			$html .= '</div>'; // sirius_edls_extra_wrap
+			$html .= '</span>'; // sirius_edls_extra_wrap
 
 			$html .= '</td>';
 
@@ -145,7 +163,7 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 
 	$form['col1_close'] = array('#markup' => '</td>');
 
-	$form['col2_open'] = array('#markup' => '<td width="40%" valign="top" style="vertical-align: top;"><strong>' . t('Available Workers') . '</strong><br />');
+	$form['col2_open'] = array('#markup' => '<td width="40%" valign="top" style="vertical-align: top;"><div id="sirius_edls_sheet_avail_head">' . t('Available Workers') . '<span class="sirius_edls_worker_stats_inner">0</span></div>');
 
 	$form['available']['filters'] = sirius_worker_form_filters(array('ms_list' => $ms_list));
 	$form['available']['workers'] = array('#markup' => sirius_worker_render_list(array('ms_list' => $ms_list)));

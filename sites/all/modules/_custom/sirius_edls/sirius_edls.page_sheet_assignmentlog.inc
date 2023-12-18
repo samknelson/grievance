@@ -17,7 +17,7 @@ function sirius_edls_node_tab_sheet_assignmentlog($sheet_node) {
   	$author = user_load($entry['log_uid']);
 
   	$row = array();
-  	$row[] = date('m/d/Y h:i a', $entry['log_ts']);
+  	$row[] = sirius_edls_node_tab_sheet_assignmentlog_date($entry['log_ts']);
   	$row[] = $author->name;
   	$row[] = $type_lookup[$entry['log_type']];
   	$row[] = $assignment['worker_id'];
@@ -33,4 +33,11 @@ function sirius_edls_node_tab_sheet_assignmentlog($sheet_node) {
   $header[] = t('Worker Name');
 
   return sirius_table_render($header, $rows);
+}
+
+function sirius_edls_node_tab_sheet_assignmentlog_date($ts) {
+  $html = date('m/d/Y h:i a', $ts);
+  $interval = time() - $ts;
+  $html .= ' (' . format_interval($interval, 2) . ' ago)';
+  return $html;
 }

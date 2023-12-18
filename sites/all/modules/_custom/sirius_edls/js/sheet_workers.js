@@ -14,46 +14,71 @@
 					},
 					'type': 'GET',
 					'dataType': 'json',
-					'error': function(jqXHR, textStatus, errorThrown) {
-						flash('Connection failed: ' + textStatus + ': ' + errorThrown, 'error');
-					},
-					'success': function(result) {
-						if (!result['success']) {
-							flash('Error: ' + result['msg'], 'error');
-							return;
-						}
+					'complete': function(jqXHR, textStatus) {
+						result = handle_ajax_response(jqXHR, textStatus, 'info');
+						if (!result) { return; }
 
 						assignments = result['data']['assignments'];
-						for (crew_uuid in assignments) {
-							for (position in assignments[crew_uuid]) {
-								worker_id = assignments[crew_uuid][position]['worker_id'];
-								worker_name = assignments[crew_uuid][position]['worker_name'];
-								worker_nameid = worker_id + ' - ' + worker_name;
-								extra = extra_parse(assignments[crew_uuid][position]);
+						crews = result['data']['crews'];
 
+						for (crew_uuid in crews) {
+							count = result['data']['crews'][crew_uuid]['count'];
+							assigned = result['data']['crews'][crew_uuid]['assigned'];
+							$('.sirius_edls_crew[data-uuid=\'' + crew_uuid + '\'] .sirius_edls_crew_stats_assigned').html(assigned);
+							$('.sirius_edls_crew[data-uuid=\'' + crew_uuid + '\'] .sirius_edls_crew_stats_count').html(count);
+
+							for (position = 0; position < count; ++position) {
 								var assignment_div = $('#crew_' + crew_uuid + '_position_' + position);
-								assignment_div.find('.sirius_edls_crew_worker_name').html(worker_nameid);
-								assignment_div.attr('data-id', worker_id);
-								assignment_div.find('.sirius_edls_extra_wrap a').removeClass('sirius_edls_hidden');
-								assignment_div.find('.sirius_edls_extra').html(extra_render(extra));
-								assignment_div.find('.sirius_edls_extra_time').val(extra['time']);
-								assignment_div.find('.sirius_edls_extra_classification').val(extra['classification']);
+
+								if (assignments[crew_uuid]) {
+									assignment = assignments[crew_uuid][position];
+								} else {
+									assignment = null;
+								}
+
+								if (assignment) { 
+									worker_id = assignment['worker_id'];
+									worker_name = assignment['worker_name'];
+									worker_nameid = worker_id + ' - ' + worker_name;
+									extra = extra_parse(assignment);
+									ms_name = settings.ms_name_lookup_short[assignment['worker_ms']];
+									if (!ms_name) { ms_name = ''; }
+
+									assignment_div.find('.sirius_edls_crew_worker_name').html(worker_nameid);
+									assignment_div.attr('data-id', worker_id);
+									assignment_div.find('.sirius_edls_extra_wrap a').removeClass('sirius_edls_hidden');
+									assignment_div.find('.sirius_edls_extra').html(extra_render(extra));
+									assignment_div.find('.sirius_edls_extra_time').val(extra['time']);
+									assignment_div.find('.sirius_edls_extra_truck').val(extra['truck']);
+									assignment_div.find('.sirius_edls_extra_classification').val(extra['classification']);
+									assignment_div.find('.sirius_edls_ctrl_unassign').removeClass('sirius_edls_ctrl_unassign_disabled');
+									assignment_div.find('.sirius_edls_ms').html(ms_name);
+								} else {
+									assignment_div.find('.sirius_edls_crew_worker_name').html('');
+									assignment_div.attr('data-id', '');
+									assignment_div.find('.sirius_edls_extra_wrap a').addClass('sirius_edls_hidden');
+									assignment_div.find('.sirius_edls_extra').html('');
+									assignment_div.find('.sirius_edls_extra_time').val('');
+									assignment_div.find('.sirius_edls_extra_truck').val('');
+									assignment_div.find('.sirius_edls_extra_classification').val('');
+									assignment_div.find('.sirius_edls_ctrl_unassign').addClass('sirius_edls_ctrl_unassign_disabled');
+									assignment_div.find('.sirius_edls_ms').html('');
+								}
 							}
 						}
 						
 						$('#sirius_edls_notes_inner').html(result['data']['notes_render']);
 						$('#sirius_edls_notes_edit').val(result['data']['notes']);
 
-						stats_render(result);
-						flash('Sheet refreshed at: ' + new Date().toLocaleTimeString(), 'success');
+						$('#sirius_edls_sheet_stats_assigned').html(result['data']['stats']['assigned']);
+						$('#sirius_edls_sheet_stats_count').html(result['data']['stats']['count']);
 					}
 				});
 			}
 
 			function worker_search() {
 				flash('Loading workers ...', 'info');
-
-				start = Date.now();
+				$('#sirius_edls_worker_search').prop('disabled', true);
 
 				$.ajax({
 					'url': '/sirius/edls/ajax/worker_list',
@@ -70,16 +95,11 @@
 					},
 					'type': 'GET',
 					'dataType': 'json',
-					'error': function(jqXHR, textStatus, errorThrown) {
-						flash('Connection failed: ' + textStatus + ': ' + errorThrown, 'error');
-					},
-					'success': function(result) {
-						if (!result['success']) {
-							flash('Error: ' + result['msg'], 'error');
-							return;
-						}
-						end = Date.now();
-						// console.log("Duration: " + (end - start));
+					'complete': function(jqXHR, textStatus) {
+						$('#sirius_edls_worker_search').prop('disabled', false);
+
+						result = handle_ajax_response(jqXHR, textStatus);
+						if (!result) { return; }
 
 						workers = result['data']['workers'];
 
@@ -87,10 +107,9 @@
 						$('#sirius_edls_workers .sirius_edls_workers_ms').html('');
 						$('#sirius_edls_workers .sirius_edls_workers_ms_wrap').addClass('sirius_edls_hidden');
 
-						if (!workers.length) {
-							flash('No workers found.', 'warning');
-							return;
-						}
+						$('#sirius_edls_sheet_avail_head .sirius_edls_worker_stats_inner').html(workers.length);
+
+						if (!workers.length) { return; }
 
 						for (i=0; i<workers.length; ++i) {
 							worker = workers[i];
@@ -166,14 +185,8 @@
 						});
 
 						sheet_search();
-
-						flash('List refreshed at: ' + new Date().toLocaleTimeString(), 'success');
 					}
 				});
-			}
-
-			function get_selected_crew() {
-				return $('.sirius_edls_crew_selected').attr('data-uuid');
 			}
 
 			function assign(worker_id, crew_uuid) {
@@ -189,39 +202,17 @@
 					},
 					'type': 'GET',
 					'dataType': 'json',
-					'error': function(jqXHR, textStatus, errorThrown) {
-						flash('Connection failed: ' + textStatus + ': ' + errorThrown, 'error');
-					},
-					'success': function(result) {
-						if (!result['success']) {
-							flash('Error: ' + result['msg'], 'error');
-							return;
-						}
-
-						position = result['position'];
-						extra = extra_parse(result['assignment']);
-
-						var assignment_div = $('#crew_' + crew_uuid + '_position_' + position);
-						var worker_div = $('#sirius_edls_worker_' + worker_id);
-
-						assignment_div.find('.sirius_edls_crew_worker_name').html(worker_nameid);
-						assignment_div.attr('data-id', worker_id);
-						assignment_div.find('.sirius_edls_extra_wrap a').removeClass('sirius_edls_hidden');
-						assignment_div.find('.sirius_edls_extra').html(extra_render(extra));
-						assignment_div.find('.sirius_edls_extra_time').val(extra['time']);
-						assignment_div.find('.sirius_edls_extra_classification').val(extra['classification']);
-
-						worker_div.addClass('sirius_edls_worker_assigned');
-
-						stats_render(result);
-						flash('Assigned: ' + worker_nameid + ' to position #' + (position+1), 'success');
-						return;
+					'complete': function(jqXHR, textStatus) {
+						result = handle_ajax_response(jqXHR, textStatus);
+						sheet_search();
+						if (!result) { return; }
+						$('#sirius_edls_worker_' + worker_id).addClass('sirius_edls_worker_assigned');
 					}
 				});
 			}
 
 			function unassign(worker_id) {
-				flash('Removing ' + worker_id + '...', 'info');
+				flash('Unassigning ' + worker_id + '...', 'info');
 
 				$.ajax({
 					'url': '/sirius/edls/ajax/unassign',
@@ -231,39 +222,20 @@
 					},
 					'type': 'GET',
 					'dataType': 'json',
-					'error': function(jqXHR, textStatus, errorThrown) {
-						flash('Connection failed: ' + textStatus + ': ' + errorThrown, 'error');
-					},
-					'success': function(result) {
-						if (!result['success']) {
-							flash('Error: ' + result['msg'], 'error');
-							return;
-						}
-
-						position = result['position'];
-
-						var assignment_div = $('.sirius_edls_assignment_wrapper[data-id=\'' + worker_id + '\']');
-						var worker_div = $('#sirius_edls_worker_' + worker_id);
-
-						worker_nameid = assignment_div.find('.sirius_edls_crew_worker_name').html();
-						assignment_div.find('.sirius_edls_crew_worker_name').html('');
-						assignment_div.attr('data-id', '');
-						assignment_div.find('.sirius_edls_extra_wrap a').addClass('sirius_edls_hidden');
-						assignment_div.find('.sirius_edls_extra').html('');
-						assignment_div.find('.sirius_edls_extra_time').val('');
-						assignment_div.find('.sirius_edls_extra_classification').val('');
-
-						worker_div.removeClass('sirius_edls_worker_assigned');
-
-						stats_render(result);
-						flash('Removed: ' + worker_nameid, 'success');
-						return;
+					'complete': function(jqXHR, textStatus) {
+						result = handle_ajax_response(jqXHR, textStatus);
+						sheet_search();
+						if (!result) { return; }
+						$('#sirius_edls_worker_' + worker_id).removeClass('sirius_edls_worker_assigned');
 					}
 				});
 			}
 
 			function assignment_set_extra(worker_id) {
-				flash('Sending ' + worker_id + '...', 'info');
+				flash('Updating worker ' + worker_id + '...', 'info');
+				$('.sirius_popup_overlay').fadeOut();
+				$('.sirius_popup_wrap').fadeOut();
+
 				var assignment_div = $('.sirius_edls_assignment_wrapper[data-id=\'' + worker_id + '\']');
 
 				$.ajax({
@@ -274,37 +246,22 @@
 						'extra': {
 							'time': assignment_div.find('.sirius_edls_extra_time').val(),
 							'classification': assignment_div.find('.sirius_edls_extra_classification').val(),
+							'truck': assignment_div.find('.sirius_edls_extra_truck').val(),
 						}
 					},
 					'type': 'GET',
 					'dataType': 'json',
-					'error': function(jqXHR, textStatus, errorThrown) {
-						flash('Connection failed: ' + textStatus + ': ' + errorThrown, 'error');
-					},
-					'success': function(result) {
-						if (!result['success']) {
-							flash('Error: ' + result['msg'], 'error');
-							return;
-						}
-
-						var assignment_div = $('.sirius_edls_assignment_wrapper[data-id=\'' + worker_id + '\']');
-						worker_nameid = assignment_div.find('.sirius_edls_crew_worker_name').html();
-
-						assignment_div.find('.sirius_edls_extra').html(extra_render(result['extra']));
-
-						// This should really be handled by popup.js, but I'm being lazy and copy-paste
-						$('.sirius_popup_overlay').fadeOut();
-      			$('.sirius_popup_wrap').fadeOut();
-
-						stats_render(result);
-						flash('Updated: ' + worker_nameid, 'success');
-						return;
+					'complete': function(jqXHR, textStatus) {
+						handle_ajax_response(jqXHR, textStatus);
+						sheet_search();
 					}
 				});
 			}
 
 			function set_notes() {
 				flash('Sending notes...', 'info');
+				$('.sirius_popup_overlay').fadeOut();
+				$('.sirius_popup_wrap').fadeOut();
 
 				$.ajax({
 					'url': '/sirius/edls/ajax/sheet_set_notes',
@@ -314,70 +271,15 @@
 					},
 					'type': 'POST',
 					'dataType': 'json',
-					'error': function(jqXHR, textStatus, errorThrown) {
-						flash('Connection failed: ' + textStatus + ': ' + errorThrown, 'error');
-					},
-					'success': function(result) {
-						console.log(result);
-						if (!result['success']) {
-							flash('Error: ' + result['msg'], 'error');
-							return;
-						}
-
-						$('#sirius_edls_notes_inner').html(result['data']['notes_render']);
-						$('#sirius_edls_notes_edit').val(result['data']['notes']);
-
-						// This should really be handled by popup.js, but I'm being lazy and copy-paste
-						$('.sirius_popup_overlay').fadeOut();
-      			$('.sirius_popup_wrap').fadeOut();
-
-						stats_render(result);
-						flash('Updated notes', 'success');
-						return;
+					'complete': function(jqXHR, textStatus) {
+						handle_ajax_response(jqXHR, textStatus);
+						sheet_search();
 					}
 				});
 			}
 
-			function extra_render(extra) {
-				if (!extra) { return ''; }
-				render = '';
-				if (extra['classification']) { 
-					render += settings['classification_options'][extra['classification']];
-				}
-				if (extra['time']) {
-					if (render) { render += ' '; }
-					render += extra['time'];
-				}
-				return render;
-			}
-
-			function extra_parse(assignment) {
-				if (!assignment) { return {'time':'', 'classification':''}; }
-
-				extra = assignment['assignment_extra'];
-				if (!extra) { return {'time':'', 'classification':''}; }
-				
-				extra = JSON.parse(extra);
-				if (!extra) { return {'time':'', 'classification':''}; }
-
-				if (!('time' in extra)) { extra['time'] = ''; }
-				if (!('classification' in extra)) { extra['classification'] = ''; }
-				return extra;
-			}
-
-			function stats_render(ajax_result) {
-				if (!ajax_result || !ajax_result['data'] || !ajax_result['data']['stats']) { return; }
-				$('#sirius_worker_edls_sheet_stats_assigned').html(ajax_result['data']['stats']['assigned']);
-				$('#sirius_worker_edls_sheet_stats_count').html(ajax_result['data']['stats']['count']);
-				console.log(ajax_result);
-			}
-
-			function flash(msg, priority) {
-				return Drupal.behaviors.sirius_ux.flash(msg, priority);
-			}
-
 			function popup_worker_details(worker_id) {
-				flash('Loading worker ' + worker_id, 'info');
+				flash('Loading worker ' + worker_id + '...', 'info');
 
 				$.ajax({
 					'url': '/sirius/edls/ajax/worker_lookup',
@@ -388,14 +290,10 @@
 					},
 					'type': 'GET',
 					'dataType': 'json',
-					'error': function(jqXHR, textStatus, errorThrown) {
-						flash('Connection failed: ' + textStatus + ': ' + errorThrown, 'error');
-					},
-					'success': function(result) {
-						if (!result['success']) {
-							flash('Error: ' + result['msg'], 'error');
-							return;
-						}
+					'complete': function(jqXHR, textStatus) {
+						result = handle_ajax_response(jqXHR, textStatus);
+						if (!result) { return; }
+						console.log(result);
 
 			      var left = Math.floor(($(window).width() - 600) / 2);
 			      var top = Math.floor(($(window).height() - 400) / 2);
@@ -405,7 +303,6 @@
 			      var close = $('#popup_worker_details_close');
 			      var content = $('#popup_worker_details_content');
 
-			      // console.log(result);
 			      content.html(result['render']);
 
 			      overlay.show();
@@ -433,13 +330,62 @@
 			          wrap.fadeOut();
 			        }
 			      });
-
-						stats_render(result);
-						flash('Worker details loaded.', 'success');
 					}
 				});
 		  }
 
+			function get_selected_crew() {
+				return $('.sirius_edls_crew_selected').attr('data-uuid');
+			}
+
+			function extra_render(extra) {
+				if (!extra) { return ''; }
+				render = '';
+				if (extra['classification']) { 
+					render += settings['classification_options'][extra['classification']];
+				}
+				if (extra['time']) {
+					if (render) { render += ' '; }
+					render += extra['time'];
+				}
+				if (extra['truck']) {
+					if (render) { render += ' '; }
+					render += 'Trk #' + extra['truck'];
+				}
+				return render;
+			}
+
+			function extra_parse(assignment) {
+				if (!assignment) { return {'time':'', 'classification':'', 'truck':''}; }
+
+				extra = assignment['assignment_extra'];
+				if (!extra) { return {'time':'', 'classification':'', 'truck':''}; }
+				
+				if (!('time' in extra)) { extra['time'] = ''; }
+				if (!('classification' in extra)) { extra['classification'] = ''; }
+				if (!('truck' in extra)) { extra['truck'] = ''; }
+				return extra;
+			}
+
+			function handle_ajax_response(jqXHR, textStatus, priority = 'success') {
+				if (textStatus == 'error') {
+					flash('Connection failed: ' + jqXHR['statusText'], 'error');
+					return false;
+				} else if (!jqXHR['responseJSON']) {
+					flash('Error: ' + jqXHR['responseText'], 'error');
+					return false;
+				} else if (!jqXHR['responseJSON']['success']) {
+					flash('Error: ' + jqXHR['responseJSON']['msg'], 'error');
+					return false;
+				} else {
+					flash(jqXHR['responseJSON']['msg'], priority);
+					return jqXHR['responseJSON'];
+				}
+			}
+
+			function flash(msg, priority) {
+				return Drupal.behaviors.sirius_ux.flash(msg, priority);
+			}
 
 			//
 			// Run once on load...
@@ -473,8 +419,9 @@
 			});
 
 			// Unassign on click
-			$('.sirius_edls_crew_worker_name').click(function() {
+			$('.sirius_edls_ctrl_unassign').click(function() {
 				worker_id = $(this).parents('.sirius_edls_assignment_wrapper').attr('data-id');
+				if (!worker_id) { return; }
 				unassign(worker_id);
 				return false;
 			});
