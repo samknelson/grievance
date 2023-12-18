@@ -10,16 +10,73 @@
 	padding-top: 0;
 }
 
-#sirius_ux_flash_wrapper {
-  height: auto;
+.sirius_callout_fullwidth {
+	border: 1px solid #999999;
+	background-color: #ffffff;
+	padding: 10px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#content .sirius_callout_basic h2,
+#content .sirius_callout_fullwidth h2 {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+#sirius_ux_flash_wrapper .sirius_ux_flash_log {
+  height: 350px;
   position: fixed; 
-  bottom: 0;
+  bottom: 46px;
   right: 0;
+  right: 40px;
   width: 300px;
   opacity: 0.8;
   padding: 10px;
   margin: 20px;
 	color: #000000;
+	border: 1px solid #000000;
+	background-color: #aaaaaa;
+	overflow: scroll;
+}
+
+#sirius_ux_flash_wrapper .sirius_ux_flash_log_toggle {
+  height: 21px;
+  position: fixed; 
+  bottom: 46px;
+  right: 0;
+  opacity: 0.8;
+  padding: 10px;
+  margin: 20px;
+	color: #000000;
+	background-color: #999999;
+	border: 1px solid #333333;
+}
+
+#sirius_ux_flash_wrapper .sirius_ux_flash_latest {
+  height: 21px;
+  position: fixed; 
+  bottom: 0;
+  right: 40px;
+  width: 300px;
+  opacity: 0.8;
+  padding: 10px;
+  margin: 20px;
+	color: #000000;
+	overflow: hidden;
+}
+
+#sirius_ux_flash_wrapper .sirius_ux_flash_latest_toggle {
+  height: 21px;
+  position: fixed; 
+  bottom: 0;
+  right: 0;
+  opacity: 0.8;
+  padding: 10px;
+  margin: 20px;
+	color: #000000;
+	background-color: #999999;
+	border: 1px solid #333333;
 }
 
 .sirius_ux_flash_warning {
@@ -33,11 +90,25 @@
 }
 
 .sirius_ux_flash_info {
-	background-color: #bbbbbb;
-	border: 1px solid #333333;
+	background-color: #cccccc;
+	border: 1px solid #999999;
 }
 
 .sirius_ux_flash_success {
 	background-color: #99ff99;
 	border: 1px solid #339933;
+}
+
+.sirius_ux_flash_ctrl {
+	float: right;
+	margin-left: 2px;
+	font-size: 125%;
+}
+
+.sirius_ux_flash_item {
+	background-color: #ffffff;
+	border: 1px solid #999999;
+	margin-bottom: 5px;
+	padding: 5px;
+	font-size: 85%;
 }
