@@ -666,6 +666,16 @@ function sirius_menu() {
     'weight' => 2,
   );
 
+  $items['sirius/admin/banner/login'] = array(
+    'title' => 'Login',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_login_config'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
   $items['sirius/auditlog/config'] = array(
     'title' => 'Auditlog Configuration ',
     'description' => '',
