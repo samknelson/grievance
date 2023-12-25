@@ -2,6 +2,10 @@
  * Layout
  */
 
+table.sirius_table tbody tr:hover td {
+	background-color:  transparent;
+}
+
 table.sirius_table td, 
 table.sirius_table th {
 	vertical-align: top;
@@ -50,6 +54,11 @@ table.sirius_table_form td div.form-item {
 	margin-bottom:  0;
 }
 
+table.sirius_table td p {
+	padding-top: 0;
+	margin-top: 0;
+}
+
 /**
  * Basic table style
  */
@@ -69,9 +78,4 @@ table.sirius_table_form td div.form-item {
 .sirius_table_basic td,
 .sirius_table_basic th {
 	padding: 4px;
-}
-
-table.sirius_table td p {
-	padding-top: 0;
-	margin-top: 0;
 }

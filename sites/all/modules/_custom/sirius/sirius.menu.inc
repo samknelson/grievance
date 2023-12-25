@@ -666,6 +666,16 @@ function sirius_menu() {
     'weight' => 2,
   );
 
+  $items['sirius/admin/banner/login'] = array(
+    'title' => 'Login',
+    'description' => '',
+    'access arguments' => array('sirius admin'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sirius_login_config'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
   $items['sirius/auditlog/config'] = array(
     'title' => 'Auditlog Configuration ',
     'description' => '',
@@ -1687,6 +1697,15 @@ function sirius_menu_access_callback($options) {
     if (!sirius_domain_component_enabled($options['component'])) {
       return FALSE;
     }
+  }
+
+  // Access plugin
+  if ($options['access']) {
+    $instance = sirius_access_instance($options['access']['type']);
+    if (!$instance) { return FALSE; }
+    $action = $options['access']['action'];
+    $context = $options['access']['context'];
+    if (!$instance->access($action, $context)) { return FALSE; }
   }
 
   // Passed all tests

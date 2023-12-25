@@ -1,0 +1,66 @@
+.sirius_edls_crew_name {
+	border: 1px solid #000000;
+}
+
+.sirius_edls_crew_name {
+	font-weight: bold;
+}
+
+/*
+.sirius_edls_crews {
+  column-count: 2;
+  column-gap: 10px;
+  margin-top: 10px;
+}
+
+.sirius_edls_crews::after {
+	content: "";
+	clear: both;
+	display: table;
+}
+
+.sirius_edls_crew {
+  margin: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  margin-bottom: 10px;
+  break-inside: avoid;
+  border: 1px solid #333333;
+  background-color: #ffffff;
+  padding: 10px;
+}
+*/
+
+#content .sirius_edls_crew h2 {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+.sirius_edls_notes_wrap {
+  margin-bottom: 10px;
+}
+.sirius_edls_notes_wrap .sirius_edls_notes {
+  display: inline-block;
+}
+
+.sirius_edls_page_number {
+  font-weight: bold;
+  text-align: right;
+}
+
+.sirius_edls_page_break {
+  page-break-after: always;
+}
+
+.sirius_edls_assignment_extra {
+  float: right;
+  font-size: 75%;
+  font-weight: bold;
+}
+
+@media print {
+  .sirius_edls_crew {
+    font-size: 85%;
+  }
+  #messages { display: none; }
+}

@@ -1,0 +1,215 @@
+.sirius_edls_worker_id {
+	display: inline-block;
+	min-width: 40px;
+	padding-right:  5px;
+}
+
+.sirius_edls_crew {
+	background-color: #bbbbbb;
+	border: 1px solid #333333;
+	margin-bottom: 15px;
+}
+
+.sirius_edls_crew_selected {
+	background-color: #99ff99;
+	border: 1px solid #339933;
+}
+
+.sirius_edls_crew_selected table tbody td:nth-child(1),
+.sirius_edls_crew_selected table tbody td:nth-child(1):hover {
+	background-color: #99ff99 !important;
+	border: 1px solid #339933 !important;
+}
+
+.sirius_edls_crew_selected:hover {
+	border: 1px solid #339933 !important;
+}
+
+.sirius_edls_worker_assigned {
+	font-weight: bold;
+}
+
+.sirius_edls_worker_unavailable {
+	/* color: #aaaaaa; */
+}
+
+.sirius_edls_worker_indicator_dot {
+  height: 0.9em;
+  width: 0.9em;
+  border-radius: 50%;
+  border: 1px solid #000000;
+  background-color: #ffffff;
+  display: inline-block;
+  margin-right: 2px;
+}
+
+.sirius_edls_worker_indicator_dot_filled {
+	background-color: #000000;
+}
+
+.sirius_edls_worker_indicator_dot_draft {
+	background-color: #aaaaaa;
+}
+
+.sirius_edls_worker_indicator_dot_request {
+	background-color: #aaaa00;
+}
+
+.sirius_edls_worker_indicator_dot_lock {
+	background-color: #00aa00;
+}
+
+.sirius_edls_worker_indicator_dot_trash {
+	background-color: #aa0000;
+}
+
+
+.sirius_edls_worker_indicator {
+	font-weight: normal;
+	font-style: normal;	
+	margin-right: 5px;
+	/* border: 1px solid #999999; */
+	font-size: 85%;
+}
+
+.sirius_edls_workers_ms_title {
+	padding-top: 10px;
+	padding-bottom: 5px;
+	font-size: 120%;
+	font-weight: bold;
+}
+
+.sirius_edls_hidden {
+	display: none;
+}
+
+.sirius_popup_contents a.sirius_edls_set_extra_submit {
+	margin-top: 15px;
+	font-weight: bold;
+}
+
+.sirius_edls_extra_wrap {
+	float: right;
+}
+
+.sirius_edls_extra_wrap .sirius_popup_trigger {
+	padding-left: 4px;
+}
+
+
+.sirius_edls_worker_detail_assignment {
+	width: 28%;
+	float: left;
+	border: 1px solid #cccccc;
+	padding: 5px;
+	margin: 5px;
+	min-height: 200px;
+	font-size: 85%;
+}
+
+#content .sirius_edls_worker_detail h2 {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+#content .sirius_edls_worker_detail_assignment h2.field-label {
+	width: auto;
+	min-width: auto;
+}
+
+.sirius_edls_worker_detail_assignment_empty {
+	background-color: #cccccc;
+}
+
+.sirius_edls_worker_detail_assignment_full {
+	background-color: #ffffff;
+}
+
+#popup_worker_details_overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
+  z-index: 9998;
+  background-color: black;
+}
+#popup_worker_details_wrap {
+  position: absolute;
+  z-index: 9999;
+  overflow: auto;
+  background: white;
+  border-radius: 8px;
+  -moz-box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+#popup_worker_details_wrap {
+  padding: 20px;
+  min-height: 50px;
+}
+#popup_worker_details_close {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  height: 26px;
+  width: 26px;
+  background: url('../../sirius/images/popup-announcement-icons.png');
+}
+#popup_worker_details_hover:hover {
+  background: url('../../sirius/images/popup-announcement-icons.png') 0 -28px;
+  cursor: pointer;
+}
+
+#sirius_edls_notes_edit {
+	width: 100%;
+}
+
+.sirius_edls_notes_wrap {
+	border: 1px solid #333333;
+	padding: 5px;
+}
+
+#content .sirius_edls_notes_wrap h2 {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+.sirius_edls_ctrl_unassign {
+	margin-right: 4px;
+}
+
+.sirius_edls_ctrl_unassign_disabled {
+	color: #999999;
+}
+
+.sirius_edls_crew_head {
+	font-weight: bold;
+	padding: 8px;
+}
+
+.sirius_edls_crew_stats {
+	float: right;
+}
+
+#sirius_worker_edls_sheet_stats,
+#sirius_edls_sheet_avail_head {
+	font-weight: bold;
+	margin-bottom: 8px;
+}
+
+#sirius_worker_edls_sheet_stats .sirius_worker_edls_sheet_stats_inner,
+#sirius_edls_sheet_avail_head .sirius_edls_worker_stats_inner {
+	float: right;
+	margin-right: 10px;
+}
+
+.container-inline label {
+	display: inline-block;
+	width: 130px;
+}
