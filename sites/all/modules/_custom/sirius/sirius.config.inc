@@ -6,7 +6,12 @@ function sirius_config_links() {
  	if (!isset($links)) {
 		$links['domain'] = array('title' => 'Domains');
 		$links['domain']['links']['sirius/domains'] 									= array('title' => 'Manage Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
-		$links['domain']['links']['sirius/domain/config'] 						= array('title' => 'Domain Settings', 'description' => 'Global domain settings -- user manager, stats configuration, etc.');
+		$links['domain']['links']['sirius/domain/config'] 						= array('title' => 'Global Domain Settings', 'description' => 'Global domain settings -- user manager, stats configuration, etc.');
+
+		$domain_nid = sirius_domain_nid();
+		if ($domain_nid) {
+			$links['domain']['links']["node/$domain_nid/sirius_domain_components"] = array('title' => 'Components', 'description' => 'Enabled components for this domain');
+		}
 		
 		$links['core'] = array('title' => 'Core', 'weight' => -1);
 		$links['core']['links']['sirius/taxonomy'] 										= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');
