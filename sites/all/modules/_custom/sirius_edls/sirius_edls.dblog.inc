@@ -82,6 +82,9 @@ class Sirius_Edls_Dblog extends Sirius_Singleton {
 			'assign' => t('Assign'),
 			'update' => t('Update'),
 			'unassign' => t('Unassign'),
+			'notification_sent' => t('Notification Sent'),
+			'notification_error' => t('Notification Failed'),
+			'notification_accept' => t('Notification Accepted'),
 		);
 	}
 

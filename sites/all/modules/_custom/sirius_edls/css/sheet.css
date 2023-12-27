@@ -54,7 +54,7 @@
 
 .sirius_edls_assignment_extra {
   float: right;
-  font-size: 75%;
+  font-size: 85%;
   font-weight: bold;
 }
 
@@ -63,4 +63,45 @@
     font-size: 85%;
   }
   #messages { display: none; }
+
+  .sirius_quicknav { display: none; }
+}
+
+
+
+.sirius_edls_notify_status {
+  float: right;
+  margin-left: 4px;
+}
+
+.sirius_edls_notify_status_long {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #333333;
+  text-align: center;
+  font-weight: bold;
+  font-size: 125%;
+  background-color: #cccccc;
+}
+
+.sirius_edls_notify_status_long_details {
+  font-weight: normal;
+  font-size: 75%;
+
+}
+
+.sirius_edls_notify_status_accepted {
+  color: #00aa00;
+}
+
+.sirius_edls_notify_status_declined {
+  color: #aa0000;
+}
+ 
+.sirius_edls_notify_status_error {
+  color: #aa0000;
+}
+ 
+.sirius_edls_notify_status_queue {
+  color: #999999;
 }

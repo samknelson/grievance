@@ -23,6 +23,7 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
   // - It will be called very frequently (many supervisors, refreshing their worker list every few seconds)
   // - It may return a lot of results (~2000 workers)
   // - It is expected to return a lot of data (worker list, assignments, previous department, etc.)
+  // - It needs to pull workers from various sources (in-house, outsource, apprentice list, etc.)
   //
   // For efficiency, we're breaking some compartmentalization rules here. In an ideal world, we'd run one
   // query to fetch all the workers, and then query each worker for their current assignment, etc. 
@@ -30,7 +31,6 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
   // But we want to avoid running ~2000 individual queries every few seconds for every active user. So 
   // we fetch as much information as we can in the one big query, and then pad it with additional information 
   // here. It's a cumbersome code design, but much more efficient.
-
   $outsource_workers = sirius_edls_outsource_list($employer_nid, $date, $filters);
   $dispatch_workers = sirius_edls_dispatch_list($employer_nid, $date, $filters);
   $result = array_merge($outsource_workers, $dispatch_workers);
@@ -62,24 +62,30 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
   foreach ($result as $delta => $record) {
     foreach (array('curr', 'prev', 'next') as $prefix) {
       $sheet_nid = $record["{$prefix}_sheet_nid"];
-      if ($sheet_nid) {
-        if (!$sheet_lookup[$sheet_nid]) {
-          $sql = "select field_sirius_edls_sheet_status_value as status, field_grievance_department_tid_tid as department ";
-          $sql .= "from node ";
-          $sql .= "left join field_data_field_sirius_edls_sheet_status on field_data_field_sirius_edls_sheet_status.entity_type = 'node' and field_data_field_sirius_edls_sheet_status.entity_id = node.nid ";
-          $sql .= "left join field_data_field_grievance_department_tid on field_data_field_grievance_department_tid.entity_type = 'node' and field_data_field_grievance_department_tid.entity_id = node.nid ";
-          $sql .= "where node.nid = :sheet_nid ";
-          $stmt = sirius_sql_query($sql, array(':sheet_nid' => $sheet_nid));
-          $sheet_lookup[$sheet_nid] = $stmt->fetchAssoc();
-        }
-
-        $result[$delta]["${prefix}_status"] = $sheet_lookup[$sheet_nid]['status'];
-        $result[$delta]["${prefix}_department"] = $sheet_lookup[$sheet_nid]['department'];
+      if (!$sheet_nid) { continue; }
+      if (!$sheet_lookup[$sheet_nid]) {
+        $sql = "select field_sirius_edls_sheet_status_value as status, field_grievance_department_tid_tid as department ";
+        $sql .= "from node ";
+        $sql .= "left join field_data_field_sirius_edls_sheet_status on field_data_field_sirius_edls_sheet_status.entity_type = 'node' and field_data_field_sirius_edls_sheet_status.entity_id = node.nid ";
+        $sql .= "left join field_data_field_grievance_department_tid on field_data_field_grievance_department_tid.entity_type = 'node' and field_data_field_grievance_department_tid.entity_id = node.nid ";
+        $sql .= "where node.nid = :sheet_nid ";
+        $stmt = sirius_sql_query($sql, array(':sheet_nid' => $sheet_nid));
+        $sheet_lookup[$sheet_nid] = $stmt->fetchAssoc();
       }
+
+      $result[$delta]["${prefix}_status"] = $sheet_lookup[$sheet_nid]['status'];
+      $result[$delta]["${prefix}_department"] = $sheet_lookup[$sheet_nid]['department'];
     }
   }
 
-  // Tidy case
+  // Filter by previous department
+  if ($filters['prev_department']) {
+    $result = array_values(array_filter($result, function($v) use ($filters) {
+      return ($v['prev_department'] == $filters['prev_department']);
+    }));
+  }
+
+  // Correct capitalization for worker names
   $sheet_lookup = array();
   foreach ($result as $delta => $record) {
     $result[$delta]['worker_name'] = ucwords(strtolower($result[$delta]['worker_name']));
@@ -90,11 +96,13 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
 
 
 function sirius_edls_worker_fetch($employer_nid, $worker_id, $date = NULL) {
+  // Fetch the worker. This is just a wrapper around a filtered "worker_list".
   if (!$date) { $date = date('Y-m-d'); }
   $result = sirius_edls_worker_list($employer_nid, $date, array('worker_id' => $worker_id));
   $record = $result[0];
   if (!$record) { $record = array(); }
 
+  // Add next and previous assignments
   $sql = "select * from sirius_edls_assignments ";
   $sql .= "where sirius_edls_assignments.worker_id = :worker_id ";
   $sql .= "and sirius_edls_assignments.employer_nid = :employer_nid ";
@@ -313,7 +321,7 @@ function sirius_worker_form_filters($options = array()) {
     '#type' => 'select',
     '#title' => t('Current Assignment'),
     '#options' => array(
-      'NULL' => t('-- Select --'),
+      NULL => t('-- Select --'),
       'exclude' => t('Exclude'),
       'include' => t('Include'),
     ),
@@ -327,7 +335,7 @@ function sirius_worker_form_filters($options = array()) {
     '#type' => 'select',
     '#title' => t('Next Assignment'),
     '#options' => array(
-      'NULL' => t('-- Select --'),
+      NULL => t('-- Select --'),
       'exclude' => t('Exclude'),
       'include' => t('Include'),
     ),
@@ -335,6 +343,20 @@ function sirius_worker_form_filters($options = array()) {
     '#prefix' => '<div class="container-inline">',
     '#suffix' => '</div>',
   );
+
+  $result = sirius_edls_employer_switch();
+  $employer_node = $result['employer_node'];
+  $department_options = sirius_edls_departments($options['employer_node']);
+  if ($department_options) { 
+    $form['prev_department'] = array(
+      '#type' => 'select',
+      '#title' => t('Last Dept.'),
+      '#options' => array(NULL => t('-- Select --')) + $department_options,
+      '#id' => 'sirius_edls_worker_filter_prev_department',
+      '#prefix' => '<div class="container-inline">',
+      '#suffix' => '</div>',
+    );
+  }
 
   $form['search'] = array(
     '#type' => 'button',

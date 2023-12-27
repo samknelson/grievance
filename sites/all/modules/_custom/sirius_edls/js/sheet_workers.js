@@ -90,6 +90,7 @@
 							'ms': $('#sirius_edls_worker_filter_ms').val(),
 							'has_assignment_curr': $('#sirius_edls_worker_filter_has_assignment_curr').val(),
 							'has_assignment_next': $('#sirius_edls_worker_filter_has_assignment_next').val(),
+							'prev_department': $('#sirius_edls_worker_filter_prev_department').val(),
 							'curr_sheet_nid': settings.sheet_nid,
 						},
 					},

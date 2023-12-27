@@ -222,7 +222,7 @@ function sirius_edls_menu() {
       ),
     ),
     'type' => MENU_LOCAL_TASK,
-    'weight' => 1,
+    'weight' => 2,
     'file' => 'sirius_edls.page_worker_list.inc'
   );
 
@@ -264,6 +264,42 @@ function sirius_edls_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
     'file' => 'sirius_edls.page_worker_outsource.inc'
+  );
+
+  /*
+  $items['sirius/edls/assignments'] = array(
+    'title' => 'Assignments',
+    'page callback' => 'sirius_edls_page_assignment_list',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'assignment_list',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+    'file' => 'sirius_edls.page_assignment_list.inc'
+  );
+  */
+
+  $items['edls-notify/%'] = array(
+    'title' => 'Notification',
+    'page callback' => 'sirius_edls_page_notification',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_edls.page_notification.inc'
   );
 
   /*

@@ -1,6 +1,6 @@
 <?php
 
-function sirius_edls_page_sheet_list() {
+function sirius_edls_page_assignment_list() {
 	$result = sirius_edls_employer_switch();
 	$html = $result['markup'];
 	$employer_node = $result['employer_node'];
@@ -9,16 +9,12 @@ function sirius_edls_page_sheet_list() {
 		return $html;
 	}
 
-	$html .= drupal_render(drupal_get_form('sirius_edls_page_sheet_list_form', $employer_node));
+	$html .= drupal_render(drupal_get_form('sirius_edls_page_assignment_list_form', $employer_node));
 	return $html;
 }
 
-function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
+function sirius_edls_page_assignment_list_form($form, &$form_state, $employer_node) {
   $form['#tree'] = TRUE;
-
-	$form['header_links'] = array(
-		'#markup' => '<p>' . l('Create a New Sheet', 'sirius/edls/sheet-create', array('attributes' => array('class' => array('tool-button')))) . '</p>',
-	);
 
 	if ($form_state['submitted']) {
 		if ($form_state['values']['filters']['date'] == 'other') {
@@ -115,18 +111,15 @@ function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
   }
 	$params['date'] = $date;
 	$params['grievance_shop'] = $employer_node->nid;
-  $sheet_nodes = sirius_edls_sheet_search($params);
-
+  $assignments = sirius_edls_assignment_search($params);
 
   $render_options = array();
   $render_options['hide_employer'] = TRUE;
-  $form['results'] = array('#markup' => sirius_edls_sheet_list_render($sheet_nodes, $render_options));
-
-	$form['footer_links'] = $form['header_links'];
+  $form['results'] = array('#markup' => sirius_edls_assignment_list_render($assignments, $render_options));
 
   return $form;
 }
 
-function sirius_edls_page_sheet_list_form_submit($form, &$form_state) {
+function sirius_edls_page_assignment_list_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 }

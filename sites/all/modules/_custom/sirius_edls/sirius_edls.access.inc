@@ -36,11 +36,16 @@ class Sirius_Edls_Access extends Sirius_Access {
       'sheet_change_supervisor',
       'sheet_revisions',
       'sheet_assignmentlog',
+      'sheet_export',
 
       // parameter sheet_node
       'sheet_status_draft',
       'sheet_status_request',
       'sheet_status_lock',
+      'sheet_notify_enable',
+
+      // Parameters: notification, notification_uuid
+      'notification_view',
     );
 
     $sheet_node = $context['sheet_node'];
@@ -67,6 +72,23 @@ class Sirius_Edls_Access extends Sirius_Access {
     // Admins can do anything
     if ($is_admin) { return TRUE; }
 
+    // Anonymous users can view notifications, if they have the correct UUID
+    if (in_array($action, array('notification_view', 'notification_accept'))) {
+      // Must have a UUID
+      if (!$context['notification_uuid']) { return FALSE; }
+
+      // It must match
+      if ($context['notification_uuid'] != $context['notification']['notification_uuid']) { return FALSE; }
+
+      // That's all you need to view the notification.
+      if ($action == 'notification_view') { return TRUE; }
+
+      // You can accept if status = 'sent'
+      if ( ($action == 'notification_accept') && (in_array($context['notification']['notification_status'], array('sent', 'error'))) ) {
+        return TRUE;
+      }
+    }
+
     // Everybody else is restricted to one employer_nid
 		$user_full = user_load($user->uid);
 		$my_employer_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
@@ -91,9 +113,6 @@ class Sirius_Edls_Access extends Sirius_Access {
       // Labor coordinators can view the statistics
       if ($is_employer_coordinator) { return TRUE; }
       if ($is_worker_advisor) { return TRUE; }
-
-      // Labor supervisors can view the statistics
-      if ($is_worker_advisor) { return TRUE; }
     }
 
     // Change the supervisor on a sheet
@@ -110,7 +129,7 @@ class Sirius_Edls_Access extends Sirius_Access {
     }
 
     // View, clone, or manage a sheet
-    if (in_array($action, array('sheet_view', 'sheet_clone', 'sheet_manage'))) {
+    if (in_array($action, array('sheet_view', 'sheet_clone', 'sheet_manage', 'sheet_export'))) {
       // Labor coordinators can view anything
       if ($is_employer_coordinator) { return TRUE; }
       if ($is_worker_advisor) { return TRUE; }
