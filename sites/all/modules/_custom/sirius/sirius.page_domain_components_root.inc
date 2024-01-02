@@ -5,12 +5,33 @@ function sirius_page_domain_components_root() {
 }
 
 function sirius_page_domain_components_root_form($form, &$form_state) {
+  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/table.css');
 	$form['#tree'] = TRUE;
 
 	$all_info = sirius_domain_component_info_all();
 
+
+	$form['component']['open'] = array(
+		'#markup' => '<table class="sirius_table">' .
+			'<tr>' . 
+			'<th>' . t('Component') . '</th>' .
+			'<th>' . t('Enable?') . '</th>' .
+			'</tr>'
+	);
+
 	foreach ($all_info as $key => $info) {
     $variable_name = 'sirius_domain_root_component_enabled_' . $key;
+
+		if (variable_get($variable_name, 'Yes') == 'Yes') { $class = 'green'; } else { $class = 'gray'; }
+
+		$form['component'][$key]['open'] = array('#markup' => "<tr class=\"$class\">");
+
+		$form['component'][$key]['title'] = array(
+			'#markup' => '<td>' .
+				sirius_tooltip_render($info['description'], $info['title']) . 
+				'</td>',
+		);
+
 		$form['component'][$key]['enabled'] = array(
 			'#type' => 'select',
 			'#options' => array(
@@ -18,11 +39,17 @@ function sirius_page_domain_components_root_form($form, &$form_state) {
 				'No' => t('No'),
 				'Yes' => t('Yes'),
 			),
-			'#title' => $info['title'],
-			'#description' => $info['description'],
 			'#default_value' => variable_get($variable_name, 'Yes'),
+			'#prefix' => '<td>',
+			'#suffix' => '</td>',
 		);
+
+		$form['component'][$key]['close'] = array('#markup' => '</tr>');
 	}
+
+	$form['component']['close'] = array(
+		'#markup' => '</table>'
+	);
 
 	$form['submit'] = array(
 		'#type' => 'submit',
