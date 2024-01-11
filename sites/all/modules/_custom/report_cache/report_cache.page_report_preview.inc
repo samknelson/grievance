@@ -25,16 +25,7 @@ function report_cache_preview_form($form, &$form_state, $report_type, $report_id
 	}
 	*/
 
-	if ($info['generator']) {
-		$parameters_render = $info['generator']->render_parameters($parameters);
-	} else {
-		// Legacy support
-		$render_parameters_callback = $info['render_parameters_callback'];
-		if ($render_parameters_callback) {
-			$parameters_render = $render_parameters_callback($parameters);
-		}
-	}
-
+	$parameters_render = $info['generator']->render_parameters($parameters);
 	if ($parameters_render) {
 		$parameters_html = '<div class="report_cache_parameters">';
 		$parameters_html .= '<h2>' . t('Parameters') . '</h2>';
@@ -77,7 +68,7 @@ function report_cache_preview_form($form, &$form_state, $report_type, $report_id
 	foreach ($display_fields as $field_name) {
 		$header[] = $fields[$field_name];
 	}
-	if ($info['generator'] && method_exists($info['generator'], 'preview_links')) { $header[] = t('Tools'); }
+	if (method_exists($info['generator'], 'preview_links')) { $header[] = t('Tools'); }
 
 	$query = db_select('report_cache');
 	$query->fields('report_cache');
@@ -98,7 +89,7 @@ function report_cache_preview_form($form, &$form_state, $report_type, $report_id
 			$row[] = $hr[$name];
 		}
 
-		if ($info['generator'] && method_exists($info['generator'], 'preview_links')) {
+		if (method_exists($info['generator'], 'preview_links')) {
 			$links = $info['generator']->preview_links($hr);
 			$links_html = '';
 			foreach ($links as $path => $name) {

@@ -144,3 +144,14 @@ function sirius_teamsters631_sirius_worker_nextid_alter(&$id) {
 		$id = max($id, $id2);
 	}
 }
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function sirius_teamsters631_report_cache_info() {
+  $items = array();
+  sirius_require('sirius_teamsters631', 'sirius_teamsters631.report_edls_compliance.inc');
+  Sirius_Teamsters631_Report_Edls_Compliance::getInstance()->setInfo($items);
+  return $items;
+}

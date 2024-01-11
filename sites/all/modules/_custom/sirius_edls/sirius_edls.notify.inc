@@ -258,8 +258,8 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 			global $base_url;
 			$url = $base_url . '/edls-notify/' . $notification['notification_uuid'];
 			$subject = $worker_node->title . ": Crew assignment for $date";
-			$body = "Your crew assignment for $date has been posted. Please follow the link below and accept:<br><br><a href=\"$url\">$url</a>";
-			$sms = $worker_node->title . ": your crew assignment for $date has been posted. Please follow the link below and accept:\n\n$url";
+			$body = "Your crew assignment for $date has been posted or updated. Please follow the link below and accept:<br><br><a href=\"$url\">$url</a>";
+			$sms = $worker_node->title . ": your crew assignment for $date has been posted or updated. Please follow the link below and accept:\n\n$url";
 
 			if ($mode == 'live') {
 				$result = sirius_worker_notify(
@@ -373,7 +373,7 @@ function sirius_edls_notify_render($notification) {
 
 	$html .= '<div class="sirius_callout_fullwidth">';
 	if (!$crew) {
-		$html .= '<p>' . t('You have been removed from this work assignment.') . '</p>';
+		$html .= '<p>' . t('You have been removed from all assignments for employer @employer on <strong>@date</strong>.', array('@employer' => $employer_node->title, '@date' => $date)) . '</p>';
 	} else {
 		$html .= '<h2>' . t('Job Information') . '</h2>';
 		$html .= sirius_fakerender_field('Employer:', $employer_node->title);

@@ -84,10 +84,19 @@ function sirius_edls_ajax_assignment_set_extra() {
 	if (!$sheet_nid) { return sirius_edls_ajax_error('Please pass in a sheet_nid'); }
 	$sheet_node = node_load($sheet_nid);
 
-	$extra = $_REQUEST['extra'];
-
 	$can_access = sirius_access_instance('edls')->access('sheet_edit_workers', array('sheet_node' => $sheet_node));
 	if (!$can_access) { return sirius_edls_ajax_error('Access denied'); }
+
+	$extra = $_REQUEST['extra'];
+
+  if ($extra['time']) {
+    $ts = strtotime($extra['time']);
+    if ($ts === false) {
+      unset($extra['time']);
+    } else {
+      $extra['time'] = date('g:i a', $ts);
+    }
+  }
 
 	$date = $sheet_node->field_sirius_date_start['und'][0]['value'];
 

@@ -247,20 +247,14 @@ function sirius_edls_assignment_set_extra($date, $worker_id, $sheet_nid, $extra 
     return array('success' => FALSE, 'msg' => 'The worker is not assigned to this sheet.');
   }
 
-  if ($extra['time']) {
-    $ts = strtotime($extra['time']);
-    if ($ts === false) {
-      unset($extra['time']);
-    } else {
-      $extra['time'] = date('g:i a', $ts);
-    }
-  }
+  // We implement this as an unassign / reassign, to keep the number of primitive operations small,
+  // and because it's nice if an "assignment" never changes.
+  
+  $result = sirius_edls_unassign($date, $worker_id, $sheet_nid);
+  if (!$result['success']) { return $result; }
 
-  $sql = "update sirius_edls_assignments set assignment_extra = :extra where assignment_id = :assignment_id";
-  $stmt = db_query($sql, array(':assignment_id' => $assignment['assignment_id'], ':extra' => json_encode($extra)));
-
-  $assignment = sirius_edls_assignment_fetch_sheet_worker($date, $sheet_nid, $worker_id);
-  sirius_edls_log_instance()->assignment_log('update', $assignment);
+  $result = sirius_edls_assign($date, $worker_id, $sheet_nid, $assignment['crew_uuid'], $extra);
+  if (!$result['success']) { return $result; }
 
   return array(
     'success' => TRUE, 
