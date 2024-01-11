@@ -10,8 +10,9 @@ function report_cache_generate_form($form, &$form_state, $report_type) {
   report_cache_form_prepare($report_type, $form, $form_state);
 
   // "parameters_form_callback" is legacy. We also support "instance", and call the method "form".
-  
-  if ($info['parameters_form_callback'] || $info['generator']) {
+	$form['parameters'] = $info['generator']->form();
+
+  if ($form['parameters']) {
 	  $instance_options = report_cache_instances_list($report_type);
 	  if ($instance_options) {
 	  	$form['instance'] = array(
@@ -25,25 +26,16 @@ function report_cache_generate_form($form, &$form_state, $report_type) {
 				'#limit_validation_errors' => array(),
 	  	);
 	  }
-
-	  if ($info['generator']) {
-  		$form['parameters'] = $info['generator']->form();
-	  } else {
-	  	// Legacy support
-  		$form['parameters'] = $info['parameters_form_callback']($report_type);
-	  }
-  	if ($form['parameters']) {
-	  	if (isset($form_state['input']['instance'])) {
-	  		$uuid = $form_state['input']['instance'];
-	  		$instance = report_cache_instance($report_type, $uuid);
-	  		$form_state['input']['parameters'] = $instance['xxxrawinputxxx']['parameters'];
-	  	}
-	  	$form['parameters']['#type'] = 'fieldset';
-	  	$form['parameters']['#tree'] = TRUE;
-	  	$form['parameters']['#title'] = t('Parameters');
-	  	$form['parameters']['#prefix'] = '<div id=\'report_cache_generate_form_parameters\'>';
-	  	$form['parameters']['#suffix'] = '</div>';
-	  }
+  	if (isset($form_state['input']['instance'])) {
+  		$uuid = $form_state['input']['instance'];
+  		$instance = report_cache_instance($report_type, $uuid);
+  		$form_state['input']['parameters'] = $instance['xxxrawinputxxx']['parameters'];
+  	}
+  	$form['parameters']['#type'] = 'fieldset';
+  	$form['parameters']['#tree'] = TRUE;
+  	$form['parameters']['#title'] = t('Parameters');
+  	$form['parameters']['#prefix'] = '<div id=\'report_cache_generate_form_parameters\'>';
+  	$form['parameters']['#suffix'] = '</div>';
   }
 
   $form['submit'] = array(
@@ -165,17 +157,7 @@ function report_cache_form_submit($form, &$form_state) {
 	$report_type_info = report_cache_info($report_type);
 	if ($report_type_info['file']) { sirius_require($report_type_info['module'], $report_type_info['file']); }
 
-	if ($report_type_info['generator']) {
-		$pks = $report_type_info['generator']->pks($form_state, $report_type, $report_id);
-	} else {
-		$pk_list_callback = $report_type_info['pk_list_callback'];
-		if (!$pk_list_callback && !$report_type_info) {
-			drupal_set_message(t('No pk_list_callback.'), 'error');
-			return;
-		}
-
-		$pks = $pk_list_callback($form_state, $report_type, $report_id);
-	}
+	$pks = $report_type_info['generator']->pks($form_state, $report_type, $report_id);
 
 	$limit = (int) $form_state['values']['report_limit'];
 	if ($limit) {
@@ -207,6 +189,7 @@ function report_cache_form_submit($form, &$form_state) {
 		//
 
 		$context = array();
+		$context['results']['report_id'] = $report_id;
 		foreach ($pks as $pk) {
 			++$count;
 			report_cache_batch($pk, $count, $total, $form_state['values'], $report_type_info, $context);
@@ -220,6 +203,10 @@ function report_cache_form_submit($form, &$form_state) {
 		//
 
 		$operations = array();
+		$operations[] = array(
+			'report_cache_batch_setup',
+			array($form_state['values']),
+		);
 		foreach ($pks as $pk) {
 			++$count;
 			$operations[] = array(
@@ -232,6 +219,7 @@ function report_cache_form_submit($form, &$form_state) {
 	  $batch = array(
 	    'operations' => $operations,
 			'finished' => 'report_cache_batch_finished',
+			'url_options' => array('query' => array('a' => 'b')),
 	  );
 	  if ($report_type_info['file']) {
 	  	$batch['file'] = drupal_get_path('module', $report_type_info['module']) . '/' . $report_type_info['file'];
@@ -243,6 +231,19 @@ function report_cache_form_submit($form, &$form_state) {
 	return;
 }
 
+function report_cache_batch_setup($values, &$context) {
+	$report_type = $values['report_type'];
+	$report_id = $values['report_id'];
+	$report_action = $values['report_action'];
+
+	$context['results']['report_type'] = $report_type;
+	$context['results']['report_id'] = $report_id;
+	$context['results']['report_action'] = $report_action;
+	$context['results']['count'] = 0;
+	$context['results']['noninteractive'] = $values['noninteractive'];
+	$context['results']['values'] = $values;
+}
+
 function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$context) {
 	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 
@@ -250,10 +251,7 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 	$report_id = $values['report_id'];
 	$report_action = $values['report_action'];
 
-	$context['results']['report_type'] = $report_type;
-	$context['results']['report_id'] = $report_id;
 	$context['results']['count']++;
-	$context['results']['noninteractive'] = $values['noninteractive'];
 
 	if ($report_action == 'continue') {
 		$stmt = db_query(
@@ -275,18 +273,7 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 	}
 	$context['message'] = $msg;
 
-	if ($report_type_info['generator']) {
-		$row = $report_type_info['generator']->batch($pk, $values, $context);
-	} else {
-		// Legacy support
-		$batch_callback = $report_type_info['batch_callback'];
-		if (!$batch_callback) {
-			drupal_set_message(t('No batch_callback.'), 'error');
-			return;
-		}
-		$row = $batch_callback($pk, $values, $report_id, $report_action, $context);
-	}
-
+	$row = $report_type_info['generator']->batch($pk, $values, $context);
 	if (!$row) { return; }
 
 	$instance_uuid = $values['instance'];
@@ -339,15 +326,20 @@ function report_cache_batch_finished($success, $results, $operations) {
 		$count = $results['count'];
 
 		if (!$results['noninteractive']) {
-			drupal_set_message(
-				t('The report has been generated and may be viewed ') . 
-				l(t('here.'), "sirius/reports/$report_type")
-			);
+			$msg = $results['values']['success_msg'];
+			if (!$msg) { 
+				$msg = t('The report has been generated and may be viewed ') . l(t('here.'), "sirius/reports/$report_type");
+			}
+			drupal_set_message($msg);
 		}
 	} else {
 		if (!$results['noninteractive']) {
 			drupal_set_message(t('No records found.'));
 		}
+	}
+
+	if ($results['values']['redirect']) {
+		drupal_goto($results['values']['redirect']['path'], array('query' => $results['values']['redirect']['query']));
 	}
 }
 

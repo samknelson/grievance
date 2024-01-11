@@ -13,13 +13,8 @@ function report_cache_render_form($form, &$form_state, $report_type, $report_id,
 		return NULL;
 	}
 
-	if ($info['generator']) {
-		$csv = $callback_record['csv'];
-		$render_callback = $callback_record['method'];
-	} else {
-		$render_callback = $callback_record;
-		$csv = FALSE;
-	}
+	$csv = $callback_record['csv'];
+	$render_callback = $callback_record['method'];
 
 	$parameters = report_cache_parameters($report_type, $report_id);
 
@@ -27,11 +22,7 @@ function report_cache_render_form($form, &$form_state, $report_type, $report_id,
 		if ($_REQUEST['output'] == 'csv') {
 			$filter_values = $_REQUEST['filters'];
 
-			if ($info['generator']) {
-				$data = $info['generator']->$render_callback($report_id, 'csv', $filter_values);
-			} else {
-				$data = $render_callback($report_type, $report_id, 'csv', $filter_values);
-			}
+			$data = $info['generator']->callback_wrapper_render($render_callback, $report_id, 'csv', $filter_values);
 
 	    $filename = "${report_type}_";
 	    $r = $report_id;
@@ -60,15 +51,7 @@ function report_cache_render_form($form, &$form_state, $report_type, $report_id,
 		$csv_link .= '</div>';
 	}
 
-	if ($info['generator']) {
-		$parameters_render = $info['generator']->render_parameters($parameters);
-	} else {
-		// Legacy support
-		$render_parameters_callback = $info['render_parameters_callback'];
-		if ($render_parameters_callback) {
-			$parameters_render = $render_parameters_callback($parameters);
-		}
-	}
+	$parameters_render = $info['generator']->render_parameters($parameters);
 
 	if ($parameters_render) {
 		$parameters_html = '<div class="report_cache_parameters">';
@@ -83,11 +66,7 @@ function report_cache_render_form($form, &$form_state, $report_type, $report_id,
 	  $form['parameters_html'] = array('#markup' => $parameters_html);
 	}
 
-	if ($info['generator']) {
-		$result = $info['generator']->{$render_callback}($report_id, 'page', $form_state['values']['filters']);
-	} else {
-		$result = $render_callback($report_type, $report_id, 'page', $form_state['values']['filters']);
-	}
+	$result = $info['generator']->callback_wrapper_render($render_callback, $report_id, 'page', $filter_values);
 
 	if (is_array($result) && $result['filters']) {
 		$form['filters'] = array(

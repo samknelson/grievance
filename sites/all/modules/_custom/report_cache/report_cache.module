@@ -1,5 +1,7 @@
 <?php
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.generator.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.generator_legacy.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.menu.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.form.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.auto.inc";
@@ -41,22 +43,41 @@ function report_cache_info_all() {
       	}
     	}
   	}
+
+		foreach ($info_all as $key => $record) {
+			// Clean up some of our names. 
+			$info_all[$key]['name'] = preg_replace('/^\s*Grievances\:\s*/', '', $info_all[$key]['name']);
+			$info_all[$key]['module_name'] = preg_replace('/^\s*Sirius\s*/', '', $info_all[$key]['module_name']);
+
+			// Set default form callback
+			if (!$info_all[$key]['form_callback']) { $info_all[$key]['form_callback'] = 'report_cache_generate_form'; }
+
+			// Legacy support
+			if ($info_all[$key]['render_callbacks']) {
+				foreach ($info_all[$key]['render_callbacks'] as $name => $callback_record) {
+					if (is_array($callback_record)) { continue; }
+					$info_all[$key]['render_callbacks'][$name] = array('method' => $callback_record);
+				}
+ 			}
+
+			// Build a generator for legacy reports
+			if (!$info_all[$key]['generator']) {
+				$classname = "Report_Cache_Generator_Auto_$key";
+				$classname = preg_replace('/\-/', '_', $classname);
+				//drupal_set_message("class $classname extends Report_Cache_Report_Generator_Legacy {}");
+				$generator = $classname::getInstance();
+				$generator->type = $key;
+				$generator->info($info_all[$key]);
+				$info_all[$key]['generator'] = $generator;
+			}
+		}
+
+		uksort($info_all, function($a, $b) use ($info_all) {
+			$result = strcasecmp($info_all[$a]['module_name'], $info_all[$b]['module_name']);
+			if (!$result) { $result = strcasecmp($info_all[$a]['name'], $info_all[$b]['name']); }
+			return $result;
+		});
 	}
-
-	foreach ($info_all as $key => $record) {
-		// Clean up some of our names. 
-		$info_all[$key]['name'] = preg_replace('/^\s*Grievances\:\s*/', '', $info_all[$key]['name']);
-		$info_all[$key]['module_name'] = preg_replace('/^\s*Sirius\s*/', '', $info_all[$key]['module_name']);
-
-		// Set default form callback
-		if (!$info_all[$key]['form_callback']) { $info_all[$key]['form_callback'] = 'report_cache_generate_form'; }
-	}
-
-	uksort($info_all, function($a, $b) use ($info_all) {
-		$result = strcasecmp($info_all[$a]['module_name'], $info_all[$b]['module_name']);
-		if (!$result) { $result = strcasecmp($info_all[$a]['name'], $info_all[$b]['name']); }
-		return $result;
-	});
 
 	return $info_all;
 }
@@ -111,7 +132,6 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
 			)
 		);
 		$stmt->execute();
-
  	}
 
  	if ($cache[$report_type][$report_id]) { return $cache[$report_type][$report_id]; }
@@ -168,95 +188,5 @@ function report_cache_rowcount($report_type, $report_id) {
 	$stmt = sirius_sql_query($sql, array(':report_type' => $report_type, ':report_id' => $report_id, ':domain_nid' => $domain_nid));
 	$hr = $stmt->fetchAssoc();
 	return $hr['c'];
-}
-
-class Report_Cache_Report_Generator {
-  // Reports are singletons. Use My_Report::getInstance()->whatever()
-  protected static $instance = array();
-  protected function __construct() { }
-  final private function __clone() { }
-
-  final public static function getInstance() {
-  	$class = get_called_class();
-    if (!isset(static::$instance[$class])) { static::$instance[$class] = new static(); }
-    return static::$instance[$class];
-  }
-
-  public function info($result = array()) {
-    $result['generator'] = $this;
-    $result['fields'] = $this->fields();
-    return $result;
-  }
-
-  public function fields() {
-    return array();
-  }
-
-  public function pks(&$form_state) {
-    return array();
-  }
-
-  public function batch($pks, $values, &$context) {
-    return array();
-  }
-
-  public function render_parameters($parameters) {
-    return '';
-  }
-
-  public function setInfo(&$items) {
-    $items[$this->type] = $this->info();
-  }
-
-  public function parameters($report_id, $parameters = array()) {
-  	return report_cache_parameters($this->type, $report_id, $parameters);
-  }
-
-  public function most_recent($instance_uuid = NULL) {
-  	return report_cache_most_recent($this->type, $instance_uuid);
-  }
-
-  public function dashboard_render_never_run($prefs, $options) {
-		return array(
-			array(
-				'count' => 0, 
-				'tools' => l('Generate', "sirius/reports/$report_type/form", array('attributes' => array('class' => array('tool-button')))),
-				'details' => 'Report has never been run',
-			)
-		);
-	}
-
-  public function dashboard($prefs, $options, $report_id = NULL) {
-		$report_id = $this->most_recent($prefs['instance']);
-		if (!$report_id) { return $this->dashboard_render_never_run($prefs, $options); }
-
-    if ($prefs['link_only'] != 'Yes') {
-      return $this->dashboard_render_link($prefs, $options, $report_id);
-    }
-
-    return $this->dashboard_render_full($prefs, $options, $report_id);
-  }
-
-  public function dashboard_render_link($prefs, $options, $report_id) {
-  	$report_type = $this->type;
-		$parameters = $this->parameters($report_id);
-		$details = $parameters['meta']['dashboard']['details'];
-		$result = array();
-		$result['tools'] = l('View', "sirius/reports/$report_type", array('query' => array('report_id' => $report_id, 'action' => 'render', 'callback-name' => 'View'), 'attributes' => array('class' => array('tool-button'))));
-		$count = $parameters['meta']['dashboard']['count'];
-		$result['count'] = $count;
-		$ts = $parameters['meta']['ts']['completed'];
-		if (isset($count)) {
-			$result['details'] = "<strong>$count records</strong> found " . format_interval(time() - $ts) . ' ago.';
-		} else {
-			$result['details'] = "Last report run " . format_interval(time() - $ts) . ' ago.';
-		}
-		if ($details) { $result['details'] .= '<br>' . $details; }
-		return array($result);
-  }
-
-  public function dashboard_render_full($prefs, $options, $report_id) {
-  	return $this->dashboard_render_link($prefs, $options, $report_id);
-  }
 }
 

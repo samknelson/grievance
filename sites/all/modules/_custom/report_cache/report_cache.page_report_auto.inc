@@ -17,7 +17,7 @@ function report_cache_page_report_auto_access($report_type) {
 	if (!user_access($access)) { return FALSE; }
 
 	// Must NOT have a parameteres callback; otherwise, it's handled in instances
-	if ($info['parameters_form_callback'] || $info['generator']) { return FALSE; }
+	if ($info['generator']->form()) { return FALSE; }
 
 	return TRUE;
 }
