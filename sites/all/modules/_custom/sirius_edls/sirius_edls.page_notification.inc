@@ -30,7 +30,7 @@ function sirius_edls_page_notification_form($form, &$form_state, $notification_u
 	if ($access->access('notification_accept', array('notification' => $notification, 'notification_uuid' => $notification_uuid))) {
 		$form['submit'] = array(
 			'#type' => 'submit',
-			'#value' => t('Accept the Assignment'),
+			'#value' => t('Accept'),
 		);
 	}
 
