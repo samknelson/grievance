@@ -13,15 +13,17 @@ function sirius_edls_page_631compliance() {
 		return $html;
 	}
 
-	if ($_REQUEST['date']) {
-		if ($_REQUEST['date'] == 'other') {
-			if ($_REQUEST['date_other']) {
-				$date = date('Y-m-d', strtotime($_REQUEST['date_other']));
+	$date_input = $_REQUEST['date'];
+	$date_other_input = $_REQUEST['date_other']['date'];
+	if ($date_input) {
+		if ($date_input == 'other') {
+			if ($date_other_input) {
+				$date = date('Y-m-d', strtotime($date_other_input));
 			} else {
 				$date = date('Y-m-d');
 			}
 		} else {
-			$date = date('Y-m-d', strtotime($_REQUEST['date']));
+			$date = date('Y-m-d', strtotime($date_input));
 		}
 	} else {
 		$date = date('Y-m-d');
@@ -40,7 +42,7 @@ function sirius_edls_page_631compliance() {
 	$html .= '</div>';
 
 	$html .= '<div class="sirius_callout_basic" style="width: 40%; float: right;">';
-	$html .= drupal_render(drupal_get_form('sirius_edls_page_631compliance_date_form', $employer_node, $date));
+	$html .= drupal_render(drupal_get_form('sirius_edls_page_631compliance_date_form', $employer_node, $date, $date_input, $date_other_input));
 	$html .= '</div>';
 
 	if (!$report_id) { return $html; }
@@ -76,7 +78,7 @@ function sirius_edls_page_631compliance() {
 	return $html;
 }
 
-function sirius_edls_page_631compliance_date_form($form, &$form_state, $employer_node, $date) {
+function sirius_edls_page_631compliance_date_form($form, &$form_state, $employer_node, $date, $date_input, $date_other_input) {
 	$form['#method'] = 'get';
 	$form['#prefix'] = '<div class="sirius_form_inline">';
 	$form['#suffix'] = '</div>';
@@ -99,7 +101,7 @@ function sirius_edls_page_631compliance_date_form($form, &$form_state, $employer
 	  '#type' => 'select',
 	  '#title' => t('Date'),
 	  '#options' => $date_options,
-		'#default_value' => $date,
+		'#default_value' => $date_input,
 		'#id' => 'date_input',
   );
 
