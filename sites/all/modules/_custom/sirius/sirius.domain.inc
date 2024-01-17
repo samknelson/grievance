@@ -48,6 +48,7 @@ function sirius_domain_root_nid() {
 }
 
 function sirius_domain_nid() {
+  global $_SESSION;
   $domain_nid = $_SESSION['domain_nid'];
   if (!$domain_nid) { $domain_nid = sirius_domain_root_nid(); }
   if ($domain_nid < 0) { return NULL; }
@@ -227,6 +228,7 @@ function sirius_domain_active($domain_nid) {
 function sirius_domain_user_login(&$edit, $account) {
   $domain_nid = $account->field_sirius_domain['und'][0]['target_id'];
   if ($domain_nid) {
+    // If it's inactive, kick the user out
     if (!sirius_domain_active($domain_nid)) {
       global $user;
       module_invoke_all('user_logout', $user);
@@ -234,6 +236,9 @@ function sirius_domain_user_login(&$edit, $account) {
       $user = drupal_anonymous_user();
       drupal_set_message("Login prohibited; your domain or one of its parents is disabled.", 'warning');
     }
+
+    // Assign the domain
+    sirius_domain($domain_nid);
   }
 }
 
@@ -602,6 +607,7 @@ function sirius_domain_form_restrict(&$form) {
     'field_sirius_work_status_tid' => 'sirius_work_status',
     'field_grievance_from_status' => 'grievance_status',
     'field_grievance_next_status' => 'grievance_status',
+    'field_sirius_trust_service_type_tid' => 'sirius_trust_service_type',
   );
 
   foreach ($field_names as $field_name => $taxonomy) {
