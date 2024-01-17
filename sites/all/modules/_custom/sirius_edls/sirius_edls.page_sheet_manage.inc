@@ -8,6 +8,7 @@ function sirius_edls_node_tab_sheet_manage_form($form, &$form_state, $sheet_node
 	$access = sirius_access_instance('edls');
 	$form_state['sheet_nid'] = $sheet_node->nid;
 	$form['#tree'] = TRUE;
+	$sheet_json = sirius_json_get($sheet_node);
 
 	$form['intro'] = array('#markup' => sirius_edls_sheet_render($sheet_node, array('hide_crews' => TRUE)));
 
@@ -23,6 +24,14 @@ function sirius_edls_node_tab_sheet_manage_form($form, &$form_state, $sheet_node
 		}
 	}
 
+	if ($access->access('sheet_notify_enable', array('sheet_node' => $sheet_node))) {
+		$actions['sheet_notify_enable'] = 'Enable Notifications';
+	}
+
+	if ($access->access('sheet_export', array('sheet_node' => $sheet_node))) {
+		$actions['sheet_export'] = 'Export';
+	}
+
 	if (!$actions) { return sirius_form_error('You do not have permission to perform any actions on this sheet.'); }
 
 	$form['action'] = array(
@@ -32,6 +41,22 @@ function sirius_edls_node_tab_sheet_manage_form($form, &$form_state, $sheet_node
 		'#required' => TRUE,
 	);
 
+	$form['sheet_notify_enable'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Notifications',
+		'#states' => array('visible' => array(":input[name=\"action\"]" => array('value' => 'sheet_notify_enable'))),
+	);
+
+	$form['sheet_notify_enable']['enable'] = array(
+		'#type' => 'select',
+		'#title' => t('Are worker notifications enabled for this sheet?'),
+		'#options' => array(
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => $sheet_json['edls']['notify']['enable'],
+	);
+
 	$form['sheet_clone'] = array(
 		'#type' => 'fieldset',
 		'#title' => 'Make a Copy',
@@ -39,7 +64,6 @@ function sirius_edls_node_tab_sheet_manage_form($form, &$form_state, $sheet_node
 	);
 
 	// Clone Form
-
 	$date_options = array();
 	foreach (array("-1 days", "today", "+1 day", "+2 day", "+3 days", "+4 days", "+5 days", "+6 days") as $d) {
 		$t = strtotime($d);
@@ -123,6 +147,15 @@ function sirius_edls_node_tab_sheet_manage_form_submit($form, &$form_state) {
 	if ($action == 'sheet_status_trash') {
 		$result = sirius_edls_sheet_status_set($sheet_node, 'trash');
 		$msg = "Sheet status set to " . $status_options['trash'];
+	}
+
+	if ($action == 'sheet_notify_enable') {
+		$result = sirius_edls_sheet_notify_enable($sheet_node, $form_state['values']['sheet_notify_enable']['enable']);
+		$msg = "Notification status set to " . $form_state['values']['sheet_notify_enable']['enable'];
+	}
+
+	if ($action == 'sheet_export') {
+		sirius_edls_sheet_export($sheet_node);
 	}
 
 	if (!$result['success']) {

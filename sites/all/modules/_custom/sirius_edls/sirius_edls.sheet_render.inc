@@ -66,6 +66,13 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 			$assignments = sirius_edls_assignment_fetch_sheet($sheet_node);
 		}
 
+		$notifications_by_id = sirius_edls_notify_fetch_sheet($sheet_node);
+		$notifications = array();
+		foreach ($notifications_by_id as $notification_id => $notification) {
+			$assignment_id = $notification['assignment_id'];
+			$notifications[$assignment_id] = $notification;
+		}
+
 		// Make our blank pages
 		$crew_header_rows = 8;
 		$pages = array(array());
@@ -73,8 +80,8 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 		if (!$rows_per_page) { $rows_per_page = 62; }
 		$page_number = 0;
 		$row_number = $sheet_header_rows;
-		foreach ($crews as $crew) {
-			$crew_uuid = $crew['uuid'];
+		foreach ($crews as $crew_uuid => $crew) {
+			if ($options['crew_uuid'] && ($crew_uuid != $options['crew_uuid'])) { continue; }
 
 			// Make sure each crew has an even number of spots
 			$count_even = $crew['count'];
@@ -172,14 +179,13 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 					$render_row = array();
 					for ($c = 0; $c<2; ++$c) {
 						$assignment = $crew_cols[$c][$i];
+						$assignment_id = $assignment['assignment_id'];
 						$render_ms = $assignment['position'] . '.&nbsp;';
 						$render_ms .= $ms_names[$assignment['worker_ms']];
 
 						$render = $assignment['worker_name'];
-						$extra = sirius_edls_crew_render_extra($assignment['assignment_extra']);
-						if ($extra) {
-							$render .= "<span class=\"sirius_edls_assignment_extra\">($extra)</span>";
-						}
+						$render .= sirius_edls_notify_render_status($assignment, $notifications[$assignment_id]);
+						$render .= sirius_edls_assignment_render_extra($assignment);
 
 						$render_row[] = array('style' => 'width: 10%;', 'data' => $render_ms);
 						$render_row[] = array('style' => 'width: 40%', 'data' => $render);
@@ -291,14 +297,19 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 	return sirius_table_render($header, $rows);
 }
 
-function sirius_sheet_render_version($sheet_node) {
-	return sirius_sheet_render_version_impl($sheet_node->nid, $sheet_node->vid);
+function sirius_sheet_render_version($sheet_node, $options = array()) {
+	return sirius_sheet_render_version_impl($sheet_node->nid, $sheet_node->vid, $options);
 }
 
-function sirius_sheet_render_version_impl($nid, $vid) {
-	$html = '<span class="sirius_edls_sheet_version">';
-	$html .= '<i class="fas fa-history"></i>&nbsp;';
-	$html .= substr($nid, 0, -4) . '.' . substr($nid, -4) . '&nbsp;::&nbsp;' . substr($vid, 0, -4) . '.' . substr($vid, -4);
-	$html .= '</span>';
+function sirius_sheet_render_version_impl($nid, $vid, $options = array()) {
+	$html = '';
+	if ($options['text_only']) {
+		$html .= substr($nid, 0, -4) . '.' . substr($nid, -4) . '::' . substr($vid, 0, -4) . '.' . substr($vid, -4);
+	} else {
+		$html .= '<span class="sirius_edls_sheet_version">';
+		$html .= '<i class="fas fa-history"></i>&nbsp;';
+		$html .= substr($nid, 0, -4) . '.' . substr($nid, -4) . '&nbsp;::&nbsp;' . substr($vid, 0, -4) . '.' . substr($vid, -4);
+		$html .= '</span>';
+	}
 	return $html;
 }

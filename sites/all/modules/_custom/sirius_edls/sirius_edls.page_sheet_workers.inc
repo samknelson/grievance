@@ -56,6 +56,37 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 	$html .= '</div>';
 	$form['col1_stats'] = array('#markup' => $html);
 
+	$html  = '<div class="sirius_edls_notes_wrap">';
+
+	$html .= '<h2>Notes</h2>';
+	$html .= '<div id="sirius_edls_notes_inner">';
+	// $html .= '[Notes go here]';
+	$html .= '</div>'; // sirius_edls_notes_inner
+	$html .= '<a href="#" class="sirius_popup_trigger">';
+	$html .= '<i class="far fa-edit sirius_popup_trigger"></i>';
+	$html .= '</a>';
+
+	$html .= '<div style="display:none" class="sirius_popup_overlay"></div>';
+	$html .= '<div style="display:none" class="sirius_popup_wrap">';
+	$html .= '<div class="sirius_popup_contents">';
+
+	$html .= '<strong>' . t('Notes') . '</strong>' . '<br />';
+	$html .= '<textarea id="sirius_edls_notes_edit" rows="10">';
+	$html .= '</textarea>';
+
+	$html .= '<a href="#" class="sirius_edls_set_notes_submit tool-button">';
+	$html .= t('Submit');
+	$html .= '</a>';
+
+	$html .= '</div>'; // sirius_popup_contents
+	$html .= '<div class="sirius_popup_close"></div>';
+
+	$html .= '</div>'; // sirius_popup_wrap
+
+	$html .= '</div>'; // sirius_edls_notes_wrap
+
+	$form['notes'] = array('#markup' => $html);
+
 	foreach ($crews as $crew_delta => $crew) {
 		$uuid = $crew['uuid'];
 		$form['assigned'][$crew_delta]['open'] = array('#markup' => 
@@ -130,42 +161,11 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 		$form['assigned'][$crew_delta]['close'] = array('#markup' => '</table></div>');
 	}
 
-	$html  = '<div class="sirius_edls_notes_wrap">';
-
-	$html .= '<h2>Notes</h2>';
-	$html .= '<div id="sirius_edls_notes_inner">';
-	// $html .= '[Notes go here]';
-	$html .= '</div>'; // sirius_edls_notes_inner
-	$html .= '<a href="#" class="sirius_popup_trigger">';
-	$html .= '<i class="far fa-edit sirius_popup_trigger"></i>';
-	$html .= '</a>';
-
-	$html .= '<div style="display:none" class="sirius_popup_overlay"></div>';
-	$html .= '<div style="display:none" class="sirius_popup_wrap">';
-	$html .= '<div class="sirius_popup_contents">';
-
-	$html .= '<strong>' . t('Notes') . '</strong>' . '<br />';
-	$html .= '<textarea id="sirius_edls_notes_edit" rows="10">';
-	$html .= '</textarea>';
-
-	$html .= '<a href="#" class="sirius_edls_set_notes_submit tool-button">';
-	$html .= t('Submit');
-	$html .= '</a>';
-
-	$html .= '</div>'; // sirius_popup_contents
-	$html .= '<div class="sirius_popup_close"></div>';
-
-	$html .= '</div>'; // sirius_popup_wrap
-
-	$html .= '</div>'; // sirius_edls_extra_wrap
-
-	$form['notes'] = array('#markup' => $html);
-
 	$form['col1_close'] = array('#markup' => '</td>');
 
 	$form['col2_open'] = array('#markup' => '<td width="40%" valign="top" style="vertical-align: top;"><div id="sirius_edls_sheet_avail_head">' . t('Available Workers') . '<span class="sirius_edls_worker_stats_inner">0</span></div>');
 
-	$form['available']['filters'] = sirius_worker_form_filters(array('ms_list' => $ms_list));
+	$form['available']['filters'] = sirius_worker_form_filters(array('ms_list' => $ms_list, 'employer_node' => $employer_node));
 	$form['available']['workers'] = array('#markup' => sirius_worker_render_list(array('ms_list' => $ms_list)));
 
 	$form['col2_close'] = array('#markup' => '</td>');

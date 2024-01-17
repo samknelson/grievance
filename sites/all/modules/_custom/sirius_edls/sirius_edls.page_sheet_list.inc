@@ -13,7 +13,7 @@ function sirius_edls_page_sheet_list() {
 	return $html;
 }
 
-function sirius_edls_page_sheet_list_form($form, &$form_state, $emlolyer_node) {
+function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
   $form['#tree'] = TRUE;
 
 	$form['header_links'] = array(

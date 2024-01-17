@@ -256,6 +256,9 @@ function sirius_backlinks_from_node($node) {
 				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:checkin')				{ $path = "node/$handler_nid/sirius_worker_steward/checkin"; }
 				else if ($handler_type == 'grievance_shop' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_employer_steward/sched"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_worker_steward/checkin-history"; }
+				else if ($log_category == 'letter') {
+					$path = "node/$handler_nid/${handler_type}_letter";
+				}
 				else if ($handler_type == 'sirius_log') {
 					if ($handler_category == 'twilio:recording') { 
 						$path = "node/$handler_nid/sirius_twilio_recording";

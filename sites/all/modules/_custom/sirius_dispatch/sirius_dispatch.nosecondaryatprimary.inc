@@ -41,7 +41,7 @@ class Sirius_Dispatch_Nosecondaryatprimary extends Sirius_Dispatch_Elig_Plugin {
 
 	public function accept(&$dispatch_node, $notes = '') {
 		// Only for "accepted" dispatches
-		if ($dispatch_node->field_sirius_dispatch_status['und'][0]['value'] != 'accepted') { return; }
+		if ($dispatch_node->field_sirius_dispatch_status['und'][0]['value'] != 'accepted') { return array('success' => TRUE); }
 
 		$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
 		if (!$job_node) { return array('success' => TRUE); }

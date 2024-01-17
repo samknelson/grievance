@@ -16,6 +16,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/si
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.ajax.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.summary.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.dblog.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.notify.inc';
 
 /**
  * Implements hook_sirius_domain_component_info
@@ -24,7 +25,11 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/si
 function sirius_edls_sirius_domain_component_info() {
   return array(
     'edls' => array(
-      'title' => 'Employer Daily Labor Schedule (EDLS)',
+      'title' => 'EDLS',
+      'description' => 'Employer Daily Labor Schedule',
+    ),
+    'edls:notify' => array(
+      'title' => 'EDLS - Notifications',
       'description' => '',
     ),
   );
@@ -88,6 +93,32 @@ function sirius_edls_sirius_cron_scan_info() {
     'callback' => 'sirius_edls_dblog_cleanup',
     'multidomain' => FALSE,
     'component' => 'edls',
+  );
+
+  $items['edls_assignment_cleanup'] = array(
+    'title' => 'EDLS Assignment Cleanup',
+    'description' => 'Clean up the EDLS Assignment table',
+    'schedule' => 'daily',
+    'callback' => 'sirius_edls_assignment_cleanup',
+    'multidomain' => FALSE,
+    'component' => 'edls',
+  );
+
+  $items['edls_notify_cleanup'] = array(
+    'title' => 'EDLS Notification Cleanup',
+    'description' => 'Clean up the EDLS Notification table',
+    'schedule' => 'daily',
+    'callback' => 'sirius_edls_notify_cleanup',
+    'multidomain' => FALSE,
+    'component' => 'edls',
+  );
+
+  $items['edls_notify_deliver'] = array(
+    'title' => 'EDLS Notification Delivery',
+    'description' => 'Send pending EDLS notifications',
+    'schedule' => 'always',
+    'callback' => 'sirius_edls_notify_deliver_batch',
+    'multidomain' => FALSE,
   );
 
   return $items;

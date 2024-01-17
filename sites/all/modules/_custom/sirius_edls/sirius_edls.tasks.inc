@@ -41,3 +41,13 @@ function sirius_edls_tasks_by_department($employer_node) {
 	$employer_json = sirius_json_get($employer_node);
 	return $employer_json['edls']['tasks_by_department'];
 }
+
+function sirius_edls_all_tasks($employer_node) {
+  $tasks_by_department = sirius_edls_tasks_by_department($employer_node);
+  $all_tasks = array();
+  foreach ($tasks_by_department as $department_tid => $tasks) {
+    $all_tasks = array_merge($all_tasks, $tasks);
+  }
+  $all_tasks = array_unique($all_tasks);
+  return array_combine($all_tasks, $all_tasks);
+}

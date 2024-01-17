@@ -9,12 +9,12 @@ function sirius_edls_update_7007() {
       worker_id varchar(255) not null,
 
       worker_name varchar(255) not null,
+      worker_ms varchar(255),
 
       employer_nid integer not null,
 
       sheet_nid integer not null,
       crew_uuid varchar(255) not null,
-      assignment_position integer not null,
 
       assignment_extra json,
 
@@ -22,7 +22,7 @@ function sirius_edls_update_7007() {
       unique index (assignment_date, worker_id),
       index(sheet_nid),
       index(worker_id),
-      index(worker_id, date)
+      index(worker_id, assignment_date)
     );',
 
     'create table sirius_edls_outsource (
@@ -36,6 +36,27 @@ function sirius_edls_update_7007() {
       unique index (employer_nid, worker_id),
       primary key (outsource_id)
     );',
+
+    'create table sirius_edls_notifications (
+      notification_id integer not null auto_increment,
+
+      worker_id varchar(255),
+      assignment_date date not null,
+
+      assignment_id integer,
+      sheet_nid integer,
+      employer_nid integer not null,
+
+      notification_status varchar(255),
+      notification_uuid varchar(255),
+      notification_extra json,
+
+      unique index (employer_nid, assignment_date, worker_id),
+      index(sheet_nid),
+      index(assignment_id),
+      primary key (notification_id)
+    );
+    ',
   );
   foreach ($sqls as $sql) {
     try {

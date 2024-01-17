@@ -4,10 +4,21 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 	$form_state['sheet_nid'] = $sheet_node->nid;
 
 	$sheet_json = sirius_json_get($sheet_node);
-	$my_employer_node = sirius_employer_get();
+
+	$result = sirius_edls_employer_switch();
+	$my_employer_node = $result['employer_node'];
+	// if (!$my_employer_node) { return sirius_form_error('Please select an employer.'); }
+
 	$sheet_employer_nid = $sheet_node->field_grievance_shop['und'][0]['target_id'];
 	if (!$sheet_employer_nid) { $sheet_employer_nid = $my_employer_node->nid; }
 	$employer_node = node_load($sheet_employer_nid);
+
+	$tasks_by_department = sirius_edls_tasks_by_department($employer_node);
+	$all_tasks = sirius_edls_all_tasks($employer_node);
+	drupal_add_js(drupal_get_path('module', 'sirius_edls') . '/js/sheet_edit.js');
+	$js_settings = array();
+	$js_settings['tasks_by_department'] = $tasks_by_department;
+	drupal_add_js(array('sirius_edls_sheet_edit' => $js_settings), 'setting');
 
   drupal_add_css(drupal_get_path('module', 'sirius') . '/css/form.css', 'file');
 
@@ -159,8 +170,6 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
   	$crews[] = array();
   }
 
-	$tasks_by_department = sirius_edls_tasks_by_department($employer_node);
-
   $form['sheet']['notes'] = array(
 	  '#type' => 'textarea',
 	  '#title' => t('Notes'),
@@ -213,17 +222,11 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
     	'#default_value' => $crew['count'],
     );
 
-   	$department = $sheet_node->field_grievance_department_tid['und'][0]['tid'];
-		$task_options = $tasks_by_department[$department];
-		if (!$task_options) { $task_options = array(); }
-		$task_options = array_combine($task_options, $task_options);
-		if (!$task_options[$crew['task']]) { $crew['task'] = NULL; }
-
     $form['crews'][$delta]['task'] = array(
     	'#type' => 'select',
     	'#title' => t('Task'),
     	'#default_value' => $crew['task'],
-    	'#options' => array(NULL => t('-- Select --')) + $task_options,
+    	'#options' => array(NULL => t('-- Select --')) + $all_tasks,
     	'#attributes' => array('class' => array('sirius_edls_sheet_task')),
     );
 
@@ -268,6 +271,7 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
     	'wrapper' => '#crews',
     	'element' => 'crews',
     ),
+    '#limit_validation_errors' => array(),
   );
 
 	$form['submit'] = array(
@@ -303,8 +307,10 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 		$crews_input_by_uuid[$crew['uuid']] = $crew;
 	}
 	if ($count_verify != $count) {
-		drupal_set_message("The count in all the crews ($count_verify) must add up to the total count ($count).", 'error');
+		drupal_set_message("The count in all the crews must add up to the total count. There are $count_verify slots in the crews, but the total count for the sheet is $count.", 'error');
 		$form_state['rebuild'] = TRUE; 
+		form_set_error('sheet][count');
+		foreach ($crews_input as $delta => $crew) { form_set_error("crews][$delta][count"); }
 		return;
 	}
 

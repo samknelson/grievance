@@ -46,7 +46,7 @@ function sirius_edls_page_worker_list_form($form, &$form_state, $employer_node) 
 
 	$form['#tree'] = TRUE;
 
-	$form['available']['filters'] = sirius_worker_form_filters(array('ms_list' => $ms_list));
+	$form['available']['filters'] = sirius_worker_form_filters(array('ms_list' => $ms_list, 'employer_node' => $employer_node));
 	$form['available']['workers'] = array('#markup' => sirius_worker_render_list(array('ms_list' => $ms_list)));
 
 	return $form;

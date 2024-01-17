@@ -195,7 +195,6 @@ function sirius_log_entity_render($nids, $log_bucket, $filters) {
 		$header[] = t('Date<br />User');
 		$header[] = t('Category<br />Type');
 		$header[] = t('Message');
-		$header[] = t('Attachments');
 		$header[] = t('Tools');
 	}
 
@@ -236,10 +235,28 @@ function sirius_log_entity_render($nids, $log_bucket, $filters) {
 			$row[] = date('n/j/Y\<\b\r\ \/\>g:ia', $hr['created']) . '<br />' . $hr['user_name'];
 			$row[] = $hr['field_sirius_category_value'] . '<br />' . $hr['field_sirius_type_value'];
 		}
-		$row[] = $hr['field_sirius_message_value'];
+
+		$msg = $hr['field_sirius_message_value'];
 		if ($display != 'csv') {
-			$row[] = $attachments_render;
-			$row[] = l('View', 'node/' . $hr['nid'], array('attributes' => array('class' => array('tool-button'))));
+			$path = "sirius/modal/" . $hr['nid'] . "/quicklog-view";
+			if (drupal_valid_path($path) && drupal_valid_path("node/" . $hr['nid'])) { 
+				drupal_add_css(drupal_get_path('module', 'sirius') . '/css/quickactions.css');
+				$msg .= '&nbsp;';
+				$msg .= l('&neArr;', $path, array('html' => TRUE));
+			}
+
+			if ($attachments_render) {
+				$msg .= '<br />';
+				$msg .= $attachments_render;
+			}
+		}
+		$row[] = $msg;
+
+		if ($display != 'csv') {
+			$tab = sirius_log_default_tab($hr['field_sirius_category_value']);
+			$path = "node/" . $hr['nid'];
+			if ($tab) { $path .= "/$tab"; }
+			$row[] = l('View', $path, array('attributes' => array('class' => array('tool-button'))));
 		}
 
 		if ($display == 'csv') {
