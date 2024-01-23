@@ -61,9 +61,9 @@ function sirius_aat_generate($len, $type = 'number') {
 	$aat = '';
 	for ($i = 0; $i < $len; $i++) {
 		if ($i == 0) {
-  		$aat .= $characters_first[rand(0, strlen($characters))];
+  		$aat .= $characters_first[rand(0, strlen($characters)-1)];
   	} else {
-  		$aat .= $characters[rand(0, strlen($characters))];
+  		$aat .= $characters[rand(0, strlen($characters)-1)];
   	}
 	}
 	return $aat;
