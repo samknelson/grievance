@@ -19,6 +19,16 @@ function sirius_teamsters631_node_tabs() {
     'weight' => 999
   );
 
+  $node_tabs['sirius_dispatch_job_group']['sirius_teamsters631_dispatch_job_group_seniority'] = array(
+    'title' => 'Seniority Settings',
+    'description' => '',
+    'callback' => 'sirius_teamsters631_node_tab_dispatch_job_group_seniority',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 4,
+    'component' => 'dispatch:live',
+    'file' => 'sirius_teamsters631.page_dispatch_job_group_seniority.inc',
+  );
+
   sirius_node_tab_set_module('sirius_teamsters631', $node_tabs);
 
   return $node_tabs;

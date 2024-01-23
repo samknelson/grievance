@@ -187,6 +187,10 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
     $job_group_node = node_load($job_node->field_sirius_dispatch_job_group['und'][0]['target_id']);
     if (!$job_group_node) { return array(); }
 
+    // Only if the job group isn't set to suppress seniority
+    $job_group_json = sirius_json_get($job_group_node);
+    if ($job_group_json['teamsters631']['seniority']['disabled'] == 'Yes') { return array(); }
+
     // Only if the job group is current
     $ts = strtotime($date);
     $job_group_start_ts = sirius_fieldval($job_group_node, 'field_sirius_datetime', 'ts');
