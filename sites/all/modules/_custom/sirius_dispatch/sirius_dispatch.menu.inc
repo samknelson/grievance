@@ -25,6 +25,18 @@ function sirius_dispatch_node_tabs() {
     'skip_node_view_check' => TRUE,
     'permissions' => array(),
     'component' => 'dispatch:live',
+    'weight' => 0,
+  );
+
+  $node_tabs['sirius_dispatch']['sirius_dispatch_prior'] = array(
+    'title' => 'Prior Dispatches',
+    'description' => '',
+    'callback' => 'sirius_node_tab_dispatch_prior',
+    'skip_node_view_check' => TRUE,
+    'permissions' => array(),
+    'component' => 'dispatch:live',
+    'weight' => 1,
+    'file' => 'sirius_dispatch.page_prior.inc',
   );
 
   $node_tabs['sirius_dispatch_job']['sirius_dispatch_job_manage'] = array(
@@ -412,7 +424,7 @@ function sirius_dispatch_term_tabs() {
     'run' => 'Run Settings',
     'event' => 'Event Settings',
   );
-  $weight = 4;
+  $weight = 20;
   foreach ($job_type_tabs as $key => $name) {
     ++$weight;
     $term_tabs['sirius_dispatch_job_type']['sirius_dispatch_job_type_' . $key] = array(
