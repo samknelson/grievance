@@ -143,9 +143,19 @@ function sirius_edls_assignment_search($params) {
     $sql_args[':status'] = $params['status'];
   }
 
+  if ($params['statuses']) {
+    $sql .= "and field_sirius_edls_sheet_status_value in (:statuses) ";
+    $sql_args[':statuses'] = $params['statuses'];
+  }
+
   if ($params['department']) {
     $sql .= "and field_grievance_department_tid_tid = :department ";
     $sql_args[':department'] = $params['department'];
+  }
+
+  if ($params['mss']) {
+    $sql .= "and worker_ms in (:mss) ";
+    $sql_args[':mss'] = $params['mss'];
   }
 
   if (!$params['include_trash']) {
