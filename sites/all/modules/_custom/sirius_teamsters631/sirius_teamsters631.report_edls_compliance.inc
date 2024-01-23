@@ -22,7 +22,8 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
           'worker_id',
           'worker_name',
           'worker_ms_name',
-          'violation',
+          'violation_name',
+          'violation_details',
         ),
       ),
     );
@@ -69,6 +70,8 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
     $fields['worker_ms'] = 'Member Status ID';
     $fields['worker_ms_name'] = 'Member Status';
     $fields['violation'] = 'Violation';
+    $fields['violation_name'] = 'Violation Name';
+    $fields['violation_details'] = 'Details';
     $fields['sheet_nid'] = 'Sheet NID';
 
     return $fields;
@@ -94,37 +97,62 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
     return array_chunk($pks, 100, TRUE);
   }
 
+  public function violation_scans() {
+    $violation_scans = array();
+    $violation_scans['journeyman_show'] = array(
+      'name' => 'Journeyman with Lower Show Priority',
+      'method' => 'violation_check_journeyman_show',
+    );
+
+    $violation_scans['extraboard'] = array(
+      'name' => 'Extraboard Before Journeyman',
+      'method' => 'violation_check_extraboard',
+    );
+    return $violation_scans;
+  }
+
+  public function violation_check($scan_key, $employer_nid, $worker, $date) {
+    $scan_info = $this->violation_scans()[$scan_key];
+    if (!$scan_info) { return array(); }
+    return $this->{$scan_info['method']}($employer_nid, $worker, $date);
+  }
+
   public function batch($pks, $values, &$context) {
     $employer_nid = $values['parameters']['employer'];
     $employer_node = node_load($employer_nid);
     $date = $values['parameters']['date'];
     $ms_lookup = sirius_edls_ms_list($employer_node);
     $rows = array('is_multiple' => TRUE, 'rows' => array());
+
+    $violation_scans = $this->violation_scans();
     foreach ($pks as $worker_id) {
       $worker = sirius_edls_worker_fetch($employer_nid, $worker_id, $date);
       if (!$worker) { continue; }
       $worker['worker_ms_name'] = $ms_lookup[$worker['worker_ms']];
 
-      $violation = $this->violation_check($employer_nid, $worker, $date);
-      if (!$violation) { continue; }
+      foreach ($violation_scans as $scan_key => $scan_info) {
+        $violation = $this->violation_check($scan_key, $employer_nid, $worker, $date);
+        if (!$violation) { continue; }
 
-      $context['message'] = 'Running compliance scan for: ' . $worker['worker_name'];
-      $row = array();
-      $row['pk'] = $worker_id;
-      $row['worker_id'] = $worker['worker_id'];
-      $row['worker_ms'] = $worker['worker_ms'];
-      $row['worker_ms_name'] = $worker['worker_ms_name'];
-      $row['worker_name'] = $worker['worker_name'];
-      $row['violation'] = $violation['msg'];
-      $row['sheet_nid'] = $violation['sheet_nid'];
-      $rows['rows'][$worker_id] = $row;
+        $context['message'] = 'Running compliance scan for: ' . $worker['worker_name'];
+        $row = array();
+        $row['pk'] = "$worker_id|$scan_key";
+        $row['worker_id'] = $worker['worker_id'];
+        $row['worker_ms'] = $worker['worker_ms'];
+        $row['worker_ms_name'] = $worker['worker_ms_name'];
+        $row['worker_name'] = $worker['worker_name'];
+        $row['violation'] = $scan_key;
+        $row['violation_name'] = $scan_info['name'];
+        $row['violation_details'] = $violation['msg'];
+        $row['sheet_nid'] = $violation['sheet_nid'];
+        $rows['rows']["$worker_id|$scan_key"] = $row;
+      }
     }
 
     return $rows;
   }
 
-  public function violation_check($employer_nid, $worker, $date) {
-    $violations = array();
+  public function violation_check_journeyman_show($employer_nid, $worker, $date) {
     $worker_id = $worker['worker_id'];
 
     // Only journeymen can have violations. This is a kludge.
@@ -193,6 +221,55 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
     }
 
     return array();
+  }
+
+  public function violation_check_extraboard($employer_nid, $worker, $date) {
+    $worker_id = $worker['worker_id'];
+
+    // Only journeymen can have violations. This is a kludge.
+    if (!preg_match('/journey/i', $worker['worker_ms_name'])) { return array(); }
+
+    // Scheduled workers have no violations
+    $assignment = sirius_edls_assignment_fetch_worker($date, $employer_nid, $worker_id);
+    if ($assignment) { return array(); }
+
+    // Outsource workers have no violations
+    if (!preg_match('/^I/', $worker_id)) { return array(); }
+    $real_worker_id = preg_replace('/^I/', '', $worker_id);
+    $worker_node = sirius_worker_get_by_id($real_worker_id);
+    if (!$worker_node) { return array(); }
+    $worker_nid = $worker_node->nid;
+
+    // Find out if any extraboards are scheduled today. (Cache for speed)
+    $cache = &drupal_static(__FUNCTION__);
+    if (!isset($cache[$employer_nid][$date])) {
+      // Find "Extraboard" member statuses
+      $employer_node = node_load($employer_nid);
+      $ms_list = sirius_edls_ms_list($employer_node);
+      $extraboard_ms_list = array();
+      foreach ($ms_list as $ms_key => $ms_name) {
+        if (preg_match('/extra/i', $ms_name)) { $extraboard_ms_list[$ms_key] = $ms_name; }
+      }
+      if (!$extraboard_ms_list) { return array(); }
+
+      $params = array();
+      $params['date'] = $date;
+      $params['employer_nid'] = $employer_nid;
+      $params['statuses'] = array('request', 'lock');
+      $params['mss'] = array_keys($extraboard_ms_list);
+      $extraboard_assignments = sirius_edls_assignment_search($params);
+      $cache[$employer_nid][$date] = reset($extraboard_assignments);
+    }
+
+    $assignment = $cache[$employer_nid][$date];
+    if (!$assignment) { return array(); }
+
+    $msg = "At least one extraboard was scheduled: ";
+    $msg .= $assignment['worker_name'];
+    $msg .= " (";
+    $msg .= $assignment['worker_id'];
+    $msg .= ") ";
+    return array('msg' => $msg, 'sheet_nid' => $assignment['sheet_nid']);
   }
 
   public function seniority_list($date, $employer_nid, $job_group_nid) {
@@ -274,6 +351,7 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
     $header[] = t('Name');
     $header[] = t('Member Status');
     $header[] = t('Potential Violations');
+    $header[] = t('Details');
     if ($output != 'csv') { $header[] = t('Tools'); }
 
     $rows = array();
@@ -284,7 +362,8 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
       $row[] = $record['worker_id'];
       $row[] = $record['worker_name'];
       $row[] = $record['worker_ms_name'];
-      $row[] = $record['violation'];
+      $row[] = $record['violation_name'];
+      $row[] = $record['violation_details'];
 
       if ($output != 'csv') {
         $tools = array();
