@@ -1,11 +1,17 @@
 <?php
 
 function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
-	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+	$worker_nid = $dispatch_node->field_sirius_worker['und'][0]['target_id'];
+	$worker_node = node_load($worker_nid);
 	if (!$worker_node) { return; }
 
-	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+	$job_nid = $dispatch_node->field_sirius_dispatch_job['und'][0]['target_id'];
+	$job_node = node_load($job_nid);
 	if (!$job_node) { return; }
+
+	$employer_nid = $job_node->field_grievance_shop['und'][0]['target_id'];
+	$employer_node = node_load($employer_nid);
+
 	if ($job_node->field_sirius_notify['und'][0]['value'] != 'Yes') { return; }
 	$emails = sirius_fieldvals($job_node, 'field_sirius_emails');
 	if (!$emails) { return; }
@@ -42,6 +48,39 @@ function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
 	$body .= "Worker: <a href=\"$base_url/node/" . $worker_node->nid . "\">" . $worker_node->title . "</a><br />";
 	$body .= "Old status: <strong>$status_old</strong><br />";
 	$body .= "New status: <strong>$status_new</strong><br />";
+
+	$body .= '<br /><strong>' . 'Other dispatches of ' . $worker_node->title . ' to ' . $employer_node->title . '</strong><br>';
+
+	$params = array();
+	$params['employer_nid'] = $employer_nid;
+	$params['worker_nid'] = $worker_nid;
+	$prior_nodes = sirius_dispatch_search($params);
+
+	if ($prior_nodes) {
+		$rows = array();
+		foreach ($prior_nodes as $prior_nid => $prior_node) {
+			if ($prior_node->nid == $dispatch_node->nid) { continue; }
+			$prior_job = node_load($prior_node->field_sirius_dispatch_job['und'][0]['target_id']);
+			$type_name = sirius_term_title($prior_job->field_sirius_dispatch_job_type['und'][0]['tid']);
+
+			$ts = sirius_fieldval($prior_job, 'field_sirius_datetime', 'ts');
+
+			$row = array();
+			$row[] = date('m/d/Y', $ts);
+			$row[] = $type_name;
+			$row[] = "<a href=\"$base_url/node/$prior_nid/sirius_dispatch_worker_view\">View</a>";
+			$rows[] = $row;
+		}
+
+		$header = array();
+		$header[] = t('Date');
+		$header[] = t('Job Type');
+		$header[] = t('Tools');
+
+		$body .= sirius_table_render($header, $rows);
+	} else {
+		$body .= '<p>' . t('No other dispatches found.') . '</p>';
+	}
 
 	foreach ($emails as $email) {
 		sirius_email_send(

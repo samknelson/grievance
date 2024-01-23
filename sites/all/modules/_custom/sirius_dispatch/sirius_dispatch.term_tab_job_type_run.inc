@@ -52,6 +52,18 @@ function sirius_dispatch_term_tab_job_type_run_form($form, &$form_state, $job_ty
 		'#description' => t('Enter the number of notifications to be sent for each open slot. If this is greater than 1, then there will be more than one notification sent for each slot, meaning that there is no guarantee that the job will be filled in seniority order.'),
 	);
 
+	$form['run']['close_after_report_date'] = array(
+		'#title' => 'Close after Report Date?',
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => 'No',
+		'#description' => t('Should this job be automatically closed (set to "Filled") when the report date / time has passed?'),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
