@@ -46,6 +46,8 @@ class Sirius_Edls_Access extends Sirius_Access {
 
       // Parameters: notification, notification_uuid
       'notification_view',
+      'notification_accept',
+      'notification_decline',
     );
 
     $sheet_node = $context['sheet_node'];
@@ -73,7 +75,7 @@ class Sirius_Edls_Access extends Sirius_Access {
     if ($is_admin) { return TRUE; }
 
     // Anonymous users can view notifications, if they have the correct UUID
-    if (in_array($action, array('notification_view', 'notification_accept'))) {
+    if (in_array($action, array('notification_view', 'notification_accept', 'notification_decline'))) {
       // Must have a UUID
       if (!$context['notification_uuid']) { return FALSE; }
 
@@ -83,8 +85,11 @@ class Sirius_Edls_Access extends Sirius_Access {
       // That's all you need to view the notification.
       if ($action == 'notification_view') { return TRUE; }
 
-      // You can accept if status = 'sent'
-      if ( ($action == 'notification_accept') && (in_array($context['notification']['notification_status'], array('sent', 'error'))) ) {
+      // You can accept or decline if status = 'sent'
+      if (
+          (in_array($action, array('notification_accept', 'notification_decline'))) && 
+          (in_array($context['notification']['notification_status'], array('sent', 'error')))
+        ) {
         return TRUE;
       }
     }

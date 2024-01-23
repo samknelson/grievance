@@ -85,6 +85,7 @@ class Sirius_Edls_Dblog extends Sirius_Singleton {
 			'notification_sent' => t('Notification Sent'),
 			'notification_error' => t('Notification Failed'),
 			'notification_accept' => t('Notification Accepted'),
+			'notification_decline' => t('Notification Declined'),
 		);
 	}
 

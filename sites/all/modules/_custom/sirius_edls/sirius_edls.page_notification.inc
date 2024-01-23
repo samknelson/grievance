@@ -27,10 +27,24 @@ function sirius_edls_page_notification_form($form, &$form_state, $notification_u
 
 	$form['view'] = array('#markup' => sirius_edls_notify_render($notification));
 
+	$actions = array();
 	if ($access->access('notification_accept', array('notification' => $notification, 'notification_uuid' => $notification_uuid))) {
+		$actions['accept'] = t('Accept');
+	}
+	if ($access->access('notification_decline', array('notification' => $notification, 'notification_uuid' => $notification_uuid))) {
+		$actions['decline'] = t('Decline');
+	}
+
+	if ($actions) {
+		$form['action'] = array(
+			'#type' => 'select',
+			'#options' => array(NULL => t('-- Select --')) + $actions,
+			'#title' => 'Action',
+			'#required' => TRUE,
+		);
 		$form['submit'] = array(
 			'#type' => 'submit',
-			'#value' => t('Accept'),
+			'#value' => t('Submit'),
 		);
 	}
 
@@ -50,13 +64,23 @@ function sirius_edls_page_notification_form_submit($form, &$form_state) {
 	sirius_domain($new_domain);
 
 	$access = sirius_access_instance('edls');
-	if (!$access->access('notification_accept', array('notification' => $notification, 'notification_uuid' => $notification_uuid))) {
-		drupal_set_message("Access denied.", 'error');
+
+	$action = $form_state['values']['action'];
+
+	if ($action == 'accept') { 
+		if (!$access->access('notification_accept', array('notification' => $notification, 'notification_uuid' => $notification_uuid))) {
+			drupal_set_message("Access denied.", 'error');
+		}
+		$result = sirius_edls_notify_accept($notification['notification_id']);
+	} else if ($action == 'decline') {
+		if (!$access->access('notification_decline', array('notification' => $notification, 'notification_uuid' => $notification_uuid))) {
+			drupal_set_message("Access denied.", 'error');
+		}
+		$result = sirius_edls_notify_decline($notification['notification_id']);
 	}
 
-	$result = sirius_edls_notify_accept($notification['notification_id']);
 	if ($result['success']) {
-		drupal_set_message("Assignment accepted.");
+		drupal_set_message($result['msg']);
 	} else {
 		drupal_set_message("Error: " . $result['msg'], 'error');
 	}

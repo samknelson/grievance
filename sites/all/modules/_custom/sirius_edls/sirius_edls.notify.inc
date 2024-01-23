@@ -320,7 +320,31 @@ function 	sirius_edls_notify_accept($notification_id) {
 		':notification_id' => $notification_id,
 		':json' => json_encode($notification['notification_extra']),
 	));
-	return array('success' => TRUE);
+	return array('success' => TRUE, 'msg' => t('Assignment Accepted'));
+}
+
+function 	sirius_edls_notify_decline($notification_id) {
+	$notification = sirius_edls_notify_fetch_by_id($notification_id);
+	if (!$notification) { return array('success' => FALSE, 'msg' => 'Notification not found.'); }
+
+	$assignment = sirius_edls_notify_fetch_assignment($notification);
+	sirius_edls_log_instance()->assignment_log('notification_decline', $assignment);
+
+	global $user;
+	$notification['notification_extra']['declined'] = array(
+		'ts' => time(),
+		'ip' => sirius_loopback_remote_ip(),
+		'uid' => $user->uid,
+		'name' => $user->name,
+		'assignment' => $assignment,
+	);
+
+	$sql = "update sirius_edls_notifications set notification_status = 'declined', notification_extra = :json where notification_id = :notification_id";
+	$stmt = db_query($sql, array(
+		':notification_id' => $notification_id,
+		':json' => json_encode($notification['notification_extra']),
+	));
+	return array('success' => TRUE, 'msg' => t('Assignment declined'));
 }
 
 function sirius_edls_notify_render_status($assignment, $notification) {
