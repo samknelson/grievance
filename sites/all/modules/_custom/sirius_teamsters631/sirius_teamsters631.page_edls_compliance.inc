@@ -14,7 +14,11 @@ function sirius_edls_page_631compliance() {
 	}
 
 	$date_input = $_REQUEST['date'];
-	$date_other_input = $_REQUEST['date_other']['date'];
+	if ($_REQUEST['date_other']) { 
+		$date_other_input = $_REQUEST['date_other']['date'];
+	} else {
+		$date_other_input = NULL;
+	}
 	if ($date_input) {
 		if ($date_input == 'other') {
 			if ($date_other_input) {
@@ -28,6 +32,7 @@ function sirius_edls_page_631compliance() {
 	} else {
 		$date = date('Y-m-d');
 	}
+	if (!$date_input) { $date_input = $date; }
 
   $report_type = 'sirius-teamsters631-edls-compliance';
   $info = report_cache_info($report_type);
