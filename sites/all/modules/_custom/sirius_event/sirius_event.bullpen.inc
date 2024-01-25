@@ -15,7 +15,7 @@ function sirius_event_bullpen_ts($event_node) {
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
 
-	$ts = sirius_fieldval($event_node, 'field_sirius_daterepeat', 'ts');
+	$ts = sirius_date_ts($event_node, 'field_sirius_daterepeat');
 	$signin_opens_self = $ts - $json['bullpen']['signin_opens_self'];
 	$signin_opens_others = $ts - $json['bullpen']['signin_opens_others'];
 
