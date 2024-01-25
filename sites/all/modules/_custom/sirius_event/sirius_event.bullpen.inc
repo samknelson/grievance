@@ -12,6 +12,7 @@ function sirius_event_bullpen_enabled_type($event_type_term) {
 }
 
 function sirius_event_bullpen_ts($event_node) {
+	date_default_timezone_set('America/Los_Angeles');
 	$event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
 	$json = json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);
 
