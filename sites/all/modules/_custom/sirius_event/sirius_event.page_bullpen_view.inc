@@ -44,7 +44,7 @@ function sirius_node_tab_event_bullpen_view($event_node) {
   if ($host_job_node->field_sirius_address_notes['und'][0]['value']) { $html .= sirius_fakerender_field('Report Location:', $host_job_node->field_sirius_address_notes['und'][0]['value']); }
 
   $html .= '<br />';
-  $html .= sirius_fakerender_field('Bullpen Starts:', '<strong>' . sirius_node_tab_event_bullpen_date_format($ts['signin_opens_self']) . '</strong>');
+  $html .= sirius_fakerender_field('Bullpen Starts:', '<strong>' . sirius_node_tab_event_bullpen_date_format($ts['job_ts']) . '</strong>');
   $html .= sirius_fakerender_field('Self Sign-in Opens:', sirius_node_tab_event_bullpen_date_format($ts['signin_opens_self']));
   $html .= sirius_fakerender_field('General Sign-in Opens:', sirius_node_tab_event_bullpen_date_format($ts['signin_opens_others']));
   $html .= sirius_fakerender_field('Sign-in Closes:', sirius_node_tab_event_bullpen_date_format($ts['signin_closes']));
