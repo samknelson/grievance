@@ -5,7 +5,7 @@ function sirius_node_tab_event_bullpen_view_access($event_node) {
 }
 
 function sirius_node_tab_event_bullpen_date_format($ts) {
-  $render = date('g:i A, l, F j Y T', $ts);
+  $render = date('g:i A, l, F j Y e', $ts);
   $interval = time() - $ts;
   if ($interval > 0) {
     $render .= ' (' . format_interval($interval, 2) . ' ago)';
