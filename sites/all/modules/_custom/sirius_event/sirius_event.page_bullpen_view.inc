@@ -19,7 +19,6 @@ function sirius_node_tab_event_bullpen_date_format($ts) {
 function sirius_node_tab_event_bullpen_view($event_node) {
   sirius_event_disclaimer_redirect($event_node);
 	$ts = sirius_event_bullpen_ts($event_node);
-	$datestr = 
 
   $host_job_node = sirius_event_bullpen_job($event_node->nid);
   $employer_node = node_load($host_job_node->field_grievance_shop['und'][0]['target_id']);
@@ -32,10 +31,12 @@ function sirius_node_tab_event_bullpen_view($event_node) {
   if ($hall_node) { $html .= sirius_fakerender_field('Hall:', $hall_node->title); }
   if ($host_job_node->field_sirius_address_notes['und'][0]['value']) { $html .= sirius_fakerender_field('Report Location:', $host_job_node->field_sirius_address_notes['und'][0]['value']); }
 
-
-  $html .= sirius_fakerender_field('EBA Sign-in Opens', sirius_node_tab_event_bullpen_date_format($ts['signin_opens_self']));
+  $html .= '<br />';
+  $html .= sirius_fakerender_field('Bullpen Starts:', '<strong>' . sirius_node_tab_event_bullpen_date_format($ts['signin_opens_self']) . '</strong>');
+  $html .= sirius_fakerender_field('Self Sign-in Opens:', sirius_node_tab_event_bullpen_date_format($ts['signin_opens_self']));
   $html .= sirius_fakerender_field('General Sign-in Opens:', sirius_node_tab_event_bullpen_date_format($ts['signin_opens_others']));
   $html .= sirius_fakerender_field('Sign-in Closes:', sirius_node_tab_event_bullpen_date_format($ts['signin_closes']));
+  $html .= '<br />';
 
   // $html .= sirius_fakerender_field('Time Now:', date($datestr, time()));
 
