@@ -4,10 +4,22 @@ function sirius_node_tab_event_bullpen_view_access($event_node) {
   return sirius_event_bullpen_enabled($event_node);
 }
 
+function sirius_node_tab_event_bullpen_date_format($ts) {
+  $render = date('g:i A, l, F j Y T', $ts);
+  $interval = time() - $ts;
+  if ($interval > 0) {
+    $render .= ' (' . format_interval($interval, 2) . ' ago)';
+  } else {
+    $render .= ' (in ' . format_interval(-1 * $interval, 2) . ')';
+  }
+
+  return $render;
+}
+
 function sirius_node_tab_event_bullpen_view($event_node) {
   sirius_event_disclaimer_redirect($event_node);
 	$ts = sirius_event_bullpen_ts($event_node);
-	$datestr = 'g:i A, l, F j';
+	$datestr = 
 
   $host_job_node = sirius_event_bullpen_job($event_node->nid);
   $employer_node = node_load($host_job_node->field_grievance_shop['und'][0]['target_id']);
@@ -19,10 +31,14 @@ function sirius_node_tab_event_bullpen_view($event_node) {
   if ($facility_node) { $html .= sirius_fakerender_field('Facility:', $facility_node->title); }
   if ($hall_node) { $html .= sirius_fakerender_field('Hall:', $hall_node->title); }
   if ($host_job_node->field_sirius_address_notes['und'][0]['value']) { $html .= sirius_fakerender_field('Report Location:', $host_job_node->field_sirius_address_notes['und'][0]['value']); }
-  $html .= sirius_fakerender_field('EBA Sign-in Opens', date($datestr, $ts['signin_opens_self']));
-  $html .= sirius_fakerender_field('General Sign-in Opens:', date($datestr, $ts['signin_opens_others']));
-  $html .= sirius_fakerender_field('Sign-in Closes:', date($datestr, $ts['signin_closes']));
-  $html .= sirius_fakerender_field('Time Now:', date($datestr));
+
+
+  $html .= sirius_fakerender_field('EBA Sign-in Opens', sirius_node_tab_event_bullpen_date_format($ts['signin_opens_self']));
+  $html .= sirius_fakerender_field('General Sign-in Opens:', sirius_node_tab_event_bullpen_date_format($ts['signin_opens_others']));
+  $html .= sirius_fakerender_field('Sign-in Closes:', sirius_node_tab_event_bullpen_date_format($ts['signin_closes']));
+
+  // $html .= sirius_fakerender_field('Time Now:', date($datestr, time()));
+
   $html .= sirius_dispatch_view_render_field($host_job_node, 'field_sirius_member_status', t('Member Statuses'));
   $html .= render(field_view_field('node', $event_node, 'body', 'full'));
 
