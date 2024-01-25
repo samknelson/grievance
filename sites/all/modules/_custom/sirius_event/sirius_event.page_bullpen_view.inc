@@ -46,7 +46,7 @@ function sirius_node_tab_event_bullpen_view($event_node) {
   $html .= sirius_fakerender_field('Sign-in Closes:', sirius_node_tab_event_bullpen_date_format($ts['signin_closes']));
   $html .= '<br />';
 
-  // $html .= sirius_fakerender_field('Time Now:', date($datestr, time()));
+  $html .= sirius_fakerender_field('Time Now:', date('Y-m-d H:i T e'));
 
   $html .= sirius_dispatch_view_render_field($host_job_node, 'field_sirius_member_status', t('Member Statuses'));
   $html .= render(field_view_field('node', $event_node, 'body', 'full'));
