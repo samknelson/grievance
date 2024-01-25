@@ -26,6 +26,7 @@ function sirius_node_tab_event_bullpen_view($event_node) {
 
     $tmp = strtotime($event_node->field_sirius_daterepeat['und'][0]['value'] . ' ' . $event_node->field_sirius_daterepeat['und'][0]['timezone_db']);
     drupal_set_message("ts $tmp");
+    drupal_set_message('<pre>' . print_r($user, 1) . '</pre>');
   }
 
   $host_job_node = sirius_event_bullpen_job($event_node->nid);
