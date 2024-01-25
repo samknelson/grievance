@@ -20,18 +20,6 @@ function sirius_node_tab_event_bullpen_view($event_node) {
   sirius_event_disclaimer_redirect($event_node);
 	$ts = sirius_event_bullpen_ts($event_node);
 
-  global $user;
-  if ($user->uid == 1) { 
-    drupal_set_message("<pre>" . print_r($event_node->field_sirius_daterepeat, 1) . '</pre>');
-
-    $tmp = strtotime($event_node->field_sirius_daterepeat['und'][0]['value'] . ' ' . $event_node->field_sirius_daterepeat['und'][0]['timezone_db']);
-    drupal_set_message("ts $tmp");
-
-    drupal_set_message("Got timestamp: $tmp");
-    drupal_set_message("Renders as: " . date('Y-m-d H:i e T', $tmp));
-    drupal_set_message("Now it is: " . date('Y-m-d H:i e T'));
-  }
-
   $host_job_node = sirius_event_bullpen_job($event_node->nid);
   $employer_node = node_load($host_job_node->field_grievance_shop['und'][0]['target_id']);
   $facility_node = node_load($host_job_node->field_sirius_dispatch_facility['und'][0]['target_id']);
