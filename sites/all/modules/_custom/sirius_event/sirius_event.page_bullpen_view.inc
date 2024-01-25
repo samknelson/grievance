@@ -20,6 +20,11 @@ function sirius_node_tab_event_bullpen_view($event_node) {
   sirius_event_disclaimer_redirect($event_node);
 	$ts = sirius_event_bullpen_ts($event_node);
 
+  global $user;
+  if ($user == 1) { 
+    drupal_set_message("<pre>" . print_r($event_node->field_sirius_daterepeat, 1) . '</pre>');
+  }
+
   $host_job_node = sirius_event_bullpen_job($event_node->nid);
   $employer_node = node_load($host_job_node->field_grievance_shop['und'][0]['target_id']);
   $facility_node = node_load($host_job_node->field_sirius_dispatch_facility['und'][0]['target_id']);
