@@ -1146,7 +1146,7 @@ function sirius_event_menu() {
 
   $items['sirius/event/catalog/list'] = array(
     'title' => 'Catalogs',
-    'access arguments' => array('sirius'),
+    'access arguments' => array('sirius event admin'),
     'page callback' => 'sirius_event_page_catalog_list',
     'page arguments' => array('sirius event admin'),
     'file' => 'sirius_event.page_catalog_list.inc',
