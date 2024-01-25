@@ -21,7 +21,7 @@ function sirius_node_tab_event_bullpen_view($event_node) {
 	$ts = sirius_event_bullpen_ts($event_node);
 
   global $user;
-  if ($user == 1) { 
+  if ($user->uid == 1) { 
     drupal_set_message("<pre>" . print_r($event_node->field_sirius_daterepeat, 1) . '</pre>');
 
     $tmp = strtotime($event_node->field_sirius_daterepeat['und'][0]['value'] . ' ' . $event_node->field_sirius_daterepeat['und'][0]['timezone_db']);
