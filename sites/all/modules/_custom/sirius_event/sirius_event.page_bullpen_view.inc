@@ -24,7 +24,7 @@ function sirius_node_tab_event_bullpen_view($event_node) {
   if ($user == 1) { 
     drupal_set_message("<pre>" . print_r($event_node->field_sirius_daterepeat, 1) . '</pre>');
 
-    $ts = strtotime($event_node->field_sirius_daterepeat['und'][0]['value'] . ' ' . $node->field_sirius_daterepeat['und'][0]['timezone_db']);
+    $ts = strtotime($event_node->field_sirius_daterepeat['und'][0]['value'] . ' ' . $event_node->field_sirius_daterepeat['und'][0]['timezone_db']);
     drupal_set_message("ts $ts");
   }
 
