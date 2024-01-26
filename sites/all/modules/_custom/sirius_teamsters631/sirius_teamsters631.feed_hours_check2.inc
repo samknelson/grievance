@@ -340,9 +340,13 @@ function sirius_teamsters631_dispatched_as_of2($worker_nid, $employer_nid, $star
   $sql = "select node.nid ";
   $sql .= "from node ";
   $sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+
   $sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
   $sql .= "left join field_data_field_sirius_date_end on field_data_field_sirius_date_end.entity_type = 'node' and field_data_field_sirius_date_end.entity_id = node.nid ";
+
+  $sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = node.nid ";
   $sql .= "left join node job_node on job_node.nid = field_sirius_dispatch_job_target_id ";
+  
   $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
   $sql .= "where node.type = 'sirius_dispatch' ";
   $sql .= "and field_sirius_worker_target_id = :worker_nid ";
