@@ -9,6 +9,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/siriu
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.badge.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.log.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.feed_hours_check.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.feed_hours_check2.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.banner.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.server_switch.inc';
 
@@ -92,6 +93,7 @@ function sirius_teamsters631_sirius_wizard_info() {
 
   // $items += sirius_ledger_feed_charges_info();
   $items += sirius_teamsters631_feed_hours_check_info();
+  $items += sirius_teamsters631_feed_hours_check2_info();
 
   return $items;
 }
