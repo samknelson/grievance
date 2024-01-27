@@ -135,7 +135,7 @@ function sirius_teamsters631_oneoff_end_date_correct($dispatch_node, $mode = 'te
 
 		if ($ts_terminated) {
 			sirius_minilog('- Using end date: ' . date('Y-m-d', $ts_terminated));
-			$dispatch_node->field_sirius_date_end['und'][0]['value'] = date('Y-m-md', $ts_terminated);
+			$dispatch_node->field_sirius_date_end['und'][0]['value'] = date('Y-m-d', $ts_terminated);
 			$need_save = TRUE;
 		}
 	}
