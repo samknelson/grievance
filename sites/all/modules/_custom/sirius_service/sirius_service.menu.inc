@@ -101,8 +101,69 @@ function sirius_service_menu() {
     'weight' => 2,
   );
 
+  $items['sirius/service/proxy/client'] = array(
+    'title' => 'Proxy',
+    'page callback' => 'sirius_service_page_proxy_client',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius service proxy client user',
+        'component' => 'service:proxy:client',
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_service.page_proxy_client.inc',
+  );
+
+  $items['user/%/sirius_proxy_server'] = array(
+    'title' => 'Proxy Server',
+    'page callback' => 'sirius_service_user_tab_proxy_server',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius service admin',
+        'component' => 'service:proxy:server',
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 8,
+    'file' => 'sirius_service.page_user_proxy_server.inc',
+  );
+
+  $items['user/%/sirius_proxy_client'] = array(
+    'title' => 'Proxy Client',
+    'page callback' => 'sirius_service_user_tab_proxy_client',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permission' => 'sirius service admin',
+        'component' => 'service:proxy:client',
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 8,
+    'file' => 'sirius_service.page_user_proxy_client.inc',
+  );
+
   return $items;
 }
+
+/*
+function sirius_service_messing_with_proxy() {
+  $args = func_get_args();
+  $path = join('/', func_get_args());
+
+  global $GLOBALS;
+  $GLOBALS['base_path'] = '/i/am/a/proxy/';
+
+  $result = menu_execute_active_handler($path, FALSE);
+  dpm($result);
+  return 'Boo';
+}
+*/
 
 function sirius_service_page_config_access($which) {
   // if (!sirius_domain_nid()) { return FALSE; }
