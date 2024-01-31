@@ -230,10 +230,9 @@ class Report_Cache_Report_Generator {
 		$report_id = $this->most_recent($prefs['instance']);
 		if (!$report_id) { return $this->dashboard_render_never_run($prefs, $options); }
 
-    if ($prefs['link_only'] != 'Yes') {
-      return $this->dashboard_render_link($prefs, $options, $report_id);
+    if ($prefs['link_only'] == 'Yes') {
+			return $this->dashboard_render_link($prefs, $options, $report_id);
     }
-
     return $this->dashboard_render_full($prefs, $options, $report_id);
   }
 
