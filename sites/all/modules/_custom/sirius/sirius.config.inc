@@ -60,9 +60,6 @@ function sirius_config_links() {
 		$links['bulk'] = array('title' => 'Bulk Messenger');
 		$links['bulk']['links']['sirius/bulk/config'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
 
-		$links['hour'] = array('title' => 'Hours');
-		$links['hour']['links']['sirius/hour/config'] 					= array('title' => 'Hour settings', 'description' => 'General settings for hour tracking.');
-
 		$links['training'] = array('title' => 'Training Center');
 		$links['training']['links']['sirius/config/training'] 					= array('title' => 'Training Center Settings', 'description' => 'Settings for the training center (evaluations, etc.).');
 

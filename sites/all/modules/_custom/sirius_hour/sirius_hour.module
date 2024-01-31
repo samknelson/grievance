@@ -105,3 +105,16 @@ function sirius_hour_sirius_domain_component_info() {
     ),
   );
 }
+
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function sirius_hour_sirius_config_links_alter(&$links) {
+  if (!isset($links['hours'])) {
+    $links['hour'] = array('title' => 'Hours');
+  }
+  $links['hour']['links']['sirius/hour/config'] = array('title' => 'Hour settings', 'description' => 'General settings for hour tracking.');
+  $links['hour']['links']['sirius/hour/search/month'] = array('title' => 'Month Search', 'description' => 'Raw hour search (by month)');
+}
