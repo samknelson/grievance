@@ -311,7 +311,7 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
-  $defaultable_fields = array('sirius_type');
+  $defaultable_fields = array('sirius_type', 'sirius_paths');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $form['field_' . $field]["und"][0]['value']['#default_value'] = $_GET[$field];
