@@ -87,7 +87,9 @@ function sirius_cron_scan_all($force = FALSE, $mode = 'live') {
 	$info_all = sirius_cron_scan_info_all();
 	foreach ($info_all as $key => $info) {
 		$result = sirius_cron_scan($key, $force, $mode);
-		if (!$result['success']) { return $result;}
+		if (!$result['success']) { 
+			// return $result;
+		}
 	}
 	return array('success' => TRUE);
 }
