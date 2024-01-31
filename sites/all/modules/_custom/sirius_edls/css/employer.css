@@ -1,0 +1,18 @@
+.sirius_edls_employer_switch {
+	float: right;
+	border: 1px solid #333333;
+	background-color: #ffffff;
+	padding: 10px;
+	margin: 0;
+}
+
+.sirius_edls_employer_switch select {
+	margin-left: 8px;
+	margin-right: 8px;
+}
+
+.sirius_edls_employer_switch::after {
+	content: "";
+	clear: both;
+	display: table;
+}

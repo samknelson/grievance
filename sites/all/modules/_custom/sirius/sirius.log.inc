@@ -251,3 +251,16 @@ function sirius_log_cleanup_orphans($mode = 'test') {
   }
   return array('success' => TRUE, 'msg' => "Cleaned up $count records", 'count' => $count);
 }
+
+function sirius_log_default_tab($category) {
+  if ($category == 'email') { return 'sirius_log_comm'; }
+  else if ($category == 'sms') { return 'sirius_log_comm'; }
+  else if ($category == 'postal') { return 'sirius_log_comm'; }
+  else if ($category == 'postal_lob') { return 'sirius_log_comm'; }
+  else if ($category == 'voice') { return 'sirius_log_comm'; }
+  else if ($category == 'steward:sched') { return 'sirius_steward_log_sched'; }
+  else if ($category == 'steward:checkin') { return 'sirius_steward_log_checkin'; }
+  else if ($category == 'bulk:queue') { return 'sirius_bulk_recipient'; }
+  //else if ($category == 'customfield') { return 'sirius_log_customfield_multiple_edit'; }
+  else { return ''; }
+}

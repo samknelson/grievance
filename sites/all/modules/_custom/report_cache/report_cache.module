@@ -1,5 +1,7 @@
 <?php
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.generator.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.generator_legacy.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.menu.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.form.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.auto.inc";
@@ -41,22 +43,41 @@ function report_cache_info_all() {
       	}
     	}
   	}
+
+		foreach ($info_all as $key => $record) {
+			// Clean up some of our names. 
+			$info_all[$key]['name'] = preg_replace('/^\s*Grievances\:\s*/', '', $info_all[$key]['name']);
+			$info_all[$key]['module_name'] = preg_replace('/^\s*Sirius\s*/', '', $info_all[$key]['module_name']);
+
+			// Set default form callback
+			if (!$info_all[$key]['form_callback']) { $info_all[$key]['form_callback'] = 'report_cache_generate_form'; }
+
+			// Legacy support
+			if ($info_all[$key]['render_callbacks']) {
+				foreach ($info_all[$key]['render_callbacks'] as $name => $callback_record) {
+					if (is_array($callback_record)) { continue; }
+					$info_all[$key]['render_callbacks'][$name] = array('method' => $callback_record);
+				}
+ 			}
+
+			// Build a generator for legacy reports
+			if (!$info_all[$key]['generator']) {
+				$classname = "Report_Cache_Generator_Auto_$key";
+				$classname = preg_replace('/\-/', '_', $classname);
+				//drupal_set_message("class $classname extends Report_Cache_Report_Generator_Legacy {}");
+				$generator = $classname::getInstance();
+				$generator->type = $key;
+				$generator->info($info_all[$key]);
+				$info_all[$key]['generator'] = $generator;
+			}
+		}
+
+		uksort($info_all, function($a, $b) use ($info_all) {
+			$result = strcasecmp($info_all[$a]['module_name'], $info_all[$b]['module_name']);
+			if (!$result) { $result = strcasecmp($info_all[$a]['name'], $info_all[$b]['name']); }
+			return $result;
+		});
 	}
-
-	foreach ($info_all as $key => $record) {
-		// Clean up some of our names. 
-		$info_all[$key]['name'] = preg_replace('/^\s*Grievances\:\s*/', '', $info_all[$key]['name']);
-		$info_all[$key]['module_name'] = preg_replace('/^\s*Sirius\s*/', '', $info_all[$key]['module_name']);
-
-		// Set default form callback
-		if (!$info_all[$key]['form_callback']) { $info_all[$key]['form_callback'] = 'report_cache_generate_form'; }
-	}
-
-	uksort($info_all, function($a, $b) use ($info_all) {
-		$result = strcasecmp($info_all[$a]['module_name'], $info_all[$b]['module_name']);
-		if (!$result) { $result = strcasecmp($info_all[$a]['name'], $info_all[$b]['name']); }
-		return $result;
-	});
 
 	return $info_all;
 }
@@ -111,7 +132,6 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
 			)
 		);
 		$stmt->execute();
-
  	}
 
  	if ($cache[$report_type][$report_id]) { return $cache[$report_type][$report_id]; }
@@ -258,4 +278,3 @@ class Report_Cache_Report_Generator {
   	return $this->dashboard_render_link($prefs, $options, $report_id);
   }
 }
-

@@ -12,7 +12,7 @@ function report_cache_page_report_instances_access($report_type) {
 	if (!user_access($access)) { return FALSE; }
 
 	// Must have a parameteres callback; otherwise, there's no need for instances
-	if (!$info['parameters_form_callback'] && !$info['generator']) { return FALSE; }
+	if (! ($info['generator']->form()) ) { return FALSE; }
 
 	return TRUE;
 }
@@ -81,11 +81,7 @@ function report_cache_page_report_instances_form($form, &$form_state, $report_ty
 			'#default_value' => $item['auto']['enabled'],
 		);
 
-	  if ($info['parameters_form_callback']) {
-	  	$form['items'][$delta]['parameters'] = $info['parameters_form_callback']($report_type); 
-	  } else if ($info['generator']) {
-	  	$form['items'][$delta]['parameters'] = $info['generator']->form();
-	  }
+  	$form['items'][$delta]['parameters'] = $info['generator']->form();
 		sirius_form_prep($form['items'][$delta]['parameters'], $item['parameters']);
 
     $form['items'][$delta]['weight'] = array(

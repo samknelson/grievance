@@ -14,7 +14,7 @@ function sirius_revision_node_presave($node) {
   $key = sirius_revision_changed($node, $node->original);
   if (!$key) { return; }
 
-  if (user_access('sirius admin')) {
+  if (user_access('sirius admin') || TRUE) {
     // drupal_set_message("Creating a new revision in node of type " . sirius_content_type_name($node->type) . " because of change in $key");
   }
 
@@ -81,7 +81,7 @@ function sirius_revision_changed_impl($arr1, $arr2, $depth = 0, $field_name = NU
     }
 
     // If we're in a JSON field, we need to decode the json and comopare.
-    if ($field_name == 'field_sirius_json' && $depth == 3) {
+    if ($field_name == 'field_sirius_json' && $depth == 3 && !is_array($value1) && !is_array($value2)) {
       $value1 = json_decode($value1, TRUE);
       $value2 = json_decode($value2, TRUE);
     }
@@ -116,8 +116,7 @@ function sirius_revision_changed_impl($arr1, $arr2, $depth = 0, $field_name = NU
  * Implements hook_sirius_config_links_alter()
  */
 
-
 function sirius_revision_sirius_config_links_alter(&$links) {
-  $links = array_merge($links, array('sirius_revision' => array('title' => 'Revisions')));
-  $links['sirius_revision']['links']['sirius/revision/config'] = array('title' => 'Settings', 'description' => 'Revision settings, including which content types should be versioned.');
+  // $links = array_merge($links, array('sirius_revision' => array('title' => 'Revisions')));
+  $links['systems']['links']['sirius/revision/config'] = array('title' => 'Revisions', 'description' => 'Revision settings, including which content types should be versioned.');
 }

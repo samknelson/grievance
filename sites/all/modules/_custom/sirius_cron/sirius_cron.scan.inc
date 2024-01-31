@@ -94,7 +94,7 @@ function sirius_cron_scan_all($force = FALSE, $mode = 'live') {
 	return array('success' => TRUE);
 }
 
-function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
+function sirius_cron_scan($key, $force = FALSE, $mode = 'live', $options = array()) {
 	sirius_minilog_reset();
 
 	$info = sirius_cron_scan_info($key);
@@ -143,7 +143,7 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 
 			$old_domain_nid = sirius_domain_nid();
 			sirius_domain($domain_nid);
-			$sub_result = $info['callback']($mode, $force);
+			$sub_result = $info['callback']($mode, $force, $options);
 			sirius_domain($old_domain_nid);
 
 			++$count;
@@ -157,7 +157,7 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live') {
 		}
 		$result = array('success' => TRUE, 'msg' => "Scanned $count domains, with $count_success success and $count_failure failures.");
 	} else {
-		$result = $info['callback']($mode, $force);
+		$result = $info['callback']($mode, $force, $options);
 	}
 
 	if (!$result['success']) {
@@ -231,6 +231,6 @@ function sirius_cron_scan_get($key, $create = FALSE) {
 
 function sirius_cron_sirius_backlinks_from_node_alter(&$links, $node) {
 	if ($node->type == 'sirius_json_definition' && sirius_cron_scan_key($node)) {
-		$links['sirius/cron/list'] = array('name' => 'All Scans');
+		$links['sirius/cron'] = array('name' => 'All Scans');
 	}
 }

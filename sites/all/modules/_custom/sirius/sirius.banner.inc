@@ -66,6 +66,40 @@ function sirius_banner_config_submit($form, &$form_state) {
 	}
 }
 
+function sirius_login_config() {
+  $form = array();
+
+  $form['sirius_login_intro'] = array(
+    '#type' => 'text_format',
+    '#title' => t('Intro Text'),
+    '#default_value' => sirius_richtext_handle_input(variable_get('sirius_login_intro', '')),
+    '#description' => t('Enter the introductory text that should appear before the site\'s login form. May contain HTML.'),
+  );
+
+  $form['sirius_login_outro'] = array(
+    '#type' => 'text_format',
+    '#title' => t('Outro Text'),
+    '#default_value' => sirius_richtext_handle_input(variable_get('sirius_login_outro', '')),
+    '#description' => t('Enter the text that should appear BELOW the site\'s login form. May contain HTML.'),
+  );
+
+	$form = system_settings_form($form);
+  return $form;
+}
+
+function sirius_form_user_login_alter(&$form, &$form_state, $form_id) {
+	$intro = sirius_richtext_handle_input(variable_get('sirius_login_intro', ''));
+	$outro = sirius_richtext_handle_input(variable_get('sirius_login_outro', ''));
+
+	if ($intro) {
+		$form['intro'] = array('#markup' => '<div class="sirius_login_intro">' . $intro . '</div>', '#weight' => -1000);
+	}
+
+	if ($outro) {
+		$form['outro'] = array('#markup' => '<div class="sirius_login_intro">' . $outro . '</div>', '#weight' => 1000);
+	}
+}
+
 function sirius_banner_render() {
 	global $user;
   $domain = sirius_domain();
