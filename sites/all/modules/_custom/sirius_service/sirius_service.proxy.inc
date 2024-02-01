@@ -28,15 +28,23 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
   }
 
   public function page_fetch($args) {
+  	// What path do we want to fetch?
+		$path = $args['path'];
+		if (!$path) { return $this->respond_error("No path."); }
+  	drupal_set_message("Looking up: $path");
+
+  	// Change to the remote user
   	$response = $this->user_lookup($args);
   	if (!$response->success()) { return $response; }
   	if (!$response->account) { return $this->respond_error($response->msg()); }
   	global $user;
   	$user = user_load($response->account['uid']);
 
-		$path = $args['path'];
-		if (!$path) { return $this->respond_error("No path."); }
-		drupal_set_message("Fetching: $path");
+  	// Change the base path
+  	global $GLOBALS;
+  	return $this->respond_error('<pre>'. print_r($GLOBALS, 1) . '</pre>');
+
+
 		$page_result = menu_execute_active_handler($path, FALSE);
 
   	$response = new Sirius_Server_Response();
