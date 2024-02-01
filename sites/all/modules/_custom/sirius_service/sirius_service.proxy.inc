@@ -55,9 +55,10 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
 
   	$response = new Sirius_Server_Response();
   	$response->success = TRUE;
-		$response->msg = 'Page retrieved.';
+		$response->msg = "Retrieved: $path";
 		$response->page['title'] = drupal_get_title();
 		$response->page['body'] = $page_result;
+		$response->page['js'] = drupal_get_js();
 
 		return $response;
   }
