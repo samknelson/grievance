@@ -32,7 +32,7 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
 		$path = $args['path'];
 		if (!$path) { return $this->respond_error("No path."); }
   	drupal_set_message("Looking up: $path");
-  	return $this->respond_error("Hmm...");
+  	// return $this->respond_error("Hmm...");
 
   	// Change to the remote user
   	$response = $this->user_lookup($args);
