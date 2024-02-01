@@ -43,8 +43,12 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
 
   	// Change the base path
   	global $GLOBALS;
-  	$GLOBALS['base_path'] = '/sirius/service/proxy/client/';
-  	return $this->respond_error('<pre>' . print_r($GLOBALS, 1) . '</pre>');
+  	$keys = array('base_path', 'base_url', 'base_root');
+  	foreach ($keys as $key) {
+  		if (isset($args['GLOBALS'][$key])) {
+		  	$GLOBALS[$key] = $args['GLOBALS'][$key]; 
+  		}
+  	}
 
   	// Change the current_path()
   	global $_GET;
@@ -62,6 +66,7 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
 		$response->page['body'] = $page_result;
 		$response->page['js'] = drupal_add_js();
 		$response->page['css'] = drupal_add_css();
+		$response->page['GLOBALS'] = $GLOBALS;
 
 		return $response;
   }
