@@ -32,7 +32,6 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
 		$path = $args['path'];
 		if (!$path) { return $this->respond_error("No path."); }
   	drupal_set_message("Looking up: $path");
-  	// return $this->respond_error("Hmm...");
 
   	// Change to the remote user
   	$response = $this->user_lookup($args);
@@ -56,8 +55,11 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
   	$_GET['q'] = $path;
 
   	// Generate the page
-  	drupal_set_message("About to execute.");
-		// $page_result = menu_execute_active_handler($path, FALSE);
+		ob_start();
+		$page_result = menu_execute_active_handler($path, FALSE);
+   	$raw_result = ob_get_contents();
+		ob_end_clean();
+		if ($raw_result) { $page_result = $raw_result; }
 
 		// Construct a resopnse
   	$response = new Sirius_Server_Response();
