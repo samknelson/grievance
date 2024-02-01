@@ -48,7 +48,7 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
   	// Change the current_path()
   	global $_GET;
   	$_GET = $args['_GET'];
-  	// $_GET['q'] = $path;
+  	$_GET['q'] = $path;
 
   	// Generate the page
 		$page_result = menu_execute_active_handler($path, FALSE);
