@@ -54,6 +54,11 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
   	$_GET = $args['_GET'];
   	$_GET['q'] = $path;
 
+		global $base_url, $base_secure_url, $base_insecure_url;
+		drupal_set_message("Base url: $base_url");
+		drupal_set_message("Base surl: $base_secure_url");
+		drupal_set_message("Base iurl: $base_insecure_url");
+
   	// Generate the page
 		ob_start();
 		$page_result = menu_execute_active_handler($path, FALSE);
@@ -70,6 +75,8 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
 		$response->page['js'] = drupal_add_js();
 		$response->page['css'] = drupal_add_css();
 		$response->page['GLOBALS'] = $GLOBALS;
+
+	
 
 		return $response;
   }
