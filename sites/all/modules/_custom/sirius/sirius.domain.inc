@@ -141,18 +141,6 @@ function sirius_sirius_domain_component_info() {
       'title' => 'Contact - Relationships',
       'description' => 'Enable relationships between contacts (or workers)',
     ),
-    'service' => array(
-      'title' => 'Services',
-      'description' => 'Enable functionality to allow Sirius to be a service for remote function calls',
-    ),
-    'service:client' => array(
-      'title' => 'Services - Client',
-      'description' => 'Allow this instance to server as a client',
-    ),
-    'service:server' => array(
-      'title' => 'Services - Server',
-      'description' => 'Allow this instance to server as a server',
-    ),
     'ledger:stripe' => array(
       'title' => 'Ledger - Stripe',
       'description' => 'Enable this domain to connect to the Stripe payment processor',
