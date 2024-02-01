@@ -56,7 +56,7 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
 
   	// Change the base URL
 		global $base_url, $base_secure_url, $base_insecure_url;
-		$base_url = $base_secure_url = $base_insecure_url = $GLOBALS['base_url'] . '/' . $GLOBALS['base_path'];
+		$base_url = $base_secure_url = $base_insecure_url = $GLOBALS['base_url'] . $GLOBALS['base_path'];
 		drupal_set_message("Base url: $base_url");
 		drupal_set_message("Base surl: $base_secure_url");
 		drupal_set_message("Base iurl: $base_insecure_url");
