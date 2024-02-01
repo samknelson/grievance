@@ -42,7 +42,7 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
 
   	// Change the base path
   	global $GLOBALS;
-  	$GLOBALS['base_path'] = '/sirius/service/proxy/client';
+  	$GLOBALS['base_path'] = '/sirius/service/proxy/client/';
 
   	// Generate the page
 		$page_result = menu_execute_active_handler($path, FALSE);
