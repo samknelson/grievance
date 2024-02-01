@@ -44,6 +44,7 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
   	// Change the base path
   	global $GLOBALS;
   	$GLOBALS['base_path'] = '/sirius/service/proxy/client/';
+  	return $this->respond_error('<pre>' . print_r($GLOBALS, 1) . '</pre>');
 
   	// Change the current_path()
   	global $_GET;
@@ -53,6 +54,7 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
   	// Generate the page
 		$page_result = menu_execute_active_handler($path, FALSE);
 
+		// Construct a resopnse
   	$response = new Sirius_Server_Response();
   	$response->success = TRUE;
 		$response->msg = "Retrieved: $path";
