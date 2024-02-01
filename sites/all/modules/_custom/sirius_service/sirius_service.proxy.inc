@@ -42,9 +42,9 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
 
   	// Change the base path
   	global $GLOBALS;
-  	return $this->respond_error('<pre>'. print_r($GLOBALS, 1) . '</pre>');
+  	$GLOBALS['base_url'] = '/sirius/service/proxy/client';
 
-
+  	// Generate the page
 		$page_result = menu_execute_active_handler($path, FALSE);
 
   	$response = new Sirius_Server_Response();
