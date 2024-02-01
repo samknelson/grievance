@@ -56,6 +56,7 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
   	$_GET['q'] = $path;
 
   	// Generate the page
+  	drupal_set_message("About to execute.");
 		$page_result = menu_execute_active_handler($path, FALSE);
 
 		// Construct a resopnse
