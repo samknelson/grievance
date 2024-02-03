@@ -28,20 +28,57 @@ class Sirius_Service_Server_Proxy extends Sirius_Service_Server {
   }
 
   public function page_fetch($args) {
+  	// What path do we want to fetch?
+		$path = $args['path'];
+		if (!$path) { return $this->respond_error("No path."); }
+  	drupal_set_message("Looking up: $path");
+
+  	// Change to the remote user
   	$response = $this->user_lookup($args);
   	if (!$response->success()) { return $response; }
   	if (!$response->account) { return $this->respond_error($response->msg()); }
   	global $user;
   	$user = user_load($response->account['uid']);
 
-		$path = $args['path'];
-		if (!$path) { return $this->respond_error("No path."); }
-		drupal_set_message("Fetching: $path");
-		$page_result = menu_execute_active_handler($path, FALSE);
+  	// Change the base path
+  	global $GLOBALS;
+  	$keys = array('base_path', 'base_url', 'base_root');
+  	foreach ($keys as $key) {
+  		if (isset($args['GLOBALS'][$key])) {
+		  	$GLOBALS[$key] = $args['GLOBALS'][$key]; 
+  		}
+  	}
 
+  	// Change the current_path()
+  	global $_GET;
+  	$_GET = $args['_GET'];
+  	$_GET['q'] = $path;
+
+  	// Change the base URL
+		global $base_url, $base_secure_url, $base_insecure_url;
+		$base_url = $base_secure_url = $base_insecure_url = $GLOBALS['base_url'] . $GLOBALS['base_path'];
+		drupal_set_message("Base url: $base_url");
+		drupal_set_message("Base surl: $base_secure_url");
+		drupal_set_message("Base iurl: $base_insecure_url");
+
+  	// Generate the page
+		ob_start();
+		$page_result = menu_execute_active_handler($path, FALSE);
+   	$raw_result = ob_get_contents();
+		ob_end_clean();
+		if ($raw_result) { $page_result = $raw_result; }
+
+		// Construct a resopnse
   	$response = new Sirius_Server_Response();
   	$response->success = TRUE;
-		$response->msg = $page_result;
+		$response->msg = "Retrieved: $path";
+		$response->page['title'] = drupal_get_title();
+		$response->page['body'] = $page_result;
+		$response->page['js'] = drupal_add_js();
+		$response->page['css'] = drupal_add_css();
+		$response->page['GLOBALS'] = $GLOBALS;
+
+	
 
 		return $response;
   }
