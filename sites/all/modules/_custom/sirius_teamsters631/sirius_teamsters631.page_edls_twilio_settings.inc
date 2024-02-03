@@ -69,6 +69,9 @@ function sirius_edls_page_631twilio_form_submit($form, &$form_state) {
 		$params['to'] = $test_number;
 		$params['sms'] = 'This is a test message from the EDLS system on behalf of ' . $employer_node->title;
 		$params['from'] = $form_state['values']['edls']['teamsters631']['twilio']['phone'];
+		// Legacy support
+		$params['sms_from'] = $params['from'];
+		
 		$result = sirius_sms_send($params);
 
 		if ($result['success']) {
