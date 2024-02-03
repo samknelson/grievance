@@ -150,5 +150,26 @@ function sirius_teamsters631_menu() {
     'file' => 'sirius_teamsters631.page_edls_compliance.inc'
   );
 
+  $items['sirius/edls/631twilio'] = array(
+    'title' => 'Twilio',
+    'page callback' => 'sirius_edls_page_631twilio',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          // 'action' => 'employer_dashboard',
+          'action' => 'admin',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 11,
+    'file' => 'sirius_teamsters631.page_edls_twilio_settings.inc'
+  );
+
   return $items;
 }

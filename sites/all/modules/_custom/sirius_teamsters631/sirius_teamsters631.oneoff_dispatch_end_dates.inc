@@ -94,6 +94,8 @@ function sirius_teamsters631_oneoff_end_date_correct($dispatch_node, $mode = 'te
 			} else {
 				$ts_start = $ts_accepted;
 			}
+		} else if ($ts_report) {
+			$ts_start = $ts_report;
 		}
 
 		if ($ts_start) {
@@ -159,6 +161,9 @@ dispatch_job:manual
 		if ($mode != 'live') {
 			sirius_minilog("- [Skipping node save because mode = $mode]");
 		} else {
+			$dispatch_node->sirius_nohook = TRUE;
+			$dispatch_node->sirius_nodenorm = TRUE;
+			$dispatch_node->sirius_no_recurse = TRUE;
 			node_save($dispatch_node);
 			sirius_minilog("- Dispatch node saved");
 		}
@@ -167,5 +172,40 @@ dispatch_job:manual
 	return array('success' => TRUE);
 }
 
+// while true ; do drush --user=1 php-eval "sirius_require('sirius_teamsters631', 'sirius_teamsters631.oneoff_dispatch_end_dates.inc'); sirius_minilog_echo_active(TRUE); sirius_teamsters631_oneoff_end_date_correct_all();" ; sleep 10; done
 
+// drush --user=1 php-eval "sirius_require('sirius_teamsters631', 'sirius_teamsters631.oneoff_dispatch_end_dates.inc'); sirius_teamsters631_oneoff_end_date_correct_all();"
 
+function sirius_teamsters631_oneoff_end_date_correct_all() {
+  $last = variable_get('sirius_teamsters631_oneoff_end_date_correct_all', 999999999);
+
+  $sql = "select count(*) as c from node ";
+  $sql .= "where node.type = 'sirius_dispatch' ";
+  $sql .= "and nid < $last ";
+  $stmt = db_query($sql, array());
+  $hr = $stmt->fetchAssoc();
+  $total = $hr['c'];
+
+  $limit = 5;
+  $sql = "select * from node ";
+  $sql .= "where node.type = 'sirius_dispatch' ";
+  $sql .= "and nid < $last ";
+  $sql .= "order by nid desc limit $limit ";
+
+  $stmt = db_query($sql, array());
+
+  $nids = array();
+
+  $count = 0;
+  while ($hr = $stmt->fetchAssoc()) {
+    $nids[] = $hr['nid'];
+  }
+
+  foreach ($nids as $nid) {
+    ++$count;
+    $node = node_load($nid);
+    sirius_teamsters631_oneoff_end_date_correct($node, 'live');
+    print "Executed $count / $limit of $total: $nid\n";
+    variable_set('sirius_teamsters631_oneoff_end_date_correct_all', $nid);
+  }
+}
