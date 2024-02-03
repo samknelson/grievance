@@ -10,21 +10,35 @@ function sirius_twilio_provider_get() {
 	return $provider;
 }
 
-function sirius_twilio_client_get() {
+function sirius_twilio_client_get($new_client = NULL) {
 	static $client;
+
+	if ($new_client) {
+		$client = $new_client;
+
+	}
 	if (!$client) {
+		$client = sirius_twilio_client_connect(array(
+			'provider' => sirius_twilio_provider_get(),
+			'account_sid' => sirius_domain_variable_get('sirius_twilio_account_sid', ''),
+			'account_token' => sirius_domain_variable_get('sirius_twilio_account_token', ''),
+			'space_url' => sirius_domain_variable_get('sirius_twilio_signalwire_space_url', ''),
+		));
+	}
 
-		$provider = sirius_twilio_provider_get();
+	return $client;
+}
 
-		$account_sid = sirius_domain_variable_get('sirius_twilio_account_sid', '');
-		$account_token = sirius_domain_variable_get('sirius_twilio_account_token', '');
-		$space_url = sirius_domain_variable_get('sirius_twilio_signalwire_space_url', '');
+function sirius_twilio_client_connect($params) {
+	$provider = $params['provider'];
+	$account_sid = $params['account_sid'];
+	$account_token = $params['account_token'];
+	$space_url = $params['space_url'];
 
-		if ($provider == 'signalwire') {
-			$client = new SignalWire\Rest\Client($account_sid, $account_token, array('signalwireSpaceUrl' => $space_url));
-		} else {
-			$client = new Twilio\Rest\Client($account_sid, $account_token);
-		}
+	if ($provider == 'signalwire') {
+		$client = new SignalWire\Rest\Client($account_sid, $account_token, array('signalwireSpaceUrl' => $space_url));
+	} else {
+		$client = new Twilio\Rest\Client($account_sid, $account_token);
 	}
 
 	return $client;
