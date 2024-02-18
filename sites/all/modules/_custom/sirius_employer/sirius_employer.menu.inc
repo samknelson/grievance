@@ -30,6 +30,7 @@ function sirius_employer_node_tabs() {
     'callback' => 'sirius_employer_node_tab_labproj_list',
     'permissions' => array('sirius employer labor projection manager'),
     'file' => 'sirius_employer.page_labproj_list.inc',
+    'component' => 'employer:labproj',
   );
 
 
@@ -40,6 +41,7 @@ function sirius_employer_node_tabs() {
     'permissions' => array('sirius employer labor projection manager'),
     'file' => 'sirius_employer.page_labproj_view.inc',
     'weight' => 5,
+    'component' => 'employer:labproj',
   );
 
   $node_tabs['sirius_log']['employer_labproj_status'] = array(
@@ -49,6 +51,7 @@ function sirius_employer_node_tabs() {
     'permissions' => array('sirius employer labor projection manager'),
     'file' => 'sirius_employer.page_labproj_status.inc',
     'weight' => 6,
+    'component' => 'employer:labproj',
   );
 
   $node_tabs['sirius_log']['employer_labproj_edit'] = array(
@@ -58,6 +61,7 @@ function sirius_employer_node_tabs() {
     'permissions' => array('sirius employer labor projection manager'),
     'file' => 'sirius_employer.page_labproj_edit.inc',
     'weight' => 7,
+    'component' => 'employer:labproj',
   );
 
 
