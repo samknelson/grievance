@@ -41,7 +41,10 @@ function sirius_quickactions_render() {
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/quickactions.css');
 
 	foreach ($links as $delta => $link) {
-		$links[$delta] = array('#markup' => sirius_sirius_quickaction_render($link));
+		$links[$delta] = array(
+			'#markup' => sirius_sirius_quickaction_render($link),
+			'#weight' => 1000,
+		);
 	}
 	return $links;
 }
