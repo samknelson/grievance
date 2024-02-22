@@ -29,6 +29,7 @@ function sirius_dispatch_notify_possible($dispatch_node) {
 
 	// Verify the job status
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+	$job_policy = sirius_dispatch_job_policy($job_node);
 	$job_status = $job_node->field_sirius_dispatch_job_status['und'][0]['value'];
 	if ($job_status != 'Unfilled' && $job_status != 'Running' && $job_status != 'Pending') {
 		return array('success' => FALSE, 'msg' => "Job status is $job_status");
@@ -66,10 +67,23 @@ function sirius_dispatch_notify(&$dispatch_node, $requested_medium = NULL, $note
 	// Load nodes and terms
 	$worker_node = node_load($dispatch_node->field_sirius_worker['und'][0]['target_id']);
 	$job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+	$job_policy = sirius_dispatch_job_policy($job_node);
 	$employer_node = node_load($job_node->field_grievance_shop['und'][0]['target_id']);
 	$job_type_term = taxonomy_term_load($job_node->field_sirius_dispatch_job_type['und'][0]['tid']);
 	global $base_url;
 	$url = "$base_url/d/" . $dispatch_node->nid . "/" . $dispatch_node->field_sirius_aat['und'][0]['value'];
+
+	// Run any plugins. 
+	$plugins = sirius_dispatch_elig_info_all();
+	foreach ($plugins as $plugin_key => $plugin) {
+		// Only active plugins with an eligibility callback
+		if ($job_policy['plugin'][$plugin_key]['active'] != 'Yes') { continue; }
+		$plugin = sirius_dispatch_elig_instance($plugin_key);
+
+		// Attempt to run the plugin
+		$result = $plugin->notify($dispatch_node, $requested_medium, $notes);
+		if (!$result['success']) { return $result; }
+	}
 
 	// Set our media. NULL means the worker's default; there might be multiple defaults.
 	$media = array();
