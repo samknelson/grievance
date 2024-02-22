@@ -393,6 +393,16 @@ function sirius_dispatch_node_tabs() {
     'weight' => 3,
   );
 
+  $node_tabs['sirius_dispatch_job_group']['sirius_dispatch_group_merge'] = array(
+    'title' => 'Merge',
+    'description' => '',
+    'callback' => 'sirius_dispatch_node_tab_group_merge',
+    'permissions' => array('sirius dispatch admin'),
+    'skip_node_view_check' => FALSE,
+    'weight' => 6,
+    'file' => 'sirius_dispatch.page_group_merge.inc',
+  );
+
   sirius_node_tab_set_module('sirius_dispatch', $node_tabs);
 
   return $node_tabs;
