@@ -467,13 +467,25 @@ function sirius_dispatch_node_view($node, $view_mode, $langcode) {
 function sirius_dispatch_sirius_dispatch_elig_info() {
   sirius_require('sirius_dispatch', 'sirius_dispatch.1for1.inc');
   sirius_require('sirius_dispatch', 'sirius_dispatch.nosecondaryatprimary.inc');
+  sirius_require('sirius_dispatch', 'sirius_dispatch.loseseniorityafternotify.inc');
 
   $items = array();
   Sirius_Dispatch_1for1::getInstance()->setInfo($items);
   Sirius_Dispatch_Nosecondaryatprimary::getInstance()->setInfo($items);
+  Sirius_Dispatch_Loseseniorityafternotify::getInstance()->setInfo($items);
   return $items;
 }
 
 function sirius_dispatch_status_options() {
   return list_allowed_values(field_info_field('field_sirius_dispatch_status'));
+}
+
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_dispatch_sirius_backlinks_from_node_alter(&$links, $node) {
+  if ($node->type == 'sirius_dispatch_job_group') {
+    $links['sirius/dispatch/groups'] = array('name' => 'All Job Groups');
+  }
 }
