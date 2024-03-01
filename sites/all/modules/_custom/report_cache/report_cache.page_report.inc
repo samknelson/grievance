@@ -47,7 +47,7 @@ function report_cache_page_report($report_type) {
 	}
 
 	$title = t("Reports: ") . $info['name'];
-	if ($report_id) { $title .= ': $report_id'; }
+	if ($report_id) { $title .= ": $report_id"; }
 	drupal_set_title($title);
 
 	if ($report_id) {
