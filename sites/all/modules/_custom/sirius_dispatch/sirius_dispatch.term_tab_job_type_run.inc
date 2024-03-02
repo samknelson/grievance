@@ -2,8 +2,26 @@
 
 function sirius_dispatch_term_tab_job_type_run_form($form, &$form_state, $job_type_term) {
 	$form_state['job_type_tid'] = $job_type_term->tid;
-
 	$form['#tree'] = TRUE;
+
+	$json = sirius_json_get($job_type_term);
+
+	$form['run']['do_not_disturb'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Do Not Disturb'),
+	);
+	$options = sirius_do_not_disturb_list();
+	$form['run']['do_not_disturb']['id'] = array(
+		'#type' => 'select',
+		'#options' => $options,
+		'#title' => t('Which Do Not Disturb schedule should be used?'),
+		'#default_value' => 'default',
+	);
+
+	if ($json['run']['do_not_disturb']['id']) {
+		$form['run']['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disurb_render($json['run']['do_not_disturb']['id']));
+	}
+
 
 	$roles = user_roles();
 	$form['run']['role'] = array(
