@@ -64,6 +64,35 @@ function sirius_dispatch_term_tab_job_type_run_form($form, &$form_state, $job_ty
 		'#description' => t('Should this job be automatically closed (set to "Filled") when the report date / time has passed?'),
 	);
 
+	$form['run']['dispstatus'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Automatically set Dispatch Status',
+	);
+
+	$form['run']['dispstatus']['primary'] = array(
+		'#title' => 'Set the worker to dispatch status "Employed" after primary dispatch?',
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => 'Yes',
+		'#description' => t(''),
+	);
+
+	$form['run']['dispstatus']['secondary'] = array(
+		'#title' => 'Set the worker to dispatch status "Employed" after secondary dispatch?',
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => 'No',
+		'#description' => t(''),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
