@@ -180,12 +180,12 @@ function sirius_worker_usersync($worker_nid) {
 		$worker_user->field_sirius_domain	= $worker_node->field_sirius_domain;
 	}
 
-	if (array_diff(array_keys($worker_user->roles), array_keys($new_rids)) || 
+	if (!($worker_user->roles) ||
+			array_diff(array_keys($worker_user->roles), array_keys($new_rids)) || 
 			array_diff(array_keys($new_rids), array_keys($worker_user->roles))) {
 		$worker_user->roles = $new_rids;
 		$need_save = TRUE;
 	}
-
 
 	if (!$need_save) {
 		return array('success' => TRUE, 'msg' => "User is unchanged.");
