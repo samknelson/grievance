@@ -631,7 +631,7 @@ function sirius_menu() {
     'title' => 'Test',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_test',
+    'page callback' => 'sirius_page_do_not_disturb_test',
     'page arguments' => array(),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
