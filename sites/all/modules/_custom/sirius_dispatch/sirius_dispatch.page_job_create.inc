@@ -312,7 +312,7 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 		// Facility
 		$hall_ajax_id = 'sirius_dispatch_page_job_create_ajax_halls';
-		$facility_options = sirius_dispatch_facility_dropdown();
+		$facility_options = sirius_dispatch_facility_dropdown(array('employer_node' => $employer_node));
 		$form['facility'] = array(
 			'#type' => 'select',
 			'#options' => $facility_options,
