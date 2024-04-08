@@ -108,6 +108,12 @@ function sirius_pdf_generate($url, $params) {
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params['post']);
 	}
+
+	// Set time limits for PDF fetch
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, variable_get('sirius_pdf_curlopt_connecttimeout', 15));
+	curl_setopt($ch, CURLOPT_TIMEOUT, variable_get('sirius_pdf_curlopt_timeout', 45));
+	set_time_limit(variable_get('sirius_pdf_script_time_limit', 60));
+	
   $html = curl_exec($ch);
   if ($html === FALSE) {
   	$error = curl_error($ch);
