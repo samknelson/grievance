@@ -28,7 +28,7 @@ function sirius_dispatch_notify_employer_dispatch($dispatch_node) {
 	if ($status_new == $status_old) { return; }
 
 	$found = FALSE; 
-	if ($status_new == 'accepted' && $notifications['dispatch_accept']) { $found = TRUE; }
+	if (in_array($status_new, array('accepted', 'accepted_secondary')) && $notifications['dispatch_accept']) { $found = TRUE; }
 	if ($status_new == 'declined' && $notifications['dispatch_decline']) { $found = TRUE; }
 	if ($status_new == 'expired' && $notifications['dispatch_expire']) { $found = TRUE; }
 	if (($status_new == 'resigned' || $status_new == 'vlri') && $notifications['dispatch_resign']) { $found = TRUE; }
