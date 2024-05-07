@@ -41,7 +41,10 @@ function sirius_quickactions_render() {
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/quickactions.css');
 
 	foreach ($links as $delta => $link) {
-		$links[$delta] = array('#markup' => sirius_sirius_quickaction_render($link));
+		$links[$delta] = array(
+			'#markup' => sirius_sirius_quickaction_render($link),
+			'#weight' => 1000,
+		);
 	}
 	return $links;
 }
@@ -166,6 +169,10 @@ function sirius_backlinks_from_node($node) {
 	if ($node->type == 'sirius_phonenumber') { $links['sirius/phonenumber'] = array('name' => 'Phone Number List'); }
 	if ($node->type == 'sirius_trust_benefit') { $links['sirius/trust/benefits'] = array('name' => 'Benefit List'); }
 	if ($node->type == 'sirius_letterhead') { $links['sirius/admin/letterhead'] = array('name' => 'Letterhead List'); }
+	if ($node->type == 'sirius_news') {
+		$links['sirius/news'] = array('name' => 'News');
+		$links['sirius/news/admin'] = array('name' => 'Admin');
+	}
 
 	if ($node->type == 'grievance_contract_template') {
 		$links['grievance/admin/contract-templates'] = array('name' => 'Contract List');
@@ -256,6 +263,9 @@ function sirius_backlinks_from_node($node) {
 				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:checkin')				{ $path = "node/$handler_nid/sirius_worker_steward/checkin"; }
 				else if ($handler_type == 'grievance_shop' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_employer_steward/sched"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_worker_steward/checkin-history"; }
+				else if ($log_category == 'letter') {
+					$path = "node/$handler_nid/${handler_type}_letter";
+				}
 				else if ($handler_type == 'sirius_log') {
 					if ($handler_category == 'twilio:recording') { 
 						$path = "node/$handler_nid/sirius_twilio_recording";

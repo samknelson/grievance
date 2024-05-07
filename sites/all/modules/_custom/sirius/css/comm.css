@@ -1,0 +1,31 @@
+.sirius_comm_section {
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid #cccccc;
+	background-color: #ffffff;
+}
+
+#content .sirius_comm_section h2 {
+	padding-top: 0;
+	margin-top: 0;
+	padding-bottom: 5px;
+	margin-bottom: 0;
+	font-size: 125%;
+}
+
+.sirius_comm_status_error .sirius_comm_status,
+.sirius_comm_status_failed .sirius_comm_status {
+	background-color: #ffcccc;
+	border-color: #990000;
+}
+
+.sirius_comm_status_sending .sirius_comm_status {
+	background-color: #ccccff;
+	border-color: #000099;
+}
+
+.sirius_comm_status_sent .sirius_comm_status {
+	background-color: #ccffcc;
+	border-color: #009900;
+}
+

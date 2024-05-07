@@ -87,8 +87,10 @@ function sirius_training_certifications_render($certification_node, $options = a
 
 	$json = sirius_jsonfield_util_node_json_get($certification_node);
 	$form = sirius_jsonfield_util_form_get($json, 'certification');
-	$results = sirius_jsonfield_util_results_get($json, 'certification');
-	$html .= sirius_jsonfield_util_render_all_values($form, $results);
+	if ($form) {
+		$results = sirius_jsonfield_util_results_get($json, 'certification');
+		$html .= sirius_jsonfield_util_render_all_values($form, $results);
+	}
 
 	$signature_definitions = $form['#sirius']['signature_definitions'];
 	if ($signature_definitions) {
@@ -96,14 +98,24 @@ function sirius_training_certifications_render($certification_node, $options = a
 		foreach ($signature_definitions as $signature_definition) {
 			$name = $signature_definition['name'];
 			$esignature = sirius_jsonfield_util_esignature_get($json, $name);
-			$html .= sirius_fakerender_field($name, sirius_esignature_render($esignature, '', $certification_node->nid, $name));
+			if ($esignature) { $html .= sirius_fakerender_field($name, sirius_esignature_render($esignature, '', $certification_node->nid, $name)); }
 		}
 	}
 
+	$renderable = field_view_field('node', $certification_node, 'field_sirius_attachments', 'full');
+	$html .= drupal_render($renderable);
+
+
 	if (!$options['hide_edit_link']) {
-		$path = 'node/' . $certification_node->nid . '/sirius_log_tc/certification_edit';
-		if (drupal_valid_path($path))
-		$html .= l('Edit', $path, array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
+		$paths = array();
+		$paths['node/' . $certification_node->nid . '/sirius_log_tc/certification_edit'] = 'Edit';
+		$paths['node/' . $certification_node->nid . '/sirius_log_tc/certification_attachments'] = 'Attachments';
+		if ($status != 'granted') { $paths['node/' . $certification_node->nid . '/sirius_log_tc/certification_grant'] = 'Grant'; }
+		foreach ($paths as $path => $title) {
+			if (drupal_valid_path($path)) {
+				$html .= l($title, $path, array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
+			}
+		}
 	}
 	$html .= '</div>';
 
@@ -120,6 +132,18 @@ function sirius_training_certification_status_options() {
 	);
 }
 
+function sirius_training_certification_add($handler_nids, $json, $files = array()) {
+	return sirius_log(
+		'worker:certification', 
+		'draft', 
+		'Certification submitted', 
+		NULL, 
+		NULL, 
+		$handler_nids, 
+		$files,
+		$json
+	);
+}
 
 function sirius_training_certification_grant($certification_node, $values = array()) {
 	$certification_json = sirius_jsonfield_util_node_json_get($certification_node);

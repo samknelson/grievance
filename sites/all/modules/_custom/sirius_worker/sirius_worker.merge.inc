@@ -22,6 +22,9 @@ function sirius_worker_merge($worker_nid, $from_worker_nid) {
 		sirius_minilog(t('Disabled user #@uid', array('@uid' => $from_user->uid)));
 	}
 
+	$from_contact_nid = $from_worker_node->field_sirius_contact['und'][0]['target_id'];
+	$contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
+
 	// Create a log entry
 	$category = 'sirius_worker';
 	$type = 'merge';
@@ -53,6 +56,19 @@ function sirius_worker_merge($worker_nid, $from_worker_nid) {
 	$stmt = db_query($sql, array(':worker_nid' => $worker_nid, ':from_worker_nid' => $from_worker_nid));
 	$count = $stmt->rowCount();
 	sirius_minilog("Executed: $sql / $count rows affected");
+
+	if ($from_contact_nid && $contact_nid) {
+		// Anything which pointed to the old contact should point to the new contact
+		$sql = 'update field_data_field_sirius_contact set field_sirius_contact_target_id = :contact_nid where field_sirius_contact_target_id = :from_contact_nid';
+		$stmt = db_query($sql, array(':contact_nid' => $contact_nid, ':from_contact_nid' => $from_contact_nid));
+		$count = $stmt->rowCount();
+		sirius_minilog("Executed: $sql / $count rows affected");
+
+		$sql = 'update field_revision_field_sirius_contact set field_sirius_contact_target_id = :contact_nid where field_sirius_contact_target_id = :from_contact_nid';
+		$stmt = db_query($sql, array(':contact_nid' => $contact_nid, ':from_contact_nid' => $from_contact_nid));
+		$count = $stmt->rowCount();
+		sirius_minilog("Executed: $sql / $count rows affected");
+	}
 
 	// Create a log entry
 	$category = 'sirius_worker';

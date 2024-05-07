@@ -109,6 +109,10 @@ function sirius_sirius_domain_component_info() {
       'title' => 'Activist - Phonebank - Prescan',
       'description' => 'For a given phonebank, enable the "prescan" function, allowing phonebank admins to remove invalid phone numbers.',
     ),
+    'grievance' => array(
+      'title' => 'Grievance',
+      'description' => 'Grievance and contract enforcement functionality',
+    ),
     'grievance:alert:assignment' => array(
       'title' => 'Grievance - Alert - Assignment',
       'description' => 'Notify users when a new grievance has been assigned to them',
@@ -136,18 +140,6 @@ function sirius_sirius_domain_component_info() {
     'contact:relationships' => array(
       'title' => 'Contact - Relationships',
       'description' => 'Enable relationships between contacts (or workers)',
-    ),
-    'service' => array(
-      'title' => 'Services',
-      'description' => 'Enable functionality to allow Sirius to be a service for remote function calls',
-    ),
-    'service:client' => array(
-      'title' => 'Services - Client',
-      'description' => 'Allow this instance to server as a client',
-    ),
-    'service:server' => array(
-      'title' => 'Services - Server',
-      'description' => 'Allow this instance to server as a server',
     ),
     'ledger:stripe' => array(
       'title' => 'Ledger - Stripe',
@@ -224,6 +216,7 @@ function sirius_domain_active($domain_nid) {
 function sirius_domain_user_login(&$edit, $account) {
   $domain_nid = $account->field_sirius_domain['und'][0]['target_id'];
   if ($domain_nid) {
+    // If it's inactive, kick the user out
     if (!sirius_domain_active($domain_nid)) {
       global $user;
       module_invoke_all('user_logout', $user);
@@ -231,6 +224,9 @@ function sirius_domain_user_login(&$edit, $account) {
       $user = drupal_anonymous_user();
       drupal_set_message("Login prohibited; your domain or one of its parents is disabled.", 'warning');
     }
+
+    // Assign the domain
+    sirius_domain($domain_nid);
   }
 }
 
@@ -531,13 +527,13 @@ function sirius_domain_restrict_taxonomy_fields(&$form, $form_id) {
 
     // @todo there has to be an easier way.
     if ($form_field['und']['#options']) {
-      $form_field['und']['#options'] = array_intersect($form_field['und']['#options'], $options);
+      $form_field['und']['#options'] = array_intersect_key($form_field['und']['#options'], $options);
     }
     if ($form_field['und'][0]['tid']['#options']) {
-      $form_field['und'][0]['tid']['#options'] = array_intersect($form_field['und'][0]['tid']['#options'], $options);
+      $form_field['und'][0]['tid']['#options'] = array_intersect_key($form_field['und'][0]['tid']['#options'], $options);
     }
     if ($form_field['und'][1]['tid']['#options']) {
-      $form_field['und'][1]['tid']['#options'] = array_intersect($form_field['und'][1]['tid']['#options'], $options);
+      $form_field['und'][1]['tid']['#options'] = array_intersect_key($form_field['und'][1]['tid']['#options'], $options);
     }
   }
 }
@@ -599,6 +595,7 @@ function sirius_domain_form_restrict(&$form) {
     'field_sirius_work_status_tid' => 'sirius_work_status',
     'field_grievance_from_status' => 'grievance_status',
     'field_grievance_next_status' => 'grievance_status',
+    'field_sirius_trust_service_type_tid' => 'sirius_trust_service_type',
   );
 
   foreach ($field_names as $field_name => $taxonomy) {

@@ -72,4 +72,5 @@ class Sirius_Dispatch_Elig_Plugin {
    
   public function elig($context, $workers) { return array('success' => TRUE); }
   public function accept(&$dispatch_node, $notes = "") { return array('success' => TRUE); }
+  public function notify(&$dispatch_node, $requested_medium, $notes = "") { return array('success' => TRUE); }
 }

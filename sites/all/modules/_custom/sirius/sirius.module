@@ -2,6 +2,7 @@
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.error.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Singleton.php';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/Sirius/Result.php';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.access.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.minilog.inc';
@@ -122,6 +123,24 @@ function sirius_cron() {
   // sirius_signature_cleanup();
   sirius_domain_stats_cron();
   sirius_mailattach_fetch_all();
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_sirius_cron_scan_info() {
+  $items = array();
+
+  $items['log_cleanup_orphans'] = array(
+    'title' => 'Cleanup Orphaned Log Entries',
+    'description' => 'Deletes any log entries where the handlers are all missing.',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_log_cleanup_orphans',
+    'multidomain' => FALSE,
+  );
+
+  return $items;
 }
 
 /**
@@ -292,7 +311,7 @@ function sirius_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
-  $defaultable_fields = array('sirius_type');
+  $defaultable_fields = array('sirius_type', 'sirius_paths');
   foreach ($defaultable_fields as $field) {
     if (isset($_GET[$field]) && isset($form['field_' . $field])) {
       $form['field_' . $field]["und"][0]['value']['#default_value'] = $_GET[$field];
@@ -1051,6 +1070,7 @@ function sirius_ajax_generic_replace($form, $form_state) {
   }
   $commands = array();
   $commands[] = ajax_command_replace($wrapper, render($element));
+  $commands[] = ajax_command_invoke('body', 'trigger', array('sirius_ajax_generic_replace'));
   return array(
     '#type' => 'ajax',
     '#commands' => $commands

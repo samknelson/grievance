@@ -13,7 +13,7 @@ function sirius_hour_node_tab_worker_hours_form($form, &$form_state, $worker_nod
 	$form['wrap_open'] = array('#markup' => '<div class="sirius-form">');
 	$form['intro'] = array('#markup' => $html);
 
-	$start_year = date('Y') - 5;
+	$start_year = date('Y') - 30;
 	$end_year = date('Y') + 5;
 	for ($year = $start_year; $year <= $end_year; ++$year) { $years[$year] = $year; }
 	for ($month = 1; $month <= 12; ++$month) { $months[$month] = $month; }

@@ -37,8 +37,12 @@ function sirius_worker_history_calc($parent_node, $history_key) {
   $query->propertyOrderBy('created');
   $stmt = $query->execute();
 
-  if (!$stmt['node']) { return array('success' => TRUE, 'msg' => 'History is empty.'); }
-  $log_nodes = node_load_multiple(array_keys($stmt['node']));
+  // if (!$stmt['node']) { return array('success' => TRUE, 'msg' => 'History is empty.'); }
+  if ($stmt['node']) {
+    $log_nodes = node_load_multiple(array_keys($stmt['node']));
+  } else {
+    $log_nodes = array();
+  }
 
   $changes = array();
   foreach ($log_nodes as $log_nid => $log_node) {
@@ -171,7 +175,7 @@ function sirius_worker_history_calc($parent_node, $history_key) {
   $result['history'] = $history;
 
   $orig_history = $parent_json['history'][$history_key];
-  if ($history['changes'] && sirius_worker_history_changed($history, $orig_history)) {
+  if (sirius_worker_history_changed($history, $orig_history)) {
     $msg = "$history_key: " . $parent_node->title . ": History changed, node updated.";
     $parent_json['history'][$history_key] = $history;
     sirius_json_set($parent_node, $parent_json);

@@ -86,16 +86,26 @@ function sirius_event_map_legend_render($event_nid) {
 
   $counts = sirius_event_participant_summary($event_nid, $prole_tid);
 
+  $has_tools = FALSE;
   $rows = array();
   foreach ($pstatus_terms as $pstatus_tid => $pstatus_term) {
     $pstatus_json = sirius_json_get($pstatus_term);
     $pin = sirius_map_pin($pstatus_json['map']['pin']);
+
+    $tools = array();
+    $path = "taxonomy/term/$pstatus_tid/sirius_event_pstatus";
+    if (drupal_valid_path($path)) {
+      $has_tools = TRUE;
+      $tools[] = l('Settings', $path, array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
+    }
 
     $row = array();
     $row[] = sirius_map_pin_render($pin);
     $row[] = $pstatus_term->name;
     $row[] = number_format($counts[$pstatus_tid], 0);
     $row[] = $pstatus_term->description;
+    if ($has_tools) { $row[] = join('', $tools); }
+
     $rows[] = $row;
   }
 
@@ -107,18 +117,31 @@ function sirius_event_map_legend_render($event_nid) {
       $pstatus_json = sirius_json_get($pstatus_term);
       $pin = sirius_map_pin($pstatus_json['map']['pin']);
 
+      $tools = array();
+      $path = "taxonomy/term/$mixed_pstatus_tid/sirius_event_pstatus";
+      if (drupal_valid_path($path)) {
+        $has_tools = TRUE;
+        $tools[] = l('Settings', $path, array('attributes' => array('class' => array('tool-button')), 'query' => array('destination' => current_path())));
+      }
+
       $row = array();
       $row[] = sirius_map_pin_render($pin);
       $row[] = 'Multiple Statuses';
       $row[] = '';
       $row[] = '(This pin is shown when there are multiple residents at an address, and they have different statuses.)';
+      if ($has_tools) { $row[] = join('', $tools); }
       $rows[] = $row;
     }
   }
 
 
-  $header = array('Marker', 'Status', 'Count', 'Description');
-  $html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => array()));
+  $header = array();
+  $header[] = t('Marker');
+  $header[] = t('Status');
+  $header[] = t('Count');
+  $header[] = t('Description');
+  if ($has_tools) { $header[] = t('Tools'); }
+  $html .= sirius_table_render($header, $rows);
   return $html;
 }
 

@@ -51,6 +51,8 @@ function sirius_sns_incoming() {
   }
 
   // Check the signature.
+  // Temporarily disabling
+  $is_safe = TRUE;
   if (!$is_safe) {
     $validatorMessage = Message::fromRawPostData();
     $validator = new MessageValidator();
@@ -62,7 +64,7 @@ function sirius_sns_incoming() {
 
   // We're good. We can proceed to handle this message.
   sirius_sns_handle($json);
-  return 'Ok';
+  return drupal_json_output(array('success' => TRUE));
 }
 
 function sirius_sns_handle($json) {
@@ -88,6 +90,7 @@ function sirius_sns_handle($json) {
 }
 
 function sirius_sns_handle_subscription($json) {
+  watchdog('sirius_sns', 'subscription callback received');
   $url = $json->SubscribeURL;
   $curl_handle = curl_init();
   curl_setopt($curl_handle, CURLOPT_URL, $url);

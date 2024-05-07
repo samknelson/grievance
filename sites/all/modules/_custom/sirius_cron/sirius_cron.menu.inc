@@ -58,18 +58,5 @@ function sirius_cron_menu() {
     'file' => 'sirius_cron.page_scan_list.inc',
   );
 
-  /*
-  $items['sirius/cron/list'] = array(
-    'title' => 'List',
-    'description' => '',
-    'page callback' => 'sirius_cron_page_scan_list',
-    'page arguments' => array(),
-    'access arguments' => array('sirius admin'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'file' => 'sirius_cron.page_scan_list.inc',
-    'weight' => 1,
-  );
-  */
-
   return $items;
 }

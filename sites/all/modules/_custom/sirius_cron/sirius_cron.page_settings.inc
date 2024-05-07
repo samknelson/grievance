@@ -1,5 +1,9 @@
 <?php
 
+//
+// @todo: Unreferenced code
+//
+
 function sirius_cron_page_settings() {
 	return drupal_get_form('sirius_cron_page_settings_form');
 }

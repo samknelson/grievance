@@ -92,3 +92,29 @@ function sirius_hour_report_cache_info() {
   return $items;
 }
 */
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_hour_sirius_domain_component_info() {
+  return array(
+    'hour:reconcile' => array(
+      'title' => 'Hour - Reconcile',
+      'description' => 'Allow multiple sources for hours, and reconcile which is "live".',
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function sirius_hour_sirius_config_links_alter(&$links) {
+  if (!isset($links['hours'])) {
+    $links['hour'] = array('title' => 'Hours');
+  }
+  $links['hour']['links']['sirius/hour/config'] = array('title' => 'Hour settings', 'description' => 'General settings for hour tracking.');
+  $links['hour']['links']['sirius/hour/search/month'] = array('title' => 'Month Search', 'description' => 'Raw hour search (by month)');
+}

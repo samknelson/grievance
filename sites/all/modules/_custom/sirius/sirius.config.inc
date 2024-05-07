@@ -6,9 +6,14 @@ function sirius_config_links() {
  	if (!isset($links)) {
 		$links['domain'] = array('title' => 'Domains');
 		$links['domain']['links']['sirius/domains'] 									= array('title' => 'Manage Domains', 'description' => 'Create or manage domains ("sites") and subdomains.');
-		$links['domain']['links']['sirius/domain/config'] 						= array('title' => 'Domain Settings', 'description' => 'Global domain settings -- user manager, stats configuration, etc.');
+		$links['domain']['links']['sirius/domain/config'] 						= array('title' => 'Global Domain Settings', 'description' => 'Global domain settings -- user manager, stats configuration, etc.');
+
+		$domain_nid = sirius_domain_nid();
+		if ($domain_nid) {
+			$links['domain']['links']["node/$domain_nid/sirius_domain_components"] = array('title' => 'Components', 'description' => 'Enabled components for this domain');
+		}
 		
-		$links['core'] = array('title' => 'Core');
+		$links['core'] = array('title' => 'Core', 'weight' => -1);
 		$links['core']['links']['sirius/taxonomy'] 										= array('title' => 'Drop-Down Lists', 'description' => 'View and edit all drop-down lists (aka "Taxonomies").');
 		$links['core']['links']['sirius/admin/do_not_disturb'] 				= array('title' => 'Do Not Disturb', 'description' => 'Set do-not-disturb blackout times, e.g. "do not call after 9:00 PM".');
 		$links['core']['links']['sirius/admin/banner'] 								= array('title' => 'Site Banner', 'description' => 'Configure the banner and footer to be shown on all web pages.');
@@ -17,7 +22,6 @@ function sirius_config_links() {
 		$links['core']['links']['sirius/document-retention'] 				= array('title' => 'Document Retention', 'description' => 'Manage document retention policies.');
 		$links['core']['links']['sirius/auditlog/config'] 					= array('title' => 'Audit Log', 'description' => 'Configure audit logging.');
 		$links['core']['links']['grievance/admin/holidays'] 				= array('title' => 'Holidays', 'description' => 'Global holidays settings.');
-		$links['core']['links']['sirius/admin/help'] 								= array('title' => 'Help Text', 'description' => 'Put explanatory text on any page on the site.');
 		$links['core']['links']['grievance/admin/basic-pages'] 			= array('title' => 'Basic Pages', 'description' => 'Manage basic pages.');
 		$links['core']['links']['sirius/pdf/settings'] 							= array('title' => 'PDF Settings', 'description' => 'Global settings for PDF generation for the site.');
 		$links['core']['links']['sirius/admin/letterhead'] 					= array('title' => 'Letterhead', 'description' => 'Manage letterheads and watermarks for the site.');
@@ -53,6 +57,7 @@ function sirius_config_links() {
 		$links['dispatch']['links']['sirius/dispatch/config/view'] 	= array('title' => 'Dispatch Display', 'description' => 'Configure the header, footer, and style for the dispatch page.');
 		$links['dispatch']['links']['sirius/dispatch/config/vlri'] 	= array('title' => 'VLRI', 'description' => 'VLRI - Voluntary layoff with a request to convert to an involuntary configuration.');
 		$links['dispatch']['links']['sirius/dispatch/job/stub'] 		= array('title' => 'Stub Jobs', 'description' => 'Create or manage "stub" jobs, for generic dispatches or for importing legacy data.');
+		$links['dispatch']['links']['sirius/staff/dispatch/facilities'] = array('title' => 'Facilities');
 
 		$links['event'] = array('title' => 'Events');
 		$links['event']['links']['sirius/event/interestlist/settings'] 	= array('title' => 'Interest List Settings', 'description' => 'Configure settings for "interest lists" for event types.');
@@ -60,9 +65,6 @@ function sirius_config_links() {
 
 		$links['bulk'] = array('title' => 'Bulk Messenger');
 		$links['bulk']['links']['sirius/bulk/config'] 					= array('title' => 'Bulk messenger settings', 'description' => 'Bulk messenger batch size, delay, etc.');
-
-		$links['hour'] = array('title' => 'Hours');
-		$links['hour']['links']['sirius/hour/config'] 					= array('title' => 'Hour settings', 'description' => 'General settings for hour tracking.');
 
 		$links['training'] = array('title' => 'Training Center');
 		$links['training']['links']['sirius/config/training'] 					= array('title' => 'Training Center Settings', 'description' => 'Settings for the training center (evaluations, etc.).');
@@ -74,6 +76,7 @@ function sirius_config_links() {
 		$links['users']['links']['admin/config/people/tfa-trusted-ip'] = array('title' => 'TFA Trusted IPs', 'description' => 'Set the list of trusted IP addresses for two-factor authentication.');
 
 		$links['systems'] = array('title' => 'Systems');
+		$links['systems']['links']['sirius/dev/config'] 					= array('title' => 'Development Settings', 'description' => 'Development settings, e.g. staging site, production site, etc.');
 		$links['systems']['links']['sirius/config/server-paths'] 					= array('title' => 'Server Paths', 'description' => 'Locations of services on the server: wkhtmltopdf, pdftk, etc.');
 		$links['systems']['links']['sirius/admin/caller-id-full-list'] 	= array('title' => 'Cross-Domain Caller ID List', 'description' => 'View a list of all caller IDs across all domains.');
 		$links['systems']['links']['sirius/config/specialrid'] 			= array('title' => 'Special Roles', 'description' => 'Certain roles have special meaning for the system; select them here.');
@@ -95,6 +98,27 @@ function sirius_config_links() {
 		$links['systems']['links']['admin/config'] 									= array('title' => 'Drupal Configuration', 'description' => 'Enter the system-wide Drupal configuration screens.');
 
 		drupal_alter('sirius_config_links', $links);
+
+		$taxonomy_settings_all = sirius_taxonomy_settings('all');
+		foreach ($taxonomy_settings_all as $vocabulary_machine_name => $taxonomy_settings) {
+			$category = $taxonomy_settings['config_category'];
+			if (!$category) { continue; }
+
+			$path = "sirius/taxonomy/$vocabulary_machine_name";
+			$name = sirius_taxonomy_friendly_name($vocabulary_machine_name);
+			$links[$category]['links'][$path] = array('title' => "Drop-down List: " . $name, 'description' => $vocabulary->description);
+		}
+
+	  uksort($links, function($a, $b) use ($links) {
+	  	if ($links[$a]['weight'] < $links[$b]['weight']) { return 1; }
+	  	if ($links[$a]['weight'] > $links[$b]['weight']) { return -1; }
+	  	return strcasecmp($links[$a]['title'], $links[$b]['title']);
+	  });
+
+	}
+
+	foreach ($links as $category => $record) {
+		if (!$record['title']) { $links[$category]['title'] = $category; }
 	}
 
 	return $links;

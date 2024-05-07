@@ -6,6 +6,7 @@ function sirius_training_node_tab_certification_edit_access($certification_node)
 
 	// Admin can access
 	if (user_access('sirius training admin')) { return TRUE; }
+	if (user_access('sirius training certification edit')) { return TRUE; }
 
 	// Author can access, but only in draft mode.
 	global $user;
@@ -33,11 +34,6 @@ function sirius_training_node_tab_certification_edit_form($form, &$form_state, $
 	$form['#tree'] = TRUE;
 	$form['survey'] = $survey_form;
 
-	$form['!intro'] = array(
-		'#markup' => '<div class="sirius_form_intro">' . sirius_training_node_tab_certification_backlinks($certification_node) . '<br /><br />' . '</div><div class="sirius-form">',
-		'#weight' => -10000,
-	);
-	
 	if (user_access('sirius training admin')) {
 		$form['status'] = array(
 			'#type' => 'select',
@@ -94,23 +90,4 @@ function sirius_training_node_tab_certification_edit_form_submit($form, &$form_s
 	}
 	node_save($certification_node);
 	drupal_set_message("Certification saved.");
-}
-
-function sirius_training_node_tab_certification_backlinks($certification_node) {
-	$html = '';
-	$handler_nodes = node_load_multiple(sirius_fieldvals($certification_node, 'field_sirius_log_handler', 'target_id'));
-	foreach ($handler_nodes as $handler_nid => $handler_node) {
-		if ($handler_node->type == 'sirius_worker') {
-			if (drupal_valid_path("node/$handler_nid/sirius_worker_tc/certifications")) {
-				$html .= l('Back to Worker Certifications', "node/$handler_nid/sirius_worker_tc/certifications", array('attributes' => array('class' => 'tool-button'), 'query' => array('status' => $status)));
-			}
-		}
-		else if ($handler_node->type == 'sirius_event_participant') {
-			$event_nid = $handler_node->field_sirius_event['und'][0]['target_id'];
-			if (drupal_valid_path("node/$event_nid/sirius_event_participants_current")) {
-				$html .= l('Back to Participant List', "node/$event_nid/sirius_event_participants_current", array('attributes' => array('class' => 'tool-button')));
-			}
-		}
-	}
-	return $html;	
 }

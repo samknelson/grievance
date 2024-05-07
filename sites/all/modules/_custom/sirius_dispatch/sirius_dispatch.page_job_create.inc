@@ -196,6 +196,9 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 			$open_member_status_options[$tid] .= ' [' . $term->field_sirius_name_short['und'][0]['value'] . ']';
 		}
 	}
+
+	if (!$open_member_status_tids) { return sirius_form_error('There are no open member statuses.'); }
+	
 	if (count($open_member_status_tids) > 1) {
 		$form['member_status'] = array(
 			'#type' => 'checkboxes',
@@ -309,7 +312,7 @@ function sirius_dispatch_page_job_create_form($form, &$form_state, $employer_nod
 
 		// Facility
 		$hall_ajax_id = 'sirius_dispatch_page_job_create_ajax_halls';
-		$facility_options = sirius_dispatch_facility_dropdown();
+		$facility_options = sirius_dispatch_facility_dropdown(array('employer_node' => $employer_node));
 		$form['facility'] = array(
 			'#type' => 'select',
 			'#options' => $facility_options,

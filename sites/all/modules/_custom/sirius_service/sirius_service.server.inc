@@ -199,6 +199,7 @@ function sirius_service_func_info_all() {
     'sirius_teamsters631_taxonomy_term_updateinsert_remote',
     'sirius_teamsters631_sirius_training_level_graduate_remote',
     'sirius_worker_nextid',
+    'sirius_service_server_call',
   );
 
   $functions_nocache = array(
@@ -286,4 +287,121 @@ function sirius_service_generic_action($args) {
   $result['drupal_messages'] = drupal_get_messages();
 
   return $result;
+}
+
+/////////////////////////////////////////////////////
+// New class stuff. This is only half-integrated. 
+/////////////////////////////////////////////////////
+//
+// @todo The server_call() function is the new way of doing things. But it's not fully integrated yet.
+//       At the moment, all calls route through generic_action(), which chains to server_call().
+//       Someday all calls should route through server_call(), instantiating the correct Server object.
+//       But not today.
+
+function sirius_service_server_call($request_serialized) {
+  $request = unserialize($request_serialized);
+  $server_type = $request->server_type();
+
+  $instance = sirius_service_server_instance($server_type);
+  if (!$instance) {
+    $result = new Sirius_Server_Response(array('success' => FALSE, 'msg' => "Server type $server_type not found."));
+  } else {
+    $result = $instance->respond($request); 
   }
+
+  return serialize($result);
+}
+
+class Sirius_Server_Request {
+  public function __construct($arr = array()) {
+    foreach ($arr as $key => $value) { $this->{$key} = $value; }
+  }
+  
+  public function server_type() {
+    return $this->server_type;
+  }
+}
+
+class Sirius_Server_Response {
+  public function __construct($arr = array()) {
+    foreach ($arr as $key => $value) { $this->{$key} = $value; }
+  }
+
+  public function success() {
+    return $this->success;
+  }
+
+  public function msg() {
+    return $this->msg;
+  }
+}
+
+
+
+
+
+
+
+
+
+function sirius_service_server_info_all() {
+  $infos = &drupal_static(__FUNCTION__);
+  if (!isset($infos)) {
+    $infos = module_invoke_all('sirius_service_server_info');
+    ksort($infos);
+  }
+  return $infos;
+}
+
+function sirius_service_server_info($type) {
+  $infos = &drupal_static(__FUNCTION__); 
+  if (!isset($infos)) { $infos = sirius_service_server_info_all(); }
+  return $infos[$type];
+}
+
+function sirius_service_server_instance($type = NULL) {
+  if (!$type) { $type = sirius_service_server_type(); }
+  $info = sirius_service_server_info($type);
+  return $info['instance'];
+}
+
+function sirius_service_server_type() {
+  return sirius_domain_variable_get('sirius_service_server_type', 'default');
+}
+
+function sirius_service_server_settings() {
+  $settings = json_decode(sirius_domain_variable_get('sirius_service_server_settings'), TRUE);
+  return $settings;
+}
+
+/** 
+ * Implements hook_sirius_service_server_info
+ */
+
+function sirius_service_sirius_service_server_info() {
+  $infos = array();
+  Sirius_Service_Server_Default::getInstance()->setInfo($infos);
+  Sirius_Service_Server_Proxy::getInstance()->setInfo($infos);
+  return $infos;
+}
+
+class Sirius_Service_Server extends Sirius_Singleton {
+  public function settings_form() { return array(); }
+  public function respond($request) { 
+    return $this->respond_error('Root respond() called. Classes must override this method.');
+  }
+
+  public function respond_error($msg) {
+    return new Sirius_Server_Response(array('success' => FALSE, 'msg' => $msg)); 
+  }
+}
+
+class Sirius_Service_Server_Default extends Sirius_Service_Server {
+  public $type = 'default';
+  public $name = 'Default Sirius Server';
+  public $description = 'Default Sirius server; responds to a sirius client. NOT YET IMPLEMENTED.';
+
+  public function settings_form() { 
+    return $form;
+  }
+}

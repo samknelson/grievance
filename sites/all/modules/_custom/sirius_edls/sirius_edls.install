@@ -1,0 +1,95 @@
+<?php
+
+function sirius_edls_update_7007() {
+  $sqls = array(
+    'create table sirius_edls_assignments (
+      assignment_id integer not null auto_increment,
+
+      assignment_date date not null,
+      worker_id varchar(255) not null,
+
+      worker_name varchar(255) not null,
+      worker_ms varchar(255),
+
+      employer_nid integer not null,
+
+      sheet_nid integer not null,
+      crew_uuid varchar(255) not null,
+
+      assignment_extra json,
+
+      primary key (assignment_id),
+      unique index (assignment_date, worker_id),
+      index(sheet_nid),
+      index(worker_id),
+      index(worker_id, assignment_date)
+    );',
+
+    'create table sirius_edls_outsource (
+      outsource_id integer not null auto_increment,
+      employer_nid integer not null,
+      worker_id varchar(255) not null,
+      worker_ms varchar(255) not null,
+      worker_name varchar(255) not null,
+      worker_data json,
+      index(worker_id),
+      unique index (employer_nid, worker_id),
+      primary key (outsource_id)
+    );',
+
+    'create table sirius_edls_notifications (
+      notification_id integer not null auto_increment,
+
+      worker_id varchar(255),
+      assignment_date date not null,
+
+      assignment_id integer,
+      sheet_nid integer,
+      employer_nid integer not null,
+
+      notification_status varchar(255),
+      notification_uuid varchar(255),
+      notification_extra json,
+
+      unique index (employer_nid, assignment_date, worker_id),
+      index(sheet_nid),
+      index(assignment_id),
+      primary key (notification_id)
+    );
+    ',
+  );
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
+
+
+function sirius_edls_update_7008() {
+  $sqls = array(
+    'create table sirius_edls_dblog (
+      log_id integer not null auto_increment,
+
+      log_uid integer,
+      log_ts integer,
+      log_category varchar(255),
+      log_type varchar(255),
+      log_handler_nid integer,
+      log_msg varchar(255),
+      log_json json,
+
+      index(log_handler_nid),
+      primary key (log_id)
+    );',
+  );
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}

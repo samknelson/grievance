@@ -25,7 +25,7 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 	$availdate = date('Y-m-d H:i:s', sirius_date_ts($worker_node, 'field_sirius_dispatch_availdate'));
 
 	if ($current_status_tid == sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_available')) {
-		$html .= '<br />' . t('Availability date: ') . "<strong>$availdate</strong>";
+		$html .= '<br />' . t('Seniority date: ') . "<strong>$availdate</strong>";
 	}
 
 	$employer_node = node_load($worker_node->field_grievance_shop['und'][0]['target_id']);

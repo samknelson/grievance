@@ -10,15 +10,24 @@ function sirius_teamsters631_node_tabs() {
     'permissions' => array('sirius dispatch staff'),
   );
 
-  /*
-  $node_tabs['grievance_basic_page']['sirius_teamsters631_basic_page_restrict'] = array(
-    'title' => 'Access Control',
+  $node_tabs['sirius_dispatch']['teamsters631_oneoff_end_dates'] = array(
+    'title' => '[Temp. End Date Correct]',
     'description' => '',
-    'callback' => 'sirius_teamsters631_node_tab_basic_page_restrict',
-    'permissions' => array('sirius dispatch staff'),
-    'file' => 'sirius_teamsters631.page_basic_page_restrict.inc',
+    'callback' => 'sirius_teamsters631_node_tab_dispatch_oneoff_end_date_correct',
+    'permissions' => array('sirius admin'),
+    'file' => 'sirius_teamsters631.oneoff_dispatch_end_dates.inc',
+    'weight' => 999
   );
-  */
+
+  $node_tabs['sirius_dispatch_job_group']['sirius_teamsters631_dispatch_job_group_seniority'] = array(
+    'title' => 'Seniority Settings',
+    'description' => '',
+    'callback' => 'sirius_teamsters631_node_tab_dispatch_job_group_seniority',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 4,
+    'component' => 'dispatch:live',
+    'file' => 'sirius_teamsters631.page_dispatch_job_group_seniority.inc',
+  );
 
   sirius_node_tab_set_module('sirius_teamsters631', $node_tabs);
 
@@ -118,6 +127,48 @@ function sirius_teamsters631_menu() {
     'page arguments' => array(),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_teamsters631.server_switch.inc',
+  );
+
+  $items['sirius/edls/631compliance'] = array(
+    'title' => 'Compliance',
+    'page callback' => 'sirius_edls_page_631compliance',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          // 'action' => 'employer_dashboard',
+          'action' => 'staff',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+    'file' => 'sirius_teamsters631.page_edls_compliance.inc'
+  );
+
+  $items['sirius/edls/631twilio'] = array(
+    'title' => 'Twilio',
+    'page callback' => 'sirius_edls_page_631twilio',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          // 'action' => 'employer_dashboard',
+          'action' => 'admin',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 11,
+    'file' => 'sirius_teamsters631.page_edls_twilio_settings.inc'
   );
 
   return $items;

@@ -287,8 +287,8 @@ function sirius_dispatch_layoff_expired_jobs($mode = 'test') {
 
 
 function sirius_dispatch_layoff_secondary_without_primary($mode = 'test') {
-	$mode = "test";
-	sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
+	//$mode = "test";
+	//sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
 
 	// Get the job types
 	$job_types = sirius_taxonomy_load('sirius_dispatch_job_type', 'tid', 'full');
@@ -339,7 +339,7 @@ function sirius_dispatch_layoff_secondary_without_primary($mode = 'test') {
 		$dispatch_nids[] = $hr['nid'];
 	}
 	if (!$dispatch_nids) {
-		return array('success' => FALSE, 'msg' => 'No secondary dispatches found for these job types where the worker does not have a primary dispatch.');
+		return array('success' => TRUE, 'msg' => 'No secondary dispatches found for these job types where the worker does not have a primary dispatch.');
 	}
 
 	$count = $count_success = $count_failure = 0;
@@ -371,6 +371,83 @@ function sirius_dispatch_layoff_secondary_without_primary($mode = 'test') {
 	if ($last_failure_msg) { $msg .= " The last error message was: $last_failure_message."; }
 	return array('success' => TRUE, 'msg' => $msg, 'count' => $count_success);
 }
+
+function sirius_dispatch_close_after_report_date($mode = 'test') {
+	// $mode = "test";
+	// sirius_minilog("[This feature is still under development, so forcing mode = $mode]");
+
+	// Get the job types
+	$job_types = sirius_taxonomy_load('sirius_dispatch_job_type', 'tid', 'full');
+	foreach ($job_types as $job_type_tid => $job_type_term) {
+		$job_type_json = sirius_json_get($job_type_term);
+		if ($job_type_json['run']['close_after_report_date'] != 'Yes') {
+			unset($job_types[$job_type_tid]);
+			continue;
+		}
+		sirius_minilog("Adding job type: " . $job_type_term->name);
+	}
+	if (!$job_types) {
+		return array('success' => TRUE, 'msg' => 'No job types have the flag "close_after_report_date" set to "Yes".');
+	}
+
+	// Get all secondary dispatches for these job types
+	$domain_nid = sirius_domain_nid();
+	$sql_args = array();
+	$sql = "select distinct node.nid ";
+	$sql .= "from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_dispatch_job_type on field_data_field_sirius_dispatch_job_type.entity_type = 'node' and field_data_field_sirius_dispatch_job_type.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_dispatch_job_status on field_data_field_sirius_dispatch_job_status.entity_type = 'node' and field_data_field_sirius_dispatch_job_status.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_datetime on field_data_field_sirius_datetime.entity_type = 'node' and field_data_field_sirius_datetime.entity_id = node.nid ";
+
+	$sql .= "where node.type = 'sirius_dispatch_job' ";
+
+	$sql .= "and field_sirius_datetime_value < :cutoff ";
+	$sql_args[':cutoff'] = gmdate('Y-m-d H:i:s');
+
+	if ($domain_nid) {
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	} else {
+		$sql .= "and field_sirius_domain_target_id is null ";
+	}
+
+	$time = 
+
+	$sql .= "and field_sirius_dispatch_job_status_value in ('Unfilled', 'Running') ";
+	$sql .= "and field_sirius_dispatch_job_type_tid in (:job_type_tids) ";
+	$sql_args[':job_type_tids'] = array_keys($job_types);
+	
+	$stmt = db_query($sql, $sql_args);
+	$job_nids = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$job_nids[] = $hr['nid'];
+	}
+	if (!$job_nids) {
+		return array('success' => TRUE, 'msg' => 'No Pending or Unfilled jobs of these types found where the report date has passed.');
+	}
+
+	$count = $count_success = $count_failure = 0;
+	foreach ($job_nids as $job_nid) {
+		++$count;
+		$job_node = node_load($job_nid);
+		sirius_minilog("Closing: <a href=\"/node/$job_nid\">Job " . $job_node->title . ": #$job_nid</a>");
+
+		if ($mode == 'live') {
+			$job_node->field_sirius_dispatch_job_status['und'][0]['value'] = 'Filled';
+			node_save($job_node);
+			++$count_success;
+			sirius_minilog("-- Job status set to \"Filled\".");
+		} else {
+			sirius_minilog("-- Skipping because mode = $mode"); 
+		}
+	}
+
+	// $msg = "Cleaned up $count dispatches, with $count_success success and $count_failure errors. ";
+	// if ($last_failure_msg) { $msg .= " The last error message was: $last_failure_message."; }
+	return array('success' => TRUE, 'msg' => $msg, 'count' => $count_success);
+}
+
 
 
 function sirius_dispatch_job_counts($job_nid) {

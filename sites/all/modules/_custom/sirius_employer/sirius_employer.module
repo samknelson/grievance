@@ -17,6 +17,19 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_em
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.page_list.inc";
 
 /**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_employer_sirius_domain_component_info() {
+  return array(
+    'employer:labproj' => array(
+      'title' => 'Employer - Labor Projections',
+      'description' => 'Use the worker database',
+    ),
+  );
+}
+
+/**
  * @todo: Migrate grievance_shop functionality to this module
  *
  * We're taking a shortcut here.  There was legacy functionality built around the content type "grievance_shop": 

@@ -162,6 +162,8 @@ function sirius_worker_render_industries($worker_node, $options = array()) {
     $industry_member_status_map[$member_status_tid] = $industry_tid;
   }
 
+  $show_dispatch = sirius_domain_component_enabled('dispatch:live');
+
   $my_ms_tids = sirius_fieldvals($worker_node, 'field_sirius_member_status', 'tid');
   $rows = array();
   foreach ($industry_terms as $industry_tid => $industry_term) {
@@ -192,48 +194,51 @@ function sirius_worker_render_industries($worker_node, $options = array()) {
           if ($str2) { $str2 .= ' / '; }
           $str .= $member_status_terms[$member_status_tid]->name;
 
-          $job_node->field_sirius_industry['und'][0]['tid'] = $industry_tid;
-          $open_member_status_tids = array_keys(sirius_worker_member_status_get_open_statuses($industry_tid, TRUE, sirius_get_special_tid('sirius_dispatch_job_type|OPEN')));
-          foreach ($open_member_status_tids as $tid) {
-            if ($tid) {
-              $job_node->field_sirius_member_status['und'][] = array('tid' => $tid);
+          if ($show_dispatch) {
+            $job_node->field_sirius_industry['und'][0]['tid'] = $industry_tid;
+            $open_member_status_tids = array_keys(sirius_worker_member_status_get_open_statuses($industry_tid, TRUE, sirius_get_special_tid('sirius_dispatch_job_type|OPEN')));
+            foreach ($open_member_status_tids as $tid) {
+              if ($tid) {
+                $job_node->field_sirius_member_status['und'][] = array('tid' => $tid);
+              }
             }
-          }
-          $dispatchable = sirius_dispatch_job_get_dispatchable_workers_explain(
-            $job_node, 
-            $worker_node->nid,
-            array(
-              'ignore_skill' => TRUE,
-              'ignore_department' => TRUE,
-            )
-          );
+            $dispatchable = sirius_dispatch_job_get_dispatchable_workers_explain(
+              $job_node, 
+              $worker_node->nid,
+              array(
+                'ignore_skill' => TRUE,
+                'ignore_department' => TRUE,
+              )
+            );
 
-          if ($dispatchable['success']) {
-            $str2 = $dispatchable['msg'];
-          } else {
-            $str2 = 'Dispatch not available: ' . $dispatchable['msg'];
+            if ($dispatchable['success']) {
+              $str2 = $dispatchable['msg'];
+            } else {
+              $str2 = 'Dispatch not available: ' . $dispatchable['msg'];
+            }
           }
         }
       }
     }
     if (!$str) { continue; }
-    if (!$str2) { $str2 = t('Dispatch not available.'); }
     $row[] = $str;
-    $row[] = $str2;
+    if ($show_dispatch) {
+      if (!$str2) { $str2 = t('Dispatch not available.'); }
+      $row[] = $str2;
+    }
 
     $rows[] = $row;
   }
 
   if ($rows) {
-    $header = array(
-      t('Industry'),
-      t('Member Status'),
-      t('Dispatch Position'),
-    );
+    $header = array();
+    $header[] = t('Industry');
+    $header[] = t('Member Status');
+    if ($show_dispatch) { $header[] = t('Dispatch Position'); }
 
     $attributes = $options['table_attributes'];
     if (!$attributes) { $attributes = array(); }
-    $html = theme_table(array('rows' => $rows, 'header' => $header, 'attributes' => $attributes));
+    $html = sirius_table_render($header, $rows);
   } else {
     $html = '<p>' . t('This worker does not currently have any industries.') . '</p>';
   }

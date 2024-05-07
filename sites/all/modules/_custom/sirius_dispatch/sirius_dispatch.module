@@ -111,13 +111,12 @@ function sirius_dispatch_sirius_cron_scan_info() {
   $items['dispatch_eba_remove_expired_dates'] = array(
     'title' => 'Dispatch EBA Remove Expired Dates',
     'description' => 'Clean up any EBA dates for workers that are in the past.',
-    'schedule' => 'daily',
+    'schedule' => 'hourly',
     'callback' => 'sirius_dispatch_eba_remove_expired_dates',
     'multidomain' => FALSE,
     'component' => 'dispatch:live',
   );
 
-  /*
   $items['dispatch_eba_layoff_expired_dispatches'] = array(
     'title' => 'Dispatch EBA Layoff Expired Dispatches',
     'description' => 'Lay off any workers who are on secondary EBA dispatches, when the date has passed.',
@@ -126,7 +125,6 @@ function sirius_dispatch_sirius_cron_scan_info() {
     'multidomain' => FALSE,
     'component' => 'dispatch',
   );
-  */
 
   $items['dispatch_elig_cache_cleanup'] = array(
     'title' => 'Dispatch Eligibility Cache',
@@ -151,7 +149,16 @@ function sirius_dispatch_sirius_cron_scan_info() {
     'description' => 'Lay off all secondary dispatches if the worker does not have a primary dispatch and if the job type has the appropriate flag set.',
     'schedule' => 'hourly',
     'callback' => 'sirius_dispatch_layoff_secondary_without_primary',
-    'multidomain' => TRUE,
+    'multidomain' => FALSE,
+    'component' => 'dispatch:live',
+  );
+
+  $items['dispatch_close_after_report_date'] = array(
+    'title' => 'Dispatch Close After Report Date',
+    'description' => 'Close all jobs whose report date has passed',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_dispatch_close_after_report_date',
+    'multidomain' => FALSE,
     'component' => 'dispatch:live',
   );
 
@@ -260,7 +267,11 @@ function sirius_dispatch_node_delete($node) {
  */
 
 function sirius_dispatch_report_cache_info() {
+  sirius_require('sirius_dispatch', 'sirius_dispatch.report_job_status.inc');
+
   $items = array();
+
+  Sirius_Dispatch_Report_Job_Status::getInstance()->setInfo($items);
 
   $items['sirius-dispatch-member-status-ratios'] = array(
     'name' => t('Member Status Ratios'),
@@ -426,6 +437,26 @@ function sirius_dispatch_node_view($node, $view_mode, $langcode) {
         $node->content['field_sirius_dispatch_sib_status'][0]['#markup'] = $name_display;
       }
     }
+
+    if (!sirius_domain_component_enabled('dispatch:live')) {
+      $fields = array(
+        'field_sirius_dispatch_asi', 
+        'field_sirius_dispatch_sib_status',
+        'field_sirius_skills_avail',
+        'field_sirius_dispatch_availdate',
+        'field_sirius_dispatch_hfe_until',
+        'field_sirius_dispatch_medium',
+        'field_sirius_dispatch_eba',
+        'field_sirius_skills_availx',
+        'field_grievance_departments',
+        'field_sirius_dispatch_cbn',
+        'field_sirius_dispatch_dncs2',
+        'field_sirius_aat_required',
+        'field_sirius_dispatch_hfe',
+        'field_sirius_dispatch_hfe_until',
+      );
+      foreach ($fields as $field) { unset($node->content[$field]); }
+    }
   }
 }
 
@@ -436,13 +467,25 @@ function sirius_dispatch_node_view($node, $view_mode, $langcode) {
 function sirius_dispatch_sirius_dispatch_elig_info() {
   sirius_require('sirius_dispatch', 'sirius_dispatch.1for1.inc');
   sirius_require('sirius_dispatch', 'sirius_dispatch.nosecondaryatprimary.inc');
+  sirius_require('sirius_dispatch', 'sirius_dispatch.loseseniorityafternotify.inc');
 
   $items = array();
   Sirius_Dispatch_1for1::getInstance()->setInfo($items);
   Sirius_Dispatch_Nosecondaryatprimary::getInstance()->setInfo($items);
+  Sirius_Dispatch_Loseseniorityafternotify::getInstance()->setInfo($items);
   return $items;
 }
 
 function sirius_dispatch_status_options() {
   return list_allowed_values(field_info_field('field_sirius_dispatch_status'));
+}
+
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_dispatch_sirius_backlinks_from_node_alter(&$links, $node) {
+  if ($node->type == 'sirius_dispatch_job_group') {
+    $links['sirius/dispatch/groups'] = array('name' => 'All Job Groups');
+  }
 }

@@ -25,6 +25,46 @@ function sirius_dashboard_item_data($json, $uuid, $options = array()) {
 	$plugin_info = sirius_dashboard_plugin_info($plugin_key);
 	$callback = $plugin_info['callbacks']['data'];
 	if (!$callback) { return '[no callback for this dashboard item has been defined.]'; }
+
 	sirius_require($plugin_info['module'], $plugin_info['file']);
-	return $callback($json['item'][$uuid]['preferences'], $options);
+
+	if (sirius_proxy_active() && $plugin_info['proxy']) {
+		$result = sirius_proxy_call('sirius_dashboard_item_data', $json, $uuid, $options);
+		if ($result['success']) {
+			$result = $result['data'];
+		} else {
+			$result = array(
+				array(
+					'count' => 0,
+					'tools' => '',
+					'details' => '<em><strong>ERROR:</strong> ' . $result['msg'] . '</em>',
+				)
+			);
+		}
+	} else {
+		$result = $callback($json['item'][$uuid]['preferences'], $options);
+	}
+
+	// Set the priority
+	$priority_cutoffs = $json['item_list'][$uuid]['priority_cutoffs'];
+	if ($priority_cutoffs && $result) {
+		foreach ($result as $key => $row) {
+			foreach ($priority_cutoffs as $priority => $cutoff) {
+				if (!is_numeric($cutoff)) { continue; }
+				if ($row['count'] >= $cutoff) {
+					$result[$key]['priority'] = $priority;
+				}
+			}
+		}
+	}
+
+	if ($result) {
+		foreach ($result as $key => $row) {
+			if ($row['priority'] == -1) {
+				unset($result[$key]);
+			}
+		}
+	}
+
+	return $result;
 }

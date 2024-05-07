@@ -29,108 +29,39 @@ function report_cache_page_report($report_type) {
 
 	}
 
+	sirius_require('report_cache', 'report_cache.page_report_list.inc');
 	if ($action == 'purge') {
 		$count = report_cache_purge($report_type, $report_id);
 		drupal_set_message(t('Purged report [@report_id]; @count records deleted.', array('@report_id' => $report_id, '@count' => $count)));
+		$render = report_cache_page_report_list($report_type, $info);
 	} elseif ($action == 'download') {
 		report_cache_download($report_type, $report_id, $info);
 	} elseif ($action == 'preview') {
 		$render = report_cache_preview($report_type, $report_id, $info);
 	} elseif ($action == 'render') {
 		$render = report_cache_render($report_type, $report_id, $info, $_REQUEST['callback-name']);
+	} elseif ($action == 'operations') {
+		$render = report_cache_operations($report_type, $report_id, $info, $_REQUEST['callback-name']);
+	} else {
+		$render = report_cache_page_report_list($report_type, $info);
 	}
 
-	if ($render) {
-		drupal_set_title(t("Reports: ") . $info['name'] . ': ' . $report_id);
- 		sirius_backlink_add("sirius/reports/$report_type", array('name' => 'Report List'));
-		return $render;
+	$title = t("Reports: ") . $info['name'];
+	if ($report_id) { $title .= ': $report_id'; }
+	drupal_set_title($title);
+
+	if ($report_id) {
+		sirius_backlink_add("sirius/reports/$report_type", array('name' => 'Report List'));
+	} else {
+		sirius_backlink_add('sirius/reports', array('name' => 'All Reports'));
 	}
-
-	drupal_set_title(t("Reports: ") . $info['name']);
-
-	$sql_args = array();
-	$sql = "select distinct report_id from report_cache ";
-	$sql .= "where report_type = :report_type ";
-	$sql_args[':report_type'] = "$report_type :: PARAMETERS";
-	$sql .= "and report_domain_nid = :domain_nid ";
-	$sql_args[':domain_nid'] = $domain_nid;
-	$sql .= "order by report_id desc ";
-	$stmt = db_query($sql, $sql_args);
-	$report_ids = array();
-	while ($hr = $stmt->fetchAssoc()) {
-		$report_ids[] = $hr['report_id'];
-	}
-	
-	if (!$report_ids) {
-		drupal_set_message(t('No reports of type @report_type have been generated yet.', array('@report_type' => $report_type)));
-	}
-
-	$header = array();
-	$header[] = t('Report ID');
-	if ($info['title_callback']) { $header[] = t('Title'); }
-	$header[] = t('Tools');
-
-	$attributes = array();
-
-	$rows = array();
-
-	foreach ($report_ids as $tmp_report_id) {
-		
-		$tools = '';
-		if ($info['render_callbacks']) {
-			foreach ($info['render_callbacks'] as $name => $callback) {
-				$tools .= l(
-					$name, 
-					"sirius/reports/$report_type", 
-					array(
-						'attributes' => array('class' => array('tool-button')), 
-						'query' => array(
-							'report_id' => $tmp_report_id, 
-							'action' => 'render',
-							'callback-name' => $name,
-						)
-					)
-				);
-			}
-		}
-		$tools .= l(t('View Source Data'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'preview')));
-		$tools .= l(t('Download Source Data'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'download')));
-		$tools .= l(t('Purge'), "sirius/reports/$report_type", array('attributes' => array('class' => array('tool-button')), 'query' => array('report_id' => $tmp_report_id, 'action' => 'purge')));
-
-		$row = array();
-		$row[] = $tmp_report_id;
-		if ($info['title_callback']) { 
-			$row[] = $info['title_callback']($report_type, $tmp_report_id);
-		}
-
-		$row[] = $tools;
-		$rows[] = $row;
-	}
-
-	// $html .= '<h2>' . $info['name'] . '</h2>';
-	$html .= $info['description'];
-
-	$html .= theme_table(array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
-
-	if ($preview) {
-		$html .= '<hr>';
-		$html .= $preview;
-	}
-
-	$path = $info['path'];
-	if (!$path) { 
-		$path = 'sirius/reports/' . $report_type . '/form';
-	}
-	$html .= l(t('Generate a new report'), $path, array('attributes' => array('class' => array('tool-button'))));
-
-	sirius_backlink_add('sirius/reports', array('name' => 'All Reports'));
-	return $html;
+	return $render;
 }
 
 function report_cache_render_meta($parameters) {
 	$html = '<div class="report_cache_meta">';
 	if ($parameters['meta']['instance']['uuid']) {
-		$instance = report_cache_instance($report_type, $parameters['meta']['instance']['uuid']);
+		$instance = report_cache_instance($parameters['report_type'], $parameters['meta']['instance']['uuid']);
 		if ($instance) {
 			$html .= sirius_fakerender_field('Instance:', $instance['title']);
 		}

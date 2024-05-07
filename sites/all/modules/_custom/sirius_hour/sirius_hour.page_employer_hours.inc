@@ -25,7 +25,7 @@ function sirius_hour_node_tab_employer_hours_date_form($form, &$form_state, $emp
 	$month_now = date('n');
 
 	$year_options = array();
-	for ($year=$year_now-10; $year<$year_now+2; ++$year) { $year_options[$year] = $year; }
+	for ($year=$year_now-30; $year<$year_now+2; ++$year) { $year_options[$year] = $year; }
 
 	$month_options = array();
 	for ($month=1; $month<=12; ++$month) { $month_options[$month] = $month; }
