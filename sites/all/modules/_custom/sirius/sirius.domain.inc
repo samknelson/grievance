@@ -48,6 +48,7 @@ function sirius_domain_root_nid() {
 }
 
 function sirius_domain_nid() {
+  global $_SESSION;
   $domain_nid = $_SESSION['domain_nid'];
   if (!$domain_nid) { $domain_nid = sirius_domain_root_nid(); }
   if ($domain_nid < 0) { return NULL; }
