@@ -81,7 +81,9 @@ function sirius_dispatch_worker_recompute_from_dispatch($dispatch_node, $is_dele
 			$worker_node->field_grievance_shop['und'][0]['target_id'] = $new_employer_nid;
 			$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|employed');
 
-			sirius_log('worker:employer', 'set', $worker_node->title . "'s employer has been set to " . $new_employer_node->title, '', '', array($worker_node->nid));
+			if (sirius_domain_component_enabled('dispatch:live')) {
+				sirius_log('worker:employer', 'set', $worker_node->title . "'s employer has been set to " . $new_employer_node->title, '', '', array($worker_node->nid));
+			}
 		} else {
 			unset($worker_node->field_grievance_shop['und']);
 
@@ -93,7 +95,9 @@ function sirius_dispatch_worker_recompute_from_dispatch($dispatch_node, $is_dele
 					$dispstatus_tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
 				}
 			}
-			sirius_log('worker:employer', 'clear', $worker_node->title . "'s employer has been cleared" . $new_employer_node->title, '', '', array($worker_node->nid));
+			if (sirius_domain_component_enabled('dispatch:live')) {
+				sirius_log('worker:employer', 'clear', $worker_node->title . "'s employer has been cleared" . $new_employer_node->title, '', '', array($worker_node->nid));
+			}
 		}
 
 		node_save($worker_node);
