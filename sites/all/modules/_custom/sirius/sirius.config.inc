@@ -37,11 +37,6 @@ function sirius_config_links() {
 		$links['core']['links']['sirius/phonetree/config'] 			= array('title' => 'Phonetree', 'description' => 'Phonetree settings for when a user calls in to the system.');
 		$links['core']['links']['sirius/lang/config'] 					= array('title' => 'Language Configuration', 'description' => 'Configure available language list for the domain.');
 
-		$links['worker'] = array('title' => 'Worker');
-		$links['worker']['links']['sirius/worker/config/user'] = array('title' => 'Worker / User Sync', 'description' => 'Configure how users are created from workers.');
-		$links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
-		$links['worker']['links']['sirius/skill/settings'] = array('title' => 'Skill Settings', 'description' => 'Configure settings for skill management and display.');
-
 		$links['employer'] = array('title' => 'Employer');
 		$links['employer']['links']['sirius/employer/config/usermanage'] = array('title' => 'Employer User Manager', 'description' => 'Configure tools for allowing employers to manage their own users.');
 
