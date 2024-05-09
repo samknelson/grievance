@@ -4,7 +4,7 @@
  * Create the denorm table.
  */
 
-function sirius_denorm_install() {
+function sirius_denorm_update_7001() {
 
   $sqls = array();
 
@@ -30,23 +30,5 @@ function sirius_denorm_install() {
     db_query($sql, array());
   } catch (exception $ignore) {
     // Do nothing.
-  }
-}
-
-/**
- * Add fields to the denorm table to support arguments
- */
-
-function sirius_denorm_update_7003() {
-  $sqls = array(
-    'alter table sirius_denorm_queue add denorm_trigger_args json',
-  );
-
-  foreach ($sqls as $sql) {
-    try {
-      print "Executing: $sql\n";
-      $stmt = db_query($sql, array());
-      print "... Done.\n";
-    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
   }
 }

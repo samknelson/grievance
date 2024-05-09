@@ -29,14 +29,47 @@ function sirius_denorm_node_tabs() {
 function sirius_denorm_menu() {
   $items = array();
 
-  $items['sirius/denorm/queue'] = array(
-    'title' => 'Denormalize Queue',
+  $items['sirius/denorm'] = array(
+    'title' => 'Denormalize',
     'description' => '',
-    'page callback' => 'sirius_denorm_page_queue',
-    'page arguments' => array(3),
+    'page callback' => 'sirius_denorm_page_settings',
+    'page arguments' => array(),
     'access arguments' => array('sirius denorm admin'),
     'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_denorm.page_settings.inc',
+  );
+
+  $items['sirius/denorm/settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'page callback' => 'sirius_denorm_page_settings',
+    'page arguments' => array(),
+    'access arguments' => array('sirius denorm admin'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'sirius_denorm.page_settings.inc',
+    'weight' => 1,
+  );
+
+  $items['sirius/denorm/queue_summary'] = array(
+    'title' => 'Queue Summary',
+    'description' => '',
+    'page callback' => 'sirius_denorm_page_queue_summary',
+    'page arguments' => array(),
+    'access arguments' => array('sirius denorm admin'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'sirius_denorm.page_queue_summary.inc',
+    'weight' => 2,
+  );
+
+  $items['sirius/denorm/queue'] = array(
+    'title' => 'Queue Details',
+    'description' => '',
+    'page callback' => 'sirius_denorm_page_queue',
+    'page arguments' => array(),
+    'access arguments' => array('sirius denorm admin'),
+    'type' => MENU_LOCAL_TASK,
     'file' => 'sirius_denorm.page_queue.inc',
+    'weight' => 3,
   );
 
   return $items;
