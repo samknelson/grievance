@@ -156,7 +156,7 @@ function report_cache_operations_form_submit($form, &$form_state) {
 
 	$contact_nids = array();	
 	while ($hr = $stmt->fetchAssoc()) {
-		$hr = unserialize($hr['report_data']);
+		$hr = $info['generator']->row_decode($hr['report_data']);
 		$contact_nid = $hr[$field_contact_nid];
 		if ($contact_nid) { $contact_nids[$contact_nid]++; }
 	}

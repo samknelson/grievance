@@ -46,6 +46,12 @@ function report_cache_generate_form($form, &$form_state, $report_type) {
   return $form;
 }
 
+function report_cache_generate_form_validate($form, &$form_state) {
+	$report_type = $form_state['values']['report_type'];
+  $info = report_cache_info($report_type);
+	$info['generator']->form_validate($form, $form_state);
+}
+
 function report_cache_generate_form_callback_replace($form, $form_state) {
   $commands = array();
   $commands[] = ajax_command_replace("#report_cache_generate_form_parameters", render($form['parameters']));
@@ -154,10 +160,10 @@ function report_cache_form_submit($form, &$form_state) {
 		return;
 	}
 
-	$report_type_info = report_cache_info($report_type);
-	if ($report_type_info['file']) { sirius_require($report_type_info['module'], $report_type_info['file']); }
+	$info = report_cache_info($report_type);
+	if ($info['file']) { sirius_require($info['module'], $info['file']); }
 
-	$pks = $report_type_info['generator']->pks($form_state, $report_type, $report_id);
+	$pks = $info['generator']->pks($form_state, $report_type, $report_id);
 
 	$limit = (int) $form_state['values']['report_limit'];
 	if ($limit) {
@@ -192,7 +198,7 @@ function report_cache_form_submit($form, &$form_state) {
 		$context['results']['report_id'] = $report_id;
 		foreach ($pks as $pk) {
 			++$count;
-			report_cache_batch($pk, $count, $total, $form_state['values'], $report_type_info, $context);
+			report_cache_batch($pk, $count, $total, $form_state['values'], $info, $context);
 			entity_get_controller('node')->resetCache();
 		}
 		report_cache_batch_finished(TRUE, $context['results'], array());
@@ -211,7 +217,7 @@ function report_cache_form_submit($form, &$form_state) {
 			++$count;
 			$operations[] = array(
 				'report_cache_batch', 
-				array($pk, $count, $total, $form_state['values'], $report_type_info),
+				array($pk, $count, $total, $form_state['values'], $info),
 			);
 		}
 
@@ -221,8 +227,8 @@ function report_cache_form_submit($form, &$form_state) {
 			'finished' => 'report_cache_batch_finished',
 			'url_options' => array('query' => array('a' => 'b')),
 	  );
-	  if ($report_type_info['file']) {
-	  	$batch['file'] = drupal_get_path('module', $report_type_info['module']) . '/' . $report_type_info['file'];
+	  if ($info['file']) {
+	  	$batch['file'] = drupal_get_path('module', $info['module']) . '/' . $info['file'];
 	  }
 		
 		batch_set($batch);
@@ -244,7 +250,7 @@ function report_cache_batch_setup($values, &$context) {
 	$context['results']['values'] = $values;
 }
 
-function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$context) {
+function report_cache_batch($pk, $count, $total, $values, $info, &$context) {
 	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
 
 	$report_type = $values['report_type'];
@@ -273,7 +279,7 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 	}
 	$context['message'] = $msg;
 
-	$row = $report_type_info['generator']->batch($pk, $values, $context);
+	$row = $info['generator']->batch($pk, $values, $context);
 	if (!$row) { return; }
 
 	$instance_uuid = $values['instance'];
@@ -287,7 +293,7 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 					'report_id' => $report_id,
 					'report_row_pk' => $sub_row_pk,
 					'report_type' => $report_type,
-					'report_data' => serialize($sub_row),
+					'report_data' => $info['generator']->row_encode($sub_row),
 					'report_domain_nid' => $domain_nid,
 					'report_instance' => $instance_uuid,
 				)
@@ -301,7 +307,7 @@ function report_cache_batch($pk, $count, $total, $values, $report_type_info, &$c
 				'report_id' => $report_id,
 				'report_row_pk' => $pk,
 				'report_type' => $report_type,
-				'report_data' => serialize($row),
+				'report_data' => $info['generator']->row_encode($row),
 				'report_domain_nid' => $domain_nid,
 				'report_instance' => $instance_uuid,
 			)
@@ -360,10 +366,10 @@ function report_cache_run($report_type, $values = array()) {
 	$values['report_action'] = $report_action;
 	$values['report_type'] = $report_type;
 
-	$report_type_infos = module_invoke_all('report_cache_info');
-	$report_type_info = $report_type_infos[$report_type];
+	$infos = module_invoke_all('report_cache_info');
+	$info = $infos[$report_type];
 
-	$pk_list_callback = $report_type_info['pk_list_callback'];
+	$pk_list_callback = $info['pk_list_callback'];
 
 	$form_state = array('values' => $values);
 	$pks = $pk_list_callback($form_state, $report_type, $report_id);
@@ -375,7 +381,7 @@ function report_cache_run($report_type, $values = array()) {
 	$operations = array();
 	foreach ($pks as $pk) {
 		$context = array();
-		report_cache_batch($pk, $values, $report_type_info, $context);
+		report_cache_batch($pk, $values, $info, $context);
 		entity_get_controller('node')->resetCache();		
 		watchdog('report-cache', $context['message']);
 	}
