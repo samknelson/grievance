@@ -609,10 +609,10 @@ function sirius_menu() {
   );
 
   $items['sirius/admin/do_not_disturb'] = array(
-    'title' => 'Do Not Disurb Configuration',
+    'title' => 'Do Not Disturb Configuration',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_config',
+    'page callback' => 'sirius_page_do_not_disturb_config',
     'page arguments' => array(),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -621,7 +621,7 @@ function sirius_menu() {
     'title' => 'Settings',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_config',
+    'page callback' => 'sirius_page_do_not_disturb_config',
     'page arguments' => array(),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
@@ -631,7 +631,7 @@ function sirius_menu() {
     'title' => 'Test',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_test',
+    'page callback' => 'sirius_page_do_not_disturb_test',
     'page arguments' => array(),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
@@ -937,7 +937,7 @@ function sirius_menu() {
     'access callback' => TRUE,
     'page callback' => 'sirius_sns_incoming',
     'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/sns/config'] = array(

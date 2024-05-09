@@ -4,7 +4,7 @@ class Report_Cache_Report_Generator {
   // Reports are singletons. Use My_Report::getInstance()->whatever()
   protected static $instance = array();
   protected function __construct() { }
-  final private function __clone() { }
+  private function __clone() { }
 
   final public static function getInstance() {
   	$class = get_called_class();

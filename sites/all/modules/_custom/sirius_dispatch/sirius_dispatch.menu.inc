@@ -385,12 +385,33 @@ function sirius_dispatch_node_tabs() {
     'component' => 'dispatch:live',
   );
 
+  $node_tabs['grievance_shop']['sirius_employer_dispatch/facilities'] = array(
+    'title' => 'Facilities',
+    'description' => '',
+    'callback' => 'sirius_node_tab_employer_dispatch_facilities',
+    'permissions' => array('sirius employer admin'),
+    'weight' => 2,
+    'skip_node_view_check' => FALSE,
+    'component' => 'dispatch:live',
+    'file' => 'sirius_dispatch.page_employer_facilities.inc',
+  );
+
   $node_tabs['grievance_shop']['sirius_employer_dispatch/payrate'] = array(
     'title' => 'Payrate',
     'description' => '',
     'callback' => 'sirius_node_tab_employer_dispatch_payrate',
     'permissions' => array('sirius dispatch staff'),
     'weight' => 3,
+  );
+
+  $node_tabs['sirius_dispatch_job_group']['sirius_dispatch_group_merge'] = array(
+    'title' => 'Merge',
+    'description' => '',
+    'callback' => 'sirius_dispatch_node_tab_group_merge',
+    'permissions' => array('sirius dispatch admin'),
+    'skip_node_view_check' => FALSE,
+    'weight' => 6,
+    'file' => 'sirius_dispatch.page_group_merge.inc',
   );
 
   sirius_node_tab_set_module('sirius_dispatch', $node_tabs);

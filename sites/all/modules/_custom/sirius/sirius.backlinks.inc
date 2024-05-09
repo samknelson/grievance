@@ -169,6 +169,10 @@ function sirius_backlinks_from_node($node) {
 	if ($node->type == 'sirius_phonenumber') { $links['sirius/phonenumber'] = array('name' => 'Phone Number List'); }
 	if ($node->type == 'sirius_trust_benefit') { $links['sirius/trust/benefits'] = array('name' => 'Benefit List'); }
 	if ($node->type == 'sirius_letterhead') { $links['sirius/admin/letterhead'] = array('name' => 'Letterhead List'); }
+	if ($node->type == 'sirius_news') {
+		$links['sirius/news'] = array('name' => 'News');
+		$links['sirius/news/admin'] = array('name' => 'Admin');
+	}
 
 	if ($node->type == 'grievance_contract_template') {
 		$links['grievance/admin/contract-templates'] = array('name' => 'Contract List');

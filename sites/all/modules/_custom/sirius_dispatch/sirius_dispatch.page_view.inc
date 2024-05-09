@@ -178,6 +178,7 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 	$form['dispatch_section_d'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_payrate', t('Pay Rate')));
 
 	// @TODO: Broken now
+	/*
 	$account_options = sirius_ledger_account_list();
 	$account_nids = array_filter(array_values(sirius_domain_variable_get('sirius_dispatch_view_accounts', array())));
 	$policy_node = sirius_ledger_policy_lookup($worker_node);
@@ -199,6 +200,7 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 			}
 		}
 	}
+	*/
 
 	$form['dispatch_section_e'] = array('#markup' => sirius_fakerender_field('Report #', $dispatch_node->nid));
 	$form['dispatch_section_close'] = array('#markup' => '</div>');
@@ -450,17 +452,19 @@ function sirius_dispatch_view_admin() {
 	  );
 	}
 
-	$accounts = sirius_ledger_account_list();
-	if ($accounts) {
-	  $var = sirius_domain_variable_name('sirius_dispatch_view_accounts');
-	  $form[$var] = array(
-	    '#type' => 'checkboxes',
-	    '#title' => t('Accounts'),
-	    '#description' => t('If you wish to show fund rates for certain accounts, select them here.'),
-	    '#default_value' => variable_get($var, NULL),
-	    '#options' => $accounts,
-	    '#checkall' => TRUE,
-	  );
+	if (function_exists('sirius_ledger_account_list')) {
+		$accounts = sirius_ledger_account_list();
+		if ($accounts) {
+		  $var = sirius_domain_variable_name('sirius_dispatch_view_accounts');
+		  $form[$var] = array(
+		    '#type' => 'checkboxes',
+		    '#title' => t('Accounts'),
+		    '#description' => t('If you wish to show fund rates for certain accounts, select them here.'),
+		    '#default_value' => variable_get($var, NULL),
+		    '#options' => $accounts,
+		    '#checkall' => TRUE,
+		  );
+		}
 	}
 
   return system_settings_form($form);

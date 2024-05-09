@@ -18,7 +18,7 @@ function sirius_do_not_disturb_tz() {
 	return $tz;
 }
 
-function sirius_page_do_not_disurb_config() { return drupal_get_form('sirius_page_do_not_disurb_config_form'); }
+function sirius_page_do_not_disturb_config() { return drupal_get_form('sirius_page_do_not_disturb_config_form'); }
 
 function sirius_page_do_not_disurb_config_form($form, &$form_state) {
 	$form['current_time'] = array('#markup' => sirius_tz_indicator(sirius_do_not_disturb_tz()));
@@ -47,7 +47,7 @@ function sirius_page_do_not_disurb_config_form($form, &$form_state) {
 		$count = 2;
 	}
 	for ($i=0; $i<$count; ++$i) {
-		$title = "Secheudle #" . ($i+1);
+		$title = t("Schedule #") . ($i+1);
 		if ($json['schedules'][$i]['title']) { $title = $json['schedules'][$i]['title']; }
 		if ($json['schedules'][$i]['id']) { $title .= ' (' . $json['schedules'][$i]['id'] . ')'; }
 
@@ -139,7 +139,7 @@ function sirius_page_do_not_disurb_config_form($form, &$form_state) {
 	return $form;
 }
 
-function sirius_page_do_not_disurb_config_form_submit($form, &$form_state) {
+function sirius_page_do_not_disturb_config_form_submit($form, &$form_state) {
 	// Need to clear any empty schedules, otherwise we'll add two each time.
 	$values = $form_state['values']['do_not_disturb'];
 	foreach ($values['schedules'] as $delta => $record) {
@@ -152,7 +152,7 @@ function sirius_page_do_not_disurb_config_form_submit($form, &$form_state) {
 }
 
 
-function sirius_page_do_not_disurb_test() { return drupal_get_form('sirius_page_do_not_disurb_test_form'); }
+function sirius_page_do_not_disturb_test() { return drupal_get_form('sirius_page_do_not_disturb_test_form'); }
 
 function sirius_page_do_not_disurb_test_form($form, &$form_state) {
 	$form['current_time'] = array('#markup' => sirius_tz_indicator(sirius_do_not_disturb_tz()));
@@ -172,7 +172,7 @@ function sirius_page_do_not_disurb_test_form($form, &$form_state) {
 	return $form;
 }
 
-function sirius_page_do_not_disurb_test_form_submit($form, &$form_state) {
+function sirius_page_do_not_disturb_test_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 
 	$result = sirius_do_not_disturb_check($form_state['values']['id']);
