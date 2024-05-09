@@ -1,6 +1,5 @@
 <?php
 
-
 function sirius_trust_benefits($active = TRUE) {
 	$query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
@@ -43,6 +42,8 @@ function sirius_trust_worker_benefit_node_form_alter(&$form, &$form_state, $form
 	$form['field_sirius_contact_relation']['#disabled'] = TRUE;
 	$form['field_grievance_shop']['#disabled'] = TRUE;
 	$form['field_sirius_trust_policy']['#disabled'] = TRUE;
+	$form['field_sirius_trust_subscriber']['#disabled'] = TRUE;
+	$form['field_sirius_trust_election']['#disabled'] = TRUE;
 
 	if ($is_edit) {
 		// Existing record: You can't change the type or employer
@@ -74,6 +75,8 @@ function sirius_trust_worker_benefits_search($params) {
 	$sql_args = array();
 	$sql = "select node.nid from node ";
 	$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_trust_subscriber on field_data_field_sirius_trust_subscriber.entity_type = 'node' and field_data_field_sirius_trust_subscriber.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_trust_election on field_data_field_sirius_trust_election.entity_type = 'node' and field_data_field_sirius_trust_election.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_trust_benefit on field_data_field_sirius_trust_benefit.entity_type = 'node' and field_data_field_sirius_trust_benefit.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_active on field_data_field_sirius_active.entity_type = 'node' and field_data_field_sirius_active.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
@@ -88,6 +91,10 @@ function sirius_trust_worker_benefits_search($params) {
   if ($params['worker_nid']) {
   	$sql .= "and field_sirius_worker_target_id = :worker_nid ";
   	$sql_args[':worker_nid'] = $params['worker_nid'];
+  }
+  if ($params['subscriber_nid']) {
+  	$sql .= "and field_sirius_trust_subscriber_target_id = :subscriber_nid ";
+  	$sql_args[':subscriber_nid'] = $params['subscriber_nid'];
   }
   if ($params['active']) {
   	$sql .= "and field_sirius_active_value = :active ";
@@ -106,6 +113,9 @@ function sirius_trust_worker_benefits_search($params) {
   	$sql .= "and field_sirius_contact_relation_target_id in (:relationship_nids) ";
   	$sql_args[':relationship_nids'] = $params['relationship_nids'];
   }
+  if ($params['exclude_self']) {
+  	$sql .= "and field_sirius_worker_target_id != field_sirius_trust_subscriber_target_id ";
+  }
   if ($params['relationship_nid']) {
   	if ($params['relationship_nid'] == 'NULL') {
 	  	$sql .= "and field_sirius_contact_relation_target_id IS NULL ";
@@ -117,6 +127,10 @@ function sirius_trust_worker_benefits_search($params) {
   if ($params['benefit_nids']) {
   	$sql .= "and field_sirius_trust_benefit_target_id in (:benefit_nids) ";
   	$sql_args[':benefit_nids'] = $params['benefit_nids'];
+  }
+  if ($params['election_nid']) {
+  	$sql .= "and field_sirius_trust_election_target_id = :election_nid ";
+  	$sql_args[':election_nid'] = $params['election_nid'];
   }
   if ($params['benefit_types']) {
   	$sql .= "and field_sirius_trust_benefit_type_tid in (:benefit_types) ";
@@ -151,7 +165,7 @@ function sirius_trust_worker_benefits($worker_node, $ts = NULL) {
 }
 
 function sirius_trust_worker_benefit_node_presave($wb_node) {
-	// Relationship is active only if it started before now, and it either hasn't ended yet, or it ended after now.
+	// Benefit is active only if it started before now, and it either hasn't ended yet, or it ended after now.
 	$start_ts = sirius_fieldval($wb_node, 'field_sirius_date_start', 'ts');
 	$end_ts = sirius_fieldval($wb_node, 'field_sirius_date_end', 'ts');
 	$now_ts = time();
@@ -161,6 +175,64 @@ function sirius_trust_worker_benefit_node_presave($wb_node) {
 	} else {
 		$wb_node->field_sirius_active['und'][0]['value'] = 'No';
 	}
+
+	// Subscriber is either the dependent or the relationship target
+	$relationship_node = node_load($wb_node->field_sirius_contact_relation['und'][0]['target_id']);
+	if ($relationship_node) {
+		$subscriber_contact_nid = $relationship_node->field_sirius_contact['und'][0]['target_id'];
+		$subscriber_worker_nid = sirius_worker_get_by_contact_nid($subscriber_contact_nid, TRUE);
+	}
+	if (!$subscriber_worker_nid) {
+		$subscriber_worker_nid = $wb_node->field_sirius_worker['und'][0]['target_id'];
+	}
+	$wb_node->field_sirius_trust_subscriber['und'][0]['target_id'] = $subscriber_worker_nid;
+
+	$election_nid = sirius_trust_wb_find_election_nid($wb_node);
+	if ($election_nid) {
+		$wb_node->field_sirius_trust_election['und'][0]['target_id'] = $election_nid;
+	} else {
+		unset($wb_node->field_sirius_trust_election['und'][0]);
+	}
+}
+
+function sirius_trust_wb_find_election_nid($wb_node) {
+	// Need a subscriber and a benefit
+	$subscriber_nid = $wb_node->field_sirius_trust_subscriber['und'][0]['target_id'];
+	if (!$subscriber_nid) { return NULL; }
+
+	$benefit_nid = $wb_node->field_sirius_trust_benefit['und'][0]['target_id'];
+	if (!$benefit_nid) { return NULL; }
+
+	$end_date = $wb_node->field_sirius_date_end['und'][0]['value'];
+
+	// We want the most recent election which:
+	// -- Is tied to the subscriber
+	// -- Contains the required benefit
+	// -- The election starts before the beneft ends
+
+	$sql = "select nid from node ";
+	$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_trust_benefits on field_data_field_sirius_trust_benefits.entity_type = 'node' and field_data_field_sirius_trust_benefits.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_date_start on field_data_field_sirius_date_start.entity_type = 'node' and field_data_field_sirius_date_start.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_trust_worker_election' ";
+
+	$sql .= "and field_sirius_worker_target_id = :subscriber_nid ";
+	$sql_args[':subscriber_nid'] = $subscriber_nid;
+
+	$sql .= "and field_sirius_trust_benefits_target_id = :benefit_nid ";
+	$sql_args[':benefit_nid'] = $benefit_nid;
+
+	if ($end_date) {
+		$sql .= "and field_sirius_date_start_value <= :end_date ";
+		$sql_args[':end_date'] = $end_date;
+	}
+
+	$sql .= "order by field_sirius_date_start_value desc ";
+	$sql .= "limit 1 ";
+
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$hr = $stmt->fetchAssoc();
+	return $hr['nid'];
 }
 
 function sirius_trust_benefit_get_by_id($id) {
@@ -233,7 +305,6 @@ function sirius_trust_worker_benefit_scan($mode = 'test') {
 
 	$mode = 'test';
 	sirius_minilog("FEATURE UNDER DEVELOPMENT: Forcing mode = $mode", 'warning');
-
 
 	$count = 0;
 	$count_ok = 0;
@@ -379,18 +450,22 @@ function sirius_trust_fetch_worker_benefits($worker_node, $direction, $params = 
   if ($direction == 'direct') {
   	$params['worker_nid'] = $worker_node->nid;
   } else {
+  	/*
 	  $relationship_params = array();
   	$relationship_params['contact_nid'] = $worker_node->field_sirius_contact['und'][0]['target_id'];
   	$relationship_params['nids_only'] = TRUE;
 		$relationship_nids = sirius_contact_relationships($relationship_params);
 		if (!$relationship_nids) { return array(); }
 		$params['relationship_nids'] = $relationship_nids;
+		*/
+		$params['subscriber_nid'] = $worker_node->nid;
+		$params['exclude_self'] = TRUE;
   }
 
 	return sirius_trust_worker_benefits_search($params);
 }
 
-function sirius_trust_render_worker_benefits($worker_node, $direction, $wb_nodes, $options) {
+function sirius_trust_render_worker_benefits($worker_node, $direction, $wb_nodes, $options = array()) {
 	if (!$wb_nodes) {
 		return '<p>' . t('No records found.') . '</p>';
 	}

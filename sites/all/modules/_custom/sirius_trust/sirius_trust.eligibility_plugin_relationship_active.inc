@@ -1,5 +1,7 @@
 <?php
 
+// Under development
+
 function sirius_trust_eligibility_plugin_relationship_active_check($settings, $params) {
 	$benefit_node = $params['benefit_node'];
 	$subscriber_worker_node = $params['subscriber_worker_node'];

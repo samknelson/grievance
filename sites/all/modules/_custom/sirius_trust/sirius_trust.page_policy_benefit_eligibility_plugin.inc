@@ -29,14 +29,13 @@ function sirius_trust_node_tab_policy_benefit_eligibility_plugin_form($form, &$f
 	  );
 	}
 
-	$callback = $plugin_info['callbacks']['settings'];
-	if (!$callback) {
+	$subform = $plugin_info['instance']->form($policy_json['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings']);
+	if (!$subform) {
 		$form['nosettings'] = array('#markup' => '<p><em>' . t('There are no settings for this plugin') . '</em></p>');
 		return $form;
 	}
 
-  $form['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings'] = 
-  	$callback($policy_json['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings']);
+  $form['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings'] = $subform;
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -50,6 +49,10 @@ function sirius_trust_node_tab_policy_benefit_eligibility_plugin_form_submit($fo
 	$policy_node = node_load($form_state['policy_nid']);
 	$benefit_node = node_load($form_state['benefit_nid']);
 	$plugin_key = $form_state['plugin_key'];
+
+  $plugin_info = sirius_trust_eligibility_plugin_info($plugin_key);
+	sirius_trust_eligibility_plugin_load($plugin_key);
+	$plugin_info['instance']->form_submit($form_state['values']['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings']);
 
 	$policy_json = sirius_json_get($policy_node);
 	$policy_json['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings'] = 

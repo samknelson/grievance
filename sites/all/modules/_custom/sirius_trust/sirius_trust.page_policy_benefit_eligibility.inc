@@ -17,7 +17,7 @@ function sirius_trust_node_tab_policy_benefit_eligibility_form($form, &$form_sta
 	$plugin_info_all = sirius_trust_eligibility_plugin_info_all();
 	$plugin_options = array();
 	foreach ($plugin_info_all as $plugin_key => $plugin_info) {
-		$plugin_options[$plugin_key] = $plugin_info['title'];
+		$plugin_options[$plugin_key] = $plugin_info['name'];
 	}
 
 	$form['#tree'] = TRUE;

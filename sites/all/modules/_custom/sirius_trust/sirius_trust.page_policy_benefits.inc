@@ -82,7 +82,7 @@ function sirius_trust_node_tab_policy_benefits_quicknav($policy_node, $my_benefi
 
   foreach ($enabled_plugins as $plugin_key) {
   	$plugin_info = sirius_trust_eligibility_plugin_info($plugin_key);
-	  $sub_link['title'] = $plugin_info['title'];
+	  $sub_link['title'] = $plugin_info['name'];
 	  $sub_link['path'] = "$sub_base_path/$plugin_key";
 	  $sub_links[] = $sub_link;
   }
