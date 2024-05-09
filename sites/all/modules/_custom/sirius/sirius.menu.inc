@@ -937,7 +937,7 @@ function sirius_menu() {
     'access callback' => TRUE,
     'page callback' => 'sirius_sns_incoming',
     'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/sns/config'] = array(
