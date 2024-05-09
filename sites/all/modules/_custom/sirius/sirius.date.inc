@@ -81,3 +81,14 @@ function sirius_date_yearmonth_widget($params) {
 
 	return $form;
 }
+
+function sirius_tz_indicator($tz) {
+	$orig_tz = date_default_timezone_get();
+	date_default_timezone_set($tz);
+	$current_time = date("h:i A");
+	date_default_timezone_set($orig_tz);
+	return '<div class="sirius_tz_indicator">' . 
+		'<i class="far fa-clock"></i>' .
+		"&nbsp;&nbsp;Using time zone <strong>$tz</strong>. Current time <strong>$current_time.</strong><br /><br />" . '</strong>' .
+		'</div>';
+}
