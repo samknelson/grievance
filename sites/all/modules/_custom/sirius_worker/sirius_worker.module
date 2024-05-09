@@ -48,7 +48,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tor.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_subscribe.inc";
 
-function sirius_worker_get_by_id($id) {
+function sirius_worker_get_by_id($id, $nid_only = FALSE) {
 	if (!$id) { return NULL; }
 
   $query = new EntityFieldQuery;
@@ -60,6 +60,8 @@ function sirius_worker_get_by_id($id) {
 	$query->propertyOrderBy('nid', 'desc');
 	$stmt = $query->execute();
 	if (!$stmt['node']) { return NULL; }
+
+  if ($nid_only) { return array_keys($stmt['node'])[0]; }
 
 	return node_load(array_keys($stmt['node'])[0]);
 }
