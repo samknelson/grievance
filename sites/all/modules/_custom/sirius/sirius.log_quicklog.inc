@@ -52,6 +52,7 @@ function sirius_log_quicklog_category_type_options($content_type) {
     $category = trim($category);
     $type = trim($type);
     $title = trim($title);
+    if (!$title) { $title = "$category - $type"; }
     if ($category && $type && $title) {
       $options["$category|$type"] = $title;
     }
@@ -84,15 +85,33 @@ function sirius_log_quicklog_page_add_form($form, &$form_state, $node) {
   }
 
   $form_state['nid'] = $node->nid;
-  $category_type_options = sirius_log_quicklog_category_type_options($node->type);
+  $ct_options = sirius_log_quicklog_category_type_options($node->type);
+  $ct_tree = array();
+  foreach ($ct_options as $ct => $title) {
+    list ($category, $type) = explode('|', $ct);
+    $ct_tree[$category][$type] = $title;
+  }
 
-  $form['category_type'] = array(
-    '#title' => t('Entry Type'),
+  $category_options = array_combine(array_keys($ct_tree), array_keys($ct_tree));
+  $form['category'] = array(
     '#type' => 'select',
-    '#options' => $category_type_options,
+    '#title' => t('Category'),
     '#required' => TRUE,
-    '#suffix' => '<br clear="all">',
+    '#options' => $category_options,
+    '#default_value' => $category_options[array_key_first($category_options)],
+    '#id' => 'quicklog_category'
   );
+
+  foreach ($ct_tree as $category => $type_options) {
+    $form["type_$category"] = array(
+      '#type' => 'select',
+      '#title' => t('Type'),
+      '#required' => TRUE,
+      '#options' => $type_options,
+      '#default_value' => $type_options[array_key_first($type_options)],
+      '#states' => array('visible' => array(array(":input[id=\"quicklog_category\"]" => array('value' => $category)))),
+    );
+  }
 
   $form['reason'] = array(
     '#type' => 'textarea',
@@ -113,9 +132,9 @@ function sirius_log_quicklog_page_add_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   $form_state['submitted'] = TRUE;
   $node = node_load($form_state['nid']);
-  $category_type_options = sirius_log_quicklog_category_type_options($node->type);
   $comment = $form_state['values']['reason'];
-  list ($category, $type) = explode('|', $form_state['values']['category_type']);
+  $category = $form_state['values']['category'];
+  $type = $form_state['values']["type_$category"];
   sirius_log($category, $type, $comment, $comment, NULL, array($node->nid), array());
-  drupal_set_message('Log entry created: ' . $category_type_options["$category|$type"]);
+  drupal_set_message("Log entry created: $category, $type.");
 }
