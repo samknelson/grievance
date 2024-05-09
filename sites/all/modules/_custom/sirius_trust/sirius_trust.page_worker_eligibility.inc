@@ -141,14 +141,14 @@ function sirius_trust_node_tab_worker_eligibility_form_submit($form, &$form_stat
 				$class = 'red';
 				$eligible = 'No';
 				$summary_eligible = FALSE;
-				$summary_failed[] = $plugin_info['title'];
+				$summary_failed[] = $plugin_info['name'];
 			}
 			if ($sub_result['tools']) { $tools = array_merge($tools, $sub_result['tools']); }
 
 			$row = array();
 			$row[] = '';
 			$row[] = '';
-			$row[] = $plugin_info['title'];
+			$row[] = $plugin_info['name'];
 			$row[] = $eligible;
 			$row[] = $sub_result['msg'];
 			$row[] = join('', $tools);

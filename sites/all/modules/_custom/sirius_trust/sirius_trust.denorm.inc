@@ -6,6 +6,10 @@ function sirius_trust_denormalize_queue($node) {
     sirius_denorm_queue_add($node->nid, $node->field_sirius_worker['und'][0]['target_id'], 'sirius_trust_worker_memdep_tag');
   }
 
+  if ($node->type == 'sirius_trust_worker_election') {
+    sirius_denorm_queue_add($node->nid, $node->field_sirius_worker['und'][0]['target_id'], 'sirius_trust_worker_election');
+  }
+
   /*
   if ($node->type == 'sirius_contact_relationship') {
     sirius_denorm_queue_add($node->nid, $node->nid, 'sirius_trust_relationships');
@@ -26,11 +30,27 @@ function sirius_trust_sirius_denorm($item) {
     sirius_trust_denorm_worker_memdep_tag($item['denorm_source_nid'], $item['denorm_target_nid']);
   }
 
+  if ($item['denorm_trigger'] == 'sirius_trust_worker_election') {
+    sirius_trust_denorm_worker_election($item['denorm_source_nid'], $item['denorm_target_nid']);
+  }
+
   /*
   if ($item['denorm_trigger'] == 'sirius_trust_relationships') {
     sirius_trust_denorm_relationships($item['denorm_source_nid']);
   }
   */
+}
+
+function sirius_trust_denorm_worker_election($election_nid, $subscriber_nid) {
+  // Check all the subscriber's benefits
+  $params = array();
+  $wb_nodes = sirius_trust_worker_benefits_search(array('subscriber_nid' => $subscriber_nid));
+  foreach ($wb_nodes as $wb_nid => $wb_node) {
+    $election_nid = sirius_trust_wb_find_election_nid($wb_node);
+    if ($election_nid != $wb_node->field_sirius_trust_election['und'][0]['target_id']) {
+      node_save($wb_node);
+    }
+  }
 }
 
 function sirius_trust_denorm_worker_memdep_tag($wb_nid, $worker_nid) {

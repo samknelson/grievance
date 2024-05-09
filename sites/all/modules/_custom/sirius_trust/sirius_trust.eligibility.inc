@@ -49,9 +49,10 @@ function sirius_trust_eligibility_plugin_check($policy_node, $benefit_node, $sub
 	if (!$ts) { $ts = time(); }
 	sirius_trust_eligibility_plugin_load($plugin_key);
 	$plugin_info = sirius_trust_eligibility_plugin_info($plugin_key);
+
+	if (!$plugin_info || !$plugin_info['instance']) { return array('success' => FALSE, 'msg' => 'Plugin callback not specified.'); }
+
 	$settings = sirius_trust_eligibility_plugin_settings($policy_node, $benefit_node, $plugin_key);
-	$callback = $plugin_info['callbacks']['check'];
-	if (!$callback) { return array('success' => FALSE, 'msg' => 'Plugin callback not specified.'); }
 
 	$params = array();
 	$params['subscriber_worker_node'] = $subscriber_worker_node;
@@ -61,7 +62,7 @@ function sirius_trust_eligibility_plugin_check($policy_node, $benefit_node, $sub
 	$params['ts'] = $ts;
 	$params['plugin_info'] = $plugin_info;
 
-	return $callback($settings, $params);
+	return $plugin_info['instance']->check($settings, $params);
 }
 
 function sirius_trust_eligibility_plugins_enabled($policy_node, $benefit_node) {
@@ -74,30 +75,21 @@ function sirius_trust_eligibility_plugins_enabled($policy_node, $benefit_node) {
  */
 
 function sirius_trust_sirius_trust_eligibility_plugin_info() {
-	$items = array();
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_universal.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_election.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_reltype.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_ws.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_ms.inc');
+	sirius_require('sirius_trust', 'sirius_trust.eligibility_plugin_geog.inc');
 
-	$items['election'] = array(
-		'title' => 'Election Required',
-		'description' => 'To be eligible for this benefit, the member or dependent must have an election on file. The election must have been made before the date of benefit commencement, and the end date on the election must be either empty or after the date of the benefit commencement.',
-		'file' => 'sirius_trust.eligibility_plugin_election.inc',
-		'module' => 'sirius_trust',
-		'callbacks' => array(
-			'check' => 'sirius_trust_eligibility_plugin_election_check',
-		),
-		'execution_cost' => 3,
-	);
-
-	$items['universal'] = array(
-		'title' => 'Universal Eligibility',
-		'description' => 'Universal eligibility indicates that there are no special eligibility requirements. All workers in the system will be eligibile for benefits with universal eligibility. In general, this plugin should not be combined with other plugins; it should be the only plugin for a given benefit.',
-		'file' => 'sirius_trust.eligibility_plugin_universal.inc',
-		'module' => 'sirius_trust',
-		'callbacks' => array(
-			'settings' => 'sirius_trust_eligibility_plugin_universal_settings_form',
-			'check' => 'sirius_trust_eligibility_plugin_universal_check',
-		),
-		'execution_cost' => -10,
-	);
+  $items = array();
+  Sirius_Trust_Elgibility_Plugin_Universal::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Election::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Reltype::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_WS::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_MS::getInstance()->setInfo($items);
+  Sirius_Trust_Elgibility_Plugin_Geog::getInstance()->setInfo($items);
+  return $items;
 
 	$items['ws'] = array(
 		'title' => 'Work Status',
@@ -123,53 +115,6 @@ function sirius_trust_sirius_trust_eligibility_plugin_info() {
 		'execution_cost' => 5,
 	);
 
-	$items['reltype'] = array(
-		'title' => 'Relationship Type',
-		'description' => 'Eligibility for this benefit is restricted to only certain relationship types.',
-		'file' => 'sirius_trust.eligibility_plugin_reltype.inc',
-		'module' => 'sirius_trust',
-		'callbacks' => array(
-			'settings' => 'sirius_trust_eligibility_plugin_reltype_settings_form',
-			'check' => 'sirius_trust_eligibility_plugin_reltype_check',
-		),
-		'execution_cost' => -7,
-	);
-
-	$items['employer'] = array(
-		'title' => 'Employer',
-		'description' => 'Eligibility for this benefit is restricted based on whether the subscriber was employed at the time, and whether the employer offered the benefit.',
-		'file' => 'sirius_trust.eligibility_plugin_employer.inc',
-		'module' => 'sirius_trust',
-		'callbacks' => array(
-			// 'benefit_settings' => 'sirius_trust_eligibility_plugin_employer_benefit_settings_form',
-			'check' => 'sirius_trust_eligibility_plugin_employer_check',
-		),
-		'execution_cost' => 7,
-	);
-
-	$items['hours'] = array(
-		'title' => 'Hours',
-		'description' => 'Eligibility for this benefit is restricted based on the subscriber\'s hours.',
-		'file' => 'sirius_trust.eligibility_plugin_hours.inc',
-		'module' => 'sirius_trust',
-		'callbacks' => array(
-			'settings' => 'sirius_trust_eligibility_plugin_hours_settings_form',
-			'check' => 'sirius_trust_eligibility_plugin_hours_check',
-		),
-		'execution_cost' => 2,
-	);
-
-	$items['relationship_active'] = array(
-		'title' => 'Relationship Active',
-		'description' => 'The relationship must be active at the time that the eligibility is checked.',
-		'file' => 'sirius_trust.eligibility_plugin_relationship_active.inc',
-		'module' => 'sirius_trust',
-		'callbacks' => array(
-			'check' => 'sirius_trust_eligibility_plugin_relationship_active_check',
-		),
-		'execution_cost' => -7,
-	);
-
 	return $items;
 }
 
@@ -181,4 +126,37 @@ function sirius_trust_eligibility_plugin_load($plugin_key) {
 function sirius_trust_eligibility_plugin_settings($policy_node, $benefit_node, $plugin_key) {
 	$policy_json = sirius_json_get($policy_node);
 	return $policy_json['benefits'][$benefit_node->nid]['eligibility']['plugin'][$plugin_key]['settings'];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Sirius_Trust_Elgibility_Plugin extends Sirius_Singleton {
+	public $type = 'root';
+	public $name = 'Root';
+	public $description = 'Root eligibility plugin; must be overridden.';
+
+	public function form($json) {
+		return array();
+	}
+
+	public function form_submit(&$json) {
+		// Handle configuration form submit (i.e. extra calculations)
+	}
+
+	public function check($settings, $params) {
+		return array('success' => FALSE, 'msg' => 'Root eligibility check called.');
+	}
 }

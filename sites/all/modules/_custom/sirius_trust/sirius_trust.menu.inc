@@ -196,6 +196,16 @@ function sirius_trust_node_tabs() {
     'component' => 'trust',
   );
 
+  $node_tabs['sirius_trust_worker_election']['sirius_trust_election_wbs'] = array(
+    'title' => 'Benefits',
+    'description' => '',
+    'callback' => 'sirius_trust_node_tab_election_wbs',
+    'permissions' => array('sirius trust staff'),
+    'weight' => 1,
+    'file' => 'sirius_trust.page_election_wbs.inc',
+    'component' => 'trust',
+  );
+
   $node_tabs['sirius_trust_worker_election']['sirius_trust_election_relationships'] = array(
     'title' => 'Relationships',
     'description' => '',

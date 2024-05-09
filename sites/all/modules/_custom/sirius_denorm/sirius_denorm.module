@@ -13,23 +13,71 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_denorm/sirius_deno
  */
 
 function sirius_denorm_node_postsave($node, $op) {
+  if (!sirius_denorm_realtime()) { return; }
 
 	$items = sirius_denorm_queue_search(array('status' => 'pending', 'source_nid' => $node->nid));
 	$items += sirius_denorm_queue_search(array('status' => 'pending', 'target_nid' => $node->nid));
+  
 	foreach ($items as $item) {
-		sirius_denorm_queue_execute_item($item);
-		sirius_denorm_queue_remove($item['denorm_id']);
+		sirius_denorm_queue_execute_item($item, 'live');
+  }
+
+  foreach ($items as $item) {
+		sirius_denorm_queue_remove($item['denorm_id'], 'live');
 	}
 }
 
-
 /**
- * Implements hook_cron
+ * Implements hook_sirius_cron_scan_info()
  */
 
-function sirius_denorm_cron() {
-  $last_ts = variable_get('sirius_denorm_cron_last_ts');
-  if (time() - $last_ts < 60*60) { return; }
-  variable_set('sirius_denorm_cron_last_ts', time());
-  sirius_denorm_queue_run();
+function sirius_denorm_sirius_cron_scan_info() {
+  $items['denorm'] = array(
+    'title' => 'Denorm',
+    'description' => 'Run the next batch of pending denorm items',
+    // 'schedule' => 'hourly', // We do our own scheduling
+    'callback' => 'sirius_denorm_queue_run',
+    'multidomain' => FALSE,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_sirius_config_links_alter
+ */
+
+function sirius_denorm_sirius_config_links_alter(&$links) {
+  $links['systems']['links']['sirius/denorm'] = array('title' => 'Denorm', 'description' => 'Manage the "denormalize" queue and settings.');
+}
+
+function sirius_denorm_realtime($new_value = NULL) {
+  static $enabled = TRUE;
+
+  if (isset($new_value)) { $enabled = $new_value; }
+
+  return $enabled;
+}
+
+/**
+ * Implements hook_sirius_dashboard_info
+ */
+
+function sirius_denorm_sirius_dashboard_plugin_info() {
+  $plugins = array();
+
+  $plugins['denorm_queue'] = array(
+    'title' => 'Denorm Queue',
+    'description' => '',
+    'file' => 'sirius_denorm.dashboard.inc',
+    'module' => 'sirius_denorm',
+    'callbacks' => array(
+      'data' => 'sirius_denorm_dashboard_data',
+      // 'config' => 'sirius_denorm_dashboard_config',
+      // 'prefs' => 'sirius_denorm_dashboard_prefs',
+    ),
+    'proxy' => TRUE,
+  );
+
+  return $plugins;
 }

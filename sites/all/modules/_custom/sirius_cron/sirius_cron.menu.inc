@@ -8,6 +8,15 @@
 function sirius_cron_node_tabs() {
   $node_tabs = array();
 
+  $node_tabs['sirius_json_definition']['sirius_cron_scan_settings'] = array(
+    'title' => 'Settings',
+    'description' => '',
+    'callback' => 'sirius_cron_node_tab_scan_settings',
+    'permissions' => array('sirius admin'),
+    'weight' => 1,
+    'file' => 'sirius_cron.page_scan_settings.inc',
+  );
+
   $node_tabs['sirius_json_definition']['sirius_cron_scan_info'] = array(
     'title' => 'Info',
     'description' => '',

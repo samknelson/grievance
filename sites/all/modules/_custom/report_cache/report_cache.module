@@ -16,6 +16,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/r
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_preview.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_render.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_operations.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_preview_modal.inc";
 
 function report_cache_info_all() {
 	$info_all = &drupal_static(__FUNCTION__, NULL);
@@ -104,6 +105,7 @@ function report_cache_access($report_type) {
 
 function report_cache_parameters($report_type, $report_id, $parameters = array()) {
  	$cache = &drupal_static(__FUNCTION__);
+	$info = report_cache_info($report_type);
 
  	// Set?
  	if ($parameters) {
@@ -120,13 +122,14 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
 
 		$instance_uuid = $parameters['meta']['instance']['uuid'];
 
+
 	  $stmt = db_insert('report_cache');
 		$stmt->fields(
 			array(
 				'report_id' => $report_id,
 				'report_row_pk' => 'PARAMETERS',
 				'report_type' => $report_type . ' :: PARAMETERS',
-				'report_data' => serialize($parameters),
+				'report_data' => $info['generator']->row_encode($parameters),
 				'report_domain_nid' => $domain_nid,
 				'report_instance' => $instance_uuid,
 			)
@@ -142,7 +145,7 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
   $query->condition('report_type', $report_type . ' :: PARAMETERS');
   $stmt = $query->execute();
   $hr = $stmt->fetchAssoc();
-	$parameters = unserialize($hr['report_data']);
+	$parameters = $info['generator']->row_decode($hr['report_data']);
 
 	// Quick sloppy caching. 
 	// - Since we're doing a database query, we want to store the results in memory

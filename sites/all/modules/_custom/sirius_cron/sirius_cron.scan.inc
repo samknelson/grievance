@@ -129,6 +129,13 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live', $options = array
 	$scan_json['cron']['start_ts'] = time();
 	sirius_minilog("Cron scan: $info[title]: Starting.");
 
+	if ($mode == 'live') {
+		if ($scan_json['cron']['settings']['disabled'] == 'Yes') {
+			sirius_minilog("This cron job is disabled.");
+			return array('success' => TRUE, 'msg' => 'Cron job is disabled.');
+		}
+	}
+
 	if ($info['multidomain']) {
 		$domains = sirius_domain_tree_render_as_select();
 		$component = $info['component'];
