@@ -69,7 +69,6 @@ function sirius_update_7028_impl() {
 
 			$stmt = db_query($sql, $sql_args);
 			sirius_minilog("... Inserted into $table");
-			break;
 		}
 	}
 }
