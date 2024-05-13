@@ -5403,6 +5403,19 @@ Section',
   $handler->display->display_options['filters']['title_1']['expose']['remember_roles'] = array(
     2 => '2',
   );
+  /* Filter criterion: Content: Title */
+  $handler->display->display_options['filters']['title_2']['id'] = 'title_2';
+  $handler->display->display_options['filters']['title_2']['table'] = 'node';
+  $handler->display->display_options['filters']['title_2']['field'] = 'title';
+  $handler->display->display_options['filters']['title_2']['operator'] = 'contains';
+  $handler->display->display_options['filters']['title_2']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['title_2']['expose']['operator_id'] = 'title_2_op';
+  $handler->display->display_options['filters']['title_2']['expose']['label'] = 'Log Title';
+  $handler->display->display_options['filters']['title_2']['expose']['operator'] = 'title_2_op';
+  $handler->display->display_options['filters']['title_2']['expose']['identifier'] = 'title_2';
+  $handler->display->display_options['filters']['title_2']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page_1');
@@ -5454,6 +5467,7 @@ Section',
     t('Log Date'),
     t('Show only open grievances?'),
     t('Company Name'),
+    t('Log Title'),
     t('Page'),
   );
   $export['grievance_log_all'] = $view;
@@ -18409,8 +18423,8 @@ Grievance Form',
     'action::flag_node_action' => array(
       'selected' => 1,
       'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'skip_permission_check' => 0,
+      'skip_confirmation' => 1,
+      'skip_permission_check' => 1,
       'override_label' => 1,
       'label' => 'Remove Bookmark',
     ),

@@ -2917,7 +2917,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_sirius_worker_preferences';
   $field_group->data = array(
     'label' => 'Holds',
-    'weight' => '46',
+    'weight' => '47',
     'children' => array(
       0 => 'field_sirius_dispatch_hfe',
       1 => 'field_sirius_dispatch_hfe_until',
@@ -2954,9 +2954,9 @@ function grievance_content_types_field_group_info() {
       2 => 'field_sirius_ssn',
       3 => 'field_sirius_aat',
       4 => 'field_sirius_id2',
-      5 => 'field_sirius_gender',
-      6 => 'field_sirius_id3',
-      7 => 'field_sirius_dob',
+      5 => 'field_sirius_id3',
+      6 => 'field_sirius_dob',
+      7 => 'field_sirius_gender_nota_calc',
       8 => 'eins',
     ),
     'format_type' => 'fieldset',
@@ -2993,6 +2993,8 @@ function grievance_content_types_field_group_info() {
       5 => 'field_sirius_gender',
       6 => 'field_sirius_id3',
       7 => 'field_sirius_dob',
+      8 => 'field_sirius_gender_nota_val',
+      9 => 'field_sirius_gender_nota_calc',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
