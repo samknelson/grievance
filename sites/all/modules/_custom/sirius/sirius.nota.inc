@@ -5,7 +5,10 @@ function sirius_nota_info_all() {
 		'content_types' => array(
 			'grievance' => array(
 				'field_sirius_gender'
-			)
+			),
+			'sirius_worker' => array(
+				'field_sirius_gender'
+			),
 		)
 	);
 }
