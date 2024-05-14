@@ -129,6 +129,18 @@ function sirius_node_tab_json_definition_disclaimer_form($form, &$form_state, $d
 		'#description' => t('When this disclaimer is accepted, a notification should be sent to the person who accepted it.'),
 	);
 
+	$form['disclaimer']['esig']['enabled'] = array(
+		'#type' => 'select',
+		'#title' => t('Require eSignature?'),
+		'#default_value' => $disclaimer_json['esig'],
+		'#options' => array(
+			'Yes' => t('Yes'),
+			'No' => t('No'),
+		),
+		'#required' => TRUE,
+		'#description' => t('Require an eSignature?'),
+	);
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Submit'),
@@ -158,13 +170,24 @@ function sirius_node_tab_json_definition_disclaimer_form_submit($form, &$form_st
 	  node_object_prepare($disclaimer_node);
 	}
 
-	$json = sirius_jsonfield_util_node_json_get($disclaimer_node);
+	$json = sirius_json_get($disclaimer_node);
 	$json['disclaimer'] = $form_state['values']['disclaimer'];
 	$json['disclaimer']['body'] = sirius_richtext_handle_input($form_state['values']['disclaimer']['body']);
-	sirius_jsonfield_util_node_json_set($disclaimer_node, $json);
+	sirius_json_set($disclaimer_node, $json);
 	$disclaimer_node->title = $form_state['values']['disclaimer']['title'];
 	node_save($disclaimer_node);
+
+	// This is hacky, but ... the "disclaimer" json should know its own NID. So we might resave it.s
+	if ($json['disclaimer']['nid'] != $disclaimer_node->nid) {
+		$json['disclaimer']['nid'] = $disclaimer_node->nid;
+		sirius_json_set($disclaimer_node, $json);
+		node_save($disclaimer_node);
+	}
 	drupal_set_message("Settings saved.");
+}
+
+function sirius_disclaimer_esig_which($disclaimer_json) {
+	return 'esig_disclaimer_' . $disclaimer_json['nid'];
 }
 
 function sirius_disclaimer_list() {
@@ -207,6 +230,7 @@ function sirius_disclaimer_accept($host_node, $disclaimer_nodes, $options = arra
 		}
 
 		$acceptance = array();
+		if ($options['acceptance']) { $acceptance = $options['acceptance']; }
 		$acceptance['ts'] = time();
 		$acceptance['uid'] = $user->uid;
 		$acceptance['user_name'] = $user->name;
@@ -285,6 +309,39 @@ function sirius_disclaimer_render_form($disclaimer_json, $acceptance_json = arra
  	}
 	$form['#prefix'] = "<div class=\"$class\">";
 	$form['#suffix'] = '</div>';
+
+	if ($disclaimer_json['esig']['enabled'] == 'Yes') {
+		sirius_esignature_init();
+
+		$esig_which = sirius_disclaimer_esig_which($disclaimer_json);
+
+		if (!$acceptance_json) {
+			sirius_esignature_form_prepare(
+				$form, 
+				$esig_which, 
+				$disclaimer_json['title'], 
+				$disclaimer_json['body'], 
+				array(
+					'hide_title' => TRUE,
+					'hide_statement' => TRUE,
+					'hide_submit' => TRUE,
+				)
+			);
+		} else {
+			if ($acceptance_json['esig_nid']) {
+				$esig_node = node_load($acceptance_json['esig_nid']);
+				$esig_json = sirius_json_get($esig_node);
+				$esig_which = sirius_disclaimer_esig_which($disclaimer_json);
+				$esignature = sirius_jsonfield_util_esignature_get($esig_json, $esig_which);
+				if ($esignature) { 
+					$html = '<div class="sirius_disclaimer_esig_signature">';
+					$html .= sirius_esignature_render($esignature, '', $esig_node->nid, $esig_which);
+					$html .= '</div>';
+					$form['esig'] = array('#markup' => $html);
+				}
+			}
+		}
+	}
 
 	return $form;
 }
