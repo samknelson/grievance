@@ -303,6 +303,7 @@ function sirius_backlinks_from_node($node) {
 		if ($definition_type == 'sirius_event:catalog')	{ $links['sirius/event/catalog/list'] = array('name' => 'All Catalogs'); }
 		else if ($definition_type == 'sirius_ledger:policy') { $links['sirius/config/ledger/policies'] = array('name' => 'All Policies'); }
 		else if ($definition_type == 'customfield') { $links['sirius/customfield/definition/list'] = array('name' => 'All Custom Field Sets'); }
+		else if ($definition_type == 'sirius:disclaimer') { $links['sirius/disclaimer/list'] = array('name' => 'All Disclaimers'); }
 	}
 
 	if ($node->type == 'grievance_basic_page') {
