@@ -1,6 +1,5 @@
 <?php
 
-
 function sirius_node_access_domain($node, $op, $account) {
   // Admins can do anything
   if (user_access('sirius admin', $account)) { return NODE_ACCESS_ALLOW; }
@@ -81,6 +80,35 @@ function sirius_domain_component_info_all() {
     ksort($infos);
   }
   return $infos;
+}
+
+/**
+ * Utility function to switch into a domain temporarily
+ */
+
+function sirius_domain_pushpop($push, $domain_nid = NULL) {
+  $stack = &drupal_static(__FUNCTION__);
+  if (!isset($stack)) { $stack = array(); }
+
+  if (!$domain_nid) { $domain_nid = -1; }
+
+  if ($push) {
+    $old_domain_nid = sirius_domain_nid();
+    if (!$old_domain_nid) { $old_domain_nid = -1; }
+    array_push($stack, $old_domain_nid);
+    sirius_domain($domain_nid);
+  } else {
+    $old_domain_nid = array_pop($stack);
+    sirius_domain($old_domain_nid);
+  }
+}
+
+function sirius_domain_push($domain_nid) {
+  return sirius_domain_pushpop(TRUE, $domain_nid);
+}
+
+function sirius_domain_pop() {
+  return sirius_domain_pushpop(FALSE);
 }
 
 /**
