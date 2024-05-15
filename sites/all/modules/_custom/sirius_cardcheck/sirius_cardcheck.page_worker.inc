@@ -20,7 +20,6 @@ function sirius_cardcheck_node_tab_worker($worker_node) {
 			return sirius_page_error("You do not have permission to create this card check record.");
 		}
 		$cardcheck_node = $instance->create($definition_node, array('entity_node' => $worker_node));
-		drupal_set_message("Created: " . $cardcheck_node->nid);
 		drupal_goto("node/" . $cardcheck_node->nid . "/sirius_log_cardcheck");
 	}
 	if ($action) { return sirius_page_error("Unknown action."); }
