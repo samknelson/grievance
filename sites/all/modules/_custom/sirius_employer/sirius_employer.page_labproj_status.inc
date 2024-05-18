@@ -17,7 +17,18 @@ function sirius_employer_node_tab_labproj_status_form($form, &$form_state, $labp
 
 	$employer_node = sirius_log_handler($labproj_node, 'grievance_shop');
 	$industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
-	$group_options = sirius_dispatch_group_list_active($industry_tids);
+
+	list ($year, $month) = sirius_employer_labproj_get_yearmonth($labproj_node);
+
+	$params = array();
+	$ts = strtotime("$year-$month-01");
+	$params['industry_tids'] = $industry_tids;
+	$params['interval'] = array(
+		'start_ts' => strtotime("-1 day", $ts),
+		'end_ts' => strtotime("+1 month", $ts),
+	);
+	$params['nids_only'] = TRUE;
+	$group_options = sirius_dispatch_group_search($params);
 
 	$labproj_json = sirius_json_get($labproj_node);
 
