@@ -26,6 +26,7 @@ class Sirius_Dispatch_Report_Job_Status extends Report_Cache_Report_Generator {
           'worker_count_yes',
           'worker_count_no',
         ),
+        'preview_links' => TRUE,
       ),
     );
     return parent::info($result);

@@ -100,12 +100,12 @@ function sirius_trust_report_cache_info() {
 
   $items['sirius-trust-eligibility-compare'] = sirius_trust_report_eligibility_compare_info();
   $items['sirius-trust-worker-benefit'] = sirius_trust_report_worker_benefit_info();
-  $items['sirius-trust-worker-summary'] = sirius_trust_report_worker_benefit_summary_info();
   $items['sirius-trust-worker-change'] = sirius_trust_report_worker_benefit_change_info();
   $items['sirius-trust-relationship-sequence'] = sirius_trust_report_relationship_sequence_info();
 
   Sirius_Trust_Report_Newhire::getInstance()->setInfo($items);
   Sirius_Trust_Report_Hour::getInstance()->setInfo($items);
+  Sirius_Trust_Report_WB_Summary::getInstance()->setInfo($items);
 
   // $items['sirius-trust-worker-detail'] = sirius_trust_report_worker_benefit_detail_info();
 

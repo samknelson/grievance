@@ -77,15 +77,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_di
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_dispatch/sirius_dispatch.term_tab_industry.inc';
 
 /**
- * Implements hook_cron
- */
-
-function sirius_dispatch_cron() {
-  sirius_dispatch_run_all();
-  sirius_dispatch_threestrikes_cron();
-}
-
-/**
  * Implements hook_sirius_domain_component_info
  */
 
@@ -100,6 +91,16 @@ function sirius_dispatch_sirius_domain_component_info() {
       'description' => 'Perform "Live" dispatches, allowing workers to accept and decline dispatch notifications.',
     ),
   );
+}
+
+/** 
+ * Implements hook_sirius_access_info
+ */
+
+function sirius_dispatch_sirius_access_info() {
+  $infos = array();
+  Sirius_Dispatch_Access::getInstance()->setInfo($infos);
+  return $infos;
 }
 
 /**
@@ -158,6 +159,24 @@ function sirius_dispatch_sirius_cron_scan_info() {
     'description' => 'Close all jobs whose report date has passed',
     'schedule' => 'hourly',
     'callback' => 'sirius_dispatch_close_after_report_date',
+    'multidomain' => FALSE,
+    'component' => 'dispatch:live',
+  );
+
+  $items['dispatch_threestrikes'] = array(
+    'title' => 'Implement the "Three Strikes" Rule',
+    'description' => '',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_dispatch_threestrikes_cron',
+    'multidomain' => FALSE,
+    'component' => 'dispatch:live',
+  );
+
+  $items['dispatch_run'] = array(
+    'title' => 'Poll Running Jobs',
+    'description' => 'For all jobs with status "running", poll the job to create new dispatches',
+    'schedule' => 'immediate',
+    'callback' => 'sirius_dispatch_run_all',
     'multidomain' => FALSE,
     'component' => 'dispatch:live',
   );
@@ -467,13 +486,81 @@ function sirius_dispatch_node_view($node, $view_mode, $langcode) {
 function sirius_dispatch_sirius_dispatch_elig_info() {
   sirius_require('sirius_dispatch', 'sirius_dispatch.1for1.inc');
   sirius_require('sirius_dispatch', 'sirius_dispatch.nosecondaryatprimary.inc');
+  sirius_require('sirius_dispatch', 'sirius_dispatch.loseseniorityafternotify.inc');
 
   $items = array();
   Sirius_Dispatch_1for1::getInstance()->setInfo($items);
   Sirius_Dispatch_Nosecondaryatprimary::getInstance()->setInfo($items);
+  Sirius_Dispatch_Loseseniorityafternotify::getInstance()->setInfo($items);
   return $items;
 }
 
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_dispatch_sirius_backlinks_from_node_alter(&$links, $node) {
+  if ($node->type == 'sirius_dispatch_job_group') {
+    $links['sirius/dispatch/groups'] = array('name' => 'All Job Groups');
+  }
+}
+
 function sirius_dispatch_status_options() {
-  return list_allowed_values(field_info_field('field_sirius_dispatch_status'));
+  $options = array();
+  $statuses = sirius_dispatch_statuses();
+  foreach ($statuses as $status => $record) { $options[$status] = $record['title']; }
+  return $options;
+}
+
+function sirius_dispatch_status_title($status) {
+  return sirius_dispatch_statuses()[$status]['title'];
+}
+
+function sirius_dispatch_status_color($status) {
+  return sirius_dispatch_statuses()[$status]['color'];
+}
+
+function sirius_dispatch_statuses() {
+  return array(
+    'requested' => array(
+      'title' => t('Requested'),
+      'color' => 'yellow',
+    ),
+    'notified' => array(
+      'title' => t('Notified'),
+      'color' => 'yellow',
+    ),
+    'notification failed' => array(
+      'title' => t('Notification failed'),
+      'color' => 'red',
+    ),
+    'accepted' => array(
+      'title' => t('Accepted'),
+      'color' => 'green',
+    ),
+    'accepted_secondary' => array(
+      'title' => t('Accepted (secondary)'),
+      'color' => 'green',
+    ),
+    'declined' => array(
+      'title' => t('Declined'),
+      'color' => 'red',
+    ),
+    'expired' => array(
+      'title' => t('Expired'),
+      'color' => 'red',
+    ),
+    'resigned' => array(
+      'title' => t('Voluntary layoff'),
+      'color' => 'red',
+    ),
+    'vlri' => array(
+      'title' => t('Voluntary layoff request involuntary'),
+      'color' => 'red',
+    ),
+    'terminated' => array(
+      'title' => t('Layoff'),
+      'color' => 'red',
+    ),
+  );
 }

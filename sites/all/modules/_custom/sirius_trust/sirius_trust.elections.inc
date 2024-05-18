@@ -379,7 +379,6 @@ function sirius_trust_election_wizard_search($params) {
 	return $results;
 }
 
-
 function sirius_trust_election_wizard_status_options() {
 	return array(
 		'draft' => t('Draft'),

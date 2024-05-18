@@ -475,6 +475,62 @@ $items['sirius/skill/settings'] = array(
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sirius/worker/config/create'] = array(
+    'title' => 'Worker Creation Configuration',
+    'description' => '',
+    'access arguments' => array('sirius worker admin'),
+    'page callback' => 'sirius_worker_page_config_create',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'access' => array(
+          'type' => 'worker',
+          'action' => 'config',
+        ),
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_worker.page_config_create.inc',
+  );
+
+
+  $items['sirius/worker/create'] = array(
+    'title' => 'Create a Worker',
+    'description' => '',
+    'page callback' => 'sirius_worker_page_create_intro',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'access' => array(
+          'type' => 'worker',
+          'action' => 'create worker',
+        ),
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_worker.page_create_intro.inc',
+  );
+
+  $items['sirius/worker/create/%'] = array(
+    'title' => 'Create a Worker',
+    'description' => '',
+    'page callback' => 'sirius_worker_page_create',
+    'page arguments' => array(3),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'access' => array(
+          'type' => 'worker',
+          'action' => 'create worker',
+        ),
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_worker.page_create.inc',
+  );
+
   $items['sirius/worker/ein'] = array(
     'title' => 'Employee ID Numbers',
     'access callback' => 'sirius_worker_page_ein_access',

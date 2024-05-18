@@ -15,13 +15,7 @@ function sirius_result_create($obj_or_array) {
 	}
 
 	$result = new SiriusResult();
-	$result->setMsg($obj_or_array['msg']);
-	$result->setSuccess($obj_or_array['success']);
-
-	$data = $obj_or_array;
-	unset($obj_or_array['msg']);
-	unset($obj_or_array['success']);
-	$result->setData($data);
+	$result->data = $obj_or_array;
 	return $result;
 }
 
@@ -30,15 +24,39 @@ function sirius_result_create($obj_or_array) {
  */
 
 class SiriusResult {
-	public $success = FALSE;
-	public $msg = '';
+	public static function create($obj_or_array) {
+		if (is_object($obj_or_array)) {
+			return $obj_or_array;
+		}
+
+		$result = new SiriusResult();
+		$result->data = $obj_or_array;
+		return $result;
+	}
+	
 	public $data = array();
 
-	public function setData($data) { $this->data = $data; }
-	public function setMsg($msg) { $this->msg = $msg; }
-	public function setSuccess($success) { $this->success = $success; }
+	public function msg() { return $this->data['msg']; }
+	public function success() { return $this->data['success']; }
 
-	public function getData() { return $this->data; }
-	public function getMsg() { return $this->msg; }
-	public function getSuccess() { return $this->success; }
+	public function get($name) { return $this->data[$name]; }
+	public function set($name, $value) { $this->data[$name] = $value; }
+
+	public function data() { return $this->data; }
+
+	public function drupalSetMessage() {
+		if ($this->success()) {
+			if ($this->msg()) {
+				drupal_set_message("Success: " . $this->msg());
+			} else {
+				drupal_set_message("Success.");
+			}
+		} else {
+			if ($this->msg()) {
+				drupal_set_message("Error: " . $this->msg(), 'error');
+			} else {
+				drupal_set_message("Error.", 'error');
+			}
+		}
+	}
 }

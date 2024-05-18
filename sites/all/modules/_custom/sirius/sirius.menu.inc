@@ -331,6 +331,24 @@ function sirius_node_tabs() {
     'weight' => 1,
   );
 
+  $node_tabs['sirius_json_definition']['sirius_json_definition_disclaimer/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_json_definition_disclaimer',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_json_definition_disclaimer/preview'] = array(
+    'title' => 'Preview',
+    'description' => '',
+    'callback' => 'sirius_node_tab_disclaimer_definition_preview',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 2,
+    'file' => 'sirius.page_disclaimer_definition_preview.inc',
+  );
+
   $node_tabs['sirius_json_definition']['sirius_customfield_content_types'] = array(
     'title' => 'Content Types',
     'description' => '',
@@ -609,10 +627,10 @@ function sirius_menu() {
   );
 
   $items['sirius/admin/do_not_disturb'] = array(
-    'title' => 'Do Not Disurb Configuration',
+    'title' => 'Do Not Disturb Configuration',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_config',
+    'page callback' => 'sirius_page_do_not_disturb_config',
     'page arguments' => array(),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -621,7 +639,7 @@ function sirius_menu() {
     'title' => 'Settings',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_config',
+    'page callback' => 'sirius_page_do_not_disturb_config',
     'page arguments' => array(),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
@@ -631,7 +649,7 @@ function sirius_menu() {
     'title' => 'Test',
     'description' => '',
     'access arguments' => array('sirius domain admin'),
-    'page callback' => 'sirius_page_do_not_disurb_test',
+    'page callback' => 'sirius_page_do_not_disturb_test',
     'page arguments' => array(),
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
@@ -937,7 +955,7 @@ function sirius_menu() {
     'access callback' => TRUE,
     'page callback' => 'sirius_sns_incoming',
     'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
   );
 
   $items['sirius/sns/config'] = array(

@@ -486,7 +486,7 @@ function sirius_dispatch_job_counts_render($job_nid) {
 
 		'declined' => array(
 			'title' => 'Declined',
-			'color' => 'grey',
+			'color' => 'red',
 			'statuses' => array('declined', 'notification failed', 'expired'),
 		),
 	);
@@ -504,10 +504,9 @@ function sirius_dispatch_job_counts_render($job_nid) {
 		}
 
 		// if (!$total) { continue; }
-		$data = '<strong>' . $total . '</strong>';
+		$data = '<strong>' . $record['title'] . ': ' . $total . '</strong>';
 		if ($details) { $data .= ' (' . join(', ', $details) . ')'; }
 		$row[] = array('data' => $data, 'class' => array($record['color']), 'style' => 'width: 33%;');
-		$header[] = $record['title'];
 	}
 	$rows[] = $row;
 

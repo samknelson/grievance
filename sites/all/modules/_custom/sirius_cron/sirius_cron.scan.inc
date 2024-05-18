@@ -104,6 +104,15 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live', $options = array
 		return array('success' => FALSE, 'msg' => $msg);
 	}
 
+	// Disabled?
+	$scan_node = sirius_cron_scan_get($key, TRUE);
+	$scan_json = sirius_json_get($scan_node);
+	if (!$force && ($scan_json['cron']['disable'] == 'Yes')) {
+		$msg = "Cron scan: $info[title]: This cron scan is disabled.";
+		sirius_minilog($msg);
+		return array('success' => TRUE, 'msg' => $msg);
+	}
+
 	// Too soon to run?
 	if ($info['schedule'] == 'daily') { $today = gmdate('Y-m-d'); }
 	else if ($info['schedule'] == 'hourly') { $today = gmdate('Y-m-d H'); }
@@ -117,10 +126,15 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live', $options = array
 	}
 	variable_set("sirius_cron_scan_${key}_last_run", $today);
 
-	$scan_node = sirius_cron_scan_get($key, TRUE);
-	$scan_json = sirius_json_get($scan_node);
 	$scan_json['cron']['start_ts'] = time();
 	sirius_minilog("Cron scan: $info[title]: Starting.");
+
+	if ($mode == 'live') {
+		if ($scan_json['cron']['settings']['disabled'] == 'Yes') {
+			sirius_minilog("This cron job is disabled.");
+			return array('success' => TRUE, 'msg' => 'Cron job is disabled.');
+		}
+	}
 
 	if ($info['multidomain']) {
 		$domains = sirius_domain_tree_render_as_select();
@@ -157,6 +171,7 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live', $options = array
 		}
 		$result = array('success' => TRUE, 'msg' => "Scanned $count domains, with $count_success success and $count_failure failures.");
 	} else {
+		drupal_set_message("About to $info[callback] with $mode");
 		$result = $info['callback']($mode, $force, $options);
 	}
 

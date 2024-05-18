@@ -169,15 +169,26 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 		);
 	}
 
+	$color = sirius_dispatch_status_color($dispatch_node->field_sirius_dispatch_status['und'][0]['value']);
 
-	$form['dispatch_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_dispatch_section">');
+	$form['dispatch_section_open'] = array('#markup' => "<div class=\"sirius_dispatch_view_dispatch_section sirius_dispatch_view_$color\">");
 	$form['dispatch_section_qr'] = array('#markup' => sirius_qr_url());
-	$form['dispatch_section_a'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_dispatch_status', t('Dispatch Status')));
+
+	$form['dispatch_section_a'] = array('#markup' => 
+		'<div class="sirius_dispatch_field_wrapper_status">' . 
+		sirius_fakerender_field(
+			t('Dispatch Status:'), 
+			sirius_dispatch_status_title($dispatch_node->field_sirius_dispatch_status['und'][0]['value'])
+		) .
+		'</div><br /><br />'
+	);
+
 	$form['dispatch_section_b'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_id', t('Request ID')));
 	$form['dispatch_section_c'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_dispatch_cbn', t('Call by Name?')));
 	$form['dispatch_section_d'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_payrate', t('Pay Rate')));
 
 	// @TODO: Broken now
+	/*
 	$account_options = sirius_ledger_account_list();
 	$account_nids = array_filter(array_values(sirius_domain_variable_get('sirius_dispatch_view_accounts', array())));
 	$policy_node = sirius_ledger_policy_lookup($worker_node);
@@ -199,6 +210,7 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 			}
 		}
 	}
+	*/
 
 	$form['dispatch_section_e'] = array('#markup' => sirius_fakerender_field('Report #', $dispatch_node->nid));
 	$form['dispatch_section_close'] = array('#markup' => '</div>');
@@ -450,17 +462,19 @@ function sirius_dispatch_view_admin() {
 	  );
 	}
 
-	$accounts = sirius_ledger_account_list();
-	if ($accounts) {
-	  $var = sirius_domain_variable_name('sirius_dispatch_view_accounts');
-	  $form[$var] = array(
-	    '#type' => 'checkboxes',
-	    '#title' => t('Accounts'),
-	    '#description' => t('If you wish to show fund rates for certain accounts, select them here.'),
-	    '#default_value' => variable_get($var, NULL),
-	    '#options' => $accounts,
-	    '#checkall' => TRUE,
-	  );
+	if (function_exists('sirius_ledger_account_list')) {
+		$accounts = sirius_ledger_account_list();
+		if ($accounts) {
+		  $var = sirius_domain_variable_name('sirius_dispatch_view_accounts');
+		  $form[$var] = array(
+		    '#type' => 'checkboxes',
+		    '#title' => t('Accounts'),
+		    '#description' => t('If you wish to show fund rates for certain accounts, select them here.'),
+		    '#default_value' => variable_get($var, NULL),
+		    '#options' => $accounts,
+		    '#checkall' => TRUE,
+		  );
+		}
 	}
 
   return system_settings_form($form);

@@ -41,7 +41,10 @@ function sirius_quickactions_render() {
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/quickactions.css');
 
 	foreach ($links as $delta => $link) {
-		$links[$delta] = array('#markup' => sirius_sirius_quickaction_render($link));
+		$links[$delta] = array(
+			'#markup' => sirius_sirius_quickaction_render($link),
+			'#weight' => 1000,
+		);
 	}
 	return $links;
 }
@@ -166,6 +169,10 @@ function sirius_backlinks_from_node($node) {
 	if ($node->type == 'sirius_phonenumber') { $links['sirius/phonenumber'] = array('name' => 'Phone Number List'); }
 	if ($node->type == 'sirius_trust_benefit') { $links['sirius/trust/benefits'] = array('name' => 'Benefit List'); }
 	if ($node->type == 'sirius_letterhead') { $links['sirius/admin/letterhead'] = array('name' => 'Letterhead List'); }
+	if ($node->type == 'sirius_news') {
+		$links['sirius/news'] = array('name' => 'News');
+		$links['sirius/news/admin'] = array('name' => 'Admin');
+	}
 
 	if ($node->type == 'grievance_contract_template') {
 		$links['grievance/admin/contract-templates'] = array('name' => 'Contract List');
@@ -256,6 +263,10 @@ function sirius_backlinks_from_node($node) {
 				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:checkin')				{ $path = "node/$handler_nid/sirius_worker_steward/checkin"; }
 				else if ($handler_type == 'grievance_shop' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_employer_steward/sched"; }
 				else if ($handler_type == 'sirius_worker' && $log_category == 'steward:sched')					{ $path = "node/$handler_nid/sirius_worker_steward/checkin-history"; }
+				else if ($handler_type == 'sirius_worker' && $log_category == 'cardcheck')							{ 
+					$path = "node/$handler_nid/sirius_worker_cardchecks";
+					$name = "All Card Checks";
+				}
 				else if ($log_category == 'letter') {
 					$path = "node/$handler_nid/${handler_type}_letter";
 				}
@@ -296,6 +307,8 @@ function sirius_backlinks_from_node($node) {
 		if ($definition_type == 'sirius_event:catalog')	{ $links['sirius/event/catalog/list'] = array('name' => 'All Catalogs'); }
 		else if ($definition_type == 'sirius_ledger:policy') { $links['sirius/config/ledger/policies'] = array('name' => 'All Policies'); }
 		else if ($definition_type == 'customfield') { $links['sirius/customfield/definition/list'] = array('name' => 'All Custom Field Sets'); }
+		else if ($definition_type == 'sirius:disclaimer') { $links['sirius/disclaimer/list'] = array('name' => 'All Disclaimers'); }
+		else if ($definition_type == 'sirius:cardcheck') { $links['sirius/cardcheck/definitions'] = array('name' => 'All Card Checks'); }
 	}
 
 	if ($node->type == 'grievance_basic_page') {

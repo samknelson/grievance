@@ -17,12 +17,21 @@ function sirius_cron_node_tabs() {
     'file' => 'sirius_cron.page_scan_info.inc',
   );
 
+  $node_tabs['sirius_json_definition']['sirius_cron_scan_disable'] = array(
+    'title' => 'Enable / Disable',
+    'description' => '',
+    'callback' => 'sirius_cron_node_tab_scan_disable',
+    'permissions' => array('sirius admin'),
+    'weight' => 2,
+    'file' => 'sirius_cron.page_scan_disable.inc',
+  );
+
   $node_tabs['sirius_json_definition']['sirius_cron_scan_run'] = array(
     'title' => 'Run',
     'description' => '',
     'callback' => 'sirius_cron_node_tab_scan_run',
     'permissions' => array('sirius admin'),
-    'weight' => 2,
+    'weight' => 3,
     'file' => 'sirius_cron.page_scan_run.inc',
   );
 

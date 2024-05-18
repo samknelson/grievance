@@ -25,6 +25,7 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
           'violation_name',
           'violation_details',
         ),
+        'preview_links' => TRUE,
       ),
     );
 

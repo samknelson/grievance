@@ -40,6 +40,7 @@ class Sirius_Trust_Report_Newhire extends Report_Cache_Report_Generator {
           'hours_total',
           'hours_at_tirggering_employer',
         ),
+        'preview_links' => TRUE,
       ),
       'operations' => array(
         'contact' => array(

@@ -848,6 +848,9 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 }
 
 function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$context) {
+	// Disable realtime denormalization
+	sirius_denorm_realtime(FALSE);
+
 	// Load include files
 	$wizard_name = $info['name'];
 	sirius_wizard_info($wizard_name);
@@ -955,6 +958,9 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 }
 
 function sirius_feed_wizard_process_finish($feed_node, $info, $data, $idx, &$context) {
+	// Disable realtime denormalization
+	sirius_denorm_realtime(FALSE);
+
 	$context['message'] = "Cleaning up.";
 	$data['feed']['counts'] = $context['results']['counts'];
 	if ($data['feed']['counts']) { ksort($data['feed']['counts']); }
@@ -1140,7 +1146,7 @@ function sirius_feed_handle_field($field_name, $field_info, &$value, $precompute
   // Expensive tests
   if ($precompute) {
     if ($field_info['type'] == 'entity_reference') {
-      $value = sirius_feed_handle_entity_reference($field_info['entity_type'], $value);
+      $value = sirius_feed_handle_entity_reference($field_info['entity_type'], $field_info['bundle'], $value);
       if (!$value) { return array('success' => FALSE, 'msg' => "$field_name invalid: no value found (or multiple values found) in the entity type: $field_info[entity_type]."); }
     }
   }
@@ -1193,18 +1199,19 @@ function sirius_feed_handle_date($field_name, $value) {
   return gmdate('Y-m-d', $ts);
 }
 
-function sirius_feed_handle_entity_reference($entity_type, $value) {
+function sirius_feed_handle_entity_reference($entity_type, $bundle, $value) {
 	if (!$entity_type) { $entity_type = 'node'; }
 
 	if ($entity_type == 'node') {
 	  $sql = "select min(nid) as mn, max(nid) as mx from node ";
 	  $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
 	  $sql .= "left join field_data_field_sirius_name_short on field_data_field_sirius_name_short.entity_type = 'node' and field_data_field_sirius_name_short.entity_id = node.nid ";
-	  $sql .= "where nid = :v1 ";
+	  $sql .= "where type = :bundle ";
+	  $sql .= "and (nid = :v1 ";
 	  $sql .= "or title = :v2 ";
 	  $sql .= "or field_sirius_id_value = :v3 ";
-	  $sql .= "or field_sirius_name_short_value = :v4 ";
-	  $stmt = sirius_sql_query($sql, array(':v1' => $value, ':v2' => $value, ':v3' => $value, ':v4' => $value));
+	  $sql .= "or field_sirius_name_short_value = :v4) ";
+	  $stmt = sirius_sql_query($sql, array(':bundle' => $bundle, ':v1' => $value, ':v2' => $value, ':v3' => $value, ':v4' => $value));
 	  $hr = $stmt->fetchAssoc();
 	  if (!$hr['mn']) { return NULL; }
 	  if ($hr['mn'] != $hr['mx']) { return NULL; }

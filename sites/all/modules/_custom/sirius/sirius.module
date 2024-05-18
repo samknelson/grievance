@@ -140,6 +140,14 @@ function sirius_sirius_cron_scan_info() {
     'multidomain' => FALSE,
   );
 
+  $items['sirius_cleanup_temporary_files'] = array(
+    'title' => 'Cleanup Temporary Files',
+    'description' => 'Deletes any temporary files that are not referenced.',
+    'schedule' => 'daily',
+    'callback' => 'sirius_cleanup_temporary_files',
+    'multidomain' => FALSE,
+  );
+
   return $items;
 }
 
@@ -1280,4 +1288,40 @@ function sirius_str_to_options($str) {
   }
 
   return $options;
+}
+
+function sirius_cleanup_temporary_files($mode = 'test') {
+  sirius_minilog("Starting temporary file cleanup.");
+
+  $sql = "select file_managed.fid from file_managed ";
+  $sql .= "left join file_usage on file_usage.fid = file_managed.fid ";
+  $sql .= "where file_usage.fid is null ";
+  $sql .= "and file_managed.status = 0 ";
+  $sql .= "and timestamp < :cutoff ";
+  $sql .= "order by file_managed.fid ";
+  $sql .= "limit 100 ";
+  $stmt = db_query($sql, array(':cutoff' => time() - 60*60*24*7));
+
+  $fids = array();
+  while ($hr = $stmt->fetchAssoc()) { $fids[] = $hr['fid']; }
+
+  if (!$fids) {
+    sirius_minilog("No files found.");
+    return array('success' => TRUE, 'count' => 0);
+  }
+
+  $count = 0;
+  foreach ($fids as $fid) {
+    ++$count;
+    sirius_minilog("Purging file: $fid");
+    if ($mode == 'live') {
+      $sql = "delete from file_managed where fid = :fid";
+      $stmt = db_query($sql, array(':fid' => $fid));
+    } else {
+      sirius_minilog("-- Skipping purge because mode = $mode.");
+    }
+  }
+
+  sirius_minilog("Cleaned up $count files.");
+  return array('success' => TRUE, 'count' => $count);
 }

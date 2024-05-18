@@ -18,6 +18,17 @@
 	margin-bottom: 10px;
 }
 
+.sirius_callout_inactive,
+.sirius_callout_gray,
+.sirius_callout_grey { background-color: #bbbbbb; }
+.sirius_callout_error,
+.sirius_callout_red { background-color: #ff9999; }
+.sirius_callout_green,
+.sirius_callout_success { background-color: #99ff99; }
+.sirius_callout_warning,
+.sirius_callout_yellow { background-color: #ffff99; }
+.sirius_callout_blue { background-color: #9999ff; }
+
 #content .sirius_callout_basic h2,
 #content .sirius_callout_fullwidth h2 {
 	margin-top: 0;

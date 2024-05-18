@@ -434,6 +434,29 @@ function sirius_update_7026() {
   }
 }
 
+/**
+ * Opt out of announcements
+ */
+
+function sirius_update_7027() {
+  variable_set('announcements_feed_enable_by_default_opt_out', TRUE);
+  // Enable some modules
+  $modules = array('announcements_feed');
+  foreach ($modules as $module) {
+    print "Disabling $module\n";
+    module_disable(array($module), TRUE);
+  }
+}
+
+/**
+ * update the sirius_gender field for Workers
+ */
+
+function sirius_update_7028() {
+  sirius_require('sirius', 'install/sirius.update_7028.inc');
+  sirius_update_7028_impl();
+}
+
 function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
   foreach ($if_you_haves as $if_you_have) {
     foreach ($then_you_gets as $then_you_get) {
@@ -446,4 +469,6 @@ function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
     }
   }
 }
+
+
 

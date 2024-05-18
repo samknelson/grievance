@@ -5,10 +5,6 @@ function sirius_cron_node_tab_scan_run_access($scan_node) {
 	return TRUE;
 }
 
-function sirius_cron_node_tab_scan_run($scan_node) {
-	return drupal_get_form('sirius_cron_node_tab_scan_run_form', $scan_node);
-}
-
 function sirius_cron_node_tab_scan_run_form($form, &$form_state, $scan_node) {
 	$form_state['scan_nid'] = $scan_node->nid;
 
@@ -28,10 +24,11 @@ function sirius_cron_node_tab_scan_run_form($form, &$form_state, $scan_node) {
 		'#title' => t('Force?'),
 		'#type' => 'select',
 		'#options' => array(
-			FALSE => t('No, run on the normal schedule'),
-			TRUE => t('Yes, run even if it is too soon'),
+			FALSE => t('No'),
+			TRUE => t('Yes'),
 		),
 		'#required' => TRUE,
+		'#description' => t('Select "Yes" to run this job even if it is disabled, or if it is not scheduled to run yet.'),
 	);
 
 	$scan_key = sirius_cron_scan_key($scan_node);

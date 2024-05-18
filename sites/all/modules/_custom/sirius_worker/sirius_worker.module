@@ -17,10 +17,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.schedule.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.schedule_tor.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.history.inc";
-
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_duplicate_id.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_multiple_member_status.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.report_skill_log.inc";
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.create.inc";
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_list.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_user.inc";
@@ -48,7 +45,7 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tor.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_subscribe.inc";
 
-function sirius_worker_get_by_id($id) {
+function sirius_worker_get_by_id($id, $nid_only = FALSE) {
 	if (!$id) { return NULL; }
 
   $query = new EntityFieldQuery;
@@ -60,6 +57,8 @@ function sirius_worker_get_by_id($id) {
 	$query->propertyOrderBy('nid', 'desc');
 	$stmt = $query->execute();
 	if (!$stmt['node']) { return NULL; }
+
+  if ($nid_only) { return array_keys($stmt['node'])[0]; }
 
 	return node_load(array_keys($stmt['node'])[0]);
 }
@@ -129,7 +128,6 @@ function sirius_worker_get_by_phone($phone) {
 
   return node_load(array_keys($stmt['node'])[0]);
 }
-
 
 /*
  * Post-save
@@ -291,12 +289,48 @@ function sirius_worker_nextid() {
   return $id;
 }
 
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function sirius_worker_sirius_config_links_alter(&$links) {
+  $links['worker']['title'] = 'Worker';
+  $links['worker']['links']['sirius/worker/config/create'] = array('title' => 'Worker Creation', 'description' => 'Configure how workers are created.');
+  $links['worker']['links']['sirius/worker/config/user'] = array('title' => 'Worker / User Sync', 'description' => 'Configure how users are created from workers.');
+  $links['worker']['links']['admin/config/grievance/workersync'] = array('title' => 'Worker Database', 'description' => 'Configure the connection between the grievance module and the worker database.');
+  $links['worker']['links']['sirius/skill/settings'] = array('title' => 'Skill Settings', 'description' => 'Configure settings for skill management and display.');
+
+}
+
+/** 
+ * Implements hook_sirius_access_info
+ */
+
+function sirius_worker_sirius_access_info() {
+  $infos = array();
+  Sirius_Worker_Access::getInstance()->setInfo($infos);
+  return $infos;
+}
+
 /***
  * Implements hook_report_cache_info() 
  */
 
 function sirius_worker_report_cache_info() {
+  sirius_require('sirius_worker', 'sirius_worker.report_duplicate_id.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_multiple_member_status.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_skill_log.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_ssn_duplicate.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_ssn_invalid.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_ssn_missing.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_geo.inc');
+
   $items = array();
+
+  Sirius_Worker_Report_Ssn_Invalid::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Ssn_Missing::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Ssn_Duplicate::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Geo::getInstance()->setInfo($items);
 
   $items['sirius-worker-duplicate-id'] = array(
     'name' => t('Workers with Duplicate IDs'),
@@ -339,68 +373,6 @@ function sirius_worker_report_cache_info() {
       'Details' => 'sirius_worker_report_skill_log_view_detail',
     ),
     'module' => 'sirius_worker',
-  );
-
-  $items['sirius-worker-ssn-missing'] = array(
-    'name' => t('SSN Missing'),
-    'description' => '',
-    'access' => 'sirius worker view',
-    'fields' => array(
-      'worker_nid' => 'Worker NID',
-      'worker_title' => 'Worker Name',
-      'worker_id' => 'Worker ID',
-    ),
-    'form_callback' => 'sirius_worker_report_ssn_missing_form',
-    'pk_list_callback' => 'sirius_worker_report_ssn_missing_pks',
-    'batch_callback' => 'sirius_worker_report_ssn_missing_batch',
-    'render_callbacks' => array(
-      'View' => 'sirius_worker_report_ssn_missing_view',
-    ),
-    'file' => 'sirius_worker.report_ssn_missing.inc',
-    'module' => 'sirius_worker',
-    'dashboard' => TRUE,
-  );
-
-  $items['sirius-worker-ssn-invalid'] = array(
-    'name' => t('SSN Invalid'),
-    'description' => '',
-    'access' => 'sirius worker view',
-    'fields' => array(
-      'worker_nid' => 'Worker NID',
-      'worker_title' => 'Worker Name',
-      'worker_id' => 'Worker ID',
-      'ssn' => 'SSN',
-    ),
-    'form_callback' => 'sirius_worker_report_ssn_invalid_form',
-    'pk_list_callback' => 'sirius_worker_report_ssn_invalid_pks',
-    'batch_callback' => 'sirius_worker_report_ssn_invalid_batch',
-    'render_callbacks' => array(
-      'View' => 'sirius_worker_report_ssn_invalid_view',
-    ),
-    'file' => 'sirius_worker.report_ssn_invalid.inc',
-    'module' => 'sirius_worker',
-    'dashboard' => TRUE,
-  );
-
-  $items['sirius-worker-ssn-duplicate'] = array(
-    'name' => t('SSN Duplicate'),
-    'description' => '',
-    'access' => 'sirius worker view',
-    'fields' => array(
-      'worker_nid' => 'Worker NID',
-      'worker_title' => 'Worker Name',
-      'worker_id' => 'Worker ID',
-      'ssn' => 'SSN',
-    ),
-    'form_callback' => 'sirius_worker_report_ssn_duplicate_form',
-    'pk_list_callback' => 'sirius_worker_report_ssn_duplicate_pks',
-    'batch_callback' => 'sirius_worker_report_ssn_duplicate_batch',
-    'render_callbacks' => array(
-      'View' => 'sirius_worker_report_ssn_duplicate_view',
-    ),
-    'file' => 'sirius_worker.report_ssn_duplicate.inc',
-    'module' => 'sirius_worker',
-    'dashboard' => TRUE,
   );
 
   return $items;

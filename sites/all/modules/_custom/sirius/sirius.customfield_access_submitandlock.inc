@@ -14,6 +14,11 @@ class Sirius_Customfield_Access_SubmitAndLock extends Sirius_Access {
   	if (!$admin_rids) { $admin_rids = array(); }
   	$admin_rids = array_filter(array_values($admin_rids));
 
+  	// Materials can be turned off altogether.
+  	if (preg_match('/^material/', $action) && ($context['settings']['allow_materials'] == 'No')) {
+  		return FALSE;
+  	}
+
   	global $user;
   	$my_rids = array();
   	if ($user && $user->roles) { 
@@ -64,6 +69,17 @@ class Sirius_Customfield_Access_SubmitAndLock extends Sirius_Access {
 			'#options' => user_roles(TRUE),
 			'#checkall' => TRUE,
 			'#description' => t('These roles have permission to perform any action on entries, even after they has been submitted.'),
+		);
+
+		$form['allow_materials'] = array(
+			'#title' => t('Allow access to the materials tab?'),
+			'#type' => 'select',
+			'#options' => array(
+				NULL => t('-- Select --'),
+				'No' => t('No'),
+				'Yes' => t('Yes'),
+			),
+			'#checkall' => TRUE,
 		);
 
 		return $form;
