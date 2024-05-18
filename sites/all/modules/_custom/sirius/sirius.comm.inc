@@ -88,7 +88,24 @@ class Sirius_Comm extends Sirius_Singleton {
 
     $attachments = $params['attachments'];
 
+    // @todo: This is a hack that should be fixed.
+    //        Sometimes client code will set both a "body" and a value for the medium-specific body.
+    //        (For instance, we lazily build a set of params and send it both by email and sms)
+    //        When that happens, we need to call send_impl with the correct body, but remember
+    //        the old body for later.
+
+    $conflict_check = FALSE;
+    if ($params['body'] && $params[$medium]) {
+    	$conflict_check = TRUE;
+    	$orig_body = $params['body'];
+    	$params['body'] = $params[$medium];
+    }
+
 		$result = $this->send_impl($params);
+
+		if ($conflict_check) {
+			$params['body'] = $orig_body;
+		}
 
 		if ($result['success']) { $log_type = 'sending'; } else { $log_type = 'error'; }
 
