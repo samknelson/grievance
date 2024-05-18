@@ -72,6 +72,8 @@ table.sirius_table td p {
 
 .sirius_table_basic th {
 	border-bottom: 3px solid #aaaaaa;
+	font-weight: bold;
+	background-color: #ffffff;
 }
 
 .sirius_table_basic tr,
