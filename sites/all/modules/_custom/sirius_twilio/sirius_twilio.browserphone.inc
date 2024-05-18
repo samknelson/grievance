@@ -442,7 +442,7 @@ function sirius_twilio_browserphone_render_error($msg) {
 function sirius_twilio_browserphone_parameters_get_node($capability_token) {
   if (!$capability_token) { return NULL; }
   
-  // We look for the most recent outgoing log entry of type "twilio:conversation"
+  // We look for the most recent outgoing log entry of type "twilio:browserphone"
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node');
   $query->entityCondition('bundle', 'sirius_log');
