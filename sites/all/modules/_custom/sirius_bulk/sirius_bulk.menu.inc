@@ -39,6 +39,16 @@ function sirius_bulk_node_tabs() {
     'component' => 'bulk',
   );
 
+  $node_tabs['sirius_bulk']['sirius_bulk_body_postal'] = array(
+    'title' => 'Postal Message',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_body_postal',
+    'permissions' => array('sirius bulk send'),
+    'weight' => 2,
+    'file' => 'sirius_bulk.page_body_postal.inc',
+    'component' => 'bulk',
+  );
+
   $node_tabs['sirius_bulk']['sirius_bulk_body_email'] = array(
     'title' => 'Email Message',
     'description' => '',
@@ -140,6 +150,16 @@ function sirius_bulk_node_tabs() {
     'component' => 'bulk',
   );
 
+  $node_tabs['sirius_log']['sirius_bulk_recipient'] = array(
+    'title' => 'Bulk Recipient',
+    'description' => '',
+    'callback' => 'sirius_bulk_node_tab_recipient',
+    'permissions' => array('sirius bulk admin'),
+    'weight' => 7,
+    'file' => 'sirius_bulk.page_recipient.inc',
+    'component' => 'bulk',
+  );
+
   sirius_node_tab_set_module('sirius_bulk', $node_tabs);
 	return $node_tabs;
 }
@@ -179,16 +199,6 @@ function sirius_bulk_menu() {
     'page arguments' => array('sirius_bulk_config'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
-  );
-
-  $items['sirius/bulk/config/poll'] = array(
-    'title' => 'Poll',
-    'description' => '',
-    'access arguments' => array('sirius bulk admin'),
-    'page callback' => 'sirius_bulk_page_poll',
-    'page arguments' => array(),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
   );
 
   $items['sirius/bulk/oneclick'] = array(

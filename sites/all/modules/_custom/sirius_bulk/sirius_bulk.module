@@ -24,11 +24,34 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.p
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_bulk/sirius_bulk.page_manual.inc";
 
 /**
- * Implements hook_cron()
+ * Implements hook_sirius_cron_scan_info()
  */
 
-function sirius_bulk_cron() {
-	sirius_bulk_deliver();
+function sirius_bulk_sirius_cron_scan_info() {
+  $items['sirius_bulk_deliver'] = array(
+    'title' => 'Bulk Deliver',
+    'description' => 'Deliver any pending bulk messages.',
+    'schedule' => 'always',
+    'callback' => 'sirius_bulk_deliver',
+    'multidomain' => FALSE,
+    'component' => 'bulk',
+    /*
+    'options_form' => array(
+    	'ignore_time_restrictions' => array(
+	    	'#type' => 'select',
+	    	'#title' => 'Ignore all time restrictions?',
+	    	'#options' => array(
+	    		NULL => '-- Select --',
+	    		'No' => 'No',
+	    		'Yes' => 'Yes',
+	    	),
+	    	'#description' => 'If you select "Yes", then all time restrictions will be ignored. This includes throttles to limit excessive sending, as well as any Do Not Disturb restrictions.',
+	    ),
+    ),
+    */
+  );
+
+  return $items;
 }
 
 function sirius_bulk_form_alter(&$form, &$form_state, $form_id) {
@@ -78,20 +101,17 @@ function sirius_bulk_views_pre_render(&$view) {
 }
 
 function sirius_bulk_media()  {
-	return array(
-		'email' => 'Email',
-		'sms' => 'SMS (text message)',
-		'voice' => 'Voice (robocall)',
-		'choice' => 'Choice (user selects email or SMS)'
-	);
+	$media = array();
+	$media['email'] = 'Email';
+	$media['sms'] = 'SMS (text message)';
+	$media['voice'] = 'Voice (robocall)';
+	$media['choice'] = 'Choice (user selects email or SMS)';
+	if (sirius_domain_component_enabled('postal')) { $media['postal'] = 'Postal Mail'; }
+	return $media;
 }
 
 function sirius_bulk_queue_statuses()  {
-	return array(
-		'add' => 'Pending',
-		'sent' => 'Sent',
-		'error' => 'Error'
-	);
+	return array('add' => 'Pending') + Sirius_Comm::getInstance()->status_options();
 }
 
 function sirius_bulk_recipient_remove($bulk_nid, $contact_nid) {

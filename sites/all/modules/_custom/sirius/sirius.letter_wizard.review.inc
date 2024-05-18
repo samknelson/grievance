@@ -4,7 +4,8 @@
  * Step 4: Review
  ************************************************************************************************/
 
-function sirius_letter_wizard_review($info, $data, $letter_node, $current_step) { 
+function sirius_letter_wizard_review($info, $data, $letter_node, $current_step) {
+	// Legacy support: Lots of crappy letter-specific rendering
 	$info = sirius_wizard_info($wizard_name);
 
 	if ($data['subject']) { $html = sirius_fakerender_field("Subject:", $data['subject']); }
@@ -55,6 +56,12 @@ function sirius_letter_wizard_review($info, $data, $letter_node, $current_step) 
 		$html .= '<hr><h2>PDF Body</h2><div style="padding: 20px; margin: 20px; border: 1px solid #cccccc;">';
 		$html .= $data['pdf_body'];
 		$html .= '</div>';
+	}
+
+	$instance = Sirius_Comm::getInstance();
+	$comm_nodes = $instance->list_from_handler($letter_node->nid);
+	if ($comm_nodes) {
+		$html .= $instance->render_multiple($comm_nodes);
 	}
 
 	return array('markup' => array('#markup' => $html));

@@ -1488,7 +1488,7 @@ function sirius_mightysearch_tools_info_all() {
 
 	$tools['bulk_view'] = array(
 		'title' => 'Bulk',
-		'path' => 'node/%',
+		'path' => 'node/%/sirius_bulk_recipient',
 		'variable' => 'bulk_nid',
 	);
 

@@ -15,8 +15,8 @@ function sirius_twilio_client_get($new_client = NULL) {
 
 	if ($new_client) {
 		$client = $new_client;
-
 	}
+
 	if (!$client) {
 		$client = sirius_twilio_client_connect(array(
 			'provider' => sirius_twilio_provider_get(),

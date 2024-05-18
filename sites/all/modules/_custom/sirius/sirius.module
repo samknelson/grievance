@@ -23,7 +23,10 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.footer.inc'
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.addr.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phone.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.phonetree.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.comm.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.email.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sms.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.voice.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.specialtid.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.sns.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.qr.inc';
@@ -67,8 +70,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.nota.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lang.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.dev.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
-
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.feed_wws.inc';
@@ -912,6 +915,26 @@ function sirius_user_login(&$edit, $account) {
 
 function sirius_node_update($node) {
   if ($node->type == 'sirius_domain') { sirius_domain_node_update($node); }
+  if ($node->type == 'sirius_log') { sirius_denormalize_queue($node); }
+}
+
+function sirius_denormalize_queue($node) {
+  if ($node->type == 'sirius_log') {
+    $instance = sirius_comm_instance($node);
+    if ($instance) {
+      sirius_denorm_queue_add($node->nid, $node->nid, 'sirius_comm_update_handlers');
+    }
+  }
+}
+
+/**
+ * Implements hook_sirius_denorm
+ */
+
+function sirius_sirius_denorm($item) {
+  if ($item['denorm_trigger'] == 'sirius_comm_update_handlers') {
+    sirius_comm_update_handlers($item['denorm_source_nid']);
+  }
 }
 
 /**
@@ -981,7 +1004,7 @@ function sirius_views_pre_view(&$view, &$display_id, &$args) {
 function sirius_quicknav($links) {
   $current_path = current_path();
 
-  $html = '<div class="sirius_quicknav">';
+  $html = '<div class="sirius_quicknav sirius_noprint">';
   foreach ($links as $link) {
     $path = $link['path'];
     $query = $link['query'];

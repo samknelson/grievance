@@ -4,16 +4,7 @@
  * Cron function -- deliver all pending messages
  */
 
-function sirius_bulk_deliver($force = FALSE) {
-	// Don't run too often
-	$last_ts = variable_get("sirius_bulk_last_ts", 0);
-	$delay = 15;
-	if (!$force && time() < $last_ts + $delay) {
-		sirius_minilog("sirius_bulk_deliver: too soon to run.");
-		return array('success' => FALSE, 'msg' => 'Too soon to run.');
-	}
-	variable_set("sirius_bulk_last_ts", time());
-
+function sirius_bulk_deliver($mode = 'test', $force = FALSE) {
 	// Get any pending nodes
 	$query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
@@ -38,7 +29,11 @@ function sirius_bulk_deliver($force = FALSE) {
 			sirius_minilog('Switched into domain: ' . $new_domain->title);
 		}
 
-  	$result = sirius_bulk_deliver_batch($bulk_node, $force);
+		if ($mode == 'live') {
+  		$result = sirius_bulk_deliver_batch($bulk_node, $force);
+  	} else {
+  		sirius_minilog('... Skipping delivery on ' . $bulk_node->title . " because mode = $mode");
+  	}
 
 		if ($new_domain_nid != $old_domain_nid) {
 			$old_domain = sirius_domain($old_domain_nid);
@@ -159,13 +154,21 @@ function sirius_bulk_deliver_entry($log_nid) {
 		if ($medium == 'email') { $to = sirius_email_format($contact_node->field_sirius_email['und'][0]['value']); }
 		else { $to = sirius_phone_format($contact_node->field_sirius_phone['und'][0]['value']); }
 
-		$result = sirius_bulk_deliver_impl($bulk_node, $medium, $to, array('contact_node' => $contact_node));
+		$result = sirius_bulk_deliver_impl(
+			$bulk_node, 
+			$medium, 
+			$to,
+			array(
+				'contact_node' => $contact_node,
+				'handler_nids' => array($log_node->nid)
+			)
+		);
 		$result['to'] = $to;
 		$result['medium'] = $medium;
 	}
 
 	if ($result['success']) {
-		$log_node->field_sirius_type['und'][0]['value'] = 'sent';
+		$log_node->field_sirius_type['und'][0]['value'] = 'sending';
 	} else {
 		$log_node->field_sirius_type['und'][0]['value'] = 'error';
 	}
@@ -181,9 +184,12 @@ function sirius_bulk_deliver_entry($log_nid) {
 function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $deliver_args = array(), $is_test = FALSE) {
 	$json = sirius_json_get($bulk_node); 
 
+	$handler_nids = $deliver_args['handler_nids'];
+	if (!$handler_nids) { $handler_nids = array($bulk_node->nid); }
+
 	if (!$to) { return array('success' => FALSE, 'msg' => 'No recipient.'); }
 	$params = array();
-	$params['handler_nids'] = array($bulk_node->nid);
+	$params['handler_nids'] = $handler_nids;
 	$params['to'] = $to;
 	$params['subject'] = $bulk_node->title;
 	$params['body'] = $bulk_node->body['und'][0]['value'];
@@ -210,6 +216,9 @@ function sirius_bulk_deliver_impl($bulk_node, $medium, $to, $deliver_args = arra
 
 	if ($medium == 'email') {
 		return sirius_email_send($params);
+	} else if ($medium == 'postal') {
+		$params['options'] = $json['postal']['options'];
+		return sirius_postal_send($params);
 	} else if ($medium == 'voice') {
 		if ($json['voice']['type'] == 'flow') {
 			// @todo: Wrap in a sirius() function, rather than bypassing sirius and handing directly to Twilio
