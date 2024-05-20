@@ -107,6 +107,22 @@ class Sirius_Postal_Client extends Sirius_Comm {
     return $from;
 	}
 
+	public function addr_from_node($node, $field_name = 'field_sirius_address', $delta = 0) {
+		$input = $node->{$field_name}['und'][$delta];
+		if (!$input) { return array(); }
+
+		$addr = array();
+		$addr['name'] = $node->title;
+		$addr['address_line1'] = $input['thoroughfare'];
+		$addr['address_line2'] = $input['premise'];
+		$addr['address_city'] = $input['locality'];
+		$addr['address_state'] = $input['administrative_area'];
+		$addr['address_zip'] = $input['postal_code'];
+		$addr['phone'] = $node->field_sirius_phone['und'][0]['value'];
+		$addr['email'] = $node->field_sirius_email['und'][0]['value'];
+		return $addr;
+	}
+
 	public function render_addr($addr, $mode) {
 		if (!$addr) { return ''; }
     $keys = $this->addr_keys();
