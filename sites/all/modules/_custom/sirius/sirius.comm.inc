@@ -186,7 +186,8 @@ class Sirius_Comm extends Sirius_Singleton {
 	  $sql .= "join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
 	  $sql .= "join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
 	  $sql .= "where node.type = 'sirius_log' ";
-	  $sql .= "and field_sirius_json_value ->> '$.external_id' = :external_id ";
+	  // $sql .= "and field_sirius_json_value->> = :external_id "; // syntax not supported by MariaDB
+	  $sql .= "and JSON_UNQUOTE(JSON_EXTRACT(field_sirius_json_value, '$.external_id')) = :external_id ";
 	  $sql .= "and field_sirius_category_value = :type ";
 	  $sql .= "and field_sirius_type_value in ('sending', 'sent', 'failed') ";
 	  $sql .= "order by nid desc limit 1 ";
@@ -380,7 +381,6 @@ class Sirius_Comm extends Sirius_Singleton {
 		$html .= '<div class="sirius_comm_section sirius_comm_body">';
 		$html .= '<h2>' . t('Message Body') . '</h2>';
 		$html .= $body;
-
 		$html .= '</div>';
 		return $html;
 	}

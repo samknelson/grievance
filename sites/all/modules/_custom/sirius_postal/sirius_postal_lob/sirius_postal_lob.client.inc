@@ -269,6 +269,7 @@ class Sirius_Postal_Client_Lob extends Sirius_Postal_Client {
 	}
 
 	public function webhook_impl($params = array()) {
+		// return array('success' => TRUE, 'event_id' => 'evt_047c3344ed0a8106', 'external_id' => 12345, 'status' => 'whatever', 'details' => 'Just a test');
 		// Parse the input
 		$input = file_get_contents('php://input');
 		if (!$input) { return array('success' => FALSE, 'msg' => 'No data was POSTed to webhook.'); }
@@ -297,9 +298,9 @@ class Sirius_Postal_Client_Lob extends Sirius_Postal_Client {
 		$body = $this->get_body($comm_node);
 		$json = sirius_json_get($comm_node);
 		if (!$body) { return ''; }
-		$html .= '<div class="sirius_comm_section sirius_comm_to">';
+		$html .= '<div class="sirius_comm_section sirius_comm_body">';
 		$html .= '<h2>' . t('Message Body') . '</h2>';
-		$html .= sirius_text_to_html($body);
+		$html .= nl2br(drupal_html_to_text($body));
 
 		// Should do this: 
 		// $pdf_url = $json['result']['message']['*container']['url']
