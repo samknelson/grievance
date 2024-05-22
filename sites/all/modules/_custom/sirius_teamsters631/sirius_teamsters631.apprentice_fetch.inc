@@ -22,6 +22,10 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 
 	$records = $fetch_result['data'];
 
+	// /////////////////////////////////////////////////////////////////////////////////////
+	// Create new dispatches or update existing dispatches
+	// /////////////////////////////////////////////////////////////////////////////////////
+
 	$count_dispatch = $count_error = $count_success = $count_existing = $count_new = 0;
 	$active_by_uuid = array();
 	foreach ($records as $record) {
@@ -34,6 +38,7 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 			sirius_minilog("... No uuid.", 'warning');
 			continue;
 		}
+		$active_by_uuid[$uuid] = TRUE;
 
 		$worker_nid = sirius_worker_get_by_id($record['worker_id'], TRUE);
 		if (!$worker_nid) {
@@ -44,6 +49,8 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 
 		// Fetch the log node
 		$log_category = 'teamsters631:apprentice';
+
+		$log_node = NULL;
 
 		$sql_args = array();
 	  $sql = "select nid ";
@@ -79,7 +86,6 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 
 		// Update the log entry
 		$changed = FALSE;
-
 		$log_json = sirius_json_get($log_node);
 
 		foreach ($record as $key => $value) {
@@ -100,11 +106,13 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 		}
 
 		++$count_success;
-
-		$active_by_uuid[$uuid] = TRUE;
 	}
 
 	sirius_minilog("Active fetch complete. Processed $count_dispatch incoming dispatch records, with $count_error errors and $count_success successes ($count_new new dispatches, $count_existing existing dispatches).");
+
+	// /////////////////////////////////////////////////////////////////////////////////////
+	// Terminate any existing dispatches which we didn't find.
+	// /////////////////////////////////////////////////////////////////////////////////////
 
 	sirius_minilog("Terminating existing dispatches ...");
 	$count_layoff = 0;
