@@ -90,7 +90,6 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 
 		$record['start_ts'] = strtotime($record['start_date']);
 		if ($record['employer_id']) {
-			drupal_set_message("Searching for employer $record[employer_id]");
 			$employer_nid = sirius_employer_get_by_id($record['employer_id'], TRUE);
 			if ($employer_nid) { $record['employer_nid'] = $employer_nid; }
 		}
