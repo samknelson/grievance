@@ -67,5 +67,15 @@ function sirius_cron_menu() {
     'file' => 'sirius_cron.page_scan_list.inc',
   );
 
+  $items['sirius/cron/shortcut/%'] = array(
+    'title' => 'Cron Management',
+    'description' => '',
+    'page callback' => 'sirius_cron_page_shortcut',
+    'page arguments' => array(3),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_cron.page_scan_shortcut.inc',
+  );
+
   return $items;
 }
