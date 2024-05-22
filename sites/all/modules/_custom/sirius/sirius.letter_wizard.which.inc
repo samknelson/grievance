@@ -331,15 +331,6 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 		drupal_alter('sirius_letter_recipients_email', $recipients, $context);
 	}
 
-
-  // /////////////////////////////////////////////////////////////////
-	// Generate the default list of recipients
-  // /////////////////////////////////////////////////////////////////
-  //
-  // A lot of logic here. At some point this probably could happily become a set of callbacks. But for now,
-  // we're just building it all in one place.
-  //
-  
   if ($data['format'] == 'sms') {
 		$recipients = array();
 
@@ -449,6 +440,37 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 				);
 			}
 		}
+	}
+
+  if ($data['format'] == 'postal') {
+		if (!sirius_domain_component_enabled('postal')) { drupal_set('Postal module is not enabled.', 'error'); return; }
+		$instance = sirius_postal_client_instance();
+		if (!$instance) { drupal_set('No postal client has been configured.', 'error'); return; }
+
+		$recipients = array();
+
+		// Main recipient
+		if ($entity_node->type == 'sirius_worker') {
+			$recipient = array();
+			$recipient['description'] = 'Worker';
+			$recipient['name'] = $entity_node->title;
+			$recipient['addr'] = $instance->addr_from_node($entity_node);
+			$recipient['delta'] = 0;
+			$recipient['disposition'] = 'to';
+		} else {
+			$recipient = array();
+			$recipient['delta'] = 0;
+			$recipient['disposition'] = 'to';
+		}
+		$recipients[] = $recipient;
+
+		// Default sender
+		$recipients[] = array(
+			'delta' => 1,
+			'disposition' => 'from',
+			'name' => 'Sender',
+			'addr' => $instance->get_from_default(),
+		);
 	}
 
 	$data['recipients'] = $recipients;
