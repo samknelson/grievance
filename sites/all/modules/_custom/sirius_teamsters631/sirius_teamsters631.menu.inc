@@ -160,7 +160,6 @@ function sirius_teamsters631_menu() {
         'component' => 'edls',
         'access' => array(
           'type' => 'edls',
-          // 'action' => 'employer_dashboard',
           'action' => 'admin',
           'context' => array(),
         ),
