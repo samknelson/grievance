@@ -45,7 +45,8 @@ function sirius_teamsters631_feed_hours_check2_info() {
       'results_fields' => array(
           'worker_nid' => 'Worker NID',
           'link' => 'Link',
-          'worker_ws' => 'Work Status',
+          'worker_ws' => 'Current Work Status',
+          'worker_ws_asof' => 'As Of Work Status',
           'worker_ms' => 'Member Status',
           'dispatch_nid' => 'Dispatch NID',
           'job_nid' => 'Job NID',
@@ -298,8 +299,11 @@ function sirius_teamsters631_feed_hours_check2_row_process($feed_node, $info, $d
   $dispatch_node = sirius_teamsters631_dispatched_as_of2($worker_nid, $employer_nid, $start_ts, $end_ts);
 
   $result['worker_nid'] = $worker_node->nid;
-  $ws_term = taxonomy_term_load($worker_node->field_sirius_work_status['und'][0]['tid']);
-  if ($ws_term) { $result['worker_ws'] = $ws_term->name; }
+  $ws_tid = $worker_node->field_sirius_work_status['und'][0]['tid'];
+  if ($ws_tid) { $result['worker_ws'] = sirius_term_title($ws_tid); }
+
+  $ws_tid_asof = sirius_worker_history_asof($worker_node, 'worker:work_status', $ts);
+  if ($ws_tid_asof) { $result['worker_ws_asof'] = sirius_term_title($ws_tid); }
 
   $employer_node = node_load($employer_nid);
   $industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
@@ -426,7 +430,7 @@ function sirius_teamsters631_feed_hours_check2_dates_form_validate($form, &$form
   }
   */
 
-  if (! ($start > $end)) {
+  if (! ($start >= $end)) {
     form_set_error('teamsters631_feed_hours_check2][payperiod_start_offset', t('Start must be greater than end.'));
   }
 }
