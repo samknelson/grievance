@@ -171,7 +171,6 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live', $options = array
 		}
 		$result = array('success' => TRUE, 'msg' => "Scanned $count domains, with $count_success success and $count_failure failures.");
 	} else {
-		drupal_set_message("About to $info[callback] with $mode");
 		$result = $info['callback']($mode, $force, $options);
 	}
 
