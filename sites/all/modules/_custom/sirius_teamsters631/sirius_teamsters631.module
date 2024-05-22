@@ -175,7 +175,7 @@ function sirius_teamsters631_sirius_cron_scan_info() {
   );
 
   $items['teamsters631_apprentice_fetch'] = array(
-    'title' => 'Teamsters631 pprentice Fetch',
+    'title' => 'Teamsters631 Apprentice Fetch',
     'description' => 'Fetch apprentice workers from the Training Center and enter them as log entries..',
     'schedule' => 'hourly',
     'callback' => 'sirius_teamsters631_apprentice_fetch',

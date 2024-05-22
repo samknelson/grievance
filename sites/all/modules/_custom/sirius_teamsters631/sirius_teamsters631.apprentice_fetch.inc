@@ -149,7 +149,7 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 
 		$title = $log_json['employer_name'] . ' / ' . $log_json['dispatch_status'] . ' / ' . date('Y-m-d', strtotime($log_json['start_date']));
 		if ($log_json['end_date']) {
-			$title .= ' / ' . date('Y-m-d', strtotime($record['end_date']));
+			$title .= ' / ' . date('Y-m-d', strtotime($log_json['end_date']));
 		}
 		$log_node->title = $title;
 
