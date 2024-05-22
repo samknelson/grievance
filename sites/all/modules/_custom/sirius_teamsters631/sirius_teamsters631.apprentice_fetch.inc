@@ -100,6 +100,15 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 			$changed = TRUE;
 		}
 
+		$title = $record['employer_name'] . ' / ' . $record['dispatch_status'] . ' / ' . date('Y-m-d', strtotime($record['start_date']));
+		if ($record['end_date']) {
+			$title .= ' / ' . date('Y-m-d', strtotime($record['end_date']));
+		}
+		if ($title != $log_node->title) {
+			$log_node->title = $title;
+			$changed = TRUE;
+		}
+
 		if ($changed) {
 			sirius_json_set($log_node, $log_json);
 			node_save($log_node);
@@ -132,7 +141,6 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
   $count_terminated = 0;
   while ($hr = $stmt->fetchAssoc()) {
   	$uuid = $hr['field_sirius_notes_value'];
-  	drupal_set_message("Here with $uuid");
   	if ($active_by_uuid[$uuid]) { continue; }
   	$log_node = node_load($hr['nid']);
   	$log_node->field_sirius_type['und'][0]['value'] = 'layoff';
