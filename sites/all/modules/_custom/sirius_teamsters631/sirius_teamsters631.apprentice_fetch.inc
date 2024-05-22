@@ -152,7 +152,7 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
   	$log_node->field_sirius_type['und'][0]['value'] = 'layoff';
   	$log_json = sirius_json_get($log_node);
   	$log_json['end_date'] = date('Y-m-d H:i:s');
-  	$jog_json['end_ts'] = time();
+  	$log_json['end_ts'] = time();
 
 		$title = $log_json['employer_name'] . ' / ' . $log_json['dispatch_status'] . ' / ' . date('Y-m-d', strtotime($log_json['start_date']));
 		if ($log_json['end_date']) {
