@@ -88,12 +88,24 @@ function sirius_edls_node_tabs() {
   $node_tabs['grievance_shop']['grievance_shop_edls'] = array(
     'title' => 'EDLS',
     'description' => '',
-    'callback' => 'sirius_edls_node_tab_employer_outsource_ms',
+    'callback' => 'sirius_edls_node_tab_employer_active',
     'permissions' => array('sirius'),
-    'file' => 'sirius_edls.page_employer_outsource_ms.inc',
+    'file' => 'sirius_edls.page_employer_active.inc',
     'skip_node_view_check' => TRUE,
     'component' => 'edls',
     'weight' => 3,
+  );
+
+  $node_tabs['grievance_shop']['grievance_shop_edls/active'] = array(
+    'title' => 'Enable EDLS',
+    'description' => '',
+    'callback' => 'sirius_edls_node_tab_employer_active',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_edls.page_employer_active.inc',
+    'skip_node_view_check' => TRUE,
+    'component' => 'edls',
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   $node_tabs['grievance_shop']['grievance_shop_edls/outsource_ms'] = array(
@@ -104,8 +116,7 @@ function sirius_edls_node_tabs() {
     'file' => 'sirius_edls.page_employer_outsource_ms.inc',
     'skip_node_view_check' => TRUE,
     'component' => 'edls',
-    'weight' => 1,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 2,
   );
 
   $node_tabs['grievance_shop']['grievance_shop_edls/tasks'] = array(
@@ -116,7 +127,7 @@ function sirius_edls_node_tabs() {
     'file' => 'sirius_edls.page_employer_tasks.inc',
     'skip_node_view_check' => TRUE,
     'component' => 'edls',
-    'weight' => 2,
+    'weight' => 3,
   );
 
 

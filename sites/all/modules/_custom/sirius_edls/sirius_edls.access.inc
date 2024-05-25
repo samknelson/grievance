@@ -13,6 +13,8 @@ class Sirius_Edls_Access extends Sirius_Access {
       'staff',
       
     	// Parameter employer_nid
+      'employer_config',
+      'employer_config_active',
 			'employer_config_tasks', 
 			'employer_config_outsource_workers', 
 			'employer_config_outsource_ms',
@@ -53,6 +55,7 @@ class Sirius_Edls_Access extends Sirius_Access {
     $sheet_node = $context['sheet_node'];
     $sheet_status = $sheet_node->field_sirius_edls_sheet_status['und'][0]['value'];
     $sheet_uid = $sheet_node->field_grievance_rep_assignee['und'][0]['target_id'];
+    $sheet_reserved = sirius_edls_sheet_reserved($sheet_node);
 
     $is_my_sheet = ($sheet_uid == $user->uid);
 
@@ -107,8 +110,13 @@ class Sirius_Edls_Access extends Sirius_Access {
 			if ($my_employer_nid != $context['sheet_node']->field_grievance_shop['und'][0]['target_id']) { return FALSE; }
 		}
 
+    // Check to make sure that the employer has EDLS enabled
+    if ($my_employer_nid) {
+      if (!sirius_edls_employer_active($my_employer_nid)) { return FALSE; }
+    }
+
     // Employer Configuration: workers, tasks, member statuses
-    if (in_array($action, array('employer_config_tasks', 'employer_config_outsource_workers', 'employer_config_outsource_ms'))) {
+    if (in_array($action, array('employer_config', 'employer_config_tasks', 'employer_config_outsource_workers', 'employer_config_outsource_ms'))) {
       // Labor coordinators can configure the employer
       if ($is_employer_coordinator) { return TRUE; }
 		}
@@ -122,6 +130,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Change the supervisor on a sheet
     if (in_array($action, array('sheet_change_supervisor'))) {
+      // Can't update reserved sheets
+      if ($sheet_reserved) { return FALSE; }
+
       // Labor coordinators can configure the employer
       if ($is_employer_coordinator) { return TRUE; }
     }
@@ -133,8 +144,23 @@ class Sirius_Edls_Access extends Sirius_Access {
       if ($is_worker_advisor) { return TRUE; }
     }
 
+
+
     // View, clone, or manage a sheet
-    if (in_array($action, array('sheet_view', 'sheet_clone', 'sheet_manage', 'sheet_export'))) {
+    if (in_array($action, array('sheet_view', 'sheet_export'))) {
+      // Labor coordinators can view anything
+      if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
+
+      // Labor supervisors can view their own sheets
+      if ($is_employer_supervisor && $is_my_sheet) { return TRUE; }
+    }
+
+    // View, clone, or manage a sheet
+    if (in_array($action, array('sheet_clone', 'sheet_manage'))) {
+      // Can't update reserved sheets
+      if ($sheet_reserved) { return FALSE; }
+
       // Labor coordinators can view anything
       if ($is_employer_coordinator) { return TRUE; }
       if ($is_worker_advisor) { return TRUE; }
@@ -145,6 +171,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Edit a sheet or assign workers
     if (in_array($action, array('sheet_edit', 'sheet_edit_workers'))) {
+      // Can't update reserved sheets
+      if ($sheet_reserved) { return FALSE; }
+
       // Labor coordinators can edit sheets in "draft" or "request")
       if ($is_employer_coordinator && in_array($sheet_status, array('draft', 'request'))) { return TRUE; }
 
@@ -164,6 +193,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Set sheet to "Draft"
     if ($action == 'sheet_status_draft') {
+      // Can't update reserved sheets
+      if ($sheet_reserved) { return FALSE; }
+
       // Can't change status to what it already is
       if ($sheet_status == 'draft') { return FALSE; }
 
@@ -176,6 +208,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Set sheet to "Request"
     if ($action == 'sheet_status_request') {
+      // Can't update reserved sheets
+      if ($sheet_reserved) { return FALSE; }
+
       // Can't change status to what it already is
       if ($sheet_status == 'request') { return FALSE; }
 
@@ -191,6 +226,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Set sheet to "Lock"
     if ($action == 'sheet_status_lock') {
+      // Can't update reserved sheets
+      if ($sheet_reserved) { return FALSE; }
+
       // Can't change status to what it already is
       if ($sheet_status == 'lock') { return FALSE; }
 
@@ -200,6 +238,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Set sheet to "Trash"
     if ($action == 'sheet_status_trash') {
+      // Can't update reserved sheets
+      if ($sheet_reserved) { return FALSE; }
+
       // Can't change status to what it already is
       if ($sheet_status == 'trash') { return FALSE; }
 

@@ -44,7 +44,7 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 			'#value' => $my_employer_node->nid,
 		);
 	} else {
-		$employer_options = sirius_employer_list(TRUE);
+		$employer_options = sirius_edls_employer_list(TRUE);
 		$form['sheet']['grievance_shop'] = array(
 			'#type' => 'select',
 			'#title' => t('Employer'),

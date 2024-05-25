@@ -12,6 +12,7 @@ function sirius_edls_sheet_search($params) {
 	$sql .= "left join field_data_field_grievance_rep_assignee on field_data_field_grievance_rep_assignee.entity_type = 'node' and field_data_field_grievance_rep_assignee.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_edls_sheet_status on field_data_field_sirius_edls_sheet_status.entity_type = 'node' and field_data_field_sirius_edls_sheet_status.entity_id = node.nid ";
 	$sql .= "left join field_data_field_grievance_department_tid on field_data_field_grievance_department_tid.entity_type = 'node' and field_data_field_grievance_department_tid.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
 	$sql .= "where node.type = 'sirius_edls_sheet' ";
 
 	if ($domain_nid) {
@@ -22,6 +23,11 @@ function sirius_edls_sheet_search($params) {
 	if ($params['grievance_shop']) {
 		$sql .= "and field_grievance_shop_target_id = :grievance_shop ";
 		$sql_args[':grievance_shop'] = $params['grievance_shop'];
+	}
+
+	if ($params['employer_nid']) {
+		$sql .= "and field_grievance_shop_target_id = :employer_nid ";
+		$sql_args[':employer_nid'] = $params['employer_nid'];
 	}
 
 	if ($params['date']) {
@@ -67,6 +73,10 @@ function sirius_edls_sheet_search($params) {
 	if ($params['department']) {
 		$sql .= "and field_grievance_department_tid_tid = :department ";
 		$sql_args[':department'] = $params['department'];
+	}
+
+	if ($params['reserved']) {
+		$sql .= "and json_unquote(json_extract(field_sirius_json_value, '\$.edls.sheet.reserved.active')) = 'Yes' ";
 	}
 
 	if (!$params['include_trash']) {

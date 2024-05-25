@@ -10,6 +10,7 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/si
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.crew.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.supervisor.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.worker.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.employer.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.assignment.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.tasks.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.outsource.inc';
@@ -17,6 +18,8 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/si
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.summary.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.dblog.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.notify.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.sched.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.sheet_reserved.inc';
 
 /**
  * Implements hook_sirius_domain_component_info
@@ -119,6 +122,16 @@ function sirius_edls_sirius_cron_scan_info() {
     'schedule' => 'always',
     'callback' => 'sirius_edls_notify_deliver_batch',
     'multidomain' => FALSE,
+    'component' => 'edls',
+  );
+
+  $items['edls_sched_sync'] = array(
+    'title' => 'EDLS Schedule Sync',
+    'description' => 'Check for time off requests or out sick records, and assign the appropriate workers to reserved sheets',
+    'schedule' => 'daily',
+    'callback' => 'sirius_edls_sched_sync',
+    'multidomain' => FALSE,
+    'component' => 'edls',
   );
 
   return $items;
@@ -143,37 +156,6 @@ function sirius_edls_sirius_access_info() {
   $infos = array();
   Sirius_Edls_Access::getInstance()->setInfo($infos);
   return $infos;
-}
-
-function sirius_edls_employer_switch() {
-  $access = sirius_access_instance('edls');
-  if (!$access->access('staff')) {
-    return array('markup' => '', 'employer_node' => sirius_employer_get());
-  }
-
-  drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
-  drupal_add_css(drupal_get_path('module', 'sirius_edls') . '/css/employer.css');
-
-  $incoming_employer_nid = $_GET['employer_nid'];
-
-  $html = '<div class="sirius_edls_employer_switch">';
-  $html .= '<form method="get">';
-  $html .= t('Employer:');
-  $html .= '<select name="employer_nid">';
-  $html .= '<option value="">' . t('-- Select --') . '</option>';
-  $employers = sirius_employer_list();
-  foreach ($employers as $employer_nid => $employer_name) {
-    if ($employer_nid == $incoming_employer_nid) { $selected = ' selected'; } else { $selected = ''; }
-    $html .= "<option value=\"$employer_nid\" $selected>$employer_name</option>";
-  }
-  $html .= '</select>';
-  $html .= '<input type="submit" value="' . t('Go') . '">';
-  $html .= '</form>';
-  $html .= '</div>';
-  $html .= '<br clear="right">';
-
-  if ($incoming_employer_nid && $employers[$incoming_employer_nid]) { $employer_node = node_load($incoming_employer_nid); }
-  return array('markup' => $html, 'employer_node' => $employer_node);
 }
 
 /**
