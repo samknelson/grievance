@@ -46,6 +46,7 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 			sirius_minilog("... Worker not found. Skipping.", 'warning');
 			continue;
 		}
+		$record['worker_nid'] = $worker_nid;
 
 		// Fetch the log node
 		$log_category = 'teamsters631:apprentice';
@@ -96,6 +97,12 @@ function sirius_teamsters631_apprentice_fetch($mode = 'test') {
 		if ($record['employer_id']) {
 			$employer_nid = sirius_employer_get_by_id($record['employer_id'], TRUE);
 			if ($employer_nid) { $record['employer_nid'] = $employer_nid; }
+		}
+
+		if (isset($log_json['end_ts']) || isset($log_json['end_date'])) {
+			unset($log_json['end_ts']);
+			unset($log_json['end_date']);
+			$changed = TRUE;
 		}
 
 		foreach ($record as $key => $value) {
