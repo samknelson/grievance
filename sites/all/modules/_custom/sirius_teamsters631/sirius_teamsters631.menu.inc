@@ -29,6 +29,26 @@ function sirius_teamsters631_node_tabs() {
     'file' => 'sirius_teamsters631.page_dispatch_job_group_seniority.inc',
   );
 
+  $node_tabs['grievance_shop']['sirius_employer_dispatch/teamsters631_m12'] = array(
+    'title' => '12th of the Month',
+    'description' => '',
+    'callback' => 'sirius_teamsters631_node_tab_employer_m12',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 10,
+    'component' => 'dispatch:live',
+    'file' => 'sirius_teamsters631.page_employer_m12.inc',
+  );
+
+  $node_tabs['sirius_log']['sirius_log_teamsters631_m12'] = array(
+    'title' => '12th of the Month',
+    'description' => '',
+    'callback' => 'sirius_teamsters631_node_tab_log_m12',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 10,
+    'component' => 'dispatch:live',
+    'file' => 'sirius_teamsters631.page_log_m12.inc',
+  );
+
   sirius_node_tab_set_module('sirius_teamsters631', $node_tabs);
 
   return $node_tabs;

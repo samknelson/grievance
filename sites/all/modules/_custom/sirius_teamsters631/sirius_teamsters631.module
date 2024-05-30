@@ -14,6 +14,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/siriu
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.server_switch.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.edls.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.apprentice_fetch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.m12.inc';
 
 /**
  * Implements hook_node_access()
