@@ -190,5 +190,36 @@ function sirius_teamsters631_menu() {
     'file' => 'sirius_teamsters631.page_edls_twilio_settings.inc'
   );
 
+
+  $items['sirius/teamsters631/m12'] = array(
+    'title' => '12th of the Month',
+    'page callback' => 'sirius_teamsters631_page_m12',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'dispatch:live',
+        'permission' => 'sirius dispatch staff',
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_teamsters631.page_m12.inc'
+  );
+
+  $items['sirius/teamsters631/m12/%'] = array(
+    'title' => '12th of the Month',
+    'page callback' => 'sirius_teamsters631_page_m12_month',
+    'page arguments' => array(3),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'dispatch:live',
+        'permission' => 'sirius dispatch staff',
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_teamsters631.page_m12_month.inc'
+  );
+
   return $items;
 }
