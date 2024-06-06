@@ -61,10 +61,3 @@ function sirius_ledger_config($form, &$form_state) {
 
   return system_settings_form($form);
 }
-
-function sirius_ledger_config_policies() {
-  $domain_nid = sirius_domain_nid();
-  $type = 'sirius_ledger:policy';
-  return views_embed_view('sirius_json_definitions', 'block_2', $domain_nid, $type);
-}
-
