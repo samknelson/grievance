@@ -28,17 +28,6 @@ function sirius_ledger_config($form, &$form_state) {
     '#description' => t('The default policy will be used globally, but may be overridden by the policy for a specific employer.')
   );
 
-  $name = sirius_domain_variable_name('sirius_ledger_monthly_enabled');
-  $form[$name] = array(
-    '#type' => 'select',
-    '#options' => array(
-      'No' => t('No'),
-      'Yes' => t('Yes'),
-    ),
-    '#title' => 'Enable Monthly Charges?',
-    '#default_value' => variable_get($name, ''),
-  );
-
   $name = sirius_domain_variable_name('sirius_ledger_monthly_batch_size');
   $form[$name] = array(
     '#type' => 'textfield',
@@ -46,17 +35,6 @@ function sirius_ledger_config($form, &$form_state) {
     '#default_value' => variable_get($name, 1000),
     '#size' => 4,
     '#description' => 'Each time the monthly dues are processed (up to once an hour), process at most this many entries. Selecting a value that is too large could result in degraded server performance.',
-  );
-
-  $name = sirius_domain_variable_name('sirius_ledger_hourly_enabled');
-  $form[$name] = array(
-    '#type' => 'select',
-    '#options' => array(
-      'No' => t('No'),
-      'Yes' => t('Yes'),
-    ),
-    '#title' => 'Enable Hourly Charges?',
-    '#default_value' => variable_get($name, ''),
   );
 
   return system_settings_form($form);

@@ -106,9 +106,22 @@ function sirius_ledger_ar_fetch($params = array()) {
 	return $result;
 }
 
+function sirius_ledger_ar_fetch_entry($ledger_id) {
+	$sql = "select * from sirius_ledger_ar where ledger_id = :ledger_id";
+	$stmt = sirius_sql_query($sql, array(':ledger_id' => $ledger_id));
+	return $stmt->fetchAssoc();
+}
+
 function sirius_ledger_ar_render($entries, $options = array()) {
-	if (!$entries) { return '<p>' . t('No A/R entries found.') . '</p>'; }
-	
+	if (!$entries) {
+		$empty_txt = $options['empty_txt'];
+		if (!$empty_txt) { $empty_txt = t('No A/R entries found.'); }
+		return "<p>$empty_txt</p>";
+	}
+
+	$access = sirius_access_instance('ledger');
+	$is_admin = $access->access('admin');
+
 	if ($options['display'] == 'csv') {
 		$header = array(
 			'account' => 'Account',
@@ -131,8 +144,8 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 			'participant' => 'Participant',
 			'reference' => array('data' => 'Reference'),
 			'memo' => array('data' => 'Memo'),
-			'tools' => 'Tools',
 		);
+		if ($is_admin) { $header['tools'] = t('Tools'); }
 	}
 	$keys = array_keys($header);
 	foreach ($keys as $key) { 
@@ -148,6 +161,8 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 		fputcsv($fp, array_values($header));
 	}
 
+	$is_admin = user_access('sirius admin');
+
 	$rows = array();
 	$totals = array();
 	foreach ($entries as $entry) {
@@ -155,6 +170,10 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 		$row = array();
 
 		$tools = '';
+
+		if ($is_admin) {
+			$tools .= l('Detail &#x21D7;', 'sirius/modal/ledger/ar/view/' . $entry['ledger_id'], array('html' => TRUE, 'attributes' => array('class' => array('tool-button'))));
+		}
 		if ($header['account']) { $row[] = $entry['account_title']; }
 		if ($header['id']) { $row[] = $entry['ledger_id']; }
 		if ($header['date']) { $row[] = date('Y-m-d H:i:s', $entry['ledger_ts']); }
@@ -189,8 +208,8 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 	}
 
 	foreach ($rows as $account_title => $sub_rows) {
-		$html .= '<h2>' . $account_title . '</h2>';
-		$html .= 'Total: <strong>$' . number_format($totals[$account_title], 2) . '</strong>';
+		if (!$options['hide_account_header']) { $html .= '<h2>' . $account_title . '</h2>'; }
+		if (!$options['hide_total']) { $html .= 'Total: <strong>$' . number_format($totals[$account_title], 2) . '</strong>'; }
 		$html .= theme_table(array('header' => array_values($header), 'rows' => $sub_rows, 'attributes' => array('style' => 'table-layout: fixed;')));
 	}
 
@@ -198,8 +217,10 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 }
 
 function sirius_ledger_ar_insert($entry) {
-	$sql = 'insert into sirius_ledger_ar (ledger_amount, ledger_status, ledger_account, ledger_participant, ledger_reference, ledger_ts, ledger_memo, ledger_key) ';
-	$sql .= 'values (:ledger_amount, :ledger_status, :ledger_account, :ledger_participant, :ledger_reference, :ledger_ts, :ledger_memo, :ledger_key) ';
+	if (!$entry['ledger_json']) { $entry['ledger_json'] = array(); }
+
+	$sql = 'insert into sirius_ledger_ar (ledger_amount, ledger_status, ledger_account, ledger_participant, ledger_reference, ledger_ts, ledger_memo, ledger_key, ledger_json) ';
+	$sql .= 'values (:ledger_amount, :ledger_status, :ledger_account, :ledger_participant, :ledger_reference, :ledger_ts, :ledger_memo, :ledger_key, :ledger_json) ';
 
 	$sql_args = array();
 	$sql_args[':ledger_amount'] = $entry['ledger_amount'];
@@ -210,6 +231,7 @@ function sirius_ledger_ar_insert($entry) {
 	$sql_args[':ledger_ts'] = $entry['ledger_ts'];
 	$sql_args[':ledger_memo'] = $entry['ledger_memo'];
 	$sql_args[':ledger_key'] = $entry['ledger_key'];
+	$sql_args[':ledger_json'] = json_encode($entry['ledger_json']);
 
 	$stmt = sirius_sql_query($sql, $sql_args);
 
@@ -217,6 +239,8 @@ function sirius_ledger_ar_insert($entry) {
 }
 
 function sirius_ledger_ar_update($entry) {
+	if (!$entry['ledger_json']) { $entry['ledger_json'] = array(); }
+
 	$sql = 'update sirius_ledger_ar set ';
 	$sql .= 'ledger_amount = :ledger_amount, ';
 	$sql .= 'ledger_status = :ledger_status, ';
@@ -226,6 +250,7 @@ function sirius_ledger_ar_update($entry) {
 	$sql .= 'ledger_ts = :ledger_ts, ';
 	$sql .= 'ledger_memo = :ledger_memo, ';
 	$sql .= 'ledger_key = :ledger_key ';
+	$sql .= 'ledger_json = :ledger_json ';
 	$sql .= 'where ledger_id = :ledger_id ';
 
 	$sql_args = array();
@@ -237,6 +262,7 @@ function sirius_ledger_ar_update($entry) {
 	$sql_args[':ledger_ts'] = $entry['ledger_ts'];
 	$sql_args[':ledger_memo'] = $entry['ledger_memo'];
 	$sql_args[':ledger_key'] = $entry['ledger_key'];
+	$sql_args[':ledger_json'] = json_encode($entry['ledger_json']);
 	$sql_args[':ledger_id'] = $entry['ledger_id'];
 
 	$stmt = sirius_sql_query($sql, $sql_args);
@@ -278,47 +304,6 @@ function sirius_ledger_ar_format_balance($balance) {
 	} else {
 		return '<span class="sirius_ledger_balance">' . '$' . number_format($balance, 2) . '</span>';
 	}
-}
-
-function sirius_ledger_page_ar_purge() {
-	return drupal_get_form('sirius_ledger_page_ar_purge_form');
-}
-
-function sirius_ledger_page_ar_purge_form($form, &$form_state) {
-	 $accounts = array(NULL => t('-- Select --')) + sirius_ledger_account_list();
-
-	 $form['account_nid'] = array(
-	 	'#type' => 'select',
-	 	'#options' => $accounts,
-	 	'#required' => TRUE,
-	 	'#title' => t('Account'),
-	 );
-
-	 $form['confirm'] = array(
-	 	'#type' => 'checkbox',
-	 	'#title' => t('I understand that his will permanently and completely delete entries from the ledger. There will be no way to retrieve or restore any data lost.'),
-	 	'#required' => TRUE,
-	 );
-
-	 $form['submit'] = array(
-	 	'#type' => 'submit',
-	 	'#value' => t('Submit'),
-	 );
-
-	 return $form;
-}
-
-function sirius_ledger_page_ar_purge_form_submit($form, &$form_state) {
-	$account_nid = $form_state['values']['account_nid'];
-	if (!$account_nid) {
-		drupal_set_message("Please select an account.");
-		return;
-	}
-
-	$params = array();
-	$params['ledger_account'] = $account_nid;
-	$count = sirius_ledger_ar_purge($params);
-	drupal_set_message("Account purged. $count records deleted.");
 }
 
 function sirius_ledger_ar_purge($params) {

@@ -1,5 +1,10 @@
 <?php
 
+function sirius_ledger_node_tab_entity_stripe_access($entity_node) {
+	$access = sirius_access_instance('ledger');
+	return $access->access('entity_page_view', array('entity_node' => $entity_node));
+}
+
 function sirius_ledger_node_tab_entity_stripe($entity_node) {
 	return drupal_get_form('sirius_ledger_node_tab_entity_stripe_form', $entity_node);
 }
@@ -8,23 +13,25 @@ function sirius_ledger_node_tab_entity_stripe_form($form, &$form_state, $entity_
 	sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
   drupal_add_css('sites/all/modules/_custom/sirius_ledger/css/stripe.css');
 
+	$access = sirius_access_instance('ledger');
+
 	$customer_id = $entity_node->uuid;
 
 	$form_state['entity_nid'] = $entity_node->nid;
 
-	// Load the customer
+	// Load the customer, or create one if it doesn't exist.
 	$result = sirius_ledger_stripe_customer_retrieve($customer_id);
-	if ($result['success']) { $customer_json = sirius_ledger_stripe_object_to_json($result['customer']); }
+	if (!$result['success']) { $result = sirius_ledger_stripe_customer_sync($entity_node); }
+	if (!$result['success']) { return sirius_form_error('Unable to fetch or sync customer: ' . $result['msg']); }
 
 	// Load the payment methods
-	if ($customer_json) {
-		$result = sirius_ledger_stripe_paymentmethod_list_multitype($customer_id, array('card', 'us_bank_account'));
-		if ($result['success']) { $paymentmethods_json = $result['paymentmethods']; }
-	}
+	$result = sirius_ledger_stripe_paymentmethod_list_multitype($customer_id, array('card', 'us_bank_account'));
+	if ($result['success']) { $paymentmethods_json = $result['paymentmethods']; }
 
-	$html .= sirius_ledger_stripe_customer_render($customer_json);
-	$html .= sirius_ledger_stripe_paymentmethods_render($entity_node, $paymentmethods_json);
-	$form['intro'] = array('#markup' => $html);
+	if ($access->access('admin', array('entity_node' => $entity_node))) {
+		$html .= sirius_ledger_stripe_paymentmethods_render($entity_node, $paymentmethods_json);
+		$form['intro'] = array('#markup' => $html);
+	}
 
 	$paymentmethods_options = sirius_ledger_stripe_paymentmethods_options($entity_node, $paymentmethods_json);
 
@@ -109,7 +116,7 @@ function sirius_ledger_node_tab_entity_stripe_form_submit($form, &$form_state) {
 			$form_state['values']['paymentmethod']
 		);
 		if ($result['success']) {
-			dpm(sirius_ledger_stripe_object_to_json($result['paymentintent']));
+			dpm(sirius_ledger_service()->object_to_json($result['paymentintent']));
 		}
 	}
 

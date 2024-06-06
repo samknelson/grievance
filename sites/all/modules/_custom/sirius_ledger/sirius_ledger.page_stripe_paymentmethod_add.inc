@@ -2,8 +2,8 @@
 
 function sirius_ledger_page_stripe_paymentmethod_add() {
 	sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
-
-	$mode = sirius_ledger_stripe_mode();
+	$service = sirius_ledger_service();
+	$mode = $service->mode();
 	$account_id = sirius_domain_variable_get('sirius_ledger_stripe_' . $mode . '_account_id');
 
 	global $base_url;
