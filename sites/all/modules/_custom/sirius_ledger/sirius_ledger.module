@@ -8,6 +8,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.accounts.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.payments.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.ar.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.invoices.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.balance.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.policy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.monthly.inc';
@@ -18,9 +19,9 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 // require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.feed_charges.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.feed_allocate.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.auth.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.charge_plugin.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_config.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_policy_definition.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_create.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_update.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_post.inc';
@@ -47,6 +48,22 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.report_discrepancy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.report_transmittal_balances.inc';
 
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_ledger_sirius_domain_component_info() {
+  return array(
+    'ledger:worker:charge:monthly' => array(
+      'title' => 'Ledger - Worker - Charge - Monthly',
+      'description' => 'Enable monthly billing per-worker',
+    ),
+    'ledger:worker:charge:hourly' => array(
+      'title' => 'Ledger - Worker - Charge - Hourly',
+      'description' => 'Enable hourly billing per-worker',
+    ),
+  );
+}
 
 function sirius_ledger_sirius_config_links_alter(&$links) {
 	$links['ledger'] = array('title' => 'A/R Accounting and Ledger');
@@ -54,6 +71,15 @@ function sirius_ledger_sirius_config_links_alter(&$links) {
 	$links['ledger']['links']['sirius/ledger/stripe/config']		= array('title' => 'Stripe Settings', 'description' => 'Settings for using the Stripe payment processor');
 }
 
+/** 
+ * Implements hook_sirius_access_info
+ */
+
+function sirius_ledger_sirius_access_info() {
+  $infos = array();
+  Sirius_Ledger_Access::getInstance()->setInfo($infos);
+  return $infos;
+}
 
 /***
  * Implements hook_report_cache_info() 
@@ -77,6 +103,7 @@ function sirius_ledger_sirius_cron_scan_info() {
 		'schedule' => 'hourly',
 		'callback' => 'sirius_ledger_monthly_charge_batch',
 		'multidomain' => TRUE,
+		'component' => 'ledger:worker:charge:monthly',
 	);
 
 	return $items;
@@ -115,7 +142,7 @@ function sirius_ledger_node_view($node, $view_mode, $langcode) {
 	// Show Stripe links in the payment
 	if ($view_mode == 'full' && $node->type == 'sirius_payment') {
 		sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
-		sirius_ledger_stripe_payment_node_view($node, $view_mode, $langcode);
+		sirius_ledger_service()->payment_node_view($node, $view_mode, $langcode);
 	}
 
 
@@ -150,4 +177,27 @@ function sirius_ledger_node_view($node, $view_mode, $langcode) {
 		}
 	}
 	*/
+}
+
+function sirius_ledger_service() {
+	sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
+	return Sirius_Ledger_Service_Stripe::getInstance();
+}
+
+function sirius_ledger_invoice_obj() {
+	sirius_require('sirius_ledger', 'sirius_ledger.invoices.inc');
+	return Sirius_Ledger_Invoices::getInstance();
+}
+
+function sirius_ledger_ms_level_options() {
+  $ms_options = sirius_taxonomy_load('sirius_member_status', 'tid', 'name');
+  $ms_level_options = array();
+  foreach ($ms_options as $ms_tid => $ms_name) {
+    $levels = sirius_training_levels_fetch($ms_tid);
+    $ms_level_options[$ms_tid] = $ms_name;
+    foreach ($levels as $level_code => $level) {
+      $ms_level_options["$ms_tid|$level_code"] = $ms_name . ': ' . $level['title'];
+    }
+  }
+  return $ms_level_options;
 }

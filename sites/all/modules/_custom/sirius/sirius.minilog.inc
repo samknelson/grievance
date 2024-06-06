@@ -9,7 +9,15 @@
 function sirius_minilog($msg = NULL, $type = 'info') {
 	static $log = array();
 	if ($type == 'reset') { $log = array(); }
+
+	static $indent = 0;
+	if ($type == 'indent') { ++$indent; return; }
+	if ($type == 'outdent') { --$indent; return; }
+
 	if (!$msg) { return $log; }
+
+	for ($i=0; $i<$indent; ++$i) { $msg = "... " . $msg; }
+		
 	$log_entry = array('ts' => time(), 'msg' => $msg, 'type' => $type);
 	sirius_minilog_echo($log_entry);
 	$log[] = $log_entry;
@@ -17,6 +25,14 @@ function sirius_minilog($msg = NULL, $type = 'info') {
 
 function sirius_minilog_reset() {
 	return sirius_minilog(NULL, 'reset');
+}
+
+function sirius_minilog_indent() {
+	return sirius_minilog(NULL, 'indent'); 
+}
+
+function sirius_minilog_outdent() {
+	return sirius_minilog(NULL, 'outdent'); 
 }
 
 function sirius_minilog_render() {
@@ -33,13 +49,26 @@ function sirius_minilog_render() {
 }
 
 function sirius_minilog_render_html() {
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/minilog.css');
+
 	$log = sirius_minilog();
-	$result = '';
+	if (!$log) { return ''; }
+	$result = '<div class="sirius_minilog">';
+	$last_entry = $log[count($log)-1];
+
+	if ($last_entry) {
+		$result .= '<div class="sirius_minilog_punchline">';
+		$result .= $last_entry['msg'];
+		$result .= '</div>';
+	}
+
+	$ts_now = time();
 	foreach ($log as $log_entry) {
 		if (!$log_entry['type']) { $log_entry['type'] = 'status'; }
 		$result .= '<div class="sirius_minilog_row">';
 		$result .= '<strong>';
-		$result .= date('Y-m-d H:i:s ', $log_entry['ts']);
+
+		$result .= date('h:i:s A ', $log_entry['ts']);
 		if ($log_entry['type'] != 'info') {
 			$result .= $log_entry['type'] . ': ';
 		}
@@ -47,6 +76,7 @@ function sirius_minilog_render_html() {
 		$result .= $log_entry['msg'];
 		$result .= '</div>';
 	}
+	$result .= '</div>';
 
 	return $result;
 }

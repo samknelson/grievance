@@ -2,7 +2,8 @@
 
 function sirius_ledger_payment_status_options() {
 	return array(
-		'Received' => 'Received',
+		'Pending' => 'Pending',
+		// 'Received' => 'Received',
 		'Cleared' => 'Cleared',
 		'Canceled' => 'Canceled',
 	);
@@ -172,4 +173,69 @@ function sirius_ledger_payment_save($form_state) {
 	}
 
 	return array('success' => TRUE, 'msg' => join('<br />', $msgs), 'payment_node' => $payment_node);
+}
+
+function sirius_ledger_payments_render($payment_nodes, $options = array()) {
+	$rows = array();
+	$account_options = sirius_ledger_account_list();
+	foreach ($payment_nodes as $payment_nid => $payment_node) {
+		$row = array();
+		$row[] = $account_options[$payment_node->field_sirius_ledger_account['und'][0]['target_id']];
+		$row[] = sirius_ledger_ar_format_balance($payment_node->field_sirius_dollar_amt['und'][0]['value']);
+		$row[] = $payment_node->field_sirius_ledger_allocated['und'][0]['value'];
+		$rows[] = $row;
+	}
+
+	$header = array();
+	$header[] = t('Account');
+	$header[] = t('Amount');
+	$header[] = t('Allocated?');
+
+	return sirius_table_render($header, $rows);
+}
+
+function sirius_ledger_payments_search($params) {
+	$domain_nid = sirius_domain_nid();
+
+	$sql_args = array();
+	$sql = "select node.nid from node ";
+	$sql .= "left join field_data_field_sirius_payer on field_data_field_sirius_payer.entity_type = 'node' and field_data_field_sirius_payer.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_ledger_account on field_data_field_sirius_ledger_account.entity_type = 'node' and field_data_field_sirius_ledger_account.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_payment_type on field_data_field_sirius_payment_type.entity_type = 'node' and field_data_field_sirius_payment_type.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_dollar_amt on field_data_field_sirius_dollar_amt.entity_type = 'node' and field_data_field_sirius_dollar_amt.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_payment_status on field_data_field_sirius_payment_status.entity_type = 'node' and field_data_field_sirius_payment_status.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_ledger_allocated on field_data_field_sirius_ledger_allocated.entity_type = 'node' and field_data_field_sirius_ledger_allocated.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_datetime_created on field_data_field_sirius_datetime_created.entity_type = 'node' and field_data_field_sirius_datetime_created.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_datetime on field_data_field_sirius_datetime.entity_type = 'node' and field_data_field_sirius_datetime.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+
+	$sql .= "where node.type = 'sirius_payment' ";
+
+	$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+	$sql_args[':domain_nid'] = $domain_nid;
+
+  if ($params['payer_nid']) {
+  	$sql .= "and field_sirius_payer_target_id = :payer_nid ";
+  	$sql_args[':payer_nid'] = $params['payer_nid'];
+  }
+
+  $sql .= "order by field_sirius_datetime_value desc ";
+
+  $offset = $params['offset'];
+  if (!$offset) { $offset = 0; }
+  $limit = $params['limit'];
+  if (!$limit) { $limit = 100; }
+  $sql .= "limit $limit offset $offset ";
+
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $election_nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+  	$election_nids[] = $hr['nid'];
+  }
+
+  if (!$election_nids) { return array(); }
+  
+  if ($params['nids_only']) { return $election_nids; }
+	return node_load_multiple($election_nids);
 }

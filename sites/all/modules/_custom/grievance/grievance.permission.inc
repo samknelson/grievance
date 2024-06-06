@@ -48,7 +48,7 @@ function grievance_permission() {
     ),
     'grievance contact' => array(
     	'title' => t('Grievance Contacts'),
-    	'description' => t('Permission to edit contacts for a shop of company.')
+        'description' => t('Permission to edit contacts for a shop of company (ALSO grants permission to see employer lists in dropdowns!)')
     ),
     'grievance report' => array(
     	'title' => t('Grievance Report'),

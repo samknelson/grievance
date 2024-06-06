@@ -51,10 +51,11 @@ function sirius_hour_node_tabs() {
   );
 
   $node_tabs['grievance_shop']['sirius_employer_hours'] = array(
-    'title' => 'Hours',
+    'title' => 'Transmittal Sheet Hours',
     'description' => '',
     'callback' => 'sirius_hour_node_tab_employer_hours',
     'permissions' => array('sirius hour admin'),
+    'component' => 'hour:transmittal',
   );
 
   /*
@@ -76,15 +77,6 @@ function sirius_hour_node_tabs() {
 
 function sirius_hour_menu() {
   $items = array();
-
-  $items['sirius/hour/config'] = array(
-    'title' => 'Hour Configuration',
-    'description' => '',
-    'access arguments' => array('sirius hour admin'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_hour_config'),
-    'type' => MENU_NORMAL_ITEM,
-  );
 
   $items['sirius/hour/payperiod/requested'] = array(
     'title' => 'Payperiods - Pending',
