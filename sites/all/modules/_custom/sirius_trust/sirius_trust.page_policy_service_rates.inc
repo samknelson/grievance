@@ -1,7 +1,7 @@
 <?php 
 
 function sirius_trust_node_tab_policy_service_rates_access($policy_node) {
-	return sirius_ledger_node_tab_policy_definition_access($policy_node);
+	return $policy_node->field_sirius_type['und'][0]['value'] == 'sirius_ledger:policy';
 }
 
 function sirius_trust_node_tab_policy_service_rates($policy_node) {
