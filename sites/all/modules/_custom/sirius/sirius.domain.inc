@@ -788,3 +788,55 @@ function sirius_domain_usermanage_roles() {
   }
   return $result;
 }
+
+function sirius_domain_root_shadow_nid($create = FALSE) {
+  $type = "domain_root_shadow";
+
+  $sql = "select nid ";
+  $sql .= "from node ";
+  $sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+  $sql .= "where node.type = 'sirius_json_definition' ";
+  $sql .= "and field_sirius_type_value = :type ";
+  $sql_args[':type'] = $type;
+  $sql .= "order by created desc limit 1";
+  $stmt = db_query($sql, $sql_args);
+  $hr = $stmt->fetchAssoc();
+  if ($hr['nid']) { return $hr['nid']; }
+
+  if (!$create) { return NULL; }
+
+  global $user;
+  $node = new stdClass();
+  $node->type = 'sirius_json_definition';
+  $node->title = 'ROOT DOMAIN';
+  $node->no_recurse = TRUE;
+  $node->language = LANGUAGE_NONE;
+  $node->uid = $user->uid;
+  $node->status = 1;
+  $node->promote = 0;
+  $node->comment = 0;
+  $node->field_sirius_type['und'][0]['value'] = $type;
+  $node = node_submit($node);
+  node_object_prepare($node);
+  node_save($node);
+  return $node->nid;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
