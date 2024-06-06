@@ -96,17 +96,19 @@ function sirius_feed_hours_row_verify($feed_node, $info, $data, &$row, $precompu
   }
 
   if (!$row['department']) {
-    return array('success' => FALSE, 'msg' => "No department specified.");
+    $department_tid = sirius_domain_variable_get('sirius_hour_default_department');
+  } else {
+    $department_tid = sirius_taxonomy_lookup_by_anything('grievance_department', $row['department'], $employer_nid);
   }
-  $department_tid = sirius_taxonomy_lookup_by_anything('grievance_department', $row['department'], $employer_nid);
   if (!$department_tid) {
     return array('success' => FALSE, 'msg' => 'Department not found');
   }
 
   if (!$row['hour_type']) {
-    return array('success' => FALSE, 'msg' => "No hour type specified.");
+    $hour_type_tid = sirius_domain_variable_get('sirius_hour_default_type');
+  } else{
+    $hour_type_tid = sirius_taxonomy_lookup_by_anything('sirius_hour_type', $row['hour_type'], $employer_nid);
   }
-  $hour_type_tid = sirius_taxonomy_lookup_by_anything('sirius_hour_type', $row['hour_type'], $employer_nid);
   if (!$hour_type_tid) {
     return array('success' => FALSE, 'msg' => 'Hour type not found');
   }
@@ -126,6 +128,9 @@ function sirius_feed_hours_row_verify($feed_node, $info, $data, &$row, $precompu
   } else {
     // @todo: This code is untested.
     $ts = strtotime($date);
+    if ($ts === NULL) {
+      return array('success' => FALSE, 'msg' => 'Invalid date format: ' . $date);
+    }
     list ($year, $month, $day) = explode('-', gmdate('Y-m-d', $ts));
   }
 
@@ -148,15 +153,11 @@ function sirius_feed_hours_row_verify($feed_node, $info, $data, &$row, $precompu
       $worker_nid = sirius_worker_ein_lookup($employer_nid, $row['ein']);
       if (!$worker_nid) { return array('success' => FALSE, 'msg' => 'Worker not found with this EIN.'); }
     } else {
-      if ($pk == 'ssn') { 
+      if ($pk == 'id') { 
         $table = 'field_data_field_sirius_id';
         $column = 'field_sirius_id_value';
         $value = $row['id'];
-      } else if ($pk == 'id3') { 
-        $table = 'field_data_field_sirius_id3';
-        $column = 'field_sirius_id3_value';
-        $value = $row['id3'];
-      } else if ($pk == 'id3') { 
+      } else if ($pk == 'ssn') { 
         $table = 'field_data_field_sirius_ssn';
         $column = 'field_sirius_ssn_value';
         $value = $row['ssn'];
