@@ -119,3 +119,40 @@ function sirius_dispatch_node_access_job($node, $op, $account) {
   return NODE_ACCESS_DENY;
 }
 
+/**
+ * @todo: We are beginning the process of moving access control into the Access class.
+ *        This process is JUST STARTING.
+ *        So don't expect too much from this at the moment. In the mean time, access control is 
+ *        spread out over various locations.
+ */
+
+class Sirius_Dispatch_Access extends Sirius_Access {
+  public $type = 'dispatch';
+  public $name = 'Dispatch';
+  public $description = '';
+
+  public function access($action, $context = array()) {
+    global $user;
+
+    $actions = array(
+      // No parameters
+      'admin',
+      
+      // Parameter dispatch node
+      'dispatch_layoff',
+      'dispatch_view',
+    );
+
+    // Who am I?
+    if (user_access('sirius admin') || user_access('sirius dispatch admin')) { 
+      $is_admin = $is_staff = TRUE;
+    } else if (user_access('sirius dispatch staff')) { 
+      $is_staff = TRUE;
+    }
+
+    // Admins can do anything
+    if ($is_admin) { return TRUE; }
+
+    return FALSE;
+  }
+}

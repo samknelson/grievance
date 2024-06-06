@@ -1,0 +1,5 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_postal_lob') . '/sirius_postal_lob.client.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_postal_lob') . '/sirius_postal_lob.menu.inc';
+

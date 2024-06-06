@@ -113,13 +113,7 @@ function sirius_dispatch_notify(&$dispatch_node, $requested_medium = NULL, $note
 			$unique_id .= $medium . "/";
 			$unique_id .= $worker_node->nid . "/";
 			$unique_id .= date('Y-m-d');
-
-			if (sirius_voice_already_sent($unique_id)) {
-				unset($media[$medium]);
-				$media[$secondary_medium] = array();
-			} else {
-				$media[$medium]['X-Sirius-Id'] = $unique_id;
-			}
+			$media[$medium]['X-Sirius-Id'] = $unique_id;
 		}
 	}
 

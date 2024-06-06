@@ -261,16 +261,25 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 			$body = "Your crew assignment for $date has been posted or updated. Please follow the link below and accept:<br><br><a href=\"$url\">$url</a>";
 			$sms = $worker_node->title . ": your crew assignment for $date has been posted or updated. Please follow the link below and accept:\n\n$url";
 
+
 			if ($mode == 'live') {
-				$result = sirius_worker_notify(
-					$worker_node,
-					array(
-						'subject' => $subject,
-						'body' => $body,
-						'sms' => $sms,
-						'X-Sirius-Id' => $unique_id,
-					)
+
+				$notify_params = array(
+					'subject' => $subject,
+					'body' => $body,
+					'sms' => $sms,
+					'X-Sirius-Id' => $unique_id,
 				);
+
+				$employer_node = node_load($sheet_node->field_grievance_shop['und'][0]['target_id']);
+				$context = array('notify_params' => &$notify_params, 'employer_node' => $employer_node);
+				drupal_alter('sirius_edls_notify_pre_send', $context);
+
+				$result = sirius_worker_notify($worker_node, $notify_params);
+
+				$context = array('notify_params' => &$notify_params, 'notify_result' => &$result, 'employer_node' => $employer_node);
+				drupal_alter('sirius_edls_notify_post_send', $context);
+				
 				if ($result['success']) {
 					$notification_status = 'sent';
 				} else {
@@ -399,6 +408,13 @@ function sirius_edls_notify_render($notification) {
 	if (!$crew) {
 		$html .= '<p>' . t('You have been removed from all assignments for employer @employer on <strong>@date</strong>.', array('@employer' => $employer_node->title, '@date' => $date)) . '</p>';
 	} else {
+		$extra = sirius_edls_assignment_render_extra($assignment, array('text_only' => TRUE));
+		if ($extra) {
+			$html .= '<h2>' . t('Special Instructions (role or alternate start time)') . '</h2>';
+			$html .= $extra;
+			$html .= '<hr>';
+		}
+
 		$html .= '<h2>' . t('Job Information') . '</h2>';
 		$html .= sirius_fakerender_field('Employer:', $employer_node->title);
 		$html .= sirius_fakerender_field('Supervisor:', sirius_edls_supervisor_render($sheet_node));
@@ -416,7 +432,6 @@ function sirius_edls_notify_render($notification) {
 		$html .= sirius_fakerender_field('Task:', $crew['task']);
 		$html .= sirius_fakerender_field('Start Time:', $crew['start_time'] . ' - ' . $crew['end_time']);
 		$html .= sirius_fakerender_field('Checkin Location:', $crew['checkin_location']);
-		$html .= sirius_fakerender_field('Details:', sirius_edls_assignment_render_extra($assignment));
 	}
 
 	$html .= '</div>';

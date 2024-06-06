@@ -81,4 +81,11 @@ function sirius_bulk_node_tab_test_form_submit($form, &$form_state) {
 			drupal_set_message($result['details'], 'warning');
 		}
 	}
+
+  if ($result['comm']) {
+    $path = 'node/' . $result['comm']->nid . '/sirius_log_comm';
+    $msg = "The message can be viewed and tracked <strong>" . l('here', $path) . '</strong>';
+    drupal_set_message($msg);
+    sirius_minilog($msg);
+  }
 }

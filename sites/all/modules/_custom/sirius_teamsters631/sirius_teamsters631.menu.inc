@@ -29,6 +29,26 @@ function sirius_teamsters631_node_tabs() {
     'file' => 'sirius_teamsters631.page_dispatch_job_group_seniority.inc',
   );
 
+  $node_tabs['grievance_shop']['sirius_employer_dispatch/teamsters631_m12'] = array(
+    'title' => '12th of the Month',
+    'description' => '',
+    'callback' => 'sirius_teamsters631_node_tab_employer_m12',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 10,
+    'component' => 'dispatch:live',
+    'file' => 'sirius_teamsters631.page_employer_m12.inc',
+  );
+
+  $node_tabs['sirius_log']['sirius_log_teamsters631_m12'] = array(
+    'title' => '12th of the Month',
+    'description' => '',
+    'callback' => 'sirius_teamsters631_node_tab_log_m12',
+    'permissions' => array('sirius dispatch staff'),
+    'weight' => 10,
+    'component' => 'dispatch:live',
+    'file' => 'sirius_teamsters631.page_log_m12.inc',
+  );
+
   sirius_node_tab_set_module('sirius_teamsters631', $node_tabs);
 
   return $node_tabs;
@@ -160,7 +180,6 @@ function sirius_teamsters631_menu() {
         'component' => 'edls',
         'access' => array(
           'type' => 'edls',
-          // 'action' => 'employer_dashboard',
           'action' => 'admin',
           'context' => array(),
         ),
@@ -169,6 +188,37 @@ function sirius_teamsters631_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 11,
     'file' => 'sirius_teamsters631.page_edls_twilio_settings.inc'
+  );
+
+
+  $items['sirius/teamsters631/m12'] = array(
+    'title' => '12th of the Month',
+    'page callback' => 'sirius_teamsters631_page_m12',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'dispatch:live',
+        'permission' => 'sirius dispatch staff',
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_teamsters631.page_m12.inc'
+  );
+
+  $items['sirius/teamsters631/m12/%'] = array(
+    'title' => '12th of the Month',
+    'page callback' => 'sirius_teamsters631_page_m12_month',
+    'page arguments' => array(3),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'dispatch:live',
+        'permission' => 'sirius dispatch staff',
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_teamsters631.page_m12_month.inc'
   );
 
   return $items;

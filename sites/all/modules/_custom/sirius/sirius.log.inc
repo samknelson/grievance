@@ -261,6 +261,21 @@ function sirius_log_default_tab($category) {
   else if ($category == 'steward:sched') { return 'sirius_steward_log_sched'; }
   else if ($category == 'steward:checkin') { return 'sirius_steward_log_checkin'; }
   else if ($category == 'bulk:queue') { return 'sirius_bulk_recipient'; }
+  else if ($category == 'letter') { return 'sirius_letter'; }
   //else if ($category == 'customfield') { return 'sirius_log_customfield_multiple_edit'; }
   else { return ''; }
+}
+
+function sirius_log_categories() {
+  $sql = 'select distinct field_sirius_category_value ';
+  $sql .= 'from field_data_field_sirius_category ';
+  $sql .= 'where entity_type = \'node\' ';
+  $sql .= 'and bundle = \'sirius_log\' ';
+  $sql .= 'order by field_sirius_category_value ';
+  $stmt = sirius_sql_query($sql, array());
+  $categories = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $categories[] = $hr['field_sirius_category_value'];
+  }
+  return $categories;
 }

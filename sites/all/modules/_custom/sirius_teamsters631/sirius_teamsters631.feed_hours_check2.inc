@@ -45,7 +45,8 @@ function sirius_teamsters631_feed_hours_check2_info() {
       'results_fields' => array(
           'worker_nid' => 'Worker NID',
           'link' => 'Link',
-          'worker_ws' => 'Work Status',
+          'worker_ws' => 'Current Work Status',
+          'worker_ws_asof' => 'As Of Work Status',
           'worker_ms' => 'Member Status',
           'dispatch_nid' => 'Dispatch NID',
           'job_nid' => 'Job NID',
@@ -298,8 +299,11 @@ function sirius_teamsters631_feed_hours_check2_row_process($feed_node, $info, $d
   $dispatch_node = sirius_teamsters631_dispatched_as_of2($worker_nid, $employer_nid, $start_ts, $end_ts);
 
   $result['worker_nid'] = $worker_node->nid;
-  $ws_term = taxonomy_term_load($worker_node->field_sirius_work_status['und'][0]['tid']);
-  if ($ws_term) { $result['worker_ws'] = $ws_term->name; }
+  $ws_tid = $worker_node->field_sirius_work_status['und'][0]['tid'];
+  if ($ws_tid) { $result['worker_ws'] = sirius_term_title($ws_tid); }
+
+  $ws_tid_asof = sirius_worker_history_asof($worker_node, 'worker:work_status', $ts);
+  if ($ws_tid_asof) { $result['worker_ws_asof'] = sirius_term_title($ws_tid); }
 
   $employer_node = node_load($employer_nid);
   $industry_tids = sirius_fieldvals($employer_node, 'field_sirius_industry', 'tid');
@@ -317,16 +321,20 @@ function sirius_teamsters631_feed_hours_check2_row_process($feed_node, $info, $d
 
   $result['dispatch_nid'] = $dispatch_node->nid;
 
-  $job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
+  if ($dispatch_node->type == 'sirius_log') {
+    $result['job_title'] = '[Apprentice dispatch]';
+  } else {
+    $job_node = node_load($dispatch_node->field_sirius_dispatch_job['und'][0]['target_id']);
 
-  if ($job_node) {
-    $result['job_nid'] = $job_node->nid;
-    $result['job_title'] = $job_node->title;
-    $result['job_report_date'] = $job_node->field_sirius_datetime['und'][0]['value'];
+    if ($job_node) {
+      $result['job_nid'] = $job_node->nid;
+      $result['job_title'] = $job_node->title;
+      $result['job_report_date'] = $job_node->field_sirius_datetime['und'][0]['value'];
 
-    $job_group_node = node_load($job_node->field_sirius_dispatch_job_group['und'][0]['target_id']);
-    if ($job_group_node) {
-      $result['job_group_title'] = $job_group_node->title;
+      $job_group_node = node_load($job_node->field_sirius_dispatch_job_group['und'][0]['target_id']);
+      if ($job_group_node) {
+        $result['job_group_title'] = $job_group_node->title;
+      }
     }
   }
 
@@ -367,7 +375,61 @@ function sirius_teamsters631_dispatched_as_of2($worker_nid, $employer_nid, $star
 
   $dispatch_nids = array();
   $hr = $stmt->fetchAssoc();
-  if (!$hr) { return NULL; }
+  if (!$hr) {
+    // Check for apprentice "dispatches"
+
+    $sql_args = array();
+    $sql = "select nid ";
+    $sql .= "from node ";
+    $sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
+    $sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
+    $sql .= "where node.type = 'sirius_log' ";
+    $sql .= "and field_sirius_category_value = 'teamsters631:apprentice' ";
+
+    $sql .= "and json_unquote(json_extract(field_data_field_sirius_json.field_sirius_json_value, '\$.worker_nid')) = :worker_nid ";
+    $sql_args[':worker_nid'] = $worker_nid;
+
+    $sql .= "and json_unquote(json_extract(field_data_field_sirius_json.field_sirius_json_value, '\$.employer_nid')) = :employer_nid ";
+    $sql_args[':employer_nid'] = $employer_nid;
+
+
+    $sql .= "and ( ";
+
+    //         The start date of the event falls within the interval
+    $sql .= "  (";
+    $sql .= "    :start_ts <= cast(json_unquote(json_extract(field_data_field_sirius_json.field_sirius_json_value, '\$.start_ts')) as signed) ";
+    $sql .= "    and ";
+    $sql .= "    cast(json_unquote(json_extract(field_data_field_sirius_json.field_sirius_json_value, '\$.start_ts')) as signed) <= :end_ts ";
+    $sql .= "  ) ";
+
+    //         The start date of the interval falls within the event
+    $sql .= "  or ( ";
+    $sql .= "    cast(json_unquote(json_extract(field_data_field_sirius_json.field_sirius_json_value, '\$.start_ts')) as signed) <= :start_ts ";
+    $sql .= "    and ";
+    $sql .= "    :start_ts <= cast(json_unquote(json_extract(field_data_field_sirius_json.field_sirius_json_value, '\$.end_ts')) as signed) ";
+    $sql .= "  ) ";
+
+    //            The end date is null
+    $sql .= "  or ( ";
+    $sql .= "    cast(json_unquote(json_extract(field_data_field_sirius_json.field_sirius_json_value, '\$.start_ts')) as signed) <= :start_ts ";
+    $sql .= "    and ";
+    $sql .= "    ( ";
+    $sql .= "      cast(json_unquote(json_extract(field_data_field_sirius_json.field_sirius_json_value, '\$.end_ts')) as signed) is null ";
+    $sql .= "      or ";
+    $sql .= "      cast(json_unquote(json_extract(field_data_field_sirius_json.field_sirius_json_value, '\$.end_ts')) as signed) = 0 ";
+    $sql .= "    ) ";
+    $sql .= "  ) ";
+    $sql .= ") ";
+
+    $sql_args[':start_ts'] = $start_ts;
+    $sql_args[':end_ts'] = $end_ts;
+
+    $sql .= "order by created desc limit 1";
+    $stmt = sirius_sql_query($sql, $sql_args);
+    $hr = $stmt->fetchAssoc();
+  }
+
   return node_load($hr['nid']);
 }
 
@@ -426,7 +488,7 @@ function sirius_teamsters631_feed_hours_check2_dates_form_validate($form, &$form
   }
   */
 
-  if (! ($start > $end)) {
+  if (! ($start >= $end)) {
     form_set_error('teamsters631_feed_hours_check2][payperiod_start_offset', t('Start must be greater than end.'));
   }
 }

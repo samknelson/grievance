@@ -149,9 +149,11 @@ function sirius_esignature_form_prepare(&$form, $field_name, $title, $statement,
 	$user_json = sirius_jsonfield_util_user_json_get($user_full);
 
 	$suffix = "<div class=\"sirius_esignature\">";
-	$suffix .= "<div class=\"sirius_esignature_statement\">";
-	$suffix .= $statement;
-	$suffix .= '</div>';
+	if (!$options['hide_statement']) {
+		$suffix .= "<div class=\"sirius_esignature_statement\">";
+		$suffix .= $statement;
+		$suffix .= '</div>';
+	}
 	$suffix .= '<h2>Signature</h2>';
 	$suffix .= "<div class=\"sirius_esignature_pane_wrap\">";
 	$suffix .= "<div class=\"sirius_esignature_pane\" id=\"sirius_esig\">";
@@ -165,13 +167,14 @@ function sirius_esignature_form_prepare(&$form, $field_name, $title, $statement,
 	$form[$field_name]['#id'] = "sirius_esig_data";
 	$form[$field_name]['#required'] = TRUE;
 
-	if ($title) {
+	if ($title && !$options['hide_title']) {
 		$form[$field_name]['#title'] = $title;
 	}
 
 	$form[$field_name . '_statement'] = array();
 	$form[$field_name . '_statement']['#type'] = 'value';
 	$form[$field_name . '_statement']['#value'] = $statement;
+
 
 	if ($options['show_name']) {
 		$form[$field_name . '_name'] = array(
@@ -200,13 +203,19 @@ function sirius_esignature_form_prepare(&$form, $field_name, $title, $statement,
 		}
 	}
 
-	$form[$field_name . '_submit'] = array();
-	$form[$field_name . '_submit']['#type'] = 'submit';
-	$form[$field_name . '_submit']['#value'] = t('Submit');
-	$form[$field_name . '_submit']['#id'] = "sirius_esig_submit";
+	if (!$options['hide_submit']) {
+		$form[$field_name . '_submit'] = array();
+		$form[$field_name . '_submit']['#type'] = 'submit';
+		$form[$field_name . '_submit']['#value'] = t('Submit');
+		$form[$field_name . '_submit']['#id'] = "sirius_esig_submit";
+	}
 }
 
-function sirius_esignature_form_get_json($form, &$form_state, $field_name) {
+/**
+ * @todo: $form is unused.
+ */
+
+function sirius_esignature_form_get_json($form, $form_state, $field_name) {
 	$json = array();
 	$json['statement'] = $form_state['values'][$field_name . '_statement'];
 	$json['name'] = $form_state['values'][$field_name . '_name'];
@@ -482,33 +491,3 @@ function sirius_esignature_admin_submit($form, &$form_state) {
 	sirius_esignature_defs_set($items);
 	drupal_set_message("Settings saved.");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

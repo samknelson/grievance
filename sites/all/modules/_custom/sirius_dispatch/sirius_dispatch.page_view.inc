@@ -169,10 +169,20 @@ function sirius_node_tab_dispatch_worker_view_form($form, &$form_state, $dispatc
 		);
 	}
 
+	$color = sirius_dispatch_status_color($dispatch_node->field_sirius_dispatch_status['und'][0]['value']);
 
-	$form['dispatch_section_open'] = array('#markup' => '<div class="sirius_dispatch_view_dispatch_section">');
+	$form['dispatch_section_open'] = array('#markup' => "<div class=\"sirius_dispatch_view_dispatch_section sirius_dispatch_view_$color\">");
 	$form['dispatch_section_qr'] = array('#markup' => sirius_qr_url());
-	$form['dispatch_section_a'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_dispatch_status', t('Dispatch Status')));
+
+	$form['dispatch_section_a'] = array('#markup' => 
+		'<div class="sirius_dispatch_field_wrapper_status">' . 
+		sirius_fakerender_field(
+			t('Dispatch Status:'), 
+			sirius_dispatch_status_title($dispatch_node->field_sirius_dispatch_status['und'][0]['value'])
+		) .
+		'</div><br /><br />'
+	);
+
 	$form['dispatch_section_b'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_id', t('Request ID')));
 	$form['dispatch_section_c'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_dispatch_cbn', t('Call by Name?')));
 	$form['dispatch_section_d'] = array('#markup' => sirius_dispatch_view_render_field($dispatch_node, 'field_sirius_payrate', t('Pay Rate')));

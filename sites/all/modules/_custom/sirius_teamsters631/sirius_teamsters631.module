@@ -13,6 +13,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/siriu
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.banner.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.server_switch.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.edls.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.apprentice_fetch.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_teamsters631/sirius_teamsters631.m12.inc';
 
 /**
  * Implements hook_node_access()
@@ -156,5 +158,31 @@ function sirius_teamsters631_report_cache_info() {
   $items = array();
   sirius_require('sirius_teamsters631', 'sirius_teamsters631.report_edls_compliance.inc');
   Sirius_Teamsters631_Report_Edls_Compliance::getInstance()->setInfo($items);
+  return $items;
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_teamsters631_sirius_cron_scan_info() {
+  $items['teamsters631_edls_apprentice_fetch'] = array(
+    'title' => 'Teamsters631 EDLS Apprentice Fetch',
+    'description' => 'Fetch apprentice workers from the Training Center and enter them as outsource workers in the EDLS system.',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_teamsters631_edls_apprentice_fetch',
+    'multidomain' => FALSE,
+    'component' => 'edls',
+  );
+
+  $items['teamsters631_apprentice_fetch'] = array(
+    'title' => 'Teamsters631 Apprentice Fetch',
+    'description' => 'Fetch apprentice workers from the Training Center and enter them as log entries..',
+    'schedule' => 'hourly',
+    'callback' => 'sirius_teamsters631_apprentice_fetch',
+    'multidomain' => FALSE,
+    'component' => 'edls',
+  );
+
   return $items;
 }

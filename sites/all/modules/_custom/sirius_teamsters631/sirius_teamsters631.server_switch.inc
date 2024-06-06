@@ -298,6 +298,7 @@ function sirius_teamsters631_node_insert_worker_remote($rnode) {
 			$node->{$key} = $value;
 		}
 	}
+	unset($node->field_sirius_contact);
 
 	$domain_nid = sirius_domain_nid();
 	if ($domain_nid) {

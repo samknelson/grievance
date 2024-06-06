@@ -106,71 +106,8 @@ function sirius_email_whitelist_validate($email) {
   return FALSE;
 }
 
-function sirius_email_send_possible($params) {
-  // Need a main recipient
-  if (!$params['to']) { return array('success' => FALSE, 'msg' => 'There is no "to" email address.'); }
-
-  // For each of the recipients....
-  foreach (array('to', 'cc', 'Cc', 'bcc', 'Bcc', 'from', 'From', 'reply-to', 'Reply-To') as $key) {
-    if ($key == 'to') { $rfc822 = $params[$key]; } else { $rfc822 = $params['headers'][$key]; }
-    if (!$rfc822) { continue; }
-    $records = sirius_email_rfc822_parse($rfc822);
-    if (!$records) { continue; }
-
-    foreach ($records as $record) {
-      // Must be a valid email address
-      if (!sirius_email_validate($record['address'])) { 
-        return array('success' => FALSE, 'msg' => "The header for $key, $rfc822, does not look like a valid rfc822-formatted email address.");
-      }
-
-      // Must be whitelisted
-      if (!sirius_email_whitelist_validate($record['address'])) { 
-        return array('success' => FALSE, 'msg' => "Email is globally disabled and the header for $key, " . htmlspecialchars($rfc822) . ", does not match any of the whitelist patterns.");
-      }
-    }
-  }
-
-  // Allow callers to set the X-Sirius-Id, and don't resent with the same ID. This allows callers to set unique email keys.
-  $id = $params['X-Sirius-Id'];
-  if ($id) {
-    if (sirius_email_already_sent($id)) {
-      return array('success' => FALSE, 'msg' => "Skipping sending for message with id $id, because it's already been sent.");
-    }
-  }
-
-  return array('success' => TRUE);
-}
-
-
-function sirius_email_send($params) {
-  $result = sirius_email_send_possible($params);
-  if (!$result['success']) { return $result; }
-
-	$message = drupal_mail(
-		'sirius', 
-		'default', 
-		$params['to'], 
-		'und',
-		$params 
-	);
-
-  // Don't log attachments or body
-  unset($message['params']['attachments']);
-  unset($message['body']);
-  
-  sirius_log(
-    'email', 
-    'sending', 
-    $params['to'], 
-    strip_tags($params['body']),
-    $message['headers']['X-Sirius-Id'], 
-    $params['handler_nids'],
-    NULL,
-    json_encode($message)
-  );
-
-	return array('success' => TRUE, 'msg' => "Email sent to " . $params['to']);
-}
+function sirius_email_send_possible($params) { return sirius_comm_send_possible('email', $params); }
+function sirius_email_send($params) { return sirius_comm_send('email', $params); }
 
 /**
  * Implements hook_mail()
@@ -208,13 +145,7 @@ function sirius_mail($key, &$message, $params) {
     $message['headers']['Reply-To'] = $user->mail;
   }
 
-  // Tracking number
-  if ($params['X-Sirius-Id']) {
-    $id = $params['X-Sirius-Id'];
-  } else {
-    $id =  uuid_generate();
-  }
-  $message['headers']['X-Sirius-Id'] = $id;
+  $message['headers']['X-Sirius-Id'] = $params['id'];
 
   // "From" 
   $from_email = $params['from'];
@@ -232,65 +163,8 @@ function sirius_mail($key, &$message, $params) {
     $from_email;
 }
 
-function sirius_email_already_sent($id) {
-  // SQL for speed
-  $sql = "select * from node ";
-  $sql .= "join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
-  $sql .= "join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
-  $sql .= "join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
-  $sql .= "where node.type = 'sirius_log' ";
-  $sql .= "and field_sirius_notes_value = :id ";
-  $sql .= "and field_sirius_category_value = 'email' ";
-  $sql .= "and field_sirius_type_value = 'sending' ";
-  $stmt = db_query($sql, array(':id' => $id));
-  $hr = $stmt->fetchAssoc();
-  if ($hr) { return TRUE; }
-  return FALSE;
-}
-
-function sirius_email_callback($id, $type, $json) {
-  if ($id) {
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node');
-    $query->entityCondition('bundle', 'sirius_log');
-    $query->fieldCondition('field_sirius_notes', 'value', $id);
-    $query->fieldCondition('field_sirius_log_handler', 'target_id', 0, '>');
-    $query->fieldCondition('field_sirius_category', 'value', 'email');
-    $query->fieldCondition('field_sirius_type', 'value', 'sending');
-    $query->propertyOrderBy('nid', 'desc');
-    $stmt = $query->execute();
-    if ($stmt['node']) {
-      $previous_log_node = node_load(array_keys($stmt['node'])[0]);
-      $handler_nids = sirius_fieldvals($previous_log_node, 'field_sirius_log_handler', 'target_id');
-    }
-  }
-
-  $summary = '';
-  if ($json->Message->delivery->recipients) {
-    foreach ($json->Message->delivery->recipients as $email) {
-      if ($summary) { $summary .= ' / '; }
-      $summary .= $email;
-    }
-  }
-  if ($json->Message->bounce->bouncedRecipients) {
-    foreach ($json->Message->bounce->bouncedRecipients as $tmp) {
-      if ($summary) { $summary .= ' / '; }
-      $summary .= $tmp->emailAddress;
-      $summary .= ': ';
-      $summary .= $tmp->diagnosticCode;
-    }
-  }
-
-  sirius_log(
-    'email', 
-    $type, 
-    "Callback of type $type", 
-    $summary,
-    $id, 
-    $handler_nids,
-    NULL,
-    $json
-  );
+function sirius_email_callback($id, $status, $json) {
+  drupal_json_output(Sirius_Comm_Email::getInstance()->webhook(array('external_id' => $id, 'status' => $status, 'json' => $json)));
 }
 
 function sirius_page_emailaddress_list() {
@@ -309,48 +183,191 @@ function sirius_emailaddress_node_presave($node) {
   $node->title = $node->field_sirius_id['und'][0]['value'];
 }
 
-function sirius_emailaddress_lookup($emailaddress) {
-  // Look up the node
-  $domain_nid = sirius_domain_nid();
-  $emailaddress = sirius_email_format($emailaddress);
-  $sql_args = array(':emailaddress' => $emailaddress);
-  $sql = "select field_data_field_sirius_id.entity_id from field_data_field_sirius_id ";
-  $sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = field_data_field_sirius_id.entity_id ";
-  $sql .= "where field_data_field_sirius_id.entity_type = 'node' ";
-  $sql .= "and field_data_field_sirius_id.bundle = 'sirius_emailaddress' ";
-  $sql .= "and field_data_field_sirius_id.field_sirius_id_value = :emailaddress ";
-
-  if ($domain_nid) {
-    $sql .= "and field_sirius_domain_target_id = :domain_nid ";
-    $sql_args[':domain_nid'] = $domain_nid;
-  }
-  $stmt = db_query($sql, $sql_args);
-  $hr = $stmt->fetchAssoc();
-  $nid = $hr['entity_id'];
-  if ($nid) {
-    $node = node_load($nid);
-    sirius_minilog("Existing record found.");
-  } else {
-    global $user;
-    $node = new stdClass();
-    $node->type = 'sirius_emailaddress';
-    node_object_prepare($node);
-    $node->language = LANGUAGE_NONE;
-    $node->uid = $user->uid;
-    $node->status = 1;
-    $node->promote = 0;
-    $node->comment = 0;
-    $node->field_sirius_id['und'][0]['value'] = $emailaddress;
-    if ($domain_nid) { $node->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
-    sirius_minilog("Existing record not found, creating a new one.");
-  }
-
-  return $node;
-}
-
-function sirius_email_render($email) {
+function sirius_email_render($email, $options = array()) {
   if (!$email) { return ''; }
   $email = htmlspecialchars($email);
 
-  return "<a href=\"mailto:$email\">$email</a>";
+  $email_display = $email;
+  if ($options['maxlength']) {
+    if (strlen($email_display) > $options['maxlength']) {
+      $email_display = substr($email_display, 0, $options['maxlength'] - 3) . '...';
+    }
+  }
+
+  return "<a href=\"mailto:$email\">$email_display</a>";
+}
+
+class Sirius_Comm_Email extends Sirius_Comm {
+  public $type = 'email';
+  public $name = 'Email';
+
+  public function send_possible_impl($params) {
+    // Need a main recipient
+    if (!$params['to']) { return array('success' => FALSE, 'msg' => 'There is no "to" email address.'); }
+
+    // For each of the recipients....
+    foreach (array('to', 'cc', 'Cc', 'bcc', 'Bcc', 'from', 'From', 'reply-to', 'Reply-To') as $key) {
+      if ($key == 'to') { $rfc822 = $params[$key]; } else { $rfc822 = $params['headers'][$key]; }
+      if (!$rfc822) { continue; }
+      $records = sirius_email_rfc822_parse($rfc822);
+      if (!$records) { continue; }
+
+      foreach ($records as $record) {
+        // Must be a valid email address
+        if (!sirius_email_validate($record['address'])) { 
+          return array('success' => FALSE, 'msg' => "The header for $key, $rfc822, does not look like a valid rfc822-formatted email address.");
+        }
+
+        // Must be whitelisted
+        if (!sirius_email_whitelist_validate($record['address'])) { 
+          return array('success' => FALSE, 'msg' => "Email is globally disabled and the header for $key, " . htmlspecialchars($rfc822) . ", does not match any of the whitelist patterns.");
+        }
+      }
+    }
+
+    return array('success' => TRUE);
+  }
+
+  public function send_impl(&$params) {
+    $message = drupal_mail(
+      'sirius', 
+      'default', 
+      $params['to'], 
+      'und',
+      $params
+    );
+
+    // Clear attachments, so that we don't log them.
+    unset($params['attachments']);
+    unset($message['params']['attachments']);
+
+    if (!$message['send']) { 
+      return array('success' => FALSE, 'msg' => "Email to $params[to] failed.", 'message' => $message);
+    } else {
+      return array('success' => TRUE, 'message' => $message, 'external_id' => $params['id']); 
+    }
+  }
+
+  public function get_from_default() {
+    return variable_get("sirius_email_default_from_address", '');
+  }
+
+  public function render_body($comm_node) {
+    $body = $this->get_body($comm_node);
+    $json = sirius_json_get($comm_node);
+    if (!$body) { return ''; }
+    $html .= '<div class="sirius_comm_section sirius_comm_to">';
+
+    $html .= '<h2>' . t('Message') . '</h2>';
+    $subject = $json['result']['message']['subject'];
+    if ($subject) {
+      $html .= sirius_fakerender_field('Subject:', $subject);
+    }
+    $html .= '<hr>';
+    $html .= strip_tags($body, '<p><a><strong><b><i><br><table><img><tr><td><th><tbody>');
+    //$html .= sirius_text_to_html($body);
+    $html .= '</div>';
+    return $html;
+  }
+
+  public function render_from($comm_node) {
+    $json = sirius_json_get($comm_node);
+    $html .= '<div class="sirius_comm_section sirius_comm_from">';
+    $html .= '<h2>' . t('Sender') . '</h2>';
+    $keys = array(
+      'From',
+      'Sender',
+      'Reply-To'
+    );
+    foreach ($keys as $key) {
+      $value = $json['result']['message']['headers'][$key];
+      if ($value) {
+        $html .= sirius_fakerender_field($key . ':', $this->render_addr($value, 'long_html'));
+      }
+    }
+    $html .= '</div>';
+
+    return $html;
+  }
+
+  public function render_to($comm_node) {
+    $json = sirius_json_get($comm_node);
+    $to = $this->get_to($comm_node);
+
+    $html .= '<div class="sirius_comm_section sirius_comm_to">';
+    $html .= '<h2>' . t('Recipient(s)') . '</h2>';
+    $html .= sirius_fakerender_field('To:', $this->render_addr($to, 'long_html'));
+    $keys = array(
+      'Cc',
+      'Bcc'
+    );
+    foreach ($keys as $key) {
+      $value = $json['result']['message']['headers'][$key];
+      if ($value) {
+        $html .= sirius_fakerender_field($key . ':', $this->render_addr($value, 'long_html'));
+      }
+    }
+    $html .= '</div>';
+    return $html;
+  }
+
+  public function render_addr($addr, $format) {
+    return htmlspecialchars($addr);
+  }
+
+  public function webhook_impl($params = array()) {
+    // Really need different imlpementations for AWS and SendGrid. This is AWS.
+
+    $external_id = $params['external_id'];
+    if (!$external_id) { return array('success' => FALSE, 'msg' => 'No external ID sent'); }
+
+    $status = $params['status'];
+
+    // Convert JSON to an array (SNS sends it as a class)
+    $json = json_decode(json_encode($params['json']), TRUE);
+
+    $summary = '';
+    if ($json['Message']['delivery']['recipients']) {
+      foreach ($json['Message']['delivery']['recipients'] as $email) {
+        if ($summary) { $summary .= ' / '; }
+        $summary .= $email;
+      }
+    }
+    if ($json['Message']['bounce']['bouncedRecipients']) {
+      foreach ($json['Message']['bounce']['bouncedRecipients'] as $tmp) {
+        if ($summary) { $summary .= ' / '; }
+        $summary .= $tmp['emailAddress'];
+        $summary .= ': ';
+        $summary .= $tmp['diagnosticCode'];
+      }
+    }
+
+    $event_id = $json['MessageId'];
+
+    $details = $json;
+
+    return array(
+      'success' => TRUE, 
+      'event_id' => $event_id, 
+      'external_id' => $external_id, 
+      'status' => $status, 
+      'details' => $details,
+      'msg' => $summary
+    );
+  }
+
+  public function event_status_info_all() {
+    return array(
+      'Bounce' => array('comm_status' => 'failed'),
+      'Complaint' => array('comm_status' => 'failed'),
+      'Delivery' => array('comm_status' => 'sent'),
+      'Send' => array(),
+      'Reject' => array('comm_status' => 'failed'),
+      'Open' => array('comm_status' => 'sent'),
+      'Click' => array('comm_status' => 'sent'),
+      'Rendering Failure' => array('comm_status' => 'failed'),
+      'DeliveryDelay' => array(),
+      'Subscription' => array(),
+    );
+  }
 }

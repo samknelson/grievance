@@ -50,6 +50,10 @@ function sirius_dispatch_search($params) {
   	$sql .= "and field_sirius_dispatch_status_value = :status ";
   	$sql_args[':status'] = $params['status'];
   }
+  if ($params['job_nid']) {
+  	$sql .= "and field_sirius_dispatch_job_target_id = :job_nid ";
+  	$sql_args[':job_nid'] = $params['job_nid'];
+  }
   if ($params['statuses']) {
   	$sql .= "and field_sirius_dispatch_status_value in (:statuses) ";
   	$sql_args[':statuses'] = $params['statuses'];

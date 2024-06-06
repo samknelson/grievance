@@ -21,6 +21,8 @@ function sirius_worker_notify($worker_node, $params) {
 	if ($medium == 'email') {
 		return sirius_email_send($params);
 	} else {
+		unset($params['subject']);
+		unset($params['body']);
 		return sirius_sms_send($params);
 	}
 }

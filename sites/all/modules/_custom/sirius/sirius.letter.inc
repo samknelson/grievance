@@ -109,6 +109,7 @@ function sirius_letter_format_options($entity) {
 	);
 	if (sirius_fax_enabled()) { $format_options['fax'] = t('Fax'); }
 	if (sirius_sms_enabled()) { $format_options['sms'] = t('SMS Text Message'); }
+	if (sirius_domain_component_enabled('postal')) { $format_options['postal'] = t('Postal Letter'); }
 	return $format_options;
 }
 

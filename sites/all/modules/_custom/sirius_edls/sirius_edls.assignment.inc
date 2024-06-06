@@ -16,7 +16,9 @@ function sirius_edls_assignment_fetch_by_assignment_id($assignment_id) {
 
 function sirius_edls_assignment_fetch_crew($sheet_node, $crew_uuid) {
   $assignments = sirius_edls_assignment_fetch_sheet($sheet_node);
-  return $assignments[$crew_uuid];
+  $result = $assignments[$crew_uuid];
+  if (!$result) { $result = array(); }
+  return $result;
 }
 
 function sirius_edls_assignment_fetch_sheet($sheet_node) {
@@ -222,6 +224,19 @@ function sirius_edls_assign($date, $worker_id, $sheet_nid, $crew_uuid, $extra = 
   $assignments = sirius_edls_assignment_fetch_crew($sheet_node, $crew_uuid);
   if (!$assignments) { $assignments = array(); }
   if (count($assignments) >= $crew['count']) { return array('success' => FALSE, 'msg' => 'The crew is full.'); }
+
+  if (!sirius_edls_sheet_reserved($sheet_node)) {
+    if (preg_match('/^I/', $worker_id)) { 
+      $worker_id_external = preg_replace('/^I/', '', $worker_id);
+      $worker_nid =  sirius_worker_get_by_id($worker_id_external, TRUE);
+      if ($worker_nid) {
+        $sched = sirius_edls_sched_check_worker_day($employer_nid, $worker_nid, $date);
+        if ($sched) {
+          return array('success' => FALSE, 'msg' => "Schedule conflict: " . $sched['json']['display']['type']);
+        }
+      }
+    }
+  }
 
   $sql_args = array();
   $sql_args[':date'] = $date;

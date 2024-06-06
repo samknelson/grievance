@@ -148,6 +148,17 @@ function sirius_node_tabs() {
     'skip_node_view_check' => TRUE,
   );
 
+  $node_tabs['sirius_log']['sirius_log_comm'] = array(
+    'title' => 'Comm',
+    'description' => '',
+    'callback' => 'sirius_node_tab_comm',
+    'permissions' => array('sirius'),
+    'weight' => 1,
+    'file' => 'sirius.page_comm.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+
   // 
   // Entity Log
   //
@@ -206,6 +217,14 @@ function sirius_node_tabs() {
       'permissions' => array('sirius'),
     );
   }
+
+  $node_tabs['sirius_log']['sirius_letter'] = array(
+    'title' => 'Letter',
+    'description' => '',
+    'callback' => 'sirius_node_tab_letter',
+    'permissions' => array('sirius'),
+    'file' => 'sirius.page_letter.inc',
+  );
 
   $node_tabs['grievance_letter_template']['sirius_letter_template_recipients'] = array(
     'title' => 'Recipients',
@@ -329,6 +348,24 @@ function sirius_node_tabs() {
     'callback' => 'sirius_node_tab_json_definition_disclaimer',
     'permissions' => array('sirius domain admin'),
     'weight' => 1,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_json_definition_disclaimer/edit'] = array(
+    'title' => 'Edit',
+    'description' => '',
+    'callback' => 'sirius_node_tab_json_definition_disclaimer',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $node_tabs['sirius_json_definition']['sirius_json_definition_disclaimer/preview'] = array(
+    'title' => 'Preview',
+    'description' => '',
+    'callback' => 'sirius_node_tab_disclaimer_definition_preview',
+    'permissions' => array('sirius domain admin'),
+    'weight' => 2,
+    'file' => 'sirius.page_disclaimer_definition_preview.inc',
   );
 
   $node_tabs['sirius_json_definition']['sirius_customfield_content_types'] = array(
@@ -1315,16 +1352,28 @@ function sirius_menu() {
     'access callback' => 'sirius_menu_access_callback',
     'access arguments' => array(
       array(
-        'permissions' => array(
-          'sirius dispatch staff', 
-          'sirius trust staff',
-          'sirius pcct admin'
-        )
+        'permissions' => array('sirius dispatch staff', 'sirius trust staff')
       ),
     ),
     'type'             => MENU_LOCAL_ACTION,
     'context'          => MENU_CONTEXT_INLINE,
     'modal'            => TRUE,
+  );
+
+  $items['sirius/modal/%node/quicklog-view'] = array(
+    'title'            => 'View Log Entry',
+    'page callback'    => 'sirius_page_log_modal_view',
+    'page arguments'   => array(2),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'permissions' => array('sirius dispatch staff', 'sirius trust staff')
+      ),
+    ),
+    'type'             => MENU_LOCAL_ACTION,
+    'context'          => MENU_CONTEXT_INLINE,
+    'modal'            => TRUE,
+    'file' => 'sirius.page_log_modal_view.inc',
   );
 
   $items['sirius/phonenumber'] = array(
@@ -1400,6 +1449,15 @@ function sirius_menu() {
     'access arguments' => array('sirius domain admin'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 1,
+  );
+
+  $items['sirius/dev/config'] = array(
+    'title' => 'Development Settings',
+    'page callback' => 'sirius_page_dev_config',
+    'page arguments' => array(),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius.page_dev_config.inc',
   );
 
   $links = sirius_config_links();
@@ -1643,6 +1701,10 @@ function sirius_modal_paths() {
   $paths = array();
 
   $paths['sirius/modal/%node/quicklog'] = array(
+    'style' => 'sirius-modal-style',
+  );
+
+  $paths['sirius/modal/%node/quicklog-view'] = array(
     'style' => 'sirius-modal-style',
   );
 

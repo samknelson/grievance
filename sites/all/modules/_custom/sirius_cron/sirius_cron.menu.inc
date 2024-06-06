@@ -8,15 +8,6 @@
 function sirius_cron_node_tabs() {
   $node_tabs = array();
 
-  $node_tabs['sirius_json_definition']['sirius_cron_scan_settings'] = array(
-    'title' => 'Settings',
-    'description' => '',
-    'callback' => 'sirius_cron_node_tab_scan_settings',
-    'permissions' => array('sirius admin'),
-    'weight' => 1,
-    'file' => 'sirius_cron.page_scan_settings.inc',
-  );
-
   $node_tabs['sirius_json_definition']['sirius_cron_scan_info'] = array(
     'title' => 'Info',
     'description' => '',
@@ -74,6 +65,16 @@ function sirius_cron_menu() {
     'access arguments' => array('sirius admin'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_cron.page_scan_list.inc',
+  );
+
+  $items['sirius/cron/shortcut/%'] = array(
+    'title' => 'Cron Management',
+    'description' => '',
+    'page callback' => 'sirius_cron_page_shortcut',
+    'page arguments' => array(3),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_cron.page_scan_shortcut.inc',
   );
 
   return $items;

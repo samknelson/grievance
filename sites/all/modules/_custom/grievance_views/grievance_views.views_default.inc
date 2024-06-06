@@ -28229,7 +28229,8 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]" class="tool-button">Disclaimer</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]" class="tool-button">Edit</a>
+<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]/preview" class="tool-button">Preview</a>';
   $translatables['sirius_json_definitions'] = array(
     t('Master'),
     t('Surveys'),
@@ -28261,7 +28262,8 @@ Grievance Form',
     t('Disclaimers'),
     t('Current Path'),
     t('Active?'),
-    t('<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]" class="tool-button">Disclaimer</a>'),
+    t('<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]" class="tool-button">Edit</a>
+<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]/preview" class="tool-button">Preview</a>'),
   );
   $export['sirius_json_definitions'] = $view;
 

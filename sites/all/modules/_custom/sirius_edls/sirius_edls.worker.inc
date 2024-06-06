@@ -31,8 +31,18 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
   // But we want to avoid running ~2000 individual queries every few seconds for every active user. So 
   // we fetch as much information as we can in the one big query, and then pad it with additional information 
   // here. It's a cumbersome code design, but much more efficient.
-  $outsource_workers = sirius_edls_outsource_list($employer_nid, $date, $filters);
-  $dispatch_workers = sirius_edls_dispatch_list($employer_nid, $date, $filters);
+
+  if ($filters['skip_outsource']) {
+    $outsource_workers = array();
+  } else {
+    $outsource_workers = sirius_edls_outsource_list($employer_nid, $date, $filters);
+  }
+
+  if ($filters['skip_dispatch']) {
+    $dispatch_workers = array();
+  } else {
+    $dispatch_workers = sirius_edls_dispatch_list($employer_nid, $date, $filters);
+  }
   $result = array_merge($outsource_workers, $dispatch_workers);
   // $result = array_splice($result, 0, 20);
 
@@ -151,6 +161,10 @@ function sirius_edls_worker_render_details($worker_record) {
 function sirius_edls_worker_render_details_assignment($worker_record, $assignment, $options = array()) {
   $class = 'sirius_edls_worker_detail_assignment';
   if ($assignment) { $class .= ' sirius_edls_worker_detail_assignment_full'; } else { $class .= ' sirius_edls_worker_detail_assignment_empty'; }
+
+  // Can I view *all* notifications
+  $can_view_notifications = sirius_access_instance('edls')->access('notification_view');
+
   $html .= "<div class=\"$class\">";
   $html .= '<h2>' . $options['title'] . '</h2>';
   if ($assignment) {
@@ -169,6 +183,12 @@ function sirius_edls_worker_render_details_assignment($worker_record, $assignmen
 
     if (drupal_valid_path("node/$sheet_nid/sirius_edls_sheet_view")) {
       $html .= l('View', "node/$sheet_nid/sirius_edls_sheet_view", array('attributes' => array('class' => array('tool-button'))));
+    }
+    if ($can_view_notifications) {
+      $notification = sirius_edls_notify_fetch_by_assignment_id($assignment['assignment_id']);
+      if ($notification) {
+        $html .= l('Notification', 'edls-notify/' . $notification['notification_uuid'], array('attributes' => array('class' => array('tool-button'))));
+      }
     }
   } else {
     $html .= '[no assignment]';

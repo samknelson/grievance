@@ -51,6 +51,7 @@ function sirius_letter_wizard_send_form($form, &$form_state, $info, $data, $lett
 	if ($data['format'] == 'pdf') { $submit_label = t('Download PDF'); }
 	else if ($data['format'] == 'sms') { $submit_label = t('Send SMS Now'); }
 	else if ($data['format'] == 'fax') { $submit_label = t('Send Fax Now'); }
+	else if ($data['format'] == 'postal') { $submit_label = t('Send Postal Letter Now'); }
 	else { $submit_label = t("Submit"); }
 
 	$form['submit'] = array(
@@ -111,10 +112,6 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		if ($data['body']) {
 			$log_body .= "Message: " . drupal_html_to_text($data['body']) . "\n";
 		}
-
-
-
-
 
 		if ($letter_node->field_sirius_attachments) {
 			foreach ($letter_node->field_sirius_attachments['und'] as $delta => $record) {
@@ -386,6 +383,38 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 			} else {
 				drupal_set_message("SMS delivery to $recipient[phone] successful: " . $result['msg']);
 			}
+		}
+
+		if ($failure_count) { 
+			drupal_set_message("Delivery failed to $failure_count recipients.", 'warning');
+			$status = 'error';
+		} else {
+			$status = 'sent';
+		}
+	}
+
+	// If format is "sms", send
+	if ($format == 'postal') {
+		if (!sirius_domain_component_enabled('postal')) { drupal_set('Postal module is not enabled.', 'error'); return; }
+		$instance = sirius_postal_client_instance();
+		if (!$instance) { drupal_set('No postal client has been configured.', 'error'); return; }
+
+		$params = array();
+
+		$params['to'] = $data['recipients'][0]['addr'];
+		$params['from'] = $data['recipients'][1]['addr'];
+		$params['body'] = $data['body'];
+		$params['options'] = $data['postal_options'];
+		// $params['id'] = $letter_node->nid;
+		$params['handler_nids'] = array($letter_node->nid);
+		$result = $instance->send($params);
+
+		$failure_count = 0;
+		if (!$result['success']) {
+			drupal_set_message("Postal delivery failed: " . $result['msg'] . ': ' . $result['details'], 'warning');
+			$failure_count++;
+		} else {
+			drupal_set_message("Postal delivery successful.");
 		}
 
 		if ($failure_count) { 
