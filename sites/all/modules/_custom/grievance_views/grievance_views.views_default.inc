@@ -27980,7 +27980,7 @@ Grievance Form',
   $handler->display->display_options['title'] = 'Surveys';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'sirius';
+  $handler->display->display_options['access']['perm'] = 'sirius cardcheck admin';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
@@ -28230,7 +28230,50 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]" class="tool-button">Edit</a>
-<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]/preview" class="tool-button">Preview</a>';
+<a href="/node/[nid]/sirius_json_definition_disclaimer/preview?destination=[current_path]" class="tool-button">Preview</a>';
+
+  /* Display: Card Checks */
+  $handler = $view->new_display('block', 'Card Checks', 'block_4');
+  $handler->display->display_options['defaults']['footer'] = FALSE;
+  $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Global: Current Path */
+  $handler->display->display_options['fields']['current_path']['id'] = 'current_path';
+  $handler->display->display_options['fields']['current_path']['table'] = 'views';
+  $handler->display->display_options['fields']['current_path']['field'] = 'current_path';
+  $handler->display->display_options['fields']['current_path']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['current_path']['qs_support_fieldset'] = array(
+    'query_string_support' => NULL,
+  );
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'node';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  $handler->display->display_options['fields']['nid']['label'] = '';
+  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['nid']['element_label_colon'] = FALSE;
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
+  /* Field: Field: JSON */
+  $handler->display->display_options['fields']['field_sirius_json']['id'] = 'field_sirius_json';
+  $handler->display->display_options['fields']['field_sirius_json']['table'] = 'field_data_field_sirius_json';
+  $handler->display->display_options['fields']['field_sirius_json']['field'] = 'field_sirius_json';
+  $handler->display->display_options['fields']['field_sirius_json']['label'] = 'Active?';
+  $handler->display->display_options['fields']['field_sirius_json']['type'] = 'sirius_jsonfield_formatter_single';
+  $handler->display->display_options['fields']['field_sirius_json']['settings'] = array(
+    'sub_name' => 'disclaimer:active',
+  );
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_json_definition_cardcheck_definition?destination=[current_path]" class="tool-button">Edit</a>
+<a href="/node/[nid]/sirius_json_definition_cardcheck_definition/preview?destination=[current_path]" class="tool-button">Preview</a>';
   $translatables['sirius_json_definitions'] = array(
     t('Master'),
     t('Surveys'),
@@ -28263,7 +28306,10 @@ Grievance Form',
     t('Current Path'),
     t('Active?'),
     t('<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]" class="tool-button">Edit</a>
-<a href="/node/[nid]/sirius_json_definition_disclaimer?destination=[current_path]/preview" class="tool-button">Preview</a>'),
+<a href="/node/[nid]/sirius_json_definition_disclaimer/preview?destination=[current_path]" class="tool-button">Preview</a>'),
+    t('Card Checks'),
+    t('<a href="/node/[nid]/sirius_json_definition_cardcheck_definition?destination=[current_path]" class="tool-button">Edit</a>
+<a href="/node/[nid]/sirius_json_definition_cardcheck_definition/preview?destination=[current_path]" class="tool-button">Preview</a>'),
   );
   $export['sirius_json_definitions'] = $view;
 
@@ -28316,6 +28362,10 @@ Grievance Form',
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
+  /* Field: Content: Currency */
+  $handler->display->display_options['fields']['field_sirius_currency']['id'] = 'field_sirius_currency';
+  $handler->display->display_options['fields']['field_sirius_currency']['table'] = 'field_data_field_sirius_currency';
+  $handler->display->display_options['fields']['field_sirius_currency']['field'] = 'field_sirius_currency';
   /* Field: Global: Custom text */
   $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
@@ -28378,6 +28428,7 @@ Grievance Form',
     t('Nid'),
     t('Current Path'),
     t('Title'),
+    t('Currency'),
     t('Tools'),
     t('<a href="/node/[nid]/edit" class="tool-button">Edit</a>
 <a href="/node/[nid]/sirius_ledger_account_payments" class="tool-button">Payments</a>
@@ -32936,8 +32987,8 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['label'] = 'Actions';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>';
 
-  /* Display: Block 17 */
-  $handler = $view->new_display('block', 'Block 17', 'block_17');
+  /* Display: Trust Service Type */
+  $handler = $view->new_display('block', 'Trust Service Type', 'block_17');
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Taxonomy term: Term ID */
   $handler->display->display_options['fields']['tid']['id'] = 'tid';
@@ -33218,7 +33269,7 @@ Grievance Form',
 <a href="/taxonomy/term/[tid]/sirius_trust_election_relationships?destination=sirius/taxonomy/!1" class="tool-button">Relationships</a>'),
     t('Gender'),
     t('None of the above?'),
-    t('Block 17'),
+    t('Trust Service Type'),
     t('Service Type'),
     t('Contact Tags'),
     t('Job Classifications'),
