@@ -9,75 +9,46 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		return sirius_domain_variable_get('sirius_ledger_invoice_footer');
 	}
 
-	public function invoice_load($participant_nid, $interval) {
-		$accounts = $this->accounts($participant_nid, $interval);
-
-		$invoice = array();
+	public function invoice_load($participant_nid, $account_nid, $interval) {
 		$invoice['participant_nid'] = $participant_nid;
+		$invoice['account_nid'] = $account_nid;
 		$invoice['interval'] = $interval;
 
-		$items_by_account = array();
-		foreach ($accounts as $account_nid => $account_title) {
+		$params = array();
+		$params['ledger_participant'] = $participant_nid;
+		$params['ledger_account'] = $account_nid;
+		$params['ledger_ts_min'] = $interval['start_ts'];
+		$params['ledger_ts_max'] = $interval['end_ts'];
+		$invoice['items'] = sirius_ledger_ar_fetch($params);
 
-			$items_by_account[$account_nid] = array('title' => $account_title);
-
-			$params = array();
-			$params['ledger_participant'] = $participant_nid;
-			$params['ledger_account'] = $account_nid;
-
-			$params['ledger_ts_min'] = $interval['start_ts'];
-			$params['ledger_ts_max'] = $interval['end_ts'];
-			$items_by_account[$account_nid]['items'] = sirius_ledger_ar_fetch($params);
-
-			$params['ledger_participant'] = $participant_nid;
-			$params['ledger_ts_min'] = $interval['start_ts'];
-			$params['ledger_ts_max'] = $interval['end_ts'];
-			$params['balance'] = TRUE;
-			$total = sirius_ledger_ar_fetch($params);
-		}
-
-		$invoice['balances'] = $this->invoice_load_balances($participant_nid, $interval);
-		$invoice['items_by_account'] = $items_by_account;
+		$invoice['balances'] = $this->invoice_load_balances($participant_nid, $account_nid, $interval);
+		$invoice['items'] = sirius_ledger_ar_fetch($params);
 		return $invoice;
 	}
 
-	public function invoice_load_balances($participant_nid, $interval) {
-		$accounts = $this->accounts($participant_nid, $interval);
+	public function invoice_load_balances($participant_nid, $account_nid, $interval) {
+		$params = array();
+
+		$params['ledger_participant'] = $participant_nid;
+		$params['ledger_account'] = $account_nid;
+		$params['ledger_ts_min'] = $interval['start_ts'];
+		$params['ledger_ts_max'] = $interval['end_ts'];
+		$params['balance'] = TRUE;
+		$total = sirius_ledger_ar_fetch($params);
+
+		$params['ledger_ts_min'] = NULL;
+		$params['ledger_ts_max'] = $interval['start_ts'] - 1;
+		$balance_in = sirius_ledger_ar_fetch($params);
+
+		$balance_out = $total + $balance_in;
+
 		$balances = array();
-		foreach ($accounts as $account_nid => $account_title) {
-			$params = array();
-			$params['ledger_participant'] = $participant_nid;
-			$params['ledger_account'] = $account_nid;
-			$params['ledger_ts_min'] = $interval['start_ts'];
-			$params['ledger_ts_max'] = $interval['end_ts'];
-			$params['balance'] = TRUE;
-			$total = sirius_ledger_ar_fetch($params);
-
-			$params['ledger_ts_min'] = NULL;
-			$params['ledger_ts_max'] = $interval['start_ts'] - 1;
-			$balance_in = sirius_ledger_ar_fetch($params);
-
-			$balance_out = $total + $balance_in;
-
-			$balances[$account_nid]['total'] = $total;
-			$balances[$account_nid]['balance_in'] = $balance_in;
-			$balances[$account_nid]['balance_out'] = $balance_out;
-		}
+		$balances['total'] = $total;
+		$balances['balance_in'] = $balance_in;
+		$balances['balance_out'] = $balance_out;
+		$balances['account_nid'] = $account_nid;
 
 		return $balances;
-	}
-
-	public function accounts($participant_nid, $interval) {
-		// Get the list of accounts
-		$sql = "select distinct ledger_account from sirius_ledger_ar where ledger_participant = :participant_nid";
-		$stmt = sirius_sql_query($sql, array(':participant_nid' => $participant_nid));
-		$tmp = array();
-		while ($hr = $stmt->fetchAssoc()) { $tmp[] = $hr['ledger_account']; }
-		$accounts = sirius_ledger_account_list();
-		foreach ($accounts as $account_nid => $account_title) {
-			if (!in_array($account_nid, $tmp)) { unset($accounts[$account_nid]); }
-		}
-		return $accounts;
 	}
 
 	public function invoice_id($participant_nid, $interval) {
@@ -86,6 +57,8 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 
 	public function invoice_render($invoice) {
 		drupal_add_css('sites/all/modules/_custom/sirius_ledger/css/invoice.css');
+
+		$currency = sirius_ledger_currency_info_from_account_nid($invoice['account_nid'])['instance'];
 
 		$html = '';
 
@@ -99,28 +72,31 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		$participant_nid = $invoice['participant_nid'];
 		$participant_title = sirius_node_title($participant_nid);
 
+		$account_nid = $invoice['account_nid'];
+		$account_title = sirius_node_title($account_nid);
+
 		$invoice_id = $this->invoice_id($participant_nid, $invoice['interval']);
 
 		$html .= '<div class="sirius_ledger_invoice_body">';
 		$html .= '<div class="sirius_ledger_invoice_title">';
-		$html .= '<h1>' . $participant_title . ': ' . t('Invoice #') . $invoice_id . '</h1>';
+		$html .= '<h1>' . $participant_title . ' :: ' . $account_title . ' :: ' . t('Invoice #') . $invoice_id . '</h1>';
 		$html .= sirius_fakerender_field('Invoice period:', $invoice['interval']['month'] . ' / ' . $invoice['interval']['year']);
 
-		foreach ($invoice['items_by_account'] as $account_nid => $record) {
-			$options = array();
-			$options['hide_status'] = TRUE;
-			$options['hide_tools'] = TRUE;
-			$options['hide_participant'] = TRUE;
-			$options['hide_total'] = TRUE;
-			$options['hide_account_header'] = TRUE;
-			$options['empty_txt'] = t('No new entries this month.');
-			$html .= '<h2>' . $record['title'] . '</h2>';
+		$options = array();
+		$options['hide_status'] = TRUE;
+		$options['hide_tools'] = TRUE;
+		$options['hide_participant'] = TRUE;
+		$options['hide_total'] = TRUE;
+		$options['hide_account_header'] = TRUE;
+		$options['empty_txt'] = t('No new entries this month.');
+		$html .= '<h2>' . $record['title'] . '</h2>';
 
-			$html .= sirius_ledger_ar_render($record['items'], $options);
-			$html .= sirius_fakerender_field('Previous Balance:', sirius_ledger_ar_format_balance($invoice['balances'][$account_nid]['balance_in']));
-			$html .= sirius_fakerender_field('Invoice Total:', sirius_ledger_ar_format_balance($invoice['balances'][$account_nid]['total']));
-			$html .= sirius_fakerender_field('New Balance:', sirius_ledger_ar_format_balance($invoice['balances'][$account_nid]['balance_out']));
-		}
+		$html .= sirius_ledger_ar_render($invoice['items'], $options);
+		$html .= sirius_fakerender_field('Previous Balance:', $currency->render_amt(-1 * $invoice['balances']['balance_in']));
+		$html .= sirius_fakerender_field('Invoice Total:', $currency->render_amt(-1 * $invoice['balances']['total']));
+		$html .= sirius_fakerender_field('New Balance:', $currency->render_amt(-1 * $invoice['balances']['balance_out']));
+		$html .= '<br />';
+		$html .= sirius_fakerender_field('Total Due:', '<strong>' . $currency->render_amt($invoice['balances']['balance_out']) . '</strong>');
 
 		$html .= '</div>';
 
@@ -139,9 +115,9 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		return sirius_do_not_disturb_tz(); 
 	}
 
-	public function first_ts($participant_id) {
-		$sql = "select min(ledger_ts) as m from sirius_ledger_ar where ledger_participant = :participant_id";
-		$stmt = sirius_sql_query($sql, array(':participant_id' => $participant_id));
+	public function first_ts($participant_id, $account_nid) {
+		$sql = "select min(ledger_ts) as m from sirius_ledger_ar where ledger_participant = :participant_id and ledger_account = :account_nid";
+		$stmt = sirius_sql_query($sql, array(':participant_id' => $participant_id, ':account_nid' => $account_nid));
 		$hr = $stmt->fetchAssoc();
 		if (!$hr) { return NULL; }
 		$first_ts = $hr['m'];
@@ -190,8 +166,8 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		);
 	}
 
-	public function first_interval($participant_id) {
-		return $this->interval_from_ts($this->first_ts($participant_id));
+	public function first_interval($participant_id, $account_nid) {
+		return $this->interval_from_ts($this->first_ts($participant_id, $account_nid));
 	}
 
 	public function next_interval($interval) {
@@ -206,10 +182,10 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		return $this->interval_from_ts(time());
 	}
 
-	public function intervals($participant_id) {
+	public function intervals($participant_id, $account_nid) {
 		$intervals = array();
 
-		$interval = $this->first_interval($participant_id);
+		$interval = $this->first_interval($participant_id, $account_nid);
 		while ($interval) {
 			$intervals[$interval['id']] = $interval;
 

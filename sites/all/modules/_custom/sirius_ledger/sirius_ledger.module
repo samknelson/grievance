@@ -5,6 +5,8 @@ ini_set('error_reporting', ini_get('error_reporting') & ~E_NOTICE & ~E_DEPRECATE
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.menu.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.permission.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.currency.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.ea.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.accounts.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.payments.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.ar.inc';
@@ -13,6 +15,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.policy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.monthly.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.hourly.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.event.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.transmittal.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.feed.inc';
@@ -22,7 +25,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.charge_plugin.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_config.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_create.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_update.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_post.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_allocate.inc';
@@ -30,13 +32,8 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_payments.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_ar.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_settings.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_payments.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_ar.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_transmittal.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_transmittal_print.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_contact_payments.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_payments.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_ar.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_monthly.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_entity_policy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_transmittal.inc';
@@ -62,13 +59,52 @@ function sirius_ledger_sirius_domain_component_info() {
       'title' => 'Ledger - Worker - Charge - Hourly',
       'description' => 'Enable hourly billing per-worker',
     ),
+    'ledger:charge:event' => array(
+      'title' => 'Ledger - Charge - Event',
+      'description' => 'Enable event charges',
+    ),
   );
 }
+
+/**
+ * Implements hook_sirius_plugin_info
+ */
+
+function sirius_ledger_sirius_plugin_info($class) {
+	if ($class == 'ledger_charge') {
+		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.root.inc');
+		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.hourly.inc');
+		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.monthly.inc');
+		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.monthly_benefit.inc');
+		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.random.inc');
+		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.event.inc');
+
+	  $items = array();
+	  Sirius_Ledger_Charge_Plugin_Hourly::getInstance()->setInfo($items);
+	  Sirius_Ledger_Charge_Plugin_Monthly::getInstance()->setInfo($items);
+	  Sirius_Ledger_Charge_Plugin_Monthly_Benefit::getInstance()->setInfo($items);
+	  Sirius_Ledger_Charge_Plugin_Random::getInstance()->setInfo($items);
+	  Sirius_Ledger_Charge_Plugin_Event::getInstance()->setInfo($items);
+	  return $items;
+	}
+
+	if ($class == 'ledger_currency') {
+	  $items = array();
+	  Sirius_Ledger_Currency_Plugin_USD::getInstance()->setInfo($items);
+	  Sirius_Ledger_Currency_Plugin_Points::getInstance()->setInfo($items);
+	  return $items;
+	}
+}
+
+/**
+ * Implement hook_sirius_config_links_alter
+ */
 
 function sirius_ledger_sirius_config_links_alter(&$links) {
 	$links['ledger'] = array('title' => 'A/R Accounting and Ledger');
 	$links['ledger']['links']['sirius/config/ledger'] 					= array('title' => 'A/R Settings', 'description' => 'Settings for the A/R accounting system: ledger, dues, payments, charges, etc.');
 	$links['ledger']['links']['sirius/ledger/stripe/config']		= array('title' => 'Stripe Settings', 'description' => 'Settings for using the Stripe payment processor');
+	$links['ledger']['links']['sirius/ledger/accounts'] = array('title' => 'Accounts', 'description' => 'List of fund / accounts, e.g. Health and Welfare Fund, Employee Strike Fund, etc.');
 }
 
 /** 
@@ -115,6 +151,7 @@ function sirius_ledger_sirius_cron_scan_info() {
 
 function sirius_ledger_node_insert($node) {
 	if ($node->type == 'sirius_payperiod') { sirius_ledger_payperiod_set($node, 'live'); }
+	if ($node->type == 'sirius_event_participant') { sirius_ledger_event_participant_set($node, 'live'); }
 }
 
 /**
@@ -123,6 +160,7 @@ function sirius_ledger_node_insert($node) {
 
 function sirius_ledger_node_update($node) {
 	if ($node->type == 'sirius_payperiod') { sirius_ledger_payperiod_set($node, 'live'); }
+	if ($node->type == 'sirius_event_participant') { sirius_ledger_event_participant_set($node, 'live'); }
 }
 
 /**
@@ -131,8 +169,22 @@ function sirius_ledger_node_update($node) {
 
 function sirius_ledger_node_delete($node) {
 	if ($node->type == 'sirius_payperiod') { sirius_ledger_payperiod_clear($node, 'live'); }
+	if ($node->type == 'sirius_event_participant') { sirius_ledger_event_participant_set($node, 'live'); }
 }
 
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_ledger_sirius_backlinks_from_node_alter(&$links, $node) {
+	// For accounts, add a link to "all accounts"
+	if ($node->type == 'sirius_ledger_account') {
+		$links['sirius/ledger/accounts'] = array('name' => 'All Accounts');
+	}
+
+	// For ea nodes, set backlinks
+	Sirius_Ledger_EA::getInstance()->backlinks_from_node_alter($links, $node);
+}
 
 /**
  * Implements hook_node_view_alter

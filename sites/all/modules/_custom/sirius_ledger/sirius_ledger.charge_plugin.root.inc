@@ -40,12 +40,6 @@ class Sirius_Ledger_Charge_Plugin extends Sirius_Plugin {
 			$entry['ledger_json']['plugin']['type_id'] = $this->type;
 			$entry['ledger_json']['plugin']['type_name'] = $this->name;
 		}
-		if (!$entry['ledger_json']['tracking']) {
-			global $user;
-			$entry['ledger_json']['tracking']['ts'] = time();
-			$entry['ledger_json']['tracking']['uid'] = $user->uid;
-			$entry['ledger_json']['tracking']['name'] = $user->name;
-		}
 
 		// Set the account
 		$account_nid = $context['policy_settings']['account'];
@@ -82,7 +76,7 @@ class Sirius_Ledger_Charge_Plugin extends Sirius_Plugin {
 		}
 
 		$amt = $entry['ledger_amount'];
-		sirius_minilog("Writing to ledger: \$" . number_format($amt, 2) . " (mode=$mode)");
+		sirius_minilog("Writing to ledger: " . number_format($amt, 2) . " (mode=$mode)");
 
 		// Set the ledger status
 		if (!$entry['ledger_status']) {
@@ -115,7 +109,7 @@ class Sirius_Ledger_Charge_Plugin extends Sirius_Plugin {
 		// 
 		
 		if ($amt == $previous_total) {
-			sirius_minilog("Previous total was \$" . number_format($previous_total, 2) . ". The ledger will not be updated.");
+			sirius_minilog("Previous total was " . number_format($previous_total, 2) . ". The ledger will not be updated.");
 			$entry['ledger_amount'] = 0;
 		} else {
 			if ($previous_total) {
@@ -143,7 +137,7 @@ class Sirius_Ledger_Charge_Plugin extends Sirius_Plugin {
 			}
 		}
 
-		$msg = "Wrote to ledger: $account_title / " . date('Y-m-d', $entry['ledger_ts']) . " / billing $participant_type / \$" . number_format($entry['ledger_amount'], 2) . " total";
+		$msg = "Wrote to ledger: $account_title / " . date('Y-m-d', $entry['ledger_ts']) . " / billing $participant_type / " . number_format($entry['ledger_amount'], 2) . " total";
 		sirius_minilog($msg);
 
 		return array('success' => TRUE, 'entry' => $entry, 'msg' => $msg, 'amt' => $entry['ledger_amount']);
@@ -192,14 +186,6 @@ class Sirius_Ledger_Charge_Plugin extends Sirius_Plugin {
 
 		return $form;
 	}
-
-
-
-
-
-
-
-
 
 	///////////////////////////////////////
 	// Employer settings
@@ -250,6 +236,78 @@ class Sirius_Ledger_Charge_Plugin extends Sirius_Plugin {
 		drupal_set_message("Settings saved.");
 		return;
 	}
+
+	///////////////////////////////////////
+	// Event Type Settings
+	///////////////////////////////////////
+
+	public function event_type_settings_enabled() { return FALSE; }
+
+	public function event_type_settings($event_type_term, $plugin_uuid) {
+		$event_type_json = sirius_json_get($event_type_term);
+		return $event_type_json['charge_plugins']['settings'][$plugin_uuid];
+	}
+
+	public function event_type_settings_set($event_type_term, $plugin_uuid, $settings) {
+		$event_type_json = sirius_json_get($event_type_term);
+		$event_type_json['charge_plugins']['settings'][$plugin_uuid] = $settings;
+		sirius_json_set($event_type_term, $event_type_json);
+		taxonomy_term_save($event_type_term);
+	}
+
+	public function event_type_settings_form($form, &$form_state, $event_type_term, $plugin_uuid) {
+		return sirius_form_error("No settings form defined.");
+	}
+
+	public function event_type_settings_form_validate($form, &$form_state) {
+		return;
+	}
+
+	public function event_type_settings_form_submit($form, &$form_state) {
+		$event_type_term = taxonomy_term_load($form_state['event_type_tid']);
+		$plugin_uuid = $form_state['plugin_uuid'];
+		$this->event_type_settings_set($event_type_term, $plugin_uuid, $form_state['values']['settings']);
+		drupal_set_message("Settings saved.");
+		return;
+	}
+
+	///////////////////////////////////////
+	// Event Settings
+	///////////////////////////////////////
+
+	public function event_settings_enabled() { return FALSE; }
+
+	public function event_settings($event_node, $plugin_uuid) {
+		$event_json = sirius_json_get($event_node);
+		return $event_json['charge_plugins']['settings'][$plugin_uuid];
+	}
+
+	public function event_settings_set($event_node, $plugin_uuid, $settings) {
+		$event_json = sirius_json_get($event_node);
+		$event_json['charge_plugins']['settings'][$plugin_uuid] = $settings;
+		sirius_json_set($event_node, $event_json);
+		node_save($event_node);
+	}
+
+	public function event_settings_form($form, &$form_state, $event_node, $plugin_uuid) {
+		return sirius_form_error("No settings form defined.");
+	}
+
+	public function event_settings_form_validate($form, &$form_state) {
+		return;
+	}
+
+	public function event_settings_form_submit($form, &$form_state) {
+		$event_node = node_load($form_state['event_nid']);
+		$plugin_uuid = $form_state['plugin_uuid'];
+		$this->event_settings_set($event_node, $plugin_uuid, $form_state['values']['settings']);
+		drupal_set_message("Settings saved.");
+		return;
+	}
+
+
+
+
 
 	public function util_history_cleanup_form(&$history_items) {
 		foreach ($history_items as $delta => $value) {

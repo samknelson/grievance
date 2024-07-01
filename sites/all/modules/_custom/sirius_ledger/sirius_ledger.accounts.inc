@@ -35,3 +35,14 @@ function sirius_ledger_account_list($params = array()) {
 
 	return $cache[$domain_nid];
 }
+
+function sirius_ledger_account_payment_type_options($account_node) {
+	$account_json = sirius_json_get($account_node);
+	$tmp = $account_json['settings']['payments']['types'];
+	if (!$tmp) { return array(); }
+
+	$tmp = array_filter(array_values($tmp));
+	$options = array();
+	foreach ($tmp as $payment_type_tid) { $options[$payment_type_tid] = sirius_term_title($payment_type_tid); }
+	return $options;
+}
