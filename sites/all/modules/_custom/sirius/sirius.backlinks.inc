@@ -229,12 +229,6 @@ function sirius_backlinks_from_node($node) {
 		if ($path) { $links[$path] = array('name' => 'Event', 'title' => sirius_backlink_title($event_nid)); }
 	}
 
-	$payer_nid = $node->field_sirius_payer['und'][0]['target_id'];
-	if ($payer_nid) {
-		$path = "node/$payer_nid";
-		if ($path) { $links[$path] = array('name' => 'Payer', 'title' => sirius_backlink_title($payer_nid)); }
-	}
-
 	if ($node->type == 'sirius_log') {
 		$handler_nids = sirius_fieldvals($node, 'field_sirius_log_handler', 'target_id');
 		if ($handler_nids) {
