@@ -1,16 +1,14 @@
 <?php
 
-function sirius_ledger_node_tab_worker_ar($worker_node) {
-	return drupal_get_form('sirius_ledger_node_tab_worker_ar_form', $worker_node);
+function sirius_ledger_node_tab_ea_ar_access($ea_node) {
+	if ($ea_node->field_sirius_category['und'][0]['value'] != 'ledger:ea') { return FALSE; }
+	return Sirius_Ledger_Access::getInstance()->access('ea_view', array('ea_node' => $ea_node));
 }
 
-function sirius_ledger_node_tab_worker_ar_form($form, &$form_state, $worker_node) {
-	$form_state['worker_nid'] = $worker_node->nid;
-	$contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
-	if (!$contact_node) { 
-		drupal_set_message('There is no contact associated with this worker.', 'error');
-		return array();
-	}
+function sirius_ledger_node_tab_ea_ar_form($form, &$form_state, $ea_node) {
+	$form_state['ea_nid'] = $ea_node->nid;
+
+	$ea = Sirius_Ledger_EA::getInstance();
 
 	$form['filters'] = array(
 		'#type' => 'fieldset',
@@ -71,7 +69,10 @@ function sirius_ledger_node_tab_worker_ar_form($form, &$form_state, $worker_node
 	);
 
 	if (!$form_state['results']) {
-		$entries = sirius_ledger_ar_fetch(array('ledger_participant' => $contact_node->nid));
+		$params = array();
+		$params['ledger_participant'] = $ea->participant_node($ea_node)->nid;
+		$params['ledger_account'] = $ea->account_node($ea_node)->nid;
+		$entries = sirius_ledger_ar_fetch($params);
 		$form_state['results'] = sirius_ledger_ar_render($entries, array('hide_participant' => TRUE, 'hide_id' => TRUE));
 	}
 
@@ -80,13 +81,14 @@ function sirius_ledger_node_tab_worker_ar_form($form, &$form_state, $worker_node
 	return $form;
 }
 
-function sirius_ledger_node_tab_worker_ar_form_submit($form, &$form_state) {
+function sirius_ledger_node_tab_ea_ar_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
-	$worker_nid = $form_state['worker_nid'];
-	$worker_node = node_load($worker_nid);
-	$contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+	$ea_node = node_load($form_state['ea_nid']);
+	$ea = Sirius_Ledger_EA::getInstance();
 
-	$params = array('ledger_participant' => $contact_node->nid);
+	$params = array();
+	$params['ledger_participant'] = $ea->participant_node($ea_node)->nid;
+	$params['ledger_account'] = $ea->account_node($ea_node)->nid;
 
 	if ($form_state['values']['charge_or_payment'] == 'charge') {
 		$params['ledger_amount_min'] = 0;
@@ -105,5 +107,5 @@ function sirius_ledger_node_tab_worker_ar_form_submit($form, &$form_state) {
 	}
 	$entries = sirius_ledger_ar_fetch($params);
 
-	$form_state['results'] = sirius_ledger_ar_render($entries, array('filename' => "ar_$worker_nid.csv", 'display' => $form_state['values']['display'], 'hide_id' => TRUE, 'hide_participant' => TRUE));
+	$form_state['results'] = sirius_ledger_ar_render($entries, array('filename' => "ar_" . $ea_node->nid . ".csv", 'display' => $form_state['values']['display'], 'hide_id' => TRUE, 'hide_participant' => TRUE));
 }

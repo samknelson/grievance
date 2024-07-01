@@ -1,18 +1,7 @@
 <?php
 
-function sirius_ledger_page_ar_purge() {
-	return drupal_get_form('sirius_ledger_page_ar_purge_form');
-}
-
-function sirius_ledger_page_ar_purge_form($form, &$form_state) {
-	$accounts = array(NULL => t('-- Select --')) + sirius_ledger_account_list();
-
-	$form['account_nid'] = array(
-	 	'#type' => 'select',
-	 	'#options' => $accounts,
-	 	'#required' => TRUE,
-	 	'#title' => t('Account'),
-	);
+function sirius_ledger_node_tab_account_purge_form($form, &$form_state, $account_node) {
+	$form_state['account_nid'] = $account_node->nid;
 
 	$form['participant_nid'] = array(
 	 	'#type' => 'textfield',
@@ -35,9 +24,11 @@ function sirius_ledger_page_ar_purge_form($form, &$form_state) {
 	 return $form;
 }
 
-function sirius_ledger_page_ar_purge_form_submit($form, &$form_state) {
+function sirius_ledger_node_tab_account_purge_form_submit($form, &$form_state) {
+	$account_node = node_load($form_state['account_nid']);
+
 	$form_state['rebuild'] = TRUE;
-	$account_nid = $form_state['values']['account_nid'];
+	$account_nid = $account_node->nid;
 	if (!$account_nid) {
 		drupal_set_message("Please select an account.");
 		return;

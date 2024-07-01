@@ -19,7 +19,7 @@ function sirius_node_tabs() {
       'permissions' => array('sirius'),
       'weight' => 20,
     );
-    if ($content_type == 'sirius_log') {
+    if (in_array($content_type, array('sirius_log', 'sirius_event'))) {
       $node_tabs[$content_type][$content_type . '_materials']['skip_node_view_check'] = TRUE;
     }
   }

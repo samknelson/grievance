@@ -38,6 +38,6 @@ function sirius_node_tab_entity_plugin_form_submit($form, &$form_state) {
 	$plugin = sirius_plugin_entity_plugin($entity_node, $plugin_class, $plugin_uuid);
 	$plugin_key = $plugin['plugin'];
 	$info = sirius_plugin_info($plugin_class, $plugin_key);
-	drupal_set_message("Setting $plugin_class, $plugin_key");
+	drupal_set_message("Settings saved.");
 	return $info['instance']->entity_settings_form_submit($form, $form_state);
 }

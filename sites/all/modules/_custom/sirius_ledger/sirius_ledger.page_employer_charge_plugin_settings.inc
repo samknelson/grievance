@@ -37,10 +37,10 @@ function sirius_ledger_node_tab_employer_charge_plugin_settings($employer_node) 
 		drupal_goto(current_path() . '/' . reset(array_keys($items)));
 	}
 
-	return drupal_get_form('sirius_ledger_node_tab_employer_charge_plugin_settings_form1', $employer_node, $policy_node, $plugin_uuid);
+	return drupal_get_form('sirius_ledger_node_tab_employer_charge_plugin_settings_form', $employer_node, $policy_node, $plugin_uuid);
 }
 
-function sirius_ledger_node_tab_employer_charge_plugin_settings_form1($form, &$form_state, $employer_node, $policy_node, $plugin_uuid) {
+function sirius_ledger_node_tab_employer_charge_plugin_settings_form($form, &$form_state, $employer_node, $policy_node, $plugin_uuid) {
 	$form['nav'] = array('#markup' => sirius_ledger_node_tab_employer_charge_plugin_settings_quicknav($employer_node, $policy_node), '#weight' => -10);
 
 	$form_state['policy_nid'] = $policy_node->nid;
@@ -60,7 +60,7 @@ function sirius_ledger_node_tab_employer_charge_plugin_settings_form1($form, &$f
 	return $info['instance']->employer_settings_form($form, $form_state, $employer_node, $policy_node, $plugin_uuid);
 }
 
-function sirius_ledger_node_tab_employer_charge_plugin_settings_form1_validate($form, &$form_state) {
+function sirius_ledger_node_tab_employer_charge_plugin_settings_form_validate($form, &$form_state) {
 	$policy_node = node_load($form_state['policy_nid']);
 	$plugin_uuid = $form_state['plugin_uuid'];
 	$item = sirius_plugin_entity_plugin($policy_node, 'ledger_charge', $plugin_uuid);
@@ -69,7 +69,7 @@ function sirius_ledger_node_tab_employer_charge_plugin_settings_form1_validate($
 	return $info['instance']->employer_settings_form_validate($form, $form_state);
 }
 
-function sirius_ledger_node_tab_employer_charge_plugin_settings_form1_submit($form, &$form_state) {
+function sirius_ledger_node_tab_employer_charge_plugin_settings_form_submit($form, &$form_state) {
 	$policy_node = node_load($form_state['policy_nid']);
 	$plugin_uuid = $form_state['plugin_uuid'];
 	$item = sirius_plugin_entity_plugin($policy_node, 'ledger_charge', $plugin_uuid);
@@ -78,7 +78,7 @@ function sirius_ledger_node_tab_employer_charge_plugin_settings_form1_submit($fo
 	return $info['instance']->employer_settings_form_submit($form, $form_state);
 }
 
-
+/*
 function sirius_ledger_node_tab_employer_charge_plugin_settings_form($form, &$form_state, $employer_node, $policy_node, $plugin_uuid) {
 	$form['nav'] = array('#markup' => sirius_ledger_node_tab_policy_charge_plugins_quicknav($policy_node), '#weight' => -10);
 
@@ -97,3 +97,4 @@ function sirius_ledger_node_tab_employer_charge_plugin_settings_form($form, &$fo
 	if (!$info) { return sirius_form_error("Plugin not defined: $plugin_key"); }
 	return $info['instance']->employer_settings_form($form, $form_state, $policy_node, $plugin_uuid);
 }
+*/

@@ -1,25 +1,32 @@
 <?php
 
-function sirius_ledger_node_tab_entity_invoices_access($entity_node) {
-	$access = sirius_access_instance('ledger');
-	return $access->access('entity_page_view', array('entity_node' => $entity_node));
+function sirius_ledger_node_tab_ea_invoices_access($ea_node) {
+	if ($ea_node->field_sirius_category['und'][0]['value'] != 'ledger:ea') { return FALSE; }
+	return Sirius_Ledger_Access::getInstance()->access('ea_invoices', array('ea_node' => $ea_node));
 }
 
-function sirius_ledger_node_tab_entity_invoices($entity_node) {
+function sirius_ledger_node_tab_ea_invoices($ea_node) {
+	$ea = Sirius_Ledger_EA::getInstance();
+
 	$interval_id = $_REQUEST['interval_id'];
 	if ($interval_id) {
-		return sirius_ledger_node_tab_entity_invoices_single($entity_node, $interval_id);
+		return sirius_ledger_node_tab_ea_invoices_single($ea_node, $interval_id);
 	} else {
-		return sirius_ledger_node_tab_entity_invoices_multiple($entity_node);
+		return sirius_ledger_node_tab_ea_invoices_multiple($ea_node);
 	}
 }
 
-function sirius_ledger_node_tab_entity_invoices_single($entity_node, $interval_id) {
+function sirius_ledger_node_tab_ea_invoices_single($ea_node, $interval_id) {
+	$ea = Sirius_Ledger_EA::getInstance();
+	$entity_node = $ea->entity_node($ea_node);
+	$participant_node = $ea->participant_node($ea_node);
+	$account_node = $ea->account_node($ea_node);
+
 	$invoice_obj = sirius_ledger_invoice_obj();
 	$interval = $invoice_obj->interval_from_id($interval_id);
 	$next_interval = $invoice_obj->next_interval($interval);
 	$prev_interval = $invoice_obj->prev_interval($interval);
-	$first_interval = $invoice_obj->first_interval($entity_node->nid);
+	$first_interval = $invoice_obj->first_interval($participant_node->nid, $account_node->nid);
 	$now_interval = $invoice_obj->now_interval($entity_node);
 
 	if ($prev_interval['id'] < $first_interval['id']) { $prev_interval = array(); }
@@ -53,19 +60,23 @@ function sirius_ledger_node_tab_entity_invoices_single($entity_node, $interval_i
 
 	$html .= join('', $tools);
 
-	$invoice = $invoice_obj->invoice_load($entity_node->nid, $interval);
+	$invoice = $invoice_obj->invoice_load($participant_node->nid, $account_node->nid, $interval);
 
 	$html .= $invoice_obj->invoice_render($invoice);
 
 	return $html;
 }
 
-function sirius_ledger_node_tab_entity_invoices_multiple($entity_node) {
-	$invoice_obj = sirius_ledger_invoice_obj();
+function sirius_ledger_node_tab_ea_invoices_multiple($ea_node) {
+	$ea = Sirius_Ledger_EA::getInstance();
+	$entity_node = $ea->entity_node($ea_node);
+	$account_node = $ea->account_node($ea_node);
+	$participant_node = $ea->participant_node($ea_node);
 
-	$participant_nid = $entity_node->nid;
-	$intervals = array_reverse($invoice_obj->intervals($participant_nid));
-	$accounts = $invoice_obj->accounts($participant_nid, $invoice_obj->now_interval());
+	$invoice_obj = sirius_ledger_invoice_obj();
+	$currency = sirius_ledger_currency_info_from_account_nid($account_node->nid)['instance'];
+
+	$intervals = array_reverse($invoice_obj->intervals($participant_node->nid, $account_node->nid));
 
 	$html .= '<h2>' . t('Invoices') . '</h2>';
 	if (!$intervals) {
@@ -85,14 +96,12 @@ function sirius_ledger_node_tab_entity_invoices_multiple($entity_node) {
 				)
 			);
 
-			$balances = $invoice_obj->invoice_load_balances($entity_node->nid, $interval);
+			$balances = $invoice_obj->invoice_load_balances($participant_node->nid, $account_node->nid, $interval);
 
 			$row = array();
-			$row[] = $invoice_obj->invoice_id($participant_nid, $interval);
+			$row[] = $invoice_obj->invoice_id($participant_node->nid, $interval);
 			$row[] = $interval['month'] . '/' . $interval['year'];
-			foreach ($accounts as $account_nid => $account_title) {
-				$row[] = sirius_ledger_ar_format_balance($balances[$account_nid]['balance_out']);
-			}
+			$row[] = $currency->render_amt($balances['balance_out']);
 			$row[] = $tools;
 			$rows[] = $row;
 		}
@@ -100,9 +109,7 @@ function sirius_ledger_node_tab_entity_invoices_multiple($entity_node) {
 		$header = array();
 		$header[] = array('data' => t('Invoice #'));
 		$header[] = array('data' => t('Period'));
-		foreach ($accounts as $account_nid => $account_title) {
-			$header[] = array('data' => $account_title);
-		}
+		$header[] = array('data' => t('Balance'));
 		$header[] = array('data' => t('Tools'));
 		$count = count($header);
 		$pct = round(100/$count);
