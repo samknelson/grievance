@@ -9,7 +9,7 @@ function sirius_node_tab_entity_letter_access($entity) {
 		if (!in_array($entity->field_sirius_category['und'][0]['value'], array('ledger:auth'))) { return FALSE; }
 	}
 	
-	return TRUE;
+	return sirius_letter_access('list', $entity);
 }
 
 
