@@ -109,6 +109,15 @@ class Sirius_Cardcheck extends Sirius_Singleton {
 			}
 		}
 
+		// Add materials. This is a kludge.
+		if (sirius_materials_access('list', $cardcheck_node)) {
+			$html = sirius_node_tab_entity_materials_list($cardcheck_node, array('hide_add' => TRUE, 'hide_empty' => TRUE, 'hide_header' => TRUE, 'hide_tools' => TRUE));
+			if ($html) {
+				$html = '<div class="sirius_callout_basic">' . $html . '</div>';
+				$form['materials'] = array('#markup' => $html);
+			}
+		}
+
 		$actions = array();
 		if ($status == 'unsigned') {
 			// Can only accept if unsigned

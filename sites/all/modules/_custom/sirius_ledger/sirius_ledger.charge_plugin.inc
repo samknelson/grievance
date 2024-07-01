@@ -1,31 +1,11 @@
 <?php
 
-/**
- * Implements hook_sirius_plugin_info
- */
-
-function sirius_ledger_sirius_plugin_info($class) {
-	if ($class == 'ledger_charge') {
-		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.root.inc');
-		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.hourly.inc');
-		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.monthly.inc');
-		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.monthly_benefit.inc');
-		sirius_require('sirius_ledger', 'sirius_ledger.charge_plugin.random.inc');
-
-	  $items = array();
-	  Sirius_Ledger_Charge_Plugin_Hourly::getInstance()->setInfo($items);
-	  Sirius_Ledger_Charge_Plugin_Monthly::getInstance()->setInfo($items);
-	  Sirius_Ledger_Charge_Plugin_Monthly_Benefit::getInstance()->setInfo($items);
-	  Sirius_Ledger_Charge_Plugin_Random::getInstance()->setInfo($items);
-	  return $items;
-	}
-}
-
 function sirius_ledger_charge_plugin_trigger_info_all() {
 	return array(
 		'hourly' => array('name' => 'Hourly'),
 		'monthly' => array('name' => 'Monthly'),
 		'manual' => array('name' => 'Manual'),
+		'event' => array('name' => 'Event'),
 	);
 }
 
@@ -128,10 +108,33 @@ function sirius_ledger_charge_plugin_charge(&$context, $mode = 'test') {
 
 function sirius_ledger_charge_plugin_policy_lookup(&$context) {
 	if (!$context['policy_node']) {
-		sirius_minilog("Looking up the policy ...");
 		sirius_minilog_indent();
 		$context['policy_node'] = sirius_ledger_policy_lookup($context['worker_node'], $context['employer_node'], $context['ts']);
 		sirius_minilog_outdent();
 	}
 	return $context['policy_node'];
+}
+
+function sirius_ledger_charge_plugins_event() {
+	// Use the global default policy node
+	$policy_node = sirius_ledger_policy_lookup(NULL);
+	if (!$policy_node) { return array(); }
+
+	// Get the plugins 
+	$items = sirius_plugin_entity_plugins($policy_node, 'ledger_charge');
+
+	// Only plugins that implement event
+	foreach ($items as $item_uuid => $item) {
+		if (!$item['info']['instance']) { 
+			unset($items[$item_uuid]);
+			continue;
+		}
+		
+		if (!$item['info']['instance']->trigger_enabled('event')) {
+			unset($items[$item_uuid]);
+			continue; 
+		}
+	}
+
+	return $items;
 }

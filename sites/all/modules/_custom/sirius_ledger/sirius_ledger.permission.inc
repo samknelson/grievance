@@ -14,7 +14,7 @@ function sirius_ledger_permission() {
       'title' => t('Sirius Ledger Employer'), 
       'description' => t('Permission to access the A/R system as an employer.'),
     ),
-    'sirius ledger ledger worker' => array(
+    'sirius ledger worker' => array(
       'title' => t('Sirius Ledger Worker'), 
       'description' => t('Permission to access the A/R system as a worker.'),
     ),
@@ -57,13 +57,22 @@ class Sirius_Ledger_Access extends Sirius_Access {
 
   public function access($action, $context = array()) {
     global $user;
+    $ea = Sirius_Ledger_EA::getInstance();
 
     $actions = array(
       // No parameters
       'admin',
       
       // Parameter entity_node
-      'entity_page_view', 
+      'entity_view',
+
+      // Parameter entity_node, account_node
+      'ea_view',
+      'ea_invoices',
+      'ea_payments',
+
+      // Parameter payment_node
+      'payment_view',
     );
 
     // Who am I?
@@ -71,26 +80,42 @@ class Sirius_Ledger_Access extends Sirius_Access {
       $is_admin = TRUE;
     }
 
+    // If we have an EA node, then set our entity and account
+    if ($context['ea_node']) {
+      if (!$context['entity_node']) { $context['entity_node'] = $ea->entity_node($context['ea_node']); }
+      if (!$context['account_node']) { $context['account_node'] = $ea->account_node($context['ea_node']); }
+    }
+
+    // EA Invoices are restricted by setting
+    if ($action == 'ea_invoices') {
+      $account_json = sirius_json_get($context['account_node']);
+      if ($account_json['settings']['ea']['invoices'] != 'Yes') { return FALSE; }
+    }
+
     // Admins can do anything
     if ($is_admin) { return TRUE; }
 
-    $user_full = user_load($user->uid);
 
     // I may be restricted by "entity". For exmaple, if I am an employer,
     // I might be restricted to only see A/R entries or features within the context of
     // my specific employer.
     $is_my_entity = FALSE;
-    if (user_access('sirius ledger stripe employer')) {
-      $my_employer_nid = $user_full->field_grievance_shops['und'][0]['target_id'];
+    if (user_access('sirius ledger employer')) {
+      $my_employer_node = sirius_employer_get();
       if ($context['entity_node'] && 
         $context['entity_node']->type == 'grievance_shop' && 
-        $context['entity_node']->nid == $my_employer_nid) {
+        $context['entity_node']->nid == $my_employer_node->nid) {
         $is_my_entity = TRUE;
       }
     }
 
-    if (user_access('sirius ledger stripe worker')) {
-      // @todo: Same logic for a worker
+    if (user_access('sirius ledger worker')) {
+      $my_worker_node = sirius_worker_get();
+      if ($context['entity_node'] && 
+        $context['entity_node']->type == 'sirius_worker' && 
+        $context['entity_node']->nid == $my_worker_node->nid) {
+        $is_my_entity = TRUE;
+      }
     }
 
     // If we have an entity node, it must be MY entity node
@@ -99,8 +124,27 @@ class Sirius_Ledger_Access extends Sirius_Access {
     }
 
     // View entity page
-    if ($action == 'entity_page_view') {
+    if ($action == 'entity_view') {
       return $is_my_entity;
+    }
+
+    // View ea page
+    if (in_array($action, array('ea_view', 'ea_invoices', 'DISABLED_ea_payments'))) {
+      // Must be my own entity
+      if (!$is_my_entity) { return FALSE; }
+
+      // Must have an account node
+      if (!$context['account_node']) { return FALSE; }
+
+      // Make sure that we have one of the roles that can access this account
+      if (!$user->roles) { return FALSE; }
+      $account_json = sirius_json_get($context['account_node']);
+      if (!$account_json['settings']['ea']['access']['view']['roles']) { return FALSE; }
+      if (!array_intersect(array_keys($user->roles), array_filter(array_values($account_json['settings']['ea']['access']['view']['roles'])))) {
+        return FALSE;
+      }
+
+      return TRUE;
     }
 
     // Oh well
