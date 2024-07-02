@@ -317,6 +317,10 @@ function sirius_backlinks_from_node($node) {
 		$links['sirius/trust/services'] = array('name' => 'All Services');
 	}
 
+	if ($node->type == 'sirius_ledger_account') {
+		$links['sirius/ledger/accounts'] = array('name' => 'All Accounts');
+	}
+
 	drupal_alter('sirius_backlinks_from_node', $links, $node);
 
 	return $links;
