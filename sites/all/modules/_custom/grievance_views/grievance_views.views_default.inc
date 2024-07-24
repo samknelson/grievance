@@ -33342,12 +33342,23 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_id']['id'] = 'field_sirius_id';
   $handler->display->display_options['fields']['field_sirius_id']['table'] = 'field_data_field_sirius_id';
   $handler->display->display_options['fields']['field_sirius_id']['field'] = 'field_sirius_id';
+  /* Field: Field: JSON */
+  $handler->display->display_options['fields']['field_sirius_json']['id'] = 'field_sirius_json';
+  $handler->display->display_options['fields']['field_sirius_json']['table'] = 'field_data_field_sirius_json';
+  $handler->display->display_options['fields']['field_sirius_json']['field'] = 'field_sirius_json';
+  $handler->display->display_options['fields']['field_sirius_json']['label'] = 'Show on Landing Page?';
+  $handler->display->display_options['fields']['field_sirius_json']['type'] = 'sirius_jsonfield_formatter_single';
+  $handler->display->display_options['fields']['field_sirius_json']['settings'] = array(
+    'sub_name' => 'contact_tags:display:landing',
+  );
   /* Field: Global: Custom text */
   $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Actions';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>
+<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1/sirius_contact_tags_display" class="tool-button">Display Options</a>
+';
 
   /* Display: Job Classifications */
   $handler = $view->new_display('block', 'Job Classifications', 'block_19');
@@ -33506,6 +33517,10 @@ Grievance Form',
     t('Trust Service Type'),
     t('Service Type'),
     t('Contact Tags'),
+    t('Show on Landing Page?'),
+    t('<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1" class="tool-button">Edit</a>
+<a href="/taxonomy/term/[tid]/edit?destination=sirius/taxonomy/!1/sirius_contact_tags_display" class="tool-button">Display Options</a>
+'),
     t('Job Classifications'),
   );
   $export['sirius_taxonomy'] = $view;
