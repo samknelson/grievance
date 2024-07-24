@@ -515,6 +515,25 @@ function grievance_content_types_ds_custom_fields_info() {
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
+  $ds_field->field = 'contact_tags';
+  $ds_field->label = 'Contact Tags';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'sirius_worker|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<p>Replace me</p>
+',
+      'format' => 'full_html',
+    ),
+    'use_token' => 0,
+  );
+  $export['contact_tags'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
   $ds_field->field = 'custom_fields';
   $ds_field->label = 'Custom Fields';
   $ds_field->field_type = 5;
