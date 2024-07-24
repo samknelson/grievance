@@ -21,7 +21,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_list.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_user.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_employer_worker_list.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_work_status.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_renew.inc";
@@ -31,7 +30,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_remove.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_term_delete.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_term_renew.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_ein.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_contact.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_contact_customfields.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_industry.inc";
@@ -125,6 +123,24 @@ function sirius_worker_get_by_phone($phone) {
   $query->propertyOrderBy('nid', 'desc');
   $stmt = $query->execute();
   if (!$stmt['node']) { return NULL; }
+
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
+function sirius_worker_get_by_field($field_name, $id, $nid_only = FALSE) {
+  if (!$id) { return NULL; }
+
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_worker');
+  $query->fieldCondition($field_name, 'value', $id);
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+  $query->propertyOrderBy('nid', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+
+  if ($nid_only) { return array_keys($stmt['node'])[0]; }
 
   return node_load(array_keys($stmt['node'])[0]);
 }
