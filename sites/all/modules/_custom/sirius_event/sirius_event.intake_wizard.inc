@@ -146,6 +146,7 @@ function sirius_event_intake_wizard_intro_form($form, &$form_state, $info, $data
     '#attributes' => array('autocomplete' => 'off'),
 		'#date_format' => 'm/d/Y',
 		'#default_value' => $data['identity']['dob'],
+		'#date_year_range' => '-150:0',
 	);
 
 	$form['survey_wrap_close'] = array('#markup' => '</div>');

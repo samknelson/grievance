@@ -406,6 +406,58 @@ function sirius_worker_node_view($node, $view_mode, $langcode) {
 
   // Render languages
   sirius_lang_node_view($node, $view_mode, $langcode);
+
+  // Render contact tags
+  sirius_worker_contact_tags_node_view($node, $view_mode, $langcode);
+}
+
+/**
+ * Show the "contact tags" on the landing page for the worker. But only those
+ * tags which have been flagged for display.
+ */
+
+function sirius_worker_contact_tags_node_view(&$node, $view_mode, $langcode) {
+  if ($node->type != 'sirius_worker') { return; }
+  if (!$node->content['contact_tags']) { return; }
+
+  $tags = &drupal_static(__FUNCTION__);
+  if (!isset($tags)) {
+    $tmp = sirius_taxonomy_load('sirius_contact_tags', 'tid', 'full');
+    foreach ($tmp as $tid => $term) {
+      $json = sirius_json_get($term);
+      if ($json['contact_tags']['display']['landing'] != 'Yes') { continue; }
+      $tags[$tid] = $term->name;
+    }
+  }
+
+  if (!$tags) {
+    unset($node->content['contact_tags']);
+    return; 
+  }
+
+  $contact_node = sirius_worker_contact_get($node);
+  if (!$contact_node) {
+    unset($node->content['contact_tags']);
+    return;
+  }
+
+  $my_tids = sirius_fieldvals($contact_node, 'field_sirius_contact_tags', 'tid');
+  $display_names = array();
+  foreach ($tags as $tid => $name) {
+    if (!in_array($tid, $my_tids)) { continue; }
+    $display_names[] = $name;
+  }
+  if (!$display_names) {
+    unset($node->content['contact_tags']);
+    return;
+  }
+
+  $node->content['contact_tags'][0]['#markup'] = sirius_fakerender_field(
+    'Tags:',
+    join('<br />', $display_names)
+  );
+
+  return;
 }
 
 /**
