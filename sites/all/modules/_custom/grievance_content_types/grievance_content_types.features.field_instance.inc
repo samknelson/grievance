@@ -28282,7 +28282,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28387,7 +28387,7 @@ If the file has multiple pages, then each page in the input document will use th
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 21,
+        'weight' => 12,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28454,7 +28454,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 45,
+        'weight' => 26,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29289,7 +29289,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 12,
+        'weight' => 11,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29383,7 +29383,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 47,
+        'weight' => 28,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29431,7 +29431,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 20,
+        'weight' => 11,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29480,7 +29480,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 10,
+        'weight' => 23,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29536,7 +29536,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 9,
+        'weight' => 10,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29582,7 +29582,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 11,
+        'weight' => 24,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29633,7 +29633,7 @@ If the file has multiple pages, then each page in the input document will use th
           'image_style' => 'medium',
         ),
         'type' => 'image',
-        'weight' => 33,
+        'weight' => 0,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29928,7 +29928,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 46,
+        'weight' => 27,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -30172,7 +30172,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 16,
+        'weight' => 8,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -30227,7 +30227,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 17,
+        'weight' => 9,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -30279,7 +30279,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 18,
+        'weight' => 10,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -30325,7 +30325,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 25,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -30369,7 +30369,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 9,
+        'weight' => 21,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -30435,7 +30435,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 10,
+        'weight' => 22,
       ),
       'sirius_worker' => array(
         'label' => 'above',
