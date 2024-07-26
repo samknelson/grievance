@@ -1,6 +1,7 @@
 <?php
 
 function sirius_cardcheck_node_tab_cardcheck_access($cardcheck_node) {
+	if ($cardcheck_node->field_sirius_category['und'][0]['value'] != 'cardcheck') { return FALSE; }
 	$access = Sirius_Cardcheck_Access::getInstance();
 	return $access->access("view cardcheck", array('cardcheck_node' => $cardcheck_node));
 }

@@ -19,7 +19,7 @@ function sirius_node_tabs() {
       'permissions' => array('sirius'),
       'weight' => 20,
     );
-    if ($content_type == 'sirius_log') {
+    if (in_array($content_type, array('sirius_log', 'sirius_event'))) {
       $node_tabs[$content_type][$content_type . '_materials']['skip_node_view_check'] = TRUE;
     }
   }
@@ -549,6 +549,16 @@ function sirius_term_tabs() {
       );
     }
   }
+
+  $term_tabs['sirius_contact_tags']['sirius_contact_tags_display'] = array(
+    'title' => 'Term Display Options',
+    'description' => '',
+    'callback' => 'sirius_node_tab_contact_tags_display',
+    'permissions' => array('sirius domain admin'),
+    'file' => 'sirius.page_contact_tags_display.inc',
+    'weight' => 4,
+  );
+
 
   sirius_node_tab_set_module('sirius', $term_tabs);
   return $term_tabs;

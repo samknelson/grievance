@@ -23003,6 +23003,49 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'node-sirius_ledger_account-field_sirius_currency'.
+  $field_instances['node-sirius_ledger_account-field_sirius_currency'] = array(
+    'bundle' => 'sirius_ledger_account',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'list_default',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_currency',
+    'label' => 'Currency',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 3,
+    ),
+  );
+
   // Exported field_instance: 'node-sirius_ledger_account-field_sirius_domain'.
   $field_instances['node-sirius_ledger_account-field_sirius_domain'] = array(
     'bundle' => 'sirius_ledger_account',
@@ -23043,7 +23086,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -23123,7 +23166,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -24359,14 +24402,9 @@ If the file has multiple pages, then each page in the input document will use th
     'display' => array(
       'default' => array(
         'label' => 'inline',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'field_delimiter' => '',
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 12,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 13,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -24446,7 +24484,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 13,
+        'weight' => 12,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -24485,7 +24523,7 @@ If the file has multiple pages, then each page in the input document will use th
         'settings' => array(
           'bypass_access' => 1,
           'field_delimiter' => '',
-          'link' => 1,
+          'link' => 0,
         ),
         'type' => 'entityreference_label',
         'weight' => 1,
@@ -24658,7 +24696,7 @@ If the file has multiple pages, then each page in the input document will use th
         'settings' => array(
           'bypass_access' => 1,
           'field_delimiter' => '',
-          'link' => 1,
+          'link' => 0,
         ),
         'type' => 'entityreference_label',
         'weight' => 0,
@@ -25642,6 +25680,46 @@ If the file has multiple pages, then each page in the input document will use th
       ),
       'type' => 'options_select',
       'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_term_proxy-field_sirius_json'.
+  $field_instances['node-sirius_term_proxy-field_sirius_json'] = array(
+    'bundle' => 'sirius_term_proxy',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'sirius_jsonfield',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'sirius_jsonfield_formatter_full',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_json',
+    'label' => 'JSON',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => -2,
     ),
   );
 
@@ -28204,7 +28282,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28309,7 +28387,7 @@ If the file has multiple pages, then each page in the input document will use th
           'use_widget_handlers' => 1,
         ),
         'type' => 'addressfield_default',
-        'weight' => 21,
+        'weight' => 12,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -28376,7 +28454,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 45,
+        'weight' => 26,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29211,7 +29289,7 @@ If the file has multiple pages, then each page in the input document will use th
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 12,
+        'weight' => 11,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29305,7 +29383,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 47,
+        'weight' => 28,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29353,7 +29431,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 20,
+        'weight' => 11,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29402,7 +29480,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 10,
+        'weight' => 23,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29458,7 +29536,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 9,
+        'weight' => 10,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29504,7 +29582,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 11,
+        'weight' => 24,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29555,7 +29633,7 @@ If the file has multiple pages, then each page in the input document will use th
           'image_style' => 'medium',
         ),
         'type' => 'image',
-        'weight' => 33,
+        'weight' => 0,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -29850,7 +29928,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 46,
+        'weight' => 27,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -30094,7 +30172,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 16,
+        'weight' => 8,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -30149,7 +30227,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 17,
+        'weight' => 9,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -30201,7 +30279,7 @@ If the file has multiple pages, then each page in the input document will use th
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 18,
+        'weight' => 10,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -30247,7 +30325,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 25,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -30291,7 +30369,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 9,
+        'weight' => 21,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -30357,7 +30435,7 @@ If the file has multiple pages, then each page in the input document will use th
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 10,
+        'weight' => 22,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -33746,6 +33824,80 @@ If the file has multiple pages, then each page in the input document will use th
       ),
       'type' => 'options_select',
       'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_dispatch_sib-field_sirius_domain'.
+  $field_instances['taxonomy_term-sirius_dispatch_sib-field_sirius_domain'] = array(
+    'bundle' => 'sirius_dispatch_sib',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 3,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_domain',
+    'label' => 'Domain',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'content_taxonomy_opt_groups' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'taxonomy_term-sirius_dispatch_sib-field_sirius_json'.
+  $field_instances['taxonomy_term-sirius_dispatch_sib-field_sirius_json'] = array(
+    'bundle' => 'sirius_dispatch_sib',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'sirius_jsonfield',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'sirius_jsonfield_formatter_full',
+        'weight' => 4,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_sirius_json',
+    'label' => 'Definition',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'sirius_jsonfield',
+      'settings' => array(),
+      'type' => 'sirius_jsonfield_widget_raw',
+      'weight' => 9,
     ),
   );
 
@@ -37167,6 +37319,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Contract Templates');
   t('Count');
   t('Created');
+  t('Currency');
   t('Current Employer');
   t('Data Corrected');
   t('Date');

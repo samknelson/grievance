@@ -17,8 +17,6 @@ function sirius_ledger_node_tab_payment_allocate_transmittal_form($form, &$form_
 
 	$form_state['payment_nid'] = $payment_node->nid;
 	$payment_json = sirius_jsonfield_util_node_json_get($payment_node);
-	// sirius_jsonfield_util_node_json_set($payment_node, array());
-	// node_save($payment_node);
 
 	$employer_node = node_load($payment_node->field_sirius_payer['und'][0]['target_id']);
 	if (!$employer_node) {

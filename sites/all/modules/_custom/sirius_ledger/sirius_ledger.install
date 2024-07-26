@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * Add json column to ledger
+ */
+
+function sirius_ledger_update_7001() {
+  $sqls = array(
+    'alter table sirius_ledger_ar add column ledger_json json',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
+

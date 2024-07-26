@@ -146,7 +146,7 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 
 	if (is_array($value)) {
 		if ($form_element['#type'] == 'date_popup') { $value_rendered = $value['date'] . ' ' . $value['time']; }
-		else if ($form_element['#type'] == 'checkboxes') { 
+		else if (($form_element['#type'] == 'checkboxes') || ($form_element['#type'] == 'select')) { 
 			foreach ($value as $a => $b) {
 				if ($b) {
 					if ($form_element['#options']) { $name = $form_element['#options'][$b]; }

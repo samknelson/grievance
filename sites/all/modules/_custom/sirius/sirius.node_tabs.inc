@@ -196,7 +196,11 @@ function sirius_term_tab_access($term, $in_tab_name) {
   $access_function_name = $tab_record['callback'] . '_access';
   sirius_node_tab_handle_requires($tab_record);
   if (function_exists($access_function_name)) {
-    if (!$access_function_name($term)) { return false; }
+    $args = array($term);
+    if ($tab_record['callback arguments']) {
+      $args = array_merge($args, $tab_record['callback arguments']);
+    }
+    if (!call_user_func_array($access_function_name, $args)) { return FALSE; }
   }
   
   return true;

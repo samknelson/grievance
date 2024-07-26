@@ -1,6 +1,7 @@
 <?php
 
-// For the moment, this tab is only "simple monthly hours".
+// For the moment, this tab is only "simple monthly hours" and is tied to transmittal sheets.
+// We should eventually separate it out...
 
 function sirius_hour_node_tab_employer_hours_access($employer_node) {
 	return sirius_domain_variable_get('sirius_hour_enable_simple_monthly') == 'Yes';

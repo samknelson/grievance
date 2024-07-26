@@ -32,9 +32,6 @@ class Sirius_Cardcheck_Access extends Sirius_Access {
       // No parameters
       'config',
       'staff', 
-
-      // optional employer_nid
-      'create worker',
     );
 
     // Who am I?
@@ -46,8 +43,10 @@ class Sirius_Cardcheck_Access extends Sirius_Access {
       $is_worker = TRUE;
     }
 
-    // Admins can do anything
-    if ($is_admin) { return TRUE; }
+    // Admins can do pretty much anything.
+    if ($is_admin) { 
+      if ($action != 'create worker cardcheck') { return TRUE; }
+    }
 
     // If we are passed in a worker node, we must have access to it.
     if (isset($context['worker_node'])) {

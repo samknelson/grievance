@@ -12,6 +12,10 @@ function sirius_ledger_node_tab_payment_allocate_options($payment_node) {
 	return $options;
 }
 
+/**
+ * @todo: This should really be "node_tab_payment_view". It's just a view of the payment, with information about allocation.
+ */
+
 function sirius_ledger_node_tab_payment_allocate($payment_node) {
 	$html = "";
 
@@ -24,26 +28,18 @@ function sirius_ledger_node_tab_payment_allocate($payment_node) {
 		$html .= "<br /><br />";
 	}
 
-	$fields = array(
-		'field_sirius_ledger_allocated',
-		'field_sirius_payment_status',
-		'field_sirius_notes',
-	);
-	foreach ($fields as $field) {
-		$html .= sirius_dispatch_view_render_field($payment_node, $field);
-	}
+	$renderable = node_view($payment_node);
+	$html .= drupal_render($renderable);
 
+	$html .= '<hr><h2>Allocation</h2>';
 	$entries = sirius_ledger_ar_fetch(array('ledger_reference' => $payment_node->nid));
-	if ($entries) { 
-		$html .= sirius_ledger_ar_render($entries, array('hide_reference' => TRUE));
-	} else {
-		$html .= "There are no A/R entries associated with this payment.";
-	}
+	$html .= sirius_ledger_ar_render($entries, array('hide_reference' => TRUE));
 
 	return $html;
 }
 
 function sirius_ledger_node_tab_payment_allocate_manual_access($payment_node) {
+	if ($payment_node->field_sirius_payment_status['und'][0]['value'] != 'Cleared') { return FALSE; }
 	return in_array('manual', sirius_ledger_node_tab_payment_allocate_options($payment_node));
 }
 
@@ -163,6 +159,7 @@ function sirius_ledger_node_tab_payment_allocate_manual_form_submit($form, &$for
 }
 
 function sirius_ledger_node_tab_payment_allocate_upload_access($payment_node) {
+	if ($payment_node->field_sirius_payment_status['und'][0]['value'] != 'Cleared') { return FALSE; }
 	return in_array('upload', sirius_ledger_node_tab_payment_allocate_options($payment_node));
 }
 
@@ -190,6 +187,7 @@ function sirius_ledger_node_tab_payment_allocate_upload($payment_node) {
 }
 
 function sirius_ledger_node_tab_payment_allocate_simple_access($payment_node) {
+	if ($payment_node->field_sirius_payment_status['und'][0]['value'] != 'Cleared') { return FALSE; }
 	return in_array('simple', sirius_ledger_node_tab_payment_allocate_options($payment_node));
 }
 

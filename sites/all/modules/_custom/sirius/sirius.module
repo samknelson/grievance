@@ -70,6 +70,7 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.tooltip.inc
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.proxy.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.nota.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.lang.inc';
+require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.plugin.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.dev.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius/sirius.install';
 

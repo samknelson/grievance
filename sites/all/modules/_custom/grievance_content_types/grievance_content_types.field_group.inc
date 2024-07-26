@@ -2796,7 +2796,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_sirius_phone_alt',
       3 => 'field_sirius_email',
       4 => 'field_sirius_phone_fax',
-      5 => 'langs',
+      5 => 'contact_tags',
+      6 => 'langs',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2947,7 +2948,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Identity',
-    'weight' => '1',
+    'weight' => '2',
     'children' => array(
       0 => 'field_sirius_id',
       1 => 'field_sirius_name',
@@ -3050,7 +3051,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Dispatch Preferences',
-    'weight' => '4',
+    'weight' => '6',
     'children' => array(
       0 => 'field_sirius_skills_avail',
       1 => 'field_sirius_dispatch_dncs2',
@@ -3186,7 +3187,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Status',
-    'weight' => '2',
+    'weight' => '5',
     'children' => array(
       0 => 'field_grievance_shop',
       1 => 'field_sirius_member_status',
@@ -3259,7 +3260,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Skills',
-    'weight' => '50',
+    'weight' => '29',
     'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(

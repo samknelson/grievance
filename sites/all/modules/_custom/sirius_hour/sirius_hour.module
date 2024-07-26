@@ -103,6 +103,10 @@ function sirius_hour_sirius_domain_component_info() {
       'title' => 'Hour - Reconcile',
       'description' => 'Allow multiple sources for hours, and reconcile which is "live".',
     ),
+    'hour:transmittal' => array(
+      'title' => 'Hour - Transmittal Sheets',
+      'description' => 'Support for "Transmittal Sheets", paper-based tools for employers to report hours.',
+    ),
   );
 }
 

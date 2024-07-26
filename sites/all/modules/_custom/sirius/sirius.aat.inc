@@ -68,3 +68,15 @@ function sirius_aat_generate($len, $type = 'number') {
 	}
 	return $aat;
 }
+
+function sirius_aat_word() {
+	sirius_require('sirius', 'sirius.aat_words.inc');
+	static $words;
+	if (!isset($words)) { 
+		$words =& sirius_aat_words();
+	}
+
+	$key = '';
+	for ($i=0; $i<5; ++$i) { $key .= rand(1,6); }
+	return $words[$key];
+}

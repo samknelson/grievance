@@ -262,9 +262,9 @@ function sirius_taxonomy_settings($vocabulary_machine_name) {
     $settings['sirius_dispatch_job_type']['view'] = 'sirius_taxonomy';
     $settings['sirius_dispatch_job_type']['display'] = 'block';
     $settings['sirius_dispatch_job_type']['multidomain'] = 'Yes';
-    $settings['sirius_dispatch_sib']['view'] = '';
-    $settings['sirius_dispatch_sib']['display'] = '';
-    $settings['sirius_dispatch_sib']['multidomain'] = '';
+    $settings['sirius_dispatch_sib']['view'] = 'sirius_taxonomy';
+    $settings['sirius_dispatch_sib']['display'] = 'block';
+    $settings['sirius_dispatch_sib']['multidomain'] = 'No';
     $settings['sirius_event_participant_role']['view'] = 'sirius_taxonomy';
     $settings['sirius_event_participant_role']['display'] = 'block';
     $settings['sirius_event_participant_role']['multidomain'] = 'Yes';
@@ -409,6 +409,10 @@ function sirius_taxonomy_proxy($tid) {
   node_object_prepare($node);
   node_save($node);
   return $node;
+}
+
+function sirius_taxonomy_term_from_proxy($proxy_node) {
+  return taxonomy_term_load($proxy_node->field_sirius_term_proxy['und'][0]['target_id']);
 }
 
 function sirius_node_access_term_proxy($node, $op, $account) { return FALSE; }

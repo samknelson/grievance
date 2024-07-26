@@ -5,10 +5,10 @@ function sirius_ledger_page_stripe_config_webhook() {
 }
 
 function sirius_ledger_page_stripe_config_webhook_form($form, &$form_state) {
-	sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
+	$service = sirius_ledger_service();
 	$webhookendpoint_id = sirius_domain_variable_get('sirius_ledger_stripe_webhookendpoint_id');
 	if ($webhookendpoint_id) {
-		$result = sirius_ledger_stripe_webhookendpoint_retrieve($webhookendpoint_id);
+		$result = $service->webhookendpoint_retrieve($webhookendpoint_id);
 		if ($result['success']) {
 			$form['msg'] = array('#markup' => sirius_fakerender_field('Current Endpoint:', $webhookendpoint_id));
 		} else {
@@ -17,8 +17,8 @@ function sirius_ledger_page_stripe_config_webhook_form($form, &$form_state) {
 	}
 
 	if ($result['webhookendpoint']) {
-		$webhookendpoint_json = sirius_ledger_stripe_object_to_json($result['webhookendpoint']);
-		$url = sirius_ledger_stripe_object_url($webhookendpoint_json);
+		$webhookendpoint_json = $service->object_to_json($result['webhookendpoint']);
+		$url = $service->object_url($webhookendpoint_json);
 		$form['link'] = array('#markup' => "<a href=\"$url\" target=\"_blank\" class=\"tool-button\">" . t('View in Stripe') . '</a>');
 	}
 
@@ -48,20 +48,20 @@ function sirius_ledger_page_stripe_config_webhook_form($form, &$form_state) {
 }
 
 function sirius_ledger_page_stripe_config_webhook_form_submit($form, &$form_state) {
-	sirius_require('sirius_ledger', 'sirius_ledger.stripe.inc');
+	$service = sirius_ledger_service();
 	$action = $form_state['values']['action'];
 
 	if ($action == 'create') {
-		$result = sirius_ledger_stripe_webhookendpoint_create();
+		$result = $service->webhookendpoint_create();
 		if ($result['success']) {
-			$webhookendpoint_json = sirius_ledger_stripe_object_to_json($result['webhookendpoint']);
+			$webhookendpoint_json = $service->object_to_json($result['webhookendpoint']);
 			sirius_domain_variable_set('sirius_ledger_stripe_webhookendpoint_id', $webhookendpoint_json['id']);
 			sirius_domain_variable_set('sirius_ledger_stripe_webhookendpoint_secret', $webhookendpoint_json['secret']);
 		} 
 	}
 
 	if ($action == 'delete') {
-		$result = sirius_ledger_stripe_webhookendpoint_delete(sirius_domain_variable_get('sirius_ledger_stripe_webhookendpoint_id'));
+		$result = $service->webhookendpoint_delete(sirius_domain_variable_get('sirius_ledger_stripe_webhookendpoint_id'));
 		if ($result['success']) {
 			sirius_domain_variable_set('sirius_ledger_stripe_webhookendpoint_id', NULL);
 			sirius_domain_variable_set('sirius_ledger_stripe_webhookendpoint_secret', NULL);
@@ -69,7 +69,7 @@ function sirius_ledger_page_stripe_config_webhook_form_submit($form, &$form_stat
 	}
 
 	if ($action == 'update') {
-		$result = sirius_ledger_stripe_webhookendpoint_update(sirius_domain_variable_get('sirius_ledger_stripe_webhookendpoint_id'));
+		$result = $service->webhookendpoint_update(sirius_domain_variable_get('sirius_ledger_stripe_webhookendpoint_id'));
 	}
 
 	if ($result['success']) {

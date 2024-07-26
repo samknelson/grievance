@@ -45,16 +45,23 @@ class Sirius_Access extends Sirius_Singleton {
    * Return TRUE if access is granted, FALSE if it is denied.
    * If access is denied, the reason for denial is sent to minilog().
    */
-   
-  public function access($action, $context = array()) { return array('success' => TRUE); }
+
+  public function access($action, $context = array()) { 
+  	return TRUE;
+  }
 
   public function settings_form() { return array(); }
 
   public function deny($msg, $action = NULL, $context = NULL) {
-  	$this->error_msg = "Access denied - $action: $msg";
+  	$tmp = '';
+  	if ($action) { $tmp = "Access denied - $action: "; }
+  	$tmp .= $msg;
+  	$this->error_msg = $msg;
   	sirius_minilog("Access denied - $action: $msg", 'access');
   	return FALSE; 
   }
+
+  public function error_msg() { return $this->error_msg; }
 }
 
 class Sirius_Access_Grantall extends Sirius_Access {
