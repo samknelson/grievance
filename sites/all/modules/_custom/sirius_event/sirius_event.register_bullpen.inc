@@ -69,7 +69,11 @@ function sirius_event_register_bullpen_signin_form_submit($form, &$form_state) {
     drupal_set_messge(t('The event is misconfigured; no prole or pstatus set.'), 'warning');
   }
 
-  $result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
+  $participant_json = array();
+  $participant_json['bullpen']['self'] = TRUE;
+  $participant_json['comments'] = 'Staff Sign-In';
+
+  $result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid, $participant_json);
   if ($result['success']) { 
     drupal_set_message('The worker has been signed in to the event.');
   } else { 

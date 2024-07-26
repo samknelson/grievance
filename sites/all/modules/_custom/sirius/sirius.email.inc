@@ -256,7 +256,7 @@ class Sirius_Comm_Email extends Sirius_Comm {
     $body = $this->get_body($comm_node);
     $json = sirius_json_get($comm_node);
     if (!$body) { return ''; }
-    $html .= '<div class="sirius_comm_section sirius_comm_to">';
+    $html .= '<div class="sirius_comm_section sirius_comm_body">';
 
     $html .= '<h2>' . t('Message') . '</h2>';
     $subject = $json['result']['message']['subject'];

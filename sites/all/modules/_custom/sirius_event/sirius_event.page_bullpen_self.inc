@@ -60,7 +60,10 @@ function sirius_node_tab_event_bullpen_self_register_form_submit($form, &$form_s
     return;
   }
 
-	$result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid);
+  $participant_json = array();
+  $participant_json['bullpen']['self'] = TRUE;
+  $participant_json['comments'] = 'Self Sign-In';
+	$result = sirius_event_participant_register($event_nid, $contact_nid, $prole_tid, $pstatus_tid, $participant_json);
   if ($result['success']) { drupal_set_message(t('You have been signed in to this bullpen.')); } else { drupal_set_message($result['msg'], 'error'); }
 }
 
