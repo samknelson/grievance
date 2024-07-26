@@ -20,7 +20,7 @@ function sirius_do_not_disturb_tz() {
 
 function sirius_page_do_not_disturb_config() { return drupal_get_form('sirius_page_do_not_disturb_config_form'); }
 
-function sirius_page_do_not_disurb_config_form($form, &$form_state) {
+function sirius_page_do_not_disturb_config_form($form, &$form_state) {
 	$form['current_time'] = array('#markup' => sirius_tz_indicator(sirius_do_not_disturb_tz()));
 
 	$json = sirius_do_not_disturb_json();
