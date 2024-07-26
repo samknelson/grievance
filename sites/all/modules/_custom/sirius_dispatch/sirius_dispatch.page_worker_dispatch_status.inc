@@ -106,26 +106,6 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 		);
 	} 
 
-	if (user_access('sirius dispatch staff')) {
-		$options = sirius_taxonomy_load('sirius_dispatch_sib', 'tid', 'name', TRUE);
-		$form['sib'] = array(
-			'#type' => 'select',
-			'#title' => t('Sign-In Blocked?'),
-			'#options' => $options,
-			'#default_value' => $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid'],
-		);
-
-		$form['reason'] = array(
-			'#type' => 'textarea',
-			'#title' => t('Notes'),
-		);
-	} else {
-		$sib_term = taxonomy_term_load($worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']);
-		if ($sib_term && $sib_term->field_sirius_dispatch_available['und'][0]['value'] == 'No') {
-			$form['sib'] = array('#markup' => '<div class="sirius_form_intro"><strong>Sign-in is not permitted - the administrator has placed a sign-in block. Please contact the office for more information.</strong></div>');
-		}
-	}
-
 	if ($need_submit) {
 		// Submit button
 		$form['submit'] = array(
@@ -135,18 +115,6 @@ function sirius_node_tab_worker_dispatch_status_form($form, &$form_state, $worke
 	} 
 
 	return $form;
-}
-
-function sirius_node_tab_worker_dispatch_status_form_validate($form, &$form_state) {
-	$worker_node = $form_state['worker_node'];
-
-	if (user_access('sirius dispatch staff')) {
-		$reason = $form_state['values']['reason'];
-		$block_tid = $form_state['values']['sib'];
-		if (!$reason && ($block_tid != $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid'])) {
-			form_set_error('reason', 'If you are changing the sign-in block status, please enter a reason.');
-		}
-	}
 }
 
 function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state) {
@@ -160,18 +128,6 @@ function sirius_node_tab_worker_dispatch_status_form_submit($form, &$form_state)
 			$worker_node->field_sirius_dispatch_availdate['und'][0]['value'] = $newdate;
 			node_save($worker_node);
 			sirius_log('worker:availdate', 'set', "Set worker's seniority date to $newdate", $reason, '', array($worker_node->nid));
-		}
-
-		$block_tid = $form_state['values']['sib'];
-		if ($block_tid != $worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']) {
-			if ($block_tid) {
-				$block_term = taxonomy_term_load($block_tid);
-				sirius_dispatch_worker_dispstatus_block_set($worker_node, $block_tid, $reason);
-				drupal_set_message("Sign-in block has been set to " . $block_term->name);
-			} else {
-				sirius_dispatch_worker_dispstatus_block_set($worker_node, NULL, $reason);
-				drupal_set_message("Sign-in block has been cleared.");
-			}
 		}
 	}
 
