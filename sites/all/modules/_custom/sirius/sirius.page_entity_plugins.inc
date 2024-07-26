@@ -1,6 +1,11 @@
 <?php 
 
-function sirius_node_tab_entity_plugins_access($entity_node, $plugin_class) {
+function sirius_node_tab_entity_plugins_access($entity, $plugin_class) {
+	// Might be passed a term or a node. If it's a term, get the "proxy".
+	if ($entity->nid) { $entity_node = $entity; } 
+	else if ($entity->tid) { $entity_node = sirius_taxonomy_proxy($entity->tid); }
+	else { return FALSE; }
+
 	if ($plugin_class == 'ledger_charge') {
 		if ( ($entity_node->type == 'sirius_json_definition') && 
 			   ($entity_node->field_sirius_type['und'][0]['value'] == 'sirius_ledger:policy')
@@ -14,7 +19,7 @@ function sirius_node_tab_entity_plugins_access($entity_node, $plugin_class) {
 			 ) { return TRUE; }
 	}
 
-	return FALSE;
+	return TRUE;
 }
 
 function sirius_node_tab_entity_plugins_quicknav($entity_node, $plugin_class) {
@@ -38,7 +43,12 @@ function sirius_node_tab_entity_plugins_quicknav($entity_node, $plugin_class) {
 	return sirius_quicknav($links);
 }
 
-function sirius_node_tab_entity_plugins($entity_node, $plugin_class) {
+function sirius_node_tab_entity_plugins($entity, $plugin_class) {
+	// Might be passed a term or a node. If it's a term, get the "proxy".
+	if ($entity->nid) { $entity_node = $entity; } 
+	else if ($entity->tid) { $entity_node = sirius_taxonomy_proxy($entity->tid); }
+	else { return FALSE; }
+
 	$plugin_uuid = sirius_node_tab_arg(0);
 	if ($plugin_uuid) {
 		sirius_require('sirius', 'sirius.page_entity_plugin.inc');
@@ -167,6 +177,8 @@ function sirius_node_tab_entity_plugins_form_submit($form, &$form_state) {
 	$entity_json = sirius_json_get($entity_node);
 	$plugin_class = $form_state['plugin_class'];
 
+	$info_all = sirius_plugin_info_all($plugin_class);
+
 	$plugins = array();
 	$plugins_input = $form_state['values']['plugins'];
 	if (!$plugins_input) { $plugins_input = array(); }
@@ -174,6 +186,10 @@ function sirius_node_tab_entity_plugins_form_submit($form, &$form_state) {
 	foreach ($plugins_input as $plugin) {
 		if (!$plugin['plugin'] && !$plugin['title']) { continue; }
     if ($plugin['delete']) { continue; }
+
+    if (!$plugin['title']) {
+    	$plugin['title'] = $info_all[$plugin['plugin']]['name'];
+    }
 		$uuid = $plugin['uuid'];
 		if (!$uuid) { 
 			$uuid = uuid_generate();
