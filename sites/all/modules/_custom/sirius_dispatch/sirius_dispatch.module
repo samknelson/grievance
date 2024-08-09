@@ -447,20 +447,9 @@ function sirius_dispatch_node_view($node, $view_mode, $langcode) {
 
   // Render the SIB status 
   if ($node->type == 'sirius_worker') {
-    if (!user_access('sirius dispatch staff')) {
-      $block_tid = $node->field_sirius_dispatch_sib_status['und'][0]['tid'];
-      if ($block_tid) {
-        $block_term = taxonomy_term_load($block_tid);
-        $name_display = $block_term->field_sirius_name_display['und'][0]['value'];
-        if (!$name_display) { $name_display = $block_term->name; }
-        $node->content['field_sirius_dispatch_sib_status'][0]['#markup'] = $name_display;
-      }
-    }
-
     if (!sirius_domain_component_enabled('dispatch:live')) {
       $fields = array(
         'field_sirius_dispatch_asi', 
-        'field_sirius_dispatch_sib_status',
         'field_sirius_skills_avail',
         'field_sirius_dispatch_availdate',
         'field_sirius_dispatch_hfe_until',

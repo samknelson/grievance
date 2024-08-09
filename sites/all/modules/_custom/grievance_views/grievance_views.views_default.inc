@@ -18787,7 +18787,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_bulk_medium']['id'] = 'field_sirius_bulk_medium';
   $handler->display->display_options['fields']['field_sirius_bulk_medium']['table'] = 'field_data_field_sirius_bulk_medium';
   $handler->display->display_options['fields']['field_sirius_bulk_medium']['field'] = 'field_sirius_bulk_medium';
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -18889,7 +18889,7 @@ Grievance Form',
     17 => 0,
     19 => 0,
   );
-  /* Filter criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Filter criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['filters']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -19617,7 +19617,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -19670,7 +19670,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_notes']['id'] = 'field_sirius_notes';
   $handler->display->display_options['fields']['field_sirius_notes']['table'] = 'field_data_field_sirius_notes';
   $handler->display->display_options['fields']['field_sirius_notes']['field'] = 'field_sirius_notes';
-  /* Sort criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Sort criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -19704,7 +19704,7 @@ Grievance Form',
     0 => '446',
   );
   $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['vocabulary'] = 'sirius_dispatch_job_type';
-  /* Filter criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Filter criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['filters']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -19771,7 +19771,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -19842,7 +19842,7 @@ Grievance Form',
     0 => '446',
   );
   $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['vocabulary'] = 'sirius_dispatch_job_type';
-  /* Filter criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Filter criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['filters']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -19889,7 +19889,7 @@ Grievance Form',
     15 => 0,
     17 => 0,
   );
-  /* Filter criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Filter criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['filters']['field_sirius_datetime_value_1']['id'] = 'field_sirius_datetime_value_1';
   $handler->display->display_options['filters']['field_sirius_datetime_value_1']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['filters']['field_sirius_datetime_value_1']['field'] = 'field_sirius_datetime_value';
@@ -20054,7 +20054,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -20129,7 +20129,7 @@ Grievance Form',
     t('Employer'),
     t('Call Number'),
     t('Created'),
-    t('Start Date / Time'),
+    t('LEGACY Start Date / Time'),
     t('Facility'),
     t('Hall'),
     t('Report Location'),
@@ -20933,7 +20933,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -20946,7 +20946,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: End Date / Time */
+  /* Field: Content: LEGACY End Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['id'] = 'field_sirius_datetime_completed';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['table'] = 'field_data_field_sirius_datetime_completed';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['field'] = 'field_sirius_datetime_completed';
@@ -20982,7 +20982,7 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]" target="_blank" class="tool-button">View</a> <a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a> <a href="/node/[nid]/sirius_dispatch_job_dispatches" target="_blank" class="tool-button">Dispatches</a>';
-  /* Sort criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Sort criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -21019,7 +21019,7 @@ Grievance Form',
   );
   $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['vocabulary'] = 'sirius_dispatch_job_type';
-  /* Filter criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Filter criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['filters']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -21053,8 +21053,8 @@ Grievance Form',
     t('Type'),
     t('Status'),
     t('Created'),
-    t('Start Date / Time'),
-    t('End Date / Time'),
+    t('LEGACY Start Date / Time'),
+    t('LEGACY End Date / Time'),
     t('Sequence'),
     t('Accepted'),
     t('Tools'),
@@ -21112,10 +21112,11 @@ Grievance Form',
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
+  $handler->display->display_options['fields']['field_sirius_datetime']['label'] = 'Start Date / Time';
   $handler->display->display_options['fields']['field_sirius_datetime']['settings'] = array(
     'format_type' => 'date_only_sortable',
     'custom_date_format' => '',
@@ -21125,10 +21126,11 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: End Date / Time */
+  /* Field: Content: LEGACY End Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['id'] = 'field_sirius_datetime_completed';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['table'] = 'field_data_field_sirius_datetime_completed';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['field'] = 'field_sirius_datetime_completed';
+  $handler->display->display_options['fields']['field_sirius_datetime_completed']['label'] = 'End Date / Time';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['settings'] = array(
     'format_type' => 'date_only_sortable',
     'custom_date_format' => '',
@@ -21311,10 +21313,11 @@ Grievance Form',
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
+  $handler->display->display_options['fields']['field_sirius_datetime']['label'] = 'Start Date / Time';
   $handler->display->display_options['fields']['field_sirius_datetime']['settings'] = array(
     'format_type' => 'date_only_sortable',
     'custom_date_format' => '',
@@ -21324,10 +21327,11 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: End Date / Time */
+  /* Field: Content: LEGACY End Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['id'] = 'field_sirius_datetime_completed';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['table'] = 'field_data_field_sirius_datetime_completed';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['field'] = 'field_sirius_datetime_completed';
+  $handler->display->display_options['fields']['field_sirius_datetime_completed']['label'] = 'End Date / Time';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['settings'] = array(
     'format_type' => 'date_only_sortable',
     'custom_date_format' => '',
@@ -21644,7 +21648,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -21698,7 +21702,7 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a> <a href="/node/[nid]/sirius_dispatch_job_manage" target="_blank" class="tool-button">Manage</a>';
-  /* Sort criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Sort criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -21735,7 +21739,7 @@ Grievance Form',
   );
   $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['vocabulary'] = 'sirius_dispatch_job_type';
-  /* Filter criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Filter criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['filters']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -21805,7 +21809,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -21922,7 +21926,7 @@ Grievance Form',
   $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['expose']['reduce'] = TRUE;
   $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_sirius_dispatch_job_type_tid']['vocabulary'] = 'sirius_dispatch_job_type';
-  /* Filter criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Filter criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['filters']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -22005,7 +22009,7 @@ Grievance Form',
     t('Type'),
     t('Status'),
     t('Created'),
-    t('Start Date / Time'),
+    t('LEGACY Start Date / Time'),
     t('Sequence'),
     t('Notified'),
     t('Accepted'),
@@ -22314,7 +22318,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -22369,7 +22373,7 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/edit" target="_blank" class="tool-button">Edit</a> <a href="/node/[nid]/sirius_dispatch_job_manage" target="_blank" class="tool-button">Manage</a>';
-  /* Sort criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Sort criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -22498,7 +22502,7 @@ Grievance Form',
     17 => 0,
     19 => 0,
   );
-  /* Filter criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Filter criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['filters']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -22731,7 +22735,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -23425,7 +23429,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_dispatch_status']['id'] = 'field_sirius_dispatch_status';
   $handler->display->display_options['fields']['field_sirius_dispatch_status']['table'] = 'field_data_field_sirius_dispatch_status';
   $handler->display->display_options['fields']['field_sirius_dispatch_status']['field'] = 'field_sirius_dispatch_status';
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -23438,7 +23442,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: End Date / Time */
+  /* Field: Content: LEGACY End Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['id'] = 'field_sirius_datetime_completed';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['table'] = 'field_data_field_sirius_datetime_completed';
   $handler->display->display_options['fields']['field_sirius_datetime_completed']['field'] = 'field_sirius_datetime_completed';
@@ -23643,7 +23647,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_dispatch_status']['id'] = 'field_sirius_dispatch_status';
   $handler->display->display_options['fields']['field_sirius_dispatch_status']['table'] = 'field_data_field_sirius_dispatch_status';
   $handler->display->display_options['fields']['field_sirius_dispatch_status']['field'] = 'field_sirius_dispatch_status';
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -23679,8 +23683,8 @@ Grievance Form',
     t('Current Path'),
     t('Worker'),
     t('Status'),
-    t('Start Date / Time'),
-    t('End Date / Time'),
+    t('LEGACY Start Date / Time'),
+    t('LEGACY End Date / Time'),
     t('Tools'),
     t('<a href="/node/[nid]/sirius_dispatch_manage" target="_blank" class="tool-button">Manage</a>
 <a href="/node/[field_sirius_worker_1]" target="_blank" class="tool-button">Worker</a>
@@ -24956,7 +24960,7 @@ Grievance Form',
   $handler->display->display_options['sorts']['field_sirius_dispatch_facility_target_id']['relationship'] = 'field_sirius_dispatch_job_target_id';
   $handler->display->display_options['sorts']['field_sirius_dispatch_facility_target_id']['exposed'] = TRUE;
   $handler->display->display_options['sorts']['field_sirius_dispatch_facility_target_id']['expose']['label'] = 'Facility';
-  /* Sort criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Sort criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -25321,11 +25325,12 @@ Grievance Form',
     'bypass_access' => 0,
     'link' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['relationship'] = 'field_sirius_dispatch_job_target_id';
+  $handler->display->display_options['fields']['field_sirius_datetime']['label'] = 'Start Date / Time';
   $handler->display->display_options['fields']['field_sirius_datetime']['exclude'] = TRUE;
   $handler->display->display_options['fields']['field_sirius_datetime']['settings'] = array(
     'format_type' => 'date_and_time_sortable',
@@ -25401,7 +25406,7 @@ Grievance Form',
   $handler->display->display_options['sorts']['field_sirius_dispatch_facility_target_id']['relationship'] = 'field_sirius_dispatch_job_target_id';
   $handler->display->display_options['sorts']['field_sirius_dispatch_facility_target_id']['exposed'] = TRUE;
   $handler->display->display_options['sorts']['field_sirius_dispatch_facility_target_id']['expose']['label'] = 'Facility';
-  /* Sort criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Sort criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -25908,7 +25913,7 @@ Grievance Form',
     'field_delimiter' => '',
   );
   $handler->display->display_options['fields']['field_sirius_member_status']['delta_offset'] = '0';
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -25945,7 +25950,7 @@ Grievance Form',
   $handler->display->display_options['sorts']['field_sirius_dispatch_facility_target_id']['relationship'] = 'field_sirius_dispatch_job_target_id';
   $handler->display->display_options['sorts']['field_sirius_dispatch_facility_target_id']['exposed'] = TRUE;
   $handler->display->display_options['sorts']['field_sirius_dispatch_facility_target_id']['expose']['label'] = 'Facility';
-  /* Sort criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Sort criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -26946,7 +26951,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_event_pstatus']['table'] = 'field_data_field_sirius_event_pstatus';
   $handler->display->display_options['fields']['field_sirius_event_pstatus']['field'] = 'field_sirius_event_pstatus';
   $handler->display->display_options['fields']['field_sirius_event_pstatus']['type'] = 'taxonomy_term_reference_plain';
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -30252,7 +30257,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -30360,7 +30365,7 @@ Grievance Form',
   );
   $handler->display->display_options['filters']['field_sirius_datetime_created_value']['form_type'] = 'date_popup';
   $handler->display->display_options['filters']['field_sirius_datetime_created_value']['year_range'] = '2020:+0';
-  /* Filter criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Filter criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['filters']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['filters']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';
@@ -30559,7 +30564,7 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -30732,13 +30737,12 @@ Grievance Form',
     'bypass_access' => 0,
     'link' => 0,
   );
-  /* Field: Content: Start Date / Time */
-  $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
-  $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
-  $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
-  $handler->display->display_options['fields']['field_sirius_datetime']['label'] = 'Start Date';
-  $handler->display->display_options['fields']['field_sirius_datetime']['settings'] = array(
-    'format_type' => 'date_only_sortable',
+  /* Field: Content: Start Date */
+  $handler->display->display_options['fields']['field_sirius_date_start']['id'] = 'field_sirius_date_start';
+  $handler->display->display_options['fields']['field_sirius_date_start']['table'] = 'field_data_field_sirius_date_start';
+  $handler->display->display_options['fields']['field_sirius_date_start']['field'] = 'field_sirius_date_start';
+  $handler->display->display_options['fields']['field_sirius_date_start']['settings'] = array(
+    'format_type' => 'date_only',
     'custom_date_format' => '',
     'fromto' => 'both',
     'multiple_number' => '',
@@ -30746,13 +30750,12 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: End Date / Time */
-  $handler->display->display_options['fields']['field_sirius_datetime_completed']['id'] = 'field_sirius_datetime_completed';
-  $handler->display->display_options['fields']['field_sirius_datetime_completed']['table'] = 'field_data_field_sirius_datetime_completed';
-  $handler->display->display_options['fields']['field_sirius_datetime_completed']['field'] = 'field_sirius_datetime_completed';
-  $handler->display->display_options['fields']['field_sirius_datetime_completed']['label'] = 'End Date';
-  $handler->display->display_options['fields']['field_sirius_datetime_completed']['settings'] = array(
-    'format_type' => 'date_only_sortable',
+  /* Field: Content: End Date */
+  $handler->display->display_options['fields']['field_sirius_date_end']['id'] = 'field_sirius_date_end';
+  $handler->display->display_options['fields']['field_sirius_date_end']['table'] = 'field_data_field_sirius_date_end';
+  $handler->display->display_options['fields']['field_sirius_date_end']['field'] = 'field_sirius_date_end';
+  $handler->display->display_options['fields']['field_sirius_date_end']['settings'] = array(
+    'format_type' => 'date_only',
     'custom_date_format' => '',
     'fromto' => 'both',
     'multiple_number' => '',
@@ -30778,7 +30781,7 @@ Grievance Form',
 <a href="/node/[nid]/sirius_payperiod_entries/edit?destination=[current_path]" class="tool-button">Edit Entries</a>
 <a href="/node/[nid]/sirius_payperiod_entries/list?destination=[current_path]" class="tool-button">List</a>
 <a href="/node/[nid]/sirius_payperiod_entries/totals?destination=[current_path]" class="tool-button">Totals</a>';
-  /* Sort criterion: Content: End Date / Time (field_sirius_datetime_completed) */
+  /* Sort criterion: Content: LEGACY End Date / Time (field_sirius_datetime_completed) */
   $handler->display->display_options['sorts']['field_sirius_datetime_completed_value']['id'] = 'field_sirius_datetime_completed_value';
   $handler->display->display_options['sorts']['field_sirius_datetime_completed_value']['table'] = 'field_data_field_sirius_datetime_completed';
   $handler->display->display_options['sorts']['field_sirius_datetime_completed_value']['field'] = 'field_sirius_datetime_completed_value';
@@ -30867,12 +30870,12 @@ Grievance Form',
     'bypass_access' => 0,
     'link' => 0,
   );
-  /* Field: Content: Start Date / Time */
-  $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
-  $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
-  $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
-  $handler->display->display_options['fields']['field_sirius_datetime']['settings'] = array(
-    'format_type' => 'long',
+  /* Field: Content: Start Date */
+  $handler->display->display_options['fields']['field_sirius_date_start']['id'] = 'field_sirius_date_start';
+  $handler->display->display_options['fields']['field_sirius_date_start']['table'] = 'field_data_field_sirius_date_start';
+  $handler->display->display_options['fields']['field_sirius_date_start']['field'] = 'field_sirius_date_start';
+  $handler->display->display_options['fields']['field_sirius_date_start']['settings'] = array(
+    'format_type' => 'date_only',
     'custom_date_format' => '',
     'fromto' => 'both',
     'multiple_number' => '',
@@ -30880,12 +30883,12 @@ Grievance Form',
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: End Date / Time */
-  $handler->display->display_options['fields']['field_sirius_datetime_completed']['id'] = 'field_sirius_datetime_completed';
-  $handler->display->display_options['fields']['field_sirius_datetime_completed']['table'] = 'field_data_field_sirius_datetime_completed';
-  $handler->display->display_options['fields']['field_sirius_datetime_completed']['field'] = 'field_sirius_datetime_completed';
-  $handler->display->display_options['fields']['field_sirius_datetime_completed']['settings'] = array(
-    'format_type' => 'long',
+  /* Field: Content: End Date */
+  $handler->display->display_options['fields']['field_sirius_date_end']['id'] = 'field_sirius_date_end';
+  $handler->display->display_options['fields']['field_sirius_date_end']['table'] = 'field_data_field_sirius_date_end';
+  $handler->display->display_options['fields']['field_sirius_date_end']['field'] = 'field_sirius_date_end';
+  $handler->display->display_options['fields']['field_sirius_date_end']['settings'] = array(
+    'format_type' => 'date_only',
     'custom_date_format' => '',
     'fromto' => 'both',
     'multiple_number' => '',
@@ -30936,8 +30939,6 @@ Grievance Form',
     t('All Payperiods'),
     t('Pending Payperiods'),
     t('My Payperiods'),
-    t('Start Date / Time'),
-    t('End Date / Time'),
     t('Approved?'),
   );
   $export['sirius_payperiods'] = $view;
@@ -30982,7 +30983,7 @@ Grievance Form',
   $handler->display->display_options['fields']['field_sirius_sms_possible']['id'] = 'field_sirius_sms_possible';
   $handler->display->display_options['fields']['field_sirius_sms_possible']['table'] = 'field_data_field_sirius_sms_possible';
   $handler->display->display_options['fields']['field_sirius_sms_possible']['field'] = 'field_sirius_sms_possible';
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -34760,7 +34761,7 @@ Grievance Form',
   $handler->display->display_options['fields']['regex_rewrite']['alter']['text_replacements'] = 'Notified
 Accepted';
   $handler->display->display_options['fields']['regex_rewrite']['element_label_colon'] = FALSE;
-  /* Field: Content: Start Date / Time */
+  /* Field: Content: LEGACY Start Date / Time */
   $handler->display->display_options['fields']['field_sirius_datetime']['id'] = 'field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['fields']['field_sirius_datetime']['field'] = 'field_sirius_datetime';
@@ -34795,7 +34796,7 @@ Accepted';
   $handler->display->display_options['fields']['nothing']['label'] = '';
   $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/sirius_dispatch_worker_view" class="tool-button">[field_grievance_shop] - [field_sirius_datetime]: [regex_rewrite]</a>';
   $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
-  /* Sort criterion: Content: Start Date / Time (field_sirius_datetime) */
+  /* Sort criterion: Content: LEGACY Start Date / Time (field_sirius_datetime) */
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['id'] = 'field_sirius_datetime_value';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['table'] = 'field_data_field_sirius_datetime';
   $handler->display->display_options['sorts']['field_sirius_datetime_value']['field'] = 'field_sirius_datetime_value';

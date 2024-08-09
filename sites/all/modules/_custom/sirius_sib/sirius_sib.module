@@ -1,0 +1,38 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_sib') . '/sirius_sib.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_sib') . '/sirius_sib.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_sib') . '/sirius_sib.sib.inc';
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_sib_sirius_domain_component_info() {
+  return array(
+    'sib' => array(
+      'title' => 'Access Restrictions',
+      'description' => 'Enable per-worker access restrictions',
+    ),
+  );
+}
+
+/**
+ * Implements hook_sirius_config_links_alter
+ */
+
+function sirius_sib_sirius_config_links_alter(&$links) {
+  //$links['sib'] = array('title' => 'Access restrictions');
+  //$links['sib']['links']['sirius/sib'] = array('title' => 'Config', 'description' => 'Configure access restrictions.');
+}
+
+/** 
+ * Implements hook_sirius_access_info
+ */
+
+function sirius_sib_sirius_access_info() {
+  $infos = array();
+  Sirius_Sib_Access::getInstance()->setInfo($infos);
+  return $infos;
+}
+

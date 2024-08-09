@@ -15,6 +15,7 @@ function sirius_page_config($show_category_name = NULL) {
 			if ($show_category_name != $category_name) { continue; }
 		}
 		$category_html = '';
+		if (!$category['links']) { $category['links'] = array(); }
 		foreach ($category['links'] as $path => $link) {
 			if (drupal_valid_path($path)) {
 				// Get the local tasks for this item. 
