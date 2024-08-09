@@ -20,7 +20,7 @@ function sirius_do_not_disturb_tz() {
 
 function sirius_page_do_not_disturb_config() { return drupal_get_form('sirius_page_do_not_disturb_config_form'); }
 
-function sirius_page_do_not_disurb_config_form($form, &$form_state) {
+function sirius_page_do_not_disturb_config_form($form, &$form_state) {
 	$form['current_time'] = array('#markup' => sirius_tz_indicator(sirius_do_not_disturb_tz()));
 
 	$json = sirius_do_not_disturb_json();
@@ -154,7 +154,7 @@ function sirius_page_do_not_disturb_config_form_submit($form, &$form_state) {
 
 function sirius_page_do_not_disturb_test() { return drupal_get_form('sirius_page_do_not_disturb_test_form'); }
 
-function sirius_page_do_not_disurb_test_form($form, &$form_state) {
+function sirius_page_do_not_disturb_test_form($form, &$form_state) {
 	$form['current_time'] = array('#markup' => sirius_tz_indicator(sirius_do_not_disturb_tz()));
 
 	$options = sirius_do_not_disturb_list();
@@ -243,7 +243,7 @@ function sirius_do_not_disturb_check($id = 'default', $ts = NULL) {
 	return array('success' => TRUE);
 }
 
-function sirius_do_not_disurb_render($id = 'default') {
+function sirius_do_not_disturb_render($id = 'default') {
 	$json = sirius_do_not_disturb_json();
 
 	if (!$json['schedules']) { return '<div class="sirius_do_not_disturb_render">No Do Not Disturb schedules have been configured.</div>'; }
