@@ -219,6 +219,15 @@ function sirius_worker_node_tabs() {
     'weight' => 4
   );
 
+  $node_tabs['sirius_worker']['sirius_worker_password'] = array(
+    'title' => 'Password',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_password',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_worker.page_password.inc',
+    'weight' => 1,
+  );
+
   $node_tabs['sirius_worker']['sirius_worker_grievances'] = array(
     'title' => 'Grievances',
     'description' => '',
