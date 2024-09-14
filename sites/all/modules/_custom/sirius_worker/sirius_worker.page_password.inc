@@ -8,8 +8,8 @@ function sirius_node_tab_worker_password_access($worker_node) {
   if (user_access('sirius worker admin')) { return TRUE; }
 
   // Workers can edit
-  $my_worker_node = sirius_worker_get($account->uid);
-  if ($my_worker_node && $node && $my_worker_node->nid == $node->nid) { return TRUE; }
+  $my_worker_node = sirius_worker_get();
+  if ($my_worker_node && $worker_node && $my_worker_node->nid == $worker_node->nid) { return TRUE; }
 
   return FALSE;
 }
@@ -67,14 +67,16 @@ function sirius_node_tab_worker_password_form_submit($form, &$form_state) {
 	$worker_node = node_load($form_state['worker_nid']);
 	global $user;
 
-	// AAT Required
-	$val = $form_state['values']['aat_required'];
-	$oldval = $worker_node->field_sirius_aat_required['und'][0]['value'];
-	if ($val != $oldval) {
-		$worker_node->field_sirius_aat_required['und'][0]['value'] = $val;
-		$msg = t('Changed (password required for phone access) from @oldval to @val', array('@oldval' => ($oldval?$oldval:"[NULL]"), '@val' => ($val?$val:"[NULL]")));
-		sirius_log('worker:contact', 'update', $msg, '', '', array($worker_node->nid), array());
-		drupal_set_message($msg);
+	if (sirius_domain_component_enabled('phonetree')) {
+		// AAT Required
+		$val = $form_state['values']['aat_required'];
+		$oldval = $worker_node->field_sirius_aat_required['und'][0]['value'];
+		if ($val != $oldval) {
+			$worker_node->field_sirius_aat_required['und'][0]['value'] = $val;
+			$msg = t('Changed (password required for phone access) from @oldval to @val', array('@oldval' => ($oldval?$oldval:"[NULL]"), '@val' => ($val?$val:"[NULL]")));
+			sirius_log('worker:contact', 'update', $msg, '', '', array($worker_node->nid), array());
+			drupal_set_message($msg);
+		}
 	}
 
 	// AAT
@@ -85,4 +87,5 @@ function sirius_node_tab_worker_password_form_submit($form, &$form_state) {
 
 	node_save($worker_node);
 	drupal_set_message("Password updated.");
+	drupal_goto('node/' . $worker_node->nid);
 }

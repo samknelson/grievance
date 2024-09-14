@@ -164,6 +164,7 @@ function sirius_worker_node_tabs() {
     'rnode' => TRUE,
   );
 
+  /*
   $node_tabs['sirius_worker']['sirius_worker_contact/phone'] = array(
     'title' => 'Phone',
     'description' => '',
@@ -173,6 +174,7 @@ function sirius_worker_node_tabs() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
   );
+  */
 
   $node_tabs['sirius_worker']['sirius_worker_contact/lang'] = array(
     'title' => 'Languages',
