@@ -58,8 +58,6 @@ function sirius_edls_client_worker_fetch($mode = 'test', $force = FALSE) {
 			sirius_minilog("... Fetch failed: " . $result['msg']);
 			continue;
 		}
-
-		dpm($result['workers']);
 	}
 
 	return array('success' => TRUE);

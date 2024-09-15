@@ -47,52 +47,54 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
   // $result = array_splice($result, 0, 20);
 
   // Filter by "has_assignment". This is hard to do in the underlying raw SQL.
-  $result = array_values(array_filter($result, function($v) use ($filters) {
-    if ($filters['has_assignment_curr'] == 'include') {
-      if (!$v['curr_sheet_nid']) { return FALSE; }
-    }
-
-    if ($filters['has_assignment_curr'] == 'exclude') {
-      if ($v['curr_sheet_nid'] && ($v['curr_sheet_nid'] != $filters['curr_sheet_nid'])) { return FALSE; }
-    }
-
-    if ($filters['has_assignment_next'] == 'include') {
-      if (!$v['next_sheet_nid']) { return FALSE; }
-    }
-
-    if ($filters['has_assignment_next'] == 'exclude') {
-      if ($v['next_sheet_nid']) { return FALSE; }
-    }
-
-    return TRUE;
-  }));
-
-  // Add sheet-specific information. Again, this is cumbersome to do in the worker list SQL. 
-  $sheet_lookup = array();
-  foreach ($result as $delta => $record) {
-    foreach (array('curr', 'prev', 'next') as $prefix) {
-      $sheet_nid = $record["{$prefix}_sheet_nid"];
-      if (!$sheet_nid) { continue; }
-      if (!$sheet_lookup[$sheet_nid]) {
-        $sql = "select field_sirius_edls_sheet_status_value as status, field_grievance_department_tid_tid as department ";
-        $sql .= "from node ";
-        $sql .= "left join field_data_field_sirius_edls_sheet_status on field_data_field_sirius_edls_sheet_status.entity_type = 'node' and field_data_field_sirius_edls_sheet_status.entity_id = node.nid ";
-        $sql .= "left join field_data_field_grievance_department_tid on field_data_field_grievance_department_tid.entity_type = 'node' and field_data_field_grievance_department_tid.entity_id = node.nid ";
-        $sql .= "where node.nid = :sheet_nid ";
-        $stmt = sirius_sql_query($sql, array(':sheet_nid' => $sheet_nid));
-        $sheet_lookup[$sheet_nid] = $stmt->fetchAssoc();
+  if (!$filters['skip_assignment']) {
+    $result = array_values(array_filter($result, function($v) use ($filters) {
+      if ($filters['has_assignment_curr'] == 'include') {
+        if (!$v['curr_sheet_nid']) { return FALSE; }
       }
 
-      $result[$delta]["${prefix}_status"] = $sheet_lookup[$sheet_nid]['status'];
-      $result[$delta]["${prefix}_department"] = $sheet_lookup[$sheet_nid]['department'];
-    }
-  }
+      if ($filters['has_assignment_curr'] == 'exclude') {
+        if ($v['curr_sheet_nid'] && ($v['curr_sheet_nid'] != $filters['curr_sheet_nid'])) { return FALSE; }
+      }
 
-  // Filter by previous department
-  if ($filters['prev_department']) {
-    $result = array_values(array_filter($result, function($v) use ($filters) {
-      return ($v['prev_department'] == $filters['prev_department']);
+      if ($filters['has_assignment_next'] == 'include') {
+        if (!$v['next_sheet_nid']) { return FALSE; }
+      }
+
+      if ($filters['has_assignment_next'] == 'exclude') {
+        if ($v['next_sheet_nid']) { return FALSE; }
+      }
+
+      return TRUE;
     }));
+
+    // Add sheet-specific information. Again, this is cumbersome to do in the worker list SQL. 
+    $sheet_lookup = array();
+    foreach ($result as $delta => $record) {
+      foreach (array('curr', 'prev', 'next') as $prefix) {
+        $sheet_nid = $record["{$prefix}_sheet_nid"];
+        if (!$sheet_nid) { continue; }
+        if (!$sheet_lookup[$sheet_nid]) {
+          $sql = "select field_sirius_edls_sheet_status_value as status, field_grievance_department_tid_tid as department ";
+          $sql .= "from node ";
+          $sql .= "left join field_data_field_sirius_edls_sheet_status on field_data_field_sirius_edls_sheet_status.entity_type = 'node' and field_data_field_sirius_edls_sheet_status.entity_id = node.nid ";
+          $sql .= "left join field_data_field_grievance_department_tid on field_data_field_grievance_department_tid.entity_type = 'node' and field_data_field_grievance_department_tid.entity_id = node.nid ";
+          $sql .= "where node.nid = :sheet_nid ";
+          $stmt = sirius_sql_query($sql, array(':sheet_nid' => $sheet_nid));
+          $sheet_lookup[$sheet_nid] = $stmt->fetchAssoc();
+        }
+
+        $result[$delta]["${prefix}_status"] = $sheet_lookup[$sheet_nid]['status'];
+        $result[$delta]["${prefix}_department"] = $sheet_lookup[$sheet_nid]['department'];
+      }
+    }
+
+    // Filter by previous department
+    if ($filters['prev_department']) {
+      $result = array_values(array_filter($result, function($v) use ($filters) {
+        return ($v['prev_department'] == $filters['prev_department']);
+      }));
+    }
   }
 
   // Correct capitalization for worker names
@@ -229,26 +231,28 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
   $sql_args = array();
 
   $sql = "select ";
-  $sql .= "( ";
-  $sql .= "  select sheet_nid from sirius_edls_assignments ";
-  $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
-  $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
-  $sql .= "  and sirius_edls_assignments.assignment_date = :date ";
-  $sql .= ") as curr_sheet_nid, ";
-  $sql .= "( ";
-  $sql .= "  select sheet_nid from sirius_edls_assignments ";
-  $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
-  $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
-  $sql .= "  and sirius_edls_assignments.assignment_date < :date ";
-  $sql .= "  order by assignment_date desc limit 1 ";
-  $sql .= ") as prev_sheet_nid, ";
-  $sql .= "( ";
-  $sql .= "  select sheet_nid from sirius_edls_assignments ";
-  $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
-  $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
-  $sql .= "  and sirius_edls_assignments.assignment_date > :date ";
-  $sql .= "  order by assignment_date limit 1 ";
-  $sql .= ") as next_sheet_nid, ";
+  if (!$filters['skip_assignment']) {
+    $sql .= "( ";
+    $sql .= "  select sheet_nid from sirius_edls_assignments ";
+    $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
+    $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
+    $sql .= "  and sirius_edls_assignments.assignment_date = :date ";
+    $sql .= ") as curr_sheet_nid, ";
+    $sql .= "( ";
+    $sql .= "  select sheet_nid from sirius_edls_assignments ";
+    $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
+    $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
+    $sql .= "  and sirius_edls_assignments.assignment_date < :date ";
+    $sql .= "  order by assignment_date desc limit 1 ";
+    $sql .= ") as prev_sheet_nid, ";
+    $sql .= "( ";
+    $sql .= "  select sheet_nid from sirius_edls_assignments ";
+    $sql .= "  where sirius_edls_assignments.worker_id = concat('I', field_sirius_id_value) ";
+    $sql .= "  and sirius_edls_assignments.employer_nid = :employer_nid ";
+    $sql .= "  and sirius_edls_assignments.assignment_date > :date ";
+    $sql .= "  order by assignment_date limit 1 ";
+    $sql .= ") as next_sheet_nid, ";
+  }
   $sql .= "concat('I', field_sirius_id_value) as worker_id, ";
   $sql .= "concat(field_sirius_name_family, ', ', field_sirius_name_given) as worker_name, ";
   $sql .= "ms_term.tid as worker_ms ";

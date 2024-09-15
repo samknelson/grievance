@@ -71,7 +71,7 @@ function sirius_edls_server_worker_list($employer_uuid, $employer_access_code) {
 
 	$employer_nid = $result['employer_nid'];
 
-	$workers = sirius_edls_worker_list($employer_nid, date('Y-m-d'));
+	$workers = sirius_edls_worker_list($employer_nid, date('Y-m-d'), array('skip_assignment' => TRUE));
 
 	return array('success' => TRUE, 'workers' => $workers);
 }
