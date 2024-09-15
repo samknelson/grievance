@@ -252,6 +252,8 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
     $sql .= "  and sirius_edls_assignments.assignment_date > :date ";
     $sql .= "  order by assignment_date limit 1 ";
     $sql .= ") as next_sheet_nid, ";
+
+    $sql_args[':date'] = $date;
   }
   $sql .= "concat('I', field_sirius_id_value) as worker_id, ";
   $sql .= "concat(field_sirius_name_family, ', ', field_sirius_name_given) as worker_name, ";
@@ -274,8 +276,6 @@ function sirius_edls_dispatch_list($employer_nid, $date, $filters) {
   $sql .= "left join node job_node on job_node.nid = field_sirius_dispatch_job_target_id ";
 
   $sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
-
-  $sql_args[':date'] = $date;
 
   $sql .= "where node.type = 'sirius_worker' ";
 
