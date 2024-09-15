@@ -35,11 +35,21 @@ function sirius_edls_server_employer($employer_uuid, $employer_access_code) {
 	$employer_node = node_load($employer_nid);
 	if ($employer_node->type != 'grievance_shop') { return array('success' => FALSE, 'msg' => 'Employer not found with the given UUID [ERR2].'); }
 
-	$domain_nid = sirius_domain_nid();
-	if ($domain_nid > 0) {
-		if ($employer_node->field_sirius_domain['und'][0]['target_id'] != $domain_nid) { 
-			return array('success' => FALSE, 'msg' => 'Employer found, but it is not in the correct domain.');
+	//
+	// We allow legacy support for employers in the root domain. This is not a good arrangement, but the
+	// only user, Teamsters631, has all their data in the root domain, and has different servers running in different domains. So
+	// this is ick.
+	//
+
+	if ($employer_node->field_sirius_domain['und'][0]['target_id']) {
+		$domain_nid = sirius_domain_nid();
+		if ($domain_nid > 0) {
+			if ($employer_node->field_sirius_domain['und'][0]['target_id'] != $domain_nid) { 
+				return array('success' => FALSE, 'msg' => 'Employer found, but it is not in the correct domain.');
+			}
 		}
+	} else {
+		sirius_domain(-1);
 	}
 
 	$employer_json = sirius_json_get($employer_node);
@@ -51,10 +61,6 @@ function sirius_edls_server_employer($employer_uuid, $employer_access_code) {
 	if ($employer_access_code != $check) {
 		return array('success' => FALSE, 'msg' => 'Incorrect access code.');
 	}
-
-	$workers = sirius_edls_worker_list($employer_nid, date('Y-m-d'));
-	dpm($workers);
-	drupal_set_message("Here...");
 
 	return array('success' => TRUE, 'employer_nid' => $employer_nid);
 }
