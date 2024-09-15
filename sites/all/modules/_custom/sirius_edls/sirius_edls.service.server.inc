@@ -76,8 +76,6 @@ function sirius_edls_server_worker_list($employer_uuid, $employer_access_code) {
 	return array('success' => TRUE, 'workers' => $workers);
 }
 
-
-
 /*
 // @todo: Stupid class loading order. Doing this to make sure that the class is loaded first. 
 //        It is time to get autoloading working.
