@@ -21,6 +21,9 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/si
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.sched.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.sheet_reserved.inc';
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.service.server.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.service.client.inc';
+
 /**
  * Implements hook_sirius_domain_component_info
  */
@@ -34,6 +37,18 @@ function sirius_edls_sirius_domain_component_info() {
     'edls:notify' => array(
       'title' => 'EDLS - Notifications',
       'description' => '',
+    ),
+    'edls:workers:local' => array(
+      'title' => 'EDLS - Workers - Local',
+      'description' => 'Get locally dispatched workers',
+    ),
+    'edls:service:client' => array(
+      'title' => 'EDLS - Service - Client',
+      'description' => 'Operate as an EDLS server',
+    ),
+    'edls:service:server' => array(
+      'title' => 'EDLS - Service - Server',
+      'description' => 'Operate as an EDLS server',
     ),
   );
 }
@@ -134,6 +149,15 @@ function sirius_edls_sirius_cron_scan_info() {
     'component' => 'edls',
   );
 
+  $items['edls_client_worker_fetch'] = array(
+    'title' => 'EDLS Service Worker Fetch',
+    'description' => 'Fetch workers from the remote server for each client.',
+    'schedule' => 'always',
+    'callback' => 'sirius_edls_client_worker_fetch',
+    'multidomain' => TRUE,
+    'component' => 'edls:service:client',
+  );
+
   return $items;
 }
 
@@ -183,4 +207,12 @@ function sirius_edls_module_implements_alter(&$implementations, $hook) {
   $group = array($module => $implementations[$module]);
   unset($implementations[$module]);
   $implementations = $group + $implementations;
+}
+
+function sirius_edls_display_name_short() {
+  return sirius_domain_variable_get('sirius_edls_name_short', 'EDLS');
+}
+
+function sirius_edls_display_name_long() {
+  return sirius_domain_variable_get('sirius_edls_name_long', 'Employer Daily Labor Schedule');
 }

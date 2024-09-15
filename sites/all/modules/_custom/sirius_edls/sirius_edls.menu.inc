@@ -130,6 +130,27 @@ function sirius_edls_node_tabs() {
     'weight' => 3,
   );
 
+  $node_tabs['grievance_shop']['grievance_shop_edls/client'] = array(
+    'title' => 'Client',
+    'description' => '',
+    'callback' => 'sirius_edls_node_tab_employer_client',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_edls.page_employer_client.inc',
+    'skip_node_view_check' => TRUE,
+    'component' => 'edls:service:client',
+    'weight' => 4,
+  );
+
+  $node_tabs['grievance_shop']['grievance_shop_edls/server'] = array(
+    'title' => 'Server',
+    'description' => '',
+    'callback' => 'sirius_edls_node_tab_employer_server',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_edls.page_employer_server.inc',
+    'skip_node_view_check' => TRUE,
+    'component' => 'edls:service:server',
+    'weight' => 4,
+  );
 
   sirius_node_tab_set_module('sirius_edls', $node_tabs);
 

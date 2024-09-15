@@ -65,6 +65,10 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 
 	if (sirius_access_instance('edls')->access('sheet_change_supervisor', array('sheet_node' => $sheet_node))) {
 		$supervisor_options = sirius_edls_supervisor_list($sheet_employer_nid);
+
+		if (!$supervisor_options) {
+			return sirius_form_error("There are no supervisors available. Sheets cannot be created without a supervisor.");
+		}
 		$form['sheet']['supervisor'] = array(
 			'#type' => 'select',
 			'#title' => t('Supervisor'),
@@ -87,6 +91,9 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
   if ($sheet_node->nid) { $form['sheet']['date_start']['#disabled'] = TRUE; }
 
 	$job_group_options = sirius_dispatch_group_list_active(NULL, $ts);
+	if (!$job_group_options) {
+		return sirius_form_error('There are no available events. Please define at least one event.');
+	}
 	$form['sheet']['sirius_dispatch_job_group'] = array(
 		'#type' => 'select',
 		'#title' => t('Event'),

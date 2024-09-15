@@ -38,7 +38,7 @@ function sirius_edls_worker_list($employer_nid, $date, $filters = array()) {
     $outsource_workers = sirius_edls_outsource_list($employer_nid, $date, $filters);
   }
 
-  if ($filters['skip_dispatch']) {
+  if (!sirius_domain_component_enabled('edls:workers:local') || $filters['skip_dispatch']) {
     $dispatch_workers = array();
   } else {
     $dispatch_workers = sirius_edls_dispatch_list($employer_nid, $date, $filters);
