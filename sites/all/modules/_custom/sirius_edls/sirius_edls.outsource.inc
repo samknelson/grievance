@@ -53,9 +53,9 @@ function sirius_edls_outsource_list($employer_nid, $date = NULL, $filters = arra
   $employer_node = node_load($employer_nid);
   $ms_list = sirius_edls_outsource_ms_list($employer_node, 'full');
 
+  $sql_args = array();
+  $sql = "select ";
   if (!$filters['skip_assignment']) {
-    $sql_args = array();
-    $sql = "select ";
     $sql .= "( ";
     $sql .= "  select sheet_nid from sirius_edls_assignments ";
     $sql .= "  where sirius_edls_assignments.worker_id = sirius_edls_outsource.worker_id ";
@@ -76,43 +76,43 @@ function sirius_edls_outsource_list($employer_nid, $date = NULL, $filters = arra
     $sql .= "  and sirius_edls_assignments.assignment_date > :date ";
     $sql .= "  order by assignment_date limit 1 ";
     $sql .= ") as next_sheet_nid, ";
-    $sql .= "sirius_edls_outsource.* ";
-    $sql .= "from sirius_edls_outsource ";
     $sql_args['date'] = $date;
-    $sql .= "where sirius_edls_outsource.employer_nid = :employer_nid ";
-    $sql_args[':employer_nid'] = $employer_nid;
-
-    if ($filters['nameid']) { 
-      $sql .= "and (sirius_edls_outsource.worker_name like :match or sirius_edls_outsource.worker_id like :match) ";
-      $sql_args[':match'] = '%' . $filters['nameid'] . '%';
-    }
-
-    if ($filters['ms']) {
-      $sql .= "and sirius_edls_outsource.worker_ms = :ms ";
-      $sql_args[':ms'] = $filters['ms'];
-    }
-
-    if ($filters['worker_id']) {
-      $sql .= "and sirius_edls_outsource.worker_id = :real_id ";
-      $sql_args[':real_id'] = $filters['worker_id']; // preg_replace('/^O/', '', $filters['worker_id']);
-    }
-
-    // $sql .= "limit 20";
-    $stmt = sirius_sql_query($sql, $sql_args);
-
-    $workers = array();
-    while ($hr = $stmt->fetchAssoc()) {
-      $workers[] = $hr;
-    }
-
-    usort($workers, function($a, $b) use ($ms_list) {
-      $ms_weight_a = $ms_list[$a['worker_ms']]['weight'];
-      $ms_weight_b = $ms_list[$b['worker_ms']]['weight'];
-      if ($ms_weight_a < $ms_weight_b) { return -1; }
-      if ($ms_weight_a > $ms_weight_b) { return 1; }
-      return strcmp($a['worker_name'], $b['worker_name']);
-    });
   }
+  $sql .= "sirius_edls_outsource.* ";
+  $sql .= "from sirius_edls_outsource ";
+  $sql .= "where sirius_edls_outsource.employer_nid = :employer_nid ";
+  $sql_args[':employer_nid'] = $employer_nid;
+
+  if ($filters['nameid']) { 
+    $sql .= "and (sirius_edls_outsource.worker_name like :match or sirius_edls_outsource.worker_id like :match) ";
+    $sql_args[':match'] = '%' . $filters['nameid'] . '%';
+  }
+
+  if ($filters['ms']) {
+    $sql .= "and sirius_edls_outsource.worker_ms = :ms ";
+    $sql_args[':ms'] = $filters['ms'];
+  }
+
+  if ($filters['worker_id']) {
+    $sql .= "and sirius_edls_outsource.worker_id = :real_id ";
+    $sql_args[':real_id'] = $filters['worker_id']; // preg_replace('/^O/', '', $filters['worker_id']);
+  }
+
+  // $sql .= "limit 20";
+  $stmt = sirius_sql_query($sql, $sql_args);
+
+  $workers = array();
+  while ($hr = $stmt->fetchAssoc()) {
+    $workers[] = $hr;
+  }
+
+  usort($workers, function($a, $b) use ($ms_list) {
+    $ms_weight_a = $ms_list[$a['worker_ms']]['weight'];
+    $ms_weight_b = $ms_list[$b['worker_ms']]['weight'];
+    if ($ms_weight_a < $ms_weight_b) { return -1; }
+    if ($ms_weight_a > $ms_weight_b) { return 1; }
+    return strcmp($a['worker_name'], $b['worker_name']);
+  });
 
   return $workers;
 }
