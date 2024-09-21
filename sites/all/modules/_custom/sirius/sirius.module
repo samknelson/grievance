@@ -935,6 +935,9 @@ function sirius_sirius_denorm($item) {
   if ($item['denorm_trigger'] == 'sirius_comm_update_handlers') {
     sirius_comm_update_handlers($item['denorm_source_nid']);
   }
+  if ($item['denorm_trigger'] == 'sirius_sns_incoming_denorm') {
+    sirius_sns_incoming_denorm($item);
+  }
 }
 
 /**
