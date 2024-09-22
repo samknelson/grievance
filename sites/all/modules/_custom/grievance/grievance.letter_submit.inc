@@ -34,7 +34,7 @@ function grievance_letter_form_submit($form, &$form_state) {
 	}
 
 	if ($mustlog) {
-		if ($output == 'pdf' || $output == 'send-email' || $output == 'send-fax') {
+		if ($output == 'pdf' || $output == 'send-email') {
 			if (!$form_state['values']['logging']) {
 				drupal_set_message(t('Letters of this type MUST be logged.'), 'error');
 				return;
