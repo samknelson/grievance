@@ -66,7 +66,7 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 		);
 	}
 
-	if (in_array($data['format'], array('email', 'fax', 'pdf'))) {
+	if (in_array($data['format'], array('email', 'pdf'))) {
 		$form['pdf_body'] = array(
 			'#type' => 'text_format',
 			'#title' => 'PDF Body',
