@@ -21,6 +21,8 @@ function sirius_sns_config() {
 }
 
 function sirius_sns_incoming() {
+  // Disabling
+  return drupal_json_output(array('success' => TRUE));
   // Construct our JSON.
   $json = json_decode(file_get_contents("php://input"));
   sirius_denorm_queue_add(1, 1, 'sirius_sns_incoming_denorm', $json);
