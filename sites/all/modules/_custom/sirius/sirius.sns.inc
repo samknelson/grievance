@@ -30,6 +30,8 @@ function sirius_sns_incoming() {
 }
 
 function sirius_sns_incoming_denorm($item) {
+  return array('success' => TRUE);
+  
   $json = json_decode($item['denorm_trigger_args']);
 
   // The payload is attached as a raw string. Expand it as well.
