@@ -3,10 +3,7 @@
 function sirius_trust_election_wizard_addr($info, $data, $wizard_node, $current_step) { return drupal_get_form('sirius_trust_election_wizard_addr_form', $info, $data, $wizard_node, $current_step); }
 
 function sirius_trust_election_wizard_addr_form($form, &$form_state, $info, $data, $wizard_node, $current_step) {
-
-	$result = sirius_trust_election_wizard_get_worker($wizard_node);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$worker_node = $result['data'];
+	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
 
 	$old_addr = $worker_node->field_sirius_address['und'][0];
 
@@ -122,3 +119,20 @@ function sirius_trust_election_wizard_addr_form_submit($form, &$form_state) {
 	sirius_trust_election_set_title($wizard_node);
 }
 
+function sirius_trust_election_wizard_addr_render($info, $data, $wizard_node, $current_step) {
+	$html .= '<div class="sirius_wizard_render_section sirius_callout_basic">';
+	$html .= '<h2>Address</h2>';
+
+	if ($data['addr']['change'] == 'Yes') {
+		$html .= sirius_fakerender_field('Address:', $data['name']['addr']['thoroughfare']);
+		$html .= sirius_fakerender_field('Address 2:', $data['name']['addr']['premise']);
+		$html .= sirius_fakerender_field('City:', $data['name']['addr']['locality']);
+		$html .= sirius_fakerender_field('State:', $data['name']['addr']['administrative_area']);
+		$html .= sirius_fakerender_field('Zip:', $data['name']['addr']['postal_code']);
+	} else {
+		$html .= '<p>' . t('Name is unchanged.') . '</p>';
+	}
+	$html .= '</div>';
+
+	return $html;
+}
