@@ -1,10 +1,8 @@
 <?php
 
 function sirius_trust_election_wizard_intro_form($form, &$form_state, $info, $data, $wizard_node, $current_step) {
-	$result = sirius_trust_election_wizard_get_policy($data);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$policy_rnode = $result['data'];
-	$policy_json = sirius_json_get($policy_rnode);
+	$policy_node = sirius_trust_election_wizard_get_policy($data);
+	$policy_json = sirius_json_get($policy_node);
 	$intro = $policy_json['elections']['intro']['body'];
 
 	$form['intro'] = array('#markup' => $intro);
