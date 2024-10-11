@@ -1,11 +1,9 @@
 <?php
 
-function sirius_trust_election_wizard_emia($info, $data, $wizard_node, $current_step) { return drupal_get_form('sirius_trust_election_wizard_email_form', $info, $data, $wizard_node, $current_step); }
+function sirius_trust_election_wizard_email($info, $data, $wizard_node, $current_step) { return drupal_get_form('sirius_trust_election_wizard_email_form', $info, $data, $wizard_node, $current_step); }
 
 function sirius_trust_election_wizard_email_form($form, &$form_state, $info, $data, $wizard_node, $current_step) {
-	$result = sirius_trust_election_wizard_get_worker($wizard_node);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$worker_node = $result['data'];
+	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
 
 	$old_email = $worker_node->field_sirius_email['und'][0]['value'];
 	$code = $data['email']['code'];
@@ -198,4 +196,18 @@ function sirius_trust_election_wizard_email_form_submit($form, &$form_state) {
 	} else {
 		return drupal_set_message("Please select one of the options below.", 'warning');
 	}
+}
+
+function sirius_trust_election_wizard_email_render($info, $data, $wizard_node, $current_step) {
+	$html .= '<div class="sirius_wizard_render_section sirius_callout_basic">';
+	$html .= '<h2>Email</h2>';
+
+	if ($data['email']['change'] == 'Yes') {
+		$html .= sirius_fakerender_field('Email Address:', $data['email']['new']['email']);
+	} else {
+		$html .= '<p>' . t('Email Address is unchanged.') . '</p>';
+	}
+	$html .= '</div>';
+
+	return $html;
 }
