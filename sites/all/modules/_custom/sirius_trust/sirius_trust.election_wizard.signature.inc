@@ -1,10 +1,8 @@
 <?php
 
 function sirius_trust_election_wizard_signature_form($form, &$form_state, $info, $data, $wizard_node, $current_step) {
-	$result = sirius_trust_election_wizard_get_policy($data);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$policy_rnode = $result['data'];
-	$policy_json = sirius_json_get($policy_rnode);
+	$policy_node = sirius_trust_election_wizard_get_policy($data);
+	$policy_json = sirius_json_get($policy_node);
 
 	sirius_esignature_init();
 	sirius_require('sirius', 'sirius.page_entity_signatures.inc');
@@ -46,10 +44,8 @@ function sirius_trust_election_wizard_signature_form_submit($form, &$form_state)
 	$wizard_json = sirius_json_get($wizard_node);
 	$current_step = $form_state['current_step'];
 
-	$result = sirius_trust_election_wizard_get_policy($data);
-	if (!$result['success']) { drupal_set_message(sirius_form_error($result['msg']), 'error'); return; }
-	$policy_rnode = $result['data'];
-	$policy_json = sirius_json_get($policy_rnode);
+	$policy_node = sirius_trust_election_wizard_get_policy($data);
+	$policy_json = sirius_json_get($policy_node);
 
 	$which = $policy_json['elections']['esignature']['def'];
 	$action = $form_state['values']['action'];
@@ -64,6 +60,7 @@ function sirius_trust_election_wizard_signature_form_submit($form, &$form_state)
 		sirius_jsonfield_util_esignature_set($wizard_json, $which, $signature);
 		sirius_json_set($wizard_node, $wizard_json);
 		sirius_trust_election_set_title($wizard_node);
+		$wizard_node->field_sirius_type['und'][0]['value'] = 'submitted';
 		sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Response saved.", array('nonsequential' => TRUE));
 	}
 }
