@@ -3,9 +3,7 @@
 function sirius_trust_election_wizard_phone($info, $data, $wizard_node, $current_step) { return drupal_get_form('sirius_trust_election_wizard_phone_form', $info, $data, $wizard_node, $current_step); }
 
 function sirius_trust_election_wizard_phone_form($form, &$form_state, $info, $data, $wizard_node, $current_step) {
-	$result = sirius_trust_election_wizard_get_worker($wizard_node);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$worker_node = $result['data'];
+	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
 
 	$old_phone = $worker_node->field_sirius_phone['und'][0]['value'];
 	$code = $data['phone']['code'];
@@ -193,4 +191,18 @@ function sirius_trust_election_wizard_phone_form_submit($form, &$form_state) {
 	} else {
 		return drupal_set_message("Please select one of the options below.", 'warning');
 	}
+}
+
+function sirius_trust_election_wizard_phone_render($info, $data, $wizard_node, $current_step) {
+	$html .= '<div class="sirius_wizard_render_section sirius_callout_basic">';
+	$html .= '<h2>Phone</h2>';
+
+	if ($data['phone']['change'] == 'Yes') {
+		$html .= sirius_fakerender_field('Phone Number:', $data['phone']['new']['phone']);
+	} else {
+		$html .= '<p>' . t('Phone number is unchanged.') . '</p>';
+	}
+	$html .= '</div>';
+
+	return $html;
 }
