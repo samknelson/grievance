@@ -1,34 +1,24 @@
 <?php
 
 function sirius_trust_election_wizard_disclaimers_form($form, &$form_state, $info, $data, $wizard_node, $current_step) {
-	return array();
-	$result = sirius_trust_election_wizard_get_policy($data);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$policy_rnode = $result['data'];
-	$policy_json = sirius_json_get($policy_rnode);
+	$policy_node = sirius_trust_election_wizard_get_policy($data);
+	$policy_json = sirius_json_get($policy_node);
 
-  $disclaimer_rnids = array();
+  $disclaimer_nids = array();
   if ($policy_json['elections']['disclaimer']['nids']) {
-  	$disclaimer_rnids = array_filter(array_values($policy_json['elections']['disclaimer']['nids']));
+  	$disclaimer_nids = array_filter(array_values($policy_json['elections']['disclaimer']['nids']));
   }
-
-  $disclaimer_rnodes = array();
-  foreach ($disclaimer_rnids as $disclaimer_rnid) {
-		$result = sirius_proxy_call('sirius_proxy_node_load', $disclaimer_rnid);
-		if (!$result['success']) { return sirius_form_error($result['msg']); }
-		$disclaimer_rnodes[$disclaimer_rnid] = $result['data'];
-  }
+  $disclaimer_nodes = node_load_multiple($disclaimer_nids);
+	if (!$disclaimer_nodes) { return sirius_form_error('No disclaimers have been configured for this election.'); }
 
 	$wizard_json = sirius_json_get($wizard_node);
 
-	if (!$disclaimer_rnodes) { return sirius_form_error('No disclaimers have been configured for this election.'); }
-
 	$accepted_all = TRUE;
-	foreach ($disclaimer_rnodes as $disclaimer_rnid => $disclaimer_rnode) {
-		$disclaimer_json = sirius_json_get($disclaimer_rnode)['disclaimer'];
-		$acceptance_json = $wizard_json['disclaimer'][$disclaimer_rnid]['acceptances'][0];
+	foreach ($disclaimer_nodes as $disclaimer_nid => $disclaimer_node) {
+		$disclaimer_json = sirius_json_get($disclaimer_node)['disclaimer'];
+		$acceptance_json = $wizard_json['disclaimer'][$disclaimer_nid]['acceptances'][0];
 		if (!$acceptance_json) { $accepted_all = FALSE; }
-		$form['disclaimer'][$disclaimer_rnid] = sirius_disclaimer_render_form($disclaimer_json, $acceptance_json);			
+		$form['disclaimer'][$disclaimer_nid] = sirius_disclaimer_render_form($disclaimer_json, $acceptance_json);			
 	}
 
 	return sirius_trust_election_wizard_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
