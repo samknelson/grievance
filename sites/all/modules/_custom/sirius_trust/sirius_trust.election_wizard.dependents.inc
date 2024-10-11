@@ -1,42 +1,45 @@
 <?php
 
 function sirius_trust_election_wizard_dependents_form($form, &$form_state, $info, $data, $wizard_node, $current_step) {
-	$result = sirius_trust_election_wizard_get_policy($data);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$policy_rnode = $result['data'];
-	$policy_json = sirius_json_get($policy_rnode);
+	$policy_node = sirius_trust_election_wizard_get_policy($data);
+	$policy_json = sirius_json_get($policy_node);
 
-	$result = sirius_proxy_call('sirius_trust_policy_benefits_offered', $policy_rnode);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$benefits = $result['data'];
+	$benefits = sirius_trust_policy_benefits_offered($policy_node);
 
-	$result = sirius_trust_election_wizard_get_worker($wizard_node);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$worker_rnode = $result['data'];
-	$worker_contact_rnid = $worker_rnode->field_sirius_contact['und'][0]['target_id'];
-	if (!$worker_contact_rnid) { return sirius_form_error("No contact record found for this worker."); }
+	$worker_node = sirius_trust_election_wizard_get_worker($wizard_node);
+	$worker_contact_nid = $worker_node->field_sirius_contact['und'][0]['target_id'];
+	if (!$worker_contact_nid) { return sirius_form_error("No contact record found for this worker."); }
 
-	$result = sirius_proxy_call('sirius_taxonomy_load', 'sirius_contact_relationship_types', 'tid', 'name');
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$relationship_type_lookup = $result['data'];
+	$relationship_type_lookup = sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'name');
+	$election_type = sirius_trust_election_wizard_get_election_type($data);
+	$election_type_json = sirius_json_get($election_type);
+	$relationship_criteria = sirius_trust_relationship_criteria_get($election_type_json);
+	$ok_relationship_types = array();
+	foreach ($relationship_criteria as $uuid => $criterion) {
+		$ok_relationship_types = array_merge($ok_relationship_types, array_filter(array_values($criterion['relationship_types'])));
+	}
+	$relationship_type_options = array();
+	foreach ($ok_relationship_types as $relationship_type_tid) {
+		$relationship_type_options[$relationship_type_tid] = sirius_term_title($relationship_type_tid);
+	}
+
+	$form['intro'] = array('#markup' => sirius_trust_relationship_criteria_render($relationship_criteria, array('title' => 'Please select the following dependents')));
 
   $params = array();
   $params['active'] = 'Yes';
-	$params['contact_nid'] = $worker_contact_rnid;
-	$result = sirius_proxy_call('sirius_contact_relationships', $params);
-	if (!$result['success']) { return sirius_form_error($result['msg']); }
-	$relationship_rnodes = $result['data'];
+	$params['contact_nid'] = $worker_contact_nid;
+	$relationship_nodes = sirius_contact_relationships($params);
 	$relationship_options = array();
-	foreach ($relationship_rnodes as $relationship_rnid => $relationship_rnode) {
-		$dependent_contact_rnid = $relationship_rnode->field_sirius_contact_alt['und'][0]['target_id'];
-		$result = sirius_proxy_call('sirius_proxy_node_load', $dependent_contact_rnid);
-		if (!$result['success']) { return sirius_form_error($result['msg']); }
-		$dependent_contact_rnode = $result['data'];
+	foreach ($relationship_nodes as $relationship_nid => $relationship_node) {
+		if (!in_array($relationship_node->field_sirius_contact_reltype['und'][0]['tid'], $ok_relationship_types)) { continue; }
 
-		$relationship_options[$relationship_rnid] = '(' . 
-			$relationship_type_lookup[$relationship_rnode->field_sirius_contact_reltype['und'][0]['tid']] . 
+		$dependent_contact_nid = $relationship_node->field_sirius_contact_alt['und'][0]['target_id'];
+		$dependent_contact_node = node_load($dependent_contact_nid);
+
+		$relationship_options[$relationship_nid] = '(' . 
+			$relationship_type_lookup[$relationship_node->field_sirius_contact_reltype['und'][0]['tid']] . 
 			' to) ' . 
-			$dependent_contact_rnode->title;
+			$dependent_contact_node->title;
 	}
 
 	$form['prefix'] = array('#markup' => $policy_json['elections']['dependents']['existing']['prefix']);
