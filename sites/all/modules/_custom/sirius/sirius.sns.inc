@@ -21,8 +21,18 @@ function sirius_sns_config() {
 }
 
 function sirius_sns_incoming() {
+  // Disabling
+  return drupal_json_output(array('success' => TRUE));
   // Construct our JSON.
   $json = json_decode(file_get_contents("php://input"));
+  sirius_denorm_queue_add(1, 1, 'sirius_sns_incoming_denorm', $json);
+  return drupal_json_output(array('success' => TRUE));
+}
+
+function sirius_sns_incoming_denorm($item) {
+  return array('success' => TRUE);
+  
+  $json = json_decode($item['denorm_trigger_args']);
 
   // The payload is attached as a raw string. Expand it as well.
   if ($json && $json->Message) { $json->Message = json_decode($json->Message); }
@@ -40,13 +50,12 @@ function sirius_sns_incoming() {
   if (!$is_safe) {
     $topic = $json->TopicArn;
     if (!$topic) { 
-      watchdog('sirius_sns', 'No topic found: <pre>' . print_r($json, 1) . '</pre>');
       return "No topic found. Message not processed.";
     }
     $allowed_topics = preg_split('/\s+/', variable_get('sirius_sns_topics', ''));
     if (!in_array($topic, $allowed_topics)) { 
       watchdog('sirius_sns', "Invalid topic $topic: <pre>" . print_r($json, 1) . '</pre>');
-      return "Invalid topic $topic. Message not processed.";
+      return array('success' => FALSE, 'msg' => "Invalid topic $topic. Message not processed.");
     }
   }
 
@@ -63,8 +72,7 @@ function sirius_sns_incoming() {
   }
 
   // We're good. We can proceed to handle this message.
-  sirius_sns_handle($json);
-  return drupal_json_output(array('success' => TRUE));
+  return sirius_sns_handle($json);
 }
 
 function sirius_sns_handle($json) {
@@ -77,16 +85,17 @@ function sirius_sns_handle($json) {
       }
     }
     sirius_email_callback($id, $type, $json);
-    return TRUE;
+    return array('success' => TRUE);
 	}
 
   // Handle subscription callback
   if ($json->Type == "SubscriptionConfirmation") {
     sirius_sns_handle_subscription($json);
-    return TRUE;
+    return array('success' => TRUE);
   }
 
   sirius_log('sns', 'unknown', 'Unknown json callback', '', '', array(), array(), $json);  
+  return array('success' => TRUE);
 }
 
 function sirius_sns_handle_subscription($json) {
@@ -99,4 +108,5 @@ function sirius_sns_handle_subscription($json) {
   curl_close($curl_handle);
 
   sirius_log('sns', 'subscription', 'Subscription confirmation for ' . $url, '', '', array(), array(), $json);
+  return array('success' => TRUE);
 }

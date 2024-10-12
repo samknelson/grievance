@@ -80,7 +80,7 @@ function sirius_domain_page_list_impl($options) {
 	return $html;
 }
 
-function sirius_domain_page_list_render($tree, $depth = NULL, $options) {
+function sirius_domain_page_list_render($tree, $depth = NULL, $options = array()) {
 	if ($options['stats']) {
 		global $user;
 		$user_full = user_load($user->uid);
