@@ -58,6 +58,30 @@ function sirius_edls_client_worker_fetch($mode = 'test', $force = FALSE) {
 			sirius_minilog("... Fetch failed: " . $result['msg']);
 			continue;
 		}
+
+		if (!$result['workers']) {
+			sirius_minilog("... No workers found.");
+			continue;
+		}
+
+		$workers_by_ms = array();
+		foreach ($result['workers'] as $worker) {
+			$ms = $worker['worker_ms'];
+			$id = $worker['worker_id'];
+			$worker_name = $worker['work_name'];
+			$workers_by_ms[$ms][] = $worker;
+		}
+
+	  $ms_list = sirius_edls_outsource_ms_list($employer_node, 'name');
+		foreach ($workers_by_ms as $ms => $workers) {
+			if (!$ms_list[$ms]) {
+				sirius_minilog("No member status configured for id $ms.", 'warning');
+				continue;
+			}
+
+			sirius_minilog("... Assigning workers to member status: $ms: $ms_list[$ms]");
+			sirius_edls_outsource_set_all_by_ms($employer_node, $workers, $ms);
+		}
 	}
 
 	return array('success' => TRUE);

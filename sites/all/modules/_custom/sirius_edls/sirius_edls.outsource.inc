@@ -4,11 +4,10 @@ function sirius_edls_outsource_encode($workers) {
   $lines = array();
   foreach ($workers as $worker_record) {
     $worker_name = $worker_record['worker_name'];
-    $worker_ms = $worker_record['worker_ms'];
     $worker_id = $worker_record['worker_id'];
     $worker_id = preg_replace('/^O/', '', $worker_id);
 
-    $lines[] = "$worker_id|$worker_ms|$worker_name";
+    $lines[] = "$worker_id|$worker_name";
   }
   return join("\n", $lines);
 }
@@ -17,7 +16,7 @@ function sirius_edls_outsource_decode($workers_encode) {
   $lines = explode("\n", $workers_encode);
   $workers = array();
   foreach ($lines as $line) {
-    list ($worker_id, $worker_ms, $worker_name) = explode('|', $line);
+    list ($worker_id, $worker_name) = explode('|', $line);
 
     $worker_name = trim($worker_name);
     $worker_name = preg_replace('/[^a-zA-Z0-9_, ]/', '', $worker_name);
@@ -27,16 +26,12 @@ function sirius_edls_outsource_decode($workers_encode) {
     $worker_id = preg_replace('/[^a-zA-Z0-9_]/', '', $worker_id);
     $worker_id = preg_replace('/\s+/', ' ', $worker_id);
 
-    $worker_ms = trim($worker_ms);
-    $worker_ms = preg_replace('/[^a-zA-Z0-9_]/', '', $worker_ms);
-    $worker_ms = preg_replace('/\s+/', ' ', $worker_ms);
-
-    if (!$worker_id && !$worker_ms && !$worker_name) { continue; }
-    if (!$worker_id || !$worker_ms || !$worker_name) { return array('success' => FALSE, 'msg' => "Please make sure that each row has a worker ID, member status, and name ($worker_id, $worker_ms, $worker_name)"); }
+    if (!$worker_id && !$worker_name) { continue; }
+    if (!$worker_id || !$worker_name) { return array('success' => FALSE, 'msg' => "Please make sure that each row has a worker ID, member status, and name ($worker_id, $worker_ms, $worker_name)"); }
 
     $worker_id = 'O' . $worker_id;
 
-    $workers[] = array('worker_name' => $worker_name, 'worker_ms' => $worker_ms, 'worker_id' => $worker_id);
+    $workers[] = array('worker_name' => $worker_name, 'worker_id' => $worker_id);
   }
 
   return array('success' => TRUE, 'workers' => $workers);
@@ -153,6 +148,41 @@ function sirius_edls_outsource_set_all($employer_node, $new_workers) {
     $sql_args[':worker_id'] = $worker_id;
     $sql_args[':worker_name'] = $worker_record['worker_name'];
     $sql_args[':worker_ms'] = $worker_record['worker_ms'];
+    $stmt = db_query($sql, $sql_args);
+  }
+
+  return array('success' => TRUE);
+}
+
+function sirius_edls_outsource_set_all_by_ms($employer_node, $new_workers, $ms) {
+  // Check member statuses
+  $ms_options = sirius_edls_outsource_ms_list($employer_node);
+  if (!$ms_options[$ms]) {
+    return array('success' => FALSE, 'msg' => "The member status [$ms] is not configured.");
+  }
+  // Delete the old workers
+  $employer_nid = $employer_node->nid;
+  $old_workers = sirius_edls_outsource_list($employer_nid);
+  foreach ($old_workers as $worker_record) {
+    $worker_id = $worker_record['worker_id'];
+    if ($new_workers[$worker_id]) { continue; }
+    $sql = "delete from sirius_edls_outsource where employer_nid = :employer_nid and worker_id = :worker_id and worker_ms = :ms";
+    $stmt = db_query($sql, array(':employer_nid' => $employer_nid, ':worker_id' => $worker_id, ':ms' => $ms));
+  }
+
+  // Create or update the new workers
+  foreach ($new_workers as $worker_record) {
+    $worker_id = $worker_record['worker_id'];
+    $sql = "insert into sirius_edls_outsource ";
+    $sql .= "(employer_nid, worker_id, worker_ms, worker_name) ";
+    $sql .= "values ";
+    $sql .= "(:employer_nid, :worker_id, :worker_ms, :worker_name) ";
+    $sql .= "on duplicate key update worker_name = :worker_name ";
+    $sql_args = array();
+    $sql_args[':employer_nid'] = $employer_nid;
+    $sql_args[':worker_id'] = $worker_id;
+    $sql_args[':worker_name'] = $worker_record['worker_name'];
+    $sql_args[':worker_ms'] = $ms;
     $stmt = db_query($sql, $sql_args);
   }
 

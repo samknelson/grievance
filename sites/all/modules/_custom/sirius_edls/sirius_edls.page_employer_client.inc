@@ -54,7 +54,6 @@ function sirius_edls_node_tab_employer_client_form_submit($form, &$form_state) {
 		$result = sirius_edls_client_worker_list($form_state['values']['client']['uuid'], $form_state['values']['client']['access_code']);
 		if ($result['success']) {
 			drupal_set_message("Remote employer lookup succeeded.");
-			dpm($result);
 		} else {
 			drupal_set_message("Remote employer lookup failed: " . $result['msg'], 'warning');
 		}
