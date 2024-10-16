@@ -206,9 +206,10 @@ function sirius_edls_outsource_ms_list($employer_node, $type = 'name') {
   if ($type == 'full') {
     return $items;
   } else if ($type == 'short') {
+    // We don't support short names yet.
     $result = array();
     foreach ($items as $key => $record) {
-      $result[$key] = $key;
+      $result[$key] = $record['ms_name'];
     }
   } else {
     $result = array();
