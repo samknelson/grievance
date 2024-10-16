@@ -64,11 +64,20 @@ function sirius_edls_client_worker_fetch($mode = 'test', $force = FALSE) {
 			continue;
 		}
 
+		// Set the worker ID for the client server. This is:
+		// - The EIN where avialable
+		// - DISP+dispatch ID otherwise
+
+		foreach ($result['workers'] as $delta => $worker) {
+			$id = $worker['worker_ein'];
+			if (!$id) { $id = 'DISP' . $worker['worker_id']; } 
+			$result['workers'][$delta]['worker_id'] = $id;
+		}
+
+		// Create lists by member status
 		$workers_by_ms = array();
 		foreach ($result['workers'] as $worker) {
 			$ms = $worker['worker_ms'];
-			$id = $worker['worker_id'];
-			$worker_name = $worker['work_name'];
 			$workers_by_ms[$ms][] = $worker;
 		}
 
@@ -79,7 +88,8 @@ function sirius_edls_client_worker_fetch($mode = 'test', $force = FALSE) {
 				continue;
 			}
 
-			sirius_minilog("... Assigning workers to member status: $ms: $ms_list[$ms]");
+			$count = count($workers);
+			sirius_minilog("... Assigning $count workers to member status: $ms: $ms_list[$ms]");
 			sirius_edls_outsource_set_all_by_ms($employer_node, $workers, $ms);
 		}
 	}

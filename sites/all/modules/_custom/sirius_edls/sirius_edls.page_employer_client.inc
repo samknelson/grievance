@@ -39,6 +39,16 @@ function sirius_edls_node_tab_employer_client_form($form, &$form_state, $employe
   	'#value' => t('Submit'),
   );
 
+  if ($form_state['result']) {
+  	$html = '<hr>';
+  	$html .= '<h2>' . t('Full Response') . '</h2>';
+  	$html .= '<p><em>' . t('The raw response from the remote server is rendered below.') . '</em></p>';
+  	$html .= '<pre>';
+  	$html .= print_r($form_state['result'], 1);
+  	$html .= '</pre>';
+  	$form['details'] = array('#markup' => $html);
+  }
+
 	return $form;
 }
 
@@ -57,5 +67,8 @@ function sirius_edls_node_tab_employer_client_form_submit($form, &$form_state) {
 		} else {
 			drupal_set_message("Remote employer lookup failed: " . $result['msg'], 'warning');
 		}
+
+		$form_state['result'] = $result;
+		$form_state['rebuild'] = TRUE;
 	}
 }
