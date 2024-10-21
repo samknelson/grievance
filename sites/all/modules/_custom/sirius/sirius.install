@@ -501,10 +501,11 @@ function sirius_update_7031() {
 
   foreach ($sqls as $sql) {
     try {
-      print "Executing: $sql\n";
+      drupal_set_message('install', "Executing: $sql");
       $stmt = db_query($sql, array());
-      print "... Done.\n";
-    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+    } catch (exception $ignore) {
+      drupal_set_message("Error: " . $ignore->getMessage());
+    }
   }
 }
 
