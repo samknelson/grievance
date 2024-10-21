@@ -488,5 +488,23 @@ function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
   }
 }
 
+/**
+ * Add the external_id column to the JSON field. 
+ * This sometimes failed on update_7026 because of MariaDB-specific SQL. Just in case, we're re-running it.
+ */
 
+function sirius_update_7031() {
+  $sqls = array(
+    'alter table field_data_field_sirius_json add column json_denorm_external_id varchar(255) generated always as (JSON_UNQUOTE(JSON_EXTRACT(field_sirius_json_value, \'$.external_id\')))',
+    'alter table field_data_field_sirius_json add index json_denorm_external_id (json_denorm_external_id)',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
 
