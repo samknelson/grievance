@@ -160,8 +160,8 @@ function sirius_edls_sirius_cron_scan_info() {
 
   $items['edls_client_event_fetch'] = array(
     'title' => 'EDLS Service Event Fetch',
-    'description' => 'Fetch the event list from the remove server.',
-    'schedule' => 'always',
+    'description' => 'Fetch the event list from the remote server.',
+    'schedule' => 'hourly',
     'callback' => 'sirius_edls_client_event_fetch',
     'multidomain' => TRUE,
     'component' => 'edls:service:client',

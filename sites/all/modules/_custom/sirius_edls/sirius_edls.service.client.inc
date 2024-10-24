@@ -71,6 +71,7 @@ function sirius_edls_client_worker_fetch($mode = 'test', $force = FALSE) {
 		foreach ($result['workers'] as $delta => $worker) {
 			$id = $worker['worker_ein'];
 			if (!$id) { $id = 'DISP' . $worker['worker_id']; } 
+			$id = 'O' . $id;
 			$result['workers'][$delta]['worker_id'] = $id;
 		}
 
@@ -96,11 +97,6 @@ function sirius_edls_client_worker_fetch($mode = 'test', $force = FALSE) {
 
 	return array('success' => TRUE);
 }
-
-
-
-
-
 
 function sirius_edls_client_event_fetch($mode = 'test', $force = FALSE) {
 	$result = sirius_edls_client_request('sirius_dispatch_group_search', array('domain_root' => 1, 'ts' => time(), 'limit' => 500));

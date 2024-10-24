@@ -160,6 +160,7 @@ function sirius_edls_outsource_set_all_by_ms($employer_node, $new_workers, $ms) 
   if (!$ms_options[$ms]) {
     return array('success' => FALSE, 'msg' => "The member status [$ms] is not configured.");
   }
+
   // Delete the old workers
   $employer_nid = $employer_node->nid;
   $old_workers = sirius_edls_outsource_list($employer_nid);
@@ -177,7 +178,7 @@ function sirius_edls_outsource_set_all_by_ms($employer_node, $new_workers, $ms) 
     $sql .= "(employer_nid, worker_id, worker_ms, worker_name) ";
     $sql .= "values ";
     $sql .= "(:employer_nid, :worker_id, :worker_ms, :worker_name) ";
-    $sql .= "on duplicate key update worker_name = :worker_name ";
+    $sql .= "on duplicate key update worker_name = :worker_name, worker_ms = :worker_ms ";
     $sql_args = array();
     $sql_args[':employer_nid'] = $employer_nid;
     $sql_args[':worker_id'] = $worker_id;
