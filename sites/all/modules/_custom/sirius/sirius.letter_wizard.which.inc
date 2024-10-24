@@ -403,14 +403,14 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 						$rep_user = user_load($tmp['target_id']);
 						if (!$rep_user) { continue; }
 						$phone = $rep_user->field_grievance_phone['und'][0]['value'];
-						if ($phone) { continue; }
+						if (!$phone) { continue; }
 
 						$recipient = array();
 						$recipient['delta'] = $delta++;
 						$recipient['description'] = $label;
 						$recipient['uid'] = $rep_user->uid;
 						$recipient['name'] = $rep_user->name;
-						$recipient['email'] = $rep_user->mail;
+						$recipient['phone'] = $phone;
 						$recipient['disposition'] = 'skip';
 						$recipients[$phone] = $recipient;
 					}
