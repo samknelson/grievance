@@ -21,8 +21,6 @@ function sirius_sns_config() {
 }
 
 function sirius_sns_incoming() {
-  // Disabling
-  return drupal_json_output(array('success' => TRUE));
   // Construct our JSON.
   $json = json_decode(file_get_contents("php://input"));
   sirius_denorm_queue_add(1, 1, 'sirius_sns_incoming_denorm', $json);
@@ -30,8 +28,6 @@ function sirius_sns_incoming() {
 }
 
 function sirius_sns_incoming_denorm($item) {
-  return array('success' => TRUE);
-  
   $json = json_decode($item['denorm_trigger_args']);
 
   // The payload is attached as a raw string. Expand it as well.
