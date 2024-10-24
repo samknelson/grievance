@@ -338,7 +338,7 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 		$json = json_decode($main_letter_template_node->field_sirius_json['und'][0]['value'], TRUE);
 		if ($json['recipients']) {
 			foreach ($json['recipients'] as $recipient) {
-				if ($recipients[$recipient['phone']]) { continue; }
+				if (!$recipients[$recipient['phone']]) { continue; }
 				$delta = $recipient['delta'];
 				$recipients[$recipient['phone']] = $recipient;
 			}
