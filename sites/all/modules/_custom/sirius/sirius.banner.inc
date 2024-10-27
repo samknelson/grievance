@@ -83,6 +83,13 @@ function sirius_login_config() {
     '#description' => t('Enter the text that should appear BELOW the site\'s login form. May contain HTML.'),
   );
 
+  $form['sirius_login_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Login Path'),
+    '#default_value' => variable_get('sirius_login_path', ''),
+    '#description' => t('Enter the Drupal path to login. This is probably only relevant if you want to encourage users to login as saml/login.'),
+  );
+
 	$form = system_settings_form($form);
   return $form;
 }
@@ -161,7 +168,9 @@ function sirius_banner_render() {
 					$html .= l(t('home'), '<front>');
 					$html .= ' / ';
 				}
-	    	$html .= l("login","user/login");
+				$login_path = variable_get('sirius_login_path', '');
+				if (!$login_path) { $login_path = 'user/login'; }
+	    	$html .= l("login", $login_path);
 	    $html .= '</div>'; // user-links-content
 	  }
 
