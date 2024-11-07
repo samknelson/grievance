@@ -164,6 +164,7 @@ function sirius_worker_node_tabs() {
     'rnode' => TRUE,
   );
 
+  /*
   $node_tabs['sirius_worker']['sirius_worker_contact/phone'] = array(
     'title' => 'Phone',
     'description' => '',
@@ -173,6 +174,7 @@ function sirius_worker_node_tabs() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
   );
+  */
 
   $node_tabs['sirius_worker']['sirius_worker_contact/lang'] = array(
     'title' => 'Languages',
@@ -218,6 +220,15 @@ function sirius_worker_node_tabs() {
     'callback' => 'sirius_node_tab_worker_merge',
     'permissions' => array('sirius worker admin'),
     'weight' => 4
+  );
+
+  $node_tabs['sirius_worker']['sirius_worker_password'] = array(
+    'title' => 'Password',
+    'description' => '',
+    'callback' => 'sirius_node_tab_worker_password',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_worker.page_password.inc',
+    'weight' => 1,
   );
 
   $node_tabs['sirius_worker']['sirius_worker_grievances'] = array(

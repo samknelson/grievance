@@ -120,10 +120,15 @@ function sirius_worker_usersync($worker_nid, $options = array()) {
 	}
 
 	// Let's figure out the roles. First get all the available worker roles.
+	foreach (array_values(sirius_domain_variable_get('sirius_worker_roles', array())) as $rid) {
+		$all_rids[$rid] = TRUE;
+	}
+	if (!$all_rids) { $all_rids = array(); }
+
+	// Let's figure out the roles. First get all the available worker roles.
 	$all_rids = array();
 	foreach (array_values(sirius_domain_variable_get('sirius_worker_roles', array())) as $rid) { $all_rids[$rid] = TRUE; }
 	foreach (array_values(sirius_domain_variable_get('sirius_worker_roles_always', array())) as $rid) { $all_rids[$rid] = TRUE; }
-
 
 	// Next, get all the user's member statuses.
 	$member_status_tids = array();
@@ -146,6 +151,7 @@ function sirius_worker_usersync($worker_nid, $options = array()) {
 			}
 		}
 	}
+
 	$no_rids = array_diff_assoc($all_rids, $yes_rids);
 
 	// Next, get the current rids. We're going to add the YES's, and remove the NO's.  

@@ -186,6 +186,11 @@ function sirius_worker_node_postsave($node, $op) {
     ($op == 'insert' || $op == 'update') &&
     !$node->grievance_no_recurse && 
     !$node->sirius_no_recurse) {
+    
+    // Switch into the relevant domain
+    if ($node->field_sirius_domain['und'][0]['target_id']) {
+      sirius_domain_push($worker_node->field_sirius_domain['und'][0]['target_id']);
+    }
 
     // Check the component
     if (!sirius_domain_component_enabled('worker:usersync')) { return; }
@@ -194,6 +199,11 @@ function sirius_worker_node_postsave($node, $op) {
     $node->grievance_no_recurse = TRUE;
     $node->sirius_no_recurse = TRUE;
     $need_save = FALSE;
+
+    // Switch into the relevant domain
+    if ($node->field_sirius_domain['und'][0]['target_id']) {
+      sirius_domain_pop();
+    }
 
     // Sync the user
     $result = sirius_worker_usersync($node->nid);

@@ -1,6 +1,6 @@
 <?php
 
-function sirius_edls_page_worker_outsource() {
+function sirius_edls_page_worker_outsource($ms_key = NULL) {
 	$result = sirius_edls_employer_switch();
 	$html = $result['markup'];
 	$employer_node = $result['employer_node'];
@@ -13,38 +13,55 @@ function sirius_edls_page_worker_outsource() {
 		return sirius_page_error('Access denied.');
 	}
 
-	$html .= drupal_render(drupal_get_form('sirius_edls_page_worker_outsource_form', $employer_node));
+	$html .= drupal_render(drupal_get_form('sirius_edls_page_worker_outsource_form', $employer_node, $ms_key));
 
 	return $html;
 }
 
+function sirius_edls_page_worker_outsource_quicknav($employer_node) {
+	$ms_options = sirius_edls_outsource_ms_list($employer_node);
 
-function sirius_edls_page_worker_outsource_form($form, &$form_state, $employer_node) {
+	$base_path = 'sirius/edls/workers/outsource';
+
+	$links = array();
+	foreach ($ms_options as $ms_key => $ms_name) {
+		$link = array();
+		$link['title'] = $ms_name;
+		$link['path'] = $base_path . '/' . $ms_key;
+		$links[] = $link;
+	}
+
+	return sirius_quicknav($links);
+}
+
+function sirius_edls_page_worker_outsource_form($form, &$form_state, $employer_node, $ms_key = NULL) {
 	$form['#tree'] = TRUE;
 	$form_state['employer_nid'] = $employer_node->nid;
+	$form_state['ms_key'] = $ms_key;
+
+	$form['quicknav'] = array('#markup' => sirius_edls_page_worker_outsource_quicknav($employer_node));
 
 	$ms_options = sirius_edls_outsource_ms_list($employer_node);
 	$ms_keys = array_keys($ms_options);
 	if (!$ms_keys) { return sirius_form_error("Please configure at least one outsource member status.", 'error'); }
-	$sample_key = $ms_keys[0];
+
+	if (!$ms_key) { 
+		$form['err'] = array('#markup' => '<p><strong>' . t('Please select a member status from the menu above.') . '</strong></p>');
+		return $form;
+	}
+
 	$html = '<p>';
 	$html .= t('Enter the outsource workers one per line. Each line should include the ID, the member status, and the name, separated by a pipe, i.e.:');
 	$html .= '<pre>';
-	$html .= "12343|$sample_key|Flintstone, Wilma\n";
-	$html .= "12344|$sample_key|Rubble, Betty\n";
-	$html .= "12345|$sample_key|Flintstone, Frederick\n";
-	$html .= "12346|$sample_key|Rubble, Barey";
+	$html .= "12343|Flintstone, Wilma\n";
+	$html .= "12344|Rubble, Betty\n";
+	$html .= "12345|Flintstone, Frederick\n";
+	$html .= "12346|Rubble, Barey";
 	$html .= '</pre>';
-	$html .= 'The following member statuses are available:';
-	$html .= '<ul>';
-	foreach ($ms_keys as $ms_key) {
-		$html .= '<li>' . $ms_key . '</li>';
-	}
-	$html .= '</ul>';
 	$html .= '</p>';
 	$form['intro'] = array('#markup' => $html);
 
-	$workers = sirius_edls_outsource_list($employer_node->nid);
+	$workers = sirius_edls_outsource_list($employer_node->nid, NULL, array('ms' => $ms_key));
 	$workers_encode = sirius_edls_outsource_encode($workers);
 	$form['workers'] = array(
 		'#type' => 'textarea',
@@ -64,6 +81,7 @@ function sirius_edls_page_worker_outsource_form($form, &$form_state, $employer_n
 
 function sirius_edls_page_worker_outsource_form_submit($form, &$form_state) {
 	$employer_node = node_load($form_state['employer_nid']);
+	$ms_key = $form_state['ms_key'];
 
 	$workers_encode = $form_state['values']['workers'];
 	$result = sirius_edls_outsource_decode($workers_encode);
@@ -75,15 +93,7 @@ function sirius_edls_page_worker_outsource_form_submit($form, &$form_state) {
 
 	$workers = $result['workers'];
 
-	/*
-	for ($i=1; $i<1000; ++$i) {
-		$worker_name = ucwords(strtolower(sirius_aat_generate(rand(5,9), 'letter') . ', ' . sirius_aat_generate(rand(5,9), 'letter')));
-		$id = $i;
-		$workers[$id] = array('worker_name' => $worker_name);
-	}
-	*/
-
-	$result = sirius_edls_outsource_set_all($employer_node, $workers);
+	$result = sirius_edls_outsource_set_all_by_ms($employer_node, $workers, $ms_key);
 	if (!$result['success']) {
 		drupal_set_message("Error: " . $result['msg']);
 		$form_state['rebuild'] = TRUE;

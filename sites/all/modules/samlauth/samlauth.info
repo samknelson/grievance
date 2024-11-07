@@ -1,0 +1,11 @@
+name = "SAML Authentication"
+description = "Allows users to authenticate against an external SAML identify provider."
+core = 7.x
+package = "User authentication"
+configure = admin/config/people/saml
+
+; Information added by Drupal.org packaging script on 2021-04-28
+version = "7.x-1.1"
+core = "7.x"
+project = "samlauth"
+datestamp = "1619622242"

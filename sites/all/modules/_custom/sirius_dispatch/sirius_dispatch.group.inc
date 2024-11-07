@@ -98,6 +98,10 @@ function sirius_dispatch_group_list_active($industry_tid = NULL, $ts = NULL) {
   } else if ($industry_tid) {
     $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid);
   }
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) {
+    $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid);
+  }
   $query->propertyOrderBy('title');
   $stmt = $query->execute();
   if (!$stmt['node']) { return array(); }

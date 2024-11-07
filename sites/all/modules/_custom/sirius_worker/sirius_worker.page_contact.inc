@@ -50,32 +50,6 @@ function sirius_node_tab_worker_contact_form($form, &$form_state, $worker_node) 
 		'#default_value' => $worker_node->field_sirius_phone_fax['und'][0]['value'],
 	);
 
-	$form['aat'] = array(
-		'#title' => t('Password'),
-		'#type' => 'textfield',
-		'#default_value' => $worker_node->field_sirius_aat['und'][0]['value'],
-		'#description' => t('Enter a password for your account.'),
-		'#required' => TRUE,
-		'#size' => 6,
-	);
-
-	$suffix = '';
-	if (preg_match('/[^0-9]/', $worker_node->field_sirius_aat['und'][0]['value'])) {
-		$form['aat']['#description'] .= ' (Keypad: <strong>' . sirius_phone_keypad($worker_node->field_sirius_aat['und'][0]['value']) . '</strong>)';
-	}
-
-	$form['aat_required'] = array(
-		'#title' => t('Password required for phone access?'),
-		'#type' => 'select',
-		'#options' => array(
-			'No' => t('No'),
-			'Yes' => t('Yes'),
-		),
-		'#default_value' => $worker_node->field_sirius_aat_required['und'][0]['value'],
-		'#description' => t('"No" means that you will be able to use the phone system by entering only your worker ID. "Yes" means that you will also have to enter your password (above).'),
-		'#required' => TRUE,
-	);
-
 	$form['thoroughfare'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Address'),
@@ -136,11 +110,6 @@ function sirius_node_tab_worker_contact_form_validate($form, &$form_state) {
 	if ($phone_fax && !sirius_phone_validate($phone_fax)) {
 		form_set_error('phone_fax', t('Please enter a valid fax number.'));
 	}
-
-	$aat = $form_state['values']['aat'];
-	if (strlen($aat) < 6) {
-		form_set_error('aat', t('Please enter a password that is at least six characters long.'));
-	}
 }
 
 function sirius_node_tab_worker_contact_form_submit($form, &$form_state) {
@@ -190,30 +159,7 @@ function sirius_node_tab_worker_contact_form_submit($form, &$form_state) {
 		drupal_set_message($msg);
 	}
 
-	// AAT Required
-	$val = $form_state['values']['aat_required'];
-	$oldval = $worker_node->field_sirius_aat_required['und'][0]['value'];
-	if ($val != $oldval) {
-		$worker_node->field_sirius_aat_required['und'][0]['value'] = $val;
-		$need_save = TRUE;
-		$msg = t('Changed (password required for phone access) from @oldval to @val', array('@oldval' => ($oldval?$oldval:"[NULL]"), '@val' => ($val?$val:"[NULL]")));
-		sirius_log('worker:contact', 'update', $msg, '', '', array($worker_node->nid), array());
-		drupal_set_message($msg);
-	}
-
-	// AAT
-	$val = $form_state['values']['aat'];
-	$oldval = $worker_node->field_sirius_aat['und'][0]['value'];
-	if ($val != $oldval) {
-		$worker_node->field_sirius_aat['und'][0]['value'] = $val;
-		$need_save = TRUE;
-		$msg = t('Changed password from @oldval to @val', array('@oldval' => ($oldval?$oldval:"[NULL]"), '@val' => ($val?$val:"[NULL]")));
-		sirius_log('worker:contact', 'update', $msg, '', '', array($worker_node->nid), array());
-		drupal_set_message($msg);
-	}
-
 	$addr_changed = FALSE;
-
 	$val = sirius_addr_format_oneline($form_state['values']);
 	$oldval = sirius_addr_format_oneline($worker_node->field_sirius_address['und'][0]);
 	if ($val != $oldval) {
