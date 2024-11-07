@@ -9,7 +9,16 @@ function sirius_worker_user_admin() {
     '#title' => t('Enable Worker / User Sync?'),
     '#default_value' => variable_get($name, ''),
     '#options' => array('No' => 'No', 'Yes' => 'Yes'),
-    '#description' => t('Should Sirius Workers by associated with Drupal Users?'),
+    '#description' => t('When a worker record is saved, should the corresponding user be updated?'),
+  );
+
+	$name = sirius_domain_variable_name('sirius_worker_usersync_enable_create');
+  $form[$name] = array(
+    '#type' => 'select',
+    '#title' => t('Enable Automatic User Creation?'),
+    '#default_value' => variable_get($name, ''),
+    '#options' => array('No' => 'No', 'Yes' => 'Yes'),
+    '#description' => t('Should new users be created when a worker record is saved?'),
   );
 
 	$name = sirius_domain_variable_name('sirius_worker_dummy_domain');
@@ -21,20 +30,25 @@ function sirius_worker_user_admin() {
   );
 
 	$role_options = user_roles(TRUE);
-	$name = sirius_domain_variable_name('sirius_worker_roles');
+	$name = sirius_domain_variable_name('sirius_worker_roles_always');
   $form[$name] = array(
     '#type' => 'checkboxes',
     '#title' => t('Worker Roles'),
+    '#options' => $role_options,
+    '#default_value' => variable_get($name, array()),
+    '#description' => t('All users will be assigned to the checked roles.'),
+  );
+
+	$name = sirius_domain_variable_name('sirius_worker_roles');
+  $form[$name] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Roles Specific to Member Statuses'),
     '#options' => $role_options,
     '#default_value' => variable_get($name, array()),
     '#description' => t('The checked roles are used for workers. Workers are assigned to, or removed from, roles within this list, based on the settings in their member status.'),
   );
 
   return system_settings_form($form);
-}
-
-function sirius_worker_usersync_enabled() {
-	return sirius_domain_variable_get('sirius_worker_usersync_enable') == 'Yes';
 }
 
 function sirius_worker_get_uid($worker_nid) {
@@ -60,9 +74,11 @@ function sirius_worker_get($uid = NULL) {
 	return node_load($worker_nid);
 }
 
-function sirius_worker_usersync($worker_nid) {
-
-	if (!sirius_worker_usersync_enabled()) { return array('success' => FALSE, 'msg' => 'User sync is not enabled.'); }
+function sirius_worker_usersync($worker_nid, $options = array()) {
+	// Skip if we don't have auto enabled.
+	if (!$options['manual'] && (sirius_domain_variable_get('sirius_worker_usersync_enable') != 'Yes')) {
+		return array('success' => FALSE, 'msg' => "User sync is not enabled.");
+	}
 
 	$worker_node = node_load($worker_nid);
 	if (!$worker_node) {
@@ -91,17 +107,23 @@ function sirius_worker_usersync($worker_nid) {
 
 	// Get an email. If we can't find one, fake it.
 	$email = $worker_node->field_sirius_email['und'][0]['value'];
-	if (!$email) { 
-		$email = "worker_" . $id . "@" . variable_get('sirius_worker_dummy_domain', 'nodomain.com');
+	if (!$email) {
+		$email = "worker_" . $id . "@" . sirius_domain_variable_get('sirius_worker_dummy_domain', 'nodomain.com');
 	}
 
 	// Get the user
 	$worker_user = sirius_worker_get_user($worker_nid);
 
-	// Let's figure out the roles. First get all the available worker roles.
-	foreach (array_values(variable_get('sirius_worker_roles', array())) as $rid) {
-		$all_rids[$rid] = TRUE;
+	// Can't create new users unless we're enabled.
+	if (!$worker_user && !$options['manual'] && (sirius_domain_variable_get('sirius_worker_usersync_enable_create') != 'Yes')) {
+		return array('success' => FALSE, 'msg' => 'No existing user found and user creation is not enabled.');
 	}
+
+	// Let's figure out the roles. First get all the available worker roles.
+	$all_rids = array();
+	foreach (array_values(sirius_domain_variable_get('sirius_worker_roles', array())) as $rid) { $all_rids[$rid] = TRUE; }
+	foreach (array_values(sirius_domain_variable_get('sirius_worker_roles_always', array())) as $rid) { $all_rids[$rid] = TRUE; }
+
 
 	// Next, get all the user's member statuses.
 	$member_status_tids = array();
@@ -113,6 +135,9 @@ function sirius_worker_usersync($worker_nid) {
 
 	// Next, get all the RIDs which are checked as associated with one of the member statuses
 	$yes_rids = array(DRUPAL_AUTHENTICATED_RID => TRUE);
+	foreach (array_values(sirius_domain_variable_get('sirius_worker_roles_always', array())) as $rid) {
+		$yes_rids[$rid] = TRUE;
+	}
 	foreach ($member_status_tids as $member_status_tid) {
 		$member_status_term = taxonomy_term_load($member_status_tid);
 		if ($member_status_term->field_sirius_roles['und']) {
@@ -121,7 +146,6 @@ function sirius_worker_usersync($worker_nid) {
 			}
 		}
 	}
-	if (!$all_rids) { $all_rids = array(); }
 	$no_rids = array_diff_assoc($all_rids, $yes_rids);
 
 	// Next, get the current rids. We're going to add the YES's, and remove the NO's.  
@@ -149,6 +173,9 @@ function sirius_worker_usersync($worker_nid) {
 	}
 
 	$need_save = FALSE;
+
+	if ($options['manual']) { $need_save = TRUE; }
+
 	if (!$worker_user) {
 		$need_save = TRUE;
 		$is_new = TRUE;
@@ -249,7 +276,7 @@ function sirius_worker_form_user_pass_validate($form, &$form_state) {
 	  $form_state['phone'] = sirius_phone_format($phone);
 	}	else {
 		// Validate that the email address isn't a "dummy".
-		$dummy_domain = variable_get('sirius_worker_dummy_domain', '');
+		$dummy_domain = sirius_domain_variable_get('sirius_worker_dummy_domain', '');
 		if ($dummy_domain) {
 			$mail = $account->mail;
 			if (strpos($mail, $dummy_domain) !== false) {
