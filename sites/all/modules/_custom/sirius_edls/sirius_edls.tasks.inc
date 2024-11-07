@@ -29,7 +29,7 @@ function sirius_edls_tasks_decode($tasks_encoded) {
   $tasks = array();
   foreach ($lines as $task) {
     $task = trim($task);
-    $task = preg_replace('/[^a-zA-Z0-9_, ]/', '', $task);
+    $task = preg_replace('/[^a-zA-Z0-9_, \=\-]/', '', $task);
     if (!$task) { continue; }
     $tasks[] = $task;
   }
