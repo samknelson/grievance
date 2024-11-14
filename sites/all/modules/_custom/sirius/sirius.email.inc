@@ -264,7 +264,7 @@ class Sirius_Comm_Email extends Sirius_Comm {
       $html .= sirius_fakerender_field('Subject:', $subject);
     }
     $html .= '<hr>';
-    $html .= strip_tags($body, '<p><a><strong><b><i><br><table><img><tr><td><th><tbody>');
+    $html .= strip_tags($body, '<ul><li><h2><p><a><strong><b><i><br><table><img><tr><td><th><tbody>');
     //$html .= sirius_text_to_html($body);
     $html .= '</div>';
     return $html;
