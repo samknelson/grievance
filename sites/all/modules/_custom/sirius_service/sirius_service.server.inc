@@ -353,7 +353,7 @@ function sirius_service_server_info_all() {
   return $infos;
 }
 
-function sirius_service_server_info($type) {
+function sirius_service_server_info($type = NULL) {
   $infos = &drupal_static(__FUNCTION__); 
   if (!isset($infos)) { $infos = sirius_service_server_info_all(); }
   return $infos[$type];
