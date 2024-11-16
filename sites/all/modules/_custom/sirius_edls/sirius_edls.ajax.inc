@@ -94,7 +94,7 @@ function sirius_edls_ajax_assignment_set_extra() {
     if ($ts === false) {
       unset($extra['time']);
     } else {
-      $extra['time'] = date('g:i a', $ts);
+      $extra['time'] = date('H:i', $ts);
     }
   }
 

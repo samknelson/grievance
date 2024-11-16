@@ -49,7 +49,8 @@
 									assignment_div.find('.sirius_edls_extra_wrap a').removeClass('sirius_edls_hidden');
 									assignment_div.find('.sirius_edls_extra').html(extra_render(extra));
 									assignment_div.find('.sirius_edls_extra_time').val(extra['time']);
-									assignment_div.find('.sirius_edls_extra_truck').val(extra['truck']);
+									// assignment_div.find('.sirius_edls_extra_truck').val(extra['truck']);
+									assignment_div.find('.sirius_edls_extra_note').val(extra['note']);
 									assignment_div.find('.sirius_edls_extra_classification').val(extra['classification']);
 									assignment_div.find('.sirius_edls_ctrl_unassign').removeClass('sirius_edls_ctrl_unassign_disabled');
 									assignment_div.find('.sirius_edls_ms').html(ms_name);
@@ -59,7 +60,8 @@
 									assignment_div.find('.sirius_edls_extra_wrap a').addClass('sirius_edls_hidden');
 									assignment_div.find('.sirius_edls_extra').html('');
 									assignment_div.find('.sirius_edls_extra_time').val('');
-									assignment_div.find('.sirius_edls_extra_truck').val('');
+									// assignment_div.find('.sirius_edls_extra_truck').val('');
+									assignment_div.find('.sirius_edls_extra_note').val('');
 									assignment_div.find('.sirius_edls_extra_classification').val('');
 									assignment_div.find('.sirius_edls_ctrl_unassign').addClass('sirius_edls_ctrl_unassign_disabled');
 									assignment_div.find('.sirius_edls_ms').html('');
@@ -247,7 +249,8 @@
 						'extra': {
 							'time': assignment_div.find('.sirius_edls_extra_time').val(),
 							'classification': assignment_div.find('.sirius_edls_extra_classification').val(),
-							'truck': assignment_div.find('.sirius_edls_extra_truck').val(),
+							// 'truck': assignment_div.find('.sirius_edls_extra_truck').val(),
+							'note': assignment_div.find('.sirius_edls_extra_note').val(),
 						}
 					},
 					'type': 'GET',
@@ -349,22 +352,29 @@
 					if (render) { render += ' '; }
 					render += extra['time'];
 				}
-				if (extra['truck']) {
+				// if (extra['truck']) {
+				// if (render) { render += ' '; }
+				// render += 'Trk #' + extra['truck'];
+				// }
+				if (extra['note']) {
 					if (render) { render += ' '; }
-					render += 'Trk #' + extra['truck'];
+					render += extra['note'];
 				}
 				return render;
 			}
 
 			function extra_parse(assignment) {
-				if (!assignment) { return {'time':'', 'classification':'', 'truck':''}; }
+				// if (!assignment) { return {'time':'', 'classification':'', 'truck':''}; }
+				if (!assignment) { return {'time':'', 'classification':'', 'note':''}; }
 
 				extra = assignment['assignment_extra'];
-				if (!extra) { return {'time':'', 'classification':'', 'truck':''}; }
+				// if (!extra) { return {'time':'', 'classification':'', 'truck':''}; }
+				if (!extra) { return {'time':'', 'classification':'', 'note':''}; }
 				
 				if (!('time' in extra)) { extra['time'] = ''; }
 				if (!('classification' in extra)) { extra['classification'] = ''; }
-				if (!('truck' in extra)) { extra['truck'] = ''; }
+				// if (!('truck' in extra)) { extra['truck'] = ''; }
+				if (!('note' in extra)) { extra['note'] = ''; }
 				return extra;
 			}
 

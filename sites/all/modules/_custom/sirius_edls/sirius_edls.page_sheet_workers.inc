@@ -138,8 +138,12 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 			$html .= '<input type="time" class="sirius_edls_extra_time">';
 			$html .= '<br /><br />';
 
-			$html .= '<strong>' . t('Truck #') . '</strong>' . '<br />';
-			$html .= '<input type="text" class="sirius_edls_extra_truck" size="5">';
+			// $html .= '<strong>' . t('Truck #') . '</strong>' . '<br />';
+			// $html .= '<input type="text" class="sirius_edls_extra_truck" size="5">';
+			// $html .= '<br /><br />';
+
+			$html .= '<strong>' . t('Note') . '</strong>' . '<br />';
+			$html .= '<input type="text" class="sirius_edls_extra_note" size="20" maxlength="20">';
 			$html .= '<br /><br />';
 
 			$html .= '<a href="#" class="sirius_edls_set_extra_submit tool-button">';

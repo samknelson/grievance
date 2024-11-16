@@ -53,6 +53,10 @@ function sirius_edls_assignment_fetch_sheet($sheet_node) {
   foreach ($assignments as $crew_uuid => $crew) {
     foreach ($crew as $delta => $assignment) {
       $assignments[$crew_uuid][$delta]['assignment_extra'] = json_decode($assignments[$crew_uuid][$delta]['assignment_extra'], TRUE);
+      if ($assignments[$crew_uuid][$delta]['assignment_extra']['time']) {
+        $assignments[$crew_uuid][$delta]['assignment_extra']['time'] = date('H:i', strtotime($assignments[$crew_uuid][$delta]['assignment_extra']['time']));
+      }
+
       $assignments[$crew_uuid][$delta]['worker_name'] =  ucwords(strtolower($assignments[$crew_uuid][$delta]['worker_name']));
     }
 
@@ -342,10 +346,13 @@ function sirius_edls_assignment_render_extra($assignment, $render_options = arra
     $parts[] = $lookups['classification_options'][$extra['classification']];
   }
   if ($extra['time']) {
-    $parts[] = date('g:i a', strtotime($extra['time']));
+    $parts[] = date('H:i', strtotime($extra['time']));
   }
-  if ($extra['truck']) {
-    $parts[] = 'Trk #' . $extra['truck'];
+  //if ($extra['truck']) {
+  //$parts[] = 'Trk #' . $extra['truck'];
+  //}
+  if ($extra['note']) {
+    $parts[] = $extra['note'];
   }
 
   $html = join(' ', array_filter($parts));
