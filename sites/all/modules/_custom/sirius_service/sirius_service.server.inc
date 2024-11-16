@@ -113,11 +113,13 @@ function sirius_service_server_authenticate($settings, $method, $args) {
   if (!sirius_service_server_active()) { return 'The server has not been set to "Active".'; }
 
   // Check IP allowlist
-	$ip_range = sirius_domain_variable_get('sirius_service_server_ips');
-	if (!$ip_range) { return 'No IP range has been configured for this domain. All access is denied.'; }
-	$remote_ip = sirius_loopback_remote_ip();
-	if (!$remote_ip) { return 'Unable to determine the request IP.'; }
-	if (!sirius_ip_check($remote_ip, $ip_range)) { return 'Your IP, ' . $remote_ip . ', does not have access to this server.'; }
+  if (sirius_domain_variable_get('sirius_service_server_ips_restrict') != 'No') {
+  	$ip_range = sirius_domain_variable_get('sirius_service_server_ips');
+  	if (!$ip_range) { return 'No IP range has been configured for this domain. All access is denied.'; }
+  	$remote_ip = sirius_loopback_remote_ip();
+  	if (!$remote_ip) { return 'Unable to determine the request IP.'; }
+  	if (!sirius_ip_check($remote_ip, $ip_range)) { return 'Your IP, ' . $remote_ip . ', does not have access to this server.'; }
+  }
 
 	// Check access token
   $valid_access_token = sirius_domain_variable_get('sirius_service_server_access');
@@ -257,6 +259,12 @@ function sirius_service_is_remote($value = NULL) {
 
 function sirius_service_generic_action($args) {
   sirius_service_is_remote(TRUE);
+
+  // Accept either
+  //    {"1":"sirius_service_ping","2":"Echo Text"}
+  // or
+  //    ["sirius_service_ping","Echo Text"]
+  if (is_array($args)) { $args = array_values($args); }
 
   // The first argument is a function name
   $key = array_shift($args);

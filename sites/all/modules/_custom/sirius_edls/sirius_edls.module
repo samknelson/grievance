@@ -234,3 +234,6 @@ function sirius_edls_display_name_short() {
 function sirius_edls_display_name_long() {
   return sirius_domain_variable_get('sirius_edls_name_long', 'Employer Daily Labor Schedule');
 }
+
+// Git test
+// This comment should go live with fls-release/v1.0.1
