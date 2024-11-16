@@ -298,6 +298,26 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_worker_outsource.inc'
   );
 
+  $items['sirius/edls/workers/outsource/%'] = array(
+    'title' => 'Outsource',
+    'page callback' => 'sirius_edls_page_worker_outsource',
+    'page arguments' => array(4),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'employer_config_outsource_workers',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'sirius_edls.page_worker_outsource.inc'
+  );
+
   /*
   $items['sirius/edls/assignments'] = array(
     'title' => 'Assignments',

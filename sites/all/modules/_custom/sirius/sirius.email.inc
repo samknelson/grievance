@@ -164,7 +164,7 @@ function sirius_mail($key, &$message, $params) {
 }
 
 function sirius_email_callback($id, $status, $json) {
-  drupal_json_output(Sirius_Comm_Email::getInstance()->webhook(array('external_id' => $id, 'status' => $status, 'json' => $json)));
+  return Sirius_Comm_Email::getInstance()->webhook(array('external_id' => $id, 'status' => $status, 'json' => $json));
 }
 
 function sirius_page_emailaddress_list() {
@@ -264,7 +264,7 @@ class Sirius_Comm_Email extends Sirius_Comm {
       $html .= sirius_fakerender_field('Subject:', $subject);
     }
     $html .= '<hr>';
-    $html .= strip_tags($body, '<p><a><strong><b><i><br><table><img><tr><td><th><tbody>');
+    $html .= strip_tags($body, '<ul><li><h2><p><a><strong><b><i><br><table><img><tr><td><th><tbody>');
     //$html .= sirius_text_to_html($body);
     $html .= '</div>';
     return $html;

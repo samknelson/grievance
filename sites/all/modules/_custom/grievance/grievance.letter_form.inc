@@ -386,49 +386,6 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
 	);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Fax Recipients
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  $form['fax'] = array(
-  	'#type' => 'fieldset',
-  	'#collapsible' => TRUE,
-  	'#collapsed' => TRUE,
-  	'#title' => t('Fax Recipient'),
-  	'#description' => t('Select or type in the fax recipient for this letter'),
-	);
-
-  // Get the company contacts
-	$fax_recipients = grievance_notify_company_contacts(array('shop_nid' => $shop_nid, 'status_nid' => $status_tid));
-	$found = FALSE;
-	$fax_options = array(NULL => t('[select]'));
-	$delta = 0;
-	foreach ($fax_recipients as $recipient) {
-		if ($recipient['fax']) {
-			++$delta;
-			$key = "$delta|" . $recipient['fax'];
-			$found = TRUE;
-			$fax_options[$key] = $recipient['fax'] . ': ' . $recipient['name'];
-			if ($recipient['role']) { $fax_options[$key] .= ' (' . $recipient['role'] . ')'; }
-			if ($recipient['description']) { $fax_options[$key] .= ' (' . $recipient['description'] . ')'; }
-		}
-	}
-	if ($found) {
-		$form['fax']['fax_recipient_dropdown'] = array(
-			'#title' => 'Company Contacts',
-			'#type' => 'select',	
-			'#options' => $fax_options,
-			'#attributes' => array('class' => array('grievance_fax_recipient_dropdown')),
-		);
-	}
-
-	$form['fax']['fax_recipient'] = array(
-		'#title' => 'Fax Number',
-		'#type' => 'textfield',	
-		'#attributes' => array('class' => array('grievance_fax_recipient')),
-	);
-
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Output and Logging
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -444,7 +401,6 @@ function grievance_letter_form($form, &$form_state, $grievance_node) {
     	'preview' => t('Preview the letter on the screen'),
     	'edit' => t('Edit the letter before sending'),
     	'send-email' => t('Send the letter by email'), 
-    	'send-fax' => t('Send the letter by fax'), 
     ),
     '#title' => t('Output'),
   );

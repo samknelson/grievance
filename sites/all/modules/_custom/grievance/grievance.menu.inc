@@ -469,15 +469,6 @@ function grievance_menu() {
 		'type' => MENU_NORMAL_ITEM,
 	);
 
-	$items['admin/config/grievance/phaxio'] = array(
-		'title' => 'Grievance Module - Phaxio',
-		'description' => t('Settings for the Phaxio fax library'),
-		'page callback' => 'drupal_get_form',
-		'page arguments' => array('grievance_phaxio_admin'),
-		'access arguments' => array('grievance admin'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-
 	$items['admin/config/grievance/quicksearch'] = array(
 		'title' => 'Grievance Module - QuickSearch',
 		'description' => t('Settings for the quicksearch'),
@@ -639,16 +630,6 @@ function grievance_menu() {
 		'page callback' => 'grievance_field_overrides_apply',
 		'page arguments' => array(),
 		'access arguments' => array('grievance admin'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-
-	$items['grievances/phaxio/callback-sent/%'] = array(
-		'title' => 'Phaxio Sent',
-		'description' => '',
-		'page callback' => 'grievance_phaxio_callback_sent',
-		'page arguments' => array(),
-		'access callback' => 'grievance_phaxio_callback_access',
-		'access arguments' => array(3),
 		'type' => MENU_NORMAL_ITEM,
 	);
 
