@@ -105,7 +105,7 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 	$form['sheet']['show_status'] = array(
 		'#type' => 'select',
 		'#title' => t('Show Status'),
-		'#options' => array(NULL => t('-- Select --')) + array('Move-in' => 'Move-in', 'Show Day' => 'Show Day', 'Teardown' => 'Teardown'),
+		'#options' => array(NULL => t('-- Select --')) + array('Pre-show' => 'Pre-show', 'Move-in' => 'Move-in', 'Show Day' => 'Show Day', 'Teardown' => 'Teardown', 'Post-show' => 'Post-show'),
 		'#default_value' => $sheet_json['edls']['sheet']['show_status'],
 	);
 
