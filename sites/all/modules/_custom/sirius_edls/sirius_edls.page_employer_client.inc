@@ -34,6 +34,26 @@ function sirius_edls_node_tab_employer_client_form($form, &$form_state, $employe
   	'#default_value' => $employer_json['edls']['client']['access_code']
   );
 
+  $ms_list = sirius_edls_outsource_ms_list($employer_node);
+  if ($ms_list) {
+	  $form['client']['active_ms_list'] = array(
+	  	'#type' => 'checkboxes',
+	  	'#checkall' => TRUE,
+	  	'#title' => 'Member Statuses to Fetch',
+	  	'#options' => $ms_list,
+	  	'#default_value' => sirius_form_array_default_value($employer_json['edls']['client']['active_ms_list']),
+	  );
+  }
+
+  $form['test'] = array(
+  	'#type' => 'select',
+  	'#title' => 'Test Connection?',
+  	'#options' => array(
+  		'No' => t('No'),
+  		'Yes' => t('Yes'),
+  	),
+  );
+
   $form['submit'] = array(
   	'#type' => 'submit',
   	'#value' => t('Submit'),
@@ -60,7 +80,9 @@ function sirius_edls_node_tab_employer_client_form_submit($form, &$form_state) {
 	node_save($employer_node);
 	drupal_set_message("Settings saved.");
 
-	if ($form_state['values']['client']['active'] == 'Yes') {
+	if ( ($form_state['values']['client']['active'] == 'Yes') && 
+			 ($form_state['values']['test'] == 'Yes') ) {
+
 		$result = sirius_edls_client_worker_list($form_state['values']['client']['uuid'], $form_state['values']['client']['access_code']);
 		if ($result['success']) {
 			drupal_set_message("Remote employer lookup succeeded.");

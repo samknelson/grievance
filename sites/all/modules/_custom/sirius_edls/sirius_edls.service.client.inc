@@ -50,6 +50,13 @@ function sirius_edls_client_worker_fetch($mode = 'test', $force = FALSE) {
 			continue;
 		}
 
+		$active_ms_list = $employer_json['edls']['client']['active_ms_list'];
+		if (!$active_ms_list) {
+			sirius_minilog("... No member statuses are configured for fetching.", 'warning');
+			continue;
+		}
+		$active_ms_list = array_filter(array_values($active_ms_list));
+
 		sirius_minilog("... Fetching workers");
 		$employer_uuid = $employer_json['edls']['client']['uuid'];
 		$employer_access_code = $employer_json['edls']['client']['access_code'];
@@ -77,8 +84,12 @@ function sirius_edls_client_worker_fetch($mode = 'test', $force = FALSE) {
 
 		// Create lists by member status
 		$workers_by_ms = array();
+		foreach ($active_ms_list as $ms) {
+			$workers_by_ms[$ms] = array();
+		}			
 		foreach ($result['workers'] as $worker) {
 			$ms = $worker['worker_ms'];
+			if (!isset($workers_by_ms[$ms])) { continue; }
 			$workers_by_ms[$ms][] = $worker;
 		}
 
