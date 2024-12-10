@@ -852,6 +852,7 @@ features[field_instance][] = node-sirius_edls_sheet-field_sirius_domain
 features[field_instance][] = node-sirius_edls_sheet-field_sirius_edls_sheet_status
 features[field_instance][] = node-sirius_edls_sheet-field_sirius_job_number
 features[field_instance][] = node-sirius_edls_sheet-field_sirius_json
+features[field_instance][] = node-sirius_edls_sheet-field_sirius_type
 features[field_instance][] = node-sirius_employee-field_grievance_shop
 features[field_instance][] = node-sirius_employee-field_sirius_domain
 features[field_instance][] = node-sirius_employee-field_sirius_id
