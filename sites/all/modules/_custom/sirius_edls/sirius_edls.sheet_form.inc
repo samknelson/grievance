@@ -110,7 +110,7 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 		'#options' => array(NULL => t('-- Select --')) + $job_group_options,
 		'#default_value' => $sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id'],
 	);
-	if (!$is_reserved) { $$form['sheet']['sirius_dispatch_job_group']['#required'] = TRUE; }
+	if (!$is_reserved) { $form['sheet']['sirius_dispatch_job_group']['#required'] = TRUE; }
 
 	$form['sheet']['show_status'] = array(
 		'#type' => 'select',
