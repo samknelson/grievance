@@ -2,7 +2,7 @@
 
 function sirius_edls_sheet_reserved($sheet_node) {
 	if (!$sheet_node) { return FALSE; }
-	
+
 	if ($sheet_node->field_sirius_edls_sheet_status['und'][0]['value'] == 'reserved') { return TRUE; }
 
 	// Legacy. We might throw this away.
@@ -28,26 +28,25 @@ function sirius_edls_sheet_reserved_types() {
 			'job_number' => 'OUT_SICK',
 			'count' => 100,
 		),
+		/*
 		'tor' => array(
 			'title' => 'Out Vacation',
 			'job_number' => 'OUT_VACATION',
 			'count' => 100,
 		),
+		*/
 		'cdl' => array(
 			'title' => 'CDL Rest',
 			'job_number' => 'CDL_REST',
 			'count' => 100,
 		),
+		/*
 		'layoff' => array(
 			'title' => 'Scheduled For Layoff',
 			'job_number' => 'LAYOFF',
 			'count' => 100,
 		),
-		'layoff' => array(
-			'title' => 'Scheduled For Layoff',
-			'job_number' => 'LAYOFF',
-			'count' => 100,
-		),
+		*/
 	);
 }
 
