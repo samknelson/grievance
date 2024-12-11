@@ -44,6 +44,18 @@ function sirius_edls_node_tab_sheet_workers_form($form, &$form_state, $sheet_nod
 	$crews = sirius_edls_crews($sheet_node);
 	if (!$crews) { return sirius_form_error('Please create at least one crew before assigning workers.'); }
 
+	// Warning if you are not the assignee
+	global $user;
+	$assignee_uid = $sheet_node->field_grievance_rep_watching['und'][0]['target_id'];
+	if ($assignee_uid && ($assignee_uid != $user->uid)) {
+		$assignee_user = user_load($assignee_uid);
+		$form['warning'] = array(
+			'#markup' => '<div class="sirius_callout_fullwidth sirius_callout_red">' . 
+				"<strong>Warning - </strong> You are editing a sheet which is assigned to <strong>" . $assignee_user->name . '</strong>' .
+				'</div>'
+		);
+	}
+
 	$form['wrapper_open'] = array('#markup' => '<table class="sirius_table sirius_table_align"><tr>');
 
 	$form['col1_open'] = array('#markup' => '<td width="60%" valign="top" style="vertical-align: top;">');

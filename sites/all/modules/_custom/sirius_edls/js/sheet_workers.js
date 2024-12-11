@@ -139,6 +139,7 @@
 							if (worker['curr_sheet_nid']) {
 								status = worker['curr_status'];
 								if (status == 'lock') { c += ' sirius_edls_worker_indicator_dot_filled'; }
+								else if (status == 'reserved') { c += ' sirius_edls_worker_indicator_dot_reserved'; }
 								else { c += ' sirius_edls_worker_indicator_dot_draft'; }
 							}
 							html += '<span class="' + c + '"></span>';
@@ -147,6 +148,7 @@
 							if (worker['next_sheet_nid']) {
 								status = worker['next_status'];
 								if (status == 'lock') { c += ' sirius_edls_worker_indicator_dot_filled'; }
+								else if (status == 'reserved') { c += ' sirius_edls_worker_indicator_dot_reserved'; }
 								else { c += ' sirius_edls_worker_indicator_dot_draft'; }
 							}
 							html += '<span class="' + c + '"></span>';

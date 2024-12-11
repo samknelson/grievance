@@ -15,6 +15,43 @@ function sirius_edls_supervisor_list($employer_nid) {
 	$sql .= "where users_roles.rid = :supervisor_rid ";
 	$sql_args[':supervisor_rid'] = $supervisor_rid;
 
+	$sql .= "and status = 1 ";
+
+	if ($employer_nid) {
+		$sql .= "and field_grievance_shops_target_id = :employer_nid ";
+		$sql_args[':employer_nid'] = $employer_nid;
+	}
+
+	$domain_nid = sirius_domain_nid();
+	if ($domain_nid) {
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	}
+
+	$sql .= "group by users.uid ";
+	$sql .= "order by name";
+
+	$stmt = sirius_sql_query($sql, $sql_args);
+	$options = array();
+	while ($hr = $stmt->fetchAssoc()) {
+		$options[$hr['uid']] = $hr['name'];
+	}
+
+	return $options;
+}
+
+function sirius_edls_assignee_list($employer_nid) {
+	// For now, this is anybody on the systejmn who is active
+	$sql_args = array();
+
+	$sql = "select users.uid, name, mail ";
+	$sql .= "from users ";
+	$sql .= "left join field_data_field_grievance_shops on field_data_field_grievance_shops.entity_type = 'user' and field_data_field_grievance_shops.entity_id = users.uid ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'user' and field_data_field_sirius_domain.entity_id = users.uid ";
+	$sql .= "left join users_roles on users_roles.uid = users.uid ";
+
+	$sql .= "where status = 1 ";
+
 	if ($employer_nid) {
 		$sql .= "and field_grievance_shops_target_id = :employer_nid ";
 		$sql_args[':employer_nid'] = $employer_nid;
@@ -58,5 +95,28 @@ function sirius_edls_supervisor_render($sheet_node, $options = array()) {
 		$supervisor_name .= sirius_phone_render($supervisor->field_grievance_phone['und'][0]['value']);
 	}
 
-	return $supervisor_name;
+	return '<span class="sirius_edls_supervisor">' . $supervisor_name . '</span>';
+}
+
+function sirius_edls_assignee_render($sheet_node, $options = array()) {
+	if (! ($sheet_node->field_grievance_rep_watching['und'][0]['target_id'])) { return ''; }
+
+	$assignee = user_load($sheet_node->field_grievance_rep_watching['und'][0]['target_id']);
+	$assignee_name = $assignee->name;
+
+	if ($options['name_only']) { return $assignee_name; }
+
+	if ($assignee_name == $assignee->mail) {
+		$assignee_name = sirius_email_render($assignee->mail, array('maxlength' => 25));
+	} else {
+		$assignee_name .= '<br />';
+		$assignee_name .= sirius_email_render($assignee->mail, array('maxlength' => 25));
+	}
+
+	if ($assignee->field_grievance_phone['und'][0]['value']) {
+		$assignee_name .= '<br />';
+		$assignee_name .= sirius_phone_render($assignee->field_grievance_phone['und'][0]['value']);
+	}
+
+	return '<span class="sirius_edls_assignee">' . $assignee_name . '</span>';
 }

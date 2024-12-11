@@ -149,6 +149,11 @@ function sirius_edls_node_tab_sheet_manage_form_submit($form, &$form_state) {
 		$msg = "Sheet status set to " . $status_options['trash'];
 	}
 
+	if ($action == 'sheet_status_reserved') {
+		$result = sirius_edls_sheet_status_set($sheet_node, 'reserved');
+		$msg = "Sheet status set to " . $status_options['reserved'];
+	}
+
 	if ($action == 'sheet_notify_enable') {
 		$result = sirius_edls_sheet_notify_enable($sheet_node, $form_state['values']['sheet_notify_enable']['enable']);
 		$msg = "Notification status set to " . $form_state['values']['sheet_notify_enable']['enable'];

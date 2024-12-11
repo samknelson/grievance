@@ -41,6 +41,17 @@ function sirius_edls_page_worker_outsource_form($form, &$form_state, $employer_n
 
 	$form['quicknav'] = array('#markup' => sirius_edls_page_worker_outsource_quicknav($employer_node));
 
+	$employer_json = sirius_json_get($employer_node);
+	if ($ms_key && ($employer_json['edls']['client']['active'] == 'Yes')) {
+		if (is_array($employer_json['edls']['client']['active_ms_list'])) {
+			if (in_array($ms_key, array_filter(array_values($employer_json['edls']['client']['active_ms_list'])))) {
+				$form['warning'] = array(
+					'#markup' => '<p><strong>' . t('WARNING: This member status has been set to sync automatically. Any changes made to this list will be overwritten at the next sync.') . '</strong></p>'
+				);
+			}
+		}
+	}
+
 	$ms_options = sirius_edls_outsource_ms_list($employer_node);
 	$ms_keys = array_keys($ms_options);
 	if (!$ms_keys) { return sirius_form_error("Please configure at least one outsource member status.", 'error'); }

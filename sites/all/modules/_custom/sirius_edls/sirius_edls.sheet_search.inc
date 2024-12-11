@@ -10,9 +10,15 @@ function sirius_edls_sheet_search($params) {
 	$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_job_number on field_data_field_sirius_job_number.entity_type = 'node' and field_data_field_sirius_job_number.entity_id = node.nid ";
 	$sql .= "left join field_data_field_grievance_rep_assignee on field_data_field_grievance_rep_assignee.entity_type = 'node' and field_data_field_grievance_rep_assignee.entity_id = node.nid ";
+	$sql .= "left join field_data_field_grievance_rep_watching on field_data_field_grievance_rep_watching.entity_type = 'node' and field_data_field_grievance_rep_watching.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_edls_sheet_status on field_data_field_sirius_edls_sheet_status.entity_type = 'node' and field_data_field_sirius_edls_sheet_status.entity_id = node.nid ";
 	$sql .= "left join field_data_field_grievance_department_tid on field_data_field_grievance_department_tid.entity_type = 'node' and field_data_field_grievance_department_tid.entity_id = node.nid ";
 	$sql .= "left join field_data_field_sirius_json on field_data_field_sirius_json.entity_type = 'node' and field_data_field_sirius_json.entity_id = node.nid ";
+
+	if ($params['type']) {
+		$sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+	}
+
 	$sql .= "where node.type = 'sirius_edls_sheet' ";
 
 	if ($domain_nid) {
@@ -65,6 +71,11 @@ function sirius_edls_sheet_search($params) {
 		$sql_args[':supervisor'] = $params['supervisor'];
 	}
 
+	if ($params['assignee']) {
+		$sql .= "and field_grievance_rep_watching_target_id = :assignee ";
+		$sql_args[':assignee'] = $params['assignee'];
+	}
+
 	if ($params['status']) {
 		$sql .= "and field_sirius_edls_sheet_status_value = :status ";
 		$sql_args[':status'] = $params['status'];
@@ -75,15 +86,16 @@ function sirius_edls_sheet_search($params) {
 		$sql_args[':department'] = $params['department'];
 	}
 
-	if ($params['reserved']) {
-		$sql .= "and json_unquote(json_extract(field_sirius_json_value, '\$.edls.sheet.reserved.active')) = 'Yes' ";
+	if ($params['type']) {
+		$sql .= "and field_sirius_type_value = :type ";
+		$sql_args[':type'] = $params['type'];
 	}
 
 	if (!$params['include_trash']) {
 		$sql .= "and field_sirius_edls_sheet_status_value != 'trash' ";
 	}
 
-  $sql .= "order by field_sirius_date_start_value ";
+  $sql .= "order by field_sirius_date_start_value, field_sirius_job_number_value ";
   $limit = $params['limit'];
   if (!$limit) { $limit = 100; }
   $sql .= "limit $limit";

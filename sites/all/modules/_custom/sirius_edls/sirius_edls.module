@@ -82,9 +82,9 @@ function sirius_edls_denormalize_queue($node) {
 function sirius_edls_report_cache_info() {
   $items = array();
 
-  // sirius_require('sirius_trust', 'sirius_trust.report_eligibility_compare.inc');
-  // Sirius_Trust_Report_Newhire::getInstance()->setInfo($items);
-
+  $items = array();
+  sirius_require('sirius_edls', 'sirius_edls.report_soop.inc');
+  Sirius_Edls_Report_Soop::getInstance()->setInfo($items);
   return $items;
 }
 
@@ -140,6 +140,7 @@ function sirius_edls_sirius_cron_scan_info() {
     'component' => 'edls',
   );
 
+  /*
   $items['edls_sched_sync'] = array(
     'title' => 'EDLS Schedule Sync',
     'description' => 'Check for time off requests or out sick records, and assign the appropriate workers to reserved sheets',
@@ -148,6 +149,7 @@ function sirius_edls_sirius_cron_scan_info() {
     'multidomain' => FALSE,
     'component' => 'edls',
   );
+  */
 
   $items['edls_client_worker_fetch'] = array(
     'title' => 'EDLS Service Worker Fetch',

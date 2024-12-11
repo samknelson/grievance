@@ -47,6 +47,10 @@
 	background-color: #000000;
 }
 
+.sirius_edls_worker_indicator_dot_reserved {
+	background-color: #aaaaff;
+}
+
 .sirius_edls_worker_indicator_dot_draft {
 	background-color: #aaaaaa;
 }

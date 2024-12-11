@@ -14,11 +14,24 @@ function sirius_edls_page_sheet_list() {
 }
 
 function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
+	drupal_add_css(drupal_get_path('module', 'sirius_edls') . '/css/sheet.css');
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
+
   $form['#tree'] = TRUE;
 
-	$form['header_links'] = array(
-		'#markup' => '<p>' . l('Create a New Sheet', 'sirius/edls/sheet-create', array('attributes' => array('class' => array('tool-button')))) . '</p>',
-	);
+  $access = sirius_access_instance('edls');
+
+	$header_links = array();
+	if ($access->access('sheet_create')) {
+		$header_links[] = l('Create a New Sheet', 'sirius/edls/sheet-create', array('attributes' => array('class' => array('tool-button'))));
+	}
+	if ($access->access('sheet_create_reserved')) {
+		$header_links[] = l('Create a Reserved Sheet', 'sirius/edls/sheet-create-reserved', array('attributes' => array('class' => array('tool-button'))));
+	}
+
+	if ($header_links) {
+		$form['header_links'] = array('#markup' => '<p>' . join('', $header_links) . '</p>');
+	}
 
 	if ($form_state['submitted']) {
 		if ($form_state['values']['filters']['date'] == 'other') {
@@ -27,6 +40,9 @@ function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
 			} else {
 				$date = date('Y-m-d');
 			}
+		}
+		else if ($form_state['values']['filters']['date'] == 'range') {
+			$date = NULL;
 		} else {
 			$date = date('Y-m-d', strtotime($form_state['values']['filters']['date']));
 		}
@@ -58,6 +74,12 @@ function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
 		'#options' => array(NULL => t('-- Select --')) + sirius_edls_supervisor_list($employer_node->nid),
   );
 
+  $form['filters']['assignee'] = array(
+	  '#type' => 'select',
+	  '#title' => t('Assignee'),
+		'#options' => array(NULL => t('-- Select --')) + sirius_edls_supervisor_list($employer_node->nid),
+  );
+
 	$date_options = array();
 	foreach (array("-1 days", "today", "+1 day", "+2 day", "+3 days", "+4 days", "+5 days", "+6 days") as $d) {
 		$t = strtotime($d);
@@ -70,6 +92,7 @@ function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
 		$date_options[date('Y-m-d', $t)] = $name;
 	}
 	$date_options['other'] = t('Other Date');
+	$date_options['range'] = t('Date Range');
 
 
   $form['filters']['date'] = array(
@@ -88,6 +111,26 @@ function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
 		'#date_format' => 'm/d/Y',
 		'#default_value' => $date,
 		'#states' => array('visible' => array(":input[name=\"filters[date]\"]" => array('value' => 'other'))),
+  );
+
+  $form['filters']['date_min'] = array(
+	  '#type' => 'date_popup',
+	  '#title' => t('Start Date'),
+		'#attributes' => array(
+			'autocomplete' => 'off',
+		),
+		'#date_format' => 'm/d/Y',
+		'#states' => array('visible' => array(":input[name=\"filters[date]\"]" => array('value' => 'range'))),
+  );
+
+  $form['filters']['date_max'] = array(
+	  '#type' => 'date_popup',
+	  '#title' => t('End Date'),
+		'#attributes' => array(
+			'autocomplete' => 'off',
+		),
+		'#date_format' => 'm/d/Y',
+		'#states' => array('visible' => array(":input[name=\"filters[date]\"]" => array('value' => 'range'))),
   );
 
   $form['filters']['department'] = array(
@@ -115,8 +158,14 @@ function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
   }
 	$params['date'] = $date;
 	$params['grievance_shop'] = $employer_node->nid;
+	$params['limit'] = 100;
   $sheet_nodes = sirius_edls_sheet_search($params);
 
+  if (count($sheet_nodes) >= $params['limit']) {
+  	$form['limit'] = array(
+  		'#markup' => '<p><em>' . t('Showing the first <strong>@limit</strong> records.', array('@limit' => $params['limit'])) . '</em></p>',
+  	);
+  }
 
   $render_options = array();
   $render_options['hide_employer'] = TRUE;

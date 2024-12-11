@@ -3,6 +3,8 @@
 function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 	$form_state['sheet_nid'] = $sheet_node->nid;
 
+	$is_reserved = sirius_edls_sheet_reserved($sheet_node);
+
 	$sheet_json = sirius_json_get($sheet_node);
 
 	$result = sirius_edls_employer_switch();
@@ -65,6 +67,7 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 
 	if (sirius_access_instance('edls')->access('sheet_change_supervisor', array('sheet_node' => $sheet_node))) {
 		$supervisor_options = sirius_edls_supervisor_list($sheet_employer_nid);
+		$assignee_options = sirius_edls_assignee_list($sheet_employer_nid);
 
 		if (!$supervisor_options) {
 			return sirius_form_error("There are no supervisors available. Sheets cannot be created without a supervisor.");
@@ -75,6 +78,13 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 			'#options' => array(NULL => t('-- Select --')) + $supervisor_options,
 			'#default_value' => $sheet_node->field_grievance_rep_assignee['und'][0]['target_id'],
 			'#required' => TRUE,
+		);
+
+		$form['sheet']['assignee'] = array(
+			'#type' => 'select',
+			'#title' => t('Assignee'),
+			'#options' => array(NULL => t('-- Select --')) + $assignee_options,
+			'#default_value' => $sheet_node->field_grievance_rep_watching['und'][0]['target_id'],
 		);
 	}
 
@@ -99,8 +109,8 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 		'#title' => t('Event'),
 		'#options' => array(NULL => t('-- Select --')) + $job_group_options,
 		'#default_value' => $sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id'],
-		'#required' => TRUE,
 	);
+	if (!$is_reserved) { $$form['sheet']['sirius_dispatch_job_group']['#required'] = TRUE; }
 
 	$form['sheet']['show_status'] = array(
 		'#type' => 'select',
@@ -296,6 +306,8 @@ function sirius_edls_sheet_form_submit_ajax_halls($form, $form_state) {
 function sirius_edls_sheet_form_validate($form, &$form_state) {
 	$sheet_node = node_load($form_state['sheet_nid']);
 
+	$is_reserved = sirius_edls_sheet_reserved($sheet_node);
+
 	$count = $form_state['values']['sheet']['count'] = intval($form_state['values']['sheet']['count']);
 	if ($count < 0 || $count > 1000) { form_set_error('sheet][count', 'Count must be between 0 and 1000.'); }
 
@@ -312,16 +324,18 @@ function sirius_edls_sheet_form_validate($form, &$form_state) {
 		$crews_input_by_uuid[$crew['uuid']] = $crew;
 		$crews_input_by_uuid[$crew['uuid']]['delta'] = $delta;
 
-		if (!preg_match('/^\d\d\:\d\d$/', $crew['start_time'])) {
-			form_set_error("crews][$delta][start_time", "Please enter a valid start time.");
-		}
+		if (!$is_reserved) {
+			if (!preg_match('/^\d\d\:\d\d$/', $crew['start_time'])) {
+				form_set_error("crews][$delta][start_time", "Please enter a valid start time.");
+			}
 
-		if (!preg_match('/^\d\d\:\d\d$/', $crew['end_time'])) {
-			form_set_error("crews][$delta][end_time", "Please enter a valid end time.");
-		}
+			if (!preg_match('/^\d\d\:\d\d$/', $crew['end_time'])) {
+				form_set_error("crews][$delta][end_time", "Please enter a valid end time.");
+			}
 
-		if (strtotime("2024-01-01 $crew[start_time]") >= strtotime("2024-01-01 $crew[end_time]")) {
-			form_set_error("crews][$delta][end_time", "End time must be after start time.");
+			if (strtotime("2024-01-01 $crew[start_time]") >= strtotime("2024-01-01 $crew[end_time]")) {
+				form_set_error("crews][$delta][end_time", "End time must be after start time.");
+			}
 		}
 	}
 
@@ -422,11 +436,19 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 	}
 
 	if (sirius_access_instance('edls')->access('sheet_change_supervisor', array('sheet_node' => $sheet_node))) {
+
 		if ($form_state['values']['sheet']['supervisor']) {
 			$sheet_node->field_grievance_rep_assignee['und'][0]['target_id'] = $form_state['values']['sheet']['supervisor'];
 		} else {
 			unset($sheet_node->field_grievance_rep_assignee['und'][0]);
 		}
+
+		if ($form_state['values']['sheet']['assignee']) {
+			$sheet_node->field_grievance_rep_watching['und'][0]['target_id'] = $form_state['values']['sheet']['assignee'];
+		} else {
+			unset($sheet_node->field_grievance_rep_watching['und'][0]);
+		}
+
 	} else {
 		if (!$sheet_node->field_grievance_rep_assignee['und'][0]['target_id']) {
 			global $user;

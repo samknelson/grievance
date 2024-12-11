@@ -179,6 +179,25 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_sheet_create.inc'
   );
 
+  $items['sirius/edls/sheet-create-reserved'] = array(
+    'title' => 'Create a Sheet',
+    'page callback' => 'sirius_edls_page_sheet_create_reserved',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'sheet_create_reserved',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_edls.page_sheet_create_reserved.inc'
+  );
+
   $items['sirius/edls'] = array(
     'title' => 'Employer Daily Labor Schedules',
     'page callback' => 'sirius_edls_page_landing',
@@ -316,6 +335,27 @@ function sirius_edls_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
     'file' => 'sirius_edls.page_worker_outsource.inc'
+  );
+
+  $items['sirius/edls/workers/soop'] = array(
+    'title' => 'Scheduled Out of Population',
+    'page callback' => 'sirius_edls_page_worker_soop',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          // 'action' => 'employer_dashboard',
+          'action' => 'employer_dashboard',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+    'file' => 'sirius_edls.page_worker_soop.inc'
   );
 
   /*

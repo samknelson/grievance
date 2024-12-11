@@ -19,6 +19,7 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 	if (!$options['hide_status']) { $col1 .= sirius_fakerender_field('Status:', $status_options[$sheet_node->field_sirius_edls_sheet_status['und'][0]['value']]); }
 	if (!$options['hide_employer']) { $col1 .= sirius_fakerender_field('Employer:', $employer_node->title); }
 	if (!$options['hide_supervisor']) { $col1 .= sirius_fakerender_field('Supervisor:', sirius_edls_supervisor_render($sheet_node)); }
+	if (!$options['hide_assignee']) { $col1 .= sirius_fakerender_field('Assignee:', sirius_edls_assignee_render($sheet_node)); }
 	if (!$options['hide_date']) { $col1 .= sirius_fakerender_field('Date:', date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value']))); }
 
 	if (!$options['hide_event']) { $col2 .= sirius_fakerender_field('Event:', sirius_node_title($sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id'])); }
@@ -219,7 +220,8 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 
 	$header = array();
 	if (!$options['hide_employer']) { $header[] = t('Employer'); }
-	if (!$options['hide_supervisor']) { $header[] = t('Supervisor'); }
+
+	if (!$options['hide_supervisor']) { $header[] = t('Supervisor') . '<br />' . t('Assignee'); }
 	if (!$options['hide_date']) { $header[] = t('Date'); }
 	if (!$options['hide_event']) { $header[] = t('Event'); }
 	if (!$options['hide_department']) { $header[] = t('Department'); }
@@ -236,6 +238,7 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 
 		$row = array();
 		$supervisor_name = sirius_edls_supervisor_render($sheet_node);
+		$assignee_name = sirius_edls_assignee_render($sheet_node);
 		$status = $sheet_node->field_sirius_edls_sheet_status['und'][0]['value'];
 		if (!$status) { $status = 'draft'; }
 
@@ -243,7 +246,12 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 
 		if (!$options['hide_employer']) { $row[] = sirius_node_title($sheet_node->field_grievance_shop['und'][0]['target_id']); }
 
-		if (!$options['hide_supervisor']) { $row[] = $supervisor_name; }
+		if (!$options['hide_supervisor']) {
+			$parts = array();
+			$parts[] = $supervisor_name;
+			$parts[] = $assignee_name;
+			$row[] = join('<br />', array_filter($parts));
+		}
 
 		if (!$options['hide_date']) { $row[] = date('m/d/Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])); }
 
@@ -290,6 +298,7 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 		else if ($status == 'request') { $class = 'yellow'; }
 		else if ($status == 'lock') { $class = 'green'; }
 		else if ($status == 'trash') { $class = 'red'; }
+		else if ($status == 'reserved') { $class = 'blue'; }
 		else { $class = ''; }
 		$rows[] = array('data' => $row, 'class' => array($class));
 	}

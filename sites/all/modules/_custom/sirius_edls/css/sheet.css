@@ -105,3 +105,22 @@
 .sirius_edls_notify_status_queue {
   color: #999999;
 }
+
+.sirius_edls_notify_status_reserved {
+  color: #0000aa;
+}
+
+.sirius_edls_supervisor,
+.sirius_edls_supervisor a,
+.sirius_edls_supervisor a:link,
+.sirius_edls_supervisor a:visited {
+  color: #1b4784;
+}
+  
+
+.sirius_edls_assignee,
+.sirius_edls_assignee a,
+.sirius_edls_assignee a:link,
+.sirius_edls_assignee a:visited {
+  color: #aa0000;
+}

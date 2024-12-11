@@ -133,7 +133,7 @@ class Sirius_Edls_Access extends Sirius_Access {
       // Can't update reserved sheets
       if ($sheet_reserved) { return FALSE; }
 
-      // Labor coordinators can configure the employer
+      // Labor coordinators can change the supervisor
       if ($is_employer_coordinator) { return TRUE; }
     }
 
@@ -144,7 +144,11 @@ class Sirius_Edls_Access extends Sirius_Access {
       if ($is_worker_advisor) { return TRUE; }
     }
 
-
+    // Create a reserved sheet
+    if (in_array($action, array('sheet_create_reserved'))) {
+      // Coordinators can create reserved sheets
+      if ($is_employer_coordinator) { return TRUE; }
+    }
 
     // View, clone, or manage a sheet
     if (in_array($action, array('sheet_view', 'sheet_export'))) {
@@ -172,7 +176,7 @@ class Sirius_Edls_Access extends Sirius_Access {
     // Edit a sheet or assign workers
     if (in_array($action, array('sheet_edit', 'sheet_edit_workers'))) {
       // Can't update reserved sheets
-      if ($sheet_reserved) { return FALSE; }
+      // if ($sheet_reserved) { return FALSE; }
 
       // Labor coordinators can edit sheets in "draft" or "request")
       if ($is_employer_coordinator && in_array($sheet_status, array('draft', 'request'))) { return TRUE; }
@@ -252,6 +256,12 @@ class Sirius_Edls_Access extends Sirius_Access {
 
       // Supervisors can set their own sheet to "trash" if it's in "draft"
       if ($is_employer_supervisor && $is_my_sheet && ($sheet_status == 'draft')) { return TRUE; }
+    }
+
+    // Set sheet to "reserved"
+    if ($action == 'sheet_status_reserved') {
+      // Nobody can set the status *to* reserved
+      return FALSE; 
     }
   }
 }

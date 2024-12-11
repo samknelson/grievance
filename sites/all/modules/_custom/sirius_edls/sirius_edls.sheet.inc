@@ -15,6 +15,7 @@ function sirius_edls_sheet_status_options() {
 	return array(
 		'draft' => t('Draft'),
 		'request' => t('Requested'),
+		'reserved' => t('Reserved'),
 		'lock' => t('Scheduled'),
 		'trash' => t('Discarded'),
 	);
