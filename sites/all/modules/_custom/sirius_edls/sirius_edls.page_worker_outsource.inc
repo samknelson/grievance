@@ -35,6 +35,8 @@ function sirius_edls_page_worker_outsource_quicknav($employer_node) {
 }
 
 function sirius_edls_page_worker_outsource_form($form, &$form_state, $employer_node, $ms_key = NULL) {
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
+
 	$form['#tree'] = TRUE;
 	$form_state['employer_nid'] = $employer_node->nid;
 	$form_state['ms_key'] = $ms_key;
@@ -46,7 +48,8 @@ function sirius_edls_page_worker_outsource_form($form, &$form_state, $employer_n
 		if (is_array($employer_json['edls']['client']['active_ms_list'])) {
 			if (in_array($ms_key, array_filter(array_values($employer_json['edls']['client']['active_ms_list'])))) {
 				$form['warning'] = array(
-					'#markup' => '<p><strong>' . t('WARNING: This member status has been set to sync automatically. Any changes made to this list will be overwritten at the next sync.') . '</strong></p>'
+					'#markup' => '<div class="sirius_callout_fullwidth sirius_callout_red">' .
+					'<strong>' . t('WARNING: This member status has been set to sync automatically. Any changes made to this list will be overwritten at the next sync.') . '</strong></div>'
 				);
 			}
 		}
