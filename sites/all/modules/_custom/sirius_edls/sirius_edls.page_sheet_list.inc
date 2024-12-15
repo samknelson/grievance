@@ -77,7 +77,7 @@ function sirius_edls_page_sheet_list_form($form, &$form_state, $employer_node) {
   $form['filters']['assignee'] = array(
 	  '#type' => 'select',
 	  '#title' => t('Assignee'),
-		'#options' => array(NULL => t('-- Select --')) + sirius_edls_supervisor_list($employer_node->nid),
+		'#options' => array(NULL => t('-- Select --')) + sirius_edls_assignee_list($employer_node->nid),
   );
 
 	$date_options = array();
