@@ -220,7 +220,7 @@ function sirius_edls_assign($date, $worker_id, $sheet_nid, $crew_uuid, $extra = 
   }
 
   $worker = sirius_edls_worker_fetch($employer_nid, $worker_id);
-  if (!$worker) { return array('success' => FALSE, 'msg' => "Worker ID $worker_id not found."); }
+  if (!$worker || !$worker['worker_name']) { return array('success' => FALSE, 'msg' => "Worker ID $worker_id not found."); }
 
   $crew = sirius_edls_crew($sheet_node, $crew_uuid);
   if (!$crew) { return array('success' => FALSE, 'msg' => 'Crew not found.'); }
