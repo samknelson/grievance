@@ -135,6 +135,7 @@ class Sirius_Edls_Access extends Sirius_Access {
 
       // Labor coordinators can change the supervisor
       if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
     }
 
     // Create a sheet, list sheets, list workers
@@ -148,6 +149,7 @@ class Sirius_Edls_Access extends Sirius_Access {
     if (in_array($action, array('sheet_create_reserved'))) {
       // Coordinators can create reserved sheets
       if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
     }
 
     // View, clone, or manage a sheet
