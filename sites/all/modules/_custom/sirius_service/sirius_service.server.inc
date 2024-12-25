@@ -184,8 +184,6 @@ function sirius_service_func_info_all() {
     'sirius_trust_benefits',
     'sirius_trust_policy_benefits_offered',
     'sirius_trust_benefit_options',
-    'sirius_trust_worker_election_wizard_push_remote',
-    'sirius_trust_worker_election_post_from_wizard',
     'sirius_ledger_policy_list',
     'sirius_ledger_policy_lookup',
     'sirius_esignature_defs',
@@ -209,11 +207,10 @@ function sirius_service_func_info_all() {
     'sirius_teamsters631_sirius_worker_member_status_set_remote',
     'sirius_teamsters631_node_insert_worker_remote',
     'sirius_teamsters631_sirius_worker_work_status_set_remote',
-    'sirius_trust_worker_election_wizard_push_remote',
-    'sirius_trust_worker_election_post_from_wizard',
     'sirius_teamsters631_taxonomy_term_updateinsert_remote',
     'sirius_teamsters631_sirius_training_level_graduate_remote',
     'sirius_worker_nextid',
+    'sirius_service_ping',
   );
 
   $info = array();
@@ -353,7 +350,7 @@ function sirius_service_server_info_all() {
   return $infos;
 }
 
-function sirius_service_server_info($type) {
+function sirius_service_server_info($type = NULL) {
   $infos = &drupal_static(__FUNCTION__); 
   if (!isset($infos)) { $infos = sirius_service_server_info_all(); }
   return $infos[$type];
