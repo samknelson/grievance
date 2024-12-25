@@ -26,10 +26,6 @@ function grievance_permission() {
     	'title' => t('Grievance Attachments'),
     	'description' => t('Permission to upload attachments to grievances.')
     ),
-    'grievance forward' => array(
-    	'title' => t('Grievance Forward'),
-    	'description' => t('Permission use the "forward a grievance" form.')
-    ),
     'grievance statuslog' => array(
     	'title' => t('Grievance Status Log'),
     	'description' => t('Permission to view or edit the status log for a grievance.')
