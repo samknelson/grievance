@@ -86,6 +86,15 @@ function sirius_log_buckets() {
 				'can_add' => TRUE,
 			),
 
+			'contact_relationship' => array(
+				'title' => 'Log',
+				'content_type' => 'sirius_contact_relationship',
+				'permissions' => array('sirius domain admin'),
+				'path' => 'sirius_contact_relationship_log',
+				'weight' => 20,
+				'can_add' => TRUE,
+			),
+
 			'worker' => array(
 				'title' => 'Log',
 				'content_type' => 'sirius_worker',
