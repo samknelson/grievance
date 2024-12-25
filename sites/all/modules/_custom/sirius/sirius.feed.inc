@@ -263,7 +263,7 @@ function sirius_feed_page_launch_form_submit($form, &$form_state) {
 	sirius_wizard_launch($info);
 }
 
-function sirius_feed_wizard_launch($wizard_name) {
+function sirius_feed_wizard_launch($wizard_name, $skip_redirect = FALSE) {
 	$domain = sirius_domain();
   $feed_node = new stdClass();
   $feed_node->type = 'sirius_feed';
@@ -290,7 +290,11 @@ function sirius_feed_wizard_launch($wizard_name) {
   node_object_prepare($feed_node);
   node_save($feed_node);
 
-  drupal_goto('node/' . $feed_node->nid . '/sirius_feed_wizard');
+  if (!$skip_redirect) {
+  	drupal_goto('node/' . $feed_node->nid . '/sirius_feed_wizard');
+  }
+
+  return $feed_node;
 }
 
 /************************************************************************************************
@@ -1131,6 +1135,12 @@ function sirius_feed_handle_field($field_name, $field_info, &$value, $precompute
     if (!$value) { return array('success' => FALSE, 'msg' => "$field_name invalid: does not look like a valid date."); }
   }
 
+  // Validate date
+  if ($field_info['type'] == 'dob') {
+    $value = sirius_feed_handle_dob($field_name, $value);
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name invalid: does not look like a valid DoB."); }
+  }
+
   // Validate list fields
   if ($field_info['type'] == 'ssn') {
     $value = sirius_feed_handle_ssn($field_name, $value);
@@ -1197,6 +1207,14 @@ function sirius_feed_handle_date($field_name, $value) {
   $ts = strtotime($value);
   if (!$ts) { return NULL; }
   return gmdate('Y-m-d', $ts);
+}
+
+function sirius_feed_handle_dob($field_name, $value) {
+  $ts = strtotime($value);
+  if ($ts === NULL) { return NULL; }
+  if ($ts > time()) { return NULL; }
+  if ($ts < strtotime('1800-01-01')) { return NULL; }
+  return date('Y-m-d', $ts);
 }
 
 function sirius_feed_handle_entity_reference($entity_type, $bundle, $value) {
