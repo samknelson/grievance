@@ -193,6 +193,7 @@ function sirius_worker_node_tabs() {
     'callback' => 'sirius_node_tab_worker_user',
     'permissions' => array('sirius worker admin'),
     'weight' => 2,
+    'component' => 'worker:usersync',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_contact/customfields'] = array(
@@ -237,6 +238,7 @@ function sirius_worker_node_tabs() {
     'permissions' => array('grievance view'),
     'file' => 'sirius_worker.page_grievances.inc',
     'rnode' => TRUE,
+    'component' => 'grievance',
   );
 
   $node_tabs['sirius_worker']['sirius_worker_relationships'] = array(
@@ -306,6 +308,25 @@ function sirius_worker_node_tabs() {
     'file' => 'sirius_worker.page_log_history.inc',
   );
   
+
+  $node_tabs['grievance_shop']['employer_workers/ein'] = array(
+    'title' => 'EIN Lookup',
+    'permissions' => array('sirius employer worker list'),
+    'callback' =>'sirius_worker_node_tab_ein_lookup',
+    'file' => 'sirius_worker.page_ein.inc',
+    'component' => 'employer:ein',
+    'weight' => 5,
+  );
+
+  $node_tabs['grievance_shop']['employer_workers/ein_set'] = array(
+    'title' => 'EIN Assign',
+    'file' => 'sirius_worker.page_ein.inc',
+    'permissions' => array('sirius employer worker manage'),
+    'callback' =>'sirius_worker_node_tab_ein_assign',
+    'component' => 'employer:ein',
+    'weight' => 6,
+  );
+
 
   sirius_node_tab_set_module('sirius_worker', $node_tabs);
 	return $node_tabs;
@@ -503,89 +524,6 @@ $items['sirius/skill/settings'] = array(
     ),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_worker.page_config_create.inc',
-  );
-
-
-  $items['sirius/worker/create'] = array(
-    'title' => 'Create a Worker',
-    'description' => '',
-    'page callback' => 'sirius_worker_page_create_intro',
-    'page arguments' => array(),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'access' => array(
-          'type' => 'worker',
-          'action' => 'create worker',
-        ),
-      ),
-    ),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'sirius_worker.page_create_intro.inc',
-  );
-
-  $items['sirius/worker/create/%'] = array(
-    'title' => 'Create a Worker',
-    'description' => '',
-    'page callback' => 'sirius_worker_page_create',
-    'page arguments' => array(3),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'access' => array(
-          'type' => 'worker',
-          'action' => 'create worker',
-        ),
-      ),
-    ),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'sirius_worker.page_create.inc',
-  );
-
-  $items['sirius/worker/ein'] = array(
-    'title' => 'Employee ID Numbers',
-    'access callback' => 'sirius_worker_page_ein_access',
-    'page callback' => 'sirius_worker_page_ein',
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['sirius/worker/ein/%'] = array(
-    'title' => 'Employee ID Numbers',
-    'access callback' => 'sirius_worker_page_ein_employer_access',
-    'access arguments' => array(3, 'lookup'),
-    'page callback' => 'sirius_worker_page_ein_employer',
-    'page arguments' => array(3, 'lookup'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['sirius/worker/ein/%/lookup'] = array(
-    'title' => 'Lookup',
-    'access callback' => 'sirius_worker_page_ein_employer_access',
-    'access arguments' => array(3, 'lookup'),
-    'page callback' => 'sirius_worker_page_ein_employer',
-    'page arguments' => array(3, 'lookup'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 1,
-  );
-
-  $items['sirius/worker/ein/%/set'] = array(
-    'title' => 'Assign',
-    'access callback' => 'sirius_worker_page_ein_employer_access',
-    'access arguments' => array(3, 'assign'),
-    'page callback' => 'sirius_worker_page_ein_employer',
-    'page arguments' => array(3, 'assign'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-  );
-
-  $items['sirius/worker/ein/%/upload'] = array(
-    'title' => 'Upload',
-    'access callback' => 'sirius_worker_page_ein_employer_access',
-    'access arguments' => array(3, 'upload'),
-    'page callback' => 'sirius_worker_page_ein_employer',
-    'page arguments' => array(3, 'upload'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
   );
 
   $items['sirius/worker/schedule/tor'] = array(

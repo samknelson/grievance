@@ -187,3 +187,44 @@ function sirius_hour_payperiod_load($domain_nid, $worker_nid, $employer_nid, $ye
 
   return $payperiod_node;
 }
+
+function sirius_hour_payperiod_load_multiple($domain_nid, $worker_nid, $year, $month, $day) {
+	$date = "$year-$month-$day 00:00:00";
+
+	$date_db = gmdate('Y-m-d H:i:s', strtotime($date));
+
+	$domain_nid = sirius_domain_nid();
+	$sql_args = array();
+	$sql = "select nid from node ";
+	$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = node.nid ";
+	$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_datetime use index (field_sirius_datetime_value) on field_data_field_sirius_datetime.entity_type = 'node' and field_data_field_sirius_datetime.entity_id = node.nid ";
+	$sql .= "left join field_data_field_sirius_datetime_completed on field_data_field_sirius_datetime_completed.entity_type = 'node' and field_data_field_sirius_datetime_completed.entity_id = node.nid ";
+	$sql .= "where node.type = 'sirius_payperiod' ";
+
+	if ($domain_nid) {
+		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':domain_nid'] = $domain_nid;
+	}
+
+	$sql .= "and field_sirius_worker_target_id = :worker_nid ";
+	$sql_args[':worker_nid'] = $worker_nid;
+
+  if ($day == 1) {
+		$sql .= "and field_sirius_datetime_value = :date_db ";
+		$sql_args[':date_db'] = $date_db;
+	} else {
+		$sql .= "and field_sirius_datetime_value <= :date_db ";
+		$sql .= "and field_sirius_datetime_completed_value > :date_db ";
+		$sql_args[':date_db'] = $date_db;
+	}
+  $sql .= "order by nid ";
+
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $nids = array();
+  while ($hr = $stmt->fetchAssoc()) {
+  	$nids[] = $hr['nid'];
+  }
+  return node_load_multiple($nids);
+}
