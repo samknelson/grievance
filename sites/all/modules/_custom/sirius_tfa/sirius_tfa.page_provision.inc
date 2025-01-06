@@ -22,7 +22,9 @@ function sirius_tfa_page_provision_form($form, &$form_state, $account, $method) 
 	// I don't know why they did this, but the "cancel" button always adds an explicit submit handler. We just want ours
 	if ($form['actions']) {
 		foreach ($form['actions'] as $key => $value) {
-			unset($form['actions'][$key]['#submit']);
+			if (is_array($value)) {
+				unset($form['actions'][$key]['#submit']);
+			}
 		}
 	}
 
