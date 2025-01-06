@@ -7,7 +7,9 @@ function sirius_edls_outsource_encode($workers) {
     $worker_id = $worker_record['worker_id'];
     $worker_id = preg_replace('/^O/', '', $worker_id);
 
-    $lines[] = "$worker_id|$worker_name";
+    $worker_phone = sirius_phone_format($worker_record['worker_phone']);
+
+    $lines[] = "$worker_id|$worker_name|$worker_phone";
   }
   return join("\n", $lines);
 }
@@ -16,7 +18,7 @@ function sirius_edls_outsource_decode($workers_encode) {
   $lines = explode("\n", $workers_encode);
   $workers = array();
   foreach ($lines as $line) {
-    list ($worker_id, $worker_name) = explode('|', $line);
+    list ($worker_id, $worker_name, $worker_phone) = explode('|', $line);
 
     $worker_name = trim($worker_name);
     $worker_name = preg_replace('/[^a-zA-Z0-9_, ]/', '', $worker_name);
@@ -26,12 +28,14 @@ function sirius_edls_outsource_decode($workers_encode) {
     $worker_id = preg_replace('/[^a-zA-Z0-9_]/', '', $worker_id);
     $worker_id = preg_replace('/\s+/', ' ', $worker_id);
 
+    $worker_phone = sirius_phone_format($worker_phone);
+
     if (!$worker_id && !$worker_name) { continue; }
     if (!$worker_id || !$worker_name) { return array('success' => FALSE, 'msg' => "Please make sure that each row has a worker ID, member status, and name ($worker_id, $worker_ms, $worker_name)"); }
 
     $worker_id = 'O' . $worker_id;
 
-    $workers[] = array('worker_name' => $worker_name, 'worker_id' => $worker_id);
+    $workers[] = array('worker_name' => $worker_name, 'worker_id' => $worker_id, 'worker_phone' => $worker_phone);
   }
 
   return array('success' => TRUE, 'workers' => $workers);
@@ -139,15 +143,16 @@ function sirius_edls_outsource_set_all($employer_node, $new_workers) {
   foreach ($new_workers as $worker_record) {
     $worker_id = $worker_record['worker_id'];
     $sql = "insert into sirius_edls_outsource ";
-    $sql .= "(employer_nid, worker_id, worker_ms, worker_name) ";
+    $sql .= "(employer_nid, worker_id, worker_ms, worker_name, worker_phone) ";
     $sql .= "values ";
-    $sql .= "(:employer_nid, :worker_id, :worker_ms, :worker_name) ";
-    $sql .= "on duplicate key update worker_name = :worker_name ";
+    $sql .= "(:employer_nid, :worker_id, :worker_ms, :worker_name, :worker_phone) ";
+    $sql .= "on duplicate key update worker_name = :worker_name, worker_phone = :worker_phone ";
     $sql_args = array();
     $sql_args[':employer_nid'] = $employer_nid;
     $sql_args[':worker_id'] = $worker_id;
     $sql_args[':worker_name'] = $worker_record['worker_name'];
     $sql_args[':worker_ms'] = $worker_record['worker_ms'];
+    $sql_args[':worker_phone'] = $worker_record['worker_phone'];
     $stmt = db_query($sql, $sql_args);
   }
 
@@ -175,15 +180,16 @@ function sirius_edls_outsource_set_all_by_ms($employer_node, $new_workers, $ms) 
   foreach ($new_workers as $worker_record) {
     $worker_id = $worker_record['worker_id'];
     $sql = "insert into sirius_edls_outsource ";
-    $sql .= "(employer_nid, worker_id, worker_ms, worker_name) ";
+    $sql .= "(employer_nid, worker_id, worker_ms, worker_name, worker_phone) ";
     $sql .= "values ";
-    $sql .= "(:employer_nid, :worker_id, :worker_ms, :worker_name) ";
-    $sql .= "on duplicate key update worker_name = :worker_name, worker_ms = :worker_ms ";
+    $sql .= "(:employer_nid, :worker_id, :worker_ms, :worker_name, :worker_phone) ";
+    $sql .= "on duplicate key update worker_name = :worker_name, worker_phone = :worker_phone ";
     $sql_args = array();
     $sql_args[':employer_nid'] = $employer_nid;
     $sql_args[':worker_id'] = $worker_id;
     $sql_args[':worker_name'] = $worker_record['worker_name'];
     $sql_args[':worker_ms'] = $ms;
+    $sql_args[':worker_phone'] = $worker_record['worker_phone'];
     $stmt = db_query($sql, $sql_args);
   }
 
@@ -253,4 +259,10 @@ function sirius_edls_outsource_ms_decode($options_encode) {
   }
 
   return array('success' => TRUE, 'options' => $options);
+}
+
+
+function sirius_edls_outsource_get_by_id($employer_nid, $worker_id) {
+  $result = sirius_edls_outsource_list($employer_nid, NULL, array('worker_id' => $worker_id, 'skip_assignment' => TRUE));
+  return reset($result);
 }
