@@ -65,12 +65,11 @@ function sirius_edls_page_worker_outsource_form($form, &$form_state, $employer_n
 	}
 
 	$html = '<p>';
-	$html .= t('Enter the outsource workers one per line. Each line should include the ID, the member status, and the name, separated by a pipe, i.e.:');
+	$html .= t('Enter the outsource workers one per line. Each line should include the ID, the name, and the phone number, separated by a pipe, i.e.:');
 	$html .= '<pre>';
-	$html .= "12343|Flintstone, Wilma\n";
-	$html .= "12344|Rubble, Betty\n";
-	$html .= "12345|Flintstone, Frederick\n";
-	$html .= "12346|Rubble, Barey";
+	$html .= "12343|Flintstone, Wilma|(845) 123-4567\n";
+	$html .= "12344|Rubble, Betty|(212) 555-1212\n";
+	$html .= "12345|Flintstone, Frederick|\n";
 	$html .= '</pre>';
 	$html .= '</p>';
 	$form['intro'] = array('#markup' => $html);
