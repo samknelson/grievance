@@ -67,7 +67,6 @@ function sirius_edls_update_7007() {
   }
 }
 
-
 function sirius_edls_update_7008() {
   $sqls = array(
     'create table sirius_edls_dblog (
@@ -84,6 +83,23 @@ function sirius_edls_update_7008() {
       index(log_handler_nid),
       primary key (log_id)
     );',
+  );
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}
+
+/**
+ * Add phone number field to outsource worker table
+ */
+
+function sirius_edls_update_7010() {
+  $sqls = array(
+    'alter table sirius_edls_outsource add worker_phone varchar(255)',
   );
   foreach ($sqls as $sql) {
     try {
