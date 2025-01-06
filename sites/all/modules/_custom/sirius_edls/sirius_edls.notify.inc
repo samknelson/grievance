@@ -62,7 +62,6 @@ function sirius_edls_notify_queue($sheet_node, $new_status) {
 }
 
 function sirius_edls_notify_queue_item($sheet_node, $old_status, $new_status, $assignment, $notification) {
-
 	// Insert a notification if:
 	// - The new status is "lock"
 	// - There is an assignment record
@@ -190,13 +189,36 @@ function sirius_edls_notify_cleanup($mode) {
   return array('success' => TRUE, 'count' => $count);
 }
 
-function sirius_edls_notify_deliver_batch($mode) {
+function sirius_edls_notify_deliver_batch($mode = 'test', $force = FALSE) {
+
+	/*
+	if (!$force) {
+		// Don't send before 5:00 PM
+		// @todo: This should be configurable, not hardcoded.
+		// @todo: We should be using the domain-specific timezone. But we're not, because this isn't a multi-domain function, because it comes 
+		//        from Teamsters 631, where things happen in the root domain :(
+
+		$tz_orig = date_default_timezone_get();
+		$tz = variable_get('date_default_timezone', @date_default_timezone_get());
+		if ($tz != $tz_orig) { 	date_default_timezone_set($tz); }
+		$h = date('H');
+		$t = date('H:i');
+		date_default_timezone_set($tz_orig);
+		if ($h < 17) { return array('success' => TRUE, 'msg' => "Cannot run before 17:00 (currently $t)"); }
+	}
+	*/
+
+	// $tomorrow = date('Y-m-d', strtotime('+1 day'));
+
+	$sql_args = array();
 	$sql = "select notification_id from sirius_edls_notifications ";
 	$sql .= "where notification_status = 'queue' ";
+	// $sql .= "and assignment_date = :tomorrow ";
+	// $sql_args[':tomorrow'] = $tomorrow;
 	$sql .= "order by notification_id ";
-	$sql .= "limit 1000 ";
+	$sql .= "limit 100 ";
 
-	$stmt = db_query($sql, array());
+	$stmt = db_query($sql, $sql_args);
 	$count = $count_success = $count_error = 0;
 	$notification_ids = array();
 	while ($hr = $stmt->fetchAssoc()) { $notification_ids[] = $hr['notification_id']; }
@@ -237,17 +259,19 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 	if (!$new_domain) { $new_domain = -1; }
 	sirius_domain($new_domain);
 
-	// @todo: Determine if we actually have to send the notification, i.e. if anything significant has changed since the last time.
-
 	$notification_status = '';
 	$worker_id = $notification['worker_id'];
+
 	if (!$worker_id) {
 		$notification_status = 'error';
 		$msg = 'No worker ID.';
-	} else if (!preg_match('/^I/', $worker_id)) {
-		$notification_status = 'error';
-		$msg = 'Outsourced workers cannot be notified.';
-	} else {
+	} else if (preg_match('/^I/', $worker_id)) {
+
+		// 
+		// Handle Insource workers ($worker_node)
+		// Notify via sirius_worker_notify(), which pulls from their preferences
+		//
+
 		$real_id = preg_replace('/^I/', '', $worker_id);
 		$worker_node = sirius_worker_get_by_id($real_id);
 		if (!$worker_node) {
@@ -261,14 +285,12 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 			$body = "Your crew assignment for $date has been posted or updated. Please follow the link below and accept:<br><br><a href=\"$url\">$url</a>";
 			$sms = $worker_node->title . ": your crew assignment for $date has been posted or updated. Please follow the link below and accept:\n\n$url";
 
-
 			if ($mode == 'live') {
 
 				$notify_params = array(
 					'subject' => $subject,
 					'body' => $body,
 					'sms' => $sms,
-					'X-Sirius-Id' => $unique_id,
 				);
 
 				$employer_node = node_load($sheet_node->field_grievance_shop['und'][0]['target_id']);
@@ -276,6 +298,52 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 				drupal_alter('sirius_edls_notify_pre_send', $context);
 
 				$result = sirius_worker_notify($worker_node, $notify_params);
+
+				$context = array('notify_params' => &$notify_params, 'notify_result' => &$result, 'employer_node' => $employer_node);
+				drupal_alter('sirius_edls_notify_post_send', $context);
+				
+				if ($result['success']) {
+					$notification_status = 'sent';
+				} else {
+					$notification_status = 'error';
+				}
+			}
+		}
+	} else {
+		//
+		// Handle outsource workers ($worker_record)
+		// Notify via sirius_sms_send()
+		//
+
+		$worker_record = sirius_edls_outsource_get_by_id($sheet_node->field_grievance_shop['und'][0]['target_id'], $worker_id);
+		if (!$worker_record) {
+			$notification_status = 'error';
+			$msg = "Worker $worker_id was not found";
+		} else if (!$worker_record['worker_phone']) {
+			$notification_status = 'error';
+			$msg = "Worker $worker_id does not have a phone number.";
+		} else {
+			$date = date('l, F j', strtotime($sheet_node->field_sirius_date_start['und'][0]['value']));
+			global $base_url;
+			$url = $base_url . '/edls-notify/' . $notification['notification_uuid'];
+			$subject = $worker_record['worker_name'] . ": Crew assignment for $date";
+			$body = "Your crew assignment for $date has been posted or updated. Please follow the link below and accept:<br><br><a href=\"$url\">$url</a>";
+			$sms = $worker_record['worker_name'] . ": your crew assignment for $date has been posted or updated. Please follow the link below and accept:\n\n$url";
+
+			if ($mode == 'live') {
+
+				$notify_params = array(
+					'subject' => $subject,
+					'body' => $body,
+					'sms' => $sms,
+					'to' => $worker_record['worker_phone'],
+				);
+
+				$employer_node = node_load($sheet_node->field_grievance_shop['und'][0]['target_id']);
+				$context = array('notify_params' => &$notify_params, 'employer_node' => $employer_node);
+				drupal_alter('sirius_edls_notify_pre_send', $context);
+
+				$result = sirius_sms_send($notify_params);
 
 				$context = array('notify_params' => &$notify_params, 'notify_result' => &$result, 'employer_node' => $employer_node);
 				drupal_alter('sirius_edls_notify_post_send', $context);
