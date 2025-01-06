@@ -39,6 +39,7 @@ class Sirius_Edls_Access extends Sirius_Access {
       'sheet_revisions',
       'sheet_assignmentlog',
       'sheet_export',
+      'sheet_layoff',
 
       // parameter sheet_node
       'sheet_status_draft',
@@ -121,6 +122,11 @@ class Sirius_Edls_Access extends Sirius_Access {
       if ($is_employer_coordinator) { return TRUE; }
 		}
 
+    // Enable notifications (manager only for now)
+    if (in_array($action, array('sheet_notify_enable'))) {
+      if ($is_employer_manager) { return TRUE; }
+    }
+
     // View the employer statistics
     if (in_array($action, array('employer_dashboard'))) {
       // Labor coordinators can view the statistics
@@ -135,6 +141,7 @@ class Sirius_Edls_Access extends Sirius_Access {
 
       // Labor coordinators can change the supervisor
       if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
     }
 
     // Create a sheet, list sheets, list workers
@@ -150,6 +157,29 @@ class Sirius_Edls_Access extends Sirius_Access {
       if ($is_employer_coordinator) { return TRUE; }
     }
 
+    // Layoff a sheet
+    if ($action == 'sheet_layoff') {
+      // Only if the layoff component is enabled
+      if (!sirius_domain_component_enabled('edls:layoff')) { return FALSE; }
+
+      // Only reserved sheets
+      if (!$sheet_reserved) { return FALSE; }
+
+      // Only layoff sheets
+      if (sheet_reserved_type($sheet_node) != 'layoff') { return FALSE; }
+
+      // Only if layoff is enabled for this employer
+      $employer_node = node_load($sheet_node->field_grievance_shop['und'][0]['target_id']);
+      $employer_json = sirius_json_get($employer_node);
+      if ($employer_json['edls']['layoff']['active'] != 'Yes') { return FALSE; }
+
+      // Labor coordinators can layoff
+      if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
+
+      return FALSE;
+    }
+
     // View, clone, or manage a sheet
     if (in_array($action, array('sheet_view', 'sheet_export'))) {
       // Labor coordinators can view anything
@@ -163,7 +193,7 @@ class Sirius_Edls_Access extends Sirius_Access {
     // View, clone, or manage a sheet
     if (in_array($action, array('sheet_clone', 'sheet_manage'))) {
       // Can't update reserved sheets
-      if ($sheet_reserved) { return FALSE; }
+      // if ($sheet_reserved) { return FALSE; }
 
       // Labor coordinators can view anything
       if ($is_employer_coordinator) { return TRUE; }
