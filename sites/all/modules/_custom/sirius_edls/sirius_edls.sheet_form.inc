@@ -78,6 +78,7 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 			'#options' => array(NULL => t('-- Select --')) + $supervisor_options,
 			'#default_value' => $sheet_node->field_grievance_rep_assignee['und'][0]['target_id'],
 			'#required' => TRUE,
+			'#id' => 'sirius_edls_sheet_supervisor',
 		);
 
 		$form['sheet']['assignee'] = array(
@@ -212,7 +213,6 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 
     $form['crews'][$delta]['weight'] = array(
       '#type' => 'textfield',
-      // '#title' => 'Sort Order',
       '#default_value' => $default_weight,
       '#size' => 4,
       '#prefix' => '<div class="sirius_form_weightfield">',
@@ -231,6 +231,20 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
     	'#title' => t('Name'),
     	'#default_value' => $crew['name'],
     );
+
+		if (sirius_access_instance('edls')->access('sheet_change_supervisor', array('sheet_node' => $sheet_node))) {
+			$form['crews'][$delta]['supervisor'] = array(
+				'#type' => 'select',
+				'#title' => t('Crew Supervisor'),
+				'#options' => array(NULL => t('-- Select --')) + $supervisor_options,
+				'#default_value' => $crew['supervisor'],
+	    	'#attributes' => array('class' => array('sirius_edls_crew_supervisor')),
+			);
+
+			if (!$crew['supervisor']) {
+				$form['crews'][$delta]['supervisor']['#default_value'] = $sheet_node->field_grievance_rep_assignee['und'][0]['target_id'];
+			}
+		}
 
     $form['crews'][$delta]['count'] = array(
     	'#type' => 'textfield',
@@ -466,6 +480,13 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 			$uuid = uuid_generate();
 			$crew['uuid'] = $uuid;
 		}
+
+		// Not everybody has the permission to set the supervisor. So, if it's not in our input array,
+		// we default to the prior value. Failing that, we default to the sheet-level supervisor.
+		$crew_orig = $sheet_json['edls']['crews'][$uuid];
+		if (!$crew['supervisor']) { $crew['supervisor'] = $crew_orig['supervisor']; }
+		if (!$crew['supervisor']) { $crew['supervisor'] = $sheet_node->field_grievance_rep_assignee['und'][0]['target_id']; }
+
 		$crews[$uuid] = $crew;
 	}
 

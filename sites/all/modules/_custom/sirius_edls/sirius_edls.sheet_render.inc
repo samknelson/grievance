@@ -165,6 +165,13 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 				if ($crew['task']) { $parts[] = $crew['task']; }
 				if ($crew['start_time']) { $parts[] = $crew['start_time'] . ' - ' . $crew['end_time']; }
 				if ($crew['checkin_location']) { $parts[] = $crew['checkin_location']; }
+
+				if (!$options['hide_supervisor']) {
+					if ($crew['supervisor']) {
+						$supervisor = user_load($crew['supervisor']);
+						$parts[] = $supervisor->name;
+					}
+				}
 				if ($assignments[$crew_uuid]) {
 					$assigned = count($assignments[$crew_uuid]);
 				} else {
