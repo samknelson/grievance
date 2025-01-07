@@ -6,7 +6,11 @@
 			// based on the curently selected department.
 
 			var settings = Drupal.settings.sirius_edls_sheet_edit;
-			console.log(settings);
+			// console.log(settings);
+
+			//
+			// Set the task options based on the department selection
+			//
 
 			function set_task_options() {
 				department_tid = $('#sirius_edls_sheet_department').val();
@@ -33,7 +37,7 @@
 				});
 			}
 
-			// When a new crew is addedd, set the options.
+			// When a new crew is added, set the options.
 			$('body').on('sirius_ajax_generic_replace', function() {
 				set_task_options();
 			});
@@ -45,6 +49,31 @@
 
 			// When the page is loaded, set the options
 			set_task_options();
+
+			//
+			// Set the supervisor default for each crew based on the sheet selection
+			//
+
+			function set_supervisor_default() {
+				supervisor_uid = $('#sirius_edls_sheet_supervisor').val();
+				if (!supervisor_uid) { return; }
+
+				$('.sirius_edls_crew_supervisor').each(function(idx) {
+					// Don't overwrite anything manually set
+					if ($(this).val()) { return; }
+					$(this).val(supervisor_uid);
+				});
+			}
+
+			// When the sheet supervisor is changed, set the default for each crew
+			$('#sirius_edls_sheet_supervisor').once().change(function() {
+				set_supervisor_default();
+			});
+
+			// When a new crew is added, set the options.
+			$('body').on('sirius_ajax_generic_replace', function() {
+				set_supervisor_default();
+			});
 		}
 	};
 })(jQuery);
