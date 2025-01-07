@@ -122,9 +122,9 @@ class Sirius_Edls_Access extends Sirius_Access {
       if ($is_employer_coordinator) { return TRUE; }
 		}
 
-    // Enable notifications (manager only for now)
+    // Enable notifications (Coordinators only for now)
     if (in_array($action, array('sheet_notify_enable'))) {
-      if ($is_employer_manager) { return TRUE; }
+      if ($is_employer_coordinator) { return TRUE; }
     }
 
     // View the employer statistics
