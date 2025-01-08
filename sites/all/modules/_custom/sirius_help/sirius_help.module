@@ -115,13 +115,9 @@ function sirius_help_block_info() {
   return $blocks;
 }
 
-/** 
- * Implements hook_block_view
- */
-
-function sirius_help_block_view($delta = '') {
-  if ($delta == 'sirius_help') { 
-
+function sirius_help_paths($new_path = NULL) {
+  $paths = &drupal_static(__FUNCTION__);
+  if (!isset($paths)) {
     // 
     // We look for thre paths: 
     // - "current_path()"
@@ -142,6 +138,23 @@ function sirius_help_block_view($delta = '') {
       }
     }
     $paths = array_unique($paths);
+  }
+
+  if ($new_path) {
+    $paths[] = $new_path;
+    $paths = array_unique($paths);
+  }
+
+  return $paths;
+}
+
+/** 
+ * Implements hook_block_view
+ */
+
+function sirius_help_block_view($delta = '') {
+  if ($delta == 'sirius_help') { 
+    $paths = sirius_help_paths();
 
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node');
