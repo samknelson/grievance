@@ -232,7 +232,7 @@ function grievance_uh_snapshot($start_ts, $end_ts) {
 	$hr = $stmt->fetchAssoc();
 	$excluded_rid = $hr['rid'];
 	if (!$excluded_rid) {
-		drupal_set_message("There is no role called 'excluded_role_name'. Please make sure to configure one.", 'warning');
+		drupal_set_message("There is no role called $excluded_role_name. Please make sure to configure one.", 'warning');
 		$excluded_rid = -1;
 	}
 
