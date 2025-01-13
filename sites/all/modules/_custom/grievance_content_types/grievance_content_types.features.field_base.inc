@@ -8259,7 +8259,7 @@ Prof.',
       'handler_settings' => array(
         'behaviors' => array(
           'views-select-list' => array(
-            'status' => 0,
+            'status' => 1,
           ),
         ),
         'view' => array(

@@ -1,17 +1,19 @@
 <?php
 
 function sirius_proxy_active() {
+  return FALSE; 
+
 	// The "Services" module must be enabled
-	if (!module_exists('sirius_service')) { return FALSE; }
+	//if (!module_exists('sirius_service')) { return FALSE; }
 
 	// The Sirius component must be enabled
-	if (!sirius_domain_component_enabled('service:client')) { return FALSE; }
+	//if (!sirius_domain_component_enabled('service:client')) { return FALSE; }
 
 	// The client must be active
-	if (!sirius_service_client_active()) { return FALSE; }
+	//if (!sirius_service_client_active()) { return FALSE; }
 
 	// Proxy mus be enabled
-	if (sirius_domain_variable_get('sirius_proxy_active') != 'Yes') { return FALSE; }
+	//if (sirius_domain_variable_get('sirius_proxy_active') != 'Yes') { return FALSE; }
 
 	return TRUE;
 }
