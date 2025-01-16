@@ -200,6 +200,8 @@ function sirius_service_func_info_all() {
     'sirius_teamsters631_sirius_training_level_graduate_remote',
     'sirius_worker_nextid',
     'sirius_service_server_call',
+    'sirius_dispatch_group_search',
+    'sirius_dispatch_facility_dropdown',
   );
 
   $functions_nocache = array(
