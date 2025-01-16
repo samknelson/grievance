@@ -39,9 +39,12 @@ function sirius_phone_format($phonenumber) {
   $phonenumber = '(' . $matches[2] . ') ' . $matches[3] . $separator . $matches[4];
 
   // Optional extension
+  // No more extensions
+  /*
   if ($matches[5] != '') {
       $phonenumber .= ' x' . $matches[5];
   }
+  */
 
   return $phonenumber;
 }

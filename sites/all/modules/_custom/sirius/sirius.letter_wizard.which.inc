@@ -119,7 +119,7 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 	}
 
 	$tokens = array('node' => $entity_node);
-	$tokens['other_tokens']['delivery_tid'] = $data['tokens']['delivery'];
+	$tokens['other_tokens']['delivery_tid'] = $form_state['values']['tokens']['delivery'];
 
 	$aliases = array();
 
@@ -338,7 +338,7 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 		$json = json_decode($main_letter_template_node->field_sirius_json['und'][0]['value'], TRUE);
 		if ($json['recipients']) {
 			foreach ($json['recipients'] as $recipient) {
-				if ($recipients[$recipient['phone']]) { continue; }
+				if (!$recipients[$recipient['phone']]) { continue; }
 				$delta = $recipient['delta'];
 				$recipients[$recipient['phone']] = $recipient;
 			}
@@ -403,14 +403,14 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 						$rep_user = user_load($tmp['target_id']);
 						if (!$rep_user) { continue; }
 						$phone = $rep_user->field_grievance_phone['und'][0]['value'];
-						if ($phone) { continue; }
+						if (!$phone) { continue; }
 
 						$recipient = array();
 						$recipient['delta'] = $delta++;
 						$recipient['description'] = $label;
 						$recipient['uid'] = $rep_user->uid;
 						$recipient['name'] = $rep_user->name;
-						$recipient['email'] = $rep_user->mail;
+						$recipient['phone'] = $phone;
 						$recipient['disposition'] = 'skip';
 						$recipients[$phone] = $recipient;
 					}

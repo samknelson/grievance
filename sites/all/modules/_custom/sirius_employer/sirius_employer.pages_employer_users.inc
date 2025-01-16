@@ -149,6 +149,9 @@ function sirius_employer_node_tab_employer_users_add_form_validate($form, &$form
 	$name = strtolower(trim($form_state['values']['name']));
 	$phone = sirius_phone_format($form_state['values']['phone']);
 
+	$domain_nid = $employer_node->field_sirius_domain['und'][0]['target_id'];
+	if ($domain_nid) { $new_user->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }	
+
 	if (!sirius_email_validate($mail)) {
 		form_set_error('mail', 'Please enter a valid email address.');
 	}
@@ -196,6 +199,9 @@ function sirius_employer_node_tab_employer_users_add_form_submit($form, &$form_s
 	$new_user->name = $name;
 	$new_user->field_grievance_shops['und'][0]['target_id'] = $employer_node->nid;
 	$new_user->field_grievance_phone['und'][0]['value'] = $phone;
+
+	$domain_nid = $employer_node->field_sirius_domain['und'][0]['target_id'];
+	if ($domain_nid) { $new_user->field_sirius_domain['und'][0]['target_id'] = $domain_nid; }
 
 	$all_roles = user_roles();
 	$required_roles = sirius_employer_usermanage_roles('required');

@@ -10,6 +10,9 @@ function sirius_edls_node_tab_employer_tasks_form($form, &$form_state, $employer
 	$form_state['employer_nid'] = $employer_node->nid;
 
 	$departments = sirius_edls_departments($employer_node);
+	if (!$departments) {
+		return sirius_form_error("No departments are defined. Please go to the " . l('the department configuration page', 'sirius/taxonomy/grievance_department') . " and create at least one department.");
+	}
 	$tasks_by_department = sirius_edls_tasks_by_department($employer_node);
 	foreach ($departments as $department_tid => $department_name) {
 		$form['tasks'][$department_tid]['tasks'] = array(

@@ -65,6 +65,10 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
 
 	if (sirius_access_instance('edls')->access('sheet_change_supervisor', array('sheet_node' => $sheet_node))) {
 		$supervisor_options = sirius_edls_supervisor_list($sheet_employer_nid);
+
+		if (!$supervisor_options) {
+			return sirius_form_error("There are no supervisors available. Sheets cannot be created without a supervisor.");
+		}
 		$form['sheet']['supervisor'] = array(
 			'#type' => 'select',
 			'#title' => t('Supervisor'),
@@ -87,6 +91,9 @@ function sirius_edls_sheet_form($form, &$form_state, $sheet_node) {
   if ($sheet_node->nid) { $form['sheet']['date_start']['#disabled'] = TRUE; }
 
 	$job_group_options = sirius_dispatch_group_list_active(NULL, $ts);
+	if (!$job_group_options) {
+		return sirius_form_error('There are no available events. Please define at least one event.');
+	}
 	$form['sheet']['sirius_dispatch_job_group'] = array(
 		'#type' => 'select',
 		'#title' => t('Event'),
@@ -286,52 +293,75 @@ function sirius_edls_sheet_form_submit_ajax_halls($form, $form_state) {
   return $form['sheet']['hall'];
 }
 
-function sirius_edls_sheet_form_submit($form, &$form_state) {
+function sirius_edls_sheet_form_validate($form, &$form_state) {
 	$sheet_node = node_load($form_state['sheet_nid']);
 
 	$count = $form_state['values']['sheet']['count'] = intval($form_state['values']['sheet']['count']);
-
-	if ($count < 0 || $count > 1000) {
-		drupal_set_message("Count must be between 0 and 1000.", 'error');
-		$form_state['rebuild'] = TRUE; 
-		return;
-	}
+	if ($count < 0 || $count > 1000) { form_set_error('sheet][count', 'Count must be between 0 and 1000.'); }
 
 	$count_verify = 0;
 	$crews_input = $form_state['values']['crews'];
 	if (!$crews_input) { $crews_input = array(); }
 	$crews_input_by_uuid = array();
+
 	foreach ($crews_input as $delta => $crew) {
+		if (!$crew['start_time'] && !$crew['count']) { continue; }
+
 		$crew_count = $form_state['values']['crews'][$delta]['count'] = intval($crew['count']);
 		$count_verify += $crew_count;
 		$crews_input_by_uuid[$crew['uuid']] = $crew;
+		$crews_input_by_uuid[$crew['uuid']]['delta'] = $delta;
+
+		if (!preg_match('/^\d\d\:\d\d$/', $crew['start_time'])) {
+			form_set_error("crews][$delta][start_time", "Please enter a valid start time.");
+		}
+
+		if (!preg_match('/^\d\d\:\d\d$/', $crew['end_time'])) {
+			form_set_error("crews][$delta][end_time", "Please enter a valid end time.");
+		}
+
+		if (strtotime("2024-01-01 $crew[start_time]") >= strtotime("2024-01-01 $crew[end_time]")) {
+			form_set_error("crews][$delta][end_time", "End time must be after start time.");
+		}
 	}
+
 	if ($count_verify != $count) {
-		drupal_set_message("The count in all the crews must add up to the total count. There are $count_verify slots in the crews, but the total count for the sheet is $count.", 'error');
-		$form_state['rebuild'] = TRUE; 
-		form_set_error('sheet][count');
+		form_set_error('sheet][count', "The count in all the crews must add up to the total count. There are $count_verify slots in the crews, but the total count for the sheet is $count.");
 		foreach ($crews_input as $delta => $crew) { form_set_error("crews][$delta][count"); }
-		return;
 	}
 
 	if ($sheet_node) {
 		$assignments = sirius_edls_assignment_fetch_sheet($sheet_node);
 		foreach ($assignments as $crew_uuid => $assignment_records) {
 			if (!$crews_input_by_uuid[$crew_uuid]) {
-				drupal_set_message("There is a worker assigned to a crew that does not appear on this sheet. Please remove the assignment.", 'error');
-				$form_state['rebuild'] = TRUE;
-				return;
+				form_set_error('sheet][count', "There is a worker assigned to a crew that does not appear on this sheet. Please remove the assignment.");
 			}
 
-			foreach ($assignment_records as $assignment_record) {
-				$position = $assignment_record['assignment_position'];
-				if ($position+1 > $crews_input_by_uuid[$crew_uuid]['count']) {
-					drupal_set_message("There is a worker assigned to position " . ($position+1) . " on a crew that only has " . $crews_input_by_uuid[$crew_uuid]['count'] . ' positions. Please remove the assignment or increase the number of positions.', 'error');
-					$form_state['rebuild'] = TRUE;
-					return;
+			if ($assignment_records) {
+				$c = count($assignment_records);
+				if ($c > $crews_input_by_uuid[$crew_uuid]['count']) {
+					$delta = $crews_input_by_uuid[$crew_uuid]['delta'];
+					form_set_error("crews][$delta][count", "There are $c workers currently assigned to this crew.");
 				}
 			}
 		}
+	}
+}
+
+function sirius_edls_sheet_form_submit($form, &$form_state) {
+	$sheet_node = node_load($form_state['sheet_nid']);
+
+	$count = $form_state['values']['sheet']['count'] = intval($form_state['values']['sheet']['count']);
+
+	$count_verify = 0;
+	$crews_input = $form_state['values']['crews'];
+	if (!$crews_input) { $crews_input = array(); }
+	$crews_input_by_uuid = array();
+
+	foreach ($crews_input as $delta => $crew) {
+		$crew_count = $form_state['values']['crews'][$delta]['count'] = intval($crew['count']);
+		$count_verify += $crew_count;
+		$crews_input_by_uuid[$crew['uuid']] = $crew;
 	}
 
 	if (!$sheet_node) {
@@ -430,8 +460,6 @@ function sirius_edls_sheet_form_submit($form, &$form_state) {
 	sirius_json_set($sheet_node, $sheet_json);
 
 	node_save($sheet_node);
-
-	
 
 	drupal_set_message("Sheet saved.");
 	drupal_goto('node/' . $sheet_node->nid . '/sirius_edls_sheet_edit');

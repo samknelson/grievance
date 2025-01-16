@@ -421,7 +421,7 @@ function sirius_update_7025() {
 
 function sirius_update_7026() {
   $sqls = array(
-    'alter table field_data_field_sirius_json add column json_denorm_external_id varchar(255) generated always as (field_sirius_json_value ->> \'$.external_id\')',
+    'alter table field_data_field_sirius_json add column json_denorm_external_id varchar(255) generated always as (JSON_UNQUOTE(JSON_EXTRACT(field_sirius_json_value, \'$.external_id\')))',
     'alter table field_data_field_sirius_json add index json_denorm_external_id (json_denorm_external_id)',
   );
 
@@ -466,6 +466,15 @@ function sirius_update_7029() {
   sirius_update_7029_impl();
 }
 
+/**
+ * Migrate the payperiod fields
+ */
+
+function sirius_update_7030() {
+  sirius_require('sirius', 'install/sirius.update_7030.inc');
+  sirius_update_7030_impl();
+}
+
 function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
   foreach ($if_you_haves as $if_you_have) {
     foreach ($then_you_gets as $then_you_get) {
@@ -479,5 +488,24 @@ function sirius_updateutil_grant($if_you_haves, $then_you_gets) {
   }
 }
 
+/**
+ * Add the external_id column to the JSON field. 
+ * This sometimes failed on update_7026 because of MariaDB-specific SQL. Just in case, we're re-running it.
+ */
 
+function sirius_update_7031() {
+  $sqls = array(
+    'alter table field_data_field_sirius_json add column json_denorm_external_id varchar(255) generated always as (JSON_UNQUOTE(JSON_EXTRACT(field_sirius_json_value, \'$.external_id\')))',
+    'alter table field_data_field_sirius_json add index json_denorm_external_id (json_denorm_external_id)',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      drupal_set_message("Executing: $sql");
+      $stmt = db_query($sql, array());
+    } catch (exception $ignore) {
+      drupal_set_message("Error: " . $ignore->getMessage(), 'warning');
+    }
+  }
+}
 

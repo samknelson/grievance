@@ -5,6 +5,8 @@ function sirius_edls_page_landing() {
 	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/ux.css');
 	drupal_add_css(drupal_get_path('module', 'sirius_edls') . '/css/sheet.css');
 
+	drupal_set_title(sirius_edls_display_name_long());
+
 	$result = sirius_edls_employer_switch();
 	$employer_node = $result['employer_node'];
 	$html .= $result['markup'];

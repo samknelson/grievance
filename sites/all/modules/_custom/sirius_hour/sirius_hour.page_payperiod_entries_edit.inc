@@ -50,7 +50,7 @@ function sirius_hour_node_tab_payperiod_entries_edit_form($form, &$form_state, $
 
   $sources = sirius_hour_payperiod_sources($json);
 
-  $start_ts = sirius_date_ts($payperiod_node, 'field_sirius_datetime');
+  $start_ts = sirius_date_ts($payperiod_node, 'field_sirius_date_start');
   $month_days = date('t', $start_ts);
   $day_options = array(NULL => '-');
   for ($i=1; $i<=$month_days; ++$i) { $day_options[$i] = $i;}

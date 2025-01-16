@@ -29,7 +29,7 @@ function sirius_edls_tasks_decode($tasks_encoded) {
   $tasks = array();
   foreach ($lines as $task) {
     $task = trim($task);
-    $task = preg_replace('/[^a-zA-Z0-9_, ]/', '', $task);
+    $task = preg_replace('/[^a-zA-Z0-9_, \=\-]/', '', $task);
     if (!$task) { continue; }
     $tasks[] = $task;
   }
@@ -39,7 +39,9 @@ function sirius_edls_tasks_decode($tasks_encoded) {
 
 function sirius_edls_tasks_by_department($employer_node) {
 	$employer_json = sirius_json_get($employer_node);
-	return $employer_json['edls']['tasks_by_department'];
+  $result = $employer_json['edls']['tasks_by_department'];
+  if (!$result) { $result = array(); }
+  return $result;
 }
 
 function sirius_edls_all_tasks($employer_node) {

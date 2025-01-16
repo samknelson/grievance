@@ -61,7 +61,35 @@ function sirius_hour_node_delete($node) {
  */
 
 function sirius_hour_node_presave($node) {
-	if ($node->type == 'sirius_payperiod') { sirius_hour_payperiod_set_title($node); }
+  // Repair legacy timestamps. This can go away eventually.
+  // We are in timezone hell, because, like a dumbass, I used a datetime field for the start and end date. Then at some point
+  // somewhere I got confused, probably because of daylight savings time, and we end up with some payperiods starting on
+  // 2027-05-01 07:00:00, and some on 08:00:00.
+  //
+  // So ... we're switching to a date-only start and end date. And since all legacy payperiods are full month, 
+  // we're adding 15 days to the start date just to get to the middle of the month.
+
+  if (in_array($node->type, array('sirius_payperiod', 'sirius_employer_payperiod'))) {
+    if ($node->field_sirius_datetime['und'][0]['value'] && !$node->field_sirius_date_start['und'][0]['value']) {
+      $orig_date = $node->field_sirius_datetime['und'][0]['value'] . ' GMT';
+      $ts = strtotime($orig_date) + 24*60*60*15;
+      $new_date = date('Y-m-01 00:00:00', $ts);
+      $node->field_sirius_date_start['und'][0]['value'] = $new_date;
+      drupal_set_message("Set $new_date from $orig_date");
+    }
+
+    if ($node->field_sirius_datetime_completed['und'][0]['value'] && !$node->field_sirius_date_end['und'][0]['value']) {
+      $orig_date = $node->field_sirius_datetime_completed['und'][0]['value'] . ' GMT';
+      $ts = strtotime($orig_date) - 24*60*60*15;
+      $new_date = date('Y-m-t 00:00:00', $ts);
+      $node->field_sirius_date_end['und'][0]['value'] = $new_date;
+      drupal_set_message("Set $new_date from $orig_date");
+    }
+  }
+
+	if ($node->type == 'sirius_payperiod') {
+    sirius_hour_payperiod_set_title($node);
+  }
 }
 
 function sirius_hour_payperiod_set_title($node) {
@@ -76,7 +104,7 @@ function sirius_hour_payperiod_set_title($node) {
 	if ($employer_nid) { $title .= substr(sirius_node_title($employer_nid), 0, 55); } else { $title .= '[no worker]'; }
 
 	$title .= ' / ';
-	if ($node->field_sirius_datetime['und']) { $title .= sirius_date_date($node, 'field_sirius_datetime', $format = 'Y-m-d'); } else { $title .= '[no date]'; }
+	if ($node->field_sirius_date_start['und']) { $title .= sirius_date_date($node, 'field_sirius_datetime', 'Y-m-d'); } else { $title .= '[no date]'; }
 
 	$node->title = $title;
 }

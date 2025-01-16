@@ -117,18 +117,6 @@ function sirius_domain_pop() {
 
 function sirius_sirius_domain_component_info() {
   return array(
-    'worker' => array(
-      'title' => 'Worker',
-      'description' => 'Use the worker database',
-    ),
-    'worker:schedule' => array(
-      'title' => 'Worker - Schedule',
-      'description' => 'Use scheduling tools for workers such as time off requests',
-    ),
-    'worker:skill' => array(
-      'title' => 'Worker - Skill',
-      'description' => 'Manage skills for workers',
-    ),
     'employer' => array(
       'title' => 'Employer',
       'description' => 'Use the employer database',
