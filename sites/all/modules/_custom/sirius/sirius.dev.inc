@@ -15,3 +15,11 @@ function sirius_dev_server_type_set($type) {
 function sirius_dev_server_type() {
 	return variable_get('sirius_dev_server_type', 'live');
 }
+
+function sirius_dpm($variable) {
+	if (function_exists('dpm')) {
+		return dpm($variable);
+	} else {
+		drupal_set_message('<pre>' . print_r($variable, 1) . '</pre>');
+	}
+}
