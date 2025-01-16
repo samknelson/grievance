@@ -1,7 +1,14 @@
 <?php
 
-function sirius_dispatch_group_search($params) {
-  $domain_nid = sirius_domain_nid();
+function sirius_dispatch_group_search($params = array()) {
+  if (!is_array($params)) { $params = json_decode($params, TRUE); }
+  watchdog('here', print_r($params, 1));
+
+  if ($params['domain_root']) { 
+    $domain_nid = NULL;
+  } else {
+    $domain_nid = sirius_domain_nid();
+  }
 
   $sql_args = array();
   $sql = "select node.nid, title from node ";
@@ -79,7 +86,7 @@ function sirius_dispatch_group_search($params) {
   }
 
   if ($params['nids_only']) { return $nids; }
-  return node_load_multiple($nids);
+  return node_load_multiple(array_keys($nids));
 }
 
 // @todo: These functions should just call _search()
@@ -97,6 +104,10 @@ function sirius_dispatch_group_list_active($industry_tid = NULL, $ts = NULL) {
     $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid, 'in');
   } else if ($industry_tid) {
     $query->fieldCondition('field_sirius_industry', 'tid', $industry_tid);
+  }
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) {
+    $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid);
   }
   $query->propertyOrderBy('title');
   $stmt = $query->execute();
