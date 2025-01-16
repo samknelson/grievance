@@ -48,6 +48,7 @@ function sirius_teamsters631_feed_hours_check2_info() {
           'worker_ws' => 'Current Work Status',
           'worker_ws_asof' => 'As Of Work Status',
           'worker_ms' => 'Member Status',
+          'apprentice_removed_date' => 'Apprentice Removed Date',
           'dispatch_nid' => 'Dispatch NID',
           'job_nid' => 'Job NID',
           'job_title' => 'Job',
@@ -338,10 +339,43 @@ function sirius_teamsters631_feed_hours_check2_row_process($feed_node, $info, $d
     }
   }
 
+  $tmp = sirius_teamsters631_apprentice_removed_asof($worker_nid);
+  if ($tmp) { $result['apprentice_removed_date'] = date('Y-m-d H:i:s', $tmp); }
+
   $result['success'] = TRUE;
   $result['msg'] = 'Dispatch found.';
   $result['dispatch_nid'] = $dispatch_node->nid;
   return $result;
+}
+
+function sirius_teamsters631_apprentice_removed_asof($worker_nid) {
+  static $cache;
+  if (isset($cache[$worker_nid])) { return $cache[$worker_nid]; }
+
+  $sql_args = array();
+  $sql = "select created from node ";
+  $sql .= "left join field_data_field_sirius_log_handler on field_data_field_sirius_log_handler.entity_type = 'node' and field_data_field_sirius_log_handler.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
+  $sql .= "left join field_data_field_sirius_message on field_data_field_sirius_message.entity_type = 'node' and field_data_field_sirius_message.entity_id = node.nid ";
+
+  $sql .= "where type = 'sirius_log' ";
+
+  $sql .= "and field_sirius_category_value = 'worker:member_status' ";
+  $sql .= "and field_sirius_type_value = 'clear' ";
+  $sql .= "and lower(field_sirius_message_value) like '%apprentice%' ";
+  $sql .= "and field_sirius_log_handler_target_id = :worker_nid ";
+  $sql_args[':worker_nid'] = $worker_nid;
+
+  $sql .= " order by created desc limit 1 ";
+  $stmt = sirius_sql_query($sql, $sql_args);
+  $hr = $stmt->fetchAssoc();
+
+  if ($hr) { $cache[$worker_nid] = $hr['created']; } else { $cache[$worker_nid] = 0; }
+
+  drupal_set_message("Found $cache[$worker_nid] for $worker_nid");
+
+  return $cache[$worker_nid];
 }
 
 function sirius_teamsters631_dispatched_as_of2($worker_nid, $employer_nid, $start_ts, $end_ts) {
