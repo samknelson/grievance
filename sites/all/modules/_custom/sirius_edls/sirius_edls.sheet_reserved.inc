@@ -133,7 +133,7 @@ function sirius_edls_sheet_reserved_fetch($employer_nid, $date, $type_key, $crea
 	$crew['start_time'] = $type['start_time'];
 	$crew['end_time'] = $type['end_time'];
 
-	$sheet_json['edls']['crews'][] = $crew;
+	$sheet_json['edls']['crews'][$uuid] = $crew;
 
 	sirius_json_set($sheet_node, $sheet_json);
 	node_save($sheet_node);
