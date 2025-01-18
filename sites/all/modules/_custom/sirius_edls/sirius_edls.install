@@ -109,3 +109,21 @@ function sirius_edls_update_7010() {
     } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
   }
 }
+
+/**
+ * Add comm nid to notifications table
+ */
+
+function sirius_edls_update_7011() {
+  $sqls = array(
+    'alter table sirius_edls_notifications add comm_nid integer',
+    'alter table sirius_edls_notifications add index(comm_nid)',
+  );
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}

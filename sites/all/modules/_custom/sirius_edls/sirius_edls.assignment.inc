@@ -159,6 +159,11 @@ function sirius_edls_assignment_search($params) {
     $sql_args[':department'] = $params['department'];
   }
 
+  if ($params['worker_id']) {
+    $sql .= "and worker_id = :worker_id ";
+    $sql_args[':worker_id'] = $params['worker_id'];
+  }
+
   if ($params['mss']) {
     $sql .= "and worker_ms in (:mss) ";
     $sql_args[':mss'] = $params['mss'];
@@ -168,7 +173,12 @@ function sirius_edls_assignment_search($params) {
     $sql .= "and field_sirius_edls_sheet_status_value != 'trash' ";
   }
 
-  $sql .= "order by field_sirius_date_start_value ";
+  if ($params['order']) {
+    $sql .= 'order by ' . $params['order'] . ' ';
+  } else {
+    $sql .= "order by field_sirius_date_start_value ";
+  }
+
   $limit = $params['limit'];
   if (!$limit) { $limit = 100; }
   $sql .= "limit $limit";
@@ -367,25 +377,37 @@ function sirius_edls_assignment_render_extra($assignment, $render_options = arra
 function sirius_edls_assignment_list_render($assignments, $render_options) {
   if (!$assignments) { return '<p>' . t('No assignments found.') . '</p>'; }
 
+  // Can I view *all* notifications
+  $can_view_notifications = sirius_access_instance('edls')->access('notification_view_delivery');
+
   $rows = array();
   foreach ($assignments as $assignment_id => $assignment) {
+    $sheet_node = node_load($assignment['sheet_nid']);
+    $notification = sirius_edls_notify_fetch_by_assignment_id($assignment_id);
+    
+
+
+    $tools = l('Sheet', 'node/' . $assignment['sheet_nid'] . '/sirius_edls_sheet_view', array('attributes' => array('class' => array('tool-button'))));
+    if ($can_view_notifications && $notification) {
+      $tools .= l('Notification', 'edls-notify/' . $notification['notification_uuid'], array('attributes' => array('class' => array('tool-button'))));
+    }
+
     $row = array();
-    $row[] = $assignment_id;
-    $row[] = $assignment['worker_id'];
-    $row[] = $assignment['worker_name'];
-    $row[] = $assignment['worker_ms'];
+    $row[] = $assignment['assignment_date'];
+    $row[] = $sheet_node->field_sirius_job_number['und'][0]['value'];
+    $row[] = sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid']);
     $row[] = sirius_edls_assignment_render_extra($assignment, array('text_only' => TRUE));
-    $row[] = l('Sheet', 'node/' . $assignment['sheet_nid'] . '/sirius_edls_sheet_view', array('attributes' => array('class' => array('tool-button'))));
+    $row[] = $notification['notification_status'];
+    $row[] = $tools;
     $rows[] = $row;
   }
 
   $header = array();
-  $header[] = t('Assignment ID');
-  $header[] = t('Worker ID');
-  $header[] = t('Worker Name');
-  $header[] = t('Member Status');
+  $header[] = t('Date');
+  $header[] = t('Job');
+  $header[] = t('Dept');
   $header[] = t('Details');
+  $header[] = t('Notification Status');
   $header[] = t('Tools');
-  // dpm($assignments);
   return sirius_table_render($header, $rows);
 }

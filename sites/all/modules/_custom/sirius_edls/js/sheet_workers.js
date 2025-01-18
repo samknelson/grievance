@@ -80,6 +80,7 @@
 
 			function worker_search() {
 				flash('Loading workers ...', 'info');
+				console.log(settings);
 				$('#sirius_edls_worker_search').prop('disabled', true);
 
 				$.ajax({
@@ -160,6 +161,12 @@
 							*/
 
 							html += '</span>';
+
+							if (settings['show_worker_link']) {
+								html += '<span class="sirius_edls_worker_link">';
+								html += '<a href="/sirius/edls/worker/' + worker['worker_id'] + '">[' + 'view' + ']</a>&nbsp;';
+								html += '</span>';
+							}
 
 							html += '<span class="sirius_edls_worker_name">';
 							html += worker['worker_id'] + ' - ' + worker['worker_name'];
@@ -299,7 +306,6 @@
 					'complete': function(jqXHR, textStatus) {
 						result = handle_ajax_response(jqXHR, textStatus);
 						if (!result) { return; }
-						console.log(result);
 
 			      var left = Math.floor(($(window).width() - 600) / 2);
 			      var top = Math.floor(($(window).height() - 400) / 2);

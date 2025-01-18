@@ -17,6 +17,20 @@ function sirius_edls_sheet_notify_enable($sheet_node, $enable) {
 	return array('success' => TRUE);
 }
 
+function sirius_edls_sheet_notify_cancel($sheet_node) {
+	$sheet_nid = $sheet_node->nid;
+	if (!$sheet_nid) { return array('success' => FALSE, 'msg' => 'No sheet.'); }
+
+	$sql = "update sirius_edls_notifications ";
+	$sql .= "set assignment_id = NULL, notification_status = 'error' ";
+	$sql .= "where sheet_nid = :sheet_nid ";
+
+
+	$stmt = db_query($sql, array(':sheet_nid' => $sheet_nid));
+	$count = $stmt->rowCount();
+	return array('success' => TRUE, 'count' => $count, 'msg' => "Canceled $count notifications.");
+}
+
 function sirius_edls_notify_queue($sheet_node, $new_status) {
 	// Only queue if the component is enabled
 	if (!sirius_edls_notify_active($sheet_node)) {
@@ -246,6 +260,7 @@ function sirius_edls_notify_fetch_assignment($notification) {
 
 function sirius_edls_notify_deliver($mode, $notification_id) {
 	$notification = sirius_edls_notify_fetch_by_id($notification_id);
+
 	if (!$notification) { return array('success' => FALSE, 'msg' => 'Notification not found.'); }
 
 	$assignment = sirius_edls_notify_fetch_assignment($notification);
@@ -298,14 +313,17 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 				drupal_alter('sirius_edls_notify_pre_send', $context);
 
 				$result = sirius_worker_notify($worker_node, $notify_params);
+				$comm_node = $result['comm'];
 
 				$context = array('notify_params' => &$notify_params, 'notify_result' => &$result, 'employer_node' => $employer_node);
 				drupal_alter('sirius_edls_notify_post_send', $context);
 				
 				if ($result['success']) {
 					$notification_status = 'sent';
+					$msg = "Notification sent at " . date('r');
 				} else {
 					$notification_status = 'error';
+					$msg = $result['msg'];
 				}
 			}
 		}
@@ -344,14 +362,17 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 				drupal_alter('sirius_edls_notify_pre_send', $context);
 
 				$result = sirius_sms_send($notify_params);
+				$comm_node = $result['comm'];
 
 				$context = array('notify_params' => &$notify_params, 'notify_result' => &$result, 'employer_node' => $employer_node);
 				drupal_alter('sirius_edls_notify_post_send', $context);
 				
 				if ($result['success']) {
 					$notification_status = 'sent';
+					$msg = "Notifiation sent at " . date('r');
 				} else {
 					$notification_status = 'error';
+					$msg = $result['msg'];
 				}
 			}
 		}
@@ -367,8 +388,25 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 			sirius_edls_log_instance()->assignment_log('notification_error', $assignment);
 		}
 
-		$sql = "update sirius_edls_notifications set notification_status = :notification_status where notification_id = :notification_id";
-		$stmt = db_query($sql, array(':notification_id' => $notification_id, ':notification_status' => $notification_status));
+		$notification['notification_extra']['delivery'] = array();
+		$notification['notification_extra']['delivery']['msg'] = $msg;
+		$notification['notification_extra']['delivery']['ts'] = time();
+		$notification['notification_extra']['delivery']['comm_nid'] = $comm_nid;
+
+		$comm_nid = NULL;
+		if ($comm_node) { $comm_nid = $comm_node->nid; }
+
+		$sql = "update sirius_edls_notifications set ";
+		$sql .= "comm_nid = :comm_nid, ";
+		$sql .= "notification_status = :notification_status, ";
+		$sql .= "notification_extra = :notification_extra ";
+		$sql .= "where notification_id = :notification_id";
+		$stmt = db_query($sql, array(
+			':notification_id' => $notification_id, 
+			':notification_status' => $notification_status,
+			':comm_nid' => $comm_nid,
+			':notification_extra' => json_encode($notification['notification_extra']),
+		));
 	}
 
 	sirius_minilog("... Notification $notification_id ($notification[notification_uuid]) set to \"$notification_status\". Msg = $msg.");
@@ -424,15 +462,28 @@ function 	sirius_edls_notify_decline($notification_id) {
 	return array('success' => TRUE, 'msg' => t('Assignment declined'));
 }
 
-function sirius_edls_notify_render_status($assignment, $notification) {
+function sirius_edls_notify_render_status($assignment, $notification, $options = array()) {
 	$notification_status = $notification['notification_status'];
-	if ($notification_status == 'accepted') { $html = '<i class="fas fa-thumbs-up"></i>'; }
-	if ($notification_status == 'declined') { $html = '<i class="fas fa-thumbs-down"></i>'; }
-	if ($notification_status == 'queue') { $html = '<i class="far fa-envelope"></i>'; }
-	if ($notification_status == 'sent') { $html = '<i class="far fa-envelope"></i>'; }
-	if ($notification_status == 'error') { $html = '<i class="fas fa-exclamation-triangle"></i>'; }
 
-	return "<span class=\"sirius_edls_notify_status sirius_edls_notify_status_$notification_status\">$html</span>";
+	if ($notification_status == 'accepted') { $icon = '<i class="fas fa-thumbs-up"></i>'; }
+	if ($notification_status == 'declined') { $icon = '<i class="fas fa-thumbs-down"></i>'; }
+	if ($notification_status == 'queue') { $icon = '<i class="far fa-envelope"></i>'; }
+	if ($notification_status == 'sent') { $icon = '<i class="far fa-envelope"></i>'; }
+	if ($notification_status == 'error') { $icon = '<i class="fas fa-exclamation-triangle"></i>'; }
+
+	if (!$icon) { return ''; }
+
+	$html = "<span class=\"sirius_edls_notify_status sirius_edls_notify_status_$notification_status\">";
+
+	if ($options['can_edit_notifications']) {
+		$html .= l($icon, "edls-notify/$notification[notification_uuid]", array('html' => TRUE));
+	} else {
+		$html .= $icon;
+	}
+
+	$html .= '</span>';
+
+	return $html;
 }
 
 function sirius_edls_notify_render_status_long($assignment, $notification) {
@@ -506,5 +557,40 @@ function sirius_edls_notify_render($notification) {
 
 	$html .= sirius_edls_notify_render_status_long($assignment, $notification);
 
+	$access = sirius_access_instance('edls');
+	if ($access->access('notification_view_delivery')) {
+		$html .= '<div class="sirius_callout_fullwidth">';
+		$html .= '<h2>' . t('Delivery') . '</h2>';
+
+		$ts = $notification['notification_extra']['delivery']['ts'];
+		if ($ts) { $html .= sirius_fakerender_field('Sent at:', date('m/d/Y H:i', $ts)); }
+
+		$html .= sirius_fakerender_field('Message:', $notification['notification_extra']['delivery']['msg']);
+
+		if ($notification['comm_nid']) {
+			$comm_node = node_load($notification['comm_nid']);
+			if ($comm_node) {
+				$medium = $comm_node->field_sirius_category['und'][0]['value'];
+				$instance = sirius_comm_instance($medium);
+				if ($instance) {
+					$html .= $instance->render($comm_node);
+				}
+			}
+		}
+		$html .= '</div>';
+	}
+
 	return $html;
 }
+
+/**
+ * Implements hook_sirius_comm_update_handlers
+ * 
+ * Most errors will fail immediately. We're not bothering to highlight subsequent delivery failures at the level of the notification; 
+ * it will just keep showing as "sent", and you can click in to the details to see why it wasn't delivered.
+ */
+
+function sirius_edls_sirius_comm_update_handlers($comm_node) {
+	// watchdog('whatever', 'Updating handlers for ' . $comm_node->nid . ' (' . $comm_node->field_sirius_type['und'][0]['value']);
+}
+

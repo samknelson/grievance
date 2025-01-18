@@ -37,7 +37,7 @@ function sirius_edls_page_sheet_create_reserved_form($form, &$form_state) {
   	'#title' => 'Type',
   	'#type' => 'select',
   	'#required' => TRUE,
-  	'#options' => array(NULL => t('-- Select --')) + sirius_edls_sheet_reserved_type_options(),
+  	'#options' => array(NULL => t('-- Select --')) + sirius_edls_sheet_reserved_options(),
   );
 
   $form['submit'] = array(

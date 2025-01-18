@@ -24,6 +24,7 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     	// Parameter employer_nid
     	'worker_list',
+      'worker_view_all',
 
     	// Parameter employer_nid
     	'sheet_create',
@@ -46,11 +47,14 @@ class Sirius_Edls_Access extends Sirius_Access {
       'sheet_status_request',
       'sheet_status_lock',
       'sheet_notify_enable',
+      'sheet_notify_edit',
+      'sheet_notify_cancel',
 
       // Parameters: notification, notification_uuid
       'notification_view',
       'notification_accept',
       'notification_decline',
+      'notification_view_delivery',
     );
 
     $sheet_node = $context['sheet_node'];
@@ -125,6 +129,27 @@ class Sirius_Edls_Access extends Sirius_Access {
     // Enable notifications (Coordinators only for now)
     if (in_array($action, array('sheet_notify_enable'))) {
       if ($is_employer_coordinator) { return TRUE; }
+    }
+
+    // Cancel notifications for a sheet
+    if (in_array($action, array('sheet_notify_cancel'))) {
+      // Can't cancel if the sheet is locked
+      if ($sheet_status == 'lock') { return FALSE; }
+
+      if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
+    }
+
+    // Edit notifications
+    if (in_array($action, array('sheet_notify_edit', 'notification_view_delivery'))) {
+      if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
+    }
+
+    // View any worker
+    if (in_array($action, array('worker_view_all'))) {
+      if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
     }
 
     // View the employer statistics

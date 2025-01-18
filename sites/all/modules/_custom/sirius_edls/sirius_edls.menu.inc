@@ -152,6 +152,17 @@ function sirius_edls_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['grievance_shop']['grievance_shop_edls/layoff'] = array(
+    'title' => 'Layoff',
+    'description' => '',
+    'callback' => 'sirius_edls_node_tab_employer_layoff',
+    'permissions' => array('sirius'),
+    'file' => 'sirius_edls.page_employer_layoff.inc',
+    'skip_node_view_check' => TRUE,
+    'component' => 'edls:layoff',
+    'weight' => 4,
+  );
+
   sirius_node_tab_set_module('sirius_edls', $node_tabs);
 
   return $node_tabs;
@@ -358,6 +369,25 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_worker_soop.inc'
   );
 
+  $items['sirius/edls/worker/%'] = array(
+    'title' => 'Worker Details',
+    'page callback' => 'sirius_edls_page_worker_view',
+    'page arguments' => array(3),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'worker_view_all',
+        ),
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 10,
+    'file' => 'sirius_edls.page_worker_view.inc'
+  );
+
   /*
   $items['sirius/edls/assignments'] = array(
     'title' => 'Assignments',
@@ -391,7 +421,9 @@ function sirius_edls_menu() {
       ),
     ),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'sirius_edls.page_notification.inc'
+    'file' => 'sirius_edls.page_notification.inc',
+    // 'modal' => TRUE,
+    // 'context' => MENU_CONTEXT_INLINE,
   );
 
   /*
@@ -448,3 +480,20 @@ function sirius_edls_menu() {
 
   return $items;
 }
+
+
+/**
+ * Implments hook_modal_paths
+ */
+
+/*
+function sirius_edls_modal_paths() {
+  $paths = array();
+
+  $paths['edls-notify/%'] = array(
+    'style' => 'sirius-modal-style',
+  );
+
+  return $paths;
+}
+*/

@@ -90,23 +90,39 @@
 
 }
 
-.sirius_edls_notify_status_accepted {
+.sirius_edls_notify_status_accepted, 
+.sirius_edls_crew .sirius_edls_notify_status_accepted a:visited,
+.sirius_edls_crew .sirius_edls_notify_status_accepted a {
   color: #00aa00;
 }
 
-.sirius_edls_notify_status_declined {
+.sirius_edls_notify_status_declined,
+.sirius_edls_crew .sirius_edls_notify_status_declined a:visited,
+.sirius_edls_crew .sirius_edls_notify_status_declined a {
   color: #aa0000;
 }
  
-.sirius_edls_notify_status_error {
+.sirius_edls_notify_status_error, 
+.sirius_edls_crew .sirius_edls_notify_status_error a:visited,
+.sirius_edls_crew .sirius_edls_notify_status_error a {
   color: #aa0000;
 }
  
-.sirius_edls_notify_status_queue {
+.sirius_edls_notify_status_queue,
+.sirius_edls_crew .sirius_edls_notify_status_queue a:visited,
+.sirius_edls_crew .sirius_edls_notify_status_queue a {
   color: #999999;
 }
 
-.sirius_edls_notify_status_reserved {
+.sirius_edls_notify_status_sent,
+.sirius_edls_crew .sirius_edls_notify_status_sent a:visited,
+.sirius_edls_crew .sirius_edls_notify_status_sent a {
+  color: #0000aa;
+}
+
+.sirius_edls_notify_status_reserved,
+.sirius_edls_crew .sirius_edls_notify_status_reserved a:visited,
+.sirius_edls_crew .sirius_edls_notify_status_reserved a {
   color: #0000aa;
 }
 

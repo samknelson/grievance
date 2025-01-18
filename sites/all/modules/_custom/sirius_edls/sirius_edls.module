@@ -20,6 +20,8 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/si
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.notify.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.sched.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.sheet_reserved.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.sheet_layoff.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.rsr.inc';
 
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.service.server.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_edls') . '/sirius_edls.service.client.inc';
@@ -49,6 +51,10 @@ function sirius_edls_sirius_domain_component_info() {
     'edls:service:server' => array(
       'title' => 'EDLS - Service - Server',
       'description' => 'Operate as an EDLS server',
+    ),
+    'edls:layoff' => array(
+      'title' => 'EDLS - Layoff',
+      'description' => 'Enable layoff functions'
     ),
   );
 }

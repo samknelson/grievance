@@ -12,6 +12,10 @@ function sirius_edls_sheet_reserved($sheet_node) {
 	return FALSE;
 }
 
+function sheet_reserved_type($sheet_node) {
+	return $sheet_node->field_sirius_type['und'][0]['value'];
+}
+
 function sirius_edls_sheet_reserved_set($sheet_node, $record) {
 	$sheet_json = sirius_json_get($sheet_node);
 	$sheet_json['edls']['sheet']['reserved'] = $record;
@@ -19,46 +23,61 @@ function sirius_edls_sheet_reserved_set($sheet_node, $record) {
 	node_save($sheet_node);
 }
 
-function sirius_edls_sheet_reserved_types() {
-	// @todo: This should be a fancy callback framework.
+function sirius_edls_sheet_reserved_info_all() {
+	$info_all = &drupal_static(__FUNCTION__, NULL);
 
+	if (!isset($info_all)) {
+		$info_all = module_invoke_all('sirius_edls_sheet_reserved_info');
+		ksort($info_all);
+	}
+
+	return $info_all;
+}
+
+function sirius_edls_sheet_reserved_info($plugin_key) {
+	$info_all = sirius_edls_sheet_reserved_info_all();
+	return $info_all[$plugin_key];
+}
+
+/**
+ * Implements hook_sirius_edls_sheet_reserved_info
+ */
+
+function sirius_edls_sirius_edls_sheet_reserved_info() {
 	return array(
 		'tos' => array(
 			'title' => 'Out Sick',
 			'job_number' => 'OUT_SICK',
 			'count' => 100,
+			'start_time' => '23:58',
+			'end_time' => '23:59',
 		),
-		/*
-		'tor' => array(
-			'title' => 'Out Vacation',
-			'job_number' => 'OUT_VACATION',
-			'count' => 100,
-		),
-		*/
 		'cdl' => array(
 			'title' => 'CDL Rest',
 			'job_number' => 'CDL_REST',
 			'count' => 100,
+			'start_time' => '23:58',
+			'end_time' => '23:59',
 		),
-		/*
 		'layoff' => array(
-			'title' => 'Scheduled For Layoff',
+			'title' => 'Layoff',
 			'job_number' => 'LAYOFF',
 			'count' => 100,
+			'start_time' => '23:58',
+			'end_time' => '23:59',
 		),
-		*/
 	);
 }
 
-function sirius_edls_sheet_reserved_type_options() {
-	$types = sirius_edls_sheet_reserved_types();
+function sirius_edls_sheet_reserved_options() {
+	$info_all = sirius_edls_sheet_reserved_info_all();
 	$options = array();
-	foreach ($types as $key => $type) { $options[$key] = $type['title']; }
+	foreach ($info_all as $key => $info) { $options[$key] = $info['title']; }
 	return $options;
 }
 
 function sirius_edls_sheet_reserved_fetch($employer_nid, $date, $type_key, $create = FALSE) {
-	$types = sirius_edls_sheet_reserved_types();
+	$types = sirius_edls_sheet_reserved_info_all();
 	$type = $types[$type_key];
 	if (!$type) {
 		return array('success' => FALSE, 'msg' => "Unknown type: $type_key");
@@ -101,7 +120,9 @@ function sirius_edls_sheet_reserved_fetch($employer_nid, $date, $type_key, $crea
 	$sheet_node->title = sirius_edls_sheet_title($sheet_node);
 
 	$sheet_json = array();
+
 	$sheet_json['edls']['sheet']['reserved']['active'] = 'Yes';
+	$sheet_json['edls']['sheet']['reserved']['type'] = $type_key;
 	$sheet_json['edls']['crews'] = array();
 
 	$uuid = uuid_generate();
@@ -109,7 +130,10 @@ function sirius_edls_sheet_reserved_fetch($employer_nid, $date, $type_key, $crea
 	$crew['name'] = 'Main';
 	$crew['count'] = $type['count'];
 	$crew['uuid'] = $uuid;
-	$sheet_json['edls']['crews'][$uuid] = $crew;
+	$crew['start_time'] = $type['start_time'];
+	$crew['end_time'] = $type['end_time'];
+
+	$sheet_json['edls']['crews'][] = $crew;
 
 	sirius_json_set($sheet_node, $sheet_json);
 	node_save($sheet_node);

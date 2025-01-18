@@ -36,6 +36,9 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 		$col2 .= sirius_fakerender_field('Count:', $assigned_count . ' / ' . $sheet_node->field_sirius_count['und'][0]['value']);
 	}
 
+	$access = sirius_access_instance('edls');
+	$can_edit_notifications = $access->access('sheet_notify_edit', array('sheet_node' => $sheet_node));
+
 	$html .= sirius_table_render(
 		array(), 
 		array(
@@ -71,6 +74,7 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 		$notifications = array();
 		foreach ($notifications_by_id as $notification_id => $notification) {
 			$assignment_id = $notification['assignment_id'];
+			if (!$assignment_id) { continue; }
 			$notifications[$assignment_id] = $notification;
 		}
 
@@ -192,7 +196,7 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 						$render_ms .= $ms_names[$assignment['worker_ms']];
 
 						$render = $assignment['worker_name'];
-						$render .= sirius_edls_notify_render_status($assignment, $notifications[$assignment_id]);
+						$render .= sirius_edls_notify_render_status($assignment, $notifications[$assignment_id], array('can_edit_notifications' => $can_edit_notifications));
 						$render .= sirius_edls_assignment_render_extra($assignment);
 
 						$render_row[] = array('style' => 'width: 10%;', 'data' => $render_ms);

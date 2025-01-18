@@ -32,6 +32,14 @@ function sirius_edls_node_tab_sheet_manage_form($form, &$form_state, $sheet_node
 		$actions['sheet_export'] = 'Export';
 	}
 
+	if ($access->access('sheet_layoff', array('sheet_node' => $sheet_node))) {
+		$actions['sheet_layoff'] = 'Layoff';
+	}
+
+	if ($access->access('sheet_notify_cancel', array('sheet_node' => $sheet_node))) {
+		$actions['sheet_notify_cancel'] = 'Cancel All Notifications';
+	}
+
 	if (!$actions) { return sirius_form_error('You do not have permission to perform any actions on this sheet.'); }
 
 	$form['action'] = array(
@@ -163,6 +171,16 @@ function sirius_edls_node_tab_sheet_manage_form_submit($form, &$form_state) {
 		sirius_edls_sheet_export($sheet_node);
 	}
 
+	if ($action == 'sheet_layoff') {
+		$result = sirius_edls_sheet_layoff($sheet_node);
+		$msg = $result['msg'];
+	}
+
+	if ($action == 'sheet_notify_cancel') {
+		$result = sirius_edls_sheet_notify_cancel($sheet_node);
+		$msg = $result['msg'];
+	}
+
 	if (!$result['success']) {
 		drupal_set_message($result['msg'], 'error');
 		$form_state['rebuild'] = TRUE;
@@ -170,6 +188,7 @@ function sirius_edls_node_tab_sheet_manage_form_submit($form, &$form_state) {
 	}
 
 	drupal_set_message($msg);
+
 	if ($result['warnings']) {
 		foreach ($result['warnings'] as $warning) {
 			drupal_set_message("Warning: $warning", 'warning');

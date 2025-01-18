@@ -33,6 +33,7 @@ function sirius_edls_page_worker_list_form($form, &$form_state, $employer_node) 
 	$js_settings = array();
 	$js_settings['employer_nid'] = $employer_nid;
 	$js_settings['date'] = date('Y-m-d');
+	$js_settings['show_worker_link'] = sirius_access_instance('edls')->access('worker_view_all');
 
 	$classification_options = sirius_edls_worker_classification_options();
 	$js_settings['classification_options'] = $classification_options;
