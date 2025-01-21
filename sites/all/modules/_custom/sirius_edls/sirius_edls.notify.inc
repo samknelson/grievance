@@ -536,7 +536,7 @@ function sirius_edls_notify_render($notification) {
 
 		$html .= '<h2>' . t('Job Information') . '</h2>';
 		$html .= sirius_fakerender_field('Employer:', $employer_node->title);
-		$html .= sirius_fakerender_field('Supervisor:', sirius_edls_supervisor_render($sheet_node));
+		// $html .= sirius_fakerender_field('Supervisor:', sirius_edls_supervisor_render($sheet_node));
 		$html .= sirius_fakerender_field('Date:', date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])));
 		$html .= sirius_fakerender_field('Event:', sirius_node_title($sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id']));
 		$html .= sirius_fakerender_field('Event Status:', sirius_text_to_html($sheet_json['edls']['sheet']['show_status']));
@@ -549,7 +549,7 @@ function sirius_edls_notify_render($notification) {
 		$html .= '<h2>' . t('Crew') . '</h2>';
 		$html .= sirius_fakerender_field('Crew:', $crew['name']);
 		$html .= sirius_fakerender_field('Task:', $crew['task']);
-		$html .= sirius_fakerender_field('Start Time:', $crew['start_time'] . ' - ' . $crew['end_time']);
+		$html .= sirius_fakerender_field('Start Time:', $crew['start_time']);
 		$html .= sirius_fakerender_field('Checkin Location:', $crew['checkin_location']);
 	}
 
