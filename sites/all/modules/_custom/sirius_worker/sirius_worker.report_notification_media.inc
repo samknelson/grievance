@@ -1,7 +1,7 @@
 <?php
 
 class Sirius_Worker_Report_Notification_Media extends Report_Cache_Report_Generator {
-  public $type = 'sirius-worker-ssn-missing';
+  public $type = 'sirius-worker-notification-media';
 
   public function info($result = array()) {
     $result = array(
