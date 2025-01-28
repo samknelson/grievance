@@ -31,6 +31,7 @@ function sirius_page_voice_forward_to_operator() {
   $log_nids = array_keys($stmt['node']);
   $log_nodes = node_load_multiple($log_nids);
 
+  /*
   foreach ($log_nodes as $log_nid => $log_node) {
     $call_sid = sirius_twilio_get_call_sid_from_node($log_node);
     if ($call_sid) {
@@ -47,6 +48,7 @@ function sirius_page_voice_forward_to_operator() {
       }
     }
   }
+  */
 
   foreach ($log_nodes as $log_nid => $log_node) {
   	$json = json_decode($log_node->field_sirius_json['und'][0]['value'], TRUE);

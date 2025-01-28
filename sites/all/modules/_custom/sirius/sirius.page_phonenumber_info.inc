@@ -19,14 +19,20 @@ function sirius_node_tab_phonenumber_info($phonenumber_node) {
 	$domain_nid = $phonenumber_node->field_sirius_domain['und'][0]['target_id'];
 	$phone = $phonenumber_node->field_sirius_id['und'][0]['value'];
 	foreach ($node_types as $node_type => $node_type_name) {
+		$sql_args = array();
 		$sql = "select nid, title from node ";
 		$sql .= "left join field_data_field_sirius_phone on field_data_field_sirius_phone.entity_type = 'node' and field_data_field_sirius_phone.entity_id = node.nid ";
 		$sql .= "left join field_data_field_sirius_domain on field_data_field_sirius_domain.entity_type = 'node' and field_data_field_sirius_domain.entity_id = node.nid ";
 		$sql .= "where node.type = :node_type ";
-		$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+		$sql_args[':node_type'] = $node_type;
+		if ($domain_nid > 0) {
+			$sql .= "and field_sirius_domain_target_id = :domain_nid ";
+			$sql_args[":domain_nid"] = $domain_nid;
+		}
 		$sql .= "and field_sirius_phone_value = :phone ";
+		$sql_args[':phone'] = $phone;
 		$sql .= "order by node.title ";
-		$stmt = sirius_sql_query($sql, array(':domain_nid' => $domain_nid, ':node_type' => $node_type, ':phone' => $phone));
+		$stmt = sirius_sql_query($sql, $sql_args);
 
 		$rows = array();
 		while ($hr = $stmt->fetchAssoc()) {

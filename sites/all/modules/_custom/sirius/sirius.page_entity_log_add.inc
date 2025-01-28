@@ -14,6 +14,16 @@ function sirius_node_tab_entity_log_add_form($form, &$form_state, $node, $log_bu
   	$ct_tree[$category][$type] = $title;
   }
 
+	// PHP version crap
+	if (!function_exists('array_key_first')) {
+    function array_key_first(array $arr) {
+      foreach ($arr as $key => $unused) {
+        return $key;
+      }
+      return null;
+    }
+	}		
+
 	$category_options = array_combine(array_keys($ct_tree), array_keys($ct_tree));
 	$form['category'] = array(
 		'#type' => 'select',
@@ -23,7 +33,9 @@ function sirius_node_tab_entity_log_add_form($form, &$form_state, $node, $log_bu
 		'#default_value' => $category_options[array_key_first($category_options)],
 	);
 
+
 	foreach ($ct_tree as $category => $type_options) {
+
 		$form["type_$category"] = array(
 			'#type' => 'select',
 			'#title' => t('Type'),

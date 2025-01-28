@@ -119,7 +119,7 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 	}
 
 	$tokens = array('node' => $entity_node);
-	$tokens['other_tokens']['delivery_tid'] = $data['tokens']['delivery'];
+	$tokens['other_tokens']['delivery_tid'] = $form_state['values']['tokens']['delivery'];
 
 	$aliases = array();
 

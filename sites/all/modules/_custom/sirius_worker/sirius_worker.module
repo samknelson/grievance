@@ -21,7 +21,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_list.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_user.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_employer_worker_list.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_work_status.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_renew.inc";
@@ -31,7 +30,6 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_remove.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_term_delete.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_skill_term_renew.inc";
-require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_ein.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_contact.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_contact_customfields.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_industry.inc";
@@ -44,6 +42,33 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_optin.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_tor.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.term_tab_member_status_subscribe.inc";
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_worker_sirius_domain_component_info() {
+  return array(
+    'worker' => array(
+      'title' => 'Worker',
+      'description' => 'Use the worker database',
+    ),
+    'worker:schedule' => array(
+      'title' => 'Worker - Schedule',
+      'description' => 'Use scheduling tools for workers such as time off requests',
+    ),
+    'worker:skill' => array(
+      'title' => 'Worker - Skill',
+      'description' => 'Manage skills for workers',
+    ),
+    'worker:usersync' => array(
+      'title' => 'Worker - User Sync',
+      'description' => 'Enable manual sync\'ing to generate users from worker records',
+    ),
+  );
+}
+
+
 
 function sirius_worker_get_by_id($id, $nid_only = FALSE) {
 	if (!$id) { return NULL; }
@@ -129,6 +154,24 @@ function sirius_worker_get_by_phone($phone) {
   return node_load(array_keys($stmt['node'])[0]);
 }
 
+function sirius_worker_get_by_field($field_name, $id, $nid_only = FALSE) {
+  if (!$id) { return NULL; }
+
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'sirius_worker');
+  $query->fieldCondition($field_name, 'value', $id);
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+  $query->propertyOrderBy('nid', 'desc');
+  $stmt = $query->execute();
+  if (!$stmt['node']) { return NULL; }
+
+  if ($nid_only) { return array_keys($stmt['node'])[0]; }
+
+  return node_load(array_keys($stmt['node'])[0]);
+}
+
 /*
  * Post-save
  *
@@ -148,6 +191,9 @@ function sirius_worker_node_postsave($node, $op) {
     if ($node->field_sirius_domain['und'][0]['target_id']) {
       sirius_domain_push($worker_node->field_sirius_domain['und'][0]['target_id']);
     }
+
+    // Check the component
+    if (!sirius_domain_component_enabled('worker:usersync')) { return; }
 
     // Avoid re-calling this function
     $node->grievance_no_recurse = TRUE;
@@ -334,6 +380,7 @@ function sirius_worker_report_cache_info() {
   sirius_require('sirius_worker', 'sirius_worker.report_ssn_invalid.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_ssn_missing.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_geo.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_notification_media.inc');
 
   $items = array();
 
@@ -341,6 +388,7 @@ function sirius_worker_report_cache_info() {
   Sirius_Worker_Report_Ssn_Missing::getInstance()->setInfo($items);
   Sirius_Worker_Report_Ssn_Duplicate::getInstance()->setInfo($items);
   Sirius_Worker_Report_Geo::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Notification_Media::getInstance()->setInfo($items);
 
   $items['sirius-worker-duplicate-id'] = array(
     'name' => t('Workers with Duplicate IDs'),
