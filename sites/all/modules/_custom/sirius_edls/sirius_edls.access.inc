@@ -230,14 +230,9 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Edit a sheet or assign workers
     if (in_array($action, array('sheet_edit', 'sheet_edit_workers'))) {
-      // Can't update reserved sheets
-      // if ($sheet_reserved) { return FALSE; }
-
-      // Labor coordinators can edit sheets in "draft" or "request")
-      if ($is_employer_coordinator && in_array($sheet_status, array('draft', 'request'))) { return TRUE; }
-
-      // Labor advisors can edit sheets that are not in "lock"
-      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
+      // Labor coordinators and advisors can edit sheets that are not locked
+      if ($is_employer_coordinator && in_array($sheet_status, array('draft', 'request', 'reserved'))) { return TRUE; }
+      if ($is_worker_advisor && in_array($sheet_status, array('draft', 'request', 'reserved'))) { return TRUE; }
 
       // Labor supervisors can edit their own sheets in "draft"
       if ($is_employer_supervisor && $is_my_sheet && ($sheet_status == 'draft')) { return TRUE; }
