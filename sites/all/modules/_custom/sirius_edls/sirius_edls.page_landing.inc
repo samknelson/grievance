@@ -12,7 +12,9 @@ function sirius_edls_page_landing() {
 	$html .= $result['markup'];
 
 	if ($employer_node && sirius_access_instance('edls')->access('employer_dashboard', array('employer_nid' => $employer_node->nid))) {
-		$html .= sirius_edls_summary($employer_node, date('Y-m-d'));
+		foreach (array('today', '+1 day') as $date) {
+			$html .= sirius_edls_summary($employer_node, $date);
+		}
 	}
 
 	$html .= '<h2>' . t('My Sheets') . '</h2>';

@@ -248,6 +248,46 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_landing.inc'
   );
 
+  $items['sirius/edls/landing/today'] = array(
+    'title' => 'Today',
+    'page callback' => 'sirius_edls_page_landing',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'employer_dashboard',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'sirius_edls.page_landing.inc'
+  );
+
+  $items['sirius/edls/landing/summary'] = array(
+    'title' => 'Other Dates',
+    'page callback' => 'sirius_edls_page_summary',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'employer_dashboard',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'sirius_edls.page_summary.inc'
+  );
+
   $items['sirius/edls/sheets'] = array(
     'title' => 'Sheets',
     'page callback' => 'sirius_edls_page_sheet_list',
