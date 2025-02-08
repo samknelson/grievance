@@ -245,3 +245,10 @@ function sirius_edls_display_name_long() {
 
 // Git test
 // This comment should go live with fls-release/v1.0.1
+
+function sirius_edls_set_changed_ts($nid, $ts = NULL) {
+  if (!isset($ts)) { $ts = time(); }
+  $sql = "update node set changed = :ts where nid = :nid";
+  $stmt = sirius_sql_query($sql, array(':nid' => $nid, ':ts' => $ts));
+  return;
+}

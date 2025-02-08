@@ -265,6 +265,8 @@ function sirius_edls_assign($date, $worker_id, $sheet_nid, $crew_uuid, $extra = 
   $sql .= "values (:date, :worker_id, :worker_name, :worker_ms, :employer_nid, :sheet_nid, :crew_uuid, :assignment_extra)";
   $stmt = db_query($sql, $sql_args);
 
+  sirius_edls_set_changed_ts($sheet_nid);
+
   $assignment = sirius_edls_assignment_fetch_sheet_worker($date, $sheet_nid, $worker_id);
   sirius_edls_log_instance()->assignment_log('assign', $assignment);
 
@@ -308,6 +310,8 @@ function sirius_edls_unassign($date, $worker_id, $sheet_nid) {
 
   $sql = "delete from sirius_edls_assignments where assignment_date = :date and worker_id = :worker_id and sheet_nid = :sheet_nid";
   $stmt = db_query($sql, array(':date' => $date, ':worker_id' => $worker_id, ':sheet_nid' => $sheet_nid));
+
+  sirius_edls_set_changed_ts($sheet_nid);
 
   return array(
     'success' => TRUE,
