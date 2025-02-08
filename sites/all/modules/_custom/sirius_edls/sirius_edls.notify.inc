@@ -295,7 +295,7 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 		} else {
 			$date = date('l, F j', strtotime($sheet_node->field_sirius_date_start['und'][0]['value']));
 			global $base_url;
-			$url = $base_url . '/edls-notify/' . $notification['notification_uuid'];
+			$url = $base_url . '/edls/' . $notification['notification_uuid'];
 			$subject = $worker_node->title . ": Crew assignment for $date";
 			$body = "Your crew assignment for $date has been posted or updated. Please follow the link below and accept:<br><br><a href=\"$url\">$url</a>";
 			$sms = $worker_node->title . ": your crew assignment for $date has been posted or updated. Please follow the link below and accept:\n\n$url";
@@ -343,7 +343,7 @@ function sirius_edls_notify_deliver($mode, $notification_id) {
 		} else {
 			$date = date('l, F j', strtotime($sheet_node->field_sirius_date_start['und'][0]['value']));
 			global $base_url;
-			$url = $base_url . '/edls-notify/' . $notification['notification_uuid'];
+			$url = $base_url . '/edls-sched/' . $notification['notification_uuid'];
 			$subject = $worker_record['worker_name'] . ": Crew assignment for $date";
 			$body = "Your crew assignment for $date has been posted or updated. Please follow the link below and accept:<br><br><a href=\"$url\">$url</a>";
 			$sms = $worker_record['worker_name'] . ": your crew assignment for $date has been posted or updated. Please follow the link below and accept:\n\n$url";
@@ -476,7 +476,7 @@ function sirius_edls_notify_render_status($assignment, $notification, $options =
 	$html = "<span class=\"sirius_edls_notify_status sirius_edls_notify_status_$notification_status\">";
 
 	if ($options['can_edit_notifications']) {
-		$html .= l($icon, "edls-notify/$notification[notification_uuid]", array('html' => TRUE));
+		$html .= l($icon, "sirius/edls/notification/$notification[notification_uuid]", array('html' => TRUE));
 	} else {
 		$html .= $icon;
 	}
@@ -507,56 +507,7 @@ function sirius_edls_notify_render_status_long($assignment, $notification) {
 	return $html;
 }
 
-function sirius_edls_notify_render($notification) {
-	$assignment = sirius_edls_notify_fetch_assignment($notification);
-	$sheet_node = node_load($assignment['sheet_nid']);
-	if (!$sheet_node) { return sirius_page_error('Sheet not found.'); }
-	$employer_node = node_load($sheet_node->field_grievance_shop['und'][0]['target_id']);
-	$sheet_vid = $sheet_node->vid;
-	$sheet_nid = $sheet_node->nid;
-	$status_options = sirius_edls_sheet_status_options();
-	$sheet_json = sirius_json_get($sheet_node);
-
-	$date = date('l, F j', strtotime($sheet_node->field_sirius_date_start['und'][0]['value']));
-	drupal_set_title("Crew Assignment for $assignment[worker_name]: $date");
-
-	$crews = sirius_edls_crews($sheet_node, 'uuid');
-	$crew = $crews[$assignment['crew_uuid']];
-
-	$html .= '<div class="sirius_callout_fullwidth">';
-	if (!$crew) {
-		$html .= '<p>' . t('You have been removed from all assignments for employer @employer on <strong>@date</strong>.', array('@employer' => $employer_node->title, '@date' => $date)) . '</p>';
-	} else {
-		$extra = sirius_edls_assignment_render_extra($assignment, array('text_only' => TRUE));
-		if ($extra) {
-			$html .= '<h2>' . t('Special Instructions (role or alternate start time)') . '</h2>';
-			$html .= $extra;
-			$html .= '<hr>';
-		}
-
-		$html .= '<h2>' . t('Job Information') . '</h2>';
-		$html .= sirius_fakerender_field('Employer:', $employer_node->title);
-		// $html .= sirius_fakerender_field('Supervisor:', sirius_edls_supervisor_render($sheet_node));
-		$html .= sirius_fakerender_field('Date:', date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])));
-		$html .= sirius_fakerender_field('Event:', sirius_node_title($sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id']));
-		$html .= sirius_fakerender_field('Event Status:', sirius_text_to_html($sheet_json['edls']['sheet']['show_status']));
-		$html .= sirius_fakerender_field('Department:', sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid']));
-		$html .= sirius_fakerender_field('Job #:', sirius_text_to_html($sheet_node->field_sirius_job_number['und'][0]['value']));
-		$html .= sirius_fakerender_field('Facility:', sirius_node_title($sheet_node->field_sirius_dispatch_facility['und'][0]['target_id']));
-		$html .= sirius_fakerender_field('Hall:', sirius_node_title($sheet_node->field_sirius_dispatch_hall['und'][0]['target_id']));
-
-		$html .= '<hr>';
-		$html .= '<h2>' . t('Crew') . '</h2>';
-		$html .= sirius_fakerender_field('Crew:', $crew['name']);
-		$html .= sirius_fakerender_field('Task:', $crew['task']);
-		$html .= sirius_fakerender_field('Start Time:', $crew['start_time']);
-		$html .= sirius_fakerender_field('Checkin Location:', $crew['checkin_location']);
-	}
-
-	$html .= '</div>';
-
-	$html .= sirius_edls_notify_render_status_long($assignment, $notification);
-
+function sirius_edls_notify_render_delivery($notification, $options = array()) {
 	$access = sirius_access_instance('edls');
 	if ($access->access('notification_view_delivery')) {
 		$html .= '<div class="sirius_callout_fullwidth">';
@@ -579,7 +530,6 @@ function sirius_edls_notify_render($notification) {
 		}
 		$html .= '</div>';
 	}
-
 	return $html;
 }
 

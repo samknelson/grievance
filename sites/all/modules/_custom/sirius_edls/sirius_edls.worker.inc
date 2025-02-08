@@ -189,7 +189,7 @@ function sirius_edls_worker_render_details_assignment($worker_record, $assignmen
     if ($can_view_notifications) {
       $notification = sirius_edls_notify_fetch_by_assignment_id($assignment['assignment_id']);
       if ($notification) {
-        $html .= l('Notification', 'edls-notify/' . $notification['notification_uuid'], array('attributes' => array('class' => array('tool-button'))));
+        $html .= l('Notification', 'sirius/edls/notification/' . $notification['notification_uuid'], array('attributes' => array('class' => array('tool-button'))));
       }
     }
   } else {

@@ -428,55 +428,23 @@ function sirius_edls_menu() {
     'file' => 'sirius_edls.page_worker_view.inc'
   );
 
-  /*
-  $items['sirius/edls/assignments'] = array(
-    'title' => 'Assignments',
-    'page callback' => 'sirius_edls_page_assignment_list',
-    'page arguments' => array(),
+  $items['sirius/edls/notification/%'] = array(
+    'title' => 'Notification',
+    'page callback' => 'sirius_edls_page_notification',
+    'page arguments' => array(3),
     'access callback' => 'sirius_menu_access_callback',
     'access arguments' => array(
       array(
         'component' => 'edls',
         'access' => array(
           'type' => 'edls',
-          'action' => 'assignment_list',
-          'context' => array(),
+          'action' => 'worker_view_all',
         ),
-      ),
-    ),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
-    'file' => 'sirius_edls.page_assignment_list.inc'
-  );
-  */
-
-  $items['edls-notify/%'] = array(
-    'title' => 'Notification',
-    'page callback' => 'sirius_edls_page_notification',
-    'page arguments' => array(1),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'component' => 'edls',
       ),
     ),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_edls.page_notification.inc',
-    // 'modal' => TRUE,
-    // 'context' => MENU_CONTEXT_INLINE,
   );
-
-  /*
-  $node_tabs['grievance_shop']['grievance_shop_edls/outsource'] = array(
-    'title' => 'Outsource Workers',
-    'description' => '',
-    'callback' => 'sirius_edls_node_tab_employer_outsource',
-    'permissions' => array('sirius'),
-    'file' => 'sirius_edls.page_employer_outsource.inc',
-    'skip_node_view_check' => TRUE,
-    'component' => 'edls',
-  );
-  */
 
   $items['sirius/edls/config'] = array(
     'title' => 'EDLS Configuration',
@@ -491,6 +459,20 @@ function sirius_edls_menu() {
     ),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_edls.page_config.inc'
+  );
+
+  $items['edls-sched/%'] = array(
+    'title' => 'Upcoming Schedule',
+    'page callback' => 'sirius_edls_page_worker_public',
+    'page arguments' => array(1),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+      ),
+    ),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_edls.page_worker_public.inc'
   );
 
   $ajax_actions = array(
@@ -520,20 +502,3 @@ function sirius_edls_menu() {
 
   return $items;
 }
-
-
-/**
- * Implments hook_modal_paths
- */
-
-/*
-function sirius_edls_modal_paths() {
-  $paths = array();
-
-  $paths['edls-notify/%'] = array(
-    'style' => 'sirius-modal-style',
-  );
-
-  return $paths;
-}
-*/

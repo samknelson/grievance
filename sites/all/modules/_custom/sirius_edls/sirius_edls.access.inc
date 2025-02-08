@@ -84,11 +84,19 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Anonymous users can view notifications, if they have the correct UUID
     if (in_array($action, array('notification_view', 'notification_accept', 'notification_decline'))) {
-      // Must have a UUID
-      if (!$context['notification_uuid']) { return FALSE; }
+      if (!$is_employer_supervisor) {
+        // Must have a UUID
+        if (!$context['notification_uuid']) { return FALSE; }
 
-      // It must match
-      if ($context['notification_uuid'] != $context['notification']['notification_uuid']) { return FALSE; }
+        // It must match
+        if ($context['notification_uuid'] != $context['notification']['notification_uuid']) { return FALSE; }
+      }
+
+      // If you aren't a supervisor, it must be in the future.
+      if (!$is_employer_supervisor && !$is_worker_advisor) {
+        $ts = strtotime($context['notification']['assignment_date']);
+        if ($ts < time() - 60*60*24*2) { return $this->deny("You cannot view past assignemnts."); }
+      }
 
       // That's all you need to view the notification.
       if ($action == 'notification_view') { return TRUE; }
