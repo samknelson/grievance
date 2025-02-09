@@ -11,6 +11,10 @@ class Sirius_Sib extends Sirius_Access {
 				'title' => 'Dispatch - Signin - Self',
 				'description' => 'Prohibit self-signin to to the dispatch "out of work" list.'
 			),
+			'dispatch_eba' => array(
+				'title' => 'Dispatch - EBA',
+				'description' => 'Prohibit access to the employed-but-available system',
+			),
 			'event_bullpen_register_self' => array(
 				'title' => 'Event - Bullpen - Register - Self',
 				'description' => 'Prohibit self-signin into bullpens.'

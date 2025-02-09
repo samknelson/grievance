@@ -186,3 +186,23 @@ function sirius_teamsters631_sirius_cron_scan_info() {
 
   return $items;
 }
+
+/**
+ * Implements hook_sirius_backlinks_from_node_alter
+ */
+
+function sirius_teamsters631_sirius_backlinks_from_node_alter(&$links, $node) {
+  if ($node->type == 'sirius_log' && $node->field_sirius_category['und'][0]['value'] == 'teamsters631:m12') {
+  	$employer_node = sirius_log_handler($node, 'grievance_shop');
+  	if ($employer_node) {
+  		unset($links['node/' . $employer_node->nid . '/grievance_shop_log']);
+	    $links['node/' . $employer_node->nid . '/grievance_shop_teamsters631_m12'] = array('name' => 'Employer');
+
+	    $m12_json = sirius_json_get($node);
+	    $year = $m12_json['teamsters631_m12']['year'];
+	    $month = $m12_json['teamsters631_m12']['month'];
+	    $links["sirius/teamsters631/m12/$year-$month/active"] = array('name' => 'All Reports');
+	  }
+  }
+}
+

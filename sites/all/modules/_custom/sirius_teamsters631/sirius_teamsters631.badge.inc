@@ -67,11 +67,11 @@ function sirius_teamsters631_badge_form($form, &$form_state, $worker_node) {
 	else if ($is_ms_journeyman && $is_ws_hhf) 				{ $which = 2; }
 	else if ($is_ms_apprentice && $is_ws_active) 			{ $which = 3; }
 	else if ($is_ms_apprentice) 											{ $which = 4; }
-	else if ($is_ms_specialty) 												{ $which = 5; }
+	else if ($is_ms_seb) 															{ $which = 5; }
 	else if ($is_ms_ueb) 															{ $which = 6; }
 	else if ($is_ms_specialty && $is_ws_active) 			{ $which = 7; }
 	else if ($is_ms_specialty) 												{ $which = 8; }
-	else if ($is_ms_organizing_company) 								{ $which = 9; }
+	else if ($is_ms_organizing_company) 							{ $which = 9; }
 
 	$rows = array();
 	foreach ($table as $rownum => $hr) {

@@ -146,12 +146,26 @@ function sirius_dispatch_elig_explain($job_node, $worker_nid, $filters = array()
 	if (!$filters['ignore_skill'] && ($job_policy['workers']['ignore_prefs_skill'] != 'Yes')) {
 		// Limit by skill avail -- which could be null, meaning all skills
 		$skills_avail = sirius_fieldvals($worker_node, 'field_sirius_skills_avail', 'tid');
+
+		$ok = TRUE;
 		if ($skill_tid && $skills_avail && !in_array($skill_tid, $skills_avail)) {
-			return array('success' => FALSE, 'msg' => t('The worker has set a skill preference preventing them from accepting this job.'));
+			$ok = FALSE;
 		}
 
 		if (!$skill_tid && $worker_node->field_sirius_skills_availx['und'][0]['value'] == 'No') {
-			return array('success' => FALSE, 'msg' => t('The worker has set a preference requesting only skilled jobs.'));
+			$ok = FALSE;
+		}
+
+		if (!$ok) {
+			if (!$skills_avail) {
+				$msg = "The worker has set a preference for only skilled jobs.";
+			} else {
+				$tmp = array();
+				foreach ($skills_avail as $term_tid) { $tmp[] = sirius_term_title($term_tid); }
+				$msg = t("The worker has set a preference for skills: ") . join(', ', $tmp);
+				if (strlen($msg) > 250) { $msg = substr($msg, 0, 245) . ' ...'; }
+			}
+			return array('success' => FALSE, 'msg' => $msg);
 		}
 	}
 
@@ -321,6 +335,9 @@ function sirius_dispatch_elig_explain($job_node, $worker_nid, $filters = array()
 	$plugins = sirius_dispatch_elig_info_all();
 	foreach ($plugins as $plugin_key => $plugin) {
 		if ($job_policy['plugin'][$plugin_key]['active'] != 'Yes') { continue; }
+
+		if ($filters['ignore_plugins'][$plugin_key]) { continue; }
+
 		$plugin = sirius_dispatch_elig_instance($plugin_key);
 		$result = $plugin->elig($context, $workers);
 		if (!$result['success']) { continue; }

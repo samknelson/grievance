@@ -5,6 +5,11 @@ function sirius_teamsters631_node_tab_employer_m12_form($form, &$form_state, $em
 
 	$form_state['employer_nid'] = $employer_node->nid;
 
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Current Report'),
+	);
+
   $search_params = array();
   $search_params['employer_nid'] = $employer_node->nid;
   $search_params['limit'] = 100;
@@ -21,30 +26,24 @@ function sirius_teamsters631_node_tab_employer_m12_form($form, &$form_state, $em
 	  	$status = $m12->get_status($m12_node);
 
 	  	$tools = array();
-	  	$tools[] = l('Select Workers', "node/" . $m12_node->nid . "/sirius_log_teamsters631_m12", array('attributes' => array('class' => array('tool-button'))));
+	  	$tools[] = l('View', "node/" . $m12_node->nid . "/sirius_log_teamsters631_m12", array('attributes' => array('class' => array('tool-button'))));
 	  	$row = array();
 	  	$row[] = $m12_json['teamsters631_m12']['month'] . ' / ' . $m12_json['teamsters631_m12']['year'];
-	  	$row[] = $m12_json['teamsters631_m12']['employer_name'];
-	  	$row[] = $status_options[$status];
+	  	//$row[] = $m12_json['teamsters631_m12']['employer_name'];
+	  	//$row[] = $status_options[$status];
 	  	$row[] = join('', $tools);
 	  	$rows[] = $row;
 	  }
 
 	  $header = array();
 	  $header[] = t('Date');
-	  $header[] = t('Employer');
-	  $header[] = t('Status');
+	  //$header[] = t('Employer');
+	  //$header[] = t('Status');
 	  $header[] = t('Tools');
 
 	  $html .= sirius_table_render($header, $rows);
 	  $form['prior_reports'] = array('#markup' => $html);
 	}
-
-
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Current Report'),
-	);
 
 	return $form;
 }
