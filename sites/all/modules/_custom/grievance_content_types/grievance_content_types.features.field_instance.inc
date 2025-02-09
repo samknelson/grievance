@@ -17525,6 +17525,71 @@ function grievance_content_types_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'node-sirius_dispatch_job-field_grievance_classifications'.
+  $field_instances['node-sirius_dispatch_job-field_grievance_classifications'] = array(
+    'bundle' => 'sirius_dispatch_job',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 11,
+      ),
+      'sirius_worker' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_classifications',
+    'label' => 'Classification',
+    'required' => 0,
+    'settings' => array(
+      'field_lock_multi_values' => array(
+        'disable_reorder' => 0,
+        'hide_add_more' => 0,
+        'hide_previous' => 0,
+        'hide_remove' => 0,
+        'lock_previous' => 0,
+        'remove_header' => 0,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'view' => array(
+      'args' => array(
+        0 => 'grievance_job_classification',
+        1 => 'CURRENT_DOMAIN',
+      ),
+      'display_name' => 'term_reference_1',
+      'match_operator' => 'CONTAINS',
+      'size' => '',
+      'view_name' => 'sirius_taxonomy',
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'multiple_selects',
+      'settings' => array(),
+      'type' => 'multiple_selects',
+      'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-sirius_dispatch_job-field_grievance_departments'.
   $field_instances['node-sirius_dispatch_job-field_grievance_departments'] = array(
     'bundle' => 'sirius_dispatch_job',
@@ -17664,7 +17729,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'text_default',
-        'weight' => 16,
+        'weight' => 17,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -17698,7 +17763,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 13,
+      'weight' => 14,
     ),
   );
 
@@ -17825,7 +17890,7 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 16,
+      'weight' => 15,
     ),
   );
 
@@ -18237,7 +18302,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 11,
+        'weight' => 12,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -18338,7 +18403,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -18363,7 +18428,7 @@ function grievance_content_types_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 12,
+        'weight' => 13,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -18453,7 +18518,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -18570,7 +18635,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 25,
+      'weight' => 24,
     ),
   );
 
@@ -18667,7 +18732,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 14,
+        'weight' => 15,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -18710,7 +18775,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -18731,7 +18796,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 0,
         ),
         'type' => 'entityreference_label',
-        'weight' => 15,
+        'weight' => 16,
       ),
       'sirius_worker' => array(
         'label' => 'inline',
@@ -18774,7 +18839,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 12,
+      'weight' => 13,
     ),
   );
 
@@ -18795,7 +18860,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 13,
+        'weight' => 14,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -18828,7 +18893,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -18883,7 +18948,7 @@ function grievance_content_types_field_default_field_instances() {
         'checkall' => FALSE,
       ),
       'type' => 'options_buttons',
-      'weight' => 43,
+      'weight' => 52,
     ),
   );
 
@@ -18954,7 +19019,7 @@ function grievance_content_types_field_default_field_instances() {
           'field_delimiter' => '',
         ),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 17,
+        'weight' => 18,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -18989,7 +19054,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 14,
+      'weight' => 15,
     ),
   );
 
@@ -19066,7 +19131,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 25,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -19111,7 +19176,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 10,
+        'weight' => 22,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -19199,7 +19264,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 42,
+      'weight' => 51,
     ),
   );
 
@@ -19219,7 +19284,7 @@ function grievance_content_types_field_default_field_instances() {
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 18,
+        'weight' => 19,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -19252,7 +19317,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 15,
+      'weight' => 16,
     ),
   );
 
@@ -19435,7 +19500,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 24,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -19525,7 +19590,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 24,
+      'weight' => 23,
     ),
   );
 
@@ -19623,7 +19688,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 40,
+      'weight' => 50,
     ),
   );
 
@@ -19638,7 +19703,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 23,
       ),
       'sirius_worker' => array(
         'label' => 'above',
@@ -19670,7 +19735,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 16,
+      'weight' => 17,
     ),
   );
 
@@ -19784,7 +19849,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
