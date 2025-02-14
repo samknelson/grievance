@@ -244,6 +244,7 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 	$status_options = sirius_edls_sheet_status_options();
 
 	$rows = array();
+	$totals = array('count' => 0, 'assigned' => 0);
 	foreach ($sheet_nodes as $sheet_nid => $sheet_node) {
 		$date = $sheet_node->field_sirius_date_start['und'][0]['value'];
 
@@ -285,9 +286,15 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 				sirius_node_title($sheet_node->field_sirius_dispatch_hall['und'][0]['target_id']);
 		}
 		if (!$options['hide_count']) {
-			$count = $sheet_node->field_sirius_count['und'][0]['value'];
 			$assigned = sirius_edls_assignment_count_sheet($date, $sheet_nid);
+			if ($status == 'reserved') { 
+				$count = $assigned;
+			} else {
+				$count = $sheet_node->field_sirius_count['und'][0]['value'];
+			}
 			$row[] = "$count<br />$assigned";
+			$totals['count'] += $count;
+			$totals['assigned'] += $assigned;
 		}
 
 		$tools = array();
@@ -314,7 +321,12 @@ function sirius_edls_sheet_list_render($sheet_nodes, $options = array()) {
 		$rows[] = array('data' => $row, 'class' => array($class));
 	}
 
-	return sirius_table_render($header, $rows);
+	$html = sirius_table_render($header, $rows);
+	if (!$options['hide_count']) {
+		$html .= sirius_fakerender_field(t('Total Count:'), number_format($totals['count'], 0));
+		$html .= sirius_fakerender_field(t('Total Assigned:'), number_format($totals['assigned'], 0));
+	}
+	return $html;
 }
 
 function sirius_sheet_render_version($sheet_node, $options = array()) {

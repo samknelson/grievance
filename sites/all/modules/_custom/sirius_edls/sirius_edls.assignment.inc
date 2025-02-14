@@ -388,8 +388,6 @@ function sirius_edls_assignment_list_render($assignments, $render_options) {
   foreach ($assignments as $assignment_id => $assignment) {
     $sheet_node = node_load($assignment['sheet_nid']);
     $notification = sirius_edls_notify_fetch_by_assignment_id($assignment_id);
-    
-
 
     $tools = l('Sheet', 'node/' . $assignment['sheet_nid'] . '/sirius_edls_sheet_view', array('attributes' => array('class' => array('tool-button'))));
     if ($can_view_notifications && $notification) {
@@ -417,7 +415,7 @@ function sirius_edls_assignment_list_render($assignments, $render_options) {
   return sirius_table_render($header, $rows);
 }
 
-function sirius_edls_assignment_render($assignment) {
+function sirius_edls_assignment_render($assignment, $options = array()) {
   $sheet_node = node_load($assignment['sheet_nid']);
   if (!$sheet_node) { return sirius_page_error('Sheet not found.'); }
   $employer_node = node_load($sheet_node->field_grievance_shop['und'][0]['target_id']);
@@ -427,7 +425,6 @@ function sirius_edls_assignment_render($assignment) {
   $sheet_json = sirius_json_get($sheet_node);
 
   $date = date('l, F j', strtotime($sheet_node->field_sirius_date_start['und'][0]['value']));
-  drupal_set_title("Crew Assignment for $assignment[worker_name]: $date");
 
   $crews = sirius_edls_crews($sheet_node, 'uuid');
   $crew = $crews[$assignment['crew_uuid']];
@@ -445,8 +442,10 @@ function sirius_edls_assignment_render($assignment) {
 
     $html .= '<h2>' . t('Job Information') . '</h2>';
     $html .= sirius_fakerender_field('Employer:', $employer_node->title);
-    // $html .= sirius_fakerender_field('Supervisor:', sirius_edls_supervisor_render($sheet_node));
-    $html .= sirius_fakerender_field('Date:', date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])));
+
+    if (!$options['hide_date']) {
+      $html .= sirius_fakerender_field('Date:', date('l, F j, Y', strtotime($sheet_node->field_sirius_date_start['und'][0]['value'])));
+    }
     $html .= sirius_fakerender_field('Event:', sirius_node_title($sheet_node->field_sirius_dispatch_job_group['und'][0]['target_id']));
     $html .= sirius_fakerender_field('Event Status:', sirius_text_to_html($sheet_json['edls']['sheet']['show_status']));
     $html .= sirius_fakerender_field('Department:', sirius_term_title($sheet_node->field_grievance_department_tid['und'][0]['tid']));

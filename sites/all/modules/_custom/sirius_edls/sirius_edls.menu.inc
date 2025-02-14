@@ -468,7 +468,7 @@ function sirius_edls_menu() {
     'access callback' => 'sirius_menu_access_callback',
     'access arguments' => array(
       array(
-        'component' => 'edls',
+        // 'component' => 'edls', (Might not be enabled in the root)
       ),
     ),
     'type' => MENU_NORMAL_ITEM,

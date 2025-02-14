@@ -9,7 +9,7 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 
 	$ms_list = sirius_edls_ms_list($employer_node);
 	$status_options = sirius_edls_sheet_status_options();
-	$sheet_nodes = array();
+	unset($status_options['trash']);
 
 	$search_params = array();
 	$search_params['employer_nid'] = $employer_node->nid;
@@ -20,18 +20,25 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 	$workers = sirius_edls_worker_list($employer_node->nid, $date, $filters = array());
 
 	$data = array();
+	$assigned_by_sheet = array();
 	$grand_total = array();
 	foreach ($workers as $worker) {
+		$sheet_nid = $worker['curr_sheet_nid'];
+
+		// The worker has an assignment today, but we didn't find the sheet today. This is an exception.
+		// Maybe they're assigned to a trash sheet? Maybe the date for the sheet was edited manually?
+		// Let's just pretend that they're unassigned.
+		if ($sheet_nid && !$sheet_nodes[$sheet_nid]) { $sheet_nid = 0; }
+
 		$ms_key = $worker['worker_ms'];
 		$data[$ms_key]['total']++;
 		$grand_total['total']++;
 
-		$sheet_nid = $worker['curr_sheet_nid'];
 		if ($sheet_nid) {
-			if (!$sheet_nodes[$sheet_nid]) { $sheet_nodessheet_nodes[$sheet_nid] = node_load($sheet_nid); }
-			$status = $sheet_nodes[$sheet_nid]->field_sirius_edls_sheet_status['und'][0]['value'];
-			$data[$ms_key][$status]++;
-			$grand_total[$status]++;
+			$status_key = $sheet_nodes[$sheet_nid]->field_sirius_edls_sheet_status['und'][0]['value'];
+			if (!$status_options[$status_key]) { $status_key = 'unassigned'; }
+			$data[$ms_key][$status_key]++;
+			$grand_total[$status_key]++;
 		} else {
 			$data[$ms_key]['unassigned']++;
 			$grand_total['unassigned']++;
@@ -44,13 +51,9 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 	foreach ($ms_list as $ms_key => $ms_name) {
 		if (!$data[$ms_key]) { continue; }
 
-		// Just in case
-		$data[$ms_key]['unassigned'] += $data[$ms_key]['trash'];
-
 		$row = array();
 		$row[] = array('data' => $ms_name, 'width' => '40%');
 		foreach ($status_options as $status_key => $status_name) {
-			if ($status_key == 'trash') { continue; }
 			$value = $data[$ms_key][$status_key];
 			if (!$value) { $value = 0; }
 			$row[] = array('data' => $value, 'width' => '10%');
@@ -63,7 +66,6 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 	$row = array();
 	$row[] = array('data' => '<strong>' . t('Total') . '</strong>', 'width' => '40%');
 	foreach ($status_options as $status_key => $status_name) {
-		if ($status_key == 'trash') { continue; }
 		$value = $grand_total[$status_key];
 		if (!$value) { $value = 0; }
 		$row[] = array('data' => "<strong>$value</strong>", 'width' => '10%');
@@ -76,37 +78,48 @@ function sirius_edls_summary($employer_node, $date, $options = array()) {
 	$row[] = array('data' => "<strong>$value</strong>", 'width' => '10%');
 	$rows[] = $row;
 
-	// Compute the "total requested" and "grand total requested". We exclude trash and reserve sheets from this count
+	// Compute the "total requested" and "grand total requested". We exclude reserve sheets from this count
 	$total_requested = array();
 	$grand_total_requested = 0;
 	foreach ($sheet_nodes as $sheet_nid => $sheet_node) {
 		$status_key = $sheet_node->field_sirius_edls_sheet_status['und'][0]['value'];
-		if (!in_array($status, array('draft', 'request', 'lock'))) { continue; }
+		if ($status_key == 'reserved') { continue; }
 		$value = $sheet_node->field_sirius_count['und'][0]['value'];
 		if (!$value) { $value = 0; }
 		$total_requested[$status_key] += $value;
 		$grand_total_requested += $value;
 	}
-	$difference = $grand_total['total'] - $grand_total_requested;
-	if ($difference > 0) { $difference = $difference; }
+	$variance = $grand_total['total'] - $grand_total_requested;
 
 	// Add the "total requested" row to the table
 	$row = array();
 	$row[] = array('data' => '<strong>' . t('Total Demand') . '</strong>', 'width' => '40%');
 	foreach ($status_options as $status_key => $status_name) {
-		if ($status_key == 'trash') { continue; }
-		$value = $total_requested[$status_key];
+		if ($status_key == 'reserved') {
+			$value = 'N/A';
+		} else {
+			$value = $total_requested[$status_key];
+		}
 		if (!$value) { $value = ''; }
 		$row[] = array('data' => "<strong>$value</strong>", 'width' => '10%');
 	}
-	$row[] = array('data' => "<strong>$difference</strong>", 'width' => '10%');
+	$row[] = array('data' => "<strong></strong>", 'width' => '10%');
 	$row[] = array('data' => "<strong>$grand_total_requested</strong>", 'width' => '10%');
+	$rows[] = $row;
+
+	// Add the Variance row to the table
+	$row = array();
+	$row[] = array('data' => '<strong>' . t('Variance') . '</strong>', 'width' => '40%');
+	foreach ($status_options as $status_key => $status_name) {
+		$row[] = array('data' => "<strong></strong>", 'width' => '10%');
+	}
+	$row[] = array('data' => "<strong></strong>", 'width' => '10%');
+	$row[] = array('data' => "<strong>$variance</strong>", 'width' => '10%');
 	$rows[] = $row;
 
 	$header = array();
 	$header[] = array('data' => t('Member Status'), 'width' => '40%');
 	foreach ($status_options as $status_key => $status_name) {
-		if ($status_key == 'trash') { continue; }
 		$header[] =  array('data' => $status_name, 'width' => '10%');
 	}
 	$header[] = array('data' => t('Unassigned'), 'width' => '10%');
