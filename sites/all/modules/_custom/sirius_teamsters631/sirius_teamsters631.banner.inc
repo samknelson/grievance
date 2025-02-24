@@ -137,6 +137,10 @@ function sirius_teamsters631_render_banner($which) {
 			  } else {
 			  	$html .= 'Teamsters 631';
 			  }
+			  if ($domain) {
+			    $html .= ' / ';
+			    $html .= $domain->title;
+			  }
 				$html .= '</span>';
 			$html .= '</a>';
 		$html .= '</div>'; // inner

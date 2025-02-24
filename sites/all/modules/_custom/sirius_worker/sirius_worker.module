@@ -402,6 +402,7 @@ function sirius_worker_report_cache_info() {
   sirius_require('sirius_worker', 'sirius_worker.report_ssn_invalid.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_ssn_missing.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_geo.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_notification_media.inc');
 
   $items = array();
 
@@ -409,6 +410,7 @@ function sirius_worker_report_cache_info() {
   Sirius_Worker_Report_Ssn_Missing::getInstance()->setInfo($items);
   Sirius_Worker_Report_Ssn_Duplicate::getInstance()->setInfo($items);
   Sirius_Worker_Report_Geo::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Notification_Media::getInstance()->setInfo($items);
 
   $items['sirius-worker-duplicate-id'] = array(
     'name' => t('Workers with Duplicate IDs'),

@@ -788,6 +788,7 @@ features[field_instance][] = node-sirius_dispatch_facility_hall-field_sirius_dis
 features[field_instance][] = node-sirius_dispatch_facility_hall-field_sirius_domain
 features[field_instance][] = node-sirius_dispatch_facility_hall-field_sirius_id
 features[field_instance][] = node-sirius_dispatch_facility_hall-field_sirius_name_short
+features[field_instance][] = node-sirius_dispatch_job-field_grievance_classifications
 features[field_instance][] = node-sirius_dispatch_job-field_grievance_departments
 features[field_instance][] = node-sirius_dispatch_job-field_grievance_shop
 features[field_instance][] = node-sirius_dispatch_job-field_sirius_address_notes

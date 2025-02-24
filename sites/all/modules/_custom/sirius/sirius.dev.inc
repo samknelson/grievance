@@ -74,3 +74,11 @@ function sirius_sirius_dev_make_safe_root($context) {
 function sirius_sirius_dev_make_safe_domain($context) {
 	sirius_domain_variable_set('sirius_sms_global_disable', 'Yes');
 }
+
+function sirius_dpm($variable) {
+	if (function_exists('dpm')) {
+		return dpm($variable);
+	} else {
+		drupal_set_message('<pre>' . print_r($variable, 1) . '</pre>');
+	}
+}
