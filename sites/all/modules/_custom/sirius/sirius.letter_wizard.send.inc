@@ -98,8 +98,8 @@ function sirius_letter_wizard_send_form_submit($form, &$form_state) {
 		if ($data['recipients']) {
 			foreach ($data['recipients'] as $recipient) {
 				if ($recipient['disposition'] == 'skip') { continue; }
-				if (preg_match('/\@/', $recipient_email)) {
-					$log_body .= $recipient['disposition'] . ': ' . sirius_email_rfc822_format($recipient['name'], $recipient['email']) . "\n";
+				if (preg_match('/\@/', $recipient['email'])) {
+					$log_body .= $recipient['disposition'] . ': ' . $recipient['name'] . ' [' . $recipient['email'] . ']' . "\n";
 				} else {
 					$log_body .= $recipient['disposition'] . ': ' . $recipient['name'] . ' ' . sirius_phone_format($recipient['phone']) . "\n";
 				}
