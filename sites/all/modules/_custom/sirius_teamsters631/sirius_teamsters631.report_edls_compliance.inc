@@ -86,33 +86,69 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
   }
 
   public function pks(&$form_state) {
+    $pks = array();
+
+    $violation_scans = $this->violation_scans();
+
+    // Some violation scans look for all EDLS workers in the pool (as of a date)
     $workers = sirius_edls_worker_list(
       $form_state['values']['parameters']['employer'], 
       $form_state['values']['parameters']['date']
     );
-
-    $pks = array();
     foreach ($workers as $delta => $worker) {
-      $pks[] = $worker['worker_id'];
+      foreach ($violation_scans as $scan_key => $scan_info) {
+        if ($scan_info['worker_list'] != 'pool') { continue; }
+        $pks[] = $worker['worker_id'] . '|' . $scan_key;
+      }
     }
+    // $pks = array_slice($pks, 0, 50);
+
+    // Some violation scans look for all scheduled workers (as of a date) whether or not they're in the pool
+    $params = array();
+    $params['grievance_shop'] = $form_state['values']['parameters']['employer'];
+    $params['date'] = $form_state['values']['parameters']['date'];
+    $sheets = sirius_edls_sheet_search($params);
+    foreach ($sheets as $sheet_nid => $sheet_node) {
+      $assignments = sirius_edls_assignment_fetch_sheet($sheet_node);
+      foreach ($assignments as $crew_uuid => $records) {
+        foreach ($records as $assignment) {
+          foreach ($violation_scans as $scan_key => $scan_info) {
+            if ($scan_info['worker_list'] != 'assigned') { continue; }
+            $pks[] = $assignment['worker_id'] . '|' . $scan_key;
+          }
+        }
+      }
+    }
+
+
     return array_chunk($pks, 100, TRUE);
   }
 
   public function violation_scans() {
     $violation_scans = array();
+
     $violation_scans['journeyman_show'] = array(
       'name' => 'Journeyman with Lower Show Priority',
       'method' => 'violation_check_journeyman_show',
+      'worker_list' => 'pool',
     );
 
     $violation_scans['extraboard'] = array(
       'name' => 'Extraboard Before Journeyman',
       'method' => 'violation_check_extraboard',
+      'worker_list' => 'pool',
     );
+
+    $violation_scans['not_on_dispatch'] = array(
+      'name' => 'Not On Dispatch',
+      'method' => 'violation_check_not_on_dispatch',
+      'worker_list' => 'assigned',
+    );
+
     return $violation_scans;
   }
 
-  public function violation_check($scan_key, $employer_nid, $worker, $date) {
+  public function violation_check($scan_key, $employer_nid, &$worker, $date) {
     $scan_info = $this->violation_scans()[$scan_key];
     if (!$scan_info) { return array(); }
     return $this->{$scan_info['method']}($employer_nid, $worker, $date);
@@ -126,31 +162,77 @@ class Sirius_Teamsters631_Report_Edls_Compliance extends Report_Cache_Report_Gen
     $rows = array('is_multiple' => TRUE, 'rows' => array());
 
     $violation_scans = $this->violation_scans();
-    foreach ($pks as $worker_id) {
+
+    foreach ($pks as $pk) {
+      list ($worker_id, $scan_key) = explode('|', $pk);
+
       $worker = sirius_edls_worker_fetch($employer_nid, $worker_id, $date);
       if (!$worker) { continue; }
+
+      // Worker fetch may fail if the worker is no longer in our pool. But we should at least
+      // remember their ID
+      if (!$worker['worker_id']) { $worker['worker_id'] = $worker_id; }
+
       $worker['worker_ms_name'] = $ms_lookup[$worker['worker_ms']];
 
-      foreach ($violation_scans as $scan_key => $scan_info) {
-        $violation = $this->violation_check($scan_key, $employer_nid, $worker, $date);
-        if (!$violation) { continue; }
+      $violation = $this->violation_check($scan_key, $employer_nid, $worker, $date);
+      if (!$violation) { continue; }
 
-        $context['message'] = 'Running compliance scan for: ' . $worker['worker_name'];
-        $row = array();
-        $row['pk'] = "$worker_id|$scan_key";
-        $row['worker_id'] = $worker['worker_id'];
-        $row['worker_ms'] = $worker['worker_ms'];
-        $row['worker_ms_name'] = $worker['worker_ms_name'];
-        $row['worker_name'] = $worker['worker_name'];
-        $row['violation'] = $scan_key;
-        $row['violation_name'] = $scan_info['name'];
-        $row['violation_details'] = $violation['msg'];
-        $row['sheet_nid'] = $violation['sheet_nid'];
-        $rows['rows']["$worker_id|$scan_key"] = $row;
-      }
+      $context['message'] = 'Scanning [' . $worker['worker_name'] . '] for [' . $violation_scans[$scan_key]['name'] . ']';
+      $row = array();
+      $row['pk'] = $pk;
+      $row['worker_id'] = $worker['worker_id'];
+      $row['worker_ms'] = $worker['worker_ms'];
+      $row['worker_ms_name'] = $worker['worker_ms_name'];
+      $row['worker_name'] = $worker['worker_name'];
+      $row['violation'] = $scan_key;
+      $row['violation_name'] = $violation_scans[$scan_key]['name'];
+      $row['violation_details'] = $violation['msg'];
+      $row['sheet_nid'] = $violation['sheet_nid'];
+      $rows['rows']["$worker_id|$scan_key"] = $row;
     }
 
     return $rows;
+  }
+
+  public function violation_check_not_on_dispatch($employer_nid, &$worker, $date) {
+    $worker_id = $worker['worker_id'];
+
+    // Must be scheduled
+    // $assignment = sirius_edls_assignment_fetch_worker($date, $employer_nid, $worker_id);
+    $assignment = $worker['assignments']['curr'];
+    if (!$assignment) { return array(); }
+
+    // Must be in the active pool
+    $probe = sirius_edls_worker_list($employer_nid, $date, array('worker_id' => $worker_id));
+    if ($probe) { return array(); }
+
+    // Outsource workers have no violations
+    // On the other hand, make it a violation, why not!
+    // if (!preg_match('/^I/', $worker_id)) { return array(); }
+
+    // If they're on a dispatch, it's not a violation
+    // Not necessary because instead we're just checking if they're on the active worker list
+    // $params = array();
+    // $params['date'] = $date;
+    // $params['worker_nid'] = $worker_nid;
+    // $params['employer_nid'] = $employer_nid;
+    // $params['statuses'] = array('accepted', 'accepted_secondary');
+    // $dispatches = sirius_dispatch_search($params);
+    // if ($dispatches) { return array(); }
+
+    // Fill out the worker record. This is irritating, because we might have a "worker" 
+    // that is just an ID, because we're explicitly looking for assigned workers who are NOT in the pool.
+    if (!$worker['worker_name']) { $worker['worker_name'] = $assignment['worker_name']; }
+    if (!$worker['worker_ms_name']) {
+      $ms_names = sirius_edls_ms_list(node_load($employer_nid));
+      $worker['worker_ms'] = $assignment['worker_ms'];
+      $worker['worker_ms_name'] = $ms_names[$assignment['worker_ms']];
+    }
+
+    $msg = "This worker is not on an active dispatch.";
+
+    return array('msg' => $msg, 'sheet_nid' => $assignment['sheet_nid']);
   }
 
   public function violation_check_journeyman_show($employer_nid, $worker, $date) {

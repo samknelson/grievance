@@ -84,6 +84,19 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event
 
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_event/sirius_event.report_wwe.inc";
 
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_event_sirius_domain_component_info() {
+  return array(
+    'event' => array(
+      'title' => 'Event',
+      'description' => 'Enable event functionality',
+    ),
+  );
+}
+
 function sirius_event_type_json($event_node) {
   $event_type_term = taxonomy_term_load($event_node->field_sirius_event_type['und'][0]['tid']);
   return json_decode($event_type_term->field_sirius_json['und'][0]['value'], TRUE);

@@ -131,6 +131,15 @@ function sirius_employer_menu() {
     'weight' => 2,
   );
 
+  $items['sirius/employer/labproj/rawdata'] = array(
+    'title' => 'Raw Data Export',
+    'page callback' => 'sirius_employer_page_labproj_rawdata',
+    'file' => 'sirius_employer.page_labproj_rawdata.inc',
+    'access arguments' => array('sirius employer admin'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
 	return $items;
 }
 

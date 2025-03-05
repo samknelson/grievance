@@ -25604,16 +25604,9 @@ Grievance Form',
   $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['id'] = 'field_sirius_dispatch_status_value';
   $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['table'] = 'field_data_field_sirius_dispatch_status';
   $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['field'] = 'field_sirius_dispatch_status_value';
-  $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['operator'] = 'not';
   $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['value'] = array(
-    'requested' => 'requested',
-    'notified' => 'notified',
-    'notification failed' => 'notification failed',
-    'declined' => 'declined',
-    'expired' => 'expired',
-    'resigned' => 'resigned',
-    'vlri' => 'vlri',
-    'terminated' => 'terminated',
+    'accepted' => 'accepted',
+    'accepted_secondary' => 'accepted_secondary',
   );
   $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['expose']['operator_id'] = 'field_sirius_dispatch_status_value_op';
   $handler->display->display_options['filters']['field_sirius_dispatch_status_value']['expose']['label'] = 'Primary/Secondary';
@@ -26495,7 +26488,7 @@ Grievance Form',
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
   $handler->display->display_options['footer']['area']['empty'] = TRUE;
-  $handler->display->display_options['footer']['area']['content'] = '<a href="/node/add/grievance-shop?destination=[current_path]" class="action-button">Add an item</a>';
+  $handler->display->display_options['footer']['area']['content'] = '<a href="/node/add/grievance-shop" class="action-button">Add an item</a>';
   $handler->display->display_options['footer']['area']['format'] = 'full_html';
   /* Relationship: Entity Reference: Referenced Entity */
   $handler->display->display_options['relationships']['field_grievance_company_target_id']['id'] = 'field_grievance_company_target_id';
@@ -26917,7 +26910,7 @@ Grievance Form',
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('<a href="/node/add/grievance-shop?destination=[current_path]" class="action-button">Add an item</a>'),
+    t('<a href="/node/add/grievance-shop" class="action-button">Add an item</a>'),
     t('Company'),
     t('Current Path'),
     t('Nid'),

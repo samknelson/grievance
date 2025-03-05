@@ -149,7 +149,21 @@ function sirius_phonenumber_node_presave($node) {
       }
     }
 
-    // Check for user block
+    // //////////////////////
+    // Check for user block on the whole phone number. 
+    // This is legacy support. Going forward, user blocks are for specific senders only.
+    // //////////////////////
+
+    // If we ever *un-blocked* any sender, clear the global block.
+    if ($json['user_block']['sms'] == 'Yes') {
+      foreach ($json['user_block'] as $key => $value) {
+        if (is_array($value) && $json['user_block'][$key]['sms'] == 'No') {
+          $json['user_block']['sms'] = "No";
+          drupal_set_message("Reset global block to \"no\".");
+        }
+      }
+    }
+    // If we have a global block, then stop sending altogether.
     if ($json['user_block']) {
       if ($json['user_block']['sms'] == 'Yes') {
         sirius_minilog("$phonenumber: User SMS block found, setting sms_possible = No");
@@ -160,6 +174,7 @@ function sirius_phonenumber_node_presave($node) {
         $voice_possible = 'No';
       }
     }
+
 
     // Check for STOP error code
     if ($json['last_sms'] && !$json['last_sms']['result']['success']) {
@@ -257,7 +272,7 @@ function sirius_phonenumber_sms_possible($phonenumber, $from = NULL) {
 
   // Check for STOPs from our sender
   $json = sirius_json_get($node);
-  if ($json['user_block']['sms'] == 'Yes') { return FALSE; }
+  // if ($json['user_block']['sms'] == 'Yes') { return FALSE; }
   if ($json['user_block'][$from]['sms'] == 'Yes') { return FALSE; }
 
   return TRUE;
@@ -411,6 +426,12 @@ function sirius_phonenumber_render_user_block($node) {
   if (!$json['user_block']) {
     $html .= t('No user block.');
   } else {
+    if ($json['user_block']['sms']) {
+      $html .= "Overall SMS Block: " . $json['user_block']['sms'];
+      $html .= "<br />Comments: " . $json['user_block']['comments'];
+      $html .= '<br />' . t('Set on ') . date('r', $json['user_block']['ts']) . '<br />';
+    }
+
     foreach ($json['user_block'] as $phone => $record) {
       if (!sirius_phone_validate($phone)) { continue; }
       $html .= "SMS block on <strong>$phone</strong>: " . $record['sms'];

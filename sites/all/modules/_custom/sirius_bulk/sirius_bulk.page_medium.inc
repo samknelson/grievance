@@ -43,7 +43,7 @@ function sirius_bulk_node_tab_medium_form($form, &$form_state, $bulk_node) {
 	);
 
 	if ($json['do_not_disturb']['id']) {
-		$form['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disurb_render($json['do_not_disturb']['id']));
+		$form['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disturb_render($json['do_not_disturb']['id']));
 	}
 
 	$form['submit'] = array(

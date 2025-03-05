@@ -92,6 +92,16 @@ function sirius_log_quicklog_page_add_form($form, &$form_state, $node) {
     $ct_tree[$category][$type] = $title;
   }
 
+  // PHP version crap
+  if (!function_exists('array_key_first')) {
+    function array_key_first(array $arr) {
+      foreach ($arr as $key => $unused) {
+        return $key;
+      }
+      return null;
+    }
+  }   
+
   $category_options = array_combine(array_keys($ct_tree), array_keys($ct_tree));
   $form['category'] = array(
     '#type' => 'select',
