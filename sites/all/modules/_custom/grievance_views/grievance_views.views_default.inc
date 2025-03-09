@@ -18916,6 +18916,9 @@ Grievance Form',
   $handler->display->display_options['fields']['body']['id'] = 'body';
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
+  $handler->display->display_options['fields']['body']['alter']['max_length'] = '250';
+  $handler->display->display_options['fields']['body']['alter']['strip_tags'] = TRUE;
+  $handler->display->display_options['fields']['body']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['body']['type'] = 'text_plain';
   /* Field: Content: Status */
   $handler->display->display_options['fields']['field_sirius_bulk_status']['id'] = 'field_sirius_bulk_status';
@@ -29434,6 +29437,19 @@ Grievance Form',
   $handler->display->display_options['filters']['created']['expose']['remember_roles'] = array(
     2 => '2',
   );
+  /* Filter criterion: Content: Handler (field_sirius_log_handler) */
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['id'] = 'field_sirius_log_handler_target_id';
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['table'] = 'field_data_field_sirius_log_handler';
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['field'] = 'field_sirius_log_handler_target_id';
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['expose']['operator_id'] = 'field_sirius_log_handler_target_id_op';
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['expose']['label'] = 'Handler';
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['expose']['description'] = '(Node ID)';
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['expose']['operator'] = 'field_sirius_log_handler_target_id_op';
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['expose']['identifier'] = 'field_sirius_log_handler_target_id';
+  $handler->display->display_options['filters']['field_sirius_log_handler_target_id']['expose']['remember_roles'] = array(
+    2 => '2',
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -29626,6 +29642,7 @@ Grievance Form',
     t('Category'),
     t('(substring ok)'),
     t('Date between'),
+    t('(Node ID)'),
     t('Page'),
     t('Content'),
     t('- Choose an operation -'),

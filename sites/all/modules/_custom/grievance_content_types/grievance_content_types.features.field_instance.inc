@@ -14017,6 +14017,54 @@ function grievance_content_types_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'node-grievance_shop_contact-field_sirius_contact'.
+  $field_instances['node-grievance_shop_contact-field_sirius_contact'] = array(
+    'bundle' => 'grievance_shop_contact',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'field_delimiter' => '',
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_contact',
+    'label' => 'Contact',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'content_taxonomy_autocomplete_new_terms' => 'allow',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 19,
+    ),
+  );
+
   // Exported field_instance: 'node-grievance_shop_contact-field_sirius_domain'.
   $field_instances['node-grievance_shop_contact-field_sirius_domain'] = array(
     'bundle' => 'grievance_shop_contact',
@@ -14086,7 +14134,7 @@ function grievance_content_types_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'body',
-    'label' => 'Email Body',
+    'label' => 'Body',
     'required' => 0,
     'settings' => array(
       'display_summary' => 1,
@@ -14101,6 +14149,49 @@ function grievance_content_types_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_bulk-field_grievance_notify_subject'.
+  $field_instances['node-sirius_bulk-field_grievance_notify_subject'] = array(
+    'bundle' => 'sirius_bulk',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_grievance_notify_subject',
+    'label' => 'Email Subject',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
       'weight' => 3,
     ),
   );
@@ -14189,7 +14280,7 @@ function grievance_content_types_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 13,
+      'weight' => 12,
     ),
   );
 
@@ -14323,7 +14414,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -14384,7 +14475,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -14446,7 +14537,7 @@ function grievance_content_types_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -14490,7 +14581,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -14527,7 +14618,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget_raw',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -14570,7 +14661,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -14613,7 +14704,7 @@ function grievance_content_types_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -37922,7 +38013,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Election');
   t('Election Type');
   t('Email');
-  t('Email Body');
+  t('Email Subject');
   t('Employed but Available');
   t('Employee ID #');
   t('Employer');
