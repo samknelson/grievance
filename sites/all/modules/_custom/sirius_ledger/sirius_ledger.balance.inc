@@ -24,7 +24,6 @@ function sirius_ledger_balance_search($params = array()) {
 		$sql .= "left join field_data_field_sirius_member_status on field_data_field_sirius_member_status.entity_type = 'node' and field_data_field_sirius_member_status.entity_id = worker_node.nid ";
 	}
 
-
 	$sql .= "where 1 = 1 ";
 
 	$domain_nid = sirius_domain_nid();
@@ -54,6 +53,10 @@ function sirius_ledger_balance_search($params = array()) {
 	if ($params['balance_participant']) { 
 		$sql .= "and balance_participant = :balance_participant ";
 		$sql_args[':balance_participant'] = $params['balance_participant'];
+	}
+	if ($params['worker_nid']) { 
+		$sql .= "and worker_node.nid = :worker_nid ";
+		$sql_args[':worker_nid'] = $params['worker_nid'];
 	}
 	if ($params['work_statuses']) {
 		$sql .= "and field_sirius_work_status_tid in (:work_statuses) ";

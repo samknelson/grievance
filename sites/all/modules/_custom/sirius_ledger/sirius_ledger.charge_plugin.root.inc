@@ -99,7 +99,10 @@ class Sirius_Ledger_Charge_Plugin extends Sirius_Plugin {
 			foreach ($previous_entries as $previous_entry) {
 				$previous_total += $previous_entry['ledger_amount'];
 			}
+			$previous_total = round($previous_total, 2);
+			$amt = round($amt, 2);
 			if ($previous_total != $amt) {
+				$diff = $previous_total - $amt;
 				sirius_minilog("Found previous total $previous_total. An adjustment will be entered.");
 			}
 		}

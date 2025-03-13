@@ -1,5 +1,6 @@
 <?php
 
+// This file is obsoelte.
 function sirius_ledger_config_invoices_form($form, &$form_state) {
   $form['#tree'] = TRUE;
 

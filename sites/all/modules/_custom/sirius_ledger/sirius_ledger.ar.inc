@@ -212,7 +212,8 @@ function sirius_ledger_ar_render($entries, $options = array()) {
 			$html .= $currency_info['instance']->render_amt(-1 * $totals[$account_nid]['amt']);
 			$html .= '</strong>';
 		}
-		$html .= theme_table(array('header' => array_values($header), 'rows' => $record['entries'], 'attributes' => array('style' => 'table-layout: fixed;')));
+
+		$html .= sirius_table_render(array_values($header), $record['entries'], array('style' => 'table-layout: fixed;', 'class' => array('sirius_data_table')));
 	}
 
 	return $html;

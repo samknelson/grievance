@@ -31,7 +31,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_allocate_transmittal.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_payments.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_ar.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_settings.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_transmittal.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_transmittal_print.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_monthly.inc';
@@ -104,6 +103,7 @@ function sirius_ledger_sirius_config_links_alter(&$links) {
 	$links['ledger'] = array('title' => 'A/R Accounting and Ledger');
 	$links['ledger']['links']['sirius/config/ledger'] 					= array('title' => 'A/R Settings', 'description' => 'Settings for the A/R accounting system: ledger, dues, payments, charges, etc.');
 	$links['ledger']['links']['sirius/ledger/stripe/config']		= array('title' => 'Stripe Settings', 'description' => 'Settings for using the Stripe payment processor');
+	$links['ledger']['links']['sirius/ledger/stripe/idsearch']		= array('title' => 'Stripe ID Search', 'description' => 'Search for a specific Stripe ID');
 	$links['ledger']['links']['sirius/ledger/accounts'] = array('title' => 'Accounts', 'description' => 'List of fund / accounts, e.g. Health and Welfare Fund, Employee Strike Fund, etc.');
 }
 
@@ -187,6 +187,28 @@ function sirius_ledger_sirius_backlinks_from_node_alter(&$links, $node) {
 }
 
 /**
+ * Implements hook_sirius_dashboard_info
+ */
+
+function sirius_ledger_sirius_dashboard_plugin_info() {
+  $plugins = array();
+
+  $plugins['ledger_worker'] = array(
+    'title' => 'Ledger: Worker',
+    'description' => '',
+    'file' => 'sirius_ledger.dashboard_worker.inc',
+    'module' => 'sirius_ledger',
+    'callbacks' => array(
+      'data' => 'sirius_ledger_dashboard_worker_data',
+      // 'config' => 'sirius_trust_dashboard_plugin_elections_config',
+      // 'prefs' => 'sirius_trust_dashboard_plugin_elections_prefs',
+    ),
+  );
+
+  return $plugins;
+}
+
+/**
  * Implements hook_node_view_alter
  */
 
@@ -252,4 +274,14 @@ function sirius_ledger_ms_level_options() {
     }
   }
   return $ms_level_options;
+}
+
+/**
+ * Implements hook_sirius_dev_make_safe_domain
+ */
+
+function sirius_ledger_sirius_dev_make_safe_domain($context) {
+	sirius_domain_variable_set('sirius_ledger_stripe_mode', 'test');
+	sirius_domain_variable_set('sirius_ledger_stripe_live_account_secret', 'DISABLED FOR DEV SERVER');
+	sirius_domain_variable_set('sirius_ledger_stripe_live_account_id', 'DISABLED FOR DEV SERVER');
 }

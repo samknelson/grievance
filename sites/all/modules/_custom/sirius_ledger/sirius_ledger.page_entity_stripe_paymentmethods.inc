@@ -2,7 +2,8 @@
 
 function sirius_ledger_node_tab_entity_stripe_paymentmethods_access($entity_node) {
 	$access = sirius_access_instance('ledger');
-	return $access->access('entity_page_view', array('entity_node' => $entity_node));
+	$result = $access->access('paymentmethods_view', array('entity_node' => $entity_node));
+	return $result;
 }
 
 function sirius_ledger_node_tab_entity_stripe_paymentmethods_form($form, &$form_state, $entity_node) {
@@ -24,7 +25,7 @@ function sirius_ledger_node_tab_entity_stripe_paymentmethods_form($form, &$form_
 	$result = $service->paymentmethod_list($customer_id);
 	if ($result['success']) { $paymentmethods_json = $result['paymentmethods']; }
 
-	if ($access->access('admin', array('entity_node' => $entity_node))) {
+	if ($access->access('paymentmethods_view', array('entity_node' => $entity_node))) {
 		$html .= $service->paymentmethods_render($entity_node, $paymentmethods_json);
 		$form['intro'] = array('#markup' => $html);
 	}

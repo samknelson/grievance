@@ -5,6 +5,7 @@ function sirius_ledger_payment_status_options() {
 		'Pending' => 'Pending',
 		'Cleared' => 'Cleared',
 		'Canceled' => 'Canceled',
+		'Failed' => 'Failed',
 	);
 }
 
@@ -13,6 +14,7 @@ function sirius_ledger_payment_status_color($status) {
 	if ($status == 'Received') { return 'grey'; }
 	if ($status == 'Cleared') { return 'green'; }
 	if ($status == 'Canceled') { return 'red'; }
+	if ($status == 'Failed') { return 'red'; }
 }
 
 function sirius_ledger_payment_set_title(&$payment_node) {
@@ -116,9 +118,26 @@ function sirius_ledger_payment_create($params) {
 	$payment_node->field_sirius_ledger_account['und'][0]['target_id'] = $params['ledger_account'];
 	$payment_node->field_sirius_payer['und'][0]['target_id'] = $params['ledger_participant'];
 	$payment_node->field_sirius_payment_type['und'][0]['tid'] = $params['payment_type'];
+	$payment_node->field_sirius_dollar_amt['und'][0]['value'] = $params['dollar_amt'];
 
-	$payment_node->field_sirius_payment_status['und'][0]['value'] = 'Received';
+	if ($params['id']) {
+		$payment_node->field_sirius_id['und'][0]['value'] = $params['id'];
+	}
+
+	$payment_node->field_sirius_payment_status['und'][0]['value'] = 'Pending';
 	$payment_node->field_sirius_ledger_allocated['und'][0]['value'] = 'No';
+
+	if ($params['merchant_name']) {
+		$payment_node->field_sirius_merchant_name['und'][0]['value'] = $params['merchant_name'];
+	}
+
+	if ($params['check_number']) {
+		$payment_node->field_sirius_check_number['und'][0]['value'] = $params['check_number'];
+	}
+
+	if ($params['notes']) {
+		$payment_node->field_sirius_notes['und'][0]['value'] = $params['notes'];
+	}
 
 	if ($params['json']) { sirius_json_set($payment_node, $params['json']); }
 
@@ -140,12 +159,29 @@ function sirius_ledger_payment_update($payment_node, $params) {
 	$msgs = array();
 
 	// Update the payment node.
-	$payment_node->field_sirius_dollar_amt['und'][0]['value'] = $params['dollar_amt'];
-	$payment_node->field_sirius_merchant_name['und'][0]['value'] = $params['merchant_name'];
-	$payment_node->field_sirius_check_number['und'][0]['value'] = $params['check_number'];
-	$payment_node->field_sirius_notes['und'][0]['value'] = $params['notes'];
-	$payment_node->field_sirius_payment_status['und'][0]['value'] = $params['payment_status'];
-	$payment_node->field_sirius_id['und'][0]['value'] = $params['id'];
+	if ($params['dollar_amt']) {
+		$payment_node->field_sirius_dollar_amt['und'][0]['value'] = $params['dollar_amt'];
+	}
+
+	if ($params['merchant_name']) {
+		$payment_node->field_sirius_merchant_name['und'][0]['value'] = $params['merchant_name'];
+	}
+
+	if ($params['check_number']) {
+		$payment_node->field_sirius_check_number['und'][0]['value'] = $params['check_number'];
+	}
+
+	if ($params['notes']) {
+		$payment_node->field_sirius_notes['und'][0]['value'] = $params['notes'];
+	}
+
+	if ($params['payment_status']) {
+		$payment_node->field_sirius_payment_status['und'][0]['value'] = $params['payment_status'];
+	}
+
+	if ($params['id']) {
+		$payment_node->field_sirius_id['und'][0]['value'] = $params['id'];
+	}
 
 	if ($params['json']) { sirius_json_set($payment_node, $params['json']); }
 
@@ -212,9 +248,11 @@ function sirius_ledger_payments_render($payment_nodes, $options = array()) {
 		$row = array();
 
 		$tools = array();
-		if ($access->access('payment_view', array('payment_node' => $payment_node))) {
-			$tools[] = l('View', 'node/' . $payment_node->nid . '/sirius_payment_allocate', array('attributes' => array('class' => array('tool-button'))));
-			$has_tools = TRUE;
+		if (!$options['hide_tools']) {
+			if ($access->access('payment_view', array('payment_node' => $payment_node))) {
+				$tools[] = l('View', 'node/' . $payment_node->nid . '/sirius_payment_allocate', array('attributes' => array('class' => array('tool-button'))));
+				$has_tools = TRUE;
+			}
 		}
 
 		$currency = sirius_ledger_currency_from_account_nid($payment_node->field_sirius_ledger_account['und'][0]['target_id']);
@@ -224,24 +262,28 @@ function sirius_ledger_payments_render($payment_nodes, $options = array()) {
 		if (!$options['hide_account']) {
 			$row[] = $account_options[$payment_node->field_sirius_ledger_account['und'][0]['target_id']];
 		}
+		$row[] = date('m/d/Y', $payment_node->created);
 		$row[] = sirius_term_title($payment_node->field_sirius_payment_type['und'][0]['tid']);
 		$row[] = $status_options[$payment_node->field_sirius_payment_status['und'][0]['value']];
 		$row[] = $currency->render_amt(-1 * $payment_node->field_sirius_dollar_amt['und'][0]['value']);
-		$row[] = $payment_node->field_sirius_ledger_allocated['und'][0]['value'];
-		$row[] = $payment_node->field_sirius_notes['und'][0]['value'];
+		if (!$options['hide_allocated']) { $row[] = $payment_node->field_sirius_ledger_allocated['und'][0]['value']; }
+		$row[] = sirius_ledger_payment_memo($payment_node);
 		$row[] = join('', $tools);
 		$rows[] = array('data' => $row, 'class' => array($color));
 	}
 
 	$header = array();
 	if (!$options['hide_account']) { $header[] = t('Account'); }
+	$header[] = t('Date');
 	$header[] = t('Type');
 	$header[] = t('Status');
 	$header[] = t('Amount');
-	$header[] = t('Allocated?');
+	if (!$options['hide_allocated']) { $header[] = t('Allocated?'); }
 	$header[] = t('Memo');
 
-	if ($has_tools) { $header[] = t('Tools'); }
+	if (!$option['hide_tools']) {
+		if ($has_tools) { $header[] = t('Tools'); }
+	}
 
 	return sirius_table_render($header, $rows);
 }
@@ -277,7 +319,22 @@ function sirius_ledger_payments_search($params) {
   	$sql_args[':account_nid'] = $params['account_nid'];
   }
 
-  $sql .= "order by field_sirius_datetime_value desc ";
+  if ($params['before_ts']) {
+  	$sql .= "and field_data_field_sirius_datetime_created <= :before ";
+  	$sql_args[':before'] = date('Y-m-d H:i:s', $params['before_ts']);
+  }
+
+  if ($params['after_ts']) {
+  	$sql .= "and field_data_field_sirius_datetime_created <= :after_ts ";
+  	$sql_args[':before'] = date('Y-m-d H:i:s', $params['after_ts']);
+  }
+
+  if ($params['payment_status']) {
+  	$sql .= "and field_sirius_payment_status_value = :payment_status ";
+  	$sql_args[':payment_status'] = $params['payment_status'];
+  }
+
+  $sql .= "order by field_sirius_datetime_value desc, nid desc ";
 
   $offset = $params['offset'];
   if (!$offset) { $offset = 0; }
