@@ -118,7 +118,6 @@ function sirius_ledger_sirius_access_info() {
 function sirius_ledger_report_cache_info() {
   $items = array();
   $items += sirius_ledger_report_discrepancy_info();
-  $items += sirius_ledger_report_transmittal_balances_info();
   return $items;
 }
 
