@@ -26612,7 +26612,7 @@ Grievance Form',
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = 'Tools';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/edit?destination=[current_path]" class="tool-button">Edit</a> <a href="/node/[nid]/contacts" class="tool-button">Contacts</a> <a href="/node/[nid]/employer_users" class="tool-button">Users</a> <a href="/node/[nid]/sirius_employer_ledger/transmittal" class="tool-button">Transmittals</a> <a href="/node/[nid]/employer_labproj" class="tool-button">Projections</a>';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<a href="/node/[nid]/edit?destination=[current_path]" class="tool-button">Edit</a> <a href="/node/[nid]/contacts" class="tool-button">Contacts</a> <a href="/node/[nid]/employer_users" class="tool-button">Users</a> <a href="/node/[nid]/employer_labproj" class="tool-button">Projections</a>';
   /* Sort criterion: Content: Title */
   $handler->display->display_options['sorts']['title']['id'] = 'title';
   $handler->display->display_options['sorts']['title']['table'] = 'node';
@@ -26927,7 +26927,7 @@ Grievance Form',
     t('Contract Template'),
     t('External ID'),
     t('Tools'),
-    t('<a href="/node/[nid]/edit?destination=[current_path]" class="tool-button">Edit</a> <a href="/node/[nid]/contacts" class="tool-button">Contacts</a> <a href="/node/[nid]/employer_users" class="tool-button">Users</a> <a href="/node/[nid]/sirius_employer_ledger/transmittal" class="tool-button">Transmittals</a> <a href="/node/[nid]/employer_labproj" class="tool-button">Projections</a>'),
+    t('<a href="/node/[nid]/edit?destination=[current_path]" class="tool-button">Edit</a> <a href="/node/[nid]/contacts" class="tool-button">Contacts</a> <a href="/node/[nid]/employer_users" class="tool-button">Users</a> <a href="/node/[nid]/employer_labproj" class="tool-button">Projections</a>'),
     t('All'),
     t('Tags'),
     t('Active?'),
