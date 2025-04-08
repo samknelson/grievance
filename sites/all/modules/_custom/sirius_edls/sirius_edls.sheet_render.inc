@@ -60,6 +60,8 @@ function sirius_edls_sheet_render($sheet_node, $options = array()) {
 		}
 	}
 
+	if ($sheet_header_rows % 2) { ++$sheet_header_rows; }
+
 	if (!$options['hide_crews']) {
 		$crews = sirius_edls_crews($sheet_node, 'uuid');
 		if ($options['fetch_workers_from_json']) {
