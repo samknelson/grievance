@@ -33,6 +33,21 @@ function sirius_employer_sirius_domain_component_info() {
   );
 }
 
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function sirius_employer_report_cache_info() {
+  $items = array();
+
+  sirius_require('sirius_employer', 'sirius_employer.report_contact_bytype.inc');
+
+  Sirius_Employer_Report_Contact_Bytype::getInstance()->setInfo($items);
+
+  return $items;
+}
+
+
 function sirius_employer_get_by_id($id, $nid_only = FALSE) {
 	if (!$id) { return NULL; }
 

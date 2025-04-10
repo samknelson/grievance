@@ -44,15 +44,6 @@ function sirius_ledger_node_tabs() {
     'weight' => 4,
   );
 
-  $node_tabs['sirius_payment']['sirius_payment_allocate/transmittal'] = array(
-    'title' => 'Transmittal',
-    'description' => '',
-    'callback' => 'sirius_ledger_node_tab_payment_allocate_transmittal',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 4,
-    'component' => 'hour:transmittal',
-  );
-
   $node_tabs['sirius_payment']['sirius_payment_update'] = array(
     'title' => 'Update',
     'description' => '',
@@ -216,14 +207,6 @@ function sirius_ledger_node_tabs() {
     'callback' => 'sirius_ledger_node_tab_entity_policy',
     'permissions' => array('sirius ledger admin'),
     'weight' => 3,
-  );
-
-  $node_tabs['grievance_shop']['grievance_shop_ledger/transmittal'] = array(
-    'title' => 'Transmittal',
-    'callback' => 'sirius_ledger_node_tab_employer_transmittal',
-    'permissions' => array('sirius ledger admin'),
-    'weight' => 4,
-    'component' => 'hour:transmittal',
   );
 
   $node_tabs['grievance_contract_template']['sirius_employer_ledger_policy'] = array(
@@ -486,21 +469,6 @@ function sirius_ledger_menu() {
     ),
   );
 
-  $items['sirius/config/ledger/transmittal'] = array(
-    'title' => 'Transmittal Sheets',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sirius_ledger_config_transmittal'),
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'permission' => 'sirius ledger admin',
-        'component' => 'hour:transmittal',
-      ),
-    ),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
-  );
-
   $items['sirius/config/ledger/dev'] = array(
     'title' => 'Dev Tools',
     'page callback' => 'sirius_ledger_page_dev',
@@ -587,67 +555,6 @@ function sirius_ledger_menu() {
     'page arguments' => array(),
     'file' => 'sirius_ledger.page_stripe_idsearch.inc',
   );
-
- $items['sirius/ledger/transmittal'] = array(
-    'title' => 'Transmittal Sheets',
-    'description' => '',
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'permission' => 'sirius ledger admin',
-        'component' => 'hour:transmittal',
-      ),
-    ),
-    'page callback' => 'sirius_ledger_page_transmittal',
-    'page arguments' => array(),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
- $items['sirius/ledger/transmittal/generate'] = array(
-    'title' => 'Generate PDFs',
-    'description' => '',
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'permission' => 'sirius ledger admin',
-        'component' => 'hour:transmittal',
-      ),
-    ),
-    'page callback' => 'sirius_ledger_page_transmittal',
-    'page arguments' => array(),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 1,
-  );
-
-  $items['sirius/ledger/transmittal/byemployer'] = array(
-    'title' => 'List By Month / Employer',
-    'description' => '',
-    'access callback' => 'sirius_menu_access_callback',
-    'access arguments' => array(
-      array(
-        'permission' => 'sirius ledger admin',
-        'component' => 'hour:transmittal',
-      ),
-    ),
-    'page callback' => 'sirius_ledger_page_transmittal_byemployer',
-    'page arguments' => array(),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-    'file' => 'sirius_ledger.page_transmittal_byemployer.inc',
-  );
-
-  /*
-  $items['sirius/ledger/transmittal/balances'] = array(
-    'title' => 'Balances',
-    'description' => '',
-    'access arguments' => array('sirius ledger admin'),
-    'page callback' => 'sirius_ledger_page_transmittal_balances',
-    'page arguments' => array(),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
-    'file' => 'sirius_ledger.page_transmittal_balances.inc',
-  );
-  */
 
   $items['sirius/ledger/delinquency'] = array(
     'title' => 'Delinquency Letters',

@@ -16,7 +16,6 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.monthly.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.hourly.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.event.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.transmittal.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.token.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.feed.inc';
 // require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.feed_charges.inc';
@@ -28,21 +27,16 @@ require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledg
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_update.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_post.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_allocate.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_payment_allocate_transmittal.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_payments.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_account_ar.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_transmittal.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_employer_transmittal_print.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_worker_monthly.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_entity_policy.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_transmittal.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_delinquency.inc';
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.page_list_workers.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.term_tab_payment_type_settings.inc';
 
 require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.report_discrepancy.inc';
-require_once DRUPAL_ROOT . '/sites/all/modules/_custom/sirius_ledger/sirius_ledger.report_transmittal_balances.inc';
 
 /**
  * Implements hook_sirius_domain_component_info
@@ -124,7 +118,6 @@ function sirius_ledger_sirius_access_info() {
 function sirius_ledger_report_cache_info() {
   $items = array();
   $items += sirius_ledger_report_discrepancy_info();
-  $items += sirius_ledger_report_transmittal_balances_info();
   return $items;
 }
 
