@@ -26,6 +26,10 @@ function sirius_employer_sirius_domain_component_info() {
       'title' => 'Employer - Labor Projections',
       'description' => 'Use the worker database',
     ),
+    'employer:ein' => array(
+    	'title' => 'Employer - EIN',
+    	'description' => 'Support for per-employer employee IDs',
+    ),
   );
 }
 
