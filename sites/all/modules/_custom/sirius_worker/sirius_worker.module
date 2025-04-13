@@ -379,6 +379,10 @@ function sirius_worker_report_cache_info() {
   sirius_require('sirius_worker', 'sirius_worker.report_ssn_duplicate.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_ssn_invalid.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_ssn_missing.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_phone_missing.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_phone_invalid.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_email_missing.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_email_invalid.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_geo.inc');
 
   $items = array();
@@ -386,6 +390,10 @@ function sirius_worker_report_cache_info() {
   Sirius_Worker_Report_Ssn_Invalid::getInstance()->setInfo($items);
   Sirius_Worker_Report_Ssn_Missing::getInstance()->setInfo($items);
   Sirius_Worker_Report_Ssn_Duplicate::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Phone_Missing::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Phone_Invalid::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Email_Missing::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Email_Invalid::getInstance()->setInfo($items);
   Sirius_Worker_Report_Geo::getInstance()->setInfo($items);
 
   $items['sirius-worker-duplicate-id'] = array(
