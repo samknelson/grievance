@@ -272,10 +272,9 @@ function sirius_worker_form_alter(&$form, &$form_state, $form_id) {
     // Some fields must be edited within tabs, can't be modified here.
     $form['field_sirius_skill']['#access'] = FALSE;
     $form['field_sirius_skill_expire']['#access'] = FALSE;
-    $form['field_sirius_member_status']['#access'] = FALSE;
+    // $form['field_sirius_member_status']['#access'] = FALSE;
     $form['field_sirius_industry']['#access'] = FALSE;
     $form['field_sirius_work_status']['#access'] = FALSE;
-    $form['field_sirius_member_status']['#access'] = FALSE;
     $form['field_sirius_worker_dispstatus']['#access'] = FALSE;
     $form['field_sirius_dispatch_availdate']['#access'] = FALSE;
     $form['field_sirius_skill']['#access'] = FALSE;
@@ -368,6 +367,29 @@ function sirius_worker_sirius_access_info() {
   return $infos;
 }
 
+/**
+ * Implements hook_sirius_dashboard_info
+ */
+
+function sirius_worker_sirius_dashboard_plugin_info() {
+  $plugins = array();
+
+  $plugins['worker_contact'] = array(
+    'title' => 'Worker: Contact Info',
+    'description' => '',
+    'file' => 'sirius_worker.dashboard_contact.inc',
+    'module' => 'sirius_worker',
+    'callbacks' => array(
+      'data' => 'sirius_worker_dashboard_contact_data',
+      // 'config' => 'sirius_denorm_dashboard_config',
+      // 'prefs' => 'sirius_denorm_dashboard_prefs',
+    ),
+    'proxy' => TRUE,
+  );
+
+  return $plugins;
+}
+
 /***
  * Implements hook_report_cache_info() 
  */
@@ -384,6 +406,7 @@ function sirius_worker_report_cache_info() {
   sirius_require('sirius_worker', 'sirius_worker.report_email_missing.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_email_invalid.inc');
   sirius_require('sirius_worker', 'sirius_worker.report_geo.inc');
+  sirius_require('sirius_worker', 'sirius_worker.report_notification_media.inc');
 
   $items = array();
 
@@ -395,6 +418,7 @@ function sirius_worker_report_cache_info() {
   Sirius_Worker_Report_Email_Missing::getInstance()->setInfo($items);
   Sirius_Worker_Report_Email_Invalid::getInstance()->setInfo($items);
   Sirius_Worker_Report_Geo::getInstance()->setInfo($items);
+  Sirius_Worker_Report_Notification_Media::getInstance()->setInfo($items);
 
   $items['sirius-worker-duplicate-id'] = array(
     'name' => t('Workers with Duplicate IDs'),

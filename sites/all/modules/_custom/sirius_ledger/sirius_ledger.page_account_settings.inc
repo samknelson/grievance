@@ -1,9 +1,5 @@
 <?php
 
-function sirius_ledger_node_tab_account_settings($account_node) {
-	return drupal_get_form('sirius_ledger_node_tab_account_settings_form', $account_node);
-}
-
 function sirius_ledger_node_tab_account_settings_form($form, &$form_state, $account_node) {
 	$form_state['account_nid'] = $account_node->nid;
 
@@ -56,7 +52,6 @@ function sirius_ledger_node_tab_account_settings_form($form, &$form_state, $acco
 			'simple' => t('Simple: one entry per check, credited to the payer'),
 			'manual' => t('Manual: multiple entries per check, credited to workers'),
 			'upload' => t('Upload: multiple entries per check, credited to workers'),
-			'transmittal' => t('Transmittal form: Multiple entries per check including hours and withholding, credited to workers'),
 		),
 	);
 

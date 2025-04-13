@@ -14,9 +14,17 @@ function sirius_ledger_permission() {
       'title' => t('Sirius Ledger Employer'), 
       'description' => t('Permission to access the A/R system as an employer.'),
     ),
+    'sirius ledger employer paymentmethods' => array(
+      'title' => 'Sirius Ledger Employer Paymentmethods',
+      'description' => 'Permission to manage or charge payment method for an employer',
+    ),
     'sirius ledger worker' => array(
       'title' => t('Sirius Ledger Worker'), 
       'description' => t('Permission to access the A/R system as a worker.'),
+    ),
+    'sirius ledger worker paymentmethods' => array(
+      'title' => 'Sirius Ledger Worker Paymentmethods',
+      'description' => 'Permission to manage or charge payment method for a worker',
     ),
   );
 }
@@ -62,6 +70,7 @@ class Sirius_Ledger_Access extends Sirius_Access {
     $actions = array(
       // No parameters
       'admin',
+      'staff',
       
       // Parameter entity_node
       'entity_view',
@@ -70,20 +79,37 @@ class Sirius_Ledger_Access extends Sirius_Access {
       'ea_view',
       'ea_invoices',
       'ea_payments',
+      'ea_payment_create',
+      'ea_view_employer_workers',
+
+      'paymentmethods_view',
+      'paymentmethods_edit',
+      'paymentmethods_charge',
 
       // Parameter payment_node
       'payment_view',
     );
 
+    // Check node type
+    if ($context['ea_node']) {
+      if ($context['ea_node']->type != 'sirius_log') { return $this->deny("System error: type not sirius_log."); }
+      if ($context['ea_node']->field_sirius_category['und'][0]['value'] != 'ledger:ea') { return $this->deny("Log entry is not of type ledger:ea."); }
+    }
+
     // Who am I?
     if (user_access('sirius admin') || user_access('sirius ledger admin')) { 
-      $is_admin = TRUE;
+      $is_admin = $is_staff = TRUE;
+    } else if (user_access('sirius ledger admin')) {
+      $is_staff = TRUE;
     }
 
     // If we have an EA node, then set our entity and account
     if ($context['ea_node']) {
       if (!$context['entity_node']) { $context['entity_node'] = $ea->entity_node($context['ea_node']); }
       if (!$context['account_node']) { $context['account_node'] = $ea->account_node($context['ea_node']); }
+
+      if (!$context['entity_node']) { return $this->deny("No entity node."); }
+      if (!$context['account_node']) { return $this->deny("No account node."); }
     }
 
     // EA Invoices are restricted by setting
@@ -92,8 +118,34 @@ class Sirius_Ledger_Access extends Sirius_Access {
       if ($account_json['settings']['ea']['invoices'] != 'Yes') { return FALSE; }
     }
 
+    $account_json = sirius_json_get($context['account_node']);
+    $participant_type = $account_json['settings']['ea']['participant'];
+
+    // "ea_view" is restricted by type (i.e. workers or employers)
+    if (in_array($action, array('ea_view', 'ea_invoices'))) {
+      if ( ($context['entity_node']->type == 'sirius_worker') && ($participant_type != 'worker')) {
+        return $this->deny("Account participant must be 'worker'.");
+      }
+
+      if ( ($context['entity_node']->type == 'grievance_shop') && ($participant_type != 'employer')) {
+        return $this->deny("Account participant must be 'employer'.");
+      }
+    }
+
+    // "ea_view_employer_workers" are specially restricted
+    if ($action == 'ea_view_employer_workers') {
+      // Must by viewed by an employer ...
+      if ($context['entity_node']->type != 'grievance_shop') { return $this->deny("Entity node is not an empoyer."); }
+
+      // But the "participant type" must be "worker"
+      if ($participant_type != 'worker') { return $this->deny("Account participant must be 'worker'."); }
+    }
+
     // Admins can do anything
     if ($is_admin) { return TRUE; }
+
+    // Staff can do pretty much anything
+    if ($action == 'staff') { return $is_staff; }
 
 
     // I may be restricted by "entity". For exmaple, if I am an employer,
@@ -128,11 +180,21 @@ class Sirius_Ledger_Access extends Sirius_Access {
       return $is_my_entity;
     }
 
-    // View ea page
-    if (in_array($action, array('ea_view', 'ea_invoices', 'DISABLED_ea_payments'))) {
-      // Must be my own entity
-      if (!$is_my_entity) { return FALSE; }
+    // View or edit payment methods
+    if (in_array($action, array('paymentmethods_view', 'paymentmethods_edit', 'paymentmethods_charge'))) {
+      if (!$context['entity_node']) { return FALSE; }
 
+      if ($context['entity_node']->type == 'sirius_worker') {
+        return user_access('sirius ledger worker paymentmethods');
+      }
+
+      if ($context['entity_node']->type == 'grievance_shop') {
+        return user_access('sirius ledger employer paymentmethods');
+      }
+    }
+
+    // View ea page
+    if (in_array($action, array('ea_view', 'ea_invoices', 'ea_view_employer_workers', 'ea_payments'))) {
       // Must have an account node
       if (!$context['account_node']) { return FALSE; }
 
@@ -149,130 +211,5 @@ class Sirius_Ledger_Access extends Sirius_Access {
 
     // Oh well
     return FALSE;
-
-    // Check to make sure that I am in the right employer
-    if ($context['employer_nid']) {
-      if ($my_employer_nid != $context['employer_nid']) { return FALSE; }
-    }
-    if ($context['sheet_node']) {
-      if ($my_employer_nid != $context['sheet_node']->field_grievance_shop['und'][0]['target_id']) { return FALSE; }
-    }
-
-    // Employer Configuration: workers, tasks, member statuses
-    if (in_array($action, array('employer_config_tasks', 'employer_config_outsource_workers', 'employer_config_outsource_ms'))) {
-      // Labor coordinators can configure the employer
-      if ($is_employer_coordinator) { return TRUE; }
-    }
-
-    // View the employer statistics
-    if (in_array($action, array('employer_dashboard'))) {
-      // Labor coordinators can view the statistics
-      if ($is_employer_coordinator) { return TRUE; }
-      if ($is_worker_advisor) { return TRUE; }
-    }
-
-    // Change the supervisor on a sheet
-    if (in_array($action, array('sheet_change_supervisor'))) {
-      // Labor coordinators can configure the employer
-      if ($is_employer_coordinator) { return TRUE; }
-    }
-
-    // Create a sheet, list sheets, list workers
-    if (in_array($action, array('sheet_create', 'sheet_list', 'worker_list'))) {
-      // Labor supervisors can create and list sheets and workers
-      if ($is_employer_supervisor) { return TRUE; }
-      if ($is_worker_advisor) { return TRUE; }
-    }
-
-    // View, clone, or manage a sheet
-    if (in_array($action, array('sheet_view', 'sheet_clone', 'sheet_manage', 'sheet_export'))) {
-      // Labor coordinators can view anything
-      if ($is_employer_coordinator) { return TRUE; }
-      if ($is_worker_advisor) { return TRUE; }
-
-      // Labor supervisors can view their own sheets
-      if ($is_employer_supervisor && $is_my_sheet) { return TRUE; }
-    }
-
-    // Edit a sheet or assign workers
-    if (in_array($action, array('sheet_edit', 'sheet_edit_workers'))) {
-      // Labor coordinators can edit sheets in "draft" or "request")
-      if ($is_employer_coordinator && in_array($sheet_status, array('draft', 'request'))) { return TRUE; }
-
-      // Labor advisors can edit sheets that are not in "lock"
-      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
-
-      // Labor supervisors can edit their own sheets in "draft"
-      if ($is_employer_supervisor && $is_my_sheet && ($sheet_status == 'draft')) { return TRUE; }
-    }
-
-    // View changes
-    if (in_array($action, array('sheet_revisions', 'sheet_assignmentlog'))) {
-      // Labor coordinators only
-      if ($is_employer_coordinator) { return TRUE; }
-      if ($is_worker_advisor) { return TRUE; }
-    }
-
-    // Set sheet to "Draft"
-    if ($action == 'sheet_status_draft') {
-      // Can't change status to what it already is
-      if ($sheet_status == 'draft') { return FALSE; }
-
-      // Coordinators can set any sheet to "draft"
-      if ($is_employer_coordinator) { return TRUE; }
-
-      // Labor advisors can edit sheets that are not in "lock"
-      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
-    }
-
-    // Set sheet to "Request"
-    if ($action == 'sheet_status_request') {
-      // Can't change status to what it already is
-      if ($sheet_status == 'request') { return FALSE; }
-
-      // Coordinators can set any sheet to "request"
-      if ($is_employer_coordinator) { return TRUE; }
-
-      // Labor advisors can edit sheets that are not in "lock"
-      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
-
-      // Supervisors can set their own sheet to "request" if it's in "draft"
-      if ($is_employer_supervisor && $is_my_sheet && ($sheet_status == 'draft')) { return TRUE; }
-    }
-
-    // Set sheet to "Lock"
-    if ($action == 'sheet_status_lock') {
-      // Can't change status to what it already is
-      if ($sheet_status == 'lock') { return FALSE; }
-
-      // Coordinators can set any sheet to "lock"
-      if ($is_employer_coordinator) { return TRUE; }
-    }
-
-    // Set sheet to "Trash"
-    if ($action == 'sheet_status_trash') {
-      // Can't change status to what it already is
-      if ($sheet_status == 'trash') { return FALSE; }
-
-      // Coordinators can set any sheet to "trash"
-      if ($is_employer_coordinator) { return TRUE; }
-
-      // Labor advisors can edit sheets that are not in "lock"
-      if ($is_worker_advisor && ($sheet_status != 'lock')) { return TRUE; }
-
-      // Supervisors can set their own sheet to "trash" if it's in "draft"
-      if ($is_employer_supervisor && $is_my_sheet && ($sheet_status == 'draft')) { return TRUE; }
-    }
   }
 }
-
-
-
-
-
-
-
-
-
-
-

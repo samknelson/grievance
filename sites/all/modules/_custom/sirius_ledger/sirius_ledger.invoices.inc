@@ -1,12 +1,16 @@
 <?php
 
 class Sirius_Ledger_Invoices extends Sirius_Singleton {
-	public function get_header() {
-		return sirius_domain_variable_get('sirius_ledger_invoice_header');
+	public function get_header($invoice) {
+		$account_node = node_load($invoice['account_nid']);
+		$account_json = sirius_json_get($account_node);
+		return $account_json['settings']['invoices']['header'];
 	}
 
-	public function get_footer() {
-		return sirius_domain_variable_get('sirius_ledger_invoice_footer');
+	public function get_footer($invoice) {
+		$account_node = node_load($invoice['account_nid']);
+		$account_json = sirius_json_get($account_node);
+		return $account_json['settings']['invoices']['footer'];
 	}
 
 	public function invoice_load($participant_nid, $account_nid, $interval) {
@@ -64,7 +68,7 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 
 		$html .= '<div class="sirius_ledger_invoice">';
 
-		$header = $this->get_header();
+		$header = $this->get_header($invoice);
 		if (strlen($header) > 10) {
 			$html .= '<div class="sirius_ledger_invoice_header">' . $header . '</div>' . '<hr>';
 		}
@@ -98,11 +102,35 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		$html .= '<br />';
 		$html .= sirius_fakerender_field('Total Due:', '<strong>' . $currency->render_amt($invoice['balances']['balance_out']) . '</strong>');
 
-		$html .= '</div>';
+		// Render pending payments
+		$params = array();
+		$params['account_nid'] = $account_nid;
+		$params['payer_nid'] = $participant_nid;
+		$params['payment_status'] = 'Pending';
+		$payments = sirius_ledger_payments_search($params);
+		if ($payments) {
+			$options = array();
+			$options['hide_account'] = TRUE;
+			$options['hide_tools'] = TRUE;
+			$options['hide_allocated'] = TRUE;
+			$html .= '<p>' . t('The following payments are pending and have not yet cleared.') . '</p>';
+			$html .= sirius_ledger_payments_render($payments, $options);
+		}
 
 		$html .= '</div>';
 
-		$footer = $this->get_footer();
+		global $user;
+
+		$html .= '<div class="sirius_printonly sirius_invoice_printby">';
+		$html .= "Printed by: " . $user->name . " &lt;" . $user->mail . '&gt;';
+		$html .= ' ' . date('r');
+		$html .= '</div>';
+
+
+
+		$html .= '</div>';
+
+		$footer = $this->get_footer($invoice);
 		if (strlen($footer) > 10) {
 			$html .= '<hr>' . '<div class="sirius_ledger_invoice_footer">' . $footer . '</div>';
 		}
@@ -120,6 +148,7 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		$stmt = sirius_sql_query($sql, array(':participant_id' => $participant_id, ':account_nid' => $account_nid));
 		$hr = $stmt->fetchAssoc();
 		if (!$hr) { return NULL; }
+		if ($hr['m'] === NULL) { return NULL; }
 		$first_ts = $hr['m'];
 
 		$old_tz = date_default_timezone_get();
@@ -138,6 +167,7 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 	}
 
 	public function interval_from_ts($ts) {
+		if ($ts === FALSE) { return array(); }
 		if ($ts === NULL) { return array(); }
 
 		$old_tz = date_default_timezone_get();
@@ -186,6 +216,7 @@ class Sirius_Ledger_Invoices extends Sirius_Singleton {
 		$intervals = array();
 
 		$interval = $this->first_interval($participant_id, $account_nid);
+		if (!$interval) { return array(); }
 		while ($interval) {
 			$intervals[$interval['id']] = $interval;
 

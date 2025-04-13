@@ -96,4 +96,11 @@ class Sirius_Ledger_Service_Stripe extends Sirius_Singleton {
 
 		return array('success' => TRUE, 'msg' => 'Request succeeded', 'data' => $data);
 	}
+
+	public function fetch_by_id($id, $nid_only = FALSE) {
+		if (preg_match('/^pi/', $id)) {
+			return $this->paymentintent_fetch_by_id($id, $nid_only);
+		}
+		return NULL;
+	}
 }

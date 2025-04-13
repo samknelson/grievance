@@ -30,11 +30,13 @@ class Sirius_Ledger_Charge_Plugin_Hourly extends Sirius_Ledger_Charge_Plugin {
 		}
 
 		$rate = $history_item['rate'];
-		sirius_minilog("Found rate \$" . number_format($rate, 2) . " effective $history_item[date]");
+		$rate_format = "\$" . number_format($rate, 2);
+
+		sirius_minilog("Found rate $rate_format effective $history_item[date]");
 
 		$amt = $qty * $rate;
 
-	  $memo = "Hourly: $qty hours at $rate";
+	  $memo = "Hourly: $qty hours at $rate_format";
 	  $entry = array();
 	  $entry['ledger_amount'] = $amt;
 	  $entry['ledger_memo'] = $memo;

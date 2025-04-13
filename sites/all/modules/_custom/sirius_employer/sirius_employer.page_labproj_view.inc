@@ -11,17 +11,18 @@ function sirius_employer_node_tab_labproj_view_access($labproj_node) {
 
 	$employer_node = sirius_log_handler($labproj_node, 'grievance_shop');
 
-	// Employers can access their own page
-	if (user_access('sirius employer labor projection manager')) { 
-		global $user;
-		$user_full = user_load($user->uid);
-		if ($user_full->field_grievance_shops['und'][0]['target_id'] == $employer_node->nid) { return TRUE; }
-	}
-
 	// Stewards can access there own page
 	if (user_access("sirius steward")) {
 		$my_employer = sirius_employer_get();
 		if ($my_employer->nid == $employer_node->nid) { return TRUE; }
+	}
+
+	// Employers can access their own page only
+	if (!user_access('sirius employer admin')) { 
+		$employer_node = sirius_log_handler($labproj_node, 'grievance_shop');
+		global $user;
+		$user_full = user_load($user->uid);
+		if ($user_full->field_grievance_shops['und'][0]['target_id'] != $employer_node->nid) { return FALSE; }
 	}
 
 	return TRUE; 

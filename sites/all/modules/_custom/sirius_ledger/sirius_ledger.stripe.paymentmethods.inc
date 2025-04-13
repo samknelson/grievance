@@ -1,6 +1,7 @@
 <?php
 
 trait Sirius_Ledger_Service_Stripe_PaymentMethods {
+
 	public function paymentmethod_list_multitype($customer_id, $types) {
 		$result_json = array('success' => TRUE, 'paymentmethods' => array('data' => array()));
 		foreach ($types as $type) {
@@ -68,6 +69,29 @@ trait Sirius_Ledger_Service_Stripe_PaymentMethods {
 		$customer_id = $entity_node->uuid;
 		if (!$customer_id) { return array('success' => FALSE, 'msg' => 'No customer_id (no uuid in the entity node).'); }
 
+		/*
+		// Here is how Stripe transaction fees will be calculated.
+		$face = $amount + $fee;
+		$fee = (0.029 * $face) + 0.3;
+		$face = $amount + (0.029*$face) + 0.3;
+		(1-0.029)*$face = $amount + 0.3;
+		$face = ($amount + 0.3) / (1-0.029);
+		drupal_set_message("Here $with $face, $fee");
+		return array('success' => FALSE);
+
+		$entry = array();
+		$entry['ledger_amount'] = $payment_node->field_sirius_dollar_amt['und'][0]['value'];
+		$entry['ledger_account'] = $payment_node->field_sirius_ledger_account['und'][0]['target_id'];
+		$entry['ledger_status'] = $payment_node->field_sirius_payment_status['und'][0]['value'];
+		$payment_type_term = taxonomy_term_load($payment_node->field_sirius_payment_type['und'][0]['tid']);
+		$payer_node = node_load($payment_node->field_sirius_payer['und'][0]['target_id']);
+		$entry['ledger_memo'] = sirius_ledger_payment_memo($payment_node);
+		$entry['ledger_ts'] = $ts;
+		$entry['ledger_reference'] = $payment_node->nid;
+		$entry['ledger_participant'] = $payer_node->nid;
+		sirius_ledger_ar_insert($entry);
+		*/
+
 		try {
 			$paymentintent = $stripe->paymentIntents->create(array(
 				'amount' => 100 * $amount,
@@ -87,15 +111,23 @@ trait Sirius_Ledger_Service_Stripe_PaymentMethods {
 		// @todo this probably should go in client code or a wrapper function
 		// 
 
+		$result = $this->paymentmethod_list($customer_id);
+		if ($result['success']) { $paymentmethods_json = $result['paymentmethods']; }
+		$paymentmethods_options = $this->paymentmethods_options($entity_node, $paymentmethods_json);
+
+
 		$payment_params = array();
+		$payment_params['notes'] = $paymentmethods_options[$paymentmethod_id];
 		if ($entity_node->type == 'sirius_worker') {
 			$payment_params['payer_type'] = 'worker';
 			$payment_params['payer_worker'] = $entity_node->field_sirius_id['und'][0]['value'];
 			$payment_params['payer_employer'] = $entity_node->field_grievance_shop['und'][0]['target_id'];
+			$payment_params['ledger_participant'] = $entity_node->field_sirius_contact['und'][0]['target_id'];
 		}
 		else if ($entity_node->type == 'grievance_shop') {
 			$payment_params['payer_type'] = 'employer';
 			$payment_params['payer_employer'] = $entity_node->nid;
+			$payment_params['ledger_participant'] = $entity_node->nid;
 		}
 		else { 
 			return array(
@@ -107,17 +139,20 @@ trait Sirius_Ledger_Service_Stripe_PaymentMethods {
 		$paymentintent_json = $this->object_to_json($paymentintent);
 
 		$payment_params['ledger_account'] = $account_nid;
-		$payment_params['dollar_amt'] = $amount;
+		$payment_params['dollar_amt'] = $payment_params['ledger_am'] = -1 * $amount;
 		$payment_params['payment_type'] = sirius_domain_variable_get('sirius_ledger_stripe_payment_type');
 		$payment_params['merchant_name'] = 'Stripe';
-		$payment_params['json'] = array('stripe' => array('paymentintent' => $this->object_to_json($paymentintent)));
+		$payment_params['json'] = array(
+			'stripe' => array('paymentintent' => $paymentintent_json),
+			'external_id' => $paymentintent_json['id'],
+		);
 		$payment_params['payment_status'] = 'Pending';
-		$payment_params['allocate'] = 'No';
+		$payment_params['allocate'] = 'Yes';
 		$payment_params['datetime_created'] = date('Y-m-d H:i:s');
-		$payment_params['datetime'] = $payment_params['datetime_created'];
+		$payment_params['datetime'] = date('Y-m-d H:i:s');;
 		$payment_params['id'] = $paymentintent_json['id'];
-		$form_state = array('values' => array('payment' => $payment_params));
-		$result = sirius_ledger_payment_save($form_state);
+		// $payment_params['notes'] = "Stripe payment to "
+		$result = sirius_ledger_payment_create($payment_params);
 		$result['paymentintent'] = $paymentintent;
 
 		return $result;
@@ -209,7 +244,6 @@ trait Sirius_Ledger_Service_Stripe_PaymentMethods {
 		$classes[] = 'sirius_ledger_stripe_paymentmethod';
 		if ($is_default) { $classes[] = 'sirius_ledger_stripe_paymentmethod_default '; } 
 		else { $classes[] = 'sirius_ledger_stripe_paymentmethod_alternative '; }
-
 		$html .= '<div class="' . join(' ', $classes) . '">';
 
 		$type = $paymentmethod_json['type'];
@@ -267,8 +301,6 @@ trait Sirius_Ledger_Service_Stripe_PaymentMethods {
 		if (!$entity_node) { return array('success' => FALSE, 'msg' => 'Customer not found.'); }
 
 		// @todo: Nothing implemented yet.
-
-		watchdog('whatever', 'Here with ' . $entity_node->title);
 		return array('success' => TRUE);
 	}
 }
