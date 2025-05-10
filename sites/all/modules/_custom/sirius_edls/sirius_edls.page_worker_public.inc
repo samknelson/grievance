@@ -52,7 +52,6 @@ function sirius_edls_page_worker_public_form($form, &$form_state, $notification_
 		$all_assignments[date('Y-m-d', strtotime($assignment['assignment_date']))] = $assignment;
 	}
 
-
 	$can_submit = FALSE;
 	$date = date('Y-m-d');
 	for ($delta=0; $delta<7; ++$delta) {
