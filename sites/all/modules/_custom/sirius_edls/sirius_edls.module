@@ -90,7 +90,9 @@ function sirius_edls_report_cache_info() {
 
   $items = array();
   sirius_require('sirius_edls', 'sirius_edls.report_soop.inc');
+  sirius_require('sirius_edls', 'sirius_edls.report_sts.inc');
   Sirius_Edls_Report_Soop::getInstance()->setInfo($items);
+  Sirius_Edls_Report_Sts::getInstance()->setInfo($items);
   return $items;
 }
 
