@@ -66,14 +66,16 @@ class Sirius_Edls_Access extends Sirius_Access {
 
     // Who am I?
     if (user_access('sirius admin') || user_access('sirius edls admin')) { 
-      $is_admin = $is_employer_manager = $is_employer_coordinator = $is_employer_supervisor = $is_worker_advisor = TRUE;
+      $is_admin = $is_employer_manager = $is_employer_coordinator = $is_employer_supervisor = $is_worker_advisor = $is_employer_reader = TRUE;
     } else if (user_access('sirius edls employer labor manager')) { 
-      $is_employer_manager = $is_employer_coordinator = $is_employer_supervisor = $is_worker_advisor = TRUE;
+      $is_employer_manager = $is_employer_coordinator = $is_employer_supervisor = $is_worker_advisor = $is_employer_reader =  TRUE;
     } else if (user_access('sirius edls employer labor coordinator')) { 
-      $is_employer_coordinator = $is_employer_supervisor = TRUE;
+      $is_employer_coordinator = $is_employer_supervisor = $is_employer_reader = TRUE;
     } else if (user_access('sirius edls employer labor supervisor')) { 
       $is_employer_supervisor = TRUE;
     }
+
+    if (user_access('sirius edls employer reader')) { $is_employer_reader = TRUE; }
 
     if (user_access('sirius edls worker labor advisor')) { 
       $is_worker_advisor = TRUE;
@@ -95,7 +97,7 @@ class Sirius_Edls_Access extends Sirius_Access {
       // If you aren't a supervisor, it must be in the future.
       if (!$is_employer_supervisor && !$is_worker_advisor) {
         $ts = strtotime($context['notification']['assignment_date']);
-        if ($ts < time() - 60*60*24*2) { return $this->deny("You cannot view past assignemnts."); }
+        if ($ts < time() - 60*60*24*2) { return $this->deny("You cannot view past assignments."); }
       }
 
       // That's all you need to view the notification.
@@ -149,15 +151,23 @@ class Sirius_Edls_Access extends Sirius_Access {
     }
 
     // Edit notifications
-    if (in_array($action, array('sheet_notify_edit', 'notification_view_delivery'))) {
+    if (in_array($action, array('sheet_notify_edit'))) {
       if ($is_employer_coordinator) { return TRUE; }
       if ($is_worker_advisor) { return TRUE; }
+    }
+
+    // View delivery
+    if (in_array($action, array('notification_view_delivery'))) {
+      if ($is_employer_coordinator) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
+      // if ($is_employer_reader) { return TRUE; }
     }
 
     // View any worker
     if (in_array($action, array('worker_view_all'))) {
       if ($is_employer_coordinator) { return TRUE; }
       if ($is_worker_advisor) { return TRUE; }
+      if ($is_employer_reader) { return TRUE; }
     }
 
     // View the employer statistics
@@ -165,6 +175,7 @@ class Sirius_Edls_Access extends Sirius_Access {
       // Labor coordinators can view the statistics
       if ($is_employer_coordinator) { return TRUE; }
       if ($is_worker_advisor) { return TRUE; }
+      if ($is_employer_reader) { return TRUE; }
     }
 
     // Change the supervisor on a sheet
@@ -177,11 +188,19 @@ class Sirius_Edls_Access extends Sirius_Access {
       if ($is_worker_advisor) { return TRUE; }
     }
 
-    // Create a sheet, list sheets, list workers
-    if (in_array($action, array('sheet_create', 'sheet_list', 'worker_list'))) {
+    // Create a sheet
+    if (in_array($action, array('sheet_create'))) {
       // Labor supervisors can create and list sheets and workers
       if ($is_employer_supervisor) { return TRUE; }
       if ($is_worker_advisor) { return TRUE; }
+    }
+
+    // Create a sheet, list sheets, list workers
+    if (in_array($action, array('sheet_list', 'worker_list'))) {
+      // Labor supervisors can create and list sheets and workers
+      if ($is_employer_supervisor) { return TRUE; }
+      if ($is_worker_advisor) { return TRUE; }
+      if ($is_employer_reader) { return TRUE; }
     }
 
     // Create a reserved sheet
@@ -213,17 +232,18 @@ class Sirius_Edls_Access extends Sirius_Access {
       return FALSE;
     }
 
-    // View, clone, or manage a sheet
+    // View or export a sheet
     if (in_array($action, array('sheet_view', 'sheet_export'))) {
       // Labor coordinators can view anything
       if ($is_employer_coordinator) { return TRUE; }
       if ($is_worker_advisor) { return TRUE; }
+      if ($is_employer_reader) { return TRUE; }
 
       // Labor supervisors can view their own sheets
       if ($is_employer_supervisor && $is_my_sheet) { return TRUE; }
     }
 
-    // View, clone, or manage a sheet
+    // Clone or manage a sheet
     if (in_array($action, array('sheet_clone', 'sheet_manage'))) {
       // Can't update reserved sheets
       // if ($sheet_reserved) { return FALSE; }
@@ -251,6 +271,7 @@ class Sirius_Edls_Access extends Sirius_Access {
       // Labor coordinators only
       if ($is_employer_coordinator) { return TRUE; }
       if ($is_worker_advisor) { return TRUE; }
+      if ($is_employer_reader) { return TRUE; }
     }
 
     // Set sheet to "Draft"
