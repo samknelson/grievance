@@ -22,6 +22,10 @@ function sirius_edls_permission() {
       'title' => t('Sirius EDLS Employer Labor Supervisor'), 
       'description' => t(''),
     ),
+    'sirius edls employer reader' => array(
+      'title' => t('Sirius EDLS Employer Reader'), 
+      'description' => t(''),
+    ),
     'sirius edls worker labor advisor' => array(
       'title' => t('Sirius EDLS Worker Labor Advisor'), 
       'description' => t(''),
