@@ -398,7 +398,6 @@ function sirius_edls_menu() {
         'component' => 'edls',
         'access' => array(
           'type' => 'edls',
-          // 'action' => 'employer_dashboard',
           'action' => 'employer_dashboard',
           'context' => array(),
         ),
@@ -407,6 +406,26 @@ function sirius_edls_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
     'file' => 'sirius_edls.page_worker_soop.inc'
+  );
+
+  $items['sirius/edls/workers/sts'] = array(
+    'title' => 'Scheduled Too Soon',
+    'page callback' => 'sirius_edls_page_worker_sts',
+    'page arguments' => array(),
+    'access callback' => 'sirius_menu_access_callback',
+    'access arguments' => array(
+      array(
+        'component' => 'edls',
+        'access' => array(
+          'type' => 'edls',
+          'action' => 'employer_dashboard',
+          'context' => array(),
+        ),
+      ),
+    ),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+    'file' => 'sirius_edls.page_worker_sts.inc'
   );
 
   $items['sirius/edls/worker/%'] = array(
