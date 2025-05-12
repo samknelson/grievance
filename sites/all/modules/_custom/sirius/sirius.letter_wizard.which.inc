@@ -138,9 +138,20 @@ function sirius_letter_wizard_which_form_submit($form, &$form_state) {
 			}
 		}
 	}
-	$tokens['my_node'] = $entity_node;
 
+	$tokens['my_node'] = $entity_node;
 	$aliases['my_node'] = 'node';
+
+	$alias_map = array(
+		'sirius_worker' => 'worker_node',
+		'sirius_contact' => 'contact_node',
+		'grievance_shop' => 'employer_node',
+	);
+	
+	if ($alias_map[$entity_node->type]) {
+		$tokens[$alias_map[$entity_node->type]] = $entity_node;
+		$aliases[$alias_map[$entity_node->type]] = 'node';
+	}
 
 	$subject = token_replace($subject, $tokens, array('clear' => TRUE, 'aliases' => $aliases));
 	$body = token_replace($body, $tokens, array('clear' => TRUE, 'aliases' => $aliases));

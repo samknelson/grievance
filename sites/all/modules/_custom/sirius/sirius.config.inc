@@ -36,6 +36,7 @@ function sirius_config_links() {
 		$links['core']['links']['sirius/log/quicklog/config']								= array('title' => 'Quicklog', 'description' => 'Settings for the Quicklog tools.');
 		$links['core']['links']['sirius/phonetree/config'] 			= array('title' => 'Phonetree', 'description' => 'Phonetree settings for when a user calls in to the system.');
 		$links['core']['links']['sirius/lang/config'] 					= array('title' => 'Language Configuration', 'description' => 'Configure available language list for the domain.');
+		$links['core']['links']['admin/config/people/autologout'] = array('title' => 'Auto-logout configuration');
 
 		$links['employer'] = array('title' => 'Employer');
 		$links['employer']['links']['sirius/employer/config/usermanage'] = array('title' => 'Employer User Manager', 'description' => 'Configure tools for allowing employers to manage their own users.');
