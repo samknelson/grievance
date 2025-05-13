@@ -45,8 +45,8 @@ function sirius_dispatch_sched($dispatch_node) {
 	$worker_nid = $dispatch_node->field_sirius_worker['und'][0]['target_id'];
 	if (!$worker_nid) { return array(); }
 
-	$ts = sirius_fieldval($job_node, 'field_sirius_datetime', 'ts');
-	$end_ts = sirius_fieldval($job_node, 'field_sirius_datetime_completed', 'ts');
+	$ts = sirius_fieldval($job_node, 'field_sirius_date_start', 'ts');
+	$end_ts = sirius_fieldval($job_node, 'field_sirius_date_end', 'ts');
 	if (!$end_ts || ($end_ts <= $ts)) { $end_ts = NULL; }
 
   $status = $dispatch_node->field_sirius_dispatch_status['und'][0]['value'];
