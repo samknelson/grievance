@@ -303,6 +303,7 @@ function sirius_backlinks_from_node($node) {
 		else if ($definition_type == 'customfield') { $links['sirius/customfield/definition/list'] = array('name' => 'All Custom Field Sets'); }
 		else if ($definition_type == 'sirius:disclaimer') { $links['sirius/disclaimer/list'] = array('name' => 'All Disclaimers'); }
 		else if ($definition_type == 'sirius:cardcheck') { $links['sirius/cardcheck/definitions'] = array('name' => 'All Card Checks'); }
+		else if ($definition_type == 'workdays') { $links['sirius/workdays'] = array('name' => 'All Calendars'); }
 	}
 
 	if ($node->type == 'grievance_basic_page') {
