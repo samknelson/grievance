@@ -78,7 +78,7 @@ function sirius_worker_node_tabs() {
   $node_tabs['sirius_worker']['sirius_worker_schedule/tor'] = array(
     'title' => 'Time Off',
     'callback' => 'sirius_worker_node_tab_schedule_tor_worker_list',
-    'permissions' => array('sirius'),
+    'permissions' => array('sirius admin'),
     'weight' => 2,
     'file' => 'sirius_worker.page_schedule_tor_worker_list.inc',
     'component' => 'worker:schedule',
