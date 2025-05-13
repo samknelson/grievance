@@ -126,10 +126,18 @@ class Sirius_Ledger_EA extends Sirius_Singleton {
       $entity_node = $this->entity_node($node);
       unset($links['node/' . $account_node->nid . '/sirius_ledger_account_log']);
       unset($links['node/' . $entity_node->nid . '/' . $entity_node->type . '_log']);
-      $links['node/' . $entity_node->nid . '/sirius_worker_ledger'] = array(
-        'name' => sirius_content_type_name($entity_node->type),
-        'title' => $entity_node->title,
-      );
+
+      if ($entity_node->type == 'sirius_worker') {
+        $path = 'node/' . $entity_node->nid . '/sirius_worker_ledger';
+      } else if ($entity_node->type == 'grievance_shop') {
+        $path = 'node/' . $entity_node->nid . '/grievance_shop_ledger';
+      }
+      if ($path) {
+        $links[$path] = array(
+          'name' => sirius_content_type_name($entity_node->type),
+          'title' => $entity_node->title,
+        );
+      }
     }
 
     if ($node->type == 'sirius_payment') {

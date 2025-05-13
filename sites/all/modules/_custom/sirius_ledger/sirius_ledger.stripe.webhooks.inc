@@ -131,7 +131,8 @@ trait Sirius_Ledger_Service_Stripe_Webhooks {
 	  if ($event_category == 'setup_intent') {
 	  	$result = array('success' => FALSE, 'msg' => 'Payment method webhooks not implemented yet.');
 	  } else if ($event_category == 'payment_intent') {
-	  	$result = array('success' => FALSE, 'msg' => 'Payment intent webhooks not implemented yet.');
+
+	  	return $this->paymentintent_webhook_handle($event_json);
 	  } else {
 			return $this->webhook_error("Don't know how to handle webhook of type $event_category.$event_type: <pre>" . print_r($event_json, 1) . '</pre>');
 		}

@@ -560,6 +560,9 @@ class Sirius_Comm extends Sirius_Singleton {
 			$html .= '</div>';
 			$html .= '<div class="sirius_accordion_body">';
 			$html .= $instance->render($comm_node);
+			if (user_access('sirius admin')) {
+				$html .= l('View Comm Node', "node/$comm_nid/sirius_log_comm", array('attributes' => array('class' => array('tool-button'))));
+			}
 			$html .= '</div>';
 		}
 		$html .= '</div>';

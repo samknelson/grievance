@@ -121,6 +121,11 @@ function sirius_dispatch_eba_remove_expired_dates_worker($worker_nid, $mode = 't
  */
 
 function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
+	sirius_minilog("No longer needed.");
+	return array('success' => TRUE);
+}
+/*
+function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 	// Find any EBA dates in the past
 	$date = date('Y-m-d 00:00:00');
 
@@ -176,7 +181,6 @@ function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 				$dispatch_node, 
 				'This was an EBA dispatch and the last scheduled work date has passed, so the dispatch is being automatically terminated.'
 			);
-			*/
 			$result = array('success' => FALSE, 'msg' => "I'm not ready to terminate anybody yet.");
 			if ($result['success']) {
 				++$count_success;
@@ -196,3 +200,4 @@ function sirius_dispatch_eba_layoff_expired_dispatches($mode = 'test') {
 	if ($last_failure_msg) { $msg .= " The last error message was: $last_failure_message."; }
 	return array('success' => TRUE, 'msg' => $msg, 'count' => $count_success);
 }
+*/
