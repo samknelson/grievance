@@ -45,6 +45,7 @@ class Sirius_Edls_Report_Sts extends Report_Cache_Report_Generator {
       '#required' => TRUE,
       '#description' => t('Enter the minimum number of hours between shift start times. The system only looks at start times, not end times.'),
       // '#default_value' => 12,
+      '#size' => 4,
     );
 
     $form['start_date'] = array(
