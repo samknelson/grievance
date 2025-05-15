@@ -142,14 +142,18 @@ class Sirius_Worker_Tos extends Sirius_Singleton {
 		$tos_node = $this->worker_active_record($worker_node->nid);
 
 		if ($tos_node) {
+			$status = $this->status($tos_node);
 			$form['action'] = array('#type' => 'value', '#value' => 'cancel');
 
+			$html = '<p>' . '<strong><span class="sirius_text_red">' . t('You are currently marked as "Absent".') . '</span></strong></p>';
 
-			$html = '<p>' . '<strong>' . t('You are currently marked as "Absent".') . '</strong></p>';
+			$class = 'sirius_callout_basic ';
+			if ($status == 'active') { $class .= 'sirius_callout_red '; }
+			$class .= "sirius_worker_tos sirius_worker_tos_$status";
 
-			$html .= "<div class=\"sirius_callout_basic sirius_worker_tos sirius_worker_tos_$status\">";
+			$html .= "<div class=\"$class\">";
 			$html .= sirius_fakerender_field('Record ID:', $tos_node->uuid);
-			$html .= sirius_fakerender_field('Status:', $this->status_label($this->status($tos_node)));
+			$html .= sirius_fakerender_field('Status:', $this->status_label($status));
 			$html .= sirius_fakerender_field('Absent at:', date('l, F j, Y g:i A T', $tos_node->created));
 			$tos_json = sirius_json_get($tos_node);
 			$ts = $tos_json['worker_tos']['cancel']['ts'];
@@ -175,7 +179,7 @@ class Sirius_Worker_Tos extends Sirius_Singleton {
 		} else {
 			$form['action'] = array('#type' => 'value', '#value' => 'activate');
 
-			$html = '<p>' . '<strong>' . t('You are not on the "Absent" list.') . '</strong></p>';
+			$html = '<p>' . '<strong><span class="sirius_text_green">' . t('You are not on the "Absent" list.') . '</span></strong></p>';
 			$form['activate']['intro'] = array('#markup' => $html);
 
 			$form['activate']['comments'] = array(
