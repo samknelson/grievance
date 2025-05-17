@@ -1,11 +1,12 @@
 <?php
 
-function sirius_worker_tos_page_list() {
-	return drupal_get_form('sirius_worker_tos_page_list_form');
+function sirius_worker_tos_page_employer_list_access($employer_node) {
+	return Sirius_Worker_Tos_Access::getInstance()->access('employer_list', array('employer_node' => $employer_node));
 }
 
-function sirius_worker_tos_page_list_form($form, &$form_state) {
+function sirius_worker_tos_page_employer_list_form($form, &$form_state, $employer_node) {
 	$tos = Sirius_Worker_Tos::getInstance();
+	$form_state['employer_nid'] = $employer_node->nid;
 
 	$form['#tree'] = TRUE;
 
@@ -14,13 +15,6 @@ function sirius_worker_tos_page_list_form($form, &$form_state) {
   	'#title' => 'filters',
   	'#collapsible' => TRUE,
   	'#collapsed' => TRUE,
-  );
-
-  $form['filters']['status'] = array(
-  	'#type' => 'select',
-  	'#title' => t('Status'),
-  	'#options' => array(NULL => t('-- Select --')) + $tos->status_options(),
-  	'#default_value' => 'active',
   );
 
   $form['filters']['start_date'] = array(
@@ -50,23 +44,24 @@ function sirius_worker_tos_page_list_form($form, &$form_state) {
 
 	$search_params = array();
 	if ($form_state['submitted']) {
-		$search_params['status'] = $form_state['values']['filters']['status'];
 		$start_ts = strtotime($form_state['values']['filters']['start_date']);
 		$end_ts = strtotime($form_state['values']['filters']['end_date']);
 		$search_params['start_ts'] = $start_ts;
 		$search_params['end_ts'] = $end_ts;
 		$search_params['worker_name_match'] = $form_state['values']['filters']['worker_name'];
-	} else {
-		$search_params['status'] = 'active';
 	}
+
+	$search_params['status'] = 'active';
+	$search_params['employer_nid'] = $employer_node->nid;
 	$tos_nodes = $tos->search($search_params);
 
 	$display_params = array();
+	$display_params['hide_tools'] = TRUE;
 	$form['results'] = array('#markup' => $tos->render_list($tos_nodes, $display_params));
 
 	return $form;
 }
 
-function sirius_worker_tos_page_list_form_submit($form, &$form_state) {
+function sirius_worker_tos_page_employer_list_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 }

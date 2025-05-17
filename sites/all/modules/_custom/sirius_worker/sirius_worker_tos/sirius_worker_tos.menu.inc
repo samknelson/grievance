@@ -40,6 +40,17 @@ function sirius_worker_tos_node_tabs() {
     'weight' => 4,
   );
 
+  $node_tabs['grievance_shop']['sirius_employer_dispatch/tos'] = array(
+    'title' => 'Call In / Out',
+    'description' => '',
+    'callback' => 'sirius_worker_tos_page_employer_list',
+    'permissions' => array(),
+    'file' => 'sirius_worker_tos.page_employer_list.inc',
+    'skip_node_view_check' => TRUE,
+    'component' => 'worker:tos',
+    'weight' => 4,
+  );
+
   sirius_node_tab_set_module('sirius_worker_tos', $node_tabs);
 
   return $node_tabs;

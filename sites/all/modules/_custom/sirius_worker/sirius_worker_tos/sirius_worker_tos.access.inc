@@ -18,6 +18,9 @@ class Sirius_Worker_Tos_Access extends Sirius_Access {
       'worker_view',
       'worker_view_archive',
 
+      // Parameter employer_node
+      'employer_list',
+
       // Parameter tos_node
       'edit',
     );
@@ -44,6 +47,13 @@ class Sirius_Worker_Tos_Access extends Sirius_Access {
       if ($my_worker_node->nid != $context['worker_node']->nid) { return $this->deny("Not my worker record."); }
     }
 
+    // Employers are restricted to their own record
+    if ($is_employer && $context['employer_node']) {
+      $my_employer_node = sirius_employer_get();
+      if (!$my_employer_node) { return $this->deny("User is not associated with an employer."); }
+      if ($my_employer_node->nid != $context['employer_node']->nid) { return $this->deny("Not my employer record."); }
+    }
+
     if (in_array($action, array('worker_view'))) {
       if ($is_staff) { return TRUE; }
       // Workers can view their own records
@@ -68,6 +78,11 @@ class Sirius_Worker_Tos_Access extends Sirius_Access {
       if (!$context['tos_node']) { return $this->deny("No TOS node."); }
 
       // STaff can edit
+      if ($is_staff) { return TRUE; }
+    }
+
+    if (in_array($action, array('employer_list'))) {
+      if ($is_employer) { return TRUE; }
       if ($is_staff) { return TRUE; }
     }
 

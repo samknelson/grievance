@@ -428,12 +428,6 @@ class Sirius_Worker_Tos extends Sirius_Singleton {
 
 		$sql .= "left join node worker_node on worker_node.type = 'sirius_worker' and worker_node.nid = worker_handler.field_sirius_log_handler_target_id ";
 
-		$sql .= "left join node dispatch_node on dispatch_node.type = 'sirius_dispatch' and dispatch_node.nid = dispatch_handler.field_sirius_log_handler_target_id ";
-		$sql .= "left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = dispatch_node.nid ";
-
-		$sql .= "left join node job_node on job_node.type = 'sirius_dispatch_job' and job_node.nid = field_sirius_dispatch_job_target_id ";
-		$sql .= "left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
-
 		$sql .= "where node.type = 'sirius_log' ";
 		$sql .= "and field_sirius_category_value = 'tos' ";
 
@@ -466,6 +460,29 @@ class Sirius_Worker_Tos extends Sirius_Singleton {
 		if ($params['end_ts']) {
 			$sql .= "and node.created <= :end_ts ";
 			$sql_args[':end_ts'] = $params['end_ts'];
+		}
+
+		if ($params['worker_name_match']) {
+			$sql .= "and worker_node.title like :worker_name_match ";
+			$sql_args[':worker_name_match'] = '%' . DatabaseConnection::escapeLike($params['worker_name_match']) . '%';
+		}
+
+		if ($params['employer_nid']) {
+			$sql .= "and exists (";
+			$sql .= "  select 1 from node dispatch_node ";
+			$sql .= "  left join field_data_field_sirius_dispatch_status on field_data_field_sirius_dispatch_status.entity_type = 'node' and field_data_field_sirius_dispatch_status.entity_id = dispatch_node.nid ";
+			$sql .= "  left join field_data_field_sirius_worker on field_data_field_sirius_worker.entity_type = 'node' and field_data_field_sirius_worker.entity_id = dispatch_node.nid ";
+			$sql .= "  left join field_data_field_sirius_dispatch_job on field_data_field_sirius_dispatch_job.entity_type = 'node' and field_data_field_sirius_dispatch_job.entity_id = dispatch_node.nid ";
+			$sql .= "  left join node job_node on job_node.nid = field_sirius_dispatch_job_target_id ";
+			$sql .= "  left join field_data_field_grievance_shop on field_data_field_grievance_shop.entity_type = 'node' and field_data_field_grievance_shop.entity_id = job_node.nid ";
+			$sql .= "  where dispatch_node.type = 'sirius_dispatch' ";
+			$alq .= "  and job_node.type = 'sirius_dispatch_job' ";
+			$sql .= "  and field_sirius_worker_target_id = worker_node.nid ";
+			$sql .= "  and field_sirius_dispatch_status_value in ('accepted', 'accepted_secondary') ";
+			$sql .= "  and field_grievance_shop_target_id = :employer_nid ";
+			$sql .= ") ";
+
+			$sql_args[':employer_nid'] = $params['employer_nid'];
 		}
 
 		$sql .= "order by node.created desc ";
@@ -517,11 +534,13 @@ class Sirius_Worker_Tos extends Sirius_Singleton {
 				$duration_render = format_interval(time() - $start_ts);
 			}
 
-			$tools = array();
-			if (!$options['hide_worker']) {
-				$tools[] = l('Worker', 'node/' . $worker_node->nid . '/sirius_worker_schedule/tos-archive', array('attributes' => array('class' => array('tool-button'))));
+			if (!$options['hide_tools']) {
+				$tools = array();
+				if (!$options['hide_worker']) {
+					$tools[] = l('Worker', 'node/' . $worker_node->nid . '/sirius_worker_schedule/tos-archive', array('attributes' => array('class' => array('tool-button'))));
+				}
+				$tools[] = l('Record', 'node/' . $tos_node->nid . '/sirius_worker_tos', array('attributes' => array('class' => array('tool-button'))));
 			}
-			$tools[] = l('Record', 'node/' . $tos_node->nid . '/sirius_worker_tos', array('attributes' => array('class' => array('tool-button'))));
 
 			$row = array();
 			if (!$options['hide_worker']) { $row[] = $worker_node->title; }
@@ -529,7 +548,7 @@ class Sirius_Worker_Tos extends Sirius_Singleton {
 			$row[] = $start_ts_render;
 			$row[] = $end_ts_render;
 			$row[] = $duration_render;
-			$row[] = join('', $tools);
+			if (!$options['hide_tools']) { $row[] = join('', $tools); }
 			$rows[] = $row;
 		}
 
@@ -539,7 +558,7 @@ class Sirius_Worker_Tos extends Sirius_Singleton {
 		$header[] = t('Start');
 		$header[] = t('End');
 		$header[] = t('Duration');
-		$header[] = t('Tools');
+		if (!$options['hide_tools']) { $header[] = t('Tools'); }
 
 		return sirius_table_render($header, $rows);
 	}
