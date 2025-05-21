@@ -245,7 +245,7 @@ function sirius_worker_node_tabs() {
     'title' => 'Relationships',
     'description' => '',
     'callback' => 'sirius_node_tab_worker_relationships',
-    'permissions' => array('sirius worker view'),
+    'permissions' => array('sirius'),
     'file' => 'sirius_worker.page_relationships.inc',
     'component' => 'contact:relationships',
     'rnode' => TRUE,
