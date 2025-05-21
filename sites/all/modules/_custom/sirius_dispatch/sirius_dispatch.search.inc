@@ -53,10 +53,6 @@ function sirius_dispatch_search($params) {
   	$sql .= "and field_sirius_dispatch_job_group_target_id = :job_group_nid ";
   	$sql_args[':job_group_nid'] = $params['job_group_nid'];
   }
-  if ($params['active']) {
-  	$sql .= "and field_sirius_active_value = :active ";
-  	$sql_args[':active'] = $params['active'];
-  }
   if ($params['types']) {
   	$sql .= "and field_sirius_dispatch_type_value in (:types) ";
   	$sql_args[':types'] = $params['types'];

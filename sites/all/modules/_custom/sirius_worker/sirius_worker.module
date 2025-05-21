@@ -19,6 +19,8 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_work
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.history.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.create.inc";
 
+require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_employer_worker_list.inc";
+
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_list.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_user.inc";
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_worker/sirius_worker.page_work_status.inc";
@@ -322,24 +324,10 @@ function sirius_worker_node_presave($worker_node) {
 }
 
 function sirius_worker_nextid() {
-  $sql = "select max(field_sirius_id_value) as m from field_data_field_sirius_id ";
-  $sql .= "where entity_type = 'node' "; 
-  $sql .= "and bundle = 'sirius_worker' ";
-  $sql .= "and field_sirius_id_value != '999099' ";
-  $sql .= "and field_sirius_id_value != '666666' ";
-  $sql .= "and field_sirius_id_value != '999001' ";
-  $sql .= "and field_sirius_id_value < '999000' ";
-  $sql .= "and length(field_sirius_id_value) = 6 ";
-  // $sql .= 'and field_sirius_id_value REGEXP \'^[0-9]{6}$\' ';
-  $stmt = db_query($sql, array());
-  $hr = $stmt->fetchAssoc();
-  $id = $hr['m'];
-  if ($id > 0) {
-    $id++;
-    if ($id == 999099) { $id++; }
-    if ($id == 666666) { $id++; }
-    if ($id == 999001) { $id++; }
-  }
+  $id = sirius_domain_variable_get('sirius_worker_nextid');
+  if (!$id) { $id = 1000000; }
+  ++$id; 
+  sirius_domain_variable_set('sirius_worker_nextid', $id);
   drupal_alter('sirius_worker_nextid', $id);
   return $id;
 }
