@@ -138,6 +138,9 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live', $options = array
 
 	if ($info['multidomain']) {
 		$domains = sirius_domain_tree_render_as_select();
+		if ($info['multidomain_include_root']) {
+			$domains[-1] = 'Root';
+		}
 		$component = $info['component'];
 
 		$count = 0;
