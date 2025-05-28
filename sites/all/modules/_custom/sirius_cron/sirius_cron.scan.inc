@@ -155,10 +155,9 @@ function sirius_cron_scan($key, $force = FALSE, $mode = 'live', $options = array
 				continue; 
 			}
 
-			$old_domain_nid = sirius_domain_nid();
-			sirius_domain($domain_nid);
+			sirius_domain_push($domain_nid);
 			$sub_result = $info['callback']($mode, $force, $options);
-			sirius_domain($old_domain_nid);
+			sirius_domain_pop();
 
 			++$count;
 			if ($sub_result['success']) { 
