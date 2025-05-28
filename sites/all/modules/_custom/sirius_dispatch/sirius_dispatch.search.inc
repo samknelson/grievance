@@ -98,7 +98,7 @@ function sirius_dispatch_search($params) {
     if ($params['order']) {
     	$order = $params['order'];
     } else {
-  	  $order = "field_sirius_date_start_value desc, field_sirius_dispatch_job_target_id ";
+  	  $order = "field_sirius_date_start_value desc, field_sirius_dispatch_job_target_id, node.nid desc ";
     }
     $sql .= "order by $order ";
     $limit = $params['limit'];

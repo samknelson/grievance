@@ -37,5 +37,21 @@ function sirius_ledger_config($form, &$form_state) {
     '#description' => 'Each time the monthly dues are processed (up to once an hour), process at most this many entries. Selecting a value that is too large could result in degraded server performance.',
   );
 
+  $name = sirius_domain_variable_name('sirius_ledger_payment_max');
+  $form[$name] = array(
+    '#type' => 'textfield',
+    '#title' => 'Maximum Payment Amount',
+    '#default_value' => variable_get($name, 100000),
+    '#size' => 4,
+  );
+
+  $name = sirius_domain_variable_name('sirius_ledger_payment_min');
+  $form[$name] = array(
+    '#type' => 'textfield',
+    '#title' => 'Minimum Payment Amount',
+    '#default_value' => variable_get($name, 2),
+    '#size' => 4,
+  );
+
   return system_settings_form($form);
 }
