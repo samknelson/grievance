@@ -14978,7 +14978,137 @@ function grievance_content_types_field_default_field_instances() {
         ),
       ),
       'type' => 'addressfield_standard',
-      'weight' => 7,
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-sirius_contact-field_sirius_address_accuracy'.
+  $field_instances['node-sirius_contact-field_sirius_address_accuracy'] = array(
+    'bundle' => 'sirius_contact',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 12,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_address_accuracy',
+    'label' => 'Address Accuracy',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 10,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_contact-field_sirius_address_canon'.
+  $field_instances['node-sirius_contact-field_sirius_address_canon'] = array(
+    'bundle' => 'sirius_contact',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_address_canon',
+    'label' => 'Canonical Address',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 9,
+    ),
+  );
+
+  // Exported field_instance: 'node-sirius_contact-field_sirius_address_county'.
+  $field_instances['node-sirius_contact-field_sirius_address_county'] = array(
+    'bundle' => 'sirius_contact',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'field_delimiter' => '',
+        ),
+        'type' => 'text_default',
+        'weight' => 13,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_sirius_address_county',
+    'label' => 'County',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 11,
     ),
   );
 
@@ -15019,7 +15149,7 @@ function grievance_content_types_field_default_field_instances() {
           'geofield_map_zoom' => 14,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 11,
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15063,7 +15193,7 @@ function grievance_content_types_field_default_field_instances() {
         'latlng_override' => 0,
       ),
       'type' => 'geocoder',
-      'weight' => 8,
+      'weight' => 12,
     ),
   );
 
@@ -15110,7 +15240,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 12,
+      'weight' => 16,
     ),
   );
 
@@ -15154,7 +15284,7 @@ function grievance_content_types_field_default_field_instances() {
         'content_taxonomy_opt_groups' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 10,
+      'weight' => 14,
     ),
   );
 
@@ -15255,7 +15385,7 @@ function grievance_content_types_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -15277,7 +15407,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'sirius_jsonfield',
       'settings' => array(),
       'type' => 'sirius_jsonfield_widget',
-      'weight' => 11,
+      'weight' => 15,
     ),
   );
 
@@ -15317,7 +15447,7 @@ function grievance_content_types_field_default_field_instances() {
       'module' => 'multiple_selects',
       'settings' => array(),
       'type' => 'multiple_selects',
-      'weight' => 9,
+      'weight' => 13,
     ),
   );
 
@@ -15602,7 +15732,7 @@ function grievance_content_types_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 13,
+      'weight' => 17,
     ),
   );
 
@@ -37890,6 +38020,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Additional Information Request');
   t('Address');
   t('Address 2');
+  t('Address Accuracy');
   t('Address Geocode');
   t('Allocated?');
   t('Alt. Contact');
@@ -37945,6 +38076,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Can and should this case be settled?');
   t('Can the articles in this contract be selected?  If "Yes", then a "dummy" section will be created for each article.');
   t('Cancel By');
+  t('Canonical Address');
   t('Category');
   t('Chapter');
   t('Check / Txn #');
@@ -37971,6 +38103,7 @@ If the file has multiple pages, then each page in the input document will use th
   t('Contract Template');
   t('Contract Templates');
   t('Count');
+  t('County');
   t('Created');
   t('Currency');
   t('Current Employer');
