@@ -6,45 +6,6 @@ function sirius_smf_feed_ehrs_verify_form($form, &$form_state, $info, $data, $fe
 	$form_state['feed_nid'] = $feed_node->nid;
 	$form_state['current_step'] = $current_step;
 
-	/*
-	// Preview the raw input
-	// (We're not doing this now, because we show it on the mapping page)
-	$reader = sirius_feed_spout_get_reader($feed_node);
-	$sheet = sirius_feed_spout_get_sheet($reader, $data['worksheet']);
-	if (!$sheet) { return sirius_form_error("Unable to load the spreadsheet"); }
-	$sheet_header = sirius_feed_spout_get_header($sheet, $data['header_row']);
-
-	$preview_header = array('xxxrowcountxxx' => 'Row');
-	$fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step);
-	foreach ($fields as $field_name => $field_info) {
-		$col = $data["map_$field_name"];
-		if ($col === NULL || $col === '') { continue; }
-		$preview_header[$field_name] = $field_info['title'] . '<br>(' . $sheet_header[$col] . ')';
-	}
-
-	// Get our data
-	$count = 0;
-	$preview_rows = array();
-	foreach ($sheet->getRowIterator() as $sheet_row) {
-		++$count;
-		if ($count == 1 && $data['header_row'] == 'Yes') { continue; }
-		$import_row = sirius_feed_spout_get_import_row($fields, $sheet_row, $data, $count, $sheet_header);
-		$preview_row = array();
-		foreach ($preview_header as $field_name => $field_label) {
-			$preview_row[$field_name] = $import_row[$field_name];
-		}
-		$preview_rows[] = $preview_row;
-
-		if ($count > 20) { break; }
-	}
-
-	$data['rows'] = $count + 1;
-
-	$html .= "<h2>Data Preview</h2>";
-	$html .= sirius_table_render($preview_header, $preview_rows);
-	$form['preview'] = array('#markup' => $html);
-	*/
-
   $access = Sirius_Smf_Ehrs_Monthly_Access::getInstance();
   if ($access->access('staff', array())) {
   	$form['ignore_errors'] = array(
@@ -83,7 +44,7 @@ function sirius_smf_feed_ehrs_verify_form($form, &$form_state, $info, $data, $fe
 		'#value' => 'Parse and Verify Upload',
 	);
 
-	return sirius_sms_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
+	return sirius_smf_feed_ehrs_form_prep($form, $form_state, $info, $data, $feed_node, $current_step);
 }
 
 function sirius_smf_feed_ehrs_verify_form_submit($form, &$form_state) {
@@ -140,7 +101,7 @@ function sirius_smf_feed_ehrs_verify_form_submit($form, &$form_state) {
 		}
 	}
 
-	sirius_wizard_submit($info, $data, $feed_node, $current_step, "Upload parsed.");
+	sirius_wizard_submit($info, $data, $feed_node, $current_step, "Upload parsed.", array('feed_status' => 'draft'));
 }
 
 function sirius_smf_feed_ehrs_worker_lookup($feed_node, $info, $data, $row) {
@@ -170,6 +131,12 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
   static $rowcount;
   $rowcount++;
 
+  // Get the employer node
+	$eup_node = sirius_smf_feed_ehrs_get_eup($feed_node);
+	if (!$eup_node) { return array('success' => FALSE, 'msg' => "This feed is not associated with an employer upload."); }
+	$eup = Sirius_Smf_Ehrs_Monthly::getInstance();
+	$employer_node = $eup->get_employer($eup_node);
+
   // Trim all
   foreach ($row as $key => $value) {
     if (!is_array($value)) { $row[$key] = trim($value); }
@@ -177,6 +144,10 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
 
   if (isset($row['ssn']) && isset($row['ein'])) {
   	return array('success' => FALSE, 'msg' => 'Uploads cannot contain both an SSN and an EIN.');
+  }
+
+  if (isset($row['ssn'])) {
+  	while (strlen($row['ssn']) < 9) { $row['ssn'] = '0' . $row['ssn']; }
   }
 
   $errors = array();
@@ -201,11 +172,7 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
 
   foreach ($fields as $field_name => $field_info) {
     if (!$row[$field_name]) { continue; }
-
-    if ($field_name == 'hour_type') {
-    	// Friendly error message for hour type
-    } 
-    $result = sirius_feed_handle_field($field_name, $field_info, $row[$field_name], $precompute);
+   	$result = sirius_feed_handle_field($field_name, $field_info, $row[$field_name], $precompute, $employer_node->nid);
     if (!$result['success']) { $errors[] = $result['msg']; }
   }
 
@@ -226,9 +193,11 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
   $row['hour_type_id'] = $hour_type_term->field_sirius_id['und'][0]['value'];
 
   // Terminated workers must have 0 hours
+  /*
   if ($row['hour_type_id'] == 'terminated' && $row['hrs'] > 0) {
   	$errors[] = 'For terminated workers, hours must be 0.';
 	}
+	*/
 
 	// FMLA and disability workers have the number of hours automatically set to their threshold
 	if (in_array($row['hour_type_id'], array('fmla', 'disability'))) {
@@ -242,7 +211,7 @@ function sirius_smf_feed_ehrs_row_verify($feed_node, $info, &$data, &$row, $prec
 		// 		But it's too silly. So:
 
 		$plugin_info = sirius_trust_eligibility_plugin_info('smf-buildup');
-		$threshold = $plugin_info['instance']->worker_max_threshold($worker_node);
+		$threshold = $plugin_info['instance']->threshold_from_worker_and_employer($worker_node, $employer_node);
 		if ($threshold > $row['hrs']) { $row['hrs'] = $threshold; }
 	}
 

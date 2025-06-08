@@ -54,14 +54,16 @@ function sirius_smf_feed_dependents_row_verify_coverage($feed_node, $info, $data
   else if ($eff) { $end[1] = date('Y-m-d 00:00:00', strtotime('-1 day', strtotime($eff))); }
 
   for ($i=0; $i<2; ++$i) {
-    if ($end[$i]) { $end[$i] = date('Y-m-t 00:00:00', strtotime($end[$i])); }
+    if ($end[$i]) {
+      $end[$i] = date('Y-m-t 23:59:59', strtotime('-1 month', strtotime($end[$i])));
+    }
     if ($start[$i] && $end[$i] && ($end[$i] < $start[$i])) { return array('success' => FALSE, 'msg' => "Coverage end #" . ($i+1) . " is after coverage start."); }
   }
 
   if (!$start[0] && !$start[1]) {return array('success' => FALSE, 'msg' => 'No coverage start date 1 and no coverage start date 2.'); }
 
   // Get subscriber's coverage records
-  $subscriber_wb_nodes = sirius_trust_worker_benefits_search(array('worker_nid' => $subscriber_worker_nid));
+  $subscriber_wb_nodes = sirius_trust_worker_benefits_search(array('worker_nid' => $subscriber_worker_nid, 'relationship_nid' => 'NULL'));
   if (!$subscriber_wb_nodes) { return array('success' => FALSE, 'msg' => 'No coverage records found for the subscriber.'); }
 
   // Delete all the existing coverage nodes for this worker and relationship

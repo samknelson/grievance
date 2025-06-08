@@ -18,17 +18,18 @@ function sirius_smf_feed_ehrs_fmla_form($form, &$form_state, $info, $data, $wiza
 
 	$rows = array();
 
+	$fmla = Sirius_Smf_Fmla::getInstance();
+	
 	foreach ($data['records']['rows'] as $data_row) {
 		if ($data_row['hour_type_id'] != 'fmla') { continue; }
 
-		// Find the FMLA start date
 
 		$row = array();
 		$row[] = $data_row[$pk];
 		$row[] = $data_row['name_first'];
 		$row[] = $data_row['name_last'];
 		$row[] = $data_row['hrs'];
-		$row[] = t('Coming soon.');
+		$row[] = $fmla->start_date($data_row['worker_nid'], $employer_node->nid, $year, $month);
 		$rows[] = $row;
 	}
 
@@ -58,7 +59,7 @@ function sirius_smf_feed_ehrs_fmla_form($form, &$form_state, $info, $data, $wiza
 		'#value' => 'Confirm FMLA and Continue',
 	);
 
-	return sirius_sms_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
+	return sirius_smf_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
 }
 
 function sirius_smf_feed_ehrs_fmla_form_submit($form, &$form_state) {
@@ -67,5 +68,5 @@ function sirius_smf_feed_ehrs_fmla_form_submit($form, &$form_state) {
 	$wizard_node = $form_state['wizard_node'];
 	$current_step = $form_state['current_step'];
 
-	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "FMLA Confirmed.", array('nonsequential' => FALSE));
+	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "FMLA Confirmed.", array('nonsequential' => FALSE, 'feed_status' => 'draft'));
 }

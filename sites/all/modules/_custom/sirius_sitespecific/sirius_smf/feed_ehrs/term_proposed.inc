@@ -25,9 +25,11 @@ function sirius_smf_feed_ehrs_term_proposed_form($form, &$form_state, $info, $da
 			'employer_nid' => $employer_node->nid,
 			'types' => array('Primary', 'Secondary'),
 			'ts' => strtotime("$year-$month-15"), // Avoid timezone silliness
+			'limit' => 100,
 		)
 	);
 
+	$count = 0;
 	foreach ($dispatch_nodes as $dispatch_nid => $dispatch_node) {
 		$worker_nid = $dispatch_node->field_sirius_worker['und'][0]['target_id'];
 		if (!$worker_nid) { continue; }
@@ -58,6 +60,9 @@ function sirius_smf_feed_ehrs_term_proposed_form($form, &$form_state, $info, $da
 		$row['name_first'] = $worker_node->field_sirius_name['und'][0]['given'];
 		$row['name_last'] = $worker_node->field_sirius_name['und'][0]['family'];
 		$rows[$worker_nid] = $row;
+
+		++$count;
+		if ($count > 10) { break; }
 	}
 
 	if ($rows) {
@@ -85,7 +90,7 @@ function sirius_smf_feed_ehrs_term_proposed_form($form, &$form_state, $info, $da
 		'#value' => 'Confirm and Continue',
 	);
 
-	return sirius_sms_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
+	return sirius_smf_feed_ehrs_form_prep($form, $form_state, $info, $data, $wizard_node, $current_step);
 }
 
 function sirius_smf_feed_ehrs_term_proposed_form_submit($form, &$form_state) {
@@ -98,5 +103,5 @@ function sirius_smf_feed_ehrs_term_proposed_form_submit($form, &$form_state) {
 		$data['term_proposed'] = array_filter(array_values($form_state['values']['term_proposed']));
 	}
 
-	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Confirmed.", array('nonsequential' => FALSE));
+	sirius_wizard_submit($info, $data, $wizard_node, $current_step, "Confirmed.", array('nonsequential' => FALSE, 'feed_status' => 'draft'));
 }

@@ -43,10 +43,10 @@ function sirius_smf_feed_contributions_info() {
 
     'feed' => array(
       'pks' => array(
-        'ssn' => '[Multipl field generated]',
+        'ssn' => '[Multiple field generated]',
       ),
       'callback_fields' => 'sirius_smf_feed_contributions_fields',
-      'batch_size' => 50,
+      'batch_size' => 250,
       'callback_row_verify' => 'sirius_smf_feed_contributions_row_verify',
       'callback_row_process' =>'sirius_smf_feed_contributions_row_process',
       'create_new_records' => 'optional',

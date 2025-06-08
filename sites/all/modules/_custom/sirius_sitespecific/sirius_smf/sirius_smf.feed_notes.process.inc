@@ -11,7 +11,7 @@ function sirius_smf_feed_notes_row_process($feed_node, $info, $data, $row) {
   if (!isset($fields)) { $fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step); }
 
   $log_text = array();
-  foreach (array('P', 'Q', 'R', 'S', 'T') as $col) {
+  foreach (array('P', 'Q', 'R', 'S', 'T', 'U',) as $col) {
     if ($row[$col]) {
       $log_text[] = $row[$col];
     }
@@ -24,10 +24,11 @@ function sirius_smf_feed_notes_row_process($feed_node, $info, $data, $row) {
   if ($log_nid) {
     $log_node = node_load($log_nid);
     $log_node->field_sirius_summary['und'][0]['value'] = $log_text;
+    $log_node->field_sirius_message['und'][0]['value'] = substr($log_text, 0, 254);
     node_save($log_node);
     $msg = "Updated an existing log entry.";
   } else {
-    $log_node = sirius_log('smf:notes', 'raw', 'Imported notes', $log_text, $pk, array($entity_nid));
+    $log_node = sirius_log('smf:notes', 'raw', $log_text, $log_text, $pk, array($entity_nid));
     $msg = "Created a new log entry.";
   }
 
