@@ -207,6 +207,11 @@ function sirius_addr_node_presave($node) {
 
 function sirius_addr_form_alter_node(&$form, &$form_state, $form_id) {
 	// Hide canonical addresses on the node form. They are always set automatically.
+	if (isset($form['field_sirius_address_canon'])) { $form['field_sirius_address_canon']['#access'] = FALSE; }
+	if (isset($form['field_sirius_address_accuracy'])) { $form['field_sirius_address_accuracy']['#access'] = FALSE; }
+	if (isset($form['field_sirius_address_county'])) { $form['field_sirius_address_county']['#access'] = FALSE; }
+
+	// Legacy support for HotelsDB
 	if (isset($form['field_address_canon'])) { $form['field_address_canon']['#access'] = FALSE; }
 	if (isset($form['field_address_canon_accuracy'])) { $form['field_address_canon_accuracy']['#access'] = FALSE; }
 }
