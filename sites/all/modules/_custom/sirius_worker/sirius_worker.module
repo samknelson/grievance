@@ -460,6 +460,22 @@ function sirius_worker_node_view($node, $view_mode, $langcode) {
 
   // Render contact tags
   sirius_worker_contact_tags_node_view($node, $view_mode, $langcode);
+
+  // Address
+  sirius_worker_addr_node_view($node, $view_mode, $langcode);
+}
+
+function sirius_worker_addr_node_view(&$worker_node, $view_mode, $langcode) {
+  if ($worker_node->type != 'sirius_worker') { return; }
+  if (!$worker_node->content['field_sirius_address']) { return; }
+  $contact_node = node_load($worker_node->field_sirius_contact['und'][0]['target_id']);
+  if (!$contact_node) { return; }
+  $accuracy = $contact_node->field_sirius_address_accuracy['und'][0]['value'];
+  if (!$accuracy) { return; }
+  $renderable = field_view_field('node', $contact_node, 'field_sirius_address_accuracy', 'full');
+  if ($renderable) {
+    $worker_node->content['field_sirius_address']['#suffix'] = render($renderable);
+  }
 }
 
 /**
