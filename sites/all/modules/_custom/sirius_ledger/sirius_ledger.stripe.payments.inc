@@ -87,7 +87,7 @@ trait Sirius_Ledger_Service_Stripe_Payments {
 		$url = $this->object_url($paymentintent_json);
 		$html .= "<a href=\"$url\" class=\"tool-button\" target=\"_blank\">";
 		$html .= '<span class="sirius_ledger_stripe_link_icon">';
-		$html .= '<i class="fab fa-cc-stripe"></i>';
+		$html .= '<i class="fas fa-user-lock"></i>';
 		$html .= '</span>';
 		$html .= "View in Stripe";
 		$html .= '</a>';

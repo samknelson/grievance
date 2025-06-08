@@ -25,7 +25,7 @@ function sirius_ledger_page_policies() {
 	  	$paths['View'] = "node/$policy_nid";
 			$paths['Benefits'] = "node/$policy_nid/sirius_trust_policy_benefits";
 			if ($trust_active) {
-				$paths['Billing'] = "node/$policy_nid/sirius_ledger_policy_definition";
+				$paths['Charge Plugins'] = "node/$policy_nid/sirius_ledger_policy_charge_plugins";
 				$paths['Elections'] = "node/$policy_nid/sirius_trust_policy_election";
 			}
 
