@@ -13,6 +13,23 @@ function sirius_dashboard_plugin_info($plugin_key) {
 }
 
 function sirius_dashboard_plugin_info_all() {
+  $plugins = &drupal_static(__FUNCTION__);
+  if (!isset($plugins)) {
+    // Allow modules to define new flood types by implementing hook_sirius_flood_info
+    $plugins = module_invoke_all('sirius_dashboard_plugin_info');
+
+    // Sort by key
+    ksort($plugins);
+  }
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_sirius_dashboard_info
+ */
+
+function sirius_dashboard_sirius_dashboard_plugin_info() {
 	$plugins = array();
 
 	$plugins['report'] = array(
@@ -115,18 +132,6 @@ function sirius_dashboard_plugin_info_all() {
 			'data' => 'sirius_dashboard_plugin_markup_data',
 			'config' => 'sirius_dashboard_plugin_markup_config',
 			'prefs' => 'sirius_dashboard_plugin_markup_prefs',
-		),
-	);
-
-	$plugins['trust_elections'] = array(
-		'title' => 'Trust - Elections',
-		'description' => '',
-		'file' => 'sirius_trust.dashboard_plugin_elections.inc',
-		'module' => 'sirius_trust',
-		'callbacks' => array(
-			'data' => 'sirius_trust_dashboard_plugin_elections_data',
-			'config' => 'sirius_trust_dashboard_plugin_elections_config',
-			'prefs' => 'sirius_trust_dashboard_plugin_elections_prefs',
 		),
 	);
 
