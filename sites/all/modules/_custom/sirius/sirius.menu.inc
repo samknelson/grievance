@@ -834,12 +834,21 @@ function sirius_menu() {
   );
 
   $items['sirius/config/phone/sms_global_disable'] = array(
-    'title' => 'SMS Global Disable',
+    'title' => 'Global Disable',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sirius_sms_admin'),
     'access arguments' => array('sirius admin'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
+  );
+
+  $items['sirius/config/phone/sms_optin'] = array(
+    'title' => 'Optin',
+    'page callback' => 'sirius_page_sms_optin_config',
+    'access arguments' => array('sirius domain admin'),
+    'file' => 'sirius.page_sms_optin_config.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 6,
   );
 
   $items['sirius/config/menu'] = array(
@@ -1575,6 +1584,7 @@ function sirius_menu() {
   );
   */
 
+  /*
   $items['user/%/sirius_proxy'] = array(
     'title' => 'Proxy',
     'page callback' => 'sirius_user_tab_proxy',
@@ -1584,6 +1594,7 @@ function sirius_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 8,
   );
+  */
 
   $items['user/%/current_location'] = array(
     'title' => 'Current Location',

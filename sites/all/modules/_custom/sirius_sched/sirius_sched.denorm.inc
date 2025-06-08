@@ -40,9 +40,11 @@ function sirius_sched_denorm_queue($node) {
   $denorm_id = sirius_denorm_queue_add($node->nid, $node->nid, 'sirius_sched');
 
   // Debug -- denorm runs after page load, so it's a pain to debug. 
+  /*
   $items = sirius_denorm_queue_search(array('denorm_id' => $denorm_id));
   $item = reset($items);
   sirius_sched_sirius_denorm($item);
+  */
 }
 
 /**
@@ -69,12 +71,14 @@ function sirius_sched_sirius_denorm($item) {
 
 		$scheds = $info['callback_denorm']($handler_node);
 		if (!$scheds) { $scheds = array(); }
+
 		sirius_sched_db_delete(array('handler_nid' => $handler_node->nid));
 	  foreach ($scheds as $sched) {
 	  	$sched['type'] = $key; 
 	  	$sched['handler_nid'] = $handler_node->nid;
 	  	$sched['title'] = $handler_node->title;
 	    sirius_sched_db_insert($sched);
+		  module_invoke_all('sirius_sched_post_update', $sched);
 	  }
 	}
 }

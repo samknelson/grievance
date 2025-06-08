@@ -1,5 +1,9 @@
 <?php
 
+function sirius_trust_node_tab_worker_election_list_access($worker_node) {
+  return Sirius_Trust_Access::getInstance()->access('worker_election_list', array('worker_node' => $worker_node));
+}
+
 function sirius_trust_node_tab_worker_election_list($worker_node) {
 	drupal_add_js(drupal_get_path('module', 'sirius') . '/js/table.js', 'file');
 	$show_inactive = $_REQUEST['show_inactive'];
@@ -44,7 +48,6 @@ function sirius_trust_render_worker_elections($worker_node, $show_inactive) {
   	$row = array();
   	$row[] = join(', ', $benefit_names);
   	$row[] = $employer_name;
-  	$row[] = sirius_term_title($election_node->field_sirius_trust_election_type['und'][0]['tid']);
   	$row[] = $election_node->field_sirius_active['und'][0]['value'];
   	$row[] = $start_date;
   	$row[] = $end_date;
@@ -62,7 +65,6 @@ function sirius_trust_render_worker_elections($worker_node, $show_inactive) {
   $header = array(
   	'Benefits', 
   	'Employer',
-  	'Type',
   	'Active',
   	'Start Date',
   	'End Date',

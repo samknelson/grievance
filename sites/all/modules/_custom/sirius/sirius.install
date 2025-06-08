@@ -509,3 +509,26 @@ function sirius_update_7031() {
   }
 }
 
+/**
+ * Grant 
+ */
+
+/**
+ * Grant "sirius worker" to anybody with "sirius dispatch worker"
+ */
+
+function sirius_update_7032() {
+  $if_you_haves = array('sirius dispatch worker', 'sirius trust worker');
+  $then_you_gets = array('sirius worker');
+
+  foreach ($if_you_haves as $if_you_have) {
+    foreach ($then_you_gets as $then_you_get) {
+      print "Granting new permission [$then_you_get] to anybody with permission [$if_you_have] ...\n";
+      $roles = user_roles(FALSE, $if_you_have);
+      foreach ($roles as $rid => $name) {
+        print "... granting [$then_you_get] to [$name]\n";
+        user_role_grant_permissions($rid, array($then_you_get));
+      }
+    }
+  }
+}

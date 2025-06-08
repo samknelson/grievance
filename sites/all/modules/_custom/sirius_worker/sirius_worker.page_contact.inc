@@ -23,6 +23,8 @@ function sirius_node_tab_worker_contact_form($form, &$form_state, $worker_node) 
 
 	$form_state['worker_node'] = $worker_node;
 
+	$worker_json = sirius_json_get($worker_node);
+
 	$form['email'] = array(
 		'#title' => t('Email Address'),
 		'#type' => 'textfield',
@@ -41,13 +43,6 @@ function sirius_node_tab_worker_contact_form($form, &$form_state, $worker_node) 
 		'#type' => 'textfield',
 		'#size' => 15,
 		'#default_value' => $worker_node->field_sirius_phone_alt['und'][0]['value'],
-	);
-
-	$form['phone_fax'] = array(
-		'#title' => t('Fax'),
-		'#type' => 'textfield',
-		'#size' => 15,
-		'#default_value' => $worker_node->field_sirius_phone_fax['und'][0]['value'],
 	);
 
 	$form['thoroughfare'] = array(
@@ -82,6 +77,14 @@ function sirius_node_tab_worker_contact_form($form, &$form_state, $worker_node) 
 		'#size' => 5,
 	);
 
+	$disclaimer_nid = sirius_domain_variable_get('sirius_sms_optin_disclaimer_nid');
+	if ($disclaimer_nid) {
+		$disclaimer_node = node_load($disclaimer_nid);
+		$disclaimer_json = sirius_json_get($disclaimer_node)['disclaimer'];
+		// $acceptance_json = $worker_json['disclaimer'][$disclaimer_nid]['acceptances'][0];
+		$form['disclaimer'][$disclaimer_nid] = sirius_disclaimer_render_form($disclaimer_json, $acceptance_json);			
+	}
+
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => 'Submit',
@@ -105,11 +108,6 @@ function sirius_node_tab_worker_contact_form_validate($form, &$form_state) {
 	if ($phone_alt && !sirius_phone_validate($phone_alt)) {
 		form_set_error('phone_alt', t('Please enter a valid phone number.'));
 	}
-
-	$phone_fax = sirius_phone_format($form_state['values']['phone_fax']);
-	if ($phone_fax && !sirius_phone_validate($phone_fax)) {
-		form_set_error('phone_fax', t('Please enter a valid fax number.'));
-	}
 }
 
 function sirius_node_tab_worker_contact_form_submit($form, &$form_state) {
@@ -117,6 +115,12 @@ function sirius_node_tab_worker_contact_form_submit($form, &$form_state) {
 
 	$worker_node = $form_state['worker_node'];
 	global $user;
+
+	$disclaimer_nid = sirius_domain_variable_get('sirius_sms_optin_disclaimer_nid');
+	if ($disclaimer_nid) {
+		$disclaimer_node = node_load($disclaimer_nid);
+		sirius_disclaimer_accept($wizard_node, array($disclaimer_node), array());
+	}
 
 	$need_save = FALSE;
 	$val = sirius_phone_format($form_state['values']['phone']);
@@ -135,16 +139,6 @@ function sirius_node_tab_worker_contact_form_submit($form, &$form_state) {
 		$worker_node->field_sirius_phone_alt['und'][0]['value'] = $val;
 		$need_save = TRUE;
 		$msg = t('Changed secondary phone number from @oldval to @val', array('@oldval' => ($oldval?$oldval:"[NULL]"), '@val' => ($val?$val:"[NULL]")));
-		sirius_log('worker:contact', 'update', $msg, '', '', array($worker_node->nid), array());
-		drupal_set_message($msg);
-	}
-
-	$val = sirius_phone_format($form_state['values']['phone_fax']);
-	$oldval = $worker_node->field_sirius_phone_fax['und'][0]['value'];
-	if ($val != $oldval) {
-		$worker_node->field_sirius_phone_fax['und'][0]['value'] = $val;
-		$need_save = TRUE;
-		$msg = t('Changed fax number from @oldval to @val', array('@oldval' => ($oldval?$oldval:"[NULL]"), '@val' => ($val?$val:"[NULL]")));
 		sirius_log('worker:contact', 'update', $msg, '', '', array($worker_node->nid), array());
 		drupal_set_message($msg);
 	}

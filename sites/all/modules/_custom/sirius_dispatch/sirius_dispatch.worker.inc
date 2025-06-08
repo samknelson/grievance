@@ -107,7 +107,7 @@ function sirius_dispatch_worker_recompute_from_dispatch($dispatch_node, $is_dele
 			$j = $hr['job_type_json']['run']['dispstatus']['primary'];
 			if (!$j) { $j = 'Yes'; }
 		} else if ($s == 'accepted_secondary') {
-			$j = $hr['job_type_json']['run']['dispstatus']['primary'];
+			$j = $hr['job_type_json']['run']['dispstatus']['secondary'];
 			if (!$j) { $j = 'No'; }
 		}
 
