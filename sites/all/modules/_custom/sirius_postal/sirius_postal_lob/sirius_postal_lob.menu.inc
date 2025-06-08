@@ -16,5 +16,16 @@ function sirius_postal_lob_menu() {
     'type' => MENU_CALLBACK,
   );
 
+
+  $items['sirius/postal/lob/body/%'] = array(
+    'title' => 'Sirius: Postal: Lob: Letter Body',
+    'description' => '',
+    'page callback' => 'sirius_postal_lob_page_body',
+    'file' => 'sirius_postal_lob.page_body.inc',
+    'page arguments' => array(4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }

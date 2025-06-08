@@ -3,3 +3,47 @@
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_postal_lob') . '/sirius_postal_lob.client.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_postal_lob') . '/sirius_postal_lob.menu.inc';
 
+/**
+ * Implements hook_sirius_dev_make_safe_domain
+ */
+
+function sirius_postal_lob_sirius_dev_make_safe_domain($context) {
+	$settings = sirius_postal_client_settings(); 
+	if (!$settings['live']) { return; }
+
+	$settings['live']['private_key'] = 'DISABLED FOR DEV SERVER';
+	$settings['live']['public_key'] = 'DISABLED FOR DEV SERVER';
+	sirius_domain_variable_set('sirius_postal_client_settings', json_encode($settings));
+}
+
+/**
+ * Implements hook_sirius_cron_scan_info()
+ */
+
+function sirius_postal_lob_sirius_cron_scan_info() {
+	$items = array();
+
+  $items['postal_lob_cache_cleanup'] = array(
+    'title' => 'Postal Lob Cache Cleanup',
+    'description' => 'Delete cached rendered letters',
+    'schedule' => 'daily',
+    'callback' => 'sirius_postal_lob_cache_cleanup',
+    'multidomain' => FALSE,
+  );
+
+  return $items;
+}
+
+function sirius_postal_lob_cache_cleanup($mode = 'test', $force = FALSE) {
+	sirius_minilog("Starting cleanup");
+
+	if ($mode != 'live') { 
+		sirius_minilog("Skipping cleanup because mode = $mode");
+		return array('success' => TRUE);
+	}
+
+	$client = Sirius_Postal_Client_Lob::getInstance();
+	$client->cache_cleanup();
+	sirius_minilog("Cleanup complete.");
+	return array('success' => TRUE);
+}
