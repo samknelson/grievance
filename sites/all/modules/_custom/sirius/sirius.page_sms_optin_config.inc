@@ -17,5 +17,3 @@ function sirius_page_sms_optin_config_form($form, &$form_state) {
 
   return system_settings_form($form);
 }
-
-

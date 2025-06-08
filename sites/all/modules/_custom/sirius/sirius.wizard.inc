@@ -268,6 +268,11 @@ function sirius_wizard_submit($info, $data, &$node, $current_step, $msg = NULL, 
 		$data['steps'][$step_name]['complete'] = FALSE;
 	}
 
+	// Handle some options
+	if ($options['feed_status']) {
+		$node->field_sirius_feed_status['und'][0]['value'] = $options['feed_status'];
+	}
+
 	// Save our data
 	sirius_wizard_data_set($info, $node, $data);
 
