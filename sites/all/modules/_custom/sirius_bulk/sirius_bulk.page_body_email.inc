@@ -32,10 +32,10 @@ function sirius_bulk_node_tab_body_email_form($form, &$form_state, $bulk_node) {
   $html .= '</div>';
   $form['#prefix'] = $html;
 
-	$form['title'] = array(
+	$form['field_grievance_notify_subject'] = array(
 		'#title' => t('Subject'),
 		'#type' => 'textfield',
-		'#default_value' => $bulk_node->title,
+		'#default_value' => $bulk_node->field_grievance_notify_subject['und'][0]['value'],
 		'#description' => t('Will be used as the subject for an email. The subject is <strong>not used</strong> for SMS (text messages) or audio messages (robocalls).'),
 		'#required' => TRUE,
 	);
@@ -59,7 +59,7 @@ function sirius_bulk_node_tab_body_email_form($form, &$form_state, $bulk_node) {
 
 function sirius_bulk_node_tab_body_email_form_submit($form, &$form_state) {
 	$bulk_node = node_load($form_state['bulk_nid']);
-	$bulk_node->title = $form_state['values']['title'];
+	$bulk_node->field_grievance_notify_subject['und'][0]['value'] = $form_state['values']['field_grievance_notify_subject'];
 	$bulk_node->body['und'][0]['value'] = $form_state['values']['body']['value'];
 	$bulk_node->body['und'][0]['text_format'] = $form_state['values']['body']['text_format'];
   node_submit($bulk_node);
