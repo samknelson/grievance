@@ -18,7 +18,7 @@ class Sirius_Trust_Elgibility_Plugin_Geog extends Sirius_Trust_Elgibility_Plugin
 		for ($delta = 0; $delta < $address_count; ++$delta) {
 			$form['addresses'][$delta] = array(
 				'#type' => 'fieldset',
-				'#title' => t('Addrress #') . ($delta+1),
+				'#title' => t('Address #') . ($delta+1),
 			);
 
 			$form['addresses'][$delta]['address'] = array(
@@ -44,6 +44,17 @@ class Sirius_Trust_Elgibility_Plugin_Geog extends Sirius_Trust_Elgibility_Plugin
 				'#size' => 4,
 			);
 		}
+
+		$form['inout'] = array(
+			'#type' => 'select',
+			'#title' => 'Inside or Outside?',
+			'#description' => 'Select "inside" to require memebers to be within the radius. Select "outside" to requir members to be outside the radius.',
+			'#options' => array(
+				NULL => t('-- Select --'),
+				'in' => t('Inside'),
+				'out' => t('Outside'),
+			),
+		);
 
 		sirius_jsonfield_util_set_defaults($form, $json);
 
@@ -74,20 +85,26 @@ class Sirius_Trust_Elgibility_Plugin_Geog extends Sirius_Trust_Elgibility_Plugin
 			return array('success' => FALSE, 'msg' => 'There are no addresses configured for this plugin.');
 		}
 
-		$worker_node = $params['subscriber_worker_node'];
-		$contact_node = sirius_worker_contact_get($worker_node);
-		if (!$contact_node) { return array('success' => FALSE, 'msg' => 'This worker does not have an associated contact record.'); }
+		if ($params['addr'] && isset($params['addr']['lat']) && isset($params['addr']['lon'])) {
+			$worker_lat = $params['addr']['lat'];
+			$worker_lon = $params['addr']['lon'];
+		} else {
+			$worker_node = $params['subscriber_worker_node'];
+			$contact_node = sirius_worker_contact_get($worker_node);
+			if (!$contact_node) {
+				return array('success' => FALSE, 'msg' => 'This worker does not have an associated contact record.');
+			}
 
-		$tools = array(
-			l('Contact', "node/" . $worker_node->nid . "/sirius_worker_contact", array('attributes' => array('class' => array('tool-button')))),
-		);
+			$tools = array(
+				l('Contact', "node/" . $worker_node->nid . "/sirius_worker_contact", array('attributes' => array('class' => array('tool-button')))),
+			);
 
-		if (!$contact_node->field_sirius_address_geo['und'][0]['geom']) {
-			return array('success' => FALSE, 'msg' => 'This worker does not have a geocoded address.', 'tools' => $tools);
+			if (!$contact_node->field_sirius_address_geo['und'][0]['geom']) {
+				return array('success' => FALSE, 'msg' => 'This worker does not have a geocoded address.', 'tools' => $tools);
+			}
+			$worker_lat = $contact_node->field_sirius_address_geo['und'][0]['lat'];
+			$worker_lon = $contact_node->field_sirius_address_geo['und'][0]['lon'];
 		}
-
-		$worker_lat = $contact_node->field_sirius_address_geo['und'][0]['lat'];
-		$worker_lon = $contact_node->field_sirius_address_geo['und'][0]['lon'];
 
 		$success = FALSE;
 		foreach ($settings['addresses'] as $delta => $record) {
@@ -103,6 +120,12 @@ class Sirius_Trust_Elgibility_Plugin_Geog extends Sirius_Trust_Elgibility_Plugin
 		}
 		if (!$success) {
 			$msg = "The worker's address is not within the required distance of any of the specified addresses.";
+		}
+
+		$inout = $settings['inout'];
+
+		if ($inout == 'out') {
+			$success = !$success;
 		}
 
 		return array(

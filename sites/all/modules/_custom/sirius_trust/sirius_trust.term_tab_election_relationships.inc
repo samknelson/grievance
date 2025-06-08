@@ -1,8 +1,8 @@
 <?php
 
-function sirius_trust_term_tab_election_relationships($election_type_term) {
-	return drupal_get_form('sirius_trust_term_tab_election_relationships_form', $election_type_term);
-}
+/**
+ * Not used any more
+ */
 
 function sirius_trust_term_tab_election_relationships_form($form, &$form_state, $election_type_term) {
 	$form_state['election_type_tid'] = $election_type_term->tid;

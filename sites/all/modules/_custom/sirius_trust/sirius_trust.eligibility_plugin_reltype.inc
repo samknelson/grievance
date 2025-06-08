@@ -5,6 +5,8 @@ class Sirius_Trust_Elgibility_Plugin_Reltype extends Sirius_Trust_Elgibility_Plu
 	public $name = 'Relationship Type';
 	public $description = 'Eligibility for this benefit is restricted to only certain relationship types.';
 
+	public function subscriber_only() { return FALSE; }
+
 	public function form($json) {
 		$form['#tree'] = TRUE;
 		$reltype_options = array('[self]' => t('[Self]')) + sirius_taxonomy_load('sirius_contact_relationship_types', 'tid', 'name');
