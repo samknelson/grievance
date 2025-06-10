@@ -73,6 +73,12 @@ function sirius_smf_feed_members_row_verify_elections($feed_node, $info, $data, 
 		} else {
 			$benefits[$date]['den'] = $benefit_nid;
 		}
+
+		if ($linked_benefits[$benefit_nid]) {
+			foreach ($linked_benefits[$benefit_nid] as $linked_benefit_nid) {
+				$benefits[$date][$linked_benefit_nid] = $linked_benefit_nid;
+			}
+		}
 	}
 
 
@@ -89,6 +95,20 @@ function sirius_smf_feed_members_row_verify_elections($feed_node, $info, $data, 
 
 		$last_date = $date;
 	}
+
+	//
+	// Linked benefits
+	//
+
+  $linked_benefits = sirius_smf_feed_members_linked_benefits();
+  foreach ($benefits as $date => $records) {
+  	foreach ($records as $key => $from_benefit_nid) {
+			if (!$linked_benefits[$from_benefit_nid]) { continue; }
+			foreach ($linked_benefits[$from_benefit_nid] as $to_benefit_nid) {
+				$benefits[$date][$to_benefit_nid] = $to_benefit_nid;
+			}
+		}
+  }
 
   // 
   // Create or update elections
@@ -155,13 +175,6 @@ function sirius_smf_feed_members_row_verify_elections($feed_node, $info, $data, 
 		if (!$row['elections'][$date]->field_sirius_trust_benefits['und']) { $row['elections'][$date]->field_sirius_trust_benefits['und'] = NULL; }
 		$row['elections'][$date]->needs_save = TRUE;
   }
-
-  /*
-  if ($row['worker_nid'] == 2792573) {
-  	dpm($benefits);
-  	dpm($row['elections']);
-  }
-  */
 
 	//
   // Set end dates
