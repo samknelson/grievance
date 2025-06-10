@@ -16,7 +16,7 @@ function sirius_smf_feed_ehrs_term_proposed_form($form, &$form_state, $info, $da
 	// Make a lookup map
 	$map = array();
 	foreach ($data['records']['rows'] as $idx => $row) {
-		$map[$row['worker_nid']] = $idx;
+		$map[$row['worker_nid']] = TRUE;
 	}
 
 	// Do a dispatch search
@@ -35,8 +35,7 @@ function sirius_smf_feed_ehrs_term_proposed_form($form, &$form_state, $info, $da
 		if (!$worker_nid) { continue; }
 
 		// Skip them if they appear on the upload.
-		$idx = $map[$worker_nid];
-		if ($idx) { continue; }
+		if ($map[$worker_nid]) { continue; }
 
 		// find the total number of hours in the preceding months
 		$y = $year; $m = $month;
