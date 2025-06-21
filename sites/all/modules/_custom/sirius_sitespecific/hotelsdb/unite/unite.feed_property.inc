@@ -263,6 +263,7 @@ function unite_feed_property_row_verify($feed_node, $info, $data, &$row, $precom
       $result = sirius_addr_validate_full($addr);
       if (!$result['success']) { return $result; }
       if (!$result['point']) { return array('success' => FALSE, 'msg' => 'No point in the address result?'); }
+      if ($result['point']->data['geocoder_accuracy'] != 'ROOFTOP') { return array('success' => FALSE, 'msg' => 'The geocoder did not return a result with ROOFTOP  accuracy.'); }
 
       $addr_canon = $result['point']->data['geocoder_formatted_address'];
       if (!$addr_canon) { return array('success' => FALSE, 'msg' => 'No geocoder_formatted_address in the data for the point returned from Google.'); }
