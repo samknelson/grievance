@@ -615,6 +615,32 @@ function sirius_user_edit_access($account) {
 }
 
 /**
+ * Implements hook_sirius_pageicon_render
+ */
+
+function sirius_sirius_pageicon($context) {
+  if (!$context['node']) { return; }
+
+  if ($context['node']->type == 'sirius_worker') {
+    $icon = '<i class="fas fa-portrait"></i>';
+  }
+
+  $result = array();
+  if ($icon) { $result['icon'] = $icon; }
+  return $result;
+}
+
+function sirius_pageicon_render() {
+  $node = menu_get_object('node');
+  $result = module_invoke_all('sirius_pageicon', array('node' => $node, 'path' => current_path()));
+
+  if ($result['icon']) {
+    $html = '<span class="sirius-pageicon">' . $result['icon'] . '</span>';
+  }
+  return $html;
+}
+
+/**
  * Implements hook_node_view
  */
 
