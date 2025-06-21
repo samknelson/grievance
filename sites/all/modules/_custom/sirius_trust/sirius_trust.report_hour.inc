@@ -30,6 +30,7 @@ class Sirius_Trust_Report_Hour extends Report_Cache_Report_Generator {
           'hours_by_month_4',
           'hours_by_month_5',
         ),
+        'preview_links' => TRUE,
       ),
     );
 

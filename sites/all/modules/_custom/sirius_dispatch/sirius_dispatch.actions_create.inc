@@ -48,6 +48,10 @@ function sirius_dispatch_actions_create($job_node, $worker_nid, $cbn = 'No', $st
 	$dispatch_node = node_submit($dispatch_node);
 	node_object_prepare($dispatch_node);
 	node_save($dispatch_node);
-	sirius_log('dispatch:create', 'complete', "Dispatch created", '', '', array($dispatch_node->nid));
+
+	if (sirius_domain_component_enabled('dispatch:live')) {
+		sirius_log('dispatch:create', 'complete', "Dispatch created", '', '', array($dispatch_node->nid));
+	}
+	
 	return array('success' => TRUE, 'dispatch_node' => $dispatch_node, 'msg' => 'Dispatch created.');
 }

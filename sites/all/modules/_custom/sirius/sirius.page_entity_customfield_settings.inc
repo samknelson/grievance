@@ -8,12 +8,19 @@ function sirius_node_tab_entity_customfield_settings_access($entity_node) {
 		return FALSE;
 	}
 
+	// If there aren't any non-show-by-default options, don't show the tab
+	$options = sirius_customfield_set_list_all(
+		$entity_node->type, 
+		$entity_node->field_sirius_category['und'][0]['value'],
+		array('tab' => array('show_by_default' => 'No'))
+	);
+	if (!$options) { return FALSE; }
+
 	return TRUE;
 }
 
 function sirius_node_tab_entity_customfield_settings_form($form, &$form_state, $entity_node) {
 	$form_state['entity_nid'] = $entity_node->nid;
-	$domain_nid = sirius_domain_nid();
 	$options = sirius_customfield_set_list_all($entity_node->type);
 	if (!$options) { 
 		drupal_set_message('No custom field sets have been defined.', 'warning');
@@ -66,7 +73,6 @@ function sirius_term_tab_entity_customfield_settings($entity_term) {
 
 function sirius_term_tab_entity_customfield_settings_form($form, &$form_state, $entity_term) {
 	$form_state['entity_tid'] = $entity_term->tid;
-	$domain_nid = sirius_domain_nid();
 	$options = sirius_customfield_set_list_all();
 	if (!$options) { 
 		drupal_set_message('No custom field sets have been defined.', 'warning');

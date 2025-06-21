@@ -2,8 +2,26 @@
 
 function sirius_dispatch_term_tab_job_type_run_form($form, &$form_state, $job_type_term) {
 	$form_state['job_type_tid'] = $job_type_term->tid;
-
 	$form['#tree'] = TRUE;
+
+	$json = sirius_json_get($job_type_term);
+
+	$form['run']['do_not_disturb'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Do Not Disturb'),
+	);
+	$options = sirius_do_not_disturb_list();
+	$form['run']['do_not_disturb']['id'] = array(
+		'#type' => 'select',
+		'#options' => $options,
+		'#title' => t('Which Do Not Disturb schedule should be used?'),
+		'#default_value' => 'default',
+	);
+
+	if ($json['run']['do_not_disturb']['id']) {
+		$form['run']['do_not_disturb']['render'] = array('#markup' => sirius_do_not_disurb_render($json['run']['do_not_disturb']['id']));
+	}
+
 
 	$roles = user_roles();
 	$form['run']['role'] = array(
@@ -50,6 +68,47 @@ function sirius_dispatch_term_tab_job_type_run_form($form, &$form_state, $job_ty
 		'#size' => 5,
 		'#default_value' => 1,
 		'#description' => t('Enter the number of notifications to be sent for each open slot. If this is greater than 1, then there will be more than one notification sent for each slot, meaning that there is no guarantee that the job will be filled in seniority order.'),
+	);
+
+	$form['run']['close_after_report_date'] = array(
+		'#title' => 'Close after Report Date?',
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => 'No',
+		'#description' => t('Should this job be automatically closed (set to "Filled") when the report date / time has passed?'),
+	);
+
+	$form['run']['dispstatus'] = array(
+		'#type' => 'fieldset',
+		'#title' => 'Automatically set Dispatch Status',
+	);
+
+	$form['run']['dispstatus']['primary'] = array(
+		'#title' => 'Set the worker to dispatch status "Employed" after primary dispatch?',
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => 'Yes',
+		'#description' => t(''),
+	);
+
+	$form['run']['dispstatus']['secondary'] = array(
+		'#title' => 'Set the worker to dispatch status "Employed" after secondary dispatch?',
+		'#type' => 'select',
+		'#options' => array(
+			NULL => t('-- Select --'),
+			'No' => t('No'),
+			'Yes' => t('Yes'),
+		),
+		'#default_value' => 'No',
+		'#description' => t(''),
 	);
 
 	$form['submit'] = array(

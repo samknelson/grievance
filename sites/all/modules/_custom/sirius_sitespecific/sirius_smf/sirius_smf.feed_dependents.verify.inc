@@ -131,6 +131,15 @@ function sirius_smf_feed_dependents_row_verify_rel($feed_node, $info, $data, &$r
   	if (!$result['success']) { $warnings[] = $result['msg']; }
 	}
 
+  // Work status
+  if ($precompute) {
+    $result = sirius_smf_feed_dependents_row_verify_rel_ws($feed_node, $info, $data, $row, $precompute);
+    if (!$result['success']) {
+      $warnings[] = $result['msg'];
+    }
+  }
+
+
 	// Coverage
   /*
   if ($precompute) {
@@ -148,24 +157,12 @@ function sirius_smf_feed_dependents_row_verify_rel($feed_node, $info, $data, &$r
 	return $result;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 function sirius_smf_feed_dependents_row_verify_cov($feed_node, $info, $data, &$row, $precompute) {
   // Load the fields
   $fields = &drupal_static(__FUNCTION__);
   if (!isset($fields)) { $fields = sirius_feed_wizard_fields($info, $data, $feed_node, $current_step); }
 
- // Only "Enroll" records
-  // "Pending"
+  // Only "Enroll" records
   if ($row['AD'] != 'E') {
     return array('success' => FALSE, 'msg' => 'Since BPA-DEP2-ENROLL != "E", skipping this record.');
   }
@@ -193,7 +190,49 @@ function sirius_smf_feed_dependents_row_verify_cov($feed_node, $info, $data, &$r
   return $result;
 }
 
+/**
+ * Compute the work status ("dependent") and "as of" date
+ */
 
+function sirius_smf_feed_dependents_row_verify_rel_ws($feed_node, $info, $data, &$row, $precompute) {
+  return array('success' => TRUE, 'msg' => 'Disabling work status for now.');
+
+  // Must have a relationship with a start date; otherwise we don't know when the work status started
+  if (!$row['relationship_node']) { return array('success' => FALSE, 'msg' => 'Skipping work status: No relationship.'); }
+  $date = $row['relationship_node']->field_sirius_date_start['und'][0]['value'];
+  if (!$date) { return array('success' => FALSE, 'msg' => 'Skipping work status: Relationship has no start date.'); }
+  $ts = strtotime($date);
+
+  // We don't replace active work statuses with dependent work status.
+  $worker_nid = $row['worker_nid'];
+  if ($worker_nid) {
+    $worker_node = node_load($worker_nid);
+    $old_work_status_tid = sirius_worker_history_asof($worker_node, 'worker:work_status', $ts);
+
+    if ($old_work_status_tid) { 
+      return array('success' => FALSE, 'msg' => 'Skipping work status: As of the relationship start date, the worker had a work status: ' . sirius_term_title($old_work_status_tid));;
+    }
+
+    // drupal_set_message("Worker: " . $worker_node->title . ' (' . $worker_node->nid . ')' . " as of $date ($ts) was " . $old_work_status_tid);
+    // $old_work_status_term = taxonomy_term_load($old_work_status_tid);
+    // if ($old_work_status_term && ($old_work_status_term->field_sirius_dispatch_available['und'][0]['value'] == 'Yes')) {
+    //  return array('success' => FALSE, 'msg' => 'Skipping work status: As of the relationship start date, the worker had a dispatchable work status: ' . $old_work_status_term->name);
+    // }
+  }
+
+  // Look up the work status to be assigned to dependents
+  $dependent_ws_tid = sirius_taxonomy_lookup_by_anything('sirius_work_status', 'dependent');
+  if (!$dependent_ws_tid) { return array('success' => FALSE, 'msg' => 'Skipping work status: There is no taxonomy term with ID "dependent".'); }
+
+  // Pass the results to process()
+  $row['ws'] = array(
+    'tid' => $dependent_ws_tid,
+    'ts' => $ts,
+    'reason' => 'Feed import: Setting work status ' . sirius_term_title($dependent_ws_tid) . ' as of ' . $date . ' because the worker is the target of a dependent relationship with that start date.',
+  );
+
+  return array('success' => TRUE);
+}
 
 function sirius_smf_feed_dependents_date($fields, $row, $field_name) {
   $col = sirius_smf_feed_dependents_field_name($fields, $field_name);

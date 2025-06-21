@@ -1,6 +1,9 @@
 <?php
 
 function sirius_node_tab_dispatch_job_dispatches_access($job_node) {
+	$access = Sirius_Dispatch_Access::getInstance();
+	// return $access->access('dispatch_list', array('job_node' => $job_node));
+
 	// Staff can view any job
 	if (user_access('sirius dispatch staff')) { return TRUE; }
 
@@ -21,8 +24,39 @@ function sirius_node_tab_dispatch_job_dispatches_access($job_node) {
 	return FALSE;
 }
 
-function sirius_node_tab_dispatch_job_dispatches($job_node) {
-	$html = sirius_dispatch_job_counts_render($job_node->nid);
+function sirius_node_tab_dispatch_job_dispatches_form($form, &$form_state, $job_node) {
+	$form_state['job_nid'] = $job_node->nid;
+	$form['#tree'] = TRUE;
+
+	$form['counts'] = array('#markup' => sirius_dispatch_job_counts_render($job_node->nid));
+
+	$dispatch_nodes = sirius_dispatch_search(array('job_nid' => $job_node->nid));
+
+	$header = array();
+	$header['worker_name'] = t('Worker');
+	$header['dispatch_status'] = t('Status');
+	$header['dispatch_start'] = t('Start');
+	$header['dispatch_end'] = t('End');
+	$header['tools'] = t('Tools');
+
+	$rows = array();
+	drupal_add_css(drupal_get_path('module', 'sirius') . '/css/table.css');
+	foreach ($dispatch_nodes as $dispatch_nid => $dispatch_node) {
+		$status = $dispatch_node->field_sirius_dispatch_status['und'][0]['value'];
+		$row['worker_name'] = sirius_node_title($dispatch_node->field_sirius_worker['und'][0]['target_id']);
+		$row['dispatch_status'] = array(
+			'data' => sirius_dispatch_status_title($status),
+			'class' => array(sirius_dispatch_status_color($status)),
+		);
+		$rows[] = $row;
+	}
+	$form['dispatch_nids'] = array(
+		'#type' => 'tableselect',
+		'#options' => $rows,
+		'#header' => $header,
+		'#empty' => t('No dispatches found.'),
+		'#attributes' => array('class' => array('sirius_table')),
+	);
 
 	if (user_access('sirius dispatch staff')) {
 		$html .= views_embed_view('sirius_dispatches', 'block', $job_node->nid);
@@ -31,7 +65,15 @@ function sirius_node_tab_dispatch_job_dispatches($job_node) {
 	} else {
 		$html .= views_embed_view('sirius_dispatches', 'block_1', $job_node->nid);
 	}
-	return $html;
+
+	$form['whatever'] = array('#markup' => $html);
+
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Submit'),
+	);
+
+	return $form;
 }
 
 function sirius_rename_this_is_steward($job_node) {

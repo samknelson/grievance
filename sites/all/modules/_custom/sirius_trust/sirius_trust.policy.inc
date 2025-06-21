@@ -6,29 +6,22 @@ function sirius_trust_policy_benefits_offered($policy_node, $options = array()) 
 
 	$benefit_nids = array_filter(array_values($policy_json['benefits']['enabled']));
 
-	if ($options['electable']) {
+	if (isset($options['electable'])) {
 		$electable_benefit_nids = array();
 		if ($policy_json['elections']['benefits']['electable']) {
 			$electable_benefit_nids = array_filter(array_values($policy_json['elections']['benefits']['electable']));
 		}
-		$benefit_nids = array_intersect($benefit_nids, $electable_benefit_nids);
+		if ($options['electable']) {
+			$benefit_nids = array_intersect($benefit_nids, $electable_benefit_nids);
+		} else {
+			$benefit_nids = array_diff($benefit_nids, $electable_benefit_nids);
+		}
 	}
+
+	if ($options['nids_only']) { return $benefit_nids; }
 
 	$result = node_load_multiple($benefit_nids);
-	$context = array('policy_node' => $policy_node, 'options' => $options);
-	drupal_alter('sirius_trust_policy_benefits_offered', $result, $context);
-	return $result;
 
-}
-
-function sirius_trust_policy_benefits_offered_options($policy_node) {
-	$benefits = sirius_trust_policy_benefits_offered($policy_node);
-	if (!$benefits) { return array(); }
-
-	$result = array();
-	foreach ($benefits as $benefit_nid => $benefit_node) {
-		$result[$benefit_nid] = $benefit_node->title;
-	}
 	return $result;
 }
 

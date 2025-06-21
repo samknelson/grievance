@@ -38,11 +38,10 @@ function report_cache_auto_run($report_type, $mode = 'test') {
 	$form_state = array();
 	$form_state['values'] = array();
 	$form_state['values']['report_type'] = $report_type;
-	$form_state['values']['report_id'] = 'Auto';
 	$form_state['values']['nobatch'] = TRUE;
 	$form_state['values']['noninteractive'] = TRUE;
 
-	if ($info['parameters_form_callback']) { 
+	if ($info['parameters_form_callback'] || $info['generator']) { 
 		// We want to iterate through the instances ...
 		$instances = report_cache_instances($report_type);
 	} else {
@@ -69,6 +68,7 @@ function report_cache_auto_run($report_type, $mode = 'test') {
 		} else {
 			$form_state['values']['parameters'] = $instance['parameters'];
 			if ($instance_uuid != 'dummy_uuid') { $form_state['values']['instance'] = $instance_uuid; }
+			$form_state['values']['report_id'] = $instance['title'] . ' - ' . 'Auto';
 			$result = report_cache_form_submit(array(), $form_state);
 		}
 	}

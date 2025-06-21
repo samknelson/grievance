@@ -63,40 +63,42 @@ function sirius_event_node_tab_catalog_view_form($form, &$form_state, $catalog_n
 		}
 	}
 
-	$title = 'Filters';
-	$form['filters'] = array(
-		'#type' => 'fieldset',
-		'#title' => 'Filters',
-		'#collapsible' => TRUE,
-		'#collapsed' => TRUE,
-	);
+	if ($catalog_json['settings']['filters']['show_filters'] == 'Yes') {
+		$title = 'Filters';
+		$form['filters'] = array(
+			'#type' => 'fieldset',
+			'#title' => 'Filters',
+			'#collapsible' => TRUE,
+			'#collapsed' => TRUE,
+		);
 
-	$form['filters']['title'] = array(
-		'#title' => t('Course Name'),
-		'#type' => 'textfield',
-		'#description' => t('Enter all or part of the course name.'),
-	);
+		$form['filters']['title'] = array(
+			'#title' => t('Course Name'),
+			'#type' => 'textfield',
+			'#description' => t('Enter all or part of the course name.'),
+		);
 
-	if ($cf_paths['filter_custom_fields']) {
-		foreach ($cf_paths['filter_custom_fields'] as $cfs_nid => $paths) {
-			foreach ($paths as $path) {
-				$form_element = sirius_jsonfield_util_get_from_path($cfs_forms[$cfs_nid], $path);
+		if ($cf_paths['filter_custom_fields']) {
+			foreach ($cf_paths['filter_custom_fields'] as $cfs_nid => $paths) {
+				foreach ($paths as $path) {
+					$form_element = sirius_jsonfield_util_get_from_path($cfs_forms[$cfs_nid], $path);
 
-				// Rewrite our form element so it looks like a filter.
-				if ($form_element['#type'] == 'checkboxes') {
-					$form_element['#type'] = 'select';
-					$form_element['#options'] = array(NULL => t('-- Select --')) + $form_element['#options'];
+					// Rewrite our form element so it looks like a filter.
+					if ($form_element['#type'] == 'checkboxes') {
+						$form_element['#type'] = 'select';
+						$form_element['#options'] = array(NULL => t('-- Select --')) + $form_element['#options'];
+					}
+
+					$form['filters']['custom'][$cfs_nid][$path] = $form_element;
 				}
-
-				$form['filters']['custom'][$cfs_nid][$path] = $form_element;
 			}
 		}
-	}
 
-	$form['filters']['submit'] = array(
-		'#value' => t('Filter'),
-		'#type' => 'submit',
-	);
+		$form['filters']['submit'] = array(
+			'#value' => t('Filter'),
+			'#type' => 'submit',
+		);
+	}
 
 
 	if ($catalog_json['settings']['courses']['event_types']) {

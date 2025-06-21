@@ -9,3 +9,130 @@
 	margin-top: 0;
 	padding-top: 0;
 }
+
+.sirius_callout_fullwidth {
+	border: 1px solid #999999;
+	background-color: #ffffff;
+	padding: 10px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.sirius_callout_inactive,
+.sirius_callout_gray,
+.sirius_callout_grey { background-color: #bbbbbb; }
+.sirius_callout_error,
+.sirius_callout_red { background-color: #ff9999; }
+.sirius_callout_green,
+.sirius_callout_success { background-color: #99ff99; }
+.sirius_callout_warning,
+.sirius_callout_yellow { background-color: #ffff99; }
+.sirius_callout_blue { background-color: #9999ff; }
+
+#content .sirius_callout_basic h2,
+#content .sirius_callout_fullwidth h2 {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+#sirius_ux_flash_wrapper .sirius_ux_flash_log {
+  height: 350px;
+  position: fixed; 
+  bottom: 46px;
+  right: 0;
+  right: 40px;
+  width: 300px;
+  opacity: 0.8;
+  padding: 10px;
+  margin: 20px;
+	color: #000000;
+	border: 1px solid #000000;
+	background-color: #aaaaaa;
+	overflow: scroll;
+}
+
+#sirius_ux_flash_wrapper .sirius_ux_flash_log_toggle {
+  height: 21px;
+  position: fixed; 
+  bottom: 46px;
+  right: 0;
+  opacity: 0.8;
+  padding: 10px;
+  margin: 20px;
+	color: #000000;
+	background-color: #999999;
+	border: 1px solid #333333;
+}
+
+#sirius_ux_flash_wrapper .sirius_ux_flash_latest {
+  height: 21px;
+  position: fixed; 
+  bottom: 0;
+  right: 40px;
+  width: 300px;
+  opacity: 0.8;
+  padding: 10px;
+  margin: 20px;
+	color: #000000;
+	overflow: hidden;
+}
+
+#sirius_ux_flash_wrapper .sirius_ux_flash_latest_toggle {
+  height: 21px;
+  position: fixed; 
+  bottom: 0;
+  right: 0;
+  opacity: 0.8;
+  padding: 10px;
+  margin: 20px;
+	color: #000000;
+	background-color: #999999;
+	border: 1px solid #333333;
+}
+
+.sirius_ux_flash_warning {
+	background-color: #ffff99;
+	border: 1px solid #999933;
+}
+
+.sirius_ux_flash_error {
+	background-color: #ff9999;
+	border: 1px solid #993333;
+}
+
+.sirius_ux_flash_info {
+	background-color: #cccccc;
+	border: 1px solid #999999;
+}
+
+.sirius_ux_flash_success {
+	background-color: #99ff99;
+	border: 1px solid #339933;
+}
+
+.sirius_ux_flash_ctrl {
+	float: right;
+	margin-left: 2px;
+	font-size: 125%;
+}
+
+.sirius_ux_flash_item {
+	background-color: #ffffff;
+	border: 1px solid #999999;
+	margin-bottom: 5px;
+	padding: 5px;
+	font-size: 85%;
+}
+
+.sirius_text_inactive,
+.sirius_text_gray,
+.sirius_text_grey { color: #666666; }
+.sirius_text_error,
+.sirius_text_red { color: #990000; }
+.sirius_text_green,
+.sirius_text_success { color: #009900; }
+.sirius_text_warning,
+.sirius_text_yellow { color: #999900; }
+.sirius_text_blue { color: #000099; }
+.sirius_text_white { color: #ffffff; }
+.sirius_text_black { color: #000000; }

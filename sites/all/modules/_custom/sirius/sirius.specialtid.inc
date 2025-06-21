@@ -49,7 +49,6 @@ function sirius_specialtid_keys() {
 			'member_forward' 								=> array('title' => 'Grievance Log Member Notification Type', 'description' => 'Grievance log type to be used for notification to the member.'),
 			'assignment' 										=> array('title' => 'Grievance Log Assignment Type', 'description' => 'Grievance log type to be used for assignment to a staff member.'),
 			'first_call' 										=> array('title' => 'Grievance Log First Call Type', 'description' => 'Grievance log type to be used for initial call to grievant.  Used for reporting.'),
-			'phaxio_callback' 							=> array('title' => 'Phaxio Callback Type', 'description' => 'Grievance log type to be used for Phaxio callback -- i.e. fax confirmation receipts.'),
 			'spi'	 													=> array('title' => 'SPI Type'),
 			'term' 													=> array('title' => 'Term Type'),
 			'written_warning' 							=> array('title' => 'Written Warning Type'),

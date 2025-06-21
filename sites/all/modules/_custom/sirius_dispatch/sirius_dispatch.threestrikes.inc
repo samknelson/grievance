@@ -265,7 +265,14 @@ function sirius_dispatch_threestrikes_scan_worker($worker_nid, $is_test = FALSE,
 	$tid = sirius_get_special_tid('sirius_worker_dispatch_status|not_employed_not_available');
 	if (!$is_test) {
 		sirius_dispatch_worker_dispstatus_set($worker_node, $tid, 1, $msg);
-		sirius_dispatch_worker_dispstatus_block_set($worker_node, sirius_get_special_tid('sirius_dispatch_sib|threestrikes'), $msg);
+
+		if (class_exists('Sirius_Sib')) {
+			$threestrikes_tid = sirius_get_special_tid('sirius_dispatch_sib|threestrikes');
+			if (!$threestrikes_tid) { return array('success' => FALSE, 'msg' => "Special TID not defined: sirius_dispatch_sib|threestrikes"); }
+			$sib = Sirius_Sib::getInstance();
+			$sib->assign($worker_node, $threestrikes_tid, "Three-strikes scan - dispatches were declined on three consecutive days.");
+		}
+
 		sirius_worker_notify(
 			$worker_node, 
 			array(

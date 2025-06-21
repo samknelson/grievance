@@ -132,6 +132,21 @@ function sirius_node_tab_dispatch_job_manage_form($form, &$form_state, $job_node
 		),
 	);
 
+	$form['mode'] = array(
+		'#title' => t('Mode'),
+		'#type' => 'select',
+		'#options' => array(
+			'test' => t('Test'),
+			'live' => t('Live'),
+		),
+		'#states' => array(
+	  	'visible' => array(
+	  		array(':input[name="action"]' => array('value' => 'poll')),
+	  	)
+		),
+	);
+
+
 	$form['wtf_cbn'] = array(
 		'#title' => 'Call by Name?',
 		'#type' => 'select',
@@ -365,18 +380,15 @@ function sirius_node_tab_dispatch_job_manage_form_submit($form, &$form_state) {
 	}
 
 	if ($action == 'poll') {
-		$result = sirius_dispatch_run($job_node);
+		$result = sirius_dispatch_run($job_node, $form_state['values']['mode'], TRUE);
+
+		drupal_set_message(sirius_minilog_render_html());
 		if ($result['success']) {
 			drupal_set_message(t("Poll complete; see the log for details."));
 		} else {
 			drupal_set_message("Poll failed: " . $result['msg'], 'error');
 		}
 
-		if ($result['info']) {
-			foreach ($result['info'] as $info) {
-				drupal_set_message($info);
-			}
-		}
 		return;
 	}
 

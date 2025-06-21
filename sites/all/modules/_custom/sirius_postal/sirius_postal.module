@@ -1,0 +1,42 @@
+<?php
+
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_postal') . '/sirius_postal.permission.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_postal') . '/sirius_postal.menu.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_postal') . '/sirius_postal.client.inc';
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_postal_sirius_domain_component_info() {
+  return array(
+    'postal' => array(
+      'title' => 'Postal',
+      'description' => 'Enable postal service integration',
+    ),
+  );
+}
+
+/**
+ * Implements hook_sirius_config_links_alter()
+ */
+
+function sirius_postal_sirius_config_links_alter(&$links) {
+  if (sirius_domain_component_enabled('postal')) {
+    $links['postal'] = array('title' => 'Postal');
+    $links['postal']['links']['sirius/postal/config'] = array('title' => 'Config', 'description' => 'Configure postal services');
+  }
+}
+
+/**
+ * Implements hook_sirius_comm_info()
+ */
+
+function sirius_postal_sirius_comm_info() {
+  $infos = array();
+  $instance = sirius_postal_client_instance();
+  if ($instance) { $infos['postal'] = $instance->info(); }
+  return $infos;
+}
+
+function sirius_postal_send($params) { return sirius_comm_send('postal', $params); }

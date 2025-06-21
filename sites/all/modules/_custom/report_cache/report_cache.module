@@ -1,5 +1,7 @@
 <?php
 
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.generator.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.generator_legacy.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.menu.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.form.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.auto.inc";
@@ -13,6 +15,8 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/r
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_auto.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_preview.inc";
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_render.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_operations.inc";
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'report_cache') . "/report_cache.page_report_preview_modal.inc";
 
 function report_cache_info_all() {
 	$info_all = &drupal_static(__FUNCTION__, NULL);
@@ -40,22 +44,41 @@ function report_cache_info_all() {
       	}
     	}
   	}
+
+		foreach ($info_all as $key => $record) {
+			// Clean up some of our names. 
+			$info_all[$key]['name'] = preg_replace('/^\s*Grievances\:\s*/', '', $info_all[$key]['name']);
+			$info_all[$key]['module_name'] = preg_replace('/^\s*Sirius\s*/', '', $info_all[$key]['module_name']);
+
+			// Set default form callback
+			if (!$info_all[$key]['form_callback']) { $info_all[$key]['form_callback'] = 'report_cache_generate_form'; }
+
+			// Legacy support
+			if ($info_all[$key]['render_callbacks']) {
+				foreach ($info_all[$key]['render_callbacks'] as $name => $callback_record) {
+					if (is_array($callback_record)) { continue; }
+					$info_all[$key]['render_callbacks'][$name] = array('method' => $callback_record);
+				}
+ 			}
+
+			// Build a generator for legacy reports
+			if (!$info_all[$key]['generator']) {
+				$classname = "Report_Cache_Generator_Auto_$key";
+				$classname = preg_replace('/\-/', '_', $classname);
+				//drupal_set_message("class $classname extends Report_Cache_Report_Generator_Legacy {}");
+				$generator = $classname::getInstance();
+				$generator->type = $key;
+				$generator->info($info_all[$key]);
+				$info_all[$key]['generator'] = $generator;
+			}
+		}
+
+		uksort($info_all, function($a, $b) use ($info_all) {
+			$result = strcasecmp($info_all[$a]['module_name'], $info_all[$b]['module_name']);
+			if (!$result) { $result = strcasecmp($info_all[$a]['name'], $info_all[$b]['name']); }
+			return $result;
+		});
 	}
-
-	foreach ($info_all as $key => $record) {
-		// Clean up some of our names. 
-		$info_all[$key]['name'] = preg_replace('/^\s*Grievances\:\s*/', '', $info_all[$key]['name']);
-		$info_all[$key]['module_name'] = preg_replace('/^\s*Sirius\s*/', '', $info_all[$key]['module_name']);
-
-		// Set default form callback
-		if (!$info_all[$key]['form_callback']) { $info_all[$key]['form_callback'] = 'report_cache_generate_form'; }
-	}
-
-	uksort($info_all, function($a, $b) use ($info_all) {
-		$result = strcasecmp($info_all[$a]['module_name'], $info_all[$b]['module_name']);
-		if (!$result) { $result = strcasecmp($info_all[$a]['name'], $info_all[$b]['name']); }
-		return $result;
-	});
 
 	return $info_all;
 }
@@ -82,6 +105,7 @@ function report_cache_access($report_type) {
 
 function report_cache_parameters($report_type, $report_id, $parameters = array()) {
  	$cache = &drupal_static(__FUNCTION__);
+	$info = report_cache_info($report_type);
 
  	// Set?
  	if ($parameters) {
@@ -98,19 +122,19 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
 
 		$instance_uuid = $parameters['meta']['instance']['uuid'];
 
+
 	  $stmt = db_insert('report_cache');
 		$stmt->fields(
 			array(
 				'report_id' => $report_id,
 				'report_row_pk' => 'PARAMETERS',
 				'report_type' => $report_type . ' :: PARAMETERS',
-				'report_data' => serialize($parameters),
+				'report_data' => $info['generator']->row_encode($parameters),
 				'report_domain_nid' => $domain_nid,
 				'report_instance' => $instance_uuid,
 			)
 		);
 		$stmt->execute();
-
  	}
 
  	if ($cache[$report_type][$report_id]) { return $cache[$report_type][$report_id]; }
@@ -121,7 +145,7 @@ function report_cache_parameters($report_type, $report_id, $parameters = array()
   $query->condition('report_type', $report_type . ' :: PARAMETERS');
   $stmt = $query->execute();
   $hr = $stmt->fetchAssoc();
-	$parameters = unserialize($hr['report_data']);
+	$parameters = $info['generator']->row_decode($hr['report_data']);
 
 	// Quick sloppy caching. 
 	// - Since we're doing a database query, we want to store the results in memory
@@ -157,41 +181,14 @@ function report_cache_most_recent($report_type, $instance_uuid = NULL) {
 	return $hr['report_id'];
 }
 
-class Report_Cache_Report_Generator {
-  // Reports are singletons. Use My_Report::getInstance()->whatever()
-  protected static $instance = array();
-  protected function __construct() { }
-  final private function __clone() { }
-
-  final public static function getInstance() {
-  	$class = get_called_class();
-    if (!isset(static::$instance[$class])) { static::$instance[$class] = new static(); }
-    return static::$instance[$class];
-  }
-
-  public function info($result = array()) {
-    $result['generator'] = $this;
-    $result['fields'] = $this->fields();
-    return $result;
-  }
-
-  public function fields() {
-    return array();
-  }
-
-  public function pks(&$form_state) {
-    return array();
-  }
-
-  public function batch($pks, $values, &$context) {
-    return array();
-  }
-
-  public function render_parameters($parameters) {
-    return '';
-  }
-
-  public function setInfo(&$items) {
-    $items[$this->type] = $this->info();
-  }
+function report_cache_rowcount($report_type, $report_id) {
+	$domain_nid = sirius_domain_nid(); if (!$domain_nid) { $domain_nid = 0; }
+	$sql = "select count(*) as c ";
+	$sql .= "from report_cache ";
+	$sql .= "where report_type = :report_type ";
+	$sql .= "and report_id = :report_id ";
+	$sql .= "and report_domain_nid = :domain_nid ";
+	$stmt = sirius_sql_query($sql, array(':report_type' => $report_type, ':report_id' => $report_id, ':domain_nid' => $domain_nid));
+	$hr = $stmt->fetchAssoc();
+	return $hr['c'];
 }

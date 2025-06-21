@@ -17,12 +17,21 @@ function sirius_cron_node_tabs() {
     'file' => 'sirius_cron.page_scan_info.inc',
   );
 
+  $node_tabs['sirius_json_definition']['sirius_cron_scan_disable'] = array(
+    'title' => 'Enable / Disable',
+    'description' => '',
+    'callback' => 'sirius_cron_node_tab_scan_disable',
+    'permissions' => array('sirius admin'),
+    'weight' => 2,
+    'file' => 'sirius_cron.page_scan_disable.inc',
+  );
+
   $node_tabs['sirius_json_definition']['sirius_cron_scan_run'] = array(
     'title' => 'Run',
     'description' => '',
     'callback' => 'sirius_cron_node_tab_scan_run',
     'permissions' => array('sirius admin'),
-    'weight' => 2,
+    'weight' => 3,
     'file' => 'sirius_cron.page_scan_run.inc',
   );
 
@@ -48,18 +57,25 @@ function sirius_cron_menu() {
     'file' => 'sirius_cron.page_scan_list.inc',
   );
 
-  /*
-  $items['sirius/cron/list'] = array(
-    'title' => 'List',
+  $items['sirius/cron/by-module/%'] = array(
+    'title' => 'Cron Management',
     'description' => '',
     'page callback' => 'sirius_cron_page_scan_list',
-    'page arguments' => array(),
+    'page arguments' => array(3),
     'access arguments' => array('sirius admin'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'type' => MENU_NORMAL_ITEM,
     'file' => 'sirius_cron.page_scan_list.inc',
-    'weight' => 1,
   );
-  */
+
+  $items['sirius/cron/shortcut/%'] = array(
+    'title' => 'Cron Management',
+    'description' => '',
+    'page callback' => 'sirius_cron_page_shortcut',
+    'page arguments' => array(3),
+    'access arguments' => array('sirius admin'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'sirius_cron.page_scan_shortcut.inc',
+  );
 
   return $items;
 }

@@ -37,3 +37,9 @@ table.report_cache_table tr.report_cache_total td {
 	font-weight: bold;
 	background-color: #cccccc;
 }
+
+#modal-content .report_cache_modal_content h1 {
+	padding-top: 0;
+	margin-top: 0;
+	text-align: center;
+}

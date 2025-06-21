@@ -45,7 +45,7 @@ function grievance_company_node_tab_contacts($company_node) {
 
   $result = '';
   $result .= views_embed_view('grievance_shop_contacts', 'block_2', $entity_nid);
-  $result .= grievance_node_tab_get_addlink("grievance-shop-contact", array("grievance_company" => $entity_nid), 'Add a company');
+  $result .= grievance_node_tab_get_addlink("grievance-shop-contact", array("grievance_company" => $entity_nid), 'Add a company contact');
 
   return $result;
 }

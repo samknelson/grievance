@@ -5,6 +5,8 @@ function sirius_node_tab_worker_user($worker_node) {
 }
 
 function sirius_worker_user_create_form($form, &$form_state, $worker_node) {
+	$form_state['worker_nid'] = $worker_node->nid;
+
 	$worker_user = sirius_worker_get_user($worker_node->nid);
 	if ($worker_user) {
 
@@ -22,14 +24,11 @@ function sirius_worker_user_create_form($form, &$form_state, $worker_node) {
 		'#markup' => '<div class="sirius_form_intro">' . $html . '</div>'
 	);
 
-	if (sirius_worker_usersync_enabled()) {
-		$form_state['worker_node'] = $worker_node;
 
-		$form['submit'] = array(
-			'#type' => 'submit',
-			'#value' => t('Sync Now'),
-		);
-	}
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Sync Now'),
+	);
 
 	return $form;
 }
@@ -37,8 +36,9 @@ function sirius_worker_user_create_form($form, &$form_state, $worker_node) {
 function sirius_worker_user_create_form_submit($form, &$form_state) {
 	$form_state['rebuild'] = TRUE;
 
-	$worker_node = $form_state['worker_node'];
-	$result = sirius_worker_usersync($worker_node->nid);
+	$worker_nid = $form_state['worker_nid'];
+
+	$result = sirius_worker_usersync($worker_nid, array('manual' => TRUE));
 	if ($result['success']) {
 		drupal_set_message("Sync complete: " . $result['msg']);
 	} else {

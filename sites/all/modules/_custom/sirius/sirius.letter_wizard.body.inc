@@ -44,7 +44,7 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 		);
 	}
 
-	if ($data['format'] == 'email') {
+	if (in_array($data['format'], array('email', 'postal'))) {
 		$form['body'] = array(
 			'#type' => 'text_format',
 			'#title' => t('Body'),
@@ -66,7 +66,7 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 		);
 	}
 
-	if ($data['format'] == 'email' || $data['format'] == 'fax' || $data['format'] == 'pdf') {
+	if (in_array($data['format'], array('email', 'pdf'))) {
 		$form['pdf_body'] = array(
 			'#type' => 'text_format',
 			'#title' => 'PDF Body',
@@ -136,7 +136,19 @@ function sirius_letter_wizard_body_form($form, &$form_state, $info, $data, $lett
 				'#title' => t('Upload #@i', array('@i' => ($i+1))),
 			);
 		}
+	}
 
+	if ($data['format'] == 'postal') {
+		if (!sirius_domain_component_enabled('postal')) { return sirius_form_error('Postal module is not enabled.'); }
+		$instance = sirius_postal_client_instance();
+		if (!$instance) { return sirius_form_error('No postal client has been configured.'); }
+		$form['postal_options'] = array(
+			'#type' => 'fieldset',
+			'#title' => t('Postal Options'),
+			'#tree' => TRUE,
+		);
+		$form['postal_options'] += $instance->mail_options_form();
+		sirius_jsonfield_util_set_defaults($form['postal_options'], $data['postal_options']);
 	}
 
 	$form['submit'] = array(
@@ -193,6 +205,7 @@ function sirius_letter_wizard_body_form_submit($form, &$form_state) {
   $data['pdf_body'] = $form_state['values']['pdf_body']['value'];
   $data['pdf_letterhead'] = $form_state['values']['pdf_letterhead'];
   $data['upload_others'] = $form_state['values']['upload_others'];
+  $data['postal_options'] = $form_state['values']['postal_options'];
 
 	sirius_letter_set_title($letter_node);
 	sirius_wizard_submit($info, $data, $letter_node, $current_step, "Letter body saved.");

@@ -86,6 +86,11 @@ p {
 }
 
 /* Page */
+
+h1#page-title .sirius-pageicon {
+  color: #999999;
+}
+
 h1#page-title {
   font-size: 1.33em;
   padding: 0;
@@ -4054,6 +4059,20 @@ input.ajax-processed:hover {
 .sirius_dispatch_view_job_section .field-name-field-sirius-notes .field-items {
   width: 100%;
   padding-bottom: 12px !important;
+}
+
+.sirius_dispatch_view_inactive,
+.sirius_dispatch_view_gray,
+.sirius_dispatch_view_grey { background-color: #bbbbbb; }
+.sirius_dispatch_view_warning { background-color: #ffff99; }
+.sirius_dispatch_view_red { background-color: #ff9999; }
+.sirius_dispatch_view_green { background-color: #99ff99; }
+.sirius_dispatch_view_yellow { background-color: #ffff99; }
+.sirius_dispatch_view_blue { background-color: #9999ff; }
+
+.sirius_dispatch_field_wrapper_status, 
+.sirius_dispatch_view_dispatch_section .sirius_dispatch_field_wrapper_status .field h2 {
+  font-weight: bold;
 }
 
 /* Wrangle things in small views */

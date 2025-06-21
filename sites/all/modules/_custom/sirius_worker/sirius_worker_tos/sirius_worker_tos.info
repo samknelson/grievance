@@ -1,0 +1,4 @@
+name = Sirius Worker Time Off Sick (TOS)
+description = Implements functionality to allow workers to sign out as sick
+package = sirius
+core = 7.x

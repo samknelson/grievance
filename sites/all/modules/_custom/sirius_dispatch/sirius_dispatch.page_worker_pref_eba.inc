@@ -2,12 +2,7 @@
 
 function sirius_dispatch_node_tab_worker_pref_eba_access($worker_node) {
 	if (!user_access('sirius dispatch staff')) {
-		// Can't see this tab if you're sign-in blocked
-	  $sib_term = taxonomy_term_load($worker_node->field_sirius_dispatch_sib_status['und'][0]['tid']);
-		if ($sib_term->field_sirius_dispatch_available['und'][0]['value'] == 'No') { return FALSE; }
-
-		// Can't see this tab if you're EBA-blocked
-		if ($worker_node->field_sirius_dispatch_eba['und'][0]['value'] == 'Blocked') { return FALSE; }
+		if (class_exists('Sirius_Sib') && !Sirius_Sib::getInstance()->access('dispatch_signin_self', array('entity_node' => $worker_node))) { return FALSE; }
 	}
 
 	if (!user_access('sirius admin')) {

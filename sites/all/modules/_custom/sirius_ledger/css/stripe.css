@@ -59,6 +59,12 @@
 	color:  #000000;
 }
 
+.sirius_ledger_stripe_customer::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
 .sirius_ledger_stripe_customer_active {
 	border: 1px solid #000099;
 	background-color: #ffffff;	

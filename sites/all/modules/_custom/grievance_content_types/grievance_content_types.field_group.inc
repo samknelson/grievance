@@ -1880,6 +1880,35 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_html|node|sirius_letterhead|form';
+  $field_group->group_name = 'group_html';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_letterhead';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'HTML',
+    'weight' => '3',
+    'children' => array(
+      0 => 'body',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'HTML',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-html field-group-fieldset',
+        'description' => 'Complete this section for HTML letterhead only.',
+      ),
+      'formatter' => 'collapsible',
+    ),
+  );
+  $field_groups['group_html|node|sirius_letterhead|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_identity|node|grievance_letter_template|form';
   $field_group->group_name = 'group_identity';
   $field_group->entity_type = 'node';
@@ -2012,6 +2041,36 @@ function grievance_content_types_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_pdf|node|sirius_letterhead|form';
+  $field_group->group_name = 'group_pdf';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'sirius_letterhead';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'PDF',
+    'weight' => '2',
+    'children' => array(
+      0 => 'field_sirius_attachments',
+      1 => 'field_sirius_json',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'PDF',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-pdf field-group-fieldset',
+        'description' => 'Complete this section for PDF letterhead only.',
+      ),
+      'formatter' => 'collapsible',
+    ),
+  );
+  $field_groups['group_pdf|node|sirius_letterhead|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_sirius_contract|node|grievance_shop|default';
   $field_group->group_name = 'group_sirius_contract';
   $field_group->entity_type = 'node';
@@ -2109,7 +2168,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Dispatch Details',
-    'weight' => '4',
+    'weight' => '5',
     'children' => array(
       0 => 'field_sirius_timelimit',
       1 => 'field_sirius_member_status',
@@ -2334,7 +2393,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Employer Notes',
-    'weight' => '3',
+    'weight' => '4',
     'children' => array(
       0 => 'field_sirius_address_parking',
       1 => 'field_sirius_notes',
@@ -2500,7 +2559,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Job Details',
-    'weight' => '2',
+    'weight' => '1',
     'children' => array(
       0 => 'field_sirius_datetime',
       1 => 'field_sirius_datetime_completed',
@@ -2512,6 +2571,7 @@ function grievance_content_types_field_group_info() {
       7 => 'field_grievance_departments',
       8 => 'field_sirius_dispatch_job_tags',
       9 => 'field_sirius_events',
+      10 => 'field_grievance_classifications',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2551,6 +2611,7 @@ function grievance_content_types_field_group_info() {
       9 => 'field_sirius_dispatch_job_tags',
       10 => 'field_sirius_payrate',
       11 => 'field_sirius_events',
+      12 => 'field_grievance_classifications',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2577,7 +2638,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Job Info',
-    'weight' => '1',
+    'weight' => '2',
     'children' => array(
       0 => 'field_sirius_datetime_created',
       1 => 'field_sirius_dispatch_job_type',
@@ -2640,7 +2701,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Notification Settings',
-    'weight' => '5',
+    'weight' => '3',
     'children' => array(
       0 => 'field_sirius_dispatch_job_nfcns',
       1 => 'field_sirius_notify',
@@ -2737,7 +2798,8 @@ function grievance_content_types_field_group_info() {
       2 => 'field_sirius_phone_alt',
       3 => 'field_sirius_email',
       4 => 'field_sirius_phone_fax',
-      5 => 'langs',
+      5 => 'contact_tags',
+      6 => 'langs',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2827,7 +2889,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Worker Counts',
-    'weight' => '9',
+    'weight' => '6',
     'children' => array(
       0 => 'field_sirius_count',
       1 => 'field_sirius_count_yes',
@@ -2858,7 +2920,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = 'group_sirius_worker_preferences';
   $field_group->data = array(
     'label' => 'Holds',
-    'weight' => '46',
+    'weight' => '47',
     'children' => array(
       0 => 'field_sirius_dispatch_hfe',
       1 => 'field_sirius_dispatch_hfe_until',
@@ -2888,16 +2950,16 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Identity',
-    'weight' => '1',
+    'weight' => '2',
     'children' => array(
       0 => 'field_sirius_id',
       1 => 'field_sirius_name',
       2 => 'field_sirius_ssn',
       3 => 'field_sirius_aat',
       4 => 'field_sirius_id2',
-      5 => 'field_sirius_gender',
-      6 => 'field_sirius_id3',
-      7 => 'field_sirius_dob',
+      5 => 'field_sirius_id3',
+      6 => 'field_sirius_dob',
+      7 => 'field_sirius_gender_nota_calc',
       8 => 'eins',
     ),
     'format_type' => 'fieldset',
@@ -2934,6 +2996,8 @@ function grievance_content_types_field_group_info() {
       5 => 'field_sirius_gender',
       6 => 'field_sirius_id3',
       7 => 'field_sirius_dob',
+      8 => 'field_sirius_gender_nota_val',
+      9 => 'field_sirius_gender_nota_calc',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -2989,7 +3053,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Dispatch Preferences',
-    'weight' => '4',
+    'weight' => '6',
     'children' => array(
       0 => 'field_sirius_skills_avail',
       1 => 'field_sirius_dispatch_dncs2',
@@ -3125,7 +3189,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Status',
-    'weight' => '2',
+    'weight' => '5',
     'children' => array(
       0 => 'field_grievance_shop',
       1 => 'field_sirius_member_status',
@@ -3198,7 +3262,7 @@ function grievance_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Skills',
-    'weight' => '50',
+    'weight' => '29',
     'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -3244,6 +3308,7 @@ function grievance_content_types_field_group_info() {
   t('Grievance Form');
   t('Grievance Settings');
   t('Grievance-Specific Fields');
+  t('HTML');
   t('Holds');
   t('Identity');
   t('Information Request');

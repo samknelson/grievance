@@ -4,6 +4,36 @@ require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_service') . '
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_service') . '/sirius_service.menu.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_service') . '/sirius_service.server.inc';
 require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_service') . '/sirius_service.client.inc';
+require_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'sirius_service') . '/sirius_service.proxy.inc';
+
+/**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_service_sirius_domain_component_info() {
+  return array(
+    'service' => array(
+      'title' => 'Services',
+      'description' => 'Enable functionality to allow Sirius to be a service for remote function calls',
+    ),
+    'service:client' => array(
+      'title' => 'Services - Client',
+      'description' => 'Allow this instance to server as a client',
+    ),
+    'service:server' => array(
+      'title' => 'Services - Server',
+      'description' => 'Allow this instance to server as a server',
+    ),
+    'service:proxy:server' => array(
+      'title' => 'Services - Proxy - Server',
+      'description' => 'Allow this instance to server as a proxy server',
+    ),
+    'service:proxy:client' => array(
+      'title' => 'Services - Proxy - Client',
+      'description' => 'Allow this instance to server as a proxy client',
+    ),
+  );
+}
 
 /**
  * Implements hook_sirius_config_links_alter()

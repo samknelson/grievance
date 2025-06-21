@@ -2,10 +2,8 @@
 
 function unite_amenities_fields() {
 	return array(
-		'field_airport',
-		'field_calc_airport_dist',
-		'field_airport_alt',
-		'field_calc_airport_dist_alt',
+		'field_niche',
+		'field_rooms',
 		'field_convention_center',
 		'field_calc_convention_dist',
 		'field_convention_center_attached',

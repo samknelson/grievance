@@ -45,6 +45,7 @@ function sirius_trust_worker_elections_search($params) {
 }
 
 function sirius_trust_worker_election($worker_node, $ts = NULL) {
+	if (!$worker_node) { return array(); }
 	$params = array();
 	$params['worker_nid'] = $worker_node->nid;
 	if ($ts) {
@@ -109,31 +110,9 @@ function sirius_trust_worker_election_node_presave($election_node) {
 	$election_node->title = "$worker_name - Election $date";
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * If we have multiple active elections, expire any duplciates (i.e. give them an end date just before 
- * the start date of the next active one.)
+ * the start date of the next one.)
  */
 
 function sirius_trust_worker_election_cleanup_multiple_active($mode, $worker_nid) {
@@ -141,7 +120,7 @@ function sirius_trust_worker_election_cleanup_multiple_active($mode, $worker_nid
   $params = array();
   $params['order'] = 'field_sirius_date_start_value asc';
   $params['worker_nid'] = $worker_nid;
-  $params['active'] = 'Yes';
+  // $params['active'] = 'Yes';
   $elections = array_values(sirius_trust_worker_elections_search($params));
   $today_date = date('Y-m-d 00:00:00');
 
@@ -150,10 +129,12 @@ function sirius_trust_worker_election_cleanup_multiple_active($mode, $worker_nid
   	$election_node = $elections[$i];
     $next_election_node = $elections[$i+1];
 
+    if ($election_node->field_sirius_active['und'][0]['value'] != 'Yes') { continue; }
+
 		$next_start_date = $next_election_node->field_sirius_date_start['und'][0]['value'];
     $next_start_ts = strtotime($next_start_date);
 
-    if ($next_start_ts < 1) {
+    if ($next_start_ts == 0) {
     	return array('success' => FALSE, 'msg' => 'It looks like one of the elections doesn\'t have a start date.');
     }
 
@@ -164,7 +145,7 @@ function sirius_trust_worker_election_cleanup_multiple_active($mode, $worker_nid
     if ($mode == 'live') {
     	node_save($election_node);
     } else {
-    	sirius_minilog("(Skipping svae because mode = $mode.)");
+    	sirius_minilog("(Skipping save because mode = $mode.)");
     }
     ++$count_expired;
   }
@@ -219,141 +200,6 @@ function sirius_trust_worker_election_scan($mode = 'test') {
 	return array('success' => TRUE, 'msg' => "Scanned $count_scan workes with multiple active eletions. Cleaned up $count_success, expiring $count_expired expired records with $count_failure failures.");
 }
 
-function sirius_trust_worker_election_post_from_wizard($wizard_node) {
-	drupal_set_message("Posting from " . $wizard_node->title . ' (' . $wizard_node->nid . ')');
-
-	$wizard_json = sirius_json_get($wizard_node);
-	$data = $wizard_json['wizard']['trust_election'];
-
-	$worker_node = sirius_log_handler($wizard_node, 'sirius_worker');
-	if (!$worker_node) { return array('success' => FALSE, 'msg' => 'No worker found for this election wizard.'); }
-
-	$policy_nid = $data['policy']['policy_rnid'];
-	$policy_node = node_load($policy_nid);
-	if (!$policy_node) { return array('success' => FALSE, 'msg' => 'Unable to find the policy for this election.'); }
-
-	$employer_nid = $data['policy']['employer_rnid'];
-	$employer_node = node_load($policy_nid);
-	if ($employer_nid && !$employer_node) { return array('success' => FALSE, 'msg' => 'Unable to find the employer for this election.'); }
-
-	// Update the worker
-	$need_save = FALSE;
-	if ($data['phone']['change'] == 'Yes') {
-		$worker_node->field_sirius_phone['und'][0]['value'] = sirius_phone_format($data['phone']['new']['phone']);
-		$need_save = TRUE;
-	}
-	if ($data['email']['change'] == 'Yes') {
-		$worker_node->field_sirius_email['und'][0]['value'] = $data['email']['new']['email'];
-		$need_save = TRUE;
-	}
-	if ($data['addr']['change'] == 'Yes') {
-		$worker_node->field_sirius_address['und'][0] = $data['addr']['new'];
-		$need_save = TRUE;
-	}
-	if ($need_save) {
-		node_save($worker_node);
-		drupal_set_message("Updated worker's contact information.");
-	}
-
-	// Create the relationships
-	drupal_set_message("Need to create dependents: ");
-	dpm($data['dependents']);
-
-	// Create the election
-	$election_node = sirius_log_handler($wizard_node, 'sirius_trust_worker_election');
-	if (!$election_node) {
-		drupal_set_message("Creating a new election for " . $worker_node->title);
-		global $user;
-    $election_node = new stdClass();
-    $election_node->type = 'sirius_trust_worker_election';
-    $election_node->uid = $user->uid;
-    $election_node->status = 1;
-    $election_node->promote = 0;
-    $election_node->comment = 0;
-	  $election_node->field_sirius_domain['und'][0]['target_id'] = sirius_domain_nid();
-    node_object_prepare($election_node);
-    $election_node = node_submit($election_node);
-	} else {
-		drupal_set_message("Updating existing election for " . $worker_node->title);
-	}
-
-	// Set the policy
-  $election_node->field_sirius_trust_policy['und'][0]['target_id'] = $policy_node->nid;
-
-  // Set the worker
-  $election_node->field_sirius_worker['und'][0]['target_id'] = $worker_node->nid;
-
-  // Set the benefits
-  $benefit_nids = array();
-  if ($data['benefits']) {
-  	foreach ($data['benefits'] as $benefit_nid => $benefit_election) {
-  		if ($benefit_election['election'] == 'Yes') { $benefit_nids[] = $benefit_nid; }
-  	}
-  }
-  $tmp = array();
-  foreach ($benefit_nids as $benefit_nid) { $tmp[] = array('target_id' => $benefit_nid); }
-  $election_node->field_sirius_trust_benefits['und'] = $tmp;
-
-  // Save
-  node_save($election_node);
-
-  // Link the wizard to the election
-  sirius_log_handler_set($wizard_node, $election_node->nid);
-  node_save($wizard_node);
-
-	return array('success' => TRUE, 'msg' => 'Posted.', 'election_node' => $election_node);
-}
-
-function sirius_trust_worker_election_wizard_push_remote($wizard_pnode) {
-	$wizard_pjson = sirius_json_get($wizard_pnode);
-
-	$result = array();
-	if ($wizard_pjson['wizard']['trust_election']['push']['server_nid']) {
-		$wizard_node = node_load($wizard_pjson['wizard']['trust_election']['push']['server_nid']);
-		$result['msg'] = "Updating existing server node.";
-	} 
-	if (!$wizard_node) {
-		$result['msg'] = "Creating new server node.";
-		$wizard_node = sirius_log(
-	    'trust:election_wizard', 
-	    'draft', 
-	    $wizard_pnode->field_sirius_message['und'][0]['value'], 
-	    'Election',
-	    $wizard_pnode->field_sirius_notes['und'][0]['value'], 
-	    array(),
-	    NULL,
-	    $wizard_pjson
-	  );
-	}
-	$result['wizard_node'] = $wizard_node;
-
-	// Update the server fields from the proxy
-	$wizard_node->field_sirius_json = $wizard_pnode->field_sirius_json;
-	$wizard_node->field_sirius_message = $wizard_pnode->field_sirius_message;
-	$wizard_node->field_sirius_notes = $wizard_pnode->field_sirius_notes;
-	$wizard_node->field_sirius_type = $wizard_pnode->field_sirius_type;
-
-	// Link the election wizard to the worker
-	$ssn = $wizard_node->field_sirius_notes['und'][0]['value'];
-	if (!$ssn) {
-		$result['msg'] = "No SSN.";
-		$result['success'] = FALSE;
-		return $result;
-	}
-	$worker_node = sirius_worker_get_by_ssn($ssn);
-	if (!$worker_node) {
-		$result['msg'] = "No worker found with this SSN.";
-		$result['success'] = FALSE;
-		return $result;
-	}
-	sirius_log_handler_set($wizard_node, $worker_node->nid);
-
-	// Update the server node
-	node_save($wizard_node);
-	$result['success'] = TRUE;
-	return $result;
-}
-
 function sirius_trust_election_wizard_search($params) {
 	$sql_args = array();
 	$sql = "select nid, field_sirius_type_value, field_sirius_notes_value from node ";
@@ -400,7 +246,6 @@ function sirius_trust_election_wizard_search($params) {
 	}
 	return $results;
 }
-
 
 function sirius_trust_election_wizard_status_options() {
 	return array(

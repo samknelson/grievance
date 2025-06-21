@@ -26,10 +26,6 @@ function grievance_permission() {
     	'title' => t('Grievance Attachments'),
     	'description' => t('Permission to upload attachments to grievances.')
     ),
-    'grievance forward' => array(
-    	'title' => t('Grievance Forward'),
-    	'description' => t('Permission use the "forward a grievance" form.')
-    ),
     'grievance statuslog' => array(
     	'title' => t('Grievance Status Log'),
     	'description' => t('Permission to view or edit the status log for a grievance.')
@@ -48,7 +44,7 @@ function grievance_permission() {
     ),
     'grievance contact' => array(
     	'title' => t('Grievance Contacts'),
-    	'description' => t('Permission to edit contacts for a shop of company.')
+        'description' => t('Permission to edit contacts for a shop of company (ALSO grants permission to see employer lists in dropdowns!)')
     ),
     'grievance report' => array(
     	'title' => t('Grievance Report'),

@@ -241,3 +241,32 @@ div.region-help {
   }
 }
 
+#block-unite-unite-quicksearch,
+#block-unite-unite-quicksearch-sub {
+      position: absolute;
+      right: 0;
+      z-index: 100;
+}
+#unite-quicksearch-form,
+#unite-quicksearch-sub-form {
+}
+#unite-quicksearch-form label,
+#unite-quicksearch-sub-form label {
+      display: none;
+}
+#unite-quicksearch-form .form-submit,
+#unite-quicksearch-sub-form .form-submit {
+      margin-right: 0;
+}
+#unite-quicksearch-form div.form-item,
+#unite-quicksearch-sub-form div.form-item {
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+      text-align: left;
+}
+#block-unite-unite-quicksearch #autocomplete {
+      left: -210px !important;
+      width: 420px !important;
+}
+

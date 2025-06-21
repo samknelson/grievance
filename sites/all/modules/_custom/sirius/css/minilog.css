@@ -1,0 +1,13 @@
+.sirius_minilog {
+	background-color: #ffffff;
+	color: #000000;
+	font-family: monospace;
+	padding: 10px;
+	border: 1px solid #000000;
+}
+
+.sirius_minilog_punchline {
+	font-weight: bold;
+	font-size: 120%;
+	padding-bottom: 10px;
+}

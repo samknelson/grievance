@@ -66,6 +66,47 @@ function sirius_banner_config_submit($form, &$form_state) {
 	}
 }
 
+function sirius_login_config() {
+  $form = array();
+
+  $form['sirius_login_intro'] = array(
+    '#type' => 'text_format',
+    '#title' => t('Intro Text'),
+    '#default_value' => sirius_richtext_handle_input(variable_get('sirius_login_intro', '')),
+    '#description' => t('Enter the introductory text that should appear before the site\'s login form. May contain HTML.'),
+  );
+
+  $form['sirius_login_outro'] = array(
+    '#type' => 'text_format',
+    '#title' => t('Outro Text'),
+    '#default_value' => sirius_richtext_handle_input(variable_get('sirius_login_outro', '')),
+    '#description' => t('Enter the text that should appear BELOW the site\'s login form. May contain HTML.'),
+  );
+
+  $form['sirius_login_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Login Path'),
+    '#default_value' => variable_get('sirius_login_path', ''),
+    '#description' => t('Enter the Drupal path to login. This is probably only relevant if you want to encourage users to login as saml/login.'),
+  );
+
+	$form = system_settings_form($form);
+  return $form;
+}
+
+function sirius_form_user_login_alter(&$form, &$form_state, $form_id) {
+	$intro = sirius_richtext_handle_input(variable_get('sirius_login_intro', ''));
+	$outro = sirius_richtext_handle_input(variable_get('sirius_login_outro', ''));
+
+	if ($intro) {
+		$form['intro'] = array('#markup' => '<div class="sirius_login_intro">' . $intro . '</div>', '#weight' => -1000);
+	}
+
+	if ($outro) {
+		$form['outro'] = array('#markup' => '<div class="sirius_login_intro">' . $outro . '</div>', '#weight' => 1000);
+	}
+}
+
 function sirius_banner_render() {
 	global $user;
   $domain = sirius_domain();
@@ -127,7 +168,9 @@ function sirius_banner_render() {
 					$html .= l(t('home'), '<front>');
 					$html .= ' / ';
 				}
-	    	$html .= l("login","user/login");
+				$login_path = variable_get('sirius_login_path', '');
+				if (!$login_path) { $login_path = 'user/login'; }
+	    	$html .= l("login", $login_path);
 	    $html .= '</div>'; // user-links-content
 	  }
 

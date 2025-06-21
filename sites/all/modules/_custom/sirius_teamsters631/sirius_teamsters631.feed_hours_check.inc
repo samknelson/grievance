@@ -4,7 +4,7 @@ function sirius_teamsters631_feed_hours_check_info() {
   $items = array();
   $items['teamsters631_feed_hours_check'] = array(
     'name' => 'teamsters631_feed_hours_check',
-    'title' => 'Teamsters 631 Day / Hour Check',
+    'title' => 'Teamsters 631 Day / Hour Check OLD',
     'description' => 'Check a spreadsheet of employees by day and hour to make sure that all are currently dispatched.',
     'steps' => array(
       'upload'    => array('label' => 'Upload',     'callback' => 'sirius_feed_wizard_upload'),
@@ -261,6 +261,7 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
 
   $employer_nid = $feed_node->field_grievance_shop['und'][0]['target_id'];
   $worker_nid = $row['worker_nid'];
+  // if ($worker_nid != 116143) { return array('success' => FALSE, 'msg' => 'Looking for Dawn.'); }
   $worker_node = node_load($worker_nid);
   if (!$worker_node) {
     return array('success' => FALSE, 'msg' => 'Worker not found.', 'worker_nid' => $row['worker_nid']);
@@ -272,6 +273,9 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
   $end_offset = $data['teamsters631_feed_hours_check']['payperiod_end_offset'];
 
   $ts = strtotime($row['date']);
+  if ( ($ts === NULL) || ($ts == 0)) {
+    return array('success' => FALSE, 'msg' => "The pay date is not in a recognized format.");
+  }
 
   if ($start_offset > 0) {
     $start_ts = strtotime("-$start_offset days", $ts);
@@ -283,15 +287,14 @@ function sirius_teamsters631_feed_hours_check_row_process($feed_node, $info, $da
   }
 
   if ($end_offset > 0) {
-    $start_ts = strtotime("-$end_offset days", $ts);
+    $end_ts = strtotime("-$end_offset days", $ts);
   } else if ($end_offset < 0) {
     $end_offset *= -1;
-    $start_ts = strtotime("$end_offset days", $ts);
+    $end_ts = strtotime("$end_offset days", $ts);
   } else {
-    $start_ts = $ts;
+    $end_ts = $ts;
   }
 
-  $end_ts = strtotime("-$end_offset days", $ts);
   $dispatch_node = sirius_teamsters631_dispatched_as_of($worker_nid, $employer_nid, $start_ts, $end_ts);
 
   $result['worker_nid'] = $worker_node->nid;
@@ -347,7 +350,7 @@ function sirius_teamsters631_dispatched_as_of($worker_nid, $employer_nid, $start
   $sql .= "and field_grievance_shop_target_id = :employer_nid ";
   $sql .= "and field_sirius_datetime_completed_value <= :date ";
   $sql .= "order by node.created desc ";
-  $sql_args[':date'] = gmdate('Y-m-d H:i:s', $start_ts);
+  $sql_args[':date'] = gmdate('Y-m-d H:i:s', $end_ts);
   $sql_args[':worker_nid'] = $worker_nid;
   $sql_args[':employer_nid'] = $employer_nid;
   $stmt = sirius_sql_query($sql, $sql_args);

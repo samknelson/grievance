@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * Create the hashed letter body table
+ */
+
+function sirius_postal_lob_update_7001() {
+
+  $sqls = array(
+    'CREATE TABLE sirius_postal_lob_cache (
+    cache_uuid varchar(1024) primary key,
+    cache_body longtext,
+    cache_created integer
+    )',
+  );
+
+  foreach ($sqls as $sql) {
+    try {
+      print "Executing: $sql\n";
+      $stmt = db_query($sql, array());
+      print "... Done.\n";
+    } catch (exception $ignore) { print "Error: " . $ignore->getMessage() . "\n"; }
+  }
+}

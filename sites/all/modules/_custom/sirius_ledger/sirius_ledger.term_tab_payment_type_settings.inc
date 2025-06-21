@@ -11,13 +11,12 @@ function sirius_ledger_term_tab_payment_type_settings_form($form, &$form_state, 
 	$form['#tree'] = TRUE;
 
 	$form["payment_settings"]["sign"] = array(
-		'#title' => t('Payment, Charge, or Adjustment?'),
+		'#title' => t('Payment or Charge?'),
 		'#type' => 'select',
 		'#options' => array(
 			NULL => t('-- Select --'),
 			'payment' => t('Payment - Must be negative (credit to the payer)'),
 			'charge' => t('Charge - Must be positive (credit to the fund)'),
-			'adjustment' => t('Adjustment - May be either negative or positive'),
 		),
 		'#default_value' => $json['payment_settings']['sign'],
 	);
@@ -26,7 +25,7 @@ function sirius_ledger_term_tab_payment_type_settings_form($form, &$form_state, 
 		'#title' => t('Maximum Permitted Value'),
 		'#type' => 'textfield',
 		'#size' => 5,
-		'#description' => 'When setting the max and min, keep sign in mind. In general, the maximum should only be set for charges, and should be a positive value; the minimum should only be set for payments, and should be a negative value. These limits are only applied for the manual entry form; they do not apply to uploads.',
+		'#description' => 'Max and min should always be positive values.',
 		'#default_value' => $json['payment_settings']['max'],
 	);
 
@@ -44,8 +43,6 @@ function sirius_ledger_term_tab_payment_type_settings_form($form, &$form_state, 
 
 	return $form;
 }
-
-
 
 function sirius_ledger_term_tab_payment_type_settings_form_submit($form, &$form_state) {
 	$payment_type_tid = $form_state['payment_type_tid'];

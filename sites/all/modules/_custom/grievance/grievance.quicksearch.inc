@@ -23,7 +23,7 @@ function grievance_quicksearch_form($form, &$form_state) {
 }
 
 function grievance_quicksearch_page($string) {
-	drupal_set_title(t('Grievance Quick-Search'));
+	drupal_set_title(t('Quick Search'));
 	
 	$form = drupal_get_form('grievance_quicksearch_page_form', $string);
 	return $form;

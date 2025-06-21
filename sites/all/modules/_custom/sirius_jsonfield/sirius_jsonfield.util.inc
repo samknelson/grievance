@@ -120,6 +120,8 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 	if ($form_element['#type'] == 'fieldset') {
 		if ($options['raw']) { 
 			return NULL;
+		} else if ($options['no_fieldsets']) {
+			return '';
 		} else if ($options['fieldsets']) {
 			$html = '<fieldset class="collapsible field-group-fieldset form-wrapper"><legend><span class="fieldset-legend">';
 			$html .= $form_element['#title'];
@@ -127,7 +129,11 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 			$html .= '<div class="fieldset-wrapper">';
 			return $html;
 		} else {
-			return '<hr><h2>' . $form_element['#title'] . '</h2>';
+			if (!$form_element['#title']) { return ''; }
+
+			if (!$options['fieldset_title_prefix']) { $options['fieldset_title_prefix'] = '<hr><h2>'; }
+			if (!$options['fieldset_title_suffix']) { $options['fieldset_title_suffix'] = '</h2>'; }
+			return $options['fieldset_title_prefix'] . $form_element['#title'] . $options['fieldset_title_suffix'];
 		}
 	}
 
@@ -135,22 +141,28 @@ function sirius_jsonfield_util_render_value($form_element, $value, $options = ar
 		if (!$value) { return ''; }
 	}
 
-	$separtor = $options['separator'];
-	if (!$separtor) { $separtor = ' / '; }
+	$separator = $options['separator'];
+	if (!$separator) { $separator = ' / '; }
 
 	if (is_array($value)) {
 		if ($form_element['#type'] == 'date_popup') { $value_rendered = $value['date'] . ' ' . $value['time']; }
-		else if ($form_element['#type'] == 'checkboxes') { 
+		else if (($form_element['#type'] == 'checkboxes') || ($form_element['#type'] == 'select')) { 
 			foreach ($value as $a => $b) {
 				if ($b) {
-					if ($value_rendered) { $value_rendered .= $separtor; }
-					$value_rendered .= $b;
+					if ($form_element['#options']) { $name = $form_element['#options'][$b]; }
+					if (!isset($name)) { $name = $b; }
+
+					if ($value_rendered) { $value_rendered .= $separator; }
+					$value_rendered .= $name;
 				}
 			}
+			if (!$value_rendered && $options['skip_empty']) { return ''; }
 		}
 		else { $value_rendered = '<pre>' . print_r($value, 1) . '</pre>'; }
 	} else { 
-		$value_rendered = sirius_text_to_html($value);
+		if ($form_element['#options']) { $name = $form_element['#options'][$value]; }
+		if (!isset($name)) { $name = $value; }
+		$value_rendered = sirius_text_to_html($name);
 	}
 
 	if ($options['raw']) { return $value_rendered; }
@@ -236,6 +248,7 @@ function sirius_jsonfield_util_list_node_fields($node_type) {
 			":$node_type:field_sirius_address_geo:lat" => 'Latitude',
 			":$node_type:field_sirius_address_geo:lon" => 'Longitude',
 			":$node_type:field_sirius_source:value" => 'Source',
+			":$node_type:field_sirius_lang:value" => 'Language',
 		);
 	} else if ($node_type == 'sirius_worker') {
 		$fields = array(
@@ -273,7 +286,6 @@ function sirius_jsonfield_util_render_all_values_new($form, $values, $options = 
 			sirius_jsonfield_util_form_sort_by_weight($form);
 			if (substr($key, 0, 1) == '#') { continue; }
 			if (!is_array($form_element)) { continue; }
-
 			if ($form_element['#type'] == 'fieldset') {
 				$inner = sirius_jsonfield_util_render_all_values_new($form_element, $values[$key], $options);
 				if ($inner || !$options['skip_empty']) {

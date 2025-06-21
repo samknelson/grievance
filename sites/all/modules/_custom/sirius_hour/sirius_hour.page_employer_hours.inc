@@ -1,10 +1,12 @@
 <?php
 
-// For the moment, this tab is only "simple monthly hours".
+// For the moment, this tab is only "simple monthly hours" and is tied to transmittal sheets.
+// We should eventually separate it out...
 
-function sirius_hour_node_tab_employer_hours_access($employer_node) {
-	return sirius_domain_variable_get('sirius_hour_enable_simple_monthly') == 'Yes';
-}
+// @todo: 
+// - BAC uses this, because they have transmittal sheets.
+// - Nobody else does, because employers upload hours
+// So I'm disabling it here, and if we ever go back to BAC, we'll figure it out.
 
 function sirius_hour_node_tab_employer_hours($employer_node) {
 	$year = sirius_node_tab_arg(0);
@@ -25,7 +27,7 @@ function sirius_hour_node_tab_employer_hours_date_form($form, &$form_state, $emp
 	$month_now = date('n');
 
 	$year_options = array();
-	for ($year=$year_now-10; $year<$year_now+2; ++$year) { $year_options[$year] = $year; }
+	for ($year=$year_now-30; $year<$year_now+2; ++$year) { $year_options[$year] = $year; }
 
 	$month_options = array();
 	for ($month=1; $month<=12; ++$month) { $month_options[$month] = $month; }

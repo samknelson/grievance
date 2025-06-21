@@ -13,7 +13,7 @@ function sirius_node_tab_feed_wizard_access($feed_node) {
 	$info = sirius_wizard_info($wizard_name);
 	if (!$info) { return FALSE; }
 
-	if ($info['feed']['employer_access'] && user_access('sirius employer user manager')) { 
+	if ($info['feed']['employer_access'] && user_access('sirius employer worker manage')) { 
 		$employer_node = sirius_employer_get();
 		if ($employer_node && ($employer_node->nid == $feed_node->field_grievance_shop['und'][0]['target_id'])) { return TRUE; }
 	}
@@ -263,7 +263,7 @@ function sirius_feed_page_launch_form_submit($form, &$form_state) {
 	sirius_wizard_launch($info);
 }
 
-function sirius_feed_wizard_launch($wizard_name) {
+function sirius_feed_wizard_launch($wizard_name, $skip_redirect = FALSE) {
 	$domain = sirius_domain();
   $feed_node = new stdClass();
   $feed_node->type = 'sirius_feed';
@@ -290,7 +290,11 @@ function sirius_feed_wizard_launch($wizard_name) {
   node_object_prepare($feed_node);
   node_save($feed_node);
 
-  drupal_goto('node/' . $feed_node->nid . '/sirius_feed_wizard');
+  if (!$skip_redirect) {
+  	drupal_goto('node/' . $feed_node->nid . '/sirius_feed_wizard');
+  }
+
+  return $feed_node;
 }
 
 /************************************************************************************************
@@ -325,6 +329,23 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 		'#type' => 'file',
 		'#title' => $title,
 	);
+
+	if (user_access('sirius admin')) {
+		$html = '<div>';
+		$html .= '<br />';
+		$html .= l(
+			'Prior Uploads', 
+			'sirius/log', 
+			array(
+				'query' => array('field_sirius_category_value' => 'feed:prior', 'field_sirius_log_handler_target_id' => $feed_node->nid),
+				'attributes' => array('class' => array('tool-button'))
+			)
+		);
+		$html .= '</div>';
+
+		$form['file_prior'] = array('#markup' => $html);
+	}
+
 
 	$default = $data['source'];
 	if (!$default) { $default = 'Import ' . date('Y-m-d H:i:s'); }
@@ -382,7 +403,6 @@ function sirius_feed_wizard_upload_form($form, &$form_state, $info, $data, $feed
 		);
 	}
 
-
 	$default = $data['header_row'];
 	if (!$default) { $default = $last_data['header_row']; }
 	$form['header_row'] = array(
@@ -407,9 +427,9 @@ function sirius_feed_wizard_upload_form_validate($form, &$form_state) {
   $file = file_save_upload("file", array(
     'file_validate_extensions' => array($extensions),
   ));
+  $ext = pathinfo($file->origname, PATHINFO_EXTENSION);
   if ($file) {
-    $name = rand();
-    if ($file = file_move($file, 'private://attach_' . rand())) {
+    if ($file = file_move($file, 'private://attach_' . uuid_generate() . '.' . $ext)) {
       $form_state['storage']["file"] = $file;
     }
     else {
@@ -433,6 +453,11 @@ function sirius_feed_wizard_upload_form_submit($form, &$form_state) {
   $file = $form_state['storage']["file"];
   if ($file) {
 		$file = (array) $file;
+
+		if ($file['fid'] != $feed_node->field_sirius_attachments['und'][0]['fid']) {
+			$log_node = sirius_log('feed:prior', 'prior', 'Prior upload', 'Prior upload', NULL, array($feed_node->nid), array($feed_node->field_sirius_attachments['und'][0]));
+  	}
+
   	$data['origname'] = $file['origname'];
 		$file['display'] = 1;
 		unset($form_state['storage']["attach_$delta"]);
@@ -582,11 +607,9 @@ function sirius_feed_wizard_map_form($form, &$form_state, $info, $data, $feed_no
 
 	$form['table_open'] = array('#markup' => '<table><tr><th>System Field</th><th>Uploaded Field</th></tr>');
 	foreach ($fields as $field_name => $field_info) {
-		if ($data) {
-			$default = $data["map_$field_name"];
-		} else {
-			$default = $last_data["map_$field_name"];
-		}
+		if ($data) { $default = $data["map_$field_name"]; }
+
+		if (!isset($default)) { $default = $last_data["map_$field_name"]; }
 
 		if ($field_info['required']) {
 			$options = $header;
@@ -848,6 +871,9 @@ function sirius_feed_wizard_process_form_submit($form, &$form_state) {
 }
 
 function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$context) {
+	// Disable realtime denormalization
+	sirius_denorm_realtime(FALSE);
+
 	// Load include files
 	$wizard_name = $info['name'];
 	sirius_wizard_info($wizard_name);
@@ -955,6 +981,9 @@ function sirius_feed_wizard_process_batch($feed_node, $info, $data, $idx, &$cont
 }
 
 function sirius_feed_wizard_process_finish($feed_node, $info, $data, $idx, &$context) {
+	// Disable realtime denormalization
+	sirius_denorm_realtime(FALSE);
+
 	$context['message'] = "Cleaning up.";
 	$data['feed']['counts'] = $context['results']['counts'];
 	if ($data['feed']['counts']) { ksort($data['feed']['counts']); }
@@ -1098,50 +1127,67 @@ function sirius_feed_lookup_by_field($content_type, $table, $field_name, $value)
   return array('success' => TRUE, 'nid' => $nid);
 }
 
-function sirius_feed_handle_field($field_name, $field_info, &$value, $precompute) {
+function sirius_feed_handle_field($field_name, $field_info, &$value, $precompute, $employer_nid = NULL) {
   if (!$value) { return array('success' => TRUE); }
+
+  $field_label = $field_info['title']; 
+  if (!$field_label) { $field_label = $field_name; }
 
   // Validate integer fields
   if ($field_info['type'] == 'integer') {
     $value = preg_replace('/\,/', '', $value);
-    if (!preg_match('/^[0-9]+$/', $value)) { return array('success' => FALSE, 'msg' => "$field_name must be an integer."); }
+    if (!preg_match('/^[0-9]+$/', $value)) { return array('success' => FALSE, 'msg' => "$field_label must be an integer."); }
   }
 
   // Validate list fields
   if ($field_info['type'] == 'list') {
     $value = sirius_feed_handle_list($field_name, $value);
-    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name invalid: must be one of the allowed values."); }
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_label invalid: must be one of the allowed values."); }
   }
 
   // Validate term_reference
   if ($field_info['type'] == 'term_reference') {
-    $value = sirius_taxonomy_lookup_by_anything($field_info['taxonomy'], $value);
-    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name invalid: must be one of the values in the taxonomy: $field_info[taxonomy]."); }
+    $value = sirius_taxonomy_lookup_by_anything($field_info['taxonomy'], $value, $employer_nid);
+    if (!$value) { 
+    	return array('success' => FALSE, 'msg' => "$field_label invalid: must be one of the allowed values.");
+    }
   }
 
   // Validate date
   if ($field_info['type'] == 'date') {
     $value = sirius_feed_handle_date($field_name, $value);
-    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name invalid: does not look like a valid date."); }
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_label invalid: does not look like a valid date."); }
+  }
+
+  // Validate date
+  if ($field_info['type'] == 'dob') {
+    $value = sirius_feed_handle_dob($field_name, $value);
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_label invalid: does not look like a valid DoB."); }
   }
 
   // Validate list fields
   if ($field_info['type'] == 'ssn') {
     $value = sirius_feed_handle_ssn($field_name, $value);
-    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name invalid: does not look like a valid SSN."); }
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_label invalid: does not look like a valid SSN."); }
   }
 
-  // Validate list fields
+  // Validate phone fields
   if ($field_info['type'] == 'phone') {
     $value = sirius_feed_handle_phone($field_name, $value);
-    if (!$value) { return array('success' => FALSE, 'msg' => "$field_name invalid: does not look like a valid phone number."); }
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_label invalid: does not look like a valid phone number."); }
+  }
+
+  // Validate email fields
+  if ($field_info['type'] == 'email') {
+    $value = sirius_feed_handle_email($field_name, $value);
+    if (!$value) { return array('success' => FALSE, 'msg' => "$field_label invalid: does not look like a valid email address."); }
   }
 
   // Expensive tests
   if ($precompute) {
     if ($field_info['type'] == 'entity_reference') {
-      $value = sirius_feed_handle_entity_reference($field_info['entity_type'], $value);
-      if (!$value) { return array('success' => FALSE, 'msg' => "$field_name invalid: no value found (or multiple values found) in the entity type: $field_info[entity_type]."); }
+      $value = sirius_feed_handle_entity_reference($field_info['entity_type'], $field_info['bundle'], $value);
+      if (!$value) { return array('success' => FALSE, 'msg' => "$field_label invalid: no value found (or multiple values found) in the entity type: $field_info[entity_type]."); }
     }
   }
 
@@ -1183,6 +1229,12 @@ function sirius_feed_handle_phone($field_name, $value) {
 	return $value;
 }
 
+function sirius_feed_handle_email($field_name, $value) {
+	$value = sirius_email_format($value);
+	if (!sirius_email_validate($value)) { return NULL; }
+	return $value;
+}
+
 //
 // @todo: Under development. Make sure these are domain-specific. Get sirius_employer working with them properly.
 // 
@@ -1193,18 +1245,27 @@ function sirius_feed_handle_date($field_name, $value) {
   return gmdate('Y-m-d', $ts);
 }
 
-function sirius_feed_handle_entity_reference($entity_type, $value) {
+function sirius_feed_handle_dob($field_name, $value) {
+  $ts = strtotime($value);
+  if ($ts === NULL) { return NULL; }
+  if ($ts > time()) { return NULL; }
+  if ($ts < strtotime('1800-01-01')) { return NULL; }
+  return date('Y-m-d', $ts);
+}
+
+function sirius_feed_handle_entity_reference($entity_type, $bundle, $value) {
 	if (!$entity_type) { $entity_type = 'node'; }
 
 	if ($entity_type == 'node') {
 	  $sql = "select min(nid) as mn, max(nid) as mx from node ";
 	  $sql .= "left join field_data_field_sirius_id on field_data_field_sirius_id.entity_type = 'node' and field_data_field_sirius_id.entity_id = node.nid ";
 	  $sql .= "left join field_data_field_sirius_name_short on field_data_field_sirius_name_short.entity_type = 'node' and field_data_field_sirius_name_short.entity_id = node.nid ";
-	  $sql .= "where nid = :v1 ";
+	  $sql .= "where type = :bundle ";
+	  $sql .= "and (nid = :v1 ";
 	  $sql .= "or title = :v2 ";
 	  $sql .= "or field_sirius_id_value = :v3 ";
-	  $sql .= "or field_sirius_name_short_value = :v4 ";
-	  $stmt = sirius_sql_query($sql, array(':v1' => $value, ':v2' => $value, ':v3' => $value, ':v4' => $value));
+	  $sql .= "or field_sirius_name_short_value = :v4) ";
+	  $stmt = sirius_sql_query($sql, array(':bundle' => $bundle, ':v1' => $value, ':v2' => $value, ':v3' => $value, ':v4' => $value));
 	  $hr = $stmt->fetchAssoc();
 	  if (!$hr['mn']) { return NULL; }
 	  if ($hr['mn'] != $hr['mx']) { return NULL; }

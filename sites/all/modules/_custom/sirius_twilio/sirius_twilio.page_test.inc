@@ -47,7 +47,7 @@ function sirius_twilio_page_test_form($form, &$form_state) {
 		),
 	);
 
-	$form['callerid'] = array(
+	$form['callerid_nid'] = array(
 		'#type' => 'select',
 		'#title' => t('Caller ID'),
 		'#options' => array(NULL => t('-- Select --')) + sirius_callerid_options(),
@@ -93,7 +93,7 @@ function sirius_twilio_page_test_form_submit($form, &$form_state) {
 	$to = $form_state['values']['to'];
 	$medium = $form_state['values']['medium'];
 	$outgoing_msg = $form_state['values']['msg'];
-	$callerid_nid = $form_state['values']['callerid'];
+	$callerid_nid = $form_state['values']['callerid_nid'];
 
 	$params = array();
 	$params['handler_nids'] = array();
@@ -123,4 +123,11 @@ function sirius_twilio_page_test_form_submit($form, &$form_state) {
 			drupal_set_message("Details: " . $result['details'], 'warning');
 		}
 	}
+
+  if ($result['comm']) {
+    $path = 'node/' . $result['comm']->nid . '/sirius_log_comm';
+    $msg = "The comm message can be viewed and tracked <strong>" . l('here', $path) . '</strong>';
+    drupal_set_message($msg);
+    sirius_minilog($msg);
+  }
 }

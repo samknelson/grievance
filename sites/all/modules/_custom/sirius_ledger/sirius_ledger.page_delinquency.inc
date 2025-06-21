@@ -75,7 +75,6 @@ function sirius_ledger_page_delinquency_employer_form_submit($form, &$form_state
 		return;
 	}
 
-	dpm($employer_nids);
 	return;
 	$html = '';
 	$is_first = TRUE;
@@ -85,11 +84,10 @@ function sirius_ledger_page_delinquency_employer_form_submit($form, &$form_state
 		}
 		if ($is_first) {
 			$is_first = FALSE;
-			$html .= '<div style="margin: 0; padding: 0;" class="sirius_ledger_transmittal_wrapper">';
+			$html .= '<div style="margin: 0; padding: 0;">';
 		} else {
-			$html .= '<div style="page-break-before: always; margin: 0; padding: 0;" class="sirius_ledger_transmittal_wrapper">';
+			$html .= '<div style="page-break-before: always; margin: 0; padding: 0;">';
 		}
-		$html .= sirius_ledger_node_tab_employer_transmittal_print($employer_node, $account_nids, $form_state['values']['hours']);
 		$html .= '</div>';
 	}
 
@@ -100,8 +98,6 @@ function sirius_ledger_page_delinquency_employer_form_submit($form, &$form_state
 
 	$params = array();
 	$params['post']['body'] = $html;
-	$params['post']['css_paths'] = 'sites/all/modules/_custom/sirius_ledger/css/transmittal.css';
-	$params['letterhead'] = sirius_domain_variable_get('sirius_ledger_transmittal_letterhead', '');
 	$params['filename'] = 'employer_delinquency_batch_' . date('Ymd') . '.pdf';
 	sirius_pdf_stream(sirius_loopback_url() . '/sirius/loopback/echo', $params);
 }

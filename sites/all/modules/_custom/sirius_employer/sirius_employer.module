@@ -17,6 +17,56 @@ require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_em
 require_once DRUPAL_ROOT . "/sites/all/modules/_custom/sirius_employer/sirius_employer.page_list.inc";
 
 /**
+ * Implements hook_sirius_domain_component_info
+ */
+
+function sirius_employer_sirius_domain_component_info() {
+  return array(
+    'employer:labproj' => array(
+      'title' => 'Employer - Labor Projections',
+      'description' => 'Use the worker database',
+    ),
+    'employer:ein' => array(
+    	'title' => 'Employer - EIN',
+    	'description' => 'Support for per-employer employee IDs',
+    ),
+  );
+}
+
+/***
+ * Implements hook_report_cache_info() 
+ */
+
+function sirius_employer_report_cache_info() {
+  $items = array();
+
+  sirius_require('sirius_employer', 'sirius_employer.report_contact_bytype.inc');
+
+  Sirius_Employer_Report_Contact_Bytype::getInstance()->setInfo($items);
+
+  return $items;
+}
+
+
+function sirius_employer_get_by_id($id, $nid_only = FALSE) {
+	if (!$id) { return NULL; }
+
+  $query = new EntityFieldQuery;
+  $query->entityCondition('entity_type', 'node');
+  $query->entityCondition('bundle', 'grievance_shop');
+	$query->fieldCondition('field_sirius_id', 'value', $id);
+  $domain_nid = sirius_domain_nid();
+  if ($domain_nid) { $query->fieldCondition('field_sirius_domain', 'target_id', $domain_nid); }
+	$query->propertyOrderBy('nid', 'desc');
+	$stmt = $query->execute();
+	if (!$stmt['node']) { return NULL; }
+
+  if ($nid_only) { return array_keys($stmt['node'])[0]; }
+
+	return node_load(array_keys($stmt['node'])[0]);
+}
+
+/**
  * @todo: Migrate grievance_shop functionality to this module
  *
  * We're taking a shortcut here.  There was legacy functionality built around the content type "grievance_shop": 

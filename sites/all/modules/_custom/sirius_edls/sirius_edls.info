@@ -1,0 +1,4 @@
+name = Sirius Employer Daily Labor Schedule EDLS
+description = Implements functionality for the day-labor scheduler
+package = sirius
+core = 7.x

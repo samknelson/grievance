@@ -48,13 +48,15 @@ function sirius_smf_feed_dependents_row_process_rel($feed_node, $info, $data, $r
   	'N' => 'administrative_area',
   	'O' => 'postal_code',
   );
-  foreach ($addr_fields as $field_name => $col) {
-    if ($row["$field_name"]) {
-      $need_country = TRUE;
-      $worker_node->field_sirius_address['und'][0][$col] = $row[$field_name];
+  if (preg_match('/[1-9]/',$row['O'])) {
+    foreach ($addr_fields as $field_name => $col) {
+      if ($row["$field_name"]) {
+        $need_country = TRUE;
+        $worker_node->field_sirius_address['und'][0][$col] = $row[$field_name];
+      }
     }
+    if ($need_country) { $worker_node->field_sirius_address['und'][0]['country'] = 'US'; }
   }
-  if ($need_country) { $worker_node->field_sirius_address['und'][0]['country'] = 'US'; }
 
   // Phone
   if ($row['phone']) {
@@ -118,6 +120,29 @@ function sirius_smf_feed_dependents_row_process_rel($feed_node, $info, $data, $r
       node_save($relationship_node);
 		}
 	}
+
+  // ////////////////////////////////////////////////////////
+  // Work Status
+  // ////////////////////////////////////////////////////////
+
+  if ($row['ws']) {
+    $result = sirius_worker_work_status_set($worker_node, $row['ws']['tid'], $row['ws']['reason'], NULL, array(), $row['ws']['ts']);
+    if (!$result['success']) {
+      $warnings[] = 'Work status update failed: ' . $result['msg'];
+    }
+  }
+
+  // ////////////////////////////////////////////////////////
+  // Tag
+  // ////////////////////////////////////////////////////////
+
+  $contact_node = sirius_worker_contact_get($worker_node);
+  $tag_tid = sirius_domain_variable_get('sirius_trust_dependent_tid');
+  if ($contact_node && $tag_tid) {
+    $contact_node->no_recurse = TRUE;
+    $result = sirius_contact_tag_add($contact_node, $tag_tid);
+    if (!$result['success']) { $warnings[] = "Tag failed: " . $result['msg']; }
+  }
 
   /*
   // ////////////////////////////////////////////////////////

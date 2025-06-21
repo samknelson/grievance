@@ -39,9 +39,12 @@ function sirius_phone_format($phonenumber) {
   $phonenumber = '(' . $matches[2] . ') ' . $matches[3] . $separator . $matches[4];
 
   // Optional extension
+  // No more extensions
+  /*
   if ($matches[5] != '') {
       $phonenumber .= ' x' . $matches[5];
   }
+  */
 
   return $phonenumber;
 }
@@ -98,185 +101,6 @@ function sirius_phone_keypad($string) {
   return $string;
 }
 
-// @todo
-function sirius_sms_enabled() { return TRUE; }
-
-function sirius_sms_send($params) {
-  // Allow callers to set the X-Sirius-Id, and don't resent with the same ID. This allows callers to set unique keys.
-  if ($params['X-Sirius-Id']) {
-    $id = $params['X-Sirius-Id'];
-    if (sirius_sms_already_sent($id)) {
-      return array('success' => FALSE, 'msg' => "Skipping sending for message with id $id, because it's already been sent.");
-    }
-  } else {
-    $id =  uuid_generate();
-  }
-
-  $from = $params['sms_from'];
-  if (!$from) { $from = sirius_domain_variable_get('sirius_twilio_phone', ''); }
-  $phone = $params['to'];
-  $msg = $params['sms'];
-  $handler_nids = $params['handler_nids'];
-  if (is_array($handler_nids)) {
-    $handler_nid = $handler_nids[0];
-  } else {
-    $handler_nid = $handler_nids;
-  }
-
-  $possible = sirius_phonenumber_sms_possible($phone, $from);
-  if (!$possible) { 
-    return array(
-      'success' => FALSE, 
-      'msg' => "SMS messaging to $phone is not possible because the number is flagged as non-deliverable. Possible causes include a user STOP message, an administrative block, or a detected landline."
-    );
-  }
-
-  $phonenumber_node = sirius_phonenumber_lookup($phone);
-  if (!$phonenumber_node->nid) { node_save($phonenumber_node); }
-  $handler_nids[] = $phonenumber_node->nid;
-
-  $result = sirius_twilio_outgoing_sms($phone, $msg, $handler_nid, $id, $from, $params['sms_attach']);
-
-  if ($result['success']) {
-    sirius_log(
-      'sms', 
-      'sending', 
-      $phone, 
-      $msg,
-      $id, 
-      $handler_nids
-    );
-  } else {
-    sirius_log(
-      'sms', 
-      'failed', 
-      $phone, 
-      $result['msg'] . ': ' . $msg,
-      $id, 
-      $handler_nids
-    );
-  }
-
-  $phonenumber_json = sirius_json_get($phonenumber_node);
-  $phonenumber_json['last_sms'] = array(
-    'ts' => time(),
-    'params' => $params,
-    'result' => $result,
-  );
-  sirius_json_set($phonenumber_node, $phonenumber_json);
-  node_save($phonenumber_node);
-
-  return $result;
-}
-
-function sirius_sms_already_sent($id) {
-  // SQL for speed
-  $sql = "select * from node ";
-  $sql .= "join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
-  $sql .= "join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
-  $sql .= "join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
-  $sql .= "where node.type = 'sirius_log' ";
-  $sql .= "and field_sirius_notes_value = :id ";
-  $sql .= "and field_sirius_category_value = 'sms' ";
-  $sql .= "and field_sirius_type_value = 'sending' ";
-  $stmt = db_query($sql, array(':id' => $id));
-  $hr = $stmt->fetchAssoc();
-  if ($hr) { return TRUE; }
-  return FALSE;
-}
-
-function sirius_sms_callback($id, $type, $json) {
-  if ($id) {
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node');
-    $query->entityCondition('bundle', 'sirius_log');
-    $query->fieldCondition('field_sirius_notes', 'value', $id);
-    $query->fieldCondition('field_sirius_log_handler', 'target_id', 0, '>');
-    $query->fieldCondition('field_sirius_category', 'value', 'sms');
-    $query->fieldCondition('field_sirius_type', 'value', 'sending');
-    $query->propertyOrderBy('nid', 'desc');
-    $stmt = $query->execute();
-    if ($stmt['node']) {
-      $previous_log_node = node_load(array_keys($stmt['node'])[0]);
-      $handler_nids = sirius_fieldvals($previous_log_node, 'field_sirius_log_handler', 'target_id');
-    }
-  }
-
-  $summary = $json['SmsStatus'];
-
-  sirius_log(
-    'sms', 
-    $type, 
-    "Callback of type $type", 
-    $summary,
-    $id, 
-    $handler_nids,
-    NULL,
-    $json
-  );
-}
-
-function sirius_voice_send($params) {
-  // Allow callers to set the X-Sirius-Id, and don't resent with the same ID. This allows callers to set unique keys.
-  $id = $params['X-Sirius-Id'];
-  if ($id) {
-    if (sirius_voice_already_sent($id)) {
-      return array('success' => FALSE, 'msg' => "Skipping sending for message with id $id, because it's already been sent.");
-    }
-  }
-
-  $phone = $params['to'];
-
-  $possible = sirius_phonenumber_voice_possible($phone);
-  if (!$possible) { return array('success' => FALSE, 'msg' => "$phone does not appear to have a valid voice carrier."); }
-
-  $msg = $params['voice'];
-  $handler_nids = $params['handler_nids'];
-  if (is_array($handler_nids)) {
-    $handler_nid = $handler_nids[0];
-  } else {
-    $handler_nid = $handler_nids;
-  }
-
-  $context = array();
-  $context['outgoing_msg'] = $msg;
-  $context['outgoing_msg_machine'] = $params['voice_machine'];
-  $context['handler_nid'] = $handler_nid;
-  $context['worker_nid'] = $params['worker_nid'];
-  $context['callerid_nid'] = $params['callerid_nid'];
-  $context['phonetree'] = $params['phonetree'];
-  $context['amd'] = $params['amd'];
-
-  $result = sirius_twilio_outgoing_voice($phone, $context);
-
-  sirius_log(
-    'voice', 
-    'sending', 
-    $phone, 
-    $msg,
-    $id, 
-    $handler_nids
-  );
-
-  return $result; 
-}
-
-function sirius_voice_already_sent($id) {
-  // SQL for speed
-  $sql = "select * from node ";
-  $sql .= "join field_data_field_sirius_notes on field_data_field_sirius_notes.entity_type = 'node' and field_data_field_sirius_notes.entity_id = node.nid ";
-  $sql .= "join field_data_field_sirius_category on field_data_field_sirius_category.entity_type = 'node' and field_data_field_sirius_category.entity_id = node.nid ";
-  $sql .= "join field_data_field_sirius_type on field_data_field_sirius_type.entity_type = 'node' and field_data_field_sirius_type.entity_id = node.nid ";
-  $sql .= "where node.type = 'sirius_log' ";
-  $sql .= "and field_sirius_notes_value = :id ";
-  $sql .= "and field_sirius_category_value = 'voice' ";
-  $sql .= "and field_sirius_type_value = 'sending' ";
-  $stmt = db_query($sql, array(':id' => $id));
-  $hr = $stmt->fetchAssoc();
-  if ($hr) { return TRUE; }
-  return FALSE;
-}
-
 function sirius_phonenumber_node_validate($node, $form, &$form_state) {
   if (!sirius_phone_validate($node->field_sirius_id['und'][0]['value'])) {
    form_set_error('field_sirius_id', t('Please enter a valid phone number.'));
@@ -325,7 +149,21 @@ function sirius_phonenumber_node_presave($node) {
       }
     }
 
-    // Check for user block
+    // //////////////////////
+    // Check for user block on the whole phone number. 
+    // This is legacy support. Going forward, user blocks are for specific senders only.
+    // //////////////////////
+
+    // If we ever *un-blocked* any sender, clear the global block.
+    if ($json['user_block']['sms'] == 'Yes') {
+      foreach ($json['user_block'] as $key => $value) {
+        if (is_array($value) && $json['user_block'][$key]['sms'] == 'No') {
+          $json['user_block']['sms'] = "No";
+          drupal_set_message("Reset global block to \"no\".");
+        }
+      }
+    }
+    // If we have a global block, then stop sending altogether.
     if ($json['user_block']) {
       if ($json['user_block']['sms'] == 'Yes') {
         sirius_minilog("$phonenumber: User SMS block found, setting sms_possible = No");
@@ -336,6 +174,7 @@ function sirius_phonenumber_node_presave($node) {
         $voice_possible = 'No';
       }
     }
+
 
     // Check for STOP error code
     if ($json['last_sms'] && !$json['last_sms']['result']['success']) {
@@ -433,7 +272,7 @@ function sirius_phonenumber_sms_possible($phonenumber, $from = NULL) {
 
   // Check for STOPs from our sender
   $json = sirius_json_get($node);
-  if ($json['user_block']['sms'] == 'Yes') { return FALSE; }
+  // if ($json['user_block']['sms'] == 'Yes') { return FALSE; }
   if ($json['user_block'][$from]['sms'] == 'Yes') { return FALSE; }
 
   return TRUE;
@@ -500,67 +339,6 @@ function sirius_page_phonenumber_check_form_submit($form, &$form_state) {
   sirius_minilog("Voice Possible: " . $node->field_sirius_voice_possible['und'][0]['value']);
   sirius_minilog("Details: " . l("Node " . $node->nid, 'node/' . $node->nid));
 }
-
-function sirius_sms_segment_count($html_id) {
-  $settings = array();
-  $settings['html_id'] = $html_id;
-  if (sirius_domain_variable_get('sirius_twilio_sms_unsubscribe', TRUE)) {
-    $settings['suffix'] = sirius_domain_variable_get('sirius_twilio_sms_unsubscribe_msg', "\nReply STOP to unsubscribe.\n");
-  } else {
-    $settings['suffix'] = '';
-  }
-
-  drupal_add_js(
-    array('sirius_sms_segment_count' => $settings),
-    array('type' => 'setting')
-  );
-  drupal_add_js('sites/all/modules/_custom/sirius/js/sms_segment_count.js');
-  drupal_add_css('sites/all/modules/_custom/sirius/css/sms_segment_count.css');
-
-  $html = '<div class="sirius_sms_segment_count" id="' . $html_id . '_count">';
-  $html .= t('SMS Segments:') . '<span class="stat messages"></span>';
-  $html .= ' / ';
-  $html .= t('Remaining in segment:') . '<span class="stat remaining"></span>';
-  $html .= ' / ';
-  $html .= t('Total length:') . '<span class="stat length"></span>';
-  $html .= ' / ';
-  // $html .= t('Per segment:') . '<span class="stat per_message"></span>';
-  // $html .= ' / ';
-  $html .= t('Encoding:') . '<span class="stat encoding"></span>';
-  $html .= '</div>';
-
-  return $html;
-}
-
-function sirius_sms_admin() {
-  $name = sirius_domain_variable_name('sirius_sms_global_disable');
-  $form[$name] = array(
-    '#type' => 'select',
-    '#title' => t('Global Disable'),
-    '#options' => array(
-      'No' => t('No'),
-      'Yes' => t('Yes'),
-    ),
-    '#description' => t('Select "Yes" to globally disable SMS on this server.'),
-    '#default_value' => variable_get($name, ''),
-  );
-
-  $name = sirius_domain_variable_name('sirius_sms_global_disable_whitelist');
-  $form[$name] = array(
-    '#type' => 'textarea',
-    '#title' => t('Whitelist'),
-    '#description' => t('When global disable is on, use the whitelist to indicate which phone numbers <strong>can</strong> receive SMS. Phone numbers must be in the format (xxx) xxx-xxxx.'),
-    '#default_value' => variable_get($name, ''),
-    '#states' => array(
-      'visible' => array(
-        array(':input[name="sirius_sms_global_disable"]' => array('value' => 'Yes')),
-      )
-    ),
-  );
-
-  return system_settings_form($form);
-}
-
 
 function sirius_phone_render($phone) {
   if (!$phone) { return ''; }
@@ -648,6 +426,12 @@ function sirius_phonenumber_render_user_block($node) {
   if (!$json['user_block']) {
     $html .= t('No user block.');
   } else {
+    if ($json['user_block']['sms']) {
+      $html .= "Overall SMS Block: " . $json['user_block']['sms'];
+      $html .= "<br />Comments: " . $json['user_block']['comments'];
+      $html .= '<br />' . t('Set on ') . date('r', $json['user_block']['ts']) . '<br />';
+    }
+
     foreach ($json['user_block'] as $phone => $record) {
       if (!sirius_phone_validate($phone)) { continue; }
       $html .= "SMS block on <strong>$phone</strong>: " . $record['sms'];

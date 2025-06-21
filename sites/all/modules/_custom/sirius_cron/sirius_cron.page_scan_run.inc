@@ -5,12 +5,10 @@ function sirius_cron_node_tab_scan_run_access($scan_node) {
 	return TRUE;
 }
 
-function sirius_cron_node_tab_scan_run($scan_node) {
-	return drupal_get_form('sirius_cron_node_tab_scan_run_form', $scan_node);
-}
-
 function sirius_cron_node_tab_scan_run_form($form, &$form_state, $scan_node) {
 	$form_state['scan_nid'] = $scan_node->nid;
+
+	$form['#tree'] = TRUE;
 
 	$form['mode'] = array(
 		'#title' => t('Mode'),
@@ -26,11 +24,23 @@ function sirius_cron_node_tab_scan_run_form($form, &$form_state, $scan_node) {
 		'#title' => t('Force?'),
 		'#type' => 'select',
 		'#options' => array(
-			FALSE => t('No, run on the normal schedule'),
-			TRUE => t('Yes, run even if it is too soon'),
+			FALSE => t('No'),
+			TRUE => t('Yes'),
 		),
 		'#required' => TRUE,
+		'#description' => t('Select "Yes" to run this job even if it is disabled, or if it is not scheduled to run yet.'),
 	);
+
+	$scan_key = sirius_cron_scan_key($scan_node);
+	$info = sirius_cron_scan_info($scan_key);
+	if ($info['options_form']) {
+		$form['options'] = array(
+			'#type' => 'fieldset',
+			'#title' => t('Options'),
+		);
+
+		$form['options'] += $info['options_form'];
+	}
 
 	$form['submit'] = array(
 		'#type' => 'submit',
@@ -60,9 +70,11 @@ function sirius_cron_node_tab_scan_run_form_submit($form, &$form_state) {
 		return;
 	}
 
+	$options = $form_state['values']['options'];
+
 	$mode = $form_state['values']['mode'];
 	$force = $form_state['values']['force'];
-	$result = sirius_cron_scan($scan_key, $force, $mode);
+	$result = sirius_cron_scan($scan_key, $force, $mode, $options);
 	if ($result['success']) {
 		drupal_set_message("Scan run complete: " . $result['msg']);
 	} else {

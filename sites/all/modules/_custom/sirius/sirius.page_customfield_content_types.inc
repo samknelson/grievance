@@ -19,12 +19,33 @@ function sirius_node_tab_customfield_content_types_form($form, &$form_state, $cf
 	} else { 
 		$def = array();
 	}
+
 	$form['customfield']['content_types']['types_enabled'] = array(
 		'#title' => 'This custom field set is available for the following content types:',
 		'#type' => 'checkboxes',
 		'#options' => $options,
 		'#checkall' => TRUE,
 		'#default_value' => $def,
+		'#id' => 'types_enabled',
+	);
+
+	$categories = sirius_log_categories();
+	$categories = array_combine($categories, $categories);
+	$form['customfield']['content_types']['log_categories'] = array(
+		'#title' => 'For log entries, restrict to the following categories:',
+		'#type' => 'checkboxes',
+		'#options' => $categories,
+		'#checkall' => TRUE,
+		'#default_value' => $cf_json['customfield']['content_types']['log_categories'],
+		'#states' => array(
+			'visible' => array(
+				array(
+					':input[name="customfield[content_types][types_enabled][sirius_log]"]' => array(
+						array('checked' => TRUE),
+					),
+				),
+			),
+		),
 	);
 
 	$form['submit'] = array(

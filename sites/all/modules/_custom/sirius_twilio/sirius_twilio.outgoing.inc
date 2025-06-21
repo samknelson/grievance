@@ -7,13 +7,22 @@ use Twilio\TwiML;
  * Status Callback
  **********************************************************************************/
 
-function sirius_twilio_statuscallback_sms_url($id) {
+function sirius_twilio_statuscallback_sms_url() {
 	global $base_url;
-	return $base_url . "/sirius/twilio/statuscallback/sms/" . urlencode($id);
+	return $base_url . "/sirius/twilio/statuscallback/sms";
 }
 
-function sirius_twilio_statuscallback_sms($id) {
-	return sirius_sms_callback(urldecode($id), $_POST['SmsStatus'], $_POST);
+function sirius_twilio_statuscallback_sms() {
+	return sirius_sms_callback($_POST);
+}
+
+function sirius_twilio_statuscallback_voice_url() {
+	global $base_url;
+	return $base_url . "/sirius/twilio/statuscallback/voice";
+}
+
+function sirius_twilio_statuscallback_voice() {
+	return sirius_voice_callback($_POST);
 }
 
 /**********************************************************************************
@@ -48,7 +57,7 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NUL
   if (!$possible) 										{ return array('success' => FALSE, 'msg' => "[$phone] does not appear to be a mobile-enabled number."); }
 
   static $registered;
-  if (sirius_domain_variable_get('sirius_twilio_sms_consolidate', FALSE)) {
+  if (sirius_domain_variable_get('sirius_twilio_sms_consolidate', FALSE) && !$from) {
 		$result = sirius_twilio_outgoing_sms_queue(FALSE, $phone, $msg, $id, $from, $attach);
 		if (!$registered) {
 			$registered = TRUE;
@@ -59,14 +68,6 @@ function sirius_twilio_outgoing_sms($phone, $msg, $handler_nid = NULL, $id = NUL
 	}
 
 	if ($result['success']) {
-		sirius_log(
-			'twilio:conversation', 
-			'outgoing_sms', 
-			"Sending to $phone: $msg",
-			"Sending to $phone: $msg",
-			$phone, 
-			array($handler_nid)
-		);
 		$result['msg'] = "Sending to $phone: $msg";
 	}
 
@@ -102,11 +103,8 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 			$sms_params['from'] = $from;
 			$sms_params['body'] = $record['msg'];
 			if ($record['attach']['url'][0]) { $sms_params["mediaUrl"] = $record['attach']['url']; }
-
-			if ($id) { $sms_params['statusCallback'] = sirius_twilio_statuscallback_sms_url($id); }
-
+			$sms_params['statusCallback'] = sirius_twilio_statuscallback_sms_url();
 			$message = $client->messages->create($phone, $sms_params);
-
 			$sid = $message->sid;
 		} catch (Exception $e) {
 			$result = array(
@@ -115,7 +113,6 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 				'code' => $e->getCode()
 			);
 			$msg =  $e->getCode() . ' - ' . $e->getMessage() . ": " . $msg;
-			sirius_log('twilio:conversation', 'error', $msg, $msg, $phone, array($handler_nid));
 		}
 	}
 
@@ -126,7 +123,7 @@ function sirius_twilio_outgoing_sms_queue($deliver_now, $phone = NULL, $msg = NU
 	$result['success'] = TRUE;
 	$result['msg'] = "Delivered $count messages.";
 	$result['count'] = $count;
-	if ( ($count == 1) && $sid) { $result['sid'] = $sid; }
+	if ( ($count == 1) && $sid) { $result['sid'] = $result['external_id'] = $sid; }
 	return $result;
 }
 
@@ -178,14 +175,12 @@ function sirius_twilio_outgoing_voice($phone, $context) {
 			}
 		}
 
+		$call_params['statusCallback'] = sirius_twilio_statuscallback_voice_url();
 		$call = $client->calls->create($phone, $callerid_phone, $call_params);
-
 		$call_sid = sirius_twilio_call_sid($call);
-		$result = array('success' => TRUE, 'msg' => 'Initiated call to ' . $phone);
+		$result = array('success' => TRUE, 'msg' => 'Initiated call to ' . $phone, 'external_id' => sirius_twilio_call_sid($call));
 	} catch (Exception $e) {
-		sirius_log('twilio:outgoing', 'error', $msg, $msg, $phone, array($handler_nid));
-		sirius_log('twilio:outgoing', 'error', $e->getCode() . ' - ' . $e->getMessage(), '', $phone, array($handler_nid));
-		$result = array('success' => FALSE, 'msg' => "Call failed.");
+		$result = array('success' => FALSE, 'msg' => "Call failed: " .  $e->getCode() . ' - ' . $e->getMessage());
 	}
 
 	sirius_twilio_set_context($call_sid, $context, 'initiated_outgoing', "Called: $phone");
@@ -335,20 +330,10 @@ function sirius_twilio_outgoing_flow($flow_sid, $phone, $callerid_nid, $flow_par
 	} catch (Exception $e) {
 		$result = array('success' => FALSE, 'msg' => "Flow message failed.", 'details' => "Failed to send to Twilio Flow: " . $e->getCode() . ' - ' . $e->getMessage());
 		$msg =  $e->getCode() . ' - ' . $e->getMessage() . ": " . $msg;
-		sirius_log('twilio:conversation', 'error', $msg, $msg, $phone, $handlers);
 		return $result;
 	}
 
 	$msg = "Transferred $phone to flow $flow_sid (callerId $callerid_phone)";
-
-	sirius_log(
-		'twilio:flow', 
-		'outgoing_flow', 
-		$msg,
-		$msg,
-		$phone, 
-		$handlers
-	);
 
 	return array('success' => TRUE, 'msg' => $msg);	
 }

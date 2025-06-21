@@ -22,13 +22,8 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Airports',
-    'weight' => '8',
-    'children' => array(
-      0 => 'field_airport',
-      1 => 'field_airport_alt',
-      2 => 'field_calc_airport_dist',
-      3 => 'field_calc_airport_dist_alt',
-    ),
+    'weight' => '10',
+    'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(
       'label' => 'Airports',
@@ -52,31 +47,29 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->mode = 'default';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Amenities',
-    'weight' => '7',
+    'label' => 'Hotel Amenities',
+    'weight' => '9',
     'children' => array(
-      0 => 'field_fh_meeting_room_count',
-      1 => 'field_fh_meeting_room_capacity',
-      2 => 'field_fh_event_space',
-      3 => 'field_fh_ballroom_count',
-      4 => 'field_fh_ballroom_capacity',
-      5 => 'field_fh_outdoor',
-      6 => 'field_fh_outdoor_area',
-      7 => 'field_fh_parking',
-      8 => 'field_fh_parking_capacity',
-      9 => 'field_fh_meeting_room_largest',
+      0 => 'field_rooms',
+      1 => 'field_fh_meeting_room_count',
+      2 => 'field_fh_meeting_room_capacity',
+      3 => 'field_fh_event_space',
+      4 => 'field_fh_ballroom_count',
+      5 => 'field_fh_ballroom_capacity',
+      6 => 'field_fh_outdoor',
+      7 => 'field_fh_outdoor_area',
+      8 => 'field_fh_parking',
+      9 => 'field_fh_parking_capacity',
+      10 => 'field_fh_meeting_room_largest',
+      11 => 'field_niche',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
-      'label' => 'Amenities',
+      'label' => 'Hotel Amenities',
       'instance_settings' => array(
         'id' => '',
         'classes' => 'group-amenities field-group-fieldset',
         'description' => '',
-        'show_label' => '1',
-        'label_element' => 'h3',
-        'effect' => 'none',
-        'speed' => 'fast',
       ),
       'formatter' => 'open',
     ),
@@ -94,25 +87,23 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Amenities',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(
-      0 => 'field_fh_meeting_room_count',
-      1 => 'field_fh_meeting_room_capacity',
-      2 => 'field_fh_event_space',
-      3 => 'field_fh_ballroom_count',
-      4 => 'field_fh_ballroom_capacity',
-      5 => 'field_airport',
-      6 => 'field_airport_alt',
-      7 => 'field_calc_airport_dist',
-      8 => 'field_calc_airport_dist_alt',
-      9 => 'field_convention_center',
-      10 => 'field_calc_convention_dist',
-      11 => 'field_convention_center_attached',
-      12 => 'field_fh_outdoor',
-      13 => 'field_fh_outdoor_area',
-      14 => 'field_fh_parking',
-      15 => 'field_fh_parking_capacity',
-      16 => 'field_fh_meeting_room_largest',
+      0 => 'field_rooms',
+      1 => 'field_fh_meeting_room_count',
+      2 => 'field_fh_meeting_room_capacity',
+      3 => 'field_fh_event_space',
+      4 => 'field_fh_ballroom_count',
+      5 => 'field_fh_ballroom_capacity',
+      6 => 'field_convention_center',
+      7 => 'field_calc_convention_dist',
+      8 => 'field_convention_center_attached',
+      9 => 'field_fh_outdoor',
+      10 => 'field_fh_outdoor_area',
+      11 => 'field_fh_parking',
+      12 => 'field_fh_parking_capacity',
+      13 => 'field_fh_meeting_room_largest',
+      14 => 'field_niche',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -138,19 +129,18 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Casino',
-    'weight' => '10',
+    'weight' => '12',
     'children' => array(
-      0 => 'field_is_casino',
-      1 => 'field_csno_slots_count',
-      2 => 'field_csno_slots_date',
-      3 => 'field_csno_tables_count',
-      4 => 'field_csno_tables_date',
-      5 => 'field_csno_source',
-      6 => 'field_csno_regulator',
-      7 => 'field_csno_book',
-      8 => 'field_csno_horse',
-      9 => 'field_csno_online',
-      10 => 'field_csno_type',
+      0 => 'field_csno_slots_count',
+      1 => 'field_csno_slots_date',
+      2 => 'field_csno_tables_count',
+      3 => 'field_csno_tables_date',
+      4 => 'field_csno_source',
+      5 => 'field_csno_regulator',
+      6 => 'field_csno_book',
+      7 => 'field_csno_horse',
+      8 => 'field_csno_online',
+      9 => 'field_csno_type',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -176,19 +166,18 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Casino',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
-      0 => 'field_is_casino',
-      1 => 'field_csno_slots_count',
-      2 => 'field_csno_slots_date',
-      3 => 'field_csno_tables_count',
-      4 => 'field_csno_tables_date',
-      5 => 'field_csno_source',
-      6 => 'field_csno_regulator',
-      7 => 'field_csno_book',
-      8 => 'field_csno_horse',
-      9 => 'field_csno_online',
-      10 => 'field_csno_type',
+      0 => 'field_csno_slots_count',
+      1 => 'field_csno_slots_date',
+      2 => 'field_csno_tables_count',
+      3 => 'field_csno_tables_date',
+      4 => 'field_csno_source',
+      5 => 'field_csno_regulator',
+      6 => 'field_csno_book',
+      7 => 'field_csno_horse',
+      8 => 'field_csno_online',
+      9 => 'field_csno_type',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -214,7 +203,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Contracts',
-    'weight' => '3',
+    'weight' => '4',
     'children' => array(
       0 => 'field_union_status',
       1 => 'field_local',
@@ -250,7 +239,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Contract',
-    'weight' => '6',
+    'weight' => '8',
     'children' => array(
       0 => 'field_union_status',
       1 => 'field_local',
@@ -286,7 +275,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Convention Center',
-    'weight' => '9',
+    'weight' => '11',
     'children' => array(
       0 => 'field_convention_center',
       1 => 'field_calc_convention_dist',
@@ -316,7 +305,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'FairHotels',
-    'weight' => '11',
+    'weight' => '13',
     'children' => array(
       0 => 'field_boycott_url',
       1 => 'field_labor_activity_index',
@@ -349,7 +338,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'FairHotels',
-    'weight' => '8',
+    'weight' => '9',
     'children' => array(
       0 => 'field_boycott_url',
       1 => 'field_labor_activity_index',
@@ -370,6 +359,36 @@ function hotelsdb_content_types_field_group_info() {
     ),
   );
   $field_groups['group_fairhotel|node|property|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_fs|node|property|form';
+  $field_group->group_name = 'group_fs';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Food Service',
+    'weight' => '10',
+    'children' => array(
+      0 => 'field_rest_cuisine',
+      1 => 'field_rest_type',
+      2 => 'field_fs_segment',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-fs field-group-fieldset',
+        'required_fields' => 1,
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_fs|node|property|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -427,7 +446,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Loans and Grants',
-    'weight' => '8',
+    'weight' => '20',
     'children' => array(
       0 => 'field_lg_balance',
       1 => 'field_lg_servicer_commentary',
@@ -545,7 +564,7 @@ function hotelsdb_content_types_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Ownership',
-    'weight' => '7',
+    'weight' => '10',
     'children' => array(
       0 => 'field_pension',
       1 => 'field_percent_owned',
@@ -580,14 +599,15 @@ function hotelsdb_content_types_field_group_info() {
     'label' => 'Property',
     'weight' => '0',
     'children' => array(
-      0 => 'field_rooms',
-      1 => 'field_brand',
-      2 => 'field_development_status',
+      0 => 'field_brand',
+      1 => 'field_development_status',
+      2 => 'field_is_casino',
       3 => 'field_notes',
       4 => 'field_legacy_id',
       5 => 'field_owner_of_record',
-      6 => 'field_niche',
-      7 => 'title',
+      6 => 'field_is_fs',
+      7 => 'field_is_hotel',
+      8 => 'title',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -601,6 +621,65 @@ function hotelsdb_content_types_field_group_info() {
     ),
   );
   $field_groups['group_property|node|property|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_restaurant|node|property|default';
+  $field_group->group_name = 'group_restaurant';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property';
+  $field_group->mode = 'default';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Food Service',
+    'weight' => '14',
+    'children' => array(
+      0 => 'field_rest_cuisine',
+      1 => 'field_rest_type',
+      2 => 'field_fs_segment',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Food Service',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-restaurant field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_restaurant|node|property|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_restaurant|node|property|form';
+  $field_group->group_name = 'group_restaurant';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'property';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Restaurant',
+    'weight' => '10',
+    'children' => array(
+      0 => 'field_rest_cuisine',
+      1 => 'field_rest_type',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-restaurant field-group-fieldset',
+        'required_fields' => 1,
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_restaurant|node|property|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
@@ -637,10 +716,13 @@ function hotelsdb_content_types_field_group_info() {
   t('Contracts');
   t('Convention Center');
   t('FairHotels');
+  t('Food Service');
+  t('Hotel Amenities');
   t('Loans and Grants');
   t('Location');
   t('Ownership');
   t('Property');
+  t('Restaurant');
   t('Tabs');
 
   return $field_groups;
